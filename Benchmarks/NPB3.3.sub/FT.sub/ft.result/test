@@ -134,14 +134,6 @@ void appft(int niter, double *total_time, logical *verified)
    printf(" %26s =%9.4f\n", "fftXYZ                    ", timer_read(15));
    printf(" %26s =%9.4f\n", "Benchmark time            ", *total_time);
 }
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
-}
 static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
 {
    double a = z1.real;
@@ -154,14 +146,6 @@ static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
    double imag = (b*c-a*d)/divisor;
    dcomplex result = (dcomplex) {real, imag};
    return result;
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
 {
@@ -266,22 +250,6 @@ void c_print_results(char *name, char class, int n1, int n2, int n3, int niter, 
    printf(" cmp@aces.snu.ac.kr\n");
    printf(" http://aces.snu.ac.kr\n");
    printf("--------------------------------------\n");
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 static double elapsed_time(void)
 {
@@ -408,14 +376,6 @@ static void Swarztrauber(int is, int m, int vlen, int n, int xd1, void *ox, dcom
    }
    if (timers_enabled)
       timer_stop(4);
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
 {
@@ -560,14 +520,6 @@ int main(int argc, char *argv[])
 
    return 0;
 }
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
-}
 static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
 {
    double a = z1.real;
@@ -647,22 +599,6 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
    
    
    printf("\n--------------------------------------\n"" Please send all errors/feedbacks to:\n"" Center for Manycore Programming\n"" cmp@aces.snu.ac.kr\n"" http://aces.snu.ac.kr\n""--------------------------------------\n\n");
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 double randlc(double *x, double a)
 {
@@ -904,6 +840,7 @@ l99998:      ;
       kt++;
       goto l99998;
 l99999:      ;
+
       *verified = false;
 _break_1:      ;
 
@@ -912,14 +849,6 @@ _break_1:      ;
       else
          printf(" Verification test for FT failed\n");
    }
-}
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 static dcomplex dcmplx_div(dcomplex z1, dcomplex z2)
 {
