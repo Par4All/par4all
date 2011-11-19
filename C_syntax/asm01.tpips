@@ -1,3 +1,18 @@
 delete asm01
+
 create asm01 asm01.c
 display PRINTED_FILE[main]
+
+# Try to make sure that the split_parser still works... but it does not yet
+create asm01 while.c
+display PRINTED_FILE[main]
+close
+
+# It is not possible to check the warnings because the database is deleted first
+#echo
+#echo Warnings:
+#echo
+
+#shell cat asm01.database/Warnings
+
+quit

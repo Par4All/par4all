@@ -1,5 +1,5 @@
 int main() {
-     int t1 = 1
+  int t1 = 1;
      register int *p1 asm ("r0") = &t1;
      register int *p2 asm ("r1") = &t1;
      register int *result asm ("r0");
