@@ -129,13 +129,21 @@ static bool current_function_is_static_p = false;
      /* Should add the current line number of the lexer */
 
      pips_user_warning("Corrupted or non-supported C constructs.\n"
-		       "Compile your code first, set proper PIPS option.\n"
+		       "Make sure your code is compiled first, set proper PIPS option, "
+		       "CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS or "
+		       "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS.\n"
 		       "FI: I do not have time to look it up right now, sorry.\n");
 
-     pips_internal_error("Not implemented yet\n."
-			 " Should reset all static variables.\n");
+     //pips_internal_error("Not implemented yet\n."
+     //		 " Should reset all static variables.\n");
      /* Reset all static variables */
      /* Close all open files: at least three... */
+     extern string current_file_name;
+     csplit_close_files(current_file_name);
+     csplit_error_handler();
+
+     // See syn_reset_lex() as in ParserError, the error routine for the Fortran parser
+
      pips_user_error(s);
    }
 
@@ -172,6 +180,12 @@ static stack TypedefStack = stack_undefined;
    }
    else
      pips_internal_error("TypedefStack is not empty");
+ }
+
+ void ForceResetTypedefStack()
+ {
+     stack_free(&TypedefStack);
+     TypedefStack = stack_undefined;
  }
 
 /* If any of the strings is undefined, we are in trouble. If not,
@@ -2216,7 +2230,7 @@ attributes_with_asm:
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
                         {
 			  free_partial_signature($5);
-			  csplit_parser_error("ASM extensions not implemented");
+			  csplit_parser_error("ASM extensions not implemented\n");
 			  $$ = string_undefined;
 			}
 ;
