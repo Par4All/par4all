@@ -1450,21 +1450,17 @@ void get_data(char filename[])
 OUT REGIONS for compute and get_data
 
 
-//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 void compute()
 {
 
-//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
    // BEGIN BLOCK
@@ -1479,8 +1475,7 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 kernel2:   p4a_kernel_launcher_compute_1(save, space);
