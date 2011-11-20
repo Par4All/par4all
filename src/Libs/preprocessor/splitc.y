@@ -129,10 +129,10 @@ static bool current_function_is_static_p = false;
      /* Should add the current line number of the lexer */
 
      pips_user_warning("Corrupted or non-supported C constructs.\n"
-		       "Make sure your code is compiled first, set proper PIPS option, "
+		       "Make sure your code is compiled by gcc -stc=c99 first, "
+		       "and/or set proper PIPS option, "
 		       "CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS or "
-		       "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS.\n"
-		       "FI: I do not have time to look it up right now, sorry.\n");
+		       "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS.\n");
 
      //pips_internal_error("Not implemented yet\n."
      //		 " Should reset all static variables.\n");
@@ -142,7 +142,13 @@ static bool current_function_is_static_p = false;
      csplit_close_files(current_file_name);
      csplit_error_handler();
 
-     // See syn_reset_lex() as in ParserError, the error routine for the Fortran parser
+     // See syn_reset_lex() -> syn_restart(syn_in); as in ParserError,
+     // the error routine for the Fortran parser, but its lexer is
+     // made of two passes, a Fortran-specific first pass and a lex second pass
+     // syn_restart(splitc_in);
+     // yy_flush_buffer(); //YY_FLUSH_BUFFER;
+     splitc_lex_destroy(); // trial and error
+     // BEGIN(0); we might have to reset the state of lex
 
      pips_user_error(s);
    }
