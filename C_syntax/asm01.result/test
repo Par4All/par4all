@@ -1,0 +1,12 @@
+
+Let us try with "asm01.c" 
+
+
+Let us try again, but this time with "while.c" 
+
+int main()
+{
+   int c = 5;
+   while (c>0)
+      c -= 1;
+}

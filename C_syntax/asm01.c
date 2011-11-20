@@ -1,3 +1,5 @@
+/* Not compatible with -std=c99 because of asm extension */
+
 # 1 "./all_privates.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
