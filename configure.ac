@@ -142,6 +142,9 @@ AX_ARG_ENABLE([pyps],
 			 AC_PYTHON_DEVEL([2.5])
 			 AX_CHECK_PROG([ipython])
 			 AX_DEPENDS([pyps],[swig python_devel ipython])
+			 AX_DEPENDS([tpips2pyps],[python_devel])
+			 # for ax_extra_scripts
+			 AS_IF([AX_HAS([tpips2pyps])],[ax_enable_tpips2pyps=tpips2pyps])
 			]
 )
 AC_SUBST(pypsruntimedir,[$\{datarootdir\}/runtime])
@@ -207,7 +210,7 @@ AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
 )
 
 # set the optionnal scripts dirs there
-AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode"])
+AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode $ax_enable_tpips2pyps"])
 
 
 # register autoconf translated files here
