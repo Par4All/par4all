@@ -41,6 +41,20 @@ int main(void)
    **pp = 0;
    return 0;
 }
+static int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
+   int r = rand();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", r);
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2==1;
+}
 
 POINTS-TO
 
@@ -112,6 +126,27 @@ int main(void)
    return 0;
 }
 
+// Points To IN: none
+
+
+// Points To OUT: none
+
+static int alea(void)
+{
+
+// Points To: none
+
+   int r = rand();
+
+// Points To: none
+
+   printf("%d\n", r);
+
+// Points To: none
+
+   return rand()%2==1;
+}
+
 PROPER  EFFECTS WITH POINTS TO
 
 int main(void)
@@ -153,6 +188,20 @@ int main(void)
    // should generate an error while analyzing?
    **pp = 0;
    return 0;
+}
+static int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
+   int r = rand();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", r);
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2==1;
 }
 
  *********************** Use-Def Chains *********************
