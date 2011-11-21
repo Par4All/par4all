@@ -69,5 +69,6 @@ void ResetTypedefStack();
 extern char * splitc_text;
 extern FILE * splitc_in;
 extern int splitc_lex();
+extern int splitc_lex_destroy();
 extern int splitc_parse();
 extern void splitc_error(const char*);
