@@ -5,7 +5,7 @@ int main()
    // This is an overcommented for loop :-)
    /* after inc */
    for (i = 0;i<5;i++)                                                  /*0015*/
-      /* after cond *//* before inc */
+      /* before init *//* after init *//* before cond *//* after cond *//* before inc */
       j++;                                                              /*0015*/
    /* after the loop */
    

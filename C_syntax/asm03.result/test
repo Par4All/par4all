@@ -1,4 +1,34 @@
 
-Create fails because of asm gcc extension
+With simple asm extension
 
+int main()
+{
+   register int r1 = 1 __asm("%eax");
+   register int r2 __asm("%ecx");
+   __asm("movl %eax, %ecx");
+   printf("%d\n", r1);
+   return 0;
+}
+
+Conservative effects
+
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <    is written>: r1
+   register int r1 = 1 __asm("%eax");
+   register int r2 __asm("%ecx");
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   __asm("movl %eax, %ecx");
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: r1 stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", r1);
+   return 0;
+}
 
