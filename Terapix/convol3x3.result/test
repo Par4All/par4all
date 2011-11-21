@@ -571,10 +571,10 @@ l99992:         launcher_0(255+1, *caillou0, *img0, *img_out0);
 }
 
 //  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=8, I_26==256}>
-//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=I_26+1, I_26==256}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=257,
+//    I_26==256}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=125, 0<=PHI2,
-//    PHI2+1<=I_26, I_26==256}>
+//    PHI2<=255, I_26==256}>
 
 void launcher_0(int I_26, int caillou0[9], int img0[128][258], int img_out0[126][256])
 {
@@ -582,19 +582,19 @@ void launcher_0(int I_26, int caillou0[9], int img0[128][258], int img_out0[126]
    int ki, kj, v3, x, y;
 
 //  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=8, I_26==256}>
-//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=I_26+1, I_26==256}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=257,
+//    I_26==256}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=125, 0<=PHI2,
-//    PHI2+1<=I_26, I_26==256}>
+//    PHI2<=255, I_26==256}>
 
 l99992:
    for(x = 0; x <= 125; x += 1)
 
 //  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=8, I_26==256, 0<=x,
 //    x<=125}>
-//  <img0[PHI1][PHI2]-R-EXACT-{x<=PHI1, PHI1<=x+2, 0<=PHI2,
-//    PHI2<=I_26+1, I_26==256, 0<=x, x<=125}>
-//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==x, 0<=PHI2, PHI2+1<=I_26,
+//  <img0[PHI1][PHI2]-R-EXACT-{x<=PHI1, PHI1<=x+2, 0<=PHI2, PHI2<=257,
+//    I_26==256, 0<=x, x<=125}>
+//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==x, 0<=PHI2, PHI2<=255,
 //    I_26==256, 0<=x, x<=125}>
 
 l99993:
