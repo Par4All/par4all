@@ -1256,6 +1256,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* _POSIX_C_SOURCE >= 199309L */
   {NANOSLEEP_FUNCTION_NAME,                 safe_c_effects},
 
+  /* assembly code */
+  {ASM_FUNCTION_NAME,                       make_anywhere_read_write_memory_effects},
+
   /* PIPS internal intrinsics */
   {PIPS_MEMORY_BARRIER_OPERATOR_NAME,       make_anywhere_read_write_memory_effects},
   {PIPS_IO_BARRIER_OPERATOR_NAME,           make_io_read_write_memory_effects},

@@ -960,14 +960,14 @@ expression:
 			}
 |   paren_comma_expression
 		        {
-			  /* paren_comma_expression is a list of
-			     expressions, maybe reduced to one */
-			  if(!string_undefined_p(expression_comment)) {
-			    if(strcmp(expression_comment, "")!=0)
-			      pips_user_warning("comment \"%s\" is lost\n", expression_comment);
-			  }
-			  expression_comment = pop_current_C_comment();
-			  expression_line_number = pop_current_C_line_number();
+                         /* paren_comma_expression is a list of
+                            expressions, maybe reduced to one */
+                         if(!string_undefined_p(expression_comment)) {
+                           if(strcmp(expression_comment, "")!=0)
+                             pips_user_warning("comment \"%s\" is lost\n", expression_comment);
+                         }
+                         expression_comment = pop_current_C_comment();
+                         expression_line_number = pop_current_C_line_number();
 			  $$ = MakeCommaExpression($1);
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
@@ -1758,8 +1758,24 @@ statement_without_pragma:
                         {
 			  CParserError("GOTO * exp not implemented\n");
 			}
-|   TK_ASM asmattr TK_LPAREN asmtemplate asmoutputs TK_RPAREN TK_SEMICOLON
-                        { CParserError("ASM not implemented\n"); }
+|   TK_ASM asmattr TK_LPAREN string_constant asmoutputs TK_RPAREN TK_SEMICOLON
+                        { 
+							call c  = make_call(
+									entity_intrinsic(ASM_FUNCTION_NAME),
+									CONS(EXPRESSION,entity_to_expression(
+										make_C_constant_entity($4, is_basic_string, 0)
+									),NIL)
+								);
+			  				free($4);
+							$$ = make_statement(
+								entity_empty_label(),
+								get_current_C_line_number(),
+								STATEMENT_ORDERING_UNDEFINED,
+			   					get_current_C_comment(),
+								make_instruction_call(c),
+								NIL, string_undefined,
+			   					empty_extensions());
+						}
 |   TK_MSASM
                         { CParserError("ASM not implemented\n"); }
 |   error location TK_SEMICOLON
@@ -2766,6 +2782,24 @@ declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
 			  /* Update the type of the direct_decl entity with pointer_opt and attributes*/
 			  if (!type_undefined_p($1))
 			    UpdatePointerEntity($2,$1,$3);
+			  else if(!entity_undefined_p($2) &&!ENDP($3) ) {
+                    if(type_undefined_p(entity_type($2))) {
+						entity_type($2) = make_type_variable(
+							make_variable(
+								basic_undefined,
+								NIL,
+								$3
+							)
+						);
+                    }
+					else if( type_variable_p(entity_type($2) ) ){
+		                variable v = type_variable(entity_type($2));
+						variable_qualifiers(v)=gen_nconc(variable_qualifiers(v),$3);
+					}
+					else  {
+						pips_user_warning("some _asm(..) attributes are going to be lost for entity `%s'\n",entity_name($2));
+					}
+              }
 			  $$ = $2;
 			}
 ;
@@ -3359,7 +3393,7 @@ attributes_with_asm:
 |   attribute attributes_with_asm
                         { $$ = CONS(QUALIFIER,$1,$2); }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
-                        { CParserError("ASM not implemented\n"); }
+                        { $$ = CONS(QUALIFIER,make_qualifier_asm($3), $5);}
 ;
 
 attribute:
@@ -3497,27 +3531,22 @@ paren_attr_list_ne:
 /*** GCC TK_ASM instructions ***/
 asmattr:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_VOLATILE  asmattr
                         { CParserError("ASM not implemented\n"); }
 |   TK_CONST asmattr
                         { CParserError("ASM not implemented\n"); }
 ;
-asmtemplate:
-    one_string_constant
-                        { CParserError("ASM not implemented\n"); }
-|   one_string_constant asmtemplate
-                        { CParserError("ASM not implemented\n"); }
-;
+
 asmoutputs:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmoperands asminputs
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoperands:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   asmoperandsne
                         { CParserError("ASM not implemented\n"); }
 ;
@@ -3535,13 +3564,13 @@ asmoperand:
 ;
 asminputs:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmoperands asmclobber
                         { CParserError("ASM not implemented\n"); }
 ;
 asmclobber:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmcloberlst_ne
                         { CParserError("ASM not implemented\n"); }
 ;

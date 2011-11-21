@@ -2235,9 +2235,15 @@ attributes_with_asm:
                         { $$ = build_signature($1, $2, NULL); }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
                         {
+/* skip the asm declaration ... this is relatively dangerous because it can change the symbol name. Yet it is ok to skip it at split level */
+#if 0
 			  free_partial_signature($5);
 			  csplit_parser_error("ASM extensions not implemented\n");
 			  $$ = string_undefined;
+#else
+                        { $$ = build_signature($5, NULL, NULL); }
+
+#endif
 			}
 ;
 

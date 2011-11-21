@@ -1773,6 +1773,10 @@ remove_a_control_from_a_list_and_relink_direction;
  */
 #define FCD_IGNORE_PREFIX       "HPFC_IGNORE_FCD_"
 
+/* __asm function
+ */
+#define ASM_FUNCTION_NAME "__asm"
+
 /* soft block->sequence transition
  */
 #define is_instruction_block is_instruction_sequence

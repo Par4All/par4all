@@ -538,6 +538,8 @@ static string c_qualifier_string(list l)
                 break;
             case is_qualifier_auto:
                 result = concatenate(result,"auto ",NULL);
+            case is_qualifier_asm:
+                result = concatenate(result,"__asm(",qualifier_asm(q),") ", NULL);
                 break;
         }
     }
