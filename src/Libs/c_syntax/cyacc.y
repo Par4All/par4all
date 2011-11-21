@@ -166,6 +166,17 @@ void reset_expression_comment()
   expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 }
 
+static statement add_expression_comment(statement s) {
+  if(!string_undefined_p(expression_comment)) {
+	char *tmp = statement_comments(s);
+	asprintf(&statement_comments(s),"%s%s",statement_comments(s),expression_comment);
+	free(tmp);
+    free(expression_comment);
+    expression_comment=string_undefined;
+  }
+  return s;
+}
+
 
 /* The scope is moved up the scope tree and a NULL is return when
    there are no more scope to explore. */
@@ -962,11 +973,13 @@ expression:
 		        {
                          /* paren_comma_expression is a list of
                             expressions, maybe reduced to one */
-                         if(!string_undefined_p(expression_comment)) {
-                           if(strcmp(expression_comment, "")!=0)
-                             pips_user_warning("comment \"%s\" is lost\n", expression_comment);
-                         }
-                         expression_comment = pop_current_C_comment();
+						 if(string_undefined_p(expression_comment))
+						   expression_comment=pop_current_C_comment();
+					     else {
+						   char *tmp = expression_comment;
+						   asprintf(&expression_comment,"%s%s",expression_comment, pop_current_C_comment());
+						   free(tmp);
+						 }
                          expression_line_number = pop_current_C_line_number();
 			  $$ = MakeCommaExpression($1);
 			}
@@ -1552,15 +1565,19 @@ statement_without_pragma:
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
 							   make_empty_block_statement()));
 			  pips_assert("statement is a test", statement_test_p($$));
-                          statement_comments($$) = pop_current_C_comment();
-			  statement_number($$) = pop_current_C_line_number();
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
+			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = add_expression_comment($$);
 			}
 |   TK_IF paren_comma_expression statement TK_ELSE statement
 	                {
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2),$3,$5));
 			  pips_assert("statement is a test", statement_test_p($$));
-                          statement_comments($$) = pop_current_C_comment();
-			  statement_number($$) = pop_current_C_line_number();
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
+			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = add_expression_comment($$);
 			}
 |   TK_SWITCH
                         {
@@ -1574,11 +1591,12 @@ statement_without_pragma:
 			}
     statement
                         {
-			  string sc = pop_current_C_comment();
-			  int sn = pop_current_C_line_number();
 
 			  $$ = MakeSwitchStatement($5);
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = add_expression_comment($$);
 			  stack_pop(SwitchGotoStack);
 			  stack_pop(SwitchControllerStack);
 			  stack_pop(LoopStack);
@@ -1595,6 +1613,7 @@ statement_without_pragma:
 			  pips_assert("While loop body consistent",statement_consistent_p($4));
 			  $$ = MakeWhileLoop($3,$4,true);
 			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = add_expression_comment($$);
 			  stack_pop(LoopStack);
 			}
 |   TK_DO
@@ -1624,6 +1643,11 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloop($2, $4, $6, $9);
+			  if(!string_undefined_p(expression_comment)) {
+			  	char *tmp = statement_comments($$);
+			  	asprintf(&statement_comments($$),"%s%s",statement_comments($$),expression_comment);
+				free(tmp);
+			  }
 			}
 |   for_clause /* A C99 for loop with a declaration in it */
                         {
@@ -1644,6 +1668,11 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloopWithIndexDeclaration($3, $4, $6, $9);
+			  if(!string_undefined_p(expression_comment)) {
+			  	char *tmp = statement_comments($$);
+			  	asprintf(&statement_comments($$),"%s%s",statement_comments($$),expression_comment);
+				free(tmp);
+			  }
 			  ExitScope();
 			}
 |   label statement
