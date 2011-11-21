@@ -168,10 +168,14 @@ void reset_expression_comment()
 
 static statement add_expression_comment(statement s) {
   if(!string_undefined_p(expression_comment)) {
-	char *tmp = statement_comments(s);
-	asprintf(&statement_comments(s),"%s%s",statement_comments(s),expression_comment);
-	free(tmp);
-    free(expression_comment);
+    if(!empty_comments_p(statement_comments(s))) {
+	  char *tmp = statement_comments(s);
+	  asprintf(&statement_comments(s),"%s%s",statement_comments(s),expression_comment);
+	  free(tmp);
+      free(expression_comment);
+    }
+    else
+      statement_comments(s) = expression_comment;
     expression_comment=string_undefined;
   }
   return s;
