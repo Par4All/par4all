@@ -200,6 +200,7 @@ static void save_expression_comment_as_statement_comment() {
 static statement flush_statement_comment(statement s) {
   s=flush_expression_comment(s); // should not be necessary 
   if(!ENDP(all_expression_comments_as_statement_comments)) {
+    pips_assert("not on a block",!statement_block_p(s));
     all_expression_comments_as_statement_comments = gen_nreverse(all_expression_comments_as_statement_comments);
     char * comments = list_to_string(all_expression_comments_as_statement_comments);
     if(!empty_comments_p(statement_comments(s))) {
@@ -1642,7 +1643,7 @@ statement_without_pragma:
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
-			  $$ = flush_statement_comment($$);
+			  //$$ = flush_statement_comment($$); SG too dangerous, maybe on a block
 			  stack_pop(SwitchGotoStack);
 			  stack_pop(SwitchControllerStack);
 			  stack_pop(LoopStack);
