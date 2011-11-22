@@ -30,7 +30,6 @@ void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, s
    const char *csrc = d2_offset*element_size+(char *) host_address;
    for(i = 0; i <= d1_block_size-1; i += 1)
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void P4A_scmp_dealloc(void *dest)
@@ -70,9 +69,14 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
                   spreading_signal1[i*8+j] = ovsf_code_user1[j];
       }
       else {
+         
+         /* pdebug_info("main path delay: 0\n"); */
          channel_delay1 = (int32_t) (rand()%6);
+         /* pdebug_info("path 1 delay: %i\n",channel_delay1); */
          channel_delay2 = (int32_t) (rand()%6);
+         /* pdebug_info("path 2 delay: %i\n",channel_delay2); */
          channel_delay3 = (int32_t) (rand()%6);
+         /* pdebug_info("path 3 delay: %i\n",channel_delay3); */
          channel_delay4 = (int32_t) (rand()%6);
          /* pdebug_info("path 4 delay: %i\n",channel_delay4); */
          //printf("%d %d %d %d\n",channel_delay1,channel_delay2,channel_delay3,channel_delay4);		
@@ -374,7 +378,6 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
                while (j<6) {
 
                   if (retro_loop_count>6) {
-
                      j_bkp = j;
                      j = 6;
                   }
@@ -559,6 +562,8 @@ int main()
    //demux
    int32_t I_user[8/2*8*sizeof(int32_t)+6/2];
    int32_t Q_user[8/2*8*sizeof(int32_t)+6/2];
+   
+   //qpsk
    float Signal_I[(8/2*8*sizeof(int32_t)+6/2)*4];
    float Signal_Q[(8/2*8*sizeof(int32_t)+6/2)*4];
    
@@ -568,6 +573,7 @@ int main()
    float x_buffer_user1[8];
    //buffer for convolution
    int32_t ptr_x_buffer_user1;
+   //ptr on buffer
    float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4];
    float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4];
    float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4];
@@ -713,6 +719,34 @@ int main()
             ;
       }
    }
+   //Debug
+   /* pdebug_memory("input image\n"); */
+   /* for(i=0;i<sizeY;i++){ */
+   /*   for(j=0;j<sizeX;j++){ */
+   /*     pdebug_memory("%d\t",image_in[i*sizeX+j]); */
+   /*   } */
+   /*   pdebug_memory("\n"); */
+   /* } */
+   
+   /* pdebug_memory("output image\n"); */
+   /* for(i=0;i<sizeY;i++){ */
+   /*   for(j=0;j<sizeX;j++){ */
+   /*     pdebug_memory("%d\t",image_out[i*sizeX+j]); */
+   /*   } */
+   /*   pdebug_memory("\n"); */
+   /* } */
+   
+   //WARNING NOT TO BE PORTED TO SESAM just to check result with diff
+   /*  FILE * output_file= fopen("output_image","w"); */
+   /*   if(output_file==NULL){ printf("ERROR when opening output file\n");exit(EXIT_FAILURE);} */
+   /*   fwrite(image_out, sizeof(unsigned char), sizeX*sizeY,output_file); */
+   /*   fclose(output_file); */
+   
+   /*   FILE * input_file= fopen("input_image","w"); */
+   /*   if(input_file==NULL){ printf("ERROR when opening input file\n");exit(EXIT_FAILURE);} */
+   /*   fwrite(image_in, sizeof(unsigned char), sizeX*sizeY,input_file); */
+   /*   fclose(input_file); */
+   
    return 0;
 }
 void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address)
@@ -747,7 +781,6 @@ void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, s
    const char *csrc = d2_offset*element_size+(char *) host_address;
    for(i = 0; i <= d1_block_size-1; i += 1)
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void P4A_scmp_dealloc(void *dest)
@@ -787,9 +820,14 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
                   spreading_signal1[i*8+j] = ovsf_code_user1[j];
       }
       else {
+         
+         /* pdebug_info("main path delay: 0\n"); */
          channel_delay1 = (int32_t) (rand()%6);
+         /* pdebug_info("path 1 delay: %i\n",channel_delay1); */
          channel_delay2 = (int32_t) (rand()%6);
+         /* pdebug_info("path 2 delay: %i\n",channel_delay2); */
          channel_delay3 = (int32_t) (rand()%6);
+         /* pdebug_info("path 3 delay: %i\n",channel_delay3); */
          channel_delay4 = (int32_t) (rand()%6);
          /* pdebug_info("path 4 delay: %i\n",channel_delay4); */
          //printf("%d %d %d %d\n",channel_delay1,channel_delay2,channel_delay3,channel_delay4);		
@@ -1091,7 +1129,6 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
                while (j<6) {
 
                   if (retro_loop_count>6) {
-
                      j_bkp = j;
                      j = 6;
                   }
@@ -1276,6 +1313,8 @@ int main()
    //demux
    int32_t I_user[32*4+2+1];
    int32_t Q_user[32*4+2+1];
+   
+   //qpsk
    float Signal_I[128*4+11+1];
    float Signal_Q[128*4+11+1];
    
@@ -1285,6 +1324,7 @@ int main()
    float x_buffer_user1[8];
    //buffer for convolution
    int32_t ptr_x_buffer_user1;
+   //ptr on buffer
    float channel_I[128*4+11+1];
    float channel_Q[128*4+11+1];
    float FIR2_I_user1[128*4+11+1];
@@ -1711,5 +1751,33 @@ int main()
             ;
       }
    }
+   //Debug
+   /* pdebug_memory("input image\n"); */
+   /* for(i=0;i<sizeY;i++){ */
+   /*   for(j=0;j<sizeX;j++){ */
+   /*     pdebug_memory("%d\t",image_in[i*sizeX+j]); */
+   /*   } */
+   /*   pdebug_memory("\n"); */
+   /* } */
+   
+   /* pdebug_memory("output image\n"); */
+   /* for(i=0;i<sizeY;i++){ */
+   /*   for(j=0;j<sizeX;j++){ */
+   /*     pdebug_memory("%d\t",image_out[i*sizeX+j]); */
+   /*   } */
+   /*   pdebug_memory("\n"); */
+   /* } */
+   
+   //WARNING NOT TO BE PORTED TO SESAM just to check result with diff
+   /*  FILE * output_file= fopen("output_image","w"); */
+   /*   if(output_file==NULL){ printf("ERROR when opening output file\n");exit(EXIT_FAILURE);} */
+   /*   fwrite(image_out, sizeof(unsigned char), sizeX*sizeY,output_file); */
+   /*   fclose(output_file); */
+   
+   /*   FILE * input_file= fopen("input_image","w"); */
+   /*   if(input_file==NULL){ printf("ERROR when opening input file\n");exit(EXIT_FAILURE);} */
+   /*   fwrite(image_in, sizeof(unsigned char), sizeX*sizeY,input_file); */
+   /*   fclose(input_file); */
+   
    return 0;
 }
