@@ -76,7 +76,6 @@ void Calc_steervect(int nth, int nv, int ntt, int nsa, float SubarraySpacing, fl
 
          for(rec = 0; rec <= ntt-1; rec += 1)
             for(ant = 0; ant <= nsa-1; ant += 1) {
-
                angldir = AngleCarrier_rad+theta+(SubarraySpacing*ant-CarrierSpeed*Tr*rec)*sin(AngleCarrier_rad)/TargetDistance;
                delta_dist = -V*Tr*rec;
                deph_a = Kdeph*SubarraySpacing*ant*cos(angldir);
@@ -284,9 +283,7 @@ void Mat_Invert(int ntt, int nsa, Cplfloat In[ntt*nsa][ntt*nsa], Cplfloat Out[nt
             coef[0] = inv[k][i][0];
             coef[1] = inv[k][i][1];
             for(l = i; l <= 2*nsa*ntt-1; l += 1) {
-
                inv[k][l][0] -= coef[0]*inv[i][l][0]-coef[1]*inv[i][l][1];
-
                inv[k][l][1] -= coef[0]*inv[i][l][1]+coef[1]*inv[i][l][0];
             }
          }
@@ -482,7 +479,6 @@ int THfloat2thint(float TH, int Nth, float Beamwidth)
 }
 int Vfloat2vint(float V, int Nv, float lambda, float Tr)
 {
-
    float Vmax = lambda/(4.*Tr);
    float Vgate = 2.*Vmax/((float) Nv);
    int v;
@@ -676,12 +672,10 @@ int main()
       for(i = 0; i <= Nraf-1; i += 1)
          if (Tr[i]<Trmin)
             Trmin = Tr[i];
-
       RecordPlots("PlotsOut.txt", 100*4, amb_out, 15, 2*20, 0.03/(2.*Trmin), 20, 5);
    }
 
    printf("STAP - end of program.\n# file 'PlotsOut.txt' generated.\n");
-
    return 0;
 }
 void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int tfac_L_RG, float tfac_K, float tfac_AVPWK, Cplfloat TOut[Nth][Nrg-tfac_L_RG+1][Nv-tfac_L_V+1])
@@ -694,7 +688,6 @@ void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int
    double S, Sc, T;
    double sqrAvPow;
    int IsMax;
-
    midRg = (tfac_L_RG-1)/2;
    midV = (tfac_L_V-1)/2;
    nb_neighb = tfac_L_RG*tfac_L_V-1;
@@ -717,7 +710,6 @@ void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int
                         IsMax = 0;
                      S += T;
                   }
-
             if (IsMax&&Sc>tfac_AVPWK*AvPower&&Sc>tfac_K*S/((double) nb_neighb))
                val = 1.*IsMax;
             else

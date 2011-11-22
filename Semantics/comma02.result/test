@@ -6,7 +6,6 @@ void comma02()
    int i;
    int j;
    int k;
-
    i = (j = 1, k = 2);
    
    //printf("%d\n", i);
@@ -34,7 +33,6 @@ void comma02()
    int k;
 
 //  T(i,j,k) {i==2, j==1, k==2}
-
 
    i = (j = 1, k = 2);
 

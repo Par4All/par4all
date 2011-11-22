@@ -27,7 +27,6 @@ void get_data(char filename[])
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "r"))==(void *) 0) {
       perror("Error loading file");
       exit(0);
@@ -81,14 +80,12 @@ void iteration(float_t space[501][501], float_t save[501][501])
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
 #pragma omp parallel for private(j)
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 int main(int argc, char *argv[])
@@ -119,7 +116,6 @@ void write_data(char filename[])
    int i, j;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "w"))==(void *) 0) {
       perror("Error opening file");
       exit(0);

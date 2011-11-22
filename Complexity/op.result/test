@@ -94,7 +94,6 @@ int main()
 
 //  P(a,b,c,z) {a==b}
 
-
    if ((z==a||z==b)&&z>1)
 
 //  P(a,b,c,z) {a==b, a==z, 2<=a}
@@ -186,7 +185,6 @@ int main()
 //                                                                    2 (STMT)
       a = b;
 //                                                                   12 (TEST)
-
    if ((z==a||z==b)&&z>1)
 //                                                                    4 (STMT)
       z = z%c;

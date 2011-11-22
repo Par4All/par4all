@@ -6,7 +6,6 @@ void sequence04()
    int i = 4;
    if (i%2==0)
       goto l100;
-
    i = i+10;
    {
       int i = 0;
@@ -25,7 +24,6 @@ void sequence04()
    int i_;
    int i = 4;
    if (i%2==0) goto l100;
-
    i = i+10;
    i_ = 0;
 

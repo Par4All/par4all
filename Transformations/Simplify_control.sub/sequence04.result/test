@@ -4,6 +4,8 @@
 void sequence04()
 {
    int i = 4;
+   
+   /* This assert cannot be cleaned up using preconditions only */
    4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
 
    return;
@@ -14,6 +16,8 @@ void sequence04()
 void sequence04()
 {
    int i = 4;
+   
+   /* This assert cannot be cleaned up using preconditions only */
    4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
 
    return;
@@ -25,6 +29,8 @@ void sequence04()
 {
 //             <    is written>: i
    int i = 4;
+   
+   /* This assert cannot be cleaned up using preconditions only */
    4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
 
    return;
@@ -35,6 +41,8 @@ void sequence04()
 void sequence04()
 {
    int i = 4;
+   
+   /* This assert cannot be cleaned up using preconditions only */
    (void) 0;
 
    return;
@@ -45,6 +53,8 @@ void sequence04()
 void sequence04()
 {
    int i = 4;
-
+   
+   /* This assert cannot be cleaned up using preconditions only */
+   
    return;
 }

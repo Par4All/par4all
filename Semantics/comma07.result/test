@@ -4,7 +4,6 @@ Parsed printed file for "comma07"
 int comma07()
 {
    int i, j;
-
    i = (j = 1, 2);
    i = 3, j = 4;
 
@@ -16,7 +15,6 @@ Code for "comma07"
 int comma07()
 {
    int i, j;
-
    i = (j = 1, 2);
    i = 3, j = 4;
 
@@ -29,7 +27,6 @@ int comma07()
 {
    int i, j;
 //             <    is written>: i j
-
    i = (j = 1, 2);
 //             <    is written>: i j
    i = 3, j = 4;
@@ -51,7 +48,6 @@ int comma07()
    int i, j;
 
 //  T(i,j) {i==2, j==1}
-
 
    i = (j = 1, 2);
 

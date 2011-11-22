@@ -7,7 +7,6 @@ void comma04()
    int j;
    int k;
    int l;
-
    i = (j = 2, k = 3, l = j*k);
    
    // printf("%d %d %d %d\n", i, j, k, l);
@@ -39,7 +38,6 @@ void comma04()
    int l;
 
 //  T(i,j,k,l) {i==6, j==2, k==3, l==6}
-
 
    i = (j = 2, k = 3, l = j*k);
 

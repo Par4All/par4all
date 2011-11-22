@@ -7,11 +7,9 @@ void compute()
 kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
@@ -23,11 +21,9 @@ void compute()
 kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
@@ -39,11 +35,9 @@ void compute()
 kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
@@ -60,7 +54,6 @@ kernel1:
          F_0 = space[i-1][j]+space[i+1][j];
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][j+1];
-
          save[i][j] = 0.25f*F_2;
       }
    for(i = 1; i <= 62; i += 1)
@@ -68,7 +61,6 @@ kernel1:
          F_3 = save[i-1][j]+save[i+1][j];
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][j+1];
-
          space[i][j] = 0.25f*F_5;
       }
 }

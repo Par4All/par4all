@@ -92,7 +92,6 @@ int main(void)
 
 //  T() {0==-1}
 
-
       exit(1);
 
 //  T(b,ok,x,y) {b+x#init+y==b#init+x+y#init,
@@ -160,7 +159,6 @@ int main(void)
 
 //  P(b,ok,x,y) {}
 
-
       exit(1);
 
 //  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
@@ -225,7 +223,6 @@ int main(void)
    if (!(!b&&ok&&x==0&&y==0))
 
 //  T() {0==-1}
-
 
       exit(1);
 
@@ -295,7 +292,6 @@ int main(void)
    if (!(!b&&ok&&x==0&&y==0))
 
 //  P(b,ok,x,y) {}
-
 
       exit(1);
 

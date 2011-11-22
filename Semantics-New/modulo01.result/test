@@ -17,7 +17,6 @@ int main()
 
 //  T(i,j) {i==5, i#init==4, j==0}
 
-
    j = i++%2;
 
 //  T(i,k) {i==6, i#init==5, j==0, k==0}
@@ -52,7 +51,6 @@ int main()
    int j, k;
 
 //  P(i,j,k) {i==4}
-
 
    j = i++%2;
 

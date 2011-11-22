@@ -7,11 +7,9 @@ void compute()
 kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void get_data(char filename[])
@@ -19,7 +17,6 @@ void get_data(char filename[])
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "r"))==(void *) 0) {
       perror("Error loading file");
       exit(0);
@@ -78,7 +75,6 @@ void write_data(char filename[])
    int i, j;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "w"))==(void *) 0) {
       perror("Error opening file");
       exit(0);
@@ -105,7 +101,6 @@ kernel1:   launch_kernel1(save, space);
    for(i = 1; i <= 62; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 62; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void get_data(char filename[])
@@ -113,7 +108,6 @@ void get_data(char filename[])
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "r"))==(void *) 0) {
       perror("Error loading file");
       exit(0);
@@ -153,7 +147,6 @@ void kernel1(float_t save[64][64], float_t space[64][64], int i)
    //PIPS generated variable
    int j;
    for(j = 1; j <= 62; j += 1)
-
       save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
 void launch_kernel1(float_t save[64][64], float_t space[64][64])
@@ -191,7 +184,6 @@ void write_data(char filename[])
    int i, j;
    unsigned char c;
    FILE *fp;
-
    if ((fp = fopen(filename, "w"))==(void *) 0) {
       perror("Error opening file");
       exit(0);

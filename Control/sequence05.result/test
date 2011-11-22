@@ -6,7 +6,6 @@ void sequence05()
    int i = 4;
    if (i%2==0)
       goto l100;
-
    i = i+10;
 
 l100:   i = i+20;
@@ -29,7 +28,6 @@ void sequence05()
 {
    int i = 4;
    if (i%2==0) goto l100;
-
    i = i+10;
 
 l100:   ;
@@ -51,7 +49,6 @@ void sequence05()
    if (i%2==0)
       ;
    else
-
       i = i+10;
 
 l100:   ;
