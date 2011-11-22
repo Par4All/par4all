@@ -26,7 +26,6 @@ int main(int argc, char *argv[])
    icplx_t i;
 //             <    is written>: i.im i.re
    i = (icplx_t) {0, 1};
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: one
    int one = ((icplx_t) {0, 1}).im;
    return 0;
@@ -34,13 +33,11 @@ int main(int argc, char *argv[])
 
 Printed code with cumulated effects
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 int main(int argc, char *argv[])
 {
    icplx_t i;
 //             <    is written>: i.im i.re
    i = (icplx_t) {0, 1};
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: one
    int one = ((icplx_t) {0, 1}).im;
    return 0;

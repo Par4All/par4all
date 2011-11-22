@@ -7,11 +7,12 @@ struct complex  i()
 }
 int main()
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: im
-   int im = i().im;
-//             <    is read   >: im
-   return im;
+//             <    is written>: im1
+   int im1 = ((struct complex ) {0, 1}).im;
+//             <    is written>: im2
+   int im2 = i().im;
+//             <    is read   >: im1 im2
+   return im1+im2;
 }
 struct complex {
    int re;

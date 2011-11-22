@@ -9,6 +9,7 @@ struct complex i() {
 }
 
 main() {
- int im = i().im;
- return im;
+  int im1 = ((struct complex) {0, 1}).im;
+  int im2 = i().im;
+ return im1 + im2;
 }
