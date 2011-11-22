@@ -482,6 +482,7 @@ int THfloat2thint(float TH, int Nth, float Beamwidth)
 }
 int Vfloat2vint(float V, int Nv, float lambda, float Tr)
 {
+
    float Vmax = lambda/(4.*Tr);
    float Vgate = 2.*Vmax/((float) Nv);
    int v;
@@ -649,6 +650,8 @@ int main()
    FILE *fp;
 
    char *filename = "InputStimuli.txt";
+   
+   //Open input file
    if ((fp = fopen(filename, "rb"))==(void *) 0) {
       fprintf(stderr, "couldn't open \"%s\"!\n", filename);
       return 1;
@@ -678,6 +681,7 @@ int main()
    }
 
    printf("STAP - end of program.\n# file 'PlotsOut.txt' generated.\n");
+
    return 0;
 }
 void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int tfac_L_RG, float tfac_K, float tfac_AVPWK, Cplfloat TOut[Nth][Nrg-tfac_L_RG+1][Nv-tfac_L_V+1])
@@ -713,6 +717,7 @@ void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int
                         IsMax = 0;
                      S += T;
                   }
+
             if (IsMax&&Sc>tfac_AVPWK*AvPower&&Sc>tfac_K*S/((double) nb_neighb))
                val = 1.*IsMax;
             else
