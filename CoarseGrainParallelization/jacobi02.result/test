@@ -27,6 +27,7 @@ void get_data(char filename[])
    int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
+
    if ((fp = fopen(filename, "r"))==(void *) 0) {
       perror("Error loading file");
       exit(0);
@@ -118,6 +119,7 @@ void write_data(char filename[])
    int i, j;
    unsigned char c;
    FILE *fp;
+
    if ((fp = fopen(filename, "w"))==(void *) 0) {
       perror("Error opening file");
       exit(0);
