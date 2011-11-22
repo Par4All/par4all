@@ -1012,14 +1012,21 @@ expression:
 			}
 |   paren_comma_expression
 		        {
-				 /* paren_comma_expression is a list of
-					expressions, maybe reduced to one */
-				 if(empty_comments_p(expression_comment))
-				   expression_comment=pop_current_C_comment();
-				 else {
-				   char *tmp = expression_comment;
-				   asprintf(&expression_comment,"%s%s",expression_comment, pop_current_C_comment());
-				   free(tmp);
+                 char * ccc = pop_current_C_comment();
+                 if(!empty_comments_p(ccc)) {
+					 bool fullspace=true; for(const char *iter=ccc;*iter;++iter) if(!(fullspace=isspace(*iter))) break;
+					 if(fullspace) free(ccc);
+					 else {
+						 /* paren_comma_expression is a list of
+							expressions, maybe reduced to one */
+						 if(empty_comments_p(expression_comment))
+						   expression_comment=ccc;
+						 else {
+						   char *tmp = expression_comment;
+						   asprintf(&expression_comment,"%s%s",expression_comment, ccc);
+						   free(tmp);
+						 }
+					 }
 				 }
 				 expression_line_number = pop_current_C_line_number();
 			     $$ = MakeCommaExpression($1);
