@@ -4,7 +4,6 @@ int main()
    size_t nbytes;
    ssize_t bytes_read;
    int fd;
-
    nbytes = sizeof(buf);
    bytes_read = read(fd, buf, nbytes);
 }
@@ -17,7 +16,6 @@ int main()
    ssize_t bytes_read;
    int fd;
 //             <    is written>: nbytes
-
    nbytes = sizeof(buf);
 //             <may be read   >: __IO_EFFECTS:LUNS[*]
 //             <may be written>: buf[*] __IO_EFFECTS:LUNS[*]
