@@ -1,0 +1,70 @@
+
+PROPER  EFFECTS 
+
+int printf01()
+{
+//             <    is written>: i
+   int i = 3;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", i++);
+//             <    is read   >: i
+
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int printf01()
+{
+
+// Points To: none
+
+   int i = 3;
+
+// Points To: none
+
+
+   printf("%d\n", i++);
+
+// Points To: none
+
+
+   return i;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int printf01()
+{
+//             <    is written>: i
+   int i = 3;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", i++);
+//             <    is read   >: i
+
+   return i;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 10 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

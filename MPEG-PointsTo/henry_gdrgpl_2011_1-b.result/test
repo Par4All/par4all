@@ -1,0 +1,199 @@
+
+PROPER  EFFECTS 
+
+int main(void)
+{
+//             <    is written>: x
+   int x = 0;
+//             <    is written>: y
+   int y = 0;
+//             <    is read   >: y
+   while (y>=0) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "loop: x=%d y=%d\n", x, y);
+//             <    is read   >: x
+      if (x<=50)
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      else
+//             <    is read   >: y
+//             <    is written>: y
+         y--;
+//             <    is read   >: x
+//             <    is written>: x
+      x++;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   fprintf(stdout, "end: x=%d y=%d\n", x, y);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   int x = 0;
+
+// Points To: none
+
+   int y = 0;
+
+// Points To: none
+
+   while (y>=0) {
+
+// Points To: none
+
+      fprintf(stdout, "loop: x=%d y=%d\n", x, y);
+
+// Points To: none
+
+      if (x<=50)
+
+// Points To: none
+
+         y++;
+      else
+
+// Points To: none
+
+         y--;
+
+// Points To: none
+
+      x++;
+   }
+
+// Points To: none
+
+   fprintf(stdout, "end: x=%d y=%d\n", x, y);
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: x
+   int x = 0;
+//             <    is written>: y
+   int y = 0;
+//             <    is read   >: y
+   while (y>=0) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "loop: x=%d y=%d\n", x, y);
+//             <    is read   >: x
+      if (x<=50)
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      else
+//             <    is read   >: y
+//             <    is written>: y
+         y--;
+//             <    is read   >: x
+//             <    is written>: x
+      x++;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   fprintf(stdout, "end: x=%d y=%d\n", x, y);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 18 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	14 --> 19 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	14 --> 23 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	14 --> 25 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 16 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	15 --> 18 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	15 --> 20 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	15 --> 25 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 20 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	18 --> 18 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	18 --> 20 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	18 --> 23 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	18 --> 25 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	19 --> 23 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	20 --> 18 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	20 --> 20 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	20 --> 22 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	22 --> 18 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	22 --> 20 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	22 --> 25 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	23 --> 18 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	23 --> 19 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	23 --> 23 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	23 --> 25 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+
+****************** End of Dependence Graph ******************

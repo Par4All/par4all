@@ -1,0 +1,137 @@
+
+PROPER  EFFECTS 
+
+int main(int j, char **unused)
+{
+   double A[10];
+   int B[10];
+//             <    is written>: k
+   int k = 2;
+//             <    is read   >: j
+//             <    is written>: A[j++] j
+
+   A[j++] = 0.;
+//             <    is read   >: j
+//             <    is written>: B[j++] j
+   B[j++] = 0;
+//             <    is read   >: k
+//             <    is written>: B[1] k
+   B[1] = k++;
+//             <    is read   >: k
+//             <    is written>: A[1] k
+   A[1] = (double) k++;
+//             <    is read   >: j
+   return j;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+// Points To OUT:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+int main(int j, char **unused)
+{
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   double A[10];
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   int B[10];
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   int k = 2;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+   A[j++] = 0.;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   B[j++] = 0;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   B[1] = k++;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   A[1] = (double) k++;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   return j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(int j, char **unused)
+{
+   double A[10];
+   int B[10];
+//             <    is written>: k
+   int k = 2;
+//             <    is read   >: j
+//             <    is written>: A[j++] j
+
+   A[j++] = 0.;
+//             <    is read   >: j
+//             <    is written>: B[j++] j
+   B[j++] = 0;
+//             <    is read   >: k
+//             <    is written>: B[1] k
+   B[1] = k++;
+//             <    is read   >: k
+//             <    is written>: A[1] k
+   A[1] = (double) k++;
+//             <    is read   >: j
+   return j;
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 11 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+	09 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+	09 --> 12 with conflicts
+		from <A[j++]-W-EXACT> to <A[1]-W-EXACT>
+	10 --> 11 with conflicts
+		from <B[j++]-W-EXACT> to <B[1]-W-EXACT>
+	10 --> 13 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	11 --> 12 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+
+****************** End of Dependence Graph ******************

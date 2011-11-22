@@ -1,0 +1,566 @@
+
+PROPER  EFFECTS 
+
+float alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: fr _RANDOM_EFFECTS:GEN_SEED
+   float fr = (float) rand()/((float) 2147483647);
+//             <    is read   >: fr
+   //printf("fr=%f\n", fr);
+   return fr;
+}
+int main()
+{
+//             <may be read   >: stdin[0] stdout[0] 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: stdin[0] stdout[0]
+//             <    is read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+   sting_berkeley();
+}
+void sting_berkeley()
+{
+   //
+   // BERKELEY model taken from Fast
+   //
+   
+//             <    is written>: exclusive nonexclusive unowned
+   int invalid, unowned = 0, nonexclusive = 0, exclusive = 0;
+
+//             <    is read   >: exclusive nonexclusive unowned
+//             <    is written>: o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned
+   int o_invalid = 0, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+//             <    is written>: count
+   int count = 0;
+   int init_invalid;
+//             <may be read   >: stdin[0]
+//             <may be written>: invalid stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   
+   
+   //propsteps(3)
+   
+   scanf("%d", &invalid);
+//             <    is read   >: invalid
+//             <    is written>: init_invalid
+   init_invalid = invalid;
+//             <    is read   >: invalid
+
+   invalid>=1?(void) 0:__assert_fail("invalid>=1", "$VDIR/sting_berkeley.c", 40, (const char *) 0);
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   srand(1);
+//             <    is read   >: count invalid nonexclusive unowned
+   while (count<=1000&&(invalid>=1||nonexclusive+unowned>=1)) {
+//             <    is read   >: exclusive
+      // StInG expected results: exclusive>=0, unowned>=0,
+      // invalid+unowned+nonexclusive+exclusive>=1
+      
+      // Experimental invariants:
+      // exclusive+nonexclusive<=1
+      // invalid+unowned+nonexclusive+exclusive==init_invalid
+      // exclusive>=0, nonexclusive>=0, invalid>=0, unowned>=0
+      
+      // Add type information
+      exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 55, (const char *) 0);
+//             <    is read   >: nonexclusive
+      nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 56, (const char *) 0);
+//             <    is read   >: invalid
+      invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 57, (const char *) 0);
+//             <    is read   >: unowned
+      unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 58, (const char *) 0);
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned unowned
+      
+      
+      
+      
+      //  while(1) {
+      if (invalid==o_invalid&&unowned==o_unowned&&nonexclusive==o_nonexclusive&&exclusive==o_exclusive)
+         //printf("useless\n");
+         ;
+      else {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: exclusive invalid nonexclusive stdout
+//                               unowned __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+         printf("exclusive=%d, unowned=%d, nonexclusive=%d, invalid=%d\n", exclusive, unowned, nonexclusive, invalid);
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned
+         o_invalid = invalid, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+//             <    is read   >: count
+//             <    is written>: count
+         
+         
+         count++;
+//             <    is read   >: exclusive nonexclusive
+         // check the invariants
+         exclusive+nonexclusive<=1?(void) 0:__assert_fail("exclusive+nonexclusive<=1", "$VDIR/sting_berkeley.c", 73, (const char *) 0);
+//             <    is read   >: exclusive init_invalid invalid 
+//                               nonexclusive unowned
+         invalid+unowned+nonexclusive+exclusive==init_invalid?(void) 0:__assert_fail("invalid+unowned+nonexclusive+exclusive==init_invalid", "$VDIR/sting_berkeley.c", 74, (const char *) 0);
+//             <    is read   >: exclusive
+         exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 75, (const char *) 0);
+//             <    is read   >: nonexclusive
+         nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 76, (const char *) 0);
+//             <    is read   >: invalid
+         invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 77, (const char *) 0);
+//             <    is read   >: unowned
+         unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 78, (const char *) 0);
+      }
+//             <    is read   >: invalid _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      //transition t1: l0,
+      if (invalid>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         nonexclusive += exclusive, exclusive = 0, invalid--, unowned++;
+//             <    is read   >: nonexclusive unowned 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      
+      //transition t2: l0,
+      if (nonexclusive+unowned>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         invalid += unowned+nonexclusive-1, exclusive++, unowned = 0, nonexclusive = 0;
+//             <    is read   >: invalid _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      
+      //transition t3: l0,
+      if (invalid>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         invalid += unowned+exclusive+nonexclusive-1, unowned = 0, nonexclusive = 0, exclusive = 1;
+//             <    is read   >: unowned
+//             <    is written>: unowned
+      
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      unowned = unowned;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: count stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // This point should never be reached, but it is. Try with small
+   // initial values for invalid
+   printf("count = %d\n", count);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+float alea(void)
+{
+
+// Points To: none
+
+   float fr = (float) rand()/((float) 2147483647);
+
+// Points To: none
+
+   //printf("fr=%f\n", fr);
+   return fr;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   sting_berkeley();
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void sting_berkeley()
+{
+   //
+   // BERKELEY model taken from Fast
+   //
+   
+
+// Points To: none
+
+   int invalid, unowned = 0, nonexclusive = 0, exclusive = 0;
+
+
+// Points To: none
+
+   int o_invalid = 0, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+
+// Points To: none
+
+   int count = 0;
+
+// Points To: none
+
+   int init_invalid;
+
+// Points To: none
+
+   
+   
+   //propsteps(3)
+   
+   scanf("%d", &invalid);
+
+// Points To: none
+
+   init_invalid = invalid;
+
+// Points To: none
+
+
+   invalid>=1?(void) 0:__assert_fail("invalid>=1", "$VDIR/sting_berkeley.c", 40, (const char *) 0);
+
+// Points To: none
+
+
+   srand(1);
+
+// Points To: none
+
+   while (count<=1000&&(invalid>=1||nonexclusive+unowned>=1)) {
+
+// Points To: none
+
+      // StInG expected results: exclusive>=0, unowned>=0,
+      // invalid+unowned+nonexclusive+exclusive>=1
+      
+      // Experimental invariants:
+      // exclusive+nonexclusive<=1
+      // invalid+unowned+nonexclusive+exclusive==init_invalid
+      // exclusive>=0, nonexclusive>=0, invalid>=0, unowned>=0
+      
+      // Add type information
+      exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 55, (const char *) 0);
+
+// Points To: none
+
+      nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 56, (const char *) 0);
+
+// Points To: none
+
+      invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 57, (const char *) 0);
+
+// Points To: none
+
+      unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 58, (const char *) 0);
+
+// Points To: none
+
+      
+      
+      
+      
+      //  while(1) {
+      if (invalid==o_invalid&&unowned==o_unowned&&nonexclusive==o_nonexclusive&&exclusive==o_exclusive)
+
+// Points To: none
+
+         //printf("useless\n");
+         ;
+      else {
+
+// Points To: none
+
+
+         printf("exclusive=%d, unowned=%d, nonexclusive=%d, invalid=%d\n", exclusive, unowned, nonexclusive, invalid);
+
+// Points To: none
+
+         o_invalid = invalid, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+
+// Points To: none
+
+         
+         
+         count++;
+
+// Points To: none
+
+         // check the invariants
+         exclusive+nonexclusive<=1?(void) 0:__assert_fail("exclusive+nonexclusive<=1", "$VDIR/sting_berkeley.c", 73, (const char *) 0);
+
+// Points To: none
+
+         invalid+unowned+nonexclusive+exclusive==init_invalid?(void) 0:__assert_fail("invalid+unowned+nonexclusive+exclusive==init_invalid", "$VDIR/sting_berkeley.c", 74, (const char *) 0);
+
+// Points To: none
+
+         exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 75, (const char *) 0);
+
+// Points To: none
+
+         nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 76, (const char *) 0);
+
+// Points To: none
+
+         invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 77, (const char *) 0);
+
+// Points To: none
+
+         unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 78, (const char *) 0);
+      }
+
+// Points To: none
+
+      
+      //transition t1: l0,
+      if (invalid>=1&&alea()>=0.5)
+
+// Points To: none
+
+         nonexclusive += exclusive, exclusive = 0, invalid--, unowned++;
+
+// Points To: none
+
+      
+      
+      //transition t2: l0,
+      if (nonexclusive+unowned>=1&&alea()>=0.5)
+
+// Points To: none
+
+         invalid += unowned+nonexclusive-1, exclusive++, unowned = 0, nonexclusive = 0;
+
+// Points To: none
+
+      
+      
+      //transition t3: l0,
+      if (invalid>=1&&alea()>=0.5)
+
+// Points To: none
+
+         invalid += unowned+exclusive+nonexclusive-1, unowned = 0, nonexclusive = 0, exclusive = 1;
+
+// Points To: none
+
+      
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      unowned = unowned;
+   }
+
+// Points To: none
+
+   // This point should never be reached, but it is. Try with small
+   // initial values for invalid
+   printf("count = %d\n", count);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+float alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: fr _RANDOM_EFFECTS:GEN_SEED
+   float fr = (float) rand()/((float) 2147483647);
+//             <    is read   >: fr
+   //printf("fr=%f\n", fr);
+   return fr;
+}
+int main()
+{
+//             <may be read   >: stdin[0] stdout[0] 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: stdin[0] stdout[0]
+//             <    is read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[0] 
+//                               __IO_EFFECTS:LUNS[1]
+   sting_berkeley();
+}
+void sting_berkeley()
+{
+   //
+   // BERKELEY model taken from Fast
+   //
+   
+//             <    is written>: exclusive nonexclusive unowned
+   int invalid, unowned = 0, nonexclusive = 0, exclusive = 0;
+
+//             <    is read   >: exclusive nonexclusive unowned
+//             <    is written>: o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned
+   int o_invalid = 0, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+//             <    is written>: count
+   int count = 0;
+   int init_invalid;
+//             <may be read   >: stdin[0]
+//             <may be written>: invalid stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   
+   
+   //propsteps(3)
+   
+   scanf("%d", &invalid);
+//             <    is read   >: invalid
+//             <    is written>: init_invalid
+   init_invalid = invalid;
+//             <    is read   >: invalid
+
+   invalid>=1?(void) 0:__assert_fail("invalid>=1", "$VDIR/sting_berkeley.c", 40, (const char *) 0);
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   srand(1);
+//             <    is read   >: count invalid nonexclusive unowned
+   while (count<=1000&&(invalid>=1||nonexclusive+unowned>=1)) {
+//             <    is read   >: exclusive
+      // StInG expected results: exclusive>=0, unowned>=0,
+      // invalid+unowned+nonexclusive+exclusive>=1
+      
+      // Experimental invariants:
+      // exclusive+nonexclusive<=1
+      // invalid+unowned+nonexclusive+exclusive==init_invalid
+      // exclusive>=0, nonexclusive>=0, invalid>=0, unowned>=0
+      
+      // Add type information
+      exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 55, (const char *) 0);
+//             <    is read   >: nonexclusive
+      nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 56, (const char *) 0);
+//             <    is read   >: invalid
+      invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 57, (const char *) 0);
+//             <    is read   >: unowned
+      unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 58, (const char *) 0);
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned unowned
+      
+      
+      
+      
+      //  while(1) {
+      if (invalid==o_invalid&&unowned==o_unowned&&nonexclusive==o_nonexclusive&&exclusive==o_exclusive)
+         //printf("useless\n");
+         ;
+      else {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: exclusive invalid nonexclusive stdout
+//                               unowned __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+         printf("exclusive=%d, unowned=%d, nonexclusive=%d, invalid=%d\n", exclusive, unowned, nonexclusive, invalid);
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: o_exclusive o_invalid o_nonexclusive 
+//                               o_unowned
+         o_invalid = invalid, o_unowned = unowned, o_nonexclusive = nonexclusive, o_exclusive = exclusive;
+//             <    is read   >: count
+//             <    is written>: count
+         
+         
+         count++;
+//             <    is read   >: exclusive nonexclusive
+         // check the invariants
+         exclusive+nonexclusive<=1?(void) 0:__assert_fail("exclusive+nonexclusive<=1", "$VDIR/sting_berkeley.c", 73, (const char *) 0);
+//             <    is read   >: exclusive init_invalid invalid 
+//                               nonexclusive unowned
+         invalid+unowned+nonexclusive+exclusive==init_invalid?(void) 0:__assert_fail("invalid+unowned+nonexclusive+exclusive==init_invalid", "$VDIR/sting_berkeley.c", 74, (const char *) 0);
+//             <    is read   >: exclusive
+         exclusive>=0?(void) 0:__assert_fail("exclusive>=0", "$VDIR/sting_berkeley.c", 75, (const char *) 0);
+//             <    is read   >: nonexclusive
+         nonexclusive>=0?(void) 0:__assert_fail("nonexclusive>=0", "$VDIR/sting_berkeley.c", 76, (const char *) 0);
+//             <    is read   >: invalid
+         invalid>=0?(void) 0:__assert_fail("invalid>=0", "$VDIR/sting_berkeley.c", 77, (const char *) 0);
+//             <    is read   >: unowned
+         unowned>=0?(void) 0:__assert_fail("unowned>=0", "$VDIR/sting_berkeley.c", 78, (const char *) 0);
+      }
+//             <    is read   >: invalid _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      //transition t1: l0,
+      if (invalid>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         nonexclusive += exclusive, exclusive = 0, invalid--, unowned++;
+//             <    is read   >: nonexclusive unowned 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      
+      //transition t2: l0,
+      if (nonexclusive+unowned>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         invalid += unowned+nonexclusive-1, exclusive++, unowned = 0, nonexclusive = 0;
+//             <    is read   >: invalid _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      
+      //transition t3: l0,
+      if (invalid>=1&&alea()>=0.5)
+//             <    is read   >: exclusive invalid nonexclusive 
+//                               unowned
+//             <    is written>: exclusive invalid nonexclusive 
+//                               unowned
+         invalid += unowned+exclusive+nonexclusive-1, unowned = 0, nonexclusive = 0, exclusive = 1;
+//             <    is read   >: unowned
+//             <    is written>: unowned
+      
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      unowned = unowned;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: count stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // This point should never be reached, but it is. Try with small
+   // initial values for invalid
+   printf("count = %d\n", count);
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

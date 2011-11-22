@@ -1,0 +1,101 @@
+
+PROPER  EFFECTS 
+
+int trust01(int n)
+{
+   float a[n];
+   // Trusting the following declarations makes the function inexecutable...
+   // float b[0]; if array declarations are trusted in C as in Fortran
+   
+   // Not possible: float c[-1];
+   
+//             <    is read   >: n
+//             <    is written>: i
+   int i = n;
+   {
+      int m;
+      float b[m];
+//             <    is read   >: i
+//             <    is written>: i
+      i = i+1;
+   }
+//             <    is read   >: i
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int trust01(int n)
+{
+
+// Points To: none
+
+   float a[n];
+   // Trusting the following declarations makes the function inexecutable...
+   // float b[0]; if array declarations are trusted in C as in Fortran
+   
+   // Not possible: float c[-1];
+   
+
+// Points To: none
+
+   int i = n;
+   {
+
+// Points To: none
+
+      int m;
+
+// Points To: none
+
+      float b[m];
+
+// Points To: none
+
+      i = i+1;
+   }
+
+// Points To: none
+
+   return i;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int trust01(int n)
+{
+   float a[n];
+   // Trusting the following declarations makes the function inexecutable...
+   // float b[0]; if array declarations are trusted in C as in Fortran
+   
+   // Not possible: float c[-1];
+   
+//             <    is read   >: n
+//             <    is written>: i
+   int i = n;
+   {
+      int m;
+      float b[m];
+//             <    is read   >: i
+//             <    is written>: i
+      i = i+1;
+   }
+//             <    is read   >: i
+   return i;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 15 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	15 --> 17 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

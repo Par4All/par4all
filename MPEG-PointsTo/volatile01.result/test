@@ -1,0 +1,72 @@
+
+PROPER  EFFECTS 
+
+void volatile01()
+{
+//             <    is written>: i
+   volatile int i = 42;
+//             <    is written>: j
+   int j = 84;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d, %d\n", i, j);
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void volatile01()
+{
+
+// Points To: none
+
+   volatile int i = 42;
+
+// Points To: none
+
+   int j = 84;
+
+// Points To: none
+
+
+   printf("%d, %d\n", i, j);
+
+// Points To: none
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void volatile01()
+{
+//             <    is written>: i
+   volatile int i = 42;
+//             <    is written>: j
+   int j = 84;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d, %d\n", i, j);
+   return;
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	08 --> 10 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+
+****************** End of Dependence Graph ******************

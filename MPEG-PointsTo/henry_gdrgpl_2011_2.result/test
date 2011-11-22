@@ -1,0 +1,173 @@
+
+PROPER  EFFECTS 
+
+int main(void)
+{
+//             <    is written>: x
+   int x = 0;
+//             <    is written>: d
+   int d = 1;
+   // infinite loop
+   while (1) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: d stdout x __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+//             <    is read   >: x
+      if (x==0)
+//             <    is written>: d
+         d = 1;
+//             <    is read   >: x
+      if (x==1000)
+//             <    is written>: d
+         d = -1;
+//             <    is read   >: d x
+//             <    is written>: x
+      x += d;
+   }
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   int x = 0;
+
+// Points To: none
+
+   int d = 1;
+
+// Points To: none
+
+   // infinite loop
+   while (1) {
+
+// Points To: none
+
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+
+// Points To: none
+
+      if (x==0)
+
+// Points To: none
+
+         d = 1;
+
+// Points To: none
+
+      if (x==1000)
+
+// Points To: none
+
+         d = -1;
+
+// Points To: none
+
+      x += d;
+   }
+
+// Points To: none
+
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: x
+   int x = 0;
+//             <    is written>: d
+   int d = 1;
+   // infinite loop
+   while (1) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: d stdout x __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+//             <    is read   >: x
+      if (x==0)
+//             <    is written>: d
+         d = 1;
+//             <    is read   >: x
+      if (x==1000)
+//             <    is written>: d
+         d = -1;
+//             <    is read   >: d x
+//             <    is written>: x
+      x += d;
+   }
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 16 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	11 --> 17 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	11 --> 18 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	11 --> 19 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	12 --> 16 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	12 --> 17 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+	16 --> 16 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	16 --> 17 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	16 --> 19 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	17 --> 18 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+	17 --> 19 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	18 --> 16 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	18 --> 17 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+	18 --> 19 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	18 --> 19 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	19 --> 16 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	19 --> 17 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	19 --> 17 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	19 --> 18 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	19 --> 19 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+
+****************** End of Dependence Graph ******************

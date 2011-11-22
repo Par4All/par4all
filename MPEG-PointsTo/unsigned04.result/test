@@ -1,0 +1,83 @@
+
+PROPER  EFFECTS 
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+//             <    is written>: i
+
+   i = -1;
+//             <    is read   >: i
+//             <    is written>: ui
+   ui = i;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr ui __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   unsigned int ui;
+
+// Points To: none
+
+
+   i = -1;
+
+// Points To: none
+
+   ui = i;
+
+// Points To: none
+
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+   int i;
+   unsigned int ui;
+//             <    is written>: i
+
+   i = -1;
+//             <    is read   >: i
+//             <    is written>: ui
+   ui = i;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr ui __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+
+   fprintf(stderr, "ui = %u\n", ui);
+}
+
+ *********************** Use-Def Chains *********************
+
+	28 --> 29 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	29 --> 31 with conflicts
+		from <ui-W-EXACT> to <ui-R-EXACT>
+
+****************** End of Dependence Graph ******************

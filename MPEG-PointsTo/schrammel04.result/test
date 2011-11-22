@@ -1,0 +1,489 @@
+
+PROPER  EFFECTS 
+
+int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int foo()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return alea();
+}
+void main()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: p x1 x2 _RANDOM_EFFECTS:GEN_SEED
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+   // With a proper foo() returning a value between 0 and 1, the
+   // following assert is useless
+   // assert(0<=x1 && 1<=x2 && x1+x2<=2 && p==1);
+   y = foo();
+//             <    is read   >: p
+   while (p<=20) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout x1 x2 __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("p=%d, x1=%d, x2=%d\n", p, x1, x2);
+//             <    is read   >: p x1 x2
+      if (2*x1+2*x2<=p)
+         if (1) {
+            // The loop is not entered for small values of p because 2x1+2x2
+            // >= 2 and p starts with 1, but it is certainly entered for p>=
+            // 4, unless x1 has increased to fast during the previous
+            // iterations
+            //
+            // So the internal loop is not entered till p has increased
+            // enough. The loop is entered or not entered and a convex hull
+            // with the identity transition must be performed
+            //
+            // Also, we may skip the loop at any time because of y
+            //
+            // The information published by Bertrand
+//             <    is written>: z
+            float z = 0.;
+//             <    is read   >: p x1 x2 _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+            while (2*x1+2*x2<=p&&alea())
+               if (1) {
+//             <    is read   >: x1 y
+//             <    is written>: x1
+                  x1 = x1+y+1;
+//             <    is read   >: y
+//             <    is written>: x2
+                  x2 = y;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+                  y = foo();
+               }
+//             <    is read   >: z
+//             <    is written>: z
+            // To get the loop postcondition
+            //y = y;
+            // without generating an indentity transformer
+            z = z;
+         }
+         else
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+            // do nothing at all, not even read y? Read y on every transition
+            y = foo();
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+   }
+//             <    is read   >: y
+//             <    is written>: y
+   //
+   // Expected result by Schrammel (the third inequality is also the
+   // second one):
+   // 1<=x1+x2, 0<=x2<=1, 0<=x1
+   
+   // Also true: 0<=x1<=2
+   
+   y = y;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int alea(void)
+{
+
+// Points To: none
+
+   return rand()%2;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo()
+{
+
+// Points To: none
+
+   return alea();
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void main()
+{
+
+// Points To: none
+
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+
+// Points To: none
+
+   // With a proper foo() returning a value between 0 and 1, the
+   // following assert is useless
+   // assert(0<=x1 && 1<=x2 && x1+x2<=2 && p==1);
+   y = foo();
+
+// Points To: none
+
+   while (p<=20) {
+
+// Points To: none
+
+      printf("p=%d, x1=%d, x2=%d\n", p, x1, x2);
+
+// Points To: none
+
+      if (2*x1+2*x2<=p)
+
+// Points To: none
+
+         if (1) {
+            // The loop is not entered for small values of p because 2x1+2x2
+            // >= 2 and p starts with 1, but it is certainly entered for p>=
+            // 4, unless x1 has increased to fast during the previous
+            // iterations
+            //
+            // So the internal loop is not entered till p has increased
+            // enough. The loop is entered or not entered and a convex hull
+            // with the identity transition must be performed
+            //
+            // Also, we may skip the loop at any time because of y
+            //
+            // The information published by Bertrand
+
+// Points To: none
+
+            float z = 0.;
+
+// Points To: none
+
+
+            while (2*x1+2*x2<=p&&alea())
+
+// Points To: none
+
+               if (1) {
+
+// Points To: none
+
+                  x1 = x1+y+1;
+
+// Points To: none
+
+                  x2 = y;
+
+// Points To: none
+
+                  y = foo();
+               }
+
+// Points To: none
+
+            // To get the loop postcondition
+            //y = y;
+            // without generating an indentity transformer
+            z = z;
+         }
+         else
+
+// Points To: none
+
+            // do nothing at all, not even read y? Read y on every transition
+            y = foo();
+
+// Points To: none
+
+      p++;
+   }
+
+// Points To: none
+
+   //
+   // Expected result by Schrammel (the third inequality is also the
+   // second one):
+   // 1<=x1+x2, 0<=x2<=1, 0<=x1
+   
+   // Also true: 0<=x1<=2
+   
+   y = y;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int foo()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return alea();
+}
+void main()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: p x1 x2 _RANDOM_EFFECTS:GEN_SEED
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+   // With a proper foo() returning a value between 0 and 1, the
+   // following assert is useless
+   // assert(0<=x1 && 1<=x2 && x1+x2<=2 && p==1);
+   y = foo();
+//             <    is read   >: p
+   while (p<=20) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout x1 x2 __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("p=%d, x1=%d, x2=%d\n", p, x1, x2);
+//             <    is read   >: p x1 x2
+      if (2*x1+2*x2<=p)
+         if (1) {
+            // The loop is not entered for small values of p because 2x1+2x2
+            // >= 2 and p starts with 1, but it is certainly entered for p>=
+            // 4, unless x1 has increased to fast during the previous
+            // iterations
+            //
+            // So the internal loop is not entered till p has increased
+            // enough. The loop is entered or not entered and a convex hull
+            // with the identity transition must be performed
+            //
+            // Also, we may skip the loop at any time because of y
+            //
+            // The information published by Bertrand
+//             <    is written>: z
+            float z = 0.;
+//             <    is read   >: p x1 x2 _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+            while (2*x1+2*x2<=p&&alea())
+               if (1) {
+//             <    is read   >: x1 y
+//             <    is written>: x1
+                  x1 = x1+y+1;
+//             <    is read   >: y
+//             <    is written>: x2
+                  x2 = y;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+                  y = foo();
+               }
+//             <    is read   >: z
+//             <    is written>: z
+            // To get the loop postcondition
+            //y = y;
+            // without generating an indentity transformer
+            z = z;
+         }
+         else
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: y _RANDOM_EFFECTS:GEN_SEED
+            // do nothing at all, not even read y? Read y on every transition
+            y = foo();
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+   }
+//             <    is read   >: y
+//             <    is written>: y
+   //
+   // Expected result by Schrammel (the third inequality is also the
+   // second one):
+   // 1<=x1+x2, 0<=x2<=1, 0<=x1
+   
+   // Also true: 0<=x1<=2
+   
+   y = y;
+}
+
+ *********************** Use-Def Chains *********************
+
+	16 --> 20 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	16 --> 21 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	16 --> 22 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	16 --> 23 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	16 --> 39 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	16 --> 41 with conflicts
+		from <x1-W-EXACT> to <x1-W-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+	16 --> 42 with conflicts
+		from <x2-W-EXACT> to <x2-W-EXACT>
+	16 --> 56 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	20 --> 39 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	20 --> 41 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	20 --> 42 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	20 --> 43 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	20 --> 53 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	20 --> 65 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	21 --> 56 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	22 --> 22 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	22 --> 41 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	22 --> 42 with conflicts
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	22 --> 56 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	23 --> 41 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	23 --> 42 with conflicts
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	23 --> 56 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	37 --> 49 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-W-EXACT> to <z-R-EXACT>
+	39 --> 39 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	39 --> 41 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	39 --> 42 with conflicts
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	39 --> 43 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	39 --> 53 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	39 --> 56 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	41 --> 22 with conflicts
+		from <x1-W-EXACT> to <x1-R-EXACT>
+	41 --> 23 with conflicts
+		from <x1-W-EXACT> to <x1-R-EXACT>
+	41 --> 39 with conflicts
+		from <x1-W-EXACT> to <x1-R-EXACT>
+	41 --> 41 with conflicts
+		from <x1-W-EXACT> to <x1-W-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	41 --> 43 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	41 --> 53 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	42 --> 22 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+	42 --> 23 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+	42 --> 39 with conflicts
+		from <x2-W-EXACT> to <x2-R-EXACT>
+	42 --> 42 with conflicts
+		from <x2-W-EXACT> to <x2-W-EXACT>
+	42 --> 43 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	42 --> 53 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	43 --> 39 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	43 --> 41 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	43 --> 42 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	43 --> 43 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	43 --> 53 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	49 --> 37 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-R-EXACT> to <z-W-EXACT>
+	53 --> 39 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	53 --> 41 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	53 --> 42 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	53 --> 43 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	53 --> 53 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	53 --> 65 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	56 --> 22 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	56 --> 23 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	56 --> 39 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	56 --> 56 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
+
+****************** End of Dependence Graph ******************

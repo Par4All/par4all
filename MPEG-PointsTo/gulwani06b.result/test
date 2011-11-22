@@ -1,0 +1,230 @@
+
+PROPER  EFFECTS 
+
+float alea(void)
+{
+   return 1.;
+}
+int main()
+{
+   float z;
+   int x, y, lock;
+//             <    is written>: x
+
+   x = 1;
+//             <    is written>: lock
+   lock = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: x y
+   
+   
+   while (x!=y) {
+//             <    is written>: z
+      z = alea();
+//             <    is written>: lock
+      lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+      x = y;
+//             <    is read   >: z
+      if (z>=0.) {
+//             <    is written>: lock
+         lock = 0;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+   }
+//             <    is read   >: lock
+   
+   
+   if (lock==1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+float alea(void)
+{
+
+// Points To: none
+
+   return 1.;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   float z;
+
+// Points To: none
+
+   int x, y, lock;
+
+// Points To: none
+
+
+   x = 1;
+
+// Points To: none
+
+   lock = 0;
+
+// Points To: none
+
+   y = 0;
+
+// Points To: none
+
+   
+   
+   while (x!=y) {
+
+// Points To: none
+
+      z = alea();
+
+// Points To: none
+
+      lock = 1;
+
+// Points To: none
+
+      x = y;
+
+// Points To: none
+
+      if (z>=0.) {
+
+// Points To: none
+
+         lock = 0;
+
+// Points To: none
+
+         y++;
+      }
+   }
+
+// Points To: none
+
+   
+   
+   if (lock==1)
+
+// Points To: none
+
+      printf("property  verified\n");
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+float alea(void)
+{
+   return 1.;
+}
+int main()
+{
+   float z;
+   int x, y, lock;
+//             <    is written>: x
+
+   x = 1;
+//             <    is written>: lock
+   lock = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: x y
+   
+   
+   while (x!=y) {
+//             <    is written>: z
+      z = alea();
+//             <    is written>: lock
+      lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+      x = y;
+//             <    is read   >: z
+      if (z>=0.) {
+//             <    is written>: lock
+         lock = 0;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+   }
+//             <    is read   >: lock
+   
+   
+   if (lock==1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+}
+
+ *********************** Use-Def Chains *********************
+
+	18 --> 23 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	18 --> 26 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	19 --> 26 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	19 --> 33 with conflicts
+		from <lock-W-EXACT> to <lock-R-EXACT>
+	20 --> 23 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	20 --> 26 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	20 --> 28 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	23 --> 26 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	23 --> 28 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	25 --> 25 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	25 --> 27 with conflicts
+		from <z-W-EXACT> to <z-R-EXACT>
+	26 --> 26 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	26 --> 28 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	26 --> 28 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	27 --> 25 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+	28 --> 26 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	28 --> 28 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	28 --> 26 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	28 --> 33 with conflicts
+		from <lock-W-EXACT> to <lock-R-EXACT>
+
+****************** End of Dependence Graph ******************

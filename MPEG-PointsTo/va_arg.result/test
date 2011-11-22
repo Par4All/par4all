@@ -1,0 +1,91 @@
+
+PROPER  EFFECTS 
+
+int f(int a, ...)
+{
+//             <    is read   >: a
+   return a;
+}
+int main()
+{
+//             <    is written>: a
+   int a = 1, b, c;
+//             <    is read   >: a b
+//             <    is written>: c
+   // This works
+   // f(a,b,c);
+   // but not this...
+   c = f(a, b);
+//             <    is read   >: c
+   return c;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int f(int a, ...)
+{
+
+// Points To: none
+
+   return a;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a = 1, b, c;
+
+// Points To: none
+
+   // This works
+   // f(a,b,c);
+   // but not this...
+   c = f(a, b);
+
+// Points To: none
+
+   return c;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int f(int a, ...)
+{
+//             <    is read   >: a
+   return a;
+}
+int main()
+{
+//             <    is written>: a
+   int a = 1, b, c;
+//             <    is read   >: a b
+//             <    is written>: c
+   // This works
+   // f(a,b,c);
+   // but not this...
+   c = f(a, b);
+//             <    is read   >: c
+   return c;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 12 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	12 --> 13 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+
+****************** End of Dependence Graph ******************

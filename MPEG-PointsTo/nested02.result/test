@@ -1,0 +1,137 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i k
+   int i = 0, j, m, n, k = 0;
+//             <    is read   >: m n
+
+   m>=1&&n>=1?(void) 0:__assert_fail("m>=1 && n>=1", "$VDIR/nested02.c", 16, (const char *) 0);
+//             <    is read   >: i m
+//             <    is written>: i j
+
+   while (i++, j = 0, i<m)
+//             <    is read   >: j n
+//             <    is written>: j
+      while (j++, j<n)
+//             <    is read   >: k
+//             <    is written>: k
+         k++;
+//             <    is read   >: i
+//             <    is written>: i
+   // Check the loop nest postcondition
+   i = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   //i = (1, 2, 3);
+   printf("%d\n", i);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0, j, m, n, k = 0;
+
+// Points To: none
+
+
+   m>=1&&n>=1?(void) 0:__assert_fail("m>=1 && n>=1", "$VDIR/nested02.c", 16, (const char *) 0);
+
+// Points To: none
+
+
+   while (i++, j = 0, i<m)
+
+// Points To: none
+
+      while (j++, j<n)
+
+// Points To: none
+
+         k++;
+
+// Points To: none
+
+   // Check the loop nest postcondition
+   i = i;
+
+// Points To: none
+
+   //i = (1, 2, 3);
+   printf("%d\n", i);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i k
+   int i = 0, j, m, n, k = 0;
+//             <    is read   >: m n
+
+   m>=1&&n>=1?(void) 0:__assert_fail("m>=1 && n>=1", "$VDIR/nested02.c", 16, (const char *) 0);
+//             <    is read   >: i m
+//             <    is written>: i j
+
+   while (i++, j = 0, i<m)
+//             <    is read   >: j n
+//             <    is written>: j
+      while (j++, j<n)
+//             <    is read   >: k
+//             <    is written>: k
+         k++;
+//             <    is read   >: i
+//             <    is written>: i
+   // Check the loop nest postcondition
+   i = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   //i = (1, 2, 3);
+   printf("%d\n", i);
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 18 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	14 --> 20 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+	14 --> 22 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	18 --> 19 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+	18 --> 22 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	19 --> 19 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+	20 --> 20 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+	22 --> 24 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

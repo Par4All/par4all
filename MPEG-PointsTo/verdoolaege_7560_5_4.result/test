@@ -1,0 +1,113 @@
+
+PROPER  EFFECTS 
+
+int flip(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+void verdoolaege_7560_5_4()
+{
+   int x, y, n;
+//             <    is read   >: n
+
+   n>=2?(void) 0:__assert_fail("n>=2", "$VDIR/verdoolaege_7560_5_4.c", 19, (const char *) 0);
+
+   if (1)
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      do {
+//             <    is read   >: n x y
+//             <    is written>: x y
+         x++, y += 1-n;
+      }
+      while (flip());
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flip(void)
+{
+
+// Points To: none
+
+   return rand()%2;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void verdoolaege_7560_5_4()
+{
+
+// Points To: none
+
+   int x, y, n;
+
+// Points To: none
+
+
+   n>=2?(void) 0:__assert_fail("n>=2", "$VDIR/verdoolaege_7560_5_4.c", 19, (const char *) 0);
+
+// Points To: none
+
+
+   if (1)
+
+// Points To: none
+
+      do {
+
+// Points To: none
+
+         x++, y += 1-n;
+      }
+      while (flip());
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int flip(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+void verdoolaege_7560_5_4()
+{
+   int x, y, n;
+//             <    is read   >: n
+
+   n>=2?(void) 0:__assert_fail("n>=2", "$VDIR/verdoolaege_7560_5_4.c", 19, (const char *) 0);
+
+   if (1)
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      do {
+//             <    is read   >: n x y
+//             <    is written>: x y
+         x++, y += 1-n;
+      }
+      while (flip());
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,218 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 20;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   shift05(i, 2);
+}
+int shift05(int i, int k)
+{
+//             <    is read   >: i
+//             <    is written>: j
+   int j = i;
+//             <    is written>: l
+   int l = -1;
+   int m;
+   int n;
+   int o;
+//             <    is read   >: i
+
+   if (i>0) {
+//             <    is read   >: i
+//             <    is written>: j
+      j = 2<<i;
+//             <    is read   >: j
+//             <    is written>: o
+      o = j;
+   }
+   else if (i==0)
+//             <    is read   >: i
+//             <    is written>: j
+      j = 2<<i;
+   else
+//             <    is read   >: i
+//             <    is written>: j
+      // i<0
+      j = 2<<i;
+//             <    is read   >: i
+//             <    is written>: m
+
+   m = 2<<i;
+//             <    is read   >: i
+//             <    is written>: n
+   n = -2<<i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: j l m n o stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // j=2097152, l=-1, m=2097152, n=-2097152, o=2097152
+   printf("j=%d, l=%d, m=%d, n=%d, o=%d\n", j, l, m, n, o);
+//             <    is read   >: j
+   return j;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 20;
+
+// Points To: none
+
+   shift05(i, 2);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int shift05(int i, int k)
+{
+
+// Points To: none
+
+   int j = i;
+
+// Points To: none
+
+   int l = -1;
+
+// Points To: none
+
+   int m;
+
+// Points To: none
+
+   int n;
+
+// Points To: none
+
+   int o;
+
+// Points To: none
+
+
+   if (i>0) {
+
+// Points To: none
+
+      j = 2<<i;
+
+// Points To: none
+
+      o = j;
+   }
+   else if (i==0)
+
+// Points To: none
+
+      j = 2<<i;
+   else
+
+// Points To: none
+
+      // i<0
+      j = 2<<i;
+
+// Points To: none
+
+
+   m = 2<<i;
+
+// Points To: none
+
+   n = -2<<i;
+
+// Points To: none
+
+   
+   // j=2097152, l=-1, m=2097152, n=-2097152, o=2097152
+   printf("j=%d, l=%d, m=%d, n=%d, o=%d\n", j, l, m, n, o);
+
+// Points To: none
+
+   return j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 20;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   shift05(i, 2);
+}
+int shift05(int i, int k)
+{
+//             <    is read   >: i
+//             <    is written>: j
+   int j = i;
+//             <    is written>: l
+   int l = -1;
+   int m;
+   int n;
+   int o;
+//             <    is read   >: i
+
+   if (i>0) {
+//             <    is read   >: i
+//             <    is written>: j
+      j = 2<<i;
+//             <    is read   >: j
+//             <    is written>: o
+      o = j;
+   }
+   else if (i==0)
+//             <    is read   >: i
+//             <    is written>: j
+      j = 2<<i;
+   else
+//             <    is read   >: i
+//             <    is written>: j
+      // i<0
+      j = 2<<i;
+//             <    is read   >: i
+//             <    is written>: m
+
+   m = 2<<i;
+//             <    is read   >: i
+//             <    is written>: n
+   n = -2<<i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: j l m n o stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // j=2097152, l=-1, m=2097152, n=-2097152, o=2097152
+   printf("j=%d, l=%d, m=%d, n=%d, o=%d\n", j, l, m, n, o);
+//             <    is read   >: j
+   return j;
+}
+
+ *********************** Use-Def Chains *********************
+
+	34 --> 35 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

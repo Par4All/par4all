@@ -1,0 +1,48 @@
+
+PROPER  EFFECTS 
+
+int rand01()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   // Used to make transformers aborting
+   rand();
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int rand01()
+{
+
+// Points To: none
+
+   // Used to make transformers aborting
+   rand();
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int rand01()
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   // Used to make transformers aborting
+   rand();
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

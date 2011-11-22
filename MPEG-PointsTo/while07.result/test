@@ -1,0 +1,156 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is read   >: i
+//             <    is written>: j
+   int i, j = i+1, k, l;
+   float x, y;
+//             <    is read   >: l
+
+   while (l>0)
+//             <    is read   >: k
+      while (k>0)
+//             <    is read   >: i
+//             <    is written>: j
+         j = i+1;
+//             <    is read   >: y
+
+   while (y>0.)
+//             <    is read   >: i
+//             <    is written>: j
+      j = i+1;
+//             <    is read   >: x
+
+   while (x>0.)
+//             <    is read   >: y
+      while (y>0.)
+//             <    is read   >: i
+//             <    is written>: j
+         j = i+1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, j = i+1, k, l;
+
+// Points To: none
+
+   float x, y;
+
+// Points To: none
+
+
+   while (l>0)
+
+// Points To: none
+
+      while (k>0)
+
+// Points To: none
+
+         j = i+1;
+
+// Points To: none
+
+
+   while (y>0.)
+
+// Points To: none
+
+      j = i+1;
+
+// Points To: none
+
+
+   while (x>0.)
+
+// Points To: none
+
+      while (y>0.)
+
+// Points To: none
+
+         j = i+1;
+
+// Points To: none
+
+   printf("%d\n", i);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is read   >: i
+//             <    is written>: j
+   int i, j = i+1, k, l;
+   float x, y;
+//             <    is read   >: l
+
+   while (l>0)
+//             <    is read   >: k
+      while (k>0)
+//             <    is read   >: i
+//             <    is written>: j
+         j = i+1;
+//             <    is read   >: y
+
+   while (y>0.)
+//             <    is read   >: i
+//             <    is written>: j
+      j = i+1;
+//             <    is read   >: x
+
+   while (x>0.)
+//             <    is read   >: y
+      while (y>0.)
+//             <    is read   >: i
+//             <    is written>: j
+         j = i+1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+ *********************** Use-Def Chains *********************
+
+	20 --> 25 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	20 --> 30 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	20 --> 35 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	25 --> 25 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	25 --> 30 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	25 --> 35 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	30 --> 30 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	30 --> 35 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	35 --> 35 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,382 @@
+
+PROPER  EFFECTS 
+
+_Bool alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int main()
+{
+   int v, t, x, d;
+//             <    is written>: d t v x
+   v = t = x = d = 0;
+   
+   // The convex enveloppe of the guards is true
+   while (1) {
+//             <    is read   >: d x
+      while (x<=4&&d<=9)
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (alea())
+//             <    is read   >: v x
+//             <    is written>: v x
+            x++, v++;
+         else
+//             <    is read   >: d t
+//             <    is written>: d t
+            d++, t++;
+//             <    is read   >: d
+      
+      //if(x>4)
+      /*x>4 &&*/
+      while (d<=9)
+//             <    is read   >: d t
+//             <    is written>: d t
+         d++, t++;
+//             <    is read   >: x _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      //else if(d>9)
+      /*d>9 &&*/
+      while (x<=4&&(alea()||x>=2))
+//             <    is read   >: v x
+//             <    is written>: v x
+         x++, v++;
+//             <    is read   >: d x
+      
+      /* && alea() */
+      while (d==10&&x>=2)
+//             <    is written>: d x
+         x = d = 0;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+_Bool alea(void)
+{
+
+// Points To: none
+
+   return rand()%2;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int v, t, x, d;
+
+// Points To: none
+
+   v = t = x = d = 0;
+
+// Points To: none
+
+   
+   // The convex enveloppe of the guards is true
+   while (1) {
+
+// Points To: none
+
+      while (x<=4&&d<=9)
+
+// Points To: none
+
+         if (alea())
+
+// Points To: none
+
+            x++, v++;
+         else
+
+// Points To: none
+
+            d++, t++;
+
+// Points To: none
+
+      
+      //if(x>4)
+      /*x>4 &&*/
+      while (d<=9)
+
+// Points To: none
+
+         d++, t++;
+
+// Points To: none
+
+      
+      //else if(d>9)
+      /*d>9 &&*/
+      while (x<=4&&(alea()||x>=2))
+
+// Points To: none
+
+         x++, v++;
+
+// Points To: none
+
+      
+      /* && alea() */
+      while (d==10&&x>=2)
+
+// Points To: none
+
+         x = d = 0;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+_Bool alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int main()
+{
+   int v, t, x, d;
+//             <    is written>: d t v x
+   v = t = x = d = 0;
+   
+   // The convex enveloppe of the guards is true
+   while (1) {
+//             <    is read   >: d x
+      while (x<=4&&d<=9)
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (alea())
+//             <    is read   >: v x
+//             <    is written>: v x
+            x++, v++;
+         else
+//             <    is read   >: d t
+//             <    is written>: d t
+            d++, t++;
+//             <    is read   >: d
+      
+      //if(x>4)
+      /*x>4 &&*/
+      while (d<=9)
+//             <    is read   >: d t
+//             <    is written>: d t
+         d++, t++;
+//             <    is read   >: x _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      
+      //else if(d>9)
+      /*d>9 &&*/
+      while (x<=4&&(alea()||x>=2))
+//             <    is read   >: v x
+//             <    is written>: v x
+         x++, v++;
+//             <    is read   >: d x
+      
+      /* && alea() */
+      while (d==10&&x>=2)
+//             <    is written>: d x
+         x = d = 0;
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+	-1 --> -1 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+	-1 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	-1 --> 31 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> 30 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	-1 --> 31 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> 25 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	-1 --> 30 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	-1 --> 31 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	-1 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+	-1 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+	-1 --> 28 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	-1 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	-1 --> 31 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	15 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+	15 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	15 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	15 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+	15 --> 19 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	15 --> 25 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	15 --> 28 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	15 --> 31 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+	19 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	19 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	19 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	19 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	19 --> 31 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	20 --> 20 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	20 --> 28 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	25 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	25 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	25 --> 31 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	28 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	28 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	28 --> 20 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	28 --> 28 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	28 --> 31 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	30 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	30 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	30 --> -1 with conflicts
+		from <d-R-EXACT> to <d-W-EXACT>
+	30 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	30 --> 31 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+		from <d-R-EXACT> to <d-W-EXACT>
+	31 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	31 --> -1 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	31 --> -1 with conflicts
+		from <d-W-EXACT> to <d-W-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	31 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	31 --> 19 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	31 --> 25 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+	31 --> 28 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	31 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <d-W-EXACT> to <d-R-EXACT>
+	31 --> 31 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <d-W-EXACT> to <d-W-EXACT>
+
+****************** End of Dependence Graph ******************

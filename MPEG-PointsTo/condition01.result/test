@@ -1,0 +1,132 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: a
+   int a = 1;
+   int b;
+   int i;
+//             <    is read   >: a b
+
+   if (a>0&&b>0)
+//             <    is written>: i
+      i = 2;
+   else
+//             <    is written>: i
+      i = 3;
+//             <    is read   >: a b
+
+   if (a>0||b>0)
+//             <    is written>: i
+      i = 2;
+   else
+//             <    is written>: i
+      i = 3;
+//             <    is read   >: i
+
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a = 1;
+
+// Points To: none
+
+   int b;
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   if (a>0&&b>0)
+
+// Points To: none
+
+      i = 2;
+   else
+
+// Points To: none
+
+      i = 3;
+
+// Points To: none
+
+
+   if (a>0||b>0)
+
+// Points To: none
+
+      i = 2;
+   else
+
+// Points To: none
+
+      i = 3;
+
+// Points To: none
+
+
+   return i;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: a
+   int a = 1;
+   int b;
+   int i;
+//             <    is read   >: a b
+
+   if (a>0&&b>0)
+//             <    is written>: i
+      i = 2;
+   else
+//             <    is written>: i
+      i = 3;
+//             <    is read   >: a b
+
+   if (a>0||b>0)
+//             <    is written>: i
+      i = 2;
+   else
+//             <    is written>: i
+      i = 3;
+//             <    is read   >: i
+
+   return i;
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 18 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	14 --> 23 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	19 --> 21 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	21 --> 24 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	24 --> 26 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	26 --> 28 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

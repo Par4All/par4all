@@ -1,0 +1,105 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: j
+   int i, j = 2, k;
+//             <    is read   >: i
+
+   while (i*i>1) {
+//             <    is read   >: k
+      if (k>=3)
+//             <    is written>: j
+         j = 3;
+//             <    is read   >: k
+      if (k>=4)
+//             <    is written>: j
+         j = 4;
+   }
+//             <    is read   >: j
+//             <    is written>: j
+   j = j;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, j = 2, k;
+
+// Points To: none
+
+
+   while (i*i>1) {
+
+// Points To: none
+
+      if (k>=3)
+
+// Points To: none
+
+         j = 3;
+
+// Points To: none
+
+      if (k>=4)
+
+// Points To: none
+
+         j = 4;
+   }
+
+// Points To: none
+
+   j = j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: j
+   int i, j = 2, k;
+//             <    is read   >: i
+
+   while (i*i>1) {
+//             <    is read   >: k
+      if (k>=3)
+//             <    is written>: j
+         j = 3;
+//             <    is read   >: k
+      if (k>=4)
+//             <    is written>: j
+         j = 4;
+   }
+//             <    is read   >: j
+//             <    is written>: j
+   j = j;
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 18 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	14 --> 22 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+	18 --> 20 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	20 --> 18 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	20 --> 22 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,161 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int a[20];
+   int n;
+   int m;
+//             <    is read   >: m n
+//             <    is written>: k
+   int k = m<=n?m:n;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &n);
+//             <may be read   >: stdin[0]
+//             <may be written>: m stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   scanf("%d", &m);
+//             <    is read   >: i m n
+//             <    is written>: i
+
+   while (i++<=(n<=m?n:m))
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int a[20];
+
+// Points To: none
+
+   int n;
+
+// Points To: none
+
+   int m;
+
+// Points To: none
+
+   int k = m<=n?m:n;
+
+// Points To: none
+
+
+   scanf("%d", &n);
+
+// Points To: none
+
+   scanf("%d", &m);
+
+// Points To: none
+
+
+   while (i++<=(n<=m?n:m))
+
+// Points To: none
+
+      a[i] = i;
+
+// Points To: none
+
+   printf("%d\n", i);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int a[20];
+   int n;
+   int m;
+//             <    is read   >: m n
+//             <    is written>: k
+   int k = m<=n?m:n;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &n);
+//             <may be read   >: stdin[0]
+//             <may be written>: m stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   scanf("%d", &m);
+//             <    is read   >: i m n
+//             <    is written>: i
+
+   while (i++<=(n<=m?n:m))
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 18 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	09 --> 19 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	09 --> 21 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	13 --> 15 with conflicts
+		from <n-R-EXACT> to <n-W-MAY>
+	13 --> 16 with conflicts
+		from <m-R-EXACT> to <m-W-MAY>
+	15 --> 16 with conflicts
+		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+	15 --> 18 with conflicts
+		from <n-W-MAY> to <n-R-EXACT>
+	16 --> 18 with conflicts
+		from <m-W-MAY> to <m-R-EXACT>
+	18 --> 19 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	18 --> 21 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	19 --> 19 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,71 @@
+
+PROPER  EFFECTS 
+
+int main(int j, char **unused)
+{
+   int B[10];
+//             <    is read   >: B[j++] j
+//             <    is written>: j
+
+   B[j++];
+//             <    is read   >: j
+
+   return j;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+// Points To OUT:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+int main(int j, char **unused)
+{
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   int B[10];
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+   B[j++];
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+   return j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(int j, char **unused)
+{
+   int B[10];
+//             <    is read   >: B[j++] j
+//             <    is written>: j
+
+   B[j++];
+//             <    is read   >: j
+
+   return j;
+}
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 12 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+
+****************** End of Dependence Graph ******************

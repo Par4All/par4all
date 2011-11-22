@@ -1,0 +1,271 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+
+   int x, y, z, k;
+//             <    is written>: x
+
+   x = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: y
+
+   while (y>=0) {
+//             <    is read   >: x y
+      while (y>=0&&x<=50) {
+//             <    is read   >: x
+//             <    is written>: x
+         x++;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+//             <    is read   >: x y
+      while (y>=0&&x>50) {
+//             <    is read   >: y
+//             <    is written>: y
+         y--;
+//             <    is read   >: x
+//             <    is written>: x
+         x++;
+      }
+   }
+//             <    is read   >: x
+   if (x==103)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+   else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property not found\n");
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+
+// Points To: none
+
+   int x, y, z, k;
+
+// Points To: none
+
+
+   x = 0;
+
+// Points To: none
+
+   y = 0;
+
+// Points To: none
+
+
+   while (y>=0) {
+
+// Points To: none
+
+      while (y>=0&&x<=50) {
+
+// Points To: none
+
+         x++;
+
+// Points To: none
+
+         y++;
+      }
+
+// Points To: none
+
+      while (y>=0&&x>50) {
+
+// Points To: none
+
+         y--;
+
+// Points To: none
+
+         x++;
+      }
+   }
+
+// Points To: none
+
+   if (x==103)
+
+// Points To: none
+
+      printf("property  verified\n");
+   else
+
+// Points To: none
+
+      printf("property not found\n");
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+
+   int x, y, z, k;
+//             <    is written>: x
+
+   x = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: y
+
+   while (y>=0) {
+//             <    is read   >: x y
+      while (y>=0&&x<=50) {
+//             <    is read   >: x
+//             <    is written>: x
+         x++;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+//             <    is read   >: x y
+      while (y>=0&&x>50) {
+//             <    is read   >: y
+//             <    is written>: y
+         y--;
+//             <    is read   >: x
+//             <    is written>: x
+         x++;
+      }
+   }
+//             <    is read   >: x
+   if (x==103)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+   else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property not found\n");
+}
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 20 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 22 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 24 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 27 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	15 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	16 --> 18 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 20 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 22 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 24 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 26 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	18 --> 22 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	18 --> 26 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	20 --> 22 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	20 --> 22 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	20 --> 26 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	20 --> 27 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	22 --> 22 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	22 --> 24 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	22 --> 26 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	22 --> 22 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	22 --> 24 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	22 --> 27 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	22 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	24 --> 22 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	24 --> 22 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	24 --> 26 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	24 --> 27 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	26 --> 20 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	26 --> 22 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	26 --> 24 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	26 --> 26 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	27 --> 20 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	27 --> 22 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	27 --> 24 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	27 --> 27 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	27 --> 30 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	31 --> 33 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

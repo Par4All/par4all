@@ -1,0 +1,64 @@
+
+PROPER  EFFECTS 
+
+int caller()
+{
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+      empty01();
+}
+int empty01()
+{
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int caller()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To: none
+
+      empty01();
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int empty01()
+{
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int caller()
+{
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+      empty01();
+}
+int empty01()
+{
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

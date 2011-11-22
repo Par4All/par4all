@@ -1,0 +1,416 @@
+
+PROPER  EFFECTS 
+
+void assert_error(void)
+{
+   exit(1);
+}
+void checking_error(void)
+{
+   exit(2);
+}
+int flip(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int main(void)
+{
+//             <may be read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: _RANDOM_EFFECTS:GEN_SEED
+   run();
+   return 0;
+}
+void run(void)
+{
+
+   int i, d, c;
+//             <    is written>: c d i
+   i = d = c = 0;
+
+   while (1) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      while (flip())
+//             <    is read   >: c
+         if (c<0) {
+//             <    is read   >: c
+//             <    is written>: c
+            c++;
+//             <    is read   >: i
+//             <    is written>: i
+            i++;
+//             <    is read   >: d i
+            if (i<d)
+               checking_error();
+         }
+         else
+            while (1)
+               ;
+//             <    is read   >: c
+      if (c==0) {
+//             <    is read   >: c
+//             <    is written>: c
+         c++;
+//             <    is read   >: i
+//             <    is written>: i
+         i++;
+//             <    is read   >: d i
+         if (i<d)
+            checking_error();
+      }
+      else
+         while (1)
+            ;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      while (flip())
+//             <    is read   >: c
+         if (c>=2) {
+//             <    is read   >: c
+//             <    is written>: c
+            c--;
+//             <    is read   >: d
+//             <    is written>: d
+            d++;
+//             <    is read   >: d i
+            if (i<d)
+               checking_error();
+         }
+         else
+            while (1)
+               ;
+//             <    is read   >: c
+      if (c==1) {
+//             <    is read   >: c
+//             <    is written>: c
+         c--;
+//             <    is read   >: d
+//             <    is written>: d
+         d++;
+//             <    is read   >: d i
+         if (i<d)
+            checking_error();
+      }
+      else
+         while (1)
+            ;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void assert_error(void)
+{
+
+// Points To: none
+
+   exit(1);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void checking_error(void)
+{
+
+// Points To: none
+
+   exit(2);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flip(void)
+{
+
+// Points To: none
+
+   return rand()%2;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   run();
+
+// Points To: none
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void run(void)
+{
+
+
+// Points To: none
+
+   int i, d, c;
+
+// Points To: none
+
+   i = d = c = 0;
+
+// Points To: none
+
+
+   while (1) {
+
+// Points To: none
+
+      while (flip())
+
+// Points To: none
+
+         if (c<0) {
+
+// Points To: none
+
+            c++;
+
+// Points To: none
+
+            i++;
+
+// Points To: none
+
+            if (i<d)
+
+// Points To: none
+
+               checking_error();
+         }
+         else
+
+// Points To: none
+
+            while (1)
+
+// Points To: none
+
+               ;
+
+// Points To: none
+
+      if (c==0) {
+
+// Points To: none
+
+         c++;
+
+// Points To: none
+
+         i++;
+
+// Points To: none
+
+         if (i<d)
+
+// Points To: none
+
+            checking_error();
+      }
+      else
+
+// Points To: none
+
+         while (1)
+
+// Points To: none
+
+            ;
+
+// Points To: none
+
+      while (flip())
+
+// Points To: none
+
+         if (c>=2) {
+
+// Points To: none
+
+            c--;
+
+// Points To: none
+
+            d++;
+
+// Points To: none
+
+            if (i<d)
+
+// Points To: none
+
+               checking_error();
+         }
+         else
+
+// Points To: none
+
+            while (1)
+
+// Points To: none
+
+               ;
+
+// Points To: none
+
+      if (c==1) {
+
+// Points To: none
+
+         c--;
+
+// Points To: none
+
+         d++;
+
+// Points To: none
+
+         if (i<d)
+
+// Points To: none
+
+            checking_error();
+      }
+      else
+
+// Points To: none
+
+         while (1)
+
+// Points To: none
+
+            ;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void assert_error(void)
+{
+   exit(1);
+}
+void checking_error(void)
+{
+   exit(2);
+}
+int flip(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int main(void)
+{
+//             <may be read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: _RANDOM_EFFECTS:GEN_SEED
+   run();
+   return 0;
+}
+void run(void)
+{
+
+   int i, d, c;
+//             <    is written>: c d i
+   i = d = c = 0;
+
+   while (1) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      while (flip())
+//             <    is read   >: c
+         if (c<0) {
+//             <    is read   >: c
+//             <    is written>: c
+            c++;
+//             <    is read   >: i
+//             <    is written>: i
+            i++;
+//             <    is read   >: d i
+            if (i<d)
+               checking_error();
+         }
+         else
+            while (1)
+               ;
+//             <    is read   >: c
+      if (c==0) {
+//             <    is read   >: c
+//             <    is written>: c
+         c++;
+//             <    is read   >: i
+//             <    is written>: i
+         i++;
+//             <    is read   >: d i
+         if (i<d)
+            checking_error();
+      }
+      else
+         while (1)
+            ;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      while (flip())
+//             <    is read   >: c
+         if (c>=2) {
+//             <    is read   >: c
+//             <    is written>: c
+            c--;
+//             <    is read   >: d
+//             <    is written>: d
+            d++;
+//             <    is read   >: d i
+            if (i<d)
+               checking_error();
+         }
+         else
+            while (1)
+               ;
+//             <    is read   >: c
+      if (c==1) {
+//             <    is read   >: c
+//             <    is written>: c
+         c--;
+//             <    is read   >: d
+//             <    is written>: d
+         d++;
+//             <    is read   >: d i
+         if (i<d)
+            checking_error();
+      }
+      else
+         while (1)
+            ;
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

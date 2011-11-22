@@ -1,0 +1,157 @@
+
+PROPER  EFFECTS 
+
+void whilewhile03()
+{
+//             <    is written>: i
+   int i = -1;
+//             <    is read   >: i
+
+   while (i<=10)
+      if (1) {
+//             <    is read   >: i
+         while (i<=10&&i>=0)
+//             <    is read   >: i
+//             <    is written>: i
+            i++;
+//             <    is read   >: i
+         while (i<=10&&i<0)
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+         // Never reached
+         ;
+      }
+
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void whilewhile03()
+{
+
+// Points To: none
+
+   int i = -1;
+
+// Points To: none
+
+
+   while (i<=10)
+
+// Points To: none
+
+      if (1) {
+
+// Points To: none
+
+         while (i<=10&&i>=0)
+
+// Points To: none
+
+            i++;
+
+// Points To: none
+
+         while (i<=10&&i<0)
+
+// Points To: none
+
+            i--;
+
+// Points To: none
+
+         // Never reached
+         ;
+      }
+
+// Points To: none
+
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void whilewhile03()
+{
+//             <    is written>: i
+   int i = -1;
+//             <    is read   >: i
+
+   while (i<=10)
+      if (1) {
+//             <    is read   >: i
+         while (i<=10&&i>=0)
+//             <    is read   >: i
+//             <    is written>: i
+            i++;
+//             <    is read   >: i
+         while (i<=10&&i<0)
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+         // Never reached
+         ;
+      }
+
+   return;
+}
+
+ *********************** Use-Def Chains *********************
+
+	25 --> 27 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	25 --> 29 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	25 --> 30 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	25 --> 31 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	25 --> 32 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	27 --> 30 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	27 --> 32 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	29 --> 30 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	29 --> 32 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	30 --> 30 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	30 --> 31 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	30 --> 32 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	31 --> 30 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	31 --> 32 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	32 --> 29 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	32 --> 30 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	32 --> 31 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	32 --> 32 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

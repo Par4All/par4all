@@ -1,0 +1,130 @@
+
+PROPER  EFFECTS 
+
+int induction03(int a)
+{
+   /*a,*/
+   int b, i, j;
+//             <may be read   >: stdin[0]
+//             <may be written>: a stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &a);
+//             <    is written>: j
+
+   for(j = 1; j <= 9; j += 1) {
+//             <    is read   >: a
+//             <    is written>: a
+      a = a-1;
+//             <    is read   >: a j
+//             <    is written>: b
+      b = j+a;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a+1;
+   }
+//             <    is read   >: b
+   return b;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int induction03(int a)
+{
+   /*a,*/
+
+// Points To: none
+
+   int b, i, j;
+
+// Points To: none
+
+
+   scanf("%d", &a);
+
+// Points To: none
+
+
+   for(j = 1; j <= 9; j += 1) {
+
+// Points To: none
+
+      a = a-1;
+
+// Points To: none
+
+      b = j+a;
+
+// Points To: none
+
+      a = a+1;
+   }
+
+// Points To: none
+
+   return b;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int induction03(int a)
+{
+   /*a,*/
+   int b, i, j;
+//             <may be read   >: stdin[0]
+//             <may be written>: a stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &a);
+//             <    is written>: j
+
+   for(j = 1; j <= 9; j += 1) {
+//             <    is read   >: a
+//             <    is written>: a
+      a = a-1;
+//             <    is read   >: a j
+//             <    is written>: b
+      b = j+a;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a+1;
+   }
+//             <    is read   >: b
+   return b;
+}
+
+ *********************** Use-Def Chains *********************
+
+	31 --> 34 with conflicts
+		from <a-W-MAY> to <a-W-EXACT>
+		from <a-W-MAY> to <a-R-EXACT>
+	34 --> 34 with conflicts
+		from <a-R-EXACT> to <a-W-EXACT>
+	34 --> 35 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	34 --> 36 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+		from <a-W-EXACT> to <a-R-EXACT>
+		from <a-R-EXACT> to <a-W-EXACT>
+	35 --> 34 with conflicts
+		from <a-R-EXACT> to <a-W-EXACT>
+	35 --> 35 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+	35 --> 36 with conflicts
+		from <a-R-EXACT> to <a-W-EXACT>
+	35 --> 38 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	36 --> 34 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+		from <a-W-EXACT> to <a-R-EXACT>
+		from <a-R-EXACT> to <a-W-EXACT>
+
+****************** End of Dependence Graph ******************

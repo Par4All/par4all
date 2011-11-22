@@ -1,0 +1,375 @@
+
+PROPER  EFFECTS 
+
+int gulwani_cav08_02(int x, int y, int z)
+{
+   int y0, k;
+//             <    is read   >: z
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 12, (const char *) 0);
+//             <    is read   >: y
+//             <    is written>: y0
+   y0 = y;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: x
+   while (x>0) {
+//             <    is read   >: k
+//             <    is written>: k
+      //    assert(y>=y0-k,"__bad");
+      k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+      x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+      y = y+z;
+   }
+
+   return 0;
+}
+int gulwani_cav08_02_r(int x, int y, int z)
+{
+   int y0, k;
+//             <    is read   >: z
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 27, (const char *) 0);
+//             <    is read   >: y
+//             <    is written>: y0
+   y0 = y;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: x
+   while (x>0) {
+//             <    is read   >: x y
+      while (x>0&&y>=0) {
+//             <    is read   >: k
+//             <    is written>: k
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+         x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+         y = y+z;
+      }
+//             <    is read   >: x y
+      while (x>0&&y<0) {
+//             <    is read   >: k
+//             <    is written>: k
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+         x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+         y = y+z;
+      }
+   }
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int gulwani_cav08_02(int x, int y, int z)
+{
+
+// Points To: none
+
+   int y0, k;
+
+// Points To: none
+
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 12, (const char *) 0);
+
+// Points To: none
+
+   y0 = y;
+
+// Points To: none
+
+   k = 0;
+
+// Points To: none
+
+   while (x>0) {
+
+// Points To: none
+
+      //    assert(y>=y0-k,"__bad");
+      k = k+1;
+
+// Points To: none
+
+      x = x+y;
+
+// Points To: none
+
+      y = y+z;
+   }
+
+// Points To: none
+
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int gulwani_cav08_02_r(int x, int y, int z)
+{
+
+// Points To: none
+
+   int y0, k;
+
+// Points To: none
+
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 27, (const char *) 0);
+
+// Points To: none
+
+   y0 = y;
+
+// Points To: none
+
+   k = 0;
+
+// Points To: none
+
+   while (x>0) {
+
+// Points To: none
+
+      while (x>0&&y>=0) {
+
+// Points To: none
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+// Points To: none
+
+         x = x+y;
+
+// Points To: none
+
+         y = y+z;
+      }
+
+// Points To: none
+
+      while (x>0&&y<0) {
+
+// Points To: none
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+// Points To: none
+
+         x = x+y;
+
+// Points To: none
+
+         y = y+z;
+      }
+   }
+
+// Points To: none
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int gulwani_cav08_02(int x, int y, int z)
+{
+   int y0, k;
+//             <    is read   >: z
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 12, (const char *) 0);
+//             <    is read   >: y
+//             <    is written>: y0
+   y0 = y;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: x
+   while (x>0) {
+//             <    is read   >: k
+//             <    is written>: k
+      //    assert(y>=y0-k,"__bad");
+      k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+      x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+      y = y+z;
+   }
+
+   return 0;
+}
+int gulwani_cav08_02_r(int x, int y, int z)
+{
+   int y0, k;
+//             <    is read   >: z
+   z<0?(void) 0:__assert_fail("z<0", "$VDIR/gulwani_cav08_02.c", 27, (const char *) 0);
+//             <    is read   >: y
+//             <    is written>: y0
+   y0 = y;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: x
+   while (x>0) {
+//             <    is read   >: x y
+      while (x>0&&y>=0) {
+//             <    is read   >: k
+//             <    is written>: k
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+         x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+         y = y+z;
+      }
+//             <    is read   >: x y
+      while (x>0&&y<0) {
+//             <    is read   >: k
+//             <    is written>: k
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+//             <    is read   >: x y
+//             <    is written>: x
+         x = x+y;
+//             <    is read   >: y z
+//             <    is written>: y
+         y = y+z;
+      }
+   }
+
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	28 --> 35 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	28 --> 41 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	29 --> 33 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+	29 --> 39 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+	30 --> 34 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	30 --> 40 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	31 --> 34 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	31 --> 35 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	31 --> 40 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	31 --> 41 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	33 --> 33 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+	33 --> 39 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+	34 --> 34 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	34 --> 35 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	34 --> 37 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	34 --> 40 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	34 --> 41 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	35 --> 34 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	35 --> 35 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	35 --> 37 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	35 --> 40 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	35 --> 41 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	37 --> 34 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	37 --> 35 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	37 --> 40 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	37 --> 41 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	39 --> 33 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+	39 --> 39 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+		from <k-W-EXACT> to <k-R-EXACT>
+		from <k-R-EXACT> to <k-W-EXACT>
+	40 --> 31 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	40 --> 34 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	40 --> 35 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	40 --> 37 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	40 --> 40 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	40 --> 41 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	41 --> 31 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	41 --> 34 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	41 --> 35 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	41 --> 37 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	41 --> 40 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	41 --> 41 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+
+****************** End of Dependence Graph ******************

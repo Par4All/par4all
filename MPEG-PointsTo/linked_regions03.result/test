@@ -1,0 +1,319 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int ii, jj, x0;
+   double x1;
+
+//             <    is written>: N
+   int N = 100;
+   double A[100][100];
+//             <    is read   >: N
+//             <    is written>: ii
+
+   for(ii = 1; ii <= N; ii += 1)
+//             <    is read   >: N
+//             <    is written>: jj
+      for(jj = 1; jj <= N; jj += 1)
+//             <    is read   >: N
+         if (1) {
+//             <    is read   >: N ii jj
+//             <    is written>: x0
+            x0 = ii*jj;
+//             <    is read   >: N
+//             <    is written>: x1
+            x1 = (double) N/2;
+//             <    is read   >: N x0 x1
+            if (x0<x1)
+//             <    is read   >: N
+               if (1) {
+//             <    is read   >: N ii jj
+//             <    is written>: A[N-ii-1][ii+jj-1]
+                  A[N-ii-1][ii+jj-1] = 1.0;
+//             <    is read   >: N ii jj
+//             <    is written>: A[ii-1][N-ii-jj-1]
+                  A[ii-1][N-ii-jj-1] = 1.0;
+               }
+//             <    is read   >: N ii jj
+            if (ii==jj)
+//             <    is read   >: N ii jj
+//             <    is written>: A[ii-1][jj-1]
+               A[ii-1][jj-1] = 1.0;
+         }
+   {
+      int i;
+//             <    is read   >: N
+//             <    is written>: i
+      for(i = 0; i <= N-1; i += 1) {
+         int j;
+//             <    is read   >: N
+//             <    is written>: j
+         for(j = 0; j <= N-1; j += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: A[i][j] N i j stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            printf("%f\n", A[i][j]);
+      }
+   }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int ii, jj, x0;
+
+// Points To: none
+
+   double x1;
+
+
+// Points To: none
+
+   int N = 100;
+
+// Points To: none
+
+   double A[100][100];
+
+// Points To: none
+
+
+   for(ii = 1; ii <= N; ii += 1)
+
+// Points To: none
+
+      for(jj = 1; jj <= N; jj += 1)
+
+// Points To: none
+
+         if (1) {
+
+// Points To: none
+
+            x0 = ii*jj;
+
+// Points To: none
+
+            x1 = (double) N/2;
+
+// Points To: none
+
+            if (x0<x1)
+
+// Points To: none
+
+               if (1) {
+
+// Points To: none
+
+                  A[N-ii-1][ii+jj-1] = 1.0;
+
+// Points To: none
+
+                  A[ii-1][N-ii-jj-1] = 1.0;
+               }
+
+// Points To: none
+
+            if (ii==jj)
+
+// Points To: none
+
+               A[ii-1][jj-1] = 1.0;
+         }
+   {
+
+// Points To: none
+
+      int i;
+
+// Points To: none
+
+      for(i = 0; i <= N-1; i += 1) {
+
+// Points To: none
+
+         int j;
+
+// Points To: none
+
+         for(j = 0; j <= N-1; j += 1)
+
+// Points To: none
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int ii, jj, x0;
+   double x1;
+
+//             <    is written>: N
+   int N = 100;
+   double A[100][100];
+//             <    is read   >: N
+//             <    is written>: ii
+
+   for(ii = 1; ii <= N; ii += 1)
+//             <    is read   >: N
+//             <    is written>: jj
+      for(jj = 1; jj <= N; jj += 1)
+//             <    is read   >: N
+         if (1) {
+//             <    is read   >: N ii jj
+//             <    is written>: x0
+            x0 = ii*jj;
+//             <    is read   >: N
+//             <    is written>: x1
+            x1 = (double) N/2;
+//             <    is read   >: N x0 x1
+            if (x0<x1)
+//             <    is read   >: N
+               if (1) {
+//             <    is read   >: N ii jj
+//             <    is written>: A[N-ii-1][ii+jj-1]
+                  A[N-ii-1][ii+jj-1] = 1.0;
+//             <    is read   >: N ii jj
+//             <    is written>: A[ii-1][N-ii-jj-1]
+                  A[ii-1][N-ii-jj-1] = 1.0;
+               }
+//             <    is read   >: N ii jj
+            if (ii==jj)
+//             <    is read   >: N ii jj
+//             <    is written>: A[ii-1][jj-1]
+               A[ii-1][jj-1] = 1.0;
+         }
+   {
+      int i;
+//             <    is read   >: N
+//             <    is written>: i
+      for(i = 0; i <= N-1; i += 1) {
+         int j;
+//             <    is read   >: N
+//             <    is written>: j
+         for(j = 0; j <= N-1; j += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: A[i][j] N i j stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            printf("%f\n", A[i][j]);
+      }
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	31 --> 34 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 35 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 36 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 37 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 38 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 39 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 40 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 41 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 42 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 44 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 45 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 48 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 49 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	31 --> 50 with conflicts
+		from <N-W-EXACT> to <N-R-EXACT>
+	35 --> 35 with conflicts
+		from <jj-W-EXACT> to <jj-W-EXACT>
+	37 --> 35 with conflicts
+		from <jj-R-EXACT> to <jj-W-EXACT>
+	37 --> 37 with conflicts
+		from <x0-W-EXACT> to <x0-W-EXACT>
+	37 --> 39 with conflicts
+		from <x0-W-EXACT> to <x0-R-EXACT>
+	38 --> 38 with conflicts
+		from <x1-W-EXACT> to <x1-W-EXACT>
+	38 --> 39 with conflicts
+		from <x1-W-EXACT> to <x1-R-EXACT>
+	39 --> 37 with conflicts
+		from <x0-R-EXACT> to <x0-W-EXACT>
+	39 --> 38 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	41 --> 35 with conflicts
+		from <jj-R-EXACT> to <jj-W-EXACT>
+	41 --> 41 with conflicts
+		from <A[N-ii-1][ii+jj-1]-W-EXACT> to <A[N-ii-1][ii+jj-1]-W-EXACT>
+	41 --> 42 with conflicts
+		from <A[N-ii-1][ii+jj-1]-W-EXACT> to <A[ii-1][N-ii-jj-1]-W-EXACT>
+	41 --> 45 with conflicts
+		from <A[N-ii-1][ii+jj-1]-W-EXACT> to <A[ii-1][jj-1]-W-EXACT>
+	41 --> 50 with conflicts
+		from <A[N-ii-1][ii+jj-1]-W-EXACT> to <A[i][j]-R-EXACT>
+	42 --> 35 with conflicts
+		from <jj-R-EXACT> to <jj-W-EXACT>
+	42 --> 41 with conflicts
+		from <A[ii-1][N-ii-jj-1]-W-EXACT> to <A[N-ii-1][ii+jj-1]-W-EXACT>
+	42 --> 42 with conflicts
+		from <A[ii-1][N-ii-jj-1]-W-EXACT> to <A[ii-1][N-ii-jj-1]-W-EXACT>
+	42 --> 45 with conflicts
+		from <A[ii-1][N-ii-jj-1]-W-EXACT> to <A[ii-1][jj-1]-W-EXACT>
+	42 --> 50 with conflicts
+		from <A[ii-1][N-ii-jj-1]-W-EXACT> to <A[i][j]-R-EXACT>
+	44 --> 35 with conflicts
+		from <jj-R-EXACT> to <jj-W-EXACT>
+	45 --> 35 with conflicts
+		from <jj-R-EXACT> to <jj-W-EXACT>
+	45 --> 41 with conflicts
+		from <A[ii-1][jj-1]-W-EXACT> to <A[N-ii-1][ii+jj-1]-W-EXACT>
+	45 --> 42 with conflicts
+		from <A[ii-1][jj-1]-W-EXACT> to <A[ii-1][N-ii-jj-1]-W-EXACT>
+	45 --> 45 with conflicts
+		from <A[ii-1][jj-1]-W-EXACT> to <A[ii-1][jj-1]-W-EXACT>
+	45 --> 50 with conflicts
+		from <A[ii-1][jj-1]-W-EXACT> to <A[i][j]-R-EXACT>
+	49 --> 49 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	50 --> 49 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	50 --> 50 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

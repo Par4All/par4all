@@ -1,0 +1,254 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+
+   int x, y, z, lock;
+//             <    is written>: x
+
+   x = 1;
+//             <    is written>: lock
+   lock = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: x y
+   
+   
+   while (x!=y) {
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] z
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &z);
+//             <    is read   >: z
+      if (z>=0) {
+//             <    is written>: lock
+         lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+         x = y;
+//             <    is written>: lock
+         lock = 0;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+      else {
+//             <    is written>: lock
+         lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+         x = y;
+      }
+   }
+//             <    is read   >: lock
+   
+   
+   if (lock==1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+
+// Points To: none
+
+   int x, y, z, lock;
+
+// Points To: none
+
+
+   x = 1;
+
+// Points To: none
+
+   lock = 0;
+
+// Points To: none
+
+   y = 0;
+
+// Points To: none
+
+   
+   
+   while (x!=y) {
+
+// Points To: none
+
+      scanf("%d", &z);
+
+// Points To: none
+
+      if (z>=0) {
+
+// Points To: none
+
+         lock = 1;
+
+// Points To: none
+
+         x = y;
+
+// Points To: none
+
+         lock = 0;
+
+// Points To: none
+
+         y++;
+      }
+      else {
+
+// Points To: none
+
+         lock = 1;
+
+// Points To: none
+
+         x = y;
+      }
+   }
+
+// Points To: none
+
+   
+   
+   if (lock==1)
+
+// Points To: none
+
+      printf("property  verified\n");
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+
+   int x, y, z, lock;
+//             <    is written>: x
+
+   x = 1;
+//             <    is written>: lock
+   lock = 0;
+//             <    is written>: y
+   y = 0;
+//             <    is read   >: x y
+   
+   
+   while (x!=y) {
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] z
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &z);
+//             <    is read   >: z
+      if (z>=0) {
+//             <    is written>: lock
+         lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+         x = y;
+//             <    is written>: lock
+         lock = 0;
+//             <    is read   >: y
+//             <    is written>: y
+         y++;
+      }
+      else {
+//             <    is written>: lock
+         lock = 1;
+//             <    is read   >: y
+//             <    is written>: x
+         x = y;
+      }
+   }
+//             <    is read   >: lock
+   
+   
+   if (lock==1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property  verified\n");
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 19 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	14 --> 23 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	15 --> 23 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	15 --> 32 with conflicts
+		from <lock-W-EXACT> to <lock-R-EXACT>
+	16 --> 19 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 23 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	16 --> 24 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	19 --> 23 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	19 --> 24 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	21 --> 21 with conflicts
+		from <z-W-MAY> to <z-W-MAY>
+		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+	21 --> 22 with conflicts
+		from <z-W-MAY> to <z-R-EXACT>
+	22 --> 21 with conflicts
+		from <z-R-EXACT> to <z-W-MAY>
+	23 --> 23 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	23 --> 24 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	23 --> 27 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	23 --> 24 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	24 --> 23 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	24 --> 24 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	24 --> 27 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	24 --> 23 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	24 --> 27 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	27 --> 23 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+	27 --> 24 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	27 --> 23 with conflicts
+		from <lock-W-EXACT> to <lock-W-EXACT>
+	27 --> 32 with conflicts
+		from <lock-W-EXACT> to <lock-R-EXACT>
+
+****************** End of Dependence Graph ******************

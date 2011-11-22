@@ -1,0 +1,176 @@
+
+PROPER  EFFECTS 
+
+int foo()
+{
+//             <    is written>: x
+   int x = 3;
+//             <    is read   >: x
+   return x*x*x/54;
+}
+void main()
+{
+   int x1, y, x2;
+//             <    is read   >: x1 x2
+   0<=x1&&x1<=x2&&x2<=1?(void) 0:__assert_fail("0<=x1 && x1<=x2 && x2<=1", "$VDIR/schrammel02.c", 8, (const char *) 0);
+//             <    is written>: y
+   y = foo();
+//             <    is read   >: x1 x2 y
+   while (x1+x2<=4&&1<=y&&y<=2) {
+//             <    is read   >: x1 y
+//             <    is written>: x1
+      x1 = x1+2*y-1;
+//             <    is read   >: x2 y
+//             <    is written>: x2
+      x2 = x2+y;
+//             <    is written>: y
+      y = foo();
+   }
+//             <    is read   >: y
+//             <    is written>: y
+   // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
+   y = y;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo()
+{
+
+// Points To: none
+
+   int x = 3;
+
+// Points To: none
+
+   return x*x*x/54;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void main()
+{
+
+// Points To: none
+
+   int x1, y, x2;
+
+// Points To: none
+
+   0<=x1&&x1<=x2&&x2<=1?(void) 0:__assert_fail("0<=x1 && x1<=x2 && x2<=1", "$VDIR/schrammel02.c", 8, (const char *) 0);
+
+// Points To: none
+
+   y = foo();
+
+// Points To: none
+
+   while (x1+x2<=4&&1<=y&&y<=2) {
+
+// Points To: none
+
+      x1 = x1+2*y-1;
+
+// Points To: none
+
+      x2 = x2+y;
+
+// Points To: none
+
+      y = foo();
+   }
+
+// Points To: none
+
+   // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
+   y = y;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int foo()
+{
+//             <    is written>: x
+   int x = 3;
+//             <    is read   >: x
+   return x*x*x/54;
+}
+void main()
+{
+   int x1, y, x2;
+//             <    is read   >: x1 x2
+   0<=x1&&x1<=x2&&x2<=1?(void) 0:__assert_fail("0<=x1 && x1<=x2 && x2<=1", "$VDIR/schrammel02.c", 8, (const char *) 0);
+//             <    is written>: y
+   y = foo();
+//             <    is read   >: x1 x2 y
+   while (x1+x2<=4&&1<=y&&y<=2) {
+//             <    is read   >: x1 y
+//             <    is written>: x1
+      x1 = x1+2*y-1;
+//             <    is read   >: x2 y
+//             <    is written>: x2
+      x2 = x2+y;
+//             <    is written>: y
+      y = foo();
+   }
+//             <    is read   >: y
+//             <    is written>: y
+   // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
+   y = y;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 11 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	08 --> 12 with conflicts
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	09 --> 10 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	09 --> 11 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	09 --> 12 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	09 --> 13 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+	09 --> 16 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	10 --> 11 with conflicts
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	10 --> 12 with conflicts
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	10 --> 13 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	11 --> 11 with conflicts
+		from <x1-W-EXACT> to <x1-W-EXACT>
+		from <x1-W-EXACT> to <x1-R-EXACT>
+		from <x1-R-EXACT> to <x1-W-EXACT>
+	11 --> 13 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	12 --> 12 with conflicts
+		from <x2-W-EXACT> to <x2-W-EXACT>
+		from <x2-W-EXACT> to <x2-R-EXACT>
+		from <x2-R-EXACT> to <x2-W-EXACT>
+	12 --> 13 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	13 --> 11 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	13 --> 12 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	13 --> 13 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+	13 --> 16 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+
+****************** End of Dependence Graph ******************

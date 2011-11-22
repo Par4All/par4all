@@ -1,0 +1,166 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: s0 s1 s2
+   int s0 = 1, s1 = 0, s2 = 0;
+   //int c0 = 1, c1 = 0, c2 = 0;
+   
+   while (1)
+//             <    is read   >: s0
+      if (s0==1) {
+//             <    is written>: s0
+         s0 = 0;
+//             <    is written>: s1
+         s1 = 1;
+      }
+      else if (s1==1) {
+//             <    is written>: s1
+         s1 = 0;
+//             <    is written>: s2
+         s2 = 1;
+      }
+      else if (s2==1) {
+//             <    is written>: s2
+         s2 = 0;
+//             <    is written>: s0
+         s0 = 1;
+      }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int s0 = 1, s1 = 0, s2 = 0;
+
+// Points To: none
+
+   //int c0 = 1, c1 = 0, c2 = 0;
+   
+   while (1)
+
+// Points To: none
+
+      if (s0==1) {
+
+// Points To: none
+
+         s0 = 0;
+
+// Points To: none
+
+         s1 = 1;
+      }
+      else if (s1==1) {
+
+// Points To: none
+
+         s1 = 0;
+
+// Points To: none
+
+         s2 = 1;
+      }
+      else if (s2==1) {
+
+// Points To: none
+
+         s2 = 0;
+
+// Points To: none
+
+         s0 = 1;
+      }
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: s0 s1 s2
+   int s0 = 1, s1 = 0, s2 = 0;
+   //int c0 = 1, c1 = 0, c2 = 0;
+   
+   while (1)
+//             <    is read   >: s0
+      if (s0==1) {
+//             <    is written>: s0
+         s0 = 0;
+//             <    is written>: s1
+         s1 = 1;
+      }
+      else if (s1==1) {
+//             <    is written>: s1
+         s1 = 0;
+//             <    is written>: s2
+         s2 = 1;
+      }
+      else if (s2==1) {
+//             <    is written>: s2
+         s2 = 0;
+//             <    is written>: s0
+         s0 = 1;
+      }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 19 with conflicts
+		from <s0-W-EXACT> to <s0-R-EXACT>
+	15 --> 20 with conflicts
+		from <s0-W-EXACT> to <s0-W-EXACT>
+	15 --> 21 with conflicts
+		from <s1-W-EXACT> to <s1-W-EXACT>
+	15 --> 26 with conflicts
+		from <s2-W-EXACT> to <s2-W-EXACT>
+	19 --> 20 with conflicts
+		from <s0-R-EXACT> to <s0-W-EXACT>
+	20 --> 19 with conflicts
+		from <s0-W-EXACT> to <s0-R-EXACT>
+	20 --> 20 with conflicts
+		from <s0-W-EXACT> to <s0-W-EXACT>
+	20 --> 31 with conflicts
+		from <s0-W-EXACT> to <s0-W-EXACT>
+	21 --> 21 with conflicts
+		from <s1-W-EXACT> to <s1-W-EXACT>
+	21 --> 24 with conflicts
+		from <s1-W-EXACT> to <s1-R-EXACT>
+	21 --> 25 with conflicts
+		from <s1-W-EXACT> to <s1-W-EXACT>
+	24 --> 21 with conflicts
+		from <s1-R-EXACT> to <s1-W-EXACT>
+	25 --> 21 with conflicts
+		from <s1-W-EXACT> to <s1-W-EXACT>
+	26 --> 26 with conflicts
+		from <s2-W-EXACT> to <s2-W-EXACT>
+	26 --> 29 with conflicts
+		from <s2-W-EXACT> to <s2-R-EXACT>
+	26 --> 30 with conflicts
+		from <s2-W-EXACT> to <s2-W-EXACT>
+	29 --> 26 with conflicts
+		from <s2-R-EXACT> to <s2-W-EXACT>
+	30 --> 26 with conflicts
+		from <s2-W-EXACT> to <s2-W-EXACT>
+	31 --> 19 with conflicts
+		from <s0-W-EXACT> to <s0-R-EXACT>
+	31 --> 20 with conflicts
+		from <s0-W-EXACT> to <s0-W-EXACT>
+
+****************** End of Dependence Graph ******************

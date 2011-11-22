@@ -1,0 +1,85 @@
+
+PROPER  EFFECTS 
+
+void mehdi01()
+{
+//             <    is written>: w z
+   int i, z = 0, w = 0;
+//             <    is read   >: SIZE
+//             <    is written>: i
+   for(i = 0; i <= SIZE-1; i += 1) {
+//             <    is read   >: SIZE z
+//             <    is written>: z
+      z = z+1;
+//             <    is read   >: SIZE z
+//             <    is written>: w
+      w = z+2;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void mehdi01()
+{
+
+// Points To: none
+
+   int i, z = 0, w = 0;
+
+// Points To: none
+
+   for(i = 0; i <= SIZE-1; i += 1) {
+
+// Points To: none
+
+      z = z+1;
+
+// Points To: none
+
+      w = z+2;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void mehdi01()
+{
+//             <    is written>: w z
+   int i, z = 0, w = 0;
+//             <    is read   >: SIZE
+//             <    is written>: i
+   for(i = 0; i <= SIZE-1; i += 1) {
+//             <    is read   >: SIZE z
+//             <    is written>: z
+      z = z+1;
+//             <    is read   >: SIZE z
+//             <    is written>: w
+      w = z+2;
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 09 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-W-EXACT> to <z-R-EXACT>
+	07 --> 10 with conflicts
+		from <w-W-EXACT> to <w-W-EXACT>
+	09 --> 09 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-W-EXACT> to <z-R-EXACT>
+		from <z-R-EXACT> to <z-W-EXACT>
+	09 --> 10 with conflicts
+		from <z-W-EXACT> to <z-R-EXACT>
+	10 --> 09 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+	10 --> 10 with conflicts
+		from <w-W-EXACT> to <w-W-EXACT>
+
+****************** End of Dependence Graph ******************

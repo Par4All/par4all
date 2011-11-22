@@ -1,0 +1,190 @@
+
+PROPER  EFFECTS 
+
+void compute(int fullcount, float input[0][0], float output[1][256])
+{
+//             <    is read   >: fslider2
+//             <    is written>: fSlow2
+   float fSlow2 = 4.656613e-10f*fslider2;
+   int index;
+   int i;
+
+   float output0[256];
+//             <    is read   >: fullcount
+//             <    is written>: index
+   
+   
+   for(index = 0; index <= fullcount-32; index += 32) {
+//             <    is written>: count
+      const int count = 32;
+//             <    is read   >: index
+//             <    is written>: 0`1`output0
+      float *output0 = &output[0][index];
+//             <    is read   >: fYec0_idx fYec0_idx_save fullcount
+//             <    is written>: fYec0_idx
+      
+      
+      fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
+//             <    is read   >: count fullcount
+//             <    is written>: i
+
+      for(i = 0; i <= count-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: count fSlow2 fullcount i 0`1`output0
+         output0[i] = fSlow2;
+   }
+}
+void main()
+{
+//             <    is written>: count
+   int count = 256;
+   float in[0][0];
+   float out[1][count];
+//             <may be read   >: fYec0_idx fYec0_idx_save
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: count fslider2
+   compute(count, in, out);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void compute(int fullcount, float input[0][0], float output[1][256])
+{
+
+// Points To: none
+
+   float fSlow2 = 4.656613e-10f*fslider2;
+
+// Points To: none
+
+   int index;
+
+// Points To: none
+
+   int i;
+
+
+// Points To: none
+
+   float output0[256];
+
+// Points To: none
+
+   
+   
+   for(index = 0; index <= fullcount-32; index += 32) {
+
+// Points To:
+// 0`1`output0 -> output[0][*] , MAY
+
+      const int count = 32;
+
+// Points To:
+// 0`1`output0 -> output[0][*] , MAY
+
+      float *output0 = &output[0][index];
+
+// Points To:
+// 0`1`output0 -> output[0][*] , MAY
+
+      
+      
+      fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
+
+// Points To:
+// 0`1`output0 -> output[0][*] , MAY
+
+
+      for(i = 0; i <= count-1; i += 1)
+
+// Points To:
+// 0`1`output0 -> output[0][*] , EXACT
+
+         output0[i] = fSlow2;
+   }
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void main()
+{
+
+// Points To: none
+
+   int count = 256;
+
+// Points To: none
+
+   float in[0][0];
+
+// Points To: none
+
+   float out[1][count];
+
+// Points To: none
+
+   compute(count, in, out);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void compute(int fullcount, float input[0][0], float output[1][256])
+{
+//             <    is read   >: fslider2
+//             <    is written>: fSlow2
+   float fSlow2 = 4.656613e-10f*fslider2;
+   int index;
+   int i;
+
+   float output0[256];
+//             <    is read   >: fullcount
+//             <    is written>: index
+   
+   
+   for(index = 0; index <= fullcount-32; index += 32) {
+//             <    is written>: count
+      const int count = 32;
+//             <    is read   >: index
+//             <    is written>: 0`1`output0
+      float *output0 = &output[0][index];
+//             <    is read   >: fYec0_idx fYec0_idx_save fullcount
+//             <    is written>: fYec0_idx
+      
+      
+      fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
+//             <    is read   >: count fullcount
+//             <    is written>: i
+
+      for(i = 0; i <= count-1; i += 1)
+//             <may be written>: output[0][*]
+//             <    is read   >: count fSlow2 fullcount i 0`1`output0
+         output0[i] = fSlow2;
+   }
+}
+void main()
+{
+//             <    is written>: count
+   int count = 256;
+   float in[0][0];
+   float out[1][count];
+//             <may be read   >: fYec0_idx fYec0_idx_save
+//             <may be written>: fYec0_idx out[0][*]
+//             <    is read   >: count fslider2
+   compute(count, in, out);
+}
+
+ *********************** Use-Def Chains *********************
+
+	36 --> 39 with conflicts
+		from <count-W-EXACT> to <count-R-EXACT>
+
+****************** End of Dependence Graph ******************

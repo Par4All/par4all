@@ -1,0 +1,142 @@
+
+PROPER  EFFECTS 
+
+int main(int argc, char *argv[])
+{
+   //scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+   
+//             <    is written>: _u_N
+   int _u_N = 100;
+   double _u_A[100][100];
+   {
+      int _u_ii;
+//             <    is read   >: _u_N
+//             <    is written>: _u_ii
+      //scilab_rt_zeros_i0i0_d2(_u_N,_u_N,100,100,_u_A);
+      for(_u_ii = 1; _u_ii <= _u_N; _u_ii += 1) {
+         int _u_jj;
+//             <    is read   >: _u_N
+//             <    is written>: _u_jj
+         for(_u_jj = 1; _u_jj <= _u_N; _u_jj += 1)
+//             <    is read   >: __lv0 __lv1 __lv2 __lv3 _u_N _u_ii 
+//                               _u_jj
+//             <    is written>: _u_A[_u_ii-1][_u_jj-1]
+            _u_A[_u_ii-1][_u_jj-1] = 1.0+(double) (__lv0+__lv1+__lv2+__lv3);
+      }
+   }
+   //scilab_rt_disp_d2_(100,100,_u_A);
+   
+   //scilab_rt_terminate();
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// argv[*] -> _argv_2[0] , EXACT
+
+
+// Points To OUT:
+// argv[*] -> _argv_2[0] , EXACT
+
+int main(int argc, char *argv[])
+{
+   //scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+   
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+   int _u_N = 100;
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+   double _u_A[100][100];
+   {
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      int _u_ii;
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      //scilab_rt_zeros_i0i0_d2(_u_N,_u_N,100,100,_u_A);
+      for(_u_ii = 1; _u_ii <= _u_N; _u_ii += 1) {
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+         int _u_jj;
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+         for(_u_jj = 1; _u_jj <= _u_N; _u_jj += 1)
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+            _u_A[_u_ii-1][_u_jj-1] = 1.0+(double) (__lv0+__lv1+__lv2+__lv3);
+      }
+   }
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+   //scilab_rt_disp_d2_(100,100,_u_A);
+   
+   //scilab_rt_terminate();
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(int argc, char *argv[])
+{
+   //scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+   
+//             <    is written>: _u_N
+   int _u_N = 100;
+   double _u_A[100][100];
+   {
+      int _u_ii;
+//             <    is read   >: _u_N
+//             <    is written>: _u_ii
+      //scilab_rt_zeros_i0i0_d2(_u_N,_u_N,100,100,_u_A);
+      for(_u_ii = 1; _u_ii <= _u_N; _u_ii += 1) {
+         int _u_jj;
+//             <    is read   >: _u_N
+//             <    is written>: _u_jj
+         for(_u_jj = 1; _u_jj <= _u_N; _u_jj += 1)
+//             <    is read   >: __lv0 __lv1 __lv2 __lv3 _u_N _u_ii 
+//                               _u_jj
+//             <    is written>: _u_A[_u_ii-1][_u_jj-1]
+            _u_A[_u_ii-1][_u_jj-1] = 1.0+(double) (__lv0+__lv1+__lv2+__lv3);
+      }
+   }
+   //scilab_rt_disp_d2_(100,100,_u_A);
+   
+   //scilab_rt_terminate();
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 14 with conflicts
+		from <_u_N-W-EXACT> to <_u_N-R-EXACT>
+	11 --> 15 with conflicts
+		from <_u_N-W-EXACT> to <_u_N-R-EXACT>
+	11 --> 16 with conflicts
+		from <_u_N-W-EXACT> to <_u_N-R-EXACT>
+	15 --> 15 with conflicts
+		from <_u_jj-W-EXACT> to <_u_jj-W-EXACT>
+	16 --> 15 with conflicts
+		from <_u_jj-R-EXACT> to <_u_jj-W-EXACT>
+	16 --> 16 with conflicts
+		from <_u_A[_u_ii-1][_u_jj-1]-W-EXACT> to <_u_A[_u_ii-1][_u_jj-1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

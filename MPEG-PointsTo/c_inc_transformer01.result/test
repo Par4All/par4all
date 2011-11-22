@@ -1,0 +1,116 @@
+
+PROPER  EFFECTS 
+
+int main(int j, char **unused)
+{
+//             <    is written>: i
+   int i = 0;
+   int A[1];
+//             <    is read   >: j
+//             <    is written>: A[1] j
+
+   A[1] = j++;
+//             <    is read   >: j
+//             <    is written>: j
+   j++;
+//             <    is read   >: j
+//             <    is written>: j
+   j = j+1;
+//             <    is read   >: j
+//             <    is written>: i j
+   i = j++;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+// Points To OUT:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+int main(int j, char **unused)
+{
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   int i = 0;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   int A[1];
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+
+   A[1] = j++;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   j++;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   j = j+1;
+
+// Points To:
+// _unused_2[0] -> __unused_2_2[0] , EXACT
+// unused -> _unused_2[0] , EXACT
+
+   i = j++;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(int j, char **unused)
+{
+//             <    is written>: i
+   int i = 0;
+   int A[1];
+//             <    is read   >: j
+//             <    is written>: A[1] j
+
+   A[1] = j++;
+//             <    is read   >: j
+//             <    is written>: j
+   j++;
+//             <    is read   >: j
+//             <    is written>: j
+   j = j+1;
+//             <    is read   >: j
+//             <    is written>: i j
+   i = j++;
+}
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	08 --> 09 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+	09 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+	10 --> 11 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,592 @@
+
+PROPER  EFFECTS 
+
+int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%1;
+}
+int main()
+{
+   float z;
+   int u, l, t, v;
+//             <    is written>: l t u v
+
+   u = l = t = v = 0;
+   while (1) {
+//             <    is written>: u v
+      u = v = 0;
+//             <    is read   >: u
+      while (u<60)
+         if (1) {
+//             <    is read   >: u v _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+            while (u<60&&v<=9&&alea())
+//             <    is read   >: l t u v
+//             <    is written>: l t u v
+               l++, v++, u++, t++;
+//             <    is read   >: u _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+            while (u<60&&alea())
+//             <    is read   >: t u
+//             <    is written>: t u
+               t++, u++;
+//             <    is read   >: l t
+
+            if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               printf("property verified\n");
+            else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               printf("error\n");
+         }
+//             <    is read   >: l t
+      if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("property verified\n");
+      else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("error\n");
+   }
+//             <    is read   >: l t
+   if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property verified\n");
+   else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("error\n");
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int alea(void)
+{
+
+// Points To: none
+
+   return rand()%1;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   float z;
+
+// Points To: none
+
+   int u, l, t, v;
+
+// Points To: none
+
+
+   u = l = t = v = 0;
+
+// Points To: none
+
+   while (1) {
+
+// Points To: none
+
+      u = v = 0;
+
+// Points To: none
+
+      while (u<60)
+
+// Points To: none
+
+         if (1) {
+
+// Points To: none
+
+            while (u<60&&v<=9&&alea())
+
+// Points To: none
+
+               l++, v++, u++, t++;
+
+// Points To: none
+
+
+            while (u<60&&alea())
+
+// Points To: none
+
+               t++, u++;
+
+// Points To: none
+
+
+            if (6*l<=t+50)
+
+// Points To: none
+
+               printf("property verified\n");
+            else
+
+// Points To: none
+
+               printf("error\n");
+         }
+
+// Points To: none
+
+      if (6*l<=t+50)
+
+// Points To: none
+
+         printf("property verified\n");
+      else
+
+// Points To: none
+
+         printf("error\n");
+   }
+
+// Points To: none
+
+   if (6*l<=t+50)
+
+// Points To: none
+
+      printf("property verified\n");
+   else
+
+// Points To: none
+
+      printf("error\n");
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%1;
+}
+int main()
+{
+   float z;
+   int u, l, t, v;
+//             <    is written>: l t u v
+
+   u = l = t = v = 0;
+   while (1) {
+//             <    is written>: u v
+      u = v = 0;
+//             <    is read   >: u
+      while (u<60)
+         if (1) {
+//             <    is read   >: u v _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+            while (u<60&&v<=9&&alea())
+//             <    is read   >: l t u v
+//             <    is written>: l t u v
+               l++, v++, u++, t++;
+//             <    is read   >: u _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+            while (u<60&&alea())
+//             <    is read   >: t u
+//             <    is written>: t u
+               t++, u++;
+//             <    is read   >: l t
+
+            if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               printf("property verified\n");
+            else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               printf("error\n");
+         }
+//             <    is read   >: l t
+      if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("property verified\n");
+      else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("error\n");
+   }
+//             <    is read   >: l t
+   if (6*l<=t+50)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("property verified\n");
+   else
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("error\n");
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> -1 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> 38 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+	-1 --> 41 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	-1 --> 43 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	-1 --> 45 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> 49 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> 52 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> -1 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> -1 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <l-W-EXACT> to <l-W-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <l-R-EXACT> to <l-W-EXACT>
+	-1 --> 38 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <v-R-EXACT> to <v-W-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+	-1 --> 41 with conflicts
+		from <v-W-EXACT> to <v-R-EXACT>
+	-1 --> 43 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	-1 --> 45 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	-1 --> 49 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	-1 --> 52 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	36 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+	36 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <l-W-EXACT> to <l-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	36 --> 38 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <u-W-EXACT> to <u-W-EXACT>
+	36 --> 45 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	36 --> 49 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	36 --> 52 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <l-W-EXACT> to <l-R-EXACT>
+	38 --> -1 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+	38 --> -1 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+		from <u-W-EXACT> to <u-W-EXACT>
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+	38 --> 39 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	38 --> 41 with conflicts
+		from <v-W-EXACT> to <v-R-EXACT>
+		from <u-W-EXACT> to <u-R-EXACT>
+	38 --> 43 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	39 --> -1 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	39 --> -1 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	39 --> 38 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	41 --> -1 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	41 --> -1 with conflicts
+		from <v-R-EXACT> to <v-W-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+	41 --> 38 with conflicts
+		from <v-R-EXACT> to <v-W-EXACT>
+		from <u-R-EXACT> to <u-W-EXACT>
+	41 --> 41 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	41 --> 43 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	43 --> -1 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	43 --> -1 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	43 --> 38 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	43 --> 41 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	43 --> 43 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	45 --> 45 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> 46 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> 49 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> 50 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> 52 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> 53 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	45 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+	45 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <l-R-EXACT> to <l-W-EXACT>
+	46 --> 45 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	46 --> 46 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	46 --> 49 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	46 --> 50 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	46 --> 52 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	46 --> 53 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 45 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 46 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 49 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 50 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 52 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> 53 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	49 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+	49 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+		from <l-R-EXACT> to <l-W-EXACT>
+	50 --> 45 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	50 --> 46 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	50 --> 49 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	50 --> 50 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	50 --> 52 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	50 --> 53 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	52 --> 53 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,2149 @@
+
+PROPER  EFFECTS 
+
+void checking_error(void)
+{
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "checking error");
+   exit(2);
+}
+void deadlock()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("deadlock\n");
+   while (1)
+      ;
+}
+int main(void)
+{
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   ts_singlestate();
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   ts_restructured();
+   return 0;
+}
+int rand_b(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int rand_z(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()-rand();
+}
+void ts_restructured(void)
+{
+   int e, ne, uo, i;
+//             <    is written>: e ne uo
+   e = ne = uo = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: i _RANDOM_EFFECTS:GEN_SEED
+   i = rand();
+//             <    is read   >: i
+   if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      deadlock();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   while (rand_b())
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand_b()) {
+//             <    is read   >: e i ne uo
+         if (!(i>=1&&e+ne+uo+i-1>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+         i += e+ne+uo-1;
+//             <    is written>: e
+         e = 1;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         while (rand_b()) {
+//             <    is read   >: i
+            if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+            ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+            uo++;
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+//             <    is written>: e
+            e = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (rand_b()) {
+//             <    is read   >: ne uo
+            if (!(ne+uo>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+            i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+            e++;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+         else {
+//             <    is read   >: i
+            if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+            i += e+ne+uo-1;
+//             <    is written>: e
+            e = 1;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: ne uo
+         if (!(ne+uo>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         while (rand_b()) {
+//             <    is read   >: i
+            if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+            ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+            uo++;
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+//             <    is written>: e
+            e = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <    is read   >: i
+         if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: ne uo
+         if (!(ne+uo>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (rand_b()) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+            if (rand_b()) {
+//             <    is read   >: i
+               if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+               while (rand_b()) {
+//             <    is read   >: i
+                  if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                     deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+                  ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+                  uo++;
+//             <    is read   >: i
+//             <    is written>: i
+                  i--;
+//             <    is written>: e
+                  e = 0;
+//             <    is read   >: e ne uo
+                  if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                     checking_error();
+               }
+//             <    is read   >: i
+               if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+            }
+            else {
+//             <    is read   >: i
+               if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+            }
+//             <    is read   >: ne uo
+            if (!(ne+uo==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+            i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+            e++;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+         else {
+//             <    is read   >: e i ne uo
+            if (!(i>=1&&e+ne+uo+i-1<1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+            i += e+ne+uo-1;
+//             <    is written>: e
+            e = 1;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         deadlock();
+      }
+}
+void ts_singlestate(void)
+{
+   int e, ne, uo, i;
+//             <    is written>: e ne uo
+   e = ne = uo = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: i _RANDOM_EFFECTS:GEN_SEED
+   i = rand();
+//             <    is read   >: i
+   if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      deadlock();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   while (rand_b())
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: ne uo
+         if (!(ne+uo>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else {
+//             <    is read   >: i
+         if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+         i += e+ne+uo-1;
+//             <    is written>: e
+         e = 1;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void checking_error(void)
+{
+
+// Points To: none
+
+   fprintf(stderr, "checking error");
+
+// Points To: none
+
+   exit(2);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void deadlock()
+{
+
+// Points To: none
+
+   printf("deadlock\n");
+
+// Points To: none
+
+   while (1)
+
+// Points To: none
+
+      ;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   ts_singlestate();
+
+// Points To: none
+
+   ts_restructured();
+
+// Points To: none
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int rand_b(void)
+{
+
+// Points To: none
+
+   return rand()%2;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int rand_z(void)
+{
+
+// Points To: none
+
+   return rand()-rand();
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void ts_restructured(void)
+{
+
+// Points To: none
+
+   int e, ne, uo, i;
+
+// Points To: none
+
+   e = ne = uo = 0;
+
+// Points To: none
+
+   i = rand();
+
+// Points To: none
+
+   if (!(i>=1))
+
+// Points To: none
+
+      deadlock();
+
+// Points To: none
+
+   while (rand_b())
+
+// Points To: none
+
+      if (rand_b()) {
+
+// Points To: none
+
+         if (!(i>=1&&e+ne+uo+i-1>=1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         i += e+ne+uo-1;
+
+// Points To: none
+
+         e = 1;
+
+// Points To: none
+
+         ne = 0;
+
+// Points To: none
+
+         uo = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+// Points To: none
+
+         if (!(i>=2))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         ne += e;
+
+// Points To: none
+
+         uo++;
+
+// Points To: none
+
+         i--;
+
+// Points To: none
+
+         e = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+
+// Points To: none
+
+         while (rand_b()) {
+
+// Points To: none
+
+            if (!(i>=2))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            ne += e;
+
+// Points To: none
+
+            uo++;
+
+// Points To: none
+
+            i--;
+
+// Points To: none
+
+            e = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+
+// Points To: none
+
+         if (rand_b()) {
+
+// Points To: none
+
+            if (!(ne+uo>=1))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            i += ne+uo-1;
+
+// Points To: none
+
+            e++;
+
+// Points To: none
+
+            ne = 0;
+
+// Points To: none
+
+            uo = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+         else {
+
+// Points To: none
+
+            if (!(i>=1))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            i += e+ne+uo-1;
+
+// Points To: none
+
+            e = 1;
+
+// Points To: none
+
+            ne = 0;
+
+// Points To: none
+
+            uo = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+      }
+      else if (rand_b()) {
+
+// Points To: none
+
+         if (!(i==1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         ne += e;
+
+// Points To: none
+
+         uo++;
+
+// Points To: none
+
+         i--;
+
+// Points To: none
+
+         e = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+
+// Points To: none
+
+         if (!(ne+uo>=2))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         i += ne+uo-1;
+
+// Points To: none
+
+         e++;
+
+// Points To: none
+
+         ne = 0;
+
+// Points To: none
+
+         uo = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+// Points To: none
+
+         if (!(i>=2))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         ne += e;
+
+// Points To: none
+
+         uo++;
+
+// Points To: none
+
+         i--;
+
+// Points To: none
+
+         e = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+
+// Points To: none
+
+         while (rand_b()) {
+
+// Points To: none
+
+            if (!(i>=2))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            ne += e;
+
+// Points To: none
+
+            uo++;
+
+// Points To: none
+
+            i--;
+
+// Points To: none
+
+            e = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+
+// Points To: none
+
+         if (!(i==1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         ne += e;
+
+// Points To: none
+
+         uo++;
+
+// Points To: none
+
+         i--;
+
+// Points To: none
+
+         e = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+
+// Points To: none
+
+         if (!(ne+uo>=2))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         i += ne+uo-1;
+
+// Points To: none
+
+         e++;
+
+// Points To: none
+
+         ne = 0;
+
+// Points To: none
+
+         uo = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+      else {
+
+// Points To: none
+
+         if (rand_b()) {
+
+// Points To: none
+
+            if (rand_b()) {
+
+// Points To: none
+
+               if (!(i>=2))
+
+// Points To: none
+
+                  deadlock();
+
+// Points To: none
+
+               ne += e;
+
+// Points To: none
+
+               uo++;
+
+// Points To: none
+
+               i--;
+
+// Points To: none
+
+               e = 0;
+
+// Points To: none
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+                  checking_error();
+
+// Points To: none
+
+               while (rand_b()) {
+
+// Points To: none
+
+                  if (!(i>=2))
+
+// Points To: none
+
+                     deadlock();
+
+// Points To: none
+
+                  ne += e;
+
+// Points To: none
+
+                  uo++;
+
+// Points To: none
+
+                  i--;
+
+// Points To: none
+
+                  e = 0;
+
+// Points To: none
+
+                  if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+                     checking_error();
+               }
+
+// Points To: none
+
+               if (!(i==1))
+
+// Points To: none
+
+                  deadlock();
+
+// Points To: none
+
+               ne += e;
+
+// Points To: none
+
+               uo++;
+
+// Points To: none
+
+               i--;
+
+// Points To: none
+
+               e = 0;
+
+// Points To: none
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+                  checking_error();
+            }
+            else {
+
+// Points To: none
+
+               if (!(i==1))
+
+// Points To: none
+
+                  deadlock();
+
+// Points To: none
+
+               ne += e;
+
+// Points To: none
+
+               uo++;
+
+// Points To: none
+
+               i--;
+
+// Points To: none
+
+               e = 0;
+
+// Points To: none
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+                  checking_error();
+            }
+
+// Points To: none
+
+            if (!(ne+uo==1))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            i += ne+uo-1;
+
+// Points To: none
+
+            e++;
+
+// Points To: none
+
+            ne = 0;
+
+// Points To: none
+
+            uo = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+         else {
+
+// Points To: none
+
+            if (!(i>=1&&e+ne+uo+i-1<1))
+
+// Points To: none
+
+               deadlock();
+
+// Points To: none
+
+            i += e+ne+uo-1;
+
+// Points To: none
+
+            e = 1;
+
+// Points To: none
+
+            ne = 0;
+
+// Points To: none
+
+            uo = 0;
+
+// Points To: none
+
+            if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+               checking_error();
+         }
+
+// Points To: none
+
+         deadlock();
+      }
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void ts_singlestate(void)
+{
+
+// Points To: none
+
+   int e, ne, uo, i;
+
+// Points To: none
+
+   e = ne = uo = 0;
+
+// Points To: none
+
+   i = rand();
+
+// Points To: none
+
+   if (!(i>=1))
+
+// Points To: none
+
+      deadlock();
+
+// Points To: none
+
+   while (rand_b())
+
+// Points To: none
+
+      if (rand_b()) {
+
+// Points To: none
+
+         if (!(i>=1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         ne += e;
+
+// Points To: none
+
+         uo++;
+
+// Points To: none
+
+         i--;
+
+// Points To: none
+
+         e = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+// Points To: none
+
+         if (!(ne+uo>=1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         i += ne+uo-1;
+
+// Points To: none
+
+         e++;
+
+// Points To: none
+
+         ne = 0;
+
+// Points To: none
+
+         uo = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+      else {
+
+// Points To: none
+
+         if (!(i>=1))
+
+// Points To: none
+
+            deadlock();
+
+// Points To: none
+
+         i += e+ne+uo-1;
+
+// Points To: none
+
+         e = 1;
+
+// Points To: none
+
+         ne = 0;
+
+// Points To: none
+
+         uo = 0;
+
+// Points To: none
+
+         if (e>=2||uo+ne>=1&&e>=1)
+
+// Points To: none
+
+            checking_error();
+      }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void checking_error(void)
+{
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "checking error");
+   exit(2);
+}
+void deadlock()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("deadlock\n");
+   while (1)
+      ;
+}
+int main(void)
+{
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   ts_singlestate();
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   ts_restructured();
+   return 0;
+}
+int rand_b(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2;
+}
+int rand_z(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()-rand();
+}
+void ts_restructured(void)
+{
+   int e, ne, uo, i;
+//             <    is written>: e ne uo
+   e = ne = uo = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: i _RANDOM_EFFECTS:GEN_SEED
+   i = rand();
+//             <    is read   >: i
+   if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      deadlock();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   while (rand_b())
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand_b()) {
+//             <    is read   >: e i ne uo
+         if (!(i>=1&&e+ne+uo+i-1>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+         i += e+ne+uo-1;
+//             <    is written>: e
+         e = 1;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         while (rand_b()) {
+//             <    is read   >: i
+            if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+            ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+            uo++;
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+//             <    is written>: e
+            e = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (rand_b()) {
+//             <    is read   >: ne uo
+            if (!(ne+uo>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+            i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+            e++;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+         else {
+//             <    is read   >: i
+            if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+            i += e+ne+uo-1;
+//             <    is written>: e
+            e = 1;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: ne uo
+         if (!(ne+uo>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         while (rand_b()) {
+//             <    is read   >: i
+            if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+            ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+            uo++;
+//             <    is read   >: i
+//             <    is written>: i
+            i--;
+//             <    is written>: e
+            e = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <    is read   >: i
+         if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+//             <    is read   >: ne uo
+         if (!(ne+uo>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+         if (rand_b()) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+            if (rand_b()) {
+//             <    is read   >: i
+               if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+               while (rand_b()) {
+//             <    is read   >: i
+                  if (!(i>=2))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                     deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+                  ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+                  uo++;
+//             <    is read   >: i
+//             <    is written>: i
+                  i--;
+//             <    is written>: e
+                  e = 0;
+//             <    is read   >: e ne uo
+                  if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                     checking_error();
+               }
+//             <    is read   >: i
+               if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+            }
+            else {
+//             <    is read   >: i
+               if (!(i==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+                  deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+               ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+               uo++;
+//             <    is read   >: i
+//             <    is written>: i
+               i--;
+//             <    is written>: e
+               e = 0;
+//             <    is read   >: e ne uo
+               if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+                  checking_error();
+            }
+//             <    is read   >: ne uo
+            if (!(ne+uo==1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+            i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+            e++;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+         else {
+//             <    is read   >: e i ne uo
+            if (!(i>=1&&e+ne+uo+i-1<1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+               deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+            i += e+ne+uo-1;
+//             <    is written>: e
+            e = 1;
+//             <    is written>: ne
+            ne = 0;
+//             <    is written>: uo
+            uo = 0;
+//             <    is read   >: e ne uo
+            if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+               checking_error();
+         }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         deadlock();
+      }
+}
+void ts_singlestate(void)
+{
+   int e, ne, uo, i;
+//             <    is written>: e ne uo
+   e = ne = uo = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: i _RANDOM_EFFECTS:GEN_SEED
+   i = rand();
+//             <    is read   >: i
+   if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      deadlock();
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   while (rand_b())
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand_b()) {
+//             <    is read   >: i
+         if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e ne
+//             <    is written>: ne
+         ne += e;
+//             <    is read   >: uo
+//             <    is written>: uo
+         uo++;
+//             <    is read   >: i
+//             <    is written>: i
+         i--;
+//             <    is written>: e
+         e = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else if (rand_b()) {
+//             <    is read   >: ne uo
+         if (!(ne+uo>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: i ne uo
+//             <    is written>: i
+         i += ne+uo-1;
+//             <    is read   >: e
+//             <    is written>: e
+         e++;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+      else {
+//             <    is read   >: i
+         if (!(i>=1))
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            deadlock();
+//             <    is read   >: e i ne uo
+//             <    is written>: i
+         i += e+ne+uo-1;
+//             <    is written>: e
+         e = 1;
+//             <    is written>: ne
+         ne = 0;
+//             <    is written>: uo
+         uo = 0;
+//             <    is read   >: e ne uo
+         if (e>=2||uo+ne>=1&&e>=1)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+            checking_error();
+      }
+}
+
+ *********************** Use-Def Chains *********************
+
+	137 --> 138 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,183 @@
+
+PROPER  EFFECTS 
+
+int assert02()
+{
+   int y, z;
+//             <    is read   >: z
+//             <    is written>: y
+   
+   /*
+     z = 1;
+     printf("z is positive, !z=%d\n", !z);
+   
+     z = 0;
+     printf("z is zero, !z=%d\n", !z);
+   
+     z = -1;
+     printf("z is negative, !z=%d\n", !z);
+   
+     if(!z<0)
+       abort();
+     */
+   
+   y = !z;
+//             <    is written>: z
+
+   z = 1;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+//             <    is written>: z
+
+   z = 0;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+//             <    is written>: z
+
+   z = -1;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+
+   return 0;
+}
+int main()
+{
+   (void) assert02();
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int assert02()
+{
+
+// Points To: none
+
+   int y, z;
+
+// Points To: none
+
+   
+   /*
+     z = 1;
+     printf("z is positive, !z=%d\n", !z);
+   
+     z = 0;
+     printf("z is zero, !z=%d\n", !z);
+   
+     z = -1;
+     printf("z is negative, !z=%d\n", !z);
+   
+     if(!z<0)
+       abort();
+     */
+   
+   y = !z;
+
+// Points To: none
+
+
+   z = 1;
+
+// Points To: none
+
+   y = !z;
+
+// Points To: none
+
+
+   z = 0;
+
+// Points To: none
+
+   y = !z;
+
+// Points To: none
+
+
+   z = -1;
+
+// Points To: none
+
+   y = !z;
+
+// Points To: none
+
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   (void) assert02();
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int assert02()
+{
+   int y, z;
+//             <    is read   >: z
+//             <    is written>: y
+   
+   /*
+     z = 1;
+     printf("z is positive, !z=%d\n", !z);
+   
+     z = 0;
+     printf("z is zero, !z=%d\n", !z);
+   
+     z = -1;
+     printf("z is negative, !z=%d\n", !z);
+   
+     if(!z<0)
+       abort();
+     */
+   
+   y = !z;
+//             <    is written>: z
+
+   z = 1;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+//             <    is written>: z
+
+   z = 0;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+//             <    is written>: z
+
+   z = -1;
+//             <    is read   >: z
+//             <    is written>: y
+   y = !z;
+
+   return 0;
+}
+int main()
+{
+   (void) assert02();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

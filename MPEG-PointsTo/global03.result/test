@@ -1,0 +1,91 @@
+
+PROPER  EFFECTS 
+
+void do_refine(int *irefine)
+{
+   int k, ne[4];
+   int num_refine;
+//             <    is read   >: nelt
+//             <    is written>: nelt
+   nelt += 1;
+//             <    is written>: k
+   for(k = 0; k <= 0; k += 1)
+//             <    is read   >: k nelt
+//             <    is written>: ne[k]
+      ne[k] = nelt;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *irefine += num_refine;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// irefine -> _irefine_1[0] , EXACT
+
+
+// Points To OUT:
+// irefine -> _irefine_1[0] , EXACT
+
+void do_refine(int *irefine)
+{
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+   int k, ne[4];
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+   int num_refine;
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+   nelt += 1;
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+   for(k = 0; k <= 0; k += 1)
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+      ne[k] = nelt;
+
+// Points To:
+// irefine -> _irefine_1[0] , EXACT
+
+   *irefine += num_refine;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void do_refine(int *irefine)
+{
+   int k, ne[4];
+   int num_refine;
+//             <    is read   >: nelt
+//             <    is written>: nelt
+   nelt += 1;
+//             <    is written>: k
+   for(k = 0; k <= 0; k += 1)
+//             <    is read   >: k nelt
+//             <    is written>: ne[k]
+      ne[k] = nelt;
+//             <    is read   >: _irefine_1[0] irefine num_refine
+//             <    is written>: _irefine_1[0]
+   *irefine += num_refine;
+}
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 08 with conflicts
+		from <nelt-W-EXACT> to <nelt-R-EXACT>
+	08 --> 08 with conflicts
+		from <ne[k]-W-EXACT> to <ne[k]-W-EXACT>
+
+****************** End of Dependence Graph ******************

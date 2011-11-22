@@ -1,0 +1,153 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: c
+   int c = 0;
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: j
+   int j = 0;
+//             <    is read   >: j
+
+   while (j<=10)
+//             <    is read   >: c
+      if (c==0)
+//             <    is read   >: i j
+//             <    is written>: i j
+         i++, j++;
+      else {
+//             <    is written>: c
+         c = 0;
+//             <    is read   >: i j
+//             <    is written>: i j
+         i--, j++;
+      }
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int c = 0;
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int j = 0;
+
+// Points To: none
+
+
+   while (j<=10)
+
+// Points To: none
+
+      if (c==0)
+
+// Points To: none
+
+         i++, j++;
+      else {
+
+// Points To: none
+
+         c = 0;
+
+// Points To: none
+
+         i--, j++;
+      }
+
+// Points To: none
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: c
+   int c = 0;
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: j
+   int j = 0;
+//             <    is read   >: j
+
+   while (j<=10)
+//             <    is read   >: c
+      if (c==0)
+//             <    is read   >: i j
+//             <    is written>: i j
+         i++, j++;
+      else {
+//             <    is written>: c
+         c = 0;
+//             <    is read   >: i j
+//             <    is written>: i j
+         i--, j++;
+      }
+   return;
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	08 --> 13 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	08 --> 16 with conflicts
+		from <c-W-EXACT> to <c-W-EXACT>
+	09 --> -1 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+	10 --> 12 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	12 --> -1 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	13 --> 16 with conflicts
+		from <c-R-EXACT> to <c-W-EXACT>
+	16 --> 13 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	16 --> 16 with conflicts
+		from <c-W-EXACT> to <c-W-EXACT>
+
+****************** End of Dependence Graph ******************

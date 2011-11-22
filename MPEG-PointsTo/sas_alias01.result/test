@@ -1,0 +1,164 @@
+
+PROPER  EFFECTS 
+
+float alea(void)
+{
+   return 1.;
+}
+void sas_alias01(int m)
+{
+//             <    is read   >: m
+//             <    is written>: x y
+   int x = m, y = 0;
+//             <    is read   >: x y
+   while (x>=0&&y>=0) {
+      if (alea()>=0.) {
+//             <    is read   >: m y
+         while (y<=m&&alea()>=0.)
+//             <    is read   >: y
+//             <    is written>: y
+            y++;
+//             <    is read   >: x
+//             <    is written>: x
+         x--;
+      }
+//             <    is read   >: y
+//             <    is written>: y
+      y--;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+float alea(void)
+{
+
+// Points To: none
+
+   return 1.;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void sas_alias01(int m)
+{
+
+// Points To: none
+
+   int x = m, y = 0;
+
+// Points To: none
+
+   while (x>=0&&y>=0) {
+
+// Points To: none
+
+      if (alea()>=0.) {
+
+// Points To: none
+
+         while (y<=m&&alea()>=0.)
+
+// Points To: none
+
+            y++;
+
+// Points To: none
+
+         x--;
+      }
+
+// Points To: none
+
+      y--;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+float alea(void)
+{
+   return 1.;
+}
+void sas_alias01(int m)
+{
+//             <    is read   >: m
+//             <    is written>: x y
+   int x = m, y = 0;
+//             <    is read   >: x y
+   while (x>=0&&y>=0) {
+      if (alea()>=0.) {
+//             <    is read   >: m y
+         while (y<=m&&alea()>=0.)
+//             <    is read   >: y
+//             <    is written>: y
+            y++;
+//             <    is read   >: x
+//             <    is written>: x
+         x--;
+      }
+//             <    is read   >: y
+//             <    is written>: y
+      y--;
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 13 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	12 --> 15 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	12 --> 16 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	12 --> 17 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	12 --> 19 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+	13 --> 16 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	13 --> 17 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	13 --> 19 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	15 --> 16 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	15 --> 19 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+	16 --> 16 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	16 --> 19 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	17 --> 17 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	19 --> 15 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	19 --> 16 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+	19 --> 19 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,115 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int a[20];
+   int n;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &n);
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n; i += 1)
+//             <    is read   >: i n
+//             <    is written>: a[i]
+      a[i] = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int a[20];
+
+// Points To: none
+
+   int n;
+
+// Points To: none
+
+
+   scanf("%d", &n);
+
+// Points To: none
+
+
+   for(i = 0; i <= n; i += 1)
+
+// Points To: none
+
+      a[i] = i;
+
+// Points To: none
+
+   printf("%d\n", i);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int a[20];
+   int n;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   scanf("%d", &n);
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n; i += 1)
+//             <    is read   >: i n
+//             <    is written>: a[i]
+      a[i] = i;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 14 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	08 --> 17 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 14 with conflicts
+		from <n-W-MAY> to <n-R-EXACT>
+	12 --> 15 with conflicts
+		from <n-W-MAY> to <n-R-EXACT>
+	14 --> 17 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	15 --> 15 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+
+****************** End of Dependence Graph ******************

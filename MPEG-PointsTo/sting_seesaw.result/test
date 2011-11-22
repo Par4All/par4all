@@ -1,0 +1,257 @@
+
+PROPER  EFFECTS 
+
+float alea(void)
+{
+   return 1.;
+}
+void sting_seesaw()
+{
+//             <    is written>: x y
+   int x = 0, y = 0;
+
+   while (1) {
+//             <    is read   >: x
+      // StInG Expected result: x<=2y, y<=3x
+      // PIPS results: y<=3x, x<=2y
+      // Transition t2
+      if (x<=4)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x++, y += 2;
+//             <    is read   >: x
+      
+      // Transition t1
+      if (5<=x&&x<=7&&alea()>=0.)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x += 2, y++;
+//             <    is read   >: x
+      
+      // Transition t3
+      if (7<=x&&x<=9&&alea()>=0.)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x++, y += 3;
+//             <    is read   >: x
+      
+      // Transition t4
+      if (x>=9)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x += 2, y++;
+//             <    is read   >: x
+//             <    is written>: x
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      x = x;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+float alea(void)
+{
+
+// Points To: none
+
+   return 1.;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void sting_seesaw()
+{
+
+// Points To: none
+
+   int x = 0, y = 0;
+
+// Points To: none
+
+
+   while (1) {
+
+// Points To: none
+
+      // StInG Expected result: x<=2y, y<=3x
+      // PIPS results: y<=3x, x<=2y
+      // Transition t2
+      if (x<=4)
+
+// Points To: none
+
+         x++, y += 2;
+
+// Points To: none
+
+      
+      // Transition t1
+      if (5<=x&&x<=7&&alea()>=0.)
+
+// Points To: none
+
+         x += 2, y++;
+
+// Points To: none
+
+      
+      // Transition t3
+      if (7<=x&&x<=9&&alea()>=0.)
+
+// Points To: none
+
+         x++, y += 3;
+
+// Points To: none
+
+      
+      // Transition t4
+      if (x>=9)
+
+// Points To: none
+
+         x += 2, y++;
+
+// Points To: none
+
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      x = x;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+float alea(void)
+{
+   return 1.;
+}
+void sting_seesaw()
+{
+//             <    is written>: x y
+   int x = 0, y = 0;
+
+   while (1) {
+//             <    is read   >: x
+      // StInG Expected result: x<=2y, y<=3x
+      // PIPS results: y<=3x, x<=2y
+      // Transition t2
+      if (x<=4)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x++, y += 2;
+//             <    is read   >: x
+      
+      // Transition t1
+      if (5<=x&&x<=7&&alea()>=0.)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x += 2, y++;
+//             <    is read   >: x
+      
+      // Transition t3
+      if (7<=x&&x<=9&&alea()>=0.)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x++, y += 3;
+//             <    is read   >: x
+      
+      // Transition t4
+      if (x>=9)
+//             <    is read   >: x y
+//             <    is written>: x y
+         x += 2, y++;
+//             <    is read   >: x
+//             <    is written>: x
+      
+      // PIPS result: 4y+5<=13x, y<=3x, x+15<=8y, x<=2y (which implies
+      // x>=1 and y >=2)
+      // NOP statement get the body postcondition
+      x = x;
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> 36 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> -1 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> 31 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	-1 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> -1 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> 28 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	-1 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> -1 with conflicts
+		from <y-R-EXACT> to <y-W-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	-1 --> 25 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	16 --> -1 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <y-W-EXACT> to <y-R-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+	16 --> 22 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	22 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	25 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	28 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	31 --> -1 with conflicts
+		from <x-R-EXACT> to <x-W-EXACT>
+	36 --> -1 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <x-R-EXACT> to <x-W-EXACT>
+	36 --> 22 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+
+****************** End of Dependence Graph ******************
