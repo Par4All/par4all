@@ -4,6 +4,7 @@ import os.path
 import broker
 import re
 import p4a_util
+import tempfile
 
 class p4a_stubs_broker(broker.broker):
     """ broker that automatically gather stub files for the par4all runtime
@@ -139,8 +140,11 @@ class p4a_stubs_broker(broker.broker):
         return self.generate_stub_for_module(module,generated_stub)
     
     def generate_stub_for_module(self,module,generated_stub):
-        fname = os.path.join(self.stubs_dir,"generated",module+".c") 
-        f = open(fname, 'w')
+        # Will copy the original stub file to a temporary location and rename
+        # it so that we ensure an unique name (no collision with user files)
+        stub_file=tempfile.NamedTemporaryFile(prefix=module,suffix=".c",delete=False)
+        stub_file_name=stub_file.name
+        f = open(stub_file_name, 'w')
         f.write(generated_stub)
         return fname
         
