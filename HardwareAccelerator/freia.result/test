@@ -227,6 +227,11 @@ freia_status freia_cipo_close(freia_data2d *o, const freia_data2d *i, int32_t c1
    o->stuff = i->stuff|c1+c2;
    return FREIA_OK;
 }
+freia_status freia_cipo_erode(freia_data2d *o, const freia_data2d *i, int32_t c1, uint32_t c2)
+{
+   o->stuff = i->stuff|c1+c2;
+   return FREIA_OK;
+}
 freia_status freia_cipo_fast_correlation(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, uint32_t c)
 {
    o->stuff = i0->stuff|i1->stuff|(int32_t) c;
@@ -774,6 +779,15 @@ freia_status freia_aipo_xor_const(freia_data2d *o, const freia_data2d *i, int32_
 //             <    is read   >: c1 c2 i i[0].stuff o
 //             <    is written>: o[0].stuff
 freia_status freia_cipo_close(freia_data2d *o, const freia_data2d *i, int32_t c1, uint32_t c2)
+{
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
+   o->stuff = i->stuff|c1+c2;
+   return FREIA_OK;
+}
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
+freia_status freia_cipo_erode(freia_data2d *o, const freia_data2d *i, int32_t c1, uint32_t c2)
 {
 //             <    is read   >: c1 c2 i i[0].stuff o
 //             <    is written>: o[0].stuff
