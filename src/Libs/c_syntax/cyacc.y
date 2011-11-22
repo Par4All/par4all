@@ -154,6 +154,7 @@ static c_parser_context ycontext = c_parser_context_undefined;
 static string expression_comment = string_undefined;
 static int expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 
+/* we don't want an expression comment with new lines, it is disgracefull */
 void reset_expression_comment()
 {
   if(!string_undefined_p(expression_comment)) {
@@ -166,8 +167,9 @@ void reset_expression_comment()
   expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 }
 
-static statement add_expression_comment(statement s) {
-  if(!string_undefined_p(expression_comment)) {
+/* flushes all expression comments and add them to statement s */
+static statement flush_expression_comment(statement s) {
+  if(!empty_comments_p(expression_comment)) {
     if(!empty_comments_p(statement_comments(s))) {
 	  char *tmp = statement_comments(s);
 	  asprintf(&statement_comments(s),"%s%s",statement_comments(s),expression_comment);
@@ -176,7 +178,41 @@ static statement add_expression_comment(statement s) {
     }
     else
       statement_comments(s) = expression_comment;
+	statement_number(s) = expression_line_number;
+	expression_line_number = STATEMENT_NUMBER_UNDEFINED;
     expression_comment=string_undefined;
+  }
+  return s;
+}
+
+
+/* after a while (crocodile) expression comments are pushed into a list that
+   is purged upon call to add_expression_comment */ 
+static list all_expression_comments_as_statement_comments = NIL;
+static void save_expression_comment_as_statement_comment() {
+	if(!string_undefined_p(expression_comment)) {
+		all_expression_comments_as_statement_comments = 
+		CONS(STRING,expression_comment, all_expression_comments_as_statement_comments);
+	}
+    expression_comment=string_undefined;
+}
+/* flushes all statement comments and add them to statement s */
+static statement flush_statement_comment(statement s) {
+  s=flush_expression_comment(s); // should not be necessary 
+  if(!ENDP(all_expression_comments_as_statement_comments)) {
+    all_expression_comments_as_statement_comments = gen_nreverse(all_expression_comments_as_statement_comments);
+    char * comments = list_to_string(all_expression_comments_as_statement_comments);
+    if(!empty_comments_p(statement_comments(s))) {
+	  char *tmp = statement_comments(s);
+	  asprintf(&statement_comments(s),"%s%s",statement_comments(s), comments);
+	  free(tmp);
+	  free(comments);
+    }
+    else
+      statement_comments(s) = comments;
+    FOREACH(STRING,s,all_expression_comments_as_statement_comments) free(s);
+    gen_free_list(all_expression_comments_as_statement_comments);
+    all_expression_comments_as_statement_comments=NIL;
   }
   return s;
 }
@@ -582,7 +618,7 @@ static void ResetDerivedEntityDeclarations()
 %type <expression> opt_expression
 %type <expression> init_expression
 %type <liste> comma_expression
-%type <liste> paren_comma_expression
+%type <liste> paren_comma_expression statement_paren_comma_expression
 %type <liste> arguments
 %type <liste> bracket_comma_expression
 %type <liste> string_list
@@ -975,17 +1011,17 @@ expression:
 			}
 |   paren_comma_expression
 		        {
-                         /* paren_comma_expression is a list of
-                            expressions, maybe reduced to one */
-						 if(string_undefined_p(expression_comment))
-						   expression_comment=pop_current_C_comment();
-					     else {
-						   char *tmp = expression_comment;
-						   asprintf(&expression_comment,"%s%s",expression_comment, pop_current_C_comment());
-						   free(tmp);
-						 }
-                         expression_line_number = pop_current_C_line_number();
-			  $$ = MakeCommaExpression($1);
+				 /* paren_comma_expression is a list of
+					expressions, maybe reduced to one */
+				 if(empty_comments_p(expression_comment))
+				   expression_comment=pop_current_C_comment();
+				 else {
+				   char *tmp = expression_comment;
+				   asprintf(&expression_comment,"%s%s",expression_comment, pop_current_C_comment());
+				   free(tmp);
+				 }
+				 expression_line_number = pop_current_C_line_number();
+			     $$ = MakeCommaExpression($1);
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
 			{
@@ -1368,6 +1404,19 @@ comma_expression_opt:
 |   comma_expression    { }
 ;
 
+statement_paren_comma_expression:
+    TK_LPAREN comma_expression TK_RPAREN
+                        {
+			  push_current_C_comment();
+			  push_current_C_line_number();
+		      save_expression_comment_as_statement_comment();
+			  $$ = $2;
+			}
+|   TK_LPAREN error TK_RPAREN
+                        {
+			  CParserError("Parse error: TK_LPAREN error TK_RPAREN \n");
+			}
+;
 paren_comma_expression:
     TK_LPAREN comma_expression TK_RPAREN
                         {
@@ -1536,15 +1585,7 @@ statement_without_pragma:
 			       expression_comment is supposed to
 			       work for real comma expressions */
 			    $$ = call_to_statement(make_call(CreateIntrinsic(COMMA_OPERATOR_NAME),$1));
-			  if(!string_undefined_p(expression_comment)) {
-			    if(!empty_comments_p(expression_comment)) {
-			      statement_comments($$) = expression_comment;
-			      statement_number($$) = expression_line_number;
-			    }
-			    expression_comment = string_undefined;
-			    expression_line_number = STATEMENT_NUMBER_UNDEFINED;
-			  }
-
+			  $$=flush_expression_comment($$);
 			}
 |   block               { }
 |   declaration         {
@@ -1563,8 +1604,9 @@ statement_without_pragma:
 			  /* Extract the statement from the list and free
 			     the list container: */
 			  $$ = make_statement_from_statement_list_or_empty_block(sl);
+			  $$=flush_expression_comment($$);
 }
-|   TK_IF paren_comma_expression statement                    %prec TK_IF
+|   TK_IF statement_paren_comma_expression  statement                    %prec TK_IF
                 	{
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
 							   make_empty_block_statement()));
@@ -1572,16 +1614,16 @@ statement_without_pragma:
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
-			  $$ = add_expression_comment($$);
+			  $$ = flush_statement_comment($$);
 			}
-|   TK_IF paren_comma_expression statement TK_ELSE statement
+|   TK_IF statement_paren_comma_expression statement TK_ELSE statement
 	                {
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2),$3,$5));
 			  pips_assert("statement is a test", statement_test_p($$));
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
-			  $$ = add_expression_comment($$);
+			  $$ = flush_statement_comment($$);
 			}
 |   TK_SWITCH
                         {
@@ -1589,7 +1631,7 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    paren_comma_expression
+    statement_paren_comma_expression
                         {
 			  stack_push((char *)MakeCommaExpression($3),SwitchControllerStack);
 			}
@@ -1600,7 +1642,7 @@ statement_without_pragma:
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
-			  $$ = add_expression_comment($$);
+			  $$ = flush_statement_comment($$);
 			  stack_pop(SwitchGotoStack);
 			  stack_pop(SwitchControllerStack);
 			  stack_pop(LoopStack);
@@ -1610,14 +1652,14 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    paren_comma_expression statement
+    statement_paren_comma_expression statement
 	        	{
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  pips_assert("While loop body consistent",statement_consistent_p($4));
 			  $$ = MakeWhileLoop($3,$4,true);
 			  $$ = add_comment_and_line_number($$, sc, sn);
-			  $$ = add_expression_comment($$);
+			  $$ = flush_statement_comment($$);
 			  stack_pop(LoopStack);
 			}
 |   TK_DO
@@ -1625,7 +1667,7 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    statement TK_WHILE paren_comma_expression TK_SEMICOLON
+    statement TK_WHILE statement_paren_comma_expression TK_SEMICOLON
 	        	{
 			  $$ = MakeWhileLoop($5,$3,false);
 			  /* The line number and comment are related to paren_comma_expression and not to TK_DO */
@@ -1647,11 +1689,7 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloop($2, $4, $6, $9);
-			  if(!string_undefined_p(expression_comment)) {
-			  	char *tmp = statement_comments($$);
-			  	asprintf(&statement_comments($$),"%s%s",statement_comments($$),expression_comment);
-				free(tmp);
-			  }
+			  $$=flush_expression_comment($$);
 			}
 |   for_clause /* A C99 for loop with a declaration in it */
                         {
@@ -1672,11 +1710,7 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloopWithIndexDeclaration($3, $4, $6, $9);
-			  if(!string_undefined_p(expression_comment)) {
-			  	char *tmp = statement_comments($$);
-			  	asprintf(&statement_comments($$),"%s%s",statement_comments($$),expression_comment);
-				free(tmp);
-			  }
+			  $$=flush_expression_comment($$);
 			  ExitScope();
 			}
 |   label statement
@@ -1772,6 +1806,7 @@ statement_without_pragma:
 						string_undefined,
 						empty_extensions());
 			  */
+			  $$=flush_expression_comment($$);
 			  statement_consistent_p($$);
 			}
 |   TK_BREAK TK_SEMICOLON
