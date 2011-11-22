@@ -66,6 +66,9 @@ void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
    unsigned int i, j;
    for(i = 1; i <= 3; i += 1)
       for(j = 1; j <= 3; j += 1)
+         
+         
+         
          result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }
 int main(int argc, char *argv[])

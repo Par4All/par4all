@@ -66,6 +66,9 @@ void alphablending(short src0[40][40], short src1[40][40], short result[40][40])
    unsigned int i, j;
    for(i = 0; i <= 39; i += 1)
       for(j = 0; j <= 39; j += 1)
+         
+         
+         
          result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }
 int main(int argc, char *argv[])
@@ -97,6 +100,9 @@ l99996:
          for(i = 10*i_t; i <= 10*i_t+9; i += 1)
 l99997:
             for(j = 10*j_t; j <= 10*j_t+9; j += 1)
+               
+               
+               
                result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }
 with r-w regions
@@ -158,6 +164,9 @@ l99997:
 //  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 10i_t<=i, i<=10i_t+9,
 //    0<=i_t, i_t<=3, 10j_t<=j, j<=10j_t+9, 0<=j_t, j_t<=3}>
 
+               
+               
+               
                result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
 }
 isolated code
@@ -182,6 +191,9 @@ l99996:
          for(i = 10*i_t; i <= 10*i_t+9; i += 1)
 l99997:
             for(j = 10*j_t; j <= 10*j_t+9; j += 1)
+               
+               
+               
                (*result0)[i-10*i_t][j-10*j_t] = (40*(*src00)[i-10*i_t][j-10*j_t]+60*(*src10)[i-10*i_t][j-10*j_t])/100;
          P4A_copy_from_accel_2d(sizeof(short), 40, 40, 10, 10, 10*i_t, 10*j_t, &result[0][0], *result0);
          P4A_accel_free(result0);
