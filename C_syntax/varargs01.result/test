@@ -10,7 +10,6 @@ int varargs01(FILE *stream, const char *fmt, ...)
       va_start(pa, fmt);
       r = vfprintf(stream, fmt, pa);
       va_end(pa);
-
       return r;
    }
    else

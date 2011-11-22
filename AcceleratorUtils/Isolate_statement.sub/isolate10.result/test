@@ -58,7 +58,6 @@ void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, s
    char *csrc = d2_offset*element_size+(char *) host_address;
    for(i = 0; i <= d1_block_size-1; i += 1)
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
@@ -67,9 +66,6 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
          if (j%2)
-            
-            
-            
             result[i][j] = (10*src0[i][j]+90*src1[i][j])/100;
 }
 int main(int argc, char *argv[])
@@ -132,9 +128,6 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 //  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
 //    j+1<=n}>
 
-            
-            
-            
             result[i][j] = (10*src0[i][j]+90*src1[i][j])/100;
 }
 isolated code
@@ -157,9 +150,6 @@ l99998:
 l99999:
             for(j = 0; j <= n-1; j += 1)
                if (j%2)
-                  
-                  
-                  
                   (*result0)[i-0][j-0] = (10*(*src00)[i-0][j-0]+90*(*src10)[i-0][j-0])/100;
          P4A_copy_from_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *result0);
          P4A_accel_free(src00);

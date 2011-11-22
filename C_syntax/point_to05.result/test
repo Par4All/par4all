@@ -4,7 +4,6 @@ parsed printed file
 void point_to05()
 {
    f_t *g;
-
    ((*g)()+2)->foo = 1;
    
    /* Floating point values are not allowed in pointer arithmetic */
