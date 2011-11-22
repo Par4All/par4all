@@ -39,6 +39,7 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 }
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
+
    if (_resoLat<=0||_resoLon<=0)
       return (void *) 0;
 
@@ -54,6 +55,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
    }
    data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
    data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+
    data_t range = (*configuration).fparam;
    {
       size_t i;
@@ -141,6 +143,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 
             if (latmin>t[k].lat)
                latmin = 2*t[k].lat-latmin;
+
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -148,9 +151,11 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
                imin = 0;
             if (imax>latRange)
                imax = latRange;
+
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
             data_t lonmax = t[k].lon+deltalon;
             data_t lonmin = t[k].lon-deltalon;
+
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -168,6 +173,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
                   for(j = jmin; j <= jmax-1; j += 1) {
+
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -229,6 +235,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 
             if (latmin>t[k].lat)
                latmin = 2*t[k].lat-latmin;
+
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -236,9 +243,11 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
                imin = 0;
             if (imax>latRange)
                imax = latRange;
+
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
             data_t lonmax = t[k].lon+deltalon;
             data_t lonmin = t[k].lon-deltalon;
+
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -256,6 +265,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
                   for(j = jmin; j <= jmax-1; j += 1) {
+
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -317,6 +327,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 
             if (latmin>t[k].lat)
                latmin = 2*t[k].lat-latmin;
+
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -324,9 +335,11 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
                imin = 0;
             if (imax>latRange)
                imax = latRange;
+
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
             data_t lonmax = t[k].lon+deltalon;
             data_t lonmin = t[k].lon-deltalon;
+
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -344,6 +357,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
                   for(j = jmin; j <= jmax-1; j += 1) {
+
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -405,6 +419,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 
             if (latmin>t[k].lat)
                latmin = 2*t[k].lat-latmin;
+
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -412,9 +427,11 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
                imin = 0;
             if (imax>latRange)
                imax = latRange;
+
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
             data_t lonmax = t[k].lon+deltalon;
             data_t lonmin = t[k].lon-deltalon;
+
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -432,6 +449,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
                   for(j = jmin; j <= jmax-1; j += 1) {
+
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -493,6 +511,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
             if (latmin>t[k].lat)
                latmin = 2*t[k].lat-latmin;
+
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -500,9 +519,11 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                imin = 0;
             if (imax>latRange)
                imax = latRange;
+
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
             data_t lonmax = t[k].lon+deltalon;
             data_t lonmin = t[k].lon-deltalon;
+
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -520,6 +541,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
                   for(j = jmin; j <= jmax-1; j += 1) {
+
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {

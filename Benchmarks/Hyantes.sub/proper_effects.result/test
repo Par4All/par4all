@@ -90,6 +90,7 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
 //             <    is read   >: _resoLat _resoLon
+
    if (_resoLat<=0||_resoLon<=0)
       return (void *) 0;
 
@@ -129,6 +130,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //             <    is read   >: _resoLat visu.MLat visu.mLat
 //             <    is written>: latStep
    data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+
 //             <    is read   >: configuration configuration[0].fparam
 //             <    is written>: range
    data_t range = (*configuration).fparam;
@@ -378,6 +380,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: k latmin nb t[k].lat
 //             <    is written>: latmin
                latmin = 2*t[k].lat-latmin;
+
 //             <    is read   >: latMin latStep latmin
 //             <    is written>: imin
             long int imin = floor((latmin-latMin)/latStep);
@@ -395,6 +398,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
+
 //             <    is read   >: k k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -404,6 +408,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: deltalon k t[k].lon
 //             <    is written>: lonmin
             data_t lonmin = t[k].lon-deltalon;
+
 //             <    is read   >: lonMin lonStep lonmin
 //             <    is written>: jmin
             long int jmin = floor((lonmin-lonMin)/lonStep);
@@ -433,6 +438,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j <= jmax-1; j += 1) {
+
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -552,6 +558,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: k latmin nb t[k].lat
 //             <    is written>: latmin
                latmin = 2*t[k].lat-latmin;
+
 //             <    is read   >: latMin latStep latmin
 //             <    is written>: imin
             long int imin = floor((latmin-latMin)/latStep);
@@ -569,6 +576,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
+
 //             <    is read   >: k k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -578,6 +586,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: deltalon k t[k].lon
 //             <    is written>: lonmin
             data_t lonmin = t[k].lon-deltalon;
+
 //             <    is read   >: lonMin lonStep lonmin
 //             <    is written>: jmin
             long int jmin = floor((lonmin-lonMin)/lonStep);
@@ -607,6 +616,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j <= jmax-1; j += 1) {
+
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -726,6 +736,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: k latmin nb t[k].lat
 //             <    is written>: latmin
                latmin = 2*t[k].lat-latmin;
+
 //             <    is read   >: latMin latStep latmin
 //             <    is written>: imin
             long int imin = floor((latmin-latMin)/latStep);
@@ -743,6 +754,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
+
 //             <    is read   >: k k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -752,6 +764,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: deltalon k t[k].lon
 //             <    is written>: lonmin
             data_t lonmin = t[k].lon-deltalon;
+
 //             <    is read   >: lonMin lonStep lonmin
 //             <    is written>: jmin
             long int jmin = floor((lonmin-lonMin)/lonStep);
@@ -781,6 +794,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j <= jmax-1; j += 1) {
+
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -900,6 +914,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: k latmin nb t[k].lat
 //             <    is written>: latmin
                latmin = 2*t[k].lat-latmin;
+
 //             <    is read   >: latMin latStep latmin
 //             <    is written>: imin
             long int imin = floor((latmin-latMin)/latStep);
@@ -917,6 +932,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
+
 //             <    is read   >: k k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -926,6 +942,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: deltalon k t[k].lon
 //             <    is written>: lonmin
             data_t lonmin = t[k].lon-deltalon;
+
 //             <    is read   >: lonMin lonStep lonmin
 //             <    is written>: jmin
             long int jmin = floor((lonmin-lonMin)/lonStep);
@@ -955,6 +972,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j <= jmax-1; j += 1) {
+
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -1074,6 +1092,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: k latmin nb t[k].lat
 //             <    is written>: latmin
                latmin = 2*t[k].lat-latmin;
+
 //             <    is read   >: latMin latStep latmin
 //             <    is written>: imin
             long int imin = floor((latmin-latMin)/latStep);
@@ -1091,6 +1110,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
+
 //             <    is read   >: k k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -1100,6 +1120,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: deltalon k t[k].lon
 //             <    is written>: lonmin
             data_t lonmin = t[k].lon-deltalon;
+
 //             <    is read   >: lonMin lonStep lonmin
 //             <    is written>: jmin
             long int jmin = floor((lonmin-lonMin)/lonStep);
@@ -1129,6 +1150,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j <= jmax-1; j += 1) {
+
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
