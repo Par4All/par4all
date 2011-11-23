@@ -112,9 +112,6 @@ void compute_rhs()
             us[k][j][i] = u[k][j][i][1]*rho_inv;
             vs[k][j][i] = u[k][j][i][2]*rho_inv;
             ws[k][j][i] = u[k][j][i][3]*rho_inv;
-            
-            
-            
             square[k][j][i] = 0.5*(u[k][j][i][1]*u[k][j][i][1]+u[k][j][i][2]*u[k][j][i][2]+u[k][j][i][3]*u[k][j][i][3])*rho_inv;
             qs[k][j][i] = square[k][j][i]*rho_inv;
             //-------------------------------------------------------------------
@@ -159,34 +156,25 @@ void compute_rhs()
       for(j = 1; j <= ny2; j += 1) {
          i = 1;
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(5.0*u[k][j][i][m]-4.0*u[k][j][i+1][m]+u[k][j][i+2][m]);
 
          i = 2;
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*((-4.0)*u[k][j][i-1][m]+6.0*u[k][j][i][m]-4.0*u[k][j][i+1][m]+u[k][j][i+2][m]);
       }
 
       for(j = 1; j <= ny2; j += 1)
          for(i = 3; i <= nx2-2; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
                rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j][i-2][m]-4.0*u[k][j][i-1][m]+6.0*u[k][j][i][m]-4.0*u[k][j][i+1][m]+u[k][j][i+2][m]);
 
       for(j = 1; j <= ny2; j += 1) {
          i = nx2-1;
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j][i-2][m]-4.0*u[k][j][i-1][m]+6.0*u[k][j][i][m]-4.0*u[k][j][i+1][m]);
 
          i = nx2;
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j][i-2][m]-4.0*u[k][j][i-1][m]+5.0*u[k][j][i][m]);
       }
    }
@@ -217,35 +205,26 @@ void compute_rhs()
       j = 1;
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(5.0*u[k][j][i][m]-4.0*u[k][j+1][i][m]+u[k][j+2][i][m]);
 
       j = 2;
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*((-4.0)*u[k][j-1][i][m]+6.0*u[k][j][i][m]-4.0*u[k][j+1][i][m]+u[k][j+2][i][m]);
 
       for(j = 3; j <= ny2-2; j += 1)
          for(i = 1; i <= nx2; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
                rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j-2][i][m]-4.0*u[k][j-1][i][m]+6.0*u[k][j][i][m]-4.0*u[k][j+1][i][m]+u[k][j+2][i][m]);
 
       j = ny2-1;
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j-2][i][m]-4.0*u[k][j-1][i][m]+6.0*u[k][j][i][m]-4.0*u[k][j+1][i][m]);
 
       j = ny2;
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k][j-2][i][m]-4.0*u[k][j-1][i][m]+5.0*u[k][j][i][m]);
    }
    if (timeron)
@@ -276,39 +255,30 @@ void compute_rhs()
    for(j = 1; j <= ny2; j += 1)
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(5.0*u[k][j][i][m]-4.0*u[k+1][j][i][m]+u[k+2][j][i][m]);
 
    k = 2;
    for(j = 1; j <= ny2; j += 1)
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*((-4.0)*u[k-1][j][i][m]+6.0*u[k][j][i][m]-4.0*u[k+1][j][i][m]+u[k+2][j][i][m]);
 
    for(k = 3; k <= nz2-2; k += 1)
       for(j = 1; j <= ny2; j += 1)
          for(i = 1; i <= nx2; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
                rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k-2][j][i][m]-4.0*u[k-1][j][i][m]+6.0*u[k][j][i][m]-4.0*u[k+1][j][i][m]+u[k+2][j][i][m]);
 
    k = nz2-1;
    for(j = 1; j <= ny2; j += 1)
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-            
-            
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k-2][j][i][m]-4.0*u[k-1][j][i][m]+6.0*u[k][j][i][m]-4.0*u[k+1][j][i][m]);
 
    k = nz2;
    for(j = 1; j <= ny2; j += 1)
       for(i = 1; i <= nx2; i += 1)
          for(m = 0; m <= 4; m += 1)
-
             rhs[k][j][i][m] = rhs[k][j][i][m]-dssp*(u[k-2][j][i][m]-4.0*u[k-1][j][i][m]+5.0*u[k][j][i][m]);
    if (timeron)
       timer_stop(4);
@@ -387,7 +357,6 @@ void exact_rhs()
 
             cuf[i] = buf[i][1]*buf[i][1];
             buf[i][0] = cuf[i]+buf[i][2]*buf[i][2]+buf[i][3]*buf[i][3];
-
             q[i] = 0.5*(buf[i][1]*ue[i][1]+buf[i][2]*ue[i][2]+buf[i][3]*ue[i][3]);
          }
 
@@ -406,27 +375,19 @@ void exact_rhs()
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
             i = 1;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(5.0*ue[i][m]-4.0*ue[i+1][m]+ue[i+2][m]);
             i = 2;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*((-4.0)*ue[i-1][m]+6.0*ue[i][m]-4.0*ue[i+1][m]+ue[i+2][m]);
          }
 
          for(i = 3; i <= grid_points[0]-4; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
                forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[i-2][m]-4.0*ue[i-1][m]+6.0*ue[i][m]-4.0*ue[i+1][m]+ue[i+2][m]);
 
          for(m = 0; m <= 4; m += 1) {
             i = grid_points[0]-3;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[i-2][m]-4.0*ue[i-1][m]+6.0*ue[i][m]-4.0*ue[i+1][m]);
             i = grid_points[0]-2;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[i-2][m]-4.0*ue[i-1][m]+5.0*ue[i][m]);
          }
       }
@@ -453,7 +414,6 @@ void exact_rhs()
 
             cuf[j] = buf[j][2]*buf[j][2];
             buf[j][0] = cuf[j]+buf[j][1]*buf[j][1]+buf[j][3]*buf[j][3];
-
             q[j] = 0.5*(buf[j][1]*ue[j][1]+buf[j][2]*ue[j][2]+buf[j][3]*ue[j][3]);
          }
 
@@ -472,27 +432,19 @@ void exact_rhs()
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
             j = 1;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(5.0*ue[j][m]-4.0*ue[j+1][m]+ue[j+2][m]);
             j = 2;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*((-4.0)*ue[j-1][m]+6.0*ue[j][m]-4.0*ue[j+1][m]+ue[j+2][m]);
          }
 
          for(j = 3; j <= grid_points[1]-4; j += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
                forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[j-2][m]-4.0*ue[j-1][m]+6.0*ue[j][m]-4.0*ue[j+1][m]+ue[j+2][m]);
 
          for(m = 0; m <= 4; m += 1) {
             j = grid_points[1]-3;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[j-2][m]-4.0*ue[j-1][m]+6.0*ue[j][m]-4.0*ue[j+1][m]);
             j = grid_points[1]-2;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[j-2][m]-4.0*ue[j-1][m]+5.0*ue[j][m]);
          }
       }
@@ -520,7 +472,6 @@ void exact_rhs()
 
             cuf[k] = buf[k][3]*buf[k][3];
             buf[k][0] = cuf[k]+buf[k][1]*buf[k][1]+buf[k][2]*buf[k][2];
-
             q[k] = 0.5*(buf[k][1]*ue[k][1]+buf[k][2]*ue[k][2]+buf[k][3]*ue[k][3]);
          }
 
@@ -539,27 +490,19 @@ void exact_rhs()
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
             k = 1;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(5.0*ue[k][m]-4.0*ue[k+1][m]+ue[k+2][m]);
             k = 2;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*((-4.0)*ue[k-1][m]+6.0*ue[k][m]-4.0*ue[k+1][m]+ue[k+2][m]);
          }
 
          for(k = 3; k <= grid_points[2]-4; k += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
                forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[k-2][m]-4.0*ue[k-1][m]+6.0*ue[k][m]-4.0*ue[k+1][m]+ue[k+2][m]);
 
          for(m = 0; m <= 4; m += 1) {
             k = grid_points[2]-3;
-            
-            
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[k-2][m]-4.0*ue[k-1][m]+6.0*ue[k][m]-4.0*ue[k+1][m]);
             k = grid_points[2]-2;
-
             forcing[k][j][i][m] = forcing[k][j][i][m]-dssp*(ue[k-2][m]-4.0*ue[k-1][m]+5.0*ue[k][m]);
          }
       }
@@ -978,7 +921,6 @@ void pinvr()
 
             t1 = bt*r1;
             t2 = 0.5*(r4+r5);
-
             rhs[k][j][i][0] = bt*(r4-r5);
             rhs[k][j][i][1] = -r3;
             rhs[k][j][i][2] = r2;
@@ -999,6 +941,12 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
       if (name[0]=='E'&&name[1]=='P') {
          sprintf(size, "%15.0lf", pow(2.0, n1));
          j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
          if (size[j]=='.') {
             size[j] = ' ';
             j--;
@@ -1204,7 +1152,6 @@ void set_constants()
    c5 = 1.4;
 
    bt = sqrt(0.5);
-
    dnxm1 = 1.0/((double) (grid_points[0]-1));
    dnym1 = 1.0/((double) (grid_points[1]-1));
    dnzm1 = 1.0/((double) (grid_points[2]-1));
@@ -1213,17 +1160,13 @@ void set_constants()
    c1c5 = c1*c5;
    c3c4 = c3*c4;
    c1345 = c1c5*c3c4;
-
    conz1 = 1.0-c1c5;
-
    tx1 = 1.0/(dnxm1*dnxm1);
    tx2 = 1.0/(2.0*dnxm1);
    tx3 = 1.0/dnxm1;
-
    ty1 = 1.0/(dnym1*dnym1);
    ty2 = 1.0/(2.0*dnym1);
    ty3 = 1.0/dnym1;
-
    tz1 = 1.0/(dnzm1*dnzm1);
    tz2 = 1.0/(2.0*dnzm1);
    tz3 = 1.0/dnzm1;
@@ -1357,7 +1300,6 @@ void txinvr()
             r3 = rhs[k][j][i][2];
             r4 = rhs[k][j][i][3];
             r5 = rhs[k][j][i][4];
-
             t1 = c2/ac2inv*(qs[k][j][i]*r1-uu*r2-vv*r3-ww*r4+r5);
             t2 = bt*ru1*(uu*r1-r2);
             t3 = bt*ru1*ac*t1;
@@ -1397,7 +1339,6 @@ void tzetar()
 
             uzik1 = u[k][j][i][0];
             btuz = bt*uzik1;
-
             t1 = btuz/ac*(r4+r5);
             t2 = r3+t1;
             t3 = btuz*(r4-r5);
@@ -1573,30 +1514,36 @@ void verify(int no_time_steps, char *Class, logical *verified)
       xceref[3] = 0.1083734951938e+01;
       xceref[4] = 0.1164108338568e+02;
    }
-   else if (grid_points[0]==1020&&grid_points[1]==1020&&grid_points[2]==1020&&no_time_steps==500) {
-      *Class = 'E';
-      dtref = 0.10e-3;
-      
-      //---------------------------------------------------------------------
-      // Reference values of RMS-norms of residual.
-      //---------------------------------------------------------------------
-      xcrref[0] = 0.6255387422609e+05;
-      xcrref[1] = 0.1495317020012e+05;
-      xcrref[2] = 0.2347595750586e+05;
-      xcrref[3] = 0.2091099783534e+05;
-      xcrref[4] = 0.4770412841218e+05;
-      
-      //---------------------------------------------------------------------
-      // Reference values of RMS-norms of solution error.
-      //---------------------------------------------------------------------
-      xceref[0] = 0.6742735164909e+02;
-      xceref[1] = 0.5390656036938e+01;
-      xceref[2] = 0.1680647196477e+02;
-      xceref[3] = 0.1536963126457e+02;
-      xceref[4] = 0.1575330146156e+03;
-   }
    else
-      *verified = false;
+      
+      //---------------------------------------------------------------------
+      // reference data for 12X12X12 grids after 100 time steps, 
+      // with DT = 1.50e-02
+      //---------------------------------------------------------------------
+      if (grid_points[0]==1020&&grid_points[1]==1020&&grid_points[2]==1020&&no_time_steps==500) {
+         *Class = 'E';
+         dtref = 0.10e-3;
+         
+         //---------------------------------------------------------------------
+         // Reference values of RMS-norms of residual.
+         //---------------------------------------------------------------------
+         xcrref[0] = 0.6255387422609e+05;
+         xcrref[1] = 0.1495317020012e+05;
+         xcrref[2] = 0.2347595750586e+05;
+         xcrref[3] = 0.2091099783534e+05;
+         xcrref[4] = 0.4770412841218e+05;
+         
+         //---------------------------------------------------------------------
+         // Reference values of RMS-norms of solution error.
+         //---------------------------------------------------------------------
+         xceref[0] = 0.6742735164909e+02;
+         xceref[1] = 0.5390656036938e+01;
+         xceref[2] = 0.1680647196477e+02;
+         xceref[3] = 0.1536963126457e+02;
+         xceref[4] = 0.1575330146156e+03;
+      }
+      else
+         *verified = false;
    
    //---------------------------------------------------------------------
    // verification test for residuals if gridsize is one of 

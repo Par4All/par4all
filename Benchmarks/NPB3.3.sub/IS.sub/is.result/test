@@ -68,7 +68,6 @@ void create_seq(double seed, double a)
 {
    double x;
    INT_TYPE i, k;
-
    k = (1<<11)/4;
 
    for(i = 0; i <= 65535; i += 1) {
@@ -282,6 +281,12 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
       if (name[0]=='E'&&name[1]=='P') {
          sprintf(size, "%15.0lf", pow(2.0, n1));
          j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
          if (size[j]=='.') {
             size[j] = ' ';
             j--;
@@ -531,8 +536,8 @@ _switch_10_case_W:         ;
          goto _break_10;
 _switch_10_case_S:         ;
          if (i<=2)
+            /* test vals were put here */
             if (key_rank!=test_rank_array[i]+iteration)
-               /* test vals were put here */
                failed = 1;
             else
                passed_verification++;

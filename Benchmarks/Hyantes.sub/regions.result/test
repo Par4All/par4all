@@ -189,7 +189,6 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
-
    if (_resoLat<=0||_resoLon<=0)
       return (void *) 0;
 
@@ -242,7 +241,6 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //  <visu.mLat-R-EXACT-{}>
 
    data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
-
 
 //  <configuration-R-EXACT-{}>
 //  <configuration[PHI1].fparam-R-EXACT-{PHI1==0}>
@@ -664,7 +662,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
                latmin = 2*t[k].lat-latmin;
-
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -672,7 +669,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
                imin = 0;
             if (imax>latRange)
                imax = latRange;
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
 //    k+1<=nb}>
@@ -688,7 +684,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    k+1<=nb}>
 
             data_t lonmin = t[k].lon-deltalon;
-
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -742,7 +737,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1000,7 +994,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
                latmin = 2*t[k].lat-latmin;
-
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -1008,7 +1001,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
                imin = 0;
             if (imax>latRange)
                imax = latRange;
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
 //    k+1<=nb}>
@@ -1024,7 +1016,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    k+1<=nb}>
 
             data_t lonmin = t[k].lon-deltalon;
-
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -1078,7 +1069,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1336,7 +1326,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
                latmin = 2*t[k].lat-latmin;
-
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -1344,7 +1333,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
                imin = 0;
             if (imax>latRange)
                imax = latRange;
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
 //    k+1<=nb}>
@@ -1360,7 +1348,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    k+1<=nb}>
 
             data_t lonmin = t[k].lon-deltalon;
-
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -1414,7 +1401,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1672,7 +1658,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
                latmin = 2*t[k].lat-latmin;
-
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -1680,7 +1665,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
                imin = 0;
             if (imax>latRange)
                imax = latRange;
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
 //    k+1<=nb}>
@@ -1696,7 +1680,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    k+1<=nb}>
 
             data_t lonmin = t[k].lon-deltalon;
-
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -1750,7 +1733,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -2008,7 +1990,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
                latmin = 2*t[k].lat-latmin;
-
             long int imin = floor((latmin-latMin)/latStep);
             size_t imax = 1+ceil((latmax-latMin)/latStep);
 
@@ -2016,7 +1997,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                imin = 0;
             if (imax>latRange)
                imax = latRange;
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
 //    k+1<=nb}>
@@ -2032,7 +2012,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    k+1<=nb}>
 
             data_t lonmin = t[k].lon-deltalon;
-
             long int jmin = floor((lonmin-lonMin)/lonStep);
             size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
 
@@ -2086,7 +2065,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,

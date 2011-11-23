@@ -120,7 +120,6 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 
 //  T() {}
 
-
    if (_resoLat<=0||_resoLon<=0)
 
 //  T() {}
@@ -169,7 +168,6 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //  T() {}
 
    data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
-
 
 //  T() {}
 
@@ -414,7 +412,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 
                latmin = 2*t[k].lat-latmin;
 
-
 //  T(imin) {}
 
             long int imin = floor((latmin-latMin)/latStep);
@@ -440,7 +437,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 
                imax = latRange;
 
-
 //  T() {}
 
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -452,7 +448,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //  T() {}
 
             data_t lonmin = t[k].lon-deltalon;
-
 
 //  T(jmin) {}
 
@@ -502,7 +497,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    jmin<=0`1`2`3`4`5`6`j}
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  T() {}
 
@@ -661,7 +655,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 
                latmin = 2*t[k].lat-latmin;
 
-
 //  T(imin) {}
 
             long int imin = floor((latmin-latMin)/latStep);
@@ -687,7 +680,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 
                imax = latRange;
 
-
 //  T() {}
 
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -699,7 +691,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //  T() {}
 
             data_t lonmin = t[k].lon-deltalon;
-
 
 //  T(jmin) {}
 
@@ -749,7 +740,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    jmin<=0`1`2`3`4`5`6`j}
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  T() {}
 
@@ -908,7 +898,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 
                latmin = 2*t[k].lat-latmin;
 
-
 //  T(imin) {}
 
             long int imin = floor((latmin-latMin)/latStep);
@@ -934,7 +923,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 
                imax = latRange;
 
-
 //  T() {}
 
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -946,7 +934,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //  T() {}
 
             data_t lonmin = t[k].lon-deltalon;
-
 
 //  T(jmin) {}
 
@@ -996,7 +983,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    jmin<=0`1`2`3`4`5`6`j}
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  T() {}
 
@@ -1155,7 +1141,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 
                latmin = 2*t[k].lat-latmin;
 
-
 //  T(imin) {}
 
             long int imin = floor((latmin-latMin)/latStep);
@@ -1181,7 +1166,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 
                imax = latRange;
 
-
 //  T() {}
 
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -1193,7 +1177,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //  T() {}
 
             data_t lonmin = t[k].lon-deltalon;
-
 
 //  T(jmin) {}
 
@@ -1243,7 +1226,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    jmin<=0`1`2`3`4`5`6`j}
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  T() {}
 
@@ -1402,7 +1384,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
                latmin = 2*t[k].lat-latmin;
 
-
 //  T(imin) {}
 
             long int imin = floor((latmin-latMin)/latStep);
@@ -1428,7 +1409,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
                imax = latRange;
 
-
 //  T() {}
 
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
@@ -1440,7 +1420,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //  T() {}
 
             data_t lonmin = t[k].lon-deltalon;
-
 
 //  T(jmin) {}
 
@@ -1490,7 +1469,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    jmin<=0`1`2`3`4`5`6`j}
 
                   for(j = jmin; j <= jmax-1; j += 1) {
-
 
 //  T() {}
 
