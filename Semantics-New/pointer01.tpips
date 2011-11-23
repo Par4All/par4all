@@ -3,7 +3,7 @@ delete pointer01
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create pointer01 pointer01.c
-
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 echo
 echo Proper effects for "main"
 echo

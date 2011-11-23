@@ -106,8 +106,8 @@ Proper effects for "foo" with points-to information
 
 void foo(int *p)
 {
-//             <    is read   >: _p_1[0] p
-//             <    is written>: _p_1[0]
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
    (*p)++;
 }
 
@@ -121,13 +121,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = (int *) malloc(sizeof(int));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    foo(p);
 //             <    is written>: p
    p = &x;
-//             <    is read   >: p x
-//             <    is written>: x
+//             <    is read   >: p
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
@@ -135,21 +133,18 @@ int main()
 
 Cumulated effects for "foo" with points-to information
 
-//             <    is read   >: _p_1[0] p
-//             <    is written>: _p_1[0]
+//             <    is read   >: _p_1 p
 void foo(int *p)
 {
-//             <    is read   >: _p_1[0] p
-//             <    is written>: _p_1[0]
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
    (*p)++;
 }
 
 Cumulated effects for "main" with points-to information
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
 //             <    is written>: x y z
@@ -158,13 +153,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = (int *) malloc(sizeof(int));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    foo(p);
 //             <    is written>: p
    p = &x;
-//             <    is read   >: p x
-//             <    is written>: x
+//             <    is read   >: p
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
@@ -178,7 +171,7 @@ Transformers for "foo" with points-to information
 void foo(int *p)
 {
 
-//  T() {}
+//  T(_p_1) {}
 
    (*p)++;
 }
@@ -186,7 +179,7 @@ void foo(int *p)
 Transformers for "main" with points-to information
 
 
-//  T(main) {main==6}
+//  T(main,x,y,z) {main==6, x==1, y==2, z==3}
 
 int main()
 {
