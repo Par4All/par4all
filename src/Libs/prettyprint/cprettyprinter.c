@@ -2254,7 +2254,7 @@ bool print_c_code(const char* module_name)
     dir = db_get_current_workspace_directory();
 
     cmd = strdup(concatenate(INDENT, " ",
-                dir, "/", crough, " -o ",
+                dir, "/", crough, " -st > ",
                 dir, "/", cpretty, NULL));
 
     safe_system(cmd);
