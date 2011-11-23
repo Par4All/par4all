@@ -85,8 +85,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_aipo_add(tmp, i0, i1);                                         /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_aipo_add_const(o, i0, -v);                                     /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 #
@@ -341,8 +341,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -354,8 +354,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return 0;                                                            /*0012*/
 }
 #
@@ -782,8 +782,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -795,8 +795,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return 0;                                                            /*0012*/
 }
 #
@@ -929,8 +929,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_aipo_add(tmp, i0, i1);                                         /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_aipo_add_const(o, i0, -v);                                     /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -942,8 +942,8 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    int32_t v;                                                           /*0008*/
    freia_aipo_add(tmp, i0, i1);                                         /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_common_destruct_data(tmp);                                     /*0011*/
    freia_aipo_add_const(o, i0, -v);                                     /*0010*/
+   freia_common_destruct_data(tmp);                                     /*0011*/
    return 0;                                                            /*0012*/
 }
 #
