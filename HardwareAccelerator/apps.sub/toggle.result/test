@@ -55,8 +55,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(mask);                                    /*0049*/
 
    freia_aipo_global_vol(out, &measure_vol);                            /*0051*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -225,8 +223,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -296,8 +292,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(mask);                                    /*0049*/
 
    freia_aipo_global_vol(out, &measure_vol);                            /*0051*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -1149,8 +1143,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -1212,8 +1204,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -1283,8 +1273,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(mask);                                    /*0049*/
 
    freia_aipo_global_vol(out, &measure_vol);                            /*0051*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -2104,8 +2092,6 @@ int main(int argc, char *argv[])
    
    
    
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -2140,8 +2126,6 @@ int main(int argc, char *argv[])
    
    
    main_helper_0_0_0(out, in, freia_morpho_kernel_8c, 1, 255, 1, 255, 0, &measure_vol);               /*0024*/
-   
-   
    
    
    
@@ -2215,8 +2199,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(mask);                                    /*0049*/
 
    freia_aipo_global_vol(out, &measure_vol);                            /*0051*/
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -2635,8 +2617,6 @@ int main(int argc, char *argv[])
    
    
    
-   
-   
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
 
    freia_common_tx_image(out, &fdout);                                  /*0056*/
@@ -2683,8 +2663,6 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0030*/
 
    main_helper_0_0_1(out, imWork1, imWork2, in, 1, 255, 1, 255, 0, &measure_vol);      /*0036*/
-   
-   
    
    
    

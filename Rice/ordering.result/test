@@ -48,6 +48,8 @@ l99998:   ;
    goto error;
 _switch_2_case_o:   ;
 /* Output file name */
+
+/* Single-character flag */
    if (rand()>0.5) goto l99997;
    free(ret->outFile);
    ret->outFile = (char *) &ap;
@@ -109,6 +111,8 @@ l99998:   ;
    goto error;
 _switch_2_case_o:   ;
 /* Output file name */
+
+/* Single-character flag */
    if (rand()>0.5) goto l99997;
    free(ret->outFile);
    ret->outFile = (char *) &ap;
