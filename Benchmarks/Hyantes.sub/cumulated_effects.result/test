@@ -135,7 +135,7 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
 //             <    is read   >: _resoLat _resoLon
-   IF (_RESOLat<=0||_resoLon<=0)
+   if (_resoLat<=0||_resoLon<=0)
       return (void *) 0;
 
 //             <    is read   >: _resoLon

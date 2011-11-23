@@ -78,7 +78,6 @@ void calc_vbv_delay()
          /* frame picture or second field */
          if (prog_seq)
             if (!repeatfirst)
-
                next_ip_delay = 90000.0/frame_rate;
             else if (!topfirst)
                next_ip_delay = 90000.0*2.0/frame_rate;
@@ -93,17 +92,20 @@ void calc_vbv_delay()
    }
 
    if (decoding_time==0.0) {
+      /* first call of calc_vbv_delay */
+      /* we start with a 7/8 filled VBV buffer (12.5% back-off) */
       picture_delay = vbv_buffer_size*16384*7/8*90000.0/bit_rate;
       if (fieldpic)
          next_ip_delay = (int) (90000.0/frame_rate+0.5);
    }
    if (!low_delay&&decoding_time<bitcnt_EOP*90000.0/bit_rate)
       /* picture not completely in buffer at intended decoding time */
+      
+      /* VBV checks */
+      
+      /* check for underflow (previous picture) */
       if (!quiet)
-         
-         /* VBV checks */
-         
-         /* check for underflow (previous picture) */
+
          fprintf(stderr, "vbv_delay underflow! (decoding_time=%.1f, t_EOP=%.1f\n)", decoding_time, bitcnt_EOP*90000.0/bit_rate);
    
    /* when to decode current frame */
@@ -112,6 +114,8 @@ void calc_vbv_delay()
    /* warning: bitcount() may overflow (e.g. after 9 min. at 8 Mbit/s */
    vbv_delay = (int) (decoding_time-bitcount()*90000.0/bit_rate);
    if (decoding_time-bitcnt_EOP*90000.0/bit_rate>vbv_buffer_size*16384*90000.0/bit_rate)
+      
+      /* check for overflow (current picture) */
       if (!quiet)
          fprintf(stderr, "vbv_delay overflow!\n");
    
@@ -227,12 +231,12 @@ void idct(short *block)
 static void idctcol(short *blk)
 {
    int x0, x1, x2, x3, x4, x5, x6, x7, x8;
+   
+   /* shortcut */
    if (!((x1 = blk[8*4]<<8)|(x2 = blk[8*6])|(x3 = blk[8*2])|(x4 = blk[8*1])|(x5 = blk[8*7])|(x6 = blk[8*5])|(x7 = blk[8*3]))) {
-
       blk[8*0] = blk[8*1] = blk[8*2] = blk[8*3] = blk[8*4] = blk[8*5] = blk[8*6] = blk[8*7] = iclp[blk[8*0]+32>>6];
       return;
    }
-
    x0 = (blk[8*0]<<8)+8192;
    
    /* first stage */
@@ -275,11 +279,12 @@ static void idctcol(short *blk)
 static void idctrow(short *blk)
 {
    int x0, x1, x2, x3, x4, x5, x6, x7, x8;
+   
+   /* shortcut */
    if (!((x1 = blk[4]<<11)|(x2 = blk[6])|(x3 = blk[2])|(x4 = blk[1])|(x5 = blk[7])|(x6 = blk[5])|(x7 = blk[3]))) {
       blk[0] = blk[1] = blk[2] = blk[3] = blk[4] = blk[5] = blk[6] = blk[7] = blk[0]<<3;
       return;
    }
-
    x0 = (blk[0]<<11)+128;
    /* for proper rounding in the fourth stage */
    
@@ -357,9 +362,9 @@ void iquant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat,
          val = (int) (src[i]*quant_mat[i]*mquant)/16;
          sum += dst[i] = val>2047?2047:val<-2048?-2048:val;
       }
+      
+      /* mismatch control */
       if ((sum&1)==0)
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -377,9 +382,9 @@ void iquant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mqua
             val = (int) ((2*val+(val>0?1:-1))*quant_mat[i]*mquant)/32;
          sum += dst[i] = val>2047?2047:val<-2048?-2048:val;
       }
+      
+      /* mismatch control */
       if ((sum&1)==0)
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -396,11 +401,14 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
             /* color component index */
             
             if (cc==0) {
+               /* luminance */
                if (pict_struct==3&&mbi[k].dct_type) {
+                  /* field DCT */
                   offs = i+((n&1)<<3)+width*(j+((n&2)>>1));
                   lx = width<<1;
                }
                else {
+                  /* frame DCT */
                   offs = i+((n&1)<<3)+width2*(j+((n&2)<<2));
                   lx = width2;
                }
@@ -415,10 +423,12 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
                i1 = chroma_format==3?i:i>>1;
                j1 = chroma_format!=1?j:j>>1;
                if (pict_struct==3&&mbi[k].dct_type&&chroma_format!=1) {
+                  /* field DCT */
                   offs = i1+(n&8)+chrom_width*(j1+((n&2)>>1));
                   lx = chrom_width<<1;
                }
                else {
+                  /* frame DCT */
                   offs = i1+(n&8)+chrom_width2*(j1+((n&2)<<2));
                   lx = chrom_width2;
                }
@@ -448,9 +458,9 @@ int main(int argc, char *argv[])
       
       /* read quantization matrices */
       readquantmat();
+      
+      /* open output file */
       if (!(outfile = fopen(argv[2], "wb"))) {
-         
-         /* open output file */
          sprintf(errortext, "Couldn't create output file %s", argv[2]);
          error(errortext);
       }
@@ -728,7 +738,10 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
       */
    mvxs = imins-(i<<1);
    mvys = jmins-(j<<1);
+   
+   /* vector for prediction from field of opposite 'parity' */
    mvxo0 = mvxs+(mvxs>0)>>1;
+   /* mvxs // 2 */
    mvyo0 = mvys+(mvys>0)>>1;
    /* mvys // 2 */
    
@@ -754,6 +767,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
             /* current mb location */
             /* adjacent line distance */
             /* half-pel flags */
+            /* compute prediction error */
+            
             local_dist = bdist2(sameref+(imins>>1)+width2*(jmins>>1), oppref+(io>>1)+width2*(jo>>1), mb, width2, imins&1, jmins&1, io&1, jo&1, 16);
             /* block height */
             
@@ -770,6 +785,10 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    /* current mb location */
    /* adjacent line distance */
    /* half-pel flags */
+   /* end delta y loop */
+   
+   /* Compute L1 error for decision purposes */
+   
    *dmcp = bdist1(sameref+(imins>>1)+width2*(jmins>>1), oppref+(imino>>1)+width2*(jmino>>1), mb, width2, imins&1, jmins&1, imino&1, jmino&1, 16);
    /* block height */
    
@@ -805,14 +824,20 @@ l99998:         ;
          
          /* vector for prediction from field of opposite 'parity' */
          if (topfirst) {
+            /* vector for prediction of top field from bottom field */
             it0 = is+(is>0)>>1;
             jt0 = (js+(js>0)>>1)-1;
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = 3*is+(is>0)>>1;
             jb0 = (3*js+(js>0)>>1)+1;
          }
          else {
+            /* vector for prediction of top field from bottom field */
             it0 = 3*is+(is>0)>>1;
             jt0 = (3*js+(js>0)>>1)-1;
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = is+(is>0)>>1;
             jb0 = (js+(js>0)>>1)+1;
          }
@@ -836,10 +861,14 @@ l99998:         ;
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* compute prediction error */
+                     
                      local_dist = bdist2(ref+(is>>1)+(width<<1)*(js>>1), ref+width+(it>>1)+(width<<1)*(jt>>1), mb, width<<1, is&1, js&1, it&1, jt&1, 8);
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* block height */
+                     
                      local_dist += bdist2(ref+width+(is>>1)+(width<<1)*(js>>1), ref+(ib>>1)+(width<<1)*(jb>>1), mb+width, width<<1, is&1, js&1, ib&1, jb&1, 8);
                      /* block height */
                      
@@ -873,6 +902,7 @@ l99999:         ;
          else {
             goto _loop_end_2;
          }
+         /* second field: scale by 1/3 */
          is = is>=0?(is+1)/3:-(((-is)+1)/3);
          js = js>=0?(js+1)/3:-(((-js)+1)/3);
          goto l99998;
@@ -880,6 +910,9 @@ _loop_end_2:         ;
       }
    
    
+   
+   
+   /* Compute L1 error for decision purposes */
    
    local_dist = bdist1(ref+(imins>>1)+(width<<1)*(jmins>>1), ref+width+(imint>>1)+(width<<1)*(jmint>>1), mb, width<<1, imins&1, jmins&1, imint&1, jmint&1, 8);
    
@@ -953,7 +986,9 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
       else if (dmc8<dmcfield) {
          /* 16x8 prediction */
          mbi->motion_type = 2;
+         /* upper half block */
          vmc = dist2((sel8u?botref:topref)+(imin8u>>1)+w2*(jmin8u>>1), mb, w2, imin8u&1, jmin8u&1, 8);
+         /* lower half block */
          vmc += dist2((sel8l?botref:topref)+(imin8l>>1)+w2*(jmin8l>>1), mb+8*w2, w2, imin8l&1, jmin8l&1, 8);
       }
       else {
@@ -1020,8 +1055,15 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
       
       
       field_estimate(neworg, newref, neworg+width, newref+width, mb, i, j, sxb, syb, 0, &iminr, &jminr, &imin8ur, &jmin8ur, &imin8lr, &jmin8lr, &dmcfieldr, &dmc8r, &selr, &sel8ur, &sel8lr, &imins, &jmins, &ds);
+      
+      /* calculate distances for bidirectional prediction */
+      /* field */
       dmcfieldi = bdist1(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminf&1, jminf&1, iminr&1, jminr&1, 16);
+      
+      /* 16x8 upper half block */
       dmc8i = bdist1(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
+      
+      /* 16x8 lower half block */
       dmc8i += bdist1(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
       
       /* select prediction type of minimum distance */
@@ -1036,7 +1078,11 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
          /* 16x8, interpolated */
          mbi->mb_type = 8|4;
          mbi->motion_type = 2;
+         
+         /* upper half block */
          vmc = bdist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
+         
+         /* lower half block */
          vmc += bdist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
       }
       else if (dmcfieldf<dmc8f&&dmcfieldf<dmcfieldr&&dmcfieldf<dmc8r) {
@@ -1049,7 +1095,11 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
          /* 16x8, forward */
          mbi->mb_type = 8;
          mbi->motion_type = 2;
+         
+         /* upper half block */
          vmc = dist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), mb, w2, imin8uf&1, jmin8uf&1, 8);
+         
+         /* lower half block */
          vmc += dist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, 8);
       }
       else if (dmcfieldr<dmc8r) {
@@ -1062,7 +1112,11 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
          /* 16x8, backward */
          mbi->mb_type = 4;
          mbi->motion_type = 2;
+         
+         /* upper half block */
          vmc = dist2(newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8ur&1, jmin8ur&1, 8);
+         
+         /* lower half block */
          vmc += dist2(newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lr&1, jmin8lr&1, 8);
       }
       
@@ -1338,6 +1392,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
          
          dmcr = fullsearch(neworg, newref, mb, width, i, j, sxb, syb, 16, width, height, &iminr, &jminr);
          vmcr = dist2(newref+(iminr>>1)+width*(jminr>>1), mb, width, iminr&1, jminr&1, 16);
+         
+         /* interpolated (bidirectional) */
          vmci = bdist2(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
          
          /* decisions */
@@ -1370,8 +1426,17 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
          
          
          frame_estimate(neworg, newref, mb, i, j, sxb, syb, &iminr, &jminr, &imintr, &jmintr, &iminbr, &jminbr, &dmcr, &dmcfieldr, &tselr, &bselr, imins, jmins);
+         
+         /* calculate interpolated distance */
+         /* frame */
          dmci = bdist1(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
+         
+         /* top field */
+         
          dmcfieldi = bdist1(oldref+(imintf>>1)+(tself?width:0)+(width<<1)*(jmintf>>1), newref+(imintr>>1)+(tselr?width:0)+(width<<1)*(jmintr>>1), mb, width<<1, imintf&1, jmintf&1, imintr&1, jmintr&1, 8);
+         
+         /* bottom field */
+         
          dmcfieldi += bdist1(oldref+(iminbf>>1)+(bself?width:0)+(width<<1)*(jminbf>>1), newref+(iminbr>>1)+(bselr?width:0)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbf&1, jminbf&1, iminbr&1, jminbr&1, 8);
          
          /* select prediction type of minimum distance from the
@@ -1555,7 +1620,6 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
    imin = i0;
    jmin = j0;
    dmin = dist1(org+imin+lx*jmin, blk, lx, 0, 0, h, 65536);
-
    sxy = sx>sy?sx:sy;
 
    for(l = 1; l <= sxy; l += 1) {
@@ -1664,7 +1728,6 @@ static void init()
    /* for field pictures */
    width = 16*mb_width;
    height = 16*mb_height;
-
    chrom_width = chroma_format==3?width:width>>1;
    chrom_height = chroma_format!=1?height:height>>1;
 
@@ -1673,9 +1736,9 @@ static void init()
    chrom_width2 = fieldpic?chrom_width<<1:chrom_width;
 
    block_count = block_count_tab[chroma_format-1];
+   
+   /* clip table */
    if (!(clp = (unsigned char *) malloc(1024)))
-      
-      /* clip table */
       error("malloc failed\n");
    clp += 384;
    for(i = -384; i <= 639; i += 1)
@@ -1684,7 +1747,6 @@ static void init()
    for(i = 0; i <= 2; i += 1) {
       size = i==0?width*height:chrom_width*chrom_height;
       if (!(newrefframe[i] = (unsigned char *) malloc(size)))
-
          error("malloc failed\n");
       if (!(oldrefframe[i] = (unsigned char *) malloc(size)))
          error("malloc failed\n");
@@ -1730,9 +1792,9 @@ static void readparmfile(char *fname)
    extern int r, Xi, Xb, Xp, d0i, d0p, d0b;
    /* rate control */
    extern double avg_act;
+   /* rate control */
+   
    if (!(fd = fopen(fname, "r"))) {
-      /* rate control */
-      
       sprintf(errortext, "Couldn't open parameter file %s", fname);
       error(errortext);
    }
@@ -2035,15 +2097,11 @@ _break_3:         ;
    for(i = 0; i <= M-1; i += 1) {
       if (motion_data[i].sxf>(4<<motion_data[i].forw_hor_f_code)-1) {
          if (!quiet)
-            
-            
             fprintf(stderr, "Warning: reducing forward horizontal search width to %d\n", (4<<motion_data[i].forw_hor_f_code)-1);
          motion_data[i].sxf = (4<<motion_data[i].forw_hor_f_code)-1;
       }
       if (motion_data[i].syf>(4<<motion_data[i].forw_vert_f_code)-1) {
          if (!quiet)
-            
-            
             fprintf(stderr, "Warning: reducing forward vertical search width to %d\n", (4<<motion_data[i].forw_vert_f_code)-1);
          motion_data[i].syf = (4<<motion_data[i].forw_vert_f_code)-1;
       }
@@ -2051,15 +2109,11 @@ _break_3:         ;
       if (i!=0) {
          if (motion_data[i].sxb>(4<<motion_data[i].back_hor_f_code)-1) {
             if (!quiet)
-               
-               
                fprintf(stderr, "Warning: reducing backward horizontal search width to %d\n", (4<<motion_data[i].back_hor_f_code)-1);
             motion_data[i].sxb = (4<<motion_data[i].back_hor_f_code)-1;
          }
          if (motion_data[i].syb>(4<<motion_data[i].back_vert_f_code)-1) {
             if (!quiet)
-               
-               
                fprintf(stderr, "Warning: reducing backward vertical search width to %d\n", (4<<motion_data[i].back_vert_f_code)-1);
             motion_data[i].syb = (4<<motion_data[i].back_vert_f_code)-1;
          }
@@ -2171,18 +2225,25 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 {
    if (pict_struct==3)
       if (topfirst) {
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
          DMV[0][1] = (mvy+(mvy>0)>>1)+dmvector[1]-1;
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
          DMV[1][1] = (3*mvy+(mvy>0)>>1)+dmvector[1]+1;
       }
       else {
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
          DMV[0][1] = (3*mvy+(mvy>0)>>1)+dmvector[1]-1;
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (mvx+(mvx>0)>>1)+dmvector[0];
          DMV[1][1] = (mvy+(mvy>0)>>1)+dmvector[1]+1;
       }
    else {
+      /* vector for prediction from field of opposite 'parity' */
       DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
       DMV[0][1] = (mvy+(mvy>0)>>1)+dmvector[1];
       
@@ -2268,6 +2329,8 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
    /* half pel flag */
    yint = dy>>1;
    yh = dy&1;
+   
+   /* origins */
    s = src+lx*(y+yint)+(x+xint);
    /* motion vector */
    d = dst+lx*y+x;
@@ -2393,12 +2456,18 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
          }
          else
             /* invalid motion_type in frame picture */
+            /* first prediction is stored, second is added and averaged */
+            
+            /* frame picture */
+            
             if (!quiet)
                fprintf(stderr, "invalid motion_type\n");
       else {
          /* field picture */
          
          currentfield = pict_struct==2;
+         
+         /* determine which frame to use for prediction */
          if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[0][0])
             predframe = newref;
          else
@@ -2413,6 +2482,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
             /* upper half */
             
             pred(predframe, mv_field_sel[0][0], cur, currentfield, lx<<1, 16, 8, bx, by, PMV[0][0][0], PMV[0][0][1], 0);
+            /* previous frame */
+            
+            
+            /* determine which frame to use for lower half prediction */
             if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[1][0])
                predframe = newref;
             else
@@ -2528,11 +2601,10 @@ void profile_and_level_checks()
 
    if (level<4||level>10||level&1)
       error("undefined Level");
-
    maxval = &maxval_tab[level-4>>1];
+   
+   /* check profile@level combination */
    if (!profile_level_defined[profile-1][level-4>>1])
-      
-      /* check profile@level combination */
       error("undefined profile@level combination");
    
    
@@ -2603,12 +2675,12 @@ void putAC(int run, int signed_level, int vlcformat)
 {
    int level, len;
    VLCtable *ptab;
-
    level = signed_level<0?-signed_level:signed_level;
+   /* abs(signed_level) */
+   
+   /* make sure run and level are valid */
    if (run<0||run>63||level==0||level>2047||mpeg1&&level>255) {
-      /* abs(signed_level) */
-      
-      /* make sure run and level are valid */
+
       sprintf(errortext, "AC value out of range (run=%d, signed_level=%d)\n", run, signed_level);
       error(errortext);
    }
@@ -2687,7 +2759,6 @@ void putbits(int val, int n)
 {
    int i;
    unsigned int mask;
-
    mask = 1<<n-1;
    /* selects first (leftmost) bit */
    
@@ -2738,7 +2809,6 @@ void putgophdr(int frame, int closed_gop)
 static int frametotc(int frame)
 {
    int fps, pict, sec, minute, hour, tc;
-
    fps = (int) (frame_rate+0.5);
    pict = frame%fps;
    frame = (frame-pict)/fps;
@@ -2792,7 +2862,6 @@ void putmbtype(int pict_type, int mb_type)
 void putmotioncode(int motion_code)
 {
    int abscode;
-
    abscode = motion_code>=0?motion_code:-motion_code;
    /* abs(motion_code) */
    putbits(motionvectab[abscode].code, motionvectab[abscode].len);
@@ -2822,6 +2891,8 @@ void putmv(int dmv, int f_code)
    if (dmv<vmin||dmv>vmax)
       if (!quiet)
          fprintf(stderr, "invalid motion vector\n");
+   
+   /* split dmv into motion_code and motion_residual */
    temp = (dmv<0?-dmv:dmv)+f-1;
    motion_code = temp>>r_size;
    if (dmv<0)
@@ -3019,11 +3090,11 @@ l99996:         ;
          
          /* macroblock cannot be skipped */
          mbinfo[k].skipped = 0;
+         
+         /* there's no VLC for 'No MC, Not Coded':
+                * we have to transmit (0,0) motion vectors
+                */
          if (pict_type==2&&!cbp&&!(mb_type&8))
-            
-            /* there's no VLC for 'No MC, Not Coded':
-                   * we have to transmit (0,0) motion vectors
-                   */
             mb_type |= 8;
 
          putaddrinc(MBAinc);
@@ -3031,9 +3102,9 @@ l99996:         ;
          MBAinc = 1;
 
          putmbtype(pict_type, mb_type);
+         /* macroblock type */
+         
          if (mb_type&(8|4)&&!frame_pred_dct)
-            /* macroblock type */
-            
             putbits(mbinfo[k].motion_type, 2);
 
          if (pict_struct==3&&cbp&&!frame_pred_dct)
@@ -3063,16 +3134,17 @@ l99996:         ;
 
          for(comp = 0; comp <= block_count-1; comp += 1)
             if (cbp&1<<block_count-1-comp)
+               /* block loop */
                if (mb_type&1) {
                   cc = comp<4?0:(comp&1)+1;
                   putintrablk(blocks[k*block_count+comp], cc);
                }
                else
                   putnonintrablk(blocks[k*block_count+comp]);
+         
+         /* reset predictors */
          if (!(mb_type&1))
             for(cc = 0; cc <= 2; cc += 1)
-               
-               /* reset predictors */
                dc_dct_pred[cc] = 0;
          if (mb_type&1||pict_type==2&&!(mb_type&8)) {
             PMV[0][0][0] = PMV[0][0][1] = PMV[1][0][0] = PMV[1][0][1] = 0;
@@ -3083,6 +3155,8 @@ l99996:         ;
          k++;
          goto _loop_end_2;
 l99999:         ;
+/* no DCT coefficients and neither first nor last macroblock of slice */
+
          if (pict_type==2&&!(mb_type&8)) goto l99998;
          if (pict_type==3&&pict_struct==3&&mbinfo[k].motion_type==2&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1])&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1])) goto l99997;
          if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
@@ -3125,8 +3199,6 @@ l99998:         ;
          /* reset predictors */
          
          for(cc = 0; cc <= 2; cc += 1)
-            /* no DCT coefficients and neither first nor last macroblock of slice */
-            
             dc_dct_pred[cc] = 0;
 
          PMV[0][0][0] = PMV[0][0][1] = PMV[1][0][0] = PMV[1][0][1] = 0;
@@ -3244,6 +3316,12 @@ void putseq()
          fprintf(stderr, "Encoding frame %d ", i);
          fflush(stderr);
       }
+      
+      /* f0: lowest frame number in current GOP
+           *
+           * first GOP contains N-(M-1) frames,
+           * all other GOPs contain N frames
+           */
       f0 = N*((i+(M-1))/N)-(M-1);
 
       if (f0<0)
@@ -3251,7 +3329,7 @@ void putseq()
       if (i==0||(i-1)%M==0) {
          /* I or P frame */
          for(j = 0; j <= 2; j += 1) {
-
+            /* shuffle reference frames */
             neworg[j] = oldorgframe[j];
             newref[j] = oldrefframe[j];
             oldorgframe[j] = neworgframe[j];
@@ -3270,6 +3348,11 @@ void putseq()
             pict_type = 1;
             forw_hor_f_code = forw_vert_f_code = 15;
             back_hor_f_code = back_vert_f_code = 15;
+            
+            /* n: number of frames in current GOP
+                     *
+                     * first GOP contains (M-1) less (B) frames
+                     */
             n = i==0?N-(M-1):N;
             
             /* last GOP may contain less frames */
@@ -3389,7 +3472,6 @@ void putseq()
          }
 
          pict_struct = topfirst?2:1;
-
          ipflag = pict_type==1;
          if (ipflag) {
             /* first field = I, second field = P */
@@ -3573,11 +3655,11 @@ void putuserdata(char *userdata)
 static void putDC(sVLCtable *tab, int val)
 {
    int absval, size;
-
    absval = val<0?-val:val;
+   /* abs(val) */
+   
    if (absval>2047||mpeg1&&absval>255) {
-      /* abs(val) */
-      
+      /* should never happen */
       sprintf(errortext, "DC value out of range (%d)\n", val);
       error(errortext);
    }
@@ -3610,6 +3692,7 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
 
    x = src[0];
    d = 8>>dc_prec;
+   /* intra_dc_mult */
    dst[0] = x>=0?(x+(d>>1))/d:-(((-x)+(d>>1))/d);
    /* round(x/d) */
    
@@ -3628,7 +3711,6 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
             y = 255;
          else if (y>2047)
             y = 2047;
-
       dst[i] = x>=0?y:-y;
    }
 
@@ -3664,12 +3746,15 @@ int quant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mquant
 static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, int mquant)
 {
    int i, val;
-
    dst[0] = src[0]<<3-dc_prec;
    for(i = 1; i <= 63; i += 1) {
       val = (int) (src[i]*quant_mat[i]*mquant)/16;
+      
+      /* mismatch control */
       if ((val&1)==0&&val!=0)
          val += val>0?-1:1;
+      
+      /* saturation */
       dst[i] = val>2047?2047:val<-2048?-2048:val;
    }
 }
@@ -3892,6 +3977,8 @@ int rc_calc_mquant(int j)
          mquant = 2;
       if (mquant>62)
          mquant = 62;
+      
+      /* ignore small changes in mquant */
       if (mquant>=8&&mquant-prev_mquant>=-4&&mquant-prev_mquant<=4)
          mquant = prev_mquant;
 
@@ -3943,7 +4030,6 @@ _switch_1_case_1:   ;
    T = (int) floor(R/(1.0+Np*Xp/(Xi*1.0)+Nb*Xb/(Xi*1.4))+0.5);
    d = d0i;
 _break_1:   ;
-
    Tmin = (int) floor(bit_rate/(8.0*frame_rate)+0.5);
 
    if (T<Tmin)
@@ -4073,7 +4159,6 @@ _break_1:   ;
 
    fprintf(statfile, "\nrate control: end of picture\n");
    fprintf(statfile, " actual number of bits: S=%d\n", S);
-
    fprintf(statfile, " average quantization parameter Q=%.1f\n", (double) Q/(mb_width*mb_height2));
    fprintf(statfile, " remaining number of bits in GOP: R=%d\n", R);
    
@@ -4146,6 +4231,7 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
             jp4 = j<height-4?j+4:height-1;
             jp5 = j<height-5?j+5:height-1;
             jp6 = j<height-5?j+6:height-1;
+            /* FIR filter with 0.5 sample interval phase shift */
             dst[w*(j>>1)] = clp[(int) (228*(src[w*j]+src[w*jp1])+70*(src[w*jm1]+src[w*jp2])-37*(src[w*jm2]+src[w*jp3])-21*(src[w*jm3]+src[w*jp4])+11*(src[w*jm4]+src[w*jp5])+5*(src[w*jm5]+src[w*jp6])+256)>>9];
          }
          src++;
@@ -4168,15 +4254,6 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
             jp5 = j<height-10?j+10:height-2;
             jp6 = j<height-12?j+12:height-2;
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
             dst[w*(j>>1)] = clp[(int) (8*src[w*jm5]+5*src[w*jm4]-30*src[w*jm3]-18*src[w*jm2]+113*src[w*jm1]+242*src[w*j]+192*src[w*jp1]+35*src[w*jp2]-38*src[w*jp3]-10*src[w*jp4]+11*src[w*jp5]+2*src[w*jp6]+256)>>9];
             
             /* bottom field */
@@ -4192,15 +4269,6 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
             jp4 = j<height-9?j+9:height-1;
             jp5 = j<height-11?j+11:height-1;
             jp6 = j<height-13?j+13:height-1;
-            
-            
-            
-            
-            
-            
-            
-            
-            
             
             dst[w*((j>>1)+1)] = clp[(int) (8*src[w*jp6]+5*src[w*jp5]-30*src[w*jp4]-18*src[w*jp3]+113*src[w*jp2]+242*src[w*jp1]+192*src[w*jm1]+35*src[w*jm2]-38*src[w*jm3]-10*src[w*jm4]+11*src[w*jm5]+2*src[w*jm6]+256)>>9];
          }
@@ -4296,7 +4364,6 @@ static void read_ppm(char *fname, unsigned char *frame[])
 
    sprintf(name, "%s.ppm", fname);
    if (!(fd = fopen(name, "rb"))) {
-
       sprintf(errortext, "Couldn't open %s\n", name);
       error(errortext);
    }
@@ -4354,7 +4421,6 @@ static void read_y_u_v(char *fname, unsigned char *frame[])
    int chrom_hsize, chrom_vsize;
    char name[128];
    FILE *fd;
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
    chrom_vsize = chroma_format!=1?vertical_size:vertical_size>>1;
 
@@ -4394,7 +4460,6 @@ static void read_yuv(char *fname, unsigned char *frame[])
    int chrom_hsize, chrom_vsize;
    char name[128];
    FILE *fd;
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
    chrom_vsize = chroma_format!=1?vertical_size:vertical_size>>1;
 
@@ -4456,7 +4521,6 @@ void stats()
    fprintf(statfile, "\npicture statistics:\n");
 
    fprintf(statfile, " # of intra coded macroblocks:  %4d (%.1f%%)\n", n_intra, 100.0*(double) n_intra/nmb);
-
    fprintf(statfile, " # of coded blocks:             %4d (%.1f%%)\n", n_blocks, 100.0*(double) n_blocks/(block_count*nmb));
 
    fprintf(statfile, " # of not coded macroblocks:    %4d (%.1f%%)\n", n_ncoded, 100.0*(double) n_ncoded/nmb);
@@ -4647,9 +4711,7 @@ void writeframe(char *fname, unsigned char *frame[])
    int chrom_hsize, chrom_vsize;
    char name[128];
    FILE *fd;
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
-
    chrom_vsize = chroma_format!=1?vertical_size:vertical_size>>1;
 
    if (fname[0]=='-')
@@ -4716,7 +4778,6 @@ void putAC(int run, int signed_level, int vlcformat)
 {
    int level, len;
    VLCtable *ptab;
-
    level = signed_level<0?-signed_level:signed_level;
    if (run<0||run>63||level==0||level>(int) sqrt(2048*2048)-1||mpeg1&&level>255) {
 
@@ -4809,13 +4870,15 @@ void putAC(int run, int signed_level, int vlcformat)
    VLCtable *ptab;
 //             <    is read   >: signed_level
 //             <    is written>: 0`level
-
    level = signed_level<0?-signed_level:signed_level;
 //             <may be read   >: errortext[*] signed_level stderr 
 //                               stderr[0] __IO_EFFECTS:LUNS[2]
 //             <may be written>: errortext[*] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: 0`level mpeg1 run
+   /* abs(signed_level) */
+   
+   /* make sure run and level are valid */
    if (run<0||run>63||level==0||level>(int) sqrt(2048*2048)-1||mpeg1&&level>255) {
 //             <may be written>: errortext[*]
 //             <    is read   >: run signed_level
@@ -4997,7 +5060,6 @@ void putAC(int run, int signed_level, int vlcformat)
    VLCtable *ptab;
 
 //  T(0`level) {0<=0`level+signed_level, signed_level<=0`level}
-
 
    level = signed_level<0?-signed_level:signed_level;
 
@@ -5245,7 +5307,6 @@ void putbits(int val, int n)
    unsigned int mask;
 
 //  T(mask) {0<=mask}
-
 
    mask = 1<<n-1;
 
@@ -5969,10 +6030,6 @@ l99996:         ;
          if (pict_type==2&&!cbp&&!(mb_type&8))
 //             <    is read   >: mb_height2 mb_type mb_width
 //             <    is written>: mb_type
-            
-            /* there's no VLC for 'No MC, Not Coded':
-                   * we have to transmit (0,0) motion vectors
-                   */
             mb_type |= 8;
 //             <may be read   >: outfile outfile[0] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
@@ -6009,6 +6066,8 @@ l99996:         ;
 //                               putbits!:outcnt
 //             <    is read   >: frame_pred_dct mb_height2 mb_type 
 //                               mb_width
+         /* macroblock type */
+         
          if (mb_type&(8|4)&&!frame_pred_dct)
 //             <may be read   >: mbinfo[*].motion_type outfile 
 //                               outfile[0] __IO_EFFECTS:LUNS[*] 
@@ -6018,8 +6077,6 @@ l99996:         ;
 //                               putbits!:bytecnt putbits!:outbfr 
 //                               putbits!:outcnt
 //             <    is read   >: k mb_height2 mb_width mbinfo
-            /* macroblock type */
-            
             putbits(mbinfo[k].motion_type, 2);
 //             <may be read   >: k mbinfo mbinfo[*].dct_type outfile 
 //                               outfile[0] __IO_EFFECTS:LUNS[*] 
@@ -6311,6 +6368,8 @@ l99996:         ;
 //             <may be read   >: cc
 //             <may be written>: cc dc_dct_pred[*]
 //             <    is read   >: mb_height2 mb_type mb_width
+         
+         /* reset predictors */
          if (!(mb_type&1))
 //             <may be read   >: cc
 //             <may be written>: dc_dct_pred[*]
@@ -6319,8 +6378,6 @@ l99996:         ;
             for(cc = 0; cc <= 2; cc += 1)
 //             <may be written>: dc_dct_pred[*]
 //             <    is read   >: cc mb_height2 mb_width
-               
-               /* reset predictors */
                dc_dct_pred[cc] = 0;
 //             <may be written>: PMV[0][0][0] PMV[0][0][1] 
 //                               PMV[0][1][0] PMV[0][1][1] 
@@ -6347,6 +6404,8 @@ l99996:         ;
          goto _loop_end_2;
 l99999:         ;
 //             <    is read   >: mb_height2 mb_type mb_width pict_type
+/* no DCT coefficients and neither first nor last macroblock of slice */
+
          if (pict_type==2&&!(mb_type&8)) goto l99998;
 //             <may be read   >: mbinfo[*].MV[0][0][0] 
 //                               mbinfo[*].MV[0][0][1] 
@@ -6433,8 +6492,6 @@ l99998:         ;
          for(cc = 0; cc <= 2; cc += 1)
 //             <may be written>: dc_dct_pred[*]
 //             <    is read   >: cc mb_height2 mb_width
-            /* no DCT coefficients and neither first nor last macroblock of slice */
-            
             dc_dct_pred[cc] = 0;
 //             <    is read   >: mb_height2 mb_width
 //             <    is written>: PMV[0][0][0] PMV[0][0][1] 
@@ -6709,14 +6766,14 @@ l99996:         ;
 
 //  T(mb_type) {}
 
+         
+         /* there's no VLC for 'No MC, Not Coded':
+                * we have to transmit (0,0) motion vectors
+                */
          if (pict_type==2&&!cbp&&!(mb_type&8))
 
 //  T(mb_type) {}
 
-            
-            /* there's no VLC for 'No MC, Not Coded':
-                   * we have to transmit (0,0) motion vectors
-                   */
             mb_type |= 8;
 
 //  T() {}
@@ -6736,12 +6793,12 @@ l99996:         ;
 
 //  T() {}
 
+         /* macroblock type */
+         
          if (mb_type&(8|4)&&!frame_pred_dct)
 
 //  T() {}
 
-            /* macroblock type */
-            
             putbits(mbinfo[k].motion_type, 2);
 
 //  T() {}
@@ -6819,6 +6876,7 @@ l99996:         ;
 
 //  T(cc) {}
 
+               /* block loop */
                if (mb_type&1) {
 
 //  T(cc) {}
@@ -6837,6 +6895,8 @@ l99996:         ;
 
 //  T(cc) {}
 
+         
+         /* reset predictors */
          if (!(mb_type&1))
 
 //  T(cc) {0<=cc, cc<=2}
@@ -6845,8 +6905,6 @@ l99996:         ;
 
 //  T() {}
 
-               
-               /* reset predictors */
                dc_dct_pred[cc] = 0;
 
 //  T() {}
@@ -6874,6 +6932,8 @@ l99996:         ;
 l99999:         ;
 
 //  T() {}
+
+/* no DCT coefficients and neither first nor last macroblock of slice */
 
          if (pict_type==2&&!(mb_type&8)) goto l99998;
 
@@ -6953,8 +7013,6 @@ l99998:         ;
 
 //  T() {}
 
-            /* no DCT coefficients and neither first nor last macroblock of slice */
-            
             dc_dct_pred[cc] = 0;
 
 //  T() {}
@@ -7356,12 +7414,12 @@ int main(int argc, char *argv[])
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: argv[2]
 //             <    is written>: outfile
+      
+      /* open output file */
       if (!(outfile = fopen(argv[2], "wb"))) {
 //             <may be read   >: argv[2][*]
 //             <may be written>: errortext[*]
 //             <    is read   >: argv[2]
-         
-         /* open output file */
          sprintf(errortext, "Couldn't create output file %s", argv[2]);
 //             <may be read   >: errortext[*] stderr[0]
 //             <may be written>: stderr[0]
@@ -7461,12 +7519,12 @@ int main(int argc, char *argv[])
 
 //  T() {}
 
+      
+      /* open output file */
       if (!(outfile = fopen(argv[2], "wb"))) {
 
 //  T() {}
 
-         
-         /* open output file */
          sprintf(errortext, "Couldn't create output file %s", argv[2]);
 
 //  T() {0==-1}
@@ -7723,7 +7781,6 @@ void calc_vbv_delay(void)
 
 //  T() {}
 
-
                next_ip_delay = 90000.0/frame_rate;
             else if (!topfirst)
 
@@ -7759,6 +7816,8 @@ void calc_vbv_delay(void)
 
 //  T() {}
 
+      /* first call of calc_vbv_delay */
+      /* we start with a 7/8 filled VBV buffer (12.5% back-off) */
       picture_delay = vbv_buffer_size*16384*7/8*90000.0/bit_rate;
 
 //  T() {}
@@ -7777,14 +7836,15 @@ void calc_vbv_delay(void)
 //  T() {}
 
       /* picture not completely in buffer at intended decoding time */
+      
+      /* VBV checks */
+      
+      /* check for underflow (previous picture) */
       if (!quiet)
 
 //  T() {}
 
-         
-         /* VBV checks */
-         
-         /* check for underflow (previous picture) */
+
          fprintf(stderr, "vbv_delay underflow! (decoding_time=%.1f, t_EOP=%.1f\n)", decoding_time, bitcnt_EOP*90000.0/bit_rate);
 
 //  T() {}
@@ -7805,6 +7865,8 @@ void calc_vbv_delay(void)
 
 //  T() {}
 
+      
+      /* check for overflow (current picture) */
       if (!quiet)
 
 //  T() {}
@@ -8130,10 +8192,11 @@ static void idctcol(short *blk)
 
 //  T(x1,x2,x3,x4,x5,x6,x7) {}
 
+   
+   /* shortcut */
    if (!((x1 = blk[8*4]<<8)|(x2 = blk[8*6])|(x3 = blk[8*2])|(x4 = blk[8*1])|(x5 = blk[8*7])|(x6 = blk[8*5])|(x7 = blk[8*3]))) {
 
 //  T() {}
-
 
       blk[8*0] = blk[8*1] = blk[8*2] = blk[8*3] = blk[8*4] = blk[8*5] = blk[8*6] = blk[8*7] = iclp[blk[8*0]+32>>6];
 
@@ -8143,7 +8206,6 @@ static void idctcol(short *blk)
    }
 
 //  T(x0) {}
-
 
    x0 = (blk[8*0]<<8)+8192;
 
@@ -8283,6 +8345,8 @@ static void idctrow(short *blk)
 
 //  T(x1,x2,x3,x4,x5,x6,x7) {}
 
+   
+   /* shortcut */
    if (!((x1 = blk[4]<<11)|(x2 = blk[6])|(x3 = blk[2])|(x4 = blk[1])|(x5 = blk[7])|(x6 = blk[5])|(x7 = blk[3]))) {
 
 //  T() {}
@@ -8295,7 +8359,6 @@ static void idctrow(short *blk)
    }
 
 //  T(x0) {}
-
 
    x0 = (blk[0]<<11)+128;
 
@@ -8533,12 +8596,12 @@ void iquant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat,
 
 //  T() {}
 
+      
+      /* mismatch control */
       if ((sum&1)==0)
 
 //  T() {}
 
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -8589,12 +8652,12 @@ void iquant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mqua
 
 //  T() {}
 
+      
+      /* mismatch control */
       if ((sum&1)==0)
 
 //  T() {}
 
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -8639,10 +8702,12 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 
 //  T(lx,offs) {}
 
+               /* luminance */
                if (pict_struct==3&&mbi[k].dct_type) {
 
 //  T(offs) {}
 
+                  /* field DCT */
                   offs = i+((n&1)<<3)+width*(j+((n&2)>>1));
 
 //  T(lx) {lx==2width}
@@ -8653,6 +8718,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 
 //  T(offs) {}
 
+                  /* frame DCT */
                   offs = i+((n&1)<<3)+width2*(j+((n&2)<<2));
 
 //  T(lx) {lx==width2}
@@ -8688,6 +8754,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 
 //  T(offs) {}
 
+                  /* field DCT */
                   offs = i1+(n&8)+chrom_width*(j1+((n&2)>>1));
 
 //  T(lx) {2chrom_width==lx}
@@ -8698,6 +8765,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 
 //  T(offs) {}
 
+                  /* frame DCT */
                   offs = i1+(n&8)+chrom_width2*(j1+((n&2)<<2));
 
 //  T(lx) {chrom_width2==lx}
@@ -8772,12 +8840,12 @@ int main(int argc, char *argv[])
 
 //  T() {}
 
+      
+      /* open output file */
       if (!(outfile = fopen(argv[2], "wb"))) {
 
 //  T() {}
 
-         
-         /* open output file */
          sprintf(errortext, "Couldn't create output file %s", argv[2]);
 
 //  T() {0==-1}
@@ -9652,10 +9720,13 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 
 //  T(mvxo0) {}
 
+   
+   /* vector for prediction from field of opposite 'parity' */
    mvxo0 = mvxs+(mvxs>0)>>1;
 
 //  T(mvyo0) {}
 
+   /* mvxs // 2 */
    mvyo0 = mvys+(mvys>0)>>1;
 
 //  T(mvyo0) {mvyo0#init<=mvyo0+1, mvyo0<=mvyo0#init+1}
@@ -9720,6 +9791,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
             /* current mb location */
             /* adjacent line distance */
             /* half-pel flags */
+            /* compute prediction error */
+            
             local_dist = bdist2(sameref+(imins>>1)+width2*(jmins>>1), oppref+(io>>1)+width2*(jo>>1), mb, width2, imins&1, jmins&1, io&1, jo&1, 16);
 
 //  T(imindmv,imino,jmindmv,jmino,vmc_dp) {vmc_dp<=local_dist,
@@ -9760,6 +9833,10 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    /* current mb location */
    /* adjacent line distance */
    /* half-pel flags */
+   /* end delta y loop */
+   
+   /* Compute L1 error for decision purposes */
+   
    *dmcp = bdist1(sameref+(imins>>1)+width2*(jmins>>1), oppref+(imino>>1)+width2*(jmino>>1), mb, width2, imins&1, jmins&1, imino&1, jmino&1, 16);
 
 //  T() {}
@@ -9847,6 +9924,7 @@ l99998:         ;
 
 //  T(it0) {}
 
+            /* vector for prediction of top field from bottom field */
             it0 = is+(is>0)>>1;
 
 //  T(jt0) {}
@@ -9855,6 +9933,8 @@ l99998:         ;
 
 //  T(ib0) {}
 
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = 3*is+(is>0)>>1;
 
 //  T(jb0) {}
@@ -9865,6 +9945,7 @@ l99998:         ;
 
 //  T(it0) {}
 
+            /* vector for prediction of top field from bottom field */
             it0 = 3*is+(is>0)>>1;
 
 //  T(jt0) {}
@@ -9873,6 +9954,8 @@ l99998:         ;
 
 //  T(ib0) {}
 
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = is+(is>0)>>1;
 
 //  T(jb0) {}
@@ -9950,6 +10033,8 @@ l99998:         ;
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* compute prediction error */
+                     
                      local_dist = bdist2(ref+(is>>1)+(width<<1)*(js>>1), ref+width+(it>>1)+(width<<1)*(jt>>1), mb, width<<1, is&1, js&1, it&1, jt&1, 8);
 
 //  T(local_dist) {local_dist#init<=local_dist}
@@ -9957,6 +10042,8 @@ l99998:         ;
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* block height */
+                     
                      local_dist += bdist2(ref+width+(is>>1)+(width<<1)*(js>>1), ref+(ib>>1)+(width<<1)*(jb>>1), mb+width, width<<1, is&1, js&1, ib&1, jb&1, 8);
 
 //  T(iminb,imindmv,imins,imint,jminb,jmindmv,jmins,jmint,vmc)
@@ -10042,6 +10129,7 @@ l99999:         ;
 
 //  T(is) {is#init<=3is+1, 3is<=is#init+1}
 
+         /* second field: scale by 1/3 */
          is = is>=0?(is+1)/3:-(((-is)+1)/3);
 
 //  T(js) {js#init<=3js+1, 3js<=js#init+1}
@@ -10058,6 +10146,9 @@ _loop_end_2:         ;
 
    
    
+   
+   
+   /* Compute L1 error for decision purposes */
    
    local_dist = bdist1(ref+(imins>>1)+(width<<1)*(jmins>>1), ref+width+(imint>>1)+(width<<1)*(jmint>>1), mb, width<<1, imins&1, jmins&1, imint&1, jmint&1, 8);
 
@@ -10257,10 +10348,12 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(vmc) {0<=vmc}
 
+         /* upper half block */
          vmc = dist2((sel8u?botref:topref)+(imin8u>>1)+w2*(jmin8u>>1), mb, w2, imin8u&1, jmin8u&1, 8);
 
 //  T(vmc) {vmc#init<=vmc}
 
+         /* lower half block */
          vmc += dist2((sel8l?botref:topref)+(imin8l>>1)+w2*(jmin8l>>1), mb+8*w2, w2, imin8l&1, jmin8l&1, 8);
       }
       else {
@@ -10423,14 +10516,21 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(dmcfieldi) {0<=dmcfieldi}
 
+      
+      /* calculate distances for bidirectional prediction */
+      /* field */
       dmcfieldi = bdist1(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  T(dmc8i) {0<=dmc8i}
 
+      
+      /* 16x8 upper half block */
       dmc8i = bdist1(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
 //  T(dmc8i) {dmc8i#init<=dmc8i}
 
+      
+      /* 16x8 lower half block */
       dmc8i += bdist1(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
 
 //  T(vmc) {0<=vmc}
@@ -10466,10 +10566,14 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(vmc) {0<=vmc}
 
+         
+         /* upper half block */
          vmc = bdist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
 //  T(vmc) {vmc#init<=vmc}
 
+         
+         /* lower half block */
          vmc += bdist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
       }
       else if (dmcfieldf<dmc8f&&dmcfieldf<dmcfieldr&&dmcfieldf<dmc8r) {
@@ -10500,10 +10604,14 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(vmc) {0<=vmc}
 
+         
+         /* upper half block */
          vmc = dist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), mb, w2, imin8uf&1, jmin8uf&1, 8);
 
 //  T(vmc) {vmc#init<=vmc}
 
+         
+         /* lower half block */
          vmc += dist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, 8);
       }
       else if (dmcfieldr<dmc8r) {
@@ -10534,10 +10642,14 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(vmc) {0<=vmc}
 
+         
+         /* upper half block */
          vmc = dist2(newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8ur&1, jmin8ur&1, 8);
 
 //  T(vmc) {vmc#init<=vmc}
 
+         
+         /* lower half block */
          vmc += dist2(newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lr&1, jmin8lr&1, 8);
       }
 
@@ -11239,6 +11351,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(vmci) {0<=vmci}
 
+         
+         /* interpolated (bidirectional) */
          vmci = bdist2(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  T(vmc) {vmc<=vmci, vmc<=vmcr}
@@ -11304,14 +11418,23 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 
 //  T(dmci) {0<=dmci}
 
+         
+         /* calculate interpolated distance */
+         /* frame */
          dmci = bdist1(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  T(dmcfieldi) {0<=dmcfieldi}
 
+         
+         /* top field */
+         
          dmcfieldi = bdist1(oldref+(imintf>>1)+(tself?width:0)+(width<<1)*(jmintf>>1), newref+(imintr>>1)+(tselr?width:0)+(width<<1)*(jmintr>>1), mb, width<<1, imintf&1, jmintf&1, imintr&1, jmintr&1, 8);
 
 //  T(dmcfieldi) {dmcfieldi#init<=dmcfieldi}
 
+         
+         /* bottom field */
+         
          dmcfieldi += bdist1(oldref+(iminbf>>1)+(bself?width:0)+(width<<1)*(jminbf>>1), newref+(iminbr>>1)+(bselr?width:0)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbf&1, jminbf&1, iminbr&1, jminbr&1, 8);
 
 //  T(vmc) {0<=vmc}
@@ -11789,7 +11912,6 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 
 //  T(sxy) {sx<=sxy, sy<=sxy}
 
-
    sxy = sx>sy?sx:sy;
 
 //  T(d,dmin,i,imin,j,jmin,k,l) {dmin<=dmin#init, 1<=l, l<=sxy}
@@ -12113,7 +12235,6 @@ static void init()
 
 //  T(chrom_width) {}
 
-
    chrom_width = chroma_format==3?width:width>>1;
 
 //  T(chrom_height) {}
@@ -12140,12 +12261,12 @@ static void init()
 
 //  T() {}
 
+   
+   /* clip table */
    if (!(clp = (unsigned char *) malloc(1024)))
 
 //  T() {0==-1}
 
-      
-      /* clip table */
       error("malloc failed\n");
 
 //  T() {}
@@ -12174,7 +12295,6 @@ static void init()
       if (!(newrefframe[i] = (unsigned char *) malloc(size)))
 
 //  T() {0==-1}
-
 
          error("malloc failed\n");
 
@@ -12331,12 +12451,12 @@ static void readparmfile(char *fname)
 
 //  T() {}
 
+   /* rate control */
+   
    if (!(fd = fopen(fname, "r"))) {
 
 //  T() {}
 
-      /* rate control */
-      
       sprintf(errortext, "Couldn't open parameter file %s", fname);
 
 //  T() {0==-1}
@@ -13317,8 +13437,6 @@ _break_3:         ;
 
 //  T() {}
 
-            
-            
             fprintf(stderr, "Warning: reducing forward horizontal search width to %d\n", (4<<motion_data[i].forw_hor_f_code)-1);
 
 //  T() {}
@@ -13336,8 +13454,6 @@ _break_3:         ;
 
 //  T() {}
 
-            
-            
             fprintf(stderr, "Warning: reducing forward vertical search width to %d\n", (4<<motion_data[i].forw_vert_f_code)-1);
 
 //  T() {}
@@ -13360,8 +13476,6 @@ _break_3:         ;
 
 //  T() {}
 
-               
-               
                fprintf(stderr, "Warning: reducing backward horizontal search width to %d\n", (4<<motion_data[i].back_hor_f_code)-1);
 
 //  T() {}
@@ -13379,8 +13493,6 @@ _break_3:         ;
 
 //  T() {}
 
-               
-               
                fprintf(stderr, "Warning: reducing backward vertical search width to %d\n", (4<<motion_data[i].back_vert_f_code)-1);
 
 //  T() {}
@@ -13673,6 +13785,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  T() {}
 
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  T() {}
@@ -13681,6 +13794,8 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  T() {}
 
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
 
 //  T() {}
@@ -13691,6 +13806,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  T() {}
 
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
 
 //  T() {}
@@ -13699,6 +13815,8 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  T() {}
 
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  T() {}
@@ -13709,6 +13827,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  T() {}
 
+      /* vector for prediction from field of opposite 'parity' */
       DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  T() {}
@@ -13950,6 +14069,8 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 
 //  T() {}
 
+   
+   /* origins */
    s = src+lx*(y+yint)+(x+xint);
 
 //  T() {}
@@ -14273,6 +14394,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //  T() {}
 
             /* invalid motion_type in frame picture */
+            /* first prediction is stored, second is added and averaged */
+            
+            /* frame picture */
+            
             if (!quiet)
 
 //  T() {}
@@ -14288,6 +14413,8 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 
 //  T() {}
 
+         
+         /* determine which frame to use for prediction */
          if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[0][0])
 
 //  T() {}
@@ -14320,6 +14447,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 
 //  T() {}
 
+            /* previous frame */
+            
+            
+            /* determine which frame to use for lower half prediction */
             if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[1][0])
 
 //  T() {}
@@ -14564,17 +14695,16 @@ void profile_and_level_checks()
 
 //  T() {}
 
-
    maxval = &maxval_tab[level-4>>1];
 
 //  T() {}
 
+   
+   /* check profile@level combination */
    if (!profile_level_defined[profile-1][level-4>>1])
 
 //  T() {0==-1}
 
-      
-      /* check profile@level combination */
       error("undefined profile@level combination");
 
 //  T() {}
@@ -14767,11 +14897,13 @@ void putAC(int run, int signed_level, int vlcformat)
 
 //  T(0`level) {0<=0`level+signed_level, signed_level<=0`level}
 
-
    level = signed_level<0?-signed_level:signed_level;
 
 //  T() {0<=run, run<=63}
 
+   /* abs(signed_level) */
+   
+   /* make sure run and level are valid */
    if (run<0||run>63||level==0||level>(int) sqrt(2048*2048)-1||mpeg1&&level>255) {
 
 //  T() {}
@@ -15095,7 +15227,6 @@ void putbits(int val, int n)
 
 //  T(mask) {0<=mask}
 
-
    mask = 1<<n-1;
 
 //  T(bytecnt,i,mask,outbfr,outcnt)
@@ -15301,7 +15432,6 @@ static int frametotc(int frame)
    int fps, pict, sec, minute, hour, tc;
 
 //  T(fps) {}
-
 
    fps = (int) (frame_rate+0.5);
 
@@ -15533,7 +15663,6 @@ void putmotioncode(int motion_code)
 
 //  T(abscode) {0<=abscode+motion_code, motion_code<=abscode}
 
-
    abscode = motion_code>=0?motion_code:-motion_code;
 
 //  T(putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
@@ -15628,6 +15757,8 @@ void putmv(int dmv, int f_code)
 
 //  T(temp) {f<=dmv+temp+1, dmv+f<=temp+1}
 
+   
+   /* split dmv into motion_code and motion_residual */
    temp = (dmv<0?-dmv:dmv)+f-1;
 
 //  T(motion_code) {}
@@ -16318,14 +16449,14 @@ l99996:         ;
 
 //  T(mb_type) {}
 
+         
+         /* there's no VLC for 'No MC, Not Coded':
+                * we have to transmit (0,0) motion vectors
+                */
          if (pict_type==2&&!cbp&&!(mb_type&8))
 
 //  T(mb_type) {}
 
-            
-            /* there's no VLC for 'No MC, Not Coded':
-                   * we have to transmit (0,0) motion vectors
-                   */
             mb_type |= 8;
 
 //  T() {}
@@ -16345,12 +16476,12 @@ l99996:         ;
 
 //  T() {}
 
+         /* macroblock type */
+         
          if (mb_type&(8|4)&&!frame_pred_dct)
 
 //  T() {}
 
-            /* macroblock type */
-            
             putbits(mbinfo[k].motion_type, 2);
 
 //  T() {}
@@ -16428,6 +16559,7 @@ l99996:         ;
 
 //  T(cc) {}
 
+               /* block loop */
                if (mb_type&1) {
 
 //  T(cc) {}
@@ -16446,6 +16578,8 @@ l99996:         ;
 
 //  T(cc) {}
 
+         
+         /* reset predictors */
          if (!(mb_type&1))
 
 //  T(cc) {0<=cc, cc<=2}
@@ -16454,8 +16588,6 @@ l99996:         ;
 
 //  T() {}
 
-               
-               /* reset predictors */
                dc_dct_pred[cc] = 0;
 
 //  T() {}
@@ -16483,6 +16615,8 @@ l99996:         ;
 l99999:         ;
 
 //  T() {}
+
+/* no DCT coefficients and neither first nor last macroblock of slice */
 
          if (pict_type==2&&!(mb_type&8)) goto l99998;
 
@@ -16562,8 +16696,6 @@ l99998:         ;
 
 //  T() {}
 
-            /* no DCT coefficients and neither first nor last macroblock of slice */
-            
             dc_dct_pred[cc] = 0;
 
 //  T() {}
@@ -17137,6 +17269,12 @@ void putseq(void)
 
 //  T(f0) {}
 
+      
+      /* f0: lowest frame number in current GOP
+           *
+           * first GOP contains N-(M-1) frames,
+           * all other GOPs contain N frames
+           */
       f0 = N*((i+(M-1))/N)-(M-1);
 
 //  T(f0) {0<=f0, f0#init<=f0}
@@ -17161,7 +17299,7 @@ void putseq(void)
 
 //  T() {}
 
-
+            /* shuffle reference frames */
             neworg[j] = oldorgframe[j];
 
 //  T() {}
@@ -17224,6 +17362,11 @@ void putseq(void)
 
 //  T(n) {}
 
+            
+            /* n: number of frames in current GOP
+                     *
+                     * first GOP contains (M-1) less (B) frames
+                     */
             n = i==0?N-(M-1):N;
 
 //  T(n) {f0+n<=nframes, n<=n#init}
@@ -17561,7 +17704,6 @@ void putseq(void)
          pict_struct = topfirst?2:1;
 
 //  T(ipflag) {}
-
 
          ipflag = pict_type==1;
 
@@ -18337,17 +18479,17 @@ static void putDC(sVLCtable *tab, int val)
 
 //  T(absval) {0<=absval+val, val<=absval}
 
-
    absval = val<0?-val:val;
 
 //  T() {absval<=2047}
 
+   /* abs(val) */
+   
    if (absval>2047||mpeg1&&absval>255) {
 
 //  T() {}
 
-      /* abs(val) */
-      
+      /* should never happen */
       sprintf(errortext, "DC value out of range (%d)\n", val);
 
 //  T() {0==-1}
@@ -18444,6 +18586,7 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
 
 //  T() {}
 
+   /* intra_dc_mult */
    dst[0] = x>=0?(x+(d>>1))/d:-(((-x)+(d>>1))/d);
 
 //  T(d,i,x,y) {1<=i, i<=63}
@@ -18494,7 +18637,6 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
             y = 2047;
 
 //  T() {}
-
 
       dst[i] = x>=0?y:-y;
    }
@@ -18594,7 +18736,6 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  T() {}
 
-
    dst[0] = src[0]<<3-dc_prec;
 
 //  T(i,val) {1<=i, i<=63}
@@ -18607,6 +18748,8 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  T(val) {val#init<=val+1, val<=val#init+1}
 
+      
+      /* mismatch control */
       if ((val&1)==0&&val!=0)
 
 //  T(val) {val#init<=val+1, val<=val#init+1}
@@ -18615,6 +18758,8 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  T() {}
 
+      
+      /* saturation */
       dst[i] = val>2047?2047:val<-2048?-2048:val;
    }
 }
@@ -18647,6 +18792,8 @@ static void iquant1_non_intra(short *src, short *dst, unsigned char *quant_mat, 
 
 //  T(val) {val#init<=val+1, val<=val#init+1}
 
+         
+         /* mismatch control */
          if ((val&1)==0&&val!=0)
 
 //  T(val) {val#init<=val+1, val<=val#init+1}
@@ -18656,6 +18803,8 @@ static void iquant1_non_intra(short *src, short *dst, unsigned char *quant_mat, 
 
 //  T() {}
 
+      
+      /* saturation */
       dst[i] = val>2047?2047:val<-2048?-2048:val;
    }
 }
@@ -19228,6 +19377,8 @@ int rc_calc_mquant(int j)
 
 //  T() {}
 
+   
+   /* measure virtual buffer discrepancy from uniform distribution model */
    dj = d+(bitcount()-S)-j*(T/(mb_width*mb_height2));
 
 //  T() {}
@@ -19248,6 +19399,8 @@ int rc_calc_mquant(int j)
 
 //  T() {}
 
+   
+   /* compute normalized activity */
    N_actj = (2.0*actj+avg_act)/(actj+2.0*avg_act);
 
 //  T(mquant,prev_mquant) {}
@@ -19315,6 +19468,8 @@ int rc_calc_mquant(int j)
 
 //  T(mquant) {mquant#init<=mquant+4, mquant<=mquant#init+4}
 
+      
+      /* ignore small changes in mquant */
       if (mquant>=8&&mquant-prev_mquant>=-4&&mquant-prev_mquant<=4)
 
 //  T(mquant) {mquant==prev_mquant}
@@ -19449,7 +19604,6 @@ _switch_1_case_1:   ;
 _break_1:   ;
 
 //  T() {}
-
 
    Tmin = (int) floor(bit_rate/(8.0*frame_rate)+0.5);
 
@@ -19715,6 +19869,7 @@ void rc_update_pict(void)
 
 //  T() {}
 
+   /* remaining # of bits in GOP */
    X = (int) floor(S*0.5*(double) Q/(mb_width*mb_height2)+0.5);
 
 //  T(d) {S+ratectl!:d#init==T+d}
@@ -19802,7 +19957,6 @@ _break_1:   ;
    fprintf(statfile, " actual number of bits: S=%d\n", S);
 
 //  T() {}
-
 
    fprintf(statfile, " average quantization parameter Q=%.1f\n", (double) Q/(mb_width*mb_height2));
 
@@ -20025,6 +20179,8 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 
 //  T() {}
 
+            
+            /* FIR filter with 0.5 sample interval phase shift */
             dst[w*(j>>1)] = clp[(int) (228*(src[w*j]+src[w*jp1])+70*(src[w*jm1]+src[w*jp2])-37*(src[w*jm2]+src[w*jp3])-21*(src[w*jm3]+src[w*jp4])+11*(src[w*jm4]+src[w*jp5])+5*(src[w*jm5]+src[w*jp6])+256)>>9];
          }
 
@@ -20097,15 +20253,7 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 //  T() {}
 
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            /* FIR filter with 0.25 sample interval phase shift */
             dst[w*(j>>1)] = clp[(int) (8*src[w*jm5]+5*src[w*jm4]-30*src[w*jm3]-18*src[w*jm2]+113*src[w*jm1]+242*src[w*j]+192*src[w*jp1]+35*src[w*jp2]-38*src[w*jp3]-10*src[w*jp4]+11*src[w*jp5]+2*src[w*jp6]+256)>>9];
 
 //  T(jm6) {j<=jm6+9, 0<=jm6}
@@ -20161,15 +20309,7 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 //  T() {}
 
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            /* FIR filter with 0.25 sample interval phase shift */
             dst[w*((j>>1)+1)] = clp[(int) (8*src[w*jp6]+5*src[w*jp5]-30*src[w*jp4]-18*src[w*jp3]+113*src[w*jp2]+242*src[w*jp1]+192*src[w*jm1]+35*src[w*jm2]-38*src[w*jm3]-10*src[w*jm4]+11*src[w*jm5]+2*src[w*jm6]+256)>>9];
          }
 
@@ -20254,6 +20394,8 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
 
 //  T() {}
 
+            
+            /* FIR filter with 0.5 sample interval phase shift */
             dst[i>>1] = clp[(int) (228*(src[i]+src[ip1])+70*(src[im1]+src[ip2])-37*(src[im2]+src[ip3])-21*(src[im3]+src[ip4])+11*(src[im4]+src[ip5])+5*(src[im5]+src[ip6])+256)>>9];
          }
 
@@ -20302,6 +20444,8 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
 
 //  T() {}
 
+            
+            /* FIR filter coefficients (*512): 22 0 -52 0 159 256 159 0 -52 0 22 */
             dst[i>>1] = clp[(int) (22*(src[im5]+src[ip5])-52*(src[im3]+src[ip3])+159*(src[im1]+src[ip1])+256*src[i]+256)>>9];
          }
 
@@ -20461,7 +20605,6 @@ static void read_ppm(char *fname, unsigned char *frame[])
    if (!(fd = fopen(name, "rb"))) {
 
 //  T() {}
-
 
       sprintf(errortext, "Couldn't open %s\n", name);
 
@@ -20635,7 +20778,6 @@ static void read_y_u_v(char *fname, unsigned char *frame[])
 
 //  T(chrom_hsize) {}
 
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
 //  T(chrom_vsize) {}
@@ -20774,7 +20916,6 @@ static void read_yuv(char *fname, unsigned char *frame[])
    FILE *fd;
 
 //  T(chrom_hsize) {}
-
 
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
@@ -20976,7 +21117,6 @@ void stats(void)
    fprintf(statfile, " # of intra coded macroblocks:  %4d (%.1f%%)\n", n_intra, 100.0*(double) n_intra/nmb);
 
 //  T() {}
-
 
    fprintf(statfile, " # of coded blocks:             %4d (%.1f%%)\n", n_blocks, 100.0*(double) n_blocks/(block_count*nmb));
 
@@ -21310,10 +21450,12 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 
 //  T(lx,offs) {}
 
+               /* luminance */
                if (pict_struct==3&&mbi[k].dct_type) {
 
 //  T(offs) {}
 
+                  /* field DCT */
                   offs = i+((n&1)<<3)+width*(j+((n&2)>>1));
 
 //  T(lx) {lx==2width}
@@ -21324,6 +21466,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 
 //  T(offs) {}
 
+                  /* frame DCT */
                   offs = i+((n&1)<<3)+width2*(j+((n&2)<<2));
 
 //  T(lx) {lx==width2}
@@ -21359,6 +21502,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 
 //  T(offs) {}
 
+                  /* field DCT */
                   offs = i1+(n&8)+chrom_width*(j1+((n&2)>>1));
 
 //  T(lx) {2chrom_width==lx}
@@ -21369,6 +21513,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 
 //  T(offs) {}
 
+                  /* frame DCT */
                   offs = i1+(n&8)+chrom_width2*(j1+((n&2)<<2));
 
 //  T(lx) {chrom_width2==lx}
@@ -21508,11 +21653,9 @@ void writeframe(char *fname, unsigned char *frame[])
 
 //  T(chrom_hsize) {}
 
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
 //  T(chrom_vsize) {}
-
 
    chrom_vsize = chroma_format!=1?vertical_size:vertical_size>>1;
 
@@ -21776,6 +21919,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_type, pict_type<=3}
 
             /* invalid motion_type in frame picture */
+            /* first prediction is stored, second is added and averaged */
+            
+            /* frame picture */
+            
             if (!quiet)
 
 //  P(addflag,currentfield) {addflag==0, lx==width, pict_struct==3,
@@ -21799,6 +21946,8 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_struct, pict_struct<=2, 1<=pict_type, pict_type<=3,
 //    0<=secondfield, secondfield<=1}
 
+         
+         /* determine which frame to use for prediction */
          if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[0][0])
 
 //  P(addflag,currentfield) {addflag==0, lx==width,
@@ -21848,6 +21997,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_struct, pict_struct<=2, 1<=pict_type, pict_type<=3,
 //    0<=secondfield, secondfield<=1}
 
+            /* previous frame */
+            
+            
+            /* determine which frame to use for lower half prediction */
             if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[1][0])
 
 //  P(addflag,currentfield) {addflag==0, lx==width, motion_type==2,
@@ -22301,7 +22454,6 @@ void calc_vbv_delay(void)
 
 //  P() {repeatfirst<=0}
 
-
                next_ip_delay = 90000.0/frame_rate;
             else if (!topfirst)
 
@@ -22337,6 +22489,8 @@ void calc_vbv_delay(void)
 
 //  P() {}
 
+      /* first call of calc_vbv_delay */
+      /* we start with a 7/8 filled VBV buffer (12.5% back-off) */
       picture_delay = vbv_buffer_size*16384*7/8*90000.0/bit_rate;
 
 //  P() {}
@@ -22355,14 +22509,15 @@ void calc_vbv_delay(void)
 //  P() {low_delay<=0}
 
       /* picture not completely in buffer at intended decoding time */
+      
+      /* VBV checks */
+      
+      /* check for underflow (previous picture) */
       if (!quiet)
 
 //  P() {low_delay<=0, quiet<=0}
 
-         
-         /* VBV checks */
-         
-         /* check for underflow (previous picture) */
+
          fprintf(stderr, "vbv_delay underflow! (decoding_time=%.1f, t_EOP=%.1f\n)", decoding_time, bitcnt_EOP*90000.0/bit_rate);
 
 //  P() {}
@@ -22383,6 +22538,8 @@ void calc_vbv_delay(void)
 
 //  P(vbv_delay) {}
 
+      
+      /* check for overflow (current picture) */
       if (!quiet)
 
 //  P(vbv_delay) {quiet<=0}
@@ -22751,10 +22908,11 @@ static void idctcol(short *blk)
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
 
+   
+   /* shortcut */
    if (!((x1 = blk[8*4]<<8)|(x2 = blk[8*6])|(x3 = blk[8*2])|(x4 = blk[8*1])|(x5 = blk[8*7])|(x6 = blk[8*5])|(x7 = blk[8*3]))) {
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
-
 
       blk[8*0] = blk[8*1] = blk[8*2] = blk[8*3] = blk[8*4] = blk[8*5] = blk[8*6] = blk[8*7] = iclp[blk[8*0]+32>>6];
 
@@ -22764,7 +22922,6 @@ static void idctcol(short *blk)
    }
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
-
 
    x0 = (blk[8*0]<<8)+8192;
 
@@ -22922,6 +23079,8 @@ static void idctrow(short *blk)
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
 
+   
+   /* shortcut */
    if (!((x1 = blk[4]<<11)|(x2 = blk[6])|(x3 = blk[2])|(x4 = blk[1])|(x5 = blk[7])|(x6 = blk[5])|(x7 = blk[3]))) {
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
@@ -22934,7 +23093,6 @@ static void idctrow(short *blk)
    }
 
 //  P(x0,x1,x2,x3,x4,x5,x6,x7,x8) {}
-
 
    x0 = (blk[0]<<11)+128;
 
@@ -23181,12 +23339,12 @@ void iquant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat,
 
 //  P(i,sum,val) {i==64, mpeg1==0}
 
+      
+      /* mismatch control */
       if ((sum&1)==0)
 
 //  P(i,sum,val) {i==64, mpeg1==0}
 
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -23237,12 +23395,12 @@ void iquant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mqua
 
 //  P(i,sum,val) {i==64, mpeg1==0}
 
+      
+      /* mismatch control */
       if ((sum&1)==0)
 
 //  P(i,sum,val) {i==64, mpeg1==0}
 
-         
-         /* mismatch control */
          dst[63] ^= 1;
    }
 }
@@ -23290,12 +23448,14 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+               /* luminance */
                if (pict_struct==3&&mbi[k].dct_type) {
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, pict_struct==3,
 //    n+1<=block_count, j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j,
 //    0<=n}
 
+                  /* field DCT */
                   offs = i+((n&1)<<3)+width*(j+((n&2)>>1));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, pict_struct==3,
@@ -23309,6 +23469,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* frame DCT */
                   offs = i+((n&1)<<3)+width2*(j+((n&2)<<2));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
@@ -23352,6 +23513,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {pict_struct==3, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* field DCT */
                   offs = i1+(n&8)+chrom_width*(j1+((n&2)>>1));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {pict_struct==3, n+1<=block_count,
@@ -23364,6 +23526,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {n+1<=block_count, j+1<=height2,
 //    0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* frame DCT */
                   offs = i1+(n&8)+chrom_width2*(j1+((n&2)<<2));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {n+1<=block_count, j+1<=height2,
@@ -23444,12 +23607,12 @@ int main(int argc, char *argv[])
 
 //  P() {argc==3}
 
+      
+      /* open output file */
       if (!(outfile = fopen(argv[2], "wb"))) {
 
 //  P() {argc==3}
 
-         
-         /* open output file */
          sprintf(errortext, "Couldn't create output file %s", argv[2]);
 
 //  P() {argc==3}
@@ -24359,12 +24522,15 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
 //    2j+mvys==jmins, 0<=i, 0<=j}
 
+   
+   /* vector for prediction from field of opposite 'parity' */
    mvxo0 = mvxs+(mvxs>0)>>1;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
 //    2j+mvys==jmins, 0<=i, 0<=j}
 
+   /* mvxs // 2 */
    mvyo0 = mvys+(mvys>0)>>1;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
@@ -24461,6 +24627,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
             /* current mb location */
             /* adjacent line distance */
             /* half-pel flags */
+            /* compute prediction error */
+            
             local_dist = bdist2(sameref+(imins>>1)+width2*(jmins>>1), oppref+(io>>1)+width2*(jo>>1), mb, width2, imins&1, jmins&1, io&1, jo&1, 16);
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
@@ -24538,6 +24706,10 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    /* current mb location */
    /* adjacent line distance */
    /* half-pel flags */
+   /* end delta y loop */
+   
+   /* Compute L1 error for decision purposes */
+   
    *dmcp = bdist1(sameref+(imins>>1)+width2*(jmins>>1), oppref+(imino>>1)+width2*(jmino>>1), mb, width2, imins&1, jmins&1, imino&1, jmino&1, 16);
 
 //  P(delta_x,delta_y,height2,i,imindmv,imino,imins,io,io0,j,jmindmv,
@@ -24650,6 +24822,7 @@ l99998:         ;
 //    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
 //    vmc<=1073741824}
 
+            /* vector for prediction of top field from bottom field */
             it0 = is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24664,6 +24837,8 @@ l99998:         ;
 //    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
 //    vmc<=1073741824}
 
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = 3*is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24680,6 +24855,7 @@ l99998:         ;
 //    vmc) {topfirst==0, 0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref,
 //    pref<=1, vmc<=1073741824}
 
+            /* vector for prediction of top field from bottom field */
             it0 = 3*is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24694,6 +24870,8 @@ l99998:         ;
 //    vmc) {topfirst==0, 0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref,
 //    pref<=1, vmc<=1073741824}
 
+            
+            /* vector for prediction of bottom field from top field */
             ib0 = is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24826,6 +25004,8 @@ l99998:         ;
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* compute prediction error */
+                     
                      local_dist = bdist2(ref+(is>>1)+(width<<1)*(js>>1), ref+width+(it>>1)+(width<<1)*(jt>>1), mb, width<<1, is&1, js&1, it&1, jt&1, 8);
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24840,6 +25020,8 @@ l99998:         ;
                      /* current mb location */
                      /* adjacent line distance */
                      /* half-pel flags */
+                     /* block height */
+                     
                      local_dist += bdist2(ref+width+(is>>1)+(width<<1)*(js>>1), ref+(ib>>1)+(width<<1)*(jb>>1), mb+width, width<<1, is&1, js&1, ib&1, jb&1, 8);
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -25028,6 +25210,7 @@ l99999:         ;
 //    vmc) {ppred+pref==1, ppred==topfirst, 0<=i, 0<=j, 0<=ppred,
 //    ppred<=1, vmc<=1073741824}
 
+         /* second field: scale by 1/3 */
          is = is>=0?(is+1)/3:-(((-is)+1)/3);
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -25052,6 +25235,9 @@ _loop_end_2:         ;
 
    
    
+   
+   
+   /* Compute L1 error for decision purposes */
    
    local_dist = bdist1(ref+(imins>>1)+(width<<1)*(jmins>>1), ref+width+(imint>>1)+(width<<1)*(jmint>>1), mb, width<<1, imins&1, jmins&1, imint&1, jmint&1, 8);
 
@@ -25430,6 +25616,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {pict_type==2, w2==2width, dmc8+1<=dmcfield, 0<=i, 0<=j,
 //    0<=secondfield, secondfield<=1}
 
+         /* upper half block */
          vmc = dist2((sel8u?botref:topref)+(imin8u>>1)+w2*(jmin8u>>1), mb, w2, imin8u&1, jmin8u&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25440,6 +25627,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {pict_type==2, w2==2width, dmc8+1<=dmcfield, 0<=i, 0<=j,
 //    0<=secondfield, secondfield<=1, 0<=vmc}
 
+         /* lower half block */
          vmc += dist2((sel8l?botref:topref)+(imin8l>>1)+w2*(jmin8l>>1), mb+8*w2, w2, imin8l&1, jmin8l&1, 8);
       }
       else {
@@ -25791,6 +25979,9 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {w2==2width, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
+      
+      /* calculate distances for bidirectional prediction */
+      /* field */
       dmcfieldi = bdist1(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25801,6 +25992,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {w2==2width, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
 //    secondfield<=1}
 
+      
+      /* 16x8 upper half block */
       dmc8i = bdist1(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25811,6 +26004,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {w2==2width, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
 //    secondfield<=1}
 
+      
+      /* 16x8 lower half block */
       dmc8i += bdist1(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25897,6 +26092,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmc8i+1<=dmcfieldf, dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i,
 //    0<=j, 0<=secondfield, secondfield<=1}
 
+         
+         /* upper half block */
          vmc = bdist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25908,6 +26105,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmc8i+1<=dmcfieldf, dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i,
 //    0<=j, 0<=secondfield, secondfield<=1, 0<=vmc}
 
+         
+         /* lower half block */
          vmc += bdist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
       }
       else if (dmcfieldf<dmc8f&&dmcfieldf<dmcfieldr&&dmcfieldf<dmc8r) {
@@ -25977,6 +26176,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {w2==2width, dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i,
 //    0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
+         
+         /* upper half block */
          vmc = dist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), mb, w2, imin8uf&1, jmin8uf&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -25988,6 +26189,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield, secondfield<=1,
 //    0<=vmc}
 
+         
+         /* lower half block */
          vmc += dist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, 8);
       }
       else if (dmcfieldr<dmc8r) {
@@ -26054,6 +26257,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {w2==2width, 0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i,
 //    0<=j, 0<=secondfield, secondfield<=1}
 
+         
+         /* upper half block */
          vmc = dist2(newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8ur&1, jmin8ur&1, 8);
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmc8r,dmc_dp,dmcfield,dmcfieldf,dmcfieldi,
@@ -26064,6 +26269,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    {w2==2width, 0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i,
 //    0<=j, 0<=secondfield, secondfield<=1, 0<=vmc}
 
+         
+         /* lower half block */
          vmc += dist2(newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lr&1, jmin8lr&1, 8);
       }
 
@@ -27216,6 +27423,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
 //    0<=i, 0<=j, 0<=vmcf, 0<=vmcr}
 
+         
+         /* interpolated (bidirectional) */
          vmci = bdist2(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  P(bsel,bself,bselr,dmc,dmc_dp,dmcf,dmcfield,dmcfieldf,dmcfieldi,
@@ -27337,6 +27546,9 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {frame_pred_dct==0, 0<=i,
 //    0<=j}
 
+         
+         /* calculate interpolated distance */
+         /* frame */
          dmci = bdist1(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
 //  P(bsel,bself,bselr,dmc,dmc_dp,dmcf,dmcfield,dmcfieldf,dmcfieldi,
@@ -27346,6 +27558,9 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {frame_pred_dct==0, 0<=dmci,
 //    0<=i, 0<=j}
 
+         
+         /* top field */
+         
          dmcfieldi = bdist1(oldref+(imintf>>1)+(tself?width:0)+(width<<1)*(jmintf>>1), newref+(imintr>>1)+(tselr?width:0)+(width<<1)*(jmintr>>1), mb, width<<1, imintf&1, jmintf&1, imintr&1, jmintr&1, 8);
 
 //  P(bsel,bself,bselr,dmc,dmc_dp,dmcf,dmcfield,dmcfieldf,dmcfieldi,
@@ -27355,6 +27570,9 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {frame_pred_dct==0,
 //    0<=dmcfieldi, 0<=dmci, 0<=i, 0<=j}
 
+         
+         /* bottom field */
+         
          dmcfieldi += bdist1(oldref+(iminbf>>1)+(bself?width:0)+(width<<1)*(jminbf>>1), newref+(iminbr>>1)+(bselr?width:0)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbf&1, jminbf&1, iminbr&1, jminbr&1, 8);
 
 //  P(bsel,bself,bselr,dmc,dmc_dp,dmcf,dmcfield,dmcfieldf,dmcfieldi,
@@ -28110,7 +28328,6 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 //    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0,
 //    jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow}
 
-
    sxy = sx>sy?sx:sy;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i0==imin,
@@ -28550,7 +28767,6 @@ static void init()
 //    16mb_width<=horizontal_size+15, horizontal_size<=16mb_width,
 //    vertical_size<=16mb_height, 16mb_height<=vertical_size+31}
 
-
    chrom_width = chroma_format==3?width:width>>1;
 
 //  P(chrom_width,height,i,mb_height,mb_height2,mb_width,
@@ -28607,6 +28823,8 @@ static void init()
 //    16mb_width<=horizontal_size+15, horizontal_size<=16mb_width,
 //    vertical_size<=16mb_height, 16mb_height<=vertical_size+31}
 
+   
+   /* clip table */
    if (!(clp = (unsigned char *) malloc(1024)))
 
 //  P(block_count,chrom_height,chrom_width,chrom_width2,height,
@@ -28616,8 +28834,6 @@ static void init()
 //    16mb_width<=horizontal_size+15, horizontal_size<=16mb_width,
 //    vertical_size<=16mb_height, 16mb_height<=vertical_size+31}
 
-      
-      /* clip table */
       error("malloc failed\n");
 
 //  P(block_count,chrom_height,chrom_width,chrom_width2,height,
@@ -28685,7 +28901,6 @@ static void init()
 //    16mb_width<=horizontal_size+15, horizontal_size<=16mb_width,
 //    0<=i, i<=2, vertical_size<=16mb_height,
 //    16mb_height<=vertical_size+31}
-
 
          error("malloc failed\n");
 
@@ -28947,12 +29162,12 @@ static void readparmfile(char *fname)
 
 //  P(f,h,i,m,s) {}
 
+   /* rate control */
+   
    if (!(fd = fopen(fname, "r"))) {
 
 //  P(f,h,i,m,s) {}
 
-      /* rate control */
-      
       sprintf(errortext, "Couldn't open parameter file %s", fname);
 
 //  P(f,h,i,m,s) {}
@@ -32412,8 +32627,6 @@ _break_3:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383,
 //    0<=video_format, video_format<=4}
 
-            
-            
             fprintf(stderr, "Warning: reducing forward horizontal search width to %d\n", (4<<motion_data[i].forw_hor_f_code)-1);
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -32520,8 +32733,6 @@ _break_3:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383,
 //    0<=video_format, video_format<=4}
 
-            
-            
             fprintf(stderr, "Warning: reducing forward vertical search width to %d\n", (4<<motion_data[i].forw_vert_f_code)-1);
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -32655,8 +32866,6 @@ _break_3:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383,
 //    0<=video_format, video_format<=4}
 
-               
-               
                fprintf(stderr, "Warning: reducing backward horizontal search width to %d\n", (4<<motion_data[i].back_hor_f_code)-1);
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -32763,8 +32972,6 @@ _break_3:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383,
 //    0<=video_format, video_format<=4}
 
-               
-               
                fprintf(stderr, "Warning: reducing backward vertical search width to %d\n", (4<<motion_data[i].back_vert_f_code)-1);
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -33099,6 +33306,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  P() {pict_struct==3}
 
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  P() {pict_struct==3}
@@ -33107,6 +33315,8 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  P() {pict_struct==3}
 
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
 
 //  P() {pict_struct==3}
@@ -33117,6 +33327,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  P() {pict_struct==3, topfirst==0}
 
+         /* vector for prediction of top field from bottom field */
          DMV[0][0] = (3*mvx+(mvx>0)>>1)+dmvector[0];
 
 //  P() {pict_struct==3, topfirst==0}
@@ -33125,6 +33336,8 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  P() {pict_struct==3, topfirst==0}
 
+         
+         /* vector for prediction of bottom field from top field */
          DMV[1][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  P() {pict_struct==3, topfirst==0}
@@ -33135,6 +33348,7 @@ static void calc_DMV(int DMV[][2], int *dmvector, int mvx, int mvy)
 
 //  P() {1<=pict_struct, pict_struct<=2}
 
+      /* vector for prediction from field of opposite 'parity' */
       DMV[0][0] = (mvx+(mvx>0)>>1)+dmvector[0];
 
 //  P() {1<=pict_struct, pict_struct<=2}
@@ -33434,6 +33648,8 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 //  P(i,j,xh,xint,yh,yint) {0<=addflag, addflag<=1, 2xint<=dx,
 //    dx<=2xint+1, 2yint<=dy, dy<=2yint+1}
 
+   
+   /* origins */
    s = src+lx*(y+yint)+(x+xint);
 
 //  P(i,j,xh,xint,yh,yint) {0<=addflag, addflag<=1, 2xint<=dx,
@@ -33857,6 +34073,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_type, pict_type<=3}
 
             /* invalid motion_type in frame picture */
+            /* first prediction is stored, second is added and averaged */
+            
+            /* frame picture */
+            
             if (!quiet)
 
 //  P(addflag,currentfield) {addflag==0, lx==width, pict_struct==3,
@@ -33880,6 +34100,8 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_struct, pict_struct<=2, 1<=pict_type, pict_type<=3,
 //    0<=secondfield, secondfield<=1}
 
+         
+         /* determine which frame to use for prediction */
          if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[0][0])
 
 //  P(addflag,currentfield) {addflag==0, lx==width,
@@ -33929,6 +34151,10 @@ static void predict_mb(unsigned char *oldref[], unsigned char *newref[], unsigne
 //    1<=pict_struct, pict_struct<=2, 1<=pict_type, pict_type<=3,
 //    0<=secondfield, secondfield<=1}
 
+            /* previous frame */
+            
+            
+            /* determine which frame to use for lower half prediction */
             if (pict_type==2&&secondfield&&currentfield!=mv_field_sel[1][0])
 
 //  P(addflag,currentfield) {addflag==0, lx==width, motion_type==2,
@@ -34328,7 +34554,6 @@ void profile_and_level_checks()
 //    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
 
-
    maxval = &maxval_tab[level-4>>1];
 
 //  P(i) {1<=M, 1<=chroma_format, chroma_format<=3, 0<=dc_prec,
@@ -34338,6 +34563,8 @@ void profile_and_level_checks()
 //    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
 
+   
+   /* check profile@level combination */
    if (!profile_level_defined[profile-1][level-4>>1])
 
 //  P(i) {1<=M, 1<=chroma_format, chroma_format<=3, 0<=dc_prec,
@@ -34347,8 +34574,6 @@ void profile_and_level_checks()
 //    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
 
-      
-      /* check profile@level combination */
       error("undefined profile@level combination");
 
 //  P(i) {1<=M, 1<=chroma_format, chroma_format<=3, 0<=dc_prec,
@@ -34780,12 +35005,14 @@ void putAC(int run, int signed_level, int vlcformat)
 
 //  P(0`level,len) {0<=run+3969, run<=63}
 
-
    level = signed_level<0?-signed_level:signed_level;
 
 //  P(0`level,len) {0<=0`level+signed_level, signed_level<=0`level,
 //    0<=run+3969, run<=63}
 
+   /* abs(signed_level) */
+   
+   /* make sure run and level are valid */
    if (run<0||run>63||level==0||level>(int) sqrt(2048*2048)-1||mpeg1&&level>255) {
 
 //  P(0`level,len) {0<=0`level+signed_level, signed_level<=0`level,
@@ -35085,7 +35312,6 @@ void putbits(int val, int n)
 
 //  P(i,mask) {}
 
-
    mask = 1<<n-1;
 
 //  P(i,mask) {0<=mask}
@@ -35361,7 +35587,6 @@ static int frametotc(int frame)
 
 //  P(fps,hour,minute,pict,sec,tc) {}
 
-
    fps = (int) (frame_rate+0.5);
 
 //  P(fps,hour,minute,pict,sec,tc) {}
@@ -35609,7 +35834,6 @@ void putmotioncode(int motion_code)
 
 //  P(abscode) {}
 
-
    abscode = motion_code>=0?motion_code:-motion_code;
 
 //  P(abscode) {0<=abscode+motion_code, motion_code<=abscode}
@@ -35713,6 +35937,8 @@ void putmv(int dmv, int f_code)
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=64f}
 
+   
+   /* split dmv into motion_code and motion_residual */
    temp = (dmv<0?-dmv:dmv)+f-1;
 
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
@@ -36577,16 +36803,16 @@ l99996:         ;
 //    {block_count<=comp, 0<=comp, 0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2}
 
+         
+         /* there's no VLC for 'No MC, Not Coded':
+                * we have to transmit (0,0) motion vectors
+                */
          if (pict_type==2&&!cbp&&!(mb_type&8))
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {pict_type==2,
 //    block_count<=comp, cbp<=0, 0<=comp, 0<=i, i<=k, i+1<=mb_width,
 //    0<=j, j+1<=mb_height2}
 
-            
-            /* there's no VLC for 'No MC, Not Coded':
-                   * we have to transmit (0,0) motion vectors
-                   */
             mb_type |= 8;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant)
@@ -36614,14 +36840,14 @@ l99996:         ;
 //    block_count<=comp, 0<=comp, 0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2}
 
+         /* macroblock type */
+         
          if (mb_type&(8|4)&&!frame_pred_dct)
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {MBAinc==1,
 //    block_count<=comp, 0<=comp, frame_pred_dct<=0, 0<=i, i<=k,
 //    i+1<=mb_width, 0<=j, j+1<=mb_height2}
 
-            /* macroblock type */
-            
             putbits(mbinfo[k].motion_type, 2);
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {MBAinc==1,
@@ -36732,6 +36958,7 @@ l99996:         ;
 //    comp+1<=block_count, 0<=comp, 0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2}
 
+               /* block loop */
                if (mb_type&1) {
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {MBAinc==1,
@@ -36758,6 +36985,8 @@ l99996:         ;
 //    block_count<=comp, 0<=comp, 0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2}
 
+         
+         /* reset predictors */
          if (!(mb_type&1))
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {MBAinc==1,
@@ -36770,8 +36999,6 @@ l99996:         ;
 //    block_count<=comp, 0<=cc, cc<=2, 0<=comp, 0<=i, i<=k,
 //    i+1<=mb_width, 0<=j, j+1<=mb_height2}
 
-               
-               /* reset predictors */
                dc_dct_pred[cc] = 0;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {MBAinc==1,
@@ -36811,6 +37038,8 @@ l99999:         ;
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant)
 //    {block_count<=comp, cbp<=0, 0<=comp, 1<=i, i<=k, i+2<=mb_width,
 //    0<=j, j+1<=mb_height2}
+
+/* no DCT coefficients and neither first nor last macroblock of slice */
 
          if (pict_type==2&&!(mb_type&8)) goto l99998;
 
@@ -36914,8 +37143,6 @@ l99998:         ;
 //    block_count<=comp, cbp<=0, 0<=cc, cc<=2, 0<=comp, 1<=i, i<=k,
 //    i+2<=mb_width, 0<=j, j+1<=mb_height2}
 
-            /* no DCT coefficients and neither first nor last macroblock of slice */
-            
             dc_dct_pred[cc] = 0;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {cc==3,
@@ -38026,6 +38253,12 @@ void putseq(void)
 //    pict_struct,pict_type,q_scale_type,sxb,sxf,syb,syf,temp_ref)
 //    {0<=i, i+1<=nframes}
 
+      
+      /* f0: lowest frame number in current GOP
+           *
+           * first GOP contains N-(M-1) frames,
+           * all other GOPs contain N frames
+           */
       f0 = N*((i+(M-1))/N)-(M-1);
 
 //  P(altscan,back_hor_f_code,back_vert_f_code,f,f0,forw_hor_f_code,
@@ -38063,7 +38296,7 @@ void putseq(void)
 //    pict_struct,pict_type,q_scale_type,sxb,sxf,syb,syf,temp_ref)
 //    {0<=f0, 0<=i, i+1<=nframes, 0<=j, j<=2}
 
-
+            /* shuffle reference frames */
             neworg[j] = oldorgframe[j];
 
 //  P(altscan,back_hor_f_code,back_vert_f_code,f,f0,forw_hor_f_code,
@@ -38163,6 +38396,11 @@ void putseq(void)
 //    forw_hor_f_code==15, forw_vert_f_code==15, j==3, pict_type==1,
 //    f+1<=nframes, 0<=f0, f0+1<=nframes}
 
+            
+            /* n: number of frames in current GOP
+                     *
+                     * first GOP contains (M-1) less (B) frames
+                     */
             n = i==0?N-(M-1):N;
 
 //  P(altscan,back_hor_f_code,back_vert_f_code,f,f0,forw_hor_f_code,
@@ -38859,7 +39097,6 @@ void putseq(void)
 //    pict_type+temp_ref<=i+nframes, pict_type<=i+2, 0<=j, 3<=j+3k,
 //    0<=k, 1<=pict_struct, pict_struct<=2, 1<=pict_type,
 //    pict_type<=3}
-
 
          ipflag = pict_type==1;
 
@@ -40687,17 +40924,17 @@ static void putDC(sVLCtable *tab, int val)
 
 //  P(absval,size) {}
 
-
    absval = val<0?-val:val;
 
 //  P(absval,size) {0<=absval+val, val<=absval}
 
+   /* abs(val) */
+   
    if (absval>2047||mpeg1&&absval>255) {
 
 //  P(absval,size) {256<=absval, 0<=absval+val, val<=absval}
 
-      /* abs(val) */
-      
+      /* should never happen */
       sprintf(errortext, "DC value out of range (%d)\n", val);
 
 //  P(absval,size) {256<=absval, 0<=absval+val, val<=absval}
@@ -40805,6 +41042,7 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
 
 //  P(d,i,x,y) {}
 
+   /* intra_dc_mult */
    dst[0] = x>=0?(x+(d>>1))/d:-(((-x)+(d>>1))/d);
 
 //  P(d,i,x,y) {}
@@ -40856,7 +41094,6 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
             y = 2047;
 
 //  P(d,i,x,y) {3mquant<=4d+1, 4d<=3mquant+2, 1<=i, i<=63, y<=2047}
-
 
       dst[i] = x>=0?y:-y;
    }
@@ -40956,7 +41193,6 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  P(i,val) {}
 
-
    dst[0] = src[0]<<3-dc_prec;
 
 //  P(i,val) {}
@@ -40969,6 +41205,8 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  P(i,val) {1<=i, i<=63}
 
+      
+      /* mismatch control */
       if ((val&1)==0&&val!=0)
 
 //  P(i,val) {1<=i, i<=63}
@@ -40977,6 +41215,8 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
 //  P(i,val) {1<=i, i<=63}
 
+      
+      /* saturation */
       dst[i] = val>2047?2047:val<-2048?-2048:val;
    }
 }
@@ -41009,6 +41249,8 @@ static void iquant1_non_intra(short *src, short *dst, unsigned char *quant_mat, 
 
 //  P(i,val) {0<=i, i<=63}
 
+         
+         /* mismatch control */
          if ((val&1)==0&&val!=0)
 
 //  P(i,val) {0<=i, i<=63}
@@ -41018,6 +41260,8 @@ static void iquant1_non_intra(short *src, short *dst, unsigned char *quant_mat, 
 
 //  P(i,val) {0<=i, i<=63}
 
+      
+      /* saturation */
       dst[i] = val>2047?2047:val<-2048?-2048:val;
    }
 }
@@ -42046,6 +42290,8 @@ int rc_calc_mquant(int j)
 
 //  P(mquant) {0<=j, 1<=mb_height2, 1<=mb_width}
 
+   
+   /* measure virtual buffer discrepancy from uniform distribution model */
    dj = d+(bitcount()-S)-j*(T/(mb_width*mb_height2));
 
 //  P(mquant) {0<=j, 1<=mb_height2, 1<=mb_width}
@@ -42066,6 +42312,8 @@ int rc_calc_mquant(int j)
 
 //  P(mquant) {0<=j, 1<=mb_height2, 1<=mb_width}
 
+   
+   /* compute normalized activity */
    N_actj = (2.0*actj+avg_act)/(actj+2.0*avg_act);
 
 //  P(mquant) {0<=j, 1<=mb_height2, 1<=mb_width}
@@ -42138,6 +42386,8 @@ int rc_calc_mquant(int j)
 //  P(mquant) {q_scale_type==0, 0<=j, 1<=mb_height2, 1<=mb_width,
 //    2<=mquant, mquant<=62}
 
+      
+      /* ignore small changes in mquant */
       if (mquant>=8&&mquant-prev_mquant>=-4&&mquant-prev_mquant<=4)
 
 //  P(mquant) {q_scale_type==0, 0<=j, 1<=mb_height2, 1<=mb_width,
@@ -42276,7 +42526,6 @@ _switch_1_case_1:   ;
 _break_1:   ;
 
 //  P(T,d) {}
-
 
    Tmin = (int) floor(bit_rate/(8.0*frame_rate)+0.5);
 
@@ -42539,6 +42788,7 @@ void rc_update_pict(void)
 //  P(R,S) {R+S==ratectl!:R#init,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8}
 
+   /* remaining # of bits in GOP */
    X = (int) floor(S*0.5*(double) Q/(mb_width*mb_height2)+0.5);
 
 //  P(R,S) {R+S==ratectl!:R#init,
@@ -42673,7 +42923,6 @@ _break_1:   ;
 //    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
 //    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
-
 
    fprintf(statfile, " average quantization parameter Q=%.1f\n", (double) Q/(mb_width*mb_height2));
 
@@ -42963,6 +43212,8 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 //    jp2<=j+2, jp3<=j+3, jp4<=j+4, jp5<=j+5, jp6<=j+6, 0<=jm1,
 //    0<=jm2, 0<=jm3, 0<=jm4, 0<=jm5, width<=2w+1, 2w<=width}
 
+            
+            /* FIR filter with 0.5 sample interval phase shift */
             dst[w*(j>>1)] = clp[(int) (228*(src[w*j]+src[w*jp1])+70*(src[w*jm1]+src[w*jp2])-37*(src[w*jm2]+src[w*jp3])-21*(src[w*jm3]+src[w*jp4])+11*(src[w*jm4]+src[w*jp5])+5*(src[w*jm5]+src[w*jp6])+256)>>9];
          }
 
@@ -43079,15 +43330,7 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 //    2w<=width}
 
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            /* FIR filter with 0.25 sample interval phase shift */
             dst[w*(j>>1)] = clp[(int) (8*src[w*jm5]+5*src[w*jm4]-30*src[w*jm3]-18*src[w*jm2]+113*src[w*jm1]+242*src[w*j]+192*src[w*jp1]+35*src[w*jp2]-38*src[w*jp3]-10*src[w*jp4]+11*src[w*jp5]+2*src[w*jp6]+256)>>9];
 
 //  P(i,j,jm1,jm2,jm3,jm4,jm5,jm6,jp1,jp2,jp3,jp4,jp5,jp6,w)
@@ -43221,15 +43464,7 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 //    0<=jm6, width<=2w+1, 2w<=width}
 
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            /* FIR filter with 0.25 sample interval phase shift */
             dst[w*((j>>1)+1)] = clp[(int) (8*src[w*jp6]+5*src[w*jp5]-30*src[w*jp4]-18*src[w*jp3]+113*src[w*jp2]+242*src[w*jp1]+192*src[w*jm1]+35*src[w*jm2]-38*src[w*jm3]-10*src[w*jm4]+11*src[w*jm5]+2*src[w*jm6]+256)>>9];
          }
 
@@ -43348,6 +43583,8 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
 //    ip1+1<=width, ip2+1<=width, ip3+1<=width, ip4+1<=width,
 //    ip5+1<=width, ip6<=width, 0<=j}
 
+            
+            /* FIR filter with 0.5 sample interval phase shift */
             dst[i>>1] = clp[(int) (228*(src[i]+src[ip1])+70*(src[im1]+src[ip2])-37*(src[im2]+src[ip3])-21*(src[im3]+src[ip4])+11*(src[im4]+src[ip5])+5*(src[im5]+src[ip6])+256)>>9];
          }
 
@@ -43413,6 +43650,8 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
 //    ip3<=i+3, ip5<=i+5, i+1<=width, 0<=im1, 0<=im3, 0<=im5,
 //    ip1+1<=width, ip3+1<=width, ip5+1<=width, 0<=j}
 
+            
+            /* FIR filter coefficients (*512): 22 0 -52 0 159 256 159 0 -52 0 22 */
             dst[i>>1] = clp[(int) (22*(src[im5]+src[ip5])-52*(src[im3]+src[ip3])+159*(src[im1]+src[ip1])+256*src[i]+256)>>9];
          }
 
@@ -43574,7 +43813,6 @@ static void read_ppm(char *fname, unsigned char *frame[])
    if (!(fd = fopen(name, "rb"))) {
 
 //  P(b,g,i,j,r) {i<=8, i<=matrix_coefficients}
-
 
       sprintf(errortext, "Couldn't open %s\n", name);
 
@@ -43756,7 +43994,6 @@ static void read_y_u_v(char *fname, unsigned char *frame[])
 
 //  P(chrom_hsize,chrom_vsize,i) {}
 
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
 //  P(chrom_hsize,chrom_vsize,i) {}
@@ -43907,7 +44144,6 @@ static void read_yuv(char *fname, unsigned char *frame[])
    FILE *fd;
 
 //  P(chrom_hsize,chrom_vsize,i) {}
-
 
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
@@ -44169,7 +44405,6 @@ void stats(void)
 //    n_intra+n_ncoded+n_skipped<=k, nmb<=k, 0<=n_backward,
 //    0<=n_blocks, 0<=n_forward, 0<=n_interp, 0<=n_intra, 0<=n_ncoded,
 //    0<=n_skipped}
-
 
    fprintf(statfile, " # of coded blocks:             %4d (%.1f%%)\n", n_blocks, 100.0*(double) n_blocks/(block_count*nmb));
 
@@ -44639,12 +44874,14 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+               /* luminance */
                if (pict_struct==3&&mbi[k].dct_type) {
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, pict_struct==3,
 //    n+1<=block_count, j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j,
 //    0<=n}
 
+                  /* field DCT */
                   offs = i+((n&1)<<3)+width*(j+((n&2)>>1));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, pict_struct==3,
@@ -44658,6 +44895,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* frame DCT */
                   offs = i+((n&1)<<3)+width2*(j+((n&2)<<2));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {cc==0, n+1<=block_count,
@@ -44701,6 +44939,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {pict_struct==3, n+1<=block_count,
 //    j+1<=height2, 0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* field DCT */
                   offs = i1+(n&8)+chrom_width*(j1+((n&2)>>1));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {pict_struct==3, n+1<=block_count,
@@ -44713,6 +44952,7 @@ void transform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi, 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {n+1<=block_count, j+1<=height2,
 //    0<=i, i<=16k, i+1<=width, 0<=j, 0<=n}
 
+                  /* frame DCT */
                   offs = i1+(n&8)+chrom_width2*(j1+((n&2)<<2));
 
 //  P(0`j1,cc,i,i1,j,k,lx,n,offs) {n+1<=block_count, j+1<=height2,
@@ -44858,11 +45098,9 @@ void writeframe(char *fname, unsigned char *frame[])
 
 //  P(chrom_hsize,chrom_vsize) {}
 
-
    chrom_hsize = chroma_format==3?horizontal_size:horizontal_size>>1;
 
 //  P(chrom_hsize,chrom_vsize) {}
-
 
    chrom_vsize = chroma_format!=1?vertical_size:vertical_size>>1;
 
