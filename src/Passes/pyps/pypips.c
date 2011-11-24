@@ -89,14 +89,18 @@ static void pyps_error_handler(const char * calling_function_name,
                    const char * a_message_format,
                    va_list *some_arguments)
 {
+	// Save pre-existing error message
 	char *old_error = pyps_last_error;
+
     char * tmp;
     vasprintf(&tmp,a_message_format,*some_arguments);
     asprintf(&pyps_last_error,"in %s: %s",calling_function_name,tmp);
     free(tmp);
+
+    // If we already had a message before, we stack it over the new one
     if(old_error) {
     	char *tmp = pyps_last_error;
-        asprintf(&pyps_last_error,"\n%s%s",old_error,tmp);
+        asprintf(&pyps_last_error,"%s%s",old_error,tmp);
     	free(old_error);
     	free(tmp);
     }
