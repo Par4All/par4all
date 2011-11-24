@@ -209,6 +209,14 @@ AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
 			  ],[validation]
 )
 
+# release mode, sets various compiler flags and so on
+AX_ARG_ENABLE([release-mode],[enable release mode],[no],
+			  [
+			   	# set CFLAGS for more warnings
+			   	CFLAGS="-g -O2 -Wall -DNDEBUG"
+			  ]
+)
+
 # set the optionnal scripts dirs there
 AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc $ax_enable_devel_mode $ax_enable_tpips2pyps"])
 
