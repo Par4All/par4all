@@ -738,24 +738,26 @@ globals:
 			      }
 			    }
 
-			  list dl = statements_to_declarations(dsl);
-			  /* Each variable should be declared only
-			     once. Type and initial value conflict
-			     should have been detected earlier. */
-			  if(!compilation_unit_p(get_current_module_name())) {
-			    pips_assert("Each variable is declared once", gen_once_p(dl));
-			  }
-			  ifdebug(9) {
-			    list gdl = statements_to_declarations(gdsl);
-			    fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
-			    print_entities(gdl);
-			    fprintf(stderr, "\n");
-			    fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
-			    print_entities(dl);
-			    fprintf(stderr, "\n");
-			    gen_free_list(gdl);
-			  }
-			  gen_free_list(dl);
+				ifdebug(1) { // the sucessive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
+				  list dl = statements_to_declarations(dsl);
+				  /* Each variable should be declared only
+					 once. Type and initial value conflict
+					 should have been detected earlier. */
+				  if(!compilation_unit_p(get_current_module_name())) {
+					pips_assert("Each variable is declared once", gen_once_p(dl));
+				  }
+				  ifdebug(9) {
+					list gdl = statements_to_declarations(gdsl);
+					fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
+					print_entities(gdl);
+					fprintf(stderr, "\n");
+					fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
+					print_entities(dl);
+					fprintf(stderr, "\n");
+					gen_free_list(gdl);
+				  }
+				  gen_free_list(dl);
+				}
 
 			  /* The order of declarations must be
 			     preserved: a structure is declared before
