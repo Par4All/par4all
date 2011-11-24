@@ -508,3 +508,30 @@ void set_python_missing_module_resolver_handler(PyObject *PyObj)
 set_internal_missing_module_resolver_handler(get_stub_from_broker);
 }
 
+
+/* Change execution mode for a loop */
+void flag_loop_execution_parallel(const char* module_name,
+                  const char* loop_label,
+                  bool exec_parallel_p) {
+
+  /* prelude */
+  set_current_module_entity(module_name_to_entity( module_name ));
+  set_current_module_statement
+    ((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+
+  entity label = find_label_entity(module_name,loop_label);
+  if(entity_undefined_p(label))
+    pips_user_error("label '%s' does not exist\n",loop_label);
+  statement stmt = find_loop_from_label(get_current_module_statement(),label);
+  if(statement_undefined_p(stmt))
+    pips_user_error("label '%s' is not on a loop\n",loop_label);
+  execution_tag(loop_execution(statement_loop(stmt)))
+      = (exec_parallel_p ? is_execution_parallel : is_execution_sequential);
+
+  /* Store the new code */
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+  /* reset current state */
+  reset_current_module_entity();
+  reset_current_module_statement();
+}
