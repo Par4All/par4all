@@ -304,7 +304,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param, par
              );
              */
           if(array_type_p(type_at_call_site)) {
-            if(param->cast_at_call_site_p) {
+            if(param->cast_at_call_site_p && fixed_length_array_type_p(type_in_func_prototype)) {
               *arg = 
                 make_expression(
                     make_syntax_cast(

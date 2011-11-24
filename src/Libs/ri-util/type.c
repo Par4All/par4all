@@ -2484,6 +2484,10 @@ bool variable_length_array_type_p(type t)
   }
   return return_val;
 }
+bool fixed_length_array_type_p(type t)
+{
+    return array_type_p(t) && !variable_length_array_type_p(t);
+}
 
 bool pointer_type_p(type t)
 {
