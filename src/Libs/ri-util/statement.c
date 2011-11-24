@@ -2872,15 +2872,15 @@ list statement_to_declarations(void* s)
 /* Returns the declarations contained in a list of statement. */
 list statements_to_declarations(list sl)
 {
-    list  enddl=NIL;    //< avoid a costly gen_nconc
-    list *dl = &enddl;  //< by managing the tail by end
+    list  tail = NIL;    //< avoid a costly gen_nconc
+    list  head = NIL;  //< by managing the tail by end
     FOREACH(STATEMENT,st,sl) {
         list s2d = statement_to_declarations(st);
-        if(ENDP(enddl)) enddl=s2d;
-        else CDR(enddl)=s2d;
-        enddl = gen_last(enddl);
+        if(ENDP(head)) head=tail=s2d;
+        else CDR(tail)=s2d;
+        tail = gen_last(tail);
     }
-    return *dl;
+    return head;
 }
 
 /* Get a list of all variables declared recursively within an instruction */
