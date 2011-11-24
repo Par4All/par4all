@@ -1,0 +1,8 @@
+int pain(struct __ *bp)
+{
+//             <    is read   >: bp
+//             <    is written>: bp[0].fun
+   /* no read effect on pain because pain is a (painful) constant */
+   bp->fun = pain;
+   return 0;
+}
