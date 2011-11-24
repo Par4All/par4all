@@ -99,7 +99,7 @@ void reset_current_phase_context()
 
 static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
 {
-    bool success = false;
+    volatile bool success = false;
 
     CATCH(any_exception_error)
     {

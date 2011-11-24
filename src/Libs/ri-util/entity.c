@@ -3116,4 +3116,33 @@ set get_referenced_entities(void* elem)
             entity_not_constant_or_intrinsic_p);
 
 }
+/**
+ * Check if a variable is local to a module
+ */
+bool entity_local_variable_p(entity var, entity module) {
+  bool local = false;
+
+  if(storage_ram_p(entity_storage(var))) {
+    ram r = storage_ram(entity_storage(var));
+    if(same_entity_p(module, ram_function(r))) {
+      entity section = ram_section(r);
+      if(same_string_p(entity_module_name(section),entity_user_name(module))) {
+        local=true;
+      }
+    }
+  } else if( storage_formal_p(entity_storage(var))) {
+    /* it might be better to check the parameter passing mode itself,
+       via the module type */
+    bool fortran_p = fortran_module_p(module);
+    bool scalar_p = entity_scalar_p(var);
+
+    formal r = storage_formal(entity_storage(var));
+    if(!fortran_p && scalar_p && same_entity_p(module, formal_function(r))) {
+      local=true;
+    }
+  }
+  pips_debug(4,"Looked if variable %s is local to function %s, result is %d\n",
+             entity_name(var),entity_name(module), local);
+  return local;
+}
 
