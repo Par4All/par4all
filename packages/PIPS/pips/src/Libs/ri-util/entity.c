@@ -47,15 +47,16 @@
 /* Static variable to memoïze some entities for performance reasons */
 /********************************************************************/
 
-/* stdio files entities */
-static entity stdin_ent = entity_undefined;
-static entity stdout_ent = entity_undefined;
-static entity stderr_ent = entity_undefined;
 
+/* variables to store internal entities created at bootstrap
+   beware: these variables are intialized during the parser phase
+*/
+static bool internal_static_entities_initialized_p = false;
 /* effects package entities */
 static entity rand_gen_ent  = entity_undefined;
 static entity malloc_effect_ent  = entity_undefined;
 static entity memmove_effect_ent  = entity_undefined;
+static entity time_effect_ent  = entity_undefined;
 static entity luns_ent  = entity_undefined;
 static entity io_ptr_ent  = entity_undefined;
 static entity io_eof_ent  = entity_undefined;
@@ -64,23 +65,46 @@ static entity io_error_luns_ent  = entity_undefined;
 /* continue statement */
 static entity continue_ent = entity_undefined;
 
-static bool static_entities_initialized_p = false;
+/* variables to store entities from standard includes */
+/* As they are not created at bootstrap as the internal entities,
+   they cannot be initialized at the same time because the
+   corresponding entities may not have been already created
+*/
+static bool std_static_entities_initialized_p = false;
+/* stdio files entities */
+static entity stdin_ent = entity_undefined;
+static entity stdout_ent = entity_undefined;
+static entity stderr_ent = entity_undefined;
+
+#define STATIC_ENTITY_CACHE_SIZE 128
+static entity *static_entity_cache[STATIC_ENTITY_CACHE_SIZE];
+static size_t static_entity_size=0;
 
 /* beware: cannot be called on creating the database */
-void set_static_entities()
+void set_std_static_entities()
 {
-  if (!static_entities_initialized_p)
+  if (!std_static_entities_initialized_p)
     {
-      stdin_ent = FindOrCreateTopLevelEntity("stdin");
-      stdout_ent = FindOrCreateTopLevelEntity("stdout");
-      stderr_ent = FindOrCreateTopLevelEntity("stderr");
+      stdin_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdin");
+      stdout_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdout");
+      stderr_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stderr");
+      std_static_entities_initialized_p = true;
+    }
+}
 
+/* beware: cannot be called on creating the database */
+void set_internal_static_entities()
+{
+  if (!internal_static_entities_initialized_p)
+    {
       rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
 					 RAND_GEN_EFFECTS_NAME);
       malloc_effect_ent  = FindOrCreateEntity(MALLOC_EFFECTS_PACKAGE_NAME,
 				       MALLOC_EFFECTS_NAME);
       memmove_effect_ent  = FindOrCreateEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
 					MEMMOVE_EFFECTS_NAME);
+      time_effect_ent  = FindOrCreateEntity(TIME_EFFECTS_PACKAGE_NAME,
+					TIME_EFFECTS_VARIABLE_NAME);
       luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
 				     IO_EFFECTS_ARRAY_NAME);
       io_ptr_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
@@ -92,28 +116,50 @@ void set_static_entities()
 
       continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
 
-      static_entities_initialized_p = true;
+      internal_static_entities_initialized_p = true;
     }
 }
 
-void reset_static_entities()
+void reset_internal_static_entities()
 {
-  stdin_ent = entity_undefined;
-  stdout_ent = entity_undefined;
-  stderr_ent = entity_undefined;
 
   rand_gen_ent  = entity_undefined;
   malloc_effect_ent  = entity_undefined;
   memmove_effect_ent  = entity_undefined;
+  time_effect_ent  = entity_undefined;
   luns_ent  = entity_undefined;
   io_ptr_ent  = entity_undefined;
   io_eof_ent  = entity_undefined;
   io_error_luns_ent  = entity_undefined;
 
   continue_ent = entity_undefined;
+  for(size_t i =0;i< static_entity_size;i++)
+      *static_entity_cache[i]=entity_undefined;
+  static_entity_size=0;
+  internal_static_entities_initialized_p = false;
+}
 
-  static_entities_initialized_p = false;
+void reset_std_static_entities()
+{
+  stdin_ent = entity_undefined;
+  stdout_ent = entity_undefined;
+  stderr_ent = entity_undefined;
+  std_static_entities_initialized_p = false;
+}
 
+void reset_static_entities()
+{
+  reset_std_static_entities();
+  reset_internal_static_entities();
+}
+
+
+/* add given entity to the set of entities that must reset upon workspace deletion
+ * practically, all static entities should be stored that way
+ */
+void register_static_entity(entity *e) {
+    static_entity_cache[static_entity_size++]=e;
+    pips_assert("static entity cache is large enough",static_entity_size<STATIC_ENTITY_CACHE_SIZE);
 }
 
 
@@ -240,24 +286,28 @@ static entity make_empty_module(const char* full_name,
   entity_type(DynamicArea) = make_type_area(make_area(0, NIL));
   entity_storage(DynamicArea) = make_storage_rom();
   entity_initial(DynamicArea) = make_value_unknown();
+  entity_kind(DynamicArea) = ABSTRACT_LOCATION | ENTITY_DYNAMIC_AREA ;
   AddEntityToDeclarations(DynamicArea, e);
 
   StaticArea = FindOrCreateEntity(name, STATIC_AREA_LOCAL_NAME);
   entity_type(StaticArea) = make_type_area(make_area(0, NIL));
   entity_storage(StaticArea) = make_storage_rom();
   entity_initial(StaticArea) = make_value_unknown();
+  entity_kind(StaticArea) = ABSTRACT_LOCATION | ENTITY_STATIC_AREA ;
   AddEntityToDeclarations(StaticArea, e);
 
   StackArea = FindOrCreateEntity(name, STACK_AREA_LOCAL_NAME);
   entity_type(StackArea) = make_type_area(make_area(0, NIL));
   entity_storage(StackArea) = make_storage_rom();
   entity_initial(StackArea) = make_value_unknown();
+  entity_kind(StackArea) = ABSTRACT_LOCATION | ENTITY_STACK_AREA ;
   AddEntityToDeclarations(StackArea, e);
 
   HeapArea = FindOrCreateEntity(name, HEAP_AREA_LOCAL_NAME);
   entity_type(HeapArea) = make_type_area(make_area(0, NIL));
   entity_storage(HeapArea) = make_storage_rom();
   entity_initial(HeapArea) = make_value_unknown();
+  entity_kind(HeapArea) = ABSTRACT_LOCATION | ENTITY_HEAP_AREA ;
   AddEntityToDeclarations(HeapArea, e);
 
   return(e);
@@ -1118,28 +1168,38 @@ bool top_level_entity_p(entity e)
    effects of IO statements. */
 bool io_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
 	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
 }
 
 bool io_luns_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, luns_ent));
 }
 
 bool rand_effects_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, rand_gen_ent));
 }
 
-bool malloc_entity_p(entity e)
+bool malloc_effect_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, malloc_effect_ent));
 
+}
+
+bool memmove_effect_entity_p(entity e) {
+  set_internal_static_entities();
+  return (same_entity_p(e, memmove_effect_ent));
+}
+
+bool time_effect_entity_p(entity e) {
+  set_internal_static_entities();
+  return (same_entity_p(e, time_effect_ent));
 }
 
 /**
@@ -1150,13 +1210,15 @@ bool malloc_entity_p(entity e)
  */
 bool effects_package_entity_p(entity e)
 {
-  set_static_entities();
-  return (same_entity_p(e, rand_gen_ent)
-	  || same_entity_p(e, malloc_effect_ent)
-	  || same_entity_p(e, memmove_effect_ent)
-	  || same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
-	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
-
+#ifndef NDEBUG
+    bool result = rand_effects_entity_p(e) 
+        || malloc_effect_entity_p(e)
+        || memmove_effect_entity_p(e)
+        || time_effect_entity_p(e)
+        || io_entity_p(e);
+    pips_assert("entity kind is consistent", result == ((entity_kind(e) & EFFECTS_PACKAGE) == EFFECTS_PACKAGE));
+#endif
+  return entity_kind(e) & EFFECTS_PACKAGE;
 }
 
 
@@ -1164,7 +1226,7 @@ bool effects_package_entity_p(entity e)
 
 entity get_stdin_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stdin_ent;
 }
 
@@ -1176,7 +1238,7 @@ bool stdin_entity_p(entity e)
 
 entity get_stdout_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stdout_ent;
 }
 
@@ -1187,7 +1249,7 @@ bool stdout_entity_p(entity e)
 
 entity get_stderr_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stderr_ent;
 }
 
@@ -1199,7 +1261,7 @@ bool stderr_entity_p(entity e)
 
 bool std_file_entity_p(entity e)
 {
-  set_static_entities();
+  set_std_static_entities();
   return(same_entity_p(e, stdin_ent)
 	 || same_entity_p(e, stdout_ent)
 	 || same_entity_p(e, stderr_ent));
@@ -1216,6 +1278,11 @@ bool intrinsic_entity_p(entity e)
 bool symbolic_entity_p(entity e)
 {
   return (!value_undefined_p(entity_initial(e)) && value_symbolic_p(entity_initial(e)));
+}
+
+bool intrinsic_name_p(const char *local_name) {
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME, local_name);
+    return !entity_undefined_p(e) && intrinsic_entity_p(e);
 }
 
 /* FI: I do not understand this function name (see next one!). It seems to me
@@ -1650,7 +1717,7 @@ bool arithmetic_intrinsic_p(entity e)
 
 entity get_continue_entity()
 {
-  set_static_entities();
+  set_internal_static_entities();
   return continue_ent;
 }
 bool entity_continue_p(entity f)
@@ -3048,5 +3115,34 @@ set get_referenced_entities(void* elem)
     return get_referenced_entities_filtered(elem,(bool (*)(void*))gen_true,
             entity_not_constant_or_intrinsic_p);
 
+}
+/**
+ * Check if a variable is local to a module
+ */
+bool entity_local_variable_p(entity var, entity module) {
+  bool local = false;
+
+  if(storage_ram_p(entity_storage(var))) {
+    ram r = storage_ram(entity_storage(var));
+    if(same_entity_p(module, ram_function(r))) {
+      entity section = ram_section(r);
+      if(same_string_p(entity_module_name(section),entity_user_name(module))) {
+        local=true;
+      }
+    }
+  } else if( storage_formal_p(entity_storage(var))) {
+    /* it might be better to check the parameter passing mode itself,
+       via the module type */
+    bool fortran_p = fortran_module_p(module);
+    bool scalar_p = entity_scalar_p(var);
+
+    formal r = storage_formal(entity_storage(var));
+    if(!fortran_p && scalar_p && same_entity_p(module, formal_function(r))) {
+      local=true;
+    }
+  }
+  pips_debug(4,"Looked if variable %s is local to function %s, result is %d\n",
+             entity_name(var),entity_name(module), local);
+  return local;
 }
 

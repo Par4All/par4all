@@ -68,6 +68,7 @@ bool internalize_parallel_code(char mod_name[])
   mod_stmt = (statement) db_get_memory_resource(DBR_PARALLELIZED_CODE,
 						mod_name, false);
   clean_up_sequences(mod_stmt);
+  module_reorder(mod_stmt);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
   debug(2,"internalize_parallel_code","done for %s\n", mod_name);
   debug_off();

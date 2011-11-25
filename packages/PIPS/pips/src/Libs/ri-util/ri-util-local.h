@@ -799,6 +799,9 @@
 #define C_READ_FUNCTION_NAME            "read"
 #define C_WRITE_FUNCTION_NAME           "write"
 #define USLEEP_FUNCTION_NAME            "usleep"
+#define LINK_FUNCTION_NAME              "link"
+#define SYMLINK_FUNCTION_NAME           "symlink"
+#define UNLINK_FUNCTION_NAME            "unlink"
 
 /*#include<stdio.h> */
 
@@ -1343,6 +1346,10 @@
 #define ENTITY_C_CLOSE_SYSTEM_P(e)       ENTITY_NAME_P(e, C_CLOSE_FUNCTION_NAME)
 #define ENTITY_C_READ_SYSTEM_P(e)        ENTITY_NAME_P(e, C_READ_FUNCTION_NAME)
 #define ENTITY_C_WRITE_SYSTEM_P(e)       ENTITY_NAME_P(e, C_WRITE_FUNCTION_NAME)
+#define ENTITY_LINK_SYSTEM_P(e)          ENTITY_NAME_P(e, LINK_FUNCTION_NAME)
+#define ENTITY_SYMLINK_SYSTEM_P(e)       ENTITY_NAME_P(e, SYMLINK_FUNCTION_NAME)
+#define ENTITY_UNLINK_SYSTEM_P(e)        ENTITY_NAME_P(e, UNLINK_FUNCTION_NAME)
+
 /* fcntl() */
 #define ENTITY_FSYNC_SYSTEM_P(e)         ENTITY_NAME_P(e, FSYNC_FUNCTION_NAME)
 #define ENTITY_FDATASYNC_SYSTEM_P(e)     ENTITY_NAME_P(e, FDATASYNC_FUNCTION_NAME)
@@ -1766,6 +1773,10 @@ remove_a_control_from_a_list_and_relink_direction;
  */
 #define FCD_IGNORE_PREFIX       "HPFC_IGNORE_FCD_"
 
+/* __asm function
+ */
+#define ASM_FUNCTION_NAME "__asm"
+
 /* soft block->sequence transition
  */
 #define is_instruction_block is_instruction_sequence
@@ -2173,3 +2184,15 @@ typedef struct {
     list (*f)(call,int,bool,list);
     int prec;
 } intrinsic_desc_t;
+
+enum {
+    DEFAULT_ENTITY_KIND = 0,
+    EFFECTS_PACKAGE = 1,
+    ABSTRACT_LOCATION = 2,
+    ENTITY_STACK_AREA = 4,
+    ENTITY_HEAP_AREA = 8,
+    ENTITY_DYNAMIC_AREA = 16,
+    ENTITY_STATIC_AREA = 32,
+};
+
+#define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)

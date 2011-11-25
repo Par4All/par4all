@@ -3566,24 +3566,40 @@ Ppolynome expression_to_polynome(expression exp)
     return(pp_new);
 }
 
-/* use polynomials to simplify an expression */
+/* use polynomials to simplify an expression
+ * in some cases this operation can change the basic of the expression. 
+ * E.g. n/4 -> .25 * n
+ * In that case we just undo the simplification
+ */
 bool simplify_expression(expression * pexp) {
     expression exp = *pexp;
     bool result =false;
     if(!expression_undefined_p(exp)) {
+        basic oldb = basic_of_expression(exp);
         Ppolynome pu = expression_to_polynome(exp);
         if((result=!POLYNOME_UNDEFINED_P(pu))) {
-            free_expression(exp);
-            *pexp=polynome_to_expression(pu);
+            expression pue = polynome_to_expression(pu);
+            basic nbasic = basic_of_expression(pue);
+            if(basic_equal_p(oldb,nbasic)) {
+                free_expression(exp);
+                *pexp=pue;
+            }
+            else {
+                free_expression(pue);
+            }
+            free_basic(nbasic);
             polynome_rm(&pu);
         }
+        free_basic(oldb);
     }
     return result;
 }
 
 static void do_simplify_expressions(call c) {
-    for(list iter = call_arguments(c);!ENDP(iter);POP(iter))
-        simplify_expression((expression*)REFCAR(iter));
+    for(list iter = call_arguments(c);!ENDP(iter);POP(iter)) {
+        expression *pexp = (expression*)REFCAR(iter);
+        simplify_expression(pexp);
+    }
 }
 
 void simplify_expressions(void *obj) {

@@ -138,6 +138,7 @@ entity step_parameter(string name_, entity module, expression expr)
 	    entity_initial(e) = make_value_expression(int_to_expression(0)); // a default value
 	  else
 	    entity_initial(e) = make_value_expression(expr);
+      entity_kind(e)=ABSTRACT_LOCATION;
 	  AddEntityToModuleCompilationUnit(e, get_current_module_entity());
 	}
     }
@@ -175,6 +176,7 @@ static entity step_local_RT_Integer(int size_of_integer, entity mpi_module, stri
       entity area = FindOrCreateEntity(entity_user_name(mpi_module), DYNAMIC_AREA_LOCAL_NAME);
       entity_type(e) = MakeTypeVariable(make_basic_int(size_of_integer), dims);
       entity_storage(e) = make_storage_ram(make_ram(mpi_module, area, add_variable_to_area(area, e), NIL));
+      entity_kind(e)=ABSTRACT_LOCATION;
       if(mpi_module != get_current_module_entity())
 	local_declaration = gen_nconc(local_declaration, CONS(ENTITY, e, NIL));
     }

@@ -31,7 +31,7 @@
 %token TK_MAKE TK_APPLY TK_CAPPLY TK_DISPLAY
 %token TK_REMOVE TK_ACTIVATE
 %token TK_SET_PROPERTY TK_GET_PROPERTY
-%token TK_SET_ENVIRONMENT TK_GET_ENVIRONMENT
+%token TK_SET_ENVIRONMENT TK_GET_ENVIRONMENT TK_UNSET_ENVIRONMENT
 %token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
@@ -114,7 +114,7 @@ static bool workspace_exist_p = false;
 
 extern void tpips_set_line_to_parse(string);
 extern int yylex(void);
-extern void yyerror(char *);
+extern void yyerror(const char *);
 
 #define CURRENT_MODULE
 

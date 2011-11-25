@@ -279,7 +279,7 @@ bool controlizer(const char* module_name)
 
        So now correct the label and the comment: */
 
-    pips_assert("the module statement is consistent "
+    ifdebug(1) pips_assert("the module statement is consistent "
 		"before the controlizer is called",
 		statement_consistent_p(module_stat));
 
@@ -293,7 +293,7 @@ bool controlizer(const char* module_name)
 				 NULL,
 				 empty_extensions ());
 
-    pips_assert("the module statement is consistent "
+    ifdebug(1) pips_assert("the module statement is consistent "
 		"after the controlizer call",
 		statement_consistent_p(module_stat));
 
@@ -313,7 +313,7 @@ bool controlizer(const char* module_name)
   /* Reorder the module, because we have a new statement structure. */
   module_reorder(module_stat);
 
-  statement_consistent_p(module_stat);
+  ifdebug(1) statement_consistent_p(module_stat);
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 

@@ -688,6 +688,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 			}
 %%
 
+/* This function is renamed splitc_error(). It should probably reset more variables */
 void yyerror(const char * msg)
 {
     user_warning("yyerror",

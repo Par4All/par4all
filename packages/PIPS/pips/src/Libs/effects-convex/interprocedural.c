@@ -1442,7 +1442,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
     case is_syntax_reference:
     case is_syntax_subscript:
       {
-	effect eff_real;
+	effect eff_real = effect_undefined;
 
 	pips_debug(5, "general case\n");
 
@@ -1455,75 +1455,79 @@ list c_convex_effects_on_actual_parameter_forward_translation
 	    list l_real_arg = generic_proper_effects_of_complex_address_expression
 	      (real_exp, &l_eff_real, true);
 	    gen_full_free_list(l_real_arg);
-	    eff_real = EFFECT(CAR(l_eff_real)); /*there should be a foreach to scan all the elements */
+	    if (!ENDP(l_eff_real))
+	      eff_real = EFFECT(CAR(l_eff_real)); /*there should be a foreach to scan all the elements */
 	    gen_free_list(l_eff_real);
 	  }
 
-	FOREACH(EFFECT, eff_orig, l_reg)
+	if (!effect_undefined_p(eff_real))
 	  {
-	    int nb_phi_orig = (int) gen_length(reference_indices(effect_any_reference(eff_orig)));
-	    int nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
-	    /* First we have to test if the eff_real access path leads to the eff_orig access path */
-
-	    /* to do that, if the entities are the same (well in fact we should also
-	       take care of aliasing), we add the constraints of eff_real to those of eff_orig,
-	       and the system must be feasible.
-	    */
-
-	    bool exact_p;
-	    if(path_preceding_p(eff_real, eff_orig, transformer_undefined, true, &exact_p)
-	       &&  nb_phi_orig >= nb_phi_real)
+	    FOREACH(EFFECT, eff_orig, l_reg)
 	      {
-		effect eff_orig_dup = (*effect_dup_func)(eff_orig);
-		region_sc_append_and_normalize(eff_orig_dup, region_system(eff_real), 1);
+		int nb_phi_orig = (int) gen_length(reference_indices(effect_any_reference(eff_orig)));
+		int nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
+		/* First we have to test if the eff_real access path leads to the eff_orig access path */
 
-		if (sc_empty_p(region_system(eff_orig_dup)))
+		/* to do that, if the entities are the same (well in fact we should also
+		   take care of aliasing), we add the constraints of eff_real to those of eff_orig,
+		   and the system must be feasible.
+		*/
+
+		bool exact_p;
+		if(path_preceding_p(eff_real, eff_orig, transformer_undefined, true, &exact_p)
+		   &&  nb_phi_orig >= nb_phi_real)
 		  {
-		    pips_debug(5, "the original effect does not correspond to the actual argument \n");
-		    free_effect(eff_orig_dup);
-		  }
-		else
-		  {
-		    /* At least part of the original effect corresponds to the actual argument :
-		       we need to translate it
-		    */
-		    reference ref_formal = make_reference(formal_ent, NIL);
-		    effect eff_formal = make_reference_region(ref_formal, copy_action(effect_action(eff_orig)));
+		    effect eff_orig_dup = (*effect_dup_func)(eff_orig);
+		    region_sc_append_and_normalize(eff_orig_dup, region_system(eff_real), 1);
 
-		    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_orig_dup);
+		    if (sc_empty_p(region_system(eff_orig_dup)))
+		      {
+			pips_debug(5, "the original effect does not correspond to the actual argument \n");
+			free_effect(eff_orig_dup);
+		      }
+		    else
+		      {
+			/* At least part of the original effect corresponds to the actual argument :
+			   we need to translate it
+			*/
+			reference ref_formal = make_reference(formal_ent, NIL);
+			effect eff_formal = make_reference_region(ref_formal, copy_action(effect_action(eff_orig)));
 
-		    /* first we perform the path translation */
-		    reference n_eff_ref;
-		    descriptor n_eff_d;
-		    effect n_eff;
-		    bool exact_translation_p;
-		    convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(eff_orig_dup),
-										   effect_descriptor(eff_orig_dup),
-										   ref_formal,
-										   effect_descriptor(eff_formal),
-										   nb_phi_real,
-										   &n_eff_ref, &n_eff_d,
-										   &exact_translation_p);
-		    n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff_orig)),
-					exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may(),
-					n_eff_d);
-		    pips_debug_effect(5, "final eff_formal : \n", n_eff);
+			pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_orig_dup);
 
-		    /* then  we translate the predicate in the callee's name space */
-		    convex_region_descriptor_translation(n_eff);
-		    pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
+			/* first we perform the path translation */
+			reference n_eff_ref;
+			descriptor n_eff_d;
+			effect n_eff;
+			bool exact_translation_p;
+			convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(eff_orig_dup),
+										       effect_descriptor(eff_orig_dup),
+										       ref_formal,
+										       effect_descriptor(eff_formal),
+										       nb_phi_real,
+										       &n_eff_ref, &n_eff_d,
+										       &exact_translation_p);
+			n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff_orig)),
+					    exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may(),
+					    n_eff_d);
+			pips_debug_effect(5, "final eff_formal : \n", n_eff);
 
-		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),effects_same_action_p);
-		    pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
-		  } /* else of the if (sc_empty_p) */
+			/* then  we translate the predicate in the callee's name space */
+			convex_region_descriptor_translation(n_eff);
+			pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
 
-	      } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
+			l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),effects_same_action_p);
+			pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
+		      } /* else of the if (sc_empty_p) */
+
+		  } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
 
 
 
-	    /* */
+		/* */
 
-	  } /* FOREACH */
+	      } /* FOREACH */
+	  }
 
 	break;
       }

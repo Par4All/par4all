@@ -13,6 +13,7 @@ AM_LFLAGS=-p tp_
 
 BUILT_SOURCES=$(TARGET).h tp_yacc.h loop_phases.h
 AM_CPPFLAGS=\
+	-I../../Libs/gnulib \
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\
 	-I../../Documentation/newgen\

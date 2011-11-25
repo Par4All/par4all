@@ -453,10 +453,15 @@ void csplit_copy(const char* module_name,
     fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
-  /* SG hook: do not keep track of module declared inside a header */
-  if(!get_bool_property("IGNORE_FUNCTION_IN_HEADER") || !path_header_p(current_include_file_path)) {
+  /* SG hook: do not keep track of module declared inside a header
+   * not very reliable in the presence of used inline function in user header,
+   * so left apart as of now
+   */
+  if(true || !get_bool_property("IGNORE_FUNCTION_IN_HEADER")
+          || !path_header_p(current_include_file_path)) {
       fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
   }
+
 
   safe_fclose(mfd, unambiguous_module_file_name);
   free(unambiguous_module_file_name);
@@ -491,15 +496,35 @@ void csplit_reset()
   reset_keyword_typedef_table();
 }
 
+void csplit_close_files(string file_name)
+{
+    csplit_close_compilation_unit();
+    current_include_file_path = NULL;
+    free(current_file_path);
+    current_file_path=NULL;
+    ForceResetTypedefStack();
+    safe_fclose(splitc_in, file_name);
+    splitc_in = NULL;
+    splitc_input_file_name = string_undefined;
+    safe_fclose(splitc_in_append, file_name);
+    splitc_in_append = NULL;
+    /*
+      safe_fclose(splitc_in_copy, file_name);
+      splitc_in_copy = NULL;
+     */
+    /* No close, because this file descriptor is managed by the caller. */
+    module_list_file = NULL;
+}
 
 /** Split a C file into one file per module (function or procedure) plus
 
     @param dir_name the directory name where the input file is to pick
-    @param file_name the the C input file name to split
+    @param file_name the C input file name to split
     @param out file opened to record module and compilation unit names
 
-    @return an error message or NULL if no error has occured.
+    @return an error message or NULL if no error has occurred.
 */
+string current_file_name = string_undefined;
 string  csplit(
 	       char * dir_name,
 	       char * file_name,
@@ -507,6 +532,7 @@ string  csplit(
 )
 {
   string error_message = string_undefined;
+  current_file_name = file_name; /* In case a error occurs*/
 
   /* */
   debug_on("CSPLIT_DEBUG_LEVEL");
@@ -548,23 +574,8 @@ string  csplit(
     /* Do not forget to catch what could remain after the last function up
        to the end of file: */
     csplit_append_to_compilation_unit(INT_MAX, ULLONG_MAX);
+    csplit_close_files(file_name);
 
-    csplit_close_compilation_unit();
-    current_include_file_path = NULL;
-    free(current_file_path);
-    current_file_path=NULL;
-    ResetTypedefStack();
-    safe_fclose(splitc_in, file_name);
-    splitc_in = NULL;
-    splitc_input_file_name = string_undefined;
-    safe_fclose(splitc_in_append, file_name);
-    splitc_in_append = NULL;
-    /*
-      safe_fclose(splitc_in_copy, file_name);
-      splitc_in_copy = NULL;
-     */
-    /* No close, because this file descriptor is managed by the caller. */
-    module_list_file = NULL;
     csplit_reset();
   }
   debug_off();

@@ -296,7 +296,7 @@ static transformer call_to_postcondition(transformer pre,
        && ENTITY_ASSIGN_P(call_function(c))) {
       entity f = call_function(c);
       list args = call_arguments(c);
-      /* impredance problem: build an expression from call c */
+      /* impedance problem: build an expression from call c */
       expression expr = make_expression(make_syntax(is_syntax_call, c),
 					normalized_undefined);
       list ef = expression_to_proper_effects(expr);

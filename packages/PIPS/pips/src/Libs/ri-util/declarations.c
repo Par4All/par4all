@@ -1994,6 +1994,9 @@ static list generic_words_qualifier(list obj, bool initial_p, bool late_p)
       if(initial_p)
       pc = CHAIN_SWORD(pc,"auto ");
       break;
+    case is_qualifier_asm: {
+      /* asm qualifiers a reprinted in the end ... */
+      } break;
     }
   }
 
@@ -2976,6 +2979,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
       || (entity_module_p(e_last) && static_module_p(e_last)))
     pc = CHAIN_SWORD(pc,"static ");
 
+
   /* This part is for type specifiers, type qualifiers, function specifiers and declarator
      Three special cases for struct/union/enum definitions are treated here.
      Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef
@@ -3059,6 +3063,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   pc = NIL;
 
 
+
   /* Add the declared variables or more declared variables. */
   list oel = CDR(el); // other entities after e1
   //print_entities(oel);
@@ -3072,6 +3077,16 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
     pc = words_variable_or_function(module, e, false, pc, in_type_declaration,
 				    pdl);
   }
+  /* add the asm qualifier if needed */
+  string asm_qual = strdup("");
+  FOREACH(QUALIFIER, q, entity_qualifiers(e1)) {
+    if(qualifier_asm_p(q)) {
+            asprintf(&asm_qual,"%s __asm(%s)", asm_qual, qualifier_asm(q));
+    }
+  }
+  pc = CHAIN_SWORD(pc,asm_qual);
+  free(asm_qual);
+  /* the final semi column,*/
   pc = CHAIN_SWORD(pc,";");
 
   /* the word list pc must be added to the last sentence of text r */

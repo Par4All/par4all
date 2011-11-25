@@ -37,7 +37,6 @@
 /* Measurement type for mem_spy.c */
 typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 
-#define ifdebug(l) if(the_current_debug_level>=(l))
 
 #define pips_unknown_function "Unknown Function Name"
 
@@ -67,22 +66,6 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
   user_irrecoverable_error(__FUNCTION__, format, ##args)
 #define pips_internal_error(format, args...)\
   pips_error(__FUNCTION__, "(%s:%d) " format, __FILE__ , __LINE__ , ##args)
-#define pips_assert(what, predicate)					\
-  do {									\
-    if(!(predicate)) {							\
-      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
-      abort();								\
-    }									\
-  } while(0)
-#define pips_user_assert(what, predicate)				\
-  do {									\
-    if(!(predicate)) {							\
-      (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
-      pips_user_error("this is a USER ERROR, I guess\n");		\
-    };									\
-  } while(0)
-#define pips_exit(code, format, args...)\
-   pips_user_warning(format, ##args), exit(code)
 #else
 #define pips_where(out) \
   fprintf(out, "[%s] (%s:%d) ", pips_unknown_function, __FILE__, __LINE__)
@@ -95,6 +78,17 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define pips_user_error pips_user_error_function
 #define pips_user_irrecoverable_error user_irrecoverable_error_function
 #define pips_internal_error pips_internal_error_function
+#endif
+
+/* common macros, two flavors depending on NDEBUG */
+#ifdef NDEBUG
+
+#define pips_assert(what, predicate)
+#define pips_user_assert(what, predicate)
+#define ifdebug(l) if(0)
+
+#else
+
 #define pips_assert(what, predicate)					\
   do {									\
     if(!(predicate)) {							\
@@ -102,15 +96,21 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
       abort();								\
     }									\
   } while(0)
+
 #define pips_user_assert(what, predicate)				\
   do {									\
     if(!(predicate)) {							\
       (void)pips_internal_error("assertion failed\n\n '%s' not verified\n\n",what);\
       pips_user_error("this is a USER ERROR, I guess\n");		\
-    }									\
+    };									\
   } while(0)
-#define pips_exit pips_where(stderr), pips_exit_function
+
+#define ifdebug(l) if(the_current_debug_level>=(l))
+
 #endif
+
+#define pips_exit(code, format, args...)\
+   pips_user_warning(format, ##args), exit(code)
 
 /* FI:need to breakpoint while inlining is available */
 /* #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)*/

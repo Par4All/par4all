@@ -94,6 +94,10 @@ class loop:
         loops=self.__ws.cpypips.module_loops(self.module.name,self.label)
         if label!=None: return self.loops()[label]
         else: return [ loop(self.module,l) for l in str.split(loops," ") ] if loops else []
+        
+    def parallel(self,execution):
+        """Define the execution mode for a loop"""
+        self.__ws.cpypips.flag_loop_execution_parallel(self.module.name,self.label,execution)
 
 class module(object): # deriving from object is needed for overloaded setter
     """A source code function"""

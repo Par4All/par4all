@@ -12,10 +12,9 @@ class simpleStubBroker(broker.broker):
 
     def stub_file_for_module(self, module):
         for broker_dir in self.get_broker_dirs():
-            try:
-                return os.path.join(broker_dir,module+".c")
-            except RuntimeError:
-                print >> sys.stderr, "function", module, "not found in broker with flavour", broker_dir, ": try another broker..."
+            fname = os.path.join(broker_dir,module+".c")
+            if os.path.exists(fname):
+              return fname
         return ""
 
     def get_broker_dirs(self):

@@ -336,14 +336,3 @@ string safe_instruction_identification(instruction i)
 }
 
 
-/* Get a list of all variables declared recursively within an instruction */
-list instruction_to_declarations(instruction i)
-{
-  list statement_to_all_included_declarations = NIL;
-
-  gen_context_recurse(i,&statement_to_all_included_declarations,
-		      statement_domain, add_statement_declarations, gen_null);
-
-  return statement_to_all_included_declarations;
-}
-
