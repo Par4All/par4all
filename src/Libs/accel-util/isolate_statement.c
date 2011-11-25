@@ -557,16 +557,152 @@ statement effects_to_dma(statement stat,
     return make_block_statement(statements);
 }
 
-static bool do_isolate_statement_preconditions(statement s)
+typedef struct {
+    char * callee_module_name;
+    list regions_to_extend;
+    bool ok;
+} param_t;
+
+static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p) {
+    if(same_string_p(entity_local_name(call_function(c)),p->callee_module_name)) {
+        /* get parent statement */
+        statement s = (statement)gen_get_ancestor(statement_domain,c);
+        pips_assert("found ancestor",!statement_undefined_p(s));
+        /* get associated regions */
+        list regions = load_cumulated_rw_effects_list(s);
+        /* verify the conditions : no access to global variables and no complex offset handling */
+        FOREACH(REGION,reg,regions) {
+            reference ref = region_any_reference(reg);
+            entity eref = reference_variable(ref);
+            list indices = reference_indices(ref);
+            size_t nbdims = gen_length(indices);
+            if(!entity_local_variable_p(eref,get_current_module_entity()) ) {
+                pips_user_warning("Trying to isolate a statement with a call that references a global variable `%s'\n",entity_user_name(eref));
+                p->ok=false;
+            }
+            else if(nbdims>1) { // unhandled
+                pips_user_warning("Trying to isolate a statement with a call that touches a multi-dimensional array `%s'\n", entity_user_name(eref));
+                p->ok=false;
+            }
+            /* we are left with a scalar or an unidimensional array */
+            else if(nbdims==1) { // see if we can approximate the region with an offset at zero
+                expression exp_phi1 = EXPRESSION(CAR(indices));
+                entity phi1 = expression_to_entity(exp_phi1);
+                Psysteme sc_reg = sc_dup(region_system(reg));
+                sc_transform_eg_in_ineg(sc_reg);
+                Pcontrainte lower,upper;
+                constraints_for_bounds(phi1,
+                        &sc_inegalites(sc_reg), &lower, &upper);
+                if( !CONTRAINTE_UNDEFINED_P(upper))
+                {
+                    expression eupper = constraints_to_loop_bound(upper,phi1,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                    normalized nupper = NORMALIZE_EXPRESSION(eupper);
+                    if(normalized_linear_p(nupper)) {
+                        /* we can do it! leave it for later */
+                        p->regions_to_extend = CONS(ENTITY, eref, p->regions_to_extend);
+                    }
+                    else {
+                        pips_user_warning("Failed to normalized the upper bound for accesses to array `%s'\n",entity_user_name(eref));
+                        p->ok=false;
+                    }
+                    free_expression(eupper);
+
+                }
+                else {
+                    pips_user_warning("Failed to find an upper bound for accesses to array `%s'\n",entity_user_name(eref));
+                    p->ok=false;
+                }
+                contrainte_rm(lower);
+                contrainte_rm(upper);
+                sc_rm(sc_reg);
+            }
+            if(!p->ok) {
+                gen_recurse_stop(0);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+static bool do_isolate_statement_preconditions_satisified_p(statement s)
 {
     callees c = compute_callees(s);
-    bool nocallees = ENDP(callees_callees(c));
-    free_callees(c);
-    if(! nocallees) {
-        pips_user_warning("cannot isolate statement with callees\n");
-        return false;
+    list thecallees = callees_callees(c);
+    /* we have to make sure every callee access no global variables and that
+     * the associated regions has no offset
+     */
+    param_t p = { .ok=true, .regions_to_extend=NIL };
+    FOREACH(STRING, callee_module_name, thecallees) {
+        p.callee_module_name=callee_module_name;
+        gen_context_recurse(s,&p,call_domain,do_check_isolate_statement_preconditions_on_call,gen_null);
+        if(!p.ok) break;
     }
-    return true;
+    free_callees(c);
+    if(p.ok) { // this mean that all checks are ok, but some patching is needed
+        // maybe we have registered some regions to extend to avoid interprocedural offset management?
+        list regions = load_cumulated_rw_effects_list(s);
+        FOREACH(ENTITY,e,p.regions_to_extend) {
+            for(list iter=regions;!ENDP(iter);POP(iter)){ // change the region in place, thus the refcar
+                region * reg = (region*)REFCAR(iter);
+                reference ref = region_any_reference(*reg);
+                list indices = reference_indices(ref);
+                if(!ENDP(indices)) { // only entities with indices are considered
+                    entity eref = reference_variable(ref);
+                    if(same_entity_p(eref,e)) { // we got the right entity
+                        expression exp_phi1 = EXPRESSION(CAR(indices));
+                        entity phi1 = expression_to_entity(exp_phi1);
+                        Psysteme sc_reg = sc_dup(region_system(*reg));
+                        sc_transform_eg_in_ineg(sc_reg);
+                        Pcontrainte lower,upper;
+                        constraints_for_bounds(phi1,
+                                &sc_inegalites(sc_reg), &lower, &upper);
+                        if( !CONTRAINTE_UNDEFINED_P(upper))
+                        {
+                            expression eupper = constraints_to_loop_bound(upper,phi1,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                            normalized nupper = NORMALIZE_EXPRESSION(eupper);
+                            if(normalized_linear_p(nupper)) {
+                                Psysteme sc =sc_new();
+                                /* add a constraint 0 <= phi1 and the upperbound constraint*/
+                                sc_add_phi_equation(&sc, int_to_expression(0), 1, false, false);
+                                sc_add_phi_equation(&sc, eupper, 1, false, true);
+                                /* duplicate the region */
+                                region copy = make_region(copy_reference(ref),
+                                        copy_action(region_action(*reg)),
+                                        make_approximation_may(), sc);
+                                /* add it to current region */
+                                region nreg = regions_must_convex_hull(*reg,copy);
+                                free_effect(*reg);
+                                free_effect(copy);
+                                *reg=nreg;
+                            }
+                            else pips_internal_error("This case should have been filtered out by `do_check_isolate_statement_preconditions_on_call'");
+                        }
+                        else pips_internal_error("This case should have been filtered out by `do_check_isolate_statement_preconditions_on_call'");
+                    }
+                }
+            }
+        }
+        /* prune out read effects on pointers ...
+         * the assumption is that reading a pointer is not that important and most certainly comes from passing a pointer as parameter to a function
+         * if the pointer itself is not written, it should be ok.
+         * Well this indeed very optimistic ...
+        */
+        list rdup = gen_copy_seq(regions);
+        FOREACH(REGION,r,rdup) {
+            if(region_read_p(r) ) {
+                reference ref = region_any_reference(r);
+                if(entity_pointer_p(reference_variable(ref)) && 
+                        ENDP(reference_indices(ref))) {
+                    gen_remove_once(&regions,r);
+                }
+            }
+        }
+        gen_free_list(rdup);
+        gen_free_list(p.regions_to_extend);
+    }
+    return p.ok;
 }
 
 /* perform statement isolation on statement @p s
@@ -578,7 +714,7 @@ void do_isolate_statement(statement s, const char* prefix, const char* suffix) {
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
     hash_table e2e ;
-    if(!do_isolate_statement_preconditions(s)) {
+    if(!do_isolate_statement_preconditions_satisified_p(s)) {
         pips_user_warning("isolated statement has callees, transfers will be approximated\n");
         fine_grain_analysis = false;
     }
