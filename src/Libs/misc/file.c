@@ -355,6 +355,7 @@ strescape (const char *source)
    @return an allocated string with the n-th part name
 
    If the path is empty or if n is out-of-bound, NULL is returned.
+   The resulting string is *not*escaped, and can contain spaces
 */
 string
 nth_path(const char * path_list, int n)
@@ -378,9 +379,7 @@ nth_path(const char * path_list, int n)
     ;
 
   char *unescaped =  strndup(path_list, len);
-  char * escaped = strescape(unescaped);
-  free(unescaped);
-  return escaped;
+  return unescaped;
 }
 
 
@@ -408,7 +407,7 @@ find_file_in_directories(const char *file_name, const char *dir_path)
     if (!dir_path || file_name[0]=='/')
 	return (string) NULL;
 
-    /* looks for the file with an additionnal path ahead.
+    /* looks for the file with an additional path ahead.
      */
     while ((path=nth_path(dir_path, n++)))
     {
