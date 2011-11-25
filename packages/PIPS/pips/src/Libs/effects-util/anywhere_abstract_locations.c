@@ -65,6 +65,7 @@ entity entity_all_locations()
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
     anywhere = make_entity(strdup(any_name), t, make_storage_rom(), make_value_unknown());
+    entity_kind(anywhere)=ABSTRACT_LOCATION;
   }
 
   return anywhere;
@@ -86,14 +87,15 @@ bool entity_all_locations_p(entity e)
 
 entity entity_nowhere_locations()
 {
-  entity nowhere = entity_undefined;
-  static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION NOWHERE_LOCATION;
-  nowhere =  gen_find_tabulated(any_name, entity_domain);
+  static entity nowhere = entity_undefined;
   if(entity_undefined_p(nowhere)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
-    nowhere = make_entity(strdup(any_name),
-			   t, make_storage_rom(), make_value_unknown());
+      static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION ;
+      area a = make_area(0,NIL); /* Size and layout are unknown */
+      type t = make_type_area(a);
+      nowhere = make_entity(strdup(any_name),
+              t, make_storage_rom(), make_value_unknown());
+      entity_kind(nowhere)=ABSTRACT_LOCATION;
+      register_static_entity(&nowhere);
   }
 
    return nowhere;
@@ -101,45 +103,34 @@ entity entity_nowhere_locations()
 /* test if an entity is the bottom of the lattice*/
 bool entity_nowhere_locations_p(entity e)
 {
-
-  bool nowhere_p;
-  nowhere_p = same_string_p(entity_local_name(e), NOWHERE_LOCATION);
-  if(nowhere_p)
-    pips_assert("defined in any module name",
-		same_string_p(entity_module_name(e), ANY_MODULE_NAME));
-  return nowhere_p;
+    return same_entity_p(e,entity_nowhere_locations());
 }
 
+
 /* return TOP-LEVEL:*NULL_POINTER*
  * The NULL pointer should be a global variable, unique for all modules
  * FI: why isn't it called entity_null_location()?
  */
 entity entity_null_locations()
 {
-  entity null_pointer = entity_undefined;
-  const char any_name [] = TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING NULL_POINTER_NAME;
-  null_pointer = gen_find_tabulated(any_name, entity_domain);
-  if(entity_undefined_p(null_pointer)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
-    null_pointer = make_entity(strdup(any_name),
-			       t, make_storage_rom(), make_value_unknown());
-  }
+    static entity null_pointer = entity_undefined;
+    if(entity_undefined_p(null_pointer)) {
+        const char any_name [] = TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING NULL_POINTER_NAME;
+        area a = make_area(0,NIL); /* Size and layout are unknown */
+        type t = make_type_area(a);
+        null_pointer = make_entity(strdup(any_name),
+                t, make_storage_rom(), make_value_unknown());
+        entity_kind(null_pointer) = ABSTRACT_LOCATION;
+        register_static_entity(&null_pointer);
+    }
 
-  return null_pointer;
+    return null_pointer;
 }
 
 /* test if an entity is the NULL POINTER*/
 bool entity_null_locations_p(entity e)
 {
-
-  bool null_pointer_p;
-  null_pointer_p = same_string_p(entity_local_name(e), NULL_POINTER_NAME);
-  if(null_pointer_p)
-    pips_assert("defined in top-level module name",
-		same_string_p(entity_module_name(e),TOP_LEVEL_MODULE_NAME));
-
-  return null_pointer_p;
+    return same_entity_p(e,entity_null_locations());
 }
 
 /* return m:*ANYWHERE*
@@ -162,6 +153,7 @@ entity entity_all_module_locations(entity m)
     entity_type(anywhere)=t;
     entity_storage(anywhere)=make_storage_rom();
     entity_initial(anywhere)=make_value_unknown();
+    entity_kind(anywhere)=ABSTRACT_LOCATION;
   }
 
   return anywhere;
@@ -181,12 +173,12 @@ bool entity_all_module_locations_p(entity e)
  * Generic set of functions for all kinds of areas
 */
 
-entity entity_all_module_xxx_locations(entity m, string xxx)
+entity entity_all_module_xxx_locations(entity m, const char *xxx)
 {
   entity dynamic = entity_undefined;
-  string any_name = strdup(concatenate(xxx,
-				       ANYWHERE_LOCATION,
-				       NULL));
+  string any_name;
+  asprintf(&any_name, "%s" ANYWHERE_LOCATION, xxx);
+
   //dynamic = gen_find_tabulated(any_name, entity_domain);
   dynamic = FindOrCreateEntity(entity_local_name(m), any_name);
   if(storage_undefined_p(entity_storage(dynamic))) {
@@ -196,6 +188,7 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
     entity_type(dynamic) = t;
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
+    entity_kind(dynamic)=ABSTRACT_LOCATION;
   }
   free(any_name);
 
@@ -272,6 +265,11 @@ entity entity_all_xxx_locations(string xxx)
     entity_type(dynamic) = make_type_unknown();
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
+    entity_kind(dynamic)=ABSTRACT_LOCATION;
+    if(same_string_p(xxx,HEAP_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_HEAP_AREA;
+    else if(same_string_p(xxx,STACK_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_STACK_AREA;
+    else if(same_string_p(xxx,STATIC_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_STATIC_AREA;
+    else if(same_string_p(xxx,DYNAMIC_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_DYNAMIC_AREA;
   }
 
   return dynamic;
@@ -301,6 +299,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
       entity_type(e) = copy_type(t);
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
+      entity_kind(e)=ABSTRACT_LOCATION;
       found_p = true;
     }
     else if(type_equal_p(t, ot))
@@ -445,16 +444,21 @@ bool entity_all_dynamic_locations_p(entity e)
 
 bool entity_abstract_location_p(entity al)
 {
-  const char * en = entity_name(al);
-  const char * module_sep = strchr(en,MODULE_SEP_CHAR);
-  return   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
-      ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
-      ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
-      ;
+#ifndef NDEBUG
+        const char * en = entity_name(al);
+        const char * module_sep = strchr(en,MODULE_SEP_CHAR);
+        bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
+                ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
+                ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
+                )
+            ;
+        pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
+#endif
+    return entity_kind(al) & ABSTRACT_LOCATION;
 }
 
 
@@ -504,7 +508,7 @@ entity variable_to_abstract_location(entity v)
       entity f = ram_function(r);
       entity a = ram_section(r);
       //string mn = entity_local_name(f);
-      string ln = string_undefined;
+      const char *ln = string_undefined;
       type uvt = ultimate_type(entity_type(v));
 
       if(static_area_p(a))
@@ -524,6 +528,7 @@ entity variable_to_abstract_location(entity v)
       }
       else
 	al = entity_all_module_xxx_locations(f, ln);
+      entity_kind(al)=ABSTRACT_LOCATION; // should it be a static/dynamic/stack/heap area too ? not according to static_area_p
     }
   }
   else
@@ -583,9 +588,9 @@ entity abstract_locations_max(entity al1, entity al2)
 
       if(strcmp(mn1, mn2)==0)
 	mn = mn1;
-      else
+      else 
 	mn = ANY_MODULE_NAME;
-      e = FindOrCreateEntity(mn, ln);
+      e = FindEntity(mn, ln);
       free(mn1);free(mn2);
     }
   return e;
@@ -650,7 +655,7 @@ entity entity_locations_max(entity al1, entity al2)
 	    ln = HEAP_AREA_LOCAL_NAME;
 	  else
 	    ln = ANYWHERE_LOCATION;
-	  e = FindOrCreateEntity(mn, ln);
+	  e = FindEntity(mn, ln);
 	}
 	else
 	  pips_internal_error("not implemented");

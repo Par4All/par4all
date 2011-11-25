@@ -969,6 +969,10 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {C_CLOSE_FUNCTION_NAME,                  unix_io_function_to_post_pv},
   {C_WRITE_FUNCTION_NAME,                  unix_io_function_to_post_pv},
   {C_READ_FUNCTION_NAME,                   unix_io_function_to_post_pv},
+  {LINK_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
+  {SYMLINK_FUNCTION_NAME,                  intrinsic_to_identical_post_pv},
+  {UNLINK_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+
   {FCNTL_FUNCTION_NAME,                    unix_io_function_to_post_pv},
   {FSYNC_FUNCTION_NAME,                    unix_io_function_to_post_pv},
   {FDATASYNC_FUNCTION_NAME,                unix_io_function_to_post_pv},

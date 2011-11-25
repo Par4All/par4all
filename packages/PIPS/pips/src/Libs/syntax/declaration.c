@@ -97,6 +97,7 @@ InitAreas()
     entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(DynamicArea) = make_storage_rom();
     entity_initial(DynamicArea) = make_value_unknown();
+    entity_kind(DynamicArea) = ABSTRACT_LOCATION | ENTITY_DYNAMIC_AREA;
     AddEntityToDeclarations(DynamicArea, get_current_module_entity());
     set_common_to_size(DynamicArea, 0);
 
@@ -104,6 +105,7 @@ InitAreas()
     entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(StaticArea) = make_storage_rom();
     entity_initial(StaticArea) = make_value_unknown();
+    entity_kind(StaticArea) = ABSTRACT_LOCATION | ENTITY_STATIC_AREA;
     AddEntityToDeclarations(StaticArea, get_current_module_entity());
     set_common_to_size(StaticArea, 0);
 
@@ -111,6 +113,7 @@ InitAreas()
     entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(HeapArea) = make_storage_rom();
     entity_initial(HeapArea) = make_value_unknown();
+    entity_kind(HeapArea) = ABSTRACT_LOCATION | ENTITY_HEAP_AREA;
     AddEntityToDeclarations(HeapArea, get_current_module_entity());
     set_common_to_size(HeapArea, 0);
 
@@ -118,6 +121,7 @@ InitAreas()
     entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(StackArea) = make_storage_rom();
     entity_initial(StackArea) = make_value_unknown();
+    entity_kind(StackArea) = ABSTRACT_LOCATION | ENTITY_STACK_AREA;
     AddEntityToDeclarations(StackArea, get_current_module_entity());
     set_common_to_size(StackArea, 0);
 }

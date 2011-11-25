@@ -154,6 +154,7 @@ static c_parser_context ycontext = c_parser_context_undefined;
 static string expression_comment = string_undefined;
 static int expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 
+/* we don't want an expression comment with new lines, it is disgracefull */
 void reset_expression_comment()
 {
   if(!string_undefined_p(expression_comment)) {
@@ -164,6 +165,57 @@ void reset_expression_comment()
   }
 
   expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+}
+
+/* flushes all expression comments and add them to statement s */
+static statement flush_expression_comment(statement s) {
+  if(!empty_comments_p(expression_comment)) {
+    if(!empty_comments_p(statement_comments(s))) {
+	  char *tmp = statement_comments(s);
+	  asprintf(&statement_comments(s),"%s%s",statement_comments(s),expression_comment);
+	  free(tmp);
+      free(expression_comment);
+    }
+    else
+      statement_comments(s) = expression_comment;
+	statement_number(s) = expression_line_number;
+	expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+    expression_comment=string_undefined;
+  }
+  return s;
+}
+
+
+/* after a while (crocodile) expression comments are pushed into a list that
+   is purged upon call to add_expression_comment */ 
+static list all_expression_comments_as_statement_comments = NIL;
+static void save_expression_comment_as_statement_comment() {
+	if(!string_undefined_p(expression_comment)) {
+		all_expression_comments_as_statement_comments = 
+		CONS(STRING,expression_comment, all_expression_comments_as_statement_comments);
+	}
+    expression_comment=string_undefined;
+}
+/* flushes all statement comments and add them to statement s */
+static statement flush_statement_comment(statement s) {
+  s=flush_expression_comment(s); // should not be necessary 
+  if(!ENDP(all_expression_comments_as_statement_comments)) {
+    pips_assert("not on a block",!statement_block_p(s));
+    all_expression_comments_as_statement_comments = gen_nreverse(all_expression_comments_as_statement_comments);
+    char * comments = list_to_string(all_expression_comments_as_statement_comments);
+    if(!empty_comments_p(statement_comments(s))) {
+	  char *tmp = statement_comments(s);
+	  asprintf(&statement_comments(s),"%s%s",statement_comments(s), comments);
+	  free(tmp);
+	  free(comments);
+    }
+    else
+      statement_comments(s) = comments;
+    FOREACH(STRING,s,all_expression_comments_as_statement_comments) free(s);
+    gen_free_list(all_expression_comments_as_statement_comments);
+    all_expression_comments_as_statement_comments=NIL;
+  }
+  return s;
 }
 
 
@@ -567,7 +619,7 @@ static void ResetDerivedEntityDeclarations()
 %type <expression> opt_expression
 %type <expression> init_expression
 %type <liste> comma_expression
-%type <liste> paren_comma_expression
+%type <liste> paren_comma_expression statement_paren_comma_expression
 %type <liste> arguments
 %type <liste> bracket_comma_expression
 %type <liste> string_list
@@ -686,24 +738,26 @@ globals:
 			      }
 			    }
 
-			  list dl = statements_to_declarations(dsl);
-			  /* Each variable should be declared only
-			     once. Type and initial value conflict
-			     should have been detected earlier. */
-			  if(!compilation_unit_p(get_current_module_name())) {
-			    pips_assert("Each variable is declared once", gen_once_p(dl));
-			  }
-			  ifdebug(9) {
-			    list gdl = statements_to_declarations(gdsl);
-			    fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
-			    print_entities(gdl);
-			    fprintf(stderr, "\n");
-			    fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
-			    print_entities(dl);
-			    fprintf(stderr, "\n");
-			    gen_free_list(gdl);
-			  }
-			  gen_free_list(dl);
+				ifdebug(1) { // the sucessive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
+				  list dl = statements_to_declarations(dsl);
+				  /* Each variable should be declared only
+					 once. Type and initial value conflict
+					 should have been detected earlier. */
+				  if(!compilation_unit_p(get_current_module_name())) {
+					pips_assert("Each variable is declared once", gen_once_p(dl));
+				  }
+				  ifdebug(9) {
+					list gdl = statements_to_declarations(gdsl);
+					fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
+					print_entities(gdl);
+					fprintf(stderr, "\n");
+					fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
+					print_entities(dl);
+					fprintf(stderr, "\n");
+					gen_free_list(gdl);
+				  }
+				  gen_free_list(dl);
+				}
 
 			  /* The order of declarations must be
 			     preserved: a structure is declared before
@@ -960,15 +1014,24 @@ expression:
 			}
 |   paren_comma_expression
 		        {
-			  /* paren_comma_expression is a list of
-			     expressions, maybe reduced to one */
-			  if(!string_undefined_p(expression_comment)) {
-			    if(strcmp(expression_comment, "")!=0)
-			      pips_user_warning("comment \"%s\" is lost\n", expression_comment);
-			  }
-			  expression_comment = pop_current_C_comment();
-			  expression_line_number = pop_current_C_line_number();
-			  $$ = MakeCommaExpression($1);
+                 char * ccc = pop_current_C_comment();
+                 if(!empty_comments_p(ccc)) {
+					 bool fullspace=true; for(const char *iter=ccc;*iter;++iter) if(!(fullspace=isspace(*iter))) break;
+					 if(fullspace) free(ccc);
+					 else {
+						 /* paren_comma_expression is a list of
+							expressions, maybe reduced to one */
+						 if(empty_comments_p(expression_comment))
+						   expression_comment=ccc;
+						 else {
+						   char *tmp = expression_comment;
+						   asprintf(&expression_comment,"%s%s",expression_comment, ccc);
+						   free(tmp);
+						 }
+					 }
+				 }
+				 expression_line_number = pop_current_C_line_number();
+			     $$ = MakeCommaExpression($1);
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
 			{
@@ -1145,7 +1208,7 @@ expression:
 /* (* We handle GCC constructor expressions *) */
 |   TK_LPAREN type_name TK_RPAREN TK_LBRACE initializer_list_opt TK_RBRACE
 		        {
-			  CParserError("GCC constructor expressions not implemented\n");
+			  $$ = MakeCastExpression($2,MakeBraceExpression($5));
 			}
 /* (* GCC's address of labels *)  */
 |   TK_AND_AND TK_IDENT
@@ -1351,6 +1414,19 @@ comma_expression_opt:
 |   comma_expression    { }
 ;
 
+statement_paren_comma_expression:
+    TK_LPAREN comma_expression TK_RPAREN
+                        {
+			  push_current_C_comment();
+			  push_current_C_line_number();
+		      save_expression_comment_as_statement_comment();
+			  $$ = $2;
+			}
+|   TK_LPAREN error TK_RPAREN
+                        {
+			  CParserError("Parse error: TK_LPAREN error TK_RPAREN \n");
+			}
+;
 paren_comma_expression:
     TK_LPAREN comma_expression TK_RPAREN
                         {
@@ -1519,15 +1595,7 @@ statement_without_pragma:
 			       expression_comment is supposed to
 			       work for real comma expressions */
 			    $$ = call_to_statement(make_call(CreateIntrinsic(COMMA_OPERATOR_NAME),$1));
-			  if(!string_undefined_p(expression_comment)) {
-			    if(!empty_comments_p(expression_comment)) {
-			      statement_comments($$) = expression_comment;
-			      statement_number($$) = expression_line_number;
-			    }
-			    expression_comment = string_undefined;
-			    expression_line_number = STATEMENT_NUMBER_UNDEFINED;
-			  }
-
+			  $$=flush_expression_comment($$);
 			}
 |   block               { }
 |   declaration         {
@@ -1546,21 +1614,26 @@ statement_without_pragma:
 			  /* Extract the statement from the list and free
 			     the list container: */
 			  $$ = make_statement_from_statement_list_or_empty_block(sl);
+			  $$=flush_expression_comment($$);
 }
-|   TK_IF paren_comma_expression statement                    %prec TK_IF
+|   TK_IF statement_paren_comma_expression  statement                    %prec TK_IF
                 	{
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
 							   make_empty_block_statement()));
 			  pips_assert("statement is a test", statement_test_p($$));
-                          statement_comments($$) = pop_current_C_comment();
-			  statement_number($$) = pop_current_C_line_number();
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
+			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = flush_statement_comment($$);
 			}
-|   TK_IF paren_comma_expression statement TK_ELSE statement
+|   TK_IF statement_paren_comma_expression statement TK_ELSE statement
 	                {
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2),$3,$5));
 			  pips_assert("statement is a test", statement_test_p($$));
-                          statement_comments($$) = pop_current_C_comment();
-			  statement_number($$) = pop_current_C_line_number();
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
+			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = flush_statement_comment($$);
 			}
 |   TK_SWITCH
                         {
@@ -1568,17 +1641,18 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    paren_comma_expression
+    statement_paren_comma_expression
                         {
 			  stack_push((char *)MakeCommaExpression($3),SwitchControllerStack);
 			}
     statement
                         {
-			  string sc = pop_current_C_comment();
-			  int sn = pop_current_C_line_number();
 
 			  $$ = MakeSwitchStatement($5);
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
 			  $$ = add_comment_and_line_number($$, sc, sn);
+			  //$$ = flush_statement_comment($$); SG too dangerous, maybe on a block
 			  stack_pop(SwitchGotoStack);
 			  stack_pop(SwitchControllerStack);
 			  stack_pop(LoopStack);
@@ -1588,13 +1662,14 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    paren_comma_expression statement
+    statement_paren_comma_expression statement
 	        	{
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  pips_assert("While loop body consistent",statement_consistent_p($4));
 			  $$ = MakeWhileLoop($3,$4,true);
 			  $$ = add_comment_and_line_number($$, sc, sn);
+			  $$ = flush_statement_comment($$);
 			  stack_pop(LoopStack);
 			}
 |   TK_DO
@@ -1602,7 +1677,7 @@ statement_without_pragma:
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
 			  /* push_current_C_comment(); */
 			}
-    statement TK_WHILE paren_comma_expression TK_SEMICOLON
+    statement TK_WHILE statement_paren_comma_expression TK_SEMICOLON
 	        	{
 			  $$ = MakeWhileLoop($5,$3,false);
 			  /* The line number and comment are related to paren_comma_expression and not to TK_DO */
@@ -1624,6 +1699,7 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloop($2, $4, $6, $9);
+			  $$=flush_expression_comment($$);
 			}
 |   for_clause /* A C99 for loop with a declaration in it */
                         {
@@ -1644,6 +1720,7 @@ statement_without_pragma:
     statement
                         {
 			  $$ = MakeForloopWithIndexDeclaration($3, $4, $6, $9);
+			  $$=flush_expression_comment($$);
 			  ExitScope();
 			}
 |   label statement
@@ -1739,6 +1816,7 @@ statement_without_pragma:
 						string_undefined,
 						empty_extensions());
 			  */
+			  $$=flush_expression_comment($$);
 			  statement_consistent_p($$);
 			}
 |   TK_BREAK TK_SEMICOLON
@@ -1758,8 +1836,24 @@ statement_without_pragma:
                         {
 			  CParserError("GOTO * exp not implemented\n");
 			}
-|   TK_ASM asmattr TK_LPAREN asmtemplate asmoutputs TK_RPAREN TK_SEMICOLON
-                        { CParserError("ASM not implemented\n"); }
+|   TK_ASM asmattr TK_LPAREN string_constant asmoutputs TK_RPAREN TK_SEMICOLON
+                        { 
+							call c  = make_call(
+									entity_intrinsic(ASM_FUNCTION_NAME),
+									CONS(EXPRESSION,entity_to_expression(
+										make_C_constant_entity($4, is_basic_string, 0)
+									),NIL)
+								);
+			  				free($4);
+							$$ = make_statement(
+								entity_empty_label(),
+								get_current_C_line_number(),
+								STATEMENT_ORDERING_UNDEFINED,
+			   					get_current_C_comment(),
+								make_instruction_call(c),
+								NIL, string_undefined,
+			   					empty_extensions());
+						}
 |   TK_MSASM
                         { CParserError("ASM not implemented\n"); }
 |   error location TK_SEMICOLON
@@ -2766,6 +2860,24 @@ declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
 			  /* Update the type of the direct_decl entity with pointer_opt and attributes*/
 			  if (!type_undefined_p($1))
 			    UpdatePointerEntity($2,$1,$3);
+			  else if(!entity_undefined_p($2) &&!ENDP($3) ) {
+                    if(type_undefined_p(entity_type($2))) {
+						entity_type($2) = make_type_variable(
+							make_variable(
+								basic_undefined,
+								NIL,
+								$3
+							)
+						);
+                    }
+					else if( type_variable_p(entity_type($2) ) ){
+		                variable v = type_variable(entity_type($2));
+						variable_qualifiers(v)=gen_nconc(variable_qualifiers(v),$3);
+					}
+					else  {
+						pips_user_warning("some _asm(..) attributes are going to be lost for entity `%s'\n",entity_name($2));
+					}
+              }
 			  $$ = $2;
 			}
 ;
@@ -3359,7 +3471,7 @@ attributes_with_asm:
 |   attribute attributes_with_asm
                         { $$ = CONS(QUALIFIER,$1,$2); }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
-                        { CParserError("ASM not implemented\n"); }
+                        { $$ = CONS(QUALIFIER,make_qualifier_asm($3), $5);}
 ;
 
 attribute:
@@ -3497,27 +3609,22 @@ paren_attr_list_ne:
 /*** GCC TK_ASM instructions ***/
 asmattr:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_VOLATILE  asmattr
                         { CParserError("ASM not implemented\n"); }
 |   TK_CONST asmattr
                         { CParserError("ASM not implemented\n"); }
 ;
-asmtemplate:
-    one_string_constant
-                        { CParserError("ASM not implemented\n"); }
-|   one_string_constant asmtemplate
-                        { CParserError("ASM not implemented\n"); }
-;
+
 asmoutputs:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmoperands asminputs
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoperands:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   asmoperandsne
                         { CParserError("ASM not implemented\n"); }
 ;
@@ -3535,13 +3642,13 @@ asmoperand:
 ;
 asminputs:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmoperands asmclobber
                         { CParserError("ASM not implemented\n"); }
 ;
 asmclobber:
     /* empty */
-                        { CParserError("ASM not implemented\n"); }
+                        {  }
 |   TK_COLON asmcloberlst_ne
                         { CParserError("ASM not implemented\n"); }
 ;

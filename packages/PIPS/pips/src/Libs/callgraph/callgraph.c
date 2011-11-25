@@ -123,10 +123,10 @@ static void gather_call_sites_in_block(statement s, gather_call_sites_t *p) {
     }
 }
 
-/** 
+/**
  * given a list @p callers_statement of module statements
  * returns a list of calls to module @p called_module
- * 
+ *
  */
 list callers_to_call_sites(list callers_statement, entity called_module)
 {
@@ -138,7 +138,7 @@ list callers_to_call_sites(list callers_statement, entity called_module)
     return p.sites;
 }
 
-/** 
+/**
  * given a list @p callers of module name calling module @p called module
  * return a list of their body
  */
@@ -515,8 +515,8 @@ bool callgraph(string name)
 
 	pips_user_warning("no source file for module %s, let's try so synthesize code\n",
 			  module_called);
-	reset_pips_current_computation();
-	entity_basic_concrete_types_reset();
+	reset_current_phase_context();
+
 	/* set_pips_current_computation(DBR_CALLEES, module_called); */
 	/* push_pips_current_computation(DBR_CALLEES, module_called); */
 	if(rmake(DBR_CALLEES, module_called)) {
@@ -542,14 +542,13 @@ bool callgraph(string name)
 	  /*
 	    pips_user_error("Provide or let PIPS synthesize source code for module %s\n",
 	    module_called);*/
-	  set_pips_current_computation(BUILDER_CALLGRAPH, name);
-	  entity_basic_concrete_types_init();
+	  set_current_phase_context(BUILDER_CALLGRAPH, name);
+
 	  return false;
 	}
 	/* pop_pips_current_computation(DBR_CALLEES, module_called); */
 	/* reset_pips_current_computation(); */
-	set_pips_current_computation(BUILDER_CALLGRAPH, name);
-	entity_basic_concrete_types_init();
+	set_current_phase_context(BUILDER_CALLGRAPH, name);
       }
 
       c = (callees) hash_get(module_callers, (void *) module_called);

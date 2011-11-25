@@ -262,7 +262,7 @@ transformer transformer_combine(transformer t1, transformer t2)
   if(!sc_empty_p(r1)) {
 
     if(sc_empty_p(r2)) {
-      t1 = empty_transformer(t1);
+      empty_transformer(t1);
     }
     else { /* both t1 and t2 are not obviously unfeasible */
 
@@ -831,10 +831,9 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
 
 /* Eliminate (some) rational or integer redundancy.
 
-   Remember that integer
-   redundancy elimination may degrade results because some transformer
-   operator such as convex hull use a rational interpretation of the
-   constraints.
+   Remember that integer redundancy elimination may degrade results
+   because some transformer operator such as convex hull use a
+   rational interpretation of the constraints.
 
    Does not take into account value types. So s=="hello" and
    s=="world" do not result into an empty transformer. But floating
@@ -847,153 +846,164 @@ transformer transformer_normalize(transformer t, int level)
 		transformer_consistency_p(t));
   }
 
-  if(float_analyzed_p()) {
-    predicate_system(transformer_relation(t)) =
-      simplify_float_constraint_system(predicate_system(transformer_relation(t)));
-    ifdebug(1)
-      pips_assert("t is consistent after floating point simplification\n",
-		  transformer_consistent_p(t));
-  }
-
-  /* Automatic variables read in a CATCH block need to be declared volatile as
-   * specified by the documentation*/
-  Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-
-  if (!sc_empty_p(r)) {
-    Pbase b = base_dup(sc_base(r));
-    /* Automatic variables read in a CATCH block need to be declared volatile as
-     * specified by the documentation*/
-    Psysteme r2 = sc_dup(r);
-
-    /* Select one tradeoff between speed and accuracy:
-     * enumerated by increasing speeds according to Beatrice
-     */
-
-    CATCH(overflow_error)
-      {
-	/* CA */
-	pips_user_warning("overflow error in  redundancy elimination\n");
-	sc_rm(r);
-	r = r2;
+  if(!transformer_is_empty_p(t)) {
+      if(float_analyzed_p()) {
+	predicate_system(transformer_relation(t)) =
+	  simplify_float_constraint_system(predicate_system(transformer_relation(t)));
+	ifdebug(1)
+	  pips_assert("t is consistent after floating point simplification\n",
+		      transformer_consistent_p(t));
       }
-    TRY
-      {
-	switch(level) {
 
-	case 0:
-	  /* Our best choice for accuracy, but damned slow on ocean */
-	  r = sc_safe_elim_redund(r);
-	  break;
+      /* Automatic variables read in a CATCH block need to be declared volatile as
+       * specified by the documentation*/
+      Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
 
-	case 1:
-	  /* Beatrice's best choice: does not deal with minmax2 (only)
-	   * but still requires 74 minutes of real time
-	   * (55 minutes of CPU time) for ocean preconditions,
-	   * when applied to each precondition stored.
-	   *
-	   * Only 64 s for ocean, if preconditions are not normalized.
-	   * But andne, callabsval, dead2, hind, negand, negand2, or,
-	   * validation_dead_code are not validated any more. Redundancy
-	   * could always be detected in a trivial way after propagating
-	   * values from equations into inequalities.
-	   */
-	  sc_nredund(&r);
-	  predicate_system(transformer_relation(t)) = r;
-	  break;
+      if (!sc_empty_p(r)) {
+	Pbase b = base_dup(sc_base(r));
+	/* Automatic variables read in a CATCH block need to be declared volatile as
+	 * specified by the documentation*/
+	Psysteme r2 = sc_dup(r);
 
-	case 2:
-	  /* Francois' own: does most of the easy stuff.
-	   * Fails on mimax2 and sum_prec, but it is somehow
-	   * more user-friendly because trivial preconditions are
-	   * not destroyed as redundant. It makes you feel safer.
-	   *
-	   * Result for full precondition normalization on ocean: 114 s
-	   * for preconditions, 4 minutes between split ocean.f and
-	   * OCEAN.prec
-	   */
-	  r = sc_strong_normalize(r);
-	  break;
+	/* Select one tradeoff between speed and accuracy:
+	 * enumerated by increasing speeds according to Beatrice
+	 */
 
-	case 5:
-	  /* Same plus a good feasibility test
-	   */
-	  r = sc_strong_normalize3(r);
-	  break;
-
-	case 3:
-	  /* Similar, but variable are actually substituted
-	   * which is sometimes painful when a complex equations
-	   * is used to replace a simple variable in a simple
-	   * inequality.
-	   */
-	  r = sc_strong_normalize2(r);
-	  break;
-	case 6:
-	  /* Similar, but variables are substituted if they belong to
-	   * a more or less simple equation, and simpler equations
-	   * are processed first and a lexicographically minimal
-	   * variable is chosen when equivalent variables are
-	   * available.
-	   */
-	  r = sc_strong_normalize4(r,
-				   (char * (*)(Variable)) external_value_name);
-	  break;
-
-	case 7:
-	  /* Same plus a good feasibility test, plus variable selection
-	   * for elimination, plus equation selection for elimination
-	   */
-	  r = sc_strong_normalize5(r,
-				   (char * (*)(Variable)) external_value_name);
-	  break;
-
-	case 4:
-	  /* Too expensive according to measurements by Beatrice
-	   * Creusillet to be used anywhere but before storing
-	   * transformers or preconditons or before printing
-	   * them. Lots of calls to string operations when C is the
-	   * analyzed language because variable names used for sorting
-	   * are easy to extract due to scope information. It is not
-	   * clear from the information mailed by Beatrice if
-	   * sc_normalize2 is also too computational but it should be
-	   * as only the basis of the constraint system is sorted out
-	   * to normalize r more effectively.
-	   */
-	  vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
-	  r = sc_normalize2(r);
-	  break;
-
-	case 8:
-	  /* Very expensive: the system is rebuilt by adding constraints
-	   * one by one
-	   */
-	  sc_safe_build_sc_nredund_1pass(&r);
-	  break;
-
-	default:
-	  pips_internal_error("unknown level %d", level);
+	CATCH(overflow_error)
+	{
+	  /* CA */
+	  pips_user_warning("overflow error in  redundancy elimination\n");
+	  sc_rm(r);
+	  r = r2;
 	}
+	TRY
+	  {
+	    /* Let start with an easy O(n) phase, unlikely to generate an
+	       overflow. It should be placed in another try-cath in order
+	       to return a better r2 in case of a later overflow. */
+	    /* This is not sufficient: it is more efficient to put this
+	       call directly in sc_normalize(). */
+	    r = sc_bounded_normalization(r);
 
-	sc_rm(r2), r2 = NULL;
-	UNCATCH(overflow_error);
-      } /* end of TRY */
+	    switch(level) {
 
-    if (SC_EMPTY_P(r)) {
-      r = sc_empty(BASE_NULLE);
+	    case 0:
+	      /* Our best choice for accuracy, but damned slow on ocean */
+	      r = sc_safe_elim_redund(r);
+	      break;
+
+	    case 1:
+	      /* Beatrice's best choice: does not deal with minmax2 (only)
+	       * but still requires 74 minutes of real time
+	       * (55 minutes of CPU time) for ocean preconditions,
+	       * when applied to each precondition stored.
+	       *
+	       * Only 64 s for ocean, if preconditions are not normalized.
+	       * But andne, callabsval, dead2, hind, negand, negand2, or,
+	       * validation_dead_code are not validated any more. Redundancy
+	       * could always be detected in a trivial way after propagating
+	       * values from equations into inequalities.
+	       */
+	      sc_nredund(&r);
+	      //predicate_system(transformer_relation(t)) = r;
+	      break;
+
+	    case 2:
+	      /* Francois' own: does most of the easy stuff.
+	       * Fails on mimax2 and sum_prec, but it is somehow
+	       * more user-friendly because trivial preconditions are
+	       * not destroyed as redundant. It makes you feel safer.
+	       *
+	       * Result for full precondition normalization on ocean: 114 s
+	       * for preconditions, 4 minutes between split ocean.f and
+	       * OCEAN.prec
+	       */
+	      r = sc_strong_normalize(r);
+	      //	  predicate_system(transformer_relation(t)) = r;
+	      break;
+
+	    case 5:
+	      /* Same plus a good feasibility test
+	       */
+	      r = sc_strong_normalize3(r);
+	      break;
+
+	    case 3:
+	      /* Similar, but variable are actually substituted
+	       * which is sometimes painful when a complex equations
+	       * is used to replace a simple variable in a simple
+	       * inequality.
+	       */
+	      r = sc_strong_normalize2(r);
+	      break;
+	    case 6:
+	      /* Similar, but variables are substituted if they belong to
+	       * a more or less simple equation, and simpler equations
+	       * are processed first and a lexicographically minimal
+	       * variable is chosen when equivalent variables are
+	       * available.
+	       */
+	      r = sc_strong_normalize4(r,
+				       (char * (*)(Variable)) external_value_name);
+	      break;
+
+	    case 7:
+	      /* Same plus a good feasibility test, plus variable selection
+	       * for elimination, plus equation selection for elimination
+	       */
+	      r = sc_strong_normalize5(r,
+				       (char * (*)(Variable)) external_value_name);
+	      break;
+
+	    case 4:
+	      /* Too expensive according to measurements by Beatrice
+	       * Creusillet to be used anywhere but before storing
+	       * transformers or preconditons or before printing
+	       * them. Lots of calls to string operations when C is the
+	       * analyzed language because variable names used for sorting
+	       * are easy to extract due to scope information. It is not
+	       * clear from the information mailed by Beatrice if
+	       * sc_normalize2 is also too computational but it should be
+	       * as only the basis of the constraint system is sorted out
+	       * to normalize r more effectively.
+	       */
+	      vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
+	      r = sc_normalize2(r);
+	      break;
+
+	    case 8:
+	      /* Very expensive: the system is rebuilt by adding constraints
+	       * one by one
+	       */
+	      sc_safe_build_sc_nredund_1pass(&r);
+	      break;
+
+	    default:
+	      pips_internal_error("unknown level %d", level);
+	    }
+
+	    sc_rm(r2), r2 = NULL;
+	    UNCATCH(overflow_error);
+	  } /* end of TRY */
+
+	if (SC_EMPTY_P(r)) {
+	  r = sc_empty(BASE_NULLE);
+	}
+	else
+	  base_rm(b), b=BASE_NULLE;
+
+	r->dimension = vect_size(r->base);
+
+	if(sc_empty_p(r)) {
+	  //empty_transformer(t);
+	  predicate_system(transformer_relation(t)) = r;
+	  free_arguments(transformer_arguments(t));
+	  transformer_arguments(t) = NIL;
+	}
+	else
+	  predicate_system(transformer_relation(t)) = r;
+      }
     }
-    else
-      base_rm(b), b=BASE_NULLE;
-
-    r->dimension = vect_size(r->base);
-
-    if(sc_empty_p(r)) {
-      free_arguments(transformer_arguments(t));
-      transformer_arguments(t) = NIL;
-    }
-
-    predicate_system(transformer_relation(t)) = r;
-  }
-
   ifdebug(8) {
     fprintf(stderr, "After normalization of transformer t=%p at level %d:\n",
 	    t, level);
@@ -1244,9 +1254,12 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 
   pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
 
-  /* A side effect of transformer_empty_p() is to normalize the transformer. */
+  /* A side effect of transformer_empty_p() is to normalize the transformer.
+   *
+   * This is very expensive before a projection. empty_transformer_p()
+   */
   if(transformer_empty_p(t)) {
-    empty_transformer(t);
+    t = empty_transformer(t);
   }
   else if(!ENDP(args)) {
     list cea;
@@ -1290,6 +1303,11 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
       if(true) {
 	// if (!sc_empty_p(r)) {
 	// Pbase b = base_dup(sc_base(r));
+
+	/* Eliminate trivial redundant constraints generated by the
+	   projection */
+	/* Probably redundant with what happens in elim() */
+	r = sc_bounded_normalization(r);
 
 	r = elim(r);
 	/* if (SC_EMPTY_P(r)) {
@@ -1382,9 +1400,15 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
      * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
     predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 
-    /* replace the old arguments by the new one */
+    /* replace the old arguments by the new one, except if the
+       constraint system is not feasible */
     gen_free_list(transformer_arguments(t));
-    transformer_arguments(t) = new_args;
+    if(sc_empty_p(r)) {
+      transformer_arguments(t) = NULL;
+      gen_free_list(new_args);
+    }
+    else
+      transformer_arguments(t) = new_args;
   }
 
   ifdebug(9) {
@@ -1642,7 +1666,12 @@ transformer transformer_filter(transformer t, list args)
 
     /* replace the old arguments by the new one */
     free_arguments(transformer_arguments(t));
-    transformer_arguments(t) = new_args;
+    if(sc_empty_p(r)) {
+      transformer_arguments(t) = NULL;
+      gen_free_list(new_args);
+    }
+    else
+      transformer_arguments(t) = new_args;
   }
 
   ifdebug(9) {
@@ -2129,10 +2158,9 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
   return is_checked;
 }
 
-/* If true is returned, the transformer certainly is empty.
- * If false is returned,
- * the transformer still might be empty, it all depends on the normalization
- * procedure power. Beware of its execution time!
+/* If true is returned, the transformer certainly is empty.  If false
+ * is returned, the transformer still might be empty, it all depends
+ * on the normalization procedure power. Beware of its execution time!
  */
 static bool parametric_transformer_empty_p(transformer t,
 			       Psysteme (*normalize)(Psysteme,
@@ -2265,7 +2293,10 @@ static bool parametric_transformer_empty_p(transformer t,
  * the transformer still might be empty, but it's not too likely...
  *
  * Well, k <= 2 and k >= 3 does not return empty in spite of
- * sc_strong_normalize()...
+ * sc_strong_normalize()... sc_bounded_normalization() should be used
+ * at a cost of O(n)
+ *
+ * See also transformer_is_empty_p() for a syntactic check
  */
 bool transformer_empty_p(transformer t)
 {

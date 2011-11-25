@@ -104,12 +104,14 @@ void init_c_areas()
   entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(DynamicArea) = make_storage_rom();
   entity_initial(DynamicArea) = make_value_unknown();
+  entity_kind(DynamicArea) = ABSTRACT_LOCATION|ENTITY_DYNAMIC_AREA;
   AddEntityToDeclarations(DynamicArea, get_current_module_entity());
 
   StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
   entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(StaticArea) = make_storage_rom();
   entity_initial(StaticArea) = make_value_unknown();
+  entity_kind(StaticArea) = ABSTRACT_LOCATION|ENTITY_STATIC_AREA;
   AddEntityToDeclarations(StaticArea, get_current_module_entity());
 
   //HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
@@ -117,6 +119,7 @@ void init_c_areas()
   entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(HeapArea) = make_storage_rom();
   entity_initial(HeapArea) = make_value_unknown();
+  entity_kind(HeapArea) = ABSTRACT_LOCATION|ENTITY_HEAP_AREA;
   AddEntityToDeclarations(HeapArea, get_current_module_entity());
 
   /* Create a hidden pointer in the heap area to modelize malloc and
@@ -152,12 +155,15 @@ void init_c_areas()
   entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(StackArea) = make_storage_rom();
   entity_initial(StackArea) = make_value_unknown();
+  entity_kind(StackArea) = ABSTRACT_LOCATION|ENTITY_STACK_AREA;
   AddEntityToDeclarations(StackArea, get_current_module_entity());
 
   entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
+  entity_kind(msae) = ABSTRACT_LOCATION|ENTITY_STATIC_AREA;
   AddEntityToDeclarations(msae, get_current_module_entity());
 
   entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
+  entity_kind(gsae) = ABSTRACT_LOCATION|ENTITY_STATIC_AREA;
   AddEntityToDeclarations(gsae, get_current_module_entity());
 
   /* This is because of the reparsing of the compilation unit

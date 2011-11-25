@@ -1596,7 +1596,7 @@ string gather_all_comments_of_a_statement(statement s)
 
 /* Find the first non-empty comment of a statement, if any
  * returns a pointer to the comment if found,
- * pointer to NULL otherwise */
+ * pointer to a "string_undefined" otherwise */
 char** find_first_statement_comment(statement s)
 {
     static char * an_empty_comment = empty_comments;
@@ -2828,6 +2828,11 @@ bool all_statements_defined_p(statement s)
 }
 
 
+typedef struct {
+  list statement_to_all_included_declarations;
+  set cache;
+} add_statement_declarations_t;
+
 /* Add the declarations of a statement to a list if not already here
 
    This function is indeed to be used by statement_to_declarations() and
@@ -2835,16 +2840,16 @@ bool all_statements_defined_p(statement s)
 
    @return true (to go on diving in a gen_recurse())
 */
-bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
+static bool add_statement_declarations(statement s,  add_statement_declarations_t* ctxt)
 {
     if(declaration_statement_p(s))
     {
-        set sp = set_make(set_pointer);
-        set_assign_list(sp,*statement_to_all_included_declarations);
         FOREACH(ENTITY,e,statement_declarations(s))
-            if(!set_belong_p(sp,e))
-                *statement_to_all_included_declarations=CONS(ENTITY,e,*statement_to_all_included_declarations);
-        set_free(sp);
+            if(!set_belong_p(ctxt->cache,e)) {
+                ctxt->statement_to_all_included_declarations=CONS(ENTITY,e,ctxt->statement_to_all_included_declarations);
+                set_add_element(ctxt->cache,ctxt->cache,e);
+            }
+        return false;/* no declaration in a declaration!*/
     }
   return true;
 }
@@ -2855,24 +2860,37 @@ bool add_statement_declarations(statement s, list *statement_to_all_included_dec
  */
 list statement_to_declarations(void* s)
 {
-  list statement_to_all_included_declarations = NIL;
-
-  gen_context_recurse(s, &statement_to_all_included_declarations,
-		      statement_domain, add_statement_declarations, gen_null);
-
-  return statement_to_all_included_declarations;
+  add_statement_declarations_t ctxt = { NIL, set_make(set_pointer) };
+  gen_context_multi_recurse(s, &ctxt,
+          call_domain,gen_false,gen_null,
+          statement_domain, add_statement_declarations, gen_null,
+          NULL);
+  set_free(ctxt.cache);
+  return ctxt.statement_to_all_included_declarations;
 }
 
 /* Returns the declarations contained in a list of statement. */
 list statements_to_declarations(list sl)
 {
-    list  dl = NIL;
-    FOREACH(STATEMENT,st,sl)
-        dl=gen_nconc(dl,statement_to_declarations(st));
-    return dl;
+    list  tail = NIL;    //< avoid a costly gen_nconc
+    list  head = NIL;  //< by managing the tail by end
+    FOREACH(STATEMENT,st,sl) {
+        list s2d = statement_to_declarations(st);
+        if(ENDP(head)) head=tail=s2d;
+        else CDR(tail)=s2d;
+        tail = gen_last(tail);
+    }
+    return head;
+}
+
+/* Get a list of all variables declared recursively within an instruction */
+list instruction_to_declarations(instruction i)
+{
+  return statement_to_declarations(i);
 }
 
 
+
 static list internal_statement_to_direct_declarations(statement st);
 
 static list unstructured_to_direct_declarations(unstructured u)
@@ -2899,8 +2917,9 @@ static list internal_statement_to_direct_declarations(statement st)
 {
   list sdl = NIL;
 
-  if(declaration_statement_p(st))
+  if(declaration_statement_p(st)) {
     sdl = gen_copy_seq(statement_declarations(st));
+  }
   else if(statement_unstructured_p(st)) {
     unstructured u = statement_unstructured(st);
     sdl = unstructured_to_direct_declarations(u);

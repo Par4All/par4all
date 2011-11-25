@@ -1120,6 +1120,195 @@ transformer affine_increment_to_transformer(entity e, Pvecteur a)
     return tf;
 }
 
+static transformer modulo_of_a_constant_to_transformer(entity e, int lb1, int lb2, int ub2)
+{
+  /* Since arg1 is a constant, ub1=lb1 */
+  transformer tf3 = transformer_undefined;
+
+     /* The first argument is numerically known */
+      if(lb1==0) {
+	/* r == 0 not matter what */
+	tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, 0);
+      }
+      else if(lb2==ub2) {
+	if(lb2==0) {
+	  /* A floating point exception is going to be raised */
+	  pips_user_warning("Zero divide encountered\n");
+	  tf3 = transformer_empty();
+	}
+	else {
+	  /* The result is known: r = lb1 % lb2 if lb2!=0 */
+	  int r = lb1 % lb2;
+	  tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, r);
+	}
+      }
+      else if(ub2<0) {
+	/* The second argument is negative:
+	 *  lb1>0? r>=0, r<= ub1, r<=-lb2-1
+	 * : r<=0, -ub1<=r, r>= lb2+1 */
+	if(lb1>0) {
+	  if(lb1<-ub2) {
+	    /* the modulo has no impact r=ub1=lb1 */
+	    tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, lb1);
+	  }
+	  else {
+	    /* r>=0, r<= ub1, r<=-lb2-1 */
+	    tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								     e, 0, false);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, lb1, true);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, -lb2-1, true);
+	  }
+	}
+	else {
+	  if(lb1>ub2) {
+	    /* the modulo has no impact r=ub1=lb1 */
+	    tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, lb1);
+	  }
+	  else {
+	  /* r<=0, -ub1<=r, r>= lb2+1 */
+	  tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								 e, 0, true);
+	  tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, lb1, false);
+	  tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, lb2+1, false);
+	  }
+	}
+      }
+      else if(lb2>0) {
+	/* The second argument is positive:
+	 * lb1>0? r>=0, r<= ub1, r<=ub2-1
+	 * : r<=0, -ub1<=r, -ub2+1<=r
+	 */
+	if(lb1>0) {
+	  if(lb1<lb2) {
+	    /* the modulo has no impact r=ub1=lb1 */
+	    tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, lb1);
+	  }
+	  else {
+	    /* r>=0, r<= ub1, r<=-lb2-1 */
+	    /* r>=0, r<= ub1, r<=ub2-1 */
+	    tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								     e, 0, false);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, lb1, true);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, ub2-1, true);
+	  }
+	}
+	else {
+	  if(-lb1<ub2) {
+	    /* the modulo has no impact r=ub1=lb1 */
+	    tf3 = transformer_add_equality_with_integer_constant(transformer_identity(), e, lb1);
+	  }
+	  else {
+	    /* r<=0, -ub1<=r, -ub2+1<=r */
+	    tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								     e, 0, true);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, lb1, false);
+	    tf3 = transformer_add_inequality_with_integer_constraint(tf3, e, -ub2+1, false);
+	  }
+	}
+      }
+      else {
+	/* no information is available on the second argument: the
+	   sign of the first argument is preserved */
+	  tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								 e, 0, lb1<0);
+      }
+      return tf3;
+}
+
+static transformer modulo_of_a_negative_value_to_transformer(entity e,
+						      int lb1, int ub1,
+						      int lb2, int ub2)
+{
+  transformer tf3 = transformer_undefined;
+  /* arg1 is negative, hence r is always negative: r<=0 */
+  if(ub2<0) {
+    if(ub2<lb1) {
+      /* the moduloe is the identity: lb1<=r<=ub1*/
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, lb1, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, ub1, true);
+    }
+    else {
+      /* arg2 is negative: r>=arg2, r>= lb2+1 */
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, 0, true);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, lb2+1, false);
+    }
+  }
+  else if(lb2>0) {
+    if(lb2>-ub1) {
+      /* the modulo is the identity: lb1<=r<=ub1*/
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, lb1, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, ub1, true);
+    }
+    else {
+      /* arg2 is positive: r<=-arg2+1, r<= -lb2+1 */
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, 0, true);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, -lb2+1, true);
+    }
+  }
+  else {
+    /* No information is available on arg2: r<=0 */
+    tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							     e, 0, true);
+  }
+
+  return tf3;
+}
+
+static transformer modulo_of_a_positive_value_to_transformer(entity e,
+							     int lb1, int ub1,
+							     int lb2, int ub2)
+{
+  transformer tf3 = transformer_undefined;
+  /* arg1 is positive, hence r is always positive: r>=0 */
+  if(ub2<0) {
+    if(-ub2>ub1) {
+      /* the modulo is the identity: lb1<=r<=ub1 */
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, lb1, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, ub1, true);
+    }
+    else {
+      /* arg2 is negative: 0<=r<=-arg2+1, 0<=r<= -ub2+1 */
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, 0, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, -ub2+1, true);
+    }
+  }
+  else if(lb2>0) {
+    if(lb2>ub1) {
+      /* the modulo is the identity: lb1<=r<=ub1*/
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, lb1, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, ub1, true);
+    }
+    else {
+      /* arg2 is positive: 0<=r<=arg2-1, 0<=r<= ub2-1 */
+      tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							       e, 0, false);
+      tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+							       e, ub2-1, true);
+    }
+  }
+  else {
+    /* No information is available on arg2: r>=0 */
+    tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							     e, 0, false);
+  }
+
+  return tf3;
+}
+
 /* Modulo and integer division
  *
  * Apparently identical in both C and Fortran
@@ -1137,18 +1326,85 @@ transformer affine_increment_to_transformer(entity e, Pvecteur a)
  * FI: to be improved by using expression_to_transformer() and the
  * precondition pre.
  */
-static transformer modulo_to_transformer(entity e, /* assumed to be a value */
-					 expression arg1 __attribute__ ((unused)),
+static transformer modulo_to_transformer(entity e, /* assumed to be an integer value */
+					 expression arg1,
 					 expression arg2,
 					 transformer pre, /* not used yet */
 					 bool is_internal __attribute__ ((unused)))
 {
   transformer tf = transformer_undefined;
+  entity v1 =  make_local_temporary_integer_value_entity();
+  transformer tf1 = any_expression_to_transformer(v1, arg1, pre, true);
+  transformer npre =
+    transformer_apply(tf1, transformer_undefined_p(pre)? transformer_identity():pre);
+  transformer pre2 = transformer_range(npre);
+  entity v2 =  make_local_temporary_integer_value_entity();
+  transformer tf2 = any_expression_to_transformer(v2, arg2, pre2, true);
+  npre = transformer_apply(tf2, pre2);
+  transformer pre3 = transformer_range(npre);
+  // To be cleaned up later
+  //transformer tf3 = transformer_undefined;
+  transformer tf3 = transformer_identity();
 
   pips_debug(8, "begin with pre=%p\n", pre);
 
-  /* Should be rewritten with expression_to_transformer */
+  /* cut-and-pasted and adapted from multiply_to_transformer(); also useful for
+     divide; the side effects of the two arguments and the derivation
+     of the preconditions and the computation of the numerical bounds
+     should be factorized in one function. */
+  if(!transformer_undefined_p(pre) && !transformer_undefined_p(npre)) {
+    int lb1 = 0;
+    int ub1 = 0;
+    int lb2 = 0;
+    int ub2 = 0;
+    expression ev1 = entity_to_expression(v1);
+    expression ev2 = entity_to_expression(v2);
 
+    expression_and_precondition_to_integer_interval(ev1, pre2, &lb1, &ub1);
+    expression_and_precondition_to_integer_interval(ev2, pre3, &lb2, &ub2);
+    free_expression(ev1);
+    free_expression(ev2);
+
+    if(lb2==ub2 && ub2==0) {
+      /* Let's get rid of the exception case right away */
+      /* A floating point exception is going to be raised */
+      pips_user_warning("Zero divide encountered\n");
+      tf3 = transformer_empty();
+    }
+    else if(lb1==ub1) {
+      tf3 = modulo_of_a_constant_to_transformer(e, lb1, lb2, ub2);
+    }
+    else if(ub1<=0) {
+      tf3 = modulo_of_a_negative_value_to_transformer(e, lb1, ub1, lb2, ub2);
+    }
+    else if(lb1>=0) {
+      tf3 = modulo_of_a_positive_value_to_transformer(e, lb1, ub1, lb2, ub2);
+    }
+    else {
+      /* No sign information available about arg1 */
+      if(lb2>0) {
+	/* arg2 is positive: -ub2+1<=r<=ub2-1 */
+	tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								 e, -ub2+1, false);
+	tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+								 e, ub2-1, true);
+      }
+      else if(ub2<0) {
+	/* arg2 is negative: lb2+1<=r<=-lb2-1 */
+	tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								 e, lb2+1, false);
+	tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+								 e, -lb2-1, true);
+      }
+    }
+  }
+  else {
+    /* Might be as good to leave it undefined... for the time
+       being. Information about either arg1 or arg2 could be used */
+    tf3 = transformer_identity();
+  }
+
+#if 0
   if(integer_constant_expression_p(arg2)) {
     int d = integer_constant_expression_value(arg2);
     Pvecteur ub = vect_new((Variable) e, VALUE_ONE);
@@ -1160,9 +1416,20 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
     vect_add_elem(&lb, TCST, int_to_value(d-1));
     cub = contrainte_make(ub);
     clb->succ = cub;
-    tf = make_transformer(NIL,
+    tf3 = make_transformer(NIL,
 			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
   }
+#endif
+
+  /* Take care of side effects: tf = tf1 o tf2 o tf3 */
+  tf = transformer_combine(tf1, tf2);
+  tf = transformer_combine(tf, tf3);
+  free_transformer(tf2);
+  free_transformer(tf3);
+
+  free_transformer(pre2);
+  free_transformer(pre3);
+  free_transformer(npre);
 
   ifdebug(8) {
     pips_debug(8, "result:\n");
@@ -2011,16 +2278,8 @@ integer_nullary_operation_to_transformer(
      code and for the analyzer?
  */
   if (ENTITY_RAND_P(f)) {
-    Pbase b = VECTEUR_NUL;
-    Psysteme s = sc_new();
-
-    /* Two inequalities should be added... */
-
-    b = vect_add_variable(b, (Variable) e);
-    s->base = b;
-    s->dimension = vect_size(b);
-
-    tf= make_transformer(NIL, make_predicate(s));
+    tf = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+							    e, 0, true);
   }
 
   return tf;
@@ -2144,6 +2403,11 @@ static transformer integer_call_expression_to_transformer(
   else if(ENTITY_RAND_P(f)) {
     tf = transformer_identity();
     tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, false);
+  }
+  else if(ENTITY_MODULO_P(f) || ENTITY_C_MODULO_P(f)) {
+    expression arg1 = EXPRESSION(CAR(args));
+    expression arg2 = EXPRESSION(CAR(CDR(args)));
+    tf = modulo_to_transformer(e, arg1, arg2, pre, false);
   }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {

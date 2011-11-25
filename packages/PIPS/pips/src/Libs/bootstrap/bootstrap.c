@@ -82,6 +82,7 @@
 #include "properties.h"
 
 #define LOCAL static
+#undef make_entity
 
 /* Working with hash_table of basic
  */
@@ -106,14 +107,16 @@ void CreateAreas()
 			       DYNAMIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          ABSTRACT_LOCATION|ENTITY_DYNAMIC_AREA);
 
 
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
 			       STATIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 }
 
 static void CreateLogicalUnits()
@@ -136,7 +139,8 @@ static void CreateLogicalUnits()
                               make_functional(NIL,make_type(is_type_void,
                                                             NIL))),
                     make_storage(is_storage_rom, UU),
-                    make_value(is_value_code, c));
+                    make_value(is_value_code, c),
+                    DEFAULT_ENTITY_KIND);
 
   set_current_module_entity(ent);
 
@@ -144,7 +148,8 @@ static void CreateLogicalUnits()
                                STATIC_AREA_LOCAL_NAME),
               make_type(is_type_area, make_area(0, NIL)),
               make_storage(is_storage_rom, UU),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE|ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -168,7 +173,8 @@ static void CreateLogicalUnits()
                            FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                  STATIC_AREA_LOCAL_NAME),
                                     0, NIL)),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE);
 
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -192,7 +198,8 @@ static void CreateLogicalUnits()
                              FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                    STATIC_AREA_LOCAL_NAME),
                              0, NIL)),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE);
 
   /* GO: entity for io logical units: It is an array which*/
   luns = make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -216,7 +223,8 @@ static void CreateLogicalUnits()
 					   FindEntity(IO_EFFECTS_PACKAGE_NAME,
 								 STATIC_AREA_LOCAL_NAME),
 					   0, NIL)),
-		     make_value(is_value_unknown, UU));
+		     make_value(is_value_unknown, UU),
+             EFFECTS_PACKAGE);
 
   reset_current_module_entity();
   add_abstract_state_variable(luns);
@@ -245,7 +253,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 			      make_functional(NIL,make_type(is_type_void,
 							    NIL))),
 		    make_storage(is_storage_rom, UU),
-		    make_value(is_value_code, c));
+		    make_value(is_value_code, c),
+            DEFAULT_ENTITY_KIND);
 
   set_current_module_entity(ent);
 
@@ -253,7 +262,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 			       STATIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          EFFECTS_PACKAGE|ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 
   /* entity for random seed or other abstract states like heap: It is
      an unsigned int. */
@@ -267,7 +277,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 					 FindEntity(pn,
 							       STATIC_AREA_LOCAL_NAME),
 					 0, NIL)),
-		   make_value(is_value_unknown, UU));
+		   make_value(is_value_unknown, UU),
+           EFFECTS_PACKAGE);
 
   reset_current_module_entity();
   return as;
@@ -4322,7 +4333,8 @@ static entity MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int))
   e = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, name),
                   intrinsic_type(arity),
                   make_storage(is_storage_rom, UU),
-                  make_value(is_value_intrinsic, NIL));
+                  make_value(is_value_intrinsic, NIL),
+                  DEFAULT_ENTITY_KIND);
 
   return e;
 }
@@ -4381,7 +4393,7 @@ void register_intrinsic_type_descriptor(IntrinsicDescriptor *p) {
 }
 
 void
-CreateIntrinsics()
+CreateIntrinsics( set module_list )
 {
     /* The table of intrinsic functions. this table is used at the begining
        of linking to create Fortran operators, commands and intrinsic functions.
@@ -5250,6 +5262,10 @@ CreateIntrinsics()
         {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
         {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
         {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
+	{LINK_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
+	{SYMLINK_FUNCTION_NAME,   2,         overloaded_to_integer_type, 0, 0},
+	{UNLINK_FUNCTION_NAME,    1,         overloaded_to_integer_type, 0, 0},
+
         /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
         {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
         {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
@@ -5259,8 +5275,6 @@ CreateIntrinsics()
         {STAT_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
         {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
         {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
-
-
         /*#include <stdlib.h>*/
 
         {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
@@ -5523,6 +5537,9 @@ CreateIntrinsics()
         {PIPS_C_MAX_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
             typing_function_int_to_int, 0},
 
+        /* assembly function */
+        { ASM_FUNCTION_NAME, 1, overloaded_to_void_type },
+
         /* PIPS intrinsics to simulate various effects */
         {PIPS_MEMORY_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
         {PIPS_IO_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
@@ -5531,7 +5548,8 @@ CreateIntrinsics()
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));
     for(IntrinsicDescriptor *p = &IntrinsicTypeDescriptorTable[0];p->name;++p) {
-        register_intrinsic_type_descriptor(p);
+        if(!set_belong_p(module_list,p->name))
+            register_intrinsic_type_descriptor(p);
     }
 }
 
@@ -5544,7 +5562,14 @@ bootstrap(string workspace)
   if (db_resource_p(DBR_ENTITIES, ""))
     pips_internal_error("entities already initialized");
 
-  CreateIntrinsics();
+  /* Create all intrinsics, skipping user-defined one */
+  set module_list = set_make(set_string);
+  gen_array_t ml = db_get_module_list();
+  for(int i=0;i< gen_array_nitems(ml);i++)
+      set_add_element(module_list, module_list, (char*)gen_array_item(ml,i));
+  CreateIntrinsics(module_list);
+  set_free(module_list);
+  gen_array_free(ml);
 
   /* Creates the dynamic and static areas for the super global
    * arrays such as the logical unit array (see below).
@@ -5578,7 +5603,8 @@ bootstrap(string workspace)
                      MakeTypeStatement(),
                      make_storage_rom(),
                      make_value(is_value_constant,
-                                make_constant_litteral()));
+                                make_constant_litteral()),
+                     DEFAULT_ENTITY_KIND);
 
   /* FI: I suppress the owner filed to make the database moveable */
   /* FC: the content must be consistent with pipsdbm/methods.h */

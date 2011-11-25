@@ -624,27 +624,42 @@ list generic_proper_effects_of_written_reference(reference ref)
   return(le);
 }
 
+
 static list generic_proper_effects_of_complex_address_field_op(list l_args, list *l_pme, int write_p)
 {
+  list le = NIL;
   /* first get an effect on the structure */
-  list le = generic_proper_effects_of_complex_address_expression
-    (EXPRESSION(CAR(l_args)), l_pme, write_p);
+  /* is the structure a constant as in {0, 1}.im */
+  expression struct_exp = EXPRESSION(CAR(l_args));
+  // very inefficient. g_p_e_o_c_a_e should convey a way to say that it's argument is constant
+ /*  list le1 = generic_proper_effects_of_expression(struct_exp); */
 
-  /* and add the field */
-  FOREACH(EFFECT, pme, *l_pme)
-    {
-      if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
+/*   if (ENDP(le1)) */
+/*     { */
+/*       pips_debug(8, "field operator applied on a constant expression -> no effect"); */
+/*     } */
+/*   else */
+/*     { */
+/*      gen_full_free_list(le1);*/
+      le = generic_proper_effects_of_complex_address_expression
+	(struct_exp, l_pme, write_p);
+
+      /* and add the field */
+      FOREACH(EFFECT, pme, *l_pme)
 	{
-	  expression field_exp = EXPRESSION(CAR(CDR(l_args)));
-	  syntax s = expression_syntax(field_exp);
-	  entity f;
-	  ifdebug(1) pips_assert("e2 is a reference", syntax_reference_p(s));
-	  f = reference_variable(syntax_reference(s));
-	  /* we extend *pme by adding a dimension corresponding
-	   * to the field */
-	  effect_add_field_dimension(pme,f);
+	  if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
+	    {
+	      expression field_exp = EXPRESSION(CAR(CDR(l_args)));
+	      syntax s = expression_syntax(field_exp);
+	      entity f;
+	      ifdebug(1) pips_assert("e2 is a reference", syntax_reference_p(s));
+	      f = reference_variable(syntax_reference(s));
+	      /* we extend *pme by adding a dimension corresponding
+	       * to the field */
+	      effect_add_field_dimension(pme,f);
+	    }
 	}
-    }
+      /*}*/
   pips_debug_effects(8, "End with le=\n", le);
   pips_debug_effects(8, "and with *l_pme=\n", *l_pme);
 
@@ -933,34 +948,44 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
 	  le = generic_proper_effects_of_complex_address_expression
 	    (deref_exp, l_pme, write_p);
 
-	  FOREACH(EFFECT, pme, *l_pme)
+	  if (ENDP(*l_pme))
 	    {
-	      if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
+	      pips_user_warning("dereferencing a constant address expression: "
+			       "PIPS doesn't know how to handled that precisely\n");
+	      *l_pme = effect_to_list(make_anywhere_effect(write_p? make_action_write_memory()
+							   : make_action_read_memory()));
+	    }
+	  else
+	    {
+	      FOREACH(EFFECT, pme, *l_pme)
 		{
-		  effect eff_read;
-		  expression e1 = EXPRESSION(CAR(l_args));
-		  type e1t = expression_to_type(e1);
-
-		  pips_debug(4,"adding a read effect on dereferenced expression\n");
-
-		  /* we add the read effect on the dereferenced expression
-		     if it's a pointer
-		  */
-		  if (type_variable_p(e1t) &&
-		      basic_pointer_p(variable_basic(type_variable(e1t)))
-		      && ENDP(variable_dimensions(type_variable(e1t))))
+		  if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
 		    {
-		      pips_debug(8, "adding read effect on argument \n");
-		      eff_read = (*effect_dup_func)(pme);
-		      /* memory leak? */
-		      effect_action_(eff_read) = make_action_read_memory();
-		      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+		      effect eff_read;
+		      expression e1 = EXPRESSION(CAR(l_args));
+		      type e1t = expression_to_type(e1);
+
+		      pips_debug(4,"adding a read effect on dereferenced expression\n");
+
+		      /* we add the read effect on the dereferenced expression
+			 if it's a pointer
+		      */
+		      if (type_variable_p(e1t) &&
+			  basic_pointer_p(variable_basic(type_variable(e1t)))
+			  && ENDP(variable_dimensions(type_variable(e1t))))
+			{
+			  pips_debug(8, "adding read effect on argument \n");
+			  eff_read = (*effect_dup_func)(pme);
+			  /* memory leak? */
+			  effect_action_(eff_read) = make_action_read_memory();
+			  le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+			}
+
+		      free_type (e1t);
+
+		      pips_debug(8, "adding dereferencing dimension \n");
+		      effect_add_dereferencing_dimension(pme);
 		    }
-
-		  free_type (e1t);
-
-		  pips_debug(8, "adding dereferencing dimension \n");
-		  effect_add_dereferencing_dimension(pme);
 		}
 	    }
 
@@ -993,34 +1018,44 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
       le = generic_proper_effects_of_complex_address_expression
 	(deref_exp, l_pme, write_p);
 
-      FOREACH(EFFECT, pme, *l_pme)
+      if (ENDP(*l_pme))
 	{
-	  if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
+	  pips_user_warning("dereferencing a constant address expression: "
+			    "PIPS doesn't know how to handled that precisely\n");
+	  *l_pme = effect_to_list(make_anywhere_effect(write_p? make_action_write_memory()
+						       : make_action_read_memory()));
+	}
+      else
+	{
+	  FOREACH(EFFECT, pme, *l_pme)
 	    {
-	      effect eff_read;
-	      expression e1 = EXPRESSION(CAR(l_args));
-	      type e1t = expression_to_type(e1);
-
-	      pips_debug(4,"adding a read effect on dereferenced expression\n");
-
-	      /* we add the read effect on the dereferenced expression
-		 if it's a pointer
-	      */
-	      if (type_variable_p(e1t) &&
-		  basic_pointer_p(variable_basic(type_variable(e1t)))
-		  && ENDP(variable_dimensions(type_variable(e1t))))
+	      if(!effect_undefined_p(pme) && !anywhere_effect_p(pme))
 		{
-		  pips_debug(8, "adding read effect on argument \n");
-		  eff_read = (*effect_dup_func)(pme);
-		  /* memory leak? */
-		  effect_action_(eff_read) = make_action_read_memory();
-		  le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+		  effect eff_read;
+		  expression e1 = EXPRESSION(CAR(l_args));
+		  type e1t = expression_to_type(e1);
+
+		  pips_debug(4,"adding a read effect on dereferenced expression\n");
+
+		  /* we add the read effect on the dereferenced expression
+		     if it's a pointer
+		  */
+		  if (type_variable_p(e1t) &&
+		      basic_pointer_p(variable_basic(type_variable(e1t)))
+		      && ENDP(variable_dimensions(type_variable(e1t))))
+		    {
+		      pips_debug(8, "adding read effect on argument \n");
+		      eff_read = (*effect_dup_func)(pme);
+		      /* memory leak? */
+		      effect_action_(eff_read) = make_action_read_memory();
+		      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+		    }
+
+		  free_type (e1t);
+
+		  pips_debug(8, "adding dereferencing dimension \n");
+		  effect_add_dereferencing_dimension(pme);
 		}
-
-	      free_type (e1t);
-
-	      pips_debug(8, "adding dereferencing dimension \n");
-	      effect_add_dereferencing_dimension(pme);
 	    }
 	}
 
@@ -1042,15 +1077,9 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
   /* FI: we assume there it at least one argument */
   pips_debug(4, "This is a call\n");
 
-  if(gen_length(args)==0)
-    {
-      /* Problem with *(1) which is syntactically legal;
-	 could also happen with hardware*/
-      pips_user_warning("Constant as address expression\n");
-      *l_pme = effect_to_list(make_anywhere_effect
-			      (write_p ? make_action_write_memory() : make_action_read_memory()));
-    }
-  else if(ENTITY_FIELD_P(op))
+  *l_pme = NIL;
+
+  if(ENTITY_FIELD_P(op))
     {
       pips_debug(4, "Call is a field operator\n");
       le = generic_proper_effects_of_complex_address_field_op(args, l_pme, write_p);
@@ -1087,17 +1116,23 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
   else
     {
       /* failure: a user function is called to return a structure or an address */
-      pips_user_warning("PIPS currently does not know how to handle "
-			"precisely function return value used as address expression\n");
-      /* FI: This comes too late. down in the recursion. The effect of
-	 the other sub-expressions won't be computed */
-      le = generic_proper_effects_of_expression(call_exp);
-
-      /* we should use a more precise abstract location here
-         or retreive the result address or address target from pointer analysis
+      /* if it's a structure, it's ok -> no effect. If it's an adress, it may be anywhere
+         until we can retrieve it from pointer analysis
       */
-      *l_pme = effect_to_list(make_anywhere_effect
+      type t = expression_to_type(call_exp);
+      if(pointer_type_p(t) || array_type_p(t))
+	{
+	  pips_user_warning("PIPS currently does not know how to precisely handle "
+			    "address values used in complex call expressions expression\n");
+	  *l_pme = effect_to_list(make_anywhere_effect
 			      (write_p ? make_action_write_memory() : make_action_read_memory()));
+	}
+      else
+	{
+	  pips_debug(8, "constant return value: -> no main effects\n");
+	}
+      free_type(t);
+      le = generic_proper_effects_of_expression(call_exp);
     }
 
   pips_debug_effects(8, "End with le=\n", le);

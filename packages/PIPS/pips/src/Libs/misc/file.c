@@ -32,6 +32,7 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <sys/stat.h>
 #include <sys/param.h>
@@ -326,6 +327,24 @@ file_exists_p(const char * name)
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
+/* protect a string, for example for use in a system call
+ */
+char *
+strescape (const char *source)
+{
+    size_t new_size = 1; // for \0
+    for(const char *iter=source;*iter;++iter,++new_size)
+        if(!isalnum(*iter)&&*iter!='_') ++new_size;
+    char *escaped = malloc(sizeof(*escaped)*new_size);
+    char *eiter = escaped;
+    for(const char *iter=source;*iter;++iter,++eiter) {
+        if(!isalnum(*iter)&&*iter!='_') *eiter++='\\';
+        *eiter=*iter;
+    }
+    *eiter=0;
+    return escaped;
+}
+
 #define COLON ':'
 /* Returns the allocated nth path from colon-separated path string.
 
@@ -336,6 +355,7 @@ file_exists_p(const char * name)
    @return an allocated string with the n-th part name
 
    If the path is empty or if n is out-of-bound, NULL is returned.
+   The resulting string is *not*escaped, and can contain spaces
 */
 string
 nth_path(const char * path_list, int n)
@@ -358,7 +378,8 @@ nth_path(const char * path_list, int n)
   for(len = 0; path_list[len] && path_list[len] != COLON; len++)
     ;
 
-  return strndup(path_list, len);
+  char *unescaped =  strndup(path_list, len);
+  return unescaped;
 }
 
 
@@ -386,7 +407,7 @@ find_file_in_directories(const char *file_name, const char *dir_path)
     if (!dir_path || file_name[0]=='/')
 	return (string) NULL;
 
-    /* looks for the file with an additionnal path ahead.
+    /* looks for the file with an additional path ahead.
      */
     while ((path=nth_path(dir_path, n++)))
     {

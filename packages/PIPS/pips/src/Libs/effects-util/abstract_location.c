@@ -92,6 +92,7 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
     entity_type(e) = t;
     entity_storage(e) = make_storage_ram(r);
     entity_initial(e) = make_value_unknown();
+    entity_kind(e) = ABSTRACT_LOCATION;
     (void) add_C_variable_to_area(a, e);
   }
   else {

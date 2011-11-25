@@ -305,17 +305,17 @@ bool heap_cell_p(cell c)
 
 bool malloc_effect_p(effect e)
 {
-  return malloc_entity_p(effect_entity(e));
+  return malloc_effect_entity_p(effect_entity(e));
 }
 
 bool malloc_cell_p(cell c)
 {
-  return malloc_entity_p(cell_entity(c));
+  return malloc_effect_entity_p(cell_entity(c));
 }
 
 bool malloc_reference_p(reference r)
 {
-  return malloc_entity_p(reference_variable(r));
+  return malloc_effect_entity_p(reference_variable(r));
 }
 
 
@@ -870,12 +870,9 @@ bool action_equal_p(action a1, action a2)
    maintenance. */
 action_kind action_to_action_kind(action a)
 {
-  action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
-
-  if(!action_read_p(a) && !action_write_p(a))
-    pips_internal_error("Inconsistent action kind.");
-
-  return ak;
+    pips_assert("consistent action kind.",action_read_p(a) || action_write_p(a));
+    action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
+    return ak;
 }
 
 action_kind effect_action_kind(effect eff)
