@@ -360,9 +360,10 @@ bool check_delete_workspace(const char* wname, bool check)
 	close_warning_file();
     }
 
-
-    if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
+    char *escaped_wname = strescape(wname);
+    if ((failure=safe_system_no_abort(concatenate("Delete ", escaped_wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
+    free(escaped_wname);
 
     return !failure;
 }

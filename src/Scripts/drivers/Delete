@@ -67,11 +67,11 @@ fi
 
 for ws 
 do
-  ws=`echo $ws | sed 's/\/$//'`
+  ws=`echo "$ws" | sed 's/\/$//'`
   # delete .PIPS_CURRENT_PROGRAM
-  rm -f `dirname $ws`/$pips_current_program
+  rm -f `dirname "$ws"`/$pips_current_program
   # so that both zzz.database and zzz are good workspace names
-  ws=`dirname $ws`/`basename $ws .database`.database
+  ws=`dirname "$ws"`/`basename "$ws" .database`.database
 
   if [ ! -d "$ws" ]
   then
@@ -84,7 +84,7 @@ do
     [ "$all" ] && verb "Deleting $ws"
 
     # was rm -r?
-    rm -rf $ws || {
+    rm -rf "$ws" || {
       verb "Cannot remove $ws"
       exit 3
     }

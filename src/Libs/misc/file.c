@@ -32,6 +32,7 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <sys/stat.h>
 #include <sys/param.h>
@@ -326,6 +327,24 @@ file_exists_p(const char * name)
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
+/* protect a string, for example for use in a system call
+ */
+char *
+strescape (const char *source)
+{
+    size_t new_size = 1; // for \0
+    for(const char *iter=source;*iter;++iter,++new_size)
+        if(!isalnum(*iter)&&*iter!='_') ++new_size;
+    char *escaped = malloc(sizeof(*escaped)*new_size);
+    char *eiter = escaped;
+    for(const char *iter=source;*iter;++iter,++eiter) {
+        if(!isalnum(*iter)&&*iter!='_') *eiter++='\\';
+        *eiter=*iter;
+    }
+    *eiter=0;
+    return escaped;
+}
+
 #define COLON ':'
 /* Returns the allocated nth path from colon-separated path string.
 
@@ -358,7 +377,10 @@ nth_path(const char * path_list, int n)
   for(len = 0; path_list[len] && path_list[len] != COLON; len++)
     ;
 
-  return strndup(path_list, len);
+  char *unescaped =  strndup(path_list, len);
+  char * escaped = strescape(unescaped);
+  free(unescaped);
+  return escaped;
 }
 
 

@@ -783,7 +783,7 @@ static string process_thru_C_pp(string name) {
     //simpler = pips_basename(name, C_FILE_SUFFIX);
     simpler = pips_initial_filename(name, C_FILE_SUFFIX);
     new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, NULL));
-    cpp_err  = strdup(concatenate(new_name, PP_ERR, NULL));
+    cpp_err  = strescape(concatenate(new_name, PP_ERR, NULL));
     free(dir_name);
     free(simpler);
 
@@ -959,8 +959,10 @@ check_input_file_syntax(
 
   user_log("Checking %s syntax of file \"%s\"\n", language, file_name);
 
+  // SG: do not forget to protect file_name
+  char *pfile_name= strescape(file_name);
   if (safe_system_no_abort
-      (concatenate(compiler, " ", options, includes, " ", file_name, " ",
+      (concatenate(compiler, " ", options, includes, " ", pfile_name, " ",
       // DO NOT USE A POSSIBLY SHARED FILE NAME!
       // the same "file_name.o" can be used by several creates
       // performed in parallel, for instance by the validation...
@@ -971,6 +973,7 @@ check_input_file_syntax(
                       language, file_name);
     syntax_ok_p = false;
   }
+  free(pfile_name);
   free(includes);
   return syntax_ok_p;
 }
@@ -1008,14 +1011,15 @@ static bool check_c_file_syntax(string file_name)
 
 /* "foo bla fun  ./e.database/foo.f" -> "./e.database/foo.f"
  */
-static string extract_last_name(string line)
+static char* extract_last_name(char *line)
 {
-    int l = strlen(line);
-    do {
-	while (l>=0 && line[l]!=' ') l--;
-	if (l>=0 && line[l]==' ') line[l]='\0';
-    } while (l>=0 && strlen(line+l+1)==0);
-    return l>=-1? line+l+1: NULL;
+    /* look for the two past directory separators */
+    char * iter = line + strlen(line);
+    for(int i =2;i&&iter!=line;--iter) {
+        if(*iter=='/') --i;
+    }
+    if(iter-1>line) iter[-1]=0;
+    return iter;
 }
 
 
