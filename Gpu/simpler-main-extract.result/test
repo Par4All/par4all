@@ -230,16 +230,16 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
          P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
          P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
          P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
          P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
 
          p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_accel_free(P4A_var_symbole_flow_user11);
          P4A_accel_free(P4A_var_ovsf_code_ref1);
          P4A_accel_free(P4A_var_inv_qpsk_user11);
@@ -375,16 +375,16 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
          P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
          P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
          P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
          P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
 
          p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_accel_free(P4A_var_symbole_flow_user11);
          P4A_accel_free(P4A_var_ovsf_code_ref1);
          P4A_accel_free(P4A_var_inv_qpsk_user11);
@@ -520,16 +520,16 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
          P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
          P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
          P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
          P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
 
          p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_accel_free(P4A_var_symbole_flow_user11);
          P4A_accel_free(P4A_var_ovsf_code_ref1);
          P4A_accel_free(P4A_var_inv_qpsk_user11);
@@ -665,16 +665,16 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
          P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
          P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
          P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
          P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
 
          p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_accel_free(P4A_var_symbole_flow_user11);
          P4A_accel_free(P4A_var_ovsf_code_ref1);
          P4A_accel_free(P4A_var_inv_qpsk_user11);
@@ -810,16 +810,16 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
          P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
          P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
          P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
          P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
 
          p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_accel_free(P4A_var_symbole_flow_user11);
          P4A_accel_free(P4A_var_ovsf_code_ref1);
          P4A_accel_free(P4A_var_inv_qpsk_user11);
