@@ -210,6 +210,13 @@ static string helper_file_name(string func_name)
   return fn;
 }
 
+static bool freia_stmt_free_p(const statement s)
+{
+  call c = freia_statement_to_call(s);
+  const char* called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, FREIA_FREE);
+}
+
 bool freia_skip_op_p(const statement s)
 {
   call c = freia_statement_to_call(s);
@@ -493,6 +500,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
     pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
 
+    // FREIA API & "intermediate" statements are kept
     if (keep_stat)
     {
       if (freia_api)
@@ -505,7 +513,9 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       {
         if (statement_depends_p(written, s) ||
             (statement_call_p(s) &&
-             ENTITY_C_RETURN_P(call_function(statement_call(s)))))
+             ENTITY_C_RETURN_P(call_function(statement_call(s)))) ||
+            // free are kept in the tail... not caught as a W effect?
+            freia_stmt_free_p(s))
         {
           pips_debug(8, "statement %d in ltail\n", (int) statement_number(s));
           ltail = CONS(statement, s, ltail);
@@ -519,7 +529,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
         }
       }
     }
-    else // the sequence is cut on this statement
+    else // the sequence must be cut on this statement
     {
       if (lup && ls)
         move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);

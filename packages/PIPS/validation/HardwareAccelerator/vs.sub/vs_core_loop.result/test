@@ -37,7 +37,6 @@ int vs_core_loop(void)
    register int32_t motion_b = 90;                                      /*0031*/
    register int32_t motion_th = 30;                                     /*0032*/
    register int32_t motion_trig = 75;                                   /*0033*/
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -383,7 +382,6 @@ int vs_core_loop(void)
    
    // hardware accelerator generated variable
    freia_data2d *immotion_6 = 0;
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -524,7 +522,6 @@ int vs_core_loop(void)
    register int32_t motion_b = 90;                                      /*0031*/
    register int32_t motion_th = 30;                                     /*0032*/
    register int32_t motion_trig = 75;                                   /*0033*/
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -1444,7 +1441,6 @@ int vs_core_loop(void)
    
    // hardware accelerator generated variable
    freia_data2d *immotion_6 = 0;
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -1556,7 +1552,6 @@ int vs_core_loop(void)
    
    // hardware accelerator generated variable
    freia_data2d *immotion_6 = 0;
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -1683,7 +1678,6 @@ int vs_core_loop(void)
    register int32_t motion_b = 90;                                      /*0031*/
    register int32_t motion_th = 30;                                     /*0032*/
    register int32_t motion_trig = 75;                                   /*0033*/
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -3086,8 +3080,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -3189,8 +3182,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -3311,7 +3303,6 @@ int vs_core_loop(void)
    register int32_t motion_b = 90;                                      /*0031*/
    register int32_t motion_th = 30;                                     /*0032*/
    register int32_t motion_trig = 75;                                   /*0033*/
-
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -4102,8 +4093,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -4216,8 +4206,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/

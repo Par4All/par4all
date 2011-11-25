@@ -101,6 +101,13 @@ int main()
    printf("\n Number of random numbers generated: %15s\n", size);
 
    verified = false;
+   
+   //--------------------------------------------------------------------
+   //  Compute the number of "batches" of random number pairs generated 
+   //  per processor. Adjust if the number of processors does not evenly 
+   //  divide the total number
+   //--------------------------------------------------------------------
+   
    np = 1<<24-16;
    
    //--------------------------------------------------------------------
@@ -292,6 +299,12 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
       if (name[0]=='E'&&name[1]=='P') {
          sprintf(size, "%15.0lf", pow(2.0, n1));
          j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
          if (size[j]=='.') {
             size[j] = ' ';
             j--;

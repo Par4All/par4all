@@ -355,7 +355,7 @@ bool analyzable_scalar_entity_p(entity e)
 {
   bool result = false;
 
-  if(!abstract_state_variable_p(e)) {
+  if(!abstract_state_variable_p(e) && !typedef_entity_p(e) ) {
     type ut = ultimate_type(entity_type(e));
 
     /* entity_scalar_p(e) is information provided by the type. It should

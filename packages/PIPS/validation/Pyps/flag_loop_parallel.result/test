@@ -1,0 +1,17 @@
+# Loop has been flag as parallel
+int flagloopexecution()
+{
+   int i;
+#pragma omp parallel for 
+loop_lab:
+   for(i = 0; i <= 9; i += 1)
+      ;
+}
+# Loop has been flag as sequential
+int flagloopexecution()
+{
+   int i;
+loop_lab:
+   for(i = 0; i <= 9; i += 1)
+      ;
+}

@@ -31,12 +31,12 @@ void run(void)
    
    if (b>0) {
 
-//  T(t,x) {t#init==0, 1<=b, x<=b+1, 0<=b+x#init+1, x#init<=t+x, 0<=x,
-//    x<=x#init, 0<=x#init}
+//  T(t,x) {t#init==0, 1<=b, x<=b+1, x#init<=t+x, 0<=x, x<=x#init,
+//    0<=x#init}
 
       if (x<-b-1) {
 
-//  T() {t==0, 1<=b, b+x+2<=0, 0<=x}
+//  T() {0==-1}
 
          while (flip())
 
@@ -44,15 +44,15 @@ void run(void)
 
             if (flip())
 
-//  T(t,x) {t==1, t#init==0, x==x#init+1, 1<=b, b+x+2<=0, 1<=x}
+//  T() {0==-1}
 
                if (x<-b-2) {
 
-//  T(x) {t==0, x==x#init+1, 1<=b, b+x+2<=0, 1<=x}
+//  T() {0==-1}
 
                   x++;
 
-//  T(t) {t==1, t#init==0, 1<=b, b+x+2<=0, 1<=x}
+//  T() {0==-1}
 
                   t++;
                }
@@ -67,7 +67,7 @@ void run(void)
                      ;
             else if (1)
 
-//  T(t) {t==1, t#init==0, 1<=b, b+x+2<=0, 0<=x}
+//  T() {0==-1}
 
                t++;
             else
@@ -94,11 +94,11 @@ void run(void)
          }
          else
 
-//  T() {t==0, 1<=b, b+x+3<=0, 0<=x}
+//  T() {0==-1}
 
             while (1)
 
-//  T() {t==0, 1<=b, b+x+3<=0, 0<=x}
+//  T() {0==-1}
 
                ;
       }
@@ -148,26 +148,25 @@ void run(void)
 
                   ;
 
-//  T(t,x) {b==x-1, b==x#init-2, t==t#init+1, 1<=b, 0<=2b+t+2,
-//    0<=b+t+1, 1<=t}
+//  T(t,x) {b==x-1, b==x#init-2, t==t#init+1, 1<=b, 0<=b+t+1, 1<=t}
 
          if (x==b+2) {
 
-//  T(x) {b==x-1, b==x#init-2, 1<=b, 0<=2b+t+3, 0<=b+t+2, 0<=t}
+//  T(x) {b==x-1, b==x#init-2, 1<=b, 0<=b+t+2, 0<=t}
 
             x--;
 
-//  T(t) {b==x-1, t==t#init+1, 1<=b, 0<=2b+t+2, 0<=b+t+1, 1<=t}
+//  T(t) {b==x-1, t==t#init+1, 1<=b, 1<=t}
 
             t++;
          }
          else
 
-//  T() {1<=b, 0<=b+t+x+1, b+3<=2t+x, b+2<=t+x, 0<=t, 0<=t+x}
+//  T() {1<=b, b+3<=2t+x, b+2<=t+x, 0<=t, 0<=t+x}
 
             while (1)
 
-//  T() {1<=b, 0<=b+t+x+1, b+3<=2t+x, b+2<=t+x, 0<=t, 0<=t+x}
+//  T() {1<=b, b+3<=2t+x, b+2<=t+x, 0<=t, 0<=t+x}
 
                ;
       }
@@ -356,7 +355,7 @@ void run(void)
       }
       else if (x>b+1) {
 
-//  P(b,t,x) {t==0, 1<=b, 0<=b+x+1, b+2<=x, 0<=x}
+//  P(b,t,x) {t==0, 1<=b, b+2<=x, 0<=x}
 
          while (flip())
 
@@ -408,7 +407,7 @@ void run(void)
 
             x--;
 
-//  P(b,t,x) {b==x-1, 1<=b, 0<=2b+t+3, 0<=b+t+2, 0<=t}
+//  P(b,t,x) {b==x-1, 1<=b, 0<=t}
 
             t++;
          }

@@ -243,24 +243,31 @@ static bool init_one_statement( statement st ) {
  * @param killers the "killer" effects
  */
 static void kill_effects(set gen, set killers) {
-  SET_FOREACH(effect,killer,killers) {
-    /* A killer effect is exact and is a write (environment effects kills !!) */
-    if ( action_write_p(effect_action(killer))
-        && approximation_exact_p(effect_approximation(killer)) ) {
-      set killed = MAKE_STATEMENT_SET();
-      SET_FOREACH(effect,e,gen) {
-        /* We only kill store effect */
-        if(!store_effect_p(e)) continue;
-        /* We avoid a self killing */
-        if( e != killer
-            && first_effect_certainely_includes_second_effect_p(killer, e) ) {
-            set_add_element( killed, killed, e );
+    set killed = MAKE_STATEMENT_SET();
+    SET_FOREACH(effect,killer,killers) {
+        /* A killer effect is exact and is a write (environment effects kills !!) */
+        if ( action_write_p(effect_action(killer))
+	     // these tests are optimizations to avoid redundant tests inside the
+	     // SET_FOREACH loop;
+	     // they allow to call first_exact_scalar_effect_certainly_includes_second_effect_p
+	     // instead of first_effect_certainly_includes_second_effect_p
+	     // if the latter is enhanced, these tests should be updated accordingly.
+	     && effect_exact_p(killer) && effect_scalar_p(killer) ) {
+            SET_FOREACH(effect,e,gen) {
+                /* We only kill store effect */
+                if(store_effect_p(e)) {
+                    /* We avoid a self killing */
+                    if( e != killer
+			&& first_exact_scalar_effect_certainly_includes_second_effect_p(killer, e) ) {
+                        set_add_element( killed, killed, e );
+                    }
+                }
+            }
+            set_difference(gen,gen,killed);
+            set_clear(killed);
         }
-      }
-      set_difference(gen,gen,killed);
-      set_free(killed);
     }
-  }
+    set_free(killed);
 }
 
 /**
@@ -1075,11 +1082,13 @@ static void add_conflicts(effect fin,
          to TRUE!  We need to think more about all of this. BC.
       */
       if(ein_abstract_location_p) {
-	pips_debug(2, "abstract location case \n");
+#if 0 //SG: as is, this code is equivalent to doing nothing
+	    pips_debug(2, "abstract location case \n");
         entity alout = variable_to_abstract_location(eout);
 	/* this test is not correct, rout should be converted to an abstract location, not eout. BC. */
         if(abstract_locations_may_conflict_p(ein, alout))
           add_conflict_p = true;
+#endif
       } else {
         reference rin = effect_any_reference(fin);
         int din = gen_length(reference_indices(rin));

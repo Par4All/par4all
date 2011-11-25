@@ -1844,24 +1844,39 @@ type intrinsic_call_to_type(call c)
 	  }
 	else
 	  {
-
+	    /* current type of expression is type of first argument */
 	    type ct = expression_to_type(EXPRESSION(CAR(args)));
 
 	    MAP(EXPRESSION, arg, {
 		type nt = expression_to_type(arg);
 		basic nb = variable_basic(type_variable(nt));
+		list  nd = variable_dimensions(type_variable(nt));
+
 		basic cb = variable_basic(type_variable(ct));
+		list  cd = variable_dimensions(type_variable(ct));
 
-		/* re-use an existing function. we do not take into
-		   account variable dimensions here. It may not be correct.
-		   but it's not worse than the previously existing version
-		   of expression_to_type
-		*/
-		basic b = basic_maximum(cb, nb);
+		/* we need to check the variable dimensions */
+		if (gen_length(nd) == gen_length(cd))
+		  {
+		    /* re-use an existing function. we do not take into
+		       account variable dimensions here. It may not be correct.
+		       but it's not worse than the previously existing version
+		       of expression_to_type
+		    */
+		    pips_debug(8,"same number of dimensions\n");
+		    basic b = basic_maximum(cb, nb);
+		    free_type(ct);
+		    free_type(nt);
+		    ct = make_type(is_type_variable, make_variable(b, gen_full_copy_list(nd), NIL));
+		  }
+		else
+		  {
+		    pips_debug(8,"different number of dimensions\n");
+		    pips_assert("pointer arithmetic with array name, first element must be the address expression", gen_length(cd) > gen_length(nd));
+		    /* current type is still valid */
+		    free_type(nt);
+		  }
 
-		free_type(ct);
-		free_type(nt);
-		ct = make_type(is_type_variable, make_variable(b, NIL, NIL));
 
 	      }, CDR(args));
 	    t = ct;
@@ -2454,6 +2469,16 @@ bool array_type_p(type t)
 {
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
+bool type_pointer_on_struct_variable_p(type t)
+{
+        t = ultimate_type(t);
+        if(basic_pointer_p(variable_basic(type_variable(t))))
+        {
+            type pt = basic_pointer(variable_basic(type_variable(t)));
+            return type_struct_variable_p(pt);
+        }
+        return false;
+}
 
 bool variable_length_array_type_p(type t)
 {
@@ -2468,6 +2493,10 @@ bool variable_length_array_type_p(type t)
     }
   }
   return return_val;
+}
+bool fixed_length_array_type_p(type t)
+{
+    return array_type_p(t) && !variable_length_array_type_p(t);
 }
 
 bool pointer_type_p(type t)

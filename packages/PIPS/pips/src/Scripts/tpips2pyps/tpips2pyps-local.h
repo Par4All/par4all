@@ -33,7 +33,7 @@ typedef struct {
 
 extern int tp_lex();
 extern int tp_parse();
-extern void tp_error();
+extern void tp_error(const char*);
 extern void tp_init_lex();
 extern void tp_begin_key();
 extern void tp_begin_fname();

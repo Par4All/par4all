@@ -91,6 +91,7 @@ void old_transformer_free(transformer t)
     /* end of DRET demo */
 }
 
+/* Allocate an identity transformer */
 transformer transformer_identity()
 {
     /* return make_transformer(NIL, make_predicate(SC_RN)); */
@@ -100,6 +101,7 @@ transformer transformer_identity()
 						   CONTRAINTE_UNDEFINED)));
 }
 
+/* Allocate an empty transformer */
 transformer transformer_empty()
 {
     return make_transformer(NIL,
@@ -107,7 +109,23 @@ transformer transformer_empty()
 }
 
 /* Do not allocate an empty transformer, but transform an allocated
-   transformer into an empty_transformer. */
+ * transformer into an empty_transformer.
+ *
+ * Pretty dangerous because the predicate contained in t may have been
+ * deleted before empty_transformer is called. It is not clear that
+ * the predicate of t can be freed or not: it is up to the caller to
+ * be aware of the problem.
+ *
+ * This function is risky to use. It can cause either a memory leak if
+ * the predicate is not freed, or a double free if the pointer in the
+ * transformer is already dangling. If the predicate has already been
+ * freed during some processing at the linear level, the caller must
+ * update the pointer transformer_relation(t) with:
+ *
+ * transformer_relation(t) = relation_undefined;
+ *
+ * before the call.
+ */
 transformer empty_transformer(transformer t)
 {
   free_predicate(transformer_relation(t));
@@ -117,6 +135,7 @@ transformer empty_transformer(transformer t)
   return t;
 }
 
+/* Check that t is an identity function */
 bool transformer_identity_p(transformer t)
 {
     /* no variables are modified; no constraints exist on their values */
@@ -129,13 +148,28 @@ bool transformer_identity_p(transformer t)
 	&& sc_nbre_inegalites(s) == 0;
 }
 
+/* Check that transformer t is the canonical representation of an
+ * empty transformer.
+ *
+ * See transformer_empty_p(), transformer_strongly_empty_p() if you
+ * need to check that a set of affine constraints is not feasible.
+ */
+bool transformer_is_empty_p(transformer t)
+{
+    Psysteme s;
+
+    pips_assert("transformer_identity_p", t != transformer_undefined);
+    s = (Psysteme) predicate_system(transformer_relation(t));
+    return sc_empty_p(s) && ENDP(transformer_arguments(t));
+}
+
 /* CHANGE THIS NAME: no loop index please, it's not directly linked
  * to loops!!!
  */
 
 /* Add in tf the information that v is striclty positive, strictly negative or zero. 
  *
- * Assume that v is a value.and tf is defined.
+ * Assume that v is a value and tf is defined.
  */
 transformer transformer_add_sign_information(transformer tf,
 					     entity v,

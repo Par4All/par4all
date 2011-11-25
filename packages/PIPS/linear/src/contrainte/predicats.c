@@ -125,8 +125,7 @@ Pcontrainte eg2;
  *  - utilisation de CONTRAINTE_UNDEFINED_P() et contrainte_vecteur()
  *    (FI, 08/12/89)
  */
-bool contrainte_equal(c1,c2)
-Pcontrainte c1,c2;
+bool contrainte_equal(Pcontrainte c1, Pcontrainte c2)
 {
     register bool 
 	undef1 = CONTRAINTE_UNDEFINED_P(c1),
@@ -137,6 +136,47 @@ Pcontrainte c1,c2;
 
     return(vect_equal(contrainte_vecteur(c1),
 		      contrainte_vecteur(c2)));
+}
+
+/* Les deux contraintes c1 et c2 sont paralleles s'il existe deux
+ * coefficients a1 et a2 tels que a1 c1 + a2 c2 est reduit un terme
+ * constant K.
+ */
+bool contrainte_parallele(Pcontrainte c1, Pcontrainte c2, Value *pa1, Value * pa2)
+{
+  bool parallel_p = false;
+  register bool 
+    undef1 = CONTRAINTE_UNDEFINED_P(c1),
+    undef2 = CONTRAINTE_UNDEFINED_P(c2);
+
+  if (undef1 || undef2) 
+    parallel_p = (undef1 && undef2);
+  else {
+    /* On cherche une composante quelconque relative a une variable */
+    Pvecteur v1 = contrainte_vecteur(c1);
+    Pvecteur v2 = contrainte_vecteur(c2);
+    if(vect_constant_p(v1))
+      parallel_p = vect_constant_p(v2);
+    else if(vect_constant_p(v2))
+      parallel_p = false;
+    else {
+      Pvecteur v;
+      for(v=v1; !VECTEUR_NUL_P(v); v = vecteur_succ(v)) {
+	if(vecteur_var(v)!=TCST)
+	  break;
+      }
+      Variable var = vecteur_var(v);
+      *pa1 = vect_coeff(var, v1);
+      *pa2 = -vect_coeff(var, v2);
+      Pvecteur nv1 = vect_multiply(vect_copy(v1), *pa2);
+      Pvecteur nv2 = vect_multiply(vect_copy(v2), *pa1);
+      Pvecteur nv = vect_add(nv1, nv2);
+      if(vect_size(nv)==0 || (vect_size(nv)==1 && vecteur_var(nv)==TCST))
+	parallel_p = true;
+      vect_rm(nv1), vect_rm(nv2), vect_rm(nv);
+    }
+  }
+  return parallel_p;
 }
 
 /* bool contrainte_constante_p(Pcontrainte c): test de contrainte

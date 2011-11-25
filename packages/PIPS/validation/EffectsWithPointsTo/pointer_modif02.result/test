@@ -23,10 +23,6 @@ int main()
    *q = 2;
    return 0;
 }
-int foo(int **dest, int *source);
-
-
-int main();
 
 POINTS-TO
 
@@ -92,22 +88,6 @@ int main()
    return 0;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-
-// Points To: none
-
-int foo(int **dest, int *source);
-
-
-
-// Points To: none
-
-int main();
-
 PROPER  EFFECTS WITH POINTS TO
 
 int foo(int **dest, int *source)
@@ -132,10 +112,6 @@ int main()
    *q = 2;
    return 0;
 }
-int foo(int **dest, int *source);
-
-
-int main();
 
  *********************** Use-Def Chains *********************
 

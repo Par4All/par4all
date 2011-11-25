@@ -2,18 +2,6 @@
 #include "freia.h"
 #include "freiaExtendedOpenMorpho.h"
 
-/**
-    \file freiaExtendedOpenMorpho.c
-    \author Michel Bilodeau
-    \date july 2011
-    \version $Id$
-
-    \brief Extend some cipo APIs, add new ones
-
-    \ingroup freia_ecipo
-
-*/
-
 static const int32_t freia_morpho_k8_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
 static const int32_t freia_morpho_k8_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
 static const int32_t freia_morpho_k8_2[9] = {0, 0, 1, 0, 1, 0, 1, 0, 0};
@@ -28,7 +16,6 @@ static const int32_t freia_morpho_k4_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
 
 /**
    Transpose the neighbor
-
 */
 void transposeNeighbor(int32_t neighborOut[9], const int32_t neighborIn[9])
 {
@@ -249,3 +236,28 @@ freia_status freia_ecipo_close(
   return ret;
 }
 
+void freia_ecipo_distance(freia_data2d *imOut, freia_data2d *imIn, const int32_t connexity){
+
+	freia_data2d * w1 = freia_common_create_data(imIn->bpp,  imIn->widthWa, imIn->heightWa);
+	freia_data2d * w2 = freia_common_create_data(imIn->bpp,  imIn->widthWa, imIn->heightWa);
+	int32_t measure_oldVol, measure_vol;
+
+	freia_aipo_threshold(w1, imIn, 1, imIn->bpp==16?32767:255, true); // binarize
+
+	freia_aipo_global_vol(w1, &measure_vol);
+	freia_aipo_set_constant(w2, w1->bpp==16?32767:255);
+	freia_aipo_subsat_const(w1, w1, w1->bpp==16?32766:254);
+
+	freia_aipo_copy(imOut, w1);
+	measure_oldVol = 0;
+
+	while (measure_vol != measure_oldVol) {
+		freia_cipo_erode(w1, w1, connexity, 1);
+		freia_aipo_add(imOut, imOut, w1);
+		measure_oldVol = measure_vol;
+		freia_aipo_global_vol(w1, &measure_vol);
+	}
+
+	freia_common_destruct_data(w1);
+	freia_common_destruct_data(w2);
+}		                                     

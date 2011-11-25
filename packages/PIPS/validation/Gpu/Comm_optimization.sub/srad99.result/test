@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
       rows = atoi(argv[1]);
       //number of rows in the domain
       cols = atoi(argv[2]);
+      //number of cols in the domain
       if (rows%16!=0||cols%16!=0) {
          fprintf(stderr, "rows and cols must be multiples of 16\n");
          exit(1);
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
       rows = atoi(argv[1]);
       //number of rows in the domain
       cols = atoi(argv[2]);
+      //number of cols in the domain
       if (rows%16!=0||cols%16!=0) {
          fprintf(stderr, "rows and cols must be multiples of 16\n");
          exit(1);

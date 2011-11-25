@@ -496,27 +496,27 @@ l99994:      launcher_0(259+1, *img0, *img_out0);
    }
 }
 
-//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2+1<=I_22, I_22==260}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=259,
+//    I_22==260}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=123, 0<=PHI2,
-//    PHI2+1<=I_22, I_22==260}>
+//    PHI2<=259, I_22==260}>
 
 void launcher_0(int I_22, int img0[128][260], int img_out0[124][260])
 {
    //PIPS generated variable
    int val3, x, y, z;
 
-//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2+1<=I_22, I_22==260}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=259,
+//    I_22==260}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=123, 0<=PHI2,
-//    PHI2+1<=I_22, I_22==260}>
+//    PHI2<=259, I_22==260}>
 
 l99994:
    for(y = 0; y <= 123; y += 1)
 
-//  <img0[PHI1][PHI2]-R-EXACT-{y<=PHI1, PHI1<=y+4, 0<=PHI2,
-//    PHI2+1<=I_22, I_22==260, 0<=y, y<=123}>
-//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, 0<=PHI2, PHI2+1<=I_22,
+//  <img0[PHI1][PHI2]-R-EXACT-{y<=PHI1, PHI1<=y+4, 0<=PHI2, PHI2<=259,
+//    I_22==260, 0<=y, y<=123}>
+//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, 0<=PHI2, PHI2<=259,
 //    I_22==260, 0<=y, y<=123}>
 
 l99995:

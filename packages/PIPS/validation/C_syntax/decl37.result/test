@@ -3,6 +3,8 @@ PRINTED FILE for "decl37"
 
 void decl37()
 {
+   //int i = 0, j = 1;
+   //string a = NULL, b = NULL;
    string a = (void *) 0, b;
 }
 

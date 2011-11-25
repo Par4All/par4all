@@ -538,6 +538,8 @@ static string c_qualifier_string(list l)
                 break;
             case is_qualifier_auto:
                 result = concatenate(result,"auto ",NULL);
+            case is_qualifier_asm:
+                result = concatenate(result,"__asm(",qualifier_asm(q),") ", NULL);
                 break;
         }
     }
@@ -2252,7 +2254,7 @@ bool print_c_code(const char* module_name)
     dir = db_get_current_workspace_directory();
 
     cmd = strdup(concatenate(INDENT, " ",
-                dir, "/", crough, " -o ",
+                dir, "/", crough, " -st > ",
                 dir, "/", cpretty, NULL));
 
     safe_system(cmd);

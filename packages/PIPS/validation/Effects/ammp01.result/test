@@ -12,6 +12,7 @@ ATOM * a_m_serial(int serial)
       n = atomNUMBER;
 
    ap = first;
+   /* static pointer is hook for more efficient search */
    if (ap==(void *) 0)
       return (void *) 0;
    if (lastmatched==(void *) 0)
@@ -57,6 +58,7 @@ ATOM * a_m_serial(int serial)
 
    ap = first;
 //             <    is read   >: ap
+   /* static pointer is hook for more efficient search */
    if (ap==(void *) 0)
       return (void *) 0;
 //             <    is read   >: lastmatched
@@ -132,6 +134,7 @@ ATOM * a_m_serial(int serial)
 
    ap = first;
 //             <    is read   >: ap
+   /* static pointer is hook for more efficient search */
    if (ap==(void *) 0)
       return (void *) 0;
 //             <may be read   >: first

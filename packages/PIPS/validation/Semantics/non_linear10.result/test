@@ -31,8 +31,8 @@ C
       IF (IS.EQ.0) GOTO 99999                                           0014
 
 C  T(K,L,M1,M2,MX,N,N1,N2) {L==1, M==M2+2, M1==2, N2==4, 0<=IS+1,
-C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX,
-C    MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
+C    IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16,
+C    1<=NQ, NQ<=64}
 
 C (22,1)
 C     BEGIN BLOCK
@@ -45,24 +45,24 @@ C   Check if input parameters are invalid.
 C
       K = U(1)                                                          0047
 
-C  T(MX) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C  T(MX) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,3)
       MX = MOD(K, 64)                                                   0048
 
-C  T() {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C  T() {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,4)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0049
 
 C  T() {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63,
-C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    58IS+MX<=63, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,5)
 C        BEGIN BLOCK
 
 C  T() {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63,
-C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    58IS+MX<=63, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,6)
 C       WRITE (6, 1)  IS, M, MX
@@ -72,8 +72,8 @@ C       STOP
 C        END BLOCK
       ENDIF
 
-C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63,
-C    32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (22,9)
 C>> A normal call to CFFTZ starts here.  M1 is the number of the first
@@ -87,35 +87,34 @@ C     probably be limited to 2.
 C
       N = 2**M                                                          0065
 
-C  T(M1) {M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX,
-C    MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(M1) {M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N,
+C    N<=64, 1<=NQ, NQ<=64}
 
 C (22,10)
 C      M1 = MIN (M / 2, 6)
       M1 = MIN(M/2, 2)                                                  0067
 
-C  T(M2) {M==M2+2, M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(M2) {M==M2+2, M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63,
+C    MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,11)
       M2 = M-M1                                                         0068
 
-C  T(N2) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
-C    2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(N2) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63,
+C    MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,12)
       N2 = 2**M1                                                        0069
 
-C  T(N1) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
-C    2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX, MX<=63, 32<=N, N<=64, 8<=N1,
-C    N1<=16, 1<=NQ, NQ<=64}
+C  T(N1) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, M<=N1+1,
+C    2M<=N1+4, 0<=MX+63, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ,
+C    NQ<=64}
 
 C (22,13)
       N1 = 2**M2                                                        0070
 
 C  T(L) {L==1, M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX, MX<=63, 32<=N, N<=64,
-C    8<=N1, N1<=16, 1<=NQ, NQ<=64}
+C    0<=MX+63, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
 
 C (22,14)
       L = 1                                                             0074
@@ -350,14 +349,13 @@ C
 99999 CONTINUE
 
 C  T(I,J,KN,KU,LN,N,NU) {J==M+1, KU+N==KN, KU==LN+1, N==NU, 0<=I,
-C    KU<=2I+1, 0<=IS+1, IS<=1, 6<=J, J<=7, J<=N, 2J<=N+2, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    KU<=2I+1, 0<=IS+1, IS<=1, 6<=J, J<=7, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,1)
 C     BEGIN BLOCK
 
-C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64,
-C    1<=NQ, NQ<=64}
+C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,2)
 C
@@ -366,59 +364,59 @@ C     permits stride one access at each FFT iteration.
 C
       N = 2**M                                                          0019
 
-C  T(NU) {N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C  T(NU) {N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,3)
       NU = N                                                            0020
 
-C  T() {N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C  T() {N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,4)
       U(1) = 64*N+M                                                     0021
 
-C  T(KU) {KU==2, N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(KU) {KU==2, N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (2,5)
       KU = 2                                                            0022
 
-C  T(KN) {KN==N+2, KU==2, N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
-C    2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T(KN) {KN==N+2, KU==2, N==NU, 0<=IS+1, IS<=1, 5<=M, M<=6, 32<=N,
+C    N<=64, 1<=NQ, NQ<=64}
 
 C (2,6)
       KN = KU+NU                                                        0023
 
 C  T(LN) {KN==N+2, KN==NU+2, KU==2, LN==1, 0<=IS+1, IS<=1, 34<=KN,
-C    KN<=66, M+3<=KN, 2M+2<=KN, 5<=M, M<=6, 1<=NQ, NQ<=64}
+C    KN<=66, 5<=M, M<=6, 1<=NQ, NQ<=64}
 
 C (2,7)
       LN = 1                                                            0024
 
 C  T(I,J,KN,KU,LN) {KN#init==N+2, KN#init==NU+2, KU==LN+1, KU#init==2,
 C    LN#init==1, 0<=IS+1, IS<=1, 1<=J, J<=M, 34<=KN#init, KN#init<=66,
-C    M+3<=KN#init, 2M+2<=KN#init, 5<=M, M<=6, 1<=NQ, NQ<=64}
+C    5<=M, M<=6, 1<=NQ, NQ<=64}
 
 C (2,8)
 C
       DO 110 J = 1, M                                                   0026
 
 C  T(I,KN,KU,LN) {KU+N==KN, KU#init+LN#init==KU, LN==2LN#init, N==NU,
-C    0<=I, LN#init<=I, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6, M+1<=N,
-C    2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    0<=I, LN#init<=I, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6, 32<=N,
+C    N<=64, 1<=NQ, NQ<=64}
 
 C (2,9)
 C        BEGIN BLOCK
 
-C  T() {N==NU, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    32<=N, N<=64, 1<=NQ, NQ<=64}
+C  T() {N==NU, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (2,10)
          T = PI/LN                                                      0027
 
 C  T(I) {N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,11)
 C
@@ -427,58 +425,57 @@ C
          DO 100 I = 0, LN-1                                             0031
 
 C  T() {I+KN==1, I+KU==1, N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J,
-C    J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,12)
 C           BEGIN BLOCK
 
 C  T() {N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J, J<=M, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,13)
             TI = I*T                                                    0032
 
 C  T() {I+KU==1, N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J, J<=M,
-C    5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,14)
             U(I+KU) = COS(TI)                                           0033
 
 C  T() {I+KN==1, I+KU==1, N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J,
-C    J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,15)
             U(I+KN) = SIN(TI)                                           0034
 
 C  T() {I+KN==1, I+KU==1, N==NU, 0<=I, I+1<=LN, 0<=IS+1, IS<=1, 1<=J,
-C    J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,16)
 100         CONTINUE                                                    0035
 C           END BLOCK
 
 C  T(KU) {KU#init+LN==KU, N==NU, 0<=I, LN<=I, 0<=IS+1, IS<=1, 1<=J,
-C    J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,17)
 C
          KU = KU+LN                                                     0037
 
 C  T(KN) {KU+N==KN, N==NU, 0<=I, LN<=I, 0<=IS+1, IS<=1, 1<=J, J<=M,
-C    5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,18)
          KN = KU+NU                                                     0038
 
 C  T(LN) {KU+N==KN, LN==2LN#init, N==NU, 0<=I, LN#init<=I, 0<=IS+1,
-C    IS<=1, 1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64,
-C    1<=NQ, NQ<=64}
+C    IS<=1, 1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,19)
          LN = 2*LN                                                      0039
 
 C  T() {KU+N==KN, N==NU, 0<=I, LN<=2I, 0<=IS+1, IS<=1, 1<=J, J<=M,
-C    5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,20)
 110      CONTINUE                                                       0040
@@ -540,21 +537,21 @@ C (22,3)
       MX = MOD(K, 64)                                                   0048
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,4)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0049
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1,
 C    MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63, 58IS+MX<=63, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,5)
 C        BEGIN BLOCK
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1,
 C    MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63, 58IS+MX<=63, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,6)
 C       WRITE (6, 1)  IS, M, MX
@@ -565,7 +562,7 @@ C        END BLOCK
       ENDIF
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,9)
 C>> A normal call to CFFTZ starts here.  M1 is the number of the first
@@ -580,36 +577,34 @@ C
       N = 2**M                                                          0065
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,10)
 C      M1 = MIN (M / 2, 6)
       M1 = MIN(M/2, 2)                                                  0067
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M1==2, 0<=IS+1, IS<=1,
-C    5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ,
-C    NQ<=64}
+C    5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,11)
       M2 = M-M1                                                         0068
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, 0<=IS+1,
-C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64,
-C    1<=NQ, NQ<=64}
+C    IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,12)
       N2 = 2**M1                                                        0069
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, N2==4,
-C    0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (22,13)
       N1 = 2**M2                                                        0070
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, N2==4,
-C    0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4,
-C    0<=MX, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
+C    0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 32<=N, N<=64,
+C    8<=N1, N1<=16, 1<=NQ, NQ<=64}
 
 C (22,14)
       L = 1                                                             0074
@@ -891,62 +886,57 @@ C     permits stride one access at each FFT iteration.
 C
       N = 2**M                                                          0019
 
-C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, 5<=M, M<=6, M+1<=N,
-C    2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, 5<=M, M<=6, 32<=N,
+C    N<=64, 1<=NQ, NQ<=64}
 
 C (2,3)
       NU = N                                                            0020
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, N==NU, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,4)
       U(1) = 64*N+M                                                     0021
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, N==NU, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,5)
       KU = 2                                                            0022
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==2, N==NU, 5<=M,
-C    M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,6)
       KN = KU+NU                                                        0023
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KN==N+2, KN==NU+2,
-C    KU==2, 34<=KN, KN<=66, M+3<=KN, 2M+2<=KN, 5<=M, M<=6, 1<=NQ,
-C    NQ<=64}
+C    KU==2, 34<=KN, KN<=66, 5<=M, M<=6, 1<=NQ, NQ<=64}
 
 C (2,7)
       LN = 1                                                            0024
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KN==N+2, KN==NU+2,
-C    KU==2, LN==1, 34<=KN, KN<=66, M+3<=KN, 2M+2<=KN, 5<=M, M<=6,
-C    1<=NQ, NQ<=64}
+C    KU==2, LN==1, 34<=KN, KN<=66, 5<=M, M<=6, 1<=NQ, NQ<=64}
 
 C (2,8)
 C
       DO 110 J = 1, M                                                   0026
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==LN+1, N==NU,
-C    1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ,
-C    NQ<=64}
+C    1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,9)
 C        BEGIN BLOCK
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==LN+1, N==NU,
-C    1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ,
-C    NQ<=64}
+C    1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,10)
          T = PI/LN                                                      0027
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==LN+1, N==NU,
-C    1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64, 1<=NQ,
-C    NQ<=64}
+C    1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (2,11)
 C
@@ -955,15 +945,15 @@ C
          DO 100 I = 0, LN-1                                             0031
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==LN+1, N==NU,
-C    0<=I, I+2<=KU, 1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    0<=I, I+2<=KU, 1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,12)
 C           BEGIN BLOCK
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {IS==0, KU==LN+1, N==NU,
-C    0<=I, I+2<=KU, 1<=J, J<=M, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    0<=I, I+2<=KU, 1<=J, J<=M, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,13)
             TI = I*T                                                    0032
@@ -985,30 +975,30 @@ C (2,16)
 C           END BLOCK
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {I==0, IS==0, KU==LN+1,
-C    N==NU, 1<=J, J<=M, KU<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    N==NU, 1<=J, J<=M, KU<=1, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,17)
 C
          KU = KU+LN                                                     0037
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {I==0, IS==0, KU==2LN+1,
-C    N==NU, 1<=J, J<=M, LN<=0, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    N==NU, 1<=J, J<=M, LN<=0, 5<=M, M<=6, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (2,18)
          KN = KU+NU                                                     0038
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {I==0, IS==0, 2LN+N==KN-1,
-C    KU==2LN+1, N==NU, 1<=J, J<=M, LN<=0, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    32<=N, N<=64, 1<=NQ, NQ<=64}
+C    KU==2LN+1, N==NU, 1<=J, J<=M, LN<=0, 5<=M, M<=6, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (2,19)
          LN = 2*LN                                                      0039
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {I==0, IS==0, KU+N==KN,
-C    KU==LN+1, N==NU, 1<=J, J<=M, KU<=1, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    32<=N, N<=64, 1<=NQ, NQ<=64}
+C    KU==LN+1, N==NU, 1<=J, J<=M, KU<=1, 5<=M, M<=6, 32<=N, N<=64,
+C    1<=NQ, NQ<=64}
 
 C (2,20)
 110      CONTINUE                                                       0040

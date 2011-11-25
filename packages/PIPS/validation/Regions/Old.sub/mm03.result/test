@@ -1,4 +1,104 @@
 
+C  T() {1<=N}
+
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+
+C  T(M) {0<=M, M<=3, 1<=N}
+
+C     
+      M = MOD(N, 4)                                                     0011
+
+C  T(I) {1<=I, I<=M, 0<=M, M<=3, 1<=N}
+
+      DO I = 1, M                                                       0012
+
+C  T() {1<=I, I<=M, 0<=M, M<=3, 1<=N}
+
+         X(I) = X(I)+S*Y(I)                                             0013
+      ENDDO
+
+C  T(I) {I#init==M+1, I#init<=I, I<=N, 1<=I#init, I#init<=4, 1<=N}
+
+C     
+      DO I = M+1, N, 4                                                  0016
+
+C  T() {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I) = X(I)+S*Y(I)                                             0017
+
+C  T() {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+1) = X(I+1)+S*Y(I+1)                                       0018
+
+C  T() {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+2) = X(I+2)+S*Y(I+2)                                       0019
+
+C  T() {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+3) = X(I+3)+S*Y(I+3)                                       0020
+      ENDDO
+C
+      END
+
+C  P() {}
+
+C     
+C     COMPUTATION OF X = X + S*Y
+C     
+C     SUMMARY OF EFFECTS ON A PROCEDURE
+C     
+      SUBROUTINE SAXPY(N, X, Y, S)
+C     
+      INTEGER N
+      REAL*8 X(N), Y(N), S
+
+C  P() {1<=N}
+
+C     
+      M = MOD(N, 4)                                                     0011
+
+C  P(M) {0<=M, M<=3, 1<=N}
+
+      DO I = 1, M                                                       0012
+
+C  P(I,M) {1<=I, I<=M, 0<=M, M<=3, 1<=N}
+
+         X(I) = X(I)+S*Y(I)                                             0013
+      ENDDO
+
+C  P(I,M) {I==M+1, 1<=I, I<=4, 1<=N}
+
+C     
+      DO I = M+1, N, 4                                                  0016
+
+C  P(I,M) {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I) = X(I)+S*Y(I)                                             0017
+
+C  P(I,M) {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+1) = X(I+1)+S*Y(I+1)                                       0018
+
+C  P(I,M) {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+2) = X(I+2)+S*Y(I+2)                                       0019
+
+C  P(I,M) {M+1<=I, I<=N, 0<=M, M<=3, 1<=N}
+
+         X(I+3) = X(I+3)+S*Y(I+3)                                       0020
+      ENDDO
+C
+      END
+
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
 C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
@@ -15,15 +115,15 @@ C
 C     
       M = MOD(N, 4)                                                     0011
 
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
-C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
-C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
 
       DO I = 1, M                                                       0012
 
-C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
-C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
+C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
 
          X(I) = X(I)+S*Y(I)                                             0013
       ENDDO
@@ -93,33 +193,36 @@ C  <C(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N, 1<=J, J<=N}>
          ENDDO
       ENDDO
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
-C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
-C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
-C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, I==N+1}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2+1<=I,
+C    I==N+1}>
+C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2+1<=I,
+C    I==N+1}>
+C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2+1<=I,
+C    I==N+1}>
 
 C     
       DO J = 1, N                                                       0018
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, N+1<=I,
-C    1<=J, J<=N}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, I==N+1,
+C    J+1<=I, 1<=J}>
 C  <B(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I}>
+C    I==N+1}>
 C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I}>
+C    I==N+1}>
 C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I}>
+C    I==N+1}>
 
          DO K = 1, N                                                    0019
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I, 1<=J, J<=N}>
+C    I==N+1, J+1<=I, 1<=J}>
 C  <B(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2,
-C    PHI2<=N, N+1<=I}>
+C    PHI2<=N, I==N+1}>
 C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I, 1<=K, K<=N}>
+C    I==N+1, K+1<=I, 1<=K}>
 C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    N+1<=I, 1<=K, K<=N}>
+C    I==N+1, K+1<=I, 1<=K}>
 
             CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                       0020
          ENDDO

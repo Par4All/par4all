@@ -76,7 +76,6 @@ void Calc_steervect(int nth, int nv, int ntt, int nsa, float SubarraySpacing, fl
 
          for(rec = 0; rec <= ntt-1; rec += 1)
             for(ant = 0; ant <= nsa-1; ant += 1) {
-
                angldir = AngleCarrier_rad+theta+(SubarraySpacing*ant-CarrierSpeed*Tr*rec)*sin(AngleCarrier_rad)/TargetDistance;
                delta_dist = -V*Tr*rec;
                deph_a = Kdeph*SubarraySpacing*ant*cos(angldir);
@@ -284,9 +283,7 @@ void Mat_Invert(int ntt, int nsa, Cplfloat In[ntt*nsa][ntt*nsa], Cplfloat Out[nt
             coef[0] = inv[k][i][0];
             coef[1] = inv[k][i][1];
             for(l = i; l <= 2*nsa*ntt-1; l += 1) {
-
                inv[k][l][0] -= coef[0]*inv[i][l][0]-coef[1]*inv[i][l][1];
-
                inv[k][l][1] -= coef[0]*inv[i][l][1]+coef[1]*inv[i][l][0];
             }
          }
@@ -649,6 +646,8 @@ int main()
    FILE *fp;
 
    char *filename = "InputStimuli.txt";
+   
+   //Open input file
    if ((fp = fopen(filename, "rb"))==(void *) 0) {
       fprintf(stderr, "couldn't open \"%s\"!\n", filename);
       return 1;
@@ -673,7 +672,6 @@ int main()
       for(i = 0; i <= Nraf-1; i += 1)
          if (Tr[i]<Trmin)
             Trmin = Tr[i];
-
       RecordPlots("PlotsOut.txt", 100*4, amb_out, 15, 2*20, 0.03/(2.*Trmin), 20, 5);
    }
 
@@ -690,7 +688,6 @@ void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int
    double S, Sc, T;
    double sqrAvPow;
    int IsMax;
-
    midRg = (tfac_L_RG-1)/2;
    midV = (tfac_L_V-1)/2;
    nb_neighb = tfac_L_RG*tfac_L_V-1;

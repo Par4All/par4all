@@ -1,4 +1,47 @@
 
+Transformers for "NEGAND"
+
+
+C  T() {}
+
+C     to test negation of and conditions
+
+      SUBROUTINE NEGAND
+
+C  T(I) {I==1}
+
+
+      I = 1                                                             0005
+
+C  T(J) {4<=J, J<=5}
+
+      IF (I.EQ.2.AND.J.EQ.3) THEN                                       0006
+
+C  T(J) {J==4}
+
+         J = 4                                                          0007
+      ELSE
+
+C  T(J) {J==5}
+
+         J = 5                                                          0009
+      ENDIF
+
+C  T(K) {J==K}
+
+
+      K = J                                                             0012
+
+C  T() {}
+
+
+      PRINT *, I, J, K                                                  0014
+
+      END
+
+Preconditions for "NEGAND"
+
+
 C  P() {}
 
 C     to test negation of and conditions

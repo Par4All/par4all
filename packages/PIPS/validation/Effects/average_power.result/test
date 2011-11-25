@@ -196,10 +196,10 @@ int main(int argc, char *argv[])
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3].im-W-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
-//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
+//  <in[PHI1][PHI2][PHI3].im-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
+//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, rg==13, th==14, v==12}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>
 //  <k-R-EXACT-{}>
@@ -211,9 +211,9 @@ int main(int argc, char *argv[])
       for(i = 0; i <= th-1; i += 1)
 
 //  <i-R-EXACT-{}>
-//  <in[PHI1][PHI2][PHI3].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=rg,
+//  <in[PHI1][PHI2][PHI3].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
 //    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
-//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=rg,
+//  <in[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12,
 //    0<=PHI3, PHI3<=11, rg==13, th==14, v==12, 0<=i, i<=13}>
 //  <j-R-EXACT-{}>
 //  <j-W-EXACT-{}>

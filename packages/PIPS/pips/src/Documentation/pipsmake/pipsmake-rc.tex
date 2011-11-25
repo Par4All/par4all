@@ -9808,9 +9808,18 @@ LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
 
 
-Use \PipsPropRef{LINEARIZE_ARRAY_VLA_ONLY} to limit this pass to C99 VLA array.
-\begin{PipsProp}{LINEARIZE_ARRAY_VLA_ONLY}
-LINEARIZE_ARRAY_VLA_ONLY FALSE
+Use \PipsPropRef{LINEARIZE_ARRAY_SKIP_STATIC_LENGTH_ARRAYS} to skip
+the array to pointer conversion for static length arrays. Linearization is
+always done.
+\begin{PipsProp}{LINEARIZE_ARRAY_SKIP_STATIC_LENGTH_ARRAYS}
+LINEARIZE_ARRAY_SKIP_STATIC_LENGTH_ARRAYS FALSE
+\end{PipsProp}
+
+Use \PipsPropRef{LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS} to skip
+the array to pointer conversion for locally declared arrays. Linearization
+is always done.
+\begin{PipsProp}{LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS}
+LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS FALSE
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE

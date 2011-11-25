@@ -1,0 +1,70 @@
+
+Let us try with "asm01.c" 
+
+int main()
+{
+   float a[10][10][10][10][10];
+   int i, j, k, l, m;
+   float x = 2.12;
+   float z = 0.0;
+   float y = 2.0;
+
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1) {
+                  y = 3.5+x+z;
+                  a[i][j][k][l][m] = x*y;
+               }
+         }
+   
+   // use the value of the array to prevent pips doing optimization on unused
+   // values
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1)
+                  fprintf(stdout, "%f", a[i][j][k][l][m]);
+         }
+
+   return 0;
+}
+
+Let us try again, but this time with "while.c" 
+
+int main()
+{
+   float a[10][10][10][10][10];
+   int i, j, k, l, m;
+   float x = 2.12;
+   float z = 0.0;
+   float y = 2.0;
+
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1) {
+                  y = 3.5+x+z;
+                  a[i][j][k][l][m] = x*y;
+               }
+         }
+   
+   // use the value of the array to prevent pips doing optimization on unused
+   // values
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1)
+                  fprintf(stdout, "%f", a[i][j][k][l][m]);
+         }
+
+   return 0;
+}

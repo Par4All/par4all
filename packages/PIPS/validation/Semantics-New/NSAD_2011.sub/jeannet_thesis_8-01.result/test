@@ -360,7 +360,7 @@ void ts_singlestate(void)
          if (!(ok==1))
 
 //  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==0, 0<=b0, b0<=1,
-//    1<=b0+x, 3<=2b0+x+y, 2<=b0+y, 1<=x, 2<=y}
+//    3<=2b0+x+y, 2<=b0+y, 1<=x, 2<=y}
 
             checking_error();
       }

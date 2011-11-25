@@ -1,0 +1,15 @@
+delete asm03
+
+
+create asm03 asm03.c
+
+echo 
+echo With simple asm extension
+echo
+display PRINTED_FILE[main]
+
+echo
+echo Conservative effects
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]

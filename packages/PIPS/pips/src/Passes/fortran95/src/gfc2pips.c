@@ -75,6 +75,7 @@
 #include "c_parser_private.h"
 #include "misc.h"
 #include "text-util.h"
+#include "ri-util.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -217,7 +218,9 @@ void gfc2pips_namespace(gfc_namespace* ns) {
       ram_function(r) = gfc2pips_main_entity;
       const char* name = module_local_name(gfc2pips_main_entity);
       if(ram_section(r) == entity_undefined) {
-        ram_section(r) = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
+         entity da = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
+         entity_kind(da)|= ABSTRACT_LOCATION | ENTITY_DYNAMIC_AREA;
+         ram_section(r) = da;
       }
     }
 
@@ -357,6 +360,8 @@ void gfc2pips_namespace(gfc_namespace* ns) {
         FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
                            strupper(local_name,local_name));
     entity_type(com) = make_type_area(make_area(0, NIL));
+
+    entity_kind(com) |= ABSTRACT_LOCATION ;
 
     entity_storage(com)
         = make_storage_ram(make_ram(get_current_module_entity(),
@@ -1065,7 +1070,8 @@ list gfc2pips_vars_(gfc_namespace *ns, list variables_p) {
         //we have a variable
         entity area = entity_undefined;
         if(gfc2pips_test_save(NULL, current_symtree)) {
-          area = FindOrCreateEntity(CurrentPackage, STATIC_AREA_LOCAL_NAME);
+          entity da = FindOrCreateEntity(CurrentPackage, STATIC_AREA_LOCAL_NAME);
+          entity_kind(da)|= ABSTRACT_LOCATION | ENTITY_STATIC_AREA;
           gfc2pips_debug(9,"Variable \"%s\" put in RAM \"%s\"\n",
               entity_local_name((entity)variables->car.e),
               STATIC_AREA_LOCAL_NAME);

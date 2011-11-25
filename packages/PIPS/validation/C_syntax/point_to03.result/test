@@ -10,7 +10,6 @@ void point_to03()
    typedef a_t *p_t;
    a_t a;
    p_t p;
-
    (&a+2)->foo = 1;
    
    /* Floating point values are not allowed in pointer arithmetic */

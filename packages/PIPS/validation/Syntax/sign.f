@@ -1,4 +1,5 @@
 C     Bug: an intrinsic is overriden
+C     SG: no longer a bug, PIPS supports this :p
 
       FUNCTION SIGN(X,Y)
 C

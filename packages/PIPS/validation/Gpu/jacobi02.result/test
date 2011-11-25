@@ -4,12 +4,10 @@ void p4a_kernel_get_data(float_t space[501][501], int i, int j)
 }
 void p4a_kernel_iteration(int i, int j, float_t save[501][501], float_t space[501][501])
 {
-
    save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
 void p4a_kernel_iteration_1(int i, int j, float_t save[501][501], float_t space[501][501])
 {
-
    space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void p4a_wrapper_get_data(float_t space[501][501], int i, int j)
@@ -21,14 +19,12 @@ void p4a_wrapper_iteration(int i, int j, float_t save[501][501], float_t space[5
 {
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
-   
    p4a_kernel_iteration(i, j, save, space);
 }
 void p4a_wrapper_iteration_1(int i, int j, float_t save[501][501], float_t space[501][501])
 {
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
-   
    p4a_kernel_iteration_1(i, j, save, space);
 }
 void p4a_launcher_get_data(float_t space[501][501], int i, int j_0[1])
@@ -52,7 +48,6 @@ void p4a_launcher_iteration(float_t save[501][501], float_t space[501][501])
       for(j = 1; j <= 499; j += 1)
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
-         
          p4a_wrapper_iteration(i, j, save, space);
 }
 void p4a_launcher_iteration_1(float_t save[501][501], float_t space[501][501])
@@ -64,7 +59,6 @@ void p4a_launcher_iteration_1(float_t save[501][501], float_t space[501][501])
       for(j = 1; j <= 499; j += 1)
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
-         
          p4a_wrapper_iteration_1(i, j, save, space);
 }
 void get_data(char filename[])

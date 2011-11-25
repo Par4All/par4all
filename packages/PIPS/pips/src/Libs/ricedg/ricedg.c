@@ -2307,16 +2307,6 @@ void writeresult(char *mod_name) {
   free(filename);
 }
 
-// have to be done before call :
-// * set_ordering_to_statement
-// * set_enclosing_loops_map
-// * loading cumulated effects
-graph compute_dg_on_statement_from_chains(statement s, graph chains) {
-  dg = copy_graph(chains);
-  return compute_dg_on_statement_from_chains_in_place(s, dg);
-}
-
-
 
 // have to be done before call :
 // * set_ordering_to_statement
@@ -2337,3 +2327,15 @@ graph compute_dg_on_statement_from_chains_in_place(statement s, graph chains) {
 
   return dg;
 }
+
+
+// have to be done before call :
+// * set_ordering_to_statement
+// * set_enclosing_loops_map
+// * loading cumulated effects
+graph compute_dg_on_statement_from_chains(statement s, graph chains) {
+  dg = copy_graph(chains);
+  return compute_dg_on_statement_from_chains_in_place(s, dg);
+}
+
+

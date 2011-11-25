@@ -1129,9 +1129,10 @@ words_assign_op(call obj,
       /* Brace expressions are not allowed in standard assignments */
       exp = EXPRESSION(CAR(CDR(args)));
       if (ENTITY_ASSIGN_P(call_function(obj))) {
-	if (brace_expression_p(exp))
-	  //pc = gen_nconc(pc,words_brace_expression(exp));
-	  pips_user_error("Brace expressions are not allowed in assignments\n");
+	if (brace_expression_p(exp)) {
+      // use GCC constructor extension */
+        pips_internal_error("this should not happen: a constructor is represnetd as a cas on brace expression\n");
+    }
 	else {
 	  /* Be careful with expression lists, they may require
            surrounding parentheses. */
@@ -2049,6 +2050,14 @@ get_special_prettyprint_for_operator(call obj){
   return op_name;
 }
 
+static list words_brace_op(call obj, int precedence, bool leftmost, list pdl)
+{
+    expression fake = call_to_expression(copy_call(obj));
+    list l = words_brace_expression(fake, pdl);
+    free_expression(fake);
+    return l;
+}
+
 /* Extension of "words_infix_binary_op" function for nary operators used
    in the EOLE project - (since "nary" assumes operators with at least 2
    op)  - JZ (Oct. 98)*/
@@ -2288,6 +2297,8 @@ static struct intrinsic_handler {
     const char * name;
     intrinsic_desc_t desc;
 } tab_intrinsic_handler[] = {
+    {BRACE_INTRINSIC, { words_brace_op, 31 } },
+
     {POWER_OPERATOR_NAME, { words_infix_binary_op, 30} },
 
     {CONCATENATION_FUNCTION_NAME, {words_infix_binary_op, 30} },
@@ -2297,6 +2308,7 @@ static struct intrinsic_handler {
     */
     {UNARY_MINUS_OPERATOR_NAME, { words_unary_minus, 25} },
     /* {"--", words_unary_minus, 19}, */
+
 
     {INVERSE_OPERATOR_NAME, { words_inverse_op, 21} },
 
@@ -2325,6 +2337,7 @@ static struct intrinsic_handler {
     {NON_EQUIV_OPERATOR_NAME, { words_infix_binary_op, 3} },
 
     {ASSIGN_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+
 
     {ALLOCATE_FUNCTION_NAME, { words_stat_io_inst, 0} },
     {DEALLOCATE_FUNCTION_NAME, { words_stat_io_inst, 0} },

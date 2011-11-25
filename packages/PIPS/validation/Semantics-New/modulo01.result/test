@@ -2,23 +2,36 @@
 Source code with transformers
 
 
-//  T() {}
+//  T(main) {main==0}
 
 int main()
 {
 
-//  T(i) {}
+//  T(i) {i==4}
 
-   int i;                                                               /*0006*/
+   int i = 4;
 
-//  T(j) {}
+//  T(j,k) {i==4}
 
-   int j;                                                               /*0007*/
+   int j, k;
 
-//  T(j) {0<=j, j<=1}
+//  T(i,j) {i==5, i#init==4, j==0}
+
+   j = i++%2;
+
+//  T(i,k) {i==6, i#init==5, j==0, k==0}
+
+   k = ++i%2;
+
+//  T() {i==6, j==0, k==0}
 
 
-   j = i++%2;                                                           /*0009*/
+   printf("i=%d, j=%d, k=%d\n", i, j, k);
+
+//  T(main) {i==6, j==0, k==0, main==0}
+
+
+   return 0;
 }
 
 Source code with preconditions
@@ -31,14 +44,27 @@ int main()
 
 //  P() {}
 
-   int i;                                                               /*0006*/
+   int i = 4;
 
-//  P(i) {}
+//  P(i) {i==4}
 
-   int j;                                                               /*0007*/
+   int j, k;
 
-//  P(i,j) {}
+//  P(i,j,k) {i==4}
+
+   j = i++%2;
+
+//  P(i,j,k) {i==5, j==0}
+
+   k = ++i%2;
+
+//  P(i,j,k) {i==6, j==0, k==0}
 
 
-   j = i++%2;                                                           /*0009*/
+   printf("i=%d, j=%d, k=%d\n", i, j, k);
+
+//  P(i,j,k) {i==6, j==0, k==0}
+
+
+   return 0;
 }

@@ -1,0 +1,8 @@
+delete asm02
+
+echo
+echo Create fails because of asm gcc extension
+echo
+
+create asm02 asm02.c
+display PRINTED_FILE[asm02!]

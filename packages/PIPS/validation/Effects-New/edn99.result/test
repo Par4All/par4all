@@ -15,14 +15,16 @@ static int get_ppm_unsigned(FILE *f)
       ch = get_ppm_char(f);
    }
    while ((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISspace);
+   
+   // If it's not a digit, we have a problem.
    if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) {
       ungetc(ch, f);
       return -1;
    }
+   // Scan all digits, converting to an integer.
    int i = ch-'0';
 l99999:   ;
    if (!1) goto _break_2;
-   // Scan all digits, converting to an integer.
    ch = get_ppm_char(f);
    if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) goto _break_2;
    i = 10*i+(ch-'0');
@@ -41,6 +43,9 @@ ppm_dim get_ppm_dim(FILE *f)
 {
    rewind(f);
    ppm_dim dim;
+   // Check magic number.
+   
+   
    if (get_ppm_char(f)!='P'||get_ppm_char(f)!='6'||!((*__ctype_b_loc())[(int) get_ppm_char(f)]&(unsigned short) _ISspace)) {
       dim.height = -1;
       dim.width = -1;
@@ -195,6 +200,8 @@ static int get_ppm_unsigned(FILE *f)
    }
    while ((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISspace);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   
+   // If it's not a digit, we have a problem.
    if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) {
 //             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
 //             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
@@ -202,6 +209,7 @@ static int get_ppm_unsigned(FILE *f)
       ungetc(ch, f);
       return -1;
    }
+   // Scan all digits, converting to an integer.
 //             <    is read   >: ch
 //             <    is written>: i
    int i = ch-'0';
@@ -211,7 +219,6 @@ l99999:   ;
 //             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
 //             <    is read   >: f
 //             <    is written>: ch
-   // Scan all digits, converting to an integer.
    ch = get_ppm_char(f);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
    if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) goto _break_2;
@@ -247,6 +254,9 @@ ppm_dim get_ppm_dim(FILE *f)
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: f[0] f[0] __IO_EFFECTS:LUNS[*] 
 //                               __IO_EFFECTS:LUNS[*]
+   // Check magic number.
+   
+   
    if (get_ppm_char(f)!='P'||get_ppm_char(f)!='6'||!((*__ctype_b_loc())[(int) get_ppm_char(f)]&(unsigned short) _ISspace)) {
 //             <    is written>: dim.height
       dim.height = -1;

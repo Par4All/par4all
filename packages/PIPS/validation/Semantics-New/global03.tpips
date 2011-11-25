@@ -1,0 +1,22 @@
+delete global03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create global03 global03.c
+
+echo
+echo Cumulated effects for "do_refine"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Transformers for "do_refine"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+close
+delete global03

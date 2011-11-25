@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "testing that tpips fails when stdio.h is not included and printf is used...."
+export WS=missing_stdio_dot_h
+
+tpips <<EOF 2> $WS.res
+delete $WS
+
+create $WS $WS.c
+
+delete $WS
+create $WS $WS.c
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete $WS
+quit
+
+EOF
+
+grep stdout $WS.res
+rm $WS.res
+
+

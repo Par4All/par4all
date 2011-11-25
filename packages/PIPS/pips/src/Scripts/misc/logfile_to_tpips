@@ -36,16 +36,13 @@ sed=${PIPS_SED:-sed}
 
 WS=${1:?"Please give me the workspace name to work with"}
 
-if [ -z "`basename $WS`" ]
-then
-	echo $0 remove trailing slash in "$WS"
-	exit 1
-fi
+# Remove trailing slash in WS
+WS= `echo "${WS}" | sed -e "s/\/*$//" `
 
 if [ `basename $WS` != "$WS" ]
 then
-	echo $0 can only be used on a local database
-	exit 1
+  	echo $0 can only be used on a local database
+	  exit 1
 fi
 
 if [ `basename $WS .database` != "$WS" ]

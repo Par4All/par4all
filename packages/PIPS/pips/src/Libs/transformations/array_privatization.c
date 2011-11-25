@@ -814,8 +814,7 @@ declarations_privatizer(char *mod_name)
     if (entity_undefined_p(dynamic_area))
     {
        	
-	dynamic_area = FindOrCreateEntity(module_local_name(module),
-					  DYNAMIC_AREA_LOCAL_NAME); 
+	dynamic_area = FindEntity(module_local_name(module), DYNAMIC_AREA_LOCAL_NAME); 
     }
 
     debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");

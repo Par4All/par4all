@@ -19,7 +19,6 @@ int main()
 //             <    is read   >: e i
 //             <    is written>: a[(e?b:c)[i]]
 //             <    is referenced>: a e i
-
    a[(e?b:c)[i]] = 0;
    return 0;
 }

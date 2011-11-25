@@ -1,0 +1,37 @@
+#
+# Parsed Code for p4a_launcher_kernel_2mm
+#
+void p4a_launcher_kernel_2mm(register int ub1, double A[1024+0][1024+0], double B[1024+0][1024+0], double D[1024+0][1024+0], double alpha, double beta, int nj, int nk, int nl, double tmp[1024+0][1024+0])
+{
+   //PIPS generated variable
+   register int c1, c2, c7;
+   // Loop nest P4A begin,2D((int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1))+1, ub1+1)
+   for (c1 = 0;c1<=ub1;c1 += 1)
+      for (c2 = 0;c2<=(int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1));c2 += 1)
+         // Loop nest P4A end
+         if (c1<=ub1&&c2<=(int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1))) {
+            D[c1][c2] *= beta;
+            tmp[c1][c2] = 0;
+            for (c7 = 0;c7<=nk+(-1);c7 += 1)
+               tmp[c1][c2] += alpha*A[c1][c7]*B[c7][c2];
+         }
+
+}
+#
+# Code after print_code for module p4a_launcher_kernel_2mm
+#
+void p4a_launcher_kernel_2mm(register int ub1, double A[1024+0][1024+0], double B[1024+0][1024+0], double D[1024+0][1024+0], double alpha, double beta, int nj, int nk, int nl, double tmp[1024+0][1024+0])
+{
+   //PIPS generated variable
+   register int c1, c2, c7;
+   // Loop nest P4A begin,2D((int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1))+1, ub1+1)
+   for(c1 = 0; c1 <= ub1; c1 += 1)
+      for(c2 = 0; c2 <= (int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1)); c2 += 1)
+         // Loop nest P4A end
+         if (c1<=ub1&&c2<=(int) (nj+(-1)<nl+(-1)?nj+(-1):nl+(-1))) {
+            D[c1][c2] *= beta;
+            tmp[c1][c2] = 0;
+            for(c7 = 0; c7 <= nk+(-1); c7 += 1)
+               tmp[c1][c2] += alpha*A[c1][c7]*B[c7][c2];
+         }
+}
