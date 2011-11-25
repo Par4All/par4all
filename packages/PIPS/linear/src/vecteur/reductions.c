@@ -452,8 +452,7 @@ Variable var;
  *    le test de proprotionalite uniquement sur la fin des vecteurs v1 et v2;
  *    Francois Irigoin, 26 mars 1991
  */
-int vect_proport(v1,v2)
-Pvecteur v1,v2;
+int vect_proport(Pvecteur v1, Pvecteur v2)
 {
     int prop = 1;
 
