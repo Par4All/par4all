@@ -674,10 +674,18 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
                                 /* add a constraint 0 <= phi1 and the upperbound constraint*/
                                 sc_add_phi_equation(&sc, int_to_expression(0), 1, false, false);
                                 sc_add_phi_equation(&sc, eupper, 1, false, true);
+
+                                bool must = false;
+                                if(!CONTRAINTE_UNDEFINED_P(lower)) {
+                                    expression elower = constraints_to_loop_bound(lower,phi1,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                                    intptr_t p;
+                                    must=(expression_integer_value(elower,&p)&&p==0);
+                                    free_expression(elower);
+                                }
                                 /* duplicate the region */
                                 region copy = make_region(copy_reference(ref),
                                         copy_action(region_action(*reg)),
-                                        make_approximation_may(), sc);
+                                        must?make_approximation_exact():make_approximation_may(), sc);
                                 /* add it to current region */
                                 region nreg = regions_must_convex_hull(*reg,copy);
                                 free_effect(*reg);
