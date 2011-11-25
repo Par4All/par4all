@@ -270,6 +270,8 @@ typedef int Value;
 #define value_compare(v1,v2) (value_eq(v1,v2)?0:value_lt(v1,v2)?-1:1)
 
 /* binary operators on values
+ *
+ * FI: some information about pdiv and pmod?
  */
 #define value_plus(v1,v2)  		((v1)+(v2))
 #define value_div(v1,v2)   		((v1)/(v2))
@@ -319,6 +321,8 @@ typedef int Value;
 #define value_posz_p(val)     value_ge(val,VALUE_ZERO)
 #define value_negz_p(val)     value_le(val,VALUE_ZERO)
 #define value_zero_p(val)     value_eq(val,VALUE_ZERO)
+// No underscore between "not" and "zero": value_not_zero_p()
+// Added to improve retrieval
 #define value_notzero_p(val)  value_ne(val,VALUE_ZERO)
 #define value_one_p(val)      value_eq(val,VALUE_ONE)
 #define value_notone_p(val)   value_ne(val,VALUE_ONE)
