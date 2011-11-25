@@ -583,7 +583,7 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
                 nbdims = gen_length(indices);
             else
                 nbdims = gen_length(variable_dimensions(type_variable(ut)));
-            if(!entity_local_variable_p(eref,get_current_module_entity()) ) {
+            if(!entity_local_variable_p(eref,get_current_module_entity()) && ! formal_parameter_p(eref) ) {
                 pips_user_warning("Trying to isolate a statement with a call that references a global variable `%s'\n",entity_user_name(eref));
                 p->ok=false;
             }
