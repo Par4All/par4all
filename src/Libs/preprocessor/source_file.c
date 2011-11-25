@@ -1013,13 +1013,35 @@ static bool check_c_file_syntax(string file_name)
  */
 static char* extract_last_name(char *line)
 {
+#if 1
     /* look for the two past directory separators */
     char * iter = line + strlen(line);
     for(int i =2;i&&iter!=line;--iter) {
         if(*iter=='/') --i;
     }
-    if(iter-1>line) iter[-1]=0;
+    /* then look for whitespace separated module names */
+    if(iter==line) {
+        iter= strrchr(line,' ');
+        if(iter) {
+            iter[0]=0;
+            iter=iter+1;
+        }
+    }
+    else
+        iter[-1]=0;
+    if(!iter)
+        iter=line;
+
     return iter;
+#else
+        int l = strlen(line);
+        do {
+               while (l>=0 && line[l]!=' ') l--;
+               if (l>=0 && line[l]==' ') line[l]='\0';
+           } while (l>=0 && strlen(line+l+1)==0);
+        return l>=-1? line+l+1: NULL;
+#endif
+
 }
 
 
