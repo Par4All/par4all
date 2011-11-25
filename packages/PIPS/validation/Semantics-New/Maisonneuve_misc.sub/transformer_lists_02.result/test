@@ -15,7 +15,7 @@ void run()
 
    int b = 0;
 
-//  T(c) {0<=c, c<=1}
+//  T(c) {b==0, 0<=c, c<=1}
 
    int c = rand()%2;
 

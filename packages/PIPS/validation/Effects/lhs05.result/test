@@ -4,7 +4,6 @@ Parsed printed file for "lhs05"
 void lhs05()
 {
    int x;
-
    *&x = 1;
 }
 
@@ -14,7 +13,6 @@ void lhs05()
 {
    int x;
 //             <    is written>: x
-
    *&x = 1;
 }
 
@@ -24,6 +22,5 @@ void lhs05()
 {
    int x;
 //             <    is written>: x
-
    *&x = 1;
 }

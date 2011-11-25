@@ -37,7 +37,7 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[bar]
-
+#quit
 echo
 echo Preconditions for "foo"
 echo
@@ -60,7 +60,7 @@ apply UNSPAGHETTIFY[bar]
 display PRINTED_FILE[bar]
 
 echo
-echo Preconditions for "bar"
+echo Preconditions for "bar" after unfolding and unspahettify
 echo
 
 activate PRINT_CODE_PRECONDITIONS

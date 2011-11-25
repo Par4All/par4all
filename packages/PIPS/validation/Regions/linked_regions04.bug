@@ -1,0 +1,1 @@
+Two properties added to exploit array declarations and references. The number of overflows and errors is reduced a lot wrt linked_regions03.c, but not reduced to 0. And the result is still wrong.

@@ -1,0 +1,24 @@
+#
+# Initial code for module pain
+#
+void pain()
+{
+   char t[18];
+holy:   sain(t);
+}
+#
+# Code after isolate_statement for module pain
+#
+void pain()
+{
+   char t[18];
+   {
+      //PIPS generated variable
+      char (*t0)[2] = (char (*)[2]) 0;
+      P4A_accel_malloc((void **) &t0, sizeof(char)*2);
+
+holy:      sain(*t0);
+      P4A_copy_from_accel_1d(sizeof(char), 18, 2, 0, &t[0], *t0);
+      P4A_accel_free(t0);
+   }
+}

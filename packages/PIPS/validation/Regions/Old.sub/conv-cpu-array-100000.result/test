@@ -36,6 +36,12 @@ int main(int argc, char *argv[])
 {
    //int n = 10000;
    int loops = 10;
+   
+   //int numBytes = n * n * sizeof(float);
+   /*
+     float* h_A = (float *) malloc(numBytes);
+     float* h_C = (float *) malloc(numBytes);
+     */
    float h_A[100000LL*100000LL];
    float h_C[100000LL*100000LL];
 
@@ -90,6 +96,12 @@ int main(int argc, char *argv[])
 {
    //int n = 10000;
    int loops = 10;
+   
+   //int numBytes = n * n * sizeof(float);
+   /*
+     float* h_A = (float *) malloc(numBytes);
+     float* h_C = (float *) malloc(numBytes);
+     */
    float h_A[100000LL*100000LL];
    float h_C[100000LL*100000LL];
 

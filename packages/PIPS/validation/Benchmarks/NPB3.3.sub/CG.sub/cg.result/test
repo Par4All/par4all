@@ -1,0 +1,965 @@
+void c_print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, int passed_verification, char *npbversion, char *compiletime, char *cc, char *clink, char *c_lib, char *c_inc, char *cflags, char *clinkflags)
+{
+   printf("\n\n %s Benchmark Completed\n", name);
+
+   printf(" Class           =                        %c\n", class);
+
+   if (n3==0) {
+      long int nn = n1;
+      if (n2!=0)
+         nn *= n2;
+      printf(" Size            =             %12ld\n", nn);
+   }
+   else
+      printf(" Size            =             %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+
+   printf(" Time in seconds =             %12.2f\n", t);
+
+   printf(" Mop/s total     =             %12.2f\n", mops);
+
+   printf(" Operation type  = %24s\n", optype);
+
+   if (passed_verification<0)
+      printf(" Verification    =            NOT PERFORMED\n");
+   else if (passed_verification)
+      printf(" Verification    =               SUCCESSFUL\n");
+   else
+      printf(" Verification    =             UNSUCCESSFUL\n");
+
+   printf(" Version         =             %12s\n", npbversion);
+
+   printf(" Compile date    =             %12s\n", compiletime);
+
+   printf("\n Compile options:\n");
+
+   printf("    CC           = %s\n", cc);
+
+   printf("    CLINK        = %s\n", clink);
+
+   printf("    C_LIB        = %s\n", c_lib);
+
+   printf("    C_INC        = %s\n", c_inc);
+
+   printf("    CFLAGS       = %s\n", cflags);
+
+   printf("    CLINKFLAGS   = %s\n", clinkflags);
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n");
+   printf(" Please send all errors/feedbacks to:\n");
+   printf(" Center for Manycore Programming\n");
+   printf(" cmp@aces.snu.ac.kr\n");
+   printf(" http://aces.snu.ac.kr\n");
+   printf("--------------------------------------\n");
+}
+static double elapsed_time(void)
+{
+   double t;
+
+   wtime_(&t);
+   return t;
+}
+static void conj_grad(int colidx[], int rowstr[], double x[], double z[], double a[], double p[], double q[], double r[], double *rnorm)
+{
+   int j, k;
+   int cgit, cgitmax = 25;
+   double d, sum, rho, rho0, alpha, beta;
+
+   rho = 0.0;
+   
+   //---------------------------------------------------------------------
+   // Initialize the CG algorithm:
+   //---------------------------------------------------------------------
+   for(j = 0; j <= naa+1-1; j += 1) {
+      q[j] = 0.0;
+      z[j] = 0.0;
+      r[j] = x[j];
+      p[j] = r[j];
+   }
+   
+   //---------------------------------------------------------------------
+   // rho = r.r
+   // Now, obtain the norm of r: First, sum squares of r elements locally...
+   //---------------------------------------------------------------------
+   for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+      rho = rho+r[j]*r[j];
+   
+   //---------------------------------------------------------------------
+   //---->
+   // The conj grad iteration loop
+   //---->
+   //---------------------------------------------------------------------
+   for(cgit = 1; cgit <= cgitmax; cgit += 1) {
+      //---------------------------------------------------------------------
+      // q = A.p
+      // The partition submatrix-vector multiply: use workspace w
+      //---------------------------------------------------------------------
+      //
+      // NOTE: this version of the multiply is actually (slightly: maybe %5) 
+      //       faster on the sp2 on 16 nodes than is the unrolled-by-2 version 
+      //       below.   On the Cray t3d, the reverse is true, i.e., the 
+      //       unrolled-by-two version is some 10% faster.  
+      //       The unrolled-by-8 version below is significantly faster
+      //       on the Cray t3d - overall speed of code is 1.5 times faster.
+      
+      for(j = 0; j <= lastrow-firstrow+1-1; j += 1) {
+         sum = 0.0;
+         for(k = rowstr[j]; k <= rowstr[j+1]-1; k += 1)
+            sum = sum+a[k]*p[colidx[k]];
+         q[j] = sum;
+      }
+      
+      /*
+          for (j = 0; j < lastrow - firstrow + 1; j++) {
+            int i = rowstr[j];
+            int iresidue = (rowstr[j+1] - i) % 2;
+            double sum1 = 0.0;
+            double sum2 = 0.0;
+            if (iresidue == 1)
+              sum1 = sum1 + a[i]*p[colidx[i]];
+            for (k = i + iresidue; k <= rowstr[j+1] - 2; k += 2) {
+              sum1 = sum1 + a[k]  *p[colidx[k]];
+              sum2 = sum2 + a[k+1]*p[colidx[k+1]];
+            }
+            q[j] = sum1 + sum2;
+          }
+          */
+      
+      /*
+          for (j = 0; j < lastrow - firstrow + 1; j++) {
+            int i = rowstr[j]; 
+            int iresidue = (rowstr[j+1] - i) % 8;
+            double sum = 0.0;
+            for (k = i; k <= i + iresidue - 1; k++) {
+              sum = sum + a[k]*p[colidx[k]];
+            }
+            for (k = i + iresidue; k <= rowstr[j+1] - 8; k += 8) {
+              sum = sum + a[k  ]*p[colidx[k  ]]
+                        + a[k+1]*p[colidx[k+1]]
+                        + a[k+2]*p[colidx[k+2]]
+                        + a[k+3]*p[colidx[k+3]]
+                        + a[k+4]*p[colidx[k+4]]
+                        + a[k+5]*p[colidx[k+5]]
+                        + a[k+6]*p[colidx[k+6]]
+                        + a[k+7]*p[colidx[k+7]];
+            }
+            q[j] = sum;
+          }
+          */
+      
+      //---------------------------------------------------------------------
+      // Obtain p.q
+      //---------------------------------------------------------------------
+      d = 0.0;
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+         d = d+p[j]*q[j];
+      
+      //---------------------------------------------------------------------
+      // Obtain alpha = rho / (p.q)
+      //---------------------------------------------------------------------
+      alpha = rho/d;
+      
+      //---------------------------------------------------------------------
+      // Save a temporary of rho
+      //---------------------------------------------------------------------
+      rho0 = rho;
+      
+      //---------------------------------------------------------------------
+      // Obtain z = z + alpha*p
+      // and    r = r - alpha*q
+      //---------------------------------------------------------------------
+      rho = 0.0;
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1) {
+         z[j] = z[j]+alpha*p[j];
+         r[j] = r[j]-alpha*q[j];
+      }
+      
+      //---------------------------------------------------------------------
+      // rho = r.r
+      // Now, obtain the norm of r: First, sum squares of r elements locally...
+      //---------------------------------------------------------------------
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+         rho = rho+r[j]*r[j];
+      
+      //---------------------------------------------------------------------
+      // Obtain beta:
+      //---------------------------------------------------------------------
+      beta = rho/rho0;
+      
+      //---------------------------------------------------------------------
+      // p = r + beta*p
+      //---------------------------------------------------------------------
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+         p[j] = r[j]+beta*p[j];
+   }
+   // end of do cgit=1,cgitmax
+   
+   //---------------------------------------------------------------------
+   // Compute residual norm explicitly:  ||r|| = ||x - A.z||
+   // First, form A.z
+   // The partition submatrix-vector multiply
+   //---------------------------------------------------------------------
+   sum = 0.0;
+   for(j = 0; j <= lastrow-firstrow+1-1; j += 1) {
+      d = 0.0;
+      for(k = rowstr[j]; k <= rowstr[j+1]-1; k += 1)
+         d = d+a[k]*z[colidx[k]];
+      r[j] = d;
+   }
+   
+   //---------------------------------------------------------------------
+   // At this point, r contains A.z
+   //---------------------------------------------------------------------
+   for(j = 0; j <= lastcol-firstcol+1-1; j += 1) {
+      d = x[j]-r[j];
+      sum = sum+d*d;
+   }
+
+   *rnorm = sqrt(sum);
+}
+static int icnvrt(double x, int ipwr2)
+{
+   return (int) (ipwr2*x);
+}
+static void makea(int n, int nz, double a[], int colidx[], int rowstr[], int firstrow, int lastrow, int firstcol, int lastcol, int arow[], int acol[][7+1], double aelt[][7+1], int iv[])
+{
+   int iouter, ivelt, nzv, nn1;
+   int ivc[7+1];
+   double vc[7+1];
+   
+   //---------------------------------------------------------------------
+   // nonzer is approximately  (int(sqrt(nnza /n)));
+   //---------------------------------------------------------------------
+   
+   //---------------------------------------------------------------------
+   // nn1 is the smallest power of two not less than n
+   //---------------------------------------------------------------------
+   nn1 = 1;
+   do {
+      nn1 = 2*nn1;
+   }
+   while (nn1<n);
+   
+   //---------------------------------------------------------------------
+   // Generate nonzero positions and save for the use in sparse.
+   //---------------------------------------------------------------------
+   for(iouter = 0; iouter <= n-1; iouter += 1) {
+      nzv = 7;
+      sprnvc(n, nzv, nn1, vc, ivc);
+      vecset(n, vc, ivc, &nzv, iouter+1, 0.5);
+      arow[iouter] = nzv;
+
+      for(ivelt = 0; ivelt <= nzv-1; ivelt += 1) {
+         acol[iouter][ivelt] = ivc[ivelt]-1;
+         aelt[iouter][ivelt] = vc[ivelt];
+      }
+   }
+   
+   //---------------------------------------------------------------------
+   // ... make the sparse matrix from list of elements with duplicates
+   //     (iv is used as  workspace)
+   //---------------------------------------------------------------------
+   
+   
+   sparse(a, colidx, rowstr, n, nz, 7, arow, acol, aelt, firstrow, lastrow, iv, 1.0e-1, 10.0);
+}
+static void sparse(double a[], int colidx[], int rowstr[], int n, int nz, int nozer, int arow[], int acol[][7+1], double aelt[][7+1], int firstrow, int lastrow, int nzloc[], double rcond, double shift)
+{
+   int nrows;
+   
+   //---------------------------------------------------
+   // generate a sparse matrix from a list of
+   // [col, row, element] tri
+   //---------------------------------------------------
+   int i, j, j1, j2, nza, k, kk, nzrow, jcol;
+   double size, scale, ratio, va;
+   logical cont40;
+   
+   //---------------------------------------------------------------------
+   // how many rows of result
+   //---------------------------------------------------------------------
+   nrows = lastrow-firstrow+1;
+   
+   //---------------------------------------------------------------------
+   // ...count the number of triples in each row
+   //---------------------------------------------------------------------
+   for(j = 0; j <= nrows+1-1; j += 1)
+      rowstr[j] = 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      for(nza = 0; nza <= arow[i]-1; nza += 1) {
+         j = acol[i][nza]+1;
+         rowstr[j] = rowstr[j]+arow[i];
+      }
+
+   rowstr[0] = 0;
+   for(j = 1; j <= nrows+1-1; j += 1)
+      rowstr[j] = rowstr[j]+rowstr[j-1];
+   nza = rowstr[nrows]-1;
+   
+   //---------------------------------------------------------------------
+   // ... rowstr(j) now is the location of the first nonzero
+   //     of row j of a
+   //---------------------------------------------------------------------
+   if (nza>nz) {
+      printf("Space for matrix elements exceeded in sparse\n");
+      printf("nza, nzmax = %d, %d\n", nza, nz);
+      exit(1);
+   }
+   
+   //---------------------------------------------------------------------
+   // ... preload data pages
+   //---------------------------------------------------------------------
+   for(j = 0; j <= nrows-1; j += 1) {
+      for(k = rowstr[j]; k <= rowstr[j+1]-1; k += 1) {
+         a[k] = 0.0;
+         colidx[k] = -1;
+      }
+      nzloc[j] = 0;
+   }
+   
+   //---------------------------------------------------------------------
+   // ... generate actual values by summing duplicates
+   //---------------------------------------------------------------------
+   size = 1.0;
+   ratio = pow(rcond, 1.0/((double) n));
+
+   for(i = 0; i <= n-1; i += 1) {
+      for(nza = 0; nza <= arow[i]-1; nza += 1) {
+         j = acol[i][nza];
+
+         scale = size*aelt[i][nza];
+         for(nzrow = 0; nzrow <= arow[i]-1; nzrow += 1) {
+            jcol = acol[i][nzrow];
+            va = aelt[i][nzrow]*scale;
+            
+            //--------------------------------------------------------------------
+            // ... add the identity * rcond to the generated matrix to bound
+            //     the smallest eigenvalue from below by rcond
+            //--------------------------------------------------------------------
+            if (jcol==j&&j==i)
+               va = va+rcond-shift;
+
+            cont40 = false;
+            k = rowstr[j];
+l99996:            ;
+            if (!(k<rowstr[j+1])) goto _break_10;
+            if (colidx[k]>jcol) goto l99999;
+            if (colidx[k]==-1) goto l99998;
+            if (colidx[k]==jcol) goto l99997;
+            k++;
+            goto l99996;
+l99997:            ;
+            //--------------------------------------------------------------
+            // ... mark the duplicated entry
+            //--------------------------------------------------------------
+            nzloc[j] = nzloc[j]+1;
+            cont40 = true;
+            goto _break_10;
+l99998:            ;
+            colidx[k] = jcol;
+            cont40 = true;
+            goto _break_10;
+l99999:            ;
+            //----------------------------------------------------------------
+            // ... insert colidx here orderly
+            //----------------------------------------------------------------
+            for(kk = rowstr[j+1]-2; kk >= k; kk += -1)
+               if (colidx[kk]>-1) {
+                  a[kk+1] = a[kk];
+                  colidx[kk+1] = colidx[kk];
+               }
+            colidx[k] = jcol;
+            a[k] = 0.0;
+            cont40 = true;
+_break_10:            ;
+            if (cont40==false) {
+               printf("internal error in sparse: i=%d\n", i);
+               exit(1);
+            }
+            a[k] = a[k]+va;
+         }
+      }
+      size = size*ratio;
+   }
+   
+   //---------------------------------------------------------------------
+   // ... remove empty entries and generate final results
+   //---------------------------------------------------------------------
+   for(j = 1; j <= nrows-1; j += 1)
+      nzloc[j] = nzloc[j]+nzloc[j-1];
+
+   for(j = 0; j <= nrows-1; j += 1) {
+      if (j>0)
+         j1 = rowstr[j]-nzloc[j-1];
+      else
+         j1 = 0;
+      j2 = rowstr[j+1]-nzloc[j];
+      nza = rowstr[j];
+      for(k = j1; k <= j2-1; k += 1) {
+         a[k] = a[nza];
+         colidx[k] = colidx[nza];
+         nza = nza+1;
+      }
+   }
+   for(j = 1; j <= nrows+1-1; j += 1)
+      rowstr[j] = rowstr[j]-nzloc[j-1];
+   nza = rowstr[nrows]-1;
+}
+static void sprnvc(int n, int nz, int nn1, double v[], int iv[])
+{
+   int nzv, ii, i;
+   double vecelt, vecloc;
+
+   nzv = 0;
+
+   while (nzv<nz) {
+      vecelt = randlc(&tran, amult);
+      
+      //---------------------------------------------------------------------
+      // generate an integer between 1 and n in a portable manner
+      //---------------------------------------------------------------------
+      vecloc = randlc(&tran, amult);
+      i = icnvrt(vecloc, nn1)+1;
+      if (i>n) goto _loop_end_1;
+      
+      //---------------------------------------------------------------------
+      // was this integer generated already?
+      //---------------------------------------------------------------------
+      logical was_gen = false;
+      ii = 0;
+l99998:      ;
+      if (!(ii<nzv)) goto _break_2;
+      if (iv[ii]==i) goto l99999;
+      ii++;
+      goto l99998;
+l99999:      ;
+      was_gen = true;
+_break_2:      ;
+      if (was_gen) goto _loop_end_1;
+      v[nzv] = vecelt;
+      iv[nzv] = i;
+      nzv = nzv+1;
+_loop_end_1:      ;
+   }
+}
+static void vecset(int n, double v[], int iv[], int *nzv, int i, double val)
+{
+   int k;
+   logical set;
+
+   set = false;
+   for(k = 0; k <= *nzv-1; k += 1)
+      if (iv[k]==i) {
+         v[k] = val;
+         set = true;
+      }
+   if (set==false) {
+      v[*nzv] = val;
+      iv[*nzv] = i;
+      *nzv = *nzv+1;
+   }
+}
+int main(int argc, char *argv[])
+{
+   int i, j, k, it;
+
+   double zeta;
+   double rnorm;
+   double norm_temp1, norm_temp2;
+
+   double t, mflops, tmax;
+   char Class;
+   logical verified;
+   double zeta_verify_value, epsilon, err;
+
+   char *t_names[3];
+
+   for(i = 0; i <= 2; i += 1)
+      timer_clear(i);
+
+   FILE *fp;
+   if ((fp = fopen("timer.flag", "r"))!=(void *) 0) {
+      timeron = true;
+      t_names[0] = "init";
+      t_names[1] = "benchmk";
+      t_names[2] = "conjgd";
+      fclose(fp);
+   }
+   else
+      timeron = false;
+
+   timer_start(0);
+
+   firstrow = 0;
+   lastrow = 1400-1;
+   firstcol = 0;
+   lastcol = 1400-1;
+
+   if (1400==1400&&7==7&&15==15&&10.0==10) {
+      Class = 'S';
+      zeta_verify_value = 8.5971775078648;
+   }
+   else if (1400==7000&&7==8&&15==15&&10.0==12) {
+      Class = 'W';
+      zeta_verify_value = 10.362595087124;
+   }
+   else if (1400==14000&&7==11&&15==15&&10.0==20) {
+      Class = 'A';
+      zeta_verify_value = 17.130235054029;
+   }
+   else if (1400==75000&&7==13&&15==75&&10.0==60) {
+      Class = 'B';
+      zeta_verify_value = 22.712745482631;
+   }
+   else if (1400==150000&&7==15&&15==75&&10.0==110) {
+      Class = 'C';
+      zeta_verify_value = 28.973605592845;
+   }
+   else if (1400==1500000&&7==21&&15==100&&10.0==500) {
+      Class = 'D';
+      zeta_verify_value = 52.514532105794;
+   }
+   else if (1400==9000000&&7==26&&15==100&&10.0==1500) {
+      Class = 'E';
+      zeta_verify_value = 77.522164599383;
+   }
+   else
+      Class = 'U';
+
+   printf("\n\n NAS Parallel Benchmarks (NPB3.3-SER-C) - CG Benchmark\n\n");
+   printf(" Size: %11d\n", 1400);
+   printf(" Iterations: %5d\n", 15);
+   printf("\n");
+
+   naa = 1400;
+   nzz = 1400*(7+1)*(7+1);
+   
+   //---------------------------------------------------------------------
+   // Inialize random number generator
+   //---------------------------------------------------------------------
+   tran = 314159265.0;
+   amult = 1220703125.0;
+   zeta = randlc(&tran, amult);
+   
+   //---------------------------------------------------------------------
+   //  
+   //---------------------------------------------------------------------
+   
+   
+   
+   
+   
+   makea(naa, nzz, a, colidx, rowstr, firstrow, lastrow, firstcol, lastcol, arow, (int (*)[7+1]) (void *) acol, (double (*)[7+1]) (void *) aelt, iv);
+   
+   //---------------------------------------------------------------------
+   // Note: as a result of the above call to makea:
+   //      values of j used in indexing rowstr go from 0 --> lastrow-firstrow
+   //      values of colidx which are col indexes go from firstcol --> lastcol
+   //      So:
+   //      Shift the col index vals from actual (firstcol --> lastcol ) 
+   //      to local, i.e., (0 --> lastcol-firstcol)
+   //---------------------------------------------------------------------
+   for(j = 0; j <= lastrow-firstrow+1-1; j += 1)
+      for(k = rowstr[j]; k <= rowstr[j+1]-1; k += 1)
+         colidx[k] = colidx[k]-firstcol;
+   
+   //---------------------------------------------------------------------
+   // set starting vector to (1, 1, .... 1)
+   //---------------------------------------------------------------------
+   for(i = 0; i <= 1400; i += 1)
+      x[i] = 1.0;
+   for(j = 0; j <= lastcol-firstcol+1-1; j += 1) {
+      q[j] = 0.0;
+      z[j] = 0.0;
+      r[j] = 0.0;
+      p[j] = 0.0;
+   }
+
+   zeta = 0.0;
+   
+   //---------------------------------------------------------------------
+   //---->
+   // Do one iteration untimed to init all code and data page tables
+   //---->                    (then reinit, start timing, to niter its)
+   //---------------------------------------------------------------------
+   for(it = 1; it <= 1; it += 1) {
+      //---------------------------------------------------------------------
+      // The call to the conjugate gradient routine:
+      //---------------------------------------------------------------------
+      conj_grad(colidx, rowstr, x, z, a, p, q, r, &rnorm);
+      
+      //---------------------------------------------------------------------
+      // zeta = shift + 1/(x.z)
+      // So, first: (x.z)
+      // Also, find norm of z
+      // So, first: (z.z)
+      //---------------------------------------------------------------------
+      norm_temp1 = 0.0;
+      norm_temp2 = 0.0;
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1) {
+         norm_temp1 = norm_temp1+x[j]*z[j];
+         norm_temp2 = norm_temp2+z[j]*z[j];
+      }
+
+      norm_temp2 = 1.0/sqrt(norm_temp2);
+      
+      //---------------------------------------------------------------------
+      // Normalize z to obtain x
+      //---------------------------------------------------------------------
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+         x[j] = norm_temp2*z[j];
+   }
+   // end of do one iteration untimed
+   
+   
+   //---------------------------------------------------------------------
+   // set starting vector to (1, 1, .... 1)
+   //---------------------------------------------------------------------
+   for(i = 0; i <= 1400; i += 1)
+      x[i] = 1.0;
+
+   zeta = 0.0;
+
+   timer_stop(0);
+
+   printf(" Initialization time = %15.3f seconds\n", timer_read(0));
+
+   timer_start(1);
+   
+   //---------------------------------------------------------------------
+   //---->
+   // Main Iteration for inverse power method
+   //---->
+   //---------------------------------------------------------------------
+   for(it = 1; it <= 15; it += 1) {
+      //---------------------------------------------------------------------
+      // The call to the conjugate gradient routine:
+      //---------------------------------------------------------------------
+      if (timeron)
+         timer_start(2);
+      conj_grad(colidx, rowstr, x, z, a, p, q, r, &rnorm);
+      if (timeron)
+         timer_stop(2);
+      
+      //---------------------------------------------------------------------
+      // zeta = shift + 1/(x.z)
+      // So, first: (x.z)
+      // Also, find norm of z
+      // So, first: (z.z)
+      //---------------------------------------------------------------------
+      norm_temp1 = 0.0;
+      norm_temp2 = 0.0;
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1) {
+         norm_temp1 = norm_temp1+x[j]*z[j];
+         norm_temp2 = norm_temp2+z[j]*z[j];
+      }
+
+      norm_temp2 = 1.0/sqrt(norm_temp2);
+
+      zeta = 10.0+1.0/norm_temp1;
+      if (it==1)
+         printf("\n   iteration           ||r||                 zeta\n");
+      printf("    %5d       %20.14E%20.13f\n", it, rnorm, zeta);
+      
+      //---------------------------------------------------------------------
+      // Normalize z to obtain x
+      //---------------------------------------------------------------------
+      for(j = 0; j <= lastcol-firstcol+1-1; j += 1)
+         x[j] = norm_temp2*z[j];
+   }
+   // end of main iter inv pow meth
+   
+   timer_stop(1);
+   
+   //---------------------------------------------------------------------
+   // End of timed section
+   //---------------------------------------------------------------------
+   
+   t = timer_read(1);
+
+   printf(" Benchmark completed\n");
+
+   epsilon = 1.0e-10;
+   if (Class!='U') {
+      err = fabs(zeta-zeta_verify_value)/zeta_verify_value;
+      if (err<=epsilon) {
+         verified = true;
+         printf(" VERIFICATION SUCCESSFUL\n");
+         printf(" Zeta is    %20.13E\n", zeta);
+         printf(" Error is   %20.13E\n", err);
+      }
+      else {
+         verified = false;
+         printf(" VERIFICATION FAILED\n");
+         printf(" Zeta                %20.13E\n", zeta);
+         printf(" The correct zeta is %20.13E\n", zeta_verify_value);
+      }
+   }
+   else {
+      verified = false;
+      printf(" Problem size unknown\n");
+      printf(" NO VERIFICATION PERFORMED\n");
+   }
+
+   if (t!=0.0)
+      mflops = (double) (2*15*1400)*(3.0+(double) (7*(7+1))+25.0*(5.0+(double) (7*(7+1)))+3.0)/t/1000000.0;
+   else
+      mflops = 0.0;
+   
+   
+   
+   
+   
+   print_results("CG", Class, 1400, 0, 0, 15, t, mflops, "          floating point", verified, "3.3.1", "08 Nov 2011", "gcc", "$(CC)", "-lm", "-I../common", "-g -Wall -O3", "-O3", "randdp");
+   
+   //---------------------------------------------------------------------
+   // More timers
+   //---------------------------------------------------------------------
+   if (timeron) {
+      tmax = timer_read(1);
+      if (tmax==0.0)
+         tmax = 1.0;
+      printf("  SECTION   Time (secs)\n");
+      for(i = 0; i <= 2; i += 1) {
+         t = timer_read(i);
+         if (i==0)
+            printf("  %8s:%9.3f\n", t_names[i], t);
+         else {
+            printf("  %8s:%9.3f  (%6.2f%%)\n", t_names[i], t, t*100.0/tmax);
+            if (i==2) {
+               t = tmax-t;
+               printf("    --> %8s:%9.3f  (%6.2f%%)\n", "rest", t, t*100.0/tmax);
+            }
+         }
+      }
+   }
+
+   return 0;
+}
+void print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, logical verified, char *npbversion, char *compiletime, char *cs1, char *cs2, char *cs3, char *cs4, char *cs5, char *cs6, char *cs7)
+{
+   char size[16];
+   int j;
+
+   printf("\n\n %s Benchmark Completed.\n", name);
+   printf(" Class           =             %12c\n", class);
+   if (n2==0&&n3==0)
+      if (name[0]=='E'&&name[1]=='P') {
+         sprintf(size, "%15.0lf", pow(2.0, n1));
+         j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
+         if (size[j]=='.') {
+            size[j] = ' ';
+            j--;
+         }
+         size[j+1] = '\0';
+         printf(" Size            =          %15s\n", size);
+      }
+      else
+         printf(" Size            =             %12d\n", n1);
+   else
+      printf(" Size            =           %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+   printf(" Time in seconds =             %12.2lf\n", t);
+   printf(" Mop/s total     =          %15.2lf\n", mops);
+   printf(" Operation type  = %24s\n", optype);
+   if (verified)
+      printf(" Verification    =             %12s\n", "SUCCESSFUL");
+   else
+      printf(" Verification    =             %12s\n", "UNSUCCESSFUL");
+   printf(" Version         =             %12s\n", npbversion);
+   printf(" Compile date    =             %12s\n", compiletime);
+   
+   
+   printf("\n Compile options:\n""    CC           = %s\n", cs1);
+   printf("    CLINK        = %s\n", cs2);
+   printf("    C_LIB        = %s\n", cs3);
+   printf("    C_INC        = %s\n", cs4);
+   printf("    CFLAGS       = %s\n", cs5);
+   printf("    CLINKFLAGS   = %s\n", cs6);
+   printf("    RAND         = %s\n", cs7);
+   
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n"" Please send all errors/feedbacks to:\n"" Center for Manycore Programming\n"" cmp@aces.snu.ac.kr\n"" http://aces.snu.ac.kr\n""--------------------------------------\n\n");
+}
+double randlc(double *x, double a)
+{
+   //--------------------------------------------------------------------
+   //
+   //  This routine returns a uniform pseudorandom double precision number in the
+   //  range (0, 1) by using the linear congruential generator
+   //
+   //  x_{k+1} = a x_k  (mod 2^46)
+   //
+   //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+   //  before repeating.  The argument A is the same as 'a' in the above formula,
+   //  and X is the same as x_0.  A and X must be odd double precision integers
+   //  in the range (1, 2^46).  The returned value RANDLC is normalized to be
+   //  between 0 and 1, i.e. RANDLC = 2^(-46) * x_1.  X is updated to contain
+   //  the new seed x_1, so that subsequent calls to RANDLC using the same
+   //  arguments will generate a continuous sequence.
+   //
+   //  This routine should produce the same results on any computer with at least
+   //  48 mantissa bits in double precision floating point data.  On 64 bit
+   //  systems, double precision should be disabled.
+   //
+   //  David H. Bailey     October 26, 1990
+   //
+   //--------------------------------------------------------------------
+   
+   // r23 = pow(0.5, 23.0);
+   ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+   // r46 = r23 * r23;
+   // t23 = pow(2.0, 23.0);
+   ////  pow(2.0, 23.0) = 8.388608e+06
+   // t46 = t23 * t23;
+   
+   const double r23 = 1.1920928955078125e-07;
+   const double r46 = r23*r23;
+   const double t23 = 8.388608e+06;
+   const double t46 = t23*t23;
+
+   double t1, t2, t3, t4, a1, a2, x1, x2, z;
+   double r;
+   
+   //--------------------------------------------------------------------
+   //  Break A into two parts such that A = 2^23 * A1 + A2.
+   //--------------------------------------------------------------------
+   t1 = r23*a;
+   a1 = (int) t1;
+   a2 = a-t23*a1;
+   
+   //--------------------------------------------------------------------
+   //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+   //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+   //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+   //--------------------------------------------------------------------
+   t1 = r23**x;
+   x1 = (int) t1;
+   x2 = *x-t23*x1;
+   t1 = a1*x2+a2*x1;
+   t2 = (int) (r23*t1);
+   z = t1-t23*t2;
+   t3 = t23*z+a2*x2;
+   t4 = (int) (r46*t3);
+   *x = t3-t46*t4;
+   r = r46**x;
+
+   return r;
+}
+void timer_clear(int n)
+{
+   elapsed[n] = 0.0;
+}
+double timer_read(int n)
+{
+   return elapsed[n];
+}
+void timer_start(int n)
+{
+   start[n] = elapsed_time();
+}
+void timer_stop(int n)
+{
+   double t, now;
+
+   now = elapsed_time();
+   t = now-start[n];
+   elapsed[n] += t;
+}
+void vranlc(int n, double *x, double a, double y[])
+{
+   //--------------------------------------------------------------------
+   //
+   //  This routine generates N uniform pseudorandom double precision numbers in
+   //  the range (0, 1) by using the linear congruential generator
+   //
+   //  x_{k+1} = a x_k  (mod 2^46)
+   //
+   //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+   //  before repeating.  The argument A is the same as 'a' in the above formula,
+   //  and X is the same as x_0.  A and X must be odd double precision integers
+   //  in the range (1, 2^46).  The N results are placed in Y and are normalized
+   //  to be between 0 and 1.  X is updated to contain the new seed, so that
+   //  subsequent calls to VRANLC using the same arguments will generate a
+   //  continuous sequence.  If N is zero, only initialization is performed, and
+   //  the variables X, A and Y are ignored.
+   //
+   //  This routine is the standard version designed for scalar or RISC systems.
+   //  However, it should produce the same results on any single processor
+   //  computer with at least 48 mantissa bits in double precision floating point
+   //  data.  On 64 bit systems, double precision should be disabled.
+   //
+   //--------------------------------------------------------------------
+   
+   // r23 = pow(0.5, 23.0);
+   ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+   // r46 = r23 * r23;
+   // t23 = pow(2.0, 23.0);
+   ////  pow(2.0, 23.0) = 8.388608e+06
+   // t46 = t23 * t23;
+   
+   const double r23 = 1.1920928955078125e-07;
+   const double r46 = r23*r23;
+   const double t23 = 8.388608e+06;
+   const double t46 = t23*t23;
+
+   double t1, t2, t3, t4, a1, a2, x1, x2, z;
+
+   int i;
+   
+   //--------------------------------------------------------------------
+   //  Break A into two parts such that A = 2^23 * A1 + A2.
+   //--------------------------------------------------------------------
+   t1 = r23*a;
+   a1 = (int) t1;
+   a2 = a-t23*a1;
+   
+   //--------------------------------------------------------------------
+   //  Generate N results.   This loop is not vectorizable.
+   //--------------------------------------------------------------------
+   for(i = 0; i <= n-1; i += 1) {
+      //--------------------------------------------------------------------
+      //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+      //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+      //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+      //--------------------------------------------------------------------
+      t1 = r23**x;
+      x1 = (int) t1;
+      x2 = *x-t23*x1;
+      t1 = a1*x2+a2*x1;
+      t2 = (int) (r23*t1);
+      z = t1-t23*t2;
+      t3 = t23*z+a2*x2;
+      t4 = (int) (r46*t3);
+      *x = t3-t46*t4;
+      y[i] = r46**x;
+   }
+
+   return;
+}
+void wtime_(double *t)
+{
+   static int sec = -1;
+   struct timeval tv;
+   gettimeofday(&tv, (void *) 0);
+   if (sec<0)
+      sec = tv.tv_sec;
+   *t = tv.tv_sec-sec+1.0e-6*tv.tv_usec;
+}

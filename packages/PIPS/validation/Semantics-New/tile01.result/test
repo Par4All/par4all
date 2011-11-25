@@ -16,6 +16,7 @@ void test(int n, int m, int a[n][m])
 
    int I_0;
    {
+      //PIPS generated variable
 
 //  P(I_0,i,j) {}
 
@@ -24,6 +25,7 @@ void test(int n, int m, int a[n][m])
 //  P(I_0,I_3,i,j) {}
 
       for(I_0 = 0; I_0 <= I_3; I_0 += 1) {
+         //PIPS generated variable
 
 //  P(I_0,I_3,i,j) {0<=I_0, I_0<=I_3}
 
@@ -41,7 +43,6 @@ void test(int n, int m, int a[n][m])
 //  P(I_0,I_1,I_2,I_3,i,j) {0<=I_0, I_0<=I_3, i<=I_1, I_1+1<=n,
 //    I_2<=i, 0<=j, j+1<=m}
 
-               //PIPS generated variable
                a[i][j] = 0;
       }
    }

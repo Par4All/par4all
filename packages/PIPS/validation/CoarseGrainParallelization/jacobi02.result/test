@@ -80,14 +80,12 @@ void iteration(float_t space[501][501], float_t save[501][501])
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
 #pragma omp parallel for private(j)
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 int main(int argc, char *argv[])

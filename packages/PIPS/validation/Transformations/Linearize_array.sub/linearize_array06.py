@@ -1,9 +1,8 @@
 from validation import vworkspace
-import ir_navigator
 
 with vworkspace() as w:
-  w.all_functions.linearize_array(use_pointers=True,vla_only=True)
+  w.all_functions.linearize_array(use_pointers=True,skip_static_length_arrays=True)
   w.all.display()
-  w.all_functions.linearize_array(use_pointers=True,vla_only=False)
+  w.all_functions.linearize_array(use_pointers=True,skip_static_length_arrays=False)
   w.all.display()
 

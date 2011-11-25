@@ -1,0 +1,127 @@
+
+Source code with transformers
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T(r1,r2,r3,r4) {}
+
+   int r1, r2, r3, r4;
+   //int a=3, b=2;
+
+//  T(a,b,c) {a==3, b==2, c==0}
+
+   int a = 3, b = 2, c = 0;
+
+//  T(r1) {a==3, b==2, c==0, r1==1}
+
+
+   r1 = a%b;
+
+//  T(r2) {a==3, b==2, c==0, r1==1, r2==-1}
+
+   r2 = -a%b;
+
+//  T(r3) {a==3, b==2, c==0, r1==1, r2==-1, r3==1}
+
+   r3 = a%(-b);
+
+//  T(r4) {a==3, b==2, c==0, r1==1, r2==-1, r3==1, r4==-1}
+
+   r4 = -a%(-b);
+
+//  T() {a==3, b==2, c==0, r1==1, r2==-1, r3==1, r4==-1}
+
+   
+   // Expected result: r1=1, r2=-1, r3=1, r4=-1
+   printf("r1=%d, r2=%d, r3=%d, r4=%d\n", r1, r2, r3, r4);
+
+//  T(r1) {a==3, b==2, c==0, r1==0, r1#init==1, r2==-1, r3==1, r4==-1}
+
+
+   r1 = c%b;
+
+//  T() {0==-1}
+
+   // This causes a zero divide
+   r2 = a%c;
+
+//  T() {0==-1}
+
+   
+   // Expected result: r1=1, r2=-1
+   printf("r1=%d, r2=%d\n", r1, r2);
+
+//  T() {0==-1}
+
+
+   return 0;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int r1, r2, r3, r4;
+   //int a=3, b=2;
+
+//  P(r1,r2,r3,r4) {}
+
+   int a = 3, b = 2, c = 0;
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0}
+
+
+   r1 = a%b;
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==1}
+
+   r2 = -a%b;
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==1, r2==-1}
+
+   r3 = a%(-b);
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==1, r2==-1, r3==1}
+
+   r4 = -a%(-b);
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==1, r2==-1, r3==1,
+//    r4==-1}
+
+   
+   // Expected result: r1=1, r2=-1, r3=1, r4=-1
+   printf("r1=%d, r2=%d, r3=%d, r4=%d\n", r1, r2, r3, r4);
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==1, r2==-1, r3==1,
+//    r4==-1}
+
+
+   r1 = c%b;
+
+//  P(a,b,c,r1,r2,r3,r4) {a==3, b==2, c==0, r1==0, r2==-1, r3==1,
+//    r4==-1}
+
+   // This causes a zero divide
+   r2 = a%c;
+
+//  P() {0==-1}
+
+   
+   // Expected result: r1=1, r2=-1
+   printf("r1=%d, r2=%d\n", r1, r2);
+
+//  P() {0==-1}
+
+
+   return 0;
+}

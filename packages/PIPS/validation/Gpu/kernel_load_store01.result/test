@@ -17,7 +17,6 @@ void change(int *i, double array[N])
    int k;
 //             <    is read   >: i i[0]
 //             <    is written>: i[0]
-
    (*i)++;
 //             <may be read   >: k
 //             <may be written>: array[*]
@@ -47,7 +46,6 @@ void change(int *i, double array[N])
    int k;
 //             <    is read   >: i i[0]
 //             <    is written>: i[0]
-
    (*i)++;
 //             <may be read   >: k
 //             <may be written>: array[*]
@@ -76,7 +74,6 @@ void give()
 void change(int *i, double array[N])
 {
    int k;
-
    (*i)++;
 
    for(k = 0; k <= 99; k += 1)
@@ -109,7 +106,6 @@ void P4A_accel_free(void *address);
 void change(int *i, double array[N])
 {
    int k;
-
    (*i)++;
 
    for(k = 0; k <= 99; k += 1)

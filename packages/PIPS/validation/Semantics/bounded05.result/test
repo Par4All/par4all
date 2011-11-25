@@ -1,0 +1,62 @@
+
+Transformers for "main"
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T() {i==3}
+
+   i==3?(void) 0:__assert_fail("i==3", "./bounded05.c", 9, (const char *) 0);
+
+//  T() {i==4}
+
+   i==4?(void) 0:__assert_fail("i==4", "./bounded05.c", 10, (const char *) 0);
+
+//  T(i) {i==i#init+1}
+
+
+   i++;
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   i==3?(void) 0:__assert_fail("i==3", "./bounded05.c", 9, (const char *) 0);
+
+//  P(i) {i==3}
+
+   i==4?(void) 0:__assert_fail("i==4", "./bounded05.c", 10, (const char *) 0);
+
+//  P() {0==-1}
+
+
+   i++;
+
+//  P() {0==-1}
+
+
+   return 0;
+}

@@ -1,11 +1,11 @@
 typedef int ARRAY[10];
 
-int vla(int size, int *d, int e[3][3]);
+int vla(int size, int *d, int e[9]);
 
-int vla(int size, int *d, int e[3][3]);
+int vla(int size, int *d, int e[9]);
 //PIPS generated variable
 void *alloca(unsigned int);
-int vla(int size, int *d, int e[3][3])
+int vla(int size, int *d, int e[9])
 {
    int n = d[size+1];
    int *a = (int *) alloca(sizeof(int[n]));

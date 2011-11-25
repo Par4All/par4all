@@ -6,7 +6,6 @@ void comment06()
    struct s {
       int foo;
    } a, *p;
-
    (p+2)->foo = 1;
    
    /* Not floating point pointer arithmetic */

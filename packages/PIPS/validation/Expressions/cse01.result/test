@@ -7,7 +7,6 @@ int cse01()
    int i;
    int j;
    int k;
-
    i = 2*(j+2);
    k = 3*(j+2);
    // END BLOCK
@@ -23,7 +22,6 @@ int cse01()
    int k;
    //PIPS generated variable
    int I_0, I_1, I_2;
-
    I_0 = j+2;
    i = 2*I_0;
    k = 3*I_0;

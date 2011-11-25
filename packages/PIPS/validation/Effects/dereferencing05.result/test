@@ -5,7 +5,6 @@ void dereferencing05()
 {
    double *p;
    int i;
-
    *p++ = 0.;
    *p-- = 0.;
    *++p = 0.;
@@ -20,7 +19,6 @@ void dereferencing05()
    int i;
 //             <    is read   >: p
 //             <    is written>: p p[0]
-
    *p++ = 0.;
 //             <    is read   >: p
 //             <    is written>: p p[0]
@@ -41,7 +39,6 @@ void dereferencing05()
    int i;
 //             <    is read   >: p
 //             <    is written>: p p[0]
-
    *p++ = 0.;
 //             <    is read   >: p
 //             <    is written>: p p[0]
@@ -62,7 +59,6 @@ void dereferencing05()
    int i;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-
    *p++ = 0.;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
@@ -84,7 +80,6 @@ void dereferencing05()
    int i;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-
    *p++ = 0.;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p

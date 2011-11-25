@@ -55,7 +55,7 @@ C  T(L2) {L2==1}
 
       L2 = .TRUE.                                                       0012
 
-C  T(I,L1,S1,X) {S1==S2, U+V==X, 1<=I, I<=2, 0<=L1, L1<=1}
+C  T(I,L1,S1,X) {S1==S2, U+V==X, 0<=I, I<=2, 0<=L1, L1<=1}
 
 
       CALL COPY_FOUR(I, 1+MOD(J, 2), X, U+V, S1, S2, L1, L2.AND.L3)     0014
@@ -77,7 +77,7 @@ C  T() {}
 
       END
 
-C  P() {SOLD=="Hi!", XOLD==2.+3., 1<=IOLD, IOLD<=2, 0<=LNEW, LNEW<=1,
+C  P() {SOLD=="Hi!", XOLD==2.+3., 0<=IOLD, IOLD<=2, 0<=LNEW, LNEW<=1,
 C    0<=LOLD, LOLD<=1}
 
 
@@ -87,24 +87,24 @@ C    0<=LOLD, LOLD<=1}
       CHARACTER*4 SNEW, SOLD
       LOGICAL LNEW, LOLD
 
-C  P() {SOLD=="Hi!", XOLD==5., 1<=IOLD, IOLD<=2, 0<=LNEW, LNEW<=1,
+C  P() {SOLD=="Hi!", XOLD==5., 0<=IOLD, IOLD<=2, 0<=LNEW, LNEW<=1,
 C    0<=LOLD, LOLD<=1}
 
 
       INEW = IOLD                                                       0008
 
-C  P(INEW) {SOLD=="Hi!", XOLD==5., INEW==IOLD, 1<=INEW, INEW<=2,
+C  P(INEW) {SOLD=="Hi!", XOLD==5., INEW==IOLD, 0<=INEW, INEW<=2,
 C    0<=LNEW, LNEW<=1, 0<=LOLD, LOLD<=1}
 
       XNEW = XOLD                                                       0009
 
-C  P(INEW,XNEW) {SOLD=="Hi!", XNEW==5., XOLD==5., INEW==IOLD, 1<=INEW,
+C  P(INEW,XNEW) {SOLD=="Hi!", XNEW==5., XOLD==5., INEW==IOLD, 0<=INEW,
 C    INEW<=2, 0<=LNEW, LNEW<=1, 0<=LOLD, LOLD<=1}
 
       SNEW = SOLD                                                       0010
 
 C  P(INEW,SNEW,XNEW) {SNEW=="Hi!", SOLD=="Hi!", XNEW==5., XOLD==5.,
-C    INEW==IOLD, 1<=INEW, INEW<=2, 0<=LNEW, LNEW<=1, 0<=LOLD, LOLD<=1}
+C    INEW==IOLD, 0<=INEW, INEW<=2, 0<=LNEW, LNEW<=1, 0<=LOLD, LOLD<=1}
 
       LNEW = LOLD                                                       0011
 
@@ -143,18 +143,18 @@ C  P(L2,S2,U,V) {S2=="Hi!", U==2., V==3., L2==1}
       CALL COPY_FOUR(I, 1+MOD(J, 2), X, U+V, S1, S2, L1, L2.AND.L3)     0014
 
 C  P(I,L1,L2,S1,S2,U,V,X) {S1=="Hi!", S2=="Hi!", X==2.+3., U==2.,
-C    V==3., L2==1, 1<=I, I<=2, 0<=L1, L1<=1}
+C    V==3., L2==1, 0<=I, I<=2, 0<=L1, L1<=1}
 
 
       PRINT *, I, X, S1, L1                                             0016
 
 C  P(I,L1,L2,S1,S2,U,V,X) {S1=="Hi!", S2=="Hi!", X==2.+3., U==2.,
-C    V==3., L2==1, 1<=I, I<=2, 0<=L1, L1<=1}
+C    V==3., L2==1, 0<=I, I<=2, 0<=L1, L1<=1}
 
 
       READ *, J, U, V, S2, L2                                           0018
 
-C  P(I,J,L1,L2,S1,S2,U,V,X) {S1=="Hi!", X==5., 1<=I, I<=2, 0<=L1,
+C  P(I,J,L1,L2,S1,S2,U,V,X) {S1=="Hi!", X==5., 0<=I, I<=2, 0<=L1,
 C    L1<=1}
 
 

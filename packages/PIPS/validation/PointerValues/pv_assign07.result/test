@@ -104,5 +104,8 @@ int main()
 // s2.a == &j (exact);
 // s2p == &s2 (exact);
 
+   
+   
+   //  printf("s1.a = %d, s1p->a = %d, s2.a = %d, s2p->a = %d\n", *s1.a, *s1p->a, *s2.a , *s2p->a);
    return 0;
 }

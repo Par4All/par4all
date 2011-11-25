@@ -1,0 +1,52 @@
+delete constructor03
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create constructor03 constructor03.c
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Printed code with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Printed code with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Printed code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Printed code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+close
+
+delete constructor03
+
+quit

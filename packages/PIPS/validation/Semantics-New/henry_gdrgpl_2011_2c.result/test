@@ -93,11 +93,11 @@ int main(void)
    // infinite loop
    while (1) {
 
-//  P(d,x) {0<=d+1, d<=1, x<=d+999, 500d<=499x+500, 0<=x, x<=1000}
+//  P(d,x) {0<=d+1, d<=1, x<=d+999, 0<=x, x<=1000}
 
       fprintf(stdout, "loop: x=%d d=%d\n", x, d);
 
-//  P(d,x) {0<=d+1, d<=1, x<=d+999, 500d<=499x+500, 0<=x, x<=1000}
+//  P(d,x) {0<=d+1, d<=1, x<=d+999, 0<=x, x<=1000}
 
       while (x==0)
 
@@ -170,8 +170,7 @@ int main(void)
 
       fprintf(stdout, "loop: x=%d d=%d\n", x, d);
 
-//  P(d,x) {0<=d+1, d<=1, x<=500d+500, x<=d+999, 500d<=499x+500, 0<=x,
-//    x<=1000}
+//  P(d,x) {0<=d+1, d<=1, x<=500d+500, x<=d+999, 0<=x, x<=1000}
 
       while (x==0)
 

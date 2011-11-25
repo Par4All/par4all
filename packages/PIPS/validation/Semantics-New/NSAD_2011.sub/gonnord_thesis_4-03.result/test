@@ -43,7 +43,7 @@ void ts_singlestate(void)
 
          x++;
 
-//  T() {1<=x, y<=x, y<=1}
+//  T() {1<=x, y<=1}
 
          if (!(y<=x&&y<=1))
 
@@ -167,7 +167,7 @@ void ts_restructured(void)
 
       x++;
 
-//  T() {1<=x, y<=x, 0<=y, y<=1}
+//  T() {1<=x, 0<=y, y<=1}
 
       if (!(y<=x&&y<=1))
 
@@ -235,7 +235,7 @@ void ts_singlestate(void)
 
          if (!(x==0))
 
-//  P(x,y) {1<=x, y<=x, 0<=y, y<=1}
+//  P(x,y) {1<=x, 0<=y, y<=1}
 
             deadlock();
 

@@ -388,7 +388,7 @@ void ts_singlestate(void)
 
             deadlock();
 
-//  P(b,s,x) {s==1, 0<=b, b<=1, x<=8b+5, 11b<=x+11, 3<=x, x<=5}
+//  P(b,s,x) {s==1, 0<=b, b<=1, 3<=x, x<=5}
 
          b = 0;
 

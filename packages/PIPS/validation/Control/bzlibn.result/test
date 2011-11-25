@@ -9,6 +9,7 @@ static Bool unRLE_obuf_to_output_FAST(DState *s)
       while ((Bool) 1) {                                                /*0077*/
 
          while ((Bool) 1) {                                             /*0089*/
+            /* try to finish existing run */
             if (s->strm->avail_out==0)                                  /*0080*/
                return (Bool) 0;                                         /*0080*/
             if (s->state_out_len==0)                                    /*0081*/
@@ -280,6 +281,7 @@ l99999:         ;
          else {
             goto _break_2;
          }
+         /* try to finish existing run */
          if (s->strm->avail_out==0)                                     /*0080*/
             return (Bool) 0;                                            /*0080*/
          if (s->state_out_len==0) goto _break_2;                        /*0081*/

@@ -290,7 +290,7 @@ void ts_singlestate(void)
 
          s = 0;
 
-//  P(d,s,t) {s==0, 0<=d, 4<=3d+4t, d<=4t, 1<=t}
+//  P(d,s,t) {s==0, 0<=d, d<=4t, 1<=t}
 
          if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
 
@@ -371,7 +371,7 @@ void ts_restructured(void)
 
          s = 0;
 
-//  P(d,s,t) {s==0, 0<=d, 2<=d+2t, d+1<=4t, 1<=t}
+//  P(d,s,t) {s==0, 0<=d, d+1<=4t, 1<=t}
 
          if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
 

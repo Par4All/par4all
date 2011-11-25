@@ -1,0 +1,48 @@
+
+Source code with transformers for "MAIN"
+
+
+C  T() {}
+
+! Test for Ticket 561: the value of I is destroyed by the call to INC
+! although the formal parameter is an array
+
+      PROGRAM MAIN
+      INTEGER I
+
+C  T(I) {I==2}
+
+      I = 2                                                             0006
+
+C  T(I) {}
+
+      CALL INC(I)                                                       0007
+
+C  T() {}
+
+      PRINT *, I                                                        0008
+      END
+
+Source code with preconditions for "MAIN"
+
+
+C  P() {}
+
+! Test for Ticket 561: the value of I is destroyed by the call to INC
+! although the formal parameter is an array
+
+      PROGRAM MAIN
+      INTEGER I
+
+C  P() {}
+
+      I = 2                                                             0006
+
+C  P(I) {I==2}
+
+      CALL INC(I)                                                       0007
+
+C  P(I) {}
+
+      PRINT *, I                                                        0008
+      END

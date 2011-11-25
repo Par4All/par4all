@@ -251,7 +251,7 @@ int bar()
    return y;
 }
 
-Preconditions for "bar"
+Preconditions for "bar" after unfolding and unspahettify
 
 
 //  P() {}

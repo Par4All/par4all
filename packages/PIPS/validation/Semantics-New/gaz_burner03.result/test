@@ -261,7 +261,7 @@ int main()
 
 //  T(t,u) {t+u#init==t#init+u, l<=t#init+50, l+u#init<=t#init+v,
 //    l+5v<=t#init+100, v<=l, t#init<=t, u<=59, v<=u, u#init<=59,
-//    49v<=47u#init+40, v<=u#init, u#init<=v+59, 0<=v, v<=10}
+//    49v<=47u#init+40, v<=u#init, 0<=v, v<=10}
 
 
             while (u<60&&alea())
@@ -277,13 +277,13 @@ int main()
             if (6*l<=t+50)
 
 //  T() {l<=t+50, 6l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
-//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+//    v<=l, u<=60, 49v<=47u+40, v<=u, 0<=v, v<=10}
 
                printf("property verified\n");
             else
 
 //  T() {t+51<=6l, l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
-//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+//    v<=l, u<=60, 49v<=47u+40, v<=u, 0<=v, v<=10}
 
                printf("error\n");
          }

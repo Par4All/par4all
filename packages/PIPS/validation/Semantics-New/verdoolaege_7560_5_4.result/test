@@ -17,7 +17,6 @@ void verdoolaege_7560_5_4()
 
 //  T() {0==-1}
 
-
       abort();
 
 //  T(x,y) {2<=n, n+x+y<=x#init+y#init+2, x#init+1<=x}

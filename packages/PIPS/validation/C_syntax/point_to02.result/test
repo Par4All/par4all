@@ -6,7 +6,6 @@ void point_to02()
    struct s {
       int foo;
    } a, *p;
-
    (&a+2)->foo = 1;
    
    /* Floating point values are not allowed in pointer arithmetic */

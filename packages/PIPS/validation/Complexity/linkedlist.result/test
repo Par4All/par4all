@@ -20,7 +20,6 @@ int main()
 
 //  P() {}
 
-
    Tete = (void *) 0;
 
 //  P() {}
@@ -50,7 +49,6 @@ int main()
 //                                                                    0 (STMT)
    struct Liste *Tete;
 //                                                                    2 (STMT)
-
    Tete = (void *) 0;
 //                                                                    4 (STMT)
    

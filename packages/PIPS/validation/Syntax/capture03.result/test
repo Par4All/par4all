@@ -33,25 +33,27 @@ Request: build resource PRINTED_FILE for module FOO.
   FILTER_FILE                    building   SOURCE_FILE(FOO)
   PARSER                         building   PARSED_CODE(FOO)
                                  building   CALLEES(FOO)
-user warning in DeclareExternalFunction: Name conflict between user declared module MIN and intrinsic MIN
-user error in DeclareExternalFunction: Parser error between lines 4 and 4
-Name conflict with intrinsic because PIPS does not support a specific name space for intrinsics. Please change your function or subroutine name.
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module FOO.
-user error in display_a_resource: Cannot build view file PRINTED_FILE
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+
+      SUBROUTINE FOO(K)
+c     Here, "min" is a user function
+      EXTERNAL MIN
+      K = MIN(K, K)                                                     0005
+      END
 Module MIN selected
 Request: build resource PRINTED_FILE for module MIN.
   FILTER_FILE                    building   SOURCE_FILE(MIN)
   PARSER                         building   PARSED_CODE(MIN)
                                  building   CALLEES(MIN)
-user warning in MakeCurrentFunction: Intrinsic MIN redefined.
-This is not supported by PIPS. Please rename MIN
-user error in MakeCurrentFunction: Parser error between lines 2 and 2
-Name conflict between a subroutine and/or a function and an intrinsic
+  CONTROLIZER                    building   CODE(MIN)
+  PRINT_CODE                     building   PRINTED_FILE(MIN)
+PRINTED_FILE made for MIN.
 
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module MIN.
-user error in display_a_resource: Cannot build view file PRINTED_FILE
+      FUNCTION MIN(L,M)
+      MIN = L+M                                                         0003
+      END
 Deletion of obsolete resources:
 none destroyed.
 Closing all modules.

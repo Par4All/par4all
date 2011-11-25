@@ -311,11 +311,11 @@ L1:   ;
    while (rand_b())
 
 //  T(c,x,y) {c==c#init+1, x==x#init+1, y==y#init+1, c<=n, 1<=m, m<=n,
-//    y+1<=m, x+1<=n}
+//    y+1<=m, 1<=n, x+1<=n}
 
       if (rand_b()) {
 
-//  T() {1<=m, m<=n, y+2<=m, x+2<=n}
+//  T() {1<=m, m<=n, y+2<=m, 1<=n, x+2<=n}
 
          if (!(x<n-1&&y<m-1))
 
@@ -323,19 +323,19 @@ L1:   ;
 
             deadlock();
 
-//  T(x) {x==x#init+1, 1<=m, m<=n, y+2<=m, x+1<=n}
+//  T(x) {x==x#init+1, 1<=m, m<=n, y+2<=m, 1<=n, x+1<=n}
 
          x++;
 
-//  T(y) {y==y#init+1, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T(y) {y==y#init+1, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          y++;
 
-//  T(c) {c==c#init+1, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T(c) {c==c#init+1, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          c++;
 
-//  T() {c<=n, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T() {c<=n, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          if (!(c<=n))
 
@@ -345,7 +345,7 @@ L1:   ;
       }
       else {
 
-//  T() {1<=m, m<=n, y+2<=m, x+2<=n}
+//  T() {1<=m, m<=n, y+2<=m, 1<=n, x+2<=n}
 
          if (!(x<n-1&&y<m-1))
 
@@ -353,19 +353,19 @@ L1:   ;
 
             deadlock();
 
-//  T(x) {x==x#init+1, 1<=m, m<=n, y+2<=m, x+1<=n}
+//  T(x) {x==x#init+1, 1<=m, m<=n, y+2<=m, 1<=n, x+1<=n}
 
          x++;
 
-//  T(y) {y==y#init+1, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T(y) {y==y#init+1, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          y++;
 
-//  T(c) {c==c#init+1, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T(c) {c==c#init+1, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          c++;
 
-//  T() {c<=n, 1<=m, m<=n, y+1<=m, x+1<=n}
+//  T() {c<=n, 1<=m, m<=n, y+1<=m, 1<=n, x+1<=n}
 
          if (!(c<=n))
 
@@ -908,15 +908,17 @@ L1:   ;
 
          x++;
 
-//  P(c,m,n,x,y) {c==x-1, c==y, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x-1, c==y, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n,
+//    1<=n}
 
          y++;
 
-//  P(c,m,n,x,y) {c==x-1, c==y-1, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x-1, c==y-1, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n,
+//    1<=n}
 
          c++;
 
-//  P(c,m,n,x,y) {c==x, c==y, 1<=c, c+1<=m, c+1<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x, c==y, 1<=c, c+1<=m, c+1<=n, 1<=m, m<=n, 1<=n}
 
          if (!(c<=n))
 
@@ -938,15 +940,17 @@ L1:   ;
 
          x++;
 
-//  P(c,m,n,x,y) {c==x-1, c==y, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x-1, c==y, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n,
+//    1<=n}
 
          y++;
 
-//  P(c,m,n,x,y) {c==x-1, c==y-1, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x-1, c==y-1, 0<=c, c+2<=m, c+2<=n, 1<=m, m<=n,
+//    1<=n}
 
          c++;
 
-//  P(c,m,n,x,y) {c==x, c==y, 1<=c, c+1<=m, c+1<=n, 1<=m, m<=n}
+//  P(c,m,n,x,y) {c==x, c==y, 1<=c, c+1<=m, c+1<=n, 1<=m, m<=n, 1<=n}
 
          if (!(c<=n))
 

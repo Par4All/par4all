@@ -8,7 +8,6 @@ int main()
 
       
       /* The a label */
-      
 a:      printf("a\n");
       /* The b label */
       ;
@@ -55,7 +54,6 @@ int main()
 
       
       /* The a label */
-      
 a:      printf("a\n");
 
 //  P(i) {i==5}
@@ -108,7 +106,6 @@ int main()
 
    
    /* The a label */
-   
 a:   printf("a\n");
 
 //  P(i) {i==5}

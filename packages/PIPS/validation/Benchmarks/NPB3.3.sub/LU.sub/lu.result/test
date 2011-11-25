@@ -16,26 +16,11 @@ void blts(int ldmx, int ldmy, int ldmz, int nx, int ny, int nz, int k, double om
    for(j = jst; j <= jend-1; j += 1)
       for(i = ist; i <= iend-1; i += 1)
          for(m = 0; m <= 4; m += 1)
-            
-            
-            
-            
-            
             vk[j][i][m] = vk[j][i][m]-omega*(ldz[j][i][0][m]*vkm1[j][i][0]+ldz[j][i][1][m]*vkm1[j][i][1]+ldz[j][i][2][m]*vkm1[j][i][2]+ldz[j][i][3][m]*vkm1[j][i][3]+ldz[j][i][4][m]*vkm1[j][i][4]);
 
    for(j = jst; j <= jend-1; j += 1)
       for(i = ist; i <= iend-1; i += 1) {
          for(m = 0; m <= 4; m += 1)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             tv[m] = vk[j][i][m]-omega*(ldy[j][i][0][m]*vk[j-1][i][0]+ldx[j][i][0][m]*vk[j][i-1][0]+ldy[j][i][1][m]*vk[j-1][i][1]+ldx[j][i][1][m]*vk[j][i-1][1]+ldy[j][i][2][m]*vk[j-1][i][2]+ldx[j][i][2][m]*vk[j][i-1][2]+ldy[j][i][3][m]*vk[j-1][i][3]+ldx[j][i][3][m]*vk[j][i-1][3]+ldy[j][i][4][m]*vk[j-1][i][4]+ldx[j][i][4][m]*vk[j][i-1][4]);
          
          //---------------------------------------------------------------------
@@ -155,26 +140,11 @@ void buts(int ldmx, int ldmy, int ldmz, int nx, int ny, int nz, int k, double om
    for(j = jend-1; j >= jst; j += -1)
       for(i = iend-1; i >= ist; i += -1)
          for(m = 0; m <= 4; m += 1)
-            
-            
-            
-            
-            
             tv[j][i][m] = omega*(udz[j][i][0][m]*v[k+1][j][i][0]+udz[j][i][1][m]*v[k+1][j][i][1]+udz[j][i][2][m]*v[k+1][j][i][2]+udz[j][i][3][m]*v[k+1][j][i][3]+udz[j][i][4][m]*v[k+1][j][i][4]);
 
    for(j = jend-1; j >= jst; j += -1)
       for(i = iend-1; i >= ist; i += -1) {
          for(m = 0; m <= 4; m += 1)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             tv[j][i][m] = tv[j][i][m]+omega*(udy[j][i][0][m]*v[k][j+1][i][0]+udx[j][i][0][m]*v[k][j][i+1][0]+udy[j][i][1][m]*v[k][j+1][i][1]+udx[j][i][1][m]*v[k][j][i+1][1]+udy[j][i][2][m]*v[k][j+1][i][2]+udx[j][i][2][m]*v[k][j][i+1][2]+udy[j][i][3][m]*v[k][j+1][i][3]+udx[j][i][3][m]*v[k][j][i+1][3]+udy[j][i][4][m]*v[k][j+1][i][4]+udx[j][i][4][m]*v[k][j][i+1][4]);
          
          //---------------------------------------------------------------------
@@ -359,6 +329,10 @@ void domain()
    nx = nx0;
    ny = ny0;
    nz = nz0;
+   
+   //---------------------------------------------------------------------
+   // check the sub-domain size
+   //---------------------------------------------------------------------
    if (nx<4||ny<4||nz<4) {
       
       
@@ -434,8 +408,6 @@ void erhs()
          for(i = 0; i <= nx-1; i += 1) {
             flux[i][0] = rsd[k][j][i][1];
             u21 = rsd[k][j][i][1]/rsd[k][j][i][0];
-            
-            
             q = 0.50*(rsd[k][j][i][1]*rsd[k][j][i][1]+rsd[k][j][i][2]*rsd[k][j][i][2]+rsd[k][j][i][3]*rsd[k][j][i][3])/rsd[k][j][i][0];
             flux[i][1] = rsd[k][j][i][1]*u21+0.40e+00*(rsd[k][j][i][4]-q);
             flux[i][2] = rsd[k][j][i][2]*u21;
@@ -445,7 +417,6 @@ void erhs()
 
          for(i = ist; i <= iend-1; i += 1)
             for(m = 0; m <= 4; m += 1)
-
                frct[k][j][i][m] = frct[k][j][i][m]-tx2*(flux[i+1][m]-flux[i-1][m]);
          for(i = ist; i <= nx-1; i += 1) {
             tmp = 1.0/rsd[k][j][i][0];
@@ -468,21 +439,10 @@ void erhs()
          }
 
          for(i = ist; i <= iend-1; i += 1) {
-            
-            
-            
             frct[k][j][i][0] = frct[k][j][i][0]+dx1*tx1*(rsd[k][j][i-1][0]-2.0*rsd[k][j][i][0]+rsd[k][j][i+1][0]);
-            
-            
             frct[k][j][i][1] = frct[k][j][i][1]+tx3*1.00e-01*1.00e+00*(flux[i+1][1]-flux[i][1])+dx2*tx1*(rsd[k][j][i-1][1]-2.0*rsd[k][j][i][1]+rsd[k][j][i+1][1]);
-            
-            
             frct[k][j][i][2] = frct[k][j][i][2]+tx3*1.00e-01*1.00e+00*(flux[i+1][2]-flux[i][2])+dx3*tx1*(rsd[k][j][i-1][2]-2.0*rsd[k][j][i][2]+rsd[k][j][i+1][2]);
-            
-            
             frct[k][j][i][3] = frct[k][j][i][3]+tx3*1.00e-01*1.00e+00*(flux[i+1][3]-flux[i][3])+dx4*tx1*(rsd[k][j][i-1][3]-2.0*rsd[k][j][i][3]+rsd[k][j][i+1][3]);
-            
-            
             frct[k][j][i][4] = frct[k][j][i][4]+tx3*1.00e-01*1.00e+00*(flux[i+1][4]-flux[i][4])+dx5*tx1*(rsd[k][j][i-1][4]-2.0*rsd[k][j][i][4]+rsd[k][j][i+1][4]);
          }
          
@@ -490,35 +450,16 @@ void erhs()
          // Fourth-order dissipation
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             frct[k][j][1][m] = frct[k][j][1][m]-dssp*( +5.0*rsd[k][j][1][m]-4.0*rsd[k][j][2][m]+rsd[k][j][3][m]);
-            
-            
-            
-            
             frct[k][j][2][m] = frct[k][j][2][m]-dssp*((-4.0)*rsd[k][j][1][m]+6.0*rsd[k][j][2][m]-4.0*rsd[k][j][3][m]+rsd[k][j][4][m]);
          }
 
          for(i = 3; i <= nx-3-1; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                frct[k][j][i][m] = frct[k][j][i][m]-dssp*(rsd[k][j][i-2][m]-4.0*rsd[k][j][i-1][m]+6.0*rsd[k][j][i][m]-4.0*rsd[k][j][i+1][m]+rsd[k][j][i+2][m]);
 
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             frct[k][j][nx-3][m] = frct[k][j][nx-3][m]-dssp*(rsd[k][j][nx-5][m]-4.0*rsd[k][j][nx-4][m]+6.0*rsd[k][j][nx-3][m]-4.0*rsd[k][j][nx-2][m]);
-            
-            
-            
             frct[k][j][nx-2][m] = frct[k][j][nx-2][m]-dssp*(rsd[k][j][nx-4][m]-4.0*rsd[k][j][nx-3][m]+5.0*rsd[k][j][nx-2][m]);
          }
       }
@@ -531,8 +472,6 @@ void erhs()
          for(j = 0; j <= ny-1; j += 1) {
             flux[j][0] = rsd[k][j][i][2];
             u31 = rsd[k][j][i][2]/rsd[k][j][i][0];
-            
-            
             q = 0.50*(rsd[k][j][i][1]*rsd[k][j][i][1]+rsd[k][j][i][2]*rsd[k][j][i][2]+rsd[k][j][i][3]*rsd[k][j][i][3])/rsd[k][j][i][0];
             flux[j][1] = rsd[k][j][i][1]*u31;
             flux[j][2] = rsd[k][j][i][2]*u31+0.40e+00*(rsd[k][j][i][4]-q);
@@ -542,7 +481,6 @@ void erhs()
 
          for(j = jst; j <= jend-1; j += 1)
             for(m = 0; m <= 4; m += 1)
-
                frct[k][j][i][m] = frct[k][j][i][m]-ty2*(flux[j+1][m]-flux[j-1][m]);
 
          for(j = jst; j <= ny-1; j += 1) {
@@ -559,7 +497,6 @@ void erhs()
             u31jm1 = tmp*rsd[k][j-1][i][2];
             u41jm1 = tmp*rsd[k][j-1][i][3];
             u51jm1 = tmp*rsd[k][j-1][i][4];
-
             flux[j][1] = ty3*(u21j-u21jm1);
             flux[j][2] = 4.0/3.0*ty3*(u31j-u31jm1);
             flux[j][3] = ty3*(u41j-u41jm1);
@@ -567,21 +504,10 @@ void erhs()
          }
 
          for(j = jst; j <= jend-1; j += 1) {
-            
-            
-            
             frct[k][j][i][0] = frct[k][j][i][0]+dy1*ty1*(rsd[k][j-1][i][0]-2.0*rsd[k][j][i][0]+rsd[k][j+1][i][0]);
-            
-            
             frct[k][j][i][1] = frct[k][j][i][1]+ty3*1.00e-01*1.00e+00*(flux[j+1][1]-flux[j][1])+dy2*ty1*(rsd[k][j-1][i][1]-2.0*rsd[k][j][i][1]+rsd[k][j+1][i][1]);
-            
-            
             frct[k][j][i][2] = frct[k][j][i][2]+ty3*1.00e-01*1.00e+00*(flux[j+1][2]-flux[j][2])+dy3*ty1*(rsd[k][j-1][i][2]-2.0*rsd[k][j][i][2]+rsd[k][j+1][i][2]);
-            
-            
             frct[k][j][i][3] = frct[k][j][i][3]+ty3*1.00e-01*1.00e+00*(flux[j+1][3]-flux[j][3])+dy4*ty1*(rsd[k][j-1][i][3]-2.0*rsd[k][j][i][3]+rsd[k][j+1][i][3]);
-            
-            
             frct[k][j][i][4] = frct[k][j][i][4]+ty3*1.00e-01*1.00e+00*(flux[j+1][4]-flux[j][4])+dy5*ty1*(rsd[k][j-1][i][4]-2.0*rsd[k][j][i][4]+rsd[k][j+1][i][4]);
          }
          
@@ -589,35 +515,16 @@ void erhs()
          // fourth-order dissipation
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             frct[k][1][i][m] = frct[k][1][i][m]-dssp*( +5.0*rsd[k][1][i][m]-4.0*rsd[k][2][i][m]+rsd[k][3][i][m]);
-            
-            
-            
-            
             frct[k][2][i][m] = frct[k][2][i][m]-dssp*((-4.0)*rsd[k][1][i][m]+6.0*rsd[k][2][i][m]-4.0*rsd[k][3][i][m]+rsd[k][4][i][m]);
          }
 
          for(j = 3; j <= ny-3-1; j += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                frct[k][j][i][m] = frct[k][j][i][m]-dssp*(rsd[k][j-2][i][m]-4.0*rsd[k][j-1][i][m]+6.0*rsd[k][j][i][m]-4.0*rsd[k][j+1][i][m]+rsd[k][j+2][i][m]);
 
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             frct[k][ny-3][i][m] = frct[k][ny-3][i][m]-dssp*(rsd[k][ny-5][i][m]-4.0*rsd[k][ny-4][i][m]+6.0*rsd[k][ny-3][i][m]-4.0*rsd[k][ny-2][i][m]);
-            
-            
-            
             frct[k][ny-2][i][m] = frct[k][ny-2][i][m]-dssp*(rsd[k][ny-4][i][m]-4.0*rsd[k][ny-3][i][m]+5.0*rsd[k][ny-2][i][m]);
          }
       }
@@ -630,8 +537,6 @@ void erhs()
          for(k = 0; k <= nz-1; k += 1) {
             flux[k][0] = rsd[k][j][i][3];
             u41 = rsd[k][j][i][3]/rsd[k][j][i][0];
-            
-            
             q = 0.50*(rsd[k][j][i][1]*rsd[k][j][i][1]+rsd[k][j][i][2]*rsd[k][j][i][2]+rsd[k][j][i][3]*rsd[k][j][i][3])/rsd[k][j][i][0];
             flux[k][1] = rsd[k][j][i][1]*u41;
             flux[k][2] = rsd[k][j][i][2]*u41;
@@ -641,7 +546,6 @@ void erhs()
 
          for(k = 1; k <= nz-1-1; k += 1)
             for(m = 0; m <= 4; m += 1)
-
                frct[k][j][i][m] = frct[k][j][i][m]-tz2*(flux[k+1][m]-flux[k-1][m]);
 
          for(k = 1; k <= nz-1; k += 1) {
@@ -658,7 +562,6 @@ void erhs()
             u31km1 = tmp*rsd[k-1][j][i][2];
             u41km1 = tmp*rsd[k-1][j][i][3];
             u51km1 = tmp*rsd[k-1][j][i][4];
-
             flux[k][1] = tz3*(u21k-u21km1);
             flux[k][2] = tz3*(u31k-u31km1);
             flux[k][3] = 4.0/3.0*tz3*(u41k-u41km1);
@@ -666,21 +569,10 @@ void erhs()
          }
 
          for(k = 1; k <= nz-1-1; k += 1) {
-            
-            
-            
             frct[k][j][i][0] = frct[k][j][i][0]+dz1*tz1*(rsd[k+1][j][i][0]-2.0*rsd[k][j][i][0]+rsd[k-1][j][i][0]);
-            
-            
             frct[k][j][i][1] = frct[k][j][i][1]+tz3*1.00e-01*1.00e+00*(flux[k+1][1]-flux[k][1])+dz2*tz1*(rsd[k+1][j][i][1]-2.0*rsd[k][j][i][1]+rsd[k-1][j][i][1]);
-            
-            
             frct[k][j][i][2] = frct[k][j][i][2]+tz3*1.00e-01*1.00e+00*(flux[k+1][2]-flux[k][2])+dz3*tz1*(rsd[k+1][j][i][2]-2.0*rsd[k][j][i][2]+rsd[k-1][j][i][2]);
-            
-            
             frct[k][j][i][3] = frct[k][j][i][3]+tz3*1.00e-01*1.00e+00*(flux[k+1][3]-flux[k][3])+dz4*tz1*(rsd[k+1][j][i][3]-2.0*rsd[k][j][i][3]+rsd[k-1][j][i][3]);
-            
-            
             frct[k][j][i][4] = frct[k][j][i][4]+tz3*1.00e-01*1.00e+00*(flux[k+1][4]-flux[k][4])+dz5*tz1*(rsd[k+1][j][i][4]-2.0*rsd[k][j][i][4]+rsd[k-1][j][i][4]);
          }
          
@@ -688,35 +580,16 @@ void erhs()
          // fourth-order dissipation
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             frct[1][j][i][m] = frct[1][j][i][m]-dssp*( +5.0*rsd[1][j][i][m]-4.0*rsd[2][j][i][m]+rsd[3][j][i][m]);
-            
-            
-            
-            
             frct[2][j][i][m] = frct[2][j][i][m]-dssp*((-4.0)*rsd[1][j][i][m]+6.0*rsd[2][j][i][m]-4.0*rsd[3][j][i][m]+rsd[4][j][i][m]);
          }
 
          for(k = 3; k <= nz-3-1; k += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                frct[k][j][i][m] = frct[k][j][i][m]-dssp*(rsd[k-2][j][i][m]-4.0*rsd[k-1][j][i][m]+6.0*rsd[k][j][i][m]-4.0*rsd[k+1][j][i][m]+rsd[k+2][j][i][m]);
 
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             frct[nz-3][j][i][m] = frct[nz-3][j][i][m]-dssp*(rsd[nz-5][j][i][m]-4.0*rsd[nz-4][j][i][m]+6.0*rsd[nz-3][j][i][m]-4.0*rsd[nz-2][j][i][m]);
-            
-            
-            
             frct[nz-2][j][i][m] = frct[nz-2][j][i][m]-dssp*(rsd[nz-4][j][i][m]-4.0*rsd[nz-3][j][i][m]+5.0*rsd[nz-2][j][i][m]);
          }
       }
@@ -770,7 +643,6 @@ void jacld(int k)
    double c1345;
    double c34;
    double tmp1, tmp2, tmp3;
-
    r43 = 4.0/3.0;
    c1345 = 1.40e+00*1.00e-01*1.00e+00*1.40e+00;
    c34 = 1.00e-01*1.00e+00;
@@ -783,28 +655,21 @@ void jacld(int k)
          tmp1 = rho_i[k][j][i];
          tmp2 = tmp1*tmp1;
          tmp3 = tmp1*tmp2;
-
          d[j][i][0][0] = 1.0+dt*2.0*(tx1*dx1+ty1*dy1+tz1*dz1);
          d[j][i][1][0] = 0.0;
          d[j][i][2][0] = 0.0;
          d[j][i][3][0] = 0.0;
          d[j][i][4][0] = 0.0;
-         
-         
          d[j][i][0][1] = -dt*2.0*(tx1*r43+ty1+tz1)*c34*tmp2*u[k][j][i][1];
          d[j][i][1][1] = 1.0+dt*2.0*c34*tmp1*(tx1*r43+ty1+tz1)+dt*2.0*(tx1*dx2+ty1*dy2+tz1*dz2);
          d[j][i][2][1] = 0.0;
          d[j][i][3][1] = 0.0;
          d[j][i][4][1] = 0.0;
-         
-         
          d[j][i][0][2] = -dt*2.0*(tx1+ty1*r43+tz1)*c34*tmp2*u[k][j][i][2];
          d[j][i][1][2] = 0.0;
          d[j][i][2][2] = 1.0+dt*2.0*c34*tmp1*(tx1+ty1*r43+tz1)+dt*2.0*(tx1*dx3+ty1*dy3+tz1*dz3);
          d[j][i][3][2] = 0.0;
          d[j][i][4][2] = 0.0;
-         
-         
          d[j][i][0][3] = -dt*2.0*(tx1+ty1+tz1*r43)*c34*tmp2*u[k][j][i][3];
          d[j][i][1][3] = 0.0;
          d[j][i][2][3] = 0.0;
@@ -930,7 +795,6 @@ void jacu(int k)
    double c1345;
    double c34;
    double tmp1, tmp2, tmp3;
-
    r43 = 4.0/3.0;
    c1345 = 1.40e+00*1.00e-01*1.00e+00*1.40e+00;
    c34 = 1.00e-01*1.00e+00;
@@ -943,7 +807,6 @@ void jacu(int k)
          tmp1 = rho_i[k][j][i];
          tmp2 = tmp1*tmp1;
          tmp3 = tmp1*tmp2;
-
          d[j][i][0][0] = 1.0+dt*2.0*(tx1*dx1+ty1*dy1+tz1*dz1);
          d[j][i][1][0] = 0.0;
          d[j][i][2][0] = 0.0;
@@ -998,11 +861,8 @@ void jacu(int k)
          a[j][i][3][3] = dt*tx2*u[k][j][i+1][1]*tmp1-dt*tx1*c34*tmp1-dt*tx1*dx4;
          a[j][i][4][3] = 0.0;
          a[j][i][0][4] = dt*tx2*(0.40e+00*2.0*qs[k][j][i+1]-1.40e+00*u[k][j][i+1][4])*u[k][j][i+1][1]*tmp2-dt*tx1*((-(r43*c34-c1345))*tmp3*u[k][j][i+1][1]*u[k][j][i+1][1]-(c34-c1345)*tmp3*u[k][j][i+1][2]*u[k][j][i+1][2]-(c34-c1345)*tmp3*u[k][j][i+1][3]*u[k][j][i+1][3]-c1345*tmp2*u[k][j][i+1][4]);
-
          a[j][i][1][4] = dt*tx2*(1.40e+00*u[k][j][i+1][4]*tmp1-0.40e+00*(u[k][j][i+1][1]*u[k][j][i+1][1]*tmp2+qs[k][j][i+1]*tmp1))-dt*tx1*(r43*c34-c1345)*tmp2*u[k][j][i+1][1];
-
          a[j][i][2][4] = dt*tx2*(-0.40e+00)*u[k][j][i+1][2]*u[k][j][i+1][1]*tmp2-dt*tx1*(c34-c1345)*tmp2*u[k][j][i+1][2];
-
          a[j][i][3][4] = dt*tx2*(-0.40e+00)*u[k][j][i+1][3]*u[k][j][i+1][1]*tmp2-dt*tx1*(c34-c1345)*tmp2*u[k][j][i+1][3];
 
          a[j][i][4][4] = dt*tx2*1.40e+00*u[k][j][i+1][1]*tmp1-dt*tx1*c1345*tmp1-dt*tx1*dx5;
@@ -1035,9 +895,7 @@ void jacu(int k)
          b[j][i][3][3] = dt*ty2*u[k][j+1][i][2]*tmp1-dt*ty1*c34*tmp1-dt*ty1*dy4;
          b[j][i][4][3] = 0.0;
          b[j][i][0][4] = dt*ty2*(0.40e+00*2.0*qs[k][j+1][i]-1.40e+00*u[k][j+1][i][4])*u[k][j+1][i][2]*tmp2-dt*ty1*((-(c34-c1345))*tmp3*u[k][j+1][i][1]*u[k][j+1][i][1]-(r43*c34-c1345)*tmp3*u[k][j+1][i][2]*u[k][j+1][i][2]-(c34-c1345)*tmp3*u[k][j+1][i][3]*u[k][j+1][i][3]-c1345*tmp2*u[k][j+1][i][4]);
-
          b[j][i][1][4] = dt*ty2*(-0.40e+00)*u[k][j+1][i][1]*u[k][j+1][i][2]*tmp2-dt*ty1*(c34-c1345)*tmp2*u[k][j+1][i][1];
-
          b[j][i][2][4] = dt*ty2*(1.40e+00*u[k][j+1][i][4]*tmp1-0.40e+00*(qs[k][j+1][i]*tmp1+u[k][j+1][i][2]*u[k][j+1][i][2]*tmp2))-dt*ty1*(r43*c34-c1345)*tmp2*u[k][j+1][i][2];
          b[j][i][3][4] = dt*ty2*(-0.40e+00)*u[k][j+1][i][2]*u[k][j+1][i][3]*tmp2-dt*ty1*(c34-c1345)*tmp2*u[k][j+1][i][3];
 
@@ -1266,13 +1124,6 @@ void pintgr()
    frc1 = 0.0;
    for(j = jbeg; j <= jfin1-1; j += 1)
       for(i = ibeg; i <= ifin1-1; i += 1)
-         
-         
-         
-         
-         
-         
-         
          frc1 = frc1+(phi1[j][i]+phi1[j][i+1]+phi1[j+1][i]+phi1[j+1][i+1]+phi2[j][i]+phi2[j][i+1]+phi2[j+1][i]+phi2[j+1][i+1]);
    frc1 = dxi*deta*frc1;
    
@@ -1297,13 +1148,6 @@ void pintgr()
    frc2 = 0.0;
    for(k = ki1; k <= ki2-1-1; k += 1)
       for(i = ibeg; i <= ifin1-1; i += 1)
-         
-         
-         
-         
-         
-         
-         
          frc2 = frc2+(phi1[k][i]+phi1[k][i+1]+phi1[k+1][i]+phi1[k+1][i+1]+phi2[k][i]+phi2[k][i+1]+phi2[k+1][i]+phi2[k+1][i+1]);
    frc2 = dxi*dzeta*frc2;
    
@@ -1328,16 +1172,8 @@ void pintgr()
    frc3 = 0.0;
    for(k = ki1; k <= ki2-1-1; k += 1)
       for(j = jbeg; j <= jfin1-1; j += 1)
-         
-         
-         
-         
-         
-         
-         
          frc3 = frc3+(phi1[k][j]+phi1[k][j+1]+phi1[k+1][j]+phi1[k+1][j+1]+phi2[k][j]+phi2[k][j+1]+phi2[k+1][j]+phi2[k+1][j+1]);
    frc3 = deta*dzeta*frc3;
-
    frc = 0.25*(frc1+frc2+frc3);
 }
 void print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, logical verified, char *npbversion, char *compiletime, char *cs1, char *cs2, char *cs3, char *cs4, char *cs5, char *cs6, char *cs7)
@@ -1351,6 +1187,12 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
       if (name[0]=='E'&&name[1]=='P') {
          sprintf(size, "%15.0lf", pow(2.0, n1));
          j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
          if (size[j]=='.') {
             size[j] = ' ';
             j--;
@@ -1535,6 +1377,10 @@ void read_input()
       ny0 = 12;
       nz0 = 12;
    }
+   
+   //---------------------------------------------------------------------
+   // check problem size
+   //---------------------------------------------------------------------
    if (nx0<4||ny0<4||nz0<4) {
 
       printf("     PROBLEM SIZE IS TOO SMALL - \n""     SET EACH OF NX, NY AND NZ AT LEAST EQUAL TO 5\n");
@@ -1576,8 +1422,6 @@ void rhs()
                rsd[k][j][i][m] = -frct[k][j][i][m];
             tmp = 1.0/u[k][j][i][0];
             rho_i[k][j][i] = tmp;
-            
-            
             qs[k][j][i] = 0.50*(u[k][j][i][1]*u[k][j][i][1]+u[k][j][i][2]*u[k][j][i][2]+u[k][j][i][3]*u[k][j][i][3])*tmp;
          }
 
@@ -1593,7 +1437,6 @@ void rhs()
             u21 = u[k][j][i][1]*rho_i[k][j][i];
 
             q = qs[k][j][i];
-
             flux[i][1] = u[k][j][i][1]*u21+0.40e+00*(u[k][j][i][4]-q);
             flux[i][2] = u[k][j][i][2]*u21;
             flux[i][3] = u[k][j][i][3]*u21;
@@ -1602,7 +1445,6 @@ void rhs()
 
          for(i = ist; i <= iend-1; i += 1)
             for(m = 0; m <= 4; m += 1)
-
                rsd[k][j][i][m] = rsd[k][j][i][m]-tx2*(flux[i+1][m]-flux[i-1][m]);
 
          for(i = ist; i <= nx-1; i += 1) {
@@ -1626,21 +1468,10 @@ void rhs()
          }
 
          for(i = ist; i <= iend-1; i += 1) {
-            
-            
-            
             rsd[k][j][i][0] = rsd[k][j][i][0]+dx1*tx1*(u[k][j][i-1][0]-2.0*u[k][j][i][0]+u[k][j][i+1][0]);
-            
-            
             rsd[k][j][i][1] = rsd[k][j][i][1]+tx3*1.00e-01*1.00e+00*(flux[i+1][1]-flux[i][1])+dx2*tx1*(u[k][j][i-1][1]-2.0*u[k][j][i][1]+u[k][j][i+1][1]);
-            
-            
             rsd[k][j][i][2] = rsd[k][j][i][2]+tx3*1.00e-01*1.00e+00*(flux[i+1][2]-flux[i][2])+dx3*tx1*(u[k][j][i-1][2]-2.0*u[k][j][i][2]+u[k][j][i+1][2]);
-            
-            
             rsd[k][j][i][3] = rsd[k][j][i][3]+tx3*1.00e-01*1.00e+00*(flux[i+1][3]-flux[i][3])+dx4*tx1*(u[k][j][i-1][3]-2.0*u[k][j][i][3]+u[k][j][i+1][3]);
-            
-            
             rsd[k][j][i][4] = rsd[k][j][i][4]+tx3*1.00e-01*1.00e+00*(flux[i+1][4]-flux[i][4])+dx5*tx1*(u[k][j][i-1][4]-2.0*u[k][j][i][4]+u[k][j][i+1][4]);
          }
          
@@ -1648,36 +1479,17 @@ void rhs()
          // Fourth-order dissipation
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             rsd[k][j][1][m] = rsd[k][j][1][m]-dssp*( +5.0*u[k][j][1][m]-4.0*u[k][j][2][m]+u[k][j][3][m]);
-            
-            
-            
-            
             rsd[k][j][2][m] = rsd[k][j][2][m]-dssp*((-4.0)*u[k][j][1][m]+6.0*u[k][j][2][m]-4.0*u[k][j][3][m]+u[k][j][4][m]);
          }
 
          for(i = 3; i <= nx-3-1; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                rsd[k][j][i][m] = rsd[k][j][i][m]-dssp*(u[k][j][i-2][m]-4.0*u[k][j][i-1][m]+6.0*u[k][j][i][m]-4.0*u[k][j][i+1][m]+u[k][j][i+2][m]);
          
          
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             rsd[k][j][nx-3][m] = rsd[k][j][nx-3][m]-dssp*(u[k][j][nx-5][m]-4.0*u[k][j][nx-4][m]+6.0*u[k][j][nx-3][m]-4.0*u[k][j][nx-2][m]);
-            
-            
-            
             rsd[k][j][nx-2][m] = rsd[k][j][nx-2][m]-dssp*(u[k][j][nx-4][m]-4.0*u[k][j][nx-3][m]+5.0*u[k][j][nx-2][m]);
          }
       }
@@ -1705,7 +1517,6 @@ void rhs()
 
          for(j = jst; j <= jend-1; j += 1)
             for(m = 0; m <= 4; m += 1)
-
                rsd[k][j][i][m] = rsd[k][j][i][m]-ty2*(flux[j+1][m]-flux[j-1][m]);
 
          for(j = jst; j <= ny-1; j += 1) {
@@ -1721,7 +1532,6 @@ void rhs()
             u31jm1 = tmp*u[k][j-1][i][2];
             u41jm1 = tmp*u[k][j-1][i][3];
             u51jm1 = tmp*u[k][j-1][i][4];
-
             flux[j][1] = ty3*(u21j-u21jm1);
             flux[j][2] = 4.0/3.0*ty3*(u31j-u31jm1);
             flux[j][3] = ty3*(u41j-u41jm1);
@@ -1729,21 +1539,10 @@ void rhs()
          }
 
          for(j = jst; j <= jend-1; j += 1) {
-            
-            
-            
             rsd[k][j][i][0] = rsd[k][j][i][0]+dy1*ty1*(u[k][j-1][i][0]-2.0*u[k][j][i][0]+u[k][j+1][i][0]);
-            
-            
             rsd[k][j][i][1] = rsd[k][j][i][1]+ty3*1.00e-01*1.00e+00*(flux[j+1][1]-flux[j][1])+dy2*ty1*(u[k][j-1][i][1]-2.0*u[k][j][i][1]+u[k][j+1][i][1]);
-            
-            
             rsd[k][j][i][2] = rsd[k][j][i][2]+ty3*1.00e-01*1.00e+00*(flux[j+1][2]-flux[j][2])+dy3*ty1*(u[k][j-1][i][2]-2.0*u[k][j][i][2]+u[k][j+1][i][2]);
-            
-            
             rsd[k][j][i][3] = rsd[k][j][i][3]+ty3*1.00e-01*1.00e+00*(flux[j+1][3]-flux[j][3])+dy4*ty1*(u[k][j-1][i][3]-2.0*u[k][j][i][3]+u[k][j+1][i][3]);
-            
-            
             rsd[k][j][i][4] = rsd[k][j][i][4]+ty3*1.00e-01*1.00e+00*(flux[j+1][4]-flux[j][4])+dy5*ty1*(u[k][j-1][i][4]-2.0*u[k][j][i][4]+u[k][j+1][i][4]);
          }
       }
@@ -1753,37 +1552,18 @@ void rhs()
       //---------------------------------------------------------------------
       for(i = ist; i <= iend-1; i += 1)
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             rsd[k][1][i][m] = rsd[k][1][i][m]-dssp*( +5.0*u[k][1][i][m]-4.0*u[k][2][i][m]+u[k][3][i][m]);
-            
-            
-            
-            
             rsd[k][2][i][m] = rsd[k][2][i][m]-dssp*((-4.0)*u[k][1][i][m]+6.0*u[k][2][i][m]-4.0*u[k][3][i][m]+u[k][4][i][m]);
          }
 
       for(j = 3; j <= ny-3-1; j += 1)
          for(i = ist; i <= iend-1; i += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                rsd[k][j][i][m] = rsd[k][j][i][m]-dssp*(u[k][j-2][i][m]-4.0*u[k][j-1][i][m]+6.0*u[k][j][i][m]-4.0*u[k][j+1][i][m]+u[k][j+2][i][m]);
 
       for(i = ist; i <= iend-1; i += 1)
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             rsd[k][ny-3][i][m] = rsd[k][ny-3][i][m]-dssp*(u[k][ny-5][i][m]-4.0*u[k][ny-4][i][m]+6.0*u[k][ny-3][i][m]-4.0*u[k][ny-2][i][m]);
-            
-            
-            
             rsd[k][ny-2][i][m] = rsd[k][ny-2][i][m]-dssp*(u[k][ny-4][i][m]-4.0*u[k][ny-3][i][m]+5.0*u[k][ny-2][i][m]);
          }
    }
@@ -1819,7 +1599,6 @@ void rhs()
 
          for(k = 1; k <= nz-1-1; k += 1)
             for(m = 0; m <= 4; m += 1)
-
                rtmp[k][m] = rsd[k][j][i][m]-tz2*(flux[k+1][m]-flux[k-1][m]);
 
          for(k = 1; k <= nz-1; k += 1) {
@@ -1836,7 +1615,6 @@ void rhs()
             u31km1 = tmp*utmp[k-1][2];
             u41km1 = tmp*utmp[k-1][3];
             u51km1 = tmp*utmp[k-1][4];
-
             flux[k][1] = tz3*(u21k-u21km1);
             flux[k][2] = tz3*(u31k-u31km1);
             flux[k][3] = 4.0/3.0*tz3*(u41k-u41km1);
@@ -1844,21 +1622,10 @@ void rhs()
          }
 
          for(k = 1; k <= nz-1-1; k += 1) {
-            
-            
-            
             rtmp[k][0] = rtmp[k][0]+dz1*tz1*(utmp[k-1][0]-2.0*utmp[k][0]+utmp[k+1][0]);
-            
-            
             rtmp[k][1] = rtmp[k][1]+tz3*1.00e-01*1.00e+00*(flux[k+1][1]-flux[k][1])+dz2*tz1*(utmp[k-1][1]-2.0*utmp[k][1]+utmp[k+1][1]);
-            
-            
             rtmp[k][2] = rtmp[k][2]+tz3*1.00e-01*1.00e+00*(flux[k+1][2]-flux[k][2])+dz3*tz1*(utmp[k-1][2]-2.0*utmp[k][2]+utmp[k+1][2]);
-            
-            
             rtmp[k][3] = rtmp[k][3]+tz3*1.00e-01*1.00e+00*(flux[k+1][3]-flux[k][3])+dz4*tz1*(utmp[k-1][3]-2.0*utmp[k][3]+utmp[k+1][3]);
-            
-            
             rtmp[k][4] = rtmp[k][4]+tz3*1.00e-01*1.00e+00*(flux[k+1][4]-flux[k][4])+dz5*tz1*(utmp[k-1][4]-2.0*utmp[k][4]+utmp[k+1][4]);
          }
          
@@ -1866,35 +1633,16 @@ void rhs()
          // fourth-order dissipation
          //---------------------------------------------------------------------
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
             rsd[1][j][i][m] = rtmp[1][m]-dssp*( +5.0*utmp[1][m]-4.0*utmp[2][m]+utmp[3][m]);
-            
-            
-            
-            
             rsd[2][j][i][m] = rtmp[2][m]-dssp*((-4.0)*utmp[1][m]+6.0*utmp[2][m]-4.0*utmp[3][m]+utmp[4][m]);
          }
 
          for(k = 3; k <= nz-3-1; k += 1)
             for(m = 0; m <= 4; m += 1)
-               
-               
-               
-               
-               
                rsd[k][j][i][m] = rtmp[k][m]-dssp*(utmp[k-2][m]-4.0*utmp[k-1][m]+6.0*utmp[k][m]-4.0*utmp[k+1][m]+utmp[k+2][m]);
 
          for(m = 0; m <= 4; m += 1) {
-            
-            
-            
-            
             rsd[nz-3][j][i][m] = rtmp[nz-3][m]-dssp*(utmp[nz-5][m]-4.0*utmp[nz-4][m]+6.0*utmp[nz-3][m]-4.0*utmp[nz-2][m]);
-            
-            
-            
             rsd[nz-2][j][i][m] = rtmp[nz-2][m]-dssp*(utmp[nz-4][m]-4.0*utmp[nz-3][m]+5.0*utmp[nz-2][m]);
          }
       }
@@ -1962,15 +1710,12 @@ void setcoeff()
    dxi = 1.0/(nx0-1);
    deta = 1.0/(ny0-1);
    dzeta = 1.0/(nz0-1);
-
    tx1 = 1.0/(dxi*dxi);
    tx2 = 1.0/(2.0*dxi);
    tx3 = 1.0/dxi;
-
    ty1 = 1.0/(deta*deta);
    ty2 = 1.0/(2.0*deta);
    ty3 = 1.0/deta;
-
    tz1 = 1.0/(dzeta*dzeta);
    tz2 = 1.0/(2.0*dzeta);
    tz3 = 1.0/dzeta;
@@ -1995,6 +1740,10 @@ void setcoeff()
    dz3 = dz1;
    dz4 = dz1;
    dz5 = dz1;
+   
+   //---------------------------------------------------------------------
+   // fourth difference dissipation
+   //---------------------------------------------------------------------
    dssp = ((dx1>dy1?dx1:dy1)>dz1?dx1>dy1?dx1:dy1:dz1)/4.0;
    
    //---------------------------------------------------------------------
@@ -2128,6 +1877,10 @@ void ssor(int niter)
    int istep;
    double tmp, tv[12][12][5];
    double delunm[5];
+   
+   //---------------------------------------------------------------------
+   // begin pseudo-time stepping iterations
+   //---------------------------------------------------------------------
    tmp = 1.0/(omega*(2.0-omega));
    
    //---------------------------------------------------------------------
@@ -2187,10 +1940,10 @@ l99998:   ;
 //---------------------------------------------------------------------
    if (!(istep<=niter)) goto _break_7;
    if (istep%20==0||istep==itmax||istep==1)
+      //if ( ( (istep % inorm) == 0 ) && ipr == 1 ) {
+      //  printf(" \n     pseudo-time SSOR iteration no.=%4d\n\n", istep);
+      //}
       if (niter>1)
-         //if ( ( (istep % inorm) == 0 ) && ipr == 1 ) {
-         //  printf(" \n     pseudo-time SSOR iteration no.=%4d\n\n", istep);
-         //}
          printf(" Time step %4d\n", istep);
    
    //---------------------------------------------------------------------
@@ -2271,11 +2024,11 @@ l99998:   ;
    if (timeron)
       timer_stop(10);
    if (istep%inorm==0) {
+      
+      //---------------------------------------------------------------------
+      // compute the max-norms of newton iteration corrections
+      //---------------------------------------------------------------------
       if (timeron)
-         
-         //---------------------------------------------------------------------
-         // compute the max-norms of newton iteration corrections
-         //---------------------------------------------------------------------
          timer_start(11);
       
       
@@ -2289,6 +2042,10 @@ l99998:   ;
    //---------------------------------------------------------------------
    rhs();
    if (istep%inorm==0||istep==itmax) {
+      
+      //---------------------------------------------------------------------
+      // compute the max-norms of newton iteration residuals
+      //---------------------------------------------------------------------
       if (timeron)
          timer_start(11);
 
@@ -2296,6 +2053,10 @@ l99998:   ;
       if (timeron)
          timer_stop(11);
    }
+
+//---------------------------------------------------------------------
+// check the newton-iteration residuals against the tolerance levels
+//---------------------------------------------------------------------
    if (rsdnm[0]<tolrsd[0]&&rsdnm[1]<tolrsd[1]&&rsdnm[2]<tolrsd[2]&&rsdnm[3]<tolrsd[3]&&rsdnm[4]<tolrsd[4]) goto l99999;
    istep++;
    goto l99998;

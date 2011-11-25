@@ -219,7 +219,7 @@ l99994:
          __scalar__0 = F_17+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 0.111111*__scalar__0;
+         __scalar__0 = __scalar__0/9;
          I_7 = I_38;
          I_8 = I_7+j;
          new_image[I_8] = __scalar__0;
@@ -331,7 +331,7 @@ l99994:
          __scalar__0 = F_17+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 0.111111*__scalar__0;
+         __scalar__0 = __scalar__0/9;
          I_7 = I_38;
          I_8 = I_7;
          I_8 = I_8+j;
@@ -444,7 +444,7 @@ l99994:
          addi(__scalar__0, F_17, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 0.111111*__scalar__0;
+         divi(__scalar__0, 9);
          I_7 = I_38;
          I_8 = I_7;
          addi(I_8, I_8, j);
@@ -557,7 +557,7 @@ l99994:
          addi(__scalar__0, F_17, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 0.111111*__scalar__0;
+         divi(__scalar__0, 9);
          I_7 = I_38;
          I_8 = I_7;
          addi(I_8, I_8, j);
@@ -670,7 +670,7 @@ l99994:
          addi(__scalar__0, F_17, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         __scalar__0 = 0.111111*__scalar__0;
+         divi(__scalar__0, 9);
          seti(I_7, I_38);
          seti(I_8, I_7);
          addi(I_8, I_8, j);
@@ -783,7 +783,7 @@ l99994:
          addi(__scalar__0, F_17, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         __scalar__0 = 0.111111*__scalar__0;
+         divi(__scalar__0, 9);
          seti(I_7, I_38);
          seti(I_8, I_7);
          addi(I_8, I_8, j);

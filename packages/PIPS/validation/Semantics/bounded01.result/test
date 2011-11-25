@@ -1,0 +1,70 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j,k) {}
+
+   int i, j, k;
+
+//  T() {0<=i+2, i<=3}
+
+   -2<=i&&i<=3?(void) 0:__assert_fail("-2<=i && i<= 3", "./bounded01.c", 9, (const char *) 0);
+
+//  T() {0<=j+5}
+
+   -5<=j?(void) 0:__assert_fail("-5<=j", "./bounded01.c", 10, (const char *) 0);
+
+//  T() {k<=10}
+
+   k<=10?(void) 0:__assert_fail("k<=10", "./bounded01.c", 11, (const char *) 0);
+
+//  T(i) {i==i#init+1}
+
+
+   i++;
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k;
+
+//  P(i,j,k) {}
+
+   -2<=i&&i<=3?(void) 0:__assert_fail("-2<=i && i<= 3", "./bounded01.c", 9, (const char *) 0);
+
+//  P(i,j,k) {0<=i+2, i<=3}
+
+   -5<=j?(void) 0:__assert_fail("-5<=j", "./bounded01.c", 10, (const char *) 0);
+
+//  P(i,j,k) {0<=i+2, i<=3, 0<=j+5}
+
+   k<=10?(void) 0:__assert_fail("k<=10", "./bounded01.c", 11, (const char *) 0);
+
+//  P(i,j,k) {0<=i+2, i<=3, 0<=j+5, k<=10}
+
+
+   i++;
+
+//  P(i,j,k) {0<=i+1, i<=4, 0<=j+5, k<=10}
+
+
+   return 0;
+}
