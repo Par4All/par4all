@@ -575,7 +575,14 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
             reference ref = region_any_reference(reg);
             entity eref = reference_variable(ref);
             list indices = reference_indices(ref);
-            size_t nbdims = gen_length(indices);
+            size_t nbdims;
+            type ut = ultimate_type(entity_type(eref));
+            if(type_pointer_on_struct_variable_p(ut))
+                nbdims = gen_length(variable_dimensions(type_variable(ut)));
+            else if(pointer_type_p(ut))
+                nbdims = gen_length(indices);
+            else
+                nbdims = gen_length(variable_dimensions(type_variable(ut)));
             if(!entity_local_variable_p(eref,get_current_module_entity()) ) {
                 pips_user_warning("Trying to isolate a statement with a call that references a global variable `%s'\n",entity_user_name(eref));
                 p->ok=false;

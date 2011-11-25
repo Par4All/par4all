@@ -2469,6 +2469,16 @@ bool array_type_p(type t)
 {
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
+bool type_pointer_on_struct_variable_p(type t)
+{
+        t = ultimate_type(t);
+        if(basic_pointer_p(variable_basic(type_variable(t))))
+        {
+            type pt = basic_pointer(variable_basic(type_variable(t)));
+            return type_struct_variable_p(pt);
+        }
+        return false;
+}
 
 bool variable_length_array_type_p(type t)
 {
