@@ -133,11 +133,12 @@ void main()
 
    y = foo();
 
-//  T(p,x1,x2,y) {p#init==1, x2#init+10<=10p+x2, y#init+1<=p+y,
-//    y+1<=p+y#init, 0<=x1, 10x1#init+x2#init<=10x1+x2,
+//  T(p,x1,x2,y) {p#init==1, 1<=p, p<=20, 11<=10p+x2,
+//    x2#init+10<=10p+x2, y#init+1<=p+y, y+1<=p+y#init, 0<=x1,
+//    10x1#init+x2#init<=10x1+x2,
 //    10x1#init+x2#init+11y#init<=10x1+x2+11y, x1#init+2y#init<=x1+2y,
-//    x1#init+y<=x1+y#init, 0<=x1#init, x1#init<=1, 1<=x2#init,
-//    x2#init<=2, 0<=y, y<=1, 0<=y#init, y#init<=1}
+//    x1#init+y<=x1+y#init, 1<=10x1+x2, 0<=x1#init, x1#init<=1,
+//    1<=x2#init, x2#init<=2, 0<=y, y<=1, 0<=y#init, y#init<=1}
 
    while (p<=20) {
 
@@ -172,8 +173,7 @@ void main()
          y = foo();
       }
 
-//  T(p) {p==p#init+1, 2<=p, p<=21, 0<=x1, 0<=x1+2y, y<=x1+1, 0<=y,
-//    y<=1}
+//  T(p) {p==p#init+1, 2<=p, p<=21, 0<=x1, 0<=y, y<=1}
 
       p++;
    }
@@ -182,7 +182,7 @@ void main()
 //    1<=40x1+x2, 0<=25x1+6x2+989, 1<=25x1+x2, 1<=21x1+x2, 1<=20x1+x2,
 //    1<=10x1+x2, 0<=3x1+x2+198, 1<=20x1+x2+31y, 1<=20x1+x2+20y,
 //    1<=20x1+x2+y, 10y<=20x1+x2+9, 1<=10x1+x2+11y, 0<=x1+x2+2y+198,
-//    0<=x1+2y, y<=x1+1, 0<=x2+199, 0<=y, y<=1}
+//    0<=x2+199, 0<=y, y<=1}
 
 
    y = y;
@@ -208,8 +208,7 @@ void main()
 
    while (p<=20) {
 
-//  P(p,x1,x2,y) {p<=20, 11p<=170x1+17x2+203, 0<=x1, 1<=21x1+x2,
-//    1<=x1+x2, 1<=10x1+x2+11y, 0<=x1+2y, y<=x1+1, 0<=x2, 0<=y, y<=1}
+//  P(p,x1,x2,y) {p<=20, 0<=x1, 1<=x1+x2, 0<=x2, x2<=2, 0<=y, y<=1}
 
       //
       // Expected result by Schrammel/Jeannet (the third inequality is also the
@@ -221,29 +220,27 @@ void main()
       //printf("p=%d, x1=%d, x2=%d\n", p, x1, x2);
       while (2*x1+2*x2<=p&&alea()) {
 
-//  P(p,x1,x2,y) {p<=20, 2x1+2x2<=p, 0<=x1, 1<=x1+x2, 0<=x2, 0<=y,
-//    y<=1}
+//  P(p,x1,x2,y) {p<=20, 2x1+2x2<=p, 0<=x2, 0<=y, y<=1}
 
          x1 = x1+y+1;
 
-//  P(p,x1,x2,y) {1<=p, p<=20, 2x1+2x2<=p+2y+2, y+2<=x1+x2, y+1<=x1,
-//    0<=x2, 0<=y, y<=1}
+//  P(p,x1,x2,y) {1<=p, p<=20, 2x1+2x2<=p+2y+2, y+1<=x1, 0<=x2, 0<=y,
+//    y<=1}
 
          x2 = y;
 
-//  P(p,x1,x2,y) {x2==y, 2<=p, p<=20, 2x1<=p+2x2+2, x2+1<=x1, 0<=x2,
+//  P(p,x1,x2,y) {x2==y, 1<=p, p<=20, 2x1<=p+2x2+2, x2+1<=x1, 0<=x2,
 //    x2<=1}
 
          y = foo();
       }
 
-//  P(p,x1,x2,y) {p<=20, 0<=x1, 1<=x1+x2, 0<=x2, 0<=y, y<=1}
+//  P(p,x1,x2,y) {p<=20, 0<=x1, 1<=x1+x2, 0<=x2, x2<=2, 0<=y, y<=1}
 
       p++;
    }
 
-//  P(p,x1,x2,y) {p==21, 0<=x1, 1<=x1+x2, 0<=x1+2y, y<=x1+1, 0<=x2,
-//    0<=y, y<=1}
+//  P(p,x1,x2,y) {p==21, 0<=x1, 1<=x1+x2, 0<=x2, x2<=2, 0<=y, y<=1}
 
 
    y = y;

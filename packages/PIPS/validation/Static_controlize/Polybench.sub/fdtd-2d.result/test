@@ -103,7 +103,6 @@ int main(int argc, char **argv)
 //                            0 <= 0`i <= nx-1-1
 //                            0 <= 0`j <= ny-1-1
 //		<   tests   >
-
             hz[i][j] = hz[i][j]-0.7*(ex[i][j+1]-ex[i][j]+ey[i+1][j]-ey[i][j]);
    }
 //		< is static > TRUE

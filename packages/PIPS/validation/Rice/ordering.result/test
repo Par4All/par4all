@@ -1,0 +1,126 @@
+#
+# Initial code for module pb_ReadParameters
+#
+struct pb_Parameters  * pb_ReadParameters(int *_argc, char **argv)
+{
+   char *err_message;
+   struct argparse ap;
+
+   struct pb_Parameters *ret = (struct pb_Parameters *) malloc(sizeof(struct pb_Parameters ));
+   
+   /* Initialize the parameters structure */
+   ret->outFile = (void *) 0;
+   ret->inpFiles = (char **) malloc(sizeof(char *));
+   (ret->inpFiles)[0] = (void *) 0;
+l99999:   ;
+
+   if (!(rand()>0.5)) goto end_of_options;
+   char *arg = (void *) 0;
+   if (arg[0]=='-'&&arg[1]!=0&&arg[2]==0) {
+   }
+   else {
+      goto l99999;
+   }
+
+   if (arg[1]=='o') goto _switch_2_case_o;
+   if (arg[1]=='i') goto _switch_2_case_i;
+   if (arg[1]=='-') goto _switch_2_case_45;
+_switch_2_default:   ;
+   err_message = "Unexpected command-line parameter\n";
+   goto error;
+_switch_2_case_45:   ;
+   /* End of options */
+   ;
+   /* end for each argument */
+   
+end_of_options:   *_argc = ap.argc;
+   /* Save the modified argc value */
+   
+   return ret;
+_switch_2_case_i:   ;
+/* Input file name */
+   if (rand()>0.5) goto l99998;
+   ret->inpFiles = (char **) &ap;
+_break_2:   ;
+   goto l99999;
+l99998:   ;
+   err_message = "Expecting file name after '-i'\n";
+   goto error;
+_switch_2_case_o:   ;
+/* Output file name */
+
+/* Single-character flag */
+   if (rand()>0.5) goto l99997;
+   free(ret->outFile);
+   ret->outFile = (char *) &ap;
+   goto _break_2;
+l99997:   ;
+   err_message = "Expecting file name after '-o'\n";
+
+error:   ;
+   fputs(err_message, stderr);
+   return (void *) 0;
+}
+#
+# Code after rice_semantics_dependence_graph for module pb_ReadParameters
+#
+struct pb_Parameters  * pb_ReadParameters(int *_argc, char **argv)
+{
+   char *err_message;
+   struct argparse ap;
+
+   struct pb_Parameters *ret = (struct pb_Parameters *) malloc(sizeof(struct pb_Parameters ));
+   
+   /* Initialize the parameters structure */
+   ret->outFile = (void *) 0;
+   ret->inpFiles = (char **) malloc(sizeof(char *));
+   (ret->inpFiles)[0] = (void *) 0;
+l99999:   ;
+
+   if (!(rand()>0.5)) goto end_of_options;
+   char *arg = (void *) 0;
+   if (arg[0]=='-'&&arg[1]!=0&&arg[2]==0) {
+   }
+   else {
+      goto l99999;
+   }
+
+   if (arg[1]=='o') goto _switch_2_case_o;
+   if (arg[1]=='i') goto _switch_2_case_i;
+   if (arg[1]=='-') goto _switch_2_case_45;
+_switch_2_default:   ;
+   err_message = "Unexpected command-line parameter\n";
+   goto error;
+_switch_2_case_45:   ;
+   /* End of options */
+   ;
+   /* end for each argument */
+   
+end_of_options:   *_argc = ap.argc;
+   /* Save the modified argc value */
+   
+   return ret;
+_switch_2_case_i:   ;
+/* Input file name */
+   if (rand()>0.5) goto l99998;
+   ret->inpFiles = (char **) &ap;
+_break_2:   ;
+   goto l99999;
+l99998:   ;
+   err_message = "Expecting file name after '-i'\n";
+   goto error;
+_switch_2_case_o:   ;
+/* Output file name */
+
+/* Single-character flag */
+   if (rand()>0.5) goto l99997;
+   free(ret->outFile);
+   ret->outFile = (char *) &ap;
+   goto _break_2;
+l99997:   ;
+   err_message = "Expecting file name after '-o'\n";
+
+error:   ;
+   fputs(err_message, stderr);
+   return (void *) 0;
+}

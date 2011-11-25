@@ -71,7 +71,6 @@ void assign02()
    s = make_s(1, 2.);
 //             <    is written>: s.entier
    s.entier = 4;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
    
@@ -84,7 +83,6 @@ void assign02()
 
 Cumulated pointer effects for "assign02"
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 void assign02()
@@ -98,7 +96,6 @@ void assign02()
    s = make_s(1, 2.);
 //             <    is written>: s.entier
    s.entier = 4;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
    

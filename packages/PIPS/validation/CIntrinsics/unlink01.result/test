@@ -1,0 +1,28 @@
+#
+# Display print_code_proper_effects for module main
+#
+int main()
+{
+//             <    is declared>: p1
+   char *p1;
+//             <    is written>: p1
+//             <    is referenced>: p1
+   p1 = "first_file_name";
+
+//             <may be read   >: p1[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is read   >: p1
+//             <    is written>: i1
+//             <    is referenced>: i1 p1
+//             <    is declared>: i1
+   int i1 = unlink(p1);
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: i2
+//             <    is referenced>: i2
+//             <    is declared>: i2
+   int i2 = unlink("second_file_name");
+//             <    is read   >: i1 i2
+//             <    is referenced>: i1 i2
+   return i1+i2;
+}

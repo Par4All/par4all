@@ -88,3 +88,6 @@ freia_status freia_ecipo_open(freia_data2d *imout, freia_data2d *imin, const int
 
  /*!@}*/
 
+
+void freia_ecipo_distance(freia_data2d *imOut, freia_data2d *imIn, const int32_t connexity);
+

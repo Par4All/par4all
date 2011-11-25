@@ -58,7 +58,6 @@ void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, s
    char *csrc = d2_offset*element_size+(char *) host_address;
    for(i = 0; i <= d1_block_size-1; i += 1)
       for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void alphablending(short src0[4][4], short src1[4][4], short result[4][4])

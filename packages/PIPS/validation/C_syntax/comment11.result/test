@@ -1,0 +1,18 @@
+#
+# Parsed Code for comment_before_test
+#
+void comment_before_test(int a, int b)
+{
+   do {
+   }
+   while (a<(b<0?1:2));
+}
+#
+# Code after print_code for module comment_before_test
+#
+void comment_before_test(int a, int b)
+{
+   do {
+   }
+   while (a<(b<0?1:2));
+}

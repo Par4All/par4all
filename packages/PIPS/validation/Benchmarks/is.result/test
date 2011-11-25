@@ -96,7 +96,6 @@ void create_seq(double seed, double a)
 {
    double x;
    int i, k;
-
    k = (1<<11)/4;
 
    for(i = 0; i <= 65535; i += 1) {
@@ -520,8 +519,8 @@ _switch_10_case_W:         ;
          goto _break_10;
 _switch_10_case_S:         ;
          if (i<=2)
+            /* test vals were put here */
             if (key_rank!=test_rank_array[i]+iteration)
-               /* test vals were put here */
                failed = 1;
             else
                passed_verification++;

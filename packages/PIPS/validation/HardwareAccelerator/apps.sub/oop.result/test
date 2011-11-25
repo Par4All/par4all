@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
    imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
 
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -351,7 +350,6 @@ int main(int argc, char *argv[])
    
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -518,7 +516,6 @@ int main(int argc, char *argv[])
    imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
 
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -1423,7 +1420,6 @@ int main(int argc, char *argv[])
    
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -1567,7 +1563,6 @@ int main(int argc, char *argv[])
    
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -1717,7 +1712,6 @@ int main(int argc, char *argv[])
    imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
 
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -2632,7 +2626,6 @@ int main(int argc, char *argv[])
    t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
    
    
-   
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -2758,7 +2751,6 @@ int main(int argc, char *argv[])
    t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
    t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
    t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
-   
    
    
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
@@ -2901,7 +2893,6 @@ int main(int argc, char *argv[])
    imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
 
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -3586,7 +3577,6 @@ int main(int argc, char *argv[])
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
    imgtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/
@@ -3747,7 +3737,6 @@ int main(int argc, char *argv[])
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
    imgtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
-
    tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
    x = fdin.framewidth;                                                 /*0168*/
    y = fdin.frameheight;                                                /*0169*/

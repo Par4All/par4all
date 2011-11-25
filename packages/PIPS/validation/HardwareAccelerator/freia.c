@@ -1,7 +1,6 @@
 // fake implementations, should be right for effects
 
 // #include <stdlib.h>
-// malloc really needs size_t?
 extern void * malloc(unsigned int);
 extern void free(void *);
 
@@ -310,4 +309,5 @@ Fun2P(freia_cipo_gradient);
 Fun2P(freia_cipo_inner_gradient);
 Fun2P(freia_cipo_open);
 Fun2P(freia_cipo_close);
+Fun2P(freia_cipo_erode);
 FbinP(freia_cipo_fast_correlation, uint32_t);

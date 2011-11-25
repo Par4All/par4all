@@ -644,7 +644,7 @@ void ts_restructured(void)
                checking_error();
          }
 
-//  T() {s==1, 0<=x, 0<=x+y, y<=x+2, 1<=y}
+//  T() {s==1, 0<=x, y<=x+2, 1<=y}
 
          if (!(s==1&&x>=0&&x+2>=y))
 
@@ -652,11 +652,11 @@ void ts_restructured(void)
 
             deadlock();
 
-//  T(x) {s==1, x==x#init+2, 2<=x, 2<=x+y, y<=x, 1<=y}
+//  T(x) {s==1, x==x#init+2, 2<=x, y<=x, 1<=y}
 
          x += 2;
 
-//  T() {s==1, 2<=x, 2<=x+y, y<=x, 1<=y}
+//  T() {s==1, 2<=x, y<=x, 1<=y}
 
          if (x<0)
 
@@ -1552,11 +1552,11 @@ void ts_restructured(void)
 
          x -= y;
 
-//  P(s,x,y) {s==2, 0<=x, 0<=x+y, y<=x, 0<=y}
+//  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
          s = 1;
 
-//  P(s,x,y) {s==1, 0<=x, 0<=x+y, y<=x, 0<=y}
+//  P(s,x,y) {s==1, 0<=x, y<=x, 0<=y}
 
          if (x<0)
 
@@ -1853,11 +1853,11 @@ void ts_restructured(void)
 
          x -= y;
 
-//  P(s,x,y) {s==2, 0<=x, 0<=x+y, x+1<=y, 0<=y}
+//  P(s,x,y) {s==2, 0<=x, x+1<=y, 0<=y}
 
          s = 1;
 
-//  P(s,x,y) {s==1, 0<=x, 0<=x+y, x+1<=y, 0<=y}
+//  P(s,x,y) {s==1, 0<=x, x+1<=y, 0<=y}
 
          if (x<0)
 
@@ -1865,7 +1865,7 @@ void ts_restructured(void)
 
             checking_error();
 
-//  P(s,x,y) {s==1, 0<=x, 0<=x+y, x+1<=y, 0<=y}
+//  P(s,x,y) {s==1, 0<=x, x+1<=y, 0<=y}
 
          while (rand_b()) {
 
@@ -1902,7 +1902,7 @@ void ts_restructured(void)
 
          x += 2;
 
-//  P(s,x,y) {s==1, 2<=x, 2<=x+y, y<=x, x<=y+1, 1<=y}
+//  P(s,x,y) {s==1, 2<=x, y<=x, x<=y+1, 1<=y}
 
          if (x<0)
 

@@ -4,7 +4,6 @@ Parsed printed file for "main"
 int main()
 {
    int i, j;                                                            /*0013*/
-
    i = (j = 1, 2);                                                      /*0015*/
    i = 3, j = 4;
 
@@ -16,7 +15,6 @@ Code for "main"
 int main()
 {
    int i, j;                                                            /*0013*/
-
    i = (j = 1, 2);                                                      /*0015*/
    i = 3, j = 4;
 
@@ -29,7 +27,6 @@ int main()
 {
    int i, j;                                                            /*0013*/
 //             <    is written>: i j
-
    i = (j = 1, 2);                                                      /*0015*/
 //             <    is written>: i j
    i = 3, j = 4;
@@ -65,7 +62,6 @@ int main()
 
 //  T(i,j) {i==2, j==1}
 
-
    i = (j = 1, 2);                                                      /*0015*/
 
 //  T(i,j) {i==3, i#init==2, j==4, j#init==1}
@@ -91,7 +87,6 @@ int main()
    int i, j;                                                            /*0013*/
 
 //  P(i,j) {}
-
 
    i = (j = 1, 2);                                                      /*0015*/
 

@@ -92,7 +92,6 @@ int main(void)
 
 //  T() {0==-1}
 
-
       exit(1);
 
 //  T(b,ok,x,y) {b+x#init+y==b#init+x+y#init,
@@ -160,7 +159,6 @@ int main(void)
 
 //  P(b,ok,x,y) {}
 
-
       exit(1);
 
 //  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
@@ -171,7 +169,7 @@ int main(void)
 
       if (b)
 
-//  P(b,ok,x,y) {b==1, x==y+1, 0<=ok, ok<=1, 1<=ok+x, 1<=x}
+//  P(b,ok,x,y) {b==1, x==y+1, 0<=ok, ok<=1, 1<=x}
 
          y = y+1;
       else
@@ -226,7 +224,6 @@ int main(void)
 
 //  T() {0==-1}
 
-
       exit(1);
 
 //  T(b,ok,x,y) {b+y==x, b+y==x+y#init, b#init==0, ok==1, ok#init==1,
@@ -239,7 +236,7 @@ int main(void)
 
       if (b)
 
-//  T(y) {b==1, x==y, x==y#init+1, 0<=ok, ok<=1, 1<=ok+x, 1<=x}
+//  T(y) {b==1, x==y, x==y#init+1, 0<=ok, ok<=1, 1<=x}
 
          y = y+1;
       else
@@ -296,7 +293,6 @@ int main(void)
 
 //  P(b,ok,x,y) {}
 
-
       exit(1);
 
 //  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
@@ -325,7 +321,7 @@ int main(void)
 
       ok = ok&&x>=y;
 
-//  P(b,ok,x,y) {b+y==x, ok==1, b<=x, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+y==x, ok==1, 1<=x, y<=x, x<=y+1}
 
       // If the previous boolean assignment is changed into
       //if(x<y)

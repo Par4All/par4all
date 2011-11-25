@@ -112,11 +112,11 @@ C  P(A,B) {0<=A, 0<=B}
 
          IF (A+B.GT.0.0) THEN                                           0011
 
-C  P(A,B) {0<=A, 0<=A+B, 0<=B}
+C  P(A,B) {0<=A, 0<=B}
 
             PRINT *, 'test redondant a+b>0'                             0012
 
-C  P(A,B) {0<=A, 0<=A+B, 0<=B}
+C  P(A,B) {0<=A, 0<=B}
 
             PRINT *, A+B                                                0013
          ENDIF

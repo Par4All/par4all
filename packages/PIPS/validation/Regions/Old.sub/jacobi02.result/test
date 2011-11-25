@@ -7,12 +7,10 @@ void compute()
 kernel1:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 kernel2:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void get_data(char filename[])
@@ -149,7 +147,6 @@ kernel1:
 //  <space[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -173,7 +170,6 @@ kernel2:
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
 //    j<=499}>
-
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
@@ -588,14 +584,12 @@ kernel1:
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 #pragma omp parallel for private(j)
 kernel2:
    for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
    // END BLOCK
 }
@@ -694,13 +688,11 @@ int main(int argc, char *argv[])
 void p4a_kernel_compute(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   
    save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
 void p4a_kernel_compute_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   
    space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void p4a_kernel_get_data(float_t space[501][501], int i, int j)
@@ -722,7 +714,6 @@ kernel1:
       for(j = 1; j <= 499; j += 1)
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
-         
          p4a_kernel_wrapper_compute(save, space, i, j);
    // END BLOCK
 }
@@ -737,7 +728,6 @@ kernel2:
       for(j = 1; j <= 499; j += 1)
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
-         
          p4a_kernel_wrapper_compute_1(save, space, i, j);
    // END BLOCK
 }
@@ -761,7 +751,6 @@ void p4a_kernel_wrapper_compute(float_t save[501][501], float_t space[501][501],
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
-   
    p4a_kernel_compute(save, space, i, j);
 }
 void p4a_kernel_wrapper_compute_1(float_t save[501][501], float_t space[501][501], int i, int j)
@@ -769,7 +758,6 @@ void p4a_kernel_wrapper_compute_1(float_t save[501][501], float_t space[501][501
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
-   
    p4a_kernel_compute_1(save, space, i, j);
 }
 void p4a_kernel_wrapper_get_data(float_t space[501][501], int i, int j)
@@ -1450,21 +1438,17 @@ void get_data(char filename[])
 OUT REGIONS for compute and get_data
 
 
-//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 void compute()
 {
 
-//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
    // BEGIN BLOCK
@@ -1479,8 +1463,7 @@ void compute()
         could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
-//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
 kernel2:   p4a_kernel_launcher_compute_1(save, space);

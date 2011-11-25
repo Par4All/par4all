@@ -60,12 +60,10 @@ void iteration(float_t space[501][501], float_t save[501][501])
         could use also a flip-flop dimension instead... */
    for(i = 1; i <= 499; i += 1)                                         /*0091*/
       for(j = 1; j <= 499; j += 1)                                      /*0092*/
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
    for(i = 1; i <= 499; i += 1)                                         /*0097*/
       for(j = 1; j <= 499; j += 1)                                      /*0098*/
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
 int main(int argc, char *argv[])
@@ -385,7 +383,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //  <space[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -409,7 +406,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
 //    j<=499}>
-
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
@@ -673,14 +669,12 @@ void iteration(float_t space[501][501], float_t save[501][501])
    for(i = 1; i <= 499; i += 1)                                         /*0091*/
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)                                      /*0092*/
-
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
 #pragma omp parallel for private(j)
    for(i = 1; i <= 499; i += 1)                                         /*0097*/
 #pragma omp parallel for 
       for(j = 1; j <= 499; j += 1)                                      /*0098*/
-
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
 int main(int argc, char *argv[])

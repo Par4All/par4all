@@ -34,7 +34,6 @@ l99995:   ;
    if (contrastenhance==1) {
       {
          int I_0;
-
          I_0 = maximal_shape/2+1;
          {
             freia_status ret;
@@ -154,7 +153,6 @@ l99995:   ;
    if (contrastenhance==1) {
       {
          int I_0;
-
          I_0 = maximal_shape/2+1;
          {
             freia_status ret;

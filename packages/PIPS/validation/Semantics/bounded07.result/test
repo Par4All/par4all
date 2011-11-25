@@ -1,0 +1,28 @@
+
+C  T() {}
+
+C     To debug sc_bounded_normalization
+
+      PROGRAM BOUNDED07
+      INTEGER A, B
+
+C  T() {}
+
+
+      IF (A.GT.0.AND.B.GT.0) THEN                                       0006
+
+C  T() {1<=A, 1<=B}
+
+         IF (A+B.GT.0) THEN                                             0007
+
+C  T() {1<=A, 1<=B}
+
+            PRINT *, 'test redondant a+b>0'                             0008
+
+C  T() {1<=A, 1<=B}
+
+            PRINT *, 'test redondant a+b>0'                             0009
+         ENDIF
+      ENDIF
+
+      END

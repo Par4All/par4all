@@ -189,8 +189,8 @@ int main()
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0, 1<=d1}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0, 1<=d1}>
-//  <y[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=d1, 0<=PHI2, PHI2<=3,
-//    d1==4, d2==4}>
+//  <y[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=3, 0<=PHI2, PHI2<=3, d1==4,
+//    d2==4}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1, 1<=d1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1, 1<=d1}>
 

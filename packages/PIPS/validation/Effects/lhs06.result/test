@@ -14,7 +14,6 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
       return 0;
 
    nbout = 0;
-
    *va_arg(pa, int *) = col;
 }
 
@@ -39,7 +38,6 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: col
-
    *va_arg(pa, int *) = col;
 }
 
@@ -64,7 +62,6 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: col
-
    *va_arg(pa, int *) = col;
 }
 
@@ -91,6 +88,5 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: col
-
    *va_arg(pa, int *) = col;
 }

@@ -1,0 +1,94 @@
+
+Parsed code
+
+int main(int argc, char *argv[])
+{
+   icplx_t i;
+   i = (icplx_t) {0, 1};
+   int one = ((icplx_t) {0, 1}).im;
+   return 0;
+}
+
+Printed code
+
+int main(int argc, char *argv[])
+{
+   icplx_t i;
+   i = (icplx_t) {0, 1};
+   int one = ((icplx_t) {0, 1}).im;
+   return 0;
+}
+
+Printed code with proper effects
+
+int main(int argc, char *argv[])
+{
+   icplx_t i;
+//             <    is written>: i.im i.re
+   i = (icplx_t) {0, 1};
+//             <    is written>: one
+   int one = ((icplx_t) {0, 1}).im;
+   return 0;
+}
+
+Printed code with cumulated effects
+
+int main(int argc, char *argv[])
+{
+   icplx_t i;
+//             <    is written>: i.im i.re
+   i = (icplx_t) {0, 1};
+//             <    is written>: one
+   int one = ((icplx_t) {0, 1}).im;
+   return 0;
+}
+
+Printed code with preconditions
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+   icplx_t i;
+
+//  P() {}
+
+   i = (icplx_t) {0, 1};
+
+//  P() {}
+
+   int one = ((icplx_t) {0, 1}).im;
+
+//  P(one) {}
+
+   return 0;
+}
+
+Printed code with transformers
+
+
+//  T(main) {main==0}
+
+int main(int argc, char *argv[])
+{
+
+//  T() {}
+
+   icplx_t i;
+
+//  T() {}
+
+   i = (icplx_t) {0, 1};
+
+//  T(one) {}
+
+   int one = ((icplx_t) {0, 1}).im;
+
+//  T(main) {main==0}
+
+   return 0;
+}

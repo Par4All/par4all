@@ -66,12 +66,12 @@ void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
       //RECV REGIONS
       ;
       
-      //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2<=9,
-      //    k==10, n==10}>
+      //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9, k==10,
+      //    n==10}>
       
       ;
       STEP_RR_c[1-1][STEP_INDEX_SLICE_LOW-1] = 0;
-      STEP_RR_c[1-1][STEP_INDEX_SLICE_UP-1] = n-1;
+      STEP_RR_c[1-1][STEP_INDEX_SLICE_UP-1] = 9;
       STEP_RR_c[2-1][STEP_INDEX_SLICE_LOW-1] = 0;
       STEP_RR_c[2-1][STEP_INDEX_SLICE_UP-1] = 9;
       STEP_SET_RECVREGIONS(c, 1, (STEP_ARG *) STEP_RR_c);
@@ -117,13 +117,13 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
          //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2+1<=n, n==10}>
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
          STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
          STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = n-1;
+         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
          //  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
@@ -134,14 +134,14 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
-         //  <b[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2+1<=n,
-         //    n==10, STEP_i_LOW<=9, STEP_i_LOW<=STEP_i_UP, 0<=STEP_i_UP}>
+         //  <b[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9, n==10,
+         //    STEP_i_LOW<=9, STEP_i_LOW<=STEP_i_UP, 0<=STEP_i_UP}>
          
          ;
          STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = 9;
          STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = n-1;
+         STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
       }
       STEP_SET_RECVREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_c);
       STEP_SET_RECVREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_a);
@@ -157,13 +157,13 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
          //  <c[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2+1<=n, n==10}>
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
          STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
          STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = n-1;
+         STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
       }
       STEP_SET_SENDREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_c);
    }

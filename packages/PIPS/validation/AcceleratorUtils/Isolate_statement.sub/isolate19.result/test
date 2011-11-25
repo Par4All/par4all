@@ -1,0 +1,25 @@
+#
+# Initial code for module pain
+#
+void pain()
+{
+   dcomplex *t = malloc(sizeof(*t)*18);
+holy:   sain(t);
+}
+#
+# Code after isolate_statement for module pain
+#
+void pain()
+{
+   dcomplex *t = malloc(sizeof(*t)*18);
+   {
+      //PIPS generated variable
+      dcomplex *(*t0)[2] = (dcomplex *(*)[2]) 0;
+      P4A_accel_malloc((void **) &t0, sizeof(t[0])*2);
+      P4A_copy_to_accel_2d(sizeof(t[0]), 2, 0, &t, *t0);
+
+holy:      sain(*t0);
+      P4A_copy_from_accel_2d(sizeof(t[1]), 1, 1, &t, *t0);
+      P4A_accel_free(t0);
+   }
+}

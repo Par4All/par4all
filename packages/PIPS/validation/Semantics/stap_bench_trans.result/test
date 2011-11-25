@@ -177,6 +177,8 @@ int main()
 
 //  T(main) {}
 
+   
+   //Open input file
    if ((fp = fopen(filename, "rb"))==(void *) 0) {
 
 //  T() {}
@@ -245,7 +247,6 @@ int main()
             Trmin = Tr[i];
 
 //  T(Nraf,Nraf_max,i) {}
-
 
       RecordPlots("PlotsOut.txt", 100*4, amb_out, 15, 2*20, 0.03/(2.*Trmin), 20, 5);
    }

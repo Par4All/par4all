@@ -999,19 +999,19 @@ void ts_restructured(void)
 
          if (!(s==1&&v<=0&&d<=7))
 
-//  P(d,s,t,v) {s==1, 1<=d, v<=d, 0<=t, v<=1}
+//  P(d,s,t,v) {s==1, 1<=d, 0<=t, v<=1}
 
             deadlock();
 
-//  P(d,s,t,v) {s==1, 0<=d, d<=7, v<=d, 0<=t, v<=0}
+//  P(d,s,t,v) {s==1, 0<=d, d<=7, 0<=t, v<=0}
 
          v++;
 
-//  P(d,s,t,v) {s==1, 0<=d, d<=7, v<=d+1, 0<=t, v<=1}
+//  P(d,s,t,v) {s==1, 0<=d, d<=7, 0<=t, v<=1}
 
          d++;
 
-//  P(d,s,t,v) {s==1, 1<=d, d<=8, v<=d, 0<=t, v<=1}
+//  P(d,s,t,v) {s==1, 1<=d, d<=8, 0<=t, v<=1}
 
          if (s>=3)
 

@@ -20,7 +20,7 @@ el imine(int n)
 
       for(i = n*n; i >= 1; i += -1)
 
-//  P(a,i) {0<=a, 0<=a+i, 1<=i}
+//  P(a,i) {0<=a, 1<=i}
 
          a++;
    }

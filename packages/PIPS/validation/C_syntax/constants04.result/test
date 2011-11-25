@@ -10,8 +10,8 @@ void foo(int *FIFO2, int *FIFO1, int I_41, int y)
    int *im2, *im3, *im4, *im5, *im6, *im7, *im8, *im9, *im10, *im11, *im12, *im13, *im14;
    //PIPS generated variable
    int re9;
-   int N1 = I_41/(0+1);
    //PIPS generated variable
+   int N1 = I_41/(0+1);
    im14 = FIFO2;
    im13 = FIFO1;
    re8 = 260*y;

@@ -1,0 +1,6 @@
+
+Create fails because of asm gcc extension
+
+/* from gcc manual, extension not supported by -stc=c99 */
+int foo = 2 __asm("myfoo");
+

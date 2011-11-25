@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
       }
    }
 
-//  P(b,x,y) {101<=x, x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
+//  P(b,x,y) {101<=x, x<=102, y<=x, x+y<=202, 0<=y}
 
    /* After widening: 0 <= y <= x , x >= 101 */
    return x;

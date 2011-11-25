@@ -1,0 +1,435 @@
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(main) {main==0}
+
+   // BEGIN BLOCK
+
+//  T(N) {N==100}
+
+   int N = 100;
+
+//  T() {}
+
+   double A[100][100];
+   {
+
+//  T() {}
+
+      // BEGIN BLOCK
+
+//  T(0`1`i) {}
+
+      int i;
+
+//  T(0`1`i) {1<=0`1`i, 0`1`i<=N}
+
+      for(i = 1; i <= N; i += 1) {
+
+//  T() {}
+
+         // BEGIN BLOCK
+
+//  T(0`1`2`3`j) {}
+
+         int j;
+
+//  T(0`1`2`3`j) {1<=0`1`2`3`j, 0`1`2`3`j<=N}
+
+         for(j = 1; j <= N; j += 1) {
+
+//  T() {}
+
+            // BEGIN BLOCK
+
+//  T(x0) {}
+
+            int x0 = i*j;
+
+//  T(x1) {2x1<=N, N<=2x1+1}
+
+            int x1 = N/2;
+
+//  T() {}
+
+            if (x0<x1) {
+
+//  T() {}
+
+               // BEGIN BLOCK
+
+//  T() {}
+
+               A[N-i-1][i+j-1] = 1.0;
+
+//  T() {}
+
+               A[i-1][N-i-j-1] = 1.0;
+               // END BLOCK
+            }
+
+//  T() {}
+
+            if (i==j)
+
+//  T() {}
+
+               A[i-1][j-1] = 1.0;
+            // END BLOCK
+         }
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   {
+
+//  T() {}
+
+      // BEGIN BLOCK
+
+//  T(0`7`i) {}
+
+      int i;
+
+//  T(0`7`i) {0<=0`7`i, 0`7`i+1<=N}
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  T() {}
+
+         // BEGIN BLOCK
+
+//  T(0`7`8`j) {}
+
+         int j;
+
+//  T(0`7`8`j) {0<=0`7`8`j, 0`7`8`j+1<=N}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  T() {}
+
+            printf("%f\n", A[i][j]);
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+//  T(main) {main==0}
+
+
+   return 0;
+   // END BLOCK
+}
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int N = 100;
+
+//  P(N) {N==100}
+
+   double A[100][100];
+   {
+
+//  P(N) {N==100}
+
+      // BEGIN BLOCK
+
+//  P(N) {N==100}
+
+      int i;
+
+//  P(0`1`i,N) {N==100}
+
+      for(i = 1; i <= N; i += 1) {
+
+//  P(0`1`i,N) {N==100, 1<=0`1`i, 0`1`i<=100}
+
+         // BEGIN BLOCK
+
+//  P(0`1`i,N) {N==100, 1<=0`1`i, 0`1`i<=100}
+
+         int j;
+
+//  P(0`1`2`3`j,0`1`i,N) {N==100, 1<=0`1`i, 0`1`i<=100}
+
+         for(j = 1; j <= N; j += 1) {
+
+//  P(0`1`2`3`j,0`1`i,N) {N==100, 1<=0`1`2`3`j, 0`1`2`3`j<=100,
+//    1<=0`1`i, 0`1`i<=100}
+
+            // BEGIN BLOCK
+
+//  P(0`1`2`3`j,0`1`i,N) {N==100, 1<=0`1`2`3`j, 0`1`2`3`j<=100,
+//    1<=0`1`i, 0`1`i<=100}
+
+            int x0 = i*j;
+
+//  P(0`1`2`3`j,0`1`i,N,x0) {N==100, 1<=0`1`2`3`j, 0`1`2`3`j<=100,
+//    x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i, 0`1`i<=100,
+//    x0<=1000`1`i, 0`1`i<=x0}
+
+            int x1 = N/2;
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {N==100, x1==50, 1<=0`1`2`3`j,
+//    0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i,
+//    0`1`i<=100, x0<=1000`1`i, 0`1`i<=x0}
+
+            if (x0<x1) {
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {N==100, x1==50, 1<=0`1`2`3`j,
+//    0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i,
+//    0`1`i<=100, x0<=1000`1`i, 0`1`i<=x0, x0<=49}
+
+               // BEGIN BLOCK
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {N==100, x1==50, 1<=0`1`2`3`j,
+//    0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i,
+//    0`1`i<=100, x0<=1000`1`i, 0`1`i<=x0, x0<=49}
+
+               A[N-i-1][i+j-1] = 1.0;
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {N==100, x1==50, 1<=0`1`2`3`j,
+//    0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i,
+//    0`1`i<=100, x0<=1000`1`i, 0`1`i<=x0, x0<=49}
+
+               A[i-1][N-i-j-1] = 1.0;
+               // END BLOCK
+            }
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {N==100, x1==50, 1<=0`1`2`3`j,
+//    0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0, 1<=0`1`i,
+//    0`1`i<=100, x0<=1000`1`i, 0`1`i<=x0}
+
+            if (i==j)
+
+//  P(0`1`2`3`j,0`1`i,N,x0,x1) {0`1`2`3`j==0`1`i, N==100, x1==50,
+//    1<=0`1`2`3`j, 0`1`2`3`j<=100, x0<=1000`1`2`3`j, 0`1`2`3`j<=x0}
+
+               A[i-1][j-1] = 1.0;
+            // END BLOCK
+         }
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   {
+
+//  P(N) {N==100}
+
+      // BEGIN BLOCK
+
+//  P(N) {N==100}
+
+      int i;
+
+//  P(0`7`i,N) {N==100}
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  P(0`7`i,N) {N==100, 0<=0`7`i, 0`7`i<=99}
+
+         // BEGIN BLOCK
+
+//  P(0`7`i,N) {N==100, 0<=0`7`i, 0`7`i<=99}
+
+         int j;
+
+//  P(0`7`8`j,0`7`i,N) {N==100, 0<=0`7`i, 0`7`i<=99}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  P(0`7`8`j,0`7`i,N) {N==100, 0<=0`7`8`j, 0`7`8`j<=99, 0<=0`7`i,
+//    0`7`i<=99}
+
+            printf("%f\n", A[i][j]);
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+//  P(N) {N==100}
+
+
+   return 0;
+   // END BLOCK
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   // BEGIN BLOCK
+   int N = 100;
+   double A[100][100];
+   {
+
+//  <A[PHI1][PHI2]-W-MAY-{N==100}>
+
+      // BEGIN BLOCK
+      int i;
+
+//  <A[PHI1][PHI2]-W-MAY-{N==100}>
+
+      for(i = 1; i <= N; i += 1) {
+
+//  <A[PHI1][PHI2]-W-MAY-{N==100}>
+
+         // BEGIN BLOCK
+         int j;
+
+//  <A[PHI1][PHI2]-W-MAY-{N==100}>
+
+         for(j = 1; j <= N; j += 1) {
+
+//  <A[PHI1][PHI2]-W-MAY-{N==100, 0<=0`1`2`3`j}>
+
+            // BEGIN BLOCK
+            int x0 = i*j;
+            int x1 = N/2;
+
+//  <A[PHI1][PHI2]-W-MAY-{2x0+9703<=99PHI1+100PHI2+1000`1`2`3`j+0`1`i,
+//    2x0+490`1`i+4949<=51PHI1+100PHI2+1000`1`2`3`j,
+//    490`1`2`3`j+4803<=48PHI1+49PHI2+98x0+0`1`i,
+//    48PHI1+49PHI2+490`1`2`3`j<=98x0+0`1`i+4703,
+//    51PHI1+100PHI2+2x0+490`1`i<=1000`1`2`3`j+9849,
+//    99PHI1+100PHI2+2x0<=1000`1`2`3`j+0`1`i+9799,
+//    PHI2+0`1`2`3`j+490`1`i<=48PHI1+147,
+//    48PHI1+0`1`2`3`j+490`1`i<=PHI2+4753,
+//    4899PHI1+4900PHI2<=49000`1`2`3`j+0`1`i+480101,
+//    0`1`2`3`j+1<=PHI2+0`1`i, PHI2+0`1`2`3`j<=0`1`i+97, x1==50,
+//    N==100, x0<=49, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j, 0`1`i<=x0,
+//    1<=0`1`i}>
+
+            if (x0<x1) {
+
+//  <A[PHI1][PHI2]-W-MAY-{2x0+9703<=99PHI1+100PHI2+1000`1`2`3`j+0`1`i,
+//    2x0+490`1`i+4949<=51PHI1+100PHI2+1000`1`2`3`j,
+//    490`1`2`3`j+4803<=48PHI1+49PHI2+98x0+0`1`i,
+//    48PHI1+49PHI2+490`1`2`3`j<=98x0+0`1`i+4703,
+//    51PHI1+100PHI2+2x0+490`1`i<=1000`1`2`3`j+9849,
+//    99PHI1+100PHI2+2x0<=1000`1`2`3`j+0`1`i+9799,
+//    PHI2+0`1`2`3`j+490`1`i<=48PHI1+147,
+//    48PHI1+0`1`2`3`j+490`1`i<=PHI2+4753,
+//    4899PHI1+4900PHI2<=49000`1`2`3`j+0`1`i+480101,
+//    0`1`2`3`j+1<=PHI2+0`1`i, PHI2+0`1`2`3`j<=0`1`i+97, x1==50,
+//    N==100, x0<=49, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j, 0`1`i<=x0,
+//    1<=0`1`i}>
+
+               // BEGIN BLOCK
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1+0`1`i==N-1, 0`1`2`3`j+0`1`i==PHI2+1,
+//    x1==50, N==100, x0<=49, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j,
+//    0`1`i<=x0, 0`1`2`3`j<=100, 1<=0`1`i, 0`1`i<=100}>
+
+               A[N-i-1][i+j-1] = 1.0;
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==0`1`i-1, PHI2+0`1`2`3`j+0`1`i==N-1,
+//    x1==50, N==100, x0<=49, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j,
+//    0`1`i<=x0, 0`1`2`3`j<=100, 1<=0`1`i, 0`1`i<=100}>
+
+               A[i-1][N-i-j-1] = 1.0;
+               // END BLOCK
+            }
+
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==0`1`i-1, PHI2==0`1`2`3`j-1, x1==50,
+//    0`1`2`3`j==0`1`i, N==100, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j,
+//    1<=0`1`2`3`j, 0`1`2`3`j<=100}>
+
+            if (i==j)
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==0`1`i-1, PHI2==0`1`2`3`j-1, x1==50,
+//    0`1`2`3`j==0`1`i, N==100, 0`1`2`3`j<=x0, x0<=1000`1`2`3`j,
+//    1<=0`1`2`3`j, 0`1`2`3`j<=100}>
+
+               A[i-1][j-1] = 1.0;
+            // END BLOCK
+         }
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   {
+
+//  <A[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    N==100}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      // BEGIN BLOCK
+      int i;
+
+//  <A[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    N==100}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==0`7`i, 0<=PHI2, PHI2<=99, N==100,
+//    0<=0`7`i, 0`7`i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         // BEGIN BLOCK
+         int j;
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==0`7`i, 0<=PHI2, PHI2<=99, N==100,
+//    0<=0`7`i, 0`7`i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==0`7`i, PHI2==0`7`8`j, N==100,
+//    0<=0`7`8`j, 0`7`8`j<=99, 0<=0`7`i, 0`7`i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+            printf("%f\n", A[i][j]);
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+
+   return 0;
+   // END BLOCK
+}

@@ -1,0 +1,24 @@
+struct complex  i()
+{
+//             <    is written>: _i.im _i.re
+   struct complex _i = {0, 1};
+//             <    is read   >: _i.im _i.re
+   return _i;
+}
+int main()
+{
+//             <    is written>: im1
+   int im1 = ((struct complex ) {0, 1}).im;
+//             <    is written>: im2
+   int im2 = i().im;
+//             <    is read   >: im1 im2
+   return im1+im2;
+}
+struct complex {
+   int re;
+   int im;
+};
+
+struct complex i();
+
+int main();

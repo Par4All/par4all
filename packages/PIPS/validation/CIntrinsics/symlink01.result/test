@@ -1,0 +1,22 @@
+#
+# Display print_code_proper_effects for module main
+#
+int main()
+{
+//             <    is declared>: p1
+   char *p1;
+//             <    is written>: p1
+//             <    is referenced>: p1
+   p1 = "first_file_name";
+
+//             <may be read   >: p1[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is read   >: p1
+//             <    is written>: i1
+//             <    is referenced>: i1 p1
+//             <    is declared>: i1
+   int i1 = symlink(p1, "second_file_name");
+//             <    is read   >: i1
+//             <    is referenced>: i1
+   return i1;
+}

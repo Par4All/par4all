@@ -1,0 +1,60 @@
+
+Parsed printed file for "main"
+
+int main()
+{
+   int a;
+   a = MAX(1, 2);
+   return 0;
+}
+
+Proper effetcs for "main"
+
+int main()
+{
+   int a;
+//             <    is written>: a
+   a = MAX(1, 2);
+   return 0;
+}
+
+Proper Pointer effetcs for "main"
+
+int main()
+{
+   int a;
+//             <    is written>: a
+   a = MAX(1, 2);
+   return 0;
+}
+
+Cumulated effetcs for "main"
+
+int main()
+{
+   int a;
+//             <    is written>: a
+   a = MAX(1, 2);
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a;
+
+//  P(a) {}
+
+   a = MAX(1, 2);
+
+//  P(a) {a==2}
+
+   return 0;
+}

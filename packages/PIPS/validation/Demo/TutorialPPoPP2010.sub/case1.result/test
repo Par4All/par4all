@@ -226,27 +226,27 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 Printed files with regions
 
 
-//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
-//    m==10, n==10}>
-//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
-//    m==10, n==10}>
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    h==2., m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    h==2., m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
    float x;
    int i, j;
 
-//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
-//    m==10, n==10}>
-//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
-//    m==10, n==10}>
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    h==2., m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    h==2., m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
-//    n==10, 1<=i, i<=n}>
-//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
-//    n==10, 1<=i, i<=n}>
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2., m==10,
+//    n==10, 1<=i, i<=10}>
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2., m==10,
+//    n==10, 1<=i, i<=10}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
@@ -260,7 +260,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       }
 }
 
-//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
 //    h==2., m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
@@ -268,13 +268,13 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    float x;
    int i, j;
 
-//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
 //    h==2., m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
-//    n==10, 1<=i, i<=n}>
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2., m==10,
+//    n==10, 1<=i, i<=10}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
@@ -337,13 +337,13 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    float x;
    int i, j;
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
+//  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
 //    h==2., m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
-//    n==10, 1<=i, i<=n}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2.,
+//    m==10, n==10, 1<=i, i<=10}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
