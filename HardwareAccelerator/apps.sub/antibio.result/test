@@ -610,7 +610,7 @@ digraph "dag_cleaned_4" {
   "w2_0" -> "162 -";
   "w1_0" -> "162 -";
 
-  // external copies: 1
+  // external after copies: 1
   "w3" [shape=circle];
   "w3 =" [shape=circle,label="=",style="dashed"]
   "w1_1" -> "w3 =";
@@ -880,7 +880,7 @@ int main(int argc, char *argv[])
    // binarize
    
    freia_aipo_global_vol(w1_1, &measure_vol);                           /*0204*/
-   freia_aipo_subsat_const(w1_1, w1_1, w1_1->bpp==16?32766:254);
+   freia_aipo_subsat_const(w1_1, w1_1, w1_1->bpp==16?32766:254);        /*0206*/
    freia_aipo_copy(w3, w1_1);
    
    
@@ -2876,7 +2876,7 @@ digraph "dag_cleaned_4" {
   "w2_0" -> "180 -";
   "w1_0" -> "180 -";
 
-  // external copies: 1
+  // external after copies: 1
   "w3" [shape=circle];
   "w3 =" [shape=circle,label="=",style="dashed"]
   "w1_1" -> "w3 =";
@@ -3220,7 +3220,7 @@ digraph "main_helper_6_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0 copies
+// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0+0 copies
 // split 0: 2 cuts
 // # SPOC calls: 2
 
@@ -3468,7 +3468,7 @@ freia_status main_helper_0_0_1(
   return ret;
 }
 
-// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0 copies
+// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -3702,7 +3702,7 @@ freia_status main_helper_1_0_0(
   return ret;
 }
 
-// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -3755,7 +3755,7 @@ freia_status main_helper_2_0_0(
   return ret;
 }
 
-// dag 3: 17 ops and 0 copies, optimized to 17 ops and 0+0 copies
+// dag 3: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -3989,7 +3989,7 @@ freia_status main_helper_3_0_0(
   return ret;
 }
 
-// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+1 copies
+// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+0+1 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // # SPOC calls: 2
@@ -4244,7 +4244,7 @@ freia_status main_helper_4_1_0(
   return ret;
 }
 
-// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -4358,7 +4358,7 @@ freia_status main_helper_5_0_0(
   return ret;
 }
 
-// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0 copies
+// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0+0 copies
 // split 0: 2 cuts
 // # SPOC calls: 2
 
@@ -4936,9 +4936,9 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   
    freia_aipo_copy(w3, w1_1);
-
+   
+   
    while (measure_vol!=measure_oldVol) {                                /*0205*/
       i_8 = 1;                                                          /*0207*/
       
@@ -5320,9 +5320,9 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   
    freia_aipo_copy(w3, w1_1);
-
+   
+   
    while (measure_vol!=measure_oldVol) {                                /*0205*/
       i_8 = 1;                                                          /*0207*/
       
@@ -5981,7 +5981,7 @@ digraph "dag_cleaned_4" {
   "w2_0" -> "162 -";
   "w1_0" -> "162 -";
 
-  // external copies: 1
+  // external after copies: 1
   "w3" [shape=circle];
   "w3 =" [shape=circle,label="=",style="dashed"]
   "w1_1" -> "w3 =";
@@ -6248,7 +6248,7 @@ digraph "main_helper_6_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0 copies
+// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -6736,7 +6736,7 @@ freia_status main_helper_0_0_0(
 }
 
 
-// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -6998,7 +6998,7 @@ freia_status main_helper_1_0_0(
 }
 
 
-// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -7181,7 +7181,7 @@ freia_status main_helper_2_0_0(
 }
 
 
-// dag 3: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 3: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -7443,7 +7443,7 @@ freia_status main_helper_3_0_0(
 }
 
 
-// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+1 copies
+// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+0+1 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -7989,7 +7989,7 @@ freia_status main_helper_4_0_0(
 }
 
 
-// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -8276,7 +8276,7 @@ freia_status main_helper_5_0_0(
 }
 
 
-// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0 copies
+// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -8905,9 +8905,9 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   
    freia_aipo_copy(w3, w1_1);
-
+   
+   
    while (measure_vol!=measure_oldVol) {                                /*0211*/
       i_8 = 1;                                                          /*0215*/
       
@@ -9132,9 +9132,9 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   
    freia_aipo_copy(w3, w1_1);
-
+   
+   
    while (measure_vol!=measure_oldVol) {                                /*0211*/
       i_8 = 1;                                                          /*0215*/
       
@@ -9792,7 +9792,7 @@ digraph "dag_cleaned_4" {
   "w2_0" -> "162 -";
   "w1_0" -> "162 -";
 
-  // external copies: 1
+  // external after copies: 1
   "w3" [shape=circle];
   "w3 =" [shape=circle,label="=",style="dashed"]
   "w1_1" -> "w3 =";
@@ -10186,9 +10186,9 @@ digraph "main_helper_6_0_2" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0 copies
+// dag 0: 12 ops and 0 copies, optimized to 12 ops and 0+0+0 copies
 
-// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_1_0_1
 static cl_kernel main_helper_1_0_1_kernel[2];
@@ -10280,9 +10280,9 @@ freia_status main_helper_1_0_1(
   return err;
 }
 
-// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 2: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
-// dag 3: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 3: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_3_0_1
 static cl_kernel main_helper_3_0_1_kernel[2];
@@ -10374,7 +10374,7 @@ freia_status main_helper_3_0_1(
   return err;
 }
 
-// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+1 copies
+// dag 4: 12 ops and 2 copies, optimized to 11 ops and 1+0+1 copies
 
 // hold kernels for main_helper_4_0_0
 static cl_kernel main_helper_4_0_0_kernel[2];
@@ -10645,7 +10645,7 @@ freia_status main_helper_4_0_4(
   return err;
 }
 
-// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 5: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_5_0_1
 static cl_kernel main_helper_5_0_1_kernel[2];
@@ -10737,7 +10737,7 @@ freia_status main_helper_5_0_1(
   return err;
 }
 
-// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0 copies
+// dag 6: 13 ops and 0 copies, optimized to 13 ops and 0+0+0 copies
 
 // hold kernels for main_helper_6_0_2
 static cl_kernel main_helper_6_0_2_kernel[2];
@@ -11299,12 +11299,12 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(w4, w4, freia_morpho_kernel_8c);                /*0181*/
    
    
-   freia_aipo_erode_8c(w4, w4, freia_morpho_kernel_8c);
-   freia_aipo_copy(w3, w1_1);
+   freia_aipo_erode_8c(w4, w4, freia_morpho_kernel_8c);                 /*0189*/
 
    main_helper_4_0_4(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);   /*0201*/
    // binarize
    
+   freia_aipo_copy(w3, w1_1);
    
    
    while (measure_vol!=measure_oldVol) {                                /*0211*/
@@ -11559,12 +11559,12 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(w4, w4, freia_morpho_kernel_8c);                /*0181*/
    
    
-   freia_aipo_erode_8c(w4, w4, freia_morpho_kernel_8c);
-   freia_aipo_copy(w3, w1_1);
+   freia_aipo_erode_8c(w4, w4, freia_morpho_kernel_8c);                 /*0189*/
 
    main_helper_4_0_4(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);   /*0201*/
    // binarize
    
+   freia_aipo_copy(w3, w1_1);
    
    
    while (measure_vol!=measure_oldVol) {                                /*0211*/

@@ -70,7 +70,7 @@ digraph "dag_cleaned_0" {
   "14 +_" -> "o0";
   "in" -> "14 +_";
 
-  // external copies: 1
+  // external before copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "in'" -> "o1 =";
@@ -82,8 +82,8 @@ digraph "dag_cleaned_0" {
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   freia_aipo_add_const(o0, in, 1);
    freia_aipo_copy(o1, in);
+   freia_aipo_add_const(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -170,7 +170,7 @@ digraph "dag_cleaned_0" {
   "14 +_" -> "o0";
   "in" -> "14 +_";
 
-  // external copies: 1
+  // external before copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "in'" -> "o1 =";
@@ -184,7 +184,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -255,8 +255,8 @@ freia_status copy_02_helper_0_0_0(
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    freia_aipo_copy(o1, in);
+   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -267,8 +267,8 @@ int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    freia_aipo_copy(o1, in);
+   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -355,7 +355,7 @@ digraph "dag_cleaned_0" {
   "14 +_" -> "o0";
   "in" -> "14 +_";
 
-  // external copies: 1
+  // external before copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "in'" -> "o1 =";
@@ -371,7 +371,7 @@ digraph "dag_cleaned_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1+0 copies
 
 /* FREIA terapix helper function for module copy_02
  *
@@ -529,8 +529,8 @@ freia_status copy_02_helper_0_0_0(
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    freia_aipo_copy(o1, in);
+   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -541,8 +541,8 @@ int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    freia_aipo_copy(o1, in);
+   copy_02_helper_0_0_0(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -629,7 +629,7 @@ digraph "dag_cleaned_0" {
   "14 +_" -> "o0";
   "in" -> "14 +_";
 
-  // external copies: 1
+  // external before copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "in'" -> "o1 =";
@@ -644,7 +644,7 @@ digraph "dag_cleaned_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 1 ops and 5 copies, optimized to 1 ops and 0+1+0 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function copy_02
 
@@ -655,8 +655,8 @@ digraph "dag_cleaned_0" {
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   freia_aipo_add_const(o0, in, 1);
    freia_aipo_copy(o1, in);
+   freia_aipo_add_const(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/
@@ -667,8 +667,8 @@ int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 int copy_02(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
 
-   freia_aipo_add_const(o0, in, 1);
    freia_aipo_copy(o1, in);
+   freia_aipo_add_const(o0, in, 1);                                     /*0014*/
    
    
    return 0;                                                            /*0023*/

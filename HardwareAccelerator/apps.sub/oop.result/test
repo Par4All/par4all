@@ -297,7 +297,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "197 D8";
   "i0" -> "198 E8";
 
-  // external copies: 1
+  // external before copies: 1
   "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
   "i0'" -> "t0 =";
@@ -383,6 +383,7 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
+      freia_aipo_copy(t0, i0);
       freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
       freia_aipo_erode_8c(imgtmp, i0, freia_morpho_kernel_8c);          /*0198*/
       freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
@@ -402,8 +403,7 @@ int main(int argc, char *argv[])
       freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
       freia_aipo_inf(i3, i2, i1);                                       /*0228*/
 
-      freia_aipo_threshold(i3, i3, 15, 255, 1);
-      freia_aipo_copy(t0, i0);
+      freia_aipo_threshold(i3, i3, 15, 255, 1);                         /*0230*/
       freia_common_destruct_data(imtmp_3);                              /*0200*/
       freia_common_destruct_data(imtmp_2);                              /*0206*/
 
@@ -760,7 +760,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "197 D8";
   "i0" -> "198 E8";
 
-  // external copies: 1
+  // external before copies: 1
   "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
   "i0'" -> "t0 =";
@@ -883,7 +883,7 @@ digraph "main_helper_0_5" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1+0 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -1450,6 +1450,7 @@ int main(int argc, char *argv[])
       
       
       
+      freia_aipo_copy(t0, i0);
       main_helper_0_0_0(imgtmp, i0, freia_morpho_kernel_8c);            /*0197*/
       main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
 
@@ -1458,9 +1459,8 @@ int main(int argc, char *argv[])
 
       main_helper_0_4_0(i2, i1_3, i2, freia_morpho_kernel_8c);          /*0225*/
       main_helper_0_5_0(i3, i1, i2, 15, 255, 1);                        /*0228*/
-
-      freia_aipo_copy(t0, i0);
-
+      
+      
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
       dx = 10;                                                          /*0233*/
       if (valmax==0) {                                                  /*0234*/
@@ -1593,6 +1593,7 @@ int main(int argc, char *argv[])
       
       
       
+      freia_aipo_copy(t0, i0);
       main_helper_0_0_0(imgtmp, i0, freia_morpho_kernel_8c);            /*0197*/
       main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
 
@@ -1601,9 +1602,8 @@ int main(int argc, char *argv[])
 
       main_helper_0_4_0(i2, i1_3, i2, freia_morpho_kernel_8c);          /*0225*/
       main_helper_0_5_0(i3, i1, i2, 15, 255, 1);                        /*0228*/
-
-      freia_aipo_copy(t0, i0);
-
+      
+      
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
       dx = 10;                                                          /*0233*/
       if (valmax==0) {                                                  /*0234*/
@@ -1956,7 +1956,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "197 D8";
   "i0" -> "198 E8";
 
-  // external copies: 1
+  // external before copies: 1
   "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
   "i0'" -> "t0 =";
@@ -2025,7 +2025,7 @@ digraph "main_helper_0_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -2656,12 +2656,12 @@ int main(int argc, char *argv[])
       
       
       
+      freia_aipo_copy(t0, i0);
       main_helper_0_0_0(i3, i0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
       
       
       
-      freia_aipo_copy(t0, i0);
-
+      
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
       dx = 10;                                                          /*0233*/
       if (valmax==0) {                                                  /*0234*/
@@ -2783,12 +2783,12 @@ int main(int argc, char *argv[])
       
       
       
+      freia_aipo_copy(t0, i0);
       main_helper_0_0_0(i3, i0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
       
       
       
-      freia_aipo_copy(t0, i0);
-
+      
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
       dx = 10;                                                          /*0233*/
       if (valmax==0) {                                                  /*0234*/
@@ -3137,7 +3137,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "197 D8";
   "i0" -> "198 E8";
 
-  // external copies: 1
+  // external before copies: 1
   "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
   "i0'" -> "t0 =";
@@ -3255,7 +3255,7 @@ digraph "main_helper_0_0_3" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1+0 copies
 
 // hold kernels for main_helper_0_0_1
 static cl_kernel main_helper_0_0_1_kernel[2];
@@ -3610,6 +3610,7 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
+      freia_aipo_copy(t0, i0);
       freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
       freia_aipo_erode_8c(imgtmp_1, i0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
@@ -3622,8 +3623,7 @@ int main(int argc, char *argv[])
       freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
       freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
       freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
-      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
-      freia_aipo_copy(t0, i0);
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
       main_helper_0_0_3(i3, i1, i2, 15, 255, 1);                        /*0228*/
 
       freia_common_destruct_data(imtmp_3);                              /*0200*/
@@ -3770,6 +3770,7 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
+      freia_aipo_copy(t0, i0);
       freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
       freia_aipo_erode_8c(imgtmp_1, i0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
@@ -3782,8 +3783,7 @@ int main(int argc, char *argv[])
       freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
       freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
       freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
-      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
-      freia_aipo_copy(t0, i0);
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
       main_helper_0_0_3(i3, i1, i2, 15, 255, 1);                        /*0228*/
 
       freia_common_destruct_data(imtmp_3);                              /*0200*/

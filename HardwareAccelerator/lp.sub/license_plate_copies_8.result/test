@@ -1755,7 +1755,7 @@ digraph "license_plate_copies_helper_0_1" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0+0 copies
 // split 0: 7 cuts
 // split 1: 1 cut
 // # SPOC calls: 8
@@ -4127,7 +4127,7 @@ digraph "license_plate_copies_helper_0_0_7" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module license_plate_copies
  *
@@ -8061,7 +8061,7 @@ digraph "license_plate_copies_helper_0_0_1" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0+0 copies
 
 // hold kernels for license_plate_copies_helper_0_0_1
 static cl_kernel license_plate_copies_helper_0_0_1_kernel[2];

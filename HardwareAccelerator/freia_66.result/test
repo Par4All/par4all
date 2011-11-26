@@ -98,7 +98,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 2
+  // external before copies: 2
   "out" [shape=circle];
   "out =" [shape=circle,label="=",style="dashed"]
   "in" -> "out =";
@@ -271,7 +271,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 2
+  // external before copies: 2
   "out" [shape=circle];
   "out =" [shape=circle,label="=",style="dashed"]
   "in" -> "out =";
@@ -337,10 +337,10 @@ digraph "freia_66_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2+0 copies
 // # SPOC calls: 0
 
-// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -627,7 +627,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 2
+  // external before copies: 2
   "out" [shape=circle];
   "out =" [shape=circle,label="=",style="dashed"]
   "in" -> "out =";
@@ -695,9 +695,9 @@ digraph "freia_66_helper_1_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2+0 copies
 
-// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module freia_66
  *
@@ -1109,7 +1109,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 2
+  // external before copies: 2
   "out" [shape=circle];
   "out =" [shape=circle,label="=",style="dashed"]
   "in" -> "out =";
@@ -1176,9 +1176,9 @@ digraph "freia_66_helper_1_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2+0 copies
 
-// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_66
 

@@ -58,7 +58,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 +";
   "in" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "out0" [shape=circle];
   "out0 =" [shape=circle,label="=",style="dashed"]
   "out1" -> "out0 =";
@@ -73,7 +73,7 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
    tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
    freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
-   freia_aipo_add(out1, tmp, in);
+   freia_aipo_add(out1, tmp, in);                                       /*0011*/
    freia_aipo_copy(out0, out1);
 
    freia_common_destruct_data(tmp);                                     /*0014*/
@@ -136,7 +136,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 +";
   "in" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "out0" [shape=circle];
   "out0 =" [shape=circle,label="=",style="dashed"]
   "out1" -> "out0 =";
@@ -166,7 +166,7 @@ digraph "freia_dead_08_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+1 copies
+// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -320,7 +320,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 +";
   "in" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "out0" [shape=circle];
   "out0 =" [shape=circle,label="=",style="dashed"]
   "out1" -> "out0 =";
@@ -352,7 +352,7 @@ digraph "freia_dead_08_helper_0_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+1 copies
+// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+0+1 copies
 
 /* FREIA terapix helper function for module freia_dead_08
  *
@@ -608,7 +608,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 +";
   "in" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "out0" [shape=circle];
   "out0 =" [shape=circle,label="=",style="dashed"]
   "out1" -> "out0 =";
@@ -639,7 +639,7 @@ digraph "freia_dead_08_helper_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+1 copies
+// dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+0+1 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_dead_08
 
@@ -653,7 +653,7 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
    tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
    freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
-   freia_aipo_add(out1, tmp, in);
+   freia_aipo_add(out1, tmp, in);                                       /*0011*/
    freia_aipo_copy(out0, out1);
 
    freia_common_destruct_data(tmp);                                     /*0014*/
@@ -668,7 +668,7 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
    tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
    freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
-   freia_aipo_add(out1, tmp, in);
+   freia_aipo_add(out1, tmp, in);                                       /*0011*/
    freia_aipo_copy(out0, out1);
 
    freia_common_destruct_data(tmp);                                     /*0014*/

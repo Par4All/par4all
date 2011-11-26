@@ -82,7 +82,7 @@ digraph "dag_cleaned_0" {
   "imIn" -> "11 -";
   "imIn" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "imOut" [shape=circle];
   "imOut =" [shape=circle,label="=",style="dashed"]
   "w2" -> "imOut =";
@@ -114,7 +114,7 @@ void freia_79(freia_data2d *imOut, const freia_data2d *imIn)
 
    freia_aipo_dilate_8c(w2, imIn, freia_morpho_kernel_8c);              /*0010*/
    freia_aipo_sub(w1, imIn, w2);                                        /*0011*/
-   freia_aipo_mul_const(w2, w1, 2);
+   freia_aipo_mul_const(w2, w1, 2);                                     /*0012*/
    freia_aipo_copy(imOut, w2);
 
    if (true)                                                            /*0015*/
@@ -204,7 +204,7 @@ digraph "dag_cleaned_0" {
   "imIn" -> "11 -";
   "imIn" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "imOut" [shape=circle];
   "imOut =" [shape=circle,label="=",style="dashed"]
   "w2" -> "imOut =";
@@ -266,7 +266,7 @@ digraph "freia_79_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+1 copies
+// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -352,7 +352,7 @@ freia_status freia_79_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -530,7 +530,7 @@ digraph "dag_cleaned_0" {
   "imIn" -> "11 -";
   "imIn" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "imOut" [shape=circle];
   "imOut =" [shape=circle,label="=",style="dashed"]
   "w2" -> "imOut =";
@@ -594,7 +594,7 @@ digraph "freia_79_helper_1_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+1 copies
+// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+0+1 copies
 
 /* FREIA terapix helper function for module freia_79
  *
@@ -808,7 +808,7 @@ freia_status freia_79_helper_0_0_0(
 }
 
 
-// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module freia_79
  *
@@ -1069,7 +1069,7 @@ digraph "dag_cleaned_0" {
   "imIn" -> "11 -";
   "imIn" -> "10 D8";
 
-  // external copies: 1
+  // external after copies: 1
   "imOut" [shape=circle];
   "imOut =" [shape=circle,label="=",style="dashed"]
   "w2" -> "imOut =";
@@ -1149,7 +1149,7 @@ digraph "freia_79_helper_1_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+1 copies
+// dag 0: 3 ops and 1 copies, optimized to 3 ops and 0+0+1 copies
 
 // hold kernels for freia_79_helper_0_0_1
 static cl_kernel freia_79_helper_0_0_1_kernel[2];
@@ -1226,7 +1226,7 @@ freia_status freia_79_helper_0_0_1(
   return err;
 }
 
-// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_79
 
@@ -1273,9 +1273,9 @@ void freia_79(freia_data2d *imOut, const freia_data2d *imIn)
    freia_data2d *w2;                                                    /*0006*/
    w2 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);            /*0008*/
 
-   freia_aipo_dilate_8c(w2, imIn, freia_morpho_kernel_8c);
-   freia_aipo_copy(imOut, w2);
+   freia_aipo_dilate_8c(w2, imIn, freia_morpho_kernel_8c);              /*0010*/
    freia_79_helper_0_0_1(w2, w2, imIn, 2);                              /*0011*/
+   freia_aipo_copy(imOut, w2);
 
    if (true)                                                            /*0015*/
       freia_aipo_add(imOut, imOut, w2);                                 /*0016*/
@@ -1290,9 +1290,9 @@ void freia_79(freia_data2d *imOut, const freia_data2d *imIn)
    freia_data2d *w2;                                                    /*0006*/
    w2 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);            /*0008*/
 
-   freia_aipo_dilate_8c(w2, imIn, freia_morpho_kernel_8c);
-   freia_aipo_copy(imOut, w2);
+   freia_aipo_dilate_8c(w2, imIn, freia_morpho_kernel_8c);              /*0010*/
    freia_79_helper_0_0_1(w2, w2, imIn, 2);                              /*0011*/
+   freia_aipo_copy(imOut, w2);
 
    freia_aipo_add(imOut, imOut, w2);                                    /*0016*/
 
