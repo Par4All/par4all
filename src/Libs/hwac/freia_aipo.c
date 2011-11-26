@@ -58,22 +58,26 @@ list freia_aipo_compile_calls
 
   // about aipo statistics: no helper file to put them...
 
-  list added_stats = freia_dag_optimize(fulld, exchanges);
+  list added_before = NIL, added_after = NIL;
+  freia_dag_optimize(fulld, exchanges, &added_before, &added_after);
 
   // intermediate images
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
 
   // dump final optimised dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld,
+                      added_before, added_after);
 
   // now may put actual allocations, which messes up statement numbers
   list reals =
     freia_allocate_new_images_if_needed(ls, new_images, occs, init, NULL);
 
   // ??? should it be NIL because it is not useful in AIPO->AIPO?
-  freia_insert_added_stats(ls, added_stats);
-  added_stats = NIL;
+  freia_insert_added_stats(ls, added_before, true);
+  added_before = NIL;
+  freia_insert_added_stats(ls, added_after, false);
+  added_after = NIL;
 
   // cleanup
   gen_free_list(new_images);

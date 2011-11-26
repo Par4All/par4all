@@ -1392,7 +1392,7 @@ static int freia_trpx_compile_one_dag(
     fname_dag = s;
   }
 
-  dag_dot_dump(module, fname_dag, d, NIL);
+  dag_dot_dump(module, fname_dag, d, NIL, NIL);
 
   // - output function in helper file
   list lparams = NIL;
@@ -1821,7 +1821,8 @@ list freia_trpx_compile_calls
   int n_op_init, n_op_init_copies;
   freia_aipo_count(fulld, &n_op_init, &n_op_init_copies);
 
-  list added_stats = freia_dag_optimize(fulld, exchanges);
+  list added_before = NIL, added_after = NIL;
+  freia_dag_optimize(fulld, exchanges, &added_before, &added_after);
 
   int n_op_opt, n_op_opt_copies;
   freia_aipo_count(fulld, &n_op_opt, &n_op_opt_copies);
@@ -1829,12 +1830,14 @@ list freia_trpx_compile_calls
   fprintf(helper_file,
           "\n"
           "// dag %d: %d ops and %d copies, "
-          "optimized to %d ops and %d+%d copies\n",
+          "optimized to %d ops and %d+%d+%d copies\n",
           number, n_op_init, n_op_init_copies,
-          n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
+          n_op_opt, n_op_opt_copies,
+          (int) gen_length(added_before), (int) gen_length(added_after));
 
   // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld,
+                      added_before, added_after);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
@@ -1926,8 +1929,10 @@ list freia_trpx_compile_calls
     n_split++;
   }
 
-  freia_insert_added_stats(ls, added_stats);
-  added_stats = NIL;
+  freia_insert_added_stats(ls, added_before, true);
+  added_before = NIL;
+  freia_insert_added_stats(ls, added_after, false);
+  added_after = NIL;
 
   // full cleanup
   set_free(global_remainings), global_remainings = NULL;
