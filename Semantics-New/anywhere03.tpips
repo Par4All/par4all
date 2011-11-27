@@ -1,0 +1,39 @@
+delete anywhere03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create anywhere03 anywhere03.c
+
+echo ############################################
+echo #
+echo # Let's try again with points-to information
+echo #
+echo ############################################
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Proper effects for "anywhere03" with points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[anywhere03]
+
+echo
+echo Transformers for "anywhere03" with points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[anywhere03]
+
+echo
+echo Preconditions for "anywhere03"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[anywhere03]
+
+close
+delete anywhere03
+quit

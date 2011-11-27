@@ -1,62 +1,28 @@
-delete pointer01
+# Second part of pointer03.tpips
+
+# To debug effects with points-to
+
+delete pointer04
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create pointer01 pointer01.c
-
-# Useless in the first part
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-echo
-echo Proper effects for "foo" without points-to information
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
-
-echo
-echo Proper effects for "foo" without points-to information
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
-
-echo
-echo Transformers for "foo" without points-to information
-echo
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[foo]
-
-echo
-echo Transformers for "main" without points-to information
-echo
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[main]
-
-echo
-echo Preconditions for "main" without points-to information
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[main]
-
-close
-delete pointer01
-
-create pointer01 pointer01.c
+create pointer04 pointer04.c
 
 #
-#
-# Let's try again with points-to information
-#
+# Use points-to information
 #
 
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PROPER_EFFECTS_WITH_POINTS_TO
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo Points-to information for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 echo
 echo Proper effects for "foo" with points-to information
@@ -108,5 +74,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-delete pointer01
+delete pointer04
 quit

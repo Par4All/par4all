@@ -1,89 +1,45 @@
 
-Proper effects for "main"
-
-int main()
-{
-//             <    is written>: x y z
-   x = 1, y = 2, z = 3;
-
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   foo(p);
-//             <    is read   >: x y z
-   return x+y+z;
-}
-
-Transformers for "foo"
+Points-to information for "main"
 
 
-//  T() {}
-
-void foo(double *p)
-{
-
-//  T() {}
-
-   (*p)++;
-}
-
-Transformers for "main"
-
-
-//  T(main) {main==6}
+// Points To: none
 
 int main()
 {
 
-//  T(x,y,z) {x==1, y==2, z==3}
+// Points To: none
 
    x = 1, y = 2, z = 3;
 
 
-//  T() {}
+// Points To: none
 
-   double *p = (int *) malloc(sizeof(double));
+   int *p = (int *) malloc(sizeof(int));
 
-//  T(x,y,z) {}
-
-   foo(p);
-
-//  T(main) {x+y+z==main}
-
-   return x+y+z;
-}
-
-Preconditions for "main"
-
-
-//  P() {}
-
-int main()
-{
-
-//  P() {}
-
-   x = 1, y = 2, z = 3;
-
-
-//  P(x,y,z) {x==1, y==2, z==3}
-
-   double *p = (int *) malloc(sizeof(double));
-
-//  P(x,y,z) {x==1, y==2, z==3}
+// Points To:
+// p -> *ANY_MODULE*:*HEAP*_b0 , EXACT
 
    foo(p);
 
-//  P(x,y,z) {}
+// Points To:
+// p -> *ANY_MODULE*:*HEAP*_b0 , EXACT
+
+   p = &x;
+
+// Points To:
+// p -> x , EXACT
+
+   foo(p);
+
+// Points To:
+// p -> x , EXACT
 
    return x+y+z;
 }
 
 Proper effects for "foo" with points-to information
 
-void foo(double *p)
+void foo(int *p)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: _p_1
@@ -99,7 +55,11 @@ int main()
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
+   int *p = (int *) malloc(sizeof(int));
+//             <    is read   >: p
+   foo(p);
+//             <    is written>: p
+   p = &x;
 //             <    is read   >: p
    foo(p);
 //             <    is read   >: x y z
@@ -109,7 +69,7 @@ int main()
 Cumulated effects for "foo" with points-to information
 
 //             <    is read   >: _p_1 p
-void foo(double *p)
+void foo(int *p)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: _p_1
@@ -127,7 +87,11 @@ int main()
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
+   int *p = (int *) malloc(sizeof(int));
+//             <    is read   >: p
+   foo(p);
+//             <    is written>: p
+   p = &x;
 //             <    is read   >: p
    foo(p);
 //             <    is read   >: x y z
@@ -139,10 +103,10 @@ Transformers for "foo" with points-to information
 
 //  T() {}
 
-void foo(double *p)
+void foo(int *p)
 {
 
-//  T() {}
+//  T(_p_1) {}
 
    (*p)++;
 }
@@ -162,7 +126,15 @@ int main()
 
 //  T() {}
 
-   double *p = (int *) malloc(sizeof(double));
+   int *p = (int *) malloc(sizeof(int));
+
+//  T() {}
+
+   foo(p);
+
+//  T() {}
+
+   p = &x;
 
 //  T() {}
 
@@ -188,7 +160,15 @@ int main()
 
 //  P(x,y,z) {x==1, y==2, z==3}
 
-   double *p = (int *) malloc(sizeof(double));
+   int *p = (int *) malloc(sizeof(int));
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   foo(p);
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   p = &x;
 
 //  P(x,y,z) {x==1, y==2, z==3}
 

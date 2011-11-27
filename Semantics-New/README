@@ -1,6 +1,11 @@
 Unlike Semantics, the tpips scripts use the current pipsmake
 environment (Fall 20009) and not the initial one.
 
+anywhere01: *p = ... impact of anywhere effects with different options
+            (see pointer01, 02, 03, 04 for interprocedural issues)
+
+anywhere02:
+
 atoll:      call site located in a declaration initialization (P. Villalon)
 
 continue01:
@@ -50,5 +55,13 @@ maisonneuve01-18:
 
 pc01-04:     Different encoding of a program counter. The goal is to 
              show robustness wrt the encoding
+
+pointer01: like anywhere01, but interprocedural issues
+
+pointer02:
+
+pointer03:
+
+pointer04:
 
 while01-11: issues with while loops
