@@ -1,3 +1,6 @@
+# Points-to information would be useful to avoid overestimating the
+# impact of fgetc(fp)
+
 delete stap_bench_trans
 
 setproperty ABORT_ON_USER_ERROR
