@@ -29,13 +29,13 @@
   * Establish mappings between analyzed scalar variable entities and
   * variable value entities for a given module (see transformer/value.c).
   *
-  * Handle equivalences too.
+  * Handle static aliasing in Fortran, i.e. equivalences too.
   *
   * Cannot handle more than one module at a time: no recursivity on
   * modules or chaos will occur.
   *
-  * See package value.c for more information on more or less ri
-  * independent routines
+  * See package value.c for more information on functions more or less
+  * independent of the internal representation.
   *
   * Francois Irigoin, 20 April 1990
   *
@@ -336,16 +336,16 @@ static void allocate_module_value_mappings(entity m)
        are ignored; some slack is added before allocating the hash
        tables; module_inter_effects are (should be) included into
        module_intra_effects */
-    MAP(EFFECT, ef,
+    FOREACH(EFFECT, ef,	module_intra_effects)
     {
 	entity e = reference_variable(effect_any_reference(ef));
 	action a = effect_action(ef);
+	// The estimation is poor when abstract effects occur
 	if(integer_scalar_entity_p(e))
 	    new_value_number++;
 	if(action_write_p(a))
 	    old_value_number++;
-    },
-	module_intra_effects);
+    }
 
     /* add 50 % slack for underestimation (some more slack will be added
        by the hash package */
@@ -408,10 +408,11 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
   }
 }
 
-static bool entity_for_value_mapping_p(entity e) {
-    return entity_not_constant_or_intrinsic_p(e) 
-        && !typedef_entity_p(e)
-        && !entity_field_p(e);
+static bool entity_for_value_mapping_p(entity e)
+{
+  return entity_not_constant_or_intrinsic_p(e) 
+    && !typedef_entity_p(e)
+    && !entity_field_p(e);
 }
 
 /* void module_to_value_mappings(entity m): build hash tables between
@@ -449,8 +450,8 @@ static bool entity_for_value_mapping_p(entity e) {
  */
 void module_to_value_mappings(entity m)
 {
-    cons * module_inter_effects;
-    cons * module_intra_effects;
+    list module_inter_effects;
+    list module_intra_effects;
 
     pips_debug(8,"begin for module %s\n", module_local_name(m));
 
@@ -773,10 +774,10 @@ upwards_vect_rename(Pvecteur v, transformer post)
      */
     list modified_values = transformer_arguments(post);
 
-    MAP(ENTITY, v_new, {
+    FOREACH(ENTITY, v_new, modified_values) {
 	entity v_init = new_value_to_old_value(v_new);
 
 	(void) vect_variable_rename(v, (Variable) v_new,
 				    (Variable) v_init);
-    }, modified_values);
+    }
 }

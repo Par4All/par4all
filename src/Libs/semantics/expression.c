@@ -3616,6 +3616,17 @@ transformer expression_to_transformer(
 
 transformer safe_expression_to_transformer(expression exp, transformer pre)
 {
+  /* This simple function does not take points-to information into
+     account. Furthermore, precise points-to information is not
+     available when side effects occur as in comma expressions.
+
+     FI: I do not see a simple way out. I can try to fix partly the
+     problem in statement_to_transformer where the effects are
+     known... Or I can play safer and use an effect function that
+     replaces dereferencements by anywhere effects.
+
+     See anywhere03.c as an example of the issue.
+  */
   list el = expression_to_proper_effects(exp);
   transformer tf = expression_to_transformer(exp, pre, el);
 
