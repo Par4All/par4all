@@ -488,16 +488,12 @@ proper_effects_of_expression(expression e)
     bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
-    set_constant_paths_p(false);
-    set_pointer_info_kind(with_no_pointer_info);
-
     if (!context_stack_defined_p)
     {
 	set_methods_for_simple_effects();
 	make_effects_private_current_context_stack();
 	debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     }
-
 
     effects_private_current_context_push(transformer_undefined);
     le = generic_proper_effects_of_expression(e);
