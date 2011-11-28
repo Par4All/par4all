@@ -43,8 +43,8 @@
 
 \author{Amaury \textsc{Darsch} \and Serge \textsc{Guelton} \and Ronan
   \textsc{Keryell} \and Grégoire \textsc{Péan} \and Claire \textsc{Seguin}
-  \and Mickaël \textsc{Thievent} \and Pierre \textsc{Villalon} 
-  \and Mehdi \textsc{Amini} \and Janice \textsc{Onanian-McMahon} 
+  \and Mickaël \textsc{Thievent} \and Pierre \textsc{Villalon}
+  \and Mehdi \textsc{Amini} \and Janice \textsc{Onanian-McMahon}
   \and Onil \textsc{Goubier}}
 
 \maketitle
@@ -495,16 +495,18 @@ The previous section provides enough guidance for simple integration
 and maintenance of \Apfa. In this section, more advanced use cases are
 presented.
 
-The developer can create from \texttt{p4a} a branch infrastructure
-\verb|p4a-very-personal|, with \verb|p4a-very-personal-pips| for
-\Apips, \verb|p4a-very-personal-polylib| for \Apolylib, etc.,
-with each attached to the main \verb|p4a|-prefixed branch
-infrastructure. To do this, use;
+For example, to prepare the release candidate of \Apfa 1.3, a developer
+can create from \texttt{p4a} a new branch infrastructure named
+\verb|p4a-1.3-rc|, with \verb|p4a-1.3-rc-pips| for \Apips,
+\verb|p4a-1.3-rc-polylib| for \Apolylib, etc., with each one starting from
+its relative \verb|p4a|-prefixed branch infrastructure. To do this, use;
 \begin{verbatim}
-p4a_git --aggregate-branches p4a-very-personal
+p4a_git --aggregate-branches p4a-1.3-rc
 \end{verbatim}
 
-To start from \texttt{p4a-0.2-alpha}, use:
+To start from another branch different from the default
+\verb|p4a|-prefixed branch infrastructure, for example
+\texttt{p4a-0.2-alpha}, use:
 \begin{verbatim}
 p4a_git --aggregate-branches p4a-very-personal p4a-0.2-alpha
 \end{verbatim}
@@ -520,6 +522,11 @@ changed by others:
 \begin{verbatim}
 p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 \end{verbatim}
+or even faster by avoiding a fetch for each \texttt{pull}:
+\begin{verbatim}
+p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+\end{verbatim}
+
 
 To set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before using them:
@@ -527,7 +534,7 @@ To set up all the tracking branches for version
 p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
         remotes/origin/p4a-0.2-alpha\$suffix
 \end{verbatim}
-\texttt{}
+
 Developing and trying a new version of the scripts dealing with
 the \Apfa infrastructure itself, such as \verb|p4a_setup.py|, is
 complicated by the fact that script execution changes the branch. This may
@@ -540,26 +547,41 @@ one in the \verb|$P4A_TOP| %$
 directory. Then, set \verb|P4A_ROOT| to the new repository.
 For a more independent development environment, one could also set
 \verb|P4A_TOP| to a new world.
-Then, set \verb|P4A_ETC| to point to the directory
-that contains the \verb|p4a_git_lib.bash| that will be
-used. Subsequent executions of the \verb|p4a_setup.py| under revision
-will act on the new sand-box repository working copy.
+
+If you are developing the \Apfa infrastructure itself, since
+\verb|p4a_setup.py| install \Apfa and rebuild a new configuration file at
+the end, to test the new \texttt{p4a_git} script for example for the
+construction of the new \Apfa, it is useful to set \verb|P4A_ETC| to point
+to the directory that contains the \verb|p4a_git_lib.bash| that will be
+used for example, to speed up the bootstrapping process. Subsequent
+executions of the \verb|p4a_setup.py| under revision will act on the new
+sand-box repository working copy.
 
 To test a \texttt{par4all} repository before the final push by
 merging and building into a new \texttt{p5} repository, use the
 following sequence of steps:
 \begin{verbatim}
 cd $P4A_TOP
+# Create a new clone from par4all in the same directory. Note that git
+# objects are hard-linked to the first one for space efficiency:
 git clone par4all p5
+# Where we will work:
 export P4A_ROOT=$P4A_TOP/p5
-export P4A_ETC=$P4A_TOP/par4all/src/dev
-$P4A_TOP/par4all/src/dev/p4a_git --add-remotes
-# To recreate the tracking branches:
-$P4A_TOP/par4all/src/dev/p4a_git --aggregate-branches p4a remotes/origin/p4a
-# Update the svn-git gateways and get all the sources at the right place:
-$P4A_TOP/par4all/src/dev/p4a_git --build-new-p4a
-# Build all the infrastructure:
-$P4A_TOP/par4all/src/dev/p4a_setup.py
+cd $P4A_ROOT
+# Select the branch version you want to try, normally p4a, but can be
+# something more specific, such as p4a-1.3-rc:
+git checkout p4a
+# Indented part is not useful for a normal developer:
+    # If you are working on the Par4All infrastructure itself and its tools.
+    export P4A_ETC=$P4A_TOP/par4all/src/dev
+    # Optionally Add remotes to the PIPS git-svn & PolyLib git gateway if we want to
+    # test the production of a new version:
+    $P4A_TOP/par4all/src/dev/p4a_git --add-remotes
+    # Here you may update the svn-git gateways and get all the sources at
+    # the right place with a brand new version:
+    $P4A_TOP/par4all/src/dev/p4a_git --build-new-p4a
+# For a normal developer, simply build Par4All
+$P4A_ROOT/src/dev/p4a_setup.py <your options>
 # Source the new environment. Be carefull, it override the P4A_ETC
 # variable above:
 source $P4A_ROOT/run/etc/par4all-rc.sh
