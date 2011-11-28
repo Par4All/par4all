@@ -1425,7 +1425,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 1
+  // external before copies: 1
   "in" [shape=circle];
   "in =" [shape=circle,label="=",style="dashed"]
   "imin" -> "in =";
@@ -4293,7 +4293,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 1
+  // external before copies: 1
   "in" [shape=circle];
   "in =" [shape=circle,label="=",style="dashed"]
   "imin" -> "in =";
@@ -6224,10 +6224,10 @@ digraph "main_helper_3_2" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1+0 copies
 // # SPOC calls: 0
 
-// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0 copies
+// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0+0 copies
 // split 0: 25 cuts
 // split 1: 1 cut
 // split 2: 1 cut
@@ -12523,7 +12523,7 @@ freia_status main_helper_1_3_0(
   return ret;
 }
 
-// dag 2: 17 ops and 0 copies, optimized to 17 ops and 0+0 copies
+// dag 2: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -12757,7 +12757,7 @@ freia_status main_helper_2_0_0(
   return ret;
 }
 
-// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0 copies
+// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0+0 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -14643,7 +14643,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 1
+  // external before copies: 1
   "in" [shape=circle];
   "in =" [shape=circle,label="=",style="dashed"]
   "imin" -> "in =";
@@ -16703,9 +16703,9 @@ digraph "main_helper_3_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1+0 copies
 
-// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0 copies
+// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -29731,7 +29731,7 @@ freia_status main_helper_1_0_18(
 }
 
 
-// dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -29993,7 +29993,7 @@ freia_status main_helper_2_0_0(
 }
 
 
-// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0 copies
+// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -31970,7 +31970,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 1
+  // external before copies: 1
   "in" [shape=circle];
   "in =" [shape=circle,label="=",style="dashed"]
   "imin" -> "in =";
@@ -33864,9 +33864,9 @@ digraph "main_helper_3_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1+0 copies
 
-// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0 copies
+// dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0+0 copies
 
 // hold kernels for main_helper_1_0_1
 static cl_kernel main_helper_1_0_1_kernel[2];
@@ -33985,7 +33985,7 @@ freia_status main_helper_1_0_1(
   return err;
 }
 
-// dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_2_0_1
 static cl_kernel main_helper_2_0_1_kernel[2];
@@ -34077,7 +34077,7 @@ freia_status main_helper_2_0_1(
   return err;
 }
 
-// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0 copies
+// dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0+0 copies
 
 // hold kernels for main_helper_3_0_0
 static cl_kernel main_helper_3_0_0_kernel[2];

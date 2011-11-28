@@ -591,7 +591,7 @@ digraph "main_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0 copies
+// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0+0 copies
 // split 0: 2 cuts
 // # SPOC calls: 2
 
@@ -1385,7 +1385,7 @@ digraph "main_helper_0_0_1" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0 copies
+// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -2711,7 +2711,7 @@ digraph "main_helper_0_0_1" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0 copies
+// dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0+0 copies
 
 // hold kernels for main_helper_0_0_1
 static cl_kernel main_helper_0_0_1_kernel[2];

@@ -39,8 +39,8 @@ int HasNextBurst(FILE *fp, float *Tr)
 
    int EndOfFile = 0;
 
-//  T(EndOfFile,HasEqual,chara,i) {EndOfFile<=0, EndOfFile#init<=0,
-//    HasEqual<=0, HasEqual#init<=0}
+//  T(EndOfFile,HasEqual,chara,i,status) {EndOfFile#init<=0,
+//    HasEqual#init<=0}
 
    while (!HasEqual&&!EndOfFile) {
 
@@ -57,7 +57,7 @@ l99998:      ;
 
       if (!(i<255)) goto _break_2;
 
-//  T() {}
+//  T(EndOfFile,HasEqual,chara,i,status) {}
 
       line[i] = fgetc(fp);
 

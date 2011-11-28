@@ -3,7 +3,17 @@ delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
 
-setproperty CONSTANT_PATH_EFFECTS TRUE
+
+#
+# Use points-to information
+#
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+# setproperty CONSTANT_PATH_EFFECTS TRUE
 
 echo
 echo Initial code
@@ -28,6 +38,22 @@ display PRINTED_FILE[duck]
 activate PRINT_CODE
 
 echo
+echo Initial code with cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Initial code with cumulated effects for "duck"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+
+echo
 echo Initial code with transformers for "duck"
 echo
 
@@ -39,7 +65,7 @@ echo
 echo Initial code with transformers for "main"
 echo
 
-activate PRINT_CODE_PRECONDITIONS
+activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 activate PRINT_CODE
 

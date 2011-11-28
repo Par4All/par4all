@@ -116,7 +116,7 @@ static int opencl_compile_mergeable_dag(
              split_name, n_cut, (int) gen_length(dag_vertices(d)));
   ifdebug(4) dag_dump(stderr, cut_name, d);
 
-  dag_dot_dump(module, cut_name, d, NIL);
+  dag_dot_dump(module, cut_name, d, NIL, NIL);
 
   pips_assert("some input or output images", dag_inputs(d) || dag_outputs(d));
 
@@ -514,7 +514,7 @@ static void opencl_merge_and_compile(
   string split_name = strdup(cat(fname_fulldag, "_", itoa(n_split)));
   pips_debug(3, "compiling for %s\n", split_name);
 
-  dag_dot_dump(module, split_name, d, NIL);
+  dag_dot_dump(module, split_name, d, NIL, NIL);
 
   int n_cut = 0;
 
@@ -709,7 +709,8 @@ list freia_opencl_compile_calls
   int n_op_init, n_op_init_copies;
   freia_aipo_count(fulld, &n_op_init, &n_op_init_copies);
 
-  list added_stats = freia_dag_optimize(fulld, exchanges);
+  list added_before = NIL, added_after = NIL;
+  freia_dag_optimize(fulld, exchanges, &added_before, &added_after);
 
   int n_op_opt, n_op_opt_copies;
   freia_aipo_count(fulld, &n_op_opt, &n_op_opt_copies);
@@ -717,9 +718,10 @@ list freia_opencl_compile_calls
   fprintf(helper_file,
           "\n"
           "// dag %d: %d ops and %d copies, "
-          "optimized to %d ops and %d+%d copies\n",
+          "optimized to %d ops and %d+%d+%d copies\n",
           number, n_op_init, n_op_init_copies,
-          n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
+          n_op_opt, n_op_opt_copies,
+          (int) gen_length(added_before), (int) gen_length(added_after));
 
   // opencl file
   string opencl_file = get_opencl_file_name(module);
@@ -740,7 +742,8 @@ list freia_opencl_compile_calls
   list new_images = dag_fix_image_reuse(fulld, init, occs);
 
   // dump final optimised dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld,
+                      added_before, added_after);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -781,8 +784,11 @@ list freia_opencl_compile_calls
   list reals =
     freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
 
-  freia_insert_added_stats(ls, added_stats);
-  added_stats = NIL;
+  // hmmm... is this too late?
+  freia_insert_added_stats(ls, added_before, true);
+  added_before = NIL;
+  freia_insert_added_stats(ls, added_after, false);
+  added_after = NIL;
 
   // cleanup
   gen_free_list(new_images);

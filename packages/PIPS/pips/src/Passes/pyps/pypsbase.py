@@ -57,7 +57,7 @@ class Maker(object):
         """ retrieve the list of makefile from which the final makefile is generated"""
         return [("pypsbase","Makefile.base") ]
 
-class loop:
+class loop(object):
     """do-loop from a module"""
 
     def __init__(self,module,label):
@@ -95,9 +95,11 @@ class loop:
         if label!=None: return self.loops()[label]
         else: return [ loop(self.module,l) for l in str.split(loops," ") ] if loops else []
         
-    def parallel(self,execution):
-        """Define the execution mode for a loop"""
-        self.__ws.cpypips.flag_loop_execution_parallel(self.module.name,self.label,execution)
+    parallel = property(
+            lambda self: self.__ws.cpypips.get_loop_execution_parallel(self.module.name,self.label),
+            lambda self,is_parallel: self.__ws.cpypips.set_loop_execution_parallel(self.module.name,self.label,is_parallel),
+            doc="True if the loop is parallel")
+
 
 class module(object): # deriving from object is needed for overloaded setter
     """A source code function"""
