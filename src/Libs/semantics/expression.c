@@ -3627,7 +3627,8 @@ transformer safe_expression_to_transformer(expression exp, transformer pre)
 
      See anywhere03.c as an example of the issue.
   */
-  list el = expression_to_proper_effects(exp);
+  //list el = expression_to_proper_effects(exp);
+  list el = expression_to_proper_constant_path_effects(exp);
   transformer tf = expression_to_transformer(exp, pre, el);
 
   gen_full_free_list(el);
