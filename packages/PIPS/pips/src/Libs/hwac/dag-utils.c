@@ -332,6 +332,32 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   }
 }
 
+static void dagvtx_copy_list_dot(FILE * out, const list ls, const set inputs)
+{
+  FOREACH(statement, s, ls)
+  {
+    call c = freia_statement_to_call(s);
+    if (c && same_string_p(entity_local_name(call_function(c)), AIPO "copy"))
+    {
+      list args = call_arguments(c);
+      pips_assert("two args to aipo copy", gen_length(args)==2);
+      entity dst = expression_to_entity(EXPRESSION(CAR(args)));
+      entity src = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+      fprintf(out,
+              "  \"%s%s\" [shape=circle];\n"
+              "  \"%s =\" [shape=circle,label=\"=\",style=\"dashed\"]\n"
+              "  \"%s%s\" -> \"%s =\";\n"
+              "  \"%s =\" -> \"%s%s\";\n",
+              entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "",
+              entity_dot_name(dst),
+              entity_dot_name(src), set_belong_p(inputs, src)? "'": "",
+              entity_dot_name(dst), entity_dot_name(dst),
+              entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "");
+    }
+    // should not be a else?
+  }
+}
+
 static void dagvtx_list_dot(
   FILE * out, const string comment, const list l, const set used)
 {
@@ -351,7 +377,8 @@ static void dagvtx_list_dot(
  * @param what, name of dag
  * @param d, dag to output
  */
-void dag_dot(FILE * out, const string what, const dag d, const list ls)
+void dag_dot(FILE * out, const string what, const dag d,
+             const list lb, const list la)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
@@ -386,31 +413,16 @@ void dag_dot(FILE * out, const string what, const dag d, const list ls)
   }
 
   // handle external copies after the computation
-  if (ls)
+  if (lb)
   {
-    fprintf(out, "\n  // external copies: %d\n", (int) gen_length(ls));
-    FOREACH(statement, s, ls)
-    {
-      call c = freia_statement_to_call(s);
-      if (c && same_string_p(entity_local_name(call_function(c)), AIPO "copy"))
-      {
-        list args = call_arguments(c);
-        pips_assert("two args to aipo copy", gen_length(args)==2);
-        entity dst = expression_to_entity(EXPRESSION(CAR(args)));
-        entity src = expression_to_entity(EXPRESSION(CAR(CDR(args))));
-        fprintf(out,
-                "  \"%s%s\" [shape=circle];\n"
-                "  \"%s =\" [shape=circle,label=\"=\",style=\"dashed\"]\n"
-                "  \"%s%s\" -> \"%s =\";\n"
-                "  \"%s =\" -> \"%s%s\";\n",
-                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "",
-                entity_dot_name(dst),
-                entity_dot_name(src), set_belong_p(inputs, src)? "'": "",
-                entity_dot_name(dst), entity_dot_name(dst),
-                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "");
-      }
-      // should not be a else?
-    }
+    fprintf(out, "\n  // external before copies: %d\n", (int) gen_length(lb));
+    dagvtx_copy_list_dot(out, lb, inputs);
+  }
+
+  if (la)
+  {
+    fprintf(out, "\n  // external after copies: %d\n", (int) gen_length(la));
+    dagvtx_copy_list_dot(out, la, inputs);
   }
 
   fprintf(out, "}\n");
@@ -423,7 +435,7 @@ void dag_dot(FILE * out, const string what, const dag d, const list ls)
 /* generate a "dot" format from a dag to a file.
  */
 void dag_dot_dump(const string module, const string name,
-                  const dag d, const list ls)
+                  const dag d, const list lb, const list la)
 {
   // build file name
   string src_dir = db_get_directory_name_for_module(module);
@@ -433,16 +445,16 @@ void dag_dot_dump(const string module, const string name,
   FILE * out = safe_fopen(fn, "w");
   fprintf(out, "// graph for dag \"%s\" of module \"%s\" in dot format\n",
     name, module);
-  dag_dot(out, name, d, ls);
+  dag_dot(out, name, d, lb, la);
   safe_fclose(out, fn);
   free(fn);
 }
 
 void dag_dot_dump_prefix(const string module, const string prefix, int number,
-                         const dag d, const list ls)
+                         const dag d, const list lb, const list la)
 {
   string name = strdup(cat(prefix, itoa(number), NULL));
-  dag_dot_dump(module, name, d, ls);
+  dag_dot_dump(module, name, d, lb, la);
   free(name);
 }
 
@@ -1296,12 +1308,13 @@ static int compatible_reduction_operation(const dagvtx v1, const dagvtx v2)
 /* remove dead image operations.
  * remove AIPO copies detected as useless.
  * remove identical operations.
- * @return statements to be managed outside (external copies)...
+ * return list of statements to be managed outside (external copies)...
  * ??? maybe there should be a transitive closure...
  */
-list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
+void freia_dag_optimize(
+  dag d, hash_table exchanges,
+  list * lbefore, list * lafter)
 {
-  list lstats = NIL;
   set remove = set_make(set_pointer);
   size_t dag_output_count = gen_length(dag_outputs(d));
 
@@ -1707,7 +1720,7 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
           // fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
           unlink_copy_vertex(d, source, w);
           set_add_element(remove, remove, w);
-          lstats = CONS(statement, freia_copy_image(source, target), lstats);
+         *lbefore = CONS(statement, freia_copy_image(source, target), *lbefore);
         }
         else // source not an input, but the result of an internal computation
         {
@@ -1717,15 +1730,15 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
             // source of the copy will be an output...
             unlink_copy_vertex(d, source, w);
             set_add_element(remove, remove, w);
-            lstats = CONS(statement, freia_copy_image(source, target), lstats);
+           *lafter = CONS(statement, freia_copy_image(source, target), *lafter);
           }
           else if (hash_defined_p(intra_pipe_copies, source))
           {
             unlink_copy_vertex(d, source, w);
             set_add_element(remove, remove, w);
-            lstats = CONS(statement,
-                freia_copy_image((entity) hash_get(intra_pipe_copies, source),
-                                 target), lstats);
+            *lafter = CONS(statement,
+                 freia_copy_image((entity) hash_get(intra_pipe_copies, source),
+                                  target), *lafter);
           }
           else // keep first copy
             hash_put(intra_pipe_copies, source, target);
@@ -1781,9 +1794,8 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
 
   pips_assert("right output count after optimizations",
       // former output images are either still computed or copies of computed
-      gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
-
-  return lstats;
+         gen_length(dag_outputs(d)) + gen_length(*lbefore) + gen_length(*lafter)
+              == dag_output_count);
 }
 
 /* return whether all vertices in list are mesures...
@@ -2305,7 +2317,7 @@ dag freia_build_dag(
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
-  dag_dot_dump_prefix(module, "dag_", number, fulld, NIL);
+  dag_dot_dump_prefix(module, "dag_", number, fulld, NIL, NIL);
 
   return fulld;
 }

@@ -209,17 +209,32 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
 
 /*********************** EFFECTS AND ABSTRACT LOCATIONS */
 
+bool cell_abstract_location_p(cell c)
+{
+  pips_assert("cell is not a GAP", !cell_gap_p(c));
+
+  return (entity_abstract_location_p(reference_variable(cell_any_reference(c))));
+}
 
 bool effect_abstract_location_p(effect eff)
 {
   return cell_abstract_location_p(effect_cell(eff));
 }
 
-bool cell_abstract_location_p(cell c)
+/* Returns true if at least one effect of effect list el is related to
+ *  an abstract location 
+ */
+bool effects_abstract_location_p(list el)
 {
-  pips_assert("cell is not a GAP", !cell_gap_p(c));
+  bool abstract_p = false;
 
-  return (entity_abstract_location_p(reference_variable(cell_any_reference(c))));
+  FOREACH(EFFECT, e, el) {
+    if(effect_abstract_location_p(e)) {
+      abstract_p = true;
+      break;
+    }
+  }
+  return abstract_p;
 }
 
 

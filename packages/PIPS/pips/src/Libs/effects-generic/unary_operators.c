@@ -41,9 +41,11 @@
 #include "ri.h"
 #include "effects.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "effects-util.h"
 #include "misc.h"
 
+#include "effects-convex.h"
 #include "effects-generic.h"
 
 void 
@@ -594,3 +596,141 @@ void effect_add_field_dimension(effect eff, entity field)
   return;
 }
 
+/***********************************************************************/
+/* FILTERING DECLARATIONS                                              */
+/***********************************************************************/
+
+/** filter the input effects using the input declaration - matching
+    effects with no dereferencements are skipped - effects with
+    dereferencements are translated using the declaration initial
+    value if it exists, or are translated to an abstract location
+    effect (currently anywhere) otherwise.
+
+    @param l_eff is the input effect list, it is freed by the function
+    to avoid copying the potentially numerous effects which are not
+    concerned by the declaration.
+
+    @param decl is an entity.
+
+    usage: l_new_eff = filter_effects_with_declaration(l_eff, decl)
+ */
+list filter_effects_with_declaration(list l_eff, entity decl)
+{
+  list l_res = NIL;
+  storage decl_s = entity_storage(decl);
+
+  ifdebug(8)
+    {
+      type ct = entity_basic_concrete_type(decl);
+      pips_debug(8, "dealing with entity : %s with type %s\n",
+		 entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
+    }
+
+  if (storage_ram_p(decl_s)
+      /* static variable declaration has no effect, even in case of initialization. */
+      && !static_area_p(ram_section(storage_ram(decl_s)))
+      && type_variable_p(entity_type(decl)))
+    {
+      value v_init = entity_initial(decl);
+      expression exp_init = expression_undefined;
+      if(value_expression_p(v_init))
+	exp_init = value_expression(v_init);
+
+      // We must first eliminate effects on the declared variable
+      // except if it is a static or extern variable.
+      // or use the initial value to translate them to the preceding memory state
+      // We should take care of the transformer too for convex effects.
+      // But which transformer ? Is the statement transfomer OK?
+      // or do we need to use the transformer for each variable initialization ?
+      // The last statement is probably the truth, but this is not what is currently implemented
+
+      FOREACH(EFFECT, eff, l_eff)
+	{
+	  reference eff_ref = effect_any_reference(eff);
+	  entity eff_ent = reference_variable(eff_ref);
+
+	  pips_debug_effect(8,"dealing_with_effect: \n", eff);
+
+	  if (eff_ent == decl)
+	    {
+	      pips_debug(8, "same entity\n");
+	      if(ENDP(reference_indices(eff_ref)))
+		{
+		  // effect on the variable itself: no need to keep it
+		  free_effect(eff);
+		}
+	      else
+		/* here, it is a store effect */
+		{
+		  bool exact_p;
+		  // no need to keep the effect if there is no pointer in the path of the effect
+		  if (!effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p))
+		    {
+		      free_effect(eff);
+		    }
+		  else
+		    {
+		      if(!expression_undefined_p(exp_init)) // there is an inital value
+			{
+			  // let us re-use an existing method even if it's not the fastest method
+			  // interprocedural translation and intra-procedural
+			  // propagation will have to be re-packaged later
+			  list l_tmp = CONS(EFFECT, eff, NIL);
+			  list l_res_tmp;
+
+			  if(c_effects_on_formal_parameter_backward_translation_func
+			     == c_convex_effects_on_formal_parameter_backward_translation)
+			    {
+			      Psysteme sc = sc_new();
+			      sc_creer_base(sc);
+			      set_translation_context_sc(sc);
+			    }
+
+			  /* beware of casts : do not take them into account for the moment */
+			  syntax s_init = expression_syntax(exp_init);
+			  if (syntax_cast_p(s_init))
+			    exp_init = cast_expression(syntax_cast(s_init));
+			  l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)
+			    (l_tmp, exp_init, transformer_undefined);
+
+			  if(c_effects_on_formal_parameter_backward_translation_func
+			     == c_convex_effects_on_formal_parameter_backward_translation)
+			    {
+			      reset_translation_context_sc();
+			    }
+
+			  if (!exact_p) effects_to_may_effects(l_res_tmp);
+
+			  l_res = (*effects_union_op)
+			    (l_res_tmp, l_res, effects_same_action_p);
+			  gen_full_free_list(l_tmp); /* also free the input effect */
+			}
+		      else
+			{
+			  pips_debug(8, "there is no inital_value\n");
+			  if (get_constant_paths_p())
+			    {
+			      pips_debug(8, "-> anywhere effect \n");
+			      list l_tmp = gen_nconc(effect_to_list(make_anywhere_effect(copy_action(effect_action(eff)))), l_res);
+			      l_res = clean_anywhere_effects(l_tmp);
+			      gen_full_free_list(l_tmp);
+			    }
+			  free_effect(eff);
+
+			}
+		    }
+		} /* if( !ENP(reference_indices(eff_ref))) */
+	    }
+	  else
+	    {
+	      // keep the effect if it's an effect on another entity
+	      l_res = CONS(EFFECT, eff, l_res);
+	    }
+
+	} /* FOREACH */
+      gen_free_list(l_eff);
+      l_res = gen_nreverse(l_res); // we try to preserve the order of the input list
+
+    }
+  return l_res;
+}
