@@ -528,11 +528,10 @@ expression_to_proper_effects(expression e)
     return(le);
 }
 
-/* list proper_effects_of_expression(expression e)
- * input    : an expression and the current context
- * output   : the corresponding list of effects.
- * modifies : nothing.
- * comment  :
+/** computes the proper constant path effects of the input expression
+    using no points-to information.
+
+    dereferencing paths are currently changed to anywhere effects
  */
 list
 proper_constant_path_effects_of_expression(expression e)
@@ -592,11 +591,14 @@ expression_to_proper_constant_path_effects(expression e)
     return(le);
 }
 
-/* list proper_effects_of_expression(expression e)
- * input    : an expression and the current context
- * output   : the corresponding list of effects.
- * modifies : nothing.
- * comment  :
+/** computes the proper constant path effects of the input expression
+    using the points-to information of the input statement.
+
+    set_pt_to_list( (statement_points_to)
+		    db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true) );
+    must have been executed before calling this function for the first time
+
+    and reset_pt_to_list() must be called after all the calls have been performed.
  */
 list
 proper_constant_path_effects_of_expression_with_points_to(expression e, statement stmt)
