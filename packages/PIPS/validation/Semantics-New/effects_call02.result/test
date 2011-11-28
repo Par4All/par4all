@@ -205,7 +205,7 @@ int main()
 
    tf_t *sp = &s;
 
-//  T() {}
+//  T(a,b) {}
 
 
    effects_call02(a, b, x, ap, sp);

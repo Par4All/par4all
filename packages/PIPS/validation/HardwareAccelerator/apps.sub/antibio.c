@@ -1,0 +1,273 @@
+#include <stdio.h>
+#include "freia.h"
+// headers extracted from: freiaExtendedDistance.c
+/* freiaExtendedDistance.c */
+extern void freia_ecipo_distance(freia_data2d *, freia_data2d *, const int32_t);
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout;
+   freia_data2d *imIn, *imOut;
+   register int i, j;
+   //PIPS generated variable
+   register freia_status _return0;
+   //PIPS generated variable
+   register freia_status _return1, _return2, _return3;
+   //PIPS generated variable
+   register freia_status _return4, _return5, _return6;
+   //PIPS generated variable
+   register freia_status _return7;
+   //PIPS generated variable
+   register freia_status _return8, _return9;
+   //PIPS generated variable
+   register freia_status _return10;
+   //PIPS generated variable
+   register freia_status _return11;
+   //PIPS generated variable
+   register freia_status _return12, _return13, _return14, _return15;
+   //PIPS generated variable
+   freia_data2d *w1_0, *w2_0, *w3, *w4;
+   //PIPS generated variable
+   register int i_0, i_1, i_2;
+   //PIPS generated variable
+   register freia_status ret_0 = 0;
+   //PIPS generated variable
+   int32_t volcurrent_0;
+   //PIPS generated variable
+   register int32_t volprevious_0;
+   //PIPS generated variable
+   register freia_status ret_1;
+   //PIPS generated variable
+   register int i_3;
+   //PIPS generated variable
+   register freia_status ret_2 = 0;
+   //PIPS generated variable
+   int32_t volcurrent_1;
+   //PIPS generated variable
+   register int32_t volprevious_1;
+   //PIPS generated variable
+   register freia_status ret_3;
+   //PIPS generated variable
+   register int i_4, i_5;
+   //PIPS generated variable
+   register freia_status ret_4;
+   //PIPS generated variable
+   register int i_6, i_7;
+   //PIPS generated variable
+   freia_data2d *w1_1, *w2_1;
+   //PIPS generated variable
+   register int32_t measure_oldVol;
+   //PIPS generated variable
+   int32_t measure_vol;
+   //PIPS generated variable
+   register int i_8;
+   //PIPS generated variable
+   register freia_status ret_5;
+   //PIPS generated variable
+   register int i_9;
+
+   freia_initialize(argc, argv);
+
+   freia_common_open_input(&fdin, 0);
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
+
+   imIn = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imOut = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   
+   // input
+   freia_common_rx_image(imIn, &fdin);
+   
+   // do the computation
+   
+   w1_0 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
+   w2_0 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
+   w3 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
+   w4 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
+   
+   // 1st step detect centers of halos
+   
+   
+   freia_aipo_dilate_8c(w1_0, imIn, freia_morpho_kernel_8c);
+   i_0 = 1;
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   i_0 = 1+1;
+   
+   
+   _return1 = 0;
+   
+   
+   freia_aipo_erode_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   
+   
+   _return4 = 0;
+   
+   
+   freia_aipo_erode_8c(w2_0, w1_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w2_0, w2_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w2_0, w2_0, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(w2_0, w2_0, freia_morpho_kernel_8c);
+   
+   
+   _return5 = 0;
+
+   ret_0 = freia_aipo_global_vol(w1_0, &volcurrent_0);
+   do {
+      volprevious_0 = volcurrent_0;
+      
+      
+      freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+      i_3 = 1;
+      
+      
+      _return14 = 0;
+      ret_1 = 0;
+      ret_1 |= freia_aipo_inf(w1_0, w1_0, imIn);
+      
+      
+      _return12 = ret_1;
+      ret_0 |= _return12;
+      ret_0 |= freia_aipo_global_vol(w1_0, &volcurrent_0);
+   }
+   while (volcurrent_0!=volprevious_0);
+   
+   
+   _return8 = ret_0;
+
+   ret_2 = freia_aipo_global_vol(w2_0, &volcurrent_1);
+   do {
+      volprevious_1 = volcurrent_1;
+      
+      
+      freia_aipo_dilate_8c(w2_0, w2_0, freia_morpho_kernel_8c);
+      i_4 = 1;
+      
+      
+      _return15 = 0;
+      ret_3 = 0;
+      ret_3 |= freia_aipo_inf(w2_0, w2_0, imIn);
+      
+      
+      _return13 = ret_3;
+      ret_2 |= _return13;
+      ret_2 |= freia_aipo_global_vol(w2_0, &volcurrent_1);
+   }
+   while (volcurrent_1!=volprevious_1);
+   
+   
+   _return9 = ret_2;
+
+   freia_aipo_sub(w1_0, w1_0, w2_0);
+
+   freia_aipo_threshold(w1_0, w1_0, 30, w1_0->bpp==16?32767:255, 1);
+   
+   
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   i_5 = 1;
+   
+   
+   _return2 = 0;
+   freia_aipo_copy(w2_0, w1_0);
+   
+   // 2nd detect halos
+   freia_aipo_threshold(w3, imIn, 30, imIn->bpp==16?32767:255, 1);
+   freia_aipo_not(w3, w3);
+
+   freia_aipo_sup(w4, w1_0, w3);
+   
+   
+   freia_aipo_dilate_8c(w4, w4, freia_morpho_kernel_8c);
+   i_6 = 1;
+   
+   
+   _return3 = 0;
+   ret_4 = 0;
+   
+   
+   freia_aipo_erode_8c(w4, w4, freia_morpho_kernel_8c);
+   i_7 = 1;
+   
+   
+   _return6 = 0;
+   
+   
+   _return0 = ret_4;
+
+   w1_1 = freia_common_create_data(w4->bpp, w4->widthWa, w4->heightWa);
+   w2_1 = freia_common_create_data(w4->bpp, w4->widthWa, w4->heightWa);
+
+   freia_aipo_threshold(w1_1, w4, 1, w4->bpp==16?32767:255, 1);
+   // binarize
+   
+   freia_aipo_global_vol(w1_1, &measure_vol);
+   freia_aipo_set_constant(w2_1, w1_1->bpp==16?32767:255);
+   freia_aipo_subsat_const(w1_1, w1_1, w1_1->bpp==16?32766:254);
+
+   freia_aipo_copy(w3, w1_1);
+   measure_oldVol = 0;
+
+   while (measure_vol!=measure_oldVol) {
+      
+      
+      freia_aipo_erode_8c(w1_1, w1_1, freia_morpho_kernel_8c);
+      i_8 = 1;
+      
+      
+      _return11 = 0;
+      freia_aipo_add(w3, w3, w1_1);
+      measure_oldVol = measure_vol;
+      freia_aipo_global_vol(w1_1, &measure_vol);
+   }
+   
+   
+   freia_common_destruct_data(w1_1);
+   freia_common_destruct_data(w2_1);
+
+   freia_aipo_inf(w4, w3, w1_0);
+   
+   
+   freia_aipo_dilate_8c(imOut, w4, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(imOut, imOut, freia_morpho_kernel_8c);
+   
+   
+   _return10 = 0;
+   ret_5 = 0;
+   ret_5 |= freia_aipo_inf(imOut, imOut, w1_0);
+   
+   
+   _return7 = ret_5;
+   
+   
+   freia_common_destruct_data(w1_0);
+   freia_common_destruct_data(w2_0);
+   freia_common_destruct_data(w3);
+   freia_common_destruct_data(w4);
+   
+   // rearrange for display
+   freia_aipo_mul_const(imOut, imOut, 4);
+   // For display
+   
+   // Write images
+   freia_common_tx_image(imIn, &fdout);
+   freia_common_tx_image(imOut, &fdout);
+   
+   // cleanup
+   freia_common_destruct_data(imIn);
+
+   freia_common_destruct_data(imOut);
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+   freia_shutdown();
+
+   return 0;
+}

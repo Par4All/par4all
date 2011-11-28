@@ -255,7 +255,7 @@ digraph "freia_62_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -354,7 +354,7 @@ freia_status freia_62_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -609,7 +609,7 @@ digraph "freia_62_helper_1_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module freia_62
  *
@@ -805,7 +805,7 @@ freia_status freia_62_helper_0_0_0(
 }
 
 
-// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module freia_62
  *
@@ -1237,7 +1237,7 @@ digraph "freia_62_helper_1_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
 // hold kernels for freia_62_helper_0_0_0
 static cl_kernel freia_62_helper_0_0_0_kernel[2];
@@ -1323,7 +1323,7 @@ freia_status freia_62_helper_0_0_0(
   return err;
 }
 
-// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// dag 1: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
 // hold kernels for freia_62_helper_1_0_0
 static cl_kernel freia_62_helper_1_0_0_kernel[2];

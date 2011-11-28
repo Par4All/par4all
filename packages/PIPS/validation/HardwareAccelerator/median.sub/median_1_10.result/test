@@ -352,7 +352,7 @@ digraph "median_1_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0 copies
+// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0+0 copies
 // split 0: 2 cuts
 // # SPOC calls: 2
 
@@ -901,7 +901,7 @@ digraph "median_1_helper_0_0_2" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0 copies
+// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module median_1
  *
@@ -1898,7 +1898,7 @@ digraph "median_1_helper_0_0_1" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0 copies
+// dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0+0 copies
 
 // hold kernels for median_1_helper_0_0_1
 static cl_kernel median_1_helper_0_0_1_kernel[2];

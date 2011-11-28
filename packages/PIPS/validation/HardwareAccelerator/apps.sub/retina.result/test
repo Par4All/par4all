@@ -1646,7 +1646,7 @@ digraph "main_helper_2_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0 copies
+// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0+0 copies
 // split 0: 2 cuts
 // split 1: 2 cuts
 // split 2: 1 cut
@@ -2406,7 +2406,7 @@ freia_status main_helper_0_3_0(
   return ret;
 }
 
-// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0 copies
+// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -2640,7 +2640,7 @@ freia_status main_helper_1_0_0(
   return ret;
 }
 
-// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -3736,7 +3736,7 @@ digraph "main_helper_2_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0 copies
+// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -5248,7 +5248,7 @@ freia_status main_helper_0_0_2(
 }
 
 
-// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -5510,7 +5510,7 @@ freia_status main_helper_1_0_0(
 }
 
 
-// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module main
  *
@@ -6767,7 +6767,7 @@ digraph "main_helper_2_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0 copies
+// dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0+0 copies
 
 // hold kernels for main_helper_0_0_2
 static cl_kernel main_helper_0_0_2_kernel[2];
@@ -6869,7 +6869,7 @@ freia_status main_helper_0_0_2(
   return err;
 }
 
-// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_1_0_1
 static cl_kernel main_helper_1_0_1_kernel[2];
@@ -6961,7 +6961,7 @@ freia_status main_helper_1_0_1(
   return err;
 }
 
-// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
 // hold kernels for main_helper_2_0_0
 static cl_kernel main_helper_2_0_0_kernel[2];

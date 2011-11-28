@@ -107,7 +107,7 @@ digraph "my_addsat_const_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -248,7 +248,7 @@ digraph "my_addsat_const_helper_0_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
 /* FREIA terapix helper function for module my_addsat_const
  *
@@ -488,7 +488,7 @@ digraph "my_addsat_const_helper_0_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
 // hold kernels for my_addsat_const_helper_0_0_0
 static cl_kernel my_addsat_const_helper_0_0_0_kernel[2];

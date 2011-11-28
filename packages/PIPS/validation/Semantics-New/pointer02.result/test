@@ -46,7 +46,7 @@ int main()
 
    double *p = (int *) malloc(sizeof(double));
 
-//  T() {}
+//  T(x,y,z) {}
 
    foo(p);
 
@@ -76,7 +76,7 @@ int main()
 
    foo(p);
 
-//  P(x,y,z) {x==1, y==2, z==3}
+//  P(x,y,z) {}
 
    return x+y+z;
 }

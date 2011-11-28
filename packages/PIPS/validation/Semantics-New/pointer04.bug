@@ -1,0 +1,5 @@
+E variables are not taken into account in the transformer of foo().
+
+I have no idea how they should be translated later at the call site,
+
+Semantics should use points-to information directly?
