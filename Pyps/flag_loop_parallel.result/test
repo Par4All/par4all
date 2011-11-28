@@ -1,3 +1,5 @@
+Loop Parallel? False
+Loop Parallel? True True
 # Loop has been flag as parallel
 int flagloopexecution()
 {
