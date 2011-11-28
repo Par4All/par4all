@@ -1,5 +1,5 @@
 
-Proper effects for "main"
+Proper effects for "foo" without points-to information
 
 int main()
 {
@@ -21,7 +21,29 @@ int main()
    return x+y+z;
 }
 
-Transformers for "foo"
+Proper effects for "foo" without points-to information
+
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int *p = (int *) malloc(sizeof(int));
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is written>: p
+   p = &x;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}
+
+Transformers for "foo" without points-to information
 
 
 //  T() {}
@@ -34,7 +56,7 @@ void foo(int *p)
    (*p)++;
 }
 
-Transformers for "main"
+Transformers for "main" without points-to information
 
 
 //  T(main) {main==6}
@@ -51,7 +73,7 @@ int main()
 
    int *p = (int *) malloc(sizeof(int));
 
-//  T() {}
+//  T(x,y,z) {}
 
    foo(p);
 
@@ -59,7 +81,7 @@ int main()
 
    p = &x;
 
-//  T() {}
+//  T(x,y,z) {}
 
    foo(p);
 
@@ -68,7 +90,7 @@ int main()
    return x+y+z;
 }
 
-Preconditions for "main"
+Preconditions for "main" without points-to information
 
 
 //  P() {}
@@ -89,15 +111,15 @@ int main()
 
    foo(p);
 
-//  P(x,y,z) {x==1, y==2, z==3}
+//  P(x,y,z) {}
 
    p = &x;
 
-//  P(x,y,z) {x==1, y==2, z==3}
+//  P(x,y,z) {}
 
    foo(p);
 
-//  P(x,y,z) {x==1, y==2, z==3}
+//  P(x,y,z) {}
 
    return x+y+z;
 }
