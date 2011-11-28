@@ -20,7 +20,7 @@ void structure02()
 
    (c.re)[i++] = 0.;
 
-//  T(i) {i==2, i#init==1}
+//  T(i) {i#init==1}
 
    (p->re)[i++] = 0.;
 }

@@ -45,7 +45,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 3
+  // external before copies: 3
   "o0" [shape=circle];
   "o0 =" [shape=circle,label="=",style="dashed"]
   "in0" -> "o0 =";
@@ -112,7 +112,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 3
+  // external before copies: 3
   "o0" [shape=circle];
   "o0 =" [shape=circle,label="=",style="dashed"]
   "in0" -> "o0 =";
@@ -134,7 +134,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3+0 copies
 // # SPOC calls: 0
 
 ! updated function
@@ -198,7 +198,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 3
+  // external before copies: 3
   "o0" [shape=circle];
   "o0 =" [shape=circle,label="=",style="dashed"]
   "in0" -> "o0 =";
@@ -222,7 +222,7 @@ digraph "dag_cleaned_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3+0 copies
 
 ! updated function
 
@@ -285,7 +285,7 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
 
-  // external copies: 3
+  // external before copies: 3
   "o0" [shape=circle];
   "o0 =" [shape=circle,label="=",style="dashed"]
   "in0" -> "o0 =";
@@ -308,7 +308,7 @@ digraph "dag_cleaned_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3+0 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_73
 

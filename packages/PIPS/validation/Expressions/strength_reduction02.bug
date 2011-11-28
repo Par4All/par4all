@@ -1,0 +1,3 @@
+Constant effects of *(a+i) and *(a+2) are anywhere instead of a[*].
+
+according to the C standard at least.

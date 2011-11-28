@@ -6,21 +6,21 @@ create anywhere01 anywhere01.c
 activate C_PARSER
 
 echo
-echo Proper effects for "anywhere01"
+echo Proper effects for "anywhere01" without points-to information
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[anywhere01]
 
 echo
-echo Transformers for "anywhere01"
+echo Transformers for "anywhere01" without points-to information
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[anywhere01]
 
 echo
-echo Preconditions for "anywhere01"
+echo Preconditions for "anywhere01" without points-to information
 echo
 
 activate PRINT_CODE_PRECONDITIONS
@@ -31,23 +31,27 @@ delete anywhere01
 
 create anywhere01 anywhere01.c
 
-# Let's try again with points-to information
+echo ############################################
+echo #
+echo # Let's try again with points-to information
+echo #
+echo ############################################
 
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PROPER_EFFECTS_WITH_POINTS_TO
 
 echo
-echo Proper effects for "anywhere01"
+echo Proper effects for "anywhere01" with points-to information
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[anywhere01]
 
 echo
-echo Transformers for "anywhere01"
+echo Transformers for "anywhere01" with points-to information
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[anywhere01]
 
 echo

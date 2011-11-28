@@ -49,7 +49,7 @@ digraph "dag_cleaned_0" {
   "9 +_" -> "o0";
   "i" -> "9 +_";
 
-  // external copies: 1
+  // external after copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "o0" -> "o1 =";
@@ -63,7 +63,7 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = i +. c
    // o1 = i +. c
-   freia_aipo_add_const(o0, i, c);
+   freia_aipo_add_const(o0, i, c);                                      /*0009*/
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0011*/
 }
@@ -115,7 +115,7 @@ digraph "dag_cleaned_0" {
   "9 +_" -> "o0";
   "i" -> "9 +_";
 
-  // external copies: 1
+  // external after copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "o0" -> "o1 =";
@@ -142,7 +142,7 @@ digraph "freia_dup_03_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -279,7 +279,7 @@ digraph "dag_cleaned_0" {
   "9 +_" -> "o0";
   "i" -> "9 +_";
 
-  // external copies: 1
+  // external after copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "o0" -> "o1 =";
@@ -308,7 +308,7 @@ digraph "freia_dup_03_helper_0_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0+1 copies
 
 /* FREIA terapix helper function for module freia_dup_03
  *
@@ -532,7 +532,7 @@ digraph "dag_cleaned_0" {
   "9 +_" -> "o0";
   "i" -> "9 +_";
 
-  // external copies: 1
+  // external after copies: 1
   "o1" [shape=circle];
   "o1 =" [shape=circle,label="=",style="dashed"]
   "o0" -> "o1 =";
@@ -560,7 +560,7 @@ digraph "freia_dup_03_helper_0_0" {
 #include "private/freia_opencl_runtime.h"
 
 
-// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0+1 copies
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_dup_03
 
@@ -573,7 +573,7 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = i +. c
    // o1 = i +. c
-   freia_aipo_add_const(o0, i, c);
+   freia_aipo_add_const(o0, i, c);                                      /*0009*/
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0011*/
 }
@@ -585,7 +585,7 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = i +. c
    // o1 = i +. c
-   freia_aipo_add_const(o0, i, c);
+   freia_aipo_add_const(o0, i, c);                                      /*0009*/
    freia_aipo_copy(o1, o0);
    return 0;                                                            /*0011*/
 }

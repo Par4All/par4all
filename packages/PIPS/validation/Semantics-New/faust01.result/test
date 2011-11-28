@@ -23,7 +23,7 @@ void compute(int fullcount, float input[0][0], float output[1][256])
 TRANSFORMERS
 
 
-//  T(fYec0_idx) {}
+//  T(fYec0_idx,fYec0_idx_save) {}
 
 void compute(int fullcount, float input[0][0], float output[1][256])
 {
@@ -45,7 +45,7 @@ void compute(int fullcount, float input[0][0], float output[1][256])
 
    float output0[256];
 
-//  T(fYec0_idx,i,index) {index+32<=fullcount, 0<=index}
+//  T(count,fYec0_idx,fYec0_idx_save,fullcount,i,index) {}
 
    
    
@@ -63,18 +63,18 @@ void compute(int fullcount, float input[0][0], float output[1][256])
 
       fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
 
-//  T(i) {i+1<=count, 0<=i}
+//  T(count,fYec0_idx,fYec0_idx_save,fullcount,i,index) {}
 
 
       for(i = 0; i <= count-1; i += 1)
 
-//  T() {}
+//  T(count,fYec0_idx,fYec0_idx_save,fullcount,i,index) {}
 
          output0[i] = fSlow2;
    }
 }
 
-//  T(fYec0_idx) {}
+//  T(fYec0_idx,fYec0_idx_save) {}
 
 void main()
 {
@@ -91,7 +91,7 @@ void main()
 
    float out[1][count];
 
-//  T(fYec0_idx) {}
+//  T(count,fYec0_idx,fYec0_idx_save) {}
 
    compute(count, in, out);
 }

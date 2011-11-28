@@ -20,9 +20,6 @@ void P4A_scmp_kernel_0(int *a, int b[10])
       a[i] = i;
    }
 }
-failed to generate communications with kernel load store:
-in effects_to_dma: pointers wreak havoc with isolate_statement
-
 int main()
 {
    int i;
@@ -30,7 +27,20 @@ int main()
    int b[10] = {0};
 
    a = (int *) malloc(10*sizeof(int));
-   P4A_scmp_kernel_0(a, b);
+   {
+      //PIPS generated variable
+      int (*P4A_var_b0)[10] = (int (*)[10]) 0;
+      //PIPS generated variable
+      int *(*P4A_var_a0)[10] = (int *(*)[10]) 0;
+      P4A_scmp_malloc((void **) &P4A_var_a0, sizeof(int)*10);
+      P4A_scmp_malloc((void **) &P4A_var_b0, sizeof(int)*10);
+
+      P4A_scmp_kernel_0(*P4A_var_a0, *P4A_var_b0);
+      P4A_copy_from_accel_2d(sizeof(int), 10, 0, &a, *P4A_var_a0);
+      P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &b[0], *P4A_var_b0);
+      P4A_scmp_dealloc(P4A_var_a0);
+      P4A_scmp_dealloc(P4A_var_b0);
+   }
 
    a[0]++;
    b[0]++;

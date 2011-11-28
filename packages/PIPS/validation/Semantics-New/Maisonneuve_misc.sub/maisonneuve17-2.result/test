@@ -2477,7 +2477,7 @@ void run(void)
 
                      while (1)
 
-//  P(x,y) {x==4, y==4}
+//  P(x,y) {4<=x, x<=5, x+y<=8, 4<=y, y<=5}
 
                         ;
 
@@ -2879,7 +2879,7 @@ void run(void)
 
                   while (1)
 
-//  P(x,y) {x==5, y==5}
+//  P(x,y) {4<=x, x<=5, 10<=x+y, 4<=y, y<=5}
 
                      ;
 
