@@ -488,12 +488,16 @@ proper_effects_of_expression(expression e)
     bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
+
     if (!context_stack_defined_p)
     {
 	set_methods_for_simple_effects();
 	make_effects_private_current_context_stack();
 	debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     }
+
 
     effects_private_current_context_push(transformer_undefined);
     le = generic_proper_effects_of_expression(e);
@@ -523,6 +527,140 @@ expression_to_proper_effects(expression e)
 
     return(le);
 }
+
+/* list proper_effects_of_expression(expression e)
+ * input    : an expression and the current context
+ * output   : the corresponding list of effects.
+ * modifies : nothing.
+ * comment  :
+ */
+list
+proper_constant_path_effects_of_expression(expression e)
+{
+    list le;
+    bool context_stack_defined_p =
+	effects_private_current_context_stack_initialized_p();
+
+    if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
+
+    if (!context_stack_defined_p)
+    {
+	set_methods_for_simple_effects();
+	make_effects_private_current_context_stack();
+    }
+
+    debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
+
+    effects_private_current_context_push(transformer_undefined);
+    le = generic_proper_effects_of_expression(e);
+
+    if (get_constant_paths_p())
+      {
+	list l_tmp = le;
+	le = pointer_effects_to_constant_path_effects(le);
+	effects_free(l_tmp);
+      }
+
+    effects_private_current_context_pop();
+    if (!context_stack_defined_p)
+    {
+	free_effects_private_current_context_stack();
+    }
+    debug_off();
+
+    return(le);
+}
+
+
+
+/* Same as above, but with debug control. Used by semantics. */
+list
+expression_to_proper_constant_path_effects(expression e)
+{
+    list le;
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+
+    le = proper_constant_path_effects_of_expression(e);
+
+    debug_off();
+
+    return(le);
+}
+
+/* list proper_effects_of_expression(expression e)
+ * input    : an expression and the current context
+ * output   : the corresponding list of effects.
+ * modifies : nothing.
+ * comment  :
+ */
+list
+proper_constant_path_effects_of_expression_with_points_to(expression e, statement stmt)
+{
+    list le;
+    bool context_stack_defined_p =
+	effects_private_current_context_stack_initialized_p();
+    bool stmt_stack_defined_p =
+	effects_private_current_stmt_stack_initialized_p();
+
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_points_to);
+
+    if (!context_stack_defined_p)
+      {
+	set_methods_for_simple_effects();
+	make_effects_private_current_context_stack();
+      }
+
+    if (!stmt_stack_defined_p)
+      make_effects_private_current_stmt_stack();
+    debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
+
+    effects_private_current_context_push(transformer_undefined);
+    effects_private_current_stmt_push(stmt);
+    le = generic_proper_effects_of_expression(e);
+
+    list l_tmp = le;
+    le = pointer_effects_to_constant_path_effects(le);
+    effects_free(l_tmp);
+
+    effects_private_current_context_pop();
+    effects_private_current_stmt_pop();
+    if (!context_stack_defined_p)
+      {
+	free_effects_private_current_context_stack();
+      }
+    if (!stmt_stack_defined_p)
+      {
+	free_effects_private_current_stmt_stack();
+      }
+    debug_off();
+
+    return(le);
+}
+
+
+
+/* Same as above, but with debug control. Used by semantics. */
+list
+expression_to_proper_constant_path_effects_with_points_to(expression e, statement stmt)
+{
+    list le;
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+
+    le = proper_constant_path_effects_of_expression_with_points_to(e, stmt);
+
+    debug_off();
+
+    return(le);
+}
+
+
 
 /* list proper_effects_of_range(range r)
  * input    : an expression and the current context
