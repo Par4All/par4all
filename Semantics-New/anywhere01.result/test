@@ -1,37 +1,10 @@
+###############################
+#
+# Without points-to information
+#
+###############################
 
-Proper effects for "anywhere01"
-
-void anywhere01()
-{
-//             <    is written>: m
-   int m = 1;
-//             <    is written>: p
-   int *p = &m;
-//             <    is written>: n
-   int n = 17;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p = 19, n = 2;
-//             <    is written>: n
-   
-   /* The write effect on n is absorbed by the unknown write effect
-        due to *p =>anymodule:anywhere must imply a write on n */
-   
-   
-   n = 23;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   // assuming this is an anywhere write effect (without points-to
-   // info), the information on n should be preserved because n is
-   // never referenced (i.e. &n does not appear in source code).
-   *p = 31;
-   
-   // n == 23
-   
-   return;
-}
-
-Transformers for "anywhere01"
+Proper effects for "anywhere01" without points-to information
 
 void anywhere01()
 {
@@ -63,7 +36,55 @@ void anywhere01()
    return;
 }
 
-Preconditions for "anywhere01"
+Transformers for "anywhere01" without points-to information
+
+
+//  T() {}
+
+void anywhere01()
+{
+
+//  T(m) {m==1}
+
+   int m = 1;
+
+//  T() {}
+
+   int *p = &m;
+
+//  T(n) {n==17}
+
+   int n = 17;
+
+//  T(m,n) {}
+
+   *p = 19, n = 2;
+
+//  T(n) {n==23}
+
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+
+//  T(m,n) {}
+
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+
+//  T() {}
+
+   
+   // n == 23
+   
+   return;
+}
+
+Preconditions for "anywhere01" without points-to information
 
 
 //  P() {}
@@ -87,7 +108,7 @@ void anywhere01()
 
    *p = 19, n = 2;
 
-//  P(m,n) {m==1, n==2}
+//  P(m,n) {}
 
    
    /* The write effect on n is absorbed by the unknown write effect
@@ -96,7 +117,7 @@ void anywhere01()
    
    n = 23;
 
-//  P(m,n) {m==1, n==23}
+//  P(m,n) {n==23}
 
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is
@@ -110,8 +131,13 @@ void anywhere01()
    
    return;
 }
+############################################
+#
+# Let's try again with points-to information
+#
+############################################
 
-Proper effects for "anywhere01"
+Proper effects for "anywhere01" with points-to information
 
 void anywhere01()
 {
@@ -143,32 +169,48 @@ void anywhere01()
    return;
 }
 
-Transformers for "anywhere01"
+Transformers for "anywhere01" with points-to information
+
+
+//  T() {}
 
 void anywhere01()
 {
-//             <    is written>: m
+
+//  T(m) {m==1}
+
    int m = 1;
-//             <    is written>: p
+
+//  T() {}
+
    int *p = &m;
-//             <    is written>: n
+
+//  T(n) {n==17}
+
    int n = 17;
-//             <    is read   >: p
-//             <    is written>: m n
+
+//  T(m,n) {n==2}
+
    *p = 19, n = 2;
-//             <    is written>: n
+
+//  T(n) {n==23}
+
    
    /* The write effect on n is absorbed by the unknown write effect
         due to *p =>anymodule:anywhere must imply a write on n */
    
    
    n = 23;
-//             <    is read   >: p
-//             <    is written>: m
+
+//  T(m) {}
+
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is
    // never referenced (i.e. &n does not appear in source code).
    *p = 31;
+
+//  T() {}
+
    
    // n == 23
    
@@ -199,7 +241,7 @@ void anywhere01()
 
    *p = 19, n = 2;
 
-//  P(m,n) {m==1, n==2}
+//  P(m,n) {n==2}
 
    
    /* The write effect on n is absorbed by the unknown write effect
@@ -208,7 +250,7 @@ void anywhere01()
    
    n = 23;
 
-//  P(m,n) {m==1, n==23}
+//  P(m,n) {n==23}
 
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is
