@@ -1027,41 +1027,63 @@ int freia_substitute_by_helper_call(
   return statement_number(found);
 }
 
-static statement find_last_aipo_statement(list ls)
+static statement find_aipo_statement(list ls, bool before)
 {
   pips_assert("some statements", ls);
+  pips_debug(8, "choosing among %d statements\n", (int) gen_length(ls));
+
   statement found = NULL;
+
   FOREACH(statement, s, ls)
   {
-    if (freia_statement_aipo_call_p(s))
+    pips_debug(8, "stmt %" _intFMT "\n", statement_number(s));
+    if (before)
+    {
+      if (!found || statement_number(found)>statement_number(s))
+        found = s;
+    }
+    else // after
+    {
       if (!found || statement_number(found)<statement_number(s))
         found = s;
+    }
   }
+
   // ??? au pif
   if (!found && ls)
-    found = STATEMENT(CAR(gen_last(ls)));
+  {
+    pips_debug(8, "no aipo call found... backup plan?\n");
+    if (before)
+      found = STATEMENT(CAR(gen_last(ls))); // list is reversed...
+    else
+      found = STATEMENT(CAR(ls));
+  }
+
   return found;
 }
 
-/* insert added statements to actual code sequence in "ls"
- * beware that ls is assumed to be in reverse order
+/* insert statements to actual code sequence in "ls"
+ * *BEWARE* that ls is assumed to be in reverse order...
  */
-void freia_insert_added_stats(list ls, list added_stats)
+void freia_insert_added_stats(list ls, list stats, bool before)
 {
-  if (added_stats)
+  if (stats)
   {
-    statement slast = find_last_aipo_statement(ls);
-    instruction ilast = statement_instruction(slast);
-    statement newstat = instruction_to_statement(ilast);
+    statement sref = find_aipo_statement(ls, before);
+    pips_debug(8, "sref for %s is %" _intFMT "\n",
+               before? "before": "after", statement_number(sref));
+    instruction iref = statement_instruction(sref);
+    statement newstat = instruction_to_statement(iref);
     // transfer comments and some cleanup...
-    statement_comments(newstat) = statement_comments(slast);
-    statement_comments(slast) = string_undefined;
-    statement_number(slast) = STATEMENT_NUMBER_UNDEFINED;
+    statement_comments(newstat) = statement_comments(sref);
+    statement_comments(sref) = string_undefined;
+    statement_number(sref) = STATEMENT_NUMBER_UNDEFINED;
     // pretty ugly because return must be handled especially...
-    if (instruction_call_p(ilast) &&
-        ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
+    // ??? not sure that it is ok if !before?
+    if (instruction_call_p(iref) &&
+        ENTITY_C_RETURN_P(call_function(instruction_call(iref))))
     {
-      call c = instruction_call(ilast);
+      call c = instruction_call(iref);
       if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
       {
         // must split return...
@@ -1069,15 +1091,22 @@ void freia_insert_added_stats(list ls, list added_stats)
       }
       else
       {
-        added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
+        if (before)
+          stats = gen_nconc(stats, CONS(statement, newstat, NIL));
+        else
+          // ???
+          stats = CONS(statement, newstat, stats);
       }
     }
     else
     {
-      added_stats = CONS(statement, newstat, added_stats);
+      if (before)
+        stats = CONS(statement, newstat, stats);
+      else
+        stats = gen_nconc(stats, CONS(statement, newstat, NIL));
     }
-    statement_instruction(slast) =
-      make_instruction_sequence(make_sequence(added_stats));
+    statement_instruction(sref) =
+      make_instruction_sequence(make_sequence(stats));
   }
 }
 

@@ -65,6 +65,10 @@ bool effects_private_current_context_stack_initialized_p()
 {
     return (effects_private_current_context_stack != stack_undefined);
 }
+bool effects_private_current_stmt_stack_initialized_p()
+{
+    return (effects_private_current_stmt_stack != stack_undefined);
+}
 
 bool normalizable_and_linear_loop_p(entity index, range l_range)
 {

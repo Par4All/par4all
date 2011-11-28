@@ -592,7 +592,7 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
                 p->ok=false;
             }
             /* we are left with a scalar or an unidimensional array */
-            else if(nbdims==1) { // see if we can approximate the region with an offset at zero
+            else if(nbdims==1 && !ENDP(indices) ) { // see if we can approximate the region with an offset at zero
                 expression exp_phi1 = EXPRESSION(CAR(indices));
                 entity phi1 = expression_to_entity(exp_phi1);
                 Psysteme sc_reg = sc_dup(region_system(reg));

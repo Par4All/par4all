@@ -99,7 +99,13 @@ transformer add_effects_to_transformer(transformer tf, list e)
     }
     else if(action_write_p(a) && entity_abstract_location_p(v)) {
       /* All analyzed variables conflicting with v must be considered
-	 written. */
+       *  written.
+       *
+       * This should depend on the abstract location, its type when
+       * anywhere effects are typed, and its scope when abstract
+       * locations can be restricted to a module or a compilation
+       * unit. See the lattice defined by Amira Mensi.
+       */
       list wvl = modified_variables_with_values();
 
       FOREACH(ENTITY, wv, wvl) {
@@ -1333,7 +1339,7 @@ transformer any_user_call_site_to_transformer(entity f,
 transformer c_user_call_to_transformer(entity f,
 				       list pc,
 				       transformer pre,
-				       list __attribute__ ((unused)) ef)
+				       list ef)
 {
   transformer tf = transformer_undefined;
   transformer t_callee = load_summary_transformer(f);
@@ -1382,7 +1388,6 @@ transformer fortran_user_call_to_transformer(entity f,
      in a field ??? */
   list formals = module_to_formal_analyzable_parameters(f);
   list formals_new = NIL;
-  cons * ce;
 
   t_callee = load_summary_transformer(f);
 
@@ -1399,8 +1404,7 @@ transformer fortran_user_call_to_transformer(entity f,
 
   /* take care of analyzable formal parameters */
 
-  for( ce = formals; !ENDP(ce); POP(ce)) {
-    entity fp = ENTITY(CAR(ce));
+  FOREACH(ENTITY, fp, formals) {
     int r = formal_offset(storage_formal(entity_storage(fp)));
     expression expr = find_ith_argument(pc, r);
 
@@ -1515,16 +1519,16 @@ transformer fortran_user_call_to_transformer(entity f,
   ifdebug(8)   dump_transformer(t_caller);
 
   /* formal new and old values left over are eliminated */
-  MAPL(ce,{entity e = ENTITY(CAR(ce));
-      entity e_new = external_entity_to_new_value(e);
-      formals_new = CONS(ENTITY, e_new, formals_new);
-      /* test to insure that entity_to_old_value exists */
-      if(entity_is_argument_p(e_new,
-			      transformer_arguments(t_caller))) {
-	entity e_old = external_entity_to_old_value(e);
-	formals_new = CONS(ENTITY, e_old, formals_new);
-      }},
-    formals);
+  FOREACH(ENTITY, e, formals) {
+    entity e_new = external_entity_to_new_value(e);
+    formals_new = CONS(ENTITY, e_new, formals_new);
+    /* test to insure that entity_to_old_value exists */
+    if(entity_is_argument_p(e_new,
+			    transformer_arguments(t_caller))) {
+      entity e_old = external_entity_to_old_value(e);
+      formals_new = CONS(ENTITY, e_old, formals_new);
+    }
+  }
 
   t_caller = transformer_filter(t_caller, formals_new);
 
@@ -1570,10 +1574,10 @@ transformer fortran_user_call_to_transformer(entity f,
     */
     transformer_arguments(t_caller) = all_args;
     /* The relation basis must be updated too */
-    MAP(ENTITY, v, {
+    FOREACH(ENTITY, v, transformer_arguments(t_effects)) {
 	Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
 	sc_base_add_variable(sc, (Variable) v);
-      }, transformer_arguments(t_effects));
+      }
   }
   else {
     pips_user_warning("Call to %s seems never to return."
@@ -2241,7 +2245,7 @@ transformer statement_to_transformer(
     }
   }
   else {
-    // Avoid lots of test in the callees
+    // Avoid lots of test in the callees ot statement_to_transformer
     // pre = transformer_undefined;
     pre = transformer_identity();
   }
@@ -2392,6 +2396,19 @@ transformer statement_to_transformer(
 	(void) print_transformer(t);
       }
     }
+  
+  /* Written abstract locations may require some information destruction 
+   *
+   * The current implementation is too crude. A new function is
+   * needed, abstract_effects_to_transformer(). The current
+   * implementation is OK for anywhere effects.
+   */
+
+  if(effects_abstract_location_p(e)) {
+    transformer etf = effects_to_transformer(e);
+    t = transformer_combine(t, etf);
+    free_transformer(etf);
+  }
 
     /* store or update the statement transformer */
     if(transformer_undefined_p(ot)) {
