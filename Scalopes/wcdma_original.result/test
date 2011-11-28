@@ -1682,6 +1682,9 @@ int main()
          //PIPS generated variable
          int32_t (*P4A_var_inv_qpsk_user10)[262] = (int32_t (*)[262]) 0, (*P4A_var_R_pilot0)[262] = (int32_t (*)[262]) 0;
          //PIPS generated variable
+         float (*P4A_var_FIR2_Q_user12)[521] = (float (*)[521]) 0, (*P4A_var_FIR2_I_user12)[521] = (float (*)[521]) 0;
+         P4A_scmp_malloc((void **) &P4A_var_FIR2_I_user12, sizeof(float)*521);
+         P4A_scmp_malloc((void **) &P4A_var_FIR2_Q_user12, sizeof(float)*521);
          P4A_scmp_malloc((void **) &P4A_var_R_pilot0, sizeof(int)*262);
          P4A_scmp_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*262);
          P4A_copy_to_accel_1d(sizeof(float), 524, 521, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user12);
