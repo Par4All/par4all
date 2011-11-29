@@ -29,8 +29,12 @@
 
 static int pointer_index = 1;
 
-/* --------------------------------Interprocedural Analysis-----------------------*/
-/*This package computes the points-to interprocedurally.*/
+/* --------------------------------Interprocedural Points-to Analysis-----------------------*/
+/* This package computes the points-to interprocedurally.
+ *
+ * See Chapter ? in Amira Mensi's PhD dissertation.
+ */
+
 void points_to_forward_translation()
 {
 
@@ -95,9 +99,14 @@ set formal_points_to_parameter(cell c)
 }
 
 
-/* To create the points-to stub assiciated to the formal parameter,
- * the sink name is a concatenation of the formal parmater and the POINTS_TO_MODULE_NAME */
-points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basic b)
+/* To create the points-to stub associated to the formal parameter,
+ * the sink name is a concatenation of the formal parameter and the
+ * POINTS_TO_MODULE_NAME.
+ *
+ * FI: Is it sufficient to generate stubs for foo(int *p) and bar(double *p)?
+ */
+points_to create_stub_points_to(cell c, type t,
+				__attribute__ ((__unused__)) basic b)
 {
   basic bb = basic_undefined;
   expression ex = make_unbounded_expression();
@@ -152,7 +161,8 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
 
 
 /* Input : a formal parameter which is a pointer and its type.
-   output : a set of points-to where sinks are stub points-to.
+
+   Output : a set of points-to where sinks are stub points-to.
    we descent recursively until reaching a basic type, then we call
    create_stub_points_to()to generate the adequate points-to.
 */
@@ -261,7 +271,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 }
 
 
-/* Input : a formal parameter which is a derived.
+/* Input : a formal parameter which has a derived type (FI, I guess).
    output : a set of points-to where sinks are stub points-to.
 */
 set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
@@ -341,6 +351,9 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 }
 
 /* Input : a formal parameter which is a typedef.
+ *
+ * FI: a formal parameter cannot be a typedef, but it can be typed
+ * with a typedefined type.
  */
 set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
 {
