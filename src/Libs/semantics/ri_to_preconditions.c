@@ -265,7 +265,8 @@ expression_to_postcondition(
 
   if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")) {
     /* Wild guess. See what should be done in call_to_postcondition() */
-    list el = expression_to_proper_effects(exp);
+    //list el = expression_to_proper_effects(exp);
+    list el = expression_to_proper_constant_path_effects(exp);
     transformer new_tf = expression_to_transformer(exp, pre, el);
     post = transformer_apply(new_tf, pre);
     free_transformer(new_tf);
@@ -299,7 +300,8 @@ static transformer call_to_postcondition(transformer pre,
       /* impedance problem: build an expression from call c */
       expression expr = make_expression(make_syntax(is_syntax_call, c),
 					normalized_undefined);
-      list ef = expression_to_proper_effects(expr);
+      //list ef = expression_to_proper_effects(expr);
+      list ef = expression_to_proper_constant_path_effects(expr);
       transformer pre_r = transformer_range(pre);
       transformer new_tf = intrinsic_to_transformer(f, args, pre_r, ef);
 
