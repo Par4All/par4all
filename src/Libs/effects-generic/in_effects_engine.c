@@ -458,13 +458,21 @@ in_effects_of_test(test t, in_effects_context *ctxt)
     l_in = (*effects_test_union_op)(lt, lf, effects_same_action_p);
 
     /* IN effects of the condition */
-    /* they are equal to the proper effects of the statement if there are
-     * no side-effects. */
+    /* They are equal to the proper read effects of the statement if
+       there are no side-effects. When there are write effects, we
+       should compute the in effects of the expression, but we still
+       use the read effects and turn them to may effects as an
+       over-approximation.
+     */
 
     lc_in = convert_rw_effects(load_proper_rw_effects_list(current_stat),ctxt);
+    list lc_in_r = effects_read_effects_dup(lc_in);
+    if (gen_length(lc_in_r) != gen_length(lc_in))
+      // there are write effects -> conservatively switch to may for the moment
+      effects_to_may_effects(lc_in_r);
 
     /* in regions of the test */
-    l_in = (*effects_union_op)(l_in, effects_dup(lc_in), effects_same_action_p);
+    l_in = (*effects_union_op)(l_in, lc_in_r, effects_same_action_p);
 
     reset_converted_rw_effects(&lc_in,ctxt);
 
