@@ -124,6 +124,12 @@ typedef struct {
 /* Push a loop that matches the criterion for annotation */
 static bool loop_push(loop l, gpu_lna_context * p) {
   if(p->max_loop_nest_depth == -1) {
+    /* This is the first loop we met in this loop nest */
+    if(p->gpu_loop_nest_annotate_parallel_p && !loop_parallel_p(l)) {
+      return true;
+    }
+
+    /* Let's compute the loop_nest_depth */
     statement current_stat = (statement)gen_get_ancestor(statement_domain, l);
     p->max_loop_nest_depth
         = p->gpu_loop_nest_annotate_parallel_p ? depth_of_parallel_perfect_loop_nest(current_stat)
@@ -345,7 +351,9 @@ static void loop_annotate(loop l, gpu_lna_context * p) {
       }
     }
   }
-  POP(p->l_enclosing_loops);
+  if(gen_length(p->l_enclosing_loops)) {
+    POP(p->l_enclosing_loops);
+  }
   return;
 }
 
@@ -385,7 +393,8 @@ bool gpu_loop_nest_annotate_on_statement(statement s) {
   c.inner_loop = loop_undefined;
   c.guard_expression = expression_undefined;
 
-  /* Annotate the loop nests of the module. */gen_context_recurse(s, &c, loop_domain, loop_push, loop_annotate);
+  /* Annotate the loop nests of the module. */
+  gen_context_recurse(s, &c, loop_domain, loop_push, loop_annotate);
 
   /* Clean up things: (hasn't it been done previously in loop_annotate?) */
   gen_free_list(c.l_number_iter_exp);
@@ -413,7 +422,7 @@ bool gpu_loop_nest_annotate(const char* module_name) {
  * FIXME : should detect the beginning sentinel, but since we use it in launcher,
  * it has no importance at that time
  */
-bool parallelize_annotated_loop_nest(statement s) {
+static bool parallelize_annotated_loop_nest(statement s) {
   char **comment=NULL;
   if(statement_loop_p(s)) {
     execution_tag(loop_execution(statement_loop(s))) = is_execution_parallel;
