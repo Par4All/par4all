@@ -712,21 +712,23 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)   \
   do {                  \
-    p4a_load_kernel(kernel,__VA_ARGS__);        \
-    P4A_argN(__VA_ARGS__);            \
-    P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel  \
-            "\" of size %d\n",P4A_n_iter_0)); \
-    P4A_create_1d_thread_descriptors(P4A_grid_descriptor,   \
-             P4A_block_descriptor,    \
-             P4A_n_iter_0);     \
-    /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
-    /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
-    /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
-        (p4a_queue,p4a_kernel,work_dim,NULL,    \
-         P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event), \
-         #kernel,#__VA_ARGS__);       \
+    if( P4A_n_iter_0 > 0 ) { \
+      p4a_load_kernel(kernel,__VA_ARGS__);        \
+      P4A_argN(__VA_ARGS__);            \
+      P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel  \
+              "\" of size %d\n",P4A_n_iter_0)); \
+      P4A_create_1d_thread_descriptors(P4A_grid_descriptor,   \
+               P4A_block_descriptor,    \
+               P4A_n_iter_0);     \
+      /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
+      /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
+      /* multiple of P4A_block_descriptor */ \
+      P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
+          (p4a_queue,p4a_kernel,work_dim,NULL,    \
+           P4A_grid_descriptor,NULL,  \
+           0,NULL,&p4a_event), \
+           #kernel,#__VA_ARGS__);       \
+    }\
   } while(0)
 
 
@@ -749,22 +751,24 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {                  \
-    p4a_load_kernel(kernel,__VA_ARGS__);        \
-    P4A_argN(__VA_ARGS__);            \
-    P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
-            "\" of size (%dx%d)\n",   \
-            P4A_n_iter_0, P4A_n_iter_1)); \
-    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,   \
-             P4A_block_descriptor,    \
-             P4A_n_iter_0, P4A_n_iter_1); \
-    /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
-    /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
-    /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
-        (p4a_queue,p4a_kernel,work_dim,NULL,    \
-         P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event), \
-         #kernel,#__VA_ARGS__);       \
+    if( P4A_n_iter_0 > 0 && P4A_n_iter_1 > 0 ) { \
+      p4a_load_kernel(kernel,__VA_ARGS__);        \
+      P4A_argN(__VA_ARGS__);            \
+      P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
+              "\" of size (%dx%d)\n",   \
+              P4A_n_iter_0, P4A_n_iter_1)); \
+      P4A_create_2d_thread_descriptors(P4A_grid_descriptor,   \
+               P4A_block_descriptor,    \
+               P4A_n_iter_0, P4A_n_iter_1); \
+      /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
+      /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
+      /* multiple of P4A_block_descriptor */ \
+      P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
+          (p4a_queue,p4a_kernel,work_dim,NULL,    \
+           P4A_grid_descriptor,NULL,  \
+           0,NULL,&p4a_event), \
+           #kernel,#__VA_ARGS__);       \
+    }\
   } while (0)
 
 /** Call a kernel in a 2-dimension parallel loop in CL
@@ -786,22 +790,24 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
   do {                  \
-    p4a_load_kernel(kernel,__VA_ARGS__);        \
-    P4A_argN(__VA_ARGS__);            \
-    P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
-            "\" of size (%dx%d)\n",   \
-            P4A_n_iter_0, P4A_n_iter_1)); \
-    P4A_create_3d_thread_descriptors(P4A_grid_descriptor,   \
-             P4A_block_descriptor,    \
-             P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2); \
-    /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
-    /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
-    /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
-        (p4a_queue,p4a_kernel,work_dim,NULL,    \
-         P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event), \
-         #kernel,#__VA_ARGS__);       \
+    if( P4A_n_iter_0 > 0 && P4A_n_iter_1 > 0 && P4A_n_iter_2 > 0) { \
+      p4a_load_kernel(kernel,__VA_ARGS__);        \
+      P4A_argN(__VA_ARGS__);            \
+      P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
+              "\" of size (%dx%d)\n",   \
+              P4A_n_iter_0, P4A_n_iter_1)); \
+      P4A_create_3d_thread_descriptors(P4A_grid_descriptor,   \
+               P4A_block_descriptor,    \
+               P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2); \
+      /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
+      /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
+      /* multiple of P4A_block_descriptor */ \
+      P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
+          (p4a_queue,p4a_kernel,work_dim,NULL,    \
+           P4A_grid_descriptor,NULL,  \
+           0,NULL,&p4a_event), \
+           #kernel,#__VA_ARGS__);       \
+    }\
   } while (0)
 
 /** 
