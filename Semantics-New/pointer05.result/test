@@ -1,0 +1,267 @@
+
+Proper effects for "foo" without points-to information
+
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int *p = (int *) malloc(sizeof(int));
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is written>: p
+   p = &x;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}
+
+Proper effects for "foo" without points-to information
+
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int *p = (int *) malloc(sizeof(int));
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is written>: p
+   p = &x;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}
+
+Transformers for "foo" without points-to information
+
+
+//  T() {}
+
+void foo(int *p)
+{
+
+//  T() {}
+
+   (*p)++;
+}
+
+Transformers for "main" without points-to information
+
+
+//  T(main) {main==6}
+
+int main()
+{
+
+//  T(x,y,z) {x==1, y==2, z==3}
+
+   x = 1, y = 2, z = 3;
+
+
+//  T() {}
+
+   int *p = (int *) malloc(sizeof(int));
+
+//  T(x,y,z) {}
+
+   foo(p);
+
+//  T() {}
+
+   p = &x;
+
+//  T(x,y,z) {}
+
+   foo(p);
+
+//  T(main) {x+y+z==main}
+
+   return x+y+z;
+}
+
+Preconditions for "main" without points-to information
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   x = 1, y = 2, z = 3;
+
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   int *p = (int *) malloc(sizeof(int));
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   foo(p);
+
+//  P(x,y,z) {}
+
+   p = &x;
+
+//  P(x,y,z) {}
+
+   foo(p);
+
+//  P(x,y,z) {}
+
+   return x+y+z;
+}
+
+Proper effects for "foo" with points-to information
+
+void foo(int *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   (*p)++;
+}
+
+Proper effects for "main" with points-to information
+
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int *p = (int *) malloc(sizeof(int));
+//             <    is read   >: p
+   foo(p);
+//             <    is written>: p
+   p = &x;
+//             <    is read   >: p
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}
+
+Cumulated effects for "foo" with points-to information
+
+//             <    is read   >: _p_1 p
+void foo(int *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   (*p)++;
+}
+
+Cumulated effects for "main" with points-to information
+
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int *p = (int *) malloc(sizeof(int));
+//             <    is read   >: p
+   foo(p);
+//             <    is written>: p
+   p = &x;
+//             <    is read   >: p
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}
+
+Transformers for "foo" with points-to information
+
+
+//  T() {}
+
+void foo(int *p)
+{
+
+//  T(_p_1) {}
+
+   (*p)++;
+}
+
+Transformers for "main" with points-to information
+
+
+//  T(main,x,y,z) {main==6, x==1, y==2, z==3}
+
+int main()
+{
+
+//  T(x,y,z) {x==1, y==2, z==3}
+
+   x = 1, y = 2, z = 3;
+
+
+//  T() {}
+
+   int *p = (int *) malloc(sizeof(int));
+
+//  T() {}
+
+   foo(p);
+
+//  T() {}
+
+   p = &x;
+
+//  T() {}
+
+   foo(p);
+
+//  T(main) {x+y+z==main}
+
+   return x+y+z;
+}
+
+Preconditions for "main" with points-to information
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   x = 1, y = 2, z = 3;
+
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   int *p = (int *) malloc(sizeof(int));
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   foo(p);
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   p = &x;
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   foo(p);
+
+//  P(x,y,z) {x==1, y==2, z==3}
+
+   return x+y+z;
+}

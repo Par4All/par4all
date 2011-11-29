@@ -1,0 +1,112 @@
+delete pointer05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer05 pointer05.c
+
+# Useless in the first part
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+echo
+echo Proper effects for "foo" without points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "foo" without points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "foo" without points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+echo
+echo Transformers for "main" without points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main" without points-to information
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete pointer05
+
+create pointer05 pointer05.c
+
+#
+#
+# Let's try again with points-to information
+#
+#
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo Proper effects for "foo" with points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Proper effects for "main" with points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated effects for "foo" with points-to information
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effects for "main" with points-to information
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "foo" with points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+echo
+echo Transformers for "main" with points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main" with points-to information
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete pointer05
+quit
