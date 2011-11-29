@@ -523,7 +523,8 @@ static void do_linearize_prepatch_subscript(subscript s) {
         if(entity_pointer_p(var)) {
           type pointed_type = basic_pointer(variable_basic(type_variable(ultimate_type(entity_type(var)))));
           if(array_type_p(ultimate_type(pointed_type))) {
-            update_expression_syntax(exp,copy_syntax(expression_syntax(arg)));
+              reference_indices(r)=CONS(EXPRESSION,int_to_expression(0),reference_indices(r));
+              update_expression_syntax(exp,copy_syntax(expression_syntax(arg)));
           }
         }
       }
