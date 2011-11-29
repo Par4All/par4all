@@ -559,13 +559,15 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 
     /* IN EFFECTS OF HEADER */
     /* We assume that there is no side effect in the loop header;
-     * thus the IN effects of the header are similar to its proper effects.
+       thus the IN effects of the header are similar to its proper read effects
+       when there are no side effects.
      */
     list l_prop_init = convert_rw_effects(load_proper_rw_effects_list(current_stat), ctxt);
-    l_prop = proper_to_summary_effects(l_prop_init);
+    l_prop = proper_to_summary_effects(effects_dup(l_prop_init));
     reset_converted_rw_effects(&l_prop_init, ctxt);
-    l_prop_read = effects_read_effects_dup(l_prop);
-    l_prop_write = effects_write_effects_dup(l_prop);
+    l_prop_read = effects_read_effects(l_prop);
+    l_prop_write = effects_write_effects(l_prop);
+    gen_free_list(l_prop);
     /* END - IN EFFECTS OF HEADER */
 
     /* INVARIANT WRITE EFFECTS OF LOOP BODY STATEMENT. */
@@ -573,24 +575,21 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
     global_write = effects_write_effects_dup(l_inv);
     reset_converted_rw_effects(&l_inv, ctxt);
 
-    ifdebug(4){
-	pips_debug(4, "W(i)= \n");
-	(*effects_prettyprint_func)(global_write);
-    }
+    pips_debug_effects(4, "W(i)= \n", global_write);
 
-    /* IN EFFECTS OF LOOP BODY STATEMENT. Effects on locals are masked. */
+    /* IN EFFECTS OF LOOP BODY STATEMENT. */
     lbody_in = load_in_effects_list(b);
 
     store_cumulated_in_effects_list(b, effects_dup(lbody_in));
     debug_consistent(lbody_in);
 
-    global_in = effects_dup_without_variables(lbody_in, loop_locals(l));
+    /* Effects on locals are masked if the loop is parallel */
+    if(loop_parallel_p(l))
+      global_in = effects_dup_without_variables(lbody_in, loop_locals(l));
+    else
+      global_in = effects_dup(lbody_in);
 
-    ifdebug(4){
-	pips_debug(4, "initial IN(i)= \n");
-	(*effects_prettyprint_func)(global_in);
-    }
-
+    pips_debug_effects(4, "initial IN(i)= \n", global_in);
 
     /* COMPUTATION OF INVARIANT IN EFFECTS */
 
@@ -603,11 +602,7 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
     (*effects_transformer_composition_op)(global_in, loop_trans);
     update_invariant_in_effects_list(b, effects_dup(global_in));
 
-    ifdebug(4){
-	pips_debug(4, "invariant IN(i)= \n");
-	(*effects_prettyprint_func)(global_in);
-    }
-
+    pips_debug_effects(4, "invariant IN(i)= \n", global_in);
 
     /* OPTIMIZATION : */
     /* If there is no write effect on a variable imported by the loop body,
@@ -622,11 +617,7 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 				      effects_dup(global_write),
 				      r_w_combinable_p);
 
-    ifdebug(4){
-	pips_debug(4, "reduced IN(i)= \n");
-	(*effects_prettyprint_func)(global_in);
-    }
-
+    pips_debug_effects(4, "reduced IN(i)= \n", global_in);
 
     if (!ENDP(global_in))
     {
@@ -651,7 +642,6 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 
 	    add_precondition_to_scalar_convex_regions = true;
 
-
 	    /* OPTIMIZATION: */
 	    /* keep only in global_write the write regions corresponding to
 	     * regions in global_in. */
@@ -659,11 +649,7 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 		effects_entities_intersection(global_write,
 					      effects_dup(global_in),
 					      w_r_combinable_p);
-	    ifdebug(4){
-		pips_debug(4, "reduced W(i)= \n");
-		(*effects_prettyprint_func)(global_write);
-	    }
-
+	    pips_debug_effects(4, "reduced W(i)= \n", global_write);
 
 	    /* VIRTUAL NORMALIZATION OF LOOP (the new increment is equal
 	     * to +/-1).
@@ -734,18 +720,12 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 		(global_write, i_prime, r, range_descriptor);
 	    free_descriptor(range_descriptor);
 
-	    ifdebug(4){
-		pips_debug(4, "U_i'[W(i')] = \n");
-		(*effects_prettyprint_func)(global_write);
-	    }
+	    pips_debug_effects(4, "U_i'[W(i')] = \n", global_write);
 
 	    /* IN = IN(i) - U_i'[W(i')] */
 	    global_in = (*effects_sup_difference_op)(global_in, global_write,
 						     r_w_combinable_p);
-	    ifdebug(4){
-		pips_debug(4, "IN(i) - U_i'[W(i')] = \n");
-		(*effects_prettyprint_func)(global_in);
-	    }
+	    pips_debug_effects(4, "IN(i) - U_i'[W(i')] = \n", global_in);
 
 	    /* We eliminate the loop index */
 	    (*effects_union_over_range_op)(global_in, i, range_undefined,
