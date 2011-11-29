@@ -22,7 +22,6 @@ int main(void)
       pp = &pi1;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pp
-
    *pp = (void *) 0;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -93,7 +92,6 @@ int main(void)
 // pp -> pi1 , MAY
 // pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
-
    *pp = (void *) 0;
 
 // Points To:
@@ -159,7 +157,6 @@ int main(void)
       pp = &pi1;
 //             <may be written>: pi1 *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pp
-
    *pp = (void *) 0;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -193,9 +190,6 @@ static int alea(void)
 	18 --> 19 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-	18 --> 22 with conflicts
-		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__TIME_EFFECTS:KALI-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	20 --> 22 with conflicts
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pp-W-EXACT> to <pp-R-EXACT>
