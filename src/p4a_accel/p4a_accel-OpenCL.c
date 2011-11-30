@@ -455,12 +455,12 @@ struct p4a_cl_kernel p4a_kernels_list[MAX_K];
 
     @{
     The C function to invoke clSetKernelArg where the reference to the
-    parameter is set as (void *).
+    parameter is the first var_arg.
 */
-void p4a_setArguments(int i,size_t size, void * ref_arg)
+void p4a_setArguments(int i,size_t size, ...)
 {
   //fprintf(stderr,"Argument %d : size = %u\n",i,size);
-  p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
+  p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&size+1); // Indeed there is a trick here ... we are taking the address of the element right after ``size''
   P4A_test_execution_with_message("clSetKernelArg");
 }
 /** 
