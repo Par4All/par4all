@@ -133,8 +133,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
 
    k = 0;
 
-//  T(k,x,y) {k==0, k#init==0, y==y0, 1<=x, 1<=x#init,
-//    z+1<=0}
+//  T() {k==0, y==y0, 1<=x, z+1<=0}
 
    while (x>0) {
 
