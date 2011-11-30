@@ -46,6 +46,29 @@
 #include "properties.h"
 #include "control.h"
 
+bool statement_has_omp_parallel_directive_p(statement s) {
+  bool found=false;
+  FOREACH(EXTENSION, ex, extensions_extension(statement_extensions(s))) {
+    pragma p = extension_pragma(ex);
+    if(pragma_string_p(p)) {
+      string ps = pragma_string(p);
+      if((found=(strstr(ps,"omp parallel")||strstr(ps,"OMP PARALLEL"))))
+        goto found;
+    }
+    else if(pragma_expression_p(p)) {
+      FOREACH(EXPRESSION,pe, pragma_expression(p)) {
+        if(expression_call_p(pe)) {
+          call c =expression_call(pe);
+          if((found=(same_entity_p(call_function(c),CreateIntrinsic(OMP_OMP_FUNCTION_NAME)))))
+            goto found;
+        }
+      }
+    }
+  }
+found:
+  return found;
+}
+
 /**
  * Check that a pragma is an "omp" one
  */
