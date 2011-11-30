@@ -1,0 +1,12 @@
+# after 10 calls to ompify_code
+int main()
+{
+   int a[2];
+   {
+      int i;
+#pragma omp parallel for
+      for(i = 0; i <= 1; i += 1)
+         a[i] = i;
+   }
+   return a[0];
+}

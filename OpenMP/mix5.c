@@ -1,4 +1,3 @@
-#include "math.h"
 
 int main () {
   int m = 0;
