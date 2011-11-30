@@ -39,8 +39,13 @@ package_name                        = "par4all"
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
 # to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
 
+# The publishing server:
 default_publish_host                = "download.par4all.org"
-default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
+# To debug gently the publishing process instead of defacing the real server:
+#default_publish_host                = "127.0.0.1"
+
+default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH/$VERSION"
+
 # Use a more hierarchical directory to clean things up:
 default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$YEAR/$MONTH/$DATE"
 default_deb_publish_dir             = "/srv/www-par4all/download/apt/$DISTRO/dists/releases/main"
@@ -81,10 +86,7 @@ def add_module_options(parser):
         help = "Specify the target distribution manually. By default, the current running Linux distribution is used.")
 
     group.add_option("--package-version", dest = "version", metavar = "VERSION",
-        help = "Specify version for binary packages.")
-
-    group.add_option("--package-src-version", dest = "src_version", metavar = "VERSION",
-        help = "Specify version for source packages.")
+        help = "Specify version for packages.")
 
     group.add_option("--append-date", "--date", action = "store_true", default = False,
         help = "Automatically append current date & time to version string.")
@@ -143,6 +145,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
 
     return [ temp_dir, temp_dir_with_prefix ]
 
+
 def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
     '''Creates a .deb package. Simply adds the necessary DEBIAN directory in the temporary directory
     and substitute some values in files in this DEBIAN directory. No modification of the
@@ -175,6 +178,7 @@ def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_tem
     else:
         p4a_util.rmtree(temp_dir, can_fail = 1)
     return package_file_name
+
 
 def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
     '''Creates a simple .tar.gz package.'''
@@ -264,7 +268,7 @@ def publish_deb(file, host, repos_dir, orig_dir, arch):
     p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
 
-def make_publish_dirs_from_template(publish_dir, distro, arch,
+def make_publish_dirs_from_template(publish_dir, distro, arch, version,
                                     deb_publish_dir, deb_distro, deb_arch):
     "Build the publish dir with its package dir at the same time for atomicity"
     # We have to compute the time only once, because time is evolving! :-/
@@ -279,15 +283,18 @@ def make_publish_dirs_from_template(publish_dir, distro, arch,
                                                     ARCH = arch,
                                                     YEAR = year,
                                                     MONTH = month,
-                                                    DATE = date),
+                                                    DATE = date,
+                                                    VERSION = version),
             string.Template(deb_publish_dir).substitute(DISTRO = distro,
                                                         ARCH = arch,
                                                         YEAR = year,
                                                         MONTH = month,
-                                                        DATE = date))
+                                                        DATE = date,
+                                                        VERSION = version))
 
 
-def publish_files(files, distro, deb_distro, arch, deb_arch, development = False):
+def publish_files(files, distro, deb_distro, arch, deb_arch, version,
+                  development = False):
     "Publish a list of files on the server"
     global default_publish_host
     global default_publish_dir, default_development_publish_dir
@@ -302,7 +309,7 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         publish_dir = default_publish_dir
         deb_publish_dir = default_deb_publish_dir
 
-    (publish_dir, deb_publish_dir) = make_publish_dirs_from_template(publish_dir, distro, arch, deb_publish_dir, deb_distro, deb_arch)
+    (publish_dir, deb_publish_dir) = make_publish_dirs_from_template(publish_dir, distro, arch, version, deb_publish_dir, deb_distro, deb_arch)
 
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
@@ -349,18 +356,48 @@ def work(options, args = []):
             p4a_util.die("Invalid target distro for building .debs: " + distro)
     p4a_util.debug("distro=" + distro)
 
+    pack_dir = options.pack_dir
+    if options.deb or options.tgz:
+        if pack_dir:
+            pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
+            p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
+        else:
+            pack_dir = default_pack_dir
+            p4a_util.warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
+        if not os.path.isdir(pack_dir):
+            p4a_util.die("Directory does not exist: " + pack_dir)
+
+    # By default use the version computed by p4a_version.VERSION:
+    version = None
+    if options.version:
+        version = options.version
+        p4a_util.info("Version: " + version + " (--package-version)")
+    else:
+        version = p4a_version.VERSION(pack_dir)
+        p4a_util.info("Version: " + version + " (override with --package-version)")
+
+    if options.append_date:
+        dt = p4a_util.utc_datetime()
+        version += "~" + dt
+
+    gitrev = p4a_version.GITREV(pack_dir)
+    p4a_util.info("Git revision: " + gitrev)
+
     if len(args):
         if not options.publish:
             p4a_util.die("You specified files on command line but did not specify --publish")
-        publish_files(args, distro, distro, arch, deb_arch, options.development)
+        publish_files(args, distro, distro, arch, deb_arch,
+                      version, options.development)
         return
 
     if options.development and not options.append_date:
         options.append_date = True
 
-	if len(options.publish_only):
-		publish_files(options.publish_only, distro, distro, arch, deb_arch, options.development)
-		return
+    if len(options.publish_only):
+        (full_version, version) = p4a_version.make_full_revision(custom_version = version)
+        publish_files(options.publish_only, distro, distro, arch, deb_arch,
+                      version, options.development)
+        return
 
     if (not options.deb #and not options.sdeb
         and not options.tgz and not options.stgz):
@@ -381,7 +418,8 @@ def work(options, args = []):
 				file_to_publish+=glob.glob(options.pack_output_dir+"/*.gz")
 			else:
 				file_to_publish+=glob.glob("*.gz")
-		publish_files(file_to_publish, distro, distro, arch, deb_arch, options.development)
+		publish_files(file_to_publish, distro, distro, arch, deb_arch,
+                      version, options.development)
 		return
 
     prefix = options.install_prefix
@@ -395,17 +433,6 @@ def work(options, args = []):
     if prefix[0] == "/" and len(prefix):
         prefix = prefix[1:]
 
-    pack_dir = options.pack_dir
-    if options.deb or options.tgz:
-        if pack_dir:
-            pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
-            p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
-        else:
-            pack_dir = default_pack_dir
-            p4a_util.warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
-        if not os.path.isdir(pack_dir):
-            p4a_util.die("Directory does not exist: " + pack_dir)
-
     output_dir = options.pack_output_dir
     if output_dir:
         output_dir = os.path.abspath(os.path.expanduser(output_dir))
@@ -414,33 +441,6 @@ def work(options, args = []):
             output_dir = None
     else:
         p4a_util.warn("Packages will be put in " + os.getcwd() + " (default; override with --pack-output-dir)")
-
-    version = ""
-    if options.version:
-        version = options.version
-        p4a_util.info("Version: " + version + " (--package-version)")
-    else:
-        version = p4a_version.VERSION(pack_dir)
-        p4a_util.info("Version: " + version + " (override with --package-version)")
-
-    src_version = ""
-    if options.src_version:
-        src_version = options.src_version
-        p4a_util.info("Sources version: " + src_version + " (--package-src-version)")
-    else:
-        src_version = p4a_version.VERSION()
-        p4a_util.info("Sources version: " + src_version + " (override with --package-src-version)")
-
-    if options.append_date:
-        dt = p4a_util.utc_datetime()
-        version += "~" + dt
-        src_version += "~" + dt
-
-    gitrev = p4a_version.GITREV(pack_dir)
-    p4a_util.info("Git revision: " + gitrev)
-
-    src_gitrev = p4a_version.GITREV()
-    p4a_util.info("Sources Git revision: " + src_gitrev)
 
     # Check that fakeroot is available.
     if not p4a_util.which("fakeroot"):
@@ -468,11 +468,12 @@ def work(options, args = []):
 			#remove previous *.gz
 			p4a_util.run(["rm -fv *src.tar.gz"])
 			output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
-                version = src_version, gitrev = src_gitrev,
+                version = version, gitrev = gitrev,
                 keep_temp = options.keep_temp))
 
         if options.publish:
-            publish_files(output_files, distro, distro, arch, deb_arch, options.development)
+            publish_files(output_files, distro, distro, arch, deb_arch,
+                          version, options.development)
 
         if output_dir:
             for file in output_files:
