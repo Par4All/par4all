@@ -81,7 +81,8 @@ def process(input):
             # First apply some generic parallelization:
             processor.parallelize(fine = input.fine,
                                   apply_phases_before = input.apply_phases['abp'],
-                                  apply_phases_after = input.apply_phases['aap'])
+                                  apply_phases_after = input.apply_phases['aap'],
+                                  omp=input.openmp and not input.accel)
 
             if input.accel:
                 # Generate code for a GPU-like accelerator. Note that we can

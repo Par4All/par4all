@@ -574,13 +574,14 @@ class p4a_processor(object):
         return (m != None)
 
     def parallelize(self, fine = False, filter_select = None,
-                    filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
+                    filter_exclude = None, apply_phases_before = [], apply_phases_after = [], omp=False):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
         if fine:
             # Set to False (mandatory) for A&K algorithm on C source file
             self.workspace.props.memory_effects_only = self.fortran
+        self.workspace.props.parallelize_again_parallel_code=False
 
         # Apply requested phases before parallezation
         apply_user_requested_phases(all_modules, apply_phases_before)
@@ -588,12 +589,18 @@ class p4a_processor(object):
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
 
+        # Always use a coarse-grain parallelization with regions:
+        all_modules.coarse_grain_parallelization(concurrent=True)
+
+        # first attempt at //izing reductions
+        if omp:
+            all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
         if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code(concurrent=True)
-
-        # Always use a coarse-grain parallelization with regions:
-        all_modules.coarse_grain_parallelization(concurrent=True)
+            # second attempt at //izing reductions
+            if omp:
+                all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
 
         #all_modules.flatten_code(unroll=False,concurrent=True)
         #all_modules.simplify_control(concurrent=True)
