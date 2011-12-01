@@ -3806,9 +3806,10 @@ void range_checks()
          error("vertical_size must be a multiple of 4 (4:2:0 field pictures)");
    }
 
-   if (mpeg1)
+   if (mpeg1) {
       if (aspectratio<1||aspectratio>14)
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
       error("aspect_ratio_information must be 1, 2, 3 or 4");
 
@@ -19179,7 +19180,7 @@ void range_checks(void)
 //  T() {1<=aspectratio, aspectratio<=14}
 
 
-   if (mpeg1)
+   if (mpeg1) {
 
 //  T() {1<=aspectratio, aspectratio<=14}
 
@@ -19188,6 +19189,7 @@ void range_checks(void)
 //  T() {0==-1}
 
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
 
 //  T() {0==-1}
@@ -41708,7 +41710,7 @@ void range_checks(void)
 //    vertical_size<=16383}
 
 
-   if (mpeg1)
+   if (mpeg1) {
 
 //  P(i) {mpeg1==1, 1<=M, 0<=fieldpic, fieldpic<=1,
 //    1<=horizontal_size, horizontal_size<=16383, 1<=vertical_size,
@@ -41721,6 +41723,7 @@ void range_checks(void)
 //    vertical_size<=16383}
 
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
 
 //  P(i) {mpeg1==0, 1<=M, 0<=fieldpic, fieldpic<=1,
