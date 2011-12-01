@@ -1,4 +1,5 @@
-# See trac #601
+// See trac #601, the second part
+
 int main(int argc, char* argv[])
 {
   /*  t82.sce - testing elseif */
