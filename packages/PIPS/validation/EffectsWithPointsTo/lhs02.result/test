@@ -9,7 +9,6 @@ void lhs02()
    int j = 2;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i
-
    *(i>2?&i:&j) = 3;
 //             <may be read   >: j
 //             <    is read   >: i
@@ -39,7 +38,6 @@ void lhs02()
 
 // Points To: none
 
-
    *(i>2?&i:&j) = 3;
 
 // Points To: none
@@ -58,7 +56,6 @@ void lhs02()
    int j = 2;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i
-
    *(i>2?&i:&j) = 3;
 //             <may be read   >: j
 //             <    is read   >: i

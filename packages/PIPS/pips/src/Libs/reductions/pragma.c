@@ -217,20 +217,6 @@ static string reduction_as_str (reduction r)
 //***********************************************************Global functions
 // all global function names start with reductions_
 
-///@brief initialize all what is needed to generate omp pragma
-///@param mod_name, the module name to analyze for reductions
-void reductions_pragma_omp_init (const char* mod_name) {
-  // prepare data structure for reductions
-  set_printed_reductions((pstatement_reductions)
-			 db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
-						mod_name, true));
-}
-
-///@brief release what have been initialize before
-void reductions_pragma_omp_end (void) {
-  //  release data structure for reductions
-  reset_printed_reductions();
-}
 
 //@return a list of expressions with omp pragma for reductions, NULL if nothing
 //to return

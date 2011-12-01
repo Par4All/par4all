@@ -1,11 +1,10 @@
-//             <may be read   >: __IO_EFFECTS:LUNS[0]
-//             <may be written>: __IO_EFFECTS:LUNS[0]
+//             <    is read   >: __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
 int f()
 {
    int i;
-//             <may be read   >: __IO_EFFECTS:LUNS[0]
-//             <may be written>: __IO_EFFECTS:LUNS[0]
-//             <    is written>: i
+//             <    is read   >: __IO_EFFECTS:LUNS[0]
+//             <    is written>: i __IO_EFFECTS:LUNS[0]
    for(i = 0; i <= 99; i += 1)
 //             <    is read   >: __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]

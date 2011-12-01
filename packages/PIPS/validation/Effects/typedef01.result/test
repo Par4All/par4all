@@ -14,13 +14,13 @@ void compute()
 void compute()
 {
    int i, j;
-//             <may be read   >: i j
-//             <may be written>: j tab[*][*]
-//             <    is written>: i
+//             <may be written>: tab[*][*]
+//             <    is read   >: i j
+//             <    is written>: i j
 
    for(i = 1; i <= 62; i += 1)
-//             <may be read   >: i j
 //             <may be written>: tab[*][*]
+//             <    is read   >: i j
 //             <    is written>: j
       for(j = 1; j <= 62; j += 1)
 //             <may be written>: tab[*][*]

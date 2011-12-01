@@ -2050,7 +2050,10 @@ get_special_prettyprint_for_operator(call obj){
   return op_name;
 }
 
-static list words_brace_op(call obj, int precedence, bool leftmost, list pdl)
+static list words_brace_op(call obj,
+			   int precedence __attribute__ ((unused)),
+			   bool leftmost __attribute__ ((unused)),
+			   list pdl)
 {
     expression fake = call_to_expression(copy_call(obj));
     list l = words_brace_expression(fake, pdl);
@@ -3476,6 +3479,30 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
 }
 
 
+/* Some code shared by text_block_if and text_block_ifthen */
+static bool test_with_dangling_else_p(test t)
+{
+  statement fb = test_false(t);
+  bool outer_else_p = !nop_statement_p(fb); // obj contains a non-empty else clause
+  /* Do we have a test as a true branch, a test with no else clause? */
+  statement ts = effective_test_true(t);
+  bool inner_test_p = statement_test_p(ts);
+  bool inner_else_p = inner_test_p?
+    !empty_statement_p(test_false(statement_test(ts))) : false;
+  bool dangling_else_p = inner_test_p && outer_else_p && !inner_else_p;
+
+  return dangling_else_p;
+}
+
+/* Prettyprint the condition, the true and, possibly, the false branch.
+ *
+ * Manage redundant braces in C according to either the standard, or
+ * gcc guidelines or a request to print them all.
+ *
+ * Brace management is a bit complex because the clausing brace of the
+ * true block may be printed with the else branch or as a final brace
+ * when the else branch is empty.
+ */
 static text text_block_if(entity module,
 			  const char* label,
 			  int margin,
@@ -3485,17 +3512,17 @@ static text text_block_if(entity module,
   text r = make_text(NIL);
   list pc = NIL;
   statement test_false_obj;
-  bool one_liner_true_statement = one_liner_p(test_true(obj)) && !prettyprint_all_c_braces_p;
-  bool one_liner_false_statement = one_liner_p(test_false(obj)) && !prettyprint_all_c_braces_p;
-  bool else_branch_p = false; /* The else branch must be printed */
-  /* Do we have an else clause to prettyprint? */
-  bool outer_else_p = !empty_statement_p(test_false(obj));
-  /* Do we have a test a true clause, a test with no else clause? */
-  statement ts = effective_test_true(obj);
-  bool inner_test_p = statement_test_p(ts);
-  bool inner_else_p = inner_test_p?
-    !empty_statement_p(test_false(statement_test(ts))) : false;
+  bool one_liner_true_statement_p = one_liner_p(test_true(obj));
+  bool one_liner_false_statement_p = one_liner_p(test_false(obj));
+  //bool else_branch_p = false; /* Is the else branch empty? */
+  bool dangling_else_p = test_with_dangling_else_p(obj);
+  bool true_braces_p = !one_liner_true_statement_p
+    || dangling_else_p
+    || gcc_if_block_braces_required_p(obj)
+    || prettyprint_all_c_braces_p;
+  bool final_braces_p = true_braces_p;
 
+  /* Prettyprint the condition and the true branch */
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
@@ -3506,12 +3533,10 @@ static text text_block_if(entity module,
     case is_language_c:
       pc = CHAIN_SWORD(pc, "if (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-      if(one_liner_true_statement
-	 && !(outer_else_p && inner_test_p && !inner_else_p) // Prettyprint/if05.c
-	 && !gcc_if_block_braces_required_p(obj)) {
-	pc = CHAIN_SWORD(pc, ")");
-      } else
+      if(true_braces_p)
 	pc = CHAIN_SWORD(pc, ") {");
+      else
+	pc = CHAIN_SWORD(pc, ")");
       break;
     default:
       pips_internal_error("Language unknown !");
@@ -3525,10 +3550,11 @@ static text text_block_if(entity module,
   MERGE_TEXTS(r, text_statement_enclosed(module,
 					 margin+INDENTATION,
 					 test_true(obj),
-					 !one_liner_true_statement,
-					 !one_liner_true_statement,
+					 !one_liner_true_statement_p,
+					 !one_liner_true_statement_p,
 					 pdl));
 
+  /* Prettyprint the false branch if it is useful */
   test_false_obj = test_false(obj);
   if(statement_undefined_p(test_false_obj)) {
     pips_internal_error("undefined statement");
@@ -3540,21 +3566,26 @@ static text text_block_if(entity module,
 	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
      || (continue_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-    else_branch_p = true;
+    //else_branch_p = true;
     switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
       break;
     case is_language_c:
-      if(!one_liner_true_statement
-	 || (outer_else_p && inner_test_p && !inner_else_p) // Prettyprint/if05.c
-	 || prettyprint_all_c_braces_p)
+      if(true_braces_p) {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-      if(one_liner_false_statement) {
+	final_braces_p = false;
+      }
+      /* FI: I am not sure this test is safe and that no dangling else
+	 can occur */
+      if(one_liner_false_statement_p
+	 && !prettyprint_all_c_braces_p) {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
+	final_braces_p = false;
       } else {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
+	final_braces_p = true;
       }
       break;
     default:
@@ -3565,15 +3596,14 @@ static text text_block_if(entity module,
 				  test_false_obj, pdl));
   }
 
+  /* Prettyprint the closing of the test */
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")));
       break;
     case is_language_c:
-      if((!else_branch_p && !one_liner_true_statement)
-	 || (else_branch_p && !one_liner_false_statement)
-	 || gcc_if_block_braces_required_p(obj))
+      if(final_braces_p)
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
       break;
     default:
@@ -3645,7 +3675,7 @@ static text text_io_block_if(entity module,
   return (r);
 }
 
-
+/* Prettyprint a test when it falsbranch is empty */
 static text text_block_ifthen(entity module,
 			      const char* label,
 			      int margin,
@@ -3655,7 +3685,11 @@ static text text_block_ifthen(entity module,
   text r = make_text(NIL);
   list pc = NIL;
   statement tb = test_true(obj);
-  bool braces_p = !one_liner_p(tb) || prettyprint_all_c_braces_p;
+  bool dangling_else_p = test_with_dangling_else_p(obj);
+  bool braces_p =
+    !one_liner_p(tb) // several statement in the true branch
+    || prettyprint_all_c_braces_p // use request for braces
+    || dangling_else_p; // else clause would be associated to the wrong if
 
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
@@ -3692,10 +3726,10 @@ static text text_block_ifthen(entity module,
 
 
 static text text_block_else(entity module,
-			    const char* __attribute__ ((unused)) label,
+			    const char * label __attribute__ ((unused)),
 			    int margin,
 			    statement stmt,
-			    int __attribute__ ((unused)) n,
+			    int n __attribute__ ((unused)),
 			    list pdl) {
   text r = make_text(NIL);
 
@@ -5002,7 +5036,7 @@ bool output_a_graph_view_of_the_unstructured_from_a_control(text r,
 
 void output_a_graph_view_of_the_unstructured(text r,
 					     entity module,
-					     const char* __attribute__ ((unused)) label,
+					     const char * label __attribute__ ((unused)),
 					     int margin,
 					     unstructured u,
 					     int __attribute__ ((unused)) num)

@@ -10,7 +10,7 @@ class ompMaker(Maker):
         return [("openmp","Makefile.omp")]+super(ompMaker,self).get_makefile_info()
 
 
-def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
+def openmp(m, verbose = False, loop_distribution=True, loop_parallel_threshold_set=False, **props):
     """parallelize module with opennmp"""
     w = m.workspace
     #select most precise analysis
@@ -29,6 +29,7 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
     w.props.constant_path_effects = False
     w.props.prettyprint_sequential_style = "do"
     w.props.memory_effects_only = False
+    w.props.parallelize_again_parallel_code=False
 
     m.loop_fusion()
 
@@ -42,8 +43,12 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
         w.props.parallelization_statistics = True
     #custom functions 
     m.coarse_grain_parallelization(**props)
-    if internalize_parallel_code:
+    # do this **before** loop distribution
+    m.flag_parallel_reduced_loops_with_openmp_directives(**props)
+    if loop_distribution:
         m.internalize_parallel_code(**props)
+        # some new reductions may have appeared
+        m.flag_parallel_reduced_loops_with_openmp_directives(**props)
     m.ompify_code(**props)
     m.omp_merge_pragma(**props)
     if verbose:

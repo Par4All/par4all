@@ -3,7 +3,12 @@ setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create anywhere01 anywhere01.c
-activate C_PARSER
+
+echo ###############################
+echo #
+echo # Without points-to information
+echo #
+echo ###############################
 
 echo
 echo Proper effects for "anywhere01" without points-to information

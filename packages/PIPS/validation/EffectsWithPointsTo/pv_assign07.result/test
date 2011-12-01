@@ -30,6 +30,9 @@ int main()
 //             <    is written>: s2p
 
    s2p = &s2;
+   
+   
+   //  printf("s1.a = %d, s1p->a = %d, s2.a = %d, s2p->a = %d\n", *s1.a, *s1p->a, *s2.a , *s2p->a);
    return 0;
 }
 
@@ -138,6 +141,9 @@ int main()
 // s2.a -> j , EXACT
 // s2p -> s2 , EXACT
 
+   
+   
+   //  printf("s1.a = %d, s1p->a = %d, s2.a = %d, s2p->a = %d\n", *s1.a, *s1p->a, *s2.a , *s2p->a);
    return 0;
 }
 
@@ -172,6 +178,9 @@ int main()
 //             <    is written>: s2p
 
    s2p = &s2;
+   
+   
+   //  printf("s1.a = %d, s1p->a = %d, s2.a = %d, s2p->a = %d\n", *s1.a, *s1p->a, *s2.a , *s2p->a);
    return 0;
 }
 

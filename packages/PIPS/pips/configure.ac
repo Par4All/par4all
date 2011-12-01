@@ -25,7 +25,7 @@ AC_INIT([pips],[0.1],[pipsdev@cri.ensmp.fr])
 AC_CONFIG_SRCDIR([src/Passes/pips/pips.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
-AM_INIT_AUTOMAKE([gnu 1.0])
+AM_INIT_AUTOMAKE([foreign 1.0]) # foreign means we drop bsd support
 AM_SILENT_RULES([yes])
 
 AM_PROG_CC_C_O

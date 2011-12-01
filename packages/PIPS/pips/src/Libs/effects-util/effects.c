@@ -485,24 +485,6 @@ bool store_independent_effect_p(effect eff)
   return independent_p;
 }
 
-/* FI: I use this predicate to guard the use-def chains computation */
-bool fortran_compatible_effect_p(effect e)
-{
-  bool compatible_p = false;
-  reference r = effect_any_reference(e);
-  entity v = reference_variable(r);
-  type ut = ultimate_type(entity_type(v));
-  list ind = reference_indices(effect_any_reference(e));
-
-  /* Basically, this is about a Fortran effect... */
-  if((!pointer_type_p(ut) || ENDP(ind))) {
-    compatible_p = true;
-  }
-
-  return compatible_p;
-}
-
-
 /* Test if an effect has a non local effect
 
    @param[in] eff is the effect to analyse

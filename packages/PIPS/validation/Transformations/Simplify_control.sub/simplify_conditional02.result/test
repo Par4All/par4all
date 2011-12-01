@@ -63,8 +63,10 @@ void Run()
 #
 # Cumulated effects
 #
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 void Run()
 {
 //             <    is written>: _u_lx
@@ -80,12 +82,12 @@ void Run()
    double _u_x[400][100];
    {
       int lv1, lv2;
-//             <may be read   >: 0`1`lv1 0`1`lv2
-//             <may be written>: _u_x[*][*] 0`1`lv2
-//             <    is written>: 0`1`lv1
-      for(lv1 = 0; lv1 <= 399; lv1 += 1)
-//             <may be read   >: 0`1`lv1 0`1`lv2
 //             <may be written>: _u_x[*][*]
+//             <    is read   >: 0`1`lv1 0`1`lv2
+//             <    is written>: 0`1`lv1 0`1`lv2
+      for(lv1 = 0; lv1 <= 399; lv1 += 1)
+//             <may be written>: _u_x[*][*]
+//             <    is read   >: 0`1`lv1 0`1`lv2
 //             <    is written>: 0`1`lv2
          for(lv2 = 0; lv2 <= 99; lv2 += 1)
 //             <may be written>: _u_x[*][*]
@@ -96,12 +98,14 @@ void Run()
    {
       int lv1, lv2;
       400==400&&100==100?(void) 0:__assert_fail("400 == 400 && 100 == 100", ".cold.tmp/cylinder.cold-pre-p4a.c", 118, (const char *) 0);
-//             <may be read   >: _u_obst_x _u_x[*][*] 0`2`lv1 0`2`lv2
-//             <may be written>: _tmpxx8[*][*] 0`2`lv2
-//             <    is written>: 0`2`lv1
-      for(lv1 = 0; lv1 <= 399; lv1 += 1)
-//             <may be read   >: _u_obst_x _u_x[*][*] 0`2`lv1 0`2`lv2
+//             <may be read   >: _u_x[*][*]
 //             <may be written>: _tmpxx8[*][*]
+//             <    is read   >: _u_obst_x 0`2`lv1 0`2`lv2
+//             <    is written>: 0`2`lv1 0`2`lv2
+      for(lv1 = 0; lv1 <= 399; lv1 += 1)
+//             <may be read   >: _u_x[*][*]
+//             <may be written>: _tmpxx8[*][*]
+//             <    is read   >: _u_obst_x 0`2`lv1 0`2`lv2
 //             <    is written>: 0`2`lv2
          for(lv2 = 0; lv2 <= 99; lv2 += 1)
 //             <may be read   >: _u_x[*][*]
@@ -111,16 +115,17 @@ void Run()
    }
    {
       int lv1, lv2;
-//             <may be read   >: _tmpxx8[*][*] 0`3`lv1 0`3`lv2 stdout 
-//                               stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: 0`3`lv2 stdout[0] 
+//             <may be read   >: _tmpxx8[*][*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: 0`3`lv1 0`3`lv2 stdout 
 //                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: 0`3`lv1
+//             <    is written>: 0`3`lv1 0`3`lv2 __IO_EFFECTS:LUNS[1]
       for(lv1 = 0; lv1 <= 399; lv1 += 1)
-//             <may be read   >: _tmpxx8[*][*] 0`3`lv1 0`3`lv2 stdout 
-//                               stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
-//             <    is written>: 0`3`lv2
+//             <may be read   >: _tmpxx8[*][*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: 0`3`lv1 0`3`lv2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: 0`3`lv2 __IO_EFFECTS:LUNS[1]
          for(lv2 = 0; lv2 <= 99; lv2 += 1)
 //             <may be read   >: _tmpxx8[*][*] stdout[0]
 //             <may be written>: stdout[0]

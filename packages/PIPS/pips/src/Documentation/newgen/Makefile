@@ -25,65 +25,28 @@ ROOT    = ../../..
 
 use_pdflatex	= 1
 
-F.tex =	ri.tex \
-        effects.tex \
-	dg.tex \
-	compsec.tex \
-	word_attachment.tex \
-	reductions_private.tex \
-	interval_graph.tex \
-	pipsdbm_private.tex \
-	eole_private.tex \
-	abc_private.tex \
-	alias_private.tex \
-	ubs_private.tex \
-	c_parser_private.tex \
-	complexity_ri.tex \
-	database.tex \
-	paf_ri.tex \
-	tiling.tex \
-	graph.tex \
-	parser_private.tex \
-	hpf_private.tex \
-	property.tex \
-	makefile.tex \
-	reduction.tex \
-	message.tex \
-	text.tex \
-	hpf.tex \
-	sac_private.tex \
-	ri_C.tex \
-	cloning.tex \
-	step_private.tex \
-	points_to_private.tex \
-	kernel_memory_mapping.tex \
-	freia_spoc_private.tex \
-	scalopes_private.tex
+include newgen.mk
 
 
 
-SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty optimizer.tex
+SOURCES = $(F_tex) unstructured.idraw newgen_domain.sty optimizer.tex
 
 # Install in a newgen subdirectory:
 HTM.subd = newgen
 DOC.subd = newgen
 
-F.newgen	= $(F.tex:%.tex=%.newgen)
-F.h		= $(F.newgen:%.newgen=%.h)
-F.c		= $(F.newgen:%.newgen=%.c)
-F.spec		= $(F.newgen:%.newgen=%.spec)
 
 ALLHS =	all_newgen_headers.h specs.h
 
-INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
-INSTALL_DOC=	$(F.newgen:%.newgen=%.pdf)
-INSTALL_HTM=	$(F.tex:%.tex=%.htdoc)
+INSTALL_INC=	$(F_h) $(F_newgen) $(F_c) $(F_spec) $(ALLHS)
+INSTALL_DOC=	$(F_newgen:%.newgen=%.pdf)
+INSTALL_HTM=	$(F_tex:%.tex=%.htdoc)
 
 all: $(ALLHS) $(INSTALL_DOC)
 
-dvi: $(F.newgen:%.newgen=%.dvi)
-pdf: $(F.newgen:%.newgen=%.pdf)
-newgen: $(F.newgen)
+dvi: $(F_newgen:%.newgen=%.dvi)
+pdf: $(F_newgen:%.newgen=%.pdf)
+newgen: $(F_newgen)
 allhs: $(ALLHS)
 
 %.newgen: %.tex
@@ -101,23 +64,23 @@ all_newgen_headers.h: specs.h
 	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' $< > $@
 	chmod a+r-w $@
 
-specs.h $(F.spec): $(F.newgen)
+specs.h $(F_spec): $(F_newgen)
 	#
 	# building specs.h
 	#
-	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -c $(F.newgen) | make_all_specs > specs.h
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -c $(F_newgen) | make_all_specs > specs.h
 
-lisp_internal_representation: $(F.newgen)
+lisp_internal_representation: $(F_newgen)
 	#
 	# building $@
 	#
-	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -lisp $(F.newgen)
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -lisp $(F_newgen)
 	touch $@
 
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(F.newgen)
+	$(RM) $(INSTALL_INC) $(F_newgen)
 	$(RM) *.dvi *.ind *.log *.ps *.pdf *.aux *.idx *.ilg *.toc *.out *.brf
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 

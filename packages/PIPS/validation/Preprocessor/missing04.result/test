@@ -1,14 +1,14 @@
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[0]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
 int f()
 {
    int i;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[0]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
    for(i = 0; i <= 99; i += 1)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

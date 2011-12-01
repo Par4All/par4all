@@ -18,7 +18,7 @@ setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
 # setenv SEMANTICS_DEBUG_LEVEL "0"
 
 echo
-echo TRANSFORMERS
+echo Transformers for "gulwani_cav08_02"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
@@ -27,7 +27,7 @@ display PRINTED_FILE[gulwani_cav08_02]
 # quit
 
 echo
-echo PRECONDITIONS
+echo Preconditions for "gulwani_cav08_02"
 echo
 
 #setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
@@ -36,7 +36,7 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[gulwani_cav08_02]
 
 echo
-echo TRANSFORMERS
+echo Transformers for "gulwani_cav08_02_r"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
@@ -45,7 +45,7 @@ display PRINTED_FILE[gulwani_cav08_02_r]
 # quit
 
 echo
-echo PRECONDITIONS
+echo Preconditions for "gulwani_cav08_02_r"
 echo
 
 #setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
@@ -53,30 +53,5 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[gulwani_cav08_02_r]
 
-#apply UNSPLIT
-
-# Refining the transformers is useless
-quit
-
-echo
-echo TRANSFORMERS
-echo
-
-apply REFINE_TRANSFORMERS[gulwani_cav08_02]
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[gulwani_cav08_02]
-
-# quit
-
-echo
-echo PRECONDITIONS
-echo
-
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[gulwani_cav08_02]
-
-close
 # delete gulwani_cav08_02
 quit

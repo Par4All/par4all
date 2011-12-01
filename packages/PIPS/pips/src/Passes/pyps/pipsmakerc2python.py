@@ -64,7 +64,8 @@ def printPythonMethod(name,doc):
 
 			if prop == "loop_label":
 				has_loop_label = True;
-				extraparamsetter = '\tif self.workspace:pypsutils.set_property(self.workspace,"' + prop.upper() + '", self.label)\n' + extraparamsetter
+				extraparamsetter += '\tif self.workspace:self.workspace.cpypips.push_property("LOOP_LABEL",pypsutils.formatprop(self.label))\n'
+				extraparamresetter = '\tif self.workspace:self.workspace.cpypips.pop_property("LOOP_LABEL")\n'  + extraparamresetter
 			else:
 				props.append(arg)
 				extraparamsetter += '\tif '+short_prop+' == None and self.workspace:'+short_prop+'=self.workspace.props.'+prop + '\n'

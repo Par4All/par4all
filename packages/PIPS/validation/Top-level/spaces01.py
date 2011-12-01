@@ -1,3 +1,3 @@
-from validation import vworkspace as workspace
-workspace.delete("a a a ")
-workspace(name="a a a ").fun.main.display()
+from pyps import workspace
+workspace.delete("bb")
+workspace("a a a /spaces01.c",name="bb",recoverInclude=False).fun.main.display()

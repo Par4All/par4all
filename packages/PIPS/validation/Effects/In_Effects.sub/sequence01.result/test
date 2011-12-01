@@ -1,0 +1,46 @@
+int main()
+{
+   // BEGIN BLOCK
+   int a, b, c;
+//             <    is written>: a
+
+   a = 0;
+//             <    is written>: b
+   b = 1;
+   {
+//             <    is read   >: a
+//             <    is written>: a c
+      // BEGIN BLOCK
+//             <    is written>: d
+      int d = 1;
+//             <    is read   >: a d
+//             <    is written>: c
+      c = a+d;
+//             <    is written>: a
+      a = 2;
+      // END BLOCK
+   }
+//             <    is read   >: b
+   return b;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int a, b, c;
+
+   a = 0;
+   b = 1;
+   {
+//             <    is imported>: a
+      // BEGIN BLOCK
+      int d = 1;
+//             <    is imported>: a d
+      c = a+d;
+      a = 2;
+      // END BLOCK
+   }
+//             <    is imported>: b
+   return b;
+   // END BLOCK
+}

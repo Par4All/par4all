@@ -783,7 +783,8 @@ transformer add_loop_index_initialization(transformer tf,
     expression init = range_lower(loop_range(l));
     transformer post = transformer_undefined;
     transformer t_init = transformer_undefined;
-    list lef = expression_to_proper_effects(init);
+    //list lef = expression_to_proper_effects(init);
+    list lef = expression_to_proper_constant_path_effects(init);
     transformer pre_r = transformer_range(pre);
 
     t_init = any_scalar_assign_to_transformer(i, init, lef, pre_r);
@@ -1223,7 +1224,9 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
 			      make_approximation_exact(),
 			      make_descriptor_none());
   list l_init_e = CONS(EFFECT, init_e, NIL);
-  list l_expr_e = expression_to_proper_effects(range_lower(loop_range(l)));
+  //list l_expr_e = expression_to_proper_effects(range_lower(loop_range(l)));
+  expression lbe = range_lower(loop_range(l));
+  list l_expr_e = expression_to_proper_constant_path_effects(lbe);
   list el = list_undefined;
 
   transformer r_pre = transformer_safe_range(pre);

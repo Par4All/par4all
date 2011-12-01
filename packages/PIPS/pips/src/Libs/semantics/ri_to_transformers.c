@@ -317,7 +317,8 @@ transformer declaration_to_transformer(entity v, transformer pre)
 	  }
 	}
 	else {
-	  list el = expression_to_proper_effects(e);
+	  //list el = expression_to_proper_effects(e);
+          list el = expression_to_proper_constant_path_effects(e);
 
 	  pips_user_warning("Type mismatch detected in initialization expression."
 			    " May be due to overloading and/or implicit confusion"
@@ -855,7 +856,8 @@ c_user_function_call_to_transformer(
   entity f = call_function(c);
   list pc = call_arguments(c);
   basic rbt = basic_of_call(c, true, true);
-  list ef = expression_to_proper_effects(expr);
+  //list ef = expression_to_proper_effects(expr);
+  list ef = expression_to_proper_constant_path_effects(expr);
 
   pips_debug(8, "begin\n");
   pips_assert("s is a call", syntax_call_p(s));
@@ -934,7 +936,8 @@ fortran_user_function_call_to_transformer(
   list pc = call_arguments(c);
   transformer t_caller = transformer_undefined;
   basic rbt = basic_of_call(c, true, true);
-  list ef = expression_to_proper_effects(expr);
+  //list ef = expression_to_proper_effects(expr);
+  list ef = expression_to_proper_constant_path_effects(expr);
 
   pips_debug(8, "begin\n");
   pips_assert("s is a call", syntax_call_p(s));
@@ -1292,7 +1295,8 @@ transformer any_user_call_site_to_transformer(entity f,
       }
       else {
 	/* Should be an error or a warning? */
-	list el = expression_to_proper_effects(e);
+	//list el = expression_to_proper_effects(e);
+	list el = expression_to_proper_constant_path_effects(e);
 	/*
 	pips_user_error("Type incompatibility between call site and declaration"
 			" for %d argument of function %s\n", n, entity_user_name(f));
@@ -1309,7 +1313,8 @@ transformer any_user_call_site_to_transformer(entity f,
     }
     else {
       /* The associated transformer may nevertheless carry useful/necessary information */
-      list el = expression_to_proper_effects(e);
+      //list el = expression_to_proper_effects(e);
+      list el = expression_to_proper_constant_path_effects(e);
 
       ctf = effects_to_transformer(el);
     }
@@ -1418,7 +1423,8 @@ transformer fortran_user_call_to_transformer(entity f,
       type tfp = entity_type(fp);
       basic bfp = variable_basic(type_variable(tfp));
       basic bexpr = basic_of_expression(expr);
-      list l_eff = expression_to_proper_effects(expr);
+      //list l_eff = expression_to_proper_effects(expr);
+      list l_eff = expression_to_proper_constant_path_effects(expr);
 
       if(effects_write_at_least_once_p(l_eff)) {
 	pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
