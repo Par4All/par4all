@@ -1871,15 +1871,19 @@ set points_to_unstructured(unstructured uns, set pt_in, bool __attribute__ ((__u
   Pred = set_assign_list(Pred, Pred_l);
  
   /* Get all the nodes of the unstructured*/
+#if 0
   CONTROL_MAP(c, {
       ;
     }, entry, nodes_l) ;
+#endif
   Nodes = set_assign_list(Nodes,nodes_l);
 
   /* Gel all the reachable nodes of the unstructured */
+#if 0
   FORWARD_CONTROL_MAP(c, {
       ;
     }, entry, blocs) ;
+#endif
   Reachable = set_assign_list(Reachable, blocs);
 
   bool inter_p = set_intersection_p(Reachable, Pred);
