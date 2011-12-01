@@ -43,8 +43,8 @@
 
 \author{Amaury \textsc{Darsch} \and Serge \textsc{Guelton} \and Ronan
   \textsc{Keryell} \and Grégoire \textsc{Péan} \and Claire \textsc{Seguin}
-  \and Mickaël \textsc{Thievent} \and Pierre \textsc{Villalon} 
-  \and Mehdi \textsc{Amini} \and Janice \textsc{Onanian-McMahon} 
+  \and Mickaël \textsc{Thievent} \and Pierre \textsc{Villalon}
+  \and Mehdi \textsc{Amini} \and Janice \textsc{Onanian-McMahon}
   \and Onil \textsc{Goubier}}
 
 \maketitle
@@ -59,6 +59,7 @@ on \PfaAllOrganizationHTDOC.
 
 % To automatically build reports from this content:
 %%ContentBegin
+
 
 \section{Introduction}
 \label{sec:introduction}
@@ -81,14 +82,10 @@ also for advanced users desiring more functionality from \Apfa.
 Since \Apfa relies on other tool projects, the documentation of these other
 projects should also be consulted independently and is not included here.
 
-The first section contains the release notes for \Apfa, including
-installations instructions. For detailed information on \Apfa
-infrastructure, including instructions for compilation, see
-sections~\ref{sec:compilation} and above.
-
 \tableofcontents{}
 
 \bigskip{}
+
 
 \section{Advanced installation}
 \label{sec:advanced_installation}
@@ -259,6 +256,7 @@ level has been used for the integration with \texttt{trunk},
 layout, which was added later at approximately revision 750. Because
 of this prior history, this gateway is not published in a public git.
 
+
 \subsection{Private repositories}
 \label{sec:private-repositories}
 
@@ -272,6 +270,7 @@ For \Ahpcp-confidential information,
 
 Other repositories can be created and used on demand according to the
 needs of evolving private collaborations.
+
 
 \subsection{Packages}
 \label{sec:packages}
@@ -385,6 +384,7 @@ these dateways, light
 branches are stored into a common \Agit view of the \Apips{} \Asvn
 repositories; these light branches can be pushed back into the \Apips{} \Asvn.
 
+
 \subsection{The p4a\_git script to deal with workflow}
 \label{sec:p4a_git-script-deal}
 
@@ -404,6 +404,7 @@ project.
 
 The following section presents some examples, after which the full
 list of options is described in detail.
+
 
 \subsubsection{\protect\texttt{p4a\_git} and \protect\texttt{git} typical use cases}
 \label{sec:p4a_git-typical-use}
@@ -488,6 +489,7 @@ If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
 of steps at the beginning of this section.
 
+
 \subsubsection{More advanced use cases for \protect\texttt{p4a\_git}}
 \label{sec:more-advanced-use}
 
@@ -501,13 +503,21 @@ The developer can create from \texttt{p4a} a branch infrastructure
 with each attached to the main \verb|p4a|-prefixed branch
 infrastructure. To do this, use;
 \begin{verbatim}
-p4a_git --aggregate-branches p4a-very-personal
+p4a_git --aggregate-branches p4a-very-personal p4a
 \end{verbatim}
 
-To start from \texttt{p4a-0.2-alpha}, use:
+To start \texttt{p4a-0.3-alpha} branch infrastructure from
+\texttt{p4a-0.2-rc} branch infrastructure, use:
 \begin{verbatim}
-p4a_git --aggregate-branches p4a-very-personal p4a-0.2-alpha
+p4a_git --aggregate-branches p4a-0.3-alpha p4a-0.2-rc
 \end{verbatim}
+
+Once the new branch infrastructure is created, you can use it, modify its
+component branches and apply the merge integration work-flow with for example:
+\begin{verbatim}
+p4a_git --aggregate-branches p4a-1.3-rc
+\end{verbatim}
+to update the \texttt{p4a-1.3-rc} branch infrastructure.
 
 When finished, these branches can be pushed for sharing or merged
 into the main \Apfa \texttt{p4a} with:
@@ -657,8 +667,8 @@ When developing \Apfa packages, it is of critical importance to test them
 For example, a new \Apips version is developed in the
 \Acri{} \Asvn repository before building \Apfa to test the integration.
 
-This process has been described in section~\ref{sec:compilation};
-further details are provided in the following example.
+This process has been described in the compilation manual; further details
+are provided in the following example.
 
 Assuming there is a \Asvn working copy of \Apips (including the \texttt{trunk}
 into \texttt{prod}, your branch in \verb|pips_dev|, etc.; refer
@@ -666,7 +676,7 @@ to the \Apips developer guide for more information), use the
 \verb|--pips-src=| to make \Apfa point to this directory.
 
 Verify that the correctd \Apfa variable is set in your shell, that
-the previous configuration file from the \Apips \Asvn environment from
+the previous configuration file from the \Apips{} \Asvn environment from
 \Acri is not automatically sourced in your shell and that there are no
 incorrect environment variables from previous invocations of a script
 (e.g., \verb|PATH|, etc.)
@@ -837,6 +847,7 @@ testing for easy rollback.
 \subsection{PIPS-GFC extension workflow}
 \label{sec:pips-gfc-workflow}
 
+
 \subsubsection{New version}
 \label{sec:new-version}
 
@@ -914,6 +925,7 @@ if you want to be modest about your gory hesitations \smiley{}.
 
 There are scripts to facilitate development.
 
+
 \subsection{Scripts for an everyday work}
 \label{sec:an-everyday-work}
 
@@ -979,6 +991,7 @@ They are located in
   \Aautotools version of \Apips;
 \end{itemize}
 
+
 \subsection{Script to manage documentation}
 \label{sec:script-deal-with}
 
@@ -1043,7 +1056,6 @@ There is also a \verb|p4a_coffee.py| script to build and publish everything
 at once.
 
 \input{p4a_coffee-help}
-
 
 
 \section{\protect\texttt{p4a} architecture}
@@ -1159,6 +1171,7 @@ construct a
 \Amat (Minimal Acceptance Test) for \Apfa. Other \Apips validation
 cases are more useful for \Apips developers, and are of less relevance
 to \Apfa validation.
+
 
 \subsubsection{Example}
 \label{sec:example}
@@ -1352,6 +1365,7 @@ to specific versions of particular branches such as
 \section{Useful \protect\Agit tricks for \protect\Apfa}
 \label{sec:some-agit-tricks}
 
+
 \subsection{Files committed to the wrong branch}
 \label{sec:you-have-comited}
 
@@ -1478,10 +1492,12 @@ where and how to get back on rails. \smiley
 
 \appendix
 
+
 \section{Various script details}
 \label{sec:vari-script-deta}
 
 In this appendix, options and other ancillary scripts are described.
+
 
 \subsection{The \protect\texttt{p4a\_recover\_includes} script}
 \label{sec:p4a_recover_includes}
@@ -1524,6 +1540,7 @@ The following section should be a very demonstration of this tool
 indeed. \smiley
 
 \input{optparse_help_to_tex-help}
+
 
 \section{Tools, tips and tricks for developpers}
 
