@@ -827,6 +827,7 @@ list proper_effects_combine(list l_eff, bool scalars_only_p)
 
       l_res = (*effects_union_op)(effect_to_list(eff), l_res, *effects_comb_p);
     }
+  gen_free_list(l_eff);
   pips_debug_effects(6, "output effects:", l_res);
   return l_res;
 }

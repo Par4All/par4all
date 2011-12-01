@@ -28,6 +28,13 @@ class vworkspace(workspace_check.workspace):
            if file == None :
                raise RuntimeError('''No source files ! Please define FILE environment 
                                     variable or provide %s.{c,f,f95}''' % (basename) )
+    
+        for f in list(sources):
+            if f==file:
+                raise RuntimeError('''Hum... a validation script must be'''+ 
+                ''' reusable. Thus you should write it without specifying ''' + f + 
+                ''' in the vworkspace() constructor, it's automatically added !!''') 
+
             
         # this workspace is intended to be run with WSPACE and FILE 
         # environment variable defined

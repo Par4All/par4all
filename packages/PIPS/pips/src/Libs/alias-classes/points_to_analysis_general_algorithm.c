@@ -90,6 +90,13 @@ points_to_statement
 #include "alias-classes.h"
 
 
+/* Static sets containing poits-to relations computed before the function's call.
+   points_to_in contains only formal parameters and gloabl/static variables.
+   points_to_out contains only formal parameters, global/static  and heap allocated variables
+*/
+static set pts_to_in ;
+static set pts_to_out; 
+
 
 /* Same as previous function, but for double pointers. */
 bool expression_double_pointer_p(expression e) {
@@ -125,13 +132,15 @@ entity argument_entity(expression exp) {
    redefenition's */
 void points_to_storage(set pts_to_set, statement s, bool store) {
   list pt_list = NIL;
-
+  statement_consistent_p(s);
   if(statement_unstructured_p(s) || statement_goto_p(s)){
-    /* store = false; */
+    pt_list = set_to_sorted_list(pts_to_set,
+				 (int(*)(const void*, const void*))
+				 points_to_compare_cells);
     points_to_list new_pt_list = make_points_to_list(pt_list);
     store_or_update_pt_to_list(s, new_pt_list);
   }
-  if (!set_empty_p(pts_to_set) && store == true) {
+  else if (!set_empty_p(pts_to_set) && store == true) {
     instruction i = statement_instruction(s);
     if(instruction_sequence_p(i)){
       sequence seq = instruction_sequence(i);
@@ -139,12 +148,14 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
 				     (int(*)(const void*, const void*))
 				     points_to_compare_cells);
 	points_to_list new_pt_list = make_points_to_list(pt_list);
+	points_to_list_consistent_p(new_pt_list);
 	store_or_update_pt_to_list(s, new_pt_list);
       FOREACH(statement, stm, sequence_statements(seq)){
 	pt_list = set_to_sorted_list(pts_to_set,
 				     (int(*)(const void*, const void*))
 				     points_to_compare_cells);
 	points_to_list new_pt_list = make_points_to_list(pt_list);
+	points_to_list_consistent_p(new_pt_list);
 	store_or_update_pt_to_list(stm, new_pt_list);
       }
     }
@@ -602,6 +613,33 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
   }
   else{
     type t = expression_to_type(rhs);
+    type lt = expression_to_type(lhs);
+    /* Handle strut assignment m = n */
+    type ct = compute_basic_concrete_type(t);
+    type lct = compute_basic_concrete_type(lt);
+    if(type_struct_p(ct) && type_struct(lct)) {
+	list l1 = type_struct(ct);
+	list l2 = type_struct(lct);
+
+	FOREACH(ENTITY, i, l1) {
+	  if( expression_pointer_p(entity_to_expression(i)) ) {
+	    entity ent2 = ENTITY (CAR(l2));
+	    expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
+					    lhs,
+					    entity_to_expression(i));
+	    expression ex2 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
+					    rhs,
+					    entity_to_expression(ent2));
+	    expression_consistent_p(ex1);
+	    expression_consistent_p(ex1);
+	    return points_to_assignment(current, ex1, ex2, incur);
+	  }
+	  l2 = CDR(l2);
+	}
+
+
+    }
+    else  {
     entity ne = entity_undefined;
     if(type_sensitive_p)
       ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
@@ -611,6 +649,7 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
     cell nc = make_cell_reference(nr);
     R = CONS(CELL, nc, NIL);
     address_of_p = true;
+  }
   }
   /* set_assign(kill_may, kill_may_set(L, in_may)); */
  /*Extract MAY/MUST points to relations from the input set*/
@@ -635,97 +674,97 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
 }
 
 
-set points_to_pointer_to_derived_assignment(statement current, expression lhs, expression rhs, set in){
+/* set points_to_pointer_to_derived_assignment(statement current, expression lhs, expression rhs, set in){ */
 
-  set out = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
-  set cur = set_generic_make(set_private, points_to_equal_p,
-				points_to_rank);
-  set incur = set_generic_make(set_private, points_to_equal_p,
-				points_to_rank);
-  set in_may = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set in_must = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set kill_must = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set kill_may = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set gen_must = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set gen_may = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set kill = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  set gen = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  list L = NIL, R = NIL;
-  bool address_of_p = false;
+/*   set out = set_generic_make(set_private, points_to_equal_p, */
+/* 			     points_to_rank); */
+/*   set cur = set_generic_make(set_private, points_to_equal_p, */
+/* 				points_to_rank); */
+/*   set incur = set_generic_make(set_private, points_to_equal_p, */
+/* 				points_to_rank); */
+/*   set in_may = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set in_must = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set kill_must = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set kill_may = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set gen_must = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set gen_may = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set kill = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   set gen = set_generic_make(set_private, points_to_equal_p, */
+/* 			   points_to_rank); */
+/*   list L = NIL, R = NIL; */
+/*   bool address_of_p = false; */
 
-  set_assign(in_may, points_to_may_filter(in));
-  set_assign(in_must, points_to_must_filter(in));
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  entity el = expression_to_entity(lhs);
-  if(entity_variable_p(el)){
-    basic b = variable_basic(type_variable(entity_type(el)));
-    if(basic_pointer_p(b)){
-      set_assign(cur, points_to_expression(rhs, in, true));
-      set_assign(incur, points_to_expression(lhs, cur, true));
-      R = expression_to_constant_paths(current, rhs,incur);
-      L = expression_to_constant_paths(current, lhs,incur);
-      set_assign(kill_may, kill_may_set(L, in_may));
-      set_assign(kill_must, kill_must_set(L, in_must));
-      set_assign(gen_may, gen_may_set(L, R, in_may, &address_of_p));
-      set_assign(gen_must, gen_must_set(L, R, in_must, &address_of_p));
-      set_union(kill, kill_may, kill_must);
-      set_union(gen, gen_may, gen_must);
-      if(set_empty_p(gen)) {
-	if(type_sensitive_p )
-	set_assign(gen, points_to_anywhere_typed(L, incur));
-	else
-	  set_assign(gen, points_to_anywhere(L, incur));
-      }
-      set_difference(in, in, kill);
-      set_union(out, in, gen);
+/*   set_assign(in_may, points_to_may_filter(in)); */
+/*   set_assign(in_must, points_to_must_filter(in)); */
+/*   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES"); */
+/*   entity el = expression_to_entity(lhs); */
+/*   if(entity_variable_p(el)){ */
+/*     basic b = variable_basic(type_variable(entity_type(el))); */
+/*     if(basic_pointer_p(b)){ */
+/*       set_assign(cur, points_to_expression(rhs, in, true)); */
+/*       set_assign(incur, points_to_expression(lhs, cur, true)); */
+/*       R = expression_to_constant_paths(current, rhs,incur); */
+/*       L = expression_to_constant_paths(current, lhs,incur); */
+/*       set_assign(kill_may, kill_may_set(L, in_may)); */
+/*       set_assign(kill_must, kill_must_set(L, in_must)); */
+/*       set_assign(gen_may, gen_may_set(L, R, in_may, &address_of_p)); */
+/*       set_assign(gen_must, gen_must_set(L, R, in_must, &address_of_p)); */
+/*       set_union(kill, kill_may, kill_must); */
+/*       set_union(gen, gen_may, gen_must); */
+/*       if(set_empty_p(gen)) { */
+/* 	if(type_sensitive_p ) */
+/* 	set_assign(gen, points_to_anywhere_typed(L, incur)); */
+/* 	else */
+/* 	  set_assign(gen, points_to_anywhere(L, incur)); */
+/*       } */
+/*       set_difference(in, in, kill); */
+/*       set_union(out, in, gen); */
 
-      basic bt = variable_basic(type_variable(basic_pointer(b)));
-      if(basic_typedef_p(bt)){
-	basic ulb = basic_ultimate(bt);
-	if(basic_derived_p(ulb)){
-	  entity e1  = basic_derived(ulb);
-	  type t1 = entity_type(e1);
-	  if(type_struct_p(t1)){
-	    entity rl = expression_to_entity(rhs);
-	    basic b1 = variable_basic(type_variable(entity_type(rl)));
-	    basic bt1 = variable_basic(type_variable(basic_pointer(b1)));
-	    basic ulb1 = basic_ultimate(bt1);
-	    entity e2  = basic_derived(ulb1);
-	    type t2 = entity_type(e2);
-	    list l_lhs = type_struct(t1);
-	    list l_rhs = type_struct(t2);
-	    for (; !ENDP(l_lhs) &&!ENDP(l_rhs)  ; POP(l_lhs), POP(l_rhs)){
-	      expression ex1 = entity_to_expression(ENTITY(CAR(l_lhs)));
-	      expression nlhs = MakeBinaryCall(entity_intrinsic(POINT_TO_OPERATOR_NAME),
-					       lhs,
-					       ex1);
-	      expression ex2 = entity_to_expression(ENTITY(CAR(l_rhs)));
-	      expression nrhs = MakeBinaryCall(entity_intrinsic(POINT_TO_OPERATOR_NAME),
-					       rhs,
-					       ex2);
-	      if(expression_pointer_p(nlhs))
-		set_assign(out, points_to_assignment(current, nlhs, nrhs, out));
-	    }
-	  }
-	  else if(type_union_p(t1))
-	    pips_user_warning("union case not handled yet\n");
-	  else if(type_enum_p(t1))
-	    pips_user_warning("enum case not handled yet\n");
-	}
-      }
-    }
-  }
-  return out;
-}
+/*       basic bt = variable_basic(type_variable(basic_pointer(b))); */
+/*       if(basic_typedef_p(bt)){ */
+/* 	basic ulb = basic_ultimate(bt); */
+/* 	if(basic_derived_p(ulb)){ */
+/* 	  entity e1  = basic_derived(ulb); */
+/* 	  type t1 = entity_type(e1); */
+/* 	  if(type_struct_p(t1)){ */
+/* 	    entity rl = expression_to_entity(rhs); */
+/* 	    basic b1 = variable_basic(type_variable(entity_type(rl))); */
+/* 	    basic bt1 = variable_basic(type_variable(basic_pointer(b1))); */
+/* 	    basic ulb1 = basic_ultimate(bt1); */
+/* 	    entity e2  = basic_derived(ulb1); */
+/* 	    type t2 = entity_type(e2); */
+/* 	    list l_lhs = type_struct(t1); */
+/* 	    list l_rhs = type_struct(t2); */
+/* 	    for (; !ENDP(l_lhs) &&!ENDP(l_rhs)  ; POP(l_lhs), POP(l_rhs)){ */
+/* 	      expression ex1 = entity_to_expression(ENTITY(CAR(l_lhs))); */
+/* 	      expression nlhs = MakeBinaryCall(entity_intrinsic(POINT_TO_OPERATOR_NAME), */
+/* 					       lhs, */
+/* 					       ex1); */
+/* 	      expression ex2 = entity_to_expression(ENTITY(CAR(l_rhs))); */
+/* 	      expression nrhs = MakeBinaryCall(entity_intrinsic(POINT_TO_OPERATOR_NAME), */
+/* 					       rhs, */
+/* 					       ex2); */
+/* 	      if(expression_pointer_p(nlhs)) */
+/* 		set_assign(out, points_to_assignment(current, nlhs, nrhs, out)); */
+/* 	    } */
+/* 	  } */
+/* 	  else if(type_union_p(t1)) */
+/* 	    pips_user_warning("union case not handled yet\n"); */
+/* 	  else if(type_enum_p(t1)) */
+/* 	    pips_user_warning("enum case not handled yet\n"); */
+/* 	} */
+/*       } */
+/*     } */
+/*   } */
+/*   return out; */
+/* } */
 
 
 set points_to_derived_assignment(statement current, expression lhs, expression rhs, set in){
@@ -733,23 +772,19 @@ set points_to_derived_assignment(statement current, expression lhs, expression r
   set out = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
   set_assign(out, in);
-  entity el = expression_to_entity(lhs);
-  if(entity_variable_p(el)){
-    basic b = variable_basic(type_variable(entity_type(el)));
-    if(basic_typedef_p(b)){
-      basic ulb = basic_ultimate(b);
-      if(basic_derived_p(ulb)){
-	entity e1  = basic_derived(ulb);
-	type t1 = entity_type(e1);
-	if(type_struct_p(t1)){
-	  if(expression_reference_p(rhs) || expression_pointer_p(rhs)){
-	    entity rl = expression_to_entity(rhs);
-	    if(entity_variable_p(rl)){
-	      basic b1 = variable_basic(type_variable(entity_type(rl)));
-	      basic ulb1 = basic_ultimate(b1);
-	      if(basic_derived_p(ulb1)){
-		entity e2  = basic_derived(ulb1);
-		type t2 = entity_type(e2);
+  entity e_lhs = expression_to_entity(lhs);
+  type ct_lhs = entity_basic_concrete_type(e_lhs);
+  entity e_rhs = expression_to_entity(rhs);
+  type ct_rhs = entity_basic_concrete_type(e_rhs);
+  if( type_struct_variable_p(ct_lhs) && type_struct_variable_p(ct_rhs) ) {
+    variable v_r = type_variable(ct_lhs);
+    variable v_l = type_variable(ct_rhs);
+    basic b_r = variable_basic(v_r);
+    basic b_l = variable_basic(v_l);
+    entity e1 = basic_derived(b_r);
+    entity e2 = basic_derived(b_l);
+    type t1 = compute_basic_concrete_type(entity_type(e1));
+    type t2 = compute_basic_concrete_type(entity_type(e2));
 		list l_lhs = type_struct(t1);
 		list l_rhs = type_struct(t2);
 		for (; !ENDP(l_lhs) &&!ENDP(l_rhs)  ; POP(l_lhs), POP(l_rhs)){
@@ -762,19 +797,13 @@ set points_to_derived_assignment(statement current, expression lhs, expression r
 						   rhs,
 						   ex2);
 		  if(expression_pointer_p(nlhs))
-		    set_assign(out, points_to_assignment(current, nlhs, nrhs, in));
+	set_assign(out, points_to_assignment(current, nlhs, nrhs, out));
 		}
 	      }
-	    }
-	  }
-	}
-	else if(type_union_p(t1))
+  else if(type_union_p(ct_lhs))
 	  pips_user_warning("union case not handled yet\n");
-	else if(type_enum_p(t1))
+  else if(type_enum_p(ct_lhs))
 	  pips_user_warning("enum case not handled yet\n");
-      }
-    }
-  }
 
   return  out;
 }
@@ -856,13 +885,12 @@ set points_to_null_pointer(list lhs_list, set input)
 set points_to_init_global(statement s, list l, set in)
 {
   list l_eval = NIL;
+  bool eval = false;
   if ( !ENDP(l) ) {
     FOREACH ( cell, c, l ) {
-      reference r = cell_to_reference(c);
+      reference r = cell_any_reference(c);
       entity e = reference_variable(r);
-      /* expression ex = reference_to_expression(r); */
       if( top_level_entity_p(e) || formal_parameter_p(e) ) {
-	/* if( expression_pointer_p(ex) ) { */
 	  value v_init = entity_initial(e);
 	  reference nr = make_reference(e, NIL);
 	  cell nc = make_cell_reference(nr);
@@ -876,31 +904,50 @@ set points_to_init_global(statement s, list l, set in)
 				      points_to_compare_location);
 	    l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
 	    generic_effects_reset_all_methods();
-	    if( ENDP(l_eval) )
+	  /* if( ENDP(l_eval) ){ */
+	/*     l_eval = gen_nconc(l_eval, l_cell); */
+	/*     l_eval= gen_nconc(l_eval, l_cell); */
+	/*   } */
+	/*   else */
+	/*     eval=true; */
+	/* } */
+	}
+	if(ENDP(l_eval)){
 	      l_eval = gen_nconc(l_eval, l_cell);
 	  }
-	  else
-	    l_eval = gen_nconc(l_eval, l_cell);
+	else{
+	eval = true;
+	}
+	/* l_eval = gen_nconc(l_eval, l_cell); */
 	  FOREACH ( cell, cel, l_eval ) {
-	    if ( !source_in_set_p(cel, in )) {
+	  bool changed = false;
+	  cell new_cel = simple_cell_to_store_independent_cell(cel, &changed);
+	  if ( !source_in_set_p(new_cel, in )) {
 	      if( value_expression_p(v_init) ){
 		expression exp_init = value_expression(v_init);
+	      bool t_to_be_freed = false;
+	      type t = cell_reference_to_type(r, &t_to_be_freed);
+	      if(pointer_type_p(t)){
 		expression lhs = entity_to_expression(e);
-		if(expression_pointer_p(lhs))
 		  in = set_assign(in,points_to_assignment(s,
 							  copy_expression(lhs),
 							  copy_expression(exp_init),
 							  in));
+		if (t_to_be_freed) free_type(t);
 	      }
-	      else {
+	    }
+	    else if(eval)
 		in = set_union(in, in,
-			       formal_points_to_parameter(/* cel */nc));
+			     formal_points_to_parameter( cel));
+	    else
+	      in = set_union(in, in,
+			     formal_points_to_parameter( nc));
 	      }
 	    }
 	  }
       }
     }
-  }
+
   return in;
 }
 
@@ -969,7 +1016,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement st,
 
 
 
-/* compute the points to set associate to a sequence of statements*/
+/* compute the points to set associate to a sequence of statements */
 set points_to_sequence(sequence seq, set pt_in, bool store) {
   set pt_out = set_generic_make(set_private, points_to_equal_p,
 				points_to_rank);
@@ -978,7 +1025,7 @@ set points_to_sequence(sequence seq, set pt_in, bool store) {
    FOREACH(statement, st, sequence_statements(seq)) {
      set_assign(pt_out, points_to_recursive_statement(st,pt_out,store));
      if(statement_block_p(st) && !ENDP(dl=statement_declarations(st)))
-	pt_out = points_to_projection(pt_out, dl);
+	pt_out = points_to_block_projection(pt_out, dl);
    }
   
   return pt_out;
@@ -1018,7 +1065,7 @@ set points_to_intrinsic(statement s, call c __attribute__ ((__unused__)), entity
 	     broken pointers towards default sinks.
 	     pt_out = points_to_filter_with_expression_effects(e, pt_cur);
 	  */
-	  pt_out = points_to_general_assignment(s, copy_expression(lhs),copy_expression(rhs), pt_cur, el);
+	  pt_out = points_to_general_assignment(s, copy_expression(lhs),copy_expression(rhs), pt_out, el);
 	}
       else if(expression_reference_p(lhs))
 	{
@@ -1030,11 +1077,13 @@ set points_to_intrinsic(statement s, call c __attribute__ ((__unused__)), entity
 	  if(basic_typedef_p(b))
 	    {
 	    basic ulb = basic_ultimate(b);
-	    if(basic_derived_p(ulb))
-	      set_assign(pt_out,points_to_derived_assignment(s, lhs, rhs, pt_cur));
+		if(basic_derived_p(ulb)){
+		  set_assign(pt_out,points_to_derived_assignment(s, lhs, rhs, pt_out));
+		  set_assign(pt_cur, pt_out);
 	    }
 	  }
 	}
+  }
   }
   else if (/* ENTITY_PLUS_UPDATE_P(e) ||  ENTITY_MINUS_UPDATE_P(e)
 	      ||*/ ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
@@ -1108,7 +1157,12 @@ set points_to_intrinsic(statement s, call c __attribute__ ((__unused__)), entity
 
   }
   else if (ENTITY_STOP_P(e) || ENTITY_ABORT_SYSTEM_P(e)
-	     || ENTITY_EXIT_SYSTEM_P(e) || ENTITY_C_RETURN_P(e)) {
+	   || ENTITY_EXIT_SYSTEM_P(e)) {
+    /* The call is never returned from. No information is available
+       for the dead code that follows. pt_out is already set to the
+       empty set. */
+    set_clear(pt_out);
+  }else if (ENTITY_C_RETURN_P(e)) {
     /* The call is never returned from. No information is available
        for the dead code that follows. pt_out is already set to the
        empty set. */
@@ -1166,8 +1220,8 @@ set points_to_filter_with_effects(set pts, list el) {
 
       cell c = effect_cell(e);
       /* Theheap problem with the future extension to GAP is hidden
-	 within cell_to_reference */
-      reference r = cell_to_reference(c);
+	 within cell_any_reference */
+      reference r = cell_any_reference(c);
       cell nc = make_cell_reference(r);
       if(ENDP(reference_indices(r))) {
 	/* Simple case: a scalar pointer is written */
@@ -1251,7 +1305,7 @@ set points_to_plus_update(statement s, expression lhs, expression rhs, set pts, 
 	cell pt_source = points_to_source(pt);
 	if(points_to_compare_cell(c, pt_source)) {
 	  cell pt_sink = points_to_sink(pt);
-	  reference ref_sink = cell_to_reference(pt_sink);
+	  reference ref_sink = cell_any_reference(pt_sink);
 	  entity ent_sink = reference_variable(ref_sink);
 	  /* if(array_reference_p(ref_sink)) { */
 	  if(array_entity_p(ent_sink)) {
@@ -1309,13 +1363,13 @@ set points_to_post_increment(statement s, expression lhs, set pts, list eff_list
   if(expression_reference_p(lhs))  {
     reference r = expression_reference(lhs);
     cell c = make_cell_reference(r);
-    SET_FOREACH(points_to, pt, pts) 
+    SET_FOREACH(points_to, pt, pts)
       {
       cell pt_source = points_to_source(pt);
-      if(points_to_compare_cell(c, pt_source)) 
+      if(points_to_compare_cell(c, pt_source))
 	{
 	cell pt_sink = points_to_sink(pt);
-	reference ref_sink = cell_to_reference(pt_sink);
+	reference ref_sink = cell_any_reference(pt_sink);
 	entity ent_sink = reference_variable(ref_sink);
 	    if( array_entity_p(ent_sink) ) {
 	  list l_ind = reference_indices(ref_sink);
@@ -1328,7 +1382,7 @@ set points_to_post_increment(statement s, expression lhs, set pts, list eff_list
 	  }
 
 	      FOREACH( EXPRESSION, exp, l_ind ) {
-	    if(expression_integer_constant_p(exp)) 
+	    if(expression_integer_constant_p(exp))
 	      {
 	      expression new_ind = make_unbounded_expression();
 	      new_inds = gen_nconc(CONS(EXPRESSION, new_ind, NIL),new_inds);
@@ -1384,10 +1438,10 @@ set points_to_whileloop(whileloop wl, set pt_in, bool store __attribute__ ((__un
 						     false));
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
-      reference sr = cell_to_reference(sc);
+      reference sr = cell_any_reference(sc);
       list sl = reference_indices(sr);
       cell kc = points_to_sink(pt);
-      reference kr = cell_to_reference(kc);
+      reference kr = cell_any_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
 	bool to_be_freed = false;
@@ -1459,10 +1513,10 @@ set points_to_forloop(forloop fl, set pt_in, bool store __attribute__ ((__unused
 						     false));
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
-      reference sr = cell_to_reference(sc);
+      reference sr = cell_any_reference(sc);
       list sl = reference_indices(sr);
       cell kc = points_to_sink(pt);
-      reference kr = cell_to_reference(kc);
+      reference kr = cell_any_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
 	bool to_be_freed = false;
@@ -1528,10 +1582,10 @@ set points_to_loop(loop fl, set pt_in, bool store __attribute__ ((__unused__))) 
 						     false));
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
-      reference sr = cell_to_reference(sc);
+      reference sr = cell_any_reference(sc);
       list sl = reference_indices(sr);
       cell kc = points_to_sink(pt);
-      reference kr = cell_to_reference(kc);
+      reference kr = cell_any_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
 	bool to_be_freed = false;
@@ -1597,10 +1651,10 @@ set points_to_do_whileloop(whileloop fl, set pt_in, bool store __attribute__ ((_
 						     false));
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
-      reference sr = cell_to_reference(sc);
+      reference sr = cell_any_reference(sc);
       list sl = reference_indices(sr);
       cell kc = points_to_sink(pt);
-      reference kr = cell_to_reference(kc);
+      reference kr = cell_any_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
 	bool to_be_freed = false;
@@ -1703,7 +1757,6 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     break;
   case is_value_intrinsic: {
     set_methods_for_proper_simple_effects();
-    //set_methods_for_simple_pointer_effects();
     list el = call_to_proper_effects(c);
     generic_effects_reset_all_methods();
     pips_debug(5, "intrinsic function %s\n", entity_name(e));
@@ -1790,14 +1843,166 @@ set points_to_expression(expression e, set pt_in, bool store) {
   return pt_out;
 }
 
+/*
+   For unstructured code, we ignore the statements order and we construct a
+   sequence of statments from the entry and the exit control. This sequence 
+   will be analyzed in an flow-insensitive way.
+   After the analysis of the unstructured we have to change the exact points-to
+   relations into may points-to.
+*/
+set points_to_unstructured(unstructured uns, set pt_in, bool __attribute__ ((__unused__))store){
+  set pt_in_n = set_generic_make(set_private, points_to_equal_p,
+				 points_to_rank);
+  set out = set_generic_make(set_private, points_to_equal_p,
+			     points_to_rank);
+  list Pred_l = NIL, nodes_l = NIL ;
+  list blocs = NIL ;
+  set Pred =  set_make(set_pointer);
+  set Nodes =  set_make(set_pointer);
+  set Reachable =  set_make(set_pointer);
+  set Processed =  set_make(set_pointer);
+  set rtbp =  set_make(set_pointer);
+  set rtbp_tmp =  set_make(set_pointer);
+  set inter =  set_make(set_pointer);
+  set tmp =  set_make(set_pointer);
+  control entry = unstructured_control(uns) ;
+  control exit = unstructured_exit(uns) ;
+  Pred_l = control_predecessors(entry);
+  Pred = set_assign_list(Pred, Pred_l);
+ 
+  /* Get all the nodes of the unstructured*/
+#if 0
+  CONTROL_MAP(c, {
+      ;
+    }, entry, nodes_l) ;
+#endif
+  Nodes = set_assign_list(Nodes,nodes_l);
 
-set points_to_unstructured(__attribute__ ((__unused__))unstructured uns, set pt_in,__attribute__ ((__unused__)) bool store){
-  /* statement s = control_statement(unstructured_entry(uns)); */
-/*   statement ss = control_statement(unstructured_exit(uns)); */
-/*   set_assign( pt_in, points_to_recursive_statement(s, pt_in, true)); */
-/*   set_assign( pt_in, points_to_recursive_statement(ss, pt_in, true)); */
-  return pt_in;
+  /* Gel all the reachable nodes of the unstructured */
+#if 0
+  FORWARD_CONTROL_MAP(c, {
+      ;
+    }, entry, blocs) ;
+#endif
+  Reachable = set_assign_list(Reachable, blocs);
 
+  bool inter_p = set_intersection_p(Reachable, Pred);
+  if(!inter_p)
+    set_add_element(rtbp, rtbp, (void*)entry);
+
+  while(!set_empty_p(rtbp)) {
+    rtbp_tmp = set_assign(rtbp_tmp,rtbp);
+    SET_FOREACH(control, n , rtbp) {
+      // to test the control's equality, I test if their statements are equals
+      if ( statement_number(control_statement(n)) == statement_number(control_statement(entry)) ) {
+	statement ss = control_statement(n);
+	statement m = control_statement(entry);
+	print_statement(ss);
+	print_statement(m);
+	pt_in_n = set_assign(pt_in_n, pt_in);
+	out = set_assign(out, pt_in_n);
+      }
+      Pred_l = NIL;
+      Pred_l = control_predecessors(n);
+      set_clear(Pred);
+      Pred = set_assign_list(Pred, Pred_l);
+      inter = set_intersection(inter,Reachable, Pred);
+      SET_FOREACH(control, p , inter){
+	out = set_assign(out, points_to_recursive_control(p, out,
+							    true));
+	/* pt_in_n = set_union(pt_in_n, pt_in_n, out); */
+      }
+      out = set_assign(out, points_to_recursive_control(n, out/* pt_in_n */,
+							  true));
+      Processed = set_union(Processed, Processed, set_add_element(Processed,Processed, (void*)n ));
+      rtbp_tmp = set_del_element(rtbp_tmp,rtbp_tmp,(void*)n);
+      rtbp_tmp = set_union(rtbp_tmp,rtbp_tmp,ready_to_be_precessed_set(n, Processed, Reachable));
+      set_clear(rtbp);
+      rtbp = set_assign(rtbp,rtbp_tmp);
+    }
+    
+  }
+
+  tmp = set_difference(tmp, Nodes, Reachable);
+  SET_FOREACH(control, cc, tmp) {
+    pt_in_n = set_clear(pt_in_n);
+    out = set_assign(out, points_to_recursive_control(cc, out,
+							true));
+  }
+
+  free(blocs);
+  free(nodes_l);
+    statement exit_s = control_statement(exit);
+  out = set_assign(out, points_to_recursive_statement(exit_s, out,
+						      true)); 
+  print_points_to_set("out apres unstructured", out);
+  return out;
+}
+
+
+/* A node is ready to be processed if its predecessors are not reachable or processed */
+bool Ready_p(control c, set Processed, set Reachable)
+{ 
+  set Pred =  set_make(set_pointer);
+  list Pred_l = control_predecessors(c);
+  Pred = set_assign_list(Pred, Pred_l);
+  bool ready_p = false;
+  SET_FOREACH(control, p , Pred) {
+    ready_p = set_belong_p(Processed,(void*) p) || !set_belong_p(Reachable,(void*) p); 
+  }
+  return ready_p;
+}
+
+
+/* A set containing all the successors of n that are ready to be processed */
+set ready_to_be_precessed_set(control n, set Processed, set Reachable)
+{
+   set Succ =  set_make(set_pointer);
+   set rtbp =  set_make(set_pointer);
+   list Succ_l = control_successors(n);
+   Succ = set_assign_list(Succ, Succ_l);
+   SET_FOREACH(control, p , Succ){
+     if(Ready_p(p, Processed, Reachable))
+       set_add_element(rtbp, rtbp, (void*)p);
+   }
+   return rtbp;
+}
+
+set points_to_recursive_control(control c, set in, bool store)
+{
+  set out = set_generic_make(set_private, points_to_equal_p,
+			     points_to_rank);
+  set out1 = set_generic_make(set_private, points_to_equal_p,
+			      points_to_rank);
+  set out2 = set_generic_make(set_private, points_to_equal_p,
+			      points_to_rank);
+  out = set_assign(out, in);
+  statement s = control_statement(c);
+  if(statement_test_p(s)) {
+    list Succ_l = control_successors(c);
+    if( (int)gen_length(Succ_l) > 1 ) {
+      control true_c = CONTROL(CAR(Succ_l));
+      control false_c = CONTROL(CAR(CDR(Succ_l)));
+      out =  points_to_recursive_statement(s, in,  true);
+      out1 =  points_to_recursive_statement(control_statement(true_c), out,  true);
+      out2 =  points_to_recursive_statement(control_statement(false_c), out,  true);
+      out = merge_points_to_set(out1, out2);
+    }
+    else
+      out =  points_to_recursive_statement(s, in,  true);
+  }
+  else
+    out =  points_to_recursive_statement(s, in,  true);
+
+  return out;
+}
+
+/* For debug*/
+void print_control_set(set s)
+{
+  SET_FOREACH(control, c, s) {
+    print_control_node(c);
+  }
 }
 
 set points_to_goto(__attribute__ ((__unused__))statement current, set pt_in,__attribute__ ((__unused__)) bool store){
@@ -1837,11 +2042,11 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
     statement true_stmt = test_true(instruction_test(i));
     statement false_stmt = test_false(instruction_test(i));
     if(statement_block_p(true_stmt) && !ENDP(dl=statement_declarations(true_stmt))){
-      pt_out = points_to_projection(pt_out, dl);
+      pt_out = points_to_block_projection(pt_out, dl);
       pt_out = merge_points_to_set(pt_out, pt_in);
     }
     if(statement_block_p(false_stmt) && !ENDP(dl=statement_declarations(false_stmt))){
-      pt_out = points_to_projection(pt_out, dl);
+      pt_out = points_to_block_projection(pt_out, dl);
       pt_out = merge_points_to_set(pt_out, pt_in);
      }
   }
@@ -1857,7 +2062,7 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
     
       statement ws = whileloop_body(instruction_whileloop(i));
       if(statement_block_p(ws) && !ENDP(dl=statement_declarations(ws)))
-	pt_out = points_to_projection(pt_out, dl);
+	pt_out = points_to_block_projection(pt_out, dl);
   }
     break;
   case is_instruction_loop: {
@@ -1865,7 +2070,7 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
     set_assign(pt_out, points_to_loop(instruction_loop(i), pt_in, store));
     statement ls = loop_body(instruction_loop(i));
       if(statement_block_p(ls) && !ENDP(dl=statement_declarations(ls)))
-	pt_out = points_to_projection(pt_out, dl);
+	pt_out = points_to_block_projection(pt_out, dl);
   }
     break;
   case is_instruction_forloop: {
@@ -1874,7 +2079,7 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
 					 pt_in, store));
     statement ls = forloop_body(instruction_forloop(i));
     if(statement_block_p(ls) && !ENDP(dl=statement_declarations(ls)))
-      pt_out = points_to_projection(pt_out, dl);
+      pt_out = points_to_block_projection(pt_out, dl);
   }
     break;
   case is_instruction_expression: {
@@ -1883,13 +2088,8 @@ set points_to_recursive_statement(statement current, set pt_in, bool store) {
   }
     break;
   case is_instruction_unstructured: {
-   /*  statement e =control_statement( unstructured_entry(instruction_unstructured(i))); */
-/*     statement s =control_statement( unstructured_exit(instruction_unstructured(i))); */
-/*     set_assign(pt_out, points_to_recursive_statement(e, pt_in, store)); */
-/*     set_assign(pt_out, points_to_recursive_statement(s, pt_out, store)); */
-    // pips_internal_error("Case unstructured not implemented yet\n");
-    store = false;
-    set_assign(pt_out, points_to_unstructured(instruction_unstructured(i), pt_in, store));
+    set_assign(pt_out, points_to_unstructured(instruction_unstructured(i), pt_in, false));
+    points_to_storage(pt_out,current,true);
   }
     break;
   case is_instruction_goto:{
@@ -1912,6 +2112,7 @@ void points_to_statement(statement current, set pt_in) {
 				points_to_rank);
   set_assign(pt_out, points_to_recursive_statement(current, pt_in,
 							    true));
+  set_assign(pts_to_out, pt_out);
 }
 
 set points_to_init(statement s, set pt_in)
@@ -1929,7 +2130,7 @@ set points_to_init(statement s, set pt_in)
 
     FOREACH(ENTITY, e, l_decls){
       if(type_variable_p(entity_type(e))){
-	if(!storage_rom_p(entity_storage(e))){
+	if( !storage_rom_p(entity_storage(e)) ){
 	value v_init = entity_initial(e);
 	/* generate points-to due to the initialisation */
 	if(value_expression_p(v_init)){
@@ -1939,7 +2140,7 @@ set points_to_init(statement s, set pt_in)
 	    pt_out = set_assign(pt_out,points_to_assignment(s,
 							    copy_expression(lhs),
 							    copy_expression(exp_init),
-							    pt_in));
+								  pt_out));
 	}
 	else{
 	  l = points_to_init_variable(e);
@@ -1955,6 +2156,8 @@ set points_to_init(statement s, set pt_in)
     }
   }
   }
+  /* } */
+
   return pt_out;
 }
 
@@ -2244,7 +2447,10 @@ bool points_to_analysis(char * module_name) {
   set pt_in =
     set_generic_make(set_private, points_to_equal_p, points_to_rank);
   list pts_to_list = NIL;
-
+  
+  pts_to_in = set_generic_make(set_private, points_to_equal_p, points_to_rank);
+  pts_to_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
+ 
   init_pt_to_list();
   module = module_name_to_entity(module_name);
   set_current_module_entity(module);
@@ -2258,30 +2464,55 @@ bool points_to_analysis(char * module_name) {
   module_stat = get_current_module_statement();
   statement_consistent_p(module_stat);
 
-  /* Get the summary_intraprocedural_points_to resource.*/
+  /*
+    Get the summary_intraprocedural_points_to resource.
+    This list contains formal paramters and their stub sinks
+  */
   points_to_list summary_pts_to_list =
     (points_to_list) db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST,
 					    module_name, true);
   /* Transform the list of summary_points_to in set of points-to.*/
     points_to_list_consistent_p(summary_pts_to_list);
-  //pts_to_list = gen_points_to_list_cons(summary_pts_to_list, pts_to_list);
   pts_to_list = gen_full_copy_list(points_to_list_list(summary_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
+
+    /* Initialize pts_to_in with formal parameters pts-to and add global variables
+     as to the computation of their sinks. 
+    */
+    pts_to_in = set_assign(pts_to_in, pt_in);
+    
   /* Compute the points-to relations using the summary_points_to as input.*/
   points_to_statement(module_stat, pt_in);
-  statement_points_to_consistent_p(get_pt_to_list());
+    /* statement_points_to_consistent_p(get_pt_to_list()); */
+    /* Save points-to relations*/
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_LIST, module_name, get_pt_to_list());
 
-  reset_pt_to_list();
+    /* Filter OUT points-to by deleting local variables */
 
+    /* if( ! ENDP(dl = code_declarations(value_code(entity_initial(module)))) ) */
+    
+    pts_to_out = points_to_function_projection(pts_to_out);
+    /* else */
+    /*   pts_to_out = set_assign(pts_to_out, pt_in); */
+
+    /* Save IN points-to relations */
+    list  l_in = set_to_list(pts_to_in);
+    points_to_list in_list = make_points_to_list(l_in);
+    DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_IN, module_name, in_list);
+
+    /* Save OUT points-to relations */
+    list  l_out = set_to_list(pts_to_out);
+    points_to_list out_list = make_points_to_list(l_out);
+    DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_OUT, module_name, out_list);
+
+  reset_pt_to_list();
   reset_current_module_entity();
   reset_current_module_statement();
   reset_effects_private_current_context_stack();
   debug_off();
-   
   bool good_result_p = true;
-  return (good_result_p);
 
+  return (good_result_p);
 }
 
 

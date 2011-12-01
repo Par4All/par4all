@@ -18,149 +18,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-F_c=ri.c \
-	effects.c \
-	dg.c \
-	compsec.c \
-	word_attachment.c \
-	reductions_private.c \
-	interval_graph.c \
-	pipsdbm_private.c \
-	eole_private.c \
-	abc_private.c \
-	alias_private.c \
-	ubs_private.c \
-	c_parser_private.c \
-	complexity_ri.c \
-	database.c \
-	paf_ri.c \
-	tiling.c \
-	graph.c \
-	parser_private.c \
-	hpf_private.c \
-	property.c \
-	makefile.c \
-	reduction.c \
-	message.c \
-	text.c \
-	hpf.c \
-	sac_private.c \
-	ri_C.c \
-	cloning.c \
-	step_private.c \
-	points_to_private.c \
-	kernel_memory_mapping.c \
-	freia_spoc_private.c \
-	scalopes_private.c
-# this duplication cannot be avoided
-# for bsd-make compatibility ...
-F_h=ri.h \
-	effects.h \
-	dg.h \
-	compsec.h \
-	word_attachment.h \
-	reductions_private.h \
-	interval_graph.h \
-	pipsdbm_private.h \
-	eole_private.h \
-	abc_private.h \
-	alias_private.h \
-	ubs_private.h \
-	c_parser_private.h \
-	complexity_ri.h \
-	database.h \
-	paf_ri.h \
-	tiling.h \
-	graph.h \
-	parser_private.h \
-	hpf_private.h \
-	property.h \
-	makefile.h \
-	reduction.h \
-	message.h \
-	text.h \
-	hpf.h \
-	sac_private.h \
-	ri_C.h \
-	cloning.h \
-	step_private.h \
-	points_to_private.h \
-	kernel_memory_mapping.h \
-	freia_spoc_private.h \
-	scalopes_private.h
-
-# this duplication cannot be avoided
-# for bsd-make compatibility ...
-F_tex=ri.tex \
-	effects.tex \
-	dg.tex \
-	compsec.tex \
-	word_attachment.tex \
-	reductions_private.tex \
-	interval_graph.tex \
-	pipsdbm_private.tex \
-	eole_private.tex \
-	abc_private.tex \
-	alias_private.tex \
-	ubs_private.tex \
-	c_parser_private.tex \
-	complexity_ri.tex \
-	database.tex \
-	paf_ri.tex \
-	tiling.tex \
-	graph.tex \
-	parser_private.tex \
-	hpf_private.tex \
-	property.tex \
-	makefile.tex \
-	reduction.tex \
-	message.tex \
-	text.tex \
-	hpf.tex \
-	sac_private.tex \
-	ri_C.tex \
-	cloning.tex \
-	step_private.tex \
-	points_to_private.tex \
-	kernel_memory_mapping.tex \
-	freia_spoc_private.tex \
-	scalopes_private.tex
-# this duplication cannot be avoided
-# for bsd-make compatibility ...
-F_pdf=ri.pdf \
-	effects.pdf \
-	dg.pdf \
-	compsec.pdf \
-	word_attachment.pdf \
-	reductions_private.pdf \
-	interval_graph.pdf \
-	pipsdbm_private.pdf \
-	eole_private.pdf \
-	abc_private.pdf \
-	alias_private.pdf \
-	ubs_private.pdf \
-	c_parser_private.pdf \
-	complexity_ri.pdf \
-	database.pdf \
-	paf_ri.pdf \
-	tiling.pdf \
-	graph.pdf \
-	parser_private.pdf \
-	hpf_private.pdf \
-	property.pdf \
-	makefile.pdf \
-	reduction.pdf \
-	message.pdf \
-	text.pdf \
-	hpf.pdf \
-	sac_private.pdf \
-	ri_C.pdf \
-	cloning.pdf \
-	step_private.pdf \
-	points_to_private.pdf \
-	kernel_memory_mapping.pdf \
-	freia_spoc_private.pdf \
-	scalopes_private.pdf
+include $(srcdir)/newgen.mk
 
 if WITH_DOC
 dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty
@@ -181,15 +39,13 @@ include_HEADERS=all_newgen_headers.h specs.h $(F_h)
 all_newgen_headers.h: specs.h Makefile
 	$(AM_V_GEN) sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' specs.h > $@
 
-specs.h:Makefile $(F_tex)
-	$(MAKE) `echo $(F_c) | sed -e 's/\.c/.newgen /g'`
-	$(AM_V_GEN) PATH=`dirname $(NEWGEN)`:$$PATH $(NEWGEN) -c `echo $(F_c) | sed -e 's/\.c/.newgen/g'` | $(MAKE_ALL_SPECS) > specs.h
-
-$(F_spec):specs.h
-$(F_c):specs.h
+specs.h:Makefile $(F_newgen)
+	$(AM_V_GEN) PATH=`dirname $(NEWGEN)`:$$PATH $(NEWGEN) -c $(F_newgen) | $(MAKE_ALL_SPECS) > specs.h
 
 .tex.newgen:
 	$(AM_V_GEN)$(srcdir)/remove-latex-comments $<
+
+$(F_c):specs.h
 
 # Convert idraw/eps files.
 ri.pdf:unstructured.pdf

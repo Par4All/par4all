@@ -440,7 +440,20 @@ bool entity_all_dynamic_locations_p(entity e)
   return entity_all_xxx_locations_p(e, DYNAMIC_AREA_LOCAL_NAME);
 }
 
-
+/* test if an entity is a stub sink for a formal pramater
+   e.g. f->_f_1, EXACT
+*/
+bool entity_stub_sink_p(entity e)
+{
+  bool stub_sink_p = false;
+  const char * en = entity_local_name(e);
+  char first = en[0];
+  char penultimate = en[strlen(en) - 2];
+  if(formal_parameter_p(e) && first == '_' && penultimate == '_')
+    stub_sink_p = true;
+
+  return stub_sink_p;
+}
 
 bool entity_abstract_location_p(entity al)
 {

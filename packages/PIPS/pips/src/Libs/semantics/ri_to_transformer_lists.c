@@ -175,7 +175,8 @@ list declaration_to_transformer_list(entity v, transformer pre)
 	  }
 	}
 	else {
-	  list el = expression_to_proper_effects(e);
+	  //list el = expression_to_proper_effects(e);
+          list el = expression_to_proper_constant_path_effects(e);
 
 	  pips_user_warning("Type mismatch detected in initialization expression."
 			    " May be due to overloading and/or implicit confusion"

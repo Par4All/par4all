@@ -536,6 +536,11 @@ proper_constant_path_effects_of_expression(expression e)
     bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
+    // needed because it can be called from phases that already define
+    // these variables
+    bool saved_constant_paths_p = get_constant_paths_p();
+    pointer_info_val saved_pointer_info_kind = get_pointer_info_kind();
+
     if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
       set_constant_paths_p(false);
     else
@@ -567,6 +572,8 @@ proper_constant_path_effects_of_expression(expression e)
     }
     debug_off();
 
+    set_constant_paths_p(saved_constant_paths_p);
+    set_pointer_info_kind(saved_pointer_info_kind);
     return(le);
 }
 
@@ -605,6 +612,10 @@ proper_constant_path_effects_of_expression_with_points_to(expression e, statemen
     bool stmt_stack_defined_p =
 	effects_private_current_stmt_stack_initialized_p();
 
+    // needed because it can be called from phases that already define
+    // these variables
+    bool saved_constant_paths_p = get_constant_paths_p();
+    pointer_info_val saved_pointer_info_kind = get_pointer_info_kind();
     set_constant_paths_p(true);
     set_pointer_info_kind(with_points_to);
 
@@ -637,6 +648,8 @@ proper_constant_path_effects_of_expression_with_points_to(expression e, statemen
 	free_effects_private_current_stmt_stack();
       }
     debug_off();
+    set_constant_paths_p(saved_constant_paths_p);
+    set_pointer_info_kind(saved_pointer_info_kind);
 
     return(le);
 }

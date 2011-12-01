@@ -2440,7 +2440,8 @@ static transformer integer_call_expression_to_transformer(
 
 transformer expression_effects_to_transformer(expression expr)
 {
-  list el = expression_to_proper_effects(expr);
+  //list el = expression_to_proper_effects(expr);
+  list el = expression_to_proper_constant_path_effects(expr);
   transformer tf = effects_to_transformer(el);
 
   gen_full_free_list(el);
@@ -3487,7 +3488,8 @@ transformer safe_any_expression_to_transformer(
   transformer tf = any_expression_to_transformer(v, expr, npre, is_internal);
 
   if(transformer_undefined_p(tf)) {
-    list el = expression_to_proper_effects(expr);
+    //list el = expression_to_proper_effects(expr);
+    list el = expression_to_proper_constant_path_effects(expr);
     tf = effects_to_transformer(el);
 
     /*
@@ -3534,7 +3536,8 @@ transformer expression_to_transformer(
     else if(syntax_call_p(s_exp)) {
       /* Must be a call to a void function */
       call c = syntax_call(s_exp);
-      list el = expression_to_proper_effects(exp);;
+      //list el = expression_to_proper_effects(exp);;
+      list el = expression_to_proper_constant_path_effects(exp);
       tf = call_to_transformer(c, pre, el);
     }
     else {
@@ -3627,7 +3630,8 @@ transformer safe_expression_to_transformer(expression exp, transformer pre)
 
      See anywhere03.c as an example of the issue.
   */
-  list el = expression_to_proper_effects(exp);
+  //list el = expression_to_proper_effects(exp);
+  list el = expression_to_proper_constant_path_effects(exp);
   transformer tf = expression_to_transformer(exp, pre, el);
 
   gen_full_free_list(el);
@@ -3646,7 +3650,8 @@ transformer condition_to_transformer(expression cond,
 				     transformer pre,
 				     bool veracity)
 {
-  list el = expression_to_proper_effects(cond);
+  //list el = expression_to_proper_effects(cond);
+  list el = expression_to_proper_constant_path_effects(cond);
   transformer safe_pre = transformer_undefined_p(pre)?
     transformer_identity():
     transformer_range(pre);

@@ -5234,10 +5234,18 @@ is a top-down analysis which calcules the points-to relations by
 applying specific rules to each assignement pattern identified.
 This phase requires another resource which
 is \PipsPassRef{intraprocedural_summary_points_to_analysis}.
+Ressources points\_to\_in and points\_to\_out will be used to compute
+the transfer function later. They represent points-to relation at the beginning of functions
+where sources are formal parameters or global variables. Points\_to\_out are points-to relations
+at the end of function's body, it contains return value and it's sink, formal parameters, gloabl 
+variables and heap allocated variables which can be visible beyond function's scope.
+
 \begin{PipsMake}
 alias points_to_analysis  'Points To Analysis'
 
 points_to_analysis > MODULE.points_to_list
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
         < PROGRAM.entities
         < MODULE.code
         < MODULE.summary_points_to_list
@@ -11924,7 +11932,6 @@ transformation_test    > MODULE.code
 
 \begin{PipsMake}
 ompify_code             > MODULE.code
-        < MODULE.cumulated_reductions
         < MODULE.code
 
 \end{PipsMake}
