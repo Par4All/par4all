@@ -1,0 +1,88 @@
+int main()
+{
+   // BEGIN BLOCK
+   int i;
+   int a[10];
+//             <    is written>: k
+   int k = 1;
+//             <    is written>: s
+   int s = 0;
+//             <may be written>: a[*]
+//             <    is read   >: i k
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be written>: a[*]
+//             <    is read   >: i k
+      a[i] = k;
+//             <may be read   >: a[*]
+//             <    is written>: s
+
+   s = partial_sum(a, 5);
+//             <    is read   >: s
+
+   return s;
+   // END BLOCK
+}
+//             <may be read   >: a[*]
+//             <    is read   >: n
+int partial_sum(int a[10], int n)
+{
+//             <may be read   >: a[*]
+//             <    is read   >: n
+   // BEGIN BLOCK
+   int i;
+//             <    is written>: s
+   int s = 0;
+//             <may be read   >: a[*] i s
+//             <may be written>: s
+//             <    is read   >: n
+//             <    is written>: i
+   for(i = 0; i <= n-1; i += 1)
+//             <may be read   >: a[*]
+//             <    is read   >: i n s
+//             <    is written>: s
+      s = s+a[i];
+//             <    is read   >: s
+   return s;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int i;
+   int a[10];
+   int k = 1;
+   int s = 0;
+//             <    is imported>: k
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is imported>: i k
+      a[i] = k;
+//             <may be imported>: a[*]
+
+   s = partial_sum(a, 5);
+//             <    is imported>: s
+
+   return s;
+   // END BLOCK
+}
+//             <may be imported>: a[*]
+//             <    is imported>: n
+int partial_sum(int a[10], int n)
+{
+//             <may be imported>: a[*]
+//             <    is imported>: n
+   // BEGIN BLOCK
+   int i;
+   int s = 0;
+//             <may be imported>: a[*] s
+//             <    is imported>: n
+   for(i = 0; i <= n-1; i += 1)
+//             <may be imported>: a[*]
+//             <    is imported>: i n s
+      s = s+a[i];
+//             <    is imported>: s
+   return s;
+   // END BLOCK
+}

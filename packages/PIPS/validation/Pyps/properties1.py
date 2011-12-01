@@ -21,6 +21,7 @@ print str (w.props.PRETTYPRINT_SEQUENTIAL_STYLE)
 main = w.fun.main
 
 main.privatize_module ()
+main.flag_parallel_reduced_loops_with_openmp_directives()
 main.internalize_parallel_code ()
 main.ompify_code ()
 

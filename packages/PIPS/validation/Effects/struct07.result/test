@@ -25,21 +25,21 @@ void struct07()
    int i, j, k, l;
    float z1, z2;
    float x[256][256];
-//             <may be read   >: k z1
 //             <may be written>: imageout[*][1].re
+//             <    is read   >: k z1
 //             <    is written>: k
 
    for(k = 0; k <= 255; k += 1)
 //             <may be written>: imageout[*][1].re
 //             <    is read   >: k z1
       imageout[k][1].re = z1;
-//             <may be read   >: i j
-//             <may be written>: j x[*][*]
-//             <    is written>: i
+//             <may be written>: x[*][*]
+//             <    is read   >: i j
+//             <    is written>: i j
 
    for(i = 0; i <= 255; i += 1)
-//             <may be read   >: i j
 //             <may be written>: x[*][*]
+//             <    is read   >: i j
 //             <    is written>: j
       for(j = 0; j <= 255; j += 1)
 //             <may be written>: x[*][*]

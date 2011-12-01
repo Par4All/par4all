@@ -1,7 +1,0 @@
-The anywhere effects are not taken into account by transformers. And they cannot be taken into account because there is no such transformer. We would need an anywhere transformer.
-
-Besides, when effects are precisely computed with points-to information, transformers also ignore this information. value_mappings should include some of the virtual variables introduced by Amira to perform her points-to analysis.
-
-Less work already done and more work still to be done than I expected.
-
- - Francois

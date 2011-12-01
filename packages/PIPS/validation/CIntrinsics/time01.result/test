@@ -20,8 +20,8 @@ int main()
 
 Cumulated effetcs for "main"
 
-//             <may be read   >: __TIME_EFFECTS:KALI
-//             <may be written>: __TIME_EFFECTS:KALI
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
 int main()
 {
    float a[100];
@@ -29,9 +29,9 @@ int main()
    clockid_t c;
    time_t t1, t2;
    int i;
-//             <may be read   >: i t1 t2 __TIME_EFFECTS:KALI
-//             <may be written>: a[*] b[*] t1 t2 __TIME_EFFECTS:KALI
-//             <    is written>: i
+//             <may be written>: a[*] b[*]
+//             <    is read   >: i t1 t2 __TIME_EFFECTS:KALI
+//             <    is written>: i t1 t2 __TIME_EFFECTS:KALI
 
    for(i = 0; i <= 99; i += 1) {
 //             <    is read   >: __TIME_EFFECTS:KALI

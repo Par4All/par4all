@@ -58,14 +58,13 @@ void inter01()
 
 Cumulated effects for "inter01"
 
-//             <may be written>: i j l k
+//             <    is written>: i j l k
 void inter01()
 {
    static int l;
    int m;
    int n;
-//             <may be written>: i j l m k
-//             <    is written>: n
+//             <    is written>: i j l m n k
 
    for(n = 0; n <= 9; n += 1) {
 //             <    is written>: i
@@ -85,6 +84,6 @@ Proper effects for "main"
 
 int main()
 {
-//             <may be written>: i j inter01:0`l k
+//             <    is written>: i j inter01:0`l k
    inter01();
 }

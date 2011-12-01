@@ -4,6 +4,7 @@ create      dotp-ptr dotp-ptr.c
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 
 apply       PRIVATIZE_MODULE(%ALL)
+apply 		FLAG_PARALLEL_REDUCED_LOOPS_WITH_OPENMP_DIRECTIVES(dotp_ptr)
 apply       COARSE_GRAIN_PARALLELIZATION(dotp_ptr)
 apply       OMPIFY_CODE(%ALL)
 apply       UNSPLIT(%ALL)

@@ -7,6 +7,7 @@ create      fct-lib fct-lib.c
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 
 apply       PRIVATIZE_MODULE(%ALL)
+apply 		FLAG_PARALLEL_REDUCED_LOOPS_WITH_OPENMP_DIRECTIVES(%ALL)
 apply       COARSE_GRAIN_PARALLELIZATION(%ALL)
 apply       OMPIFY_CODE(%ALL)
 apply       UNSPLIT(%ALL)

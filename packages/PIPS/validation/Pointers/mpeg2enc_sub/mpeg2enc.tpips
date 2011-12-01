@@ -1,0 +1,65 @@
+setenv WS="mpeg2enc"
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete $WS
+create $WS mpeg2enc/conform.c mpeg2enc/stats.c mpeg2enc/putvlc.c mpeg2enc/putmpg.c mpeg2enc/puthdr.c mpeg2enc/writepic.c mpeg2enc/fdctref.c mpeg2enc/idct.c mpeg2enc/quantize.c mpeg2enc/readpic.c mpeg2enc/motion.c mpeg2enc/transfrm.c mpeg2enc/mpeg2enc.c mpeg2enc/putseq.c mpeg2enc/predict.c mpeg2enc/ratectl.c mpeg2enc/putbits.c mpeg2enc/putpic.c
+
+# Too time consuming
+display PRINTED_FILE[%ALLFUNC]
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+#setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 4
+#setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE 
+
+# eliminate some numerical constants
+
+#shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+
+
+#shell (cd $WS.database/putnonintrablk; sed -e 's/64/(2<<6)/' <putnonintrablk.c >tmp.c; mv tmp.c putnonintrablk.c)
+
+#shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+
+#display PARSED_PRINTED_FILE[putnonintrablk]
+#display PRINTED_FILE[putnonintrablk]
+
+#shell cat  $WS.database/putAC/putAC.c
+
+
+#shell (cd $WS.database/putAC; sed -e 's/63/((2<<6)-1)/;s/127/((2<<7)-1)/;s/255/((2<<8)-1)/;s/2047/(((int)sqrt(2048*2048))-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
+shell (cd $WS.database/putAC; sed -e 's/2047/(((int)sqrt(2048*2048))-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
+
+#shell cat  $WS.database/putAC/putAC.c
+#echo 
+#echo PROPER  EFFECTS 
+#echo
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[%ALLFUNC]
+
+
+#module main
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+#echo 
+#echo PROPER  EFFECTS WITH POINTS TO
+#echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[%ALLFUNC]
+
+
+#activate PRINT_CHAINS_GRAPH
+#display DG_FILE 
+
+
+close
+delete mpeg2enc
+quit
