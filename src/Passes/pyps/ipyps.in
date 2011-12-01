@@ -9,21 +9,7 @@ This is inspired by the ipython script to lauch iPyPs instead of iPython
 Ronan.Keryell@hpc-project.com
 """
 
-# Load IPython:
-from IPython.Shell import IPShellEmbed
-import IPython.ipapi
-
-import sys
-
-# Load PyPS:
-from pyps import *
-
-
-
-# Inject line arguments to set the default prompt to something with iPyPS:
-sys.argv[1:1] = [ '-prompt_in1', 'iPyPS [\#]: ']
-#print sys.argv
-
+# The banner used for ipyps greeting
 banner = """Welcome to iPyPS, the interactive Python PIPS environment shell
 
 ?         -> Introduction and overview of IPython's features.
@@ -38,9 +24,30 @@ modules   -> to manipulate a set of PIPS modules.
 %load     -> load and execute a PyPS file
 """
 
+# Load IPython, be compatible with several versions ...
+try:
+	from IPython.Shell import IPShellEmbed as InteractiveShellEmbed
+	shell_params = { 'banner' : banner } # use a dictionnary to match the parameter name change
+except:
+	from IPython.frontend.terminal.embed import InteractiveShellEmbed
+	shell_params = { 'banner1' : banner }
+	InteractiveShellEmbed.expose_magic = InteractiveShellEmbed.define_magic # use python magic for method aliasisng
+
+import sys
+
+# Load PyPS:
+from pyps import *
+
+
+
+# Inject line arguments to set the default prompt to something with iPyPS:
+sys.argv[1:1] = [ '-prompt_in1', 'iPyPS [\#]: ']
+#print sys.argv
+
+
 # Create an embedded shell to inherit pyps current namespace into the
 # interactive one. I guess there is a more direct way...
-ipshell = IPShellEmbed(banner = banner)
+ipshell = InteractiveShellEmbed(**shell_params)
 
 def load_pyps(self, filename):
     "Load and execute a PyPS file"
@@ -53,9 +60,7 @@ def load_pyps(self, filename):
         print("Error while loading PyPS file" )
 
 # Add a new magic function:
-ip = IPython.ipapi.get()
-
-ip.expose_magic('load', load_pyps)
+ipshell.expose_magic('load', load_pyps)
 
 # Call the iPython shell itself:
 ipshell()
