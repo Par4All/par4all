@@ -700,8 +700,23 @@ statement MakeCaseStatement(expression e)
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
   /* It might be easier to evaluate e since e must be evaluable at
-     compile time... */
-  string estr = words_to_string(words_expression(e, NIL));
+     compile time... And it is necessary if e contains operators whose
+     name cannot be part of a label: see switch04 */
+  string estr = string_undefined;
+  if(expression_constant_p(e))
+    estr = words_to_string(words_expression(e, NIL));
+  else {
+    /* You must evaluate the constant expression. Hopefully it is an
+       integer expression... */
+    intptr_t val;
+    if(expression_integer_value(e, &val)) {
+      asprintf(&estr, "%lld", (long long int) val);
+    }
+    else {
+      fprint_expression(stderr, e);
+      CParserError("Unsupported case expression\n");
+    }
+  }
   string restr = estr;
 
   /* The expression may be a character */
