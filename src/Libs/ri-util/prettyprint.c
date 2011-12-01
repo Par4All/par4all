@@ -3514,7 +3514,7 @@ static text text_block_if(entity module,
   statement test_false_obj;
   bool one_liner_true_statement_p = one_liner_p(test_true(obj));
   bool one_liner_false_statement_p = one_liner_p(test_false(obj));
-  bool else_branch_p = false; /* Is the else branch empty? */
+  //bool else_branch_p = false; /* Is the else branch empty? */
   bool dangling_else_p = test_with_dangling_else_p(obj);
   bool true_braces_p = !one_liner_true_statement_p
     || dangling_else_p
@@ -3566,7 +3566,7 @@ static text text_block_if(entity module,
 	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
      || (continue_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-    else_branch_p = true;
+    //else_branch_p = true;
     switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
