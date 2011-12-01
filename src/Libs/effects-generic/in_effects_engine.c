@@ -608,6 +608,8 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
     /* If there is no write effect on a variable imported by the loop body,
      * then, the same effect is imported by the whole loop.
      */
+    /* Fix me: This may not be valid if there are effects on abstract locations.
+     */
     global_in_read_only =
 	effects_entities_inf_difference(effects_dup(global_in),
 					effects_dup(global_write),
@@ -620,18 +622,24 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
     pips_debug_effects(4, "reduced IN(i)= \n", global_in);
 
     if (!ENDP(global_in))
-    {
+      {
 	/* If the loop range cannot be represented in the chosen representation
 	 * then, no useful computation can be performed.
 	 */
 
 	if (! normalizable_and_linear_loop_p(i, r))
-	{
+	  {
 	    pips_debug(7, "non linear loop range.\n");
 	    effects_to_may_effects(global_in);
-	}
+	  }
+	else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
+	  {
+	    if (!loop_executed_at_least_once_p(l))
+	      effects_to_may_effects(global_in);
+	    /* else global_in is still valid because store independent */
+	  }
 	else
-	{
+	  {
 	    descriptor range_descriptor	 = descriptor_undefined;
 	    Value incr;
 	    Pvecteur v_i_i_prime = VECTEUR_UNDEFINED;
@@ -658,7 +666,7 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 	     */
 	    range_descriptor = (*loop_descriptor_make_func)(l);
 
-	    /* first work around the fact that loop precondtions have not been
+	    /* first work around the fact that loop preconditions have not been
 	       added to scalar regions
 	    */
 	    global_write = scalar_regions_sc_append(global_write,
