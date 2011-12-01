@@ -4565,20 +4565,20 @@ void stats()
             if ((mb_type&(8|4))==8) goto _switch_5_case_8;
             if ((mb_type&(8|4))==4) goto _switch_5_case_4;
             if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+
 _switch_5_default:            ;
             _IO_putc('0', statfile);
             goto _break_5;
-_switch_5_case_8|4:            ;
 
+_switch_5_case_8|4:            ;
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
+            
+            
 _switch_5_case_4:            ;
-
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
 _switch_5_case_8:            ;
-            
-            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 _break_5:            ;
          }
@@ -5394,9 +5394,9 @@ void putbits(int val, int n)
 
 Cumulated effects for "putnonintrablk"
 
-//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
-//                               errortext[*] mpeg1 outfile outfile[0]
-//                               stderr stderr[0] zig_zag_scan[*] 
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               mpeg1 outfile outfile[0] stderr 
+//                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
@@ -5404,6 +5404,7 @@ Cumulated effects for "putnonintrablk"
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: altscan blk
 void putnonintrablk(short *blk)
 {
    int n, run, signed_level, first;
@@ -5412,19 +5413,18 @@ void putnonintrablk(short *blk)
    run = 0;
 //             <    is written>: first
    first = 1;
-//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
-//                               errortext[*] first mpeg1 n outfile 
-//                               outfile[0] run signed_level stderr 
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               first mpeg1 outfile outfile[0] stderr
 //                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <may be written>: errortext[*] first outfile[0] run 
-//                               signed_level stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
+//             <may be written>: errortext[*] first outfile[0] 
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is written>: n
+//             <    is read   >: altscan blk n run signed_level
+//             <    is written>: n run signed_level
 
    for(n = 0; n <= 63; n += 1) {
 //             <may be read   >: alternate_scan[*] blk[*] 
@@ -5933,9 +5933,8 @@ void putpict(unsigned char *frame)
 //             <    is read   >: mb_height2 mb_width
 
             putbits(0, 1);
-//             <may be read   >: cc
 //             <may be written>: dc_dct_pred[*]
-//             <    is read   >: mb_height2 mb_width
+//             <    is read   >: cc mb_height2 mb_width
 //             <    is written>: cc
             /* extra_bit_slice */
             
@@ -6341,11 +6340,10 @@ l99996:         ;
 //             <    is read   >: block_count cbp comp mb_height2 
 //                               mb_width
             if (cbp&1<<block_count-1-comp)
-//             <may be read   >: alternate_scan[*] altscan cc 
-//                               dc_dct_pred[*] errortext[*] intravlc 
-//                               mpeg1 outfile outfile[0] stderr 
-//                               stderr[0] zig_zag_scan[*] 
-//                               __IO_EFFECTS:LUNS[2] 
+//             <may be read   >: alternate_scan[*] cc dc_dct_pred[*] 
+//                               errortext[*] intravlc mpeg1 outfile 
+//                               outfile[0] stderr stderr[0] 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt 
 //                               putvlc!:DCchromtab[*].code 
@@ -6357,17 +6355,17 @@ l99996:         ;
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is read   >: block_count blocks comp k mb_height2 
-//                               mb_type mb_width
+//             <    is read   >: altscan block_count blocks comp k 
+//                               mb_height2 mb_type mb_width
                /* block loop */
                if (mb_type&1) {
 //             <    is read   >: block_count comp mb_height2 mb_width
 //             <    is written>: cc
                   cc = comp<4?0:(comp&1)+1;
-//             <may be read   >: alternate_scan[*] altscan 
-//                               dc_dct_pred[*] errortext[*] outfile 
-//                               outfile[0] stderr stderr[0] 
-//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
+//             <may be read   >: alternate_scan[*] dc_dct_pred[*] 
+//                               errortext[*] outfile outfile[0] 
+//                               stderr stderr[0] zig_zag_scan[*] 
+//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt 
 //                               putvlc!:DCchromtab[*].code 
@@ -6379,23 +6377,22 @@ l99996:         ;
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is read   >: block_count blocks cc comp intravlc k
-//                               mb_height2 mb_width mpeg1
+//             <    is read   >: altscan block_count blocks cc comp 
+//                               intravlc k mb_height2 mb_width mpeg1
                   putintrablk(blocks[k*block_count+comp], cc);
                }
                else
-//             <may be read   >: alternate_scan[*] altscan 
-//                               errortext[*] mpeg1 outfile outfile[0]
-//                               stderr stderr[0] zig_zag_scan[*] 
-//                               __IO_EFFECTS:LUNS[2] 
+//             <may be read   >: alternate_scan[*] errortext[*] mpeg1 
+//                               outfile outfile[0] stderr stderr[0] 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is read   >: block_count blocks comp k mb_height2 
-//                               mb_width
+//             <    is read   >: altscan block_count blocks comp k 
+//                               mb_height2 mb_width
                   putnonintrablk(blocks[k*block_count+comp]);
 //             <may be read   >: cc
 //             <may be written>: cc dc_dct_pred[*]
@@ -6403,9 +6400,8 @@ l99996:         ;
          
          /* reset predictors */
          if (!(mb_type&1))
-//             <may be read   >: cc
 //             <may be written>: dc_dct_pred[*]
-//             <    is read   >: mb_height2 mb_width
+//             <    is read   >: cc mb_height2 mb_width
 //             <    is written>: cc
             for(cc = 0; cc <= 2; cc += 1)
 //             <may be written>: dc_dct_pred[*]
@@ -6513,9 +6509,8 @@ l99997:         ;
          k++;
          goto _loop_end_2;
 l99998:         ;
-//             <may be read   >: cc
 //             <may be written>: dc_dct_pred[*]
-//             <    is read   >: mb_height2 mb_width
+//             <    is read   >: cc mb_height2 mb_width
 //             <    is written>: cc
          /* P picture, no motion vectors -> skip */
          
@@ -7444,7 +7439,7 @@ int main(int argc, char *argv[])
 //             <may be read   >: chrom_height errortext[*] statname[*]
 //                               stderr stderr[0] stdout 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*] idct!:iclp 
+//                               __IO_EFFECTS:LUNS[*] 
 //                               mpeg2enc!init:0`block_count_tab[*]
 //             <may be written>: auxframe[*] auxorgframe[*] clp[*] 
 //                               errortext[*] neworgframe[*] 
@@ -7458,7 +7453,7 @@ int main(int argc, char *argv[])
 //                               horizontal_size mb_height mb_height2 
 //                               mb_width mbinfo prog_seq statname[0] 
 //                               vertical_size width 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//                               _MALLOC_EFFECTS:_MALLOC_ idct!:iclp
 //             <    is written>: block_count blocks chrom_height 
 //                               chrom_width chrom_width2 clp height 
 //                               height2 mb_height mb_height2 mb_width
@@ -21467,6 +21462,7 @@ void stats(void)
 
 //  T() {}
 
+
 _switch_5_default:            ;
 
 //  T() {}
@@ -21476,20 +21472,21 @@ _switch_5_default:            ;
 
 //  T() {}
 
+
 _switch_5_case_8|4:            ;
 
 //  T() {}
-
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
 
 //  T() {}
 
+            
+            
 _switch_5_case_4:            ;
 
 //  T() {}
-
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -21500,8 +21497,6 @@ _switch_5_case_8:            ;
 
 //  T() {}
 
-            
-            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  T() {}
@@ -44864,6 +44859,7 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+
 _switch_5_default:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
@@ -44879,13 +44875,13 @@ _switch_5_default:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+
 _switch_5_case_8|4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
-
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
@@ -44895,13 +44891,14 @@ _switch_5_case_8|4:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+            
+            
 _switch_5_case_4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
-
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -44918,8 +44915,6 @@ _switch_5_case_8:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            
-            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
