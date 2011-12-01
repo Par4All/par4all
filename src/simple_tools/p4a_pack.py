@@ -357,15 +357,14 @@ def work(options, args = []):
     p4a_util.debug("distro=" + distro)
 
     pack_dir = options.pack_dir
-    if options.deb or options.tgz:
-        if pack_dir:
-            pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
-            p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
-        else:
-            pack_dir = default_pack_dir
-            p4a_util.warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
-        if not os.path.isdir(pack_dir):
-            p4a_util.die("Directory does not exist: " + pack_dir)
+    if pack_dir:
+        pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
+        p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
+    else:
+        pack_dir = default_pack_dir
+        p4a_util.warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
+    if not os.path.isdir(pack_dir):
+        p4a_util.die("Directory does not exist: " + pack_dir)
 
     # By default use the version computed by p4a_version.VERSION:
     version = None
