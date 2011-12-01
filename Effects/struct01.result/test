@@ -46,8 +46,8 @@ int main()
    x.first = 1;
 //             <    is written>: x.second
    x.second = 2;
-//             <may be read   >: i x.first x.second
 //             <may be written>: y[*].first y[*].second
+//             <    is read   >: i x.first x.second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
@@ -58,8 +58,8 @@ int main()
 //             <    is read   >: i x.second
       y[i].second = x.second;
    }
-//             <may be read   >: i x.first x.second
 //             <may be written>: z[*].first z[*].second
+//             <    is read   >: i x.first x.second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
@@ -116,8 +116,8 @@ int main()
    x.first = 1;
 //             <    is written>: x.second
    x.second = 2;
-//             <may be read   >: i x.first x.second
 //             <may be written>: y[*].first y[*].second
+//             <    is read   >: i x.first x.second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
@@ -128,8 +128,8 @@ int main()
 //             <    is read   >: i x.second
       y[i].second = x.second;
    }
-//             <may be read   >: i x.first x.second
 //             <may be written>: z[*].first z[*].second
+//             <    is read   >: i x.first x.second
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)

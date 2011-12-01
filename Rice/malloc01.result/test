@@ -66,8 +66,8 @@ void malloc01()
    int *p = malloc(10*sizeof(int));
    //int p[10];
    int i;
-//             <may be read   >: i p
 //             <may be written>: p[*]
+//             <    is read   >: i p
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)

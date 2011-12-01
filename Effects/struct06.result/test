@@ -31,8 +31,9 @@ int struct06()
    } x[10];
 //             <    is written>: i
    int i = 0;
-//             <may be read   >: i x[*].deux.second
+//             <may be read   >: x[*].deux.second
 //             <may be written>: x[*].un.first
+//             <    is read   >: i
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)

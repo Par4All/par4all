@@ -49,8 +49,9 @@ int struct05()
    } x[10];
 //             <    is written>: i
    int i = 0;
-//             <may be read   >: i x[*].first x[*].second
+//             <may be read   >: x[*].first x[*].second
 //             <may be written>: x[*].first x[*].second
+//             <    is read   >: i
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)

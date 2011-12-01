@@ -3,9 +3,9 @@ restructuring
 
 Cumulated effects for "putnonintrablk"
 
-//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
-//                               errortext[*] mpeg1 outfile outfile[0]
-//                               stderr stderr[0] zig_zag_scan[*] 
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               mpeg1 outfile outfile[0] stderr 
+//                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
@@ -13,6 +13,7 @@ Cumulated effects for "putnonintrablk"
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: altscan blk
 void putnonintrablk(short *blk)
 {
    int n, run, signed_level, first;
@@ -21,19 +22,18 @@ void putnonintrablk(short *blk)
    run = 0;
 //             <    is written>: first
    first = 1;
-//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
-//                               errortext[*] first mpeg1 n outfile 
-//                               outfile[0] run signed_level stderr 
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               first mpeg1 outfile outfile[0] stderr
 //                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <may be written>: errortext[*] first outfile[0] run 
-//                               signed_level stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
+//             <may be written>: errortext[*] first outfile[0] 
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is written>: n
+//             <    is read   >: altscan blk n run signed_level
+//             <    is written>: n run signed_level
 
    for(n = 0; n <= 63; n += 1) {
 //             <may be read   >: alternate_scan[*] blk[*] 

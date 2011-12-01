@@ -34,9 +34,9 @@ int main()
    int a[500];                                                          /*0004*/
 //             <    is written>: j
    j = 1;
-//             <may be read   >: i j
-//             <may be written>: a[*] j
-//             <    is written>: i
+//             <may be written>: a[*]
+//             <    is read   >: i j
+//             <    is written>: i j
 
    for(i = 0; i <= 499; i += 1) {                                       /*0006*/
 //             <may be written>: a[*]

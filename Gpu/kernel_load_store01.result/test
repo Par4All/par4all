@@ -18,8 +18,8 @@ void change(int *i, double array[N])
 //             <    is read   >: i i[0]
 //             <    is written>: i[0]
    (*i)++;
-//             <may be read   >: k
 //             <may be written>: array[*]
+//             <    is read   >: k
 //             <    is written>: k
 
    for(k = 0; k <= 99; k += 1)
@@ -47,8 +47,8 @@ void change(int *i, double array[N])
 //             <    is read   >: i i[0]
 //             <    is written>: i[0]
    (*i)++;
-//             <may be read   >: k
 //             <may be written>: array[*]
+//             <    is read   >: k
 //             <    is written>: k
 
    for(k = 0; k <= 99; k += 1)

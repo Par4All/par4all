@@ -32,13 +32,13 @@ float main(int argc, char *argv[])
 float main(int argc, char *argv[])
 {
    int i, j, k;
-//             <may be read   >: i j
-//             <may be written>: imagein[*][*].im imagein[*][*].re j
-//             <    is written>: i
+//             <may be written>: imagein[*][*].im imagein[*][*].re
+//             <    is read   >: i j
+//             <    is written>: i j
 
    for(i = 0; i <= 8; i += 1)
-//             <may be read   >: i j
 //             <may be written>: imagein[*][*].im imagein[*][*].re
+//             <    is read   >: i j
 //             <    is written>: j
       for(j = 0; j <= 8; j += 1) {
 //             <may be written>: imagein[*][*].re

@@ -368,8 +368,8 @@ int main()
       a.p = (int *) malloc(10*sizeof(int));
 //             <    is written>: a.n
       a.n = 2;
-//             <may be read   >: a.p i
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a.p i
       for(i = 0; i <= 9; i += 1)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a.p i
@@ -384,11 +384,10 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with pointer copy : \n");
-//             <may be read   >: stdout stdout[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 9; i += 1) {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: b.p i
@@ -403,8 +402,8 @@ int main()
       
       // definition of c
       c.n = 3;
-//             <may be read   >: i
 //             <may be written>: c.array[*]
+//             <    is read   >: i
 //             <    is written>: i
       for(i = 0; i <= 9; i += 1)
 //             <may be written>: c.array[*]
@@ -422,11 +421,10 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array copy : \n");
-//             <may be read   >: c.array[*] d.array[*] i stdout 
-//                               stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: d.array[*] stdout[0] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: i
+//             <may be read   >: c.array[*] d.array[*] stdout[0]
+//             <may be written>: d.array[*] stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 9; i += 1) {
 //             <may be written>: d.array[*]
 //             <    is read   >: i
@@ -442,17 +440,18 @@ int main()
       
       // definition of e
       e.m = 4;
-//             <may be read   >: e.champ[*].p i j 
-//                               _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: e.champ[*].p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i j _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       for(i = 0; i <= 4; i += 1) {
 //             <may be written>: e.champ[*].p
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
          (e.champ)[i].p = malloc(10*sizeof(int));
-//             <may be read   >: e.champ[*].p i j
+//             <may be read   >: e.champ[*].p
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i j
          for(j = 0; j <= 9; j += 1)
 //             <may be read   >: e.champ[*].p
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -471,17 +470,15 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with pointer copy : \n");
-//             <may be read   >: stdout stdout[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 4; i += 1)
-//             <may be read   >: stdout stdout[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          for(j = 0; j <= 9; j += 1) {
 //             <may be read   >: f.champ[*].p
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -499,12 +496,12 @@ int main()
       
       // definition of g
       g.m = 5;
-//             <may be read   >: i j
-//             <may be written>: g.champ[*].array[*] j
-//             <    is written>: i
-      for(i = 0; i <= 4; i += 1)
-//             <may be read   >: i j
 //             <may be written>: g.champ[*].array[*]
+//             <    is read   >: i j
+//             <    is written>: i j
+      for(i = 0; i <= 4; i += 1)
+//             <may be written>: g.champ[*].array[*]
+//             <    is read   >: i j
 //             <    is written>: j
          for(j = 0; j <= 9; j += 1)
 //             <may be written>: g.champ[*].array[*]
@@ -523,18 +520,16 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with array copy : \n");
 //             <may be read   >: g.champ[*].array[*] 
-//                               h.champ[*].array[*] i j stdout 
-//                               stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: h.champ[*].array[*] j stdout[0] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: i
+//                               h.champ[*].array[*] stdout[0]
+//             <may be written>: h.champ[*].array[*] stdout[0]
+//             <    is read   >: i j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: i j __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 4; i += 1)
 //             <may be read   >: g.champ[*].array[*] 
-//                               h.champ[*].array[*] i j stdout 
-//                               stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: h.champ[*].array[*] stdout[0] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: j
+//                               h.champ[*].array[*] stdout[0]
+//             <may be written>: h.champ[*].array[*] stdout[0]
+//             <    is read   >: i j stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: j __IO_EFFECTS:LUNS[1]
          for(j = 0; j <= 9; j += 1) {
 //             <may be written>: h.champ[*].array[*]
 //             <    is read   >: i j
