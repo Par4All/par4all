@@ -148,10 +148,20 @@ bool print_code_points_to(const char* module_name,
   bool res;
   debug_on("POINTS_TO_DEBUG_LEVEL");
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-  points_to_list summary_pts_to = (points_to_list)
-    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true);
-  list l_sum_pt_to = points_to_list_list(summary_pts_to);
+  /* points_to_list summary_pts_to = (points_to_list) */
+  /*   db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true); */
+  /* list l_sum_pt_to = points_to_list_list(summary_pts_to); */
   
+  /* Load IN summary pts-to */
+  points_to_list pts_to_in = (points_to_list)
+    db_get_memory_resource(DBR_POINTS_TO_IN, module_name, true);
+  list l_pt_to_in = points_to_list_list(pts_to_in);
+
+ /* Load OUT summary pts-to */
+  points_to_list pts_to_out = (points_to_list)
+    db_get_memory_resource(DBR_POINTS_TO_OUT, module_name, true);
+  list l_pt_to_out = points_to_list_list(pts_to_out);
+
   pips_debug(1, "considering module %s \n",
 	     module_name);
 
@@ -159,19 +169,23 @@ bool print_code_points_to(const char* module_name,
   // check_abstract_locations();
   set_printed_points_to_list((statement_points_to)
 			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true));
-  statement_points_to_consistent_p(get_printed_points_to_list());
+  /* statement_points_to_consistent_p(get_printed_points_to_list()); */
   set_current_module_statement((statement)
 			       db_get_memory_resource(DBR_CODE,
 						      module_name,
 						      true));
 
   init_prettyprint(text_pt_to);
-  text sum_tex = text_points_to_relations(l_sum_pt_to, "Points To:");
+  /* text sum_tex = text_points_to_relations(l_sum_pt_to, "Points To:"); */
+  text in_tex = text_points_to_relations(l_pt_to_in, "Points To IN:");
+  text out_tex = text_points_to_relations(l_pt_to_out, "Points To OUT:");
   text t = make_text(NIL);
-  MERGE_TEXTS( t, sum_tex );
+  /* MERGE_TEXTS( t, sum_tex ); */
+  MERGE_TEXTS( t, in_tex );
+  MERGE_TEXTS( t, out_tex );
   MERGE_TEXTS(t, text_module(get_current_module_entity(),
 			     get_current_module_statement()));
-  res= make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, t);
+  res = make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, t);
   close_prettyprint();
   reset_current_module_entity();
   reset_current_module_statement();
@@ -211,9 +225,9 @@ list words_points_to(points_to pt)
   approximation ap = points_to_approximation(pt);
   pips_assert("approximation is not must\n", !approximation_exact_p(ap));
 
-  w= gen_nconc(w, effect_words_reference(source_ref));
+  w = gen_nconc(w, effect_words_reference(source_ref));
   w = CHAIN_SWORD(w," -> ");
-  w= gen_nconc(w, effect_words_reference(sink_ref));
+  w = gen_nconc(w, effect_words_reference(sink_ref));
   w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
   return (w);
 }

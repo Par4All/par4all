@@ -43,7 +43,6 @@ void points_to_forward_translation()
 void points_to_backward_translation()
 {
 }
-
 /* We want a recursive descent on the type of the formal parameter,
  * once we found a pointer type we beguin a recursive descent until
  * founding a basic case. Then we beguin the ascent and the creation
@@ -56,13 +55,18 @@ set formal_points_to_parameter(cell c)
 	set pt_in = set_generic_make(set_private,
 				     points_to_equal_p,
 				     points_to_rank);
-	r = cell_reference(c);
+  r = cell_to_reference(c);
 	e = reference_variable(r);
+  bool to_be_freed = false;
 	fpt = entity_basic_concrete_type(e);
  	if(type_variable_p(fpt)){
 		/* We ignor dimensions for the being, descriptors are not
 		 * implemented yet...Amira Mensi*/
 		basic fpb = variable_basic(type_variable(fpt));
+    if(array_type_p(fpt)) {
+      pt_in = set_union(pt_in, pt_in, array_formal_parameter_to_stub_points_to(fpt,copy_cell(c)));
+    }
+    else {
 		switch(basic_tag(fpb)){
 		case is_basic_int:
 			break;
@@ -75,7 +79,7 @@ set formal_points_to_parameter(cell c)
 		case is_basic_complex:
 			break;
 		case is_basic_pointer:{
-		  pt_in = set_union(pt_in, pt_in, pointer_formal_parameter_to_stub_points_to(fpt,copy_cell(c)));
+	pt_in = set_union(pt_in, pt_in, pointer_formal_parameter_to_stub_points_to(copy_type(fpt),copy_cell(c)));
 		  /* what about storage*/
 		  break;
 		}
@@ -94,6 +98,8 @@ set formal_points_to_parameter(cell c)
 		default: pips_internal_error("unexpected tag %d", basic_tag(fpb));
 		}
 	}
+  }
+  if (to_be_freed) free_type(fpt);
 	return pt_in;
 
 }
@@ -108,21 +114,24 @@ set formal_points_to_parameter(cell c)
 points_to create_stub_points_to(cell c, type t,
 				__attribute__ ((__unused__)) basic b)
 {
+  points_to pt_to = points_to_undefined;
   basic bb = basic_undefined;
   expression ex = make_unbounded_expression();
   reference sink_ref = reference_undefined;
-  reference r = cell_to_reference(copy_cell(c));
+  reference r = cell_any_reference(copy_cell(c));
   entity e = reference_variable(r);
   formal f = storage_formal( entity_storage(e) );
   int off = formal_offset(f);
-  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
+  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(off/* pointer_index */), NULL));
   string formal_name = strdup(concatenate(get_current_module_name() /* POINTS_TO_MODULE_NAME */ ,MODULE_SEP_STRING, s, NULL));
   entity formal_parameter = gen_find_entity(formal_name);
   /* type pt = type_to_pointed_type(t); */
   type pt = type_undefined;
   bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+
   if(type_variable_p(t))
     bb = variable_basic(type_variable(t));
+
   if(type_strict_p)
     pt = make_type_variable(
 			       make_variable(copy_basic(bb),
@@ -130,11 +139,72 @@ points_to create_stub_points_to(cell c, type t,
 						  make_dimension(int_to_expression(0),ex),NIL),
 					     NIL));
   else
+    pt = copy_type(t);
+ 
+  if(entity_undefined_p(formal_parameter)) 
+    formal_parameter = make_entity(formal_name,
+				   pt,
+				   make_storage_formal(
+						       make_formal(
+								    get_current_module_entity() 
+								   /* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
+								  off /* pointer_index */)),
+				   make_value_unknown());
+  
+
+  if(type_strict_p)
+    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+  else
+    sink_ref = make_reference(formal_parameter,  NIL);
+
+  cell sink_cell = make_cell_reference(sink_ref);
+  approximation rel = make_approximation_exact();
+  pt_to = make_points_to(copy_cell(c), sink_cell, rel,
+				   make_descriptor_none());
+  pointer_index ++;
+  return pt_to;
+}
+
+/* To create the points-to stub assiciated to the formal parameter,
+ * the sink name is a concatenation of the formal parmater and the POINTS_TO_MODULE_NAME */
+points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basic b)
+{ 
+  list l_ind = NIL;
+  basic bb = basic_undefined;
+  expression ex = make_unbounded_expression();
+  expression l = expression_undefined;
+  expression u = expression_undefined;
+  reference sink_ref = reference_undefined;
+  reference r = cell_any_reference(copy_cell(c));
+  entity e = reference_variable(r);
+  formal f = storage_formal( entity_storage(e) );
+  int off = formal_offset(f);
+  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(off/* pointer_index */), NULL));
+  string formal_name = strdup(concatenate(get_current_module_name() /* POINTS_TO_MODULE_NAME */ ,MODULE_SEP_STRING, s, NULL));
+  entity formal_parameter = gen_find_entity(formal_name);
+  /* type pt = type_to_pointed_type(t); */
+  type pt = type_undefined;
+  bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  bb = variable_basic(type_variable(t));
+  list l_dim = variable_dimensions(type_variable(t));
+
+  FOREACH(DIMENSION, d, l_dim){
+    l = dimension_lower(d);
+    u = dimension_upper(d);
+    l_ind = CONS(EXPRESSION,copy_expression( l), NIL);
+    l_ind = gen_nconc(l_ind, (CONS(EXPRESSION, copy_expression(u), NIL)));
+  }
+  
+ 
+  if(type_strict_p)
     pt = make_type_variable(
 			    make_variable(copy_basic(bb),
-					  NIL,
+					  CONS(DIMENSION,
+					       make_dimension(int_to_expression(0),ex),NIL),
 					  NIL));
- 
+  else
+    pt = copy_type(t);    
+
   if(entity_undefined_p(formal_parameter)) {
     formal_parameter = make_entity(formal_name,
 				   pt,
@@ -148,8 +218,11 @@ points_to create_stub_points_to(cell c, type t,
 
   if(type_strict_p)
     sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+  else if((int)gen_length(l_dim)>1){
+    sink_ref = make_reference(formal_parameter,l_ind);
+  }
   else
-    sink_ref = make_reference(formal_parameter,  NIL);
+    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
 
   cell sink_cell = make_cell_reference(sink_ref);
   approximation rel = make_approximation_exact();
@@ -168,8 +241,6 @@ points_to create_stub_points_to(cell c, type t,
 */
 set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 {
-  reference r = reference_undefined;
-  entity e = entity_undefined;
   points_to pt_to = points_to_undefined;
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
@@ -178,28 +249,14 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   type upt = type_to_pointed_type(pt);
-  r = cell_reference(copy_cell(c));
-  e = reference_variable(r);
-
-  if(type_variable_p(upt)){
-    if(array_entity_p(e)){
-      /* We ignor dimensions for the being, descriptors are not
-       * implemented yet...Amira Mensi*/
-      ;
-      /* ultimate_type() returns a wrong type for arrays. For
-       * example for type int*[10] it returns int*[10] instead of int[10]. */
+  if( type_variable_p(upt) ){
       basic fpb = variable_basic(type_variable(upt));
-      if(basic_pointer_p(fpb)){
-	expression ind = make_unbounded_expression();
-	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
-	cell c = make_cell_reference(r);
-	pt_to = create_stub_points_to(c, pt/* upt */, fpb);
+    if( array_type_p(upt) ){
+      pt_to = create_pointer_to_array_stub_points_to(c, upt , fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
     }
-    }
     else {
-      basic fpb = variable_basic(type_variable(upt));
       switch(basic_tag(fpb)){
       case is_basic_int:{
 	pt_to = create_stub_points_to(c, upt, fpb);
@@ -213,14 +270,26 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 				(void*) pt_to );
 	break;
       }
-      case is_basic_logical:
-	break;
-      case is_basic_overloaded:
-	break;
-      case is_basic_complex:
-	break;
-      case is_basic_pointer:{
+      case is_basic_logical:{
 	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_overloaded:{
+	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_complex:{
+	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+	break;
+      }
+      case is_basic_pointer:{
+	pt_to = create_stub_points_to(c, upt, fpb); 
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	cell sink = points_to_sink(pt_to);
@@ -258,7 +327,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
        be done for points-to analysis. */
   else if(type_void_p(upt)) {
     /* Create a target of unknown type */
-    pt_to = create_stub_points_to(c, make_type_unknown(), basic_undefined /*memory leak?*/);
+    pt_to = create_stub_points_to(c, upt/* make_type_unknown() */, basic_undefined /*memory leak?*/);
     pt_in = set_add_element(pt_in, pt_in, (void*) pt_to );
   }
   else
@@ -269,6 +338,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 
 
 }
+
 
 
 /* Input : a formal parameter which has a derived type (FI, I guess).
@@ -286,9 +356,7 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   type upt = type_to_pointed_type(pt);
-  type bt =  compute_basic_concrete_type(pt);
-  print_type(bt);
-  r = cell_reference(copy_cell(c));
+  r = cell_any_reference(copy_cell(c));
   e = reference_variable(r);
 
   if(type_variable_p(upt)){
@@ -367,9 +435,7 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   type upt = type_to_pointed_type(pt);
-  type bt =  compute_basic_concrete_type(pt);
-  print_type(bt);
-  r = cell_reference(copy_cell(c));
+  r = cell_any_reference(copy_cell(c));
   e = reference_variable(r);
 
   if(type_variable_p(upt)){
@@ -428,14 +494,36 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
   return pt_in;
 }
 
+
+set array_formal_parameter_to_stub_points_to(type t,cell c)
+ {
+   set pt_in = set_generic_make(set_private,
+				points_to_equal_p,
+				points_to_rank);
+   basic fpb = variable_basic(type_variable(t));
+   if(basic_pointer_p(fpb)) {
+     reference r = cell_any_reference(c);
+     entity e = reference_variable(r);
+     expression ind = make_unbounded_expression();
+     reference ref = make_reference(e, CONS(EXPRESSION, ind, NULL));
+     reference_consistent_p(ref);
+     cell cel = make_cell_reference(ref);
+     type pt = basic_pointer(fpb);
+     points_to pt_to = create_stub_points_to(cel, pt, fpb);
+     pt_in = set_add_element(pt_in, pt_in,
+			     (void*) pt_to );
+   }
+
+   return pt_in;
+
+ }
+
+
 bool intraprocedural_summary_points_to_analysis(char * module_name)
 {
   entity module;
   type t;
-  //statement module_stat;
   list pt_list = NIL;
-  //list dcl = NIL;
-  //list params = NIL;
   set pts_to_set = set_generic_make(set_private,
 				    points_to_equal_p,points_to_rank);
 

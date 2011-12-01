@@ -131,26 +131,54 @@ _uint points_to_rank( const void *  vpt, size_t size)
 }
 
 /* Used to remove local variables and keep static one from blocks */
-set points_to_projection(set pts, list  l)
+set points_to_block_projection(set pts, list  l)
 {
-  FOREACH(entity, e, l){
-    reference r = make_reference(e, NIL);
-    cell c = make_cell_reference(r);
+  set res = set_generic_make(set_private, points_to_equal_p,
+				      points_to_rank);
+  set_assign(res, pts);
+  FOREACH(ENTITY, e, l) {
     SET_FOREACH(points_to, pt, pts){
-      if(points_to_compare_cell(points_to_source(pt), c) && !variable_static_p(e))
-	set_del_element(pts, pts, (void*)pt);
-      if(points_to_compare_cell(points_to_sink(pt), c) && !variable_static_p(e) ){
-	reference r = cell_to_reference(points_to_source(pt));
-	entity e = reference_variable(r);
-	pips_user_warning("Dangling pointer %s \n", entity_user_name(e));
-	list lhs = CONS(CELL, points_to_source(pt), NIL);
-	pts = points_to_nowhere_typed(lhs, pts);
+      cell source = points_to_source(pt);
+      cell sink = points_to_sink(pt);
+      entity e_sr = reference_variable(cell_to_reference(source));
+      entity e_sk = reference_variable(cell_to_reference(sink));
+      if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source))))
+	set_del_element(res, res, (void*)pt);
+      
+      else if(e == e_sk && (!(variable_static_p(e_sk) || top_level_entity_p(e_sk) || heap_cell_p(sink)))){
+	pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
+	list lhs = CONS(CELL, source, NIL);
+	res = points_to_nowhere_typed(lhs, res);
       }
     }
   }
-  return pts;
+  return res;
 }
 
+
+set points_to_function_projection(set pts)
+{
+  set res = set_generic_make(set_private, points_to_equal_p,
+			     points_to_rank);
+  set_assign(res, pts);
+
+  SET_FOREACH(points_to, pt, pts){
+    if(cell_out_of_scope_p(points_to_source(pt)) || cell_out_of_scope_p(points_to_sink(pt)))
+      set_del_element(res, res, (void*)pt);
+  }
+  return res;
+}
+
+/* Return true if a cell is out of scope */
+bool cell_out_of_scope_p(cell c)
+{
+  reference r = cell_to_reference(c);
+  entity e = reference_variable(r);
+  if (!(variable_static_p(e) || formal_parameter_p(e) || top_level_entity_p(e) || entity_heap_location_p(e)))
+    return true;
+  else
+    return false;
+}
 
 /*print a points-to for debug*/
 void print_points_to(const points_to pt)
@@ -181,8 +209,11 @@ bool source_in_set_p(cell source, set s)
 {
   bool in_p = false;
   SET_FOREACH ( points_to, pt, s ) {
-    if ( cell_equal_p(points_to_source(pt),source) )
-      in_p = true;
+    /* if ( cell_equal_p(points_to_source(pt),source) ) */
+    /*   in_p = true; */
+    if( opkill_may_vreference(source, points_to_source(pt) ))
+      return true;
+
   }
   return in_p;
 }
