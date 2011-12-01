@@ -13,4 +13,3 @@ void p4a_kernel_main(int I_1, int I_2, int *array0, int i)
    if (i<=I_1-I_2)
       *(array0+i) = I_2+i;
 }
-

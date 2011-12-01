@@ -21,6 +21,8 @@ setenv OPMIFY_CODE_DEBUG_LEVEL 9
 activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply FLAG_PARALLEL_REDUCED_LOOPS_WITH_OPENMP_DIRECTIVES(main)
 #echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
