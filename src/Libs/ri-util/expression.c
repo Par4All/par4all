@@ -2014,6 +2014,10 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  *
  * SG: improvement: the integer value of a extended_integer_constant_expression_p
  *  is computed too, for instance 0+5
+ *
+ * FI: I am not sure it is an improvement; it looks more like a change
+ * of semantics (see above comments and expression_constant_p());
+ * other functions exist to evaluate a constant expression...
  */
 int expression_to_int(expression exp)
 {
