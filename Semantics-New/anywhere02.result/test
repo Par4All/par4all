@@ -105,7 +105,7 @@ void anywhere02(int n, int *p)
 //             <    is written>: n
    n = 17;
 //             <    is read   >: p
-//             <    is written>: _p_1[0] n
+//             <    is written>: _p_2[0] n
    *p = 19, n = 2;
 //             <    is written>: n
    
@@ -115,7 +115,7 @@ void anywhere02(int n, int *p)
    
    n = 23;
 //             <    is read   >: p
-//             <    is written>: _p_1[0]
+//             <    is written>: _p_2[0]
    
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is
@@ -134,7 +134,7 @@ void anywhere02(int n, int *p)
 //             <    is written>: n
    n = 17;
 //             <    is read   >: p
-//             <    is written>: _p_1[0] n
+//             <    is written>: _p_2[0] n
    *p = 19, n = 2;
 //             <    is written>: n
    
@@ -144,7 +144,7 @@ void anywhere02(int n, int *p)
    
    n = 23;
 //             <    is read   >: p
-//             <    is written>: _p_1[0]
+//             <    is written>: _p_2[0]
    
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is

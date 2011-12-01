@@ -2,7 +2,13 @@
 POINTS TO
 
 
-// Points To:
+// Points To IN:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+
+
+// Points To OUT:
 // a -> _a_1[0] , EXACT
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
