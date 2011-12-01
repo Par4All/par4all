@@ -31,11 +31,14 @@ function usage()
         "     repositories into their respective branches and update the\n" \
         "     p4a branch infrastructure\n" \
         "  -m|--aggregate-branches [<to-prefix> [<origin-prefix>]] : merge\n" \
-        "     all the p4a branch infrastructure into the <to-prefix> branch\n" \
-        "     architecture. If the <to-prefix> branch infrastructure does\n" \
-        "     not exist, it is created from the <origin-prefix> branch\n" \
-        "     infrastructure if provided, else from the p4a branch\n" \
-        "     architecture\n" \
+        "     all the p4a-like branch infrastructure into the <to-prefix> branch\n" \
+        "     architecture. If <to-prefix> is null, work into p4a default\n" \
+        "     branch infrastructure. If <origin-prefix> is null,\n" \
+        "     use the same as <to-prefix>, that means we aggregate\n" \
+        "     the <to-prefix> branch infrastructure without using\n" \
+        "     external branches. If the <to-prefix> branch infrastructure\n" \
+        "     does not exist, it is created from the <origin-prefix> branch\n" \
+        "     infrastructure\n" \
         "  -b|--branch-action args+: apply a shell-script to a branch\n" \
         "     hierarchy, with the branch suffix available in \$suffix\n" \
         "  -a|--add-remotes: create the remotes pointing\n" \

@@ -4,8 +4,8 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
-import p4a_git 
-import p4a_util 
+import p4a_git
+import p4a_util
 import re
 import sys
 import os
@@ -42,6 +42,7 @@ def VERSION_file_path(dist_dir = None):
     p4a_util.debug(version_file_name + " file path is " + version_file_path)
     return version_file_path
 
+
 def GITREV_file_path(dist_dir = None):
     '''Returns the Par4All GITREV file path.'''
     global program_dir
@@ -71,6 +72,7 @@ def VERSION(file_dir = None):
     p4a_util.debug("VERSION(" + repr(file_dir) + ") = " + version)
     return version
 
+
 def GITREV(file_dir = None, test_dirty = True, include_tag = False):
     gitrev = ""
     gitrev_file = GITREV_file_path(file_dir)
@@ -95,16 +97,19 @@ def write_VERSION(dir, version):
     p4a_util.write_file(file, version)
     return file
 
+
 def write_GITREV(dir, gitrev):
     file = os.path.join(dir, "GITREV")
     p4a_util.write_file(file, gitrev)
     return file
 
 
-def make_full_revision(file_dir = None, custom_version = "", custom_gitrev = ""):
+def make_full_revision(file_dir = None,
+                       custom_version = None,
+                       custom_gitrev = None):
 
     '''Make up a precise revision/version string for a given file or directory,
-    or from passed version and git revision strings.'''
+    or use given custom version and git revision strings.'''
 
     version = custom_version
     if not version:
@@ -145,6 +150,7 @@ def make_full_revision(file_dir = None, custom_version = "", custom_gitrev = "")
 
     p4a_util.debug("Version string for " + repr(file_dir) + ": " + version)
 
+    # Return (version~git_revision, version)
     return version, versiond
 
 

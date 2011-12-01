@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+// To have M_PI defined on Windows:
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #ifndef rangex

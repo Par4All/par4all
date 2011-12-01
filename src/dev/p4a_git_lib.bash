@@ -196,7 +196,8 @@ function do_pull_remote_git() {
 
 
 # Pull into the given $1 branch hierarchy all the parts from the $2 p4a
-# remote git hierarchy. Use 'p4a' as default for $1 or $2 when null:
+# remote git hierarchy. Use 'p4a' as default for $1 if null.
+# Use $1 as $2 if $2 is null.
 function do_aggregate_branches() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
@@ -209,8 +210,8 @@ function do_aggregate_branches() {
     fi
     if [[ -z $merge_origin_branch_prefix ]]; then
 	# If we do not have $merge_origin_branch_prefix defined,
-	# we use the standard reference branch:
-	merge_origin_branch_prefix=p4a
+	# we use the current reference branch to merge from & into:
+	merge_origin_branch_prefix=$merge_to_prefix_branches
     fi
 
     # Since we only have integration branches here, we can always select

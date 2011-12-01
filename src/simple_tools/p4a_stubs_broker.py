@@ -146,5 +146,5 @@ class p4a_stubs_broker(broker.broker):
         stub_file_name=stub_file.name
         f = open(stub_file_name, 'w')
         f.write(generated_stub)
-        return fname
+        return stub_file_name
         
