@@ -6,7 +6,6 @@ void lhs04()
    float x;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
    *((int *) &x) &= 0x7fffffff;
 }
 
@@ -27,7 +26,6 @@ void lhs04()
 
 // Points To: none
 
-
    *((int *) &x) &= 0x7fffffff;
 }
 
@@ -38,7 +36,6 @@ void lhs04()
    float x;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
    *((int *) &x) &= 0x7fffffff;
 }
 

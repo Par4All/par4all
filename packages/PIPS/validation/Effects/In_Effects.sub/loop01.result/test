@@ -1,0 +1,55 @@
+int main()
+{
+   // BEGIN BLOCK
+   int i;
+   int a[10];
+//             <    is written>: k
+   int k = 1;
+//             <    is written>: s
+   int s = 0;
+//             <may be written>: a[*]
+//             <    is read   >: i k
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be written>: a[*]
+//             <    is read   >: i k
+      a[i] = k;
+//             <may be read   >: a[*]
+//             <    is read   >: i s
+//             <    is written>: i s
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: a[*]
+//             <    is read   >: i s
+//             <    is written>: s
+      s = s+a[i];
+//             <    is read   >: s
+
+   return s;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int i;
+   int a[10];
+   int k = 1;
+   int s = 0;
+//             <    is imported>: k
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is imported>: i k
+      a[i] = k;
+//             <may be imported>: a[*]
+//             <    is imported>: s
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be imported>: a[*]
+//             <    is imported>: i s
+      s = s+a[i];
+//             <    is imported>: s
+
+   return s;
+   // END BLOCK
+}

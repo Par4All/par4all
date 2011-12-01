@@ -95,18 +95,20 @@ int main()
 
 Cumulated effetcs for "main"
 
-//             <may be read   >: stderr stderr[0] __IO_EFFECTS:LUNS[2]
-//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
 int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
-//             <may be read   >: i j
-//             <may be written>: b[*][*] j
-//             <    is written>: i
-   for(i = 1; i <= 10; i += 1)
-//             <may be read   >: i j
 //             <may be written>: b[*][*]
+//             <    is read   >: i j
+//             <    is written>: i j
+   for(i = 1; i <= 10; i += 1)
+//             <may be written>: b[*][*]
+//             <    is read   >: i j
 //             <    is written>: j
       for(j = 1; j <= 10; j += 1)
 //             <may be written>: b[*][*]
@@ -118,15 +120,15 @@ int main()
 //             <may be written>: a[*][*]
 //             <    is read   >: h
    func1(10, 10, a, b, h);
-//             <may be read   >: a[*][*] i j stderr stderr[0] 
-//                               __IO_EFFECTS:LUNS[2]
-//             <may be written>: j stderr[0] __IO_EFFECTS:LUNS[2]
-//             <    is written>: i
+//             <may be read   >: a[*][*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: i j stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: i j __IO_EFFECTS:LUNS[2]
    for(i = 1; i <= 10; i += 1)
-//             <may be read   >: a[*][*] i j stderr stderr[0] 
-//                               __IO_EFFECTS:LUNS[2]
-//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
-//             <    is written>: j
+//             <may be read   >: a[*][*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: i j stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: j __IO_EFFECTS:LUNS[2]
       for(j = 1; j <= 10; j += 1)
 //             <may be read   >: a[*][*] stderr[0]
 //             <may be written>: stderr[0]

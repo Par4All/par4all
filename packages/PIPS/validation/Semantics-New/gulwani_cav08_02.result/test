@@ -1,5 +1,5 @@
 
-TRANSFORMERS
+Transformers for "gulwani_cav08_02"
 
 
 //  T(gulwani_cav08_02) {gulwani_cav08_02==0, z+1<=0}
@@ -53,7 +53,7 @@ int gulwani_cav08_02(int x, int y, int z)
    return 0;
 }
 
-PRECONDITIONS
+Preconditions for "gulwani_cav08_02"
 
 
 //  P() {}
@@ -105,7 +105,7 @@ int gulwani_cav08_02(int x, int y, int z)
    return 0;
 }
 
-TRANSFORMERS
+Transformers for "gulwani_cav08_02_r"
 
 
 //  T(gulwani_cav08_02_r) {gulwani_cav08_02_r==0, z+1<=0}
@@ -133,8 +133,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
 
    k = 0;
 
-//  T(k,x,y) {k==0, k#init==0, y==y#init, y==y0, 1<=x, 1<=x#init,
-//    z+1<=0}
+//  T() {k==0, y==y0, 1<=x, z+1<=0}
 
    while (x>0) {
 
@@ -158,8 +157,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
       }
 
 //  T(k,x,y) {k#init<=k, k+x<=k#init+x#init, k+y<=k#init+y#init, 1<=x,
-//    1<=x#init, y#init+2<=x#init, z+2<=x#init, y+1<=0, y#init+1<=0,
-//    z+1<=0}
+//    1<=x#init, y+1<=0, y#init+1<=0, z+1<=0}
 
       while (x>0&&y<0) {
 
@@ -185,7 +183,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
    return 0;
 }
 
-PRECONDITIONS
+Preconditions for "gulwani_cav08_02_r"
 
 
 //  P() {}

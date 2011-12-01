@@ -25,7 +25,6 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
       (*col)++;
    }
    
@@ -108,7 +107,6 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 // col -> _col_4 , EXACT
 // nbout -> _nbout_6 , EXACT
 
-
       (*col)++;
    }
 
@@ -166,7 +164,6 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       }
 //             <    is read   >: _col_4 col
 //             <    is written>: _col_4
-
       (*col)++;
    }
    

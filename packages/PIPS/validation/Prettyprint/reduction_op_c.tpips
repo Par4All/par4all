@@ -23,11 +23,14 @@ setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 #echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 activate C_SYMBOL_TABLE
 
 apply PRIVATIZE_MODULE(main)
+apply FLAG_PARALLEL_REDUCED_LOOPS_WITH_OPENMP_DIRECTIVES(main)
 setproperty PRAGMA_TYPE "str"
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)

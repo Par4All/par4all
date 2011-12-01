@@ -17,18 +17,18 @@ void compute()
          tab3[i][j] = i*j;
       }
 }
-//             <may be read   >: tab3
 //             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <    is read   >: tab3
 void compute()
 {
    int i, j;
-//             <may be read   >: i j tab3
-//             <may be written>: j tab1[*][*] tab2[*][*] tab3[*][*]
-//             <    is written>: i
+//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <    is read   >: i j tab3
+//             <    is written>: i j
 
    for(i = 1; i <= 62; i += 1)
-//             <may be read   >: i j tab3
 //             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <    is read   >: i j tab3
 //             <    is written>: j
       for(j = 1; j <= 62; j += 1) {
 //             <may be written>: tab1[*][*]

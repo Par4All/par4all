@@ -6,7 +6,7 @@ create anywhere03 anywhere03.c
 
 echo ############################################
 echo #
-echo # Let's try again with points-to information
+echo # Let's try with points-to information
 echo #
 echo ############################################
 

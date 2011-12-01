@@ -6,8 +6,8 @@ int main(void)
    my_type t[10];
    {
       int i;
-//             <may be read   >: 0`1`i
 //             <may be written>: t[*].val
+//             <    is read   >: 0`1`i
 //             <    is written>: 0`1`i
 
       for(i = 0; i <= 9; i += 1)
@@ -17,7 +17,8 @@ int main(void)
    }
    {
       int i;
-//             <may be read   >: 0`3`i t[*].val
+//             <may be read   >: t[*].val
+//             <    is read   >: 0`3`i
 //             <    is written>: 0`3`i
       
       // go through my types
@@ -64,8 +65,8 @@ int main(void)
    my_type t[10];
    {
       int i;
-//             <may be read   >: 0`1`i
 //             <may be written>: t[*].val
+//             <    is read   >: 0`1`i
 //             <    is written>: 0`1`i
 
       for(i = 0; i <= 9; i += 1)
@@ -75,7 +76,8 @@ int main(void)
    }
    {
       int i;
-//             <may be read   >: 0`3`i t[*].val
+//             <may be read   >: t[*].val
+//             <    is read   >: 0`3`i
 //             <    is written>: 0`3`i
       
       // go through my types

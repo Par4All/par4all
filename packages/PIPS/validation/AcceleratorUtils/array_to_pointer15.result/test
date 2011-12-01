@@ -111,7 +111,7 @@ int main(int argc, char **argv)
    //     read *, image
    for(i = 0; i <= image_size-1; i += 1)
       for(j = 0; j <= image_size-1; j += 1)
-         *(image+j*image_size+i) = i*j;
+         *(image+(j+i*image_size)+0) = i*j;
    
    
    for(n = 0; n <= 0; n += 1)
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
    
    
    for(i = 0; i <= image_size-1; i += 1)
-      printf("%f ", *(new_image+i*image_size+i));
+      printf("%f ", *(new_image+(i+i*image_size)+0));
 
    free(image);
    free(new_image);

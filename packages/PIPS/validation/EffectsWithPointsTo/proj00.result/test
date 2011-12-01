@@ -209,10 +209,6 @@ static int alea(void)
 	16 --> 18 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-	16 --> 31 with conflicts
-		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <__TIME_EFFECTS:KALI-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	20 --> 23 with conflicts
 		from <pi-W-EXACT> to <pi-R-EXACT>
 	20 --> 31 with conflicts

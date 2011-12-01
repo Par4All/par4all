@@ -5,11 +5,13 @@ Source code with cumulated effects
 int main(void)
 {
    int bla, *pbla;
+//             <    is written>: b
+   _Bool b = 1;
+//             <    is written>: pbla
+
+   pbla = &bla;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pbla
-   //  _Bool b = 1;
-   
-   //pbla = &bla;
    // kill all preconditions
    *pbla = 1;
 
@@ -28,11 +30,17 @@ int main(void)
 
    int bla, *pbla;
 
-//  T(bla) {}
+//  T(b) {b==1}
 
-   //  _Bool b = 1;
-   
-   //pbla = &bla;
+   _Bool b = 1;
+
+//  T() {}
+
+
+   pbla = &bla;
+
+//  T(b,bla) {}
+
    // kill all preconditions
    *pbla = 1;
 
@@ -56,13 +64,19 @@ int main(void)
 
 //  P(bla) {}
 
-   //  _Bool b = 1;
-   
-   //pbla = &bla;
+   _Bool b = 1;
+
+//  P(b,bla) {b==1}
+
+
+   pbla = &bla;
+
+//  P(b,bla) {b==1}
+
    // kill all preconditions
    *pbla = 1;
 
-//  P(bla) {}
+//  P(b,bla) {}
 
 
    return 0;

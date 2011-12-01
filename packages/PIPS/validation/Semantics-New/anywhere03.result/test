@@ -1,6 +1,6 @@
 ############################################
 #
-# Let's try again with points-to information
+# Let's try with points-to information
 #
 ############################################
 
@@ -38,7 +38,7 @@ void anywhere03()
 
    int *p = &m;
 
-//  T(n) {n==2}
+//  T(m,n) {n==2}
 
    *p = 19, n = 2;
 
@@ -71,7 +71,7 @@ void anywhere03()
 
    *p = 19, n = 2;
 
-//  P(m,n) {m==1, n==2}
+//  P(m,n) {n==2}
 
    
    /* Impact of comma expression */
