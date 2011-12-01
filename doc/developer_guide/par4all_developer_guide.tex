@@ -414,7 +414,7 @@ and potentially contain integration work performed by \Apfa team
 members beyond the current release. To retrieve an up-to-date version
 of a reference branch, use:
 \begin{verbatim}
-p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+p4a_git --branch-action-name p4a "git checkout \$branch; git pull origin \$branch"
 \end{verbatim}
 
 Work performed on \Apfa itself without integrating new versions of upstream
@@ -483,7 +483,7 @@ After testing and validation, this branch can be published\footnote{But
   \texttt{gitk} because it may be cumbersome for the community to remove
   some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
-p4a_git --branch-action git push origin p4a\$suffix
+p4a_git --branch-action-name p4a git push origin \$branch
 \end{verbatim}
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
@@ -522,20 +522,20 @@ to update the \texttt{p4a-1.3-rc} branch infrastructure.
 When finished, these branches can be pushed for sharing or merged
 into the main \Apfa \texttt{p4a} with:
 \begin{verbatim}
-p4a_git --branch-action git push origin p4a-very-personal\$suffix
+p4a_git --branch-action-name p4a-very-personal git push origin \$branch
 \end{verbatim}
 
 To pull all the different \Apfa branches that may have been
 changed by others:
 \begin{verbatim}
-p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+p4a_git --branch-action-name p4a "git checkout \$branch; git pull origin \$branch"
 \end{verbatim}
 
 To set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before using them:
 \begin{verbatim}
-p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
-        remotes/origin/p4a-0.2-alpha\$suffix
+p4a_git --branch-action-name p4a-0.2-alpha git branch \$branch \
+        remotes/origin/\$branch
 \end{verbatim}
 \texttt{}
 Developing and trying a new version of the scripts dealing with
@@ -600,18 +600,27 @@ The \verb|p4a_git| options are available in short and long forms:
   remote \Agit repositories into their respective branches and update the
   \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
 \item[\texttt{-m} or \texttt{--aggregate-branches}
-  \texttt{\emph{[<to-prefix>}} \texttt{\emph{[<origin-prefix>]]}}] merge the
-  entire \texttt{p4a} branch infrastructure into the
-  \texttt{\emph{<to-prefix>}} branch architecture. If the
-  \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
-  created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
-  if provided, else from the \texttt{p4a} branch architecture;
-\item[\texttt{-b} or \texttt{--branch-action} \texttt{\emph{args+}}] apply
-  the \texttt{\emph{args+}} shell-script to a branch hierarchy, with the
-  branch suffix available to the \texttt{\emph{args+}} script in the
-  \verb|$suffix| variable. Do not forget to escape special shell
+  \texttt{\emph{[<to-prefix>}} \texttt{\emph{[<origin-prefix>]]}}] merge
+  all the \texttt{p4a}-like branch infrastructure into the
+  \texttt{\emph{<to-prefix>}} branch architecture. If
+  \texttt{\emph{<to-prefix>}} is null, work into \texttt{p4a} default
+  branch infrastructure. If \texttt{\emph{<origin-prefix>}} is null, use
+  the same as \texttt{\emph{<to-prefix>}}, that means we aggregate the
+  \texttt{\emph{<to-prefix>}} branch infrastructure without using external
+  branches. If the \texttt{\emph{<to-prefix>}} branch infrastructure does
+  not exist, it is created from the \texttt{\emph{<origin-prefix>}} branch
+  infrastructure;
+\item[\texttt{-b} or \texttt{--branch-action-name}
+  \texttt{\emph{<branch-prefix>}} \texttt{\emph{args+}}] apply a
+  shell-script to a branch hierarchy with name starting with
+  \texttt{<branch-prefix>}. The branch name is available in the
+  \texttt{\$branch} variable and the suffix available in the
+  \texttt{\$suffix} variable. Do not forget to escape special shell
   characters in the final shell;
-\item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
+\item[\texttt{-a} or \texttt{--branch-action} \texttt{\emph{args+}}] same
+  as \verb|--branch-action-name p4a ...| to deal with default \texttt{p4a}
+  branch hierarchy;
+\item[\texttt{--add-remotes}] create the remotes pointing
   to \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
   change the git working repository.

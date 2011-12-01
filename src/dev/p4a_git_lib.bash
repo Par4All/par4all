@@ -255,16 +255,24 @@ function do_aggregate_branches() {
 
 
 # Pull into the par4all git all the parts from the remote git associated:
-function do_branch_action() {
-    verb 1 "Entering do_branch_action"
+function do_branch_action_name() {
+    verb 1 "Entering do_branch_action_name"
     enforce_P4A_TOP
     stop_on_error
+    branch_name="$1"
+    shift
     action="$@"
     for b in $P4A_BRANCH_SUFFIX; do
+	# The variables usable by the user:
 	suffix=-$b
+	# Build the branch name from the prefix and the suffix:
+	branch=$branch_name$suffix
 	eval $action
     done
+    # And add an iteration for the empty suffix since we can not do it in
+    # shell with strings:
     suffix=
+    branch=$branch_name$suffix
     eval $action
 }
 
