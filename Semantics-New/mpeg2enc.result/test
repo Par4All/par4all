@@ -4565,13 +4565,13 @@ void stats()
          else {
             if ((mb_type&(8|4))==8) goto _switch_5_case_8;
             if ((mb_type&(8|4))==4) goto _switch_5_case_4;
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 _switch_5_default:            ;
             _IO_putc('0', statfile);
             goto _break_5;
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
             
@@ -21460,7 +21460,7 @@ void stats(void)
 
 //  T() {}
 
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 //  T() {}
 
@@ -21475,7 +21475,7 @@ _switch_5_default:            ;
 //  T() {}
 
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
 
 //  T() {}
 
@@ -44855,7 +44855,7 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -44879,7 +44879,7 @@ _switch_5_default:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
