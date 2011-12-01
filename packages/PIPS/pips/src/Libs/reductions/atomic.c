@@ -320,8 +320,10 @@ static bool process_reductions_in_openmp_loop(statement st) {
   pips_assert("in a loop", statement_loop_p(st));
   loop l = statement_loop(st);
   bool ret = false;
-  if ((ret=!omp_pragma_expr_for_reduction (l, st, false)))
+  if (!(ret=omp_pragma_expr_for_reduction (l, st, false)))
     ret=omp_pragma_expr_for (l, st);
+  if(ret)
+      execution_tag(loop_execution(l))=is_execution_parallel;
   return ret;
 }
 

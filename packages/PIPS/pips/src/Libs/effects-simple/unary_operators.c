@@ -450,7 +450,8 @@ list simple_effects_union_over_range(list l_eff,
 
     //gen_full_free_list(h_eff_l);
   }
- if (!get_bool_property("ONE_TRIP_DO"))
+ if (!get_bool_property("ONE_TRIP_DO")
+     && !range_contains_at_least_one_point_p(r))
     {
       effects_to_may_effects(l_eff);
     }

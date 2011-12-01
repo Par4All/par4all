@@ -51,6 +51,7 @@
 #include "resources.h"
 #include "reductions.h"
 #include "properties.h"
+#include "transformations.h"
 
 
 /////////////////////////////////////////////////////PRAGMA AS EXPRESSION
@@ -62,10 +63,8 @@
 static void generate_expr_omp_pragma_loop (loop l) {
 
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
-
-  if (omp_pragma_expr_for_reduction (l, stmt, true) == false)
-    // A reduction pragma has already been found no need to look for a simple
-    // parallel for loop. Note that founding such a simple parallel for loop
+  if(!statement_has_omp_parallel_directive_p(stmt))
+    // Note that founding such a simple parallel for loop
     // might show some problems in the code. For example dead code or the usage
     // of initialized variables. In such a case PIPS follows the principle :
     // If the code is false or dead then, do it in parallel, it will still be
@@ -77,21 +76,6 @@ static void generate_expr_omp_pragma_loop (loop l) {
 
 /////////////////////////////////////////////////////PRAGMA AS STRING
 
-/// @brief generate pragma for a reduction as a string
-/// @return true if a pragma has been generated
-/// @param l, the loop to analyze for omp reduction
-/// @param stmt, the statament where the pragma should be attached
-static bool pragma_str_for_reduction (loop l, statement stmt) {
-  string str = string_undefined;
-  str = reductions_get_omp_pragma_str (l, stmt);
-  // insert the pragma (if any) as a string to the current statement
-  if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
-    add_pragma_str_to_statement (stmt, str, false);
-    pips_debug (5, "new reduction pragma as an extension added: %s \n", str);
-    return true;
-  }
-  return false;
-}
 
 /// @brief generate pragma for as a string
 /// @return true if a pragma has been generated
@@ -133,16 +117,16 @@ static bool pragma_str_for (loop l, statement stmt) {
   return false;
 }
 
+
 /// @brief generate pragma as a string for a loop
 /// @return void
 /// @param l, the loop to decorate with pragma
 static void generate_str_omp_pragma_loop (loop l) {
 
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
+  if(!statement_has_omp_parallel_directive_p(stmt))
 
-  if (pragma_str_for_reduction (l, stmt) == false)
-    // A reduction pragma has alredy been found no need to look for a simple
-    // parallel for loop. Note that founding such a simple paralle for loop
+    // Note that founding such a simple parallel for loop
     // might show some problems in the code. For example dead code or the usage
     // of unitialized variables. In such a case PIPS follows the principle :
     // If the code is false or dead then, do it in parallel, it will still be
@@ -165,9 +149,6 @@ bool ompify_code (const const char* module_name) {
   set_string_property("PRETTYPRINT_PARALLEL", "omp");
   // we need to know which type of pragma need to be generated
   const char* type = get_string_property("PRAGMA_TYPE");
-
-  // we need to initialize few things to generate reduction
-  reductions_pragma_omp_init (module_name);
 
   // generate pragma string or expression using the correct language:
   value mv = entity_initial(module_name_to_entity(module_name));
@@ -194,9 +175,6 @@ bool ompify_code (const const char* module_name) {
   // Restore the previous PRETTYPRINT_PARALLEL property for the next
   set_string_property("PRETTYPRINT_PARALLEL", previous);
   free(previous);
-
-  // no more reductions to generate
-  reductions_pragma_omp_end ();
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);

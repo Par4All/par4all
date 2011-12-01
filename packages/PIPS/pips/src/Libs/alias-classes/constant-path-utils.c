@@ -177,7 +177,7 @@ set points_to_anywhere_typed(list lhs_list, set input)
   FOREACH(cell, c, lhs_list) {
       /* create a new points to with as source the current
 	 element of lhs_set and sink the null value .*/
-    reference cr = cell_to_reference(c);
+    reference cr = cell_any_reference(c);
     entity er = reference_variable(cr);
     type t = entity_type(er);
     entity e = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
@@ -278,6 +278,84 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
   Change dereferenced pointers and filed access into a constant paths
   When no constant path is found the expression is uninitialized pointer
 */
+/* list expression_to_constant_paths(statement s, expression e, set in) */
+/* { */
+/*   set cur = set_generic_make(set_private, points_to_equal_p, */
+/* 					 points_to_rank); */
+/*   cell c = cell_undefined; */
+/*   entity nowhere = entity_undefined; */
+/*   list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL; */
+/*   bool exact_p = false, *nowhere_p = false; */
+/*   bool eval_p = true; */
+/*   c = get_memory_path(e, &eval_p); */
+/*   reference cr = cell_any_reference(c); */
+/*   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES"); */
+/*   /\* Take into account global variables which are initialized in demand*\/ */
+/*   /\* entity ce = reference_variable(cr); *\/ */
+/*   /\* cell cc = make_cell_reference(cr); *\/ */
+/*   l_cell = CONS(CELL, c, NIL); */
+/*   in = set_assign(cur, points_to_init_global(s, l_cell, in)); */
+/*   if( eval_p ) { */
+/*     l_cell = CONS(CELL, c, NIL); */
+/*     set_methods_for_proper_simple_effects(); */
+/*     l_in = set_to_sorted_list(in, */
+/* 			      (int(*)(const void*, const void*)) */
+/* 			      points_to_compare_location); */
+/*     l_eval = eval_cell_with_points_to(c, l_in, &exact_p); */
+/*     generic_effects_reset_all_methods(); */
+/*     /\* in = points_to_init_global(s, l_cell, in); *\/ */
+/*     l_cell = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p)); */
+
+/*     in =  set_assign(in, points_to_init_global(s, l_cell, in)); */
+/*   } */
+/*   else { */
+/*     l_cell = CONS(CELL, c, NIL); */
+/*     in =  set_assign(cur, points_to_init_global(s, l_cell, in)); */
+/*   } */
+  
+
+/*   /\* if c is an anywhere or a reference we don't evaluate it*\/ */
+/*   if (!eval_p) */
+/*     l = CONS(CELL, c, NIL); */
+/*   else if (set_empty_p(in)|| entity_null_locations_p(reference_variable(cr)) */
+/* 			      || entity_nowhere_locations_p(reference_variable(cr))){ */
+/*     if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){ */
+/*       pips_user_error("Uninitialized pointer\n"); */
+/*     } */
+/*     else { */
+/*       pips_user_warning("Uninitialized pointer"); */
+/*       bool to_be_freed = false; */
+/*       type c_type = cell_to_type(c, &to_be_freed); */
+/*       if ( type_sensitive_p )  */
+/* 	nowhere = entity_all_xxx_locations_typed( */
+/* 						      NOWHERE_LOCATION, */
+/* 						      c_type); */
+/*       else */
+/* 	nowhere = entity_all_xxx_locations( NOWHERE_LOCATION ); */
+
+/*       reference r = make_reference(nowhere,NIL); */
+/*       c = make_cell_reference(r); */
+/*       l = CONS(CELL, c, NIL); */
+/*       if (to_be_freed) free_type(c_type); */
+/*     } */
+/*   } */
+/*   else { */
+/*     set_methods_for_proper_simple_effects(); */
+/*     l_in = set_to_sorted_list(in, */
+/* 			      (int(*)(const void*, const void*)) */
+/* 			      points_to_compare_location); */
+/*     l_eval = eval_cell_with_points_to(c, l_in, &exact_p); */
+/*     generic_effects_reset_all_methods(); */
+/*     l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p)); */
+/*   } */
+
+/*   return l; */
+/* } */
+
+/*
+  Change dereferenced pointers and filed access into a constant paths
+  When no constant path is found the expression is uninitialized pointer
+*/
 list expression_to_constant_paths(statement s, expression e, set in)
 {
   set cur = set_generic_make(set_private, points_to_equal_p,
@@ -288,18 +366,14 @@ list expression_to_constant_paths(statement s, expression e, set in)
   bool exact_p = false, *nowhere_p = false;
   bool eval_p = true;
   c = get_memory_path(e, &eval_p);
-  reference cr = cell_to_reference(c);
+  reference cr = cell_any_reference(c);
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   /* Take into account global variables which are initialized in demand*/
   /* entity ce = reference_variable(cr); */
   /* cell cc = make_cell_reference(cr); */
   l_cell = CONS(CELL, c, NIL);
   in = set_assign(cur, points_to_init_global(s, l_cell, in));
-  if( !eval_p ) {
-    l_cell = CONS(CELL, c, NIL);
-    in =  set_assign(cur, points_to_init_global(s, l_cell, in));
-    }
-    else {
+  if( eval_p ) {
     l_cell = CONS(CELL, c, NIL);
     set_methods_for_proper_simple_effects();
     l_in = set_to_sorted_list(in,
@@ -312,21 +386,31 @@ list expression_to_constant_paths(statement s, expression e, set in)
 
     in =  set_assign(in, points_to_init_global(s, l_cell, in));
     }
-
+  else {
+    l_cell = CONS(CELL, c, NIL);
+    in =  set_assign(cur, points_to_init_global(s, l_cell, in));
+  }
+  
 
   /* if c is an anywhere or a reference we don't evaluate it*/
-  if (!eval_p)
-    l = CONS(CELL, c, NIL);
-  else if (set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
-			      || entity_nowhere_locations_p(reference_variable(cr))){
-    if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){
-      pips_user_error("Uninitialized pointer\n");
+  if (eval_p && !(set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
+		 || entity_nowhere_locations_p(reference_variable(cr))) && 
+      !get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
+    {
+      set_methods_for_proper_simple_effects();
+      l_in = set_to_sorted_list(in,
+				(int(*)(const void*, const void*))
+				points_to_compare_location);
+      l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
+      generic_effects_reset_all_methods();
+      l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
+    
     }
-    else {
+  else if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
       pips_user_warning("Uninitialized pointer");
       bool to_be_freed = false;
       type c_type = cell_to_type(c, &to_be_freed);
-      if ( type_sensitive_p ) 
+	if ( type_sensitive_p )
 	nowhere = entity_all_xxx_locations_typed(
 						      NOWHERE_LOCATION,
 						      c_type);
@@ -338,19 +422,17 @@ list expression_to_constant_paths(statement s, expression e, set in)
       l = CONS(CELL, c, NIL);
       if (to_be_freed) free_type(c_type);
     }
-  }
-  else {
-    set_methods_for_proper_simple_effects();
-    l_in = set_to_sorted_list(in,
-			      (int(*)(const void*, const void*))
-			      points_to_compare_location);
-    l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
-    generic_effects_reset_all_methods();
-    l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
-  }
+  else if(eval_p)
+    pips_user_error("Uninitialized pointer\n");
+  
+  else
+    l = CONS(CELL, c, NIL);
 
   return l;
 }
+
+
+
 
 /* This function returns a cell
 - we initialize the effect engine
@@ -510,7 +592,7 @@ list possible_constant_paths(
     bool to_be_freed = false;
     type lhs_type = cell_to_type(lhs, &to_be_freed);
     FOREACH(cell, c, l){
-      reference r = cell_to_reference(c);
+      reference r = cell_any_reference(c);
       entity e = reference_variable(r);
       if(entity_nowhere_locations_p(e))
 	pips_user_warning("Uninitialized pointer \n");
@@ -541,8 +623,8 @@ list possible_constant_paths(
 */
 cell max_module(cell m1, cell m2)
 {
-  reference r1 = cell_to_reference(m1);
-  reference r2 = cell_to_reference(m2);
+  reference r1 = cell_any_reference(m1);
+  reference r2 = cell_any_reference(m2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
@@ -576,8 +658,8 @@ bool entity_any_module_p(entity e)
 
 bool opkill_may_module(cell m1, cell m2)
 {
-  reference r1 = cell_to_reference(m1);
-  reference r2 = cell_to_reference(m2);
+  reference r1 = cell_any_reference(m1);
+  reference r2 = cell_any_reference(m2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
   bool kill_may_p;
@@ -594,8 +676,8 @@ bool opkill_may_module(cell m1, cell m2)
 
 bool opkill_must_module(cell m1, cell m2)
 {
-  reference r1 = cell_to_reference(m1);
-  reference r2 = cell_to_reference(m2);
+  reference r1 = cell_any_reference(m1);
+  reference r2 = cell_any_reference(m2);
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
   bool kill_must_p;
@@ -644,8 +726,8 @@ cell op_gen_module(cell m1,  __attribute__ ((__unused__))cell m2)
 
 bool opkill_may_name(cell n1, cell n2)
 {
- reference r1 = cell_to_reference(n1);
- reference r2 = cell_to_reference(n2);
+ reference r1 = cell_any_reference(n1);
+ reference r2 = cell_any_reference(n2);
  entity e1 = reference_variable(r1);
  entity e2 = reference_variable(r2);
  bool kill_may_p;
@@ -695,8 +777,8 @@ bool opkill_may_name(cell n1, cell n2)
 
 bool opkill_must_name(cell n1, cell n2)
 {
- reference r1 = cell_to_reference(n1);
- reference r2 = cell_to_reference(n2);
+ reference r1 = cell_any_reference(n1);
+ reference r2 = cell_any_reference(n2);
  entity e1 = reference_variable(r1);
  entity e2 = reference_variable(r2);
  bool kill_must_p;
@@ -812,8 +894,8 @@ bool opkill_may_reference(cell c1, cell c2)
 
 bool opkill_must_reference(cell c1, cell c2)
 {
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   bool kill_must_p = false;
 
   if (store_independent_reference_p(r1) || store_independent_reference_p(r2))
@@ -828,8 +910,8 @@ bool opkill_must_reference(cell c1, cell c2)
 bool opkill_may_vreference(cell c1, cell c2)
 {
   int i = 0;
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
   list sl1 = NIL, sl2 = NIL;
@@ -867,8 +949,8 @@ bool opkill_may_vreference(cell c1, cell c2)
 bool opkill_must_vreference(cell c1, cell c2)
 {
   int i = 0;
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
   list sl1 = NIL, sl2 = NIL;
@@ -907,11 +989,13 @@ bool opkill_must_vreference(cell c1, cell c2)
 }
 
 
+
+
 bool opkill_may_constant_path(cell c1, cell c2)
 {
   bool kill_may_p;
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   type t1 = type_undefined;
   type t2 = type_undefined;
   entity v1 = reference_variable(r1);
@@ -932,8 +1016,8 @@ bool opkill_may_constant_path(cell c1, cell c2)
 bool opkill_must_constant_path(cell c1, cell c2)
 {
   bool kill_must_p;
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   type t1 = type_undefined;
   type t2 = type_undefined;
   entity v1 = reference_variable(r1);
@@ -1123,16 +1207,18 @@ set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int l
        points to relation */
     FOREACH(cell, r, R){
       SET_FOREACH(points_to, i, in_may){
-	if (locations_equal_p(r, points_to_source(i)) /* &&  !entity_abstract_location_p(el) */ ){
+	if (/* locations_equal_p */equal_must_vreference(r, points_to_source(i)) /* &&  !entity_abstract_location_p(el) */ ){
 	  pt = make_points_to(l, points_to_sink(i), make_approximation_may(), make_descriptor_none());
 	}
-	if(array_entity_p(reference_variable(cell_to_reference(r)))){
-	  reference ref = cell_to_reference(r);
-	  expression ex = reference_to_expression(ref);
-	  if(!expression_pointer_p(ex))
+	if(array_entity_p(reference_variable(cell_any_reference(r)))){
+	  reference ref = cell_any_reference(r);
+	  bool t_to_be_freed = false;
+	  type t = cell_reference_to_type(ref, &t_to_be_freed);
+	  if(pointer_type_p(t))
 	  pt = make_points_to(l, r, make_approximation_may(), make_descriptor_none());
 	  else
 	    pt = make_points_to(l, points_to_sink(i), make_approximation_may(), make_descriptor_none());
+	  if (t_to_be_freed) free_type(t);
 	}
 	if(!points_to_undefined_p(pt)) {
 	  set_add_element(gen_may_cps, gen_may_cps, (void*) pt);
@@ -1157,6 +1243,7 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 			     points_to_rank);
   points_to pt = points_to_undefined;
   approximation a = approximation_undefined;
+  bool changed = false;
 
   if(len > 1)
     a = make_approximation_may();
@@ -1175,9 +1262,27 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
        points to relation */
     FOREACH(cell, r, R){
       SET_FOREACH(points_to, i, in_must) {
-	if (locations_equal_p(r, points_to_source(i))/*  && !entity_abstract_location_p(el) */)
+	if (/* locations_equal_p */equal_must_vreference(r, points_to_source(i))/*  && !entity_abstract_location_p(el) */){
+	  set_methods_for_proper_simple_effects();
+	  l = simple_cell_to_store_independent_cell(l, &changed);
+	  generic_effects_reset_all_methods();
 	  pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
-	if(array_entity_p(reference_variable(cell_to_reference(r)))){
+
+
+	  /* if(array_entity_p(reference_variable(cell_any_reference(r)))){ */
+	  /*   reference ref = cell_any_reference(r); */
+	  /*   expression ex = reference_to_expression(ref); */
+
+	  /*   if(!expression_pointer_p(ex)) */
+	  /*     pt = make_points_to(l, r, a, make_descriptor_none()); */
+	  /*   else */
+	  /*     pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none()); */
+	  /* } */
+
+	  /* if(!points_to_undefined_p(pt)) */
+	  /*   set_add_element(gen_must_cps, gen_must_cps, (void*) pt); */
+
+	if(array_entity_p(reference_variable(cell_any_reference(r)))){
 	  reference ref = cell_any_reference(r);
 	  bool t_to_be_freed = false;
 	  type t = cell_reference_to_type(ref, &t_to_be_freed);
@@ -1185,6 +1290,7 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	    pt = make_points_to(l, r, a, make_descriptor_none());
 	  else
 	    pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
+
 	  if (t_to_be_freed) free_type(t);
 	}
 	if(!points_to_undefined_p(pt))
@@ -1192,7 +1298,8 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
       }
     }
   }
-
+  }
+  
  return gen_must_cps;
 }
 
@@ -1275,7 +1382,7 @@ bool opgen_may_vreference(list vr1, list vr2)
 bool atomic_constant_path_p(cell cp)
 {
   bool atomic_cp_p = true;
-  reference r = cell_to_reference(cp);
+  reference r = cell_any_reference(cp);
   entity e = reference_variable(r);
 
   if(entity_abstract_location_p(e)|| entity_null_locations_p(e))
@@ -1400,4 +1507,56 @@ cell add_array_dimension(cell c)
   cell c1 = make_cell_reference(r1);
 
   return c1;
+}
+
+
+bool equal_must_vreference(cell c1, cell c2)
+{
+  int i = 0;
+  bool changed = false;
+  set_methods_for_proper_simple_effects();
+  c1 = simple_cell_to_store_independent_cell(c1, &changed);
+  c2 = simple_cell_to_store_independent_cell(c2, &changed);
+  generic_effects_reset_all_methods();
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+  list sl1 = NIL, sl2 = NIL;
+  // FI: memory leak? generation of a new string?
+  extern const char* entity_minimal_user_name(entity);
+
+  i = strcmp(entity_minimal_user_name(v1), entity_minimal_user_name(v2));
+  if (i==0) {
+    sl1 = reference_indices(r1);
+    sl2 = reference_indices(r2);
+    if( (int)gen_length(sl1) == (int)gen_length(sl2) ) {
+      for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2)){
+	expression se1 = EXPRESSION(CAR(sl1));
+	expression se2 = EXPRESSION(CAR(sl2));
+	if( unbounded_expression_p(se1) ){
+	  i = 0;
+	}
+	else if (expression_constant_p(se1) && expression_constant_p(se2)){
+	  int i1 = expression_to_int(se1);
+	  int i2 = expression_to_int(se2);
+	  i = i2>i1? 1 : (i2<i1? -1 : 0);
+	  if (i==0){
+	    string s1 = words_to_string(words_expression(se1, NIL));
+	    string s2 = words_to_string(words_expression(se2, NIL));
+	    i = strcmp(s1, s2);
+	  }
+	}
+	else {
+	  string s1 = words_to_string(words_expression(se1, NIL));
+	  string s2 = words_to_string(words_expression(se2, NIL));
+	  i = strcmp(s1, s2);
+	}
+      }
+    }
+    else
+      i = 1;
+  }
+
+  return (i==0? true: false);
 }

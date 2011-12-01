@@ -893,13 +893,9 @@ list statement_to_loop_statement_list(statement s)
   return l;
 }
 
-/**
- * @brief Check if loop bound are constant and then if upper > lower
- * @return true if the loop is always executed at least once
- */
-bool loop_executed_at_least_once_p( loop l ) {
+bool range_contains_at_least_one_point_p( range r )
+{
   bool return_val = false;
-  range r = loop_range(l);
   expression low = range_lower(r);
   expression up = range_upper(r);
   expression inc = range_increment(r);
@@ -916,6 +912,16 @@ bool loop_executed_at_least_once_p( loop l ) {
     }
   }
   return return_val;
+}
+
+
+/**
+ * @brief Check if loop bound are constant and then if upper > lower
+ * @return true if the loop is always executed at least once
+ */
+bool loop_executed_at_least_once_p( loop l )
+{
+  return range_contains_at_least_one_point_p(loop_range(l));
 }
 
 
