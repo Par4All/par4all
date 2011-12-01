@@ -1334,7 +1334,7 @@ static transformer modulo_to_transformer(entity e, /* assumed to be an integer v
 {
   transformer tf = transformer_undefined;
   entity v1 =  make_local_temporary_integer_value_entity();
-  transformer tf1 = any_expression_to_transformer(v1, arg1, pre, true);
+  transformer tf1 = safe_any_expression_to_transformer(v1, arg1, pre, true);
   transformer npre =
     transformer_apply(tf1, transformer_undefined_p(pre)? transformer_identity():pre);
   transformer pre2 = transformer_range(npre);
