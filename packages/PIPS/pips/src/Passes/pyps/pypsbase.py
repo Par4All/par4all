@@ -323,18 +323,22 @@ class workspace(object):
             use the string `cppflags' to provide extra preprocessor flags
             use the boolean `recoverInclude' to turn include recovering on/off
             use the boolean `deleteOnClose' to turn full workspace deletion on/off
+            other kwargs will be interpreted as properties
         """
 
-        # gather relevant keywords from kwargs
-        self.__name             = kwargs.setdefault("name",           "")
-        self.verbose            = kwargs.setdefault("verbose",        True)
-        self.cppflags           = kwargs.setdefault("cppflags",       "")
-        self.ldflags            = kwargs.setdefault("ldflags",       "")
-        self.cpypips            = kwargs.setdefault("cpypips",        pypips)
-        self.recoverInclude     = kwargs.setdefault("recoverInclude", True)
-        self.deleteOnClose      = kwargs.setdefault("deleteOnClose",  False)
-        deleteOnCreate          = kwargs.setdefault("deleteOnCreate",  False)
-
+        # gather relevant keywords from kwargs and set default values
+        options_default = { "name":"",
+                "verbose":True,
+                "cppflags":"",
+                "ldflags":"",
+                "cpypips":pypips,
+                "recoverInclude":True,
+                "deleteOnClose":False,
+                "deleteOnCreate":False
+                }
+        # set the attribute k with value v taken from kwargs or options_default
+        [ setattr(self,k,kwargs.setdefault(k,v)) for (k,v) in options_default.iteritems() ]
+        
         # init some values
         self.__checkpoints=[]
         self.__modules={}
@@ -346,14 +350,14 @@ class workspace(object):
         self.__sources=list(sources)
 
         # use random repository name if none given
-        if not self.__name :
+        if not self.name :
             #  generate a random place in $PWS
             dirname=tempfile.mktemp(".database","PYPS",dir=".")
-            self.__name=os.path.splitext(os.path.basename(dirname))[0]
+            self.name=os.path.splitext(os.path.basename(dirname))[0]
 
         # sanity check to fail with a python exception
         if os.path.exists(".".join([self.name,"database"])):
-            if deleteOnCreate :
+            if self.deleteOnCreate :
                 self.delete(self.name)
             else:
                 raise RuntimeError("Cannot create two workspaces with same database")
@@ -376,6 +380,20 @@ class workspace(object):
         if self.verbose:
             print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
+        # before the workspace gets created, set some properties to pyps friendly values
+        if not self.verbose:
+            self.props.no_user_warning = True
+            self.props.user_log_p = False
+        self.props.maximum_user_error = 42  # after this number of exceptions the program will abort
+        self.props.pyps=True
+
+        # also set the extra properties given in kwargs
+        def safe_setattr(p,k,v): # just in case some extra kwarg are passed for child classes
+            try: setattr(p,k,v)
+            except: pass
+        [ safe_setattr(self.props,k,v) for (k,v) in kwargs.items() if k not in options_default.iterkeys() ]
+
+
         # try to recover includes
         if self.recoverInclude:
             # add guards around #include's, in order to be able to undo the
@@ -385,32 +403,28 @@ class workspace(object):
             except OSError:pass
             os.mkdir(self.__recover_include_dir )
 
-            new_sources = []
-            for f in self.__sources:
-                newfname = os.path.join(self.__recover_include_dir ,os.path.basename(f))
+            def rename_and_copy(f):
+                """ rename file f and copy it to the recover include dir """
+                fp = f.replace('/','_') if self.props.preprocessor_file_name_conflict_handling else f
+                newfname = os.path.join(self.__recover_include_dir ,os.path.basename(fp))
                 shutil.copy2(f, newfname)
-                new_sources += [newfname]
                 pypsutils.guardincludes(newfname)
-            self.__sources = new_sources
+                return newfname
+            self.__sources = [ rename_and_copy(f) for f in self.__sources ]
+            # this not very nice, but if conflict name handling is used, it is emulated at the recover include step and not needed any further
+            if self.props.preprocessor_file_name_conflict_handling:
+                self.props.preprocessor_file_name_conflict_handling=False
 
-         # remove any existing previous checkpoint state
+        # remove any existing previous checkpoint state
         for chkdir in glob.glob(".%s.chk*" % self.dirname):
             shutil.rmtree(chkdir)
  
-         # try to create the workspace now
+        # try to create the workspace now
         try:
             self.cpypips.create(self.name, self.__sources)
         except RuntimeError:
             self.close()
             raise
-
-
-        # now that the workspace is created, set some properties to pyps friendly values
-        if not self.verbose:
-            self.props.no_user_warning = True
-            self.props.user_log_p = False
-        self.props.maximum_user_error = 42  # after this number of exceptions the program will abort
-        self.props.pyps=True
         self.__build_module_list()
 
     
@@ -423,11 +437,6 @@ class workspace(object):
             self.deleteOnClose=False
         self.close()
         return False
-
-    @property
-    def name(self):
-        """retrieve workspace name"""
-        return self.__name
 
     @property
     def dirname(self):
