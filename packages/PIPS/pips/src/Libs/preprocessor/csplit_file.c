@@ -78,7 +78,7 @@ void error_reset_module_name_list()
 }
 
 static string splitc_input_file_name = string_undefined;
-/* The FILE descripto used to generate the compilation unit: */
+/* The FILE descripton used to generate the compilation unit: */
 static FILE * splitc_in_append = NULL;
 static int current_input_line = 0; /* In file just above */
 

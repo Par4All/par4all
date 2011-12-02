@@ -690,7 +690,7 @@ char * pips_basename(char *fullpath, char *suffix)
   return pips_filename(fullpath, suffix, true);
 }
 
-/* The source file name access path is shortened or not dependeing on
+/* The source file name access path is shortened or not depending on
    the property. It is shorten if the name conflicts are not managed. */
 char * pips_initial_filename(char *fullpath, char *suffix)
 {
