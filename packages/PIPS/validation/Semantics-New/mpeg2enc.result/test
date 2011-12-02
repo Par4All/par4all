@@ -3806,9 +3806,10 @@ void range_checks()
          error("vertical_size must be a multiple of 4 (4:2:0 field pictures)");
    }
 
-   if (mpeg1)
+   if (mpeg1) {
       if (aspectratio<1||aspectratio>14)
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
       error("aspect_ratio_information must be 1, 2, 3 or 4");
 
@@ -4564,13 +4565,13 @@ void stats()
          else {
             if ((mb_type&(8|4))==8) goto _switch_5_case_8;
             if ((mb_type&(8|4))==4) goto _switch_5_case_4;
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 _switch_5_default:            ;
             _IO_putc('0', statfile);
             goto _break_5;
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
             
@@ -19179,7 +19180,7 @@ void range_checks(void)
 //  T() {1<=aspectratio, aspectratio<=14}
 
 
-   if (mpeg1)
+   if (mpeg1) {
 
 //  T() {1<=aspectratio, aspectratio<=14}
 
@@ -19188,6 +19189,7 @@ void range_checks(void)
 //  T() {0==-1}
 
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
 
 //  T() {0==-1}
@@ -21458,7 +21460,7 @@ void stats(void)
 
 //  T() {}
 
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 //  T() {}
 
@@ -21473,7 +21475,7 @@ _switch_5_default:            ;
 //  T() {}
 
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
 
 //  T() {}
 
@@ -41708,7 +41710,7 @@ void range_checks(void)
 //    vertical_size<=16383}
 
 
-   if (mpeg1)
+   if (mpeg1) {
 
 //  P(i) {mpeg1==1, 1<=M, 0<=fieldpic, fieldpic<=1,
 //    1<=horizontal_size, horizontal_size<=16383, 1<=vertical_size,
@@ -41721,6 +41723,7 @@ void range_checks(void)
 //    vertical_size<=16383}
 
          error("pel_aspect_ratio must be between 1 and 14 (MPEG-1)");
+   }
    else if (aspectratio<1||aspectratio>4)
 
 //  P(i) {mpeg1==0, 1<=M, 0<=fieldpic, fieldpic<=1,
@@ -44852,7 +44855,7 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -44876,7 +44879,7 @@ _switch_5_default:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
 
-_switch_5_case_8|4:            ;
+_switch_5_case_12:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,

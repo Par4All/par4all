@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+void modulo05(int *p)
+{
+
+//  T(i) {i==1}
+
+   int i = 1;
+
+//  T(i) {}
+
+   if ((*p)++%2!=0)
+      ;
+
+//  T() {}
+
+
+   return;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+void modulo05(int *p)
+{
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   if ((*p)++%2!=0)
+      ;
+
+//  P(i) {}
+
+
+   return;
+}
