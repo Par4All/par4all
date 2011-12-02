@@ -18,6 +18,6 @@
 /* target-independent parts */
 #include "p4a_accel-shared.c"
 /* target-dependent part. Each file must implement the p4a_accel.h interface not implemented in p4a_accel-shared.c */
-#include "p4a_accel-cuda.c"
+#include "p4a_accel-CUDA.c"
 #include "p4a_accel-OpenCL.c"
 #include "p4a_accel-OpenMP.c"

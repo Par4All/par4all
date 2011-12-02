@@ -597,6 +597,7 @@ class p4a_processor(object):
             all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
             # on the **others**, try to distribute them
             self.workspace.props.parallelize_again_parallel_code=False
+            self.workspace.props.memory_effects_only = False # mandatory for internalize_parallel_code
             all_modules.internalize_parallel_code(concurrent=True)
             # and flag the remaining reductions if possible
             all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
