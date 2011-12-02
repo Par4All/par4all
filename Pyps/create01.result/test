@@ -1,0 +1,2 @@
+default behavior of abort_on_user_error False
+custom behavior of abort_on_user_error True
