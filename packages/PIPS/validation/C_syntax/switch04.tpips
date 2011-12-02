@@ -1,0 +1,20 @@
+delete switch04
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
+create switch04 switch04.c
+
+echo
+echo Parsed Printed file for "switch04"
+echo
+
+display PARSED_PRINTED_FILE[switch04]
+
+apply UNSPLIT[%PROGRAM]
+close
+
+#shell (cd switch04.database/Src;gcc -c switch04.c)
+
+delete switch04
+
+quit

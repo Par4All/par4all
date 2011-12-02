@@ -1,0 +1,6 @@
+delete duplicate01
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+create duplicate01 duplicate.c duplicate/duplicate.c
+info modules
+close duplicate01
