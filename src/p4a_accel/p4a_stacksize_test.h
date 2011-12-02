@@ -5,6 +5,8 @@
 	HPC Project 2011 
 
 **/
+#ifndef P4A_STACKSIZE_CHECK_H
+#define P4A_STACKSIZE_CHECK_H
 
 #include <stdio.h>
 #include <sys/time.h>
@@ -23,3 +25,4 @@ static inline void checkStackSizeInline(const char *currentFile, const int curre
     if (stacksize < stacksize_max)
 		fprintf(stderr, "Warning: file: %s line: %d your stacksize is %llu you may need to set it to unlimited size using the command 'ulimit -s unlimited' \n", currentFile, currentLine, stacksize);
 }
+#endif

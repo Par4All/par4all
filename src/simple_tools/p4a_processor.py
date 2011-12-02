@@ -574,7 +574,7 @@ class p4a_processor(object):
         return (m != None)
 
     def parallelize(self, fine = False, filter_select = None,
-                    filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
+                    filter_exclude = None, apply_phases_before = [], apply_phases_after = [], omp=False):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
@@ -588,12 +588,26 @@ class p4a_processor(object):
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
 
-        if fine:
-            # Use a fine-grain parallelization à la Allen & Kennedy:
+        # Use a different //izing scheme for openmp and the other accelerators
+        # Wait for p4a 2.0 for better engineering 
+        if omp:
+            # first step is to find big parallel loops
+            all_modules.coarse_grain_parallelization(concurrent=True)
+            # and the one with reductions
+            all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
+            # on the **others**, try to distribute them
+            self.workspace.props.parallelize_again_parallel_code=False
             all_modules.internalize_parallel_code(concurrent=True)
+            # and flag the remaining reductions if possible
+            all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
+        else:
+            if fine:
+                # Use a fine-grain parallelization à la Allen & Kennedy:
+                all_modules.internalize_parallel_code(concurrent=True)
 
-        # Always use a coarse-grain parallelization with regions:
-        all_modules.coarse_grain_parallelization(concurrent=True)
+            # Always use a coarse-grain parallelization with regions:
+            all_modules.coarse_grain_parallelization(concurrent=True)
+
 
         #all_modules.flatten_code(unroll=False,concurrent=True)
         #all_modules.simplify_control(concurrent=True)
