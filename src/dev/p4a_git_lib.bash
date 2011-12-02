@@ -196,7 +196,8 @@ function do_pull_remote_git() {
 
 
 # Pull into the given $1 branch hierarchy all the parts from the $2 p4a
-# remote git hierarchy. Use 'p4a' as default for $1 or $2 when null:
+# remote git hierarchy. Use 'p4a' as default for $1 if null.
+# Use $1 as $2 if $2 is null.
 function do_aggregate_branches() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
@@ -209,8 +210,8 @@ function do_aggregate_branches() {
     fi
     if [[ -z $merge_origin_branch_prefix ]]; then
 	# If we do not have $merge_origin_branch_prefix defined,
-	# we use the standard reference branch:
-	merge_origin_branch_prefix=p4a
+	# we use the current reference branch to merge from & into:
+	merge_origin_branch_prefix=$merge_to_prefix_branches
     fi
 
     # Since we only have integration branches here, we can always select
@@ -229,15 +230,18 @@ function do_aggregate_branches() {
 	cd $P4A_ROOT
         # Funny loop distribution to factorize out the checkout of the
         # package branch :-)
-	for i in $P4A_PACKAGES; do
+	if [[ $merge_to_prefix_branches != $merge_origin_branch_prefix ]]; then
+	  # We are asked to merge from an other branch hierarchy:
+	  for i in $P4A_PACKAGES; do
 	    # Start the branch from the origin one:
 	    create_branch_if_needed $merge_to_prefix_branches-$i $merge_origin_branch_prefix-$i
 	    git checkout $merge_to_prefix_branches-$i
 	    # Merge into the current branch the branch that buffers the remote
 	    # PIPS git svn gateway that should have been populated by a
 	    # previous do_pull_remote_git:
-	    git merge $merge_strategy $MERGE_LOG p4a-$i
-	done
+	    git merge $merge_strategy $MERGE_LOG $merge_origin_branch_prefix-$i
+	  done
+	fi
 	git checkout $merge_to_prefix_branches-packages
 	for i in $P4A_PACKAGES; do
 	    # The merge into packages branch:
@@ -254,16 +258,24 @@ function do_aggregate_branches() {
 
 
 # Pull into the par4all git all the parts from the remote git associated:
-function do_branch_action() {
-    verb 1 "Entering do_branch_action"
+function do_branch_action_name() {
+    verb 1 "Entering do_branch_action_name"
     enforce_P4A_TOP
     stop_on_error
+    branch_name="$1"
+    shift
     action="$@"
     for b in $P4A_BRANCH_SUFFIX; do
+	# The variables usable by the user:
 	suffix=-$b
+	# Build the branch name from the prefix and the suffix:
+	branch=$branch_name$suffix
 	eval $action
     done
+    # And add an iteration for the empty suffix since we can not do it in
+    # shell with strings:
     suffix=
+    branch=$branch_name$suffix
     eval $action
 }
 

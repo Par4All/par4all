@@ -5,7 +5,7 @@
 # Display help
 function usage()
 {
-  local status=$1 msg=$2
+  local status="$1" msg="$2"
   if [[ $msg ]]
   then
     echo -e "message: $msg\n" >&2
@@ -31,14 +31,23 @@ function usage()
         "     repositories into their respective branches and update the\n" \
         "     p4a branch infrastructure\n" \
         "  -m|--aggregate-branches [<to-prefix> [<origin-prefix>]] : merge\n" \
-        "     all the p4a branch infrastructure into the <to-prefix> branch\n" \
-        "     architecture. If the <to-prefix> branch infrastructure does\n" \
-        "     not exist, it is created from the <origin-prefix> branch\n" \
-        "     infrastructure if provided, else from the p4a branch\n" \
-        "     architecture\n" \
-        "  -b|--branch-action args+: apply a shell-script to a branch\n" \
-        "     hierarchy, with the branch suffix available in \$suffix\n" \
-        "  -a|--add-remotes: create the remotes pointing\n" \
+        "     all the p4a-like branch infrastructure into the <to-prefix> branch\n" \
+        "     architecture. If <to-prefix> is null, work into p4a default\n" \
+        "     branch infrastructure. If <origin-prefix> is null,\n" \
+        "     use the same as <to-prefix>, that means we aggregate\n" \
+        "     the <to-prefix> branch infrastructure without using\n" \
+        "     external branches. If the <to-prefix> branch infrastructure\n" \
+        "     does not exist, it is created from the <origin-prefix> branch\n" \
+        "     infrastructure\n" \
+        "  -b|--branch-action-name <branch-prefix> args+:\n" \
+        "     apply a shell-script to a branch hierarchy with name starting\n" \
+        "     with <branch-prefix>. The branch name is available\n" \
+        "     in the \$branch variable and the suffix available in\n" \
+        "     the \$suffix variable. Do not forget to escape special\n" \
+        "     shell characters in the final shell\n" \
+        "  -a|--branch-action args+: same as --branch-action-name p4a ...\n" \
+        "     to deal with default p4a branch hierarchy\n" \
+        "  --add-remotes: create the remotes pointing\n" \
         "      into $P4A_CRI_GIT_SVN and on the polylib" \
         "  -r|--root <directory-name>: create a git repository of this name\n" \
         "     instead of 'par4all'"
@@ -100,10 +109,11 @@ while [ "$1" ] ; do
       -g|--recursive-git-svn) recursive_git_action=1 ;;
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
-      -m|--aggregate-branches) aggregate_branches=1 ; merge_to_prefix_branches=$1 ; shift ; merge_remote_git_prefix=$1 ; shift ;;
-      -b|--branch-action) branch_action="$@"; break;;
-      -a|--add-remotes) add_remotes=1 ;;
-      -r|--root) P4A_ROOT=$1 ; shift ;;
+      -m|--aggregate-branches) aggregate_branches=1 ; merge_to_prefix_branches=$1 ; shift ; merge_remote_git_prefix="$1" ; shift ;;
+      -a|--branch-action) branch_action_name=p4a ; branch_action="$@" ; break;;
+      -b|--branch-action-name) branch_action_name="$1" ; shift; branch_action="$@" ; break;;
+      --add-remotes) add_remotes=1 ;;
+      -r|--root) P4A_ROOT="$1" ; shift ;;
       # error
       *) usage 1 "unexpected option: $opt"
   esac
@@ -148,8 +158,8 @@ else
         do_recursive_git $@
     fi
 
-    if [[ -n $branch_action ]]; then
-        do_branch_action "$branch_action"
+   if [[ -n $branch_action_name ]]; then
+        do_branch_action_name "$branch_action_name" "$branch_action"
     fi
 
     if [[ $add_remotes ]]; then

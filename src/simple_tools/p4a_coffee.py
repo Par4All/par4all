@@ -100,7 +100,7 @@ def main():
                 os.chdir(work_dir)
 
                 if options.git_revision:
-                    revision = options.git_revision
+                    git_branch = options.git_revision
                 else:
                     # Use the default branch:
                     git_branch = "p4a"
