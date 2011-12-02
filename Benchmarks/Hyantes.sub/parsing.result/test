@@ -95,27 +95,27 @@ static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range
 		return;
 	}*/
 
-   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
-   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
-   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
-   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
-   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+   if (configuration->fid==F_DISK) goto _switch_1_case_0;
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_1;
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_2;
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_3;
+   if (configuration->fid==F_PARETO) goto _switch_1_case_4;
 _switch_1_default:   ;
    do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
    goto _break_1;
-_switch_1_case_F_PARETO:   ;
+_switch_1_case_4:   ;
    do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
    goto _break_1;
-_switch_1_case_F_EXPONENTIAL:   ;
+_switch_1_case_3:   ;
    do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
    goto _break_1;
-_switch_1_case_F_GAUSSIAN:   ;
+_switch_1_case_2:   ;
    do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
    goto _break_1;
-_switch_1_case_F_AMORTIZED_DISK:   ;
+_switch_1_case_1:   ;
    do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
    goto _break_1;
-_switch_1_case_F_DISK:   ;
+_switch_1_case_0:   ;
    do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
 _break_1:   ;
 }
@@ -589,22 +589,22 @@ _break_2:         ;
 static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
 {
    int res = 1;
-   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
-   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
-   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
-   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
-   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
-   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_0;
+   if (opt==HS_THRESHOLD) goto _switch_1_case_1;
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_2;
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_3;
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_4;
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_5;
 
 _switch_1_default:   ;
    fprintf(stderr, "[hs_set] unknow option \n");
    res = 0;
    goto _break_1;
-_switch_1_case_HS_MODULE_OPT:   ;
+_switch_1_case_5:   ;
    //res = init_module(ap);
    res = 0;
    goto _break_1;
-_switch_1_case_HS_SMOOTH_FUNC:   ;
+_switch_1_case_4:   ;
    {
       char *fname = va_arg(*ap, char *);
       double fparam = va_arg(*ap, double);
@@ -628,15 +628,15 @@ _break_2:      ;
       }
    }
    goto _break_1;
-_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+_switch_1_case_3:   ;
    res = 0;
    goto _break_1;
-_switch_1_case_HS_LOAD_RAW:   ;
+_switch_1_case_2:   ;
    res = 0;
    goto _break_1;
-_switch_1_case_HS_THRESHOLD:   ;
+_switch_1_case_1:   ;
    goto _break_1;
-_switch_1_case_HS_PARSE_ONLY:   ;
+_switch_1_case_0:   ;
    res = 0;
 _break_1:   ;
    if (!res)
