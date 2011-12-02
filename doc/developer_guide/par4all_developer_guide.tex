@@ -60,6 +60,7 @@ on \PfaAllOrganizationHTDOC.
 % To automatically build reports from this content:
 %%ContentBegin
 
+
 \section{Introduction}
 \label{sec:introduction}
 
@@ -81,14 +82,10 @@ also for advanced users desiring more functionality from \Apfa.
 Since \Apfa relies on other tool projects, the documentation of these other
 projects should also be consulted independently and is not included here.
 
-The first section contains the release notes for \Apfa, including
-installations instructions. For detailed information on \Apfa
-infrastructure, including instructions for compilation, see
-sections~\ref{sec:compilation} and above.
-
 \tableofcontents{}
 
 \bigskip{}
+
 
 \section{Advanced installation}
 \label{sec:advanced_installation}
@@ -259,6 +256,7 @@ level has been used for the integration with \texttt{trunk},
 layout, which was added later at approximately revision 750. Because
 of this prior history, this gateway is not published in a public git.
 
+
 \subsection{Private repositories}
 \label{sec:private-repositories}
 
@@ -272,6 +270,7 @@ For \Ahpcp-confidential information,
 
 Other repositories can be created and used on demand according to the
 needs of evolving private collaborations.
+
 
 \subsection{Packages}
 \label{sec:packages}
@@ -385,6 +384,7 @@ these dateways, light
 branches are stored into a common \Agit view of the \Apips{} \Asvn
 repositories; these light branches can be pushed back into the \Apips{} \Asvn.
 
+
 \subsection{The p4a\_git script to deal with workflow}
 \label{sec:p4a_git-script-deal}
 
@@ -405,6 +405,7 @@ project.
 The following section presents some examples, after which the full
 list of options is described in detail.
 
+
 \subsubsection{\protect\texttt{p4a\_git} and \protect\texttt{git} typical use cases}
 \label{sec:p4a_git-typical-use}
 
@@ -413,7 +414,7 @@ and potentially contain integration work performed by \Apfa team
 members beyond the current release. To retrieve an up-to-date version
 of a reference branch, use:
 \begin{verbatim}
-p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+p4a_git --branch-action-name p4a "git checkout \$branch; git pull origin \$branch"
 \end{verbatim}
 
 Work performed on \Apfa itself without integrating new versions of upstream
@@ -482,11 +483,12 @@ After testing and validation, this branch can be published\footnote{But
   \texttt{gitk} because it may be cumbersome for the community to remove
   some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
-p4a_git --branch-action git push origin p4a\$suffix
+p4a_git --branch-action-name p4a git push origin \$branch
 \end{verbatim}
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
 of steps at the beginning of this section.
+
 
 \subsubsection{More advanced use cases for \protect\texttt{p4a\_git}}
 \label{sec:more-advanced-use}
@@ -504,23 +506,29 @@ its relative \verb|p4a|-prefixed branch infrastructure. To do this, use;
 p4a_git --aggregate-branches p4a-1.3-rc
 \end{verbatim}
 
-To start from another branch different from the default
-\verb|p4a|-prefixed branch infrastructure, for example
-\texttt{p4a-0.2-alpha}, use:
+To start the \texttt{p4a-0.3-alpha} branch infrastructure from
+\texttt{p4a-0.2-rc} branch infrastructure, use:
 \begin{verbatim}
-p4a_git --aggregate-branches p4a-very-personal p4a-0.2-alpha
+p4a_git --aggregate-branches p4a-0.3-alpha p4a-0.2-rc
 \end{verbatim}
+
+Once the new branch infrastructure is created, you can use it, modify its
+component branches and apply the merge integration work-flow with for example:
+\begin{verbatim}
+p4a_git --aggregate-branches p4a-1.3-rc
+\end{verbatim}
+to update the \texttt{p4a-1.3-rc} branch infrastructure.
 
 When finished, these branches can be pushed for sharing or merged
 into the main \Apfa \texttt{p4a} with:
 \begin{verbatim}
-p4a_git --branch-action git push origin p4a-very-personal\$suffix
+p4a_git --branch-action-name p4a-very-personal git push origin \$branch
 \end{verbatim}
 
 To pull all the different \Apfa branches that may have been
 changed by others:
 \begin{verbatim}
-p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+p4a_git --branch-action-name p4a "git checkout \$branch; git pull origin \$branch"
 \end{verbatim}
 or even faster by avoiding a fetch for each \texttt{pull}:
 \begin{verbatim}
@@ -531,8 +539,8 @@ p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 To set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before using them:
 \begin{verbatim}
-p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
-        remotes/origin/p4a-0.2-alpha\$suffix
+p4a_git --branch-action-name p4a-0.2-alpha git branch \$branch \
+        remotes/origin/\$branch
 \end{verbatim}
 
 Developing and trying a new version of the scripts dealing with
@@ -550,7 +558,7 @@ For a more independent development environment, one could also set
 
 If you are developing the \Apfa infrastructure itself, since
 \verb|p4a_setup.py| install \Apfa and rebuild a new configuration file at
-the end, to test the new \texttt{p4a_git} script for example for the
+the end, to test the new \verb|p4a_git| script for example for the
 construction of the new \Apfa, it is useful to set \verb|P4A_ETC| to point
 to the directory that contains the \verb|p4a_git_lib.bash| that will be
 used for example, to speed up the bootstrapping process. Subsequent
@@ -612,18 +620,27 @@ The \verb|p4a_git| options are available in short and long forms:
   remote \Agit repositories into their respective branches and update the
   \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
 \item[\texttt{-m} or \texttt{--aggregate-branches}
-  \texttt{\emph{[<to-prefix>}} \texttt{\emph{[<origin-prefix>]]}}] merge the
-  entire \texttt{p4a} branch infrastructure into the
-  \texttt{\emph{<to-prefix>}} branch architecture. If the
-  \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
-  created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
-  if provided, else from the \texttt{p4a} branch architecture;
-\item[\texttt{-b} or \texttt{--branch-action} \texttt{\emph{args+}}] apply
-  the \texttt{\emph{args+}} shell-script to a branch hierarchy, with the
-  branch suffix available to the \texttt{\emph{args+}} script in the
-  \verb|$suffix| variable. Do not forget to escape special shell
+  \texttt{\emph{[<to-prefix>}} \texttt{\emph{[<origin-prefix>]]}}] merge
+  all the \texttt{p4a}-like branch infrastructure into the
+  \texttt{\emph{<to-prefix>}} branch architecture. If
+  \texttt{\emph{<to-prefix>}} is null, work into \texttt{p4a} default
+  branch infrastructure. If \texttt{\emph{<origin-prefix>}} is null, use
+  the same as \texttt{\emph{<to-prefix>}}, that means we aggregate the
+  \texttt{\emph{<to-prefix>}} branch infrastructure without using external
+  branches. If the \texttt{\emph{<to-prefix>}} branch infrastructure does
+  not exist, it is created from the \texttt{\emph{<origin-prefix>}} branch
+  infrastructure;
+\item[\texttt{-b} or \texttt{--branch-action-name}
+  \texttt{\emph{<branch-prefix>}} \texttt{\emph{args+}}] apply a
+  shell-script to a branch hierarchy with name starting with
+  \texttt{<branch-prefix>}. The branch name is available in the
+  \texttt{\$branch} variable and the suffix available in the
+  \texttt{\$suffix} variable. Do not forget to escape special shell
   characters in the final shell;
-\item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
+\item[\texttt{-a} or \texttt{--branch-action} \texttt{\emph{args+}}] same
+  as \verb|--branch-action-name p4a ...| to deal with default \texttt{p4a}
+  branch hierarchy;
+\item[\texttt{--add-remotes}] create the remotes pointing
   to \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
   change the git working repository.
@@ -679,8 +696,8 @@ When developing \Apfa packages, it is of critical importance to test them
 For example, a new \Apips version is developed in the
 \Acri{} \Asvn repository before building \Apfa to test the integration.
 
-This process has been described in section~\ref{sec:compilation};
-further details are provided in the following example.
+This process has been described in the compilation manual; further details
+are provided in the following example.
 
 Assuming there is a \Asvn working copy of \Apips (including the \texttt{trunk}
 into \texttt{prod}, your branch in \verb|pips_dev|, etc.; refer
@@ -688,7 +705,7 @@ to the \Apips developer guide for more information), use the
 \verb|--pips-src=| to make \Apfa point to this directory.
 
 Verify that the correctd \Apfa variable is set in your shell, that
-the previous configuration file from the \Apips \Asvn environment from
+the previous configuration file from the \Apips{} \Asvn environment from
 \Acri is not automatically sourced in your shell and that there are no
 incorrect environment variables from previous invocations of a script
 (e.g., \verb|PATH|, etc.)
@@ -859,6 +876,7 @@ testing for easy rollback.
 \subsection{PIPS-GFC extension workflow}
 \label{sec:pips-gfc-workflow}
 
+
 \subsubsection{New version}
 \label{sec:new-version}
 
@@ -936,6 +954,7 @@ if you want to be modest about your gory hesitations \smiley{}.
 
 There are scripts to facilitate development.
 
+
 \subsection{Scripts for an everyday work}
 \label{sec:an-everyday-work}
 
@@ -1001,6 +1020,7 @@ They are located in
   \Aautotools version of \Apips;
 \end{itemize}
 
+
 \subsection{Script to manage documentation}
 \label{sec:script-deal-with}
 
@@ -1065,7 +1085,6 @@ There is also a \verb|p4a_coffee.py| script to build and publish everything
 at once.
 
 \input{p4a_coffee-help}
-
 
 
 \section{\protect\texttt{p4a} architecture}
@@ -1181,6 +1200,7 @@ construct a
 \Amat (Minimal Acceptance Test) for \Apfa. Other \Apips validation
 cases are more useful for \Apips developers, and are of less relevance
 to \Apfa validation.
+
 
 \subsubsection{Example}
 \label{sec:example}
@@ -1374,6 +1394,7 @@ to specific versions of particular branches such as
 \section{Useful \protect\Agit tricks for \protect\Apfa}
 \label{sec:some-agit-tricks}
 
+
 \subsection{Files committed to the wrong branch}
 \label{sec:you-have-comited}
 
@@ -1500,10 +1521,12 @@ where and how to get back on rails. \smiley
 
 \appendix
 
+
 \section{Various script details}
 \label{sec:vari-script-deta}
 
 In this appendix, options and other ancillary scripts are described.
+
 
 \subsection{The \protect\texttt{p4a\_recover\_includes} script}
 \label{sec:p4a_recover_includes}
@@ -1546,6 +1569,7 @@ The following section should be a very demonstration of this tool
 indeed. \smiley
 
 \input{optparse_help_to_tex-help}
+
 
 \section{Tools, tips and tricks for developpers}
 

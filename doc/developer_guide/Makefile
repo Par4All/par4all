@@ -53,7 +53,7 @@ par4all_developer_guide.tex: p4a_setup-help.tex p4a_pack-help.tex p4a_post_proce
 
 # p4a_pack-help is included at a deeper sectioning level:
 p4a_pack-help.tex: p4a_pack.help Makefile
-	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
+	../../src/dev/optparse_help_to_tex --article --article-section-level 4 $< > $@
 
 # p4a_validate-help is included at a deeper sectioning level:
 p4a_validate-help.tex: p4a_validate.help Makefile
@@ -61,7 +61,7 @@ p4a_validate-help.tex: p4a_validate.help Makefile
 
 # p4a_coffee-help is included at a deeper sectioning level:
 p4a_coffee-help.tex: p4a_coffee.help Makefile
-	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
+	../../src/dev/optparse_help_to_tex --article --article-section-level 4 $< > $@
 
 # Match commands into the directories specified in the VPATH above
 # If the command has a basic name:
