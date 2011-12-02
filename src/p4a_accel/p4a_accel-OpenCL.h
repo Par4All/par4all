@@ -436,13 +436,13 @@ parameters types are resolved.
 /* See the C version of the p4a_setArguments in p4a_accel.c. The
     reference to the parameter is set as the first var_arg
 */
-void p4a_setArguments(int i,char *s,size_t size, ... /*ref_arg*/);
+void p4a_setArguments(int i,char *s,size_t size, void* ref_arg);
 
 /** Interpretation of one parameter in OpenCL. Call to the
 clSetKernelArg via the C version of p4a_setArguments() such that the
 parameters types are resolved.
  */
-#define P4A_arg1(n,x,...)  p4a_setArguments(n,STRINGIFY(x),sizeof(x),x); // not taking the address because it may be invalid (constants or lvalue)
+#define P4A_arg1(n,x,...)  { typeof(x) __x=x; p4a_setArguments(n,STRINGIFY(x),sizeof(x),&__x);} // not taking the address because it may be invalid (constants or lvalue)
 #endif 
 
 /** 
