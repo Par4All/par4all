@@ -1,6 +1,6 @@
-
-Parsed code
-
+#
+# Parsed Code for main
+#
 int main(int argc, char *argv[])
 {
    /*  t82.sce - testing elseif */
@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
          if (_u_a<_u_c)
             call("a<c<b");
 }
-
-Code
-
+#
+# Code after print_code for module main
+#
 int main(int argc, char *argv[])
 {
    /*  t82.sce - testing elseif */

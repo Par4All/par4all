@@ -2497,12 +2497,12 @@ bool points_to_analysis(char * module_name) {
 
     /* Save IN points-to relations */
     list  l_in = set_to_list(pts_to_in);
-    points_to_list in_list = make_points_to_list(l_in);
+    points_to_list in_list = make_points_to_list(gen_full_copy_list(l_in)); // SG: baaaaaaad copy, let us hope AM will fix her code :p
     DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_IN, module_name, in_list);
 
     /* Save OUT points-to relations */
     list  l_out = set_to_list(pts_to_out);
-    points_to_list out_list = make_points_to_list(l_out);
+    points_to_list out_list = make_points_to_list(gen_full_copy_list(l_out)); // SG: baaaaaaad copy, let us hope AM will fix her code :p
     DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_OUT, module_name, out_list);
 
   reset_pt_to_list();
