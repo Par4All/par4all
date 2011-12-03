@@ -1,1 +1,1 @@
-char a ='c';
+int a() { return 0;}
