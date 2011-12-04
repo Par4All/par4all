@@ -1,0 +1,213 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(ii,jj) {}
+
+   int ii, jj;
+
+
+//  T(N) {N==100}
+
+   int N = 100;
+
+//  T() {}
+
+   double A[100][100];
+
+//  T(ii,jj) {ii+1<=N, 0<=ii}
+
+
+   for(ii = 0; ii <= N-1; ii += 1)
+
+//  T(jj) {jj+1<=N, 0<=jj}
+
+      for(jj = 0; jj <= N-1; jj += 1)
+
+//  T() {}
+
+         if (ii>0||jj<N-1)
+
+//  T() {}
+
+            A[ii][jj] = 1.0;
+   {
+
+//  T(i) {}
+
+      int i;
+
+//  T(i) {i+1<=N, 0<=i}
+
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  T(j) {}
+
+         int j;
+
+//  T(j) {j+1<=N, 0<=j}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  T() {}
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int ii, jj;
+
+
+//  P(ii,jj) {}
+
+   int N = 100;
+
+//  P(N,ii,jj) {N==100}
+
+   double A[100][100];
+
+//  P(N,ii,jj) {N==100}
+
+
+   for(ii = 0; ii <= N-1; ii += 1)
+
+//  P(N,ii,jj) {N==100, 0<=ii, ii<=99}
+
+      for(jj = 0; jj <= N-1; jj += 1)
+
+//  P(N,ii,jj) {N==100, 0<=ii, ii<=99, 0<=jj, jj<=99}
+
+         if (ii>0||jj<N-1)
+
+//  P(N,ii,jj) {N==100, 0<=ii, ii<=99, jj<=ii+98, 0<=jj, jj<=99}
+
+            A[ii][jj] = 1.0;
+   {
+
+//  P(N,ii,jj) {N==100, ii==100, jj==100}
+
+      int i;
+
+//  P(N,i,ii,jj) {N==100, ii==100, jj==100}
+
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  P(N,i,ii,jj) {N==100, ii==100, jj==100, 0<=i, i<=99}
+
+         int j;
+
+//  P(N,i,ii,j,jj) {N==100, ii==100, jj==100, 0<=i, i<=99}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  P(N,i,ii,j,jj) {N==100, ii==100, jj==100, 0<=i, i<=99, 0<=j,
+//    j<=99}
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+//  P(N,ii,jj) {N==100, ii==100, jj==100}
+
+
+   return 0;
+}
+
+Regions for "main"
+
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+int main()
+{
+   int ii, jj;
+
+   int N = 100;
+   double A[100][100];
+
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, PHI2<=PHI1+98, 0<=PHI2,
+//    PHI2<=99, N==100}>
+
+
+   for(ii = 0; ii <= N-1; ii += 1)
+
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii, 0<=PHI2, PHI2<=99, PHI2<=ii+98,
+//    N==100, 0<=ii, ii<=99}>
+
+      for(jj = 0; jj <= N-1; jj += 1)
+
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii, PHI2==jj, N==100, 0<=ii, ii<=99,
+//    jj<=ii+98, 0<=jj, jj<=99}>
+
+         if (ii>0||jj<N-1)
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==ii, PHI2==jj, N==100, 0<=ii, ii<=99,
+//    jj<=ii+98, 0<=jj, jj<=99}>
+
+            A[ii][jj] = 1.0;
+   {
+      int i;
+
+//  <A[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    N==100, ii==100, jj==100}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+
+      for(i = 0; i <= N-1; i += 1) {
+         int j;
+
+//  <A[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2<=99, N==100, ii==100,
+//    jj==100, 0<=i, i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, N==100, ii==100,
+//    jj==100, 0<=j, j<=99, 0<=i, i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+   return 0;
+}
