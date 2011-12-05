@@ -13,6 +13,6 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 #display PARSED_PRINTED_FILE[%ALL]
 #display PRINTED_FILE[%ALL]
 
-shell ls vik1.database/*/*.c | xargs cat | sed -e '/^# 1[^0-9][^0-9]*/d;/^$/d'
+shell ls vik1.database/*/*.c | xargs cat | sed -e '/^# [0-9]/d;/^$/d'
 
 quit
