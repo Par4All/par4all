@@ -156,6 +156,13 @@ bool empty_string_p(const char* s)
     return(strcmp(s, "") == 0);
 }
 
+
+bool blank_string_p(const char*s ){
+    extern int isspace(int);
+    while(*s&&isspace(*s++));
+    return !*s;
+}
+
 bool return_local_label_name_p(const char* s)
 {
     return(strcmp(s, RETURN_LABEL_NAME) == 0);
