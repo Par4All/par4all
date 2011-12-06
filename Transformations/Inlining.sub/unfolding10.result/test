@@ -11,9 +11,9 @@ int main(int argc, char **argv)
       unsigned int y;
       
       //init
-      for(y = 0; y <= maxY-1; y += 1) {
+      for(y = 0; y < maxY; y += 1) {
          unsigned int x;
-         for(x = 0; x <= maxX-1; x += 1) {
+         for(x = 0; x < maxX; x += 1) {
             table1[y][x] = (unsigned char) (rand()*256/2147483647);
             table2[y][x] = (unsigned char) (rand()*256/2147483647);
             results[y][x] = 0;
@@ -24,9 +24,9 @@ int main(int argc, char **argv)
       unsigned int macroY;
       
       
-      for(macroY = 0; macroY <= maxY-16-1; macroY += 1) {
+      for(macroY = 0; macroY < maxY-16; macroY += 1) {
          unsigned int macroX;
-         for(macroX = 0; macroX <= maxX-16-1; macroX += 1) {
+         for(macroX = 0; macroX < maxX-16; macroX += 1) {
             int ret = Intermediate_function(macroX, macroY, maxX, maxY, table1, table2);
             results[macroY][macroX] = ret;
          }
@@ -36,9 +36,9 @@ int main(int argc, char **argv)
       unsigned int y;
       
       // display 
-      for(y = 0; y <= maxY-1; y += 1) {
+      for(y = 0; y < maxY; y += 1) {
          unsigned int x;
-         for(x = 0; x <= maxX-1; x += 1)
+         for(x = 0; x < maxX; x += 1)
             finalSum += results[y][x];
       }
    }
@@ -61,10 +61,10 @@ int main(int argc, char **argv)
       
       //init
 l99998:
-      for(y = 0; y <= maxY-1; y += 1) {
+      for(y = 0; y < maxY; y += 1) {
          unsigned int x;
 l99999:
-         for(x = 0; x <= maxX-1; x += 1) {
+         for(x = 0; x < maxX; x += 1) {
             table1[y][x] = (unsigned char) (rand()*256/2147483647);
             table2[y][x] = (unsigned char) (rand()*256/2147483647);
             results[y][x] = 0;
@@ -76,7 +76,7 @@ l99999:
       
       
 l99996:
-      for(macroY = 0; macroY <= maxY-16-1; macroY += 1) {
+      for(macroY = 0; macroY < maxY-16; macroY += 1) {
          unsigned int macroX;
 l99997:         new(maxX, maxY, macroY, results, table1, table2);
       }
@@ -86,10 +86,10 @@ l99997:         new(maxX, maxY, macroY, results, table1, table2);
       
       // display 
 l99994:
-      for(y = 0; y <= maxY-1; y += 1) {
+      for(y = 0; y < maxY; y += 1) {
          unsigned int x;
 l99995:
-         for(x = 0; x <= maxX-1; x += 1)
+         for(x = 0; x < maxX; x += 1)
             finalSum += results[y][x];
       }
    }
@@ -103,7 +103,7 @@ void new(unsigned int maxX, unsigned int maxY, unsigned int macroY, int results[
    //PIPS generated variable
    unsigned int macroX;
 l99997:
-   for(macroX = 0; macroX <= maxX-16-1; macroX += 1) {
+   for(macroX = 0; macroX < maxX-16; macroX += 1) {
       int ret = Intermediate_function(macroX, macroY, maxX, maxY, table1, table2);
       results[macroY][macroX] = ret;
    }
@@ -115,15 +115,15 @@ void new(unsigned int maxX, unsigned int maxY, unsigned int macroY, int results[
    //PIPS generated variable
    int _return0;
 l99997:
-   for(macroX = 0; macroX <= maxX-16-1; macroX += 1) {
+   for(macroX = 0; macroX < maxX-16; macroX += 1) {
       int ret;
       {
          int sum = 0;
          {
             unsigned int y;
-            for(y = 0; y <= maxY-1; y += 1) {
+            for(y = 0; y < maxY; y += 1) {
                unsigned int x;
-               for(x = 0; x <= maxX-1; x += 1)
+               for(x = 0; x < maxX; x += 1)
                   sum += table1[y+macroY][x+macroX]-table2[y+macroY][x+macroX];
             }
          }
