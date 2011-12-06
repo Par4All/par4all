@@ -323,9 +323,9 @@ remove_loop_statement(statement s, instruction i, loop l)
   /* If we can, we will replace the use of the loop index in the body with
    * the lower bound, we handle only pure simple scalar expression cases
    */
-  if(expression_integer_constant_p(rl) ||
-      (expression_reference_p(rl)
-      && entity_scalar_p(reference_variable(expression_reference(rl))))) {
+  if( (expression_integer_constant_p(rl) && expression_to_int(rl) >= 0)
+      || (expression_reference_p(rl)
+          && entity_scalar_p(reference_variable(expression_reference(rl))))) {
 
     entity up_bound;
     if(expression_integer_constant_p(rl)) {
