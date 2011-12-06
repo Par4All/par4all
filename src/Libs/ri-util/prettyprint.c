@@ -526,16 +526,35 @@ list C_loop_range(range obj, entity i, list pdl)
 
     /* Increasing or decreasing index? */
     expression inc = range_increment(obj);
-    // Assume the increment has an integer value with a known sign
-    if (expression_negative_integer_value_p(inc))
-      /* The increment is negative, that means the index is tested against
-	 a lower bound: */
-      pc = CHAIN_SWORD(pc," >= ");
-    else
-      /* Else we assume to test against an upper bound: */
-      pc = CHAIN_SWORD(pc," <= ");
+    /* Assume the increment has an integer value with a known sign
+       If The increment is negative, that means the index is tested against
+       a lower bound
+       Else we assume to test against an upper bound
+    */
 
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, true, pdl));
+    expression ru = range_upper(obj);
+    /* check if we have something of the form exp -1 as range_upper */
+    expression ru_minus_one = make_op_exp(PLUS_OPERATOR_NAME,
+            copy_expression(ru),
+            int_to_expression(1)
+            );
+
+    /* Additionally, we want to pretty print a strict comparison if certain conditions are met. This could be the default choice , but the impact on the validation would be huge */
+    set re = get_referenced_entities(ru);
+    bool references_unsigned_entity_p = false;
+    SET_FOREACH(entity,e,re) {
+        references_unsigned_entity_p |= unsigned_type_p(ultimate_type(entity_type(e)));
+    }
+    set_free(re);
+    if( references_unsigned_entity_p ) {
+        pc = CHAIN_SWORD(pc, expression_negative_integer_value_p(inc) ? " > " : " < ");
+        pc = gen_nconc(pc, words_subexpression(ru_minus_one, 0, true, pdl));
+    }
+    else {
+        pc = CHAIN_SWORD(pc, expression_negative_integer_value_p(inc) ? " >= " : " <= ");
+        pc = gen_nconc(pc, words_subexpression(ru, 0, true, pdl));
+    }
+    free_expression(ru_minus_one);
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Increment the loop index */
