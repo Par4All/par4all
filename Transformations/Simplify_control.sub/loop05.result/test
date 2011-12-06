@@ -1,0 +1,9 @@
+#
+# Code after simplify_control_directly for module trivial_loop
+#
+void trivial_loop(int A[10][10])
+{
+   int i, j;
+   for(j = 0; j <= 9; j += 1)
+      A[0][j] = 0;
+}
