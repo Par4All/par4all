@@ -52,8 +52,7 @@ void loop01()
 {
    int i = 0;
 
-   i = 0;
-   printf("%d\n", i);
+   printf("%d\n", 0);
    i = 0+1;
 
    return;
