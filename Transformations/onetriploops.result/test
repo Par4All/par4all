@@ -108,28 +108,23 @@ Code after one trip loop detection and simplification
       INTEGER I, N
       READ *, N                                                         0004
 
-      I = 1
-      PRINT *, 'i = ', I                                                0007
+      PRINT *, 'i = ', 1                                                0007
       I = 1+1
 
-      I = 2
-      PRINT *, 'i = ', I                                                0011
+      PRINT *, 'i = ', 2                                                0011
       I = 2+1
 
       I = -10
       PRINT *, 'i = ', I                                                0015
       I = -10+1
 
-      I = N
-      PRINT *, 'i = ', I                                                0019
+      PRINT *, 'i = ', N                                                0019
       I = N+1
 
-      I = 1
-      PRINT *, 'i = ', I                                                0023
+      PRINT *, 'i = ', 1                                                0023
       I = 1+1
 
-      I = 1
-      PRINT *, 'i = ', I                                                0027
+      PRINT *, 'i = ', 1                                                0027
       I = 1+(-1)
 
       I = 2*N+3
@@ -147,14 +142,12 @@ Code after one trip loop detection and simplification
 
       M = N                                                             0043
 
-      I = N
-      PRINT *, 'i = ', I                                                0046
+      PRINT *, 'i = ', N                                                0046
       I = N+1
 
       M = N+2                                                           0049
 
-      I = N
-      PRINT *, 'i = ', I                                                0052
+      PRINT *, 'i = ', N                                                0052
       I = N+3
 
 ! pas simplifiable
@@ -167,8 +160,7 @@ Code after one trip loop detection and simplification
          PRINT *, 'i = ', I                                             0062
       ENDDO
 
-      I = M
-      PRINT *, 'i = ', I                                                0066
+      PRINT *, 'i = ', M                                                0066
       I = M+(-3)
 
 ! pas simplifiable
@@ -186,8 +178,7 @@ Code after one trip loop detection and simplification
          DO I = N, 2*N+1, N                                             0081
             PRINT *, 'i = ', I                                          0082
          ENDDO
-         I = N
-         PRINT *, 'i = ', I                                             0085
+         PRINT *, 'i = ', N                                             0085
          I = N+N
       ENDIF
 
@@ -196,8 +187,7 @@ Code after one trip loop detection and simplification
          DO I = N, 2*N-1, N                                             0091
             PRINT *, 'i = ', I                                          0092
          ENDDO
-         I = N
-         PRINT *, 'i = ', I                                             0095
+         PRINT *, 'i = ', N                                             0095
          I = N+N
       ENDIF
 
