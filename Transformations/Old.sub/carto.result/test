@@ -204,15 +204,12 @@ void carto(float towns[100][100], float result[100][100])
          for(k = 0; k <= i-1; k += 1) {
             for(l = 0; l <= j-1; l += 1)
                result[i][j] += towns[k][l]/dist(i, j, k, l);
-            l0 = j;
             l0 = j+1;
             for(l00 = j+1; l00 <= 99; l00 += 1)
                result[i][j] += towns[k][l00]/dist(i, j, k, l00);
          }
-         k0 = i;
          for(l1 = 0; l1 <= j-1; l1 += 1)
             ;
-         l01 = j;
          l01 = j+1;
          for(l000 = j+1; l000 <= 99; l000 += 1)
             ;
@@ -220,7 +217,6 @@ void carto(float towns[100][100], float result[100][100])
          for(k00 = i+1; k00 <= 99; k00 += 1) {
             for(l10 = 0; l10 <= j-1; l10 += 1)
                result[i][j] += towns[k00][l10]/dist(i, j, k00, l10);
-            l010 = j;
             l010 = j+1;
             for(l0000 = j+1; l0000 <= 99; l0000 += 1)
                result[i][j] += towns[k00][l0000]/dist(i, j, k00, l0000);
