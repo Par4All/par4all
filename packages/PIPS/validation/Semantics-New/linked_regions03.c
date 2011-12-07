@@ -32,6 +32,8 @@ int main()
    double A[100][100];
 
    for(ii = 1; ii <= N; ii += 1)
+     /* The region for A computed here contains the point N=100,
+	ii==1, jj==1, phi1==0, phi2==0 */
       for(jj = 1; jj <= N; jj += 1) {
 	if(1) {
 	  x0 = ii*jj;

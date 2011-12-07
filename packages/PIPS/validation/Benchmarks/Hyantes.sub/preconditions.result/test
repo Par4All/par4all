@@ -10,7 +10,7 @@ void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lo
 
 //  P(i) {}
 
-   for(i = 0; i <= latRange-1; i += 1) {
+   for(i = 0; i < latRange; i += 1) {
       {
 
 //  P(i) {0<=i, i+1<=latRange}
@@ -19,7 +19,7 @@ void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lo
 
 //  P(i,j) {0<=i, i+1<=latRange}
 
-         for(j = 0; j <= lonRange-1; j += 1)
+         for(j = 0; j < lonRange; j += 1)
 
 //  P(i,j) {0<=i, i+1<=latRange, 0<=j, j+1<=lonRange}
 
@@ -182,7 +182,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 
       
       /* init step: prepare output array */
-      for(i = 0; i <= latRange-1; i += 1) {
+      for(i = 0; i < latRange; i += 1) {
 
 //  P(i,latRange,lonRange,nb) {0<=i, i+1<=latRange}
 
@@ -190,7 +190,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 
 //  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange}
 
-         for(j = 0; j <= lonRange-1; j += 1) {
+         for(j = 0; j < lonRange; j += 1) {
 
 //  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange, 0<=j,
 //    j+1<=lonRange}
@@ -377,7 +377,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  P(k) {0<=k, k+1<=nb}
 
@@ -496,7 +496,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -508,7 +508,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
@@ -575,7 +575,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
 //    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -587,7 +587,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
@@ -664,7 +664,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  P(k) {0<=k, k+1<=nb}
 
@@ -783,7 +783,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -795,7 +795,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
@@ -862,7 +862,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
 //    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -874,7 +874,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
@@ -951,7 +951,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  P(k) {0<=k, k+1<=nb}
 
@@ -1070,7 +1070,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1082,7 +1082,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
@@ -1149,7 +1149,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
 //    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1161,7 +1161,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
@@ -1238,7 +1238,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  P(k) {0<=k, k+1<=nb}
 
@@ -1357,7 +1357,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1369,7 +1369,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
@@ -1436,7 +1436,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
 //    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1448,7 +1448,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
@@ -1525,7 +1525,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  P(k) {0<=k, k+1<=nb}
 
@@ -1644,7 +1644,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1656,7 +1656,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
@@ -1730,7 +1730,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
 
 //  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
 //    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
@@ -1742,7 +1742,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
 //    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
 //    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,

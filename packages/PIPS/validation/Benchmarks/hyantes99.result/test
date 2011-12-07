@@ -5,8 +5,8 @@ void run(data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t
 
    fprintf(stderr, "begin computation ...\n");
 
-   for(i = 0; i <= rangex-1; i += 1)
-      for(j = 0; j <= rangey-1; j += 1) {
+   for(i = 0; i < rangex; i += 1)
+      for(j = 0; j < rangey; j += 1) {
          pt[i][j][0] = (xmin+step*i)*180/3.14159265358979323846;
          pt[i][j][1] = (ymin+step*j)*180/3.14159265358979323846;
          pt[i][j][2] = 0.;

@@ -12,3 +12,14 @@ int main()
       for(j = 0; j <= 9; j += 1)
          A[i][j] = 0;
 }
+int main()
+{
+   int A[10][10];
+   int i, j;
+   // This pragma use to lead to an abort because OMP_MERGE_PRAGMA tried to merge every pragma without looking if they're openmp ones.
+#pragma omp parallel for private(j)
+#pragma toto
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         A[i][j] = 0;
+}

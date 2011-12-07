@@ -54,10 +54,9 @@ void loop03()
 void loop03()
 {
    int i = 0;
-
-   i = 0;
+   
    /* This loop is executed exactly once */
-   printf("%d\n", i);
+   printf("%d\n", 0);
    i = 0+1;
 
    return;

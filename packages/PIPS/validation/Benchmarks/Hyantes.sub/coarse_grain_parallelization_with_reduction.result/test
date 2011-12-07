@@ -1,10 +1,10 @@
 void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
 {
    size_t i;
-   for(i = 0; i <= latRange-1; i += 1) {
+   for(i = 0; i < latRange; i += 1) {
       {
          size_t j;
-         for(j = 0; j <= lonRange-1; j += 1)
+         for(j = 0; j < lonRange; j += 1)
             printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
       }
       putchar('\n');
@@ -59,9 +59,9 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
       size_t i;
       
       /* init step: prepare output array */
-      for(i = 0; i <= latRange-1; i += 1) {
+      for(i = 0; i < latRange; i += 1) {
          size_t j;
-         for(j = 0; j <= lonRange-1; j += 1) {
+         for(j = 0; j < lonRange; j += 1) {
             ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
             ((*plots)[i])[j].lat = visu.mLat+latStep*i;
             ((*plots)[i])[j].pot = 0.;
@@ -128,7 +128,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
       size_t k;
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
          data_t pot = t[k].pot;
          town_sum += pot;
          /* only process if it is relevant */
@@ -164,10 +164,10 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
                size_t i;
 
 #pragma omp parallel for reduction(+:sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -187,10 +187,10 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
             if (sum>0) {
                size_t i;
 #pragma omp parallel for reduction(+:total_sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:total_sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t c = contrib[i-imin][j-jmin];
                      if (c>0) {
                         pt[i][j].pot += c*pot/sum;
@@ -216,7 +216,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
       size_t k;
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
          data_t pot = t[k].pot;
          town_sum += pot;
          /* only process if it is relevant */
@@ -252,10 +252,10 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
                size_t i;
 
 #pragma omp parallel for reduction(+:sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -275,10 +275,10 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
             if (sum>0) {
                size_t i;
 #pragma omp parallel for reduction(+:total_sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:total_sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t c = contrib[i-imin][j-jmin];
                      if (c>0) {
                         pt[i][j].pot += c*pot/sum;
@@ -304,7 +304,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
       size_t k;
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
          data_t pot = t[k].pot;
          town_sum += pot;
          /* only process if it is relevant */
@@ -340,10 +340,10 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
                size_t i;
 
 #pragma omp parallel for reduction(+:sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -363,10 +363,10 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
             if (sum>0) {
                size_t i;
 #pragma omp parallel for reduction(+:total_sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:total_sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t c = contrib[i-imin][j-jmin];
                      if (c>0) {
                         pt[i][j].pot += c*pot/sum;
@@ -392,7 +392,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
       size_t k;
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
          data_t pot = t[k].pot;
          town_sum += pot;
          /* only process if it is relevant */
@@ -428,10 +428,10 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
                size_t i;
 
 #pragma omp parallel for reduction(+:sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -451,10 +451,10 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
             if (sum>0) {
                size_t i;
 #pragma omp parallel for reduction(+:total_sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:total_sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t c = contrib[i-imin][j-jmin];
                      if (c>0) {
                         pt[i][j].pot += c*pot/sum;
@@ -480,7 +480,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
       size_t k;
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
          data_t pot = t[k].pot;
          town_sum += pot;
          /* only process if it is relevant */
@@ -516,10 +516,10 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                size_t i;
 
 #pragma omp parallel for reduction(+:sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
@@ -540,10 +540,10 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
             if (sum>0) {
                size_t i;
 #pragma omp parallel for reduction(+:total_sum)
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 #pragma omp parallel for reduction(+:total_sum)
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
                      data_t c = contrib[i-imin][j-jmin];
                      if (c>0) {
                         pt[i][j].pot += c*pot/sum;

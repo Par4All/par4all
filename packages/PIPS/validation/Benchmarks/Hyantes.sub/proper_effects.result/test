@@ -3,12 +3,12 @@ void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lo
    size_t i;
 //             <    is read   >: latRange
 //             <    is written>: i
-   for(i = 0; i <= latRange-1; i += 1) {
+   for(i = 0; i < latRange; i += 1) {
       {
          size_t j;
 //             <    is read   >: latRange lonRange
 //             <    is written>: j
-         for(j = 0; j <= lonRange-1; j += 1)
+         for(j = 0; j < lonRange; j += 1)
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: i j latRange lonRange pt[i][j].lat 
@@ -138,11 +138,11 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //             <    is written>: i
       
       /* init step: prepare output array */
-      for(i = 0; i <= latRange-1; i += 1) {
+      for(i = 0; i < latRange; i += 1) {
          size_t j;
 //             <    is read   >: latRange lonRange
 //             <    is written>: j
-         for(j = 0; j <= lonRange-1; j += 1) {
+         for(j = 0; j < lonRange; j += 1) {
 //             <    is read   >: i j latRange lonRange lonStep plots 
 //                               visu.mLon
 //             <    is written>: plots[0][i][j].lon
@@ -352,7 +352,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is written>: k
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 //             <    is read   >: k t[k].pot
 //             <    is written>: pot
          data_t pot = t[k].pot;
@@ -428,11 +428,11 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -471,11 +471,11 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
                size_t i;
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`10`11`i
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`10`11`12`13`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: contrib[i-imin][j-jmin] 
 //                               0`1`2`3`10`11`i imin 
 //                               0`1`2`3`10`11`12`13`j jmin
@@ -526,7 +526,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is written>: k
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 //             <    is read   >: k t[k].pot
 //             <    is written>: pot
          data_t pot = t[k].pot;
@@ -602,11 +602,11 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -645,11 +645,11 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
                size_t i;
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`10`11`i
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`10`11`12`13`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: contrib[i-imin][j-jmin] 
 //                               0`1`2`3`10`11`i imin 
 //                               0`1`2`3`10`11`12`13`j jmin
@@ -700,7 +700,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is written>: k
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 //             <    is read   >: k t[k].pot
 //             <    is written>: pot
          data_t pot = t[k].pot;
@@ -776,11 +776,11 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -819,11 +819,11 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
                size_t i;
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`10`11`i
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`10`11`12`13`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: contrib[i-imin][j-jmin] 
 //                               0`1`2`3`10`11`i imin 
 //                               0`1`2`3`10`11`12`13`j jmin
@@ -874,7 +874,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is written>: k
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 //             <    is read   >: k t[k].pot
 //             <    is written>: pot
          data_t pot = t[k].pot;
@@ -950,11 +950,11 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -993,11 +993,11 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
                size_t i;
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`10`11`i
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`10`11`12`13`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: contrib[i-imin][j-jmin] 
 //                               0`1`2`3`10`11`i imin 
 //                               0`1`2`3`10`11`12`13`j jmin
@@ -1048,7 +1048,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is written>: k
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 //             <    is read   >: k t[k].pot
 //             <    is written>: pot
          data_t pot = t[k].pot;
@@ -1124,11 +1124,11 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
 //                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
 //                               k latMin latMin latStep latStep 
@@ -1173,11 +1173,11 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                size_t i;
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`10`11`i
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`10`11`12`13`j
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 //             <    is read   >: contrib[i-imin][j-jmin] 
 //                               0`1`2`3`10`11`i imin 
 //                               0`1`2`3`10`11`12`13`j jmin

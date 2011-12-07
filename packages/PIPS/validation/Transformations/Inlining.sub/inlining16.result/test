@@ -37,19 +37,19 @@ freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t c
    }
    else if (connexity==4) {
       freia_aipo_dilate_8c(imout, imin, kernel_4c);
-      for(i = 1; i <= size-1; i += 1)
+      for(i = 1; i < size; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c);
       ret = 0;
    }
    else if (connexity==6) {
       freia_aipo_dilate_6c(imout, imin, kernel_6c);
-      for(i = 1; i <= size-1; i += 1)
+      for(i = 1; i < size; i += 1)
          freia_aipo_dilate_6c(imout, imout, kernel_6c);
       ret = 0;
    }
    else if (connexity==8) {
       freia_aipo_dilate_8c(imout, imin, kernel_8c);
-      for(i = 1; i <= size-1; i += 1)
+      for(i = 1; i < size; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c);
       ret = 0;
    }
@@ -148,19 +148,19 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
       }
       else if (connexity==4) {
          freia_aipo_dilate_8c(imout, imin, kernel_4c);
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
             freia_aipo_dilate_8c(imout, imout, kernel_4c);
          ret = 0;
       }
       else if (connexity==6) {
          freia_aipo_dilate_6c(imout, imin, kernel_6c);
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
             freia_aipo_dilate_6c(imout, imout, kernel_6c);
          ret = 0;
       }
       else if (connexity==8) {
          freia_aipo_dilate_8c(imout, imin, kernel_8c);
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
             freia_aipo_dilate_8c(imout, imout, kernel_8c);
          ret = 0;
       }
@@ -419,7 +419,7 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 
 //  P() {0==-1}
 
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
 
 //  P() {0==-1}
 
@@ -437,7 +437,7 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 
 //  P() {0==-1}
 
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
 
 //  P() {0==-1}
 
@@ -455,7 +455,7 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 
 //  P(0`1`ret,0`ret,_return0,i) {connexity==8, size==4}
 
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
 
 //  P(0`1`ret,0`ret,_return0,i) {connexity==8, size==4, 1<=i, i<=3}
 
@@ -565,13 +565,13 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
       }
       else if (8==4) {
          freia_aipo_dilate_8c(imout, imin, kernel_4c);
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
             freia_aipo_dilate_8c(imout, imout, kernel_4c);
          ret = 0;
       }
       else if (8==6) {
          freia_aipo_dilate_6c(imout, imin, kernel_6c);
-         for(i = 1; i <= size-1; i += 1)
+         for(i = 1; i < size; i += 1)
             freia_aipo_dilate_6c(imout, imout, kernel_6c);
          ret = 0;
       }

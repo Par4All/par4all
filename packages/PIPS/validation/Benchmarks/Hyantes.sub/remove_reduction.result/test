@@ -8,14 +8,14 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
       {
          //PIPS generated variable
          double RED0[nb], RED[nb];
-         for(k = 0; k <= nb-1; k += 1)
+         for(k = 0; k < nb; k += 1)
             RED0[k] = 0;
-         for(k = 0; k <= nb-1; k += 1)
+         for(k = 0; k < nb; k += 1)
             RED[k] = 0;
          /*for each town, we shall calculate its contribution on the window */
          
 l99995:
-         for(k = 0; k <= nb-1; k += 1) {
+         for(k = 0; k < nb; k += 1) {
             data_t pot = t[k].pot;
             RED[k] += pot;
             /* only process if it is relevant */
@@ -52,19 +52,19 @@ l99995:
                   {
                      //PIPS generated variable
                      double RED3[imax-imin];
-                     for(i = 0; i <= imax-imin-1; i += 1)
+                     for(i = 0; i < imax-imin; i += 1)
                         RED3[i] = 0;
 
 l99998:
-                     for(i = imin; i <= imax-1; i += 1) {
+                     for(i = imin; i < imax; i += 1) {
                         size_t j;
                         {
                            //PIPS generated variable
                            double RED4[jmax-jmin];
-                           for(j = 0; j <= jmax-jmin-1; j += 1)
+                           for(j = 0; j < jmax-jmin; j += 1)
                               RED4[j] = 0;
 l99999:
-                           for(j = jmin; j <= jmax-1; j += 1) {
+                           for(j = jmin; j < jmax; j += 1) {
                               data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
                               /* if distance from town is within range, set contribution */
                               if (tmp<range) {
@@ -77,11 +77,11 @@ l99999:
                               else
                                  contrib[i-imin][j-jmin] = 0;
                            }
-                           for(j = jmin; j <= jmax-1; j += 1)
+                           for(j = jmin; j < jmax; j += 1)
                               RED3[i-imin] = RED3[i-imin]+RED4[j-jmin];
                         }
                      }
-                     for(i = imin; i <= imax-1; i += 1)
+                     for(i = imin; i < imax; i += 1)
                         sum = sum+RED3[i-imin];
                   }
                }
@@ -92,38 +92,38 @@ l99999:
                   {
                      //PIPS generated variable
                      double RED1[imax-imin];
-                     for(i = 0; i <= imax-imin-1; i += 1)
+                     for(i = 0; i < imax-imin; i += 1)
                         RED1[i] = 0;
 l99996:
-                     for(i = imin; i <= imax-1; i += 1) {
+                     for(i = imin; i < imax; i += 1) {
                         size_t j;
                         {
                            //PIPS generated variable
                            double RED2[jmax-jmin];
-                           for(j = 0; j <= jmax-jmin-1; j += 1)
+                           for(j = 0; j < jmax-jmin; j += 1)
                               RED2[j] = 0;
 l99997:
-                           for(j = jmin; j <= jmax-1; j += 1) {
+                           for(j = jmin; j < jmax; j += 1) {
                               data_t c = contrib[i-imin][j-jmin];
                               if (c>0) {
                                  pt[i][j].pot += c*pot/sum;
                                  RED2[j-jmin] += c*pot/sum;
                               }
                            }
-                           for(j = jmin; j <= jmax-1; j += 1)
+                           for(j = jmin; j < jmax; j += 1)
                               RED1[i-imin] = RED1[i-imin]+RED2[j-jmin];
                         }
                      }
-                     for(i = imin; i <= imax-1; i += 1)
+                     for(i = imin; i < imax; i += 1)
                         RED0[k] = RED0[k]+RED1[i-imin];
                   }
                }
             }
             config->status = (unsigned long int) k;
          }
-         for(k = 0; k <= nb-1; k += 1)
+         for(k = 0; k < nb; k += 1)
             total_sum = total_sum+RED0[k];
-         for(k = 0; k <= nb-1; k += 1)
+         for(k = 0; k < nb; k += 1)
             town_sum = town_sum+RED[k];
       }
    }
