@@ -2342,18 +2342,23 @@ bool signed_type_p(type t)
     }
   return false;
 }
+bool unsigned_basic_p(basic b) {
+    if (basic_int_p(b))
+        if (basic_int(b)/10 == DEFAULT_UNSIGNED_TYPE_SIZE)
+            return true;
+    return false;
+}
 
 bool unsigned_type_p(type t)
 {
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      if (basic_int_p(b))
-	if (basic_int(b)/10 == DEFAULT_UNSIGNED_TYPE_SIZE)
-	  return true;
+      return unsigned_basic_p(b);
     }
   return false;
 }
+
 
 bool long_type_p(type t)
 {

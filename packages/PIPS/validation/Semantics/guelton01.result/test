@@ -86,7 +86,6 @@ int FIR()
 {
 
    int ifr;
-   ifr = 0;
    ifr = 0+1;
    return 0;
 }

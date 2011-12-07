@@ -91,14 +91,12 @@ Code after one trip loop detection and simplification
       M = N+2                                                           0008
 
       IF (N.GT.0) THEN                                                  0010
-         I = N
-         PRINT *, 'i = ', I                                             0012
+         PRINT *, 'i = ', N                                             0012
          I = N+N
       ENDIF
 
       IF (N.LT.0) THEN                                                  0016
-         I = N
-         PRINT *, 'i = ', I                                             0018
+         PRINT *, 'i = ', N                                             0018
          I = N+N
       ENDIF
 

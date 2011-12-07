@@ -18,9 +18,9 @@ P4A_accel_kernel main(unsigned int maxX, unsigned int maxY, unsigned int macroX,
          int sum = 0;
          {
             unsigned int y;
-            for(y = 0; y <= maxY-1; y += 1) {
+            for(y = 0; y < maxY; y += 1) {
                unsigned int x;
-               for(x = 0; x <= maxX-1; x += 1)
+               for(x = 0; x < maxX; x += 1)
                   sum += table1[y+macroY][x+macroX]-table2[y+macroY][x+macroX];
             }
          }

@@ -1,0 +1,9 @@
+from __future__ import with_statement # this is to work with python2.5
+
+from validation import vworkspace
+
+with vworkspace() as w:
+    w.props.memory_effects_only = False
+    w.props.simplify_control_directly_private_loop_indices = True
+    w.all_functions.validate_phases("simplify_control_directly")
+

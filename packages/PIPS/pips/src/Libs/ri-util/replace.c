@@ -30,18 +30,26 @@ replace_entities_declaration_walker(statement s, hash_table ht)
 }
 
 static void
-replace_entities_reference_walker(reference r, hash_table ht)
+replace_entities_expression_walker(expression parent, hash_table ht)
 {
-    entity new = hash_get(ht,reference_variable(r));
-    if(new!= HASH_UNDEFINED_VALUE) {
-        reference_variable(r)=new;
-        expression next=(expression)r,parent=NULL;
-        /* we need to unormalize the uppermost parent of this expression
-         * otherwise its normalized field gets incorrect */
-        while((next=(expression) gen_get_ancestor(expression_domain,next)))
-            parent=next;
-        if(parent)
-            unnormalize_expression(parent); /* otherwise field normalized get wrong */
+    if(expression_reference_p(parent)) {
+        reference r = expression_reference(parent);
+        entity new = hash_get(ht,reference_variable(r));
+        if(new!= HASH_UNDEFINED_VALUE) {
+            if(entity_constant_p(new)) {
+                update_expression_syntax(parent,
+                        make_syntax_call(make_call(new,NIL))
+                        );
+            }
+            else
+                reference_variable(r)=new;
+            expression next=parent,root=parent;
+            /* we need to unormalize the uppermost parent of this expression
+             * otherwise its normalized field gets incorrect */
+            while((next=(expression) gen_get_ancestor(expression_domain,next)))
+                root=next;
+            unnormalize_expression(root); /* otherwise field normalized get wrong */
+        }
     }
 }
 
@@ -82,8 +90,7 @@ replace_entities(void* s, hash_table ht)
   }
   else {
       gen_context_multi_recurse(s, ht,
-              reference_domain, gen_true, replace_entities_reference_walker,
-              //expression_domain, gen_true, replace_entity_expression_walker,
+              expression_domain, gen_true, replace_entities_expression_walker,
               statement_domain, gen_true, replace_entities_declaration_walker,
               loop_domain, gen_true, replace_entities_loop_walker,
               NULL);

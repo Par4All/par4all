@@ -50,8 +50,7 @@ Code after one trip loop detection and simplification
 
       M = N                                                             0005
 
-      I = N
-      PRINT *, 'i = ', I                                                0008
+      PRINT *, 'i = ', N                                                0008
       I = N+1
 
       END

@@ -15,7 +15,7 @@ void P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_ad
    size_t i;
    char *cdest = host_address;
    char *csrc = accel_address;
-   for(i = 0; i <= element_size-1; i += 1)
+   for(i = 0; i < element_size; i += 1)
       cdest[i] = csrc[i];
 }
 void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
@@ -23,7 +23,7 @@ void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block
    size_t i;
    char *cdest = d1_offset*element_size+(char *) host_address;
    char *csrc = accel_address;
-   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+   for(i = 0; i < d1_block_size*element_size-1+1; i += 1)
       cdest[i] = csrc[i];
 }
 void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
@@ -31,8 +31,8 @@ void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size,
    size_t i, j;
    char *cdest = d2_offset*element_size+(char *) host_address;
    char *csrc = (char *) accel_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+   for(i = 0; i < d1_block_size; i += 1)
+      for(j = 0; j < d2_block_size*element_size-1+1; j += 1)
          cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
 }
 void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
@@ -40,7 +40,7 @@ void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_addr
    size_t i;
    char *cdest = accel_address;
    char *csrc = host_address;
-   for(i = 0; i <= element_size-1; i += 1)
+   for(i = 0; i < element_size; i += 1)
       cdest[i] = csrc[i];
 }
 void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
@@ -48,7 +48,7 @@ void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_s
    size_t i;
    char *cdest = accel_address;
    char *csrc = d1_offset*element_size+(char *) host_address;
-   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+   for(i = 0; i < d1_block_size*element_size-1+1; i += 1)
       cdest[i] = csrc[i];
 }
 void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
@@ -56,8 +56,8 @@ void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, s
    size_t i, j;
    char *cdest = (char *) accel_address;
    char *csrc = d2_offset*element_size+(char *) host_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+   for(i = 0; i < d1_block_size; i += 1)
+      for(j = 0; j < d2_block_size*element_size-1+1; j += 1)
          cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
 }
 void erode(int isi, int isj, int new_image[isi][isj], int image[isi][isj])

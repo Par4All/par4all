@@ -607,7 +607,6 @@ int main(int argc, char *argv[])
    
    
    freia_aipo_dilate_8c(out, imWork1, freia_morpho_kernel_8c);
-   i_4 = 1;
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
    i_4 = 1+1;
    

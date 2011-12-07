@@ -27,7 +27,7 @@ void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lo
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
-   for(i = 0; i <= latRange-1; i += 1) {
+   for(i = 0; i < latRange; i += 1) {
       {
          size_t j;
 
@@ -43,7 +43,7 @@ void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lo
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
-         for(j = 0; j <= lonRange-1; j += 1)
+         for(j = 0; j < lonRange; j += 1)
 
 //  <pt[PHI1][PHI2].lat-R-EXACT-{PHI1==i, PHI2==j, 0<=j,
 //    j+1<=lonRange, 0<=i, i+1<=latRange}>
@@ -261,7 +261,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 
       
       /* init step: prepare output array */
-      for(i = 0; i <= latRange-1; i += 1) {
+      for(i = 0; i < latRange; i += 1) {
          size_t j;
 
 //  <plots-R-EXACT-{}>
@@ -274,7 +274,7 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //  <visu.mLat-R-EXACT-{0<=i, i+1<=latRange, 1<=lonRange}>
 //  <visu.mLon-R-EXACT-{0<=i, i+1<=latRange, 1<=lonRange}>
 
-         for(j = 0; j <= lonRange-1; j += 1) {
+         for(j = 0; j < lonRange; j += 1) {
 
 //  <plots-R-EXACT-{}>
 //  <plots[PHI1][PHI2][PHI3].lon-W-EXACT-{PHI1==0, PHI2==i, PHI3==j,
@@ -623,7 +623,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
@@ -712,7 +712,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
@@ -736,7 +736,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -827,7 +827,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
 //    0<=k, k+1<=nb}>
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
@@ -843,7 +843,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
 //    k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
 //    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
@@ -955,7 +955,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
@@ -1044,7 +1044,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
@@ -1068,7 +1068,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1159,7 +1159,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
 //    0<=k, k+1<=nb}>
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
@@ -1175,7 +1175,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
 //    k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
 //    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
@@ -1287,7 +1287,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
@@ -1376,7 +1376,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
@@ -1400,7 +1400,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1491,7 +1491,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
 //    0<=k, k+1<=nb}>
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
@@ -1507,7 +1507,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
 //    k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
 //    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
@@ -1619,7 +1619,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
@@ -1708,7 +1708,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
@@ -1732,7 +1732,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -1823,7 +1823,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
 //    0<=k, k+1<=nb}>
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
@@ -1839,7 +1839,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
 //    k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
 //    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
@@ -1951,7 +1951,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
       /*for each town, we shall calculate its contribution on the window */
       
-      for(k = 0; k <= nb-1; k += 1) {
+      for(k = 0; k < nb; k += 1) {
 
 //  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
 
@@ -2040,7 +2040,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
@@ -2064,7 +2064,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
 //    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
 //    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
@@ -2156,7 +2156,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
 //    0<=k, k+1<=nb}>
 
-               for(i = imin; i <= imax-1; i += 1) {
+               for(i = imin; i < imax; i += 1) {
                   size_t j;
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
@@ -2172,7 +2172,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
 //    k+1<=nb}>
 
-                  for(j = jmin; j <= jmax-1; j += 1) {
+                  for(j = jmin; j < jmax; j += 1) {
 
 //  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
 //    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,

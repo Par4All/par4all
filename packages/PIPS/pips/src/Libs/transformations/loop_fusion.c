@@ -628,7 +628,7 @@ static bool fusion_loops(statement sloop1,
       sequence_statements(statement_sequence(body_loop1)) = fused;
       gen_free_list(sequence_statements(statement_sequence(body_loop2)));
       sequence_statements(statement_sequence(body_loop2)) = NIL;
-      free_statement(sloop2);
+      //free_statement(sloop2); SG causes lost comments and lost extensions, MA should check this
     } else {
       // Inner loops have been fused
       gen_free_list(fused);
@@ -916,6 +916,13 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
     fbset_free(prune_successors_tree(b));
   }
   set_free(heads);
+
+  // Do not loose comments and extensions
+  if(!empty_comments_p(statement_comments(block2->s)) &&
+          !blank_string_p(statement_comments(block2->s)))
+      append_comments_to_statement(block1->s, statement_comments(block2->s));
+  extensions_extension(statement_extensions(block1->s))=
+      gen_nconc(extensions_extension(statement_extensions(block1->s)), gen_full_copy_list(extensions_extension(statement_extensions(block2->s))));
 
   block1->count_fusion++;
 
