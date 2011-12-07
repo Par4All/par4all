@@ -319,14 +319,52 @@ remove_loop_statement(statement s, instruction i, loop l)
   pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
 
   index = make_factor_expression(1, loop_index(l));
-  statement_instruction(s) =
-      make_instruction_block(
-              make_statement_list(as1 = make_assign_statement(index, init_val),
-				  loop_body(l),
-				  as2=make_assign_statement(copy_expression(index),
-							last_val))
-			     );
-  statement_label(as1) = statement_label(s);
+
+  /* If we can, we will replace the use of the loop index in the body with
+   * the lower bound, we handle only pure simple scalar expression cases
+   */
+  if( (expression_integer_constant_p(rl) && expression_to_int(rl) >= 0)
+      || (expression_reference_p(rl)
+          && entity_scalar_p(reference_variable(expression_reference(rl))))) {
+
+    entity up_bound;
+    if(expression_integer_constant_p(rl)) {
+      up_bound = int_to_entity(expression_to_int(rl));
+    } else {
+      up_bound = reference_variable(expression_reference(rl));
+    }
+    replace_entity(loop_body(l),loop_index(l),up_bound);
+
+    // A property can prevent the assignment of upper bound to loop index
+    if(get_bool_property("SIMPLIFY_CONTROL_DIRECTLY_PRIVATE_LOOP_INDICES")) {
+      statement_instruction(s) =
+          make_instruction_block(make_statement_list(loop_body(l)));
+    } else {
+      statement_instruction(s) =
+          make_instruction_block(
+              make_statement_list(loop_body(l),
+                                  as2=make_assign_statement(copy_expression(index),
+                                                            last_val))
+          );
+    }
+  } else {
+    /* Standard case, the loop header is removed, but we have to assign value to
+     * the loop index:
+     * for(i=low;i<upper;i+=inc)
+     * =>
+     * i=low;
+     * // body...
+     * i=low+inc;
+     */
+    as1 = make_assign_statement(index, init_val);
+    as2 = make_assign_statement(copy_expression(index),last_val);
+    statement_instruction(s) =
+        make_instruction_block(make_statement_list(as1,
+                                                   loop_body(l),
+                                                   as2)
+        );
+    statement_label(as1) = statement_label(s);
+  }
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
 
@@ -1073,26 +1111,26 @@ static bool dead_statement_filter(statement s)
 	break;
       }
       else if (loop_executed_once_p(s, l)) {
-	/* This piece of code is not ready yet */
-	statement body = loop_body(l);
-	ifdebug(2) {
-	  pips_debug(2,
-		     "loop %s at %td (%td, %td) executed once and only once\n",
-		     label_local_name(loop_label(l)),
-		     statement_number(s),
-		     ORDERING_NUMBER(statement_ordering(s)),
-		     ORDERING_STATEMENT(statement_ordering(s)));
+        /* This piece of code is not ready yet */
+        statement body = loop_body(l);
+        ifdebug(2) {
+          pips_debug(2,
+                     "loop %s at %td (%td, %td) executed once and only once\n",
+                     label_local_name(loop_label(l)),
+                     statement_number(s),
+                     ORDERING_NUMBER(statement_ordering(s)),
+                     ORDERING_STATEMENT(statement_ordering(s)));
 
-	  stdebug(9, "dead_statement_filter", s);
-	}
+          stdebug(9, "dead_statement_filter", s);
+        }
 
-	remove_loop_statement(s, i, l);
-	dead_code_loop_executed_once++;
-	stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
+        remove_loop_statement(s, i, l);
+        dead_code_loop_executed_once++;
+        stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
 
-	suppress_dead_code_statement(body);
-	retour = false;
-	break;
+        suppress_dead_code_statement(body);
+        retour = false;
+        break;
       }
       else {
 	/* Standard loop, proceed downwards */
