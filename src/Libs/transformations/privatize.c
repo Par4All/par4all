@@ -705,12 +705,21 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
         instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
         statement_instruction(s) = iblock;
         /* keep comments and extensions attached to the loop */
-#define SWAP(x,y) do { typeof(x) __tmp = x ; x=y; y=__tmp; } while (0)
-        SWAP(statement_comments(new_statement), statement_comments(s));
-        SWAP(statement_extensions(new_statement), statement_extensions(s));
-        SWAP(statement_label(new_statement), statement_label(s));
-        SWAP(statement_number(new_statement), statement_number(s));
-#undef SWAP
+        string stmp = statement_comments(s);
+        statement_comments(s)=statement_comments(new_statement);
+        statement_comments(new_statement)=stmp;
+
+        extensions ex = statement_extensions(new_statement);
+        statement_extensions(new_statement) = statement_extensions(s);
+        statement_extensions(s) = ex;
+
+        entity etmp = statement_label(s);
+        statement_label(s) = statement_label(new_statement);
+        statement_label(new_statement) = etmp;
+
+        intptr_t itmp = statement_number(s);
+        statement_number(s) = statement_number(new_statement);
+        statement_number(new_statement) = itmp;
 
         /* now add declarations to the created block */
         list locals = gen_copy_seq(loop_locals(l));
