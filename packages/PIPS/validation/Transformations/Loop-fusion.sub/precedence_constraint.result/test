@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
    // This outer loop can be fused with the third one
    // The reordering of statements after fusion used to 
    // trigger a bug that then allowed to fuse the last loop
+   
+   // The outermost loop can be fused with the first loop nest  
    for(j = 0; j <= 359; j += 1) {
       A[j] = 1;
       E[j] += A[j]*C[j+1];

@@ -1,18 +1,18 @@
 void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
    size_t i, j;
-   for(i = 0; i <= n-ksize+1-1; i += 1) {
+   for(i = 0; i < -ksize+n+1; i += 1) {
       out[i] = 0.0;
-      for(j = 0; j <= ksize-1; j += 1)
+      for(j = 0; j < ksize; j += 1)
          out[i] += in[i+j]*kernel[j];
    }
 }
 void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
    size_t i, j;
-   for(i = 0; i <= n-ksize+1-1; i += 1) {
+   for(i = 0; i < -ksize+n+1; i += 1) {
       out[i] = 0.0;
-      for(j = 0; j <= ksize-1; j += 1)
+      for(j = 0; j < ksize; j += 1)
          out[i] += in[i+j]*kernel[j];
    }
 }
@@ -20,7 +20,7 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
    size_t i, j;
 l99998:
-   for(i = 0; i <= n-ksize; i += 1) {
+   for(i = 0; i < -ksize+n+1; i += 1) {
       out[i] = 0.0;
 l99999:      fir_l99999(n, i, in, kernel, ksize, out);
    }
@@ -36,14 +36,14 @@ void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, 
    RED0[2] = 0.;
    RED0[3] = 0.;
 l99999:
-   for(j = 0; j <= 4*(ksize/4)-1; j += 4) {
+   for(j = 0; j < 4*(ksize/4)-1+1; j += 4) {
       RED0[0] = RED0[0]+in[j+i]*kernel[j];
       RED0[1] = RED0[1]+in[1+(j+i)]*kernel[1+j];
       RED0[2] = RED0[2]+in[2+(j+i)]*kernel[2+j];
       RED0[3] = RED0[3]+in[3+(j+i)]*kernel[3+j];
    }
    out[i] = RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+out[i])));
-   for(j = 4*(ksize/4); j <= ksize-1; j += 1)
+   for(j = 4*(ksize/4); j < ksize; j += 1)
       out[i] = out[i]+in[j+i]*kernel[j];
 }
 void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
@@ -59,7 +59,7 @@ void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, 
    RED0[2] = 0.;
    RED0[3] = 0.;
 l99999:
-   for(j = 0; j <= 4*(ksize/4)-1; j += 4) {
+   for(j = 0; j < 4*(ksize/4)-1+1; j += 4) {
       RED0[0] = __PIPS_SAC_MULADD(RED0[0], in[j+i], kernel[j]);
       RED0[1] = __PIPS_SAC_MULADD(RED0[1], in[1+(j+i)], kernel[1+j]);
       RED0[2] = __PIPS_SAC_MULADD(RED0[2], in[2+(j+i)], kernel[2+j]);
@@ -69,7 +69,7 @@ l99999:
    F_1 = RED0[1]+F_0;
    F_2 = RED0[2]+F_1;
    out[i] = RED0[3]+F_2;
-   for(j = 4*(ksize/4); j <= ksize-1; j += 1)
+   for(j = 4*(ksize/4); j < ksize; j += 1)
       out[i] = __PIPS_SAC_MULADD(out[i], in[j+i], kernel[j]);
 }
 void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
@@ -85,7 +85,7 @@ void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, 
    RED0[2] = 0.;
    RED0[3] = 0.;
 l99999:
-   for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
+   for(j0 = 0; j0 < 4*(ksize/4)-1+1; j0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
       SIMD_LOAD_V4SF(vec20, &kernel[j0]);
@@ -98,7 +98,7 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    out[i] = RED0[3]+F_20;
-   for(j1 = 4*(ksize/4); j1 <= ksize-1; j1 += 1)
+   for(j1 = 4*(ksize/4); j1 < ksize; j1 += 1)
       out[i] = __PIPS_SAC_MULADD(out[i], in[j1+i], kernel[j1]);
 }
 void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
@@ -117,7 +117,7 @@ void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, 
    RED0[3] = 0.;
    SIMD_LOAD_V4SF(vec00_0, &RED0[0]);
 l99999:
-   for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
+   for(j0 = 0; j0 < 4*(ksize/4)-1+1; j0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec10_0, &in[j0+i]);
       SIMD_LOAD_V4SF(vec20_0, &kernel[j0]);
@@ -128,14 +128,14 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    out[i] = RED0[3]+F_20;
-   for(j1 = 4*(ksize/4); j1 <= ksize-1; j1 += 1)
+   for(j1 = 4*(ksize/4); j1 < ksize; j1 += 1)
       out[i] = __PIPS_SAC_MULADD(out[i], in[j1+i], kernel[j1]);
 }
 void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
    size_t i, j;
 l99998:
-   for(i = 0; i <= n-ksize; i += 1) {
+   for(i = 0; i < -ksize+n+1; i += 1) {
       out[i] = 0.0;
 l99999:      fir_l99999(n, i, in, kernel, ksize, out);
    }
@@ -144,7 +144,7 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
    size_t i, j;
 l99998:
-   for(i = 0; i <= n-ksize; i += 1) {
+   for(i = 0; i < -ksize+n+1; i += 1) {
       out[i] = 0.0;
 l99999:      fir_l99999(n, i, in, kernel, ksize, out);
    }
@@ -154,7 +154,7 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
    //PIPS generated variable
    size_t i0;
 l99998:
-   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+   for(i0 = 0; i0 < -ksize+n+1; i0 += 1) {
       out[i0] = 0.0;
 l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
    }
@@ -164,7 +164,7 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
    //PIPS generated variable
    size_t i0;
 l99998:
-   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+   for(i0 = 0; i0 < -ksize+n+1; i0 += 1) {
       out[i0] = 0.0;
 l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
    }
@@ -174,7 +174,7 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
    //PIPS generated variable
    size_t i0;
 l99998:
-   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+   for(i0 = 0; i0 < -ksize+n+1; i0 += 1) {
       out[i0] = 0.0;
 l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
    }

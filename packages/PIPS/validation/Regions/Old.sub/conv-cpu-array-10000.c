@@ -27,44 +27,23 @@ void conv_cpu(float a[n*n], float c[n*n],
       int idx = i * n + j;
 
       if (0<i && i<n-1 && 0<j && j<n-1) {
-	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a20 * a[idx+n-1] \
-	  + a01 * a[idx-n]   + a11 * a[idx]   + a21 * a[idx+n]	  \
-	  + a02 * a[idx-n+1] + a12 * a[idx+1] + a22 * a[idx+n+1];
-
-
+	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a20 * a[idx+n-1] + a01 * a[idx-n]   + a11 * a[idx] + a21 * a[idx+n] + a02 * a[idx-n+1] + a12 * a[idx+1] + a22 * a[idx+n+1];
       } else  if (i == 0 && j ==0) {
-	c[idx] =  a11 * a[idx]   + a21 * a[idx+n]	  \
-	  + a12 * a[idx+1] + a22 * a[idx+n+1];
-
+	c[idx] =  a11 * a[idx]   + a21 * a[idx+n] + a12 * a[idx+1] + a22 * a[idx+n+1];
       } else if ( i==0 && j==n-1 ) {
-	c[idx] = a10 * a[idx-1]   + a20 * a[idx+n-1]  \
-	  + a11 * a[idx]     + a21 * a[idx+n];
-
+	c[idx] = a10 * a[idx-1]   + a20 * a[idx+n-1] + a11 * a[idx] + a21 * a[idx+n];
       } else if ( i==n-1 && j==0 ) {
-	c[idx] = a01 * a[idx-n]   + a11 * a[idx] 	  \
-	  + a02 * a[idx-n+1] + a12 * a[idx+1];
-
+	c[idx] = a01 * a[idx-n]   + a11 * a[idx] + a02 * a[idx-n+1] + a12 * a[idx+1];
       } else if ( i==n-1 && j==n-1 ) {
-	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] \
-	  + a01 * a[idx-n]   + a11 * a[idx];
-
+	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a01 * a[idx-n] + a11 * a[idx];
       } else if ( i==0 && 0<j && j<n-1) {
-	c[idx] =  a10 * a[idx-1] + a20 * a[idx+n-1] \
-	  + a11 * a[idx]   + a21 * a[idx+n]	\
-	  + a12 * a[idx+1] + a22 * a[idx+n+1];
-
+	c[idx] =  a10 * a[idx-1] + a20 * a[idx+n-1] + a11 * a[idx] + a21 * a[idx+n] + a12 * a[idx+1] + a22 * a[idx+n+1];
       } else if ( i==n-1 && 0<j && j<n-1) {
-	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] \
-	  + a01 * a[idx-n]   + a11 * a[idx]   \
-	  + a02 * a[idx-n+1] + a12 * a[idx+1];
-
+	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a01 * a[idx-n] + a11 * a[idx] + a02 * a[idx-n+1] + a12 * a[idx+1];
       } else if (j==0 && 0<i && i<n-1) {
-	c[idx] = a01 * a[idx-n]   + a11 * a[idx]   + a21 * a[idx+n]	  \
-	  + a02 * a[idx-n+1] + a12 * a[idx+1] + a22 * a[idx+n+1];
-
+	c[idx] = a01 * a[idx-n] + a11 * a[idx] + a21 * a[idx+n] + a02 * a[idx-n+1] + a12 * a[idx+1] + a22 * a[idx+n+1];
       } else if (j==n-1 && 0<i && i<n-1) {
-	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a20 * a[idx+n-1] \
-	  + a01 * a[idx-n]   + a11 * a[idx]   + a21 * a[idx+n];
+	c[idx] = a00 * a[idx-n-1] + a10 * a[idx-1] + a20 * a[idx+n-1] + a01 * a[idx-n] + a11 * a[idx] + a21 * a[idx+n];
       }
     }
   }
