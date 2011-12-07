@@ -175,7 +175,7 @@ void init_kernel(float imagein_re[64][64])
    //PIPS generated variable
    int i;
 
-init_kernel:   ;
+init_kernel:
    for(i = 0; i <= 63; i += 1) {
       //PIPS generated variable
       int j;
@@ -196,7 +196,7 @@ void init_kernel(float imagein_re[64][64])
    //PIPS generated variable
    int i;
 
-init_kernel:   ;
+init_kernel:
    for(i = 0; i <= 63; i += 1) {
       //PIPS generated variable
       int j;
@@ -217,8 +217,8 @@ void init_kernel(float imagein_re[64][64])
    //PIPS generated variable
    int i;
 
-init_kernel:   ;
 #pragma omp parallel for 
+init_kernel:
    for(i = 0; i <= 63; i += 1) {
       //PIPS generated variable
       int j;
