@@ -704,9 +704,13 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
         statement new_statement = instruction_to_statement(i);
         instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
         statement_instruction(s) = iblock;
-        /* Since this is illegal to have comments and label on a block,
-           moved them downward: */
-        fix_sequence_statement_attributes(s);
+        /* keep comments and extensions attached to the loop */
+#define SWAP(x,y) do { typeof(x) __tmp = x ; x=y; y=__tmp; } while (0)
+        SWAP(statement_comments(new_statement), statement_comments(s));
+        SWAP(statement_extensions(new_statement), statement_extensions(s));
+        SWAP(statement_label(new_statement), statement_label(s));
+        SWAP(statement_number(new_statement), statement_number(s));
+#undef SWAP
 
         /* now add declarations to the created block */
         list locals = gen_copy_seq(loop_locals(l));

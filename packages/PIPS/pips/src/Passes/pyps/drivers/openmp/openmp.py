@@ -55,5 +55,5 @@ def openmp(m, verbose = False, loop_distribution=True, loop_parallel_threshold_s
         m.display(**props)
 
 pyps.module.openmp=openmp
-pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m)
+pyps.modules.openmp=lambda m,verbose=False,loop_distribution=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,loop_distribution,loop_parallel_threshold_set,**props),m)
 
