@@ -2121,6 +2121,25 @@ constant expression_constant(expression exp)
   return constant_undefined;
 }
 
+bool expression_string_constant_p(expression exp) {
+  if(expression_constant_p(exp) && expression_call_p(exp) ) {
+    call c = expression_call(exp);
+    entity operator = call_function(c);
+    const char * eun = entity_user_name(operator);
+    return ( eun[0]=='"' && eun[strlen(eun)-1] == '"' ) ;
+  }
+  return false;
+}
+
+/* returns a newly allocated string! */
+char* expression_string_constant(expression exp) {
+  pips_assert("is a string constant", expression_string_constant_p(exp));
+    call c = expression_call(exp);
+    entity operator = call_function(c);
+    const char * eun = entity_user_name(operator);
+    return strndup(eun+1,strlen(eun)-2);
+}
+
 bool expression_integer_constant_p(e)
 expression e;
 {

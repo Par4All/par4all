@@ -9316,6 +9316,18 @@ simplify_subscripts > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{simplify_constant_address_expressions}
+  This pass evaluates expression of the form \lstinline|*"ae"| that can be
+  found in COLD output.
+\end{PipsPass}
+
+I doubt it can be useful elsewhere ...
+\begin{PipsMake}
+simplify_constant_address_expressions > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{simplify_complex}
 This pass performs a conversion from complex to real.
 \PipsPropRef{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS} controls the new layout

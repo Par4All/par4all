@@ -617,3 +617,49 @@ static void do_simplify_c_operator(call c)
 void simplify_c_operator(statement s) {
   gen_recurse(s,call_domain,gen_true, do_simplify_c_operator);
 }
+
+/* perform constant string dereferencing evaluation */
+static void do_simplify_constant_address_expression(expression exp) {
+    if(expression_call_p(exp)) {
+        call c =expression_call(exp);
+        entity operator = call_function(c);
+        list args = call_arguments(c);
+        if(ENTITY_DEREFERENCING_P(operator)) {
+            expression arg = EXPRESSION(CAR(args));
+            if(expression_string_constant_p(arg)) {
+                char * string_constant = expression_string_constant(arg);
+                char buf[] = { '\'', *string_constant, '\'', 0 };
+                expression character_constant  = MakeCharacterConstantExpression(strdup(buf));
+                update_expression_syntax(exp,expression_syntax(character_constant));
+                expression_syntax(character_constant)=syntax_undefined;
+                free(string_constant);
+                free_expression(character_constant);
+            }
+        }
+    }
+}
+
+/* forward processing through declarations */
+static void do_simplify_constant_address_expression_in_decl(statement st) {
+    if(declaration_statement_p(st)) {
+        FOREACH(ENTITY,e,statement_declarations(st))
+            gen_recurse(entity_initial(e),expression_domain, gen_true, do_simplify_constant_address_expression);
+    }
+}
+
+/* transforms *"aer" into 'a'
+ * do not take care of "aer"[2] but could be extended to
+ */
+bool simplify_constant_address_expressions(const char *module_name) {
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+
+    gen_multi_recurse(get_current_module_statement(),
+            expression_domain, gen_true, do_simplify_constant_address_expression,
+            statement_domain, gen_true, do_simplify_constant_address_expression_in_decl,
+            0
+            );
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+}
