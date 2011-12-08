@@ -1795,6 +1795,14 @@ expression make_phi_expression(int n)
 bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
+    if(expression_range_p(expr)) {
+        pips_assert("inequality with respect to a range has no meaning",is_eg);
+        range r =expression_range(expr);
+        bool must_p = sc_add_phi_equation(psc, range_upper(r), dim, false, is_phi_first);
+        must_p &= sc_add_phi_equation(psc, range_lower(r), dim, false, !is_phi_first);
+        return must_p;
+    }
+    else {
   normalized nexpr = NORMALIZE_EXPRESSION(expr);
 
   bool must_p = false; /* Do we capture the semantics of the
@@ -1937,6 +1945,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
   pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
   *psc = sc;
   return must_p;
+    }
 }
 
 

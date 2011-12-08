@@ -1684,10 +1684,21 @@ bool expression_subscript_p(expression e) {
     return syntax_subscript_p(expression_syntax(e));
 }
 
+
 subscript expression_subscript(expression e)
 {
     pips_assert("is a subscript\n",expression_subscript_p(e));
     return syntax_subscript(expression_syntax(e));
+}
+bool expression_range_p(expression e)
+{
+    return syntax_range_p(expression_syntax(e));
+}
+
+range expression_range(expression e)
+{
+    pips_assert("is a range", expression_range_p(e));
+    return syntax_range(expression_syntax(e));
 }
 
 /* predicates on references */
