@@ -2412,16 +2412,8 @@ transformer statement_to_transformer(
 
   if(effects_abstract_location_p(e)) {
     transformer etf = effects_to_transformer(e);
-    /* This is mathematically correct but very inefficient (see ticket
-       644) and useless as long anymodule:anywhere is the only
-       abstract effect we have to deal with.
-     */
-    /*
     t = transformer_combine(t, etf);
     free_transformer(etf);
-    */
-    free_transformer(t);
-    t = etf;
   }
 
     /* store or update the statement transformer */
