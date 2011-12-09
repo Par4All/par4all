@@ -222,7 +222,7 @@ transformer relation_to_transformer(entity op, entity e1, entity e2,
  */
 transformer transformer_combine(transformer t1, transformer t2)
 {
-  /* algorithm:
+  /* general algorithm:
      let a1 be t1 arguments, a2 be t2 arguments,
      let ints be the intersection of a1 and a2
      let r1 be t1 relation and r2 be a copy of t2 relation
@@ -233,8 +233,19 @@ transformer transformer_combine(transformer t1, transformer t2)
      project b along ints
      build t1 with a and b
   */
-  cons * a1 = transformer_arguments(t1);
-  cons * a2 = transformer_arguments(t2);
+  list a1 = transformer_arguments(t1);
+  list a2 = transformer_arguments(t2);
+  list wvl = modified_variables_with_values();
+  if(transformer_is_rn_p(t1) && arguments_equal_p(a1, wvl)) {
+    /* nothing to do since t1 is going to destroy all information in t2 */
+    t1 = t1; // Hopefully, to set a breakpoint...
+  }
+  else if(transformer_is_rn_p(t1) && arguments_equal_p(a2, wvl)) {
+    /* nothing smart to do since t2 is going to destroy all information in t1 */
+    free_transformer(t1);
+    t1 = copy_transformer(t2);
+  }
+  else {
   /* Newgen does not generate the proper castings */
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
@@ -386,6 +397,7 @@ transformer transformer_combine(transformer t1, transformer t2)
     }
     predicate_system(transformer_relation(t1)) = r1;
     }
+  }
   }
 
   pips_debug(8,"res. t1=%p\n",t1);
@@ -2296,7 +2308,7 @@ static bool parametric_transformer_empty_p(transformer t,
  * sc_strong_normalize()... sc_bounded_normalization() should be used
  * at a cost of O(n)
  *
- * See also transformer_is_empty_p() for a syntactic check
+ * See also transformer_is_empty_p() for a simple quick syntactic check
  */
 bool transformer_empty_p(transformer t)
 {

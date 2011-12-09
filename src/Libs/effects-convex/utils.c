@@ -304,11 +304,18 @@ transformer context;
     return(l_reg);
 }
 
-/* adapted from transformer_normalize
+/* adapted from transformer_normalize... which may have changed since
+ * then...
+ *
+ * FI: Normalization and redundancy elimination are often considered
+ * equivalent and used accordingly. Normalization is much more
+ * expensive: its purpose is not only to minimize the number of
+ * constraints, but also to rewrite them in a as canonical as possible
+ * way to simplify non-regression tests and to be as user-friendly as
+ * possible. Currently, region_sc_normaliza() is likely to be called instead of region_sc_redundancy_elimination(), if ever this function exists.
  */
 Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 {
-
     if (!sc_empty_p(sc_reg))
     {
 	Pbase b = base_dup(sc_base(sc_reg));
@@ -338,6 +345,8 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	     * could always be detected in a trivial way after propagating
 	     * values from equations into inequalities.
 	     */
+	    sc_reg = sc_bounded_normalization(sc_reg);
+	    sc_reg = sc_bounded_normalization(sc_reg);
 	    sc_nredund(&sc_reg);
 	    break;
 
