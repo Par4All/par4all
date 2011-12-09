@@ -117,6 +117,8 @@ Psysteme ps;
 }
 
 
+/* Check if variable var appears in at least on of the constraints in
+   constraint list pc with a non-zero coefficient */
 bool var_in_lcontrainte_p(pc,var)
 Pcontrainte pc;
 Variable var;
