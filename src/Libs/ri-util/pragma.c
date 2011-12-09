@@ -316,7 +316,7 @@ list filter_variables_in_pragma_expr(list /* of expr */ l_expr,
    a list of expression ordered. The pragma list has to be ordered
    from the outer pragma to the inner pragma as in the original loop nest.
 **/
-list pragma_omp_merge_expr (list l_pragma) {
+list pragma_omp_merge_expr (list outer_extensions, list l_pragma) {
   // The "omp parallel for" as a list of expression
   list result = pragma_omp_parallel_for_as_exprs ();
   // The list of the variables of the private clauses
@@ -327,8 +327,15 @@ list pragma_omp_merge_expr (list l_pragma) {
   list red = NIL;
   // Get the if clause policy
   if_clause_policy policy = get_if_clause_policy ();
-  // the outer flag
-  bool flag = true;
+  // the outer pragmas
+  set outer_pragmas = set_make(set_pointer);
+  FOREACH(EXTENSION,ex, outer_extensions) {
+      pragma p = extension_pragma(ex);
+      if(pragma_expression_p(p)) {
+          FOREACH(EXPRESSION, e, pragma_expression (p))
+              set_add_element(outer_pragmas,outer_pragmas,e);
+      }
+  }
 
   // look into each pragma for private, reduction and if clauses
   FOREACH (PRAGMA, p, l_pragma) {
@@ -363,8 +370,8 @@ list pragma_omp_merge_expr (list l_pragma) {
             break;
         }
       } else if(is_expression_omp_reduction_p(e)) {
-        // Only the reductions clause on the outer loop need to be saved
-        if(flag ) {
+          // only reductions on outer statement are kept
+        if(set_belong_p(outer_pragmas,e) ) {
           red = gen_expression_cons(e, red);
         }
       } else if(is_expression_omp_omp_p(e) || is_expression_omp_for_p(e)
@@ -375,8 +382,8 @@ list pragma_omp_merge_expr (list l_pragma) {
         pips_internal_error("pips cannot merge this pragma clause");
       }
     }
-    flag = false;
   }
+  set_free(outer_pragmas);
   // build the private clause if needed
   if(priv_var != NIL) {
     expression priv = pragma_private_as_expr_with_args(priv_var);

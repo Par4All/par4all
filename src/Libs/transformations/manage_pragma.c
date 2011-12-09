@@ -204,9 +204,11 @@ static void merge_on_outer (list l_outer) {
   FOREACH (STATEMENT, stmt, l_outer) {
     // The list of pragma to be merged
     list l_pragma = NIL;
-    // collect the pragma
+    list outer_extensions = gen_copy_seq(extensions_extension(statement_extensions(stmt)));
+    // collect the pragma and detach them from their statement
     gen_context_recurse  (stmt, &l_pragma, extensions_domain, gen_true, build_omp_pragma_list);
-    list l_expr = pragma_omp_merge_expr (l_pragma);
+    list l_expr = pragma_omp_merge_expr (outer_extensions, l_pragma);
+    gen_free_list(outer_extensions);
 
     // We have to removed locally declared variables from the pragma clause,
     // else generated code won't compile !
