@@ -249,13 +249,15 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
 	 substitute_p = false;
     }
     if(false && substitute_p) {
-      extern char * entity_local_name(void *);
-      fprintf(stderr, "Initial constraint:\n");
-      vect_print(v, entity_local_name);
-      fprintf(stderr, "Difference:\n");
-      vect_print(dv, entity_local_name);
-      fprintf(stderr, "New constraint:\n");
-      vect_print(nv, entity_local_name);
+      /* Mathematically correct, but interactions with temporary
+	 values not understood and catastrophic... */
+      //extern char * entity_local_name(void *);
+      //fprintf(stderr, "Initial constraint:\n");
+      //vect_print(v, entity_local_name);
+      //fprintf(stderr, "Difference:\n");
+      //vect_print(dv, entity_local_name);
+      //fprintf(stderr, "New constraint:\n");
+      //vect_print(nv, entity_local_name);
       vect_rm(v);
       vect_rm(dv);
       v = nv;
