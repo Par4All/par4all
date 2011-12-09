@@ -345,8 +345,9 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	     * could always be detected in a trivial way after propagating
 	     * values from equations into inequalities.
 	     */
-	    sc_reg = sc_bounded_normalization(sc_reg);
-	    sc_reg = sc_bounded_normalization(sc_reg);
+	    // FI: not really effective
+	    // sc_reg = sc_bounded_normalization(sc_reg);
+	    // sc_reg = sc_bounded_normalization(sc_reg);
 	    sc_nredund(&sc_reg);
 	    break;
 
