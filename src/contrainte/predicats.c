@@ -310,6 +310,71 @@ Pbase vars;
 
     return(true);
 }	
+
+/* Evaluate constraint c according to values in v and return the
+   constant obtained. The constraint may be an equality or an
+   inequality.
+
+   If c is an equality, the value return must be zero or the point
+   does not belong to the hyperplane defined by c.
+
+   If c is an inequality, the value returned is negative if v belongs
+   to the half-space defined by c. If it is zero, the point v belongs
+   to the constraint, i.e. is on the boundary of any constraint system
+   containing c, i.e. to the hyperplane defined by c. If the value
+   returned is stricly positive, v does not belong to the half-space
+   defined by c.
+
+   Note: this function is not a predicate but it is used by the next
+   function, which is a predicate.
+ */
+Value contrainte_eval(Pvecteur c, Pvecteur v)
+{
+  Value k = VALUE_ZERO;
+  Pvecteur cc = VECTEUR_NUL;
+
+  for(cc=c; !VECTEUR_NUL_P(cc); cc = vecteur_succ(cc)) {
+    Variable var = vecteur_var(cc);
+    Value coef = vecteur_val(cc);
+    if(var==TCST) {
+      value_addto(k, coef);
+    }
+    else {
+      Value val = vect_coeff(var, v);
+      value_addto(k, value_direct_multiply(coef, val));
+    }
+  }
+
+  return k;
+}
+
+/* Evaluate constraint c according to values in v and return true if
+   the constraint is met. The constraint may be an equality or an
+   inequality depending on is_equality_p */
+bool contrainte_eval_p(Pvecteur c, Pvecteur v, bool is_equality_p)
+{
+  Value k = VALUE_ZERO;
+  bool is_met_p = true;
+
+  k = contrainte_eval(c, v);
+
+  if(is_equality_p)
+    is_met_p = value_zero_p(k);
+  else
+    is_met_p = value_negz_p(k);
+
+  return is_met_p;
+}
+
+bool equality_eval_p(Pvecteur c, Pvecteur v)
+{
+  return contrainte_eval_p(c, v, true);
+}
+
+bool inequality_eval_p(Pvecteur c, Pvecteur v)
+{
+  return contrainte_eval_p(c, v, false);
+}
 
 /*
  *   that is all

@@ -631,3 +631,24 @@ bool base_included_p(Pbase b1, Pbase b2)
   
   return included_p;
 }
+
+/* Make sure that each dimension of b1 is the same dimension in b2 */
+bool bases_strictly_equal_p(Pbase b1, Pbase b2)
+{
+  int s1 = base_dimension(b1);
+  int s2 = base_dimension(b2);
+  bool strictly_equal_p = true;
+
+  if(s1==s2) {
+    int i;
+    for(i=1; i<= s1 && strictly_equal_p; i++) {
+      Variable d1 = variable_of_rank(b1, i);
+      Variable d2 = variable_of_rank(b2, i);
+      strictly_equal_p = (d1==d2);
+    }
+  }
+  else
+    strictly_equal_p = false;
+
+  return strictly_equal_p;
+}
