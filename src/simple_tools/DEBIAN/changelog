@@ -1,3 +1,9 @@
+2011-12-06  Serge Guelton <serge.guelton@hpc-project.com>
+
+ * Par4All 1.3.1
+
+   * Fix loop bound generation in the presence of unsigned types
+
 2011-11-11  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.3
