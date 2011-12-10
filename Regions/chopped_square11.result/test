@@ -170,28 +170,26 @@ int main()
    int N = 100;
    double A[100][100];
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 9801<=29302PHI1+9801PHI2,
-//    100<=100PHI1+297PHI2, 0<=PHI2, PHI2<=99, N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 49<=148PHI1+49PHI2,
+//    49<=49PHI1+148PHI2, 0<=PHI2, PHI2<=99, N==100}>
 
 
    for(ii = 0; ii <= N-1; ii += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{9801<=29401PHI1+9801PHI2,
-//    100<=100PHI1+297PHI2, 99PHI2<=100PHI1+9801,
-//    9801<=9700PHI1+9801PHI2+9801ii, ii<=PHI1+PHI2,
-//    99PHI1<=100PHI2+99ii, ii<=2PHI1, 99PHI1<=49ii+4950, PHI2<=99,
-//    N==100, 0<=ii, ii<=99}>
+//  <A[PHI1][PHI2]-W-MAY-{99ii+49<=148PHI1+49PHI2,
+//    50ii<=50PHI1+49PHI2, PHI2+ii<=PHI1+99, PHI1<=PHI2+ii,
+//    49PHI1+50<=50PHI2+99ii, 49PHI1+50PHI2<=49ii+4950, 50ii<=99PHI1,
+//    99PHI1<=49ii+4950, N==100, 0<=ii, ii<=99}>
 
       for(jj = 0; jj <= N-1; jj += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{196ii+99<=295PHI1+99PHI2,
-//    99PHI2+98ii<=98PHI1+9801, ii<=PHI1+PHI2,
-//    49PHI1+50PHI2<=49ii+4950, 99PHI1<=100PHI2+99ii,
-//    97PHI2+100<=100PHI1+197jj, 99PHI2<=100PHI1+99jj,
-//    196jj+99<=99PHI1+295PHI2, jj<=PHI1+PHI2,
-//    50PHI1+49PHI2<=49jj+4950, 99PHI1+98jj<=98PHI2+9801, ii<=2PHI1,
-//    99PHI1<=49ii+4950, 97jj+99<=196PHI2+99ii, 99<=2PHI2+99ii+97jj,
-//    jj<=2PHI2, 99PHI2<=49jj+4950, N==100, 0<=ii, ii<=99, 0<=jj,
+//  <A[PHI1][PHI2]-W-MAY-{99ii+49<=148PHI1+49PHI2,
+//    50ii<=50PHI1+49PHI2, PHI2+ii<=PHI1+99, PHI1<=PHI2+ii,
+//    49PHI1+50<=50PHI2+99ii, 49PHI1+50PHI2<=49ii+4950,
+//    49PHI2+50<=50PHI1+99jj, 99jj+49<=49PHI1+148PHI2,
+//    50jj<=49PHI1+50PHI2, PHI2<=PHI1+jj, PHI1+jj<=PHI2+99,
+//    50PHI1+49PHI2<=49jj+4950, 50ii<=99PHI1, 99PHI1<=49ii+4950,
+//    50jj<=99PHI2, 99PHI2<=49jj+4950, N==100, 0<=ii, ii<=99, 0<=jj,
 //    jj<=99}>
 
          if (1) {
@@ -206,7 +204,7 @@ int main()
 
                A[ii][jj] = 1.0;
 
-//  <A[PHI1][PHI2]-W-MAY-{N<=2PHI1+1, 2PHI1<=N, N<=2PHI2+1, 2PHI2<=N,
+//  <A[PHI1][PHI2]-W-MAY-{50<=PHI1, PHI1<=50, 50<=PHI2, PHI2<=50,
 //    N==100, 0<=ii, ii<=99, 0<=jj, jj<=99}>
 
             A[N/2][N/2] = 0.;

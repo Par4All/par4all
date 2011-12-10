@@ -1,14 +1,11 @@
-setenv WS linked_regions01
+setenv WS chopped_square24
 delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create $WS $WS.c
 
-setenv REGIONS_DEBUG_LEVEL 8
-setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
-setenv EFFECTS_OPERATORS_DEBUG_LEVEL 8
-setenv EFFECTS_DEBUG_LEVEL 8
-
-setproperty CONSTANT_PATH_EFFECTS  FALSE
-activate MUST_REGIONS
+#setproperty CONSTANT_PATH_EFFECTS  FALSE
 
 echo
 echo Transformers for "main"
@@ -23,13 +20,14 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
-#quit
+
 echo
 echo Regions for "main"
 echo
 
 activate PRINT_CODE_REGIONS 
 display PRINTED_FILE[main]
+
 close
-delete $WS
+#delete $WS
 quit
