@@ -236,15 +236,38 @@ transformer transformer_combine(transformer t1, transformer t2)
   list a1 = transformer_arguments(t1);
   list a2 = transformer_arguments(t2);
   list wvl = modified_variables_with_values();
-  if(transformer_is_rn_p(t1) && arguments_equal_p(a1, wvl)) {
-    /* nothing to do since t1 is going to destroy all information in t2 */
-    t1 = t1; // Hopefully, to set a breakpoint...
+
+  /* Handling of four special cases because abstract effects are
+     likely to generate rn transformers, which lead to lots of
+     variable projections if handled as a usual transformer. Not
+     sufficient to solve Ticket 644. But sufficient to introduce lots
+     of bugs... */
+  if(transformer_is_rn_p(t1) && !ENDP(wvl) && arguments_equal_p(a1, wvl)) {
+    if(transformer_is_empty_p(t2)) {
+      free_transformer(t1);
+      t1 = copy_transformer(t2); // t1 is empty
+    }
+    else {
+      /* not much to do since t1 is going to destroy all information
+	 in t2, except its range */
+      transformer r = transformer_range(t2);
+      t1 = transformer_range_intersection(t1, r);
+      free_transformer(r);
+    }
   }
-  else if(transformer_is_rn_p(t1) && arguments_equal_p(a2, wvl)) {
-    /* nothing smart to do since t2 is going to destroy all information in t1 */
-    free_transformer(t1);
-    t1 = copy_transformer(t2);
+  else if(transformer_is_rn_p(t2) && !ENDP(wvl) && arguments_equal_p(a2, wvl)) {
+    if(transformer_is_empty_p(t1))
+      t1 == t1;
+    else {
+      /* not much to do since t2 is going to destroy all information
+	 in t1, except its domain */
+      transformer d = transformer_to_domain(t1);
+      free_transformer(t1);
+      t1 = transformer_domain_intersection(copy_transformer(t2), d);
+      free_transformer(d);
+    }
   }
+  /* Standard case */
   else {
   /* Newgen does not generate the proper castings */
   /* Automatic variables read in a CATCH block need to be declared volatile as
