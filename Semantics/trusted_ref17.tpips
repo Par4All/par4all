@@ -1,7 +1,7 @@
 delete trusted_ref17
 create trusted_ref17 trusted_ref17.f
 
-# setenv SEMANTICS_DEBUG_LEVEL 8
+# setenv SEMANTICS_DEBUG_LEVEL 1
 
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
