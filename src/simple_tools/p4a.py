@@ -473,8 +473,10 @@ def main():
         ld_flags = options.ld_flags
         for lib_dir in options.lib_dirs:
             ld_flags += [ "-L" + lib_dir ]
+
+        ld_libs = []
         for lib in options.libs:
-            ld_flags += [ "-l" + lib ]
+            ld_libs += [ "-l" + lib ]
 
         # Instantiate the builder. It will be used to keep track and arrange all
         # the CPP, C, Fortran etc. flags, apart from being used for building the
@@ -484,6 +486,7 @@ def main():
             c_flags = options.c_flags,
             cxx_flags = options.cxx_flags,
             ld_flags = ld_flags,
+            ld_libs = ld_libs,
             nvcc_flags = options.nvcc_flags,
             fortran_flags = options.fortran_flags,
             cpp = options.cpp,

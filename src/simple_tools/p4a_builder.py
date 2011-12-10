@@ -5,7 +5,7 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
-import p4a_util 
+import p4a_util
 import string
 import os
 import time
@@ -13,7 +13,6 @@ import time
 '''
 Par4All Builder Class
 '''
-
 
 
 actual_script = p4a_util.change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
@@ -77,10 +76,10 @@ def get_opencl_cpp_flags():
         opencl_flags=["-I"+os.path.join(opencl_dir, "include")]
     else:
         opencl_dir=get_cuda_dir()
-        opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL") 
-                + " -I" + os.path.join(opencl_dir, "include/CL2") 
-                + " -I" +  os.path.join(opencl_dir, "include") 
-                ]	
+        opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL")
+                + " -I" + os.path.join(opencl_dir, "include/CL2")
+                + " -I" +  os.path.join(opencl_dir, "include")
+                ]
     return opencl_flags
 
 def get_cuda_cpp_flags():
@@ -114,7 +113,7 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
 
 def get_opencl_ld_flags(m64 = True):
     '''To be restructured for multi-platforms OpenCL
-    '''	
+    '''
     opencl_dir=get_amd_opencl_dir()
     lib_arch_suffix = ""
     if opencl_dir:
@@ -132,7 +131,7 @@ def get_opencl_ld_flags(m64 = True):
             lib_arch_suffix = ""
     flags = [
 #        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(opencl_dir, lib_opencl_path + lib_arch_suffix),        
+        "-L" + os.path.join(opencl_dir, lib_opencl_path + lib_arch_suffix),
 #        "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
         "-L" + lib_opencl_path,
         "-L/usr/lib",
@@ -194,10 +193,11 @@ class p4a_builder:
 
     def __init__(self,
                  cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [],
+                 ld_libs = [],
                  nvcc_flags = [], fortran_flags = [],
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
-                 openmp = False, accel_openmp = False, icc = False,                
+                 openmp = False, accel_openmp = False, icc = False,
                  cuda = False, opencl = False, atomic=False,com_optimization=False,cuda_cc=2,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  add_openmp_flag = False, no_default_flags = False,
@@ -221,7 +221,6 @@ class p4a_builder:
             nvcc_flags = [ "-arch=sm_13" ] + nvcc_flags
         elif cuda_cc == 2.0:
             nvcc_flags = [ "-arch=sm_20" ] + nvcc_flags
-            
 
         if not nvcc:
             nvcc = "nvcc"
@@ -294,11 +293,11 @@ class p4a_builder:
             cpp_flags += [ "-DP4A_RUNTIME_FFTW", "-I" + os.environ["P4A_ACCEL_DIR"] ]
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_fftw3_runtime.cpp") ]
             if cuda :
-                ld_flags += [ "-lcufft" ]
+                ld_libs += [ "-lcufft" ]
             elif opencl :
                 p4a_util.die("fftw3+opencl :  TODO")
             else :
-                ld_flags += [ "-lfftw3 -lfftw3f" ]
+                ld_libs += [ "-lfftw3 -lfftw3f" ]
 
 
 
@@ -332,6 +331,7 @@ class p4a_builder:
         self.c_flags = c_flags
         self.cxx_flags = cxx_flags
         self.ld_flags = ld_flags
+        self.ld_libs = ld_libs
         self.nvcc_flags = nvcc_flags
         self.fortran_flags = fortran_flags
 
@@ -348,7 +348,7 @@ class p4a_builder:
         # update cuda flags only if somathing will be built at the end
         if cuda and (self.builder == True):
             self.cudafy_flags()
-            
+
         # update opencl flags only if something will be built at the end
         if opencl and (self.builder == True):
             self.openclify_flags()
@@ -369,7 +369,7 @@ class p4a_builder:
         p4a_util.run([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
-        """ Build progams, libraries , objects or ...
+        """ Build progams, libraries, objects or ...
         files, the files to be used by the building process
         output_files, the files to be produced
         extra_obj, some exta objects to be used by the building process
@@ -405,7 +405,7 @@ class p4a_builder:
                 first_pass_files += [ cucpp_file ]
             elif p4a_util.opencl_file_p(file):
                 has_opencl = True
-                self.openclify_flags()                
+                self.openclify_flags()
             else:
                 first_pass_files += [ file ]
 
@@ -461,7 +461,7 @@ class p4a_builder:
             for obj in extra_obj:
 				quoted_extra_obj+=[p4a_util.quote_fname(obj)]
             # Create the final binary.
-            p4a_util.run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", p4a_util.quote_fname(output_file) ] + second_pass_files + quoted_extra_obj,
+            p4a_util.run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", p4a_util.quote_fname(output_file) ] + second_pass_files + quoted_extra_obj + self.ld_libs,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
 
@@ -494,7 +494,7 @@ class p4a_builder:
                 self.cudafy_flags()
             if p4a_util.opencl_file_p(file):
                 self.openclify_flags()
-                
+
         # Append additional required files such as accel files.
         files += self.extra_source_files
 
@@ -549,7 +549,7 @@ class p4a_builder:
             source_files = "\n    ".join(source_files),
             include_dirs = " ".join([elem[2:].strip() for elem in self.cpp_flags if elem.startswith("-I")]),
             lib_dirs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-L")]),
-            libs = " ".join([elem[2:].strip() for elem in self.ld_flags if elem.startswith("-l")]),
+            libs = " ".join([elem[2:].strip() for elem in self.ld_libs if elem.startswith("-l")]),
         )
 
         cmakelists = string.Template("""# Generated on $time by $script
@@ -638,7 +638,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
             raise p4a_util.p4a_error("Could not find " + cmakelists_file)
         p4a_util.debug("Generating from " + cmakelists_file)
 
-        p4a_util.run([ "cmake", "." ] + cmake_flags, working_dir = dir)        
+        p4a_util.run([ "cmake", "." ] + cmake_flags, working_dir = dir)
         if build:
             makeflags = []
             if p4a_util.get_verbosity() >= 2:
