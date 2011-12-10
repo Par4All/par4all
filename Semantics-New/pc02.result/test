@@ -11,8 +11,7 @@ int main()
 
    int s0 = 1, s1 = 0, s2 = 0;
 
-//  T(s0,s1,s2) {s0+s1+s2==1, s0+s1+s2==s2#init+1, s0#init==1,
-//    s1#init==0}
+//  T(s0,s1,s2) {s0+s1+s2==1, s0#init==1, s1#init==0, s2#init==0}
 
    //int c0 = 1, c1 = 0, c2 = 0;
    

@@ -1,0 +1,82 @@
+
+Transformers for slope03
+
+
+//  T() {}
+
+void slope03()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=10}
+
+   
+   /* create a minimal bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-1, 5) to point(21,7), 21y=2x+107. It
+      * should be simplified into 10y=x+50.
+      */
+   if (12*y<=x+61)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+   return;
+}
+
+Preconditions for slope03
+
+
+//  P() {}
+
+void slope03()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a minimal bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=10}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-1, 5) to point(21,7), 21y=2x+107. It
+      * should be simplified into 10y=x+50.
+      */
+   if (12*y<=x+61)
+
+//  P(k,x,y) {0<=x, x<=10, 12y<=x+61}
+
+      k = x+y;
+
+//  P(k,x,y) {0<=x, x<=10}
+
+   return;
+}
