@@ -248,24 +248,26 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
       if((n==1 && value_zero_p(cst)) || (n==2 && value_notzero_p(cst)))
 	 substitute_p = false;
     }
-    if(false && substitute_p) {
-      /* Mathematically correct, but interactions with temporary
-	 values not understood and catastrophic... */
-      //extern char * entity_local_name(void *);
-      //fprintf(stderr, "Initial constraint:\n");
-      //vect_print(v, entity_local_name);
-      //fprintf(stderr, "Difference:\n");
-      //vect_print(dv, entity_local_name);
-      //fprintf(stderr, "New constraint:\n");
-      //vect_print(nv, entity_local_name);
+    if(substitute_p) {
+      if(false) {
+	extern char * entity_local_name(void *);
+	fprintf(stderr, "Initial constraint:\n");
+	vect_fprint(stderr, v, entity_local_name);
+	fprintf(stderr, "Difference:\n");
+	vect_fprint(stderr, dv, entity_local_name);
+	fprintf(stderr, "New constraint:\n");
+	vect_fprint(stderr, nv, entity_local_name);
+      }
       vect_rm(v);
       vect_rm(dv);
       v = nv;
       contrainte_vecteur(eq) = nv;
+      //assert(vect_check(nv));
     }
     else {
       vect_rm(dv);
       vect_rm(nv);
+      //assert(vect_check(v));
     }
   }
 }
@@ -997,6 +999,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
       if(base_dimension(ub)+base_dimension(lb) >=1) {
 	for(eq=sc_inegalites(ps);
 	    !CONTRAINTE_UNDEFINED_P(eq) && !empty_p; eq = contrainte_succ(eq)) {
+
+	  simplify_constraint_with_bounding_box(eq, cb, l, true);
+
 	  Pvecteur v = contrainte_vecteur(eq);
 	  int n = vect_size(v);
 	  Pvecteur vc;
@@ -1007,8 +1012,6 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	  bool ub_failed_p = false; /* the bounding box does not contain
 				    enough information to check
 				    redundancy with the upper bound */
-
-	  simplify_constraint_with_bounding_box(eq, cb, l, true);
 
 	  /* Try to compute the bounds nub and nlb implied by the bounding box */
 	  for(vc=v; !VECTEUR_NUL_P(vc) && !(ub_failed_p&&lb_failed_p);
@@ -1097,15 +1100,16 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     vect_rm(cb);
   }
 
-  /* Free all elements of the bounding box */
-  vect_rm(l), vect_rm(lb), vect_rm(u), vect_rm(ub);
-
   if(empty_p) {
     Psysteme ns = sc_empty(sc_base(ps));
     sc_base(ps) = BASE_NULLE;
     sc_rm(ps);
     ps = ns;
   }
+
+  /* Free all elements of the bounding box */
+  vect_rm(l), vect_rm(lb), vect_rm(u), vect_rm(ub);
+
   return ps;
 }
 
@@ -1168,7 +1172,7 @@ Psysteme sc_normalize(Psysteme ps)
      * transformer_projection(). But it is not sufficient for type03.
      */
     static int francois=1;
-    if(francois==1)
+    if(francois==1 && ps && !sc_empty_p(ps) && !sc_rn_p(ps))
       ps = sc_bounded_normalization(ps);
 
     /* FI: this takes (a lot of) time but I do not know why: O(n^2)? */
@@ -1534,7 +1538,10 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		    */
 		    
 		    /* We need an exact copy of ps to have equalities
-		     * and inqualities in the very same order
+		     * and inequalities in the very same order
+		     *
+		     * FI: may have is has been fixed with sc_dup() by
+		     * now... see comments in sc_copy()
 		     */
 		    new_ps = sc_copy(ps);
 		    proj_ps = sc_copy(new_ps);
@@ -1734,7 +1741,8 @@ Psysteme sc_strong_normalize_and_check_feasibility
 
 	    if(!feasible_p) {
 		sc_rm(new_ps);
-		new_ps = SC_EMPTY;
+		//new_ps = SC_EMPTY; interpreted as R^n by the caller sometimes...
+		new_ps = sc_empty(BASE_NULLE);
 	    }
 	    else {
 		sc_base(new_ps) = sc_base(ps);

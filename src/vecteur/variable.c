@@ -53,9 +53,11 @@
  * Type Variable is assumed here to be char *
  *
  * Modifications:
+ *
  *  - no assumptions are made on type Variable; v1 and v2 may be of
  *    any type; all computations in vecteur.dir are based on pointer
- *    comparisons (FI, 28/12/89)
+ *    comparisons (FI, 28/12/89); this may lead to disaster for unit
+ *    testing (FI, 11/12/2011)
  */
 bool variable_equal(v1, v2)
 Variable v1;
