@@ -27,8 +27,8 @@ void ts_singlestate(void)
 
       checking_error();
 
-//  T(b,ok,x,y) {b+x#init+y==b#init+x+y#init, b+y==x, ok==1, 0<=b,
-//    b<=1, b+x#init<=b#init+x, x#init<=x, 0<=y}
+//  T(b,ok,x,y) {b+x#init+y==b#init+x+y#init, b+y==x, ok==1,
+//    b+x#init<=b#init+x, x#init<=x, y<=x, x<=y+1, 0<=y}
 
    while (rand_b())
 
@@ -253,15 +253,15 @@ void ts_singlestate(void)
 
    while (rand_b())
 
-//  P(b,ok,x,y) {b+y==x, ok==1, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
 
       if (rand_b()) {
 
-//  P(b,ok,x,y) {b+y==x, ok==1, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
 
          if (!(b==0))
 
-//  P(b,ok,x,y) {b+y==x, ok==1, 1<=b, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
 
             deadlock();
 
@@ -296,11 +296,11 @@ void ts_singlestate(void)
       }
       else {
 
-//  P(b,ok,x,y) {b+y==x, ok==1, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
 
          if (!(b==1))
 
-//  P(b,ok,x,y) {b+y==x, ok==1, b<=0, y<=x, 0<=y}
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 0<=x}
 
             deadlock();
 

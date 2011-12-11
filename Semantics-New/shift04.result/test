@@ -72,7 +72,7 @@ int shift04(int i, int k)
 
    int m = -j>>2;
 
-//  P() {0==-1}
+//  P(j,l,m) {i==20, j==20, k==2, l==5, m==-5}
 
    
    // Check a subset of particular cases: not found with the current
@@ -84,7 +84,7 @@ int shift04(int i, int k)
       j = j>>k;
    else if (j>=0&&2<=k&&k<=4)
 
-//  P() {0==-1}
+//  P(j,l,m) {i==20, j==20, k==2, l==5, m==-5}
 
       j = j>>k;
    else
@@ -93,12 +93,12 @@ int shift04(int i, int k)
 
       j = j>>k;
 
-//  P() {0==-1}
+//  P(j,l,m) {i==20, k==2, l==5, m==-5}
 
 
    printf("j=%d, l=%d, m=%d\n", j, l, m);
 
-//  P() {0==-1}
+//  P(j,l,m) {i==20, k==2, l==5, m==-5}
 
    return j;
 }

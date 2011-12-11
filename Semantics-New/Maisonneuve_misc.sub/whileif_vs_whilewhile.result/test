@@ -215,7 +215,7 @@ void whilewhile(void)
             error();
       }
 
-//  P(x,y) {x==9, x==y}
+//  P(x,y) {x==9, y==9}
 
       while (x<=58&&y>8) {
 

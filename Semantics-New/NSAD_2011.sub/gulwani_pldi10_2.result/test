@@ -954,7 +954,7 @@ void ts_restructured(void)
 
             if (!(n>0&&s==2&&n>1))
 
-//  P(i,m,n,n0,s) {i==n0-1, m==0, n==1, s==2, 2<=n0}
+//  P(i,m,n,n0,s) {i==n0-1, m==0, n==1, s==2, 1<=i}
 
                deadlock();
 
@@ -987,7 +987,7 @@ void ts_restructured(void)
 
             if (!(n>0&&s==2&&n>1))
 
-//  P(i,m,n,n0,s) {i==n0-1, n==1, s==2, 1<=m, 2<=n0}
+//  P(i,m,n,n0,s) {i==n0-1, n==1, s==2, 1<=i, 1<=m}
 
                deadlock();
 
@@ -1112,7 +1112,7 @@ void ts_restructured(void)
 
          if (!(n>0&&s==2&&n>1))
 
-//  P(i,m,n,n0,s) {i==n0-1, m==0, n==1, s==2, 2<=n0}
+//  P(i,m,n,n0,s) {i==n0-1, m==0, n==1, s==2, 1<=i}
 
             deadlock();
 
@@ -1145,7 +1145,7 @@ void ts_restructured(void)
 
          if (!(n>0&&s==2&&n>1))
 
-//  P(i,m,n,n0,s) {i==n0-1, n==1, s==2, 1<=m, 2<=n0}
+//  P(i,m,n,n0,s) {i==n0-1, n==1, s==2, 1<=i, 1<=m}
 
             deadlock();
 

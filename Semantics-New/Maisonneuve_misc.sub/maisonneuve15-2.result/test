@@ -415,8 +415,7 @@ void run(void)
                      assert_error();
                }
 
-//  T(x,y) {x==x#init-2, y==y#init-2, 1<=x, x<=2, y<=x+4, 2y<=x+4,
-//    x<=y+4, x+y<=3, 2x<=y+4, 1<=y, y<=2}
+//  T(x,y) {x==x#init-2, y==y#init-2, 1<=x, x<=2, x+y<=3, 1<=y, y<=2}
 
             if (flip()) {
 
@@ -927,8 +926,7 @@ void run(void)
                      assert_error();
                }
 
-//  T(x,y) {x==x#init+2, y==y#init+2, 4<=x, x<=5, 9<=x+y, y<=x+4,
-//    x<=y+4, 4<=y, y<=5}
+//  T(x,y) {x==x#init+2, y==y#init+2, 4<=x, x<=5, 9<=x+y, 4<=y, y<=5}
 
             if (flip()) {
 
