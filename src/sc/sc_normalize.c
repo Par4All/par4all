@@ -505,10 +505,8 @@ new_constraint_for_coefficient_reduction_with_bounding_box(Pvecteur v,
     swap_value_intervals(px_min, px_max, py_min, py_max);
   }
   /* Make sure that nv is properly built... */
-  extern char * entity_local_name(void *);
-  vect_print(nv, entity_local_name);
+  // vect_print(nv, entity_local_name);
   assert(small_slope_and_first_quadrant_p(nv));
-
   return nv;
 }
 
