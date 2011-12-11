@@ -51,6 +51,13 @@ transformer print_transformer(transformer tf)
 			      (get_variable_name_t) external_value_name);
 }
 
+/* For debugging without problem from temporary values */
+transformer print_any_transformer(transformer tf)
+{
+    return fprint_transformer(stderr, tf,
+			      (get_variable_name_t) entity_local_name);
+}
+
 list print_transformers(list tl)
 {
     return fprint_transformers(stderr, tl,
