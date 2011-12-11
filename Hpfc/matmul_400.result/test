@@ -388,8 +388,8 @@ c
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL8 BUFUPK
-            DO ALPHA2 = MAX(L, 200*PSI2-199), MIN(200*PSI2, U)
-               DO ALPHA1 = MAX(L, 200*PSI1-199), MIN(200*PSI1, U)
+            DO ALPHA2 = MAX(196, 200*PSI2-199), MIN(205, 200*PSI2)
+               DO ALPHA1 = MAX(196, 200*PSI1-199), MIN(205, 200*PSI1)
                   LALPHA1 = ALPHA1-200*PSI1+200
                   LALPHA2 = ALPHA2-200*PSI2+200
                   BUF INDEX = BUF INDEX+1
@@ -429,8 +429,8 @@ c
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = ALPHA1-200*PSI1+200
-      LALPHA2 = ALPHA2-200*PSI2+200
+      LALPHA1 = 5
+      LALPHA2 = 5
       BUF INDEX = BUF INDEX+1
       B(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -445,8 +445,8 @@ c
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = ALPHA1-200*PSI1+200
-      LALPHA2 = ALPHA2-200*PSI2+200
+      LALPHA1 = 5
+      LALPHA2 = 5
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -694,21 +694,18 @@ c
 ! collecting distributed variable C
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (200*PSI2.LE.U+199.AND.(L.LE.200*PSI2.AND.(200*PSI1.LE.U+199
-     &.AND.L.LE.200*PSI1))) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = MAX(L, 200*PSI2-199), MIN(200*PSI2, U)
-            DO ALPHA1 = MAX(L, 200*PSI1-199), MIN(200*PSI1, U)
-               LALPHA1 = ALPHA1-200*PSI1+200
-               LALPHA2 = ALPHA2-200*PSI2+200
-               BUF INDEX = BUF INDEX+1
-               HPFC REAL8 BUFF(BUF INDEX) = C(LALPHA1,LALPHA2)
-            ENDDO
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      DO ALPHA2 = MAX(196, 200*PSI2-199), MIN(205, 200*PSI2)
+         DO ALPHA1 = MAX(196, 200*PSI1-199), MIN(205, 200*PSI1)
+            LALPHA1 = ALPHA1-200*PSI1+200
+            LALPHA2 = ALPHA2-200*PSI2+200
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL8 BUFF(BUF INDEX) = C(LALPHA1,LALPHA2)
          ENDDO
-         CALL HPFC REAL8 BUFPCK
-         CALL HPFC SND TO HOST
-      ENDIF
+      ENDDO
+      CALL HPFC REAL8 BUFPCK
+      CALL HPFC SND TO HOST
 ! end of collect
 ! updating shared variable I
       BUF INDEX = 0
@@ -748,8 +745,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = ALPHA1-200*PSI1+200
-         LALPHA2 = ALPHA2-200*PSI2+200
+         LALPHA1 = 5
+         LALPHA2 = 5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK
@@ -764,8 +761,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = ALPHA1-200*PSI1+200
-         LALPHA2 = ALPHA2-200*PSI2+200
+         LALPHA1 = 5
+         LALPHA2 = 5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK

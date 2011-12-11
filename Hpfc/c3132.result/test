@@ -124,9 +124,9 @@
       ALPHA3 = 1
       ALPHA2 = 1
       ALPHA1 = 1
-      LALPHA1 = ALPHA1
-      LALPHA2 = ALPHA2-16*PSI1+16
-      LALPHA3 = ALPHA3
+      LALPHA1 = 1
+      LALPHA2 = 1
+      LALPHA3 = 1
       BUF INDEX = BUF INDEX+1
       T31P(ALPHA1,ALPHA2,ALPHA3) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -306,9 +306,9 @@
          ALPHA3 = 1
          ALPHA2 = 1
          ALPHA1 = 1
-         LALPHA1 = ALPHA1
-         LALPHA2 = ALPHA2-16*PSI1+16
-         LALPHA3 = ALPHA3
+         LALPHA1 = 1
+         LALPHA2 = 1
+         LALPHA3 = 1
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = T31P_1(LALPHA1,LALPHA2,LALPHA3)
          CALL HPFC REAL4 BUFPCK
