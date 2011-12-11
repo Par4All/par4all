@@ -261,23 +261,23 @@ void compute(int p, int n, float a[n][n])
    // END BLOCK
 }
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI1+1<=n, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, 1<=n, 1<=p}>
 
 void compute(int p, int n, float a[n][n])
 {
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI1+1<=n, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, 1<=n, 1<=p}>
 
    // BEGIN BLOCK
    int t[n];
    int k = n, i, s;
    int j;
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI2+1<=k, k==n, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, k==n, 1<=k, 1<=p}>
 
    for(i = 0; i <= n-1; i += 1) {
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, k==n, i+1<=k,
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, i==0, k==n, i+1<=k,
 //    1<=p}>
 
       // BEGIN BLOCK
@@ -291,19 +291,18 @@ void compute(int p, int n, float a[n][n])
 
          t[j] = a[i][j]+j;
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2+1<=k,
-//    k==n, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, i==0, k==n, 1<=k, 1<=p}>
 
 
       for(j = 0; j <= n-1; j += 1)
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2==j, k==n,
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, i==0, j==0, k==n,
 //    j+1<=k, 1<=p}>
 
          if (p>0)
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2==j, k==n,
-//    1<=k, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, i==0, j==0, k==n, 1<=k,
+//    1<=p}>
 
             a[i][j] = t[j];
       // END BLOCK
