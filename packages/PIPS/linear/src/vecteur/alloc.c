@@ -188,6 +188,45 @@ vect_make(Pvecteur v, Variable var, Value val, ...)
     return v;
 }
 
+/* Allocate a new vector v whose coefficient are given by the list of
+   values ad whose dimension is given by b. The number of constant
+   values passed as argument is supposed to be equal to the dimension
+   of b.
+
+   Note: 0 is a normal value. I see no way to mark the last argument.
+
+   FI: I add this function to check under gdb that a given point
+   belongs to a constraint system. The manual verification is tedious
+   and error prone. This is done for debugging in PIPS the
+   linked_regions bug.
+ */
+Pvecteur vect_make_dense(Pbase b, Value val, ...)
+{
+    va_list the_args;
+    Pvecteur v = VECTEUR_NUL;
+    Variable var;
+    int dim = (int) base_dimension(b);
+    int i = 0; // current dimension
+
+    /* handle first argument - the first element of a basis has rank 1 */
+    var = variable_of_rank(b,1);
+    vect_add_elem(&v, var, val);
+
+    /* get others */
+    va_start (the_args, val);
+
+    for(i=2;i<=dim;i++) // i <= dim because of the way dimensions are counted
+    {
+	var = variable_of_rank(b,i);
+	val = va_arg(the_args, Value);
+	vect_add_elem(&v, var, val);
+    }
+
+    va_end (the_args);
+
+    return v;
+}
+
 
 /* direct duplication.
  * vect_dup() and vect_reversal() do the same thing :

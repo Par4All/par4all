@@ -607,6 +607,12 @@ static bool internal_sc_feasibility
 }
 
 
+/* return true is the system is feasible
+ *
+ * In case an exception, due to an overflow or to an error such as
+ * zero divide or a GCD with 0, occurs, return ofl_res. So, an error
+ * may lead to a feasible or a non feasible system.
+ */
 bool 
 sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
 Psysteme sc;

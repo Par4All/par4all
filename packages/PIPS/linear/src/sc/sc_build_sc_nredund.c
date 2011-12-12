@@ -281,22 +281,32 @@ Psysteme volatile *psc;
 int ofl_ctrl;
 {
   Psysteme ps = *psc;
+  static int francois_check = 0;
+  Pvecteur ip;
+  if(francois_check && !SC_UNDEFINED_P(ps))
+    ip = vect_make_dense(ps->base, 1LL, 0LL, 0LL, 100LL, 0LL);
 
   if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps))
     return;
 
   *psc = sc_normalize(ps);
+  if(francois_check)
+    assert(sc_belongs_p(*psc, ip));
 ifscdebug(5) {   
 		  fprintf(stderr, "after normalize: \n");  
 		  sc_default_dump(*psc);
 		}
   assert(!SC_UNDEFINED_P(*psc));
   build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
+  if(francois_check)
+    assert(sc_belongs_p(*psc, ip));
 ifscdebug(5) {   
 		  fprintf(stderr, "after first nredund: \n");  
 		  sc_default_dump(*psc);
 		}
   build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
+  if(francois_check)
+    assert(sc_belongs_p(*psc, ip));
 }
 
 
