@@ -27,8 +27,8 @@ void ts_singlestate(void)
 
       checking_error();
 
-//  T(i,x,y) {i+x#init+y#init==i#init+x+y, x+y==i, i<=m+100, x<=i,
-//    0<=m, 0<=x, x<=100, x#init<=x, y#init<=y}
+//  T(i,x,y) {i+x#init+y#init==i#init+x+y, x+y==i, i<=m+100, y<=i,
+//    i<=y+100, 0<=m, x#init<=x, 0<=y, y#init<=y}
 
    while (rand_b())
 
@@ -202,7 +202,7 @@ void ts_restructured(void)
          checking_error();
    }
 
-//  T() {i==m+99, m==y, x==99, 0<=m}
+//  T() {i==m+99, i==y+99, x==99, 99<=i}
 
    if (!(x==99&&y>=m))
 
@@ -293,7 +293,7 @@ void ts_singlestate(void)
 
          if (!(x<100&&y>=m))
 
-//  P(i,m,x,y) {x+y==i, 100i+100<=100m+101x, 0<=m, x+y<=m+100, 0<=x,
+//  P(i,m,x,y) {x+y==i, 101y+100<=i+100m, 0<=m, x+y<=m+100, 0<=x,
 //    x<=100, 0<=y}
 
             deadlock();

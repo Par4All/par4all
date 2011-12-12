@@ -70,12 +70,11 @@ void scalarization19(double B[SIZE][SIZE])
 
    for(i = 0; i <= SIZE-1; i += 1)
 
-//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, SIZE==10}>
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, SIZE==10, i==0}>
 
       for(j = 0; j <= SIZE-1; j += 1)
 
-//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, PHI2==j,
-//    SIZE==10}>
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, SIZE==10, i==0, j==0}>
 
          B[i][j] = 0.;
    // END BLOCK

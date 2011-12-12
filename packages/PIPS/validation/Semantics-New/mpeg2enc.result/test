@@ -4566,20 +4566,20 @@ void stats()
             if ((mb_type&(8|4))==8) goto _switch_5_case_8;
             if ((mb_type&(8|4))==4) goto _switch_5_case_4;
             if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_12;
-
 _switch_5_default:            ;
             _IO_putc('0', statfile);
             goto _break_5;
-
 _switch_5_case_12:            ;
+
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
-            
-            
 _switch_5_case_4:            ;
+
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
 _switch_5_case_8:            ;
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 _break_5:            ;
          }
@@ -21464,7 +21464,6 @@ void stats(void)
 
 //  T() {}
 
-
 _switch_5_default:            ;
 
 //  T() {}
@@ -21474,21 +21473,20 @@ _switch_5_default:            ;
 
 //  T() {}
 
-
 _switch_5_case_12:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
 
 //  T() {}
 
-            
-            
 _switch_5_case_4:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -21499,6 +21497,8 @@ _switch_5_case_8:            ;
 
 //  T() {}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  T() {}
@@ -31335,23 +31335,25 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {mpeg1==1,
-//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N, 1<=aspectratio,
-//    aspectratio<=14, 1<=chroma_format, chroma_format<=3,
-//    1<=color_primaries, color_primaries<=7, 0<=constrparms,
-//    constrparms<=1, 15615constrparms+horizontal_size<=16383,
+//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
+//    1<=aspectratio, aspectratio<=14, 1<=chroma_format,
+//    chroma_format<=3, 1<=color_primaries, color_primaries<=7,
+//    0<=constrparms, constrparms<=1,
+//    15615constrparms+horizontal_size<=16383,
 //    5205constrparms+horizontal_size<=5205i+768, constrparms<=i,
 //    5269constrparms+vertical_size<=5269i+576,
 //    15807constrparms+vertical_size<=16383, 0<=dc_prec, dc_prec<=3,
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
 
       if (chroma_format!=1) {
@@ -31363,23 +31365,25 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {mpeg1==1,
-//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N, 1<=aspectratio,
-//    aspectratio<=14, 2<=chroma_format, chroma_format<=3,
-//    1<=color_primaries, color_primaries<=7, 0<=constrparms,
-//    constrparms<=1, 15615constrparms+horizontal_size<=16383,
+//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
+//    1<=aspectratio, aspectratio<=14, 2<=chroma_format,
+//    chroma_format<=3, 1<=color_primaries, color_primaries<=7,
+//    0<=constrparms, constrparms<=1,
+//    15615constrparms+horizontal_size<=16383,
 //    5205constrparms+horizontal_size<=5205i+768, constrparms<=i,
 //    5269constrparms+vertical_size<=5269i+576,
 //    15807constrparms+vertical_size<=16383, 0<=dc_prec, dc_prec<=3,
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          if (!quiet)
 
@@ -31390,23 +31394,25 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {mpeg1==1,
-//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N, 1<=aspectratio,
-//    aspectratio<=14, 2<=chroma_format, chroma_format<=3,
-//    1<=color_primaries, color_primaries<=7, 0<=constrparms,
-//    constrparms<=1, 15615constrparms+horizontal_size<=16383,
+//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
+//    1<=aspectratio, aspectratio<=14, 2<=chroma_format,
+//    chroma_format<=3, 1<=color_primaries, color_primaries<=7,
+//    0<=constrparms, constrparms<=1,
+//    15615constrparms+horizontal_size<=16383,
 //    5205constrparms+horizontal_size<=5205i+768, constrparms<=i,
 //    5269constrparms+vertical_size<=5269i+576,
 //    15807constrparms+vertical_size<=16383, 0<=dc_prec, dc_prec<=3,
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, quiet<=0, 0<=repeatfirst,
-//    repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1, quiet<=0,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             fprintf(stderr, "Warning: setting chroma_format = 1 (4:2:0)\n");
 
@@ -31417,23 +31423,25 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {mpeg1==1,
-//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N, 1<=aspectratio,
-//    aspectratio<=14, 2<=chroma_format, chroma_format<=3,
-//    1<=color_primaries, color_primaries<=7, 0<=constrparms,
-//    constrparms<=1, 15615constrparms+horizontal_size<=16383,
+//    prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
+//    1<=aspectratio, aspectratio<=14, 2<=chroma_format,
+//    chroma_format<=3, 1<=color_primaries, color_primaries<=7,
+//    0<=constrparms, constrparms<=1,
+//    15615constrparms+horizontal_size<=16383,
 //    5205constrparms+horizontal_size<=5205i+768, constrparms<=i,
 //    5269constrparms+vertical_size<=5269i+576,
 //    15807constrparms+vertical_size<=16383, 0<=dc_prec, dc_prec<=3,
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          chroma_format = 1;
       }
@@ -31445,7 +31453,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N,
+//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
 //    15615constrparms+horizontal_size<=16383,
@@ -31455,13 +31463,14 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
 
       if (dc_prec!=0) {
@@ -31473,7 +31482,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N,
+//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
 //    15615constrparms+horizontal_size<=16383,
@@ -31483,13 +31492,14 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          if (!quiet)
 
@@ -31500,7 +31510,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N,
+//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
 //    15615constrparms+horizontal_size<=16383,
@@ -31510,13 +31520,14 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, quiet<=0, 0<=repeatfirst,
-//    repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1, quiet<=0,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             fprintf(stderr, "Warning: setting intra_dc_precision = 0\n");
 
@@ -31527,7 +31538,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, 1<=N,
+//    mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2, i<=M+2, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
 //    15615constrparms+horizontal_size<=16383,
@@ -31537,13 +31548,14 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          dc_prec = 0;
       }
@@ -31556,22 +31568,23 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 2constrparms+i<=M+2,
-//    1<=N, 1<=aspectratio, aspectratio<=14, 1<=color_primaries,
-//    color_primaries<=7, 0<=constrparms, constrparms<=1,
-//    15615constrparms+horizontal_size<=16383,
+//    i<=M+2, 1<=N, 1<=aspectratio, aspectratio<=14,
+//    1<=color_primaries, color_primaries<=7, 0<=constrparms,
+//    constrparms<=1, 15615constrparms+horizontal_size<=16383,
 //    5205constrparms+horizontal_size<=5205i+768, constrparms<=i,
 //    5269constrparms+vertical_size<=5269i+576,
 //    15807constrparms+vertical_size<=16383,
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    horizontal_size<=5205i+768, 0<=i, vertical_size<=5269i+576,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -31584,7 +31597,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31593,13 +31610,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          if (qscale_tab[i]) {
 
@@ -31611,7 +31628,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31620,13 +31641,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             if (!quiet)
 
@@ -31638,7 +31659,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31647,13 +31672,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1, quiet<=0,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
                fprintf(stderr, "Warning: setting qscale_tab[%d] = 0\n", i);
 
@@ -31665,7 +31690,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31674,13 +31703,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             qscale_tab[i] = 0;
          }
@@ -31693,7 +31722,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, i==3, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31702,13 +31735,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -31721,7 +31754,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31730,13 +31767,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          if (intravlc_tab[i]) {
 
@@ -31748,7 +31785,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31757,13 +31798,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             if (!quiet)
 
@@ -31775,7 +31816,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31784,13 +31829,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1, quiet<=0,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
                fprintf(stderr, "Warning: setting intravlc_tab[%d] = 0\n", i);
 
@@ -31802,7 +31847,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31811,13 +31860,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             intravlc_tab[i] = 0;
          }
@@ -31830,7 +31879,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, i==3, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31839,13 +31892,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=low_delay,
-//    low_delay<=1, 1<=matrix_coefficients, matrix_coefficients<=7,
-//    0<=prog_frame, prog_frame<=1, 0<=repeatfirst, repeatfirst<=1,
-//    0<=topfirst, topfirst<=1, 1<=transfer_characteristics,
-//    transfer_characteristics<=7, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, 0<=video_format,
-//    video_format<=4}
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
+//    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
+//    1<=transfer_characteristics, transfer_characteristics<=7,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -31858,7 +31911,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31867,13 +31924,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
          if (altscan_tab[i]) {
 
@@ -31885,7 +31942,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31894,13 +31955,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             if (!quiet)
 
@@ -31912,7 +31973,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31921,13 +31986,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1, quiet<=0,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
                fprintf(stderr, "Warning: setting altscan_tab[%d] = 0\n", i);
 
@@ -31939,7 +32004,11 @@ _break_3:         ;
 //    quiet,r,repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
+//    5205constrparms+horizontal_size<=5205M+11178,
+//    10410constrparms+horizontal_size<=5205M+11178,
 //    15615constrparms+horizontal_size<=5205M+11178,
+//    5269constrparms+vertical_size<=5269M+11114,
+//    10538constrparms+vertical_size<=5269M+11114,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
 //    color_primaries<=7, 0<=constrparms, constrparms<=1,
@@ -31948,13 +32017,13 @@ _break_3:         ;
 //    0<=display_horizontal_size, display_horizontal_size<=16383,
 //    0<=display_vertical_size, display_vertical_size<=16383,
 //    0<=fieldpic, fieldpic<=1, 1<=frame_rate_code,
-//    frame_rate_code<=8, 1<=horizontal_size, 0<=i, i<=2,
-//    0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
+//    frame_rate_code<=8, 1<=horizontal_size, horizontal_size<=16383,
+//    0<=i, i<=2, 0<=low_delay, low_delay<=1, 1<=matrix_coefficients,
 //    matrix_coefficients<=7, 0<=prog_frame, prog_frame<=1,
 //    0<=repeatfirst, repeatfirst<=1, 0<=topfirst, topfirst<=1,
 //    1<=transfer_characteristics, transfer_characteristics<=7,
 //    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    0<=video_format, video_format<=4}
+//    vertical_size<=16383, 0<=video_format, video_format<=4}
 
             altscan_tab[i] = 0;
          }
@@ -44862,7 +44931,6 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 _switch_5_default:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
@@ -44878,13 +44946,13 @@ _switch_5_default:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 _switch_5_case_12:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
@@ -44894,14 +44962,13 @@ _switch_5_case_12:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            
-            
 _switch_5_case_4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -44918,6 +44985,8 @@ _switch_5_case_8:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,

@@ -28,39 +28,13 @@ echo
 
 display PRINTED_FILE[comma02]
 
-# echo
-# echo Source code after loop interchange
-# echo
-
-#apply STRIP_MINE
-#l1
-#0
-#128
-#display PRINTED_FILE[comma02]
-
 echo
-echo Check transformers on strip-mined loop
+echo Check transformers
 echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[comma02]
-quit
-echo
-echo Check preconditions on strip-mined loop
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE
-
-activate PRINT_CODE
-apply UNSPLIT[%PROGRAM]
 
 close
-
-echo
-echo Warnings
-echo
-
-shell cat comma02.database/Warnings
-
+#delete comma02
 quit

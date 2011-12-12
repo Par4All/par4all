@@ -300,27 +300,27 @@ void ts_restructured(void)
 
    while (rand_b())
 
-//  P(d,s,t) {s+4t==d, s<=d, 0<=s, s<=3}
+//  P(d,s,t) {s+4t==d, 4t<=d, d<=4t+3, 0<=t}
 
       if (rand_b()) {
 
-//  P(d,s,t) {s+4t==d, s<=d, 0<=s, s<=3}
+//  P(d,s,t) {s+4t==d, 4t<=d, d<=4t+3, 0<=t}
 
          if (!(s<=2))
 
-//  P(d,s,t) {d==4t+3, s==3, 3<=d}
+//  P(d,s,t) {s+4t==d, d<=4t+3, 3<=s, 0<=t}
 
             deadlock();
 
-//  P(d,s,t) {s+4t==d, s<=d, 0<=s, s<=2}
+//  P(d,s,t) {s+4t==d, 4t<=d, s<=2, 0<=t}
 
          d++;
 
-//  P(d,s,t) {s+4t==d-1, s+1<=d, 0<=s, s<=2}
+//  P(d,s,t) {s+4t==d-1, 4t+1<=d, s<=2, 0<=t}
 
          s++;
 
-//  P(d,s,t) {s+4t==d, s<=d, 1<=s, s<=3}
+//  P(d,s,t) {s+4t==d, 4t+1<=d, s<=3, 0<=t}
 
          if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
 
@@ -330,11 +330,11 @@ void ts_restructured(void)
       }
       else {
 
-//  P(d,s,t) {s+4t==d, s<=d, 0<=s, s<=3}
+//  P(d,s,t) {s+4t==d, 4t<=d, d<=4t+3, 0<=t}
 
          if (!(s==3))
 
-//  P(d,s,t) {s+4t==d, s<=d, 0<=s, s<=2}
+//  P(d,s,t) {s+4t==d, 4t<=d, s<=2, 0<=t}
 
             deadlock();
 

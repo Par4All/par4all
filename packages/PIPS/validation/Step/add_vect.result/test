@@ -125,11 +125,11 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int a[100000], int b[100000], int d[100000], i
       for(IDX = 1; IDX <= STEP_COMM_SIZE; IDX += 1) {
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
-         //  <d[PHI1]-W-EXACT-{PHI1==5, STEP_i_LOW<=PHI1, PHI1<=STEP_i_UP}>
+         //  <d[PHI1]-W-EXACT-{PHI1==5, STEP_i_LOW<=5, 5<=STEP_i_UP}>
          
          ;
-         STEP_SR_d[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 5);
-         STEP_SR_d[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 5);
+         STEP_SR_d[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = 5;
+         STEP_SR_d[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = 5;
       }
       STEP_SET_SENDREGIONS(d, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_d);
    }

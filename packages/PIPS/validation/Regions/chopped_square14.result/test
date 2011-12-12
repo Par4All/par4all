@@ -170,30 +170,28 @@ int main()
    int N = 100;
    double A[100][100];
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 99PHI2<=98PHI1+9801,
-//    50PHI1<=49PHI2+4950, 1617PHI1+4867PHI2<=640299,
-//    4867PHI1+1617PHI2<=640299, 0<=PHI2, PHI2<=99, N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99,
+//    2401PHI1+7251PHI2<=953147, 7251PHI1+2401PHI2<=953147, 0<=PHI2,
+//    PHI2<=99, N==100}>
 
 
    for(ii = 0; ii <= N-1; ii += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{99PHI2+98ii<=98PHI1+9801,
-//    33PHI2+65ii<=32PHI1+6501, ii<=PHI1+PHI2,
-//    49PHI1+50PHI2<=49ii+4950, 99PHI1<=100PHI2+99ii,
-//    147PHI1+50PHI2<=97ii+9850, ii<=2PHI1, 99PHI1<=49ii+4950, N==100,
-//    0<=ii, ii<=99}>
+//  <A[PHI1][PHI2]-W-MAY-{50ii<=50PHI1+49PHI2,
+//    49PHI2+97ii<=48PHI1+9653, PHI2+ii<=PHI1+99, PHI1<=PHI2+ii,
+//    49PHI1+50PHI2<=49ii+4950, 147PHI1+50PHI2<=97ii+9850,
+//    50ii<=99PHI1, 99PHI1<=49ii+4950, N==100, 0<=ii, ii<=99}>
 
       for(jj = 0; jj <= N-1; jj += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{99PHI2+98ii<=98PHI1+9801,
-//    33PHI2+65ii<=32PHI1+6501, ii<=PHI1+PHI2,
-//    49PHI1+50PHI2<=49ii+4950, 99PHI1<=100PHI2+99ii,
-//    147PHI1+50PHI2<=97ii+9850, 99PHI2<=100PHI1+99jj, jj<=PHI1+PHI2,
-//    33PHI1+65jj<=32PHI2+6501, 50PHI1+49PHI2<=49jj+4950,
-//    50PHI1+147PHI2<=97jj+9850, 99PHI1+98jj<=98PHI2+9801, ii<=2PHI1,
-//    99PHI1<=49ii+4950, 49PHI1+25jj<=24ii+4925, PHI2+49ii+48jj<=9653,
-//    49PHI2+25ii<=24jj+4925, jj<=2PHI2, 99PHI2<=49jj+4950, N==100,
-//    0<=ii, ii<=99, 0<=jj, jj<=99}>
+//  <A[PHI1][PHI2]-W-MAY-{50ii<=50PHI1+49PHI2,
+//    49PHI2+97ii<=48PHI1+9653, PHI2+ii<=PHI1+99, PHI1<=PHI2+ii,
+//    49PHI1+50PHI2<=49ii+4950, 147PHI1+50PHI2<=97ii+9850,
+//    50jj<=49PHI1+50PHI2, PHI2<=PHI1+jj, PHI1+jj<=PHI2+99,
+//    49PHI1+97jj<=48PHI2+9653, 50PHI1+49PHI2<=49jj+4950,
+//    50PHI1+147PHI2<=97jj+9850, 50ii<=99PHI1, 99PHI1<=49ii+4950,
+//    50jj<=99PHI2, 99PHI2<=49jj+4950, N==100, 0<=ii, ii<=99, 0<=jj,
+//    jj<=99}>
 
          if (1) {
 
@@ -207,7 +205,7 @@ int main()
 
                A[ii][jj] = 1.0;
 
-//  <A[PHI1][PHI2]-W-MAY-{N<=2PHI1+1, 2PHI1<=N, N<=2PHI2+1, 2PHI2<=N,
+//  <A[PHI1][PHI2]-W-MAY-{50<=PHI1, PHI1<=50, 50<=PHI2, PHI2<=50,
 //    N==100, 0<=ii, ii<=99, 0<=jj, jj<=99}>
 
             A[N/2][N/2] = 0.;

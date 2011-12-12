@@ -1,0 +1,9 @@
+#
+# Code after simplify_constant_address_expressions for module main
+#
+int main()
+{
+   char c;
+   c = 'e';
+   return 0;
+}

@@ -1,5 +1,16 @@
 delete ca5
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create ca5 ca5.f
+
+# FI: I have no idea how the test results could be obtained without
+# these two properties
+
+# setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+# setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+
+# In fact, they are due to the propagation of preconditions from the main
 
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION

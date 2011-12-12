@@ -1,0 +1,37 @@
+#
+# Code after openmp for module main
+#
+int main()
+{
+   int ua2[3][1];
+   ua2[0][0] = 1;
+   ua2[1][0] = 2;
+   ua2[2][0] = 3;
+   int uc0;
+   uc0 = 0;
+   {
+      int lv1;
+#pragma omp parallel for reduction(|:uc0)
+      for(lv1 = 0; lv1 <= 2; lv1 += 1)
+         uc0 |= ua2[lv1][0]!=(int) 0;
+   }
+   printf("%d\n", uc0);
+   return 0;
+}
+int main()
+{
+   int ua2[3][1];
+   ua2[0][0] = 1;
+   ua2[1][0] = 2;
+   ua2[2][0] = 3;
+   int uc0;
+   uc0 = 0;
+   {
+      int lv1;
+#pragma omp parallel for reduction(|:uc0)
+      for(lv1 = 0; lv1 <= 2; lv1 += 1)
+         uc0 |= ua2[lv1][0]!=(int) 0;
+   }
+   printf("%d\n", uc0);
+   return 0;
+}

@@ -10,10 +10,16 @@ activate PRECONDITIONS_INTER_FULL
 activate PRINT_CODE_PRECONDITIONS
 
 echo
+echo Preconditions in "DEAD3"
+echo
+
+display PRINTED_FILE[DEAD3]
+
+echo
 echo Without explicit dead code elimination:
 echo
 
-display PRINTED_FILE
+display PRINTED_FILE[PR]
 
 close
 delete dead3

@@ -56,7 +56,6 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
       return ret;
 
    if (datdest->type==FLGR_UINT16)
-
       flgr2d_convolution_fgUINT16(datdest, datsrc, nhb);
 }
 void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos)
@@ -82,7 +81,18 @@ void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_
    for(k = 0; k <= spp-1; k += 1) {
       _return0 = data_array[i];
       val = _return0;
-      vector_array[k] = val;
+      {
+         //PIPS generated variable
+         fgUINT16 *array0;
+         //PIPS generated variable
+         int pos0;
+         //PIPS generated variable
+         fgUINT16 value0;
+         array0 = vector_array;
+         pos0 = k;
+         value0 = val;
+         array0[pos0] = value0;
+      }
       i++;
    }
 }
@@ -109,7 +119,18 @@ void flgr_set_data_array_vector_fgUINT16(fgUINT16 *data_array, fgUINT16 *vector_
    for(k = 0; k <= spp-1; k += 1) {
       _return0 = vector_array[k];
       val = _return0;
-      data_array[i] = val;
+      {
+         //PIPS generated variable
+         fgUINT16 *array0;
+         //PIPS generated variable
+         int pos0;
+         //PIPS generated variable
+         fgUINT16 value0;
+         array0 = data_array;
+         pos0 = i;
+         value0 = val;
+         array0[pos0] = value0;
+      }
       i++;
    }
 }
@@ -130,42 +151,223 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
 }
 void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
 {
-   FLGR_Vector *vec = flgr_vector_create(nhb->spp, nhb->type);
+   FLGR_Vector *vec;
    int i, j;
-   int w = nhb->size_x;
-   int h = nhb->size_y;
+   int w;
+   int h;
    //PIPS generated variable
-   FLGR_Ret _return0;
+   FLGR_Vector *_return0;
+   //PIPS generated variable
+   FLGR_Ret _return1;
+   //PIPS generated variable
+   int _return2;
+   //PIPS generated variable
+   FLGR_Ret _return3;
+   //PIPS generated variable
+   void *_return4, *_return5;
    {
-      int k;
-      fgUINT16 *vctar = (fgUINT16 *) vec->array;
-      for(k = 0; k <= vec->spp-1; k += 1)
-         vctar[k] = 0;
+      //PIPS generated variable
+      int spp0;
+      //PIPS generated variable
+      FLGR_Type type0;
+      spp0 = nhb->spp;
+      type0 = nhb->type;
+      {
+         FLGR_Vector *vct;
+         
+         
+         
+         
+         
+         if (type0==FLGR_UINT8)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_UINT16)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_UINT32)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_UINT64)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_INT8)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_INT16)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_INT32)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_INT64)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_FLOAT32)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_FLOAT64)
+            _return3 = FLGR_RET_OK;
+         else if (type0==FLGR_BIT)
+            _return3 = FLGR_RET_OK;
+         else
+            _return3 = FLGR_RET_TYPE_UNKNOWN;
+         if (_return3!=FLGR_RET_OK) {
+            fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""unknwon type\n", "./fulguro-included.h", 1122, __FUNCTION__);
+            _return0 = (void *) 0;
+         }
+         else
+
+            if (spp0<1) {
+               fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Sample Per Pixel (spp) cannot be < 1\n", "./fulguro-included.h", 1127, __FUNCTION__);
+               _return0 = (void *) 0;
+            }
+            else {
+               {
+                  //PIPS generated variable
+                  int I_0;
+                  I_0 = sizeof(FLGR_Vector);
+                  {
+                     void *tmp = malloc(I_0);
+                     if (tmp==(void *) 0) {
+                        fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Could not allocate data, returning NULL pointer !\n", "./fulguro-included.h", 1110, __FUNCTION__);
+                        _return4 = (void *) 0;
+                     }
+                     else
+                        
+                        
+                        _return4 = tmp;
+                  }
+               }
+               vct = _return4;
+               
+               
+               
+               
+               if (type0==FLGR_BIT)
+                  _return2 = 1;
+               else if (type0==FLGR_UINT8)
+                  _return2 = sizeof(fgUINT8)<<3;
+               else if (type0==FLGR_UINT16)
+                  _return2 = sizeof(fgUINT16)<<3;
+               else if (type0==FLGR_UINT32)
+                  _return2 = sizeof(fgUINT32)<<3;
+               else if (type0==FLGR_UINT64)
+                  _return2 = sizeof(fgUINT64)<<3;
+               else if (type0==FLGR_INT8)
+                  _return2 = sizeof(fgINT8)<<3;
+               else if (type0==FLGR_INT16)
+                  _return2 = sizeof(fgINT16)<<3;
+               else if (type0==FLGR_INT32)
+                  _return2 = sizeof(fgINT32)<<3;
+               else if (type0==FLGR_INT64)
+                  _return2 = sizeof(fgINT64)<<3;
+               else if (type0==FLGR_FLOAT32)
+                  _return2 = sizeof(fgFLOAT32)<<3;
+               else if (type0==FLGR_FLOAT64)
+                  _return2 = sizeof(fgFLOAT64)<<3;
+               else
+
+                  _return2 = FLGR_RET_TYPE_UNKNOWN;
+               vct->bps = _return2;
+               vct->spp = spp0;
+               vct->type = type0;
+               {
+                  //PIPS generated variable
+                  int I_1;
+                  I_1 = spp0*vct->bps/8+16;
+                  {
+                     void *tmp = malloc(I_1);
+                     if (tmp==(void *) 0) {
+                        fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Could not allocate data, returning NULL pointer !\n", "./fulguro-included.h", 1110, __FUNCTION__);
+                        _return5 = (void *) 0;
+                     }
+                     else
+                        
+                        
+                        _return5 = tmp;
+                  }
+               }
+               vct->array = _return5;
+               if (vct->array==(void *) 0) {
+                  fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Allocation error !\n", "./fulguro-included.h", 1140, __FUNCTION__);
+                  
+                  
+                  free(vct);
+                  _return0 = (void *) 0;
+               }
+               else
+                  
+                  
+                  _return0 = vct;
+            }
+      }
+   }
+   vec = _return0;
+   w = nhb->size_x;
+   h = nhb->size_y;
+   {
+      //PIPS generated variable
+      FLGR_Vector *vctdest0;
+      //PIPS generated variable
+      fgUINT16 scalar0;
+      vctdest0 = vec;
+      scalar0 = 0;
+      {
+         int k;
+         fgUINT16 *vctar = (fgUINT16 *) vctdest0->array;
+         for(k = 0; k <= vctdest0->spp-1; k += 1) {
+            //PIPS generated variable
+            fgUINT16 *array0;
+            //PIPS generated variable
+            int pos0;
+            //PIPS generated variable
+            fgUINT16 value0;
+            array0 = vctar;
+            pos0 = k;
+            value0 = scalar0;
+            array0[pos0] = value0;
+         }
+      }
    }
    for(j = w/2+1; j <= w-1; j += 1) {
       //PIPS generated variable
-      int I_0;
-      I_0 = h/2;
+      FLGR_Data2D *dat0;
+      //PIPS generated variable
+      int row0, col0;
+      //PIPS generated variable
+      FLGR_Vector *vct0;
+      dat0 = nhb;
+      row0 = h/2;
+      col0 = j;
+      vct0 = vec;
       {
          fgUINT16 *array_s;
          fgUINT16 *array_d;
-         array_s = (fgUINT16 *) vec->array;
-         array_d = (fgUINT16 *) (nhb->array)[I_0];
+         array_s = (fgUINT16 *) vct0->array;
+         array_d = (fgUINT16 *) (dat0->array)[row0];
          {
             //PIPS generated variable
-            int I_0_;
-            I_0_ = vec->spp;
+            fgUINT16 *data_array0, *vector_array0;
+            //PIPS generated variable
+            int spp0, pos0;
+            data_array0 = array_d;
+            vector_array0 = array_s;
+            spp0 = vct0->spp;
+            pos0 = col0;
             {
                register fgUINT16 val;
                register int i, k;
                //PIPS generated variable
                fgUINT16 _return0;
-               i = j*I_0_;
+               i = pos0*spp0;
 
-               for(k = 0; k <= I_0_-1; k += 1) {
-                  _return0 = array_s[k];
+               for(k = 0; k <= spp0-1; k += 1) {
+                  _return0 = vector_array0[k];
                   val = _return0;
-                  array_d[i] = val;
+                  {
+                     //PIPS generated variable
+                     fgUINT16 *array0;
+                     //PIPS generated variable
+                     int pos0_;
+                     //PIPS generated variable
+                     fgUINT16 value0;
+                     array0 = data_array0;
+                     pos0_ = i;
+                     value0 = val;
+                     array0[pos0_] = value0;
+                  }
                   i++;
                }
             }
@@ -174,49 +376,74 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
    }
    for(i = h/2+1; i <= h-1; i += 1)
       for(j = 0; j <= w-1; j += 1) {
-         fgUINT16 *array_s;
-         fgUINT16 *array_d;
-         array_s = (fgUINT16 *) vec->array;
-         array_d = (fgUINT16 *) (nhb->array)[i];
+         //PIPS generated variable
+         FLGR_Data2D *dat1;
+         //PIPS generated variable
+         int row1, col1;
+         //PIPS generated variable
+         FLGR_Vector *vct1;
+         dat1 = nhb;
+         row1 = i;
+         col1 = j;
+         vct1 = vec;
          {
-            //PIPS generated variable
-            int I_0;
-            I_0 = vec->spp;
+            fgUINT16 *array_s;
+            fgUINT16 *array_d;
+            array_s = (fgUINT16 *) vct1->array;
+            array_d = (fgUINT16 *) (dat1->array)[row1];
             {
-               register fgUINT16 val;
-               register int i_, k;
                //PIPS generated variable
-               fgUINT16 _return0;
-               i_ = j*I_0;
+               fgUINT16 *data_array0, *vector_array0;
+               //PIPS generated variable
+               int spp0, pos0;
+               data_array0 = array_d;
+               vector_array0 = array_s;
+               spp0 = vct1->spp;
+               pos0 = col1;
+               {
+                  register fgUINT16 val;
+                  register int i, k;
+                  //PIPS generated variable
+                  fgUINT16 _return0;
+                  i = pos0*spp0;
 
-               for(k = 0; k <= I_0-1; k += 1) {
-                  _return0 = array_s[k];
-                  val = _return0;
-                  array_d[i_] = val;
-                  i_++;
+                  for(k = 0; k <= spp0-1; k += 1) {
+                     _return0 = vector_array0[k];
+                     val = _return0;
+                     {
+                        //PIPS generated variable
+                        fgUINT16 *array0;
+                        //PIPS generated variable
+                        int pos0_;
+                        //PIPS generated variable
+                        fgUINT16 value0;
+                        array0 = data_array0;
+                        pos0_ = i;
+                        value0 = val;
+                        array0[pos0_] = value0;
+                     }
+                     i++;
+                  }
                }
             }
          }
       }
    if (vec==(void *) 0) {
-      
-      
       fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Null object\n", "./fulguro-included.h", 1060, __FUNCTION__);
-      _return0 = FLGR_RET_NULL_OBJECT;
+      _return1 = FLGR_RET_NULL_OBJECT;
    }
    else if (vec->array==(void *) 0) {
-
       fprintf(stderr, "ERROR: File %s, Line %d, Function %s: ""Vector array is null\n", "./fulguro-included.h", 1065, __FUNCTION__);
-      _return0 = FLGR_RET_NULL_OBJECT;
+      _return1 = FLGR_RET_NULL_OBJECT;
    }
    else {
       {
          //PIPS generated variable
-         void *P_4;
-         P_4 = vec->array;
+         void *P_0;
+         P_0 = vec->array;
          
          
-         free(P_4);
+         free(P_0);
       }
       
       
@@ -226,8 +453,8 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
       
       
       
-      _return0 = FLGR_RET_OK;
+      _return1 = FLGR_RET_OK;
    }
-   _return0;
+   _return1;
    return;
 }

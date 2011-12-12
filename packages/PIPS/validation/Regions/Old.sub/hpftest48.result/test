@@ -1,3 +1,1593 @@
+--- Preconditions for HPFTEST48
+
+C  P() {}
+
+c
+c     Adaptation hpf de onde24, Fabien Coelho et Ronan Keryell, 1993
+c     
+c     - taille NP passees en parame`tres et verifiee aux IO~;
+c     - idem NT~;
+c     - les surdeclarations inutiles ont ete corrigees (NPMAX+1->NP)
+c     - tableaux B et UB coupes en 3~: E, S, W~;
+c     - tableau temporaire UINT duplique en 3~: E, S, W~;
+c     - reductions remplacees par des appels de fonctions~;
+c     - inclusion dans le code de l ouverture des fichiers~;
+c     - directives de placement proposees par Ronan, et modifiees~;
+c     - boucles paralle`les independantes,
+c     - avec les variables privees~;
+c     - mise en commentaire des mesures de performances~;
+c     - & -> $ car marche mieux avec emacs~;
+c     - fonctions REDMIN et REDMAX codees en 2D~;
+c     - CONTINUE -> ENDDO
+c     - boucle 71 distribuee
+c     
+c     + hint to the compiler with independent do scalar loops
+c
+c     Il faudrait encore
+c
+c     - revoir les I/O...
+
+      PROGRAM HPFTEST48
+
+C  ------------------------------------------------------
+C        MODELISATION PAR EQUATION D ONDES D UN PHENOMENE
+C              DE PROPAGATION EN DIMENSION 2.
+C
+C  HYPOTHESES  :   - ON CONSIDERE UN DOMAINE CARRE .
+C  ----------      - LA SURFACE EST LIBRE.
+C                  - ON CONSIDERE DES CONDITIONS ABSORBANTES DU SECOND
+C                    ORDRE SUR LES BORDS  (cf. these CHALINDAR).
+C                  - LE MILIEU EST HETEROGENE.
+C
+C
+C  UTILISATION DUN SCHEMA AUX DIFFERENCES FINIES DORDRE (2,4)
+C  (ORDRE 2 EN TEMPS ET 4 EN ESPACE) COMME METHODE DE RESOLUTION :
+C
+C         - SCHEMA DORDRE (2,4) POUR LE DOMAINE INTERIEUR.
+C         - SCHEMA DORDRE (2,2) POUR LE BORD INTERIEUR DU DOMAINE.
+C         - CONDITIONS PARAXIALES DORDRE 2 POUR LE BORD DU DOMAINE.
+C
+C  -----------------------------------------------------
+
+
+
+C  DECLARATION DE CONSTANTES
+C  -------------------------
+C  NPMAX      : NOMBRE DE POINTS MAXIMUM DU MAILLAGE SPATIAL
+C  NTMAX      : NOMBRE MAXIMUM DE PAS DE TEMPS
+C  NBTRAC   : NOMBRE DE TRACES SISMIQUES
+C  TMAX        : TEMPS DE PRISE EN COMPTE DE LA FONCTION SOURCE (S)
+
+      INTEGER    NPMAX 
+      INTEGER    NTMAX 
+      INTEGER    NBTRAC
+      INTEGER    TMAX   
+      REAL*8     PI     
+
+      PARAMETER      (NPMAX     = 809)
+      PARAMETER      (NTMAX     = 4000)
+      PARAMETER      (NBTRAC  = 50)
+      PARAMETER      (TMAX       = 1.0)
+      PARAMETER      (PI         = 3.141592653589)
+
+
+C  DECLARATION DE TABLEAUX
+C  -----------------------
+C  U      :    SOLUTION DE LA MODELISATION PAR EQUATION DONDE DUN
+C              PHENOMENE DE PROPAGATION. UTILISATION DUN SCHEMA AUX
+C              DIFFERENCES FINIES COMME METHODE DE RESOLUTION.
+C                U(.,.,KM) REPRESENTE U(t)
+C              U(.,.,KP) REPRESENTE U(t-1) et U(t+1)
+C
+C  V      :    CHAMP DE VITESSE CARACTERISTIQUE DU MILIEU.
+C              - LE TABLEAU MEMORISE LA CONSTANTE LIEE A LA VITESSE
+C                     1/12*((V(i,j)*DELTAT/H)**2)
+C                POUR LES POINTS INTERIEURS DU DOMAINE.
+C              - LE TABLEAU MEMORISE LA CONSTANTE LIEE A LA VITESSE
+C                     (V(i,j)*DELTAT/H)**2
+C                POUR LES POINTS CONSTITUANT LE BORD INTERNE DU DOMAINE
+C              - DANS LE CAS DES POINTS CONSTITUANT LES FRONTIERES
+C                E-W-S, LE TABLEAU CONTIENT LA MOYENNE HARMONIQUE
+C                DES VITESSES DES POINTS FRONTIERES ET DES POINTS
+C                CONNEXES A LA FRONTIERE.
+C              - DANS LE CAS DES POINTS CONSTITUANT LES COINS INF.
+C                DU DOMAINE, ET LES DEUX POINTS FRONTIERES CONNEXES
+C                AUX COINS,  LE TABLEAU CONTIENT LA MOYENNE HARMONIQUE
+C                DES VITESSES DES 4 POINTS CONNEXES AU POINT CONCERNE.
+C              - LES COINS SUPERIEURS SONT CONSIDERES COMME PARTIE
+C                DE LA SURFACE LIBRE.
+C
+C  B      :    TABLEAUX DE 3 VECTEURS CONTENANT LES CONSTANTES LIEES
+C              AUX EQUATIONS ASSOCIEES AUX BORDS.
+C              B1 = 1 - (1/(V`*DELTAT + H)) * (2*H + (V`*DELTAT)**2/H)
+C              B2 = 2*H / (V`*DELTAT + H)
+C              B3 = (V`*DELTAT)*(V`*DELTAT) / 2*H*(V`*DELTAT + H)
+C              AVEC V`: VITESSE HARMONIQUE SUR DEUX POINTS.
+C
+C              DANS LE CAS PARTICULIER DES 3 POINTS COMPOSANT
+C              CHAQUE COIN E-S ET S-W, LES TABLEAUX B1 ET B2 
+C              CONTIENNENT RESPECTIVEMENT LES CONSTANTES :
+C                  B1   = 2*V`*DELTAT / ( 4*V`*DELTAT + 3*H)
+C                  B2   = 3*H / (4*V`*DELTAT + 3*H)
+C              AVEC V`: VITESSE HARMONIQUE SUR QUATRE POINTS.
+C                  
+C  UB     :    TABLEAU DE VECTEURS INTERMEDIAIRES UTILISES POUR LE 
+C              CALCUL DES BORDS E-S-W ; LE CODAGE EST LE MEME QUE POUR 
+C              LES VECTEURS B.
+C
+C  UINT   :    VECTEUR INTERMEDIAIRE UTILISE LORS DU CALCUL DE
+C              LA SOLUTION AUX BORDS
+C
+C
+
+c
+c     nouvelles declarations avec NP et NT
+c
+c     pour BE, BW, UINT, (NP-1) est suffisant
+c
+      INTEGER   NP
+      INTEGER   NT
+      PARAMETER (NP = 800)
+      PARAMETER (NT = 4000)
+
+      EXTERNAL REDMIN, REDMAX
+      REAL*8 REDMIN, REDMAX
+
+      REAL*8    U     (NP,NP,2)
+      REAL*8    V     (NP,NP)
+ 
+      REAL*8    BE   (NP,3)
+      REAL*8    BS   (NP,3)
+      REAL*8    BW   (NP,3)
+
+      REAL*8    UBE  (NP)
+      REAL*8    UBS  (NP)
+      REAL*8    UBW  (NP)
+
+      REAL*8    UINTE(NP)
+      REAL*8    UINTS(NP)
+      REAL*8    UINTW(NP)
+
+      REAL*8    SISMO (NBTRAC,NT)
+
+c
+c     directives de placement HPF
+c
+
+CHPF$ TEMPLATE DOMAIN(NP,NP)
+CHPF$ PROCESSORS PE(4,4)
+CHPF$ DISTRIBUTE DOMAIN(BLOCK,BLOCK) ONTO PE
+
+CHPF$ ALIGN V(I,J), U(I,J,*) WITH DOMAIN(I,J)
+
+CHPF$ ALIGN UBE(I) WITH DOMAIN(I,799)
+CHPF$ ALIGN UBS(I) WITH DOMAIN(799,I)
+CHPF$ ALIGN UBW(I) WITH DOMAIN(I,2)
+
+CHPF$ ALIGN BE(I,*), UINTE(I) WITH DOMAIN(I,800)
+CHPF$ ALIGN BS(I,*), UINTS(I) WITH DOMAIN(800,I)
+CHPF$ ALIGN BW(I,*), UINTW(I) WITH DOMAIN(I,1)
+
+CHPF$ ALIGN SISMO(I,*) WITH DOMAIN(1,750+I)
+
+C  DECLARATION DE SCALAIRES
+C  ------------------------
+C  NP       : NOMBRE DE POINT SELON LA DIMENSION X DU MAILLAGE SPATIAL
+C  NT       : NOMBRE DE PAS DE TEMPS DE LA SIMULATION
+C  DELTAT   : INTERVALLE DE TEMPS               (0.0005 S)
+C  H        : INTERVALLE DESPACE               (1.5    M)
+C  F        : FREQUENCE DE LA SOURCE            (30     HERTZ)
+C  IS,JS    : COORDONNEES DE LA SOURCE            
+C
+C  KM,KP    : POINTEURS PERMETTANT DE PERMUTER LES PLANS ESPACE.
+C  I,J,K,N  : INDICES DE BOUCLES
+C  Wi       : VARIABLES DE TRAVAIL
+C  G0       : INTENSITE DE LA SOURCE A LINSTANT t
+C  TINIT,
+C  TFIN,
+C  TMESUR   : COMPTEURS DE GESTION DU TEMPS
+C  TiCPU    : COMPTEURS DE GESTION DU TEMPS CPU
+C  TiELAP   : COMPTEURS DE GESTION DU TEMPS ELAPSED
+C  NBOPi    : COMPTEURS DU NOMBRE DOPERATIONS FLOTTANTES
+C  MFLOPS   : NOMBRE DE MFLOPS MESURES
+C  UMIN     : VALEUR MIN DE LA SOLUTION U AU DERNIER PAS DE TEMPS
+C  UMAX     : VALEUR MAX DE LA SOLUTION U AU DERNIER PAS DE TEMPS
+C  VMIN     : VALEUR MIN DE LA SOLUTION DU CHAMP DE VITESSE
+C  VMAX     : VALEUR MAX DE LA SOLUTION DU CHAMP DE VITESSE
+C  SISMIN   : VALEUR MIN DE LA SOLUTION DU SISMOGRAMME
+C  SISMAX   : VALEUR MAX DE LA SOLUTION DU SISMOGRAMME
+C
+      REAL*8    DELTAT 
+      REAL*8    H      
+      REAL*8    F      
+      INTEGER   IS,JS
+      INTEGER   KM,KP
+      INTEGER   I,J,K,N
+      REAL*8    W
+      REAL*8    C1,C2,C3
+
+      REAL*8    G0
+
+c      REAL*8    
+c     $     TMESUR, TINIT, TFIN, T1CPU, T2CPU, T3CPU, 
+c     $     NBOP1, NBOP2, MFLOPS
+
+      REAL*8    UMIN, UMAX
+      REAL*8    VMIN, VMAX
+      REAL*8    SISMIN, SISMAX
+
+      INTEGER   NPTMP, NTTMP
+
+C  P() {}
+
+C
+C             CORPS DU PROGRAMME
+C             ------------------
+
+c
+c     ouverture des fichiers
+c
+
+      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0224
+
+C  P() {}
+
+      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0225
+
+C  P() {}
+
+      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0226
+
+C  P() {}
+
+      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0227
+
+C  P() {}
+
+
+C
+C ACQUISITION DES PARAMETRES DE LA MODELISATION
+C -----------------------------------------
+
+C WRITE (6,'('' ENTRER LE NB DE POINTS DU MAILLAGE CARRE (NP) ? '',$)')
+      READ (4, *) NPTMP                                                 0234
+
+C  P(NPTMP) {}
+
+      IF (NPTMP.NE.NP) STOP                                             0235
+
+C  P(NPTMP) {NPTMP==800}
+
+C WRITE (6,'('' ENTRER LE NB DE PAS DE TEMPS TOTAL (NT) ? '',$)')
+      READ (4, *) NTTMP                                                 0237
+
+C  P(NPTMP,NTTMP) {NPTMP==800}
+
+      IF (NTTMP.NE.NT) STOP                                             0238
+
+C  P(NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+C WRITE (6,'('' ENTRER LE PAS DE DISCR. EN ESPACE (H) ? '',$)')
+      READ (4, *) H                                                     0240
+
+C  P(NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+C WRITE (6,'('' ENTRER LE PAS DE DISCR. EN TEMPS (DELTAT) ? '',$)')
+      READ (4, *) DELTAT                                                0242
+
+C  P(NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+C WRITE (6,'('' ENTRER LA POSITION EN X DE LA SOURCE (JS) ? '',$)')
+      READ (4, *) JS                                                    0244
+
+C  P(JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+C WRITE (6,'('' ENTRER LA POSITION EN Z DE LA SOURCE (IS) ? '',$)')
+      READ (4, *) IS                                                    0246
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+C WRITE (6,'('' ENTRER LA FREQUENCE DE LA SOURCE (F) ? '',$)')
+      READ (4, *) F                                                     0248
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+
+      WRITE (1, 1100)                                                   0250
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1110)                                                   0251
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1120)                                                   0252
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1130) NP, NP                                            0253
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1135) NT                                                0254
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1140) IS, JS                                            0255
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1171) H                                                 0256
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1170) DELTAT                                            0257
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+      WRITE (1, 1180) F                                                 0258
+
+C  P(IS,JS,NPTMP,NTTMP) {NPTMP==800, NTTMP==4000}
+
+
+C
+C INITIALISATION DES VARIABLES SCALAIRES
+C ---------------------------------
+      KM = 1                                                            0263
+
+C  P(IS,JS,KM,NPTMP,NTTMP) {KM==1, NPTMP==800, NTTMP==4000}
+
+      KP = 2                                                            0264
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800, NTTMP==4000}
+
+      G0 = 0                                                            0265
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800, NTTMP==4000}
+
+
+
+C INITIALISATION DU CHAMP VITESSE
+C V(I,J)     = READ (Vi) (CAS DUN MILIEU HETEROGENE)
+C ----------------------------------------------
+
+      READ (3, *) NPTMP                                                 0272
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NTTMP==4000}
+
+      IF (NPTMP.NE.NP) STOP                                             0273
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800, NTTMP==4000}
+
+      READ (3, *) NPTMP                                                 0274
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NTTMP==4000}
+
+      IF (NPTMP.NE.NP) STOP                                             0275
+
+C  P(IS,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800, NTTMP==4000}
+
+      DO I = 1, NP                                                      0276
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=I, I<=800}
+
+         DO J = 1, NP                                                   0277
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}
+
+            READ (3, *) V(I,J)                                          0278
+         ENDDO
+      ENDDO
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {I==801, J==801, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+c
+c     reductions MIN et MAX
+c
+      VMIN = REDMIN(V(1,1), 1, NP, 1, NP)                               0285
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {I==801, J==801, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+      VMAX = REDMAX(V(1,1), 1, NP, 1, NP)                               0286
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {I==801, J==801, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+      WRITE (1, 1051) VMIN, VMAX                                        0288
+
+C  P(I,IS,J,JS,KM,KP,NPTMP,NTTMP) {I==801, J==801, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+C     INITIALISATION DE LA SOLUTION U
+C     U(.,.,t=0) = U(.,.,t=1) = 0
+C     ET DES ENREGISTREMENTS 
+C     SISMO (T=1) = 0.0
+C     ------------------------------
+
+chpf$ independent(k,j,i)
+      DO K = 1, 2                                                       0297
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=K, K<=2}
+
+         DO J = 1, NP                                                   0298
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=J, J<=800, 1<=K, K<=2}
+
+            DO I = 1, NP                                                0299
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800, 1<=K, K<=2}
+
+               U(I,J,K) = 0.0                                           0300
+            ENDDO
+         ENDDO
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==801, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i)
+      DO I = 1, NBTRAC                                                  0306
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 1<=I, I<=50}
+
+         SISMO(I,1) = 0.0                                               0307
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==51, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+
+
+
+C     INITIALISATION DES CONSTANTES LIEES AUX COINS INFERIEURS
+C            V(I,J)  <--  moyenne harmonique sur 4 points
+C            B(I,.,.)<--  cf declarations
+C     ET AUX BORDS E-S-W
+C            V(I,J)  <--  moyenne harmonique sur 2 points
+C            B(I,.,.)<--  cf declarations
+C     -------------------------------------------
+
+
+C     CAS DES TROIS POINTS DU COIN E-S
+C     --------------------------------
+
+c
+c how to help the compiler...
+c
+chpf$ independent(i), new(C1,W)
+      DO I = 0, 0                                                       0329
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C1 = 4/(1/V(NP-1,NP)+1/V(NP-1,NP-1)+1/V(NP-2,NP)+1/V(NP-2,NP   0330
+     &   -1))                                                           0330
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C1*DELTAT                                                  0332
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BE(NP-1,1) = 2*W/(4*W+3*H)                                     0333
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BE(NP-1,2) = 3*H/(4*W+3*H)                                     0334
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP-1,NP) = C1                                                0335
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(C2,W)
+      DO I = 0, 0                                                       0339
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C2 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0340
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C2*DELTAT                                                  0342
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(NP,1) = 2*W/(4*W+3*H)                                       0343
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(NP,2) = 3*H/(4*W+3*H)                                       0344
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP,NP) = C2                                                  0345
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(C3,W)
+      DO I = 0, 0                                                       0349
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C3 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0350
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C3*DELTAT                                                  0352
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(NP-1,1) = 2*W/(4*W+3*H)                                     0353
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(NP-1,2) = 3*H/(4*W+3*H)                                     0354
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP,NP-1) = C3                                                0355
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+C     CAS DES 3 POINTS DU COIN W-S
+C     ----------------------------
+
+chpf$ independent(i), new(C1,W)
+      DO I = 0, 0                                                       0362
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C1 = 4/(1/V(NP,2)+1/V(NP,3)+1/V(NP-1,2)+1/V(NP-1,3))           0363
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C1*DELTAT                                                  0365
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(2,1) = 2*W/(4*W+3*H)                                        0366
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(2,2) = 3*H/(4*W+3*H)                                        0367
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP,2) = C1                                                   0368
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(C2,W)
+      DO I = 0, 0                                                       0372
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C2 = 4/(1/V(NP,1)+1/V(NP,2)+1/V(NP-1,1)+1/V(NP-1,2))           0373
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C2*DELTAT                                                  0375
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(1,1) = 2*W/(4*W+3*H)                                        0376
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BS(1,2) = 3*H/(4*W+3*H)                                        0377
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP,1) = C2                                                   0378
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(C3,W)
+      DO I = 0, 0                                                       0382
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         C3 = 4/(1/V(NP-1,1)+1/V(NP-1,2)+1/V(NP-2,1)+1/V(NP-2,2))       0383
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         W = C3*DELTAT                                                  0385
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BW(NP-1,1) = 2*W/(4*W+3*H)                                     0386
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         BW(NP-1,2) = 3*H/(4*W+3*H)                                     0387
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==0, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+         V(NP-1,1) = C3                                                 0388
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==1, J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000}
+
+
+C     CAS DES BORDS   E - S - W
+C     -------------------------
+
+c     
+c     les variables reparties ecrites sont bien alignees
+c     
+
+chpf$ independent(i), new(W)
+      DO I = 2, NP-2                                                    0399
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0400
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         W = V(I,NP)*DELTAT                                             0401
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BE(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0402
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BE(I,2) = 2*H/(W+H)                                            0403
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BE(I,3) = W*W/(2*H*(W+H))                                      0404
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==799, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(W)
+      DO I = 3, NP-2                                                    0408
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0409
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         W = V(NP,I)*DELTAT                                             0410
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         BS(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0411
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         BS(I,2) = 2*H/(W+H)                                            0412
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         BS(I,3) = W*W/(2*H*(W+H))                                      0413
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==799, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i), new(W)
+      DO I = 2, NP-2                                                    0417
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0418
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         W = V(I,1)*DELTAT                                              0419
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BW(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0420
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BW(I,2) = 2*H/(W+H)                                            0421
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 2<=I, I<=798}
+
+         BW(I,3) = W*W/(2*H*(W+H))                                      0422
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==799, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+C
+C     INITIALISATION DES CONSTANTES LIEES AUX BORDS INTERNES
+C     ------------------------------------------------------
+
+chpf$ independent(i)
+      DO I = 3, NP-1                                                    0430
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=799}
+
+         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0431
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==800, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i)
+      DO I = 3, NP-1                                                    0435
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=799}
+
+         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0436
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==800, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+chpf$ independent(i)
+      DO I = 3, NP-2                                                    0440
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {J==801, K==3, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 3<=I, I<=798}
+
+         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0441
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==799, J==801, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+
+C     INITIALISATION DES CONSTANTES LIEES AU DOMAINE INTERIEUR
+C            V(I,J) <--  1/12*((V(I,J)*DELTAT/H)**2)
+C     -------------------------------------------
+
+chpf$ independent(j,i)
+      DO J = 3, NP-2                                                    0450
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {K==3, KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 3<=J, J<=798}
+
+         DO I = 3, NP-2                                                 0451
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {K==3, KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 3<=J, J<=798}
+
+            V(I,J) = (V(I,J)*DELTAT/H)**2/12                            0452
+         ENDDO
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,NPTMP,NTTMP) {I==799, J==799, K==3, KM==1,
+C    KP==2, NPTMP==800, NTTMP==4000}
+
+
+C     -----------------------------------------
+C     !     MODELISATION DE LA PROPAGATION DES ONDES
+C     !               PAR EQUATION DONDE.
+C     !        RESOLUTION PAR DIFFERENCES FINIES.
+C     -------------------------------------------
+
+
+C     ----------------------------
+C     !     BOUCLE EN TEMPS      !
+C     ----------------------------
+
+      DO N = 2, NT                                                      0467
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+
+C PRISE EN COMPTE DE LA FONCTION SOURCE PENDANT UN TEMPS DE TMAX SEC.
+C Un = Un + SOURCE
+C ---------------------------------------------------
+         W = F*(N*DELTAT-1.0/F)                                         0472
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+         IF (W**2.LT.TMAX) THEN                                         0473
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+            W = (W*PI)**2                                               0474
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+            G0 = (1.0-2.0*W)*EXP(-W)                                    0475
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+            U(IS,JS,KM) = U(IS,JS,KM)+G0*12*V(IS,JS)*H**2               0476
+         ENDIF
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=N, N<=4000}
+
+
+
+
+C     --------------------------------------------------------
+C     SAUVEGARDE DE LA FRANGE CONNEXE AUX BORDS POUR LE CALCUL
+C     ULTERIEUR DE LA SOLUTION AUX BORDS
+C     --------------------------------------------------------
+C     boucle 71
+
+chpf$ independent(i)
+         DO I = 2, NP-1                                                 0488
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=I, I<=799, 2<=N, N<=4000}
+
+            UBE(I) = U(I,NP-1,KP)                                       0489
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==800, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 2, NP-1                                                 0493
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=I, I<=799, 2<=N, N<=4000}
+
+            UBS(I) = U(NP-1,I,KP)                                       0494
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==800, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 2, NP-1                                                 0498
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    2<=I, I<=799, 2<=N, N<=4000}
+
+            UBW(I) = U(I,2,KP)                                          0499
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==800, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     ------------------------------------------------
+C     SOLUTION SUR LE DOMAINE INTERIEUR
+C     SCHEMA DORDRE 2 EN TEMPS ET DORDRE 4 EN ESPACE
+C     ------------------------------------------------
+
+chpf$ independent(j,i)
+         DO J = 3, NP-2                                                 0509
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    3<=J, J<=798, 2<=N, N<=4000}
+
+            DO I = 3, NP-2                                              0510
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {K==3, NPTMP==800, NTTMP==4000,
+C    3<=I, I<=798, 3<=J, J<=798, 2<=N, N<=4000}
+
+
+               U(I,J,KP) = 2*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60*U(I,J,KM)   0512
+     &         -16*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U(I,J+1,KM))+   0512
+     &         U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+2,KM))         0512
+
+            ENDDO
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     ------------------------------------------------
+C     SOLUTION SUR LES BORDS INTERIEURS
+C     SCHEMA DORDRE 2 EN TEMPS ET DORDRE 2 EN ESPACE
+C     ------------------------------------------------
+
+chpf$ independent(i)
+         DO I = 3, NP-1                                                 0530
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}
+
+            U(I,2,KP) = 2*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4*U(I,2,KM)-(U(   0531
+     &      I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))                 0531
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==800, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 3, NP-1                                                 0538
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}
+
+            U(I,NP-1,KP) = 2*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*(4*U   0539
+     &      (I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP-2,KM)+U   0539
+     &      (I,NP,KM)))                                                 0539
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==800, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0546
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            U(NP-1,I,KP) = 2*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*(4*U   0547
+     &      (NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,KM)+U(NP-   0547
+     &      1,I+1,KM)))                                                 0547
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     --------------------------------------------------------
+C     SOLUTION AU BORD EAST. CONDITIONS ABSORBANTES DORDRE 2.
+C     --------------------------------------------------------
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0559
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            UINTE(I) = BE(I,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UBE(I)+BE(I,   0560
+     &      2)*(U(I,NP,KM)+U(I,NP-1,KM))+BE(I,3)*(U(I+1,NP-1,KP)+U(I+   0560
+     &      1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                       0560
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0568
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            U(I,NP,KP) = UINTE(I)                                       0569
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     --------------------------------------------------------
+C     SOLUTION AU BORD SOUTH. CONDITIONS ABSORBANTES DORDRE 2.
+C     --------------------------------------------------------
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0578
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            UINTS(I) = BS(I,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UBS(I)+BS(I,   0579
+     &      2)*(U(NP,I,KM)+U(NP-1,I,KM))+BS(I,3)*(U(NP-1,I+1,KP)+U(NP   0579
+     &      ,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                       0579
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0587
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            U(NP,I,KP) = UINTS(I)                                       0588
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     --------------------------------------------------------
+C     SOLUTION AU BORD WEST. CONDITIONS ABSORBANTES DORDRE 2.
+C     --------------------------------------------------------
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0597
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            UINTW(I) = BW(I,1)*(U(I,1,KP)+U(I,2,KP))-UBW(I)+BW(I,2)*(   0598
+     &      U(I,1,KM)+U(I,2,KM))+BW(I,3)*(U(I+1,2,KP)+U(I+1,1,KP)+U(I   0598
+     &      -1,2,KP)+U(I-1,1,KP))                                       0598
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 3, NP-2                                                 0606
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}
+
+            U(I,1,KP) = UINTW(I)                                        0607
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==799, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+C     -----------------------------------------------
+C     CALCUL DU BORD DU COIN 
+C     U(NP-1,NP,KP) ,  U(NP,NP-1,KP) ET U(NP-1,NP,KP)
+C     -----------------------------------------------
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0616
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP-1,NP,KP) = BE(NP-1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP)   0617
+     &      )+BE(NP-1,2)*U(NP-1,NP,KM)                                  0617
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0622
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP,NP-1,KP) = BS(NP-1,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP)   0623
+     &      )+BS(NP-1,2)*U(NP,NP-1,KM)                                  0623
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0628
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP,NP,KP) = BS(NP,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+BS(    0629
+     &      NP,2)*U(NP,NP,KM)                                           0629
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+C     -----------------------------------------------
+C     CALCUL DU BORD DU COIN 
+C     U(NP,2,KP) ,  U(NP-1,1,KP) ET U(NP,1,KP)
+C     -----------------------------------------------
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0639
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP-1,1,KP) = BW(NP-1,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+BW(   0640
+     &      NP-1,2)*U(NP-1,1,KM)                                        0640
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0645
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP,2,KP) = BS(2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+BS(2,2)*U(   0646
+     &      NP,2,KM)                                                    0646
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+chpf$ independent(i)
+         DO I = 0, 0                                                    0651
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==0, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+            U(NP,1,KP) = BS(1,1)*(U(NP-1,1,KP)+U(NP,2,KP))+BS(1,2)*U(   0652
+     &      NP,1,KM)                                                    0652
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==1, J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 2<=N, N<=4000}
+
+
+C
+C     ENREGISTREMENT DU SISMOGRAMME
+C     -----------------------------
+
+chpf$ independent(i)
+         DO I = 1, NBTRAC                                               0661
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {J==799, K==3, NPTMP==800,
+C    NTTMP==4000, 1<=I, I<=50, 2<=N, N<=4000}
+
+            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0662
+         ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==799, K==3,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+
+
+C     PERMUTATION A CHAQUE ITERATION DES PLANS ESPACE
+C     -----------------------------------------------
+C
+         KM = KP                                                        0669
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==799, K==3, KM==KP,
+C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}
+
+         KP = 3-KP                                                      0670
+
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==799, K==3, KM+KP==3,
+C    N==4001, NPTMP==800, NTTMP==4000}
+
+
+C     
+C     SORTIE FICHIER DU SISMOGRAMME
+C     -----------------------------
+
+      WRITE (2, *) NBTRAC                                               0678
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==799, K==3, KM+KP==3,
+C    N==4001, NPTMP==800, NTTMP==4000}
+
+      WRITE (2, *) NT                                                   0679
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==799, K==3, KM+KP==3,
+C    N==4001, NPTMP==800, NTTMP==4000}
+
+      DO K = 1, NBTRAC                                                  0680
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, KM+KP==3, N==4001,
+C    NPTMP==800, NTTMP==4000, 1<=K, K<=50}
+
+         DO J = 1, NT                                                   0681
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, KM+KP==3, N==4001,
+C    NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}
+
+            WRITE (2, *) SISMO(K,J)                                     0682
+         ENDDO
+      ENDDO
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+
+C
+C     CALCUL DE STATISTIQUES SUR LE RESULTAT
+C     --------------------------------------
+
+c
+c     reductions
+c
+
+      UMIN = REDMIN(U(1,1,KM), 1, NP, 1, NP)                            0695
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+      UMAX = REDMAX(U(1,1,KM), 1, NP, 1, NP)                            0696
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+      WRITE (1, 1050) UMIN, UMAX                                        0698
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+
+      SISMIN = REDMIN(SISMO(1,1), 1, NBTRAC, 1, NT)                     0701
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+      SISMAX = REDMAX(SISMO(1,1), 1, NBTRAC, 1, NT)                     0702
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+      WRITE (1, 1055) SISMIN, SISMAX                                    0704
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+      WRITE (1, 1200)                                                   0706
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+      CLOSE (1)                                                         0708
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+      CLOSE (2)                                                         0709
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+      CLOSE (3)                                                         0710
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+      CLOSE (4)                                                         0711
+
+C  P(I,IS,J,JS,K,KM,KP,N,NPTMP,NTTMP) {I==51, J==4001, K==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}
+
+
+      STOP                                                              0713
+
+C  P() {0==-1}
+
+
+
+C     DECLARATIONS DE FORMATS DE SORTIE
+C     ---------------------------------
+
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0719
+
+C  P() {0==-1}
+
+
+1120  FORMAT(1X,'MODELISATION PAR EQUATION D"ONDES',/,1X,'SCHEMA D"ORDRE
+     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0721
+
+C  P() {0==-1}
+
+1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0723
+
+C  P() {0==-1}
+
+1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0724
+
+C  P() {0==-1}
+
+1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0725
+
+C  P() {0==-1}
+
+1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0726
+
+C  P() {0==-1}
+
+1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0727
+
+C  P() {0==-1}
+
+1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0728
+
+C  P() {0==-1}
+
+1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0729
+
+C  P() {0==-1}
+
+1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0730
+
+C  P() {0==-1}
+
+
+!1000  FORMAT (1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)
+!1010  FORMAT (1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)
+!1020  FORMAT (1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)
+!1030  FORMAT (1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)
+!1015  FORMAT (1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)
+1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0737
+
+C  P() {0==-1}
+
+1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0738
+
+C  P() {0==-1}
+
+!1060  FORMAT (1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)
+!1065  FORMAT (1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)
+!1070  FORMAT (1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)
+
+C/////////////////////////////////////////////////////////////////////
+C
+C   PARTIE SPECIFIQUE A CHAQUE MACHINE ET A CHAQUE MODELISATION
+C 
+C            - FORMATS DES COMMENTAIRES
+C            - OUVERTURE DE FICHIERS
+C            - FONCTIONS DE GESTION DES TIMERS
+C
+C/////////////////////////////////////////////////////////////////////
+
+
+1110  FORMAT(1X,'*********************************************',/,1X,'  
+     &     RESOLUTION SUR SUN 4                  ',/,1X,'     DOUBLE PRE
+     &CISION (64 bits)              ',/,1X,'         VERSION STANDART   
+     &                 ',/,1X,'                                         
+     &    ',/,1X,'*********************************************'//)     0754
+
+      END
+--- Preconditions for REDMIN
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+
+c
+c     calcul du min
+c
+      REAL*8 FUNCTION REDMIN(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
+      REAL*8 A(LO1:UP1,LO2:UP2), MINA
+      INTEGER I,J
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+      MINA = A(LO1,LO2)                                                 0009
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+      DO J = LO2, UP2                                                   0010
+
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 800<=UP2,
+C    UP2<=4000}
+
+         DO I = LO1, UP1                                                0011
+
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=I, I<=UP1, 1<=J,
+C    J<=UP2, 800<=UP2, UP2<=4000}
+
+            IF (A(I,J).LT.MINA) MINA = A(I,J)                           0012
+         ENDDO
+      ENDDO
+
+C  P(I,J) {64I+15J==63279, I==UP1+1, J==UP2+1, LO1==1, LO2==1, 801<=J,
+C    J<=4001}
+
+      REDMIN = MINA                                                     0015
+      END
+--- Preconditions for REDMAX
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+c
+c     calcul du max
+c
+      REAL*8 FUNCTION REDMAX(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
+      REAL*8 A(LO1:UP1,LO2:UP2), MAXA
+      INTEGER I,J
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+      MAXA = A(LO1,LO2)                                                 0008
+
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
+
+      DO J = LO2, UP2                                                   0009
+
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 800<=UP2,
+C    UP2<=4000}
+
+         DO I = LO1, UP1                                                0010
+
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=I, I<=UP1, 1<=J,
+C    J<=UP2, 800<=UP2, UP2<=4000}
+
+            IF (A(I,J).GT.MAXA) MAXA = A(I,J)                           0011
+         ENDDO
+      ENDDO
+
+C  P(I,J) {64I+15J==63279, I==UP1+1, J==UP2+1, LO1==1, LO2==1, 801<=J,
+C    J<=4001}
+
+      REDMAX = MAXA                                                     0014
+      END
+--- Regions for REDMIN
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=UP1, 1<=PHI2,
+C    15PHI2+64UP1<=63200, LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1,
+C    UP1<=800}>
+
+
+c
+c     calcul du min
+c
+      REAL*8 FUNCTION REDMIN(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
+      REAL*8 A(LO1:UP1,LO2:UP2), MINA
+      INTEGER I,J
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==1, PHI2==1, LO1==1, LO2==1,
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
+
+      MINA = A(LO1,LO2)                                                 0009
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, 64PHI1+15UP2<=63200, 1<=PHI2,
+C    PHI2<=UP2, LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2,
+C    UP2<=4000}>
+
+      DO J = LO2, UP2                                                   0010
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, 64PHI1+15UP2<=63200,
+C    1<=PHI2, PHI2<=UP2, LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2,
+C    UP2<=4000}>
+
+         DO I = LO1, UP1                                                0011
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=PHI1,
+C    64PHI1+15UP2<=63200, 1<=PHI2, PHI2<=UP2, LO1==1, LO2==1,
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
+
+            IF (A(I,J).LT.MINA) MINA = A(I,J)                           0012
+         ENDDO
+      ENDDO
+      REDMIN = MINA                                                     0015
+      END
+--- Regions for REDMAX
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=UP1, 1<=PHI2,
+C    15PHI2+64UP1<=63200, LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1,
+C    UP1<=800}>
+
+c
+c     calcul du max
+c
+      REAL*8 FUNCTION REDMAX(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
+      REAL*8 A(LO1:UP1,LO2:UP2), MAXA
+      INTEGER I,J
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==1, PHI2==1, LO1==1, LO2==1,
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
+
+      MAXA = A(LO1,LO2)                                                 0008
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, 64PHI1+15UP2<=63200, 1<=PHI2,
+C    PHI2<=UP2, LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2,
+C    UP2<=4000}>
+
+      DO J = LO2, UP2                                                   0009
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, 64PHI1+15UP2<=63200,
+C    1<=PHI2, PHI2<=UP2, LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2,
+C    UP2<=4000}>
+
+         DO I = LO1, UP1                                                0010
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=PHI1,
+C    64PHI1+15UP2<=63200, 1<=PHI2, PHI2<=UP2, LO1==1, LO2==1,
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
+
+            IF (A(I,J).GT.MAXA) MAXA = A(I,J)                           0011
+         ENDDO
+      ENDDO
+      REDMAX = MAXA                                                     0014
+      END
 --- Regions for HPFTEST48
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{0<=PHI1, PHI1<=4}>
@@ -126,8 +1716,13 @@ c     nouvelles declarations avec NP et NT
 c
 c     pour BE, BW, UINT, (NP-1) est suffisant
 c
+      INTEGER   NP
+      INTEGER   NT
       PARAMETER (NP = 800)
       PARAMETER (NT = 4000)
+
+      EXTERNAL REDMIN, REDMAX
+      REAL*8 REDMIN, REDMAX
 
       REAL*8    U     (NP,NP,2)
       REAL*8    V     (NP,NP)
@@ -193,8 +1788,6 @@ C  VMAX     : VALEUR MAX DE LA SOLUTION DU CHAMP DE VITESSE
 C  SISMIN   : VALEUR MIN DE LA SOLUTION DU SISMOGRAMME
 C  SISMAX   : VALEUR MAX DE LA SOLUTION DU SISMOGRAMME
 C
-      INTEGER   NP
-      INTEGER   NT
       REAL*8    DELTAT 
       REAL*8    H      
       REAL*8    F      
@@ -227,22 +1820,22 @@ c
 c     ouverture des fichiers
 c
 
-      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0221
+      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0224
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3}>
 
-      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0222
+      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0225
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1}>
 
-      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0223
+      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0226
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2}>
 
-      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0224
+      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0227
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4}>
@@ -253,23 +1846,23 @@ C ACQUISITION DES PARAMETRES DE LA MODELISATION
 C -----------------------------------------
 
 C WRITE (6,'('' ENTRER LE NB DE POINTS DU MAILLAGE CARRE (NP) ? '',$)')
-      READ (4, *) NPTMP                                                 0231
+      READ (4, *) NPTMP                                                 0234
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==0}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==0}>
 
-      IF (NPTMP.NE.NP) STOP                                             0232
+      IF (NPTMP.NE.NP) STOP                                             0235
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800}>
 
 C WRITE (6,'('' ENTRER LE NB DE PAS DE TEMPS TOTAL (NT) ? '',$)')
-      READ (4, *) NTTMP                                                 0234
+      READ (4, *) NTTMP                                                 0237
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==0, NPTMP==800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==0, NPTMP==800}>
 
-      IF (NTTMP.NE.NT) STOP                                             0235
+      IF (NTTMP.NE.NT) STOP                                             0238
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
@@ -277,7 +1870,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
 
 C WRITE (6,'('' ENTRER LE PAS DE DISCR. EN ESPACE (H) ? '',$)')
-      READ (4, *) H                                                     0237
+      READ (4, *) H                                                     0240
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
@@ -285,7 +1878,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
 
 C WRITE (6,'('' ENTRER LE PAS DE DISCR. EN TEMPS (DELTAT) ? '',$)')
-      READ (4, *) DELTAT                                                0239
+      READ (4, *) DELTAT                                                0242
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
@@ -293,7 +1886,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
 
 C WRITE (6,'('' ENTRER LA POSITION EN X DE LA SOURCE (JS) ? '',$)')
-      READ (4, *) JS                                                    0241
+      READ (4, *) JS                                                    0244
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
@@ -301,7 +1894,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
 
 C WRITE (6,'('' ENTRER LA POSITION EN Z DE LA SOURCE (IS) ? '',$)')
-      READ (4, *) IS                                                    0243
+      READ (4, *) IS                                                    0246
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
@@ -309,7 +1902,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, NPTMP==800,
 C    NTTMP==4000}>
 
 C WRITE (6,'('' ENTRER LA FREQUENCE DE LA SOURCE (F) ? '',$)')
-      READ (4, *) F                                                     0245
+      READ (4, *) F                                                     0248
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
@@ -317,70 +1910,70 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
 
-      WRITE (1, 1100)                                                   0247
+      WRITE (1, 1100)                                                   0250
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1110)                                                   0248
+      WRITE (1, 1110)                                                   0251
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1120)                                                   0249
+      WRITE (1, 1120)                                                   0252
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1130) NP, NP                                            0250
+      WRITE (1, 1130) NP, NP                                            0253
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1135) NT                                                0251
+      WRITE (1, 1135) NT                                                0254
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1140) IS, JS                                            0252
+      WRITE (1, 1140) IS, JS                                            0255
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1171) H                                                 0253
+      WRITE (1, 1171) H                                                 0256
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1170) DELTAT                                            0254
+      WRITE (1, 1170) DELTAT                                            0257
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, NPTMP==800,
 C    NTTMP==4000}>
 
-      WRITE (1, 1180) F                                                 0255
+      WRITE (1, 1180) F                                                 0258
 
 C
 C INITIALISATION DES VARIABLES SCALAIRES
 C ---------------------------------
-      KM = 1                                                            0260
-      KP = 2                                                            0261
-      G0 = 0                                                            0262
+      KM = 1                                                            0263
+      KP = 2                                                            0264
+      G0 = 0                                                            0265
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2,
 C    NTTMP==4000}>
@@ -393,28 +1986,28 @@ C INITIALISATION DU CHAMP VITESSE
 C V(I,J)     = READ (Vi) (CAS DUN MILIEU HETEROGENE)
 C ----------------------------------------------
 
-      READ (3, *) NPTMP                                                 0269
+      READ (3, *) NPTMP                                                 0272
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==0, KM==1, KP==2,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==0, KM==1, KP==2,
 C    NTTMP==4000}>
 
-      IF (NPTMP.NE.NP) STOP                                             0270
+      IF (NPTMP.NE.NP) STOP                                             0273
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NTTMP==4000}>
 
-      READ (3, *) NPTMP                                                 0271
+      READ (3, *) NPTMP                                                 0274
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==0, KM==1, KP==2,
 C    NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==0, KM==1, KP==2,
 C    NTTMP==4000}>
 
-      IF (NPTMP.NE.NP) STOP                                             0272
+      IF (NPTMP.NE.NP) STOP                                             0275
 
 C  <V(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=800,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
@@ -423,7 +2016,7 @@ C    NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000}>
 
-      DO I = 1, NP                                                      0273
+      DO I = 1, NP                                                      0276
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, 1<=PHI2, PHI2<=800, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
@@ -432,7 +2025,7 @@ C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
 
-         DO J = 1, NP                                                   0274
+         DO J = 1, NP                                                   0277
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, KM==1, KP==2, NPTMP==800,
 C    NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
@@ -441,7 +2034,7 @@ C    NPTMP==800, NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
 
-            READ (3, *) V(I,J)                                          0275
+            READ (3, *) V(I,J)                                          0278
          ENDDO
       ENDDO
 
@@ -452,12 +2045,12 @@ C    I==801, J==801, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 c
 c     reductions MIN et MAX
 c
-      VMIN = REDMIN(V(1,1), 1, NP, 1, NP)                               0282
+      VMIN = REDMIN(V(1,1), 1, NP, 1, NP)                               0285
 
 C  <V(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=800,
 C    I==801, J==801, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-      VMAX = REDMAX(V(1,1), 1, NP, 1, NP)                               0283
+      VMAX = REDMAX(V(1,1), 1, NP, 1, NP)                               0286
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, I==801, J==801, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000}>
@@ -465,7 +2058,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, I==801, J==801, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000}>
 
 
-      WRITE (1, 1051) VMIN, VMAX                                        0285
+      WRITE (1, 1051) VMIN, VMAX                                        0288
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=800,
 C    1<=PHI3, PHI3<=2, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
@@ -478,23 +2071,23 @@ C     SISMO (T=1) = 0.0
 C     ------------------------------
 
 chpf$ independent(k,j,i)
-      DO K = 1, 2                                                       0294
+      DO K = 1, 2                                                       0297
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI3==K, 1<=PHI1, PHI1<=800, 1<=PHI2,
 C    PHI2<=800, KM==1, KP==2, NPTMP==800, NTTMP==4000, 1<=K, K<=2}>
 
-         DO J = 1, NP                                                   0295
+         DO J = 1, NP                                                   0298
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==J, PHI3==K, 1<=PHI1, PHI1<=800,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000, 1<=J, J<=800, 1<=K, K<=2}>
 
-            DO I = 1, NP                                                0296
+            DO I = 1, NP                                                0299
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==J, PHI3==K, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800, 1<=K,
 C    K<=2}>
 
-               U(I,J,K) = 0.0                                           0297
+               U(I,J,K) = 0.0                                           0300
             ENDDO
          ENDDO
       ENDDO
@@ -504,12 +2097,12 @@ C    K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i)
-      DO I = 1, NBTRAC                                                  0303
+      DO I = 1, NBTRAC                                                  0306
 
 C  <SISMO(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 1<=I, I<=50}>
 
-         SISMO(I,1) = 0.0                                               0304
+         SISMO(I,1) = 0.0                                               0307
       ENDDO
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -539,29 +2132,29 @@ c
 c how to help the compiler...
 c
 chpf$ independent(i), new(C1,W)
-      DO I = 0, 0                                                       0326
+      DO I = 0, 0                                                       0329
 
 C  <V(PHI1,PHI2)-R-EXACT-{798<=PHI1, PHI1<=799, 799<=PHI2, PHI2<=800,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C1 = 4/(1/V(NP-1,NP)+1/V(NP-1,NP-1)+1/V(NP-2,NP)+1/V(NP-2,NP   0327
-     &   -1))                                                           0327
-         W = C1*DELTAT                                                  0329
+         C1 = 4/(1/V(NP-1,NP)+1/V(NP-1,NP-1)+1/V(NP-2,NP)+1/V(NP-2,NP   0330
+     &   -1))                                                           0330
+         W = C1*DELTAT                                                  0332
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BE(NP-1,1) = 2*W/(4*W+3*H)                                     0330
+         BE(NP-1,1) = 2*W/(4*W+3*H)                                     0333
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BE(NP-1,2) = 3*H/(4*W+3*H)                                     0331
+         BE(NP-1,2) = 3*H/(4*W+3*H)                                     0334
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==800, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP-1,NP) = C1                                                0332
+         V(NP-1,NP) = C1                                                0335
       ENDDO
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==800, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -573,28 +2166,28 @@ C    KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(C2,W)
-      DO I = 0, 0                                                       0336
+      DO I = 0, 0                                                       0339
 
 C  <V(PHI1,PHI2)-R-EXACT-{799<=PHI1, PHI1<=800, 799<=PHI2, PHI2<=800,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C2 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0337
-         W = C2*DELTAT                                                  0339
+         C2 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0340
+         W = C2*DELTAT                                                  0342
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(NP,1) = 2*W/(4*W+3*H)                                       0340
+         BS(NP,1) = 2*W/(4*W+3*H)                                       0343
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(NP,2) = 3*H/(4*W+3*H)                                       0341
+         BS(NP,2) = 3*H/(4*W+3*H)                                       0344
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==800, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP,NP) = C2                                                  0342
+         V(NP,NP) = C2                                                  0345
       ENDDO
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -606,28 +2199,28 @@ C    KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(C3,W)
-      DO I = 0, 0                                                       0346
+      DO I = 0, 0                                                       0349
 
 C  <V(PHI1,PHI2)-R-EXACT-{799<=PHI1, PHI1<=800, 799<=PHI2, PHI2<=800,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C3 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0347
-         W = C3*DELTAT                                                  0349
+         C3 = 4/(1/V(NP,NP)+1/V(NP,NP-1)+1/V(NP-1,NP)+1/V(NP-1,NP-1))   0350
+         W = C3*DELTAT                                                  0352
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(NP-1,1) = 2*W/(4*W+3*H)                                     0350
+         BS(NP-1,1) = 2*W/(4*W+3*H)                                     0353
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(NP-1,2) = 3*H/(4*W+3*H)                                     0351
+         BS(NP-1,2) = 3*H/(4*W+3*H)                                     0354
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==799, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP,NP-1) = C3                                                0352
+         V(NP,NP-1) = C3                                                0355
       ENDDO
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==2, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -642,28 +2235,28 @@ C     CAS DES 3 POINTS DU COIN W-S
 C     ----------------------------
 
 chpf$ independent(i), new(C1,W)
-      DO I = 0, 0                                                       0359
+      DO I = 0, 0                                                       0362
 
 C  <V(PHI1,PHI2)-R-EXACT-{799<=PHI1, PHI1<=800, 2<=PHI2, PHI2<=3,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C1 = 4/(1/V(NP,2)+1/V(NP,3)+1/V(NP-1,2)+1/V(NP-1,3))           0360
-         W = C1*DELTAT                                                  0362
+         C1 = 4/(1/V(NP,2)+1/V(NP,3)+1/V(NP-1,2)+1/V(NP-1,3))           0363
+         W = C1*DELTAT                                                  0365
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==2, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(2,1) = 2*W/(4*W+3*H)                                        0363
+         BS(2,1) = 2*W/(4*W+3*H)                                        0366
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==2, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(2,2) = 3*H/(4*W+3*H)                                        0364
+         BS(2,2) = 3*H/(4*W+3*H)                                        0367
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP,2) = C1                                                   0365
+         V(NP,2) = C1                                                   0368
       ENDDO
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==1, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -675,28 +2268,28 @@ C    KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(C2,W)
-      DO I = 0, 0                                                       0369
+      DO I = 0, 0                                                       0372
 
 C  <V(PHI1,PHI2)-R-EXACT-{799<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=2,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C2 = 4/(1/V(NP,1)+1/V(NP,2)+1/V(NP-1,1)+1/V(NP-1,2))           0370
-         W = C2*DELTAT                                                  0372
+         C2 = 4/(1/V(NP,1)+1/V(NP,2)+1/V(NP-1,1)+1/V(NP-1,2))           0373
+         W = C2*DELTAT                                                  0375
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(1,1) = 2*W/(4*W+3*H)                                        0373
+         BS(1,1) = 2*W/(4*W+3*H)                                        0376
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BS(1,2) = 3*H/(4*W+3*H)                                        0374
+         BS(1,2) = 3*H/(4*W+3*H)                                        0377
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP,1) = C2                                                   0375
+         V(NP,1) = C2                                                   0378
       ENDDO
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==801, K==3,
@@ -708,28 +2301,28 @@ C    KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(C3,W)
-      DO I = 0, 0                                                       0379
+      DO I = 0, 0                                                       0382
 
 C  <V(PHI1,PHI2)-R-EXACT-{798<=PHI1, PHI1<=799, 1<=PHI2, PHI2<=2,
 C    I==0, J==801, K==3, KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         C3 = 4/(1/V(NP-1,1)+1/V(NP-1,2)+1/V(NP-2,1)+1/V(NP-2,2))       0380
-         W = C3*DELTAT                                                  0382
+         C3 = 4/(1/V(NP-1,1)+1/V(NP-1,2)+1/V(NP-2,1)+1/V(NP-2,2))       0383
+         W = C3*DELTAT                                                  0385
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BW(NP-1,1) = 2*W/(4*W+3*H)                                     0383
+         BW(NP-1,1) = 2*W/(4*W+3*H)                                     0386
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==2, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         BW(NP-1,2) = 3*H/(4*W+3*H)                                     0384
+         BW(NP-1,2) = 3*H/(4*W+3*H)                                     0387
 
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==1, I==0, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
-         V(NP-1,1) = C3                                                 0385
+         V(NP-1,1) = C3                                                 0388
       ENDDO
 
 C  <BE(PHI1,PHI2)-W-EXACT-{2<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -748,34 +2341,34 @@ c     les variables reparties ecrites sont bien alignees
 c     
 
 chpf$ independent(i), new(W)
-      DO I = 2, NP-2                                                    0396
+      DO I = 2, NP-2                                                    0399
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, 799<=PHI2, PHI2<=800, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==800, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0397
+         V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0400
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==800, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         W = V(I,NP)*DELTAT                                             0398
+         W = V(I,NP)*DELTAT                                             0401
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BE(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0399
+         BE(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0402
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==2, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BE(I,2) = 2*H/(W+H)                                            0400
+         BE(I,2) = 2*H/(W+H)                                            0403
 
 C  <BE(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==3, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BE(I,3) = W*W/(2*H*(W+H))                                      0401
+         BE(I,3) = W*W/(2*H*(W+H))                                      0404
       ENDDO
 
 C  <BS(PHI1,PHI2)-W-EXACT-{3<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -787,34 +2380,34 @@ C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(W)
-      DO I = 3, NP-2                                                    0405
+      DO I = 3, NP-2                                                    0408
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==I, 799<=PHI1, PHI1<=800, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==800, PHI2==I, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0406
+         V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0409
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==800, PHI2==I, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         W = V(NP,I)*DELTAT                                             0407
+         W = V(NP,I)*DELTAT                                             0410
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         BS(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0408
+         BS(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0411
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==2, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         BS(I,2) = 2*H/(W+H)                                            0409
+         BS(I,2) = 2*H/(W+H)                                            0412
 
 C  <BS(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==3, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         BS(I,3) = W*W/(2*H*(W+H))                                      0410
+         BS(I,3) = W*W/(2*H*(W+H))                                      0413
       ENDDO
 
 C  <BW(PHI1,PHI2)-W-EXACT-{2<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -826,34 +2419,34 @@ C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i), new(W)
-      DO I = 2, NP-2                                                    0414
+      DO I = 2, NP-2                                                    0417
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=2, J==801, K==3,
 C    KM==1, KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0415
+         V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0418
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         W = V(I,1)*DELTAT                                              0416
+         W = V(I,1)*DELTAT                                              0419
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BW(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0417
+         BW(I,1) = 1-1/(W+H)*(2*H+W*W/H)                                0420
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==2, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BW(I,2) = 2*H/(W+H)                                            0418
+         BW(I,2) = 2*H/(W+H)                                            0421
 
 C  <BW(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==3, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 2<=I, I<=798}>
 
-         BW(I,3) = W*W/(2*H*(W+H))                                      0419
+         BW(I,3) = W*W/(2*H*(W+H))                                      0422
       ENDDO
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==2, 3<=PHI1, PHI1<=799, J==801, K==3,
@@ -867,14 +2460,14 @@ C     INITIALISATION DES CONSTANTES LIEES AUX BORDS INTERNES
 C     ------------------------------------------------------
 
 chpf$ independent(i)
-      DO I = 3, NP-1                                                    0427
+      DO I = 3, NP-1                                                    0430
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==2, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=799}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==2, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=799}>
 
-         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0428
+         V(I,2) = (V(I,2)*DELTAT/H)**2                                  0431
       ENDDO
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==799, 3<=PHI1, PHI1<=799, J==801, K==3,
@@ -884,14 +2477,14 @@ C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i)
-      DO I = 3, NP-1                                                    0432
+      DO I = 3, NP-1                                                    0435
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==799, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=799}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==799, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=799}>
 
-         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0433
+         V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0436
       ENDDO
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==799, 3<=PHI2, PHI2<=798, J==801, K==3,
@@ -901,14 +2494,14 @@ C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
 
 chpf$ independent(i)
-      DO I = 3, NP-2                                                    0437
+      DO I = 3, NP-2                                                    0440
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==799, PHI2==I, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==799, PHI2==I, J==801, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=I, I<=798}>
 
-         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0438
+         V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0441
       ENDDO
 
 C  <V(PHI1,PHI2)-R-EXACT-{3<=PHI1, PHI1<=798, 3<=PHI2, PHI2<=798,
@@ -923,21 +2516,21 @@ C            V(I,J) <--  1/12*((V(I,J)*DELTAT/H)**2)
 C     -------------------------------------------
 
 chpf$ independent(j,i)
-      DO J = 3, NP-2                                                    0447
+      DO J = 3, NP-2                                                    0450
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==J, 3<=PHI1, PHI1<=798, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=J, J<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI2==J, 3<=PHI1, PHI1<=798, K==3, KM==1,
 C    KP==2, NPTMP==800, NTTMP==4000, 3<=J, J<=798}>
 
-         DO I = 3, NP-2                                                 0448
+         DO I = 3, NP-2                                                 0451
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 3<=J, J<=798}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, K==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 3<=J, J<=798}>
 
-            V(I,J) = (V(I,J)*DELTAT/H)**2/12                            0449
+            V(I,J) = (V(I,J)*DELTAT/H)**2/12                            0452
          ENDDO
       ENDDO
 
@@ -990,12 +2583,12 @@ C     ----------------------------
 C     !     BOUCLE EN TEMPS      !
 C     ----------------------------
 
-      DO N = 2, NT                                                      0464
+      DO N = 2, NT                                                      0467
 
 C PRISE EN COMPTE DE LA FONCTION SOURCE PENDANT UN TEMPS DE TMAX SEC.
 C Un = Un + SOURCE
 C ---------------------------------------------------
-         W = F*(N*DELTAT-1.0/F)                                         0469
+         W = F*(N*DELTAT-1.0/F)                                         0472
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{PHI1==IS, PHI2==JS, PHI3==KM, K==3,
 C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1004,9 +2597,9 @@ C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-MAY-{PHI1==IS, PHI2==JS, K==3, NPTMP==800,
 C    NTTMP==4000, 2<=N, N<=4000}>
 
-         IF (W**2.LT.TMAX) THEN                                         0470
-            W = (W*PI)**2                                               0471
-            G0 = (1.0-2.0*W)*EXP(-W)                                    0472
+         IF (W**2.LT.TMAX) THEN                                         0473
+            W = (W*PI)**2                                               0474
+            G0 = (1.0-2.0*W)*EXP(-W)                                    0475
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==IS, PHI2==JS, PHI3==KM, K==3,
 C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1015,7 +2608,7 @@ C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==IS, PHI2==JS, K==3, NPTMP==800,
 C    NTTMP==4000, 2<=N, N<=4000}>
 
-            U(IS,JS,KM) = U(IS,JS,KM)+G0*12*V(IS,JS)*H**2               0473
+            U(IS,JS,KM) = U(IS,JS,KM)+G0*12*V(IS,JS)*H**2               0476
          ENDIF
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI2==799, PHI3==KP, 2<=PHI1,
@@ -1033,14 +2626,14 @@ C     --------------------------------------------------------
 C     boucle 71
 
 chpf$ independent(i)
-         DO I = 2, NP-1                                                 0485
+         DO I = 2, NP-1                                                 0488
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I, PHI2==799, PHI3==KP, K==3,
 C    NPTMP==800, NTTMP==4000, 2<=I, I<=799, 2<=N, N<=4000}>
 C  <UBE(PHI1)-W-EXACT-{PHI1==I, K==3, NPTMP==800, NTTMP==4000, 2<=I,
 C    I<=799, 2<=N, N<=4000}>
 
-            UBE(I) = U(I,NP-1,KP)                                       0486
+            UBE(I) = U(I,NP-1,KP)                                       0489
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==799, PHI3==KP, 2<=PHI2,
@@ -1050,14 +2643,14 @@ C    NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 2, NP-1                                                 0490
+         DO I = 2, NP-1                                                 0493
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==799, PHI2==I, PHI3==KP, K==3,
 C    NPTMP==800, NTTMP==4000, 2<=I, I<=799, 2<=N, N<=4000}>
 C  <UBS(PHI1)-W-EXACT-{PHI1==I, K==3, NPTMP==800, NTTMP==4000, 2<=I,
 C    I<=799, 2<=N, N<=4000}>
 
-            UBS(I) = U(NP-1,I,KP)                                       0491
+            UBS(I) = U(NP-1,I,KP)                                       0494
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI2==2, PHI3==KP, 2<=PHI1, PHI1<=799,
@@ -1067,14 +2660,14 @@ C    NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 2, NP-1                                                 0495
+         DO I = 2, NP-1                                                 0498
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I, PHI2==2, PHI3==KP, K==3,
 C    NPTMP==800, NTTMP==4000, 2<=I, I<=799, 2<=N, N<=4000}>
 C  <UBW(PHI1)-W-EXACT-{PHI1==I, K==3, NPTMP==800, NTTMP==4000, 2<=I,
 C    I<=799, 2<=N, N<=4000}>
 
-            UBW(I) = U(I,2,KP)                                          0496
+            UBW(I) = U(I,2,KP)                                          0499
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{1<=PHI1, PHI1<=800, 4<=PHI1+PHI2,
@@ -1093,7 +2686,7 @@ C     SCHEMA DORDRE 2 EN TEMPS ET DORDRE 4 EN ESPACE
 C     ------------------------------------------------
 
 chpf$ independent(j,i)
-         DO J = 3, NP-2                                                 0506
+         DO J = 3, NP-2                                                 0509
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{J+1<=PHI1+PHI2, PHI2+1<=PHI1+J,
 C    PHI1+J<=PHI2+800, PHI1+PHI2<=J+800, J<=PHI2+2, PHI2<=J+2, K==3,
@@ -1103,7 +2696,7 @@ C    K==3, NPTMP==800, NTTMP==4000, 3<=J, J<=798, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==J, 3<=PHI1, PHI1<=798, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=J, J<=798, 2<=N, N<=4000}>
 
-            DO I = 3, NP-2                                              0507
+            DO I = 3, NP-2                                              0510
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I+J<=PHI1+PHI2+2, PHI2+I<=PHI1+J+2,
 C    PHI1+J<=PHI2+I+2, PHI1+PHI2<=I+J+2, K==3, NPTMP==800,
@@ -1115,9 +2708,9 @@ C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 3<=J, J<=798, 2<=N, N<=4000}>
 
 
-               U(I,J,KP) = 2*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60*U(I,J,KM)   0509
-     &         -16*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U(I,J+1,KM))+   0509
-     &         U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+2,KM))         0509
+               U(I,J,KP) = 2*U(I,J,KM)-U(I,J,KP)-V(I,J)*(60*U(I,J,KM)   0512
+     &         -16*(U(I+1,J,KM)+U(I-1,J,KM)+U(I,J-1,KM)+U(I,J+1,KM))+   0512
+     &         U(I+2,J,KM)+U(I-2,J,KM)+U(I,J-2,KM)+U(I,J+2,KM))         0512
 
             ENDDO
          ENDDO
@@ -1138,7 +2731,7 @@ C     SCHEMA DORDRE 2 EN TEMPS ET DORDRE 2 EN ESPACE
 C     ------------------------------------------------
 
 chpf$ independent(i)
-         DO I = 3, NP-1                                                 0527
+         DO I = 3, NP-1                                                 0530
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I+1<=PHI1+PHI2, PHI2+I<=PHI1+3,
 C    PHI1+1<=PHI2+I, PHI1+PHI2<=I+3, J==799, K==3, NPTMP==800,
@@ -1148,8 +2741,8 @@ C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==2, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}>
 
-            U(I,2,KP) = 2*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4*U(I,2,KM)-(U(   0528
-     &      I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))                 0528
+            U(I,2,KP) = 2*U(I,2,KM)-U(I,2,KP)-V(I,2)*(4*U(I,2,KM)-(U(   0531
+     &      I+1,2,KM)+U(I-1,2,KM)+U(I,1,KM)+U(I,3,KM)))                 0531
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{801<=PHI1+PHI2, PHI2<=PHI1+797,
@@ -1162,7 +2755,7 @@ C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 3, NP-1                                                 0535
+         DO I = 3, NP-1                                                 0538
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I+798<=PHI1+PHI2, PHI2+I<=PHI1+800,
 C    PHI1+798<=PHI2+I, PHI1+PHI2<=I+800, J==799, K==3, NPTMP==800,
@@ -1172,9 +2765,9 @@ C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==799, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=799, 2<=N, N<=4000}>
 
-            U(I,NP-1,KP) = 2*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*(4*U   0536
-     &      (I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP-2,KM)+U   0536
-     &      (I,NP,KM)))                                                 0536
+            U(I,NP-1,KP) = 2*U(I,NP-1,KM)-U(I,NP-1,KP)-V(I,NP-1)*(4*U   0539
+     &      (I,NP-1,KM)-(U(I+1,NP-1,KM)+U(I-1,NP-1,KM)+U(I,NP-2,KM)+U   0539
+     &      (I,NP,KM)))                                                 0539
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{798<=PHI1, PHI1<=800, 801<=PHI1+PHI2,
@@ -1187,7 +2780,7 @@ C    NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0543
+         DO I = 3, NP-2                                                 0546
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I+798<=PHI1+PHI2, PHI2+798<=PHI1+I,
 C    PHI1+I<=PHI2+800, PHI1+PHI2<=I+800, J==799, K==3, NPTMP==800,
@@ -1197,9 +2790,9 @@ C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==799, PHI2==I, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            U(NP-1,I,KP) = 2*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*(4*U   0544
-     &      (NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,KM)+U(NP-   0544
-     &      1,I+1,KM)))                                                 0544
+            U(NP-1,I,KP) = 2*U(NP-1,I,KM)-U(NP-1,I,KP)-V(NP-1,I)*(4*U   0547
+     &      (NP-1,I,KM)-(U(NP,I,KM)+U(NP-2,I,KM)+U(NP-1,I-1,KM)+U(NP-   0547
+     &      1,I+1,KM)))                                                 0547
          ENDDO
 
 C  <BE(PHI1,PHI2)-R-EXACT-{3<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -1218,7 +2811,7 @@ C     SOLUTION AU BORD EAST. CONDITIONS ABSORBANTES DORDRE 2.
 C     --------------------------------------------------------
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0556
+         DO I = 3, NP-2                                                 0559
 
 C  <BE(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=3, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
@@ -1230,9 +2823,9 @@ C    3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTE(PHI1)-W-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            UINTE(I) = BE(I,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UBE(I)+BE(I,   0557
-     &      2)*(U(I,NP,KM)+U(I,NP-1,KM))+BE(I,3)*(U(I+1,NP-1,KP)+U(I+   0557
-     &      1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                       0557
+            UINTE(I) = BE(I,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UBE(I)+BE(I,   0560
+     &      2)*(U(I,NP,KM)+U(I,NP-1,KM))+BE(I,3)*(U(I+1,NP-1,KP)+U(I+   0560
+     &      1,NP,KP)+U(I-1,NP-1,KP)+U(I-1,NP,KP))                       0560
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==800, PHI3==KP, 3<=PHI1,
@@ -1242,14 +2835,14 @@ C    NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0565
+         DO I = 3, NP-2                                                 0568
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==800, PHI3==KP, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTE(PHI1)-R-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            U(I,NP,KP) = UINTE(I)                                       0566
+            U(I,NP,KP) = UINTE(I)                                       0569
          ENDDO
 
 C  <BS(PHI1,PHI2)-R-EXACT-{3<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -1268,7 +2861,7 @@ C     SOLUTION AU BORD SOUTH. CONDITIONS ABSORBANTES DORDRE 2.
 C     --------------------------------------------------------
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0575
+         DO I = 3, NP-2                                                 0578
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=3, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
@@ -1280,9 +2873,9 @@ C    3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTS(PHI1)-W-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            UINTS(I) = BS(I,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UBS(I)+BS(I,   0576
-     &      2)*(U(NP,I,KM)+U(NP-1,I,KM))+BS(I,3)*(U(NP-1,I+1,KP)+U(NP   0576
-     &      ,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                       0576
+            UINTS(I) = BS(I,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UBS(I)+BS(I,   0579
+     &      2)*(U(NP,I,KM)+U(NP-1,I,KM))+BS(I,3)*(U(NP-1,I+1,KP)+U(NP   0579
+     &      ,I+1,KP)+U(NP-1,I-1,KP)+U(NP,I-1,KP))                       0579
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI3==KP, 3<=PHI2,
@@ -1292,14 +2885,14 @@ C    NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0584
+         DO I = 3, NP-2                                                 0587
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI2==I, PHI3==KP, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTS(PHI1)-R-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            U(NP,I,KP) = UINTS(I)                                       0585
+            U(NP,I,KP) = UINTS(I)                                       0588
          ENDDO
 
 C  <BW(PHI1,PHI2)-R-EXACT-{3<=PHI1, PHI1<=798, 1<=PHI2, PHI2<=3,
@@ -1318,7 +2911,7 @@ C     SOLUTION AU BORD WEST. CONDITIONS ABSORBANTES DORDRE 2.
 C     --------------------------------------------------------
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0594
+         DO I = 3, NP-2                                                 0597
 
 C  <BW(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=3, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
@@ -1330,9 +2923,9 @@ C    3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTW(PHI1)-W-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            UINTW(I) = BW(I,1)*(U(I,1,KP)+U(I,2,KP))-UBW(I)+BW(I,2)*(   0595
-     &      U(I,1,KM)+U(I,2,KM))+BW(I,3)*(U(I+1,2,KP)+U(I+1,1,KP)+U(I   0595
-     &      -1,2,KP)+U(I-1,1,KP))                                       0595
+            UINTW(I) = BW(I,1)*(U(I,1,KP)+U(I,2,KP))-UBW(I)+BW(I,2)*(   0598
+     &      U(I,1,KM)+U(I,2,KM))+BW(I,3)*(U(I+1,2,KP)+U(I+1,1,KP)+U(I   0598
+     &      -1,2,KP)+U(I-1,1,KP))                                       0598
          ENDDO
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==1, PHI3==KP, 3<=PHI1, PHI1<=798,
@@ -1342,14 +2935,14 @@ C    NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 3, NP-2                                                 0603
+         DO I = 3, NP-2                                                 0606
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==1, PHI3==KP, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 C  <UINTW(PHI1)-R-EXACT-{PHI1==I, J==799, K==3, NPTMP==800,
 C    NTTMP==4000, 3<=I, I<=798, 2<=N, N<=4000}>
 
-            U(I,1,KP) = UINTW(I)                                        0604
+            U(I,1,KP) = UINTW(I)                                        0607
          ENDDO
 
 C  <BE(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1366,7 +2959,7 @@ C     U(NP-1,NP,KP) ,  U(NP,NP-1,KP) ET U(NP-1,NP,KP)
 C     -----------------------------------------------
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0613
+         DO I = 0, 0                                                    0616
 
 C  <BE(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1375,8 +2968,8 @@ C    I==0, J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==799, PHI2==800, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP-1,NP,KP) = BE(NP-1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP)   0614
-     &      )+BE(NP-1,2)*U(NP-1,NP,KM)                                  0614
+            U(NP-1,NP,KP) = BE(NP-1,1)*(U(NP-1,NP-1,KP)+U(NP-2,NP,KP)   0617
+     &      )+BE(NP-1,2)*U(NP-1,NP,KM)                                  0617
          ENDDO
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1388,7 +2981,7 @@ C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0619
+         DO I = 0, 0                                                    0622
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1397,8 +2990,8 @@ C    I==0, J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI2==799, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP,NP-1,KP) = BS(NP-1,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP)   0620
-     &      )+BS(NP-1,2)*U(NP,NP-1,KM)                                  0620
+            U(NP,NP-1,KP) = BS(NP-1,1)*(U(NP,NP-2,KP)+U(NP-1,NP-1,KP)   0623
+     &      )+BS(NP-1,2)*U(NP,NP-1,KM)                                  0623
          ENDDO
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==800, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1410,7 +3003,7 @@ C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0625
+         DO I = 0, 0                                                    0628
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==800, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1419,8 +3012,8 @@ C    I==0, J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI2==800, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP,NP,KP) = BS(NP,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+BS(    0626
-     &      NP,2)*U(NP,NP,KM)                                           0626
+            U(NP,NP,KP) = BS(NP,1)*(U(NP,NP-1,KP)+U(NP-1,NP,KP))+BS(    0629
+     &      NP,2)*U(NP,NP,KM)                                           0629
          ENDDO
 
 C  <BW(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1437,7 +3030,7 @@ C     U(NP,2,KP) ,  U(NP-1,1,KP) ET U(NP,1,KP)
 C     -----------------------------------------------
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0636
+         DO I = 0, 0                                                    0639
 
 C  <BW(PHI1,PHI2)-R-EXACT-{PHI1==799, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1446,8 +3039,8 @@ C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==799, PHI2==1, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP-1,1,KP) = BW(NP-1,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+BW(   0637
-     &      NP-1,2)*U(NP-1,1,KM)                                        0637
+            U(NP-1,1,KP) = BW(NP-1,1)*(U(NP-1,2,KP)+U(NP-2,1,KP))+BW(   0640
+     &      NP-1,2)*U(NP-1,1,KM)                                        0640
          ENDDO
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==2, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1459,7 +3052,7 @@ C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0642
+         DO I = 0, 0                                                    0645
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==2, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1468,8 +3061,8 @@ C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI2==2, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP,2,KP) = BS(2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+BS(2,2)*U(   0643
-     &      NP,2,KM)                                                    0643
+            U(NP,2,KP) = BS(2,1)*(U(NP,3,KP)+U(NP-1,2,KP))+BS(2,2)*U(   0646
+     &      NP,2,KM)                                                    0646
          ENDDO
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==1, 1<=PHI2, PHI2<=2, J==799, K==3,
@@ -1481,7 +3074,7 @@ C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
 
 chpf$ independent(i)
-         DO I = 0, 0                                                    0648
+         DO I = 0, 0                                                    0651
 
 C  <BS(PHI1,PHI2)-R-EXACT-{PHI1==1, 1<=PHI2, PHI2<=2, I==0, J==799,
 C    K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
@@ -1490,8 +3083,8 @@ C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==800, PHI2==1, PHI3==KP, I==0,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 2<=N, N<=4000}>
 
-            U(NP,1,KP) = BS(1,1)*(U(NP-1,1,KP)+U(NP,2,KP))+BS(1,2)*U(   0649
-     &      NP,1,KM)                                                    0649
+            U(NP,1,KP) = BS(1,1)*(U(NP-1,1,KP)+U(NP,2,KP))+BS(1,2)*U(   0652
+     &      NP,1,KM)                                                    0652
          ENDDO
 
 C  <SISMO(PHI1,PHI2)-W-EXACT-{PHI2==N, 1<=PHI1, PHI1<=50, J==799,
@@ -1505,7 +3098,7 @@ C     ENREGISTREMENT DU SISMOGRAMME
 C     -----------------------------
 
 chpf$ independent(i)
-         DO I = 1, NBTRAC                                               0658
+         DO I = 1, NBTRAC                                               0661
 
 C  <SISMO(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==N, J==799, K==3,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=50, 2<=N, N<=4000}>
@@ -1513,15 +3106,15 @@ C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==IS, PHI2==I+750, PHI3==KP,
 C    J==799, K==3, NPTMP==800, NTTMP==4000, 1<=I, I<=50, 2<=N,
 C    N<=4000}>
 
-            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0659
+            SISMO(I,N) = U(IS,NP-NBTRAC+I,KP)                           0662
          ENDDO
 
 
 C     PERMUTATION A CHAQUE ITERATION DES PLANS ESPACE
 C     -----------------------------------------------
 C
-         KM = KP                                                        0666
-         KP = 3-KP                                                      0667
+         KM = KP                                                        0669
+         KP = 3-KP                                                      0670
 
       ENDDO
 
@@ -1535,14 +3128,14 @@ C
 C     SORTIE FICHIER DU SISMOGRAMME
 C     -----------------------------
 
-      WRITE (2, *) NBTRAC                                               0675
+      WRITE (2, *) NBTRAC                                               0678
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, I==51, J==799, K==3,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, J==799, K==3,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
-      WRITE (2, *) NT                                                   0676
+      WRITE (2, *) NT                                                   0679
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=4000,
 C    I==51, KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1551,7 +3144,7 @@ C    N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000}>
 
-      DO K = 1, NBTRAC                                                  0677
+      DO K = 1, NBTRAC                                                  0680
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, 1<=PHI2, PHI2<=4000, I==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
@@ -1560,7 +3153,7 @@ C    N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
 
-         DO J = 1, NT                                                   0678
+         DO J = 1, NT                                                   0681
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
@@ -1569,7 +3162,7 @@ C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
 
-            WRITE (2, *) SISMO(K,J)                                     0679
+            WRITE (2, *) SISMO(K,J)                                     0682
          ENDDO
       ENDDO
 
@@ -1587,13 +3180,13 @@ c
 c     reductions
 c
 
-      UMIN = REDMIN(U(1,1,KM), 1, NP, 1, NP)                            0692
+      UMIN = REDMIN(U(1,1,KM), 1, NP, 1, NP)                            0695
 
 C  <U(PHI1,PHI2,PHI3)-R-EXACT-{PHI3==KM, 1<=PHI1, PHI1<=800, 1<=PHI2,
 C    PHI2<=800, 1<=PHI3, PHI3<=2, I==51, J==4001, K==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000}>
 
-      UMAX = REDMAX(U(1,1,KM), 1, NP, 1, NP)                            0693
+      UMAX = REDMAX(U(1,1,KM), 1, NP, 1, NP)                            0696
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1601,7 +3194,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
 
-      WRITE (1, 1050) UMIN, UMAX                                        0695
+      WRITE (1, 1050) UMIN, UMAX                                        0698
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=4000,
 C    I==51, J==4001, K==51, KM+KP==3, N==4001, NPTMP==800,
@@ -1609,13 +3202,13 @@ C    NTTMP==4000}>
 
 
 
-      SISMIN = REDMIN(SISMO(1,1), 1, NBTRAC, 1, NT)                     0698
+      SISMIN = REDMIN(SISMO(1,1), 1, NBTRAC, 1, NT)                     0701
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=4000,
 C    I==51, J==4001, K==51, KM+KP==3, N==4001, NPTMP==800,
 C    NTTMP==4000}>
 
-      SISMAX = REDMAX(SISMO(1,1), 1, NBTRAC, 1, NT)                     0699
+      SISMAX = REDMAX(SISMO(1,1), 1, NBTRAC, 1, NT)                     0702
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1623,7 +3216,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
 
-      WRITE (1, 1055) SISMIN, SISMAX                                    0701
+      WRITE (1, 1055) SISMIN, SISMAX                                    0704
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1631,7 +3224,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
 
-      WRITE (1, 1200)                                                   0703
+      WRITE (1, 1200)                                                   0706
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1639,28 +3232,28 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
 
-      CLOSE (1)                                                         0705
+      CLOSE (1)                                                         0708
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
-      CLOSE (2)                                                         0706
+      CLOSE (2)                                                         0709
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
-      CLOSE (3)                                                         0707
+      CLOSE (3)                                                         0710
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
-      CLOSE (4)                                                         0708
+      CLOSE (4)                                                         0711
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==0, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
@@ -1668,35 +3261,35 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==0, I==51, J==4001, K==51,
 C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
 
-      STOP                                                              0710
+      STOP                                                              0713
 
 
 C     DECLARATIONS DE FORMATS DE SORTIE
 C     ---------------------------------
 
-1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0716
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0719
 
 1120  FORMAT(1X,'MODELISATION PAR EQUATION D"ONDES',/,1X,'SCHEMA D"ORDRE
-     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0718
-1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0720
-1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0721
-1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0722
-1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0723
-1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0724
-1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0725
-1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0726
-1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0727
+     & 4 EN ESPACE ET 2 EN TEMPS'//)                                    0721
+1130  FORMAT(1X,'TAILLE DU MAILLAGE NPXNP       : ',I4,'  X',I4)        0723
+1135  FORMAT(1X,'NOMBRE DE PAS DE TEMPS         : ',I4)                 0724
+1140  FORMAT(1X,'POSITION DE LA SOURCE          : (',I3,',',I3,')')     0725
+1171  FORMAT(1X,'PAS DE DISCR. EN ESPACE (H)    : ',E12.5)              0726
+1170  FORMAT(1X,'PAS DE DISCR. EN TEMPS (DELTAT): ',E12.5)              0727
+1180  FORMAT(1X,'FREQUENCE DE LA SOURCE (F)     : ',E12.5)              0728
+1051  FORMAT(1X,'MIN DE V:',E11.5,3X,'MAX DE V:  ',E11.5//)             0729
+1200  FORMAT(1X,/,1X,'FIN DU PROGRAMME')                                0730
 
-1000  FORMAT(1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)      0729
-1010  FORMAT(1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)      0730
-1020  FORMAT(1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)      0731
-1030  FORMAT(1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)    0732
-1015  FORMAT(1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)      0733
-1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0734
-1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0735
-1060  FORMAT(1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)      0736
-1065  FORMAT(1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)      0737
-1070  FORMAT(1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)    0738
+!1000  FORMAT (1X,'TEMPS CPU DE LA RESOLUTION     (RESOL) : ',E15.5)
+!1010  FORMAT (1X,'TEMPS CPU DES INITIALISATIONS   (INIT) : ',E15.5)
+!1020  FORMAT (1X,'TEMPS CPU DES ENTREES/SORTIES    (E/S) : ',E15.5)
+!1030  FORMAT (1X,'TEMPS CPU TOTAL       (RESOL+INIT+E/S) : ',E15.5//)
+!1015  FORMAT (1X,'TEMPS CPU DE L"APPEL AU TIMER          : ',E15.5)
+1050  FORMAT(1X,'MIN DE U     :',E15.5,3X,'MAX DE U     : ',E15.5)      0737
+1055  FORMAT(1X,'MIN DE SISMO :',E15.5,3X,'MAX DE SISMO : ',E15.5//)    0738
+!1060  FORMAT (1X,'MFLOPS CPU PARTIE VECTORIELLE  (RESOL) : ',E15.5)
+!1065  FORMAT (1X,'MFLOPS CPU RESOLUTION     (RESOL+INIT) : ',E15.5)
+!1070  FORMAT (1X,'MFLOPS CPU GLOBAL     (RESOL+INIT+E/S) : ',E15.5//)
 
 C/////////////////////////////////////////////////////////////////////
 C
@@ -1713,6 +3306,6 @@ C/////////////////////////////////////////////////////////////////////
      &     RESOLUTION SUR SUN 4                  ',/,1X,'     DOUBLE PRE
      &CISION (64 bits)              ',/,1X,'         VERSION STANDART   
      &                 ',/,1X,'                                         
-     &    ',/,1X,'*********************************************'//)     0751
+     &    ',/,1X,'*********************************************'//)     0754
 
       END

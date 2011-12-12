@@ -226,8 +226,8 @@ int main(void)
 
       exit(1);
 
-//  T(b,ok,x,y) {b+y==x, b+y==x+y#init, b#init==0, ok==1, ok#init==1,
-//    x#init==0, 0<=b, b<=1, b<=x, 0<=x}
+//  T(b,ok,x,y) {b+y==x, b#init==0, ok==1, ok#init==1, x#init==0,
+//    y#init==0, 0<=b, b<=1, b<=x, 0<=x}
 
    while (1) {
 
