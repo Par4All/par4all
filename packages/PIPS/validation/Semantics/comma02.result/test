@@ -8,11 +8,12 @@ void comma02()
    int k;
    i = (j = 1, k = 2);
    
-   //printf("%d\n", i);
+   // Here, i==2
+   // printf("%d\n", i);
    i = 0;
 }
 
-Check transformers on strip-mined loop
+Check transformers
 
 
 //  T() {}
@@ -39,6 +40,7 @@ void comma02()
 //  T(i) {i==0, i#init==2, j==1, k==2}
 
    
-   //printf("%d\n", i);
+   // Here, i==2
+   // printf("%d\n", i);
    i = 0;
 }

@@ -23,7 +23,7 @@
          DO ALPHA1 = MAX(2, 5*PSI1-4), 5*PSI1
             ALPHA2 = 1
             LALPHA1 = ALPHA1-5*PSI1+5
-            LALPHA2 = ALPHA2
+            LALPHA2 = 1
             BUF INDEX = BUF INDEX+1
             B(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
@@ -159,7 +159,7 @@
       DO ALPHA1 = MAX(2, 5*PSI1-4), 5*PSI1
          ALPHA2 = 1
          LALPHA1 = ALPHA1-5*PSI1+5
-         LALPHA2 = ALPHA2
+         LALPHA2 = 1
          BUF INDEX = BUF INDEX+1
          HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
       ENDDO

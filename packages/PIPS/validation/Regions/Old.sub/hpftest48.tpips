@@ -1,8 +1,11 @@
 delete hpftest48
 
 setproperty ABORT_ON_USER_ERROR TRUE
+
 # Logical to integer implicit type conversion not supported by gfrotran
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
+# setenv SEMANTICS_DEBUG_LEVEL=8
 
 create hpftest48 hpftest48.f
 module HPFTEST48
@@ -10,9 +13,40 @@ activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FAST
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FAST
+
+activate PRINT_CODE_TRANSFORMERS
+
+#echo --- Transformers for HPFTEST48
+#display PRINTED_FILE[HPFTEST48]
+
+#echo --- Transformers for REDMIN
+#display PRINTED_FILE[REDMIN]
+
+#echo --- Transformers for REDMAX
+#display PRINTED_FILE[REDMAX]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo --- Preconditions for HPFTEST48
+display PRINTED_FILE[HPFTEST48]
+
+echo --- Preconditions for REDMIN
+display PRINTED_FILE[REDMIN]
+
+echo --- Preconditions for REDMAX
+display PRINTED_FILE[REDMAX]
+
 activate PRINT_CODE_REGIONS
+
+echo --- Regions for REDMIN
+display PRINTED_FILE[REDMIN]
+
+echo --- Regions for REDMAX
+display PRINTED_FILE[REDMAX]
+
 echo --- Regions for HPFTEST48
 display PRINTED_FILE[HPFTEST48]
+
 close
 delete hpftest48
 quit

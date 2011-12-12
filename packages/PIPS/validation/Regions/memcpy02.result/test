@@ -1,0 +1,30 @@
+
+//  <res[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <res[PHI1][PHI2]-W-MAY-{0<=PHI2}>
+//  <resC[PHI1].height-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <resC[PHI1].width-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <src[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <src[PHI1][PHI2]-R-MAY-{0<=PHI2}>
+
+void using_memcpy(int nb, t resC[nb], unsigned char *res[nb], unsigned char *src[nb])
+{
+   int i;
+
+//  <res[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <res[PHI1][PHI2]-W-MAY-{0<=PHI2}>
+//  <resC[PHI1].height-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <resC[PHI1].width-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <src[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <src[PHI1][PHI2]-R-MAY-{0<=PHI2}>
+
+   for(i = 0; i <= nb-1; i += 1)
+
+//  <res[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=nb}>
+//  <res[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2}>
+//  <resC[PHI1].height-R-EXACT-{PHI1==i, 0<=i, i+1<=nb}>
+//  <resC[PHI1].width-R-EXACT-{PHI1==i, 0<=i, i+1<=nb}>
+//  <src[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=nb}>
+//  <src[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2}>
+
+      memcpy(res[i], src[i], resC[i].width*resC[i].height*sizeof(unsigned char));
+}

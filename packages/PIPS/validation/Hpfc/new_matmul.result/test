@@ -427,8 +427,8 @@ c
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = ALPHA1-5*PSI1+5
-      LALPHA2 = ALPHA2-5*PSI2+5
+      LALPHA1 = 5
+      LALPHA2 = 5
       BUF INDEX = BUF INDEX+1
       B(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -443,8 +443,8 @@ c
       CALL HPFC REAL8 BUFUPK
       ALPHA2 = 5
       ALPHA1 = 5
-      LALPHA1 = ALPHA1-5*PSI1+5
-      LALPHA2 = ALPHA2-5*PSI2+5
+      LALPHA1 = 5
+      LALPHA2 = 5
       BUF INDEX = BUF INDEX+1
       A(ALPHA1,ALPHA2) = HPFC REAL8 BUFF(BUF INDEX)
 ! end of collect
@@ -738,8 +738,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = ALPHA1-5*PSI1+5
-         LALPHA2 = ALPHA2-5*PSI2+5
+         LALPHA1 = 5
+         LALPHA2 = 5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK
@@ -754,8 +754,8 @@ c
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = ALPHA1-5*PSI1+5
-         LALPHA2 = ALPHA2-5*PSI2+5
+         LALPHA1 = 5
+         LALPHA2 = 5
          BUF INDEX = BUF INDEX+1
          HPFC REAL8 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
          CALL HPFC REAL8 BUFPCK

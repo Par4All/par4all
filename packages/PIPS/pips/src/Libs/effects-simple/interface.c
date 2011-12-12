@@ -831,4 +831,37 @@ bool simple_cumulated_effects(const char* module_name, statement current)
 
 
 
+/*********** INTERFACES FOR LIVENESS ANALYSIS */
 
+
+bool
+live_paths(const char* module_name)
+{
+  return true;
+}
+
+bool
+live_in_summary_paths(const char* module_name)
+{
+  return true;
+}
+
+bool
+live_out_summary_paths(const char* module_name)
+{
+  return true;
+}
+
+bool
+print_code_live_in_paths(const char* module_name)
+{
+    return print_code_effects(module_name, true, false, true,
+		      DBR_LIVE_IN_PATHS, DBR_LIVE_IN_SUMMARY_PATHS, ".live_in");
+}
+
+bool
+print_code_live_out_paths(const char* module_name)
+{
+    return print_code_effects(module_name, true, false, true,
+		      DBR_LIVE_OUT_PATHS, DBR_LIVE_OUT_SUMMARY_PATHS, ".live_in");
+}

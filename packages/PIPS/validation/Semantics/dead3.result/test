@@ -1,4 +1,28 @@
 
+Preconditions in "DEAD3"
+
+
+C  P() {}
+
+      PROGRAM DEAD3
+
+C  P() {}
+
+
+      CALL PR(1)                                                        0003
+
+C  P() {}
+
+
+      STOP                                                              0005
+
+C  P() {0==-1}
+
+
+      CALL PR(2)                                                        0007
+
+      END
+
 Without explicit dead code elimination:
 
 

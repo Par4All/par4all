@@ -27,32 +27,6 @@ echo
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[W13]
 
-quit
-
-echo
-echo PRECONDITIONS 
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[W13]
-
-echo
-echo REFINED TRANSFORMERS
-echo
-
-apply REFINE_TRANSFORMERS
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[W13]
-
-# quit
-
-echo
-echo PRECONDITIONS WITH REFINED TRANSFORMERS
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[W13]
-
 close
 delete w13
 quit

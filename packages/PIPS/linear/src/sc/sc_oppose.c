@@ -38,16 +38,22 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* Psysteme sc_oppose(Psysteme ps):
- * calcul pour un systeme de contraintes sans egalites du systeme de
- * contraintes dont les inegalites sont les negations des inegalites
- * originelles; attention, cela ne calcule pas le polyedre complementaire!
+/* Psysteme sc_oppose(Psysteme ps): calcul, pour un systeme de
+ * contraintes sans egalites, du systeme de contraintes dont les
+ * inegalites sont les negations des inegalites originelles;
+ * attention, cela ne calcule pas le complementaire, qui n'est
+ * d'aileurs pas un polyedre!
+ *
+ * Pour chaque inegalite de, AX <= B, on construit une inegalites "opposee"
+ * AX > B approximee par -AX <= -B
  *
  * Un systeme non trivial risque fort d'etre transforme en systeme non
- * faisable.
+ * faisable. For instance, -1<=x<=1 is changed into 1<=-x<=-1.
  *
- * pour chaque inegalite donnee AX <= B, on construit une inegalites "opposee"
- * AX > B ie -AX <= -B
+ * The function aborts if ps contains equalities.
+ *
+ * The constraint system ps is modified by side effect and
+ * returned. No new system is allocated.
  */
 Psysteme sc_oppose(ps)
 Psysteme ps;

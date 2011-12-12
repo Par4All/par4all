@@ -80,8 +80,6 @@ typedef struct type_sg {
 
 /* macros d'acces aux champs */
 
-/* test de sg vide */
-#define sg_empty(sg) ((sg)->soms_sg.nb_s==0 &&(sg)-> rays_sg.nb_v == 0 && (sg)->dtes_sg.nb_v == 0)
 /* acces au premier sommet de la liste des sommets d'un systeme generateur
    defini par un pointeur: sg_sommets(Ptsg) */
 #define sg_sommets(sg) ((sg)->soms_sg.ssg)
@@ -103,7 +101,14 @@ typedef struct type_sg {
 /* nombre de droites: int sg_nbre_droites(Ptsg) */
 #define sg_nbre_droites(sg) ((sg)->dtes_sg.nb_v)
 
-/* Macros obsoletes de Malik
+/* Basis used for the generating system */
+#define sg_base(sg) ((sg)->base)
+
+/* Test for an empty generating system, which corresponds to an empty set */
+#define sg_empty(sg) \
+  ((sg)->soms_sg.nb_s==0 &&(sg)-> rays_sg.nb_v == 0 && (sg)->dtes_sg.nb_v == 0)
+
+/* Obsolete macros of Malik Imadache
  * #define soms_of_sg(sg) (((sg).soms_sg).ssg)
  * #define rays_of_sg(sg) (((sg).rays_sg).vsg)
  * #define dtes_of_sg(sg) (((sg).dtes_sg).vsg)

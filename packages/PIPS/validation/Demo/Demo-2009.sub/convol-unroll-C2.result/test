@@ -248,26 +248,26 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
          for(j = 1; j <= 510; j += 1) {
-            *(new_image+j+i_1*isj) = 0.;
-            F_0 = *(image+j-1+(i_1-1)*isj)**(kernel+0);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_0;
-            F_1 = *(image+j+(i_1-1)*isj)**(kernel+1);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_1;
-            F_2 = *(image+j+1+(i_1-1)*isj)**(kernel+2);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_2;
-            F_3 = *(image+j-1+i_1*isj)**(kernel+ksj);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_3;
-            F_4 = *(image+j+i_1*isj)**(kernel+ksj+1);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_4;
-            F_5 = *(image+j+1+i_1*isj)**(kernel+ksj+2);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_5;
-            F_6 = *(image+j-1+(i_1+1)*isj)**(kernel+2*ksj);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_6;
-            F_7 = *(image+j+(i_1+1)*isj)**(kernel+2*ksj+1);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_7;
-            F_8 = *(image+j+1+(i_1+1)*isj)**(kernel+2*ksj+2);
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_8;
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
+            *(new_image+(j+i_1*isj)) = 0.;
+            F_0 = *(image+(j-1+(i_1-1)*isj))**(kernel+0);
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_0;
+            F_1 = *(image+(j+(i_1-1)*isj))**(kernel+1);
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_1;
+            F_2 = *(image+(j+1+(i_1-1)*isj))**(kernel+2);
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_2;
+            F_3 = *(image+(j-1+i_1*isj))**(kernel+ksj);
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_3;
+            F_4 = *(image+(j+i_1*isj))**(kernel+(ksj+1));
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_4;
+            F_5 = *(image+(j+1+i_1*isj))**(kernel+(ksj+2));
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_5;
+            F_6 = *(image+(j-1+(i_1+1)*isj))**(kernel+2*ksj);
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_6;
+            F_7 = *(image+(j+(i_1+1)*isj))**(kernel+(2*ksj+1));
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_7;
+            F_8 = *(image+(j+1+(i_1+1)*isj))**(kernel+(2*ksj+2));
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_8;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))/9;
          }
    }
 }
@@ -321,7 +321,7 @@ Printed file for "launch_microcode1!
 void launch_microcode1(int isi, int isj, int ksi, int ksj, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
    //PIPS generated variable
-   int i, j, ki, kj;
+   int i;
 
 l400:
    for(i = 1; i <= 510; i += 128)
@@ -356,7 +356,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
          new_image[i][j] = image[i][j];
 
-//  T() {}
+//  T(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
 
 l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
@@ -421,61 +421,61 @@ int main()
    for(n = 0; n <= 19; n += 1) {
       //PIPS generated variable
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {0<=n, n<=19}
 
       float (*P4A_var_new_image0)[512][512] = (float (*)[512][512]) 0, (*P4A_var_image0)[512][512] = (float (*)[512][512]) 0, (*P4A_var_kernel0)[3][3] = (float (*)[3][3]) 0;
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {0<=n, n<=19}
 
       P4A_accel_malloc((void **) &P4A_var_kernel0, sizeof(float)*9);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_accel_malloc((void **) &P4A_var_image0, sizeof(float)*262144);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_accel_malloc((void **) &P4A_var_new_image0, sizeof(float)*262144);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kernel[0][0], *P4A_var_kernel0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_copy_to_accel_2d(sizeof(float), 512, 512, 512, 512, 0, 0, &image[0][0], *P4A_var_image0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_copy_to_accel_2d(sizeof(float), 512, 512, 512, 512, 0, 0, &new_image[0][0], *P4A_var_new_image0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
 
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
 
       convol(512, 512, *P4A_var_new_image0, *P4A_var_image0, 3, 3, *P4A_var_kernel0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_copy_from_accel_2d(sizeof(float), 512, 512, 512, 512, 0, 0, &new_image[0][0], *P4A_var_new_image0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_accel_free(P4A_var_kernel0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_accel_free(P4A_var_image0);
 
-//  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
+//  P(i,j,n) {}
 
       P4A_accel_free(P4A_var_new_image0);
    }
 
-//  P(i,j,n) {i==512, j==512, n==20}
+//  P(i,j,n) {n==20}
 
 
    for(i = 0; i <= 511; i += 1)
@@ -499,114 +499,114 @@ int main()
 After a last partial evaluation of "microcode"
 
 
-//  P() {}
+//  P() {1<=i, i<=510}
 
 void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
 
-//  P() {}
+//  P() {1<=i, i<=510}
 
    int j, ki, kj;
    //PIPS generated variable
 
-//  P(j,ki,kj) {}
+//  P(j,ki,kj) {1<=i, i<=510}
 
    float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
    {
       //PIPS generated variable
 
-//  P(j,ki,kj) {}
+//  P(j,ki,kj) {1<=i, i<=510}
 
       int i_1;
 
-//  P(i_1,j,ki,kj) {}
+//  P(i_1,j,ki,kj) {1<=i, i<=510}
 
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
          for(j = 1; j <= 510; j += 1) {
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {1<=j, j<=510}
 
-            *(new_image+j+i_1*isj) = 0.;
+            *(new_image+(j+i_1*isj)) = 0.;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_0 = *(image+j+(i_1-1)*isj-1)**kernel;
+            F_0 = *(image+(j+(i_1-1)*isj-1))**kernel;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_0;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_0;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_1 = *(image+j+(i_1-1)*isj)**(kernel+1);
+            F_1 = *(image+(j+(i_1-1)*isj))**(kernel+1);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_1;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_1;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_2 = *(image+j+(i_1-1)*isj+1)**(kernel+2);
+            F_2 = *(image+(j+(i_1-1)*isj+1))**(kernel+2);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_2;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_2;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_3 = *(image+j+i_1*isj-1)**(kernel+ksj);
+            F_3 = *(image+(j+i_1*isj-1))**(kernel+ksj);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_3;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_3;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_4 = *(image+j+i_1*isj)**(kernel+ksj+1);
+            F_4 = *(image+(j+i_1*isj))**(kernel+ksj+1);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_4;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_4;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_5 = *(image+j+i_1*isj+1)**(kernel+ksj+2);
+            F_5 = *(image+(j+i_1*isj+1))**(kernel+ksj+2);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_5;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_5;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_6 = *(image+j+(i_1+1)*isj-1)**(kernel+2*ksj);
+            F_6 = *(image+(j+(i_1+1)*isj-1))**(kernel+2*ksj);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_6;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_6;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_7 = *(image+j+(i_1+1)*isj)**(kernel+2*ksj+1);
+            F_7 = *(image+(j+(i_1+1)*isj))**(kernel+2*ksj+1);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_7;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_7;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            F_8 = *(image+j+(i_1+1)*isj+1)**(kernel+2*ksj+2);
+            F_8 = *(image+(j+(i_1+1)*isj+1))**(kernel+2*ksj+2);
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_8;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))+F_8;
 
-//  P(i_1,j,ki,kj) {i_1<=i+127, i<=i_1, i_1<=510, 1<=j, j<=510}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
+            *(new_image+(j+i_1*isj)) = *(new_image+(j+i_1*isj))/9;
          }
    }
 }

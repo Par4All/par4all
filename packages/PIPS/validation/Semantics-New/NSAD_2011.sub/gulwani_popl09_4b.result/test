@@ -214,15 +214,15 @@ void ts_restructured(void)
 
       checking_error();
 
-//  T(c1,c2,s,x,y) {c1+x#init==n, c1+x0==n, c1#init==0, c2==0,
-//    c2#init==0, n==x, s==1, s#init==1, y#init==y0, 0<=c1, c1<=n,
-//    y#init<=m, y#init<=y, 0<=y#init}
+//  T(c1,c2,s,x,y) {c1+x#init==n, c1+x#init==x, c1#init==0, c2==0,
+//    c2#init==0, s==1, s#init==1, x#init==x0, y#init==y0, 0<=c1,
+//    y#init<=m, 0<=x#init, y#init<=y, 0<=y#init}
 
    if (x<n)
 
-//  T(c1,c2,s,x,y) {c1+x#init==c1#init+n, c1+x#init==n, c2==0,
-//    c2#init==0, n==x, s==1, s#init==1, x#init==x0, y#init==y0,
-//    y#init<=m, 0<=n, x#init+1<=n, 0<=x#init, y#init<=y, 0<=y#init}
+//  T(c1,c2,s,x,y) {c1+x#init==n, c1+x0==n, c1#init==0, c2==0,
+//    c2#init==0, n==x, s==1, s#init==1, y#init==y0, y#init<=m, 0<=n,
+//    x#init+1<=n, 0<=x#init, y#init<=y, 0<=y#init}
 
       if (y<m) {
 

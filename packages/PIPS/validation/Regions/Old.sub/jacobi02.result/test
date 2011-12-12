@@ -1448,8 +1448,7 @@ void compute()
    // BEGIN BLOCK
    int i, j;
 
-//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
-//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
+//  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
    

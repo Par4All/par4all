@@ -297,71 +297,70 @@ int main()
    int N = 100;
    double A[100][100];
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1+1, 0<=102PHI1+PHI2+2,
-//    0<=PHI1+PHI2+2, PHI1+PHI2<=198, 20299PHI1+99PHI2<=2019402,
-//    N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{PHI1<=99, 0<=102PHI1+PHI2+2, 0<=PHI1+PHI2+2,
+//    PHI1+PHI2<=198, N==100}>
 
 
    if (1) {
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1+1, 0<=102PHI1+PHI2+2,
-//    0<=PHI1+PHI2+2, PHI1+PHI2<=198, 102PHI1+PHI2<=10096, N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{PHI1<=99, 0<=102PHI1+PHI2+2, 0<=PHI1+PHI2+2,
+//    PHI1+PHI2<=198, 102PHI1+PHI2<=10096, N==100}>
 
       if (1) {
 
-//  <A[PHI1][PHI2]-W-MAY-{N<=PHI1+PHI2+1, PHI1+PHI2<=N+98,
-//    N<=PHI1+101, PHI1+2<=N, N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1+1, PHI1<=98, 99<=PHI1+PHI2,
+//    PHI1+PHI2<=198, N==100}>
 
          for(ii = 1; ii <= N; ii += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==N-1, ii<=PHI2, PHI2<=ii+99, N==100,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==99, ii<=PHI2, PHI2<=ii+99, N==100,
 //    1<=ii, ii<=100}>
 
             for(jj = 1; jj <= N; jj += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==N-1, ii+jj==PHI2+1, N==100, 1<=ii,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==99, ii+jj==PHI2+1, N==100, 1<=ii,
 //    ii<=100, 1<=jj, jj<=100}>
 
                if (1) {
                   x0 = ii*jj;
                   x1 = (double) N/2;
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==N-1, ii+jj==PHI2+1, N==100, 1<=ii,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1+ii==99, ii+jj==PHI2+1, N==100, 1<=ii,
 //    ii<=100, 1<=jj, jj<=100}>
 
                   if (x0<x1)
 
-//  <A[PHI1][PHI2]-W-EXACT-{PHI1+ii==N-1, ii+jj==PHI2+1, N==100,
-//    1<=ii, ii<=100, 1<=jj, jj<=100}>
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1+ii==99, ii+jj==PHI2+1, N==100, 1<=ii,
+//    ii<=100, 1<=jj, jj<=100}>
 
                      A[N-ii-1][ii+jj-1] = 1.0;
                }
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, N<=PHI1+PHI2+102,
-//    PHI1+PHI2+3<=N, N==100}>
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 0<=PHI1+PHI2+2,
+//    PHI1+PHI2<=97, N==100}>
 
 
          for(ii = 1; ii <= N; ii += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, N<=PHI2+ii+101, PHI2+ii+2<=N,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, 0<=PHI2+ii+1, PHI2+ii<=98,
 //    N==100, 1<=ii, ii<=100}>
 
             for(jj = 1; jj <= N; jj += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, PHI2+ii+jj==N-1, N==100, 1<=ii,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, PHI2+ii+jj==99, N==100, 1<=ii,
 //    ii<=100, 1<=jj, jj<=100}>
 
                if (1) {
                   x0 = ii*jj;
                   x1 = (double) N/2;
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, PHI2+ii+jj==N-1, N==100, 1<=ii,
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, PHI2+ii+jj==99, N==100, 1<=ii,
 //    ii<=100, 1<=jj, jj<=100}>
 
                   if (x0<x1)
 
-//  <A[PHI1][PHI2]-W-EXACT-{PHI1==ii-1, PHI2+ii+jj==N-1, N==100,
-//    1<=ii, ii<=100, 1<=jj, jj<=100}>
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==ii-1, PHI2+ii+jj==99, N==100, 1<=ii,
+//    ii<=100, 1<=jj, jj<=100}>
 
                      A[ii-1][N-ii-jj-1] = 1.0;
                }

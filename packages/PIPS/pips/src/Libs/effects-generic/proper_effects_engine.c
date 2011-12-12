@@ -704,6 +704,9 @@ static list generic_proper_effects_of_complex_address_point_to_op(list l_args, l
   return le;
 }
 
+/* This function should be further cleaned up - see call_to_post_pv - in particular
+   pointer arithmetic should be externalized - BC.
+*/
 static list generic_proper_effects_of_complex_address_dereferencing_op(list l_args, list *l_pme, int write_p)
 {
   list le = NIL;
@@ -714,17 +717,18 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
       call s_c = syntax_call(expression_syntax(deref_exp));
       entity s_op = call_function(s_c);
       list s_args = call_arguments(s_c);
+      value op_init = entity_initial(s_op);
+      type op_type = ultimate_type(entity_type(s_op));
+      tag t = value_tag(op_init);
 
       pips_debug(4,"The dereferenced expression is a call itself (%s)\n",
 		 entity_local_name(s_op));
       ifdebug(8)
 	{
 	  pips_debug(8,"with arguments : \n");
-	  FOREACH(EXPRESSION,x,s_args)
-	    {
-	      print_expression(x);
-	    }
+	  print_expressions(s_args);
 	}
+
       /* MINUS_C should be handled as well BC */
       if(ENTITY_PLUS_C_P(s_op))
 	{
@@ -948,11 +952,39 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
 	  le = generic_proper_effects_of_complex_address_expression
 	    (deref_exp, l_pme, write_p);
 
-	  if (ENDP(*l_pme))
+	  bool success = !ENDP(*l_pme);
+	  if (!success)
+	    {
+	      if (type_functional_p(op_type) && t == is_value_constant)
+		{
+		  constant op_const = value_constant(op_init);
+		  if (constant_int_p(op_const) && (constant_int(op_const) == 0))
+		    {
+		      success = false;
+		    }
+		  else
+		    {
+		      type tt = functional_result(type_functional(op_type));
+		      if (type_variable_p(tt))
+			{
+			  variable v = type_variable(tt);
+			  basic b = variable_basic(v);
+			  if (basic_string_p(b))/* constant strings */
+			    {
+			      /*the user dereferences a constant string -> it's a constant,
+			       -> no effect */
+			      success = true;
+			    }
+			}
+		    }
+		}
+	    }
+	  if (!success)
 	    {
 	      pips_user_warning("dereferencing a constant address expression: "
-			       "PIPS doesn't know how to handled that precisely\n");
-	      *l_pme = effect_to_list(make_anywhere_effect(write_p? make_action_write_memory()
+				"PIPS doesn't know how to handled that precisely\n");
+	      *l_pme = effect_to_list(make_anywhere_effect(write_p?
+							   make_action_write_memory()
 							   : make_action_read_memory()));
 	    }
 	  else

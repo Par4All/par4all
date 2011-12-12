@@ -2416,12 +2416,12 @@ transformer statement_to_transformer(
        644) and useless as long anymodule:anywhere is the only
        abstract effect we have to deal with.
      */
-    /*
     t = transformer_combine(t, etf);
     free_transformer(etf);
-    */
+    /* Not a sufficient solution:
     free_transformer(t);
     t = etf;
+    */
   }
 
     /* store or update the statement transformer */

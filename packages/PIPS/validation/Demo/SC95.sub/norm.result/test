@@ -92,19 +92,19 @@ C    K<=K2}>
 
             CALL PVNMUT(TI)                                             0025
 
-C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN, NN==14,
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==14, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==1, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
             T(J,K,NN) = S*TI(1)                                         0026
 
-C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+1, NN==14,
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==15, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==2, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 
             T(J,K,NN+1) = S*TI(2)                                       0027
 
-C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+2, NN==14,
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==16, NN==14,
 C    J1<=J, J<=JA, K1<=K, K<=K2}>
 C  <TI(PHI1)-R-EXACT-{PHI1==3, NN==14, J1<=J, J<=JA, K1<=K, K<=K2}>
 

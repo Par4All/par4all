@@ -2636,6 +2636,71 @@ is turned off.
 TIME_EFFECTS_USED FALSE
 \end{PipsProp}
 
+\section{Live Memory Access Paths}
+\label{subsection-live-memory-paths}
+\index{Effect}
+
+There are many cases in which it is necessary to know if a variable
+may be used in the remainder of the execution of the analyzed
+application. For instance, a global variable cannot be privatized, or
+a global array be scalarized, if we don't know whether their values
+are used afterwards, or a copy-out must be generated, which is not
+currently implemented in the simplest algorithms. Similarly,
+preconditions do not need to propagate information about variables
+which are no more alive.
+
+Traditional liveness analyzes deals with scalar variables. However,
+with C code, it is interesting to be able to distinguish between
+different structure fields for instance, and it may also be
+interesting to deal with array regions. So we have retained for these
+analyzes an internal representation as \emph{effects}, thus allowing
+to deal with general memory access paths, and to rely on the existing
+machinery of effects/regions computations.
+
+For each statement or function, we compute two sets: a \emph{Live\_in}
+set contains the memory paths which are alive in the store preceding
+the statement execution, while a \emph{Live\_out} set contains the
+memory paths alive in the store immediately following the statement
+execution. For sequences of instructions, the \emph{Live\_out} set of
+an instruction is equal to the \emph{Live\_in} set of the next
+instruction. However, this not true for the last statement of
+conditional or loop bodies and the first statement of the next
+instruction.
+
+
+
+\begin{PipsPass}{live_paths}
+\end{PipsPass}
+
+\begin{PipsMake}
+live_paths     > MODULE.live_in_paths
+               > MODULE.live_out_paths
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.live_out_summary_paths
+\end{PipsMake}
+
+\begin{PipsPass}{live_summary_paths}
+\end{PipsPass}
+
+
+\begin{PipsMake}
+live_in_summary_paths     > MODULE.live_in_summary_paths
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.live_in_paths
+\end{PipsMake}
+
+\begin{PipsPass}{live_out_summary_paths}
+\end{PipsPass}
+
+\begin{PipsMake}
+live_out_summary_paths     > MODULE.live_out_summary_paths
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.live_out_paths
+\end{PipsMake}
+
 
 \section{Reductions}
 \label{sec:reductions}
@@ -9316,6 +9381,18 @@ simplify_subscripts > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{simplify_constant_address_expressions}
+  This pass evaluates expression of the form \lstinline|*"ae"| that can be
+  found in COLD output.
+\end{PipsPass}
+
+I doubt it can be useful elsewhere ...
+\begin{PipsMake}
+simplify_constant_address_expressions > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{simplify_complex}
 This pass performs a conversion from complex to real.
 \PipsPropRef{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS} controls the new layout
@@ -12784,6 +12861,34 @@ print_code_out_effects       > MODULE.printed_file
         < MODULE.out_effects
         < MODULE.out_summary_effects
 \end{PipsMake}
+
+
+\subsection{Sequential View with Live Paths}
+
+\begin{PipsPass}{print_code_live_in_paths}
+Display the code decorated with the cumulated effects.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_live_in_paths    > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.live_in_paths
+        < MODULE.live_in_summary_paths
+\end{PipsMake}
+
+\begin{PipsPass}{print_code_live_out_paths}
+Display the code decorated with the cumulated effects.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_code_live_out_paths    > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.live_out_paths
+        < MODULE.live_out_summary_paths
+\end{PipsMake}
+
 
 \subsection{Sequential View with Proper Reductions}
 

@@ -185,7 +185,7 @@ c     integer h2
 
 C  <VSTAB(PHI1,PHI2)-OUT-EXACT-{0<=PHI1, PHI1<=N, 8T8<=PHI1,
 C    PHI1<=8T8+7, 0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
-C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T8+6<=PHI1+N, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T8+1<=N, 0<=T8}>
 
          DO T7 = 8*T8, 8*T8+7                                           0024
 

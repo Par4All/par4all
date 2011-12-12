@@ -59,6 +59,7 @@ libsc_la_SOURCES = 	sc_alloc.c \
 		sc_janus_feasibility.c \
 		sc_gram.y \
 		sc_lex.l \
+		sc_belong.c \
 		$(other_headers)
 
 CLEANFILES=sc_gram.[ch] sc_lex.c

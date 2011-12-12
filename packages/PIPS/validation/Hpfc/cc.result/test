@@ -110,8 +110,8 @@
             CALL HPFC REAL4 BUFUPK
             DO LALPHA1 = 1, (-PSI2+3)/2
                DO LALPHA2 = 1, (-PSI1+3)/2
-                  ALPHA2 = 2*LALPHA2+PSI1-2
-                  ALPHA1 = 2*LALPHA1+PSI2-2
+                  ALPHA2 = 1
+                  ALPHA1 = 1
                   BUF INDEX = BUF INDEX+1
                   A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
                ENDDO
@@ -245,8 +245,8 @@
       SEND NOT INITIALIZED = .TRUE.
       DO LALPHA1 = 1, (-PSI2+3)/2
          DO LALPHA2 = 1, (-PSI1+3)/2
-            ALPHA2 = 2*LALPHA2+PSI1-2
-            ALPHA1 = 2*LALPHA1+PSI2-2
+            ALPHA2 = 1
+            ALPHA1 = 1
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
          ENDDO

@@ -13,7 +13,7 @@ C  <A(PHI1)-W-EXACT-{PHI1==I, J==4, 0<=I}>
       A(I) = 0                                                          0006
       K = 5                                                             0007
 
-C  <B(PHI1)-W-EXACT-{PHI1==K, J==4, K==5, 0<=I}>
+C  <B(PHI1)-W-EXACT-{PHI1==5, J==4, K==5, 0<=I}>
 
       B(K) = 0                                                          0008
 

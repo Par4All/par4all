@@ -259,10 +259,7 @@ Ptsg sg;
 /* void sg_fprint(FILE * f, Ptsg sg, char * (*nom_var)()):
  * impression d'un systeme generateur
  */
-void sg_fprint(f, sg, nom_var)
-FILE * f;
-Ptsg sg;
-char * (*nom_var)(Variable);
+void sg_fprint(FILE * f, Ptsg sg, char * (*nom_var)(Variable))
 {
     (void) fprintf(f,"Generating system:\n");
     (void) fprintf(f,"%d Vert%s \n",sg_nbre_sommets(sg),
@@ -279,6 +276,18 @@ char * (*nom_var)(Variable);
 	fprint_lray_dte(f, sg_droites(sg), nom_var);
     }
     (void) fprintf(f,"\nEnd of generating system ****\n");
+}
+
+/* For debugging */
+void sg_print(Ptsg sg, char * (*nom_var)(Variable))
+{
+  sg_fprint(stderr, sg, nom_var);
+}
+
+/* For debugging */
+void sg_dump(Ptsg sg)
+{
+  sg_print(sg, variable_dump_name);
 }
 
 /* void sg_fprint_as_dense(FILE * f, Ptsg sg):
@@ -365,13 +374,13 @@ sg_fprint_as_ddv(
     fprintf(fd, ")");
 }
 
-void sg_dump(sg)
-Ptsg sg;
-{
-    /* char * (*variable_dump_name)(); */
-
-    sg_fprint(stderr, sg, variable_dump_name);
-}
+//void sg_dump(sg)
+//Ptsg sg;
+//{
+//    /* char * (*variable_dump_name)(); */
+//
+//    sg_fprint(stderr, sg, variable_dump_name);
+//}
 
 
 /* bool egal_soms(Ptsg_soms sgs1, Ptsg_soms sgs2): test de l'egalite
