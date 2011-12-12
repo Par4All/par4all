@@ -22,7 +22,8 @@ for arg in $* ; do
 		-h|--help)
 	cat << EOF
 p4a_scpp - P4A Selective C PreProcessor
-usage: p4a_scpp [-h|--help] [--no-beautifier] [cpp flags] [--include-re=regexp] [input_file=stdin]
+usage: p4a_scpp [-h|--help] [--no-beautifier] [--cuda|--opencl|--openmp] [cpp flags] [--include-re=regexp] [input_file=stdin]
+sample: p4a_scpp -DP4A_ACCEL_OPENMP hello_world.p4a.c
 sample: p4a_scpp -DP4A_ACCEL_OPENMP hello_world.p4a.c
         p4a_scpp --no-beautifier -DNDEBUG --include-re=stdio\\\\.h /usr/include/stdlib.h | indent -linux
 EOF
@@ -33,6 +34,10 @@ EOF
 			;;
 		--include-re=*)
 			p4a_re="`echo "$arg"| cut -c 14-`"
+			;;
+		--cuda|--opencl|--openmp)
+			# Transform for example --opencl into -DP4A_ACCEL_OPENCL:
+			P4A_CPPFLAGS="$P4A_CPPFLAGS -DP4A_ACCEL_`echo $arg | sed s/--// | tr 'a-z' 'A-Z'`"
 			;;
 		-*)
 			P4A_CPPFLAGS="$P4A_CPPFLAGS $arg"
