@@ -47,7 +47,8 @@ INC_CFILES = 	sc_alloc.c \
 		sc_new_loop_bound.c \
 		sc_simplexe_feasibility.c \
 		sc_debug.c \
-		sc_janus_feasibility.c
+		sc_janus_feasibility.c \
+		sc_belong.c
 
 LIB_CFILES= $(INC_CFILES) $(DERIVED_CFILES)
 

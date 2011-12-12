@@ -74,7 +74,8 @@
  * four vectors.
  */
 
-/* Auxiliary function for sc_bounded_normalization()
+/* Auxiliary functions for sc_bounded_normalization(): build the
+ * bounding box
  *
  * Update bound information for variable var. A lower or upper bound_p
  * and bound_base_p must be passer regardless of lower_p. lower_p is
@@ -170,12 +171,14 @@ static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
       vect_add_elem(ubound_p, var, nb);
     }
 
-    /* Update the lower bound, almost identical, but for the compatibility check */
+    /* Update the lower bound, almost identical, but for the
+       compatibility check */
     if(vect_coeff(var,*lbound_base_p)!=0) {
       /* A lower bound has already been defined */
       Value ob = vect_coeff(var, *lbound_p);
 	if(value_lt(ob, nb)) {
-	  /* The new bound nb is stricter and consistent with the preexisting lower bound */
+	  /* The new bound nb is stricter and consistent with the
+	     preexisting lower bound */
 	  vect_add_elem(lbound_p, var, value_minus(nb,ob));
 	}
 	else if(value_eq(ob,nb))
@@ -199,7 +202,555 @@ static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
   }
   return empty_p;
 }
+
+/* Use constants imposed by the bounding box to eliminate constant
+   terms from constraint eq, unless this is the constraint defining
+   the bounding box. Constant variables are defined by basis cb and
+   their value are found in l */
+static void
+simplify_constraint_with_bounding_box(Pcontrainte eq,
+				      Pbase cb,
+				      Pvecteur l,
+				      bool is_inequality_p __attribute__ ((unused)))
+{
+  Pvecteur v = contrainte_vecteur(eq);
+  Pvecteur vc;
+  Pvecteur dv = VECTEUR_NUL;
 
+  /* Substitute constant variables, computing a delta value to be
+     added to the constant term and setting the variable coefficient
+     to zero; we should have not only lb and ub but also cb, the base
+     for the constant terms */
+  for(vc=v; !VECTEUR_NUL_P(vc); vc = vecteur_succ(vc)) {
+    Variable var = vecteur_var(vc);
+    Value c = vecteur_val(vc);
+    /* We could check here if var has a constant value and eliminate
+       it from the constraint v... if this did not break the
+       surrounding loop on v...  So the update is accumulated into a
+       difference vector dv that is added to v at the end of the
+       loop */
+    if(vect_coeff(var, cb)!=0) {
+      Value delta = value_direct_multiply(c, vect_coeff(var, l));
+      vect_add_elem(&dv, TCST, delta);
+      vect_add_elem(&dv, var, value_uminus(c));
+    }
+  }
+  /* We should update here the constant term with delta, the
+     value accumulated with the constant terms */
+  if(!VECTEUR_NUL_P(dv)) {
+    Pvecteur nv = vect_add(v, dv);
+    bool substitute_p = true;
+    if(/*!is_inequality_p &&*/ VECTEUR_NUL_P(nv)) {
+      /* do not destroy this equation by simplification if it defines
+	 a constant... */
+      int n = vect_size(v);
+      Value cst = vect_coeff(TCST, v);
+      if((n==1 && value_zero_p(cst)) || (n==2 && value_notzero_p(cst)))
+	 substitute_p = false;
+    }
+    if(substitute_p) {
+      if(false) {
+	extern char * entity_local_name(void *);
+	fprintf(stderr, "Initial constraint:\n");
+	vect_fprint(stderr, v, entity_local_name);
+	fprintf(stderr, "Difference:\n");
+	vect_fprint(stderr, dv, entity_local_name);
+	fprintf(stderr, "New constraint:\n");
+	vect_fprint(stderr, nv, entity_local_name);
+      }
+      vect_rm(v);
+      vect_rm(dv);
+      v = nv;
+      contrainte_vecteur(eq) = nv;
+      //assert(vect_check(nv));
+    }
+    else {
+      vect_rm(dv);
+      vect_rm(nv);
+      //assert(vect_check(v));
+    }
+  }
+}
+
+/* v is supposed to be the equation of a line in a 2-D
+ * space. Retrieve, when they exist, the bounds for x and y, x being
+ * the first variable to appear in v and y the second one.
+ *
+ * The bounds are assumed initialized to VALUE_MIN and VALUE_MAX.
+ *
+ * Note: a bit dangerous to rely on the order of variables in a linear
+ * sparce vector.
+ */
+static void compute_x_and_y_bounds(Pvecteur v,
+				   Pvecteur l, Pvecteur lb, 
+				   Pvecteur u, Pvecteur ub, 
+				   Value * px_min, Value * px_max,
+				   Value * py_min, Value * py_max)
+{
+  Pvecteur vc;
+  for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+    Variable var = vecteur_var(vc);
+    if(var!=TCST) {
+      if(!value_zero_p(vect_coeff(var,lb))
+	 && !value_zero_p(vect_coeff(var,ub))) {
+	if(value_eq(*px_min, VALUE_MIN)) {
+	  *px_min = vect_coeff(var,l);
+	  *px_max = vect_coeff(var,u);
+	}
+	else {
+	  *py_min = vect_coeff(var,l);
+	  *py_max = vect_coeff(var,u);
+	}
+      }
+    }
+  }
+}
+
+/* Is it possible to reduce the magnitude of at least one constraint
+ * coefficient because it is larger than the intervals defined by
+ * the bouding box?
+ *
+ * Note: the modularity wastes computations. It would be nice to
+ * benefit from a, b, dx and dy.
+ */
+static bool eligible_for_coefficient_reduction_with_bounding_box_p(Pvecteur v,
+								   Pvecteur l,
+								   Pvecteur lb,
+								   Pvecteur u,
+								   Pvecteur ub)
+{
+  bool eligible_p = true;
+  bool bounded_p = false;
+  Value dx = VALUE_MAX; // width of bounding box
+  Value dy = VALUE_MAX; // height of bounding box
+  Value a = VALUE_ZERO;
+  Value b = VALUE_ZERO;
+  Variable x = VARIABLE_UNDEFINED; // Dangerous, same as TCST...
+
+  /* v is a 2-D constraint */
+  eligible_p = (vect_size(v)==2 && value_zero_p(vect_coeff(TCST, v)))
+    ||  (vect_size(v)==2 && value_zero_p(vect_coeff(TCST, v)));
+
+  /* The two variables are bounded by a non-degenerated rectangle... */
+  /* At least one variable is bounded by an interval: sufficient condition */
+  if(eligible_p) {
+    Pvecteur vc;
+    for(vc=v; !VECTEUR_UNDEFINED_P(vc) && eligible_p; vc=vecteur_succ(vc)) {
+      Variable var = vecteur_var(vc);
+      bool var_bounded_p = false;
+      if(var!=TCST) {
+	if(value_pos_p(vect_coeff(var, lb)) && value_pos_p(vect_coeff(var, ub))) {
+	  bounded_p = true;
+	  var_bounded_p = true;
+	}
+	if(VARIABLE_UNDEFINED_P(x)) {
+	    dx = var_bounded_p?
+	      value_minus(vect_coeff(var,u),vect_coeff(var,l))
+	      : VALUE_MAX;
+	    a = vect_coeff(var, vc);
+	    x = var;
+	}
+	else {
+	  dy = var_bounded_p?
+	    value_minus(vect_coeff(var,u),vect_coeff(var,l))
+	    : VALUE_MAX;
+	  b = vect_coeff(var, vc);
+	}
+      }
+    }
+
+    /* The bounding box is not degenerated. If it is the case, the
+       constraint should have been simplified in a much easier
+       way. */
+    eligible_p = bounded_p && value_pos_p(dx) && value_pos_p(dy);
+    if(eligible_p)
+      /* make sure that at least one coefficient can be reduced */
+      eligible_p = value_gt(a,dy) || value_gt(b,dx);
+  }
+
+  return eligible_p;
+}
+
+/* Check that the coefficients on the first and second variables, x
+ * and y, define a increasing line with a slope less than one.
+ *
+ * Internal check used after a change of frame.
+ *
+ * Note: dangerous use of term ordering inside a linear sparse vector.
+ */
+static bool small_slope_and_first_quadrant_p(Pvecteur v)
+{
+  Value a = VALUE_ZERO;
+  Value b = VALUE_ZERO;
+  Pvecteur vc;
+  bool ok_p = true;
+
+  ok_p = (vect_size(v)==2 && value_zero_p(vect_coeff(TCST, v)))
+    ||  (vect_size(v)==3 && value_notzero_p(vect_coeff(TCST, v)));
+
+  if(ok_p) {
+    for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+      Variable var = vecteur_var(vc);
+      if(var!=TCST) {
+	if(value_zero_p(a))
+	  a = vect_coeff(var, vc);
+	else
+	  b = vect_coeff(var, vc);
+      }
+    }
+  }
+
+  ok_p = value_neg_p(a) && value_pos_p(b) && value_gt(b, value_uminus(a));
+
+  return ok_p;
+}
+
+static void negate_value_interval(Value * pmin, Value * pmax)
+{
+  Value t = value_uminus(*pmin);
+  *pmin = value_uminus(*pmax);
+  *pmax = t;
+}
+
+static void swap_values(Value * p1, Value * p2)
+{
+  Value t = *p1;
+  *p1 = *p2;
+  *p2 = t;
+}
+
+static void swap_value_intervals(Value * px_min, Value * px_max,
+				 Value * py_min, Value * py_max)
+{
+  swap_values(px_min, py_min);
+  swap_values(px_max, py_max);
+}
+
+/* Compute a normalized version of the constraint v and the
+ * corresponding change of basis.
+ *
+ * The change of basis is encoded by an integer belonging to the
+ * interval [0,7].  Bit 2 is used to encode a change of sign for x,
+ * bit 1, a change of sign for y and bit 0 a permutation between x and
+ * y.
+ *
+ * No new variable x' and y' are introduced. The new constraint is
+ * still expressed as a constraint on x and y.
+ *
+ * The bounds on x and y must be adapted into bound on x' and y'.
+ */
+static Pvecteur
+new_constraint_for_coefficient_reduction_with_bounding_box(Pvecteur v,
+							   int * pcb,
+							   Value * px_min,
+							   Value * px_max,
+							   Value * py_min,
+							   Value * py_max)
+{
+  Value a = VALUE_ZERO;
+  Value b = VALUE_ZERO;
+  Value c = VALUE_ZERO;
+  Value a_prime = VALUE_ZERO;
+  Value b_prime = VALUE_ZERO; 
+  Pvecteur vc;
+  Variable x, y;
+  Pvecteur nv = VECTEUR_NUL; //  new constraint
+
+  for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+    Variable var = vecteur_var(vc);
+    if(var!=TCST) {
+      if(value_zero_p(a)) {
+	a = vect_coeff(var, vc);
+	x = vecteur_var(vc);
+      }
+      else {
+	b = vect_coeff(var, vc);
+	y = vecteur_var(vc);
+      }
+    }
+    else
+      c = vect_coeff(var, vc);
+  }
+  if(value_pos_p(a)) {
+    /* substitute x by x'=-x */
+    *pcb = 4;
+    /* FI: could cause an overflow */
+    value_assign(a_prime, value_uminus(a));
+    negate_value_interval(px_min, px_max);
+  }
+  else {
+    *pcb = 0;
+    value_assign(a_prime, a);
+  }
+  if(value_neg_p(b)) {
+    *pcb |= 2;
+    /* FI: could cause an overflow */
+    value_assign(b_prime, value_uminus(b));
+    negate_value_interval(py_min, py_max);
+  }
+  else {
+    // *pcb |= 0; i.e. unchanged
+    value_assign(b_prime, b);
+  }
+  if(value_gt(b_prime, value_uminus(a_prime))) {
+    /* Build a_prime x + b_prime y <= -c */
+    vect_add_elem(&nv, y, b_prime);
+    vect_add_elem(&nv, x, a_prime);
+    vect_add_elem(&nv, TCST, c);
+  }
+  else {
+    /* x and y must be exchanged: -b_prime x - a_prime y <= -c */
+    *pcb |= 1;
+    vect_add_elem(&nv, y, value_uminus(a_prime));
+    vect_add_elem(&nv, x, value_uminus(b_prime));
+    vect_add_elem(&nv, TCST, c);
+    swap_value_intervals(px_min, px_max, py_min, py_max);
+  }
+  /* Make sure that nv is properly built... */
+  // vect_print(nv, entity_local_name);
+  assert(small_slope_and_first_quadrant_p(nv));
+  return nv;
+}
+
+/* Compute the equation of the line joining (x0,y0) and (x1,y1) 
+ *
+ * (x1-x0) y = (y1 -y0) (x - x0) + y0 (x1-x0)
+ *
+ * as ax+by+c=0
+*/
+static Pvecteur vect_make_line(Variable x, Variable y, Value x0, Value y0, Value x1, Value y1)
+{
+  Value dx = value_minus(x1,x0);
+  Value dy = value_minus(y1,y0);
+  Value a = dy;
+  Value b = -dx;
+  /* constant term: -x0 dy + y0 dx */
+  Value c = value_minus(value_mult(y0, dx), value_mult(x0, dy));
+  Pvecteur v = vect_new(x, a);
+  vect_add_elem(&v, y, b);
+  vect_add_elem(&v, TCST, c);
+  return v;
+}
+
+/* The set of constraints returned may be empty if the constraint does
+   not intersect the bounding box or contain, maybe, up to three new
+   constraints. Usually one or two. */
+static Pcontrainte
+small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
+							   Value x_min,
+							   Value x_max,
+							   Value y_min __attribute__ ((unused)),
+							   Value y_max __attribute__ ((unused)))
+{
+  Value a = VALUE_ZERO;
+  Value b = VALUE_ZERO;
+  Value c = VALUE_ZERO;
+  Value lmpx, lmpy; // left most vertex
+  Value rmpx, rmpy; // right most vertex
+  Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+  Variable x;
+  Variable y;
+
+  /* Retrieve coefficients and variables in v = ax+by+c */
+  Pvecteur vc;
+  for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+    Variable var = vecteur_var(vc);
+    if(var!=TCST) {
+      if(value_zero_p(a)) {
+	a = vect_coeff(var, vc);
+	x = vecteur_var(vc);
+      }
+      else {
+	b = vect_coeff(var, vc);
+	y = vecteur_var(vc);
+      }
+    }
+    else
+      c = vect_coeff(var, vc);
+  }
+
+  /* Compute two integer vertices for x_min and x_max using constraint
+     ax+by+c=0, y = (- c - ax)/b */
+  assert(value_ne(x_min, VALUE_MIN) && value_ne(x_max, VALUE_MAX));
+
+  /* Reminder: the slope is positive, the function is increasing */
+  Value y_x_min =
+    value_div(value_plus(value_uminus(c),value_mult(value_uminus(a), x_min)), b);
+  Value y_x_max =
+    value_div(value_plus(value_uminus(c),value_mult(value_uminus(a), x_max)), b);
+
+  /* x must be bounded, but y bounds are useless; they simply make the resolution more complex */
+#if 0
+  /* Compute two integer vertices for y_min and y_max using constraint
+     ax+by+c=0, x = (- c - by)/a */
+  x_y_min =
+    value_div(value_add(value_uminus(c),value_mult(value_minus(b), y_min)), a);
+  x_y_max =
+    value_div(value_add(value_uminus(c),value_mult(value_minus(b), y_max)), a);
+
+  /* The constraint ax+by+c=0 has at most two valid intersections with
+     the bounding box. Because the slope is positive, 0<-a/b<1, the
+     minimum point is obtained with x_min or y_min and the maximum
+     point is obtained with x_max or y_max.
+
+     Constraint redundant with the bounding box should have been
+     eliminated earlier with a simpler technique.
+  */
+  if(value_ge(y_x_min, y_min) && value_le(y_x_min, y_max)) {
+    if(value_lt(y_x_min, y_max)) { 
+      /* The left most point is (x_min, y_x_min) */
+      lmpx = x_min;
+      lmpy = y_x_min;
+      found_p = true;
+    }
+    else {
+      /* The constraint is a redundant tangent */
+      redundant_p = true;
+    }
+  }
+  if(!redundant_p && value_ge(x_y_min, x_min) && value_le(x_y_min, x_max)) {
+    if(value_lt(x_y_min, x_max)) { 
+      /* The left most point is (x_y_min, y_min) */
+      lmpx = x_min;
+      lmpy = y_x_min;
+      found_p = true;
+    }
+    else {
+      /* The constraint is a redundant tangent */
+      redundant_p = true;
+    }
+  }
+  if(!found_p)
+    redundant = true;
+  assert(!redundant);
+  fprintf(stderr, "lmpx=%d, lmpy=%d\n", (int) lmpx, (int) lmpy);
+  if(value_ge(y_x_max, y_min) && value_le(y_x_max, y_max)) {
+    if(value_lt(y_x_max, y_max)) { 
+      /* The right most point is (x_max, y_x_max) */
+      rmpx = x_min;
+      rmpy = y_x_min;
+      found_p = true;
+    }
+    else if(value_lt(y_x_max, y_min)) {
+      /* The constraint is a redundant tangent */
+      redundant_p = true;
+    }
+  }
+  if(!redundant_p && !found_p
+     && value_ge(x_y_max, x_max) && value_le(x_y_max, x_max)) {
+    if(value_lt(x_y_max, x_max)) { 
+      /* The right most point is (x_y_max, y_max) */
+      rmpx = x_min;
+      rmpy = y_x_min;
+      found_p = true;
+    }
+    else {
+      /* The constraint is a redundant tangent */
+      redundant_p = true;
+    }
+  }
+  if(!found_p)
+    redundant = true;
+  assert(!redundant && found_p);
+
+  fprintf(stderr, "rmpx=%d, rmpy=%d\n", (int) rmpx, (int) rmpy);
+#endif
+  lmpx = x_min;
+  lmpy = y_x_min;
+  rmpx = x_max;
+  rmpy = y_x_max;
+  
+
+  if(value_le(value_minus(rmpy,lmpy), VALUE_ZERO)) {
+    /* One new horizontal constraint defined by the two vertices lmp
+       and rmp: y<=lmpy; test case slope01.c */
+    Pvecteur nv = vect_make(nv, y, VALUE_ONE, TCST);
+    vect_add_elem(&nv, TCST, value_uminus(lmpy));
+    ineq = contrainte_make(nv);
+  }
+  else if(value_le(value_minus(rmpy,lmpy), VALUE_ONE)) {
+    /* There may be one vertex on the left of rmp, lrmp, with a lrmpx
+       + b rmpy <= -c, lrmpx >= (-c - b rmpy -a -1)/(-a) */
+    Value lrmpx = value_div(value_uminus(value_plus(c, value_plus(value_mult(b, rmpy), value_plus(a,VALUE_ONE)))), value_uminus(a));
+    if(value_gt(lrmpx, lmpx) && value_lt(lrmpx, rmpx)) {
+      /* Two constraints defined by (lmp,lrmp) and (lrmp, rmp). test
+	 case slope02.c  */
+      Pvecteur nv = VECTEUR_UNDEFINED;
+      Pvecteur nv1 = vect_make_line(x, y, lmpx, lmpy, lrmpx, rmpy);
+      Pvecteur nv2 = vect_make(nv, y, VALUE_ONE, TCST);
+      vect_add_elem(&nv, TCST, value_uminus(rmpy));
+      Pcontrainte ineq1 = contrainte_make(nv1);
+      Pcontrainte ineq2 = contrainte_make(nv2);
+      contrainte_succ(ineq1) = ineq2;
+      ineq = ineq1;
+    }
+    else if(value_eq(lrmpx, rmpx)) {
+      /* Only one constraint defined by : test case slope03.c  */
+      Pvecteur nv = vect_make_line(x, y, lmpx, lmpy, lrmpx, rmpy);
+      ineq = contrainte_make(nv);
+    }
+  }
+  else {
+    /* The slope is sufficiently large to find three constraints? */
+    ;
+  }
+  return ineq;
+}
+
+/* If at least one of the coefficients of constraint v == ax+by<=c are
+ * greater that the intervals of the bounding box, reduce them to be
+ * at most the the size of the intervals.
+ *
+ * This is similar to a Gomory cut, but we apply the procedure to 2-D
+ * constraints only.
+ *
+ * Three steps:
+ *
+ * 0. Check eligibility: 2-D constraint and either |a|>y_max-y_min or
+ * |b|>x_max-x_min. Assume or ensure that gcd(a,b)=1. This step must
+ * be performed by the caller. 
+ *
+ * 1. Perform a change of basis M to obtain (x,y)^t = M(x',y')^t and
+ * (a',b') = (a,b)M with b'>-a'>0
+ *
+ * 2. Simplify constraint a'x'+b'y'<=c. The corresponding line is in
+ * the first quadrant and its slope is strictly less than 1 and
+ * greater than 0. Up to three new constraints may be generated.
+ *
+ * 3. Apply M^-1 to the new contraints on (x',y') in order to obtain
+ * constraints on x and y, and return the constraint list.
+ */
+//static 
+Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
+							 Pvecteur l,
+							 Pvecteur lb,
+							 Pvecteur u,
+							 Pvecteur ub)
+{
+  Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+  Pvecteur nv = VECTEUR_NUL; // normalized constraint
+  int cb; // memorize the change of basis
+  /* Beware of overflows if you compute the widths of these intervals... */
+  Value x_min=VALUE_MIN, x_max=VALUE_MAX, y_min=VALUE_MIN, y_max=VALUE_MAX;
+
+  assert(eligible_for_coefficient_reduction_with_bounding_box_p(v, l, lb, u, ub));
+
+  compute_x_and_y_bounds(v, l, lb, u, ub, &x_min, &x_max, &y_min, &y_max);
+
+  nv = new_constraint_for_coefficient_reduction_with_bounding_box(v, &cb,
+								  &x_min, &x_max,
+								  &y_min, &y_max);
+
+  ineq =
+    small_positive_slope_reduce_coefficients_with_bounding_box(nv, x_min, x_max,
+							       y_min, y_max);
+
+  /* Perform the reverse change of basis cb on constraints in
+     constraint list ineq */
+  return ineq;
+}
+							 
+
 /* Eliminate trivially redundant integer constraint using a O(n x d^2)
  * algorithm, where n is the number of constraints and d the
  * dimension. And possibly detect an non feasible constraint system
@@ -363,11 +914,11 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	   after the test on the sign of the coefficient. */
 	if(value_pos_p(c)) { /* upper bound */
 	  Value b_var = -value_pdiv(k,c);
-	  update_lower_or_upper_bound(&u, &ub, var, b_var, value_pos_p(c));
+	  update_lower_or_upper_bound(&u, &ub, var, b_var, !value_pos_p(c));
 	}
 	else { /* lower bound */
 	  Value b_var = -value_pdiv(k,c);
-	  update_lower_or_upper_bound(&l, &lb, var, b_var, value_pos_p(c));
+	  update_lower_or_upper_bound(&l, &lb, var, b_var, !value_pos_p(c));
 	}
       }
     }
@@ -375,8 +926,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     /* Check that the bounding box is not empty because a lower bound
        is strictly greater than the corresponding upper bound. This
        could be checked above each time a new bound is defined or
-       redefined. */
+       redefined. Also, build the constant base, cb */
     Pvecteur vc;
+    Pvecteur cb = VECTEUR_NUL;
     for(vc=ub; !VECTEUR_UNDEFINED_P(vc) && !empty_p; vc=vecteur_succ(vc)) {
       Variable var = vecteur_var(vc);
       Value upper = vect_coeff(var, u);
@@ -384,6 +936,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	Value lower = vect_coeff(var, l);
 	if(lower>upper)
 	  empty_p = true;
+	else if(lower==upper) {
+	  vect_add_elem(&cb, var, VALUE_ONE);
+	}
       }
     }
 
@@ -431,11 +986,22 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     }
 
     if(!empty_p) {
-      /* Check inequalities for redundancy with respect to ub and lb, if
-	 ub and lb contain a minum of information */
+      /* Simplify equalities using cb and l */
+      if(base_dimension(cb) >=1) {
+	for(eq=sc_egalites(ps); !CONTRAINTE_UNDEFINED_P(eq);
+	    eq = contrainte_succ(eq))
+	  simplify_constraint_with_bounding_box(eq, cb, l, false);
+      }
+
+      /* Check inequalities for redundancy with respect to ub and lb,
+	 if ub and lb contain a minum of information. Also simplify
+	 constraints using cb when possible. */
       if(base_dimension(ub)+base_dimension(lb) >=1) {
 	for(eq=sc_inegalites(ps);
 	    !CONTRAINTE_UNDEFINED_P(eq) && !empty_p; eq = contrainte_succ(eq)) {
+
+	  simplify_constraint_with_bounding_box(eq, cb, l, true);
+
 	  Pvecteur v = contrainte_vecteur(eq);
 	  int n = vect_size(v);
 	  Pvecteur vc;
@@ -446,13 +1012,8 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	  bool ub_failed_p = false; /* the bounding box does not contain
 				    enough information to check
 				    redundancy with the upper bound */
+
 	  /* Try to compute the bounds nub and nlb implied by the bounding box */
-	  /* We should not stop on double failure but go to the end
-	     and substitute constant variables on the fiable,
-	     computing a delta value to be added to the constant term
-	     and setting the variable coefficient to zero; we should
-	     have not only lb and ub but also cb, the base for the
-	     constant terms */
 	  for(vc=v; !VECTEUR_NUL_P(vc) && !(ub_failed_p&&lb_failed_p);
 	      vc = vecteur_succ(vc)) {
 	    Variable var = vecteur_var(vc);
@@ -463,7 +1024,6 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 						    right hand side of the
 						    inequality */
 	    }
-	    /* We could check here if var has a constant value */
 	    else {
 	      if(value_pos_p(c)) { /* an upper bound of var is needed */
 		if(vect_coeff(var, ub)!=0) { /* the value macro should be used */
@@ -501,8 +1061,6 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	      }
 	    }
 	  }
-	  /* We should update here the constant term with delta, the
-	     value accumulated with the constant terms */
 
 	  /* If the new bound nub is tighter, nub <= ob, ob-nub >= 0 */
 	  if(!ub_failed_p) {
@@ -539,6 +1097,7 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	}
       }
     }
+    vect_rm(cb);
   }
 
   if(empty_p) {
@@ -547,6 +1106,10 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     sc_rm(ps);
     ps = ns;
   }
+
+  /* Free all elements of the bounding box */
+  vect_rm(l), vect_rm(lb), vect_rm(u), vect_rm(ub);
+
   return ps;
 }
 
@@ -609,7 +1172,7 @@ Psysteme sc_normalize(Psysteme ps)
      * transformer_projection(). But it is not sufficient for type03.
      */
     static int francois=1;
-    if(francois==1)
+    if(francois==1 && ps && !sc_empty_p(ps) && !sc_rn_p(ps))
       ps = sc_bounded_normalization(ps);
 
     /* FI: this takes (a lot of) time but I do not know why: O(n^2)? */
@@ -975,7 +1538,10 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		    */
 		    
 		    /* We need an exact copy of ps to have equalities
-		     * and inqualities in the very same order
+		     * and inequalities in the very same order
+		     *
+		     * FI: may have is has been fixed with sc_dup() by
+		     * now... see comments in sc_copy()
 		     */
 		    new_ps = sc_copy(ps);
 		    proj_ps = sc_copy(new_ps);
@@ -1175,7 +1741,8 @@ Psysteme sc_strong_normalize_and_check_feasibility
 
 	    if(!feasible_p) {
 		sc_rm(new_ps);
-		new_ps = SC_EMPTY;
+		//new_ps = SC_EMPTY; interpreted as R^n by the caller sometimes...
+		new_ps = sc_empty(BASE_NULLE);
 	    }
 	    else {
 		sc_base(new_ps) = sc_base(ps);

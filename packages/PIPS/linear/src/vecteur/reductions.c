@@ -550,6 +550,10 @@ bool vect_check(Pvecteur v)
   return consistent;
 }
 
+/* To ease retrieval of vect_check() */
+bool vect_consistent_p(Pvecteur v) { return vect_check(v);}
+
+
 /* @return whether one coef in v is greater than abs(val), but CST
  * @param v vecteur being scanned
  * @param val maximum absolute value allowed, or 0 to ignore

@@ -558,14 +558,163 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 
     return sc;
 }
+
+/* Check if the Value vector N is in the submatrix R[b:e-1]
+ *
+ * Used to avoid adding duplicate vertices.
+ */
+static bool duplicate_vertex_p(Value ** R, int b, int e, int d, Value * N)
+{
+  bool duplicate_p = true;
+  int i, j;
 
+  for(i=b;i<e && duplicate_p;i++)
+    for(j=0; j< d && duplicate_p;j++)
+      duplicate_p = (R[i][j]==N[j]);
+  return duplicate_p;
+}
 
+/* Evaluate  that the point defined by the value array N meets the
+   sparse equality defined by v and b. See also contrainte_eval(). */
+static Value eval_constraint_with_vertex(Pvecteur v,
+					 Pbase b,
+					 int d,
+					 Value * N)
+{
+  Pvecteur cv = VECTEUR_UNDEFINED;
+  Value k = VALUE_ZERO;
+  int i;
+
+  /* debugging information */
+  static int francois_debug=0;
+  if(francois_debug) {
+    extern char * pips_region_user_name(void *);
+    fprintf(stderr, "Constraint:\n");
+    vect_print(v, pips_region_user_name);
+    fprintf(stderr, "Basis:\n");
+    vect_print(b, pips_region_user_name);
+    fprintf(stderr, "Vertex:\n");
+    for(i=0;i<d;i++)
+      fprintf(stderr, "N[%d]=%ld, ", i, (long int) N[i]);
+    fprintf(stderr, "\n");
+  }
+
+  for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+    Variable var = vecteur_var(cv);
+    Value coeff = vecteur_val(cv);
+    if(var==TCST) {
+      value_addto(k, coeff);
+    }
+    else {
+      int rank = rank_of_variable(b, var);
+      assert(0<rank && rank<d-1);
+      Value val = value_pdiv(N[rank],N[d-1]); 
+      value_addto(k, value_direct_multiply(coeff, val));
+    }
+  }
+
+  return k;
+}
+
+/* Check that the point defined by the value array N meets the
+   sparse equality defined by v and b */
+static bool vertex_meets_equality_p(Pvecteur v, Pbase b, int d, Value * N)
+{
+  Value k = eval_constraint_with_vertex(v, b, d, N);
+  bool meets_p = value_zero_p(k);
+
+  return meets_p;
+}
+
+/* Check that the point defined by the value array N meets the
+   sparse inequality defined by v and b */
+static bool vertex_meets_inequality_p(Pvecteur v, Pbase b, int d, Value * N)
+{
+  Value k = eval_constraint_with_vertex(v, b, d, N);
+  bool meets_p = value_negz_p(k);
+
+  return meets_p;
+}
+
+/* Check that the point defined by the value array N meets the
+   sparse inequality defined by v and b */
+static bool vertex_strictly_meets_inequality_p(Pvecteur v, Pbase b, int d, Value * N)
+{
+  Value k = eval_constraint_with_vertex(v, b, d, N);
+  bool meets_p = value_neg_p(k);
+
+  return meets_p;
+}
+
+/* Check if the Value vector N is inside the set of integer points defined by sc
+ *
+ * Used to avoid adding redundant vertices.
+ */
+static bool redundant_vertex_p(Psysteme sc, int d, Value * N, bool strict_p)
+{
+  bool redundant_p = true;
+  Pbase b = sc_base(sc);
+  Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+  assert(base_dimension(b)==d-2);
+
+  for(eq=sc_egalites(sc);
+      !CONTRAINTE_UNDEFINED_P(eq) && redundant_p;
+      eq = contrainte_succ(eq)) {
+    Pvecteur v = contrainte_vecteur(eq);
+    redundant_p = vertex_meets_equality_p(v, b, d, N);
+  }
+
+  for(eq=sc_inegalites(sc);
+      !CONTRAINTE_UNDEFINED_P(eq) && redundant_p;
+      eq = contrainte_succ(eq)) {
+    Pvecteur v = contrainte_vecteur(eq);
+    if(strict_p)
+      redundant_p = vertex_strictly_meets_inequality_p(v, b, d, N);
+    else
+      redundant_p = vertex_meets_inequality_p(v, b, d, N);
+  }
+
+  return redundant_p;
+}
+
+/* Returns the convex hull sc of two constraint systems, sc1 and
+ * sc2. All these constraint systems are represented using a sparse
+ * representation.
+ *
+ * Each constraint systems is first translated into a dense
+ * representation and converted to its dual representation, the
+ * generating systems a1 or a2, using a dense representation,
+ * i.e. matrices. The union of a1 and a2 is performed using the matrix
+ * representation and its result, the generating system a, is
+ * converted back to constraints, using a dense representation, and
+ * then is translated into a sparse representation sc. A (integer
+ * based?) redundance elimination phase is then (unfortunately?) applied
+ * (sc_normalize).
+ *
+ * Two extra dimensions are added: one for the constant terms and the
+ * second one to transform any polyhedron into a zero-pointed cone so
+ * as to have only rays to handle. See INRIA Tech Report 785 by Doran
+ * K. Wilde for motivation and explanations.
+ *
+ * Overflows (and arithmetic errors) can occur during the process, but
+ * they are caught and a correct result is returned.
+ *
+ * Note: sc1 and sc2 must have the exact same basis for the convex
+ * hull and the conversion to the dense representation to be meaningfull.
+ */
 Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 {
     int nbrows1 = 0;
     int nbcolumns1 = 0;
     int nbrows2 = 0;
     int nbcolumns2 = 0;
+    Pbase b1 = sc_base(sc1);
+    Pbase b2 = sc_base(sc2);
+
+    /* Make sure that the two sparse constraint systems are in the
+       same space, with the same bases */
+    assert(bases_strictly_equal_p(b1, b2));
 
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
@@ -685,17 +834,32 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     sc->dimension = vect_size(sc->base);
 
     if (A1->NbRays == 0) {
-	a= Polyhedron2Constraints(A2); 
+	a = Polyhedron2Constraints(A2); 
     } else  if (A2->NbRays == 0) {
-	a= Polyhedron2Constraints(A1); 
+	a = Polyhedron2Constraints(A1); 
     } else {
-
+      /* Keep track of the different kinds of generating elements copied in a:
+       *
+       * lines of A1 in [0:l1-1]
+       * lines of A2 in [l1:l2-1]
+       *
+       * rays of A1 in [l2][r1-1]
+       * rays of A2 in [r1][r2-1]
+       *
+       * vertices of A1 in [r2][v1-1]
+       * vertices of A2 in [v1][v2-1]
+       *
+       * Each of these subsets may be empty.
+       *
+       * We have 0<=l1<=l2<=r1<=r2<=v1<=v2
+       */
+      int l1 = 0, l2 = 0, r1 = 0, r2 = 0, v1 = 0, v2 = 0;
 	Dimension = A1->Dimension+2;
 	a = Matrix_Alloc(A1->NbRays + A2->NbRays,Dimension);
 
 	/* Tri des contraintes de A1->Ray et A2->Ray, pour former 
 	   l'union de ces contraintes dans un meme format 
-	   Line , Ray , vertex */
+	   Line , Ray , Vertex */
 	cp = 0;
 	i1 = 0;
 	i2 = 0;
@@ -704,41 +868,52 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 		a->p[cp][j] = A1->Ray[i1][j]; 
 	    cp++; i1++; 
 	}
-
+	l1 = cp;
 	while (i2 < A2->NbRays && A2->Ray[i2][0] ==0) {
 	    for (j=0 ; j < Dimension ; j++) 
 		a->p[cp][j] = A2->Ray[i2][j];
 	    cp++; i2++;
 	}
-
+	l2 = cp;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] ==1 
 	       && A1->Ray[i1][Dimension-1]==0) {
 	    for (j=0; j < Dimension ; j++) 
 		a->p[cp][j] = A1->Ray[i1][j]; 
 	    cp++; i1++; 
 	}
-
+	r1 = cp;
 	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
 	       && A2->Ray[i2][Dimension-1]==0) {
 	    for (j=0; j < Dimension ; j++) 
 		a->p[cp][j] = A2->Ray[i2][j]; 
 	    cp++; i2++;
 	}
-
+	r2 = cp;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] == 1 
 	       && A1->Ray[i1][Dimension-1]!= 0) {
+	  /* Insert vertex of sc1 if it is not strictly redundant with sc2 */
+	  if(true || !redundant_vertex_p(sc2, Dimension, A1->Ray[i1], true)) {
 	    for (j=0; j < Dimension ; j++)  
 		a->p[cp][j] = A1->Ray[i1][j]; 
-	    cp++; i1++; 
+	    cp++;
+	  }
+	  i1++; 
 	}
-
+	v1 = cp;
 	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
 	       && A2->Ray[i2][Dimension-1]!=0) {
+	  /* Insert vertex of sc2 if it is not also a vertex of s1 and
+	     is not redundant with sc1 */
+	  if(true || !duplicate_vertex_p(a->p, r2, v1, Dimension, A2->Ray[i2])
+	     && !redundant_vertex_p(sc1, Dimension, A2->Ray[i2], false)) {
 	    for (j=0; j < Dimension ; j++)  
-		a->p[cp][j] = A2->Ray[i2][j]; 
-	    cp++;  i2++;
+	      a->p[cp][j] = A2->Ray[i2][j]; 
+	    cp++;
+	  }
+	  i2++;
 	}
-  
+	v2 = cp;
+
 	my_Polyhedron_Free(&A1);
 	my_Polyhedron_Free(&A2);
 	
@@ -770,7 +945,8 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
     return sc;
 }
-
+
+    /**/
 static Variable base_nth(Pbase b,size_t i) {
     while(i--) {
         b=vecteur_succ(b);
