@@ -162,6 +162,17 @@ bool transformer_is_empty_p(transformer t)
     s = (Psysteme) predicate_system(transformer_relation(t));
     return sc_empty_p(s) && ENDP(transformer_arguments(t));
 }
+
+/* Check that transformer t is the canonical representation of the
+   whole afine space defined by its basis */
+bool transformer_is_rn_p(transformer t)
+{
+    Psysteme s;
+
+    pips_assert("transformer_identity_p", t != transformer_undefined);
+    s = (Psysteme) predicate_system(transformer_relation(t));
+    return sc_nbre_egalites(s)==0 && sc_nbre_inegalites(s)==0;
+}
 
 /* CHANGE THIS NAME: no loop index please, it's not directly linked
  * to loops!!!

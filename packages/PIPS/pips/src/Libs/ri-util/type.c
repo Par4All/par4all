@@ -2405,6 +2405,7 @@ bool logical_type_p(type t)
   return false;
 }
 
+/* return true whether `t' is a char or an unsigned char */
 bool char_type_p(type t)
 {
   bool is_char = false;
@@ -2413,7 +2414,7 @@ bool char_type_p(type t)
     basic b = variable_basic(type_variable(t));
     if (!basic_undefined_p(b) && basic_int_p(b)) {
       int i = basic_int(b);
-    is_char = (i==1); /* see words_basic() */
+    is_char = (i==1)||(i==11); /* see words_basic() */
     }
   }
   return is_char;
