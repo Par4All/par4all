@@ -257,7 +257,8 @@ transformer transformer_combine(transformer t1, transformer t2)
   }
   else if(transformer_is_rn_p(t2) && !ENDP(wvl) && arguments_equal_p(a2, wvl)) {
     if(transformer_is_empty_p(t1))
-      t1 == t1;
+      //t1 == t1;
+      ;
     else {
       /* not much to do since t2 is going to destroy all information
 	 in t1, except its domain */
