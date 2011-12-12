@@ -500,9 +500,7 @@ static void in_effects_of_forloop(forloop f, in_effects_context *ctxt)
   list lrw = convert_rw_effects(load_rw_effects_list(current),ctxt);
   list lin = effects_read_effects_dup(lrw);
   /* switch to MAY... */
-  MAP(EFFECT, e,
-      approximation_tag(effect_approximation(e)) = is_approximation_may,
-      lin);
+  effects_to_may_effects(lin);
   store_in_effects_list(current, lin);
   store_invariant_in_effects_list(current, NIL);
   reset_converted_rw_effects(&lrw, ctxt);
@@ -520,9 +518,7 @@ static void in_effects_of_whileloop(whileloop w, in_effects_context *ctxt)
   list lrw = convert_rw_effects(load_rw_effects_list(current), ctxt);
   list lin = effects_read_effects_dup(lrw);
   /* switch to MAY... */
-  MAP(EFFECT, e,
-      approximation_tag(effect_approximation(e)) = is_approximation_may,
-      lin);
+  effects_to_may_effects(lin);
   store_in_effects_list(current, lin);
   store_invariant_in_effects_list(current, NIL);
   reset_converted_rw_effects(&lrw, ctxt);

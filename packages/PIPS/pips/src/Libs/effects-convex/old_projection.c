@@ -268,6 +268,8 @@ void project_regions_along_loop_index(list l_reg, entity index, range l_range)
     debug_regions_consistency(l_reg);
 
 
+    /* Take care of loops with non-unit increment when must regions
+       are required */
     index = loop_regions_normalize(l_reg, index, l_range,
 				   &projection_of_index_safe,false,&sc_tmp);
 
@@ -968,7 +970,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
  * output   : nothing.
  * modifies : the initial region is projected along the variables in l_param.
  *            its approximation is systematically set to may.
- * comment  : overflow errors are trapped here. if it occurs, an empty region
+ * comment  : overflow errors are trapped here. if it occurs, a whole array region
  *           replaces the initial region.
  */
 void region_non_exact_projection_along_variables(region reg, list l_var)
@@ -987,7 +989,7 @@ void region_non_exact_projection_along_variables(region reg, list l_var)
 	{
 	    pips_debug(6, "initial region :\n");
 	    print_region(reg);
-	    debug(6, "", "variables along which the projection must be performed:\n");
+	    pips_debug(6, "variables along which the projection must be performed:\n");
 	    print_arguments(l_var);
 	}
 

@@ -172,6 +172,22 @@ text text_region(effect reg)
     return t_reg;
 }
 
+/* print the constraint system of a region
+ *
+ * Used for debugging, e.g. called from gdb
+ */
+void print_region_sc(effect r)
+{
+  descriptor d = effect_descriptor(r);
+  if(descriptor_none_p(d)) {
+    fprintf(stderr, "No descriptor\n");
+  }
+  else {
+    Psysteme sc = region_system(r);
+    sc_print(sc, (get_variable_name_t) pips_region_user_name);
+  }
+}
+
 
 /* text text_array_regions(list l_reg, string ifread, string ifwrite)
  * input    : a list of regions

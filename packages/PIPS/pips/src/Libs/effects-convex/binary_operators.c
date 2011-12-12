@@ -970,6 +970,12 @@ static effect regions_may_convex_hull(region r1, region r2)
  */
 static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
 {
+  /* FI->BC: beware of callers that do not perform
+     simplifications. Observed on Regions/chopped_square24.c where two
+     equalities are encoded as four inequalities because a constant is
+     divided by two. Maybe a function similar to
+     expression_to_transformer should be used to analyze subscript
+     expressions, if it is not already the case. */
   return cute_convex_union(ps1, ps2);
 }
 

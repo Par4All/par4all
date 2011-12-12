@@ -26,12 +26,12 @@ modules   -> to manipulate a set of PIPS modules.
 
 # Load IPython, be compatible with several versions ...
 try:
-	from IPython.Shell import IPShellEmbed as InteractiveShellEmbed
-	shell_params = { 'banner' : banner } # use a dictionnary to match the parameter name change
+    from IPython.Shell import IPShellEmbed as InteractiveShellEmbed
+    shell_params = { 'banner' : banner } # use a dictionary to match the parameter name change
 except:
-	from IPython.frontend.terminal.embed import InteractiveShellEmbed
-	shell_params = { 'banner1' : banner }
-	InteractiveShellEmbed.expose_magic = InteractiveShellEmbed.define_magic # use python magic for method aliasisng
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    shell_params = { 'banner1' : banner }
+    InteractiveShellEmbed.expose_magic = InteractiveShellEmbed.define_magic # use python magic for method aliasisng
 
 import sys
 
@@ -59,8 +59,15 @@ def load_pyps(self, filename):
         # We cannot get the exception because of 2.5 compliancy:
         print("Error while loading PyPS file" )
 
+try:
+    import IPython.ipapi
+    ip = IPython.ipapi.get()
+except:
+    ip = ipshell # once again, manage several IPython versions ...
+
 # Add a new magic function:
-ipshell.expose_magic('load', load_pyps)
+ip.expose_magic('load', load_pyps)
+
 
 # Call the iPython shell itself:
 ipshell()

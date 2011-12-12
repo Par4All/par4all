@@ -304,11 +304,18 @@ transformer context;
     return(l_reg);
 }
 
-/* adapted from transformer_normalize
+/* adapted from transformer_normalize... which may have changed since
+ * then...
+ *
+ * FI: Normalization and redundancy elimination are often considered
+ * equivalent and used accordingly. Normalization is much more
+ * expensive: its purpose is not only to minimize the number of
+ * constraints, but also to rewrite them in a as canonical as possible
+ * way to simplify non-regression tests and to be as user-friendly as
+ * possible. Currently, region_sc_normaliza() is likely to be called instead of region_sc_redundancy_elimination(), if ever this function exists.
  */
 Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 {
-
     if (!sc_empty_p(sc_reg))
     {
 	Pbase b = base_dup(sc_base(sc_reg));
@@ -338,6 +345,9 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	     * could always be detected in a trivial way after propagating
 	     * values from equations into inequalities.
 	     */
+	    // FI: not really effective
+	    // sc_reg = sc_bounded_normalization(sc_reg);
+	    // sc_reg = sc_bounded_normalization(sc_reg);
 	    sc_nredund(&sc_reg);
 	    break;
 
@@ -1795,6 +1805,14 @@ expression make_phi_expression(int n)
 bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
+    if(expression_range_p(expr)) {
+        pips_assert("inequality with respect to a range has no meaning",is_eg);
+        range r =expression_range(expr);
+        bool must_p = sc_add_phi_equation(psc, range_upper(r), dim, false, is_phi_first);
+        must_p &= sc_add_phi_equation(psc, range_lower(r), dim, false, !is_phi_first);
+        return must_p;
+    }
+    else {
   normalized nexpr = NORMALIZE_EXPRESSION(expr);
 
   bool must_p = false; /* Do we capture the semantics of the
@@ -1937,6 +1955,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
   pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
   *psc = sc;
   return must_p;
+    }
 }
 
 
