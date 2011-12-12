@@ -262,15 +262,15 @@ int main(int argc, char *argv[])
                in[i][j][k].im = i*j+k;
             }
 
-//  <in[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, i==14, j==13, k==12, rg==13,
+//  <in[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, i==14, j==13, k==12, rg==13,
 //    th==14, v==12}>
-//  <in[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1+1<=th, 0<=PHI2,
-//    PHI2+1<=rg, 0<=PHI3, PHI3+1<=v, i==14, j==13, k==12, rg==13,
+//  <in[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1<=13, 0<=PHI2,
+//    PHI2<=12, 0<=PHI3, PHI3<=11, i==14, j==13, k==12, rg==13,
 //    th==14, v==12}>
-//  <pow[PHI1].im-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
+//  <pow[PHI1].im-W-EXACT-{0<=PHI1, PHI1<=13, i==14, j==13, k==12,
 //    rg==13, th==14, v==12}>
-//  <pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1+1<=th, i==14, j==13, k==12,
+//  <pow[PHI1].re-W-EXACT-{0<=PHI1, PHI1<=13, i==14, j==13, k==12,
 //    rg==13, th==14, v==12}>
 //  <rg-R-EXACT-{}>
 //  <th-R-EXACT-{}>

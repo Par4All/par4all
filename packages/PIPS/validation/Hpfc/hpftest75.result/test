@@ -399,8 +399,8 @@
          CALL HPFC REAL4 BUFUPK
          ALPHA2 = 5
          ALPHA1 = 5
-         LALPHA1 = ALPHA1
-         LALPHA2 = ALPHA2-3*PSI1+3
+         LALPHA1 = 5
+         LALPHA2 = 2
          BUF INDEX = BUF INDEX+1
          A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
 ! end of collect
@@ -586,8 +586,8 @@
             SEND NOT INITIALIZED = .TRUE.
             ALPHA2 = 5
             ALPHA1 = 5
-            LALPHA1 = ALPHA1
-            LALPHA2 = ALPHA2-3*PSI1+3
+            LALPHA1 = 5
+            LALPHA2 = 2
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = A_2(LALPHA1,LALPHA2)
             CALL HPFC REAL4 BUFPCK

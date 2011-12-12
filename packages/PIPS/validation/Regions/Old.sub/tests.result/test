@@ -24,8 +24,8 @@ C  <A(PHI1)-W-MAY-{PHI1==N}>
 C     TWO BRANCHES WITH THE SAME ARRAY ELEMENTS ACCESSED
       IF (N.EQ.3) THEN                                                  0015
 
-C  <A(PHI1)-R-EXACT-{PHI1==N, N==3}>
-C  <A(PHI1)-W-EXACT-{PHI1==N, N==3}>
+C  <A(PHI1)-R-EXACT-{PHI1==3, N==3}>
+C  <A(PHI1)-W-EXACT-{PHI1==3, N==3}>
 
          A(N) = A(N)+N                                                  0016
       ELSE

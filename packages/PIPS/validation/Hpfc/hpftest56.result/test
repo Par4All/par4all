@@ -320,7 +320,7 @@ c end of the common declarations
          DO ALPHA1 = 5*PSI1-4, 5*PSI1
             ALPHA2 = 2
             LALPHA1 = ALPHA1-5*PSI1+5
-            LALPHA2 = ALPHA2
+            LALPHA2 = 2
             BUF INDEX = BUF INDEX+1
             A(ALPHA1,ALPHA2) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
@@ -373,7 +373,7 @@ c end of the common declarations
       DO ALPHA1 = 5*PSI1-4, 5*PSI1
          ALPHA2 = 2
          LALPHA1 = ALPHA1-5*PSI1+5
-         LALPHA2 = ALPHA2
+         LALPHA2 = 2
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1,LALPHA2)
       ENDDO

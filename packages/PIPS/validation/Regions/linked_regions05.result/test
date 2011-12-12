@@ -145,7 +145,7 @@ int main()
    int N = 11;
    double A[N][N];
 
-//  <A[PHI1][PHI2]-W-MAY-{PHI1<=10, PHI2<=10PHI1+9, 0<=PHI2, PHI2<=10,
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=10, 10PHI2<=PHI1+99, 0<=PHI2,
 //    N==11}>
 
 

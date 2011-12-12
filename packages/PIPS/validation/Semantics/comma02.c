@@ -1,6 +1,6 @@
-// check use of constant increment and loop bound by semantics analysis
+// check for modelization of the comma operator
 
-//#include <stdio.h>
+// #include <stdio.h>
 
 void comma02()
 {
@@ -10,7 +10,8 @@ void comma02()
 
   i = (j = 1, k = 2);
 
-  //printf("%d\n", i);
+  // Here, i==2
+  // printf("%d\n", i);
   i = 0;
 }
 

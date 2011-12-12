@@ -10,26 +10,23 @@
             PSI2 = MY POS(2,2)
             PSI3 = MY POS(3,2)
             IF (MY LID.LE.8) THEN
-               DO TMP3 = 0, 1
-                  DO PSIp1 = PSI1+2*PSI3+4*TMP3-2, MIN(5, PSI1+2*PSI3
-     &            +4*TMP3-2)
-                     T LID = 2*PSIp1+PSIp2-2
+               DO TMP3 = 0, (-PSI1-2*PSI3+7)/4
+                  PSIp1 = PSI1+2*PSI3+4*TMP3-2
+                  T LID = 2*PSIp1+PSIp2-2
 ! - broadcasting
-                     CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
-                     DO LALPHAp1 = 10*PSI2-9, 10*PSI2
-                        LALPHA1 = 5*LALPHAp1-50*PSI2+PSIp1+45
-                        BUF INDEX = BUF INDEX+1
-                        HPFC INTEGER4 BUFF(BUF INDEX) = A_1(LALPHA1)
-                     ENDDO
-                     DO PSIp2 = 1, 2
-                        T LID = 2*PSIp1+PSIp2-2
-                        IF (MY LID.NE.T LID) THEN
-                           CALL pvmfsend(NODE TIDS(T LID), 
-     &                     SEND CHANNELS(T LID), HPFC INFO)
-                           SEND CHANNELS(T LID) = SEND CHANNELS(T LID
-     &                     )+2
-                        ENDIF
-                     ENDDO
+                  CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
+                  DO LALPHAp1 = 10*PSI2-9, 10*PSI2
+                     LALPHA1 = 5*LALPHAp1-50*PSI2+PSIp1+45
+                     BUF INDEX = BUF INDEX+1
+                     HPFC INTEGER4 BUFF(BUF INDEX) = A_1(LALPHA1)
+                  ENDDO
+                  DO PSIp2 = 1, 2
+                     T LID = 2*PSIp1+PSIp2-2
+                     IF (MY LID.NE.T LID) THEN
+                        CALL pvmfsend(NODE TIDS(T LID), SEND CHANNELS
+     &                  (T LID), HPFC INFO)
+                        SEND CHANNELS(T LID) = SEND CHANNELS(T LID)+2
+                     ENDIF
                   ENDDO
                ENDDO
             ENDIF

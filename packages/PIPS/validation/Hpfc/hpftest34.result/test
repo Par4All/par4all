@@ -14,8 +14,7 @@
       PRINT *, 'hpftest34 running'
 ! collecting distributed variable B
       DO PSI1 = 1, 2
-         DO PSI2 = MAX(PSI1-1, HPFC DIVIDE(-3*PSI1+9, 4)), MIN(5+
-     &   HPFC DIVIDE(-4*PSI1, 3), PSI1+1)
+         DO PSI2 = 1, 2
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0

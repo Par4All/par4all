@@ -281,7 +281,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  T(j) {i==101, j==j#init+101, s==2, j#init+82<=0}
+//  T(j) {i==101, j==j#init+101, s==2, j<=19}
 
          j += i;
 

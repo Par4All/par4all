@@ -169,7 +169,7 @@ void ts_restructured(void)
       checking_error();
 
 //  T(f,i,n,s) {f==s-1, f#init==1, i+n==n#init+1, i#init==0,
-//    n#init==n0, s#init==1, 0<=f, f<=1, f+1<=i, i<=n#init+1}
+//    n#init==n0, s#init==1, 0<=f, f<=1, f+n<=n#init, 0<=n}
 
    if (n>0) {
 
@@ -202,7 +202,7 @@ void ts_restructured(void)
          checking_error();
 
 //  T(f,i,n,s) {f==s-1, f#init==0, i+n==n#init+1, i#init==1,
-//    n#init==n0, s#init==2, 0<=f, f<=1, 1<=f+n, f+n<=n#init}
+//    n#init==n0, s#init==2, 0<=f, f<=1, f+1<=i, i<=f+n#init}
 
       if (rand_b()) {
 
@@ -641,7 +641,7 @@ void ts_restructured(void)
 
             if (!(n>0&&s==2&&n>1))
 
-//  P(f,i,n,n0,s) {f==1, i==n0, n==1, s==2, 2<=n0}
+//  P(f,i,n,n0,s) {f==1, i==n0, n==1, s==2, 2<=i}
 
                deadlock();
 

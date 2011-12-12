@@ -1,4 +1,4 @@
-      program dead2
+      program dead3
 
       call pr(1)
 

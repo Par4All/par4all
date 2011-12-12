@@ -40,8 +40,8 @@ int main()
 
    old = 1;
 
-//  T(new,old,x,y,z) {new#init==0, old#init==1, y+z==x, x+z#init==y+z,
-//    x#init==0, y#init==0, x<=9, y<=x, 0<=y}
+//  T(new,old,x,y,z) {new#init==0, old#init==1, y+z==x, x#init==0,
+//    y#init==0, z#init==0, x<=9, y<=x, 0<=y}
 
 
    while (x<10) {
@@ -165,7 +165,7 @@ int main()
    }
 
 //  P(k,new,old,x,y,z) {new+old==1, x==10, y+z==10, 0<=new, new<=1,
-//    1<=new+z, new+z<=10}
+//    y<=new+9, new<=y}
 
    if (new==1&&old==0||new==0&&old==1)
 

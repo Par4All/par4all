@@ -733,7 +733,7 @@ void ts_restructured(void)
 
    if (x<n) goto l99999;
 
-//  P(c,m,n,x,y) {c==0, n==0, x==0, y==0, 0<=m, m<=n}
+//  P(c,m,n,x,y) {c==0, m==0, n==0, x==0, y==0}
 
    if (y<m) {
    }

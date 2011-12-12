@@ -7,8 +7,8 @@ C  T() {}
       DIMENSION U(1), X(1), Y(1)
 
 C  T(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {K==LK, KU+NU==KN,
-C    KU==LI+1, 2KU==LJ+2, 0<=K, L<=K, 2L<=K+2, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    KU==LI+1, 2KU==LJ+2, 0<=K, L<=K, 2L<=K+2, 2M+NU+1<=KN+2L,
+C    M+NU+2<=KN+L, NU+1<=KN, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -77,10 +77,10 @@ C (0,11)
 C
       DO 100 K = 0, LK-1                                                0018
 
-C  T(I,I11,I12,I21,I22) {I+I11==I12, I11+KU==I12+1, I21+N1==I22,
-C    KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11, 1<=I21, 0<=K, K+1<=LK,
-C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N,
-C    2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C  T(I,I11,I12,I21,I22) {I+I11==I12, I+NU==KN-1, I==KU-1, I==LI,
+C    2I==LJ, I21+N1==I22, 0<=I, 2M<=I+2L, M+1<=I+L, 1<=I11, 1<=I21,
+C    0<=K, K+1<=LK, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N,
+C    2N1<=N, N<=2N1+1}
 
 C (0,12)
 C        BEGIN BLOCK

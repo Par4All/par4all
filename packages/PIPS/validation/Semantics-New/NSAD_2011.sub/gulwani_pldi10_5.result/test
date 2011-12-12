@@ -285,9 +285,9 @@ void ts_restructured(void)
             checking_error();
       }
 
-//  T(f,i,j,n,s) {f==0, f#init+n==n#init, i==j-1,
-//    i#init+2n==j#init+2n#init-1, n==n0, s==2, s#init==2, 0<=i,
-//    j#init+2n#init<=i+2n+1, i+1<=n, n<=n#init}
+//  T(f,i,j,n,s) {f==0, 2f#init+j#init==i#init+1, f#init+n==n#init,
+//    i==j-1, n==n0, s==2, s#init==2, 0<=f#init, 2f#init+j#init<=i+1,
+//    0<=i, i+1<=n}
 
       while (rand_b())
 

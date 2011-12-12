@@ -243,7 +243,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  T(x) {d==-1, x==x#init-1, 2<=x#init, x#init<=999}
+//  T(x) {d==-1, x==x#init-1, 1<=x, x<=998}
 
          x += d;
 

@@ -254,7 +254,7 @@ void ts_restructured(void)
 
          v2 = 0;
 
-//  T(i2) {i2==m, i2#init==0, v2==0, i1<=n, 1<=m, 1<=n, 1<=v1}
+//  T(i2) {i2==m, i2#init==0, v2==0, i1<=n, 1<=i2, 1<=n, 1<=v1}
 
          i2 += m;
 
