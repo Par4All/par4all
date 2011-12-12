@@ -12,7 +12,7 @@ void out1()
 
    for(j = 0; j <= 0; j += 1) {
 
-//  <a[PHI1]-OUT-EXACT-{PHI1==j, j==0}>
+//  <a[PHI1]-OUT-EXACT-{PHI1==0, j==0}>
 
       a[j] = 1;
 
