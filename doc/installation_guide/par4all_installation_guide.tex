@@ -116,6 +116,23 @@ packages are needed:
   \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
   \texttt{git}, \texttt{wget}
 \end{quote}
+In Ubuntu 11.10 there is a bug in the \texttt{libtinfo-dev} and
+\texttt{libtinfo5} packages that prevents \texttt{tpips} from being
+compiled. If you are really brave, you can try to download manually the
+Debian packages and force their installation with: {\small
+\begin{verbatim}
+wget -nd http://ftp.us.debian.org/debian/pool/main/n/ncurses/libtinfo-dev_5.9-4_amd64.deb
+sudo dpkg --force-depends -i libtinfo-dev_5.9-4_amd64.deb
+wget -nd http://http.us.debian.org/debian/pool/main/n/ncurses/libtinfo5_5.9-4_amd64.deb
+sudo dpkg -i libtinfo5_5.9-4_amd64.deb
+\end{verbatim}
+}%
+The links drom Debian/unstable are expected to change. So look at
+\url{http://packages.debian.org/sid/amd64/libtinfo5/download} and
+\url{http://packages.debian.org/sid/amd64/libtinfo-dev/download}.  See
+\url{https://bugs.launchpad.net/ubuntu/+source/ncurses/+bug/900635} for
+the bug report.
+
 
 To compile \Apfa with Fedora Core 15, 14 or 13, the following additional
 packages are needed:
