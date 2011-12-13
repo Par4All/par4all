@@ -60,6 +60,30 @@
 
 bool live_in_summary_paths_engine(const char* module_name)
 {
+  list l_glob = NIL, l_loc = NIL;
+  statement module_stat;
+
+  set_current_module_entity(module_name_to_entity(module_name));
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, true) );
+  module_stat = get_current_module_statement();
+
+  (*effects_computation_init_func)(module_name);
+
+  set_live_in_paths((*db_get_live_in_paths_func)(module_name));
+
+  l_loc = load_live_in_paths_list(module_stat);
+
+  l_glob = (*effects_local_to_global_translation_op)(l_loc);
+
+  (*db_put_live_in_summary_paths_func)(module_name, l_glob);
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  reset_live_in_paths();
+
+  (*effects_computation_reset_func)(module_name);
+
   return true;
 }
 
