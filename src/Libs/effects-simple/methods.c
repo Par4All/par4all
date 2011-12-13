@@ -78,6 +78,12 @@ DB_NOPUT_SE(simple_invariant_in_effects)
 DB_GETPUT_LS(simple_summary_in_effects, IN_SUMMARY_EFFECTS)
 DB_GETPUT_LS(simple_summary_out_effects, OUT_SUMMARY_EFFECTS)
 
+DB_GETPUT_SE(simple_live_in_paths, LIVE_IN_PATHS)
+DB_GETPUT_SE(simple_live_out_paths, LIVE_OUT_PATHS)
+DB_GETPUT_LS(simple_live_in_summary_paths, LIVE_IN_SUMMARY_PATHS)
+DB_GETPUT_LS(simple_live_out_summary_paths, LIVE_OUT_SUMMARY_PATHS)
+
+
 void
 set_methods_for_proper_references()
 {
@@ -586,6 +592,23 @@ void set_methods_for_inout_effects(const char* module_name __attribute__ ((unuse
   */
 }
 
+void set_methods_for_live_paths(const char* module_name __attribute__ ((unused)))
+{
+  set_methods_for_simple_effects();
+
+  db_get_live_in_paths_func = db_get_simple_live_in_paths;
+  db_put_live_in_paths_func = db_put_simple_live_in_paths;
+
+  db_get_live_out_paths_func = db_get_simple_live_out_paths;
+  db_put_live_out_paths_func = db_put_simple_live_out_paths;
+
+  db_get_live_in_summary_paths_func = db_get_simple_live_in_summary_paths;
+  db_put_live_in_summary_paths_func = db_put_simple_live_in_summary_paths;
+
+  db_get_live_out_summary_paths_func = db_get_simple_live_out_summary_paths;
+  db_put_live_out_summary_paths_func = db_put_simple_live_out_summary_paths;
+}
+
 void reset_methods_for_inout_effects()
 {
   /*
@@ -593,6 +616,7 @@ void reset_methods_for_inout_effects()
   free_value_mappings();
   */
 }
+
 
 void set_methods_for_rw_effects_prettyprint(const char* module_name __attribute__ ((unused)))
 {
@@ -608,6 +632,14 @@ void set_methods_for_inout_effects_prettyprint(const char* module_name __attribu
   effects_prettyprint_func = print_effects;
   effect_prettyprint_func = print_effect;
   effects_to_text_func = simple_inout_effects_to_text;
+}
+
+void set_methods_for_live_paths_prettyprint(const char* module_name __attribute__ ((unused)))
+{
+  set_action_interpretation(ACTION_LIVE, ACTION_WRITE);/* Live paths are read paths */
+  effects_prettyprint_func = print_effects;
+  effect_prettyprint_func = print_effect;
+  effects_to_text_func = simple_live_paths_to_text;
 }
 
 void reset_methods_for_effects_prettyprint(const char* module_name __attribute__ ((unused)))
