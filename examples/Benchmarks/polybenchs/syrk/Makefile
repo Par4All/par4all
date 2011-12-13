@@ -1,4 +1,4 @@
-TARGET=syrk
+LOCAL_TARGET=syrk
 SIZE_PARAMS=-DY=256 -DX=256
 
 include ../bench.mk

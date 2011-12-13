@@ -1,4 +1,4 @@
-TARGET=2mm
+LOCAL_TARGET=2mm
 
 
 include ../bench.mk

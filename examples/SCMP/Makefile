@@ -1,8 +1,8 @@
 # A GNU makefile to run a demo of Par4All on Jacobi application excerpt
 
-TARGET= data_flow01
+LOCAL_TARGET= data_flow01
 
-SOURCES= $(TARGET:=.c)
+SOURCES= $(LOCAL_TARGET:=.c)
 
 
 default:
@@ -11,7 +11,7 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo : $(TARGET)_scmp
+demo : $(LOCAL_TARGET)_scmp
 
 %_scmp : %.c
 	p4a --scmp -p $* $<
