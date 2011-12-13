@@ -1,9 +1,9 @@
 # A GNU makefile to run a demo of Par4All on Hyantes application 
 
-TARGET= hyantes-static-99
+LOCAL_TARGET= hyantes-static-99
 LDLIBS+= -lm
 
-SOURCES= $(TARGET:=.c)
+SOURCES= $(LOCAL_TARGET:=.c)
 
 RUN_ARG=Rhone-alpesXYLongLat_pop.txt 1.1 32 4 35 0.01 40 > output_$*
 
