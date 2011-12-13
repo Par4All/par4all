@@ -62,39 +62,77 @@ on \PfaAllInstallationHTDOC.
 
 You can install \Apfa in different ways, more or less automatic. The easiest
 way to install \Apfa is to use update manager or tarball files. If you are
-interested in a more advanced installation from the sources, you can clone 
-the \Apfa \Agit repository.
+interested in a more advanced installation from the sources, you can clone
+the \Apfa{} \Agit repository.
 
-This document describes these different ways of installing \Apfa as well as 
-the prerequisites of the installation and the way to verify that your installation
-is correctly done.
+This document describes these different ways of installing \Apfa as well
+as the prerequisites of the installation and the way to verify that your
+installation is correctly done.
+
 
 \section{Requirements}
 \label{sec:requirements}
 
-Current version of \Apfa should work on any \texttt{GNU/Linux} distribution, especially Debian, 
-Ubuntu and Fedora.
+Current version of \Apfa should work on any \texttt{GNU/Linux}
+distribution, especially Debian, Ubuntu and Fedora.
+
 
 \subsection{Packages needed to build and run Par4All}
 \label{sec:pack-need-build}
 
-The following packages need to be installed especially if you use
-a less automatic way of installation such as a tarball file, 
-or if you install from the sources.
+% To ease copy/paste:
+% libncurses5 libreadline5 python python-ply gfortran
+
+To run \Apfa with Debian or Ubuntu, the following packages are needed:
+\begin{quote}
+  \texttt{gfortran}, \texttt{gnuplot}, \texttt{ipython},
+  \texttt{libmpfr-dev}, \texttt{libncurses5}, \texttt{libpython},
+  \texttt{libreadline5}, \texttt{python}, \texttt{python-ply}.
+\end{quote}
+If you get a precompiled version of \Apfa, you may select a ore specific
+Python version.
+
+To run \Apfa with Fedora Core 15, 14 or 13, the following packages are needed:
+\begin{quote}
+ \texttt{gnuplot}, \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
+  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
+  \texttt{ipython}.
+\end{quote}
+
+The following packages need to be installed especially if you use a less
+automatic way of installation such as a tarball file, or if you install
+from the sources.
 
 % To ease copy/paste:
-% cproto indent flex bison automake libtool autoconf libreadline5-dev python-dev swig python-ply libgmp3-dev libmpfr-dev gfortran subversion git
+% cproto indent flex bison automake libtool autoconf libreadline6-dev python-dev swig python-ply libgmp3-dev libmpfr-dev gfortran subversion git wget
 
 To compile \Apfa with Debian or Ubuntu, the following additional
 packages are needed:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
   \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
-  \texttt{libreadline5-dev}, \texttt{python-dev}, \texttt{swig},
+  \texttt{libreadline6-dev}, \texttt{python-dev}, \texttt{swig},
   \texttt{python-ply}, \texttt{libgmp3-dev},
   \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
-  \texttt{git} \texttt{wget}
+  \texttt{git}, \texttt{wget}
 \end{quote}
+In Ubuntu 11.10 there is a bug in the \texttt{libtinfo-dev} and
+\texttt{libtinfo5} packages that prevents \texttt{tpips} from being
+compiled. If you are really brave, you can try to download manually the
+Debian packages and force their installation with: {\small
+\begin{verbatim}
+wget -nd http://ftp.us.debian.org/debian/pool/main/n/ncurses/libtinfo-dev_5.9-4_amd64.deb
+sudo dpkg --force-depends -i libtinfo-dev_5.9-4_amd64.deb
+wget -nd http://http.us.debian.org/debian/pool/main/n/ncurses/libtinfo5_5.9-4_amd64.deb
+sudo dpkg -i libtinfo5_5.9-4_amd64.deb
+\end{verbatim}
+}%
+The links drom Debian/unstable are expected to change. So look at
+\url{http://packages.debian.org/sid/amd64/libtinfo5/download} and
+\url{http://packages.debian.org/sid/amd64/libtinfo-dev/download}.  See
+\url{https://bugs.launchpad.net/ubuntu/+source/ncurses/+bug/900635} for
+the bug report.
+
 
 To compile \Apfa with Fedora Core 15, 14 or 13, the following additional
 packages are needed:
@@ -104,25 +142,7 @@ packages are needed:
   \texttt{readline-devel}, \texttt{python-devel}, \texttt{swig},
   \texttt{python-ply}, \texttt{gmp-devel},
   \texttt{mpfr-devel}, \texttt{gcc-gfortran}, \texttt{subversion},
-  \texttt{git} \texttt{wget}
-\end{quote}
-
-% To ease copy/paste:
-% libncurses5 libreadline5 python python-ply gfortran
-
-To run \Apfa with Debian or Ubuntu, the following packages are needed:
-\begin{quote}
-  \texttt{libmpfr1ldbl},
-  \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
-  \texttt{python-ply}, \texttt{gfortran},
-  \texttt{ipython}.
-\end{quote}
-
-To run \Apfa with Fedora Core 15, 14 or 13, the following packages are needed:
-\begin{quote}
-  \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
-  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
-  \texttt{ipython}.
+  \texttt{git}, \texttt{wget}
 \end{quote}
 
 To compile the documentation with Debian or Ubuntu, the following
@@ -137,7 +157,8 @@ additional packages are needed:
   \texttt{texlive}, \texttt{tex4ht}
 \end{quote}
 
-\subsection{CUDA environment to compile and execute on NVidia GPU}
+
+\subsection{CUDA environment to compile and execute on NVIDIA GPU}
 
 To compile and to run the \Acuda and \Aopencl output, you should have the following
 environment variables set:
@@ -147,15 +168,18 @@ environment variables set:
 \item \verb|LD_LIBRARY_PATH| should contains at least \verb|$CUDA_DIR/lib64|
 \end{itemize}
 
+
 \section{Installations}
 \label{sec:installation}
 
 This section represents different ways to install \Apfa.
 
-The installation is done into \texttt{/usr/local/par4all}. If you want \Apfa
-installed in another location, have a loot at the section~\ref{sec:relocation} 
-for a binary installation and at the section~\ref{sec:installation_options} 
-for the installation from the sources.
+The installation is done into \texttt{/usr/local/par4all}. If you want
+\Apfa installed in another location, have a loot at the
+section~\ref{sec:relocation} for a binary installation and at the
+section~\ref{sec:installation_options} for the installation from the
+sources.
+
 
 \subsection{Installation using \protect\Apfa package repository}
 
@@ -195,6 +219,7 @@ Once this is done, run your favorite graphics package tool
 To set your environment up and test your \Apfa
 installation, please refer to the section~\ref{sec:testing}.
 
+
 \subsection{Installation using a package}
 
 A less automatic way on Debian or Ubuntu is to install a Par4All
@@ -222,15 +247,16 @@ For development versions, according to your OS and architecture, download a pack
 \subsubsection{Installing the package}
 You can then install the package with:
 \begin{verbatim}
-  sudo gdebi <the_package>.deb
+sudo gdebi <the_package>.deb
 \end{verbatim}
-or 
+or
 \begin{verbatim}
-  sudo dpkg -i <the_package>.deb 
+sudo dpkg -i <the_package>.deb
 \end{verbatim}
 
 The second one would also work but does not
 automatically install dependencies you should install later.
+
 
 \subsection{Installation using tar.gz binary distribution}
 
@@ -238,19 +264,21 @@ An even less automatic way is to use a tarball \texttt{.tar.gz} file. It
 contains the binaries as built on a stable Ubuntu or unstable Debian
 distribution.
 
-It should work also on any GNU/Linux distribution with the following 
-libraries installed: (a fairly recent) libc.so.6, libncurses.so.5, 
-libreadline.so.6, etc. and Python 2.6. We chose this Python version 
-because it is recent enough to provide nice features for Par4All and 
-not too recent to be absent from most Linux distributions. See the 
-section~\ref{sec:requirements} to have the list of some needed packages.
+It should work also on any GNU/Linux distribution with the following
+libraries installed: (a fairly recent) \texttt{libc.so.6},
+\texttt{libncurses.so.5}, \texttt{libreadline.so.6}, etc. and Python
+2.7. We chose this Python version because it is recent enough to provide
+nice features for Par4All and not too recent to be absent from most Linux
+distributions. See the section~\ref{sec:requirements} to have the list of
+some needed packages.
 
 If you are not on Debian on Ubuntu, try one of the following, it may work.
 
+
 \subsubsection{Getting the distribution}
 
-For the 64-bit x86 architecture,
-according to the OS and version you want, download a \texttt{...\_x86\_64.tar.gz} file from
+For the 64-bit x86 architecture, according to the OS and version you want,
+download a \texttt{...\_x86\_64.tar.gz} file from
 
 \begin{itemize}
 \item \protect\url{http://download.par4all.org/releases/debian/x86_64}
@@ -259,8 +287,8 @@ according to the OS and version you want, download a \texttt{...\_x86\_64.tar.gz
 \item \protect\url{http://download.par4all.org/development/debian/x86_64}
 \end{itemize}
 
-For the 32-bit x86 architecture,
-according to the OS and version you want, download a \texttt{...\_i686.tar.gz} file from
+For the 32-bit x86 architecture, according to the OS and version you want,
+download a \texttt{...\_i686.tar.gz} file from
 \begin{itemize}
 \item \protect\url{http://download.par4all.org/releases/debian/i686}
 \item \protect\url{http://download.par4all.org/releases/ubuntu/i686}
@@ -273,49 +301,55 @@ according to the OS and version you want, download a \texttt{...\_i686.tar.gz} f
 
 Once you have downloaded one of these \texttt{.tar.gz} packages from
 \url{http://download.par4all.org}, extract it with the following command::
-\begin{verbatim}
-  tar xvzf <the_package>.tar.gz
-\end{verbatim}
+\begin{alltt}
+tar xvzf \emph{<the_package>}.tar.gz
+\end{alltt}
 
 It will create a directory named \texttt{par4all}. Move this directory to its final
 location:
 \begin{verbatim}
-  sudo mv par4all /usr/local
+sudo mv par4all /usr/local
 \end{verbatim}
 
-Then please go to the section~\ref{sec:testing} to get information on how to set up 
-your environment and to test your installation.
-
+Then please go to the section~\ref{sec:testing} to get information on how
+to set up your environment and to test your installation.
 
 
 \subsection{Installation using the sources}
 
-This is not the preferred way to work, but it can be useful for 
-people who cannot use a precompiled version.
+This is not the preferred way to work, but it can be useful for people who
+cannot use a precompiled version.
+
 
 \subsubsection{Get the source distribution}
-First get a source tar ball in the following directories (Ubuntu or Debian 
+First get a source tar ball in the following directories (Ubuntu or Debian
 do not matter here) :
 \begin{itemize}
 \item \protect\url{http://download.par4all.org/releases}
 \item \protect\url{http://download.par4all.org/development}
 \end{itemize}
 
-Pick up a file with a name ending with \texttt{\_src.tar.gz}. You can decompress it with a tar zxvf.
+Pick up a file with a name ending with \texttt{\_src.tar.gz}. You can
+decompress it with a \texttt{tar zxvf}.
+
 
 \subsubsection{Get a source snapshot from the git repository}
 
-On \url{https://git.hpc-project.com/cgit/par4all} you can find the snapshots in 
-the Download section in \texttt{.zip, .tar.gz or .tar.bz2}.
+On \url{https://git.hpc-project.com/cgit/par4all} you can find the
+snapshots in the Download section in \texttt{.zip}, \texttt{.tar.gz} or
+\texttt{.tar.bz2}.
 
-By tweaking the URL of a tag snapshot you can even get a snapshot from any 
-branch or commit, not only tag. For example the last snapshot of the \texttt{p4a} integrated branch is in:
+By tweaking the URL of a tag snapshot you can even get a snapshot from any
+branch or commit, not only tag. For example the last snapshot of the
+\texttt{p4a} integrated branch is in:
 
 \url{https://git.hpc-project.com/cgit/par4all/snapshot/p4a.tar.bz2}
 
+
 \subsubsection{Installing from the sources}
-Please refer to the section~\ref{sec:installation_using git} to get to know how to install
-\Apfa from the sources.
+Please refer to the section~\ref{sec:installation_using git} to get to
+know how to install \Apfa from the sources.
+
 
 \subsection{Installation using \protect\Agit}
 \label{sec:installation_using git}
@@ -347,7 +381,7 @@ executed as \texttt{root}, therefore, the latter approach to \Apfa
 installation is preferable.
 
 To install in another location, the \verb|--prefix| option can be used,
-for example to choose \texttt{/opt/par4all}. 
+for example to choose \texttt{/opt/par4all}.
 
 \begin{alltt}
 src/simple_tools/p4a_setup.py --prefix=/opt/par4all
@@ -393,7 +427,7 @@ cp -av \emph{/usr/local/par4all} \emph{/opt}
 \item Extract from a Debian package, for example to install
   \Apfa in \texttt{/opt} directory:
 \begin{alltt}
-sudo dpkg -x par4all-1.1.1-xxx.deb \emph{/opt}
+sudo dpkg -x par4all-1.3.1-xxx.deb \emph{/opt}
 \end{alltt}
 
 \end{enumerate}
@@ -417,21 +451,22 @@ P4A_ROOT='/opt/usr/local/par4all'
 \end{alltt}
 
 
-
 \subsection{Advanced installation}
 
-To get information on a more advanced installation please see 
+To get information on a more advanced installation please see
 \url{http://www.par4all.org/documentation/par4all_developer_guide}
+
 
 \subsection{Installation options}
 \label{sec:installation_options}
 
-This section concerns the installation from the \Apfa sources. The compilation 
-and installation of \Apfa is controlled by the
-\verb|p4a_setup.py| script, with the usage and options described in
-this section.
+This section concerns the installation with compilation from the \Apfa
+sources. The compilation and installation of \Apfa is controlled by the
+\verb|p4a_setup.py| script, with the usage and options described in this
+section.
 
 \input{p4a_setup-help}
+
 
 \section{Setting up environment and testing \protect\Apfa}
 \label{sec:testing}
@@ -443,11 +478,11 @@ execution:
 \begin{itemize}
 \item if you use \texttt{bash, sh, dash}, etc.:
 \begin{verbatim}
-      source /usr/local/par4all/etc/par4all-rc.sh
+source /usr/local/par4all/etc/par4all-rc.sh
 \end{verbatim}
 \item if you use \texttt{csh, tcsh}, etc.:
 \begin{verbatim}
-      source /usr/local/par4all/etc/par4all-rc.csh
+source /usr/local/par4all/etc/par4all-rc.csh
 \end{verbatim}
 \end{itemize}
 
@@ -457,37 +492,39 @@ execution:
 Once you set your environment up, you can, for example, run \texttt{p4a -h}
 to get help about the usage of the \texttt{p4a} frontend script.
 
+
 \subsubsection{Examples and demos}
 
-In the examples directory there are few examples or demos showing some \texttt{p4a,
-tpips, pyps} use cases. You can use these examples to test your installation.
-For example, to test \texttt{p4a} using one of the examples in the \texttt{P4A} directory
-go to one of  the directories in \texttt{P4A} and run:
+In the examples directory there are few examples or demos showing some
+\texttt{p4a}, \texttt{tpips}, \texttt{pyps} use cases. You can use these
+examples to test your installation.  For example, to test \texttt{p4a}
+using one of the examples in the \texttt{P4A} directory go to one of the
+directories in \texttt{P4A} and run:
 \begin{verbatim}
-      make demo
+make demo
 \end{verbatim}
-if you got all needed environments installed, included \Acuda. This will chain all 
-available demos included:
+if you got all needed environments installed, included \Acuda. This will
+chain all available demos included:
 \begin{itemize}
-\item sequential execution
-\item automatic parallelization with p4a for parallel execution on multi-cores
-  with OpenMP
-\item automatic parallelization with p4a --cuda for parallel execution on
-  nVidia GPU
-\item automatic parallelization with p4a --accel for an OpenMP parallel 
-  emulation of a GPU-like accelerator
-\item automatic parallelization with p4a --opencl for the OpenCL parallel 
-  execution on nVidia GPU
+\item sequential execution;
+\item automatic parallelization with \texttt{p4a} for parallel execution
+  on multi-cores with \Aopenmp;
+\item automatic parallelization with \verb|p4a --cuda| for parallel
+  execution on nVidia \Agpu;
+\item automatic parallelization with \verb|p4a --accel| for an \Aopenmp
+  parallel emulation of a \Agpu-like accelerator;
+\item automatic parallelization with \verb|p4a --opencl| for the \Aopencl
+  parallel execution on nVidia \Agpu.
 \end{itemize}
 
-If you do not have \Acuda environment in your machine, you can test your installation with
-\Aopenmp, as the following:
+If you do not have \Acuda environment in your machine, you can test your
+installation with \Aopenmp, as the following:
 \begin{verbatim}
-      make display_openmp
+make display_openmp
 \end{verbatim}
-which will transform the sequential codes to the \Aopenmp, compile the generated codes,
-run and display the results.
-To get more information on the examples, have a look at \texttt{examples/README.txt}
+which will transform the sequential codes to the \Aopenmp, compile the
+generated codes, run and display the results.  To get more information on
+the examples, have a look at \texttt{examples/README.txt}.
 
 Further you can look at the manual of \texttt{p4a} on
 \url{http://www.par4all.org/documentation} for information on how to use Par4All.
@@ -496,3 +533,7 @@ Further you can look at the manual of \texttt{p4a} on
 
 
 
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End:
