@@ -417,7 +417,8 @@ static list statements_localize_declarations(list statements,entity module,state
         FOREACH(ENTITY,e,private_ents)
         {
             if(gen_chunk_undefined_p(gen_find_eq(e,sd))) {
-                if(formal_parameter_p(e)) { // otherwise bad interaction with formal parameter pretty printing
+                if(formal_parameter_p(e) || 
+                        (!get_bool_property("OUTLINE_ALLOW_GLOBALS") && top_level_entity_p(e) )) { // otherwise bad interaction with formal parameter pretty printing
                     localized=CONS(ENTITY,e,localized); // this is to make sure that the original `e' is removed from the referenced entities too
                     entity ep = make_new_scalar_variable_with_prefix(
                             entity_user_name(e),
