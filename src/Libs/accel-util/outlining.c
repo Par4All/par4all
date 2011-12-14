@@ -552,8 +552,6 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     /* Retrieve declared entities */
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
-    FOREACH(ENTITY,de,declared_entities)
-        gen_remove(&entity_declarations(get_current_module_entity()), de);
     declared_entities=gen_nconc(declared_entities,localized);
 
     /* get the relative complements and create the parameter list*/
@@ -836,6 +834,14 @@ void outliner_patch_parameters(list statements_to_outline, list referenced_entit
         pips_assert("no effective parameter left", ENDP(iter));
 }
 
+static void do_remove_entity_from_private(loop l, entity e) {
+    gen_remove(&loop_locals(l),e);
+    if(same_entity_p(e,loop_index(l))) loop_index(l)=entity_undefined;
+}
+static void do_remove_entity_from_decl(statement s, entity e) {
+    gen_remove(&statement_declarations(s),e);
+}
+
 void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
 {
   string outline_module_name = (string)entity_user_name(new_fun);
@@ -872,6 +878,8 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     free_text(t);
 
     set_bool_property(STAT_ORDER,saved);
+
+
 
     /* horrible hack to prevent declaration duplication
      * signed : Serge Guelton
@@ -966,6 +974,20 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
 
     /* 6 : call */
     statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);
+
+    /* 7: remove obsolete entities, this is needed otherwise the IR keeps some obsolete data */
+    list declared_entities = statements_to_declarations(statements_to_outline);
+    FOREACH(ENTITY,de,declared_entities) {
+        FOREACH(STATEMENT, sde, statements_to_outline) {
+            gen_context_multi_recurse(sde, de, 
+                    statement_domain, gen_true, do_remove_entity_from_decl,
+                    loop_domain, gen_true, do_remove_entity_from_private,
+                    NULL);
+            gen_remove(&entity_declarations(get_current_module_entity()), de);
+            free_entity(de);
+        }
+    }
+    gen_free_list(declared_entities);
 
 
     return new_stmt;
