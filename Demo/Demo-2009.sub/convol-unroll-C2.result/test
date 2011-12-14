@@ -74,7 +74,6 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 #pragma omp parallel for 
       for(j = 0; j <= 511; j += 1)
          new_image[i][j] = image[i][j];
-
 l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
 }
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
@@ -357,7 +356,6 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
          new_image[i][j] = image[i][j];
 
 //  T(i,isi,isj,j,ki,kj,ksi,ksj) {}
-
 
 l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
 }
