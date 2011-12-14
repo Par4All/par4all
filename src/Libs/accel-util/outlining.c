@@ -552,6 +552,8 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     /* Retrieve declared entities */
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
+    FOREACH(ENTITY,e,declared_entities)
+        gen_remove_once(&entity_declarations(get_current_module_entity()),e);
     declared_entities=gen_nconc(declared_entities,localized);
 
     /* get the relative complements and create the parameter list*/
@@ -921,9 +923,11 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
             statement_instruction(old_statement)=make_continue_instruction();
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
-        /* trash any extensions, they may not be valid now */
+        /* trash any extensions|comments, they may not be valid now */
         free_extensions(statement_extensions(old_statement));
         statement_extensions(old_statement)=empty_extensions();
+        if(!string_undefined_p(statement_comments(old_statement))) free(statement_comments(old_statement));
+        statement_comments(old_statement)=empty_comments;
 
     }
     return new_stmt;
