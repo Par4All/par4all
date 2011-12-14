@@ -552,6 +552,8 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     /* Retrieve declared entities */
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
+    FOREACH(ENTITY,de,declared_entities)
+        gen_remove(&entity_declarations(get_current_module_entity()), de);
     declared_entities=gen_nconc(declared_entities,localized);
 
     /* get the relative complements and create the parameter list*/
