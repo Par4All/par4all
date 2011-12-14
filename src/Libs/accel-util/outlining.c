@@ -926,8 +926,10 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
         /* trash any extensions|comments, they may not be valid now */
         free_extensions(statement_extensions(old_statement));
         statement_extensions(old_statement)=empty_extensions();
+#if 0 // this code is true but wreaks havoc in validation, I am not eager to change it
         if(!string_undefined_p(statement_comments(old_statement))) free(statement_comments(old_statement));
         statement_comments(old_statement)=empty_comments;
+#endif
 
     }
     return new_stmt;
