@@ -431,7 +431,7 @@ bool parallel_loop_statement_p(statement s) {
 int depth_of_parallel_perfect_loop_nest(statement s) {
   // We can have blocks and declarations surrounding loops
   while(statement_block_p(s)) {
-    if(ENDP(statement_block(s))) return 0;
+    statement prev = s;
     for(list iter=statement_block(s);!ENDP(iter);POP(iter)) {
       statement st = STATEMENT(CAR(iter));
       if(declaration_statement_p(st))//ok, skip this
@@ -440,6 +440,7 @@ int depth_of_parallel_perfect_loop_nest(statement s) {
       else
         s = st;
     }
+    if(s == prev) return 0;
   }
 
   if(parallel_loop_statement_p(s)) {
