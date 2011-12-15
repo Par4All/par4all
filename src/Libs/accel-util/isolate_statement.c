@@ -477,18 +477,6 @@ statement effects_to_dma(statement stat,
       gen_full_free_list(may_write_effects);
   }
 
-
-  /* The following test could be refined, but it is OK right now if we can
-     override it with the following property when generating code for GPU
-     for example. */
-  if (!get_bool_property("ISOLATE_STATEMENT_EVEN_NON_LOCAL")
-     && effects_on_non_local_variable_p(effects) &&
-     !io_effects_p(effects) && !std_file_effects_p(effects) ) {
-    pips_user_error("Cannot handle with some effects on non local variables in isolate_statement\n");
-    /* Should not return from previous exception anyway... */
-    return statement_undefined;
-  }
-
   /* builds out transfer from gathered effects */
   list statements = NIL;
   FOREACH(EFFECT,eff,effects) {
@@ -570,7 +558,7 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
         pips_assert("found ancestor",!statement_undefined_p(s));
         /* get associated regions */
         list regions = load_cumulated_rw_effects_list(s);
-        /* verify the conditions : no access to global variables and no complex offset handling */
+        /* verify the conditions : no complex offset handling */
         FOREACH(REGION,reg,regions) {
             reference ref = region_any_reference(reg);
             entity eref = reference_variable(ref);
@@ -583,11 +571,7 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
                 nbdims = gen_length(indices);
             else
                 nbdims = gen_length(variable_dimensions(type_variable(ut)));
-            if(!entity_local_variable_p(eref,get_current_module_entity()) && ! formal_parameter_p(eref) ) {
-                pips_user_warning("Trying to isolate a statement with a call that references a global variable `%s'\n",entity_user_name(eref));
-                p->ok=false;
-            }
-            else if(nbdims>1) { // unhandled
+            if(nbdims>1) { // unhandled
                 pips_user_warning("Trying to isolate a statement with a call that touches a multi-dimensional array `%s'\n", entity_user_name(eref));
                 p->ok=false;
             }
@@ -628,6 +612,24 @@ static bool do_check_isolate_statement_preconditions_on_call(call c, param_t* p)
                 return false;
             }
         }
+
+        // verify the call does not references globals
+        list summary_regions = effects_to_list((effects)db_get_memory_resource(DBR_SUMMARY_REGIONS, p->callee_module_name, true));
+        FOREACH(REGION, sr, summary_regions) {
+            reference ref = region_any_reference(sr);
+            entity eref = reference_variable(ref);
+            if(!entity_local_variable_p(eref,get_current_module_entity()) && ! formal_parameter_p(eref) ) {
+                /* The following test could be refined, but it is OK right now if we can
+                   override it with the following property when generating code for GPU
+                   for example. */
+                if (!get_bool_property("ISOLATE_STATEMENT_EVEN_NON_LOCAL") &&
+                        !io_effect_p(sr) && !std_file_effect_p(sr) ) {
+                    pips_user_error("Cannot handle with some effects on non local variables in isolate_statement\n");
+                    /* Should not return from previous exception anyway... */
+                }
+
+            }
+        }
     }
 
     return true;
@@ -647,7 +649,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
         if(!p.ok) break;
     }
     free_callees(c);
-    if(p.ok) { // this mean that all checks are ok, but some patching is needed
+    if(false && p.ok) { // this mean that all checks are ok, but some patching is needed
         // maybe we have registered some regions to extend to avoid interprocedural offset management?
         list regions = load_cumulated_rw_effects_list(s);
         FOREACH(ENTITY,e,p.regions_to_extend) {
@@ -719,6 +721,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
     }
     return p.ok;
 }
+
 
 /* perform statement isolation on statement @p s
  * that is make sure that all access to variables in @p s
