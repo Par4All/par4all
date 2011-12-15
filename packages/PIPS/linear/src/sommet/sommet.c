@@ -119,7 +119,7 @@ Psommet s;
 char *f;
 {
     (void) fprintf(stderr,"destruction de sommet dans %s : ",f);
-    sommet_fprint(stderr, s, variable_dump_name);
+    sommet_fprint(stderr, s, variable_debug_name);
     dbg_vect_rm(s->vecteur,f);
     FREE((char *)s,SOMMET,f);
 }
@@ -163,12 +163,12 @@ Pbase b;
 }
 
 /* void sommet_dump(Psommet s): impression d'un sommet sur stderr avec
- * variable_dump_name()
+ * variable_debug_name()
  */
 void sommet_dump(s)
 Psommet s;
 {
-    sommet_fprint(stderr, s, variable_dump_name);
+    sommet_fprint(stderr, s, variable_debug_name);
 }
 
 /* void fprint_lsom(FILE * f, Psommet s, char * (*nom_var)()):
