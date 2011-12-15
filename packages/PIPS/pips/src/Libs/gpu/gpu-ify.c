@@ -122,19 +122,21 @@ mark_loop_to_outline(const statement s) {
      We recurse on statements instead of loops in order to pick
      informations on the statement itself, such as pragmas
   */
-  int parallel_loop_nest_depth = depth_of_parallel_perfect_loop_nest(s);
-  ifdebug(3) {
-    pips_debug(1, "Statement %td with // depth %d\n", statement_number(s),
-	       parallel_loop_nest_depth);
-    print_statement(s);
-  }
-  if (parallel_loop_nest_depth > 0) {
-    // Register the loop-nest (note the list is in the reverse order):
-    loop_nests_to_outline = CONS(STATEMENT, s, loop_nests_to_outline);
-    /* Since we only outline outermost loop-nest, stop digging further in
-       this statement: */
-    pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
-    return false;
+  if(statement_loop_p(s)) {
+    int parallel_loop_nest_depth = depth_of_parallel_perfect_loop_nest(s);
+    ifdebug(3) {
+      pips_debug(1, "Statement %td with // depth %d\n", statement_number(s),
+          parallel_loop_nest_depth);
+      print_statement(s);
+    }
+    if (parallel_loop_nest_depth > 0) {
+      // Register the loop-nest (note the list is in the reverse order):
+      loop_nests_to_outline = CONS(STATEMENT, s, loop_nests_to_outline);
+      /* Since we only outline outermost loop-nest, stop digging further in
+         this statement: */
+      pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
+      return false;
+    }
   }
   // This statement is not a parallel loop, go on digging:
   return true;

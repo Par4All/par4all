@@ -455,3 +455,35 @@ bool gpu_parallelize_annotated_loop_nest(const string mod_name) {
   ;
   // The macro above does a "return TRUE" indeed.
 }
+
+
+/**
+ * Callback for gen_recurse
+ * Remove annotation on a loop nest
+ */
+bool clear_annotated_loop_nest(statement s) {
+  string comment = statement_comments(s);
+  if(comment  && !empty_comments_p(comment)
+      && (NULL != strstr(comment, "Loop nest P4A end")|| NULL != strstr(comment, "Loop nest P4A begin"))) {
+    // clear the comment
+    // We may instead filter out only the annotation inside the comment
+    statement_comments(s) = string_undefined;
+  }
+  return true;
+}
+
+/** Remove all annotations on a loop nest */
+bool gpu_clear_annotations_on_loop_nest(const string mod_name) {
+  // Use this module name and this environment variable to set
+  statement module_statement = PIPS_PHASE_PRELUDE(mod_name,
+      "GPU_IFY_DEBUG_LEVEL");
+
+  // Parallelize loops
+  gen_recurse(module_statement,
+      statement_domain, clear_annotated_loop_nest, gen_identity);
+
+  // Put back the new statement module
+  PIPS_PHASE_POSTLUDE(module_statement)
+  ;
+  // The macro above does a "return TRUE" indeed.
+}

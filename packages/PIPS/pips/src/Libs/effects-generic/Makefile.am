@@ -16,7 +16,8 @@ libeffects_generic_la_SOURCES=\
 	prettyprint.c \
 	intrinsics.c \
 	interprocedural.c \
-	eval.c
+	eval.c \
+	liveness_analysis_engine.c
 
 
 include $(srcdir)/../pipslibs_includes.mk
