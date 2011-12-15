@@ -583,11 +583,10 @@ static Value eval_constraint_with_vertex(Pvecteur v,
 {
   Pvecteur cv = VECTEUR_UNDEFINED;
   Value k = VALUE_ZERO;
-  int i;
 
   /* debugging information */
-  static int francois_debug=0;
-  if(francois_debug) {
+#ifdef FI_DEBUG // pips in linear ?
+    int i;
     extern char * pips_region_user_name(void *);
     fprintf(stderr, "Constraint:\n");
     vect_print(v, pips_region_user_name);
@@ -598,6 +597,7 @@ static Value eval_constraint_with_vertex(Pvecteur v,
       fprintf(stderr, "N[%d]=%ld, ", i, (long int) N[i]);
     fprintf(stderr, "\n");
   }
+#endif
 
   for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
     Variable var = vecteur_var(cv);
@@ -853,7 +853,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
        *
        * We have 0<=l1<=l2<=r1<=r2<=v1<=v2
        */
-      int l1 = 0, l2 = 0, r1 = 0, r2 = 0, v1 = 0, v2 = 0;
+      int   __attribute__((unused))  l1 = 0, l2 = 0, __attribute__((unused)) r1 = 0, r2 = 0, v1 = 0, __attribute__((unused)) v2 = 0;
 	Dimension = A1->Dimension+2;
 	a = Matrix_Alloc(A1->NbRays + A2->NbRays,Dimension);
 
@@ -904,8 +904,8 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	       && A2->Ray[i2][Dimension-1]!=0) {
 	  /* Insert vertex of sc2 if it is not also a vertex of s1 and
 	     is not redundant with sc1 */
-	  if(true || !duplicate_vertex_p(a->p, r2, v1, Dimension, A2->Ray[i2])
-	     && !redundant_vertex_p(sc1, Dimension, A2->Ray[i2], false)) {
+	  if(true || (!duplicate_vertex_p(a->p, r2, v1, Dimension, A2->Ray[i2])
+	     && !redundant_vertex_p(sc1, Dimension, A2->Ray[i2], false))) {
 	    for (j=0; j < Dimension ; j++)  
 	      a->p[cp][j] = A2->Ray[i2][j]; 
 	    cp++;

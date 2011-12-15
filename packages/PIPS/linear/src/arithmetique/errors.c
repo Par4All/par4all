@@ -240,7 +240,7 @@ pop_exception_from_stack(
 /* throws an exception of a given type by searching for 
    the specified 'what' in the current exception stack.
 */
-/* This can be overrided in the PolyLib */
+/* This can be overridden in the PolyLib */
 void __attribute__ ((weak)) throw_exception(const int what,
 					    const char * function,
 					    const char * file,
@@ -296,7 +296,7 @@ void __attribute__ ((weak)) throw_exception(const int what,
   abort();
 }
 
-/* This can be overrided in the PolyLib */
+/* This can be overridden in the PolyLib */
 void __attribute__ ((weak))
  linear_initialize_exception_stack(unsigned int verbose_exceptions,
 				   exception_callback_t push, 
