@@ -137,13 +137,12 @@ Psysteme * ps;
  * Ancien nom: sc_fprint() (modifie a cause d'un conflit avec une autre
  * fonction sc_fprint d'un profil different)
  *
- * using variable_dump_name(); lost of original variables' names
+ * using variable_debug_name(); lost of original variables' names
  * now compatible with sc_fscan()
  * Better use sc_default_name(Psysteme)
  * DN(5/8/2002)
  */
-void sc_dump(sc)
-Psysteme sc;
+void sc_dump(Psysteme sc)
 {
   if(!SC_UNDEFINED_P(sc)) {
 
@@ -154,14 +153,14 @@ Psysteme sc;
     //(void) fprintf(stderr,"LISTE INEGALITES (%p)  ", sc->inegalites);
     //(void) fprintf(stderr,"LISTE EGALITES (%p)  ", sc->egalites);
     (void) fprintf(stderr,"\nVAR ");
-    base_fprint(stderr,sc->base, variable_dump_name);
+    base_fprint(stderr,sc->base, variable_debug_name);
     (void) fprintf(stderr,"  {\n");
-    inegalites_fprint(stderr,sc->inegalites, variable_dump_name);
-    egalites_fprint(stderr,sc->egalites, variable_dump_name);
+    inegalites_fprint(stderr,sc->inegalites, variable_debug_name);
+    egalites_fprint(stderr,sc->egalites, variable_debug_name);
     (void) fprintf(stderr,"  }\n");
   }
   else
-    (void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
+    (void) fprintf(stderr, "SC_RN or SC_EMPTY or SC_UNDEFINED\n");
 }
 
 /* void sc_default_dump(Psysteme sc): dump to stderr
