@@ -11,10 +11,8 @@ void p4a_wrapper_getimage(complex imageout[128][128], int i, int j)
 }
 void p4a_launcher_getimage(complex imageout[128][128])
 {
-   double z, amp, sum, squares;
-   int i, j, conj, nx, ny;
-   unsigned char c;
-   FILE *fp;
+   //PIPS generated variable
+   int i, j;
    
    /* There is no light on the screen at the beginning: */
    for(i = 0; i <= 127; i += 1)
@@ -25,12 +23,20 @@ void p4a_launcher_getimage(complex imageout[128][128])
 }
 void getimage(char *filename)
 {
-   //PIPS generated variable
-   complex (*P4A_var_imageout0)[128][128] = (complex (*)[128][128]) 0;
-   P4A_accel_malloc((void **) &P4A_var_imageout0, sizeof(imageout[0][0])*16384);
-   P4A_copy_to_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   {
+      //PIPS generated variable
+      complex (*P4A_var_imageout0)[128][128] = (complex (*)[128][128]) 0;
+      P4A_accel_malloc((void **) &P4A_var_imageout0, sizeof(imageout[0][0])*16384);
+      P4A_copy_to_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
 
-   p4a_launcher_getimage(*P4A_var_imageout0);
-   P4A_copy_from_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
-   P4A_accel_free(P4A_var_imageout0);
+      
+      /* There is no light on the screen at the beginning: */
+      p4a_launcher_getimage(*P4A_var_imageout0);
+      P4A_copy_from_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
+      P4A_accel_free(P4A_var_imageout0);
+   }
 }

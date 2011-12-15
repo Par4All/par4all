@@ -3,6 +3,7 @@
 
 void p4a_launcher_updateBug(float force[128][128][128])
 {
+   //PIPS generated variable
    int i, j, k;
    for(i = 0; i <= 127; i += 1)
       for(j = 0; j <= 127; j += 1)
@@ -17,6 +18,7 @@ void p4a_launcher_updateBug(float force[128][128][128])
 
 void p4a_launcher_updateBug(float force[128][128][128])
 {
+   //PIPS generated variable
    int i, j, k;
    // Loop nest P4A begin,2D(128, 128)
 #pragma omp parallel for private(j)
@@ -36,6 +38,7 @@ void p4a_launcher_updateBug(float force[128][128][128])
 
 void p4a_launcher_updateBug(float force[128][128][128])
 {
+   //PIPS generated variable
    int i, j, k;
    // Loop nest P4A begin,2D(128, 128)
 #pragma omp parallel for private(j)

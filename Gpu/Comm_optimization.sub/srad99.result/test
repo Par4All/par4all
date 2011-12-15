@@ -72,8 +72,15 @@ int main(int argc, char *argv[])
       meanROI = sum/size_R;
       varROI = sum2/size_R-meanROI*meanROI;
       q0sqr = varROI/(meanROI*meanROI);
-      p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
-      p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+      {
+         int i;
+
+         p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
+      }
+      {
+         int i;
+         p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+      }
    }
    //  printf("Computation Done\n");
    
@@ -157,8 +164,15 @@ int main(int argc, char *argv[])
       meanROI = sum/size_R;
       varROI = sum2/size_R-meanROI*meanROI;
       q0sqr = varROI/(meanROI*meanROI);
-      p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
-      p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+      {
+         int i;
+
+         p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
+      }
+      {
+         int i;
+         p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+      }
       P4A_copy_from_accel(J, sizeof(float)*rows*cols);
    }
    //  printf("Computation Done\n");
