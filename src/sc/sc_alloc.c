@@ -411,3 +411,20 @@ void sc_add_inegalite(Psysteme p, Pcontrainte i)
   p->inegalites = i;
   p->nb_ineq++;
 }
+
+void sc_add_inegalites(Psysteme p, Pcontrainte i)
+{
+  if(CONTRAINTE_UNDEFINED_P(sc_inegalites(p))) {
+    sc_inegalites(p) = i;
+  }
+  else {
+    Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+    for(ineq = sc_inegalites(p);
+	!CONTRAINTE_UNDEFINED_P(contrainte_succ(ineq));
+	ineq = contrainte_succ(ineq)) {
+    }
+    contrainte_succ(ineq) = i;
+  }
+  /* Adjust the number of inequalities */
+  sc_nbre_inegalites(p) = nb_elems_list(sc_inegalites(p));
+}
