@@ -158,93 +158,91 @@ bool kernel_load_store(const const char* module_name) {
 static
 bool do_kernelize(statement s, entity loop_label)
 {
-  if( same_entity_p(statement_label(s),loop_label) ||
-      (statement_loop_p(s) && same_entity_p(loop_label(statement_loop(s)),loop_label)))
+    if( same_entity_p(statement_label(s),loop_label) ||
+            (statement_loop_p(s) && same_entity_p(loop_label(statement_loop(s)),loop_label)))
     {
-      if( !instruction_loop_p(statement_instruction(s)) )
-	pips_user_error("you choosed a label of a non-doloop statement\n");
+        if( !instruction_loop_p(statement_instruction(s)) )
+            pips_user_error("you choosed a label of a non-doloop statement\n");
 
 
 
-      loop l = instruction_loop(statement_instruction(s));
+        loop l = instruction_loop(statement_instruction(s));
 
-      /* gather and check parameters */
-      int nb_nodes = get_int_property("KERNELIZE_NBNODES");
-      while(!nb_nodes)
+        /* gather and check parameters */
+        int nb_nodes = get_int_property("KERNELIZE_NBNODES");
+        while(!nb_nodes)
         {
-	  string ur = user_request("number of nodes for your kernel?\n");
-	  nb_nodes=atoi(ur);
+            string ur = user_request("number of nodes for your kernel?\n");
+            nb_nodes=atoi(ur);
         }
 
-      /* verify the loop is parallel */
-      if( execution_sequential_p(loop_execution(l)) )
-	pips_user_error("you tried to kernelize a sequential loop\n");
-      if( !entity_is_argument_p(loop_index(statement_loop(s)),loop_locals(statement_loop(s))) )
-	pips_user_error("you tried to kernelize a loop whose index is not private\n");
+        /* verify the loop is parallel */
+        if( execution_sequential_p(loop_execution(l)) )
+            pips_user_error("you tried to kernelize a sequential loop\n");
+        if( !entity_is_argument_p(loop_index(statement_loop(s)),loop_locals(statement_loop(s))) )
+            pips_user_error("you tried to kernelize a loop whose index is not private\n");
 
-      if(nb_nodes >1 )
-      {
-      /* we can strip mine the loop */
-      loop_strip_mine(s,nb_nodes,-1);
-      /* unfortunetly, the strip mining does not exactly does what we
-	 want, fix it here
+        if(nb_nodes >1 )
+        {
+            /* we can strip mine the loop */
+            loop_strip_mine(s,nb_nodes,-1);
+            /* unfortunately, the strip mining does not exactly does what we
+               want, fix it here
 
-	 it is legal because we know the loop index is private,
-	 otherwise the end value of the loop index may be used
-	 incorrectly...
-      */
-      {
-	statement s2 = loop_body(statement_loop(s));
-	entity outer_index = loop_index(statement_loop(s));
-	entity inner_index = loop_index(statement_loop(s2));
-	replace_entity(s2,inner_index,outer_index);
-	loop_index(statement_loop(s2))=outer_index;
-	replace_entity(loop_range(statement_loop(s2)),outer_index,inner_index);
-	if(!ENDP(loop_locals(statement_loop(s2)))) replace_entity(loop_locals(statement_loop(s2)),outer_index,inner_index);
-	loop_index(statement_loop(s))=inner_index;
-	replace_entity(loop_range(statement_loop(s)),outer_index,inner_index);
-    RemoveLocalEntityFromDeclarations(outer_index,get_current_module_entity(),get_current_module_statement());
-	loop_body(statement_loop(s))=make_block_statement(make_statement_list(s2));
-	AddLocalEntityToDeclarations(outer_index,get_current_module_entity(),loop_body(statement_loop(s)));
-	l = statement_loop(s);
-      }
-      }
+               it is legal because we know the loop index is private,
+               otherwise the end value of the loop index may be used
+               incorrectly...
+               */
+            {
+                statement s2 = loop_body(statement_loop(s));
+                entity outer_index = loop_index(statement_loop(s));
+                entity inner_index = loop_index(statement_loop(s2));
+                replace_entity(s2,inner_index,outer_index);
+                loop_index(statement_loop(s2))=outer_index;
+                replace_entity(loop_range(statement_loop(s2)),outer_index,inner_index);
+                if(!ENDP(loop_locals(statement_loop(s2)))) replace_entity(loop_locals(statement_loop(s2)),outer_index,inner_index);
+                loop_index(statement_loop(s))=inner_index;
+                replace_entity(loop_range(statement_loop(s)),outer_index,inner_index);
+                RemoveLocalEntityFromDeclarations(outer_index,get_current_module_entity(),get_current_module_statement());
+                loop_body(statement_loop(s))=make_block_statement(make_statement_list(s2));
+                AddLocalEntityToDeclarations(outer_index,get_current_module_entity(),loop_body(statement_loop(s)));
+                l = statement_loop(s);
+            }
+        }
 
-      const char* kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
-      const char* host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
+        const char* kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
+        const char* host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
 
-      /* validate changes */
-      callees kernels=(callees)db_get_memory_resource(DBR_KERNELS,"",true);
-      callees_callees(kernels)= CONS(STRING,strdup(host_call_name),callees_callees(kernels));
-      DB_PUT_MEMORY_RESOURCE(DBR_KERNELS,"",kernels);
+        /* validate changes */
+        callees kernels=(callees)db_get_memory_resource(DBR_KERNELS,"",true);
+        callees_callees(kernels)= CONS(STRING,strdup(host_call_name),callees_callees(kernels));
+        DB_PUT_MEMORY_RESOURCE(DBR_KERNELS,"",kernels);
 
-      entity cme = get_current_module_entity();
-      statement cms = get_current_module_statement();
-      module_reorder(get_current_module_statement());
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE, get_current_module_name(),get_current_module_statement());
-      DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, get_current_module_name(), compute_callees(get_current_module_statement()));
-      reset_current_module_entity();
-      reset_current_module_statement();
+        entity cme = get_current_module_entity();
+        statement cms = get_current_module_statement();
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, get_current_module_name(),get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, get_current_module_name(), compute_callees(get_current_module_statement()));
+        reset_current_module_entity();
+        reset_current_module_statement();
 
-      /* recompute effects */
-      proper_effects(module_local_name(cme));
-      cumulated_effects(module_local_name(cme));
-      set_current_module_entity(cme);
-      set_current_module_statement(cms);
-      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
-      /* outline the work and kernel parts*/
-      outliner(kernel_name,make_statement_list(loop_body(l)));
-      (void)outliner(host_call_name,make_statement_list(s));
-      reset_cumulated_rw_effects();
+        /* recompute effects */
+        proper_effects(module_local_name(cme));
+        cumulated_effects(module_local_name(cme));
+        set_current_module_entity(cme);
+        set_current_module_statement(cms);
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
 
+        /* outline the work and kernel parts*/
+        outliner(kernel_name,make_statement_list(loop_body(l)));
+        (void)outliner(host_call_name,make_statement_list(s));
+        reset_cumulated_rw_effects();
 
-
-
-      /* job done */
-      gen_recurse_stop(NULL);
+        /* job done */
+        gen_recurse_stop(NULL);
 
     }
-  return true;
+    return true;
 }
 
 

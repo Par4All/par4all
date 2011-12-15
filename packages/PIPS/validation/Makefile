@@ -92,6 +92,9 @@ SVN.URL	= $(shell svn info | grep 'Repository Root' | cut -d: -f2-)
 SVN.R	= $(shell svnversion)
 SVN.C	= $(shell svnversion -c)
 
+# To have some git information
+GIT_DESCRIBE=git describe --long --always --all
+
 # check for svn working copy early
 .PHONY: check-run-consistency
 check-run-consistency:
@@ -146,6 +149,7 @@ $(HEAD): check-run-consistency
 	  echo "host name: $$(hostname)" ; \
 	  echo "in directory: $(PWD)" ; \
 	  test -d .svn && echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
+	  $(GIT_DESCRIBE) > /dev/null 2>&1 && echo "Git validation version: `$(GIT_DESCRIBE)`" ; \
 	  echo "with pips: $(shell which pips)" ; \
 	  pips -v ; \
 	  echo "with tpips: $(shell which tpips)" ; \

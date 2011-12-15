@@ -1,0 +1,12 @@
+int MAD(int a, int b)
+{
+   return MAX(a, b);
+}
+int MAD(int a, int b)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = a>b?a:b;
+   return _return0;
+}

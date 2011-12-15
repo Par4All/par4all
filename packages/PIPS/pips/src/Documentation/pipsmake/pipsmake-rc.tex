@@ -7720,6 +7720,21 @@ GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
 \end{PipsProp}
 
 
+
+\begin{PipsPass}{gpu_clear_annotations_on_loop_nest}
+Clear annotation previously added by \PipsPassRef{gpu_loop_nest_annotate}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias gpu_clear_annotations_on_loop_nest 'Clear annotation previously added by gpu_loop_nest_annotate'
+
+gpu_clear_annotations_on_loop_nest   > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
+
 \begin{PipsPass}{gpu_parallelize_annotated_loop_nest}
 Parallelize annotated loop nests based on the sentinel comments.
 \end{PipsPass}

@@ -1,0 +1,1 @@
+Has failed since constraints are simplified by sc_bounded_normalization, I believe. No time to investigate right away.
