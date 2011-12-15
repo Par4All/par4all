@@ -689,6 +689,7 @@ class p4a_processor(object):
         # We flag loops in kernel launchers as parallel, based on the annotation
         # previously made
         kernel_launchers.gpu_parallelize_annotated_loop_nest();
+        kernel_launchers.gpu_clear_annotations_on_loop_nest();
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
         kernel_launchers.loop_normalize(
@@ -790,7 +791,9 @@ class p4a_processor(object):
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
             
-            
+        # add sentinel around loop nests in launcher, used to replace the loop
+        # nest with a call kernel in post-processing             
+        kernel_launchers.gpu_loop_nest_annotate(parallel=True);
 
         # Update the list of CUDA modules:
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
