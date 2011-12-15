@@ -417,7 +417,8 @@ static list statements_localize_declarations(list statements,entity module,state
         FOREACH(ENTITY,e,private_ents)
         {
             if(gen_chunk_undefined_p(gen_find_eq(e,sd))) {
-                if(formal_parameter_p(e)) { // otherwise bad interaction with formal parameter pretty printing
+                if(formal_parameter_p(e) || 
+                        (!get_bool_property("OUTLINE_ALLOW_GLOBALS") && top_level_entity_p(e) )) { // otherwise bad interaction with formal parameter pretty printing
                     localized=CONS(ENTITY,e,localized); // this is to make sure that the original `e' is removed from the referenced entities too
                     entity ep = make_new_scalar_variable_with_prefix(
                             entity_user_name(e),
@@ -551,6 +552,8 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     /* Retrieve declared entities */
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
+    FOREACH(ENTITY,e,declared_entities)
+        gen_remove_once(&entity_declarations(get_current_module_entity()),e);
     declared_entities=gen_nconc(declared_entities,localized);
 
     /* get the relative complements and create the parameter list*/
@@ -833,6 +836,14 @@ void outliner_patch_parameters(list statements_to_outline, list referenced_entit
         pips_assert("no effective parameter left", ENDP(iter));
 }
 
+static void do_remove_entity_from_private(loop l, entity e) {
+    gen_remove(&loop_locals(l),e);
+    if(same_entity_p(e,loop_index(l))) loop_index(l)=entity_undefined;
+}
+static void do_remove_entity_from_decl(statement s, entity e) {
+    gen_remove(&statement_declarations(s),e);
+}
+
 void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
 {
   string outline_module_name = (string)entity_user_name(new_fun);
@@ -869,6 +880,8 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     free_text(t);
 
     set_bool_property(STAT_ORDER,saved);
+
+
 
     /* horrible hack to prevent declaration duplication
      * signed : Serge Guelton
@@ -910,9 +923,13 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
             statement_instruction(old_statement)=make_continue_instruction();
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
-        /* trash any extensions, they may not be valid now */
+        /* trash any extensions|comments, they may not be valid now */
         free_extensions(statement_extensions(old_statement));
         statement_extensions(old_statement)=empty_extensions();
+#if 0 // this code is true but wreaks havoc in validation, I am not eager to change it
+        if(!string_undefined_p(statement_comments(old_statement))) free(statement_comments(old_statement));
+        statement_comments(old_statement)=empty_comments;
+#endif
 
     }
     return new_stmt;
@@ -963,6 +980,20 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
 
     /* 6 : call */
     statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);
+
+    /* 7: remove obsolete entities, this is needed otherwise the IR keeps some obsolete data */
+    list declared_entities = statements_to_declarations(statements_to_outline);
+    FOREACH(ENTITY,de,declared_entities) {
+        FOREACH(STATEMENT, sde, statements_to_outline) {
+            gen_context_multi_recurse(sde, de, 
+                    statement_domain, gen_true, do_remove_entity_from_decl,
+                    loop_domain, gen_true, do_remove_entity_from_private,
+                    NULL);
+            gen_remove(&entity_declarations(get_current_module_entity()), de);
+            free_entity(de);
+        }
+    }
+    gen_free_list(declared_entities);
 
 
     return new_stmt;

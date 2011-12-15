@@ -210,6 +210,17 @@ void (*db_put_summary_out_effects_func)(const char *, list);
 statement_effects  (*db_get_out_effects_func)(const char *);
 void (*db_put_out_effects_func)(const char *, statement_effects);
 
+statement_effects (*db_get_live_in_paths_func)(const char *);
+void (*db_put_live_in_paths_func)(const char *, statement_effects);
+
+statement_effects (*db_get_live_out_paths_func)(const char *);
+void (*db_put_live_out_paths_func)(const char *, statement_effects);
+
+list (*db_get_live_in_summary_paths_func)(const char *);
+void (*db_put_live_in_summary_paths_func)(const char *, list);
+
+list (*db_get_live_out_summary_paths_func)(const char *);
+void (*db_put_live_out_summary_paths_func)(const char *, list);
 
 /* prettyprint function for debug */
 void (*effects_prettyprint_func)(list); /* should be avoided : use print_effects instead */
@@ -300,6 +311,14 @@ generic_effects_reset_all_methods()
     db_put_summary_out_effects_func = (void_function) UNDEF;
     db_get_out_effects_func = (statement_effects_function) UNDEF;
     db_put_out_effects_func = (void_function) UNDEF;
+    db_get_live_in_paths_func = (statement_effects_function) UNDEF;
+    db_put_live_in_paths_func = (void_function) UNDEF;
+    db_get_live_out_paths_func = (statement_effects_function) UNDEF;
+    db_put_live_out_paths_func = (void_function) UNDEF;
+    db_get_live_in_summary_paths_func = (list_function) UNDEF;
+    db_put_live_in_summary_paths_func = (void_function) UNDEF;
+    db_get_live_out_summary_paths_func = (list_function) UNDEF;
+    db_put_live_out_summary_paths_func = (void_function) UNDEF;
 
     set_contracted_proper_effects(true);
     set_contracted_rw_effects(true);

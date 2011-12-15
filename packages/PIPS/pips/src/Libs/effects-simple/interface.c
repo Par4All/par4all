@@ -843,13 +843,32 @@ live_paths(const char* module_name)
 bool
 live_in_summary_paths(const char* module_name)
 {
-  return true;
+  bool ok;
+  if (! c_module_p(module_name_to_entity(module_name))
+      || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+    set_constant_paths_p(false);
+  else
+    set_constant_paths_p(true);
+  set_methods_for_live_paths(module_name);
+  ok = live_in_summary_paths_engine(module_name);
+  generic_effects_reset_all_methods();
+  return ok;
 }
 
 bool
 live_out_summary_paths(const char* module_name)
 {
-  return true;
+  bool ok;
+  if (! c_module_p(module_name_to_entity(module_name))
+      || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+    set_constant_paths_p(false);
+  else
+    set_constant_paths_p(true);
+  set_pointer_info_kind(with_no_pointer_info);
+  set_methods_for_live_paths(module_name);
+  ok = live_out_summary_paths_engine(module_name);
+  generic_effects_reset_all_methods();
+  return ok;
 }
 
 bool
@@ -863,5 +882,5 @@ bool
 print_code_live_out_paths(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
-		      DBR_LIVE_OUT_PATHS, DBR_LIVE_OUT_SUMMARY_PATHS, ".live_in");
+		      DBR_LIVE_OUT_PATHS, DBR_LIVE_OUT_SUMMARY_PATHS, ".live_out");
 }

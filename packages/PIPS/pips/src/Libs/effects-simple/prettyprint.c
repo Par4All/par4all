@@ -68,6 +68,7 @@ static string continuation = string_undefined;
 #define ACTION_write		"written"
 #define ACTION_in		"imported"
 #define ACTION_out		"exported"
+#define ACTION_live		"alive"
 /* Can be used both for environment and type declaration */
 #define ACTION_declared		"declared"
 #define ACTION_referenced	"referenced"
@@ -271,7 +272,10 @@ text simple_rw_effects_to_text(list l)
 { return simple_effects_to_text(l, ACTION_read, ACTION_write, ACTION_declared, ACTION_referenced);}
 
 text simple_inout_effects_to_text(list l)
-{ return simple_effects_to_text(l, ACTION_in, ACTION_out, "", "");}
+{ return simple_effects_to_text(l, ACTION_in, ACTION_out, ACTION_declared, ACTION_referenced);}
+
+text simple_live_paths_to_text(list l)
+{ return simple_effects_to_text(l, ACTION_live, ACTION_write, ACTION_referenced, ACTION_referenced);}
 
 string
 effect_to_string(effect eff)

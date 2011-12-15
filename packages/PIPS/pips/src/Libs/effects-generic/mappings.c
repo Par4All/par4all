@@ -57,7 +57,23 @@ GENERIC_GLOBAL_FUNCTION(cumulated_rw_effects, statement_effects)
  */
 GENERIC_GLOBAL_FUNCTION(expr_prw_effects, persistant_expression_to_effects)
 
-list 
+
+/* IN AND OUT EFFECTS */
+GENERIC_GLOBAL_FUNCTION(in_effects, statement_effects)
+GENERIC_GLOBAL_FUNCTION(cumulated_in_effects, statement_effects)
+GENERIC_GLOBAL_FUNCTION(invariant_in_effects, statement_effects)
+
+GENERIC_GLOBAL_FUNCTION(out_effects, statement_effects)
+
+/* LIVE IN AND LIVE OUT PATHS */
+GENERIC_GLOBAL_FUNCTION(live_in_paths, statement_effects)
+GENERIC_GLOBAL_FUNCTION(live_out_paths, statement_effects)
+
+
+
+/* APIs to get lists of effects instead of RI's effects */
+
+list
 load_proper_rw_pointer_effects_list(statement s)
 {
   effects e = load_proper_rw_pointer_effects(s);
@@ -224,11 +240,6 @@ update_cumulated_rw_effects_list(statement s, list l_eff)
 
 
 /* IN AND OUT EFFECTS */
-GENERIC_GLOBAL_FUNCTION(in_effects, statement_effects)
-GENERIC_GLOBAL_FUNCTION(cumulated_in_effects, statement_effects)
-GENERIC_GLOBAL_FUNCTION(invariant_in_effects, statement_effects)
-
-GENERIC_GLOBAL_FUNCTION(out_effects, statement_effects)
 
 list 
 load_in_effects_list(statement s)
@@ -303,6 +314,45 @@ update_out_effects_list(statement s, list l_eff)
 {
     update_out_effects(s, make_effects(l_eff));
 }
+
+list
+load_live_in_paths_list(statement s)
+{
+    return(effects_effects(load_live_in_paths(s)));
+}
+
+void
+store_live_in_paths_list(statement s, list l_paths)
+{
+    store_live_in_paths(s, make_effects(l_paths));
+}
+
+void
+update_live_in_paths_list(statement s, list l_paths)
+{
+    update_live_out_paths(s, make_effects(l_paths));
+}
+
+list
+load_live_out_paths_list(statement s)
+{
+    return(effects_effects(load_live_out_paths(s)));
+}
+
+void
+store_live_out_paths_list(statement s, list l_paths)
+{
+    store_live_out_paths(s, make_effects(l_paths));
+}
+
+void
+update_live_out_paths_list(statement s, list l_paths)
+{
+    update_live_out_paths(s, make_effects(l_paths));
+}
+
+
+
 
 /* BACKWARD COMPATIBILITY */
 

@@ -36,7 +36,8 @@ LIB_CFILES = \
 	prettyprint.c \
 	intrinsics.c \
 	interprocedural.c \
-	eval.c
+	eval.c \
+	liveness_analysis_engine.c
 
 INC_TARGET =    $(TARGET).h
 
