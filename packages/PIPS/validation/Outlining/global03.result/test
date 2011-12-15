@@ -1,0 +1,19 @@
+#
+# Code after outline for module foo
+#
+int foo()
+{
+not_me:   ninja_turtle(&leonardo);
+}
+void ninja_turtle(int leonardo_0[1])
+{
+   //PIPS generated variable
+   int leonardo;
+   leonardo = *leonardo_0;
+not_me:   if (1) {
+      for(leonardo = 0; leonardo <= 9; leonardo += 1)
+         puts("yet another iteration");
+      printf("%d\n", leonardo);
+   }
+   *leonardo_0 = leonardo;
+}

@@ -18,7 +18,12 @@ int main(int argc, char **argv)
    int n = atoi(argv[1]);
    int a[n];
    int b[n];
-   p4a_launcher_main(n, a);
+   {
+      int i;
+      
+      
+      p4a_launcher_main(n, a);
+   }
 }
 
 //
@@ -61,6 +66,7 @@ void p4a_kernel_main(int n, int i, int a[n]);
 void p4a_wrapper_main(int n, int i, int a[n]);
 void p4a_launcher_main(int n, int a[n])
 {
+   //PIPS generated variable
    int i;
    
    

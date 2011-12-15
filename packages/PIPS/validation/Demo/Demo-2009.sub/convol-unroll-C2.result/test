@@ -356,7 +356,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
          new_image[i][j] = image[i][j];
 
-//  T(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
+//  T(i,isi,isj,j,ki,kj,ksi,ksj) {}
 
 
 l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
