@@ -294,11 +294,17 @@ char * vect_sprint_as_monome(Pvecteur v,
 }
 
 
-/* void vect_dump(Pvecteur v): impression "physique" d'un vecteur creux
- * sur stderr
+/* void vect_dump(Pvecteur v): print sparse vector v on stderr. By
+ * default, each dimension/variable is represented by an X followed by
+ * its hexadeximal address.
+ *
+ * Intended for debug purposes. Its behavior depends on the setting of
+ * pointer variable_debug_name by
+ * init_variable_debug_name(). Different names can be returned for
+ * each variable, more useful than a pointer value.
  */
 void vect_dump(Pvecteur v) {
-  vect_fprint(stderr, v, variable_dump_name);
+  vect_fprint(stderr, v, variable_debug_name);
 }
 
 /* void vect_print(Pvecteur v, char * (*variable_name)()):
@@ -311,10 +317,10 @@ void vect_print(Pvecteur v, get_variable_name_t variable_name)
 }
 
 /* void vect_fdump(FILE * f, Pvecteur v): impression d'un vecteur creux
- * par vect_fprint() avec passage de la fonction variable_dump_name()
+ * par vect_fprint() avec passage de la fonction variable_debug_name()
  */
 void vect_fdump(FILE * f, Pvecteur v) {
-    vect_fprint(f, v, variable_dump_name);
+    vect_fprint(f, v, variable_debug_name);
 }
 
 /* void base_fprint(FILE * f, Pbase b, char * (*variable_name)()):

@@ -97,6 +97,8 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 /* MACROS ET CONSTANTES */
 
 #define egalite_print(eg) egalite_fprint(stdout,eg)
+/* FI: this macro requires an additional parameter or a default value
+   as third parameter of inegalite_fprint() */
 #define inegalite_print(ineg) inegalite_fprint(stdout,ineg)
 
 /* passage au champ vecteur d'une contrainte "a la  Newgen" */

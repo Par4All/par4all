@@ -147,7 +147,7 @@ Pray_dte rd;
 char *f;
 {
     (void) fprintf(stderr,"destruction de R/D dans %s\n",f);
-    vect_fprint(stderr, rd->vecteur, variable_dump_name);
+    vect_fprint(stderr, rd->vecteur, variable_debug_name);
     dbg_vect_rm(rd->vecteur,f);
     FREE((char *)rd,RAY_DTE,f);
 }
@@ -182,12 +182,12 @@ Pbase b;
 }
 
 /* void ray_dte_dump(Pray_dte rd): impression de debug de rd sur stderr,
- * utilisant variable_dump_name()
+ * utilisant variable_debug_name()
  */
 void ray_dte_dump(rd)
 Pray_dte rd;
 {
-    ray_dte_fprint(stderr, rd, variable_dump_name);
+    ray_dte_fprint(stderr, rd, variable_debug_name);
 }
 
 /* void fprint_lray_dte(FILE * f, Pray_dte listrd, char * (*nom_var)()):

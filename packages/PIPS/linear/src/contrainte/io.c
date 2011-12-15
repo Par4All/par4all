@@ -149,10 +149,7 @@ char * (*variable_name)(Variable);
  *
  * Ancien nom: eg_print(), print_eq()
  */
-void egalite_fprint(fp,eg,variable_name)
-FILE *fp;
-Pcontrainte eg;
-char * (*variable_name)(Variable);
+void egalite_fprint(FILE *fp, Pcontrainte eg, char * (*variable_name)(Variable))
 {
     contrainte_fprint(fp,eg,false,variable_name);
 }
@@ -161,7 +158,7 @@ char * (*variable_name)(Variable);
  * utilise en debugging
  */
 void egalite_dump(Pcontrainte c) {
-    egalite_fprint(stderr, c, variable_dump_name);
+    egalite_fprint(stderr, c, variable_debug_name);
 }
 
 /* void inegalite_fprint(FILE * fp, Pcontrainte ineg,
@@ -183,7 +180,7 @@ char * (*variable_name)(Variable);
  * utilise en debugging
  */
 void inegalite_dump(Pcontrainte c) {
-    inegalite_fprint(stderr, c, variable_dump_name);
+    inegalite_fprint(stderr, c, variable_debug_name);
 }
 
 /* void egalites_fprint(FILE * fp, Pcontrainte eg, char * (*variable_name)()):
@@ -201,6 +198,9 @@ char * (*variable_name)(Variable);
 	contrainte_fprint(fp,eg,false,variable_name);
 }
 
+void egalites_dump(Pcontrainte eg)
+{egalites_fprint(stderr, eg, variable_debug_name);}
+
 /* void inegalites_fprint(FILE * fp, Pcontrainte ineg,
  *                        char * (*variable_name)()):
  * impression d'une liste d'inegalites ineg dans le fichier fp avec des noms de
@@ -216,6 +216,9 @@ char * (*variable_name)(Variable);
     for( ; ineg != NULL; ineg = ineg->succ)
 	contrainte_fprint(fp,ineg,true,variable_name);
 }
+
+void inegalites_dump(Pcontrainte eg)
+{inegalites_fprint(stderr, eg, variable_debug_name);}
 
 void
 sprint_operator(char *s, bool is_inegalite, bool a_la_fortran)

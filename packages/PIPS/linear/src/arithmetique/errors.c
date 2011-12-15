@@ -37,7 +37,8 @@
 #include "arithmetique.h"
 
 
-/* This can be overrided in the PolyLib */
+/* This can be overrided in the PolyLib. And seems to be according to
+   gdb who cannot find the corresponding source code. */
 char const *  __attribute__ ((weak))
 get_exception_name(const linear_exception_t exception)
 {

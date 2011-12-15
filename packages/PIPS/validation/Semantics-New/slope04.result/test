@@ -1,0 +1,80 @@
+
+Transformers for slope04
+
+
+//  T() {}
+
+void slope04()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=5}
+
+   
+   /* create a minimal bounding box */
+   if (!(0<=x&&x<=5))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-3, 0) to point(7,3), 10y<=3x+9. It
+      * should be simplified into y<=x, y<=5, and 3*y<=x+2.
+      */
+   if (-3*x+10*y-9<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+   return;
+}
+
+Preconditions for slope04
+
+
+//  P() {}
+
+void slope04()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a minimal bounding box */
+   if (!(0<=x&&x<=5))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=5}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-3, 0) to point(7,3), 10y<=3x+9. It
+      * should be simplified into y<=x, y<=5, and 3*y<=x+2.
+      */
+   if (-3*x+10*y-9<=0)
+
+//  P(k,x,y) {0<=x, x<=5, 10y<=3x+9}
+
+      k = x+y;
+
+//  P(k,x,y) {0<=x, x<=5}
+
+   return;
+}

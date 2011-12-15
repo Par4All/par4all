@@ -103,6 +103,26 @@ char * variable_dump_name(Variable v) {
   return(buffer);
 }
 
+/* Debug support: pointer to the function used by debug print outs. 
+ *
+ * It can be set to point to other packages' own definition of
+ * Value. For instance, entity_local_name() for PIPS.
+ *
+ * For unit tests within linear, it should be set to point to
+ * variable_default_name()
+ */
+char * (*variable_debug_name)(Variable) = variable_dump_name;
+					  
+/* This function is mostly intended for use from within gdb */
+void init_variable_debug_name(char *(*name)(Variable))
+{
+  variable_debug_name = name;
+}
+void reset_variable_debug_name(void)
+{
+  variable_debug_name = variable_dump_name;
+}
+
 /* Variable variable_make(char * name): defines a new variable of a given
  * name
  */
