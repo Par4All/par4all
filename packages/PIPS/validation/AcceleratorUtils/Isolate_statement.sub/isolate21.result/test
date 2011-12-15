@@ -11,10 +11,11 @@ holy:   sain(T);
 void pain(char *T)
 {
    //PIPS generated variable
-   char *(*T0)[2] = (char *(*)[2]) 0;
-   P4A_accel_malloc((void **) &T0, sizeof(char)*2);
+   char **T0 = (char **) 0;
+   P4A_accel_malloc((void **) &T0, sizeof(char *)*1);
+   P4A_copy_to_accel_1d(sizeof(char *), &T, *T0);
 
 holy:   sain(*T0);
-   P4A_copy_from_accel_2d(sizeof(char), 2, 0, &T, *T0);
+   P4A_copy_from_accel_1d(sizeof(char), 2, 0, &T, *T0);
    P4A_accel_free(T0);
 }
