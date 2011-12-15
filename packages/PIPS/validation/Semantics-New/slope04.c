@@ -3,19 +3,18 @@
 
 #include <assert.h>
 
-void slope03()
+void slope04()
 {
   int x, y, k;
 
   /* create a minimal bounding box */
-  // assert(0<=x && x<=10 && 0<=y && 0<=10);
-  assert(0<=x && x<=10);
+  assert(0<=x && x<=5);
 
   /* Define a horizontal constraint that is slightly increasing in
-   * rationals.  It links point (-1, 5) to point(21,7), 21y=2x+107. It
-   * should be simplified into 10y<=x+50.
+   * rationals.  It links point (-3, 0) to point(7,3), 10y<=3x+9. It
+   * should be simplified into y<=x, y<=5, and 3*y<=x+2.
    */
-  if(21*y<=2*x+107)
+  if(-3*x+10*y-9<=0)
     k = x + y;
   return;
 }

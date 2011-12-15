@@ -27,9 +27,9 @@ void slope03()
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-1, 5) to point(21,7), 21y=2x+107. It
-      * should be simplified into 10y=x+50.
+      * should be simplified into 10y<=x+50.
       */
-   if (12*y<=x+61)
+   if (21*y<=2*x+107)
 
 //  T(k) {x+y==k}
 
@@ -68,11 +68,11 @@ void slope03()
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-1, 5) to point(21,7), 21y=2x+107. It
-      * should be simplified into 10y=x+50.
+      * should be simplified into 10y<=x+50.
       */
-   if (12*y<=x+61)
+   if (21*y<=2*x+107)
 
-//  P(k,x,y) {0<=x, x<=10, 12y<=x+61}
+//  P(k,x,y) {0<=x, x<=10, 10y<=x+50}
 
       k = x+y;
 

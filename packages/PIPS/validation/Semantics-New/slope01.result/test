@@ -34,7 +34,7 @@ void slope01()
       * need a bounding box but simply bounds for the x dimension if the
       * y coefficient is large and vice versa.
       */
-   if (12*y<=x+61)
+   if (-x+12*y-61<=0)
 
 //  T(k) {x+y==k}
 
@@ -80,9 +80,9 @@ void slope01()
       * need a bounding box but simply bounds for the x dimension if the
       * y coefficient is large and vice versa.
       */
-   if (12*y<=x+61)
+   if (-x+12*y-61<=0)
 
-//  P(k,x,y) {0<=x, x<=10, 12y<=x+61}
+//  P(k,x,y) {0<=x, x<=10, y<=5}
 
       k = x+y;
 

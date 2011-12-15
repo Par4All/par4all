@@ -20,7 +20,7 @@ void slope01()
    * need a bounding box but simply bounds for the x dimension if the
    * y coefficient is large and vice versa.
    */
-  if(12*y<=x+61) 
+  if(-x+12*y-61<=0) 
     k = x + y;
   return;
 }
