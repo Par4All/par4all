@@ -15,12 +15,10 @@ void slope02()
    * rationals.  It links point (-1, 5) to point(11,7), 6y=x+31. It
    * should be simplified into y<=5 and 5y<x+25.
    *
-   * Problem for testing: the redundancy elimination kill one of the
-   * bounding box inequalities... The analysis was wrong: you do not
-   * need a bounding box but simply bounds for the x dimension if the
-   * y coefficient is large and vice versa.
+   * Due to division, the left point must be moved to (-2,5) for dx=13
    */
-  if(12*y<=x+61) 
+  //if(6*y<=x+31)
+  if(13*y<=2*x+69)
     k = x + y;
   return;
 }
