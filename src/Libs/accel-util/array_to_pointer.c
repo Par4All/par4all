@@ -69,7 +69,10 @@ bool do_convert_this_array_to_pointer_p(entity e) {
   if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS")) {
     if(get_bool_property("LINEARIZE_ARRAY_SKIP_STATIC_LENGTH_ARRAYS") && !entity_variable_length_array_p(e))
       return false;
-    if(get_bool_property("LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS") && !entity_formal_p(e))
+    value v =entity_initial(e);
+    if ( !value_undefined_p(v) && value_expression_p(v) && !expression_brace_p(value_expression(v) ) ) 
+        return true;
+    if( get_bool_property("LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS") && !entity_formal_p(e) ) 
       return false;
     return true;
   }
