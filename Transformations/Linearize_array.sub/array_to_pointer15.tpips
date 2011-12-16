@@ -1,0 +1,34 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "array_to_pointer15"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after array conversion
+echo
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc $WS.c -o  $WS.database/Tmp/ref
+# note the trick to make sure alloca doesnot disturb us on some configuration
+shell cc -Dalloca=malloc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+shell ./$WS.database/Tmp/ref 100 > ./$WS.database/Tmp/ref-out
+shell ./$WS.database/Tmp/out 100 > ./$WS.database/Tmp/out-out
+shell cmp ./$WS.database/Tmp/ref-out ./$WS.database/Tmp/out-out
+
+close
+delete $WS
+quit
+

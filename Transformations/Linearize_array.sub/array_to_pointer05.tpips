@@ -1,0 +1,40 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "array_to_pointer05"
+delete $WS
+create $WS $WS.c
+
+
+
+echo
+echo Initial code
+echo
+module vector_product
+
+display PRINTED_FILE
+
+echo
+echo Code after array conversion
+echo
+
+apply LINEARIZE_ARRAY
+display PRINTED_FILE
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc -c $WS.c -o  $WS.database/Tmp/ref.o
+shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/out.o
+
+close
+delete $WS
+quit
+

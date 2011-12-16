@@ -1,0 +1,11 @@
+delete array_to_pointer07
+create array_to_pointer07 array_to_pointer07.c
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+display PRINTED_FILE[%ALLFUNC]
+apply LINEARIZE_ARRAY[%ALL]
+display PRINTED_FILE[%ALLFUNC]
+
+
+quit
+

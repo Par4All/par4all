@@ -1,0 +1,28 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete array_to_pointer09
+create array_to_pointer09 array_to_pointer09.c
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+display PRINTED_FILE[atp]
+display PRINTED_FILE[main]
+
+echo
+echo "/* After apply LINEARIZE_ARRAY[%ALL] */"
+echo
+
+apply LINEARIZE_ARRAY[%ALLFUNC]
+display PRINTED_FILE[atp]
+display PRINTED_FILE[main]
+
+apply UNSPLIT[%ALL]
+close
+
+
+shell cc array_to_pointer09.c -o array_to_pointer09.database/Tmp/ref
+# alloca -> malloc for validation
+shell cc -Dalloca=malloc -W -Wall array_to_pointer09.database/Src/array_to_pointer09.c -o array_to_pointer09.database/Tmp/out
+shell test "`./array_to_pointer09.database/Tmp/ref`" = "`./array_to_pointer09.database/Tmp/out`"
+
+delete array_to_pointer09
+
+

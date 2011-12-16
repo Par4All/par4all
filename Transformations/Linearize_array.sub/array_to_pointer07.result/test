@@ -1,0 +1,30 @@
+void atp(float cdens[1024][2])
+{
+   int i;
+   for(i = 0; i <= 1023; i += 1) {
+      cdens[i][0] = 1;
+      cdens[i][1] = 0;
+   }
+}
+int main(int argc, char **argv)
+{
+   float cdens[1024][2];
+   float (*pdens)[1024][2] = (float (*)[1024][2]) malloc(sizeof(cdens));
+   atp(cdens);
+   atp(*pdens);
+}
+void atp(float *cdens)
+{
+   int i;
+   for(i = 0; i <= 1023; i += 1) {
+      *(cdens+2*i) = 1;
+      *(cdens+(2*i+1)) = 0;
+   }
+}
+int main(int argc, char **argv)
+{
+   float *cdens = (float *) alloca(sizeof(float[2048]));
+   float *pdens = (float *) malloc(sizeof(cdens));
+   atp(cdens);
+   atp(pdens);
+}

@@ -1,0 +1,27 @@
+setenv WS=array_to_pointer11
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+display PRINTED_FILE[%ALL]
+
+echo
+echo "/* After apply LINEARIZE_ARRAY[%ALL] */"
+echo
+
+#apply LINEARIZE_ARRAY[%ALL]
+apply LINEARIZE_ARRAY[init]
+apply LINEARIZE_ARRAY[p4a_kernel_1]
+apply LINEARIZE_ARRAY[p4a_kernel_launcher_1]
+apply LINEARIZE_ARRAY[p4a_kernel_wrapper_1]
+display PRINTED_FILE[%ALL]
+
+#quit
+
+apply UNSPLIT[%ALL]
+shell cc -W -Wall -c $WS.database/Src/$WS.c
+
+
+quit
+

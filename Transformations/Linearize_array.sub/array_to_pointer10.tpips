@@ -1,0 +1,25 @@
+setenv WS=array_to_pointer10
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+display PRINTED_FILE[%ALL]
+
+echo
+echo "/* After apply LINEARIZE_ARRAY[%ALL] */"
+echo
+
+apply LINEARIZE_ARRAY[%ALL]
+display PRINTED_FILE[%ALL]
+
+#quit
+
+apply UNSPLIT[%ALL]
+close
+
+shell cc -W -Wall -o $WS.out $WS.database/Src/$WS.c
+shell rm $WS.out
+
+delete $WS
+quit

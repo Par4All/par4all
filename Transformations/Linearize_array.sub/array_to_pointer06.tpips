@@ -1,0 +1,39 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "array_to_pointer06"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[duck]
+
+echo
+echo Code after array conversion
+echo
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY[duck]
+display PRINTED_FILE[%ALLFUNC]
+
+#echo
+#echo Code after partial eval
+#echo
+#
+#apply PARTIAL_EVAL[duck]
+#display PRINTED_FILE[duck]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc $WS.c -o  $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+shell test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`
+
+close
+delete $WS
+quit
+
