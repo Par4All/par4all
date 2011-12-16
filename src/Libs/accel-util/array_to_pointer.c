@@ -540,8 +540,15 @@ static void do_linearize_prepatch_subscripts(statement s) {
 
 static void do_linearize_prepatch(entity m,statement s) {
   FOREACH(ENTITY,e,entity_declarations(m))
-    if(entity_variable_p(e))
+    if(entity_variable_p(e)) {
+        if(local_entity_of_module_p(e,m) && 
+                entity_pointer_p(e) &&
+                value_unknown_p(entity_initial(e))) {
+            free_value(entity_initial(e));
+            entity_initial(e) = make_value_expression(int_to_expression(0));
+        }
       do_linearize_prepatch_type(entity_type(e));
+    }
   FOREACH(PARAMETER,p,module_functional_parameters(m)) {
     dummy d = parameter_dummy(p);
     if(dummy_identifier_p(d))
