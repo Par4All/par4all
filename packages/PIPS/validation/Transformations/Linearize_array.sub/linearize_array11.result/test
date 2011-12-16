@@ -1,0 +1,13 @@
+int pof(int n, complex IN[3][n])
+{
+   complex (*a)[n] = (complex (*)[n]) &IN[2];
+   return (*a)[3].im;
+}
+#
+# Code after linearize_array for module pof
+#
+int pof(int n, complex *IN)
+{
+   complex *a = (complex *) (IN+2*n);
+   return (*(a+3)).im;
+}

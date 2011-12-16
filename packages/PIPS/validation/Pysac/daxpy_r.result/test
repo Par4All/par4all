@@ -17,8 +17,6 @@ void daxpy_r(int n, float da, float dx[n], float dy[n])
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
    int i;
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }
 void daxpy_r_l99999(int n, float da, float dx[n], float dy[n])
@@ -95,32 +93,22 @@ l99999:
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
    int i;
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
    int i;
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }
 void daxpy_r(int n, float da, float dx[n], float dy[n])
 {
-   /* code for both increments equal to 1 */
-   
 l99999:   daxpy_r_l99999(n, da, dx, dy);
 }

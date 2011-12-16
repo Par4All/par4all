@@ -145,7 +145,6 @@ init_kernel:
 int main(int argc, char *argv[])
 {
    int i, j;
-
 init_kernel:   init_kernel(imagein_re);
 
    for(i = 0; i <= 63; i += 1) {
@@ -245,7 +244,6 @@ init_kernel:
 int main(int argc, char *argv[])
 {
    int i;
-
 init_kernel:   init_kernel(imagein_re);
 
    for(i = 0; i <= 63; i += 1) {

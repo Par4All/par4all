@@ -45,8 +45,6 @@ C To be assigned to a call to P4A_vp_0: J
 
 !$OMP    PARALLEL DO 
          DO J = 1, N                                                    0016
-C To be assigned to a call to P4A_vp_1: I
-C To be assigned to a call to P4A_vp_0: J
             CALL P4A_WRAPPER_MATADD_1(M, N, A, B, C, I, J)              0017
          ENDDO
       ENDDO

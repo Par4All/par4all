@@ -9,7 +9,6 @@ int main(int argc, char **argv)
       double (*P4A_var_y0)[80] = (double (*)[80]) 0;
       P4A_accel_malloc((void **) &P4A_var_y0, sizeof(double)*80);
 
-
       p4a_launcher_main(*P4A_var_y0);
       P4A_copy_from_accel_1d(sizeof(double), 80, 80, 0, &y[0], *P4A_var_y0);
       P4A_accel_free(P4A_var_y0);

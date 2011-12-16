@@ -600,9 +600,6 @@ void compute()
 {
    // BEGIN BLOCK
    int i, j;
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
@@ -639,8 +636,6 @@ void get_data(char filename[])
    /* Get ONE carriage return */
    fgetc(fp);
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
@@ -712,8 +707,6 @@ void p4a_kernel_launcher_compute(float_t save[501][501], float_t space[501][501]
 kernel1:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_kernel_wrapper_compute(save, space, i, j);
    // END BLOCK
 }
@@ -726,8 +719,6 @@ void p4a_kernel_launcher_compute_1(float_t save[501][501], float_t space[501][50
 kernel2:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_kernel_wrapper_compute_1(save, space, i, j);
    // END BLOCK
 }
@@ -741,8 +732,6 @@ void p4a_kernel_launcher_get_data(float_t space[501][501])
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1)
       for(j = 0; j <= 500; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_kernel_wrapper_get_data(space, i, j);
    // END BLOCK
 }
@@ -831,9 +820,6 @@ void compute()
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -993,8 +979,6 @@ void get_data(char filename[])
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
 
 //  <fp-R-EXACT-{}>
@@ -1074,9 +1058,6 @@ void compute()
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -1200,8 +1181,6 @@ void get_data(char filename[])
 //  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
@@ -1264,9 +1243,6 @@ void compute()
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -1385,8 +1361,6 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
 
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
 
 //  <fp-IN-EXACT-{}>
@@ -1451,9 +1425,6 @@ void compute()
 //  <save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
@@ -1558,8 +1529,6 @@ void get_data(char filename[])
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500}>
 
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
 
 //  <fp[PHI1]-OUT-MAY-{PHI1==0, 1<=nx, 1<=ny}>
@@ -1616,9 +1585,6 @@ void compute()
 {
    // BEGIN BLOCK
    int i, j;
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   p4a_kernel_launcher_compute(save, space);
 kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
@@ -1655,8 +1621,6 @@ void get_data(char filename[])
    /* Get ONE carriage return */
    fgetc(fp);
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */

@@ -56,6 +56,42 @@
 #include "pointer_values.h"
 #include "effects-generic.h"
 
+
+typedef struct {
+  bool memory_effects_only;
+  bool memory_in_out_effects_only;
+  effects_representation_val representation;
+} live_paths_analysis_context;
+
+
+static void init_live_paths_context(live_paths_analysis_context *ctxt,
+				    effects_representation_val representation)
+{
+  ctxt->memory_effects_only = get_bool_property("MEMORY_EFFECTS_ONLY");
+  ctxt->memory_in_out_effects_only = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  ctxt->representation = representation;
+}
+
+static list __attribute__((unused)) convert_rw_effects(list lrw, live_paths_analysis_context *ctxt)
+{
+  if (!ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
+    lrw = effects_store_effects(lrw);
+
+  return lrw;
+}
+
+
+static void __attribute__((unused)) reset_converted_rw_effects(list *lrw, live_paths_analysis_context *ctxt)
+{
+  if (!ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
+    gen_free_list(*lrw);
+  *lrw = NIL;
+}
+
+
+
 /**************************** GENERIC INTERPROCEDURAL LIVE_IN PATHS ANALYSIS */
 
 bool live_in_summary_paths_engine(const char* module_name)
@@ -134,7 +170,11 @@ live_out_paths_from_call_site_to_callee(call c, live_out_summary_engine_context 
 
     /* There may also be a problem here in C, because calls may be
        anywhere inside an expression, and not solely as standalone
-       statements. BC.
+       statements.  It may be better to call this function during the
+       intraprocedural analysis of callers and not during a standalone
+       phase which would have to deal with calls in sub-expressions,
+       and thus also with store/pointers modifications.
+       BC.
     */
     list l_out = load_live_out_paths_list(current_stmt);
 
@@ -243,8 +283,72 @@ bool live_out_summary_paths_engine(const char* module_name)
 
 /********************* GENERIC INTRAPROCEDURAL LIVE_IN AND LIVE_OUT PATHS ANALYSIS */
 
-
-bool live_paths_engine(const char *module_name)
+static void
+live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt)
 {
+  return;
+}
+
+bool live_paths_engine(const char *module_name, effects_representation_val representation)
+{
+  debug_on("LIVE_PATHS_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  set_current_module_entity(module_name_to_entity(module_name));
+
+  /* Get the code of the module. */
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, true) );
+  statement module_statement = get_current_module_statement();
+
+
+
+  make_effects_private_current_context_stack();
+  (*effects_computation_init_func)(module_name);
+
+  /* Get the various effects and in_effects of the module. */
+
+  set_rw_effects((*db_get_rw_effects_func)(module_name));
+  set_invariant_rw_effects((*db_get_invariant_rw_effects_func)(module_name));
+
+  set_cumulated_in_effects((*db_get_cumulated_in_effects_func)(module_name));
+  set_in_effects((*db_get_in_effects_func)(module_name));
+  set_invariant_in_effects((*db_get_invariant_in_effects_func)(module_name));
+
+
+  /* initialise the map for live_out and live_int paths */
+  init_live_in_paths();
+  init_live_out_paths();
+
+  /* Get the live_out_summary_paths of the current module */
+  list l_sum_live_out = (*db_get_live_out_summary_paths_func)(module_name);
+  /* And stores them as the out regions of the module statement */
+  store_live_out_paths_list(module_statement, effects_dup(l_sum_live_out));
+
+  /* Compute the out_effects of the module. */
+  live_paths_analysis_context ctxt;
+  init_live_paths_context(&ctxt, representation);
+  live_paths_of_module_statement(module_statement, &ctxt);
+
+  pips_debug(1, "end\n");
+
+  (*db_put_live_out_paths_func)(module_name, get_live_out_paths());
+
+  reset_rw_effects();
+  reset_invariant_rw_effects();
+  reset_in_effects();
+  reset_cumulated_in_effects();
+  reset_invariant_in_effects();
+  reset_live_in_paths();
+  reset_live_out_paths();
+  (*effects_computation_reset_func)(module_name);
+
+  free_effects_private_current_context_stack();
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  pips_debug(1, "end\n");
+
+  debug_off();
   return true;
 }

@@ -38,9 +38,7 @@ C To be assigned to a call to P4A_vp_0: J
 
       DO I = 1, M                                                       0005
          DO J = 1, N                                                    0006
-C To be assigned to a call to P4A_vp_1: I
-C To be assigned to a call to P4A_vp_0: J
-            CALL P4A_WRAPPER_MATADD(M, N, B, C, I, J)                   0009
+            CALL P4A_WRAPPER_MATADD(M, N, B, C, I, J)                   0007
          ENDDO
       ENDDO
       END
@@ -53,9 +51,7 @@ C To be assigned to a call to P4A_vp_0: J
 
       DO I = 1, M                                                       0005
          DO J = 1, N                                                    0006
-C To be assigned to a call to P4A_vp_1: I
-C To be assigned to a call to P4A_vp_0: J
-            CALL P4A_WRAPPER_MATADD_1(M, N, A, B, C, I, J)              0009
+            CALL P4A_WRAPPER_MATADD_1(M, N, A, B, C, I, J)              0007
          ENDDO
       ENDDO
       END
@@ -68,9 +64,7 @@ C To be assigned to a call to P4A_vp_0: J
       PARAMETER (M = 402, N = 160)
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
-
       CALL P4A_LAUNCHER_MATADD(M, N, B, C)                              0008
-
       CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)                         0015
 
       END

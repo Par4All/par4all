@@ -137,8 +137,6 @@ void do_one_iteration(int m, int n, IMAGE_RGB x[m][n], RGB ui[m][n], RGB uj[m][n
             P4A_copy_to_accel_4d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &ui[0][0][0], *P4A_var_ui0);
             P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kInv[0][0], *P4A_var_kInv0);
 
-            
-            // Loops over the entire 2d signal
             p4a_launcher_do_one_iteration(m, n, q, qofs, alpha, *P4A_var_kInv0, *P4A_var_ui0, *P4A_var_uj0, *P4A_var_weights0, *P4A_var_x0);
             P4A_copy_from_accel_4d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &uj[0][0][0], *P4A_var_uj0);
             P4A_accel_free(P4A_var_x0);
@@ -216,8 +214,6 @@ void p4a_launcher_do_one_iteration(int m, int n, int q, int qofs, FLOAT alpha, F
    for(i = 0; i <= m-1; i += 1) {
       int j;
       for(j = 0; j <= n-1; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_wrapper_do_one_iteration(m, n, q, j, i, qofs, alpha, kInv, ui, uj, weights, x);
    }
 }

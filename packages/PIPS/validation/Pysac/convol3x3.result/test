@@ -151,7 +151,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int i, j, k, l;
    //PIPS generated variable
    int I_0, I_1;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
@@ -330,7 +329,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int i, j, k, l;
    //PIPS generated variable
    int I_0, I_1;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
@@ -350,7 +348,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int i, j, k, l;
    //PIPS generated variable
    int I_0, I_1;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
@@ -370,7 +367,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int j;
    //PIPS generated variable
    int i0;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
@@ -390,7 +386,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int j;
    //PIPS generated variable
    int i0;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
@@ -410,7 +405,6 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
    int j;
    //PIPS generated variable
    int i0;
-
 l99998:   convol3x3_l99998(isi, isj, image, new_image);
 
 l99994:
