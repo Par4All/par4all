@@ -69,7 +69,10 @@ bool do_convert_this_array_to_pointer_p(entity e) {
   if(get_bool_property("LINEARIZE_ARRAY_USE_POINTERS")) {
     if(get_bool_property("LINEARIZE_ARRAY_SKIP_STATIC_LENGTH_ARRAYS") && !entity_variable_length_array_p(e))
       return false;
-    if(get_bool_property("LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS") && !entity_formal_p(e))
+    value v =entity_initial(e);
+    if ( !value_undefined_p(v) && value_expression_p(v) && !expression_brace_p(value_expression(v) ) ) 
+        return true;
+    if( get_bool_property("LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS") && !entity_formal_p(e) ) 
       return false;
     return true;
   }
@@ -540,8 +543,15 @@ static void do_linearize_prepatch_subscripts(statement s) {
 
 static void do_linearize_prepatch(entity m,statement s) {
   FOREACH(ENTITY,e,entity_declarations(m))
-    if(entity_variable_p(e)&&formal_parameter_p(e))
+    if(entity_variable_p(e)) {
+        if(local_entity_of_module_p(e,m) && 
+                entity_pointer_p(e) &&
+                value_unknown_p(entity_initial(e))) {
+            free_value(entity_initial(e));
+            entity_initial(e) = make_value_expression(int_to_expression(0));
+        }
       do_linearize_prepatch_type(entity_type(e));
+    }
   FOREACH(PARAMETER,p,module_functional_parameters(m)) {
     dummy d = parameter_dummy(p);
     if(dummy_identifier_p(d))
@@ -654,7 +664,7 @@ static void do_array_to_pointer_walk_expression(expression exp) {
 }
 
 /* fix some strange constructs introduced by previous processing */
-static void do_array_to_pointer_patch_call_expression(expression exp) {
+static bool do_array_to_pointer_patch_call_expression(expression exp) {
   if(expression_call_p(exp)) {
     call c = expression_call(exp);
     entity op = call_function(c);
@@ -673,6 +683,7 @@ static void do_array_to_pointer_patch_call_expression(expression exp) {
       }
     }
   }
+  return true;
 }
 
 /* special ad-hoc handler for pointer to arrays */
@@ -712,7 +723,7 @@ static void do_array_to_pointer_walker(void *obj) {
       call_domain,gen_true,do_array_to_pointer_walk_call_and_patch,
       cast_domain,gen_true,do_array_to_pointer_walk_cast,
       NULL);
-  gen_recurse(obj,expression_domain,gen_true,do_array_to_pointer_patch_call_expression);
+  gen_recurse(obj,expression_domain,do_array_to_pointer_patch_call_expression,do_array_to_pointer_patch_call_expression);
 
 }
 
@@ -757,39 +768,46 @@ list initialization_list_to_statements(entity e) {
       }
     }
     if(!formal_parameter_p(e)) {
-      /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
-      free_value(entity_initial(e));
-      type ct = copy_type(ultimate_type(entity_type(e)));
-      if(array_type_p(ct)) {
-        POP(variable_dimensions(type_variable(ct))); //leak spotted !
-        ct = make_type_variable(
-            make_variable(
-              make_basic_pointer(ct),NIL,NIL
-              )
-            );
-      }
+        value v = entity_initial(e);
+        expression ev;
+        if(value_expression_p(v) && (!expression_call_p(ev=value_expression(v)) ||
+                !ENTITY_BRACE_INTRINSIC_P(call_function(expression_call(ev)) ))) {
+        }
+        else {
+            /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
+            free_value(entity_initial(e));
+            type ct = copy_type(ultimate_type(entity_type(e)));
+            if(array_type_p(ct)) {
+                POP(variable_dimensions(type_variable(ct))); //leak spotted !
+                ct = make_type_variable(
+                        make_variable(
+                            make_basic_pointer(ct),NIL,NIL
+                            )
+                        );
+            }
 
-      entity_initial(e) = make_value_expression(
-          syntax_to_expression(
-            make_syntax_cast(
-              make_cast(ct,
-                MakeUnaryCall(
-                  entity_intrinsic(ALLOCA_FUNCTION_NAME),
-                  make_expression(
-                    make_syntax_sizeofexpression(
-                      make_sizeofexpression_type(
-                        copy_type(entity_type(e))
+            entity_initial(e) = make_value_expression(
+                    syntax_to_expression(
+                        make_syntax_cast(
+                            make_cast(ct,
+                                MakeUnaryCall(
+                                    entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                                    make_expression(
+                                        make_syntax_sizeofexpression(
+                                            make_sizeofexpression_type(
+                                                copy_type(entity_type(e))
+                                                )
+                                            ),
+                                        normalized_undefined
+                                        )
+                                    )
+                                )
+                            )
                         )
-                      ),
-                    normalized_undefined
-                    )
-                  )
-                )
-              )
-            )
-          );
-      AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
-          get_current_module_entity());
+                    );
+            AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                    get_current_module_entity());
+        }
     }
   }
   return gen_nreverse(stats);

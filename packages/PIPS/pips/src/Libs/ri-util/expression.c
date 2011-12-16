@@ -304,6 +304,14 @@ make_assign_expression(expression lhs,
 
 /* predicates and short cut accessors on expressions */
 
+bool expression_brace_p(expression e) {
+    if(expression_call_p(e)) {
+        call c = expression_call(e);
+        return ENTITY_BRACE_INTRINSIC_P(call_function(c));
+    }
+    return false;
+}
+
 bool expression_call_p(expression e)
 {
   return(syntax_call_p(expression_syntax(e)));
