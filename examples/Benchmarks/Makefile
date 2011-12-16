@@ -1,4 +1,4 @@
-TARGETS=polybenchs rodinia
+LOCAL_TARGETS=polybenchs rodinia
 
 include main.mk
 
