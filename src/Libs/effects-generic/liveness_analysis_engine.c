@@ -170,7 +170,11 @@ live_out_paths_from_call_site_to_callee(call c, live_out_summary_engine_context 
 
     /* There may also be a problem here in C, because calls may be
        anywhere inside an expression, and not solely as standalone
-       statements. BC.
+       statements.  It may be better to call this function during the
+       intraprocedural analysis of callers and not during a standalone
+       phase which would have to deal with calls in sub-expressions,
+       and thus also with store/pointers modifications.
+       BC.
     */
     list l_out = load_live_out_paths_list(current_stmt);
 
