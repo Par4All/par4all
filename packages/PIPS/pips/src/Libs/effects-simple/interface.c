@@ -837,7 +837,16 @@ bool simple_cumulated_effects(const char* module_name, statement current)
 bool
 live_paths(const char* module_name)
 {
-  return true;
+  bool ok;
+  if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+    set_constant_paths_p(false);
+  else
+    set_constant_paths_p(true);
+  set_pointer_info_kind(with_no_pointer_info);
+  set_methods_for_live_paths(module_name);
+  ok = live_paths_engine(module_name, simple);
+  generic_effects_reset_all_methods();
+  return ok;
 }
 
 bool

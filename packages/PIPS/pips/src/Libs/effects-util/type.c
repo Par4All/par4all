@@ -249,94 +249,117 @@ bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
 /*************************************************************************/
 /* cell references */
 
-static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type, bool *to_be_freed)
+static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to_be_freed)
 {
   type t = type_undefined;  /* the return type */
-  pips_assert("input type tag should be variable\n", type_variable_p(current_type));
 
-  basic current_basic = variable_basic(type_variable(current_type)); /* current basic */
-  list l_current_dim = variable_dimensions(type_variable(current_type)); /* current type array dimensions */
-  size_t current_nb_dim = gen_length(l_current_dim);
-
-  pips_debug(8, "input type : %s\n", type_to_string(current_type));
-  pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
-
-  /* the remainder of the function heavily relies on the following assumption */
-  pips_assert("there should be no memory access paths to variable names\n", gen_length(ref_l_ind) >= current_nb_dim);
-
-  if (ENDP(ref_l_ind)) /* We have reached the current basic and there are no array dimensions to skip */
+  switch (type_tag(current_type))
     {
-      t = current_type;
-      *to_be_freed = false;
-    }
-  else
-    {
-      /* skip array dimensions if any */
-      for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
+    case is_type_variable:
+      {
+	basic current_basic = variable_basic(type_variable(current_type)); /* current basic */
+	list l_current_dim = variable_dimensions(type_variable(current_type)); /* current type array dimensions */
+	size_t current_nb_dim = gen_length(l_current_dim);
 
-      if (ENDP(ref_l_ind)) /* We have reached the current basic */
-	{
-	  /* Warning : qualifiers are set to NIL, because I do not see
-	     the need for something else for the moment. BC.
-	  */
-	  t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
-	  *to_be_freed = true;
-	}
-      else
-	{
-	  /* The cell reference contains indices that go beyond the current type array dimensions.
-	     This can happen if and only if the current basic is a pointer or a derived
-	     (typedef have been eliminated by the use of basic_concrete_type).
-	  */
-	  switch (basic_tag(current_basic))
-	    {
-	    case is_basic_pointer:
+	pips_debug(8, "input type : %s\n", type_to_string(current_type));
+	pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
+
+	/* the remainder of the function heavily relies on the following assumption */
+	pips_assert("there should be no memory access paths to variable names\n", gen_length(ref_l_ind) >= current_nb_dim);
+
+	if (ENDP(ref_l_ind)) /* We have reached the current basic and there are no array dimensions to skip */
+	  {
+	    t = current_type;
+	    *to_be_freed = false;
+	  }
+	else
+	  {
+	    /* skip array dimensions if any */
+	    for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
+
+	    if (ENDP(ref_l_ind)) /* We have reached the current basic */
 	      {
-		/* if the input type is a bct, then I think there is no need to compute the bct of a basic_pointer. BC.*/
-		/*type new_current_type = compute_basic_concrete_type(basic_pointer(current_basic));*/
-		type new_current_type = basic_pointer(current_basic);
-		POP(ref_l_ind); /* pop the pointer dimension */
-		t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
-		/* free_type(new_current_type);*/
-		break;
+		/* Warning : qualifiers are set to NIL, because I do not see
+		   the need for something else for the moment. BC.
+		*/
+		t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
+		*to_be_freed = true;
 	      }
-	    case is_basic_derived:
+	    else
 	      {
-		/* the next reference index should be a field entity */
-		expression next_index = EXPRESSION(CAR(ref_l_ind));
-		syntax s = expression_syntax(next_index);
-		if (syntax_reference_p(s))
+		/* The cell reference contains indices that go beyond the current type array dimensions.
+		   This can happen if and only if the current basic is a pointer or a derived
+		   (typedef have been eliminated by the use of basic_concrete_type).
+		*/
+		switch (basic_tag(current_basic))
 		  {
-		    entity next_index_e = reference_variable(syntax_reference(s));
-		    if (entity_field_p(next_index_e))
-		      {
-			type new_current_type = entity_basic_concrete_type(next_index_e);
-			POP(ref_l_ind); /* pop the field dimension */
-			t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
-		      }
-		    else
-		      pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity");
+		  case is_basic_pointer:
+		    {
+		      /* if the input type is a bct, then I think there is no need to compute the bct of a basic_pointer. BC.*/
+		      /*type new_current_type = compute_basic_concrete_type(basic_pointer(current_basic));*/
+		      type new_current_type = basic_pointer(current_basic);
+		      POP(ref_l_ind); /* pop the pointer dimension */
+		      t = r_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
+		      /* free_type(new_current_type);*/
+		      break;
+		    }
+		  case is_basic_derived:
+		    {
+		      /* the next reference index should be a field entity */
+		      expression next_index = EXPRESSION(CAR(ref_l_ind));
+		      syntax s = expression_syntax(next_index);
+		      if (syntax_reference_p(s))
+			{
+			  entity next_index_e = reference_variable(syntax_reference(s));
+			  if (entity_field_p(next_index_e))
+			    {
+			      type new_current_type = entity_basic_concrete_type(next_index_e);
+			      POP(ref_l_ind); /* pop the field dimension */
+			      t = r_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
+			    }
+			  else
+			    pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity");
+			}
+		      else
+			pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
+		      break;
+		    }
+		  default:
+		    {
+		      pips_internal_error("unexpected basic tag");
+		    }
 		  }
-		else
-		  pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
-		break;
 	      }
-	    default:
-	      {
-		pips_internal_error("unexpected basic tag");
-	      }
-	    }
-	}
-    }
+	  }
 
-  ifdebug(8)
-    {
-      variable v = type_variable(t);
-      pips_debug(8, "output type is: %s\n",  type_to_string(t));
-      pips_debug(8, "with basic : %s, and number of dimensions %d\n",
-		 basic_to_string(variable_basic(v)),
-		 (int) gen_length(variable_dimensions(v)));
-      pips_debug(8, "*to_be_freed = %s\n", *to_be_freed? "true": "false");
+	ifdebug(8)
+	  {
+	    if (type_variable_p(t))
+	      {
+		variable v = type_variable(t);
+		pips_debug(8, "output type is: %s\n",  type_to_string(t));
+		pips_debug(8, "with basic : %s, and number of dimensions %d\n",
+			   basic_to_string(variable_basic(v)),
+			   (int) gen_length(variable_dimensions(v)));
+		pips_debug(8, "*to_be_freed = %s\n", *to_be_freed? "true": "false");
+	      }
+	  }
+	break;
+      }
+    case is_type_void:
+      {
+	t = copy_type(current_type);
+	*to_be_freed = true;
+
+	ifdebug(8)
+	  {
+	    pips_debug(8, "output type is: void\n");
+	    pips_debug(8, "*to_be_freed = true\n");
+	  }
+	break;
+      }
+    default:
+      pips_internal_error("non void and non variable case: not handled yet here, please report\n");
     }
   return t;
 }
@@ -365,7 +388,7 @@ type cell_reference_to_type(reference ref, bool *to_be_freed)
     {
       if(type_variable_p(ref_type))
 	{
-	  t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type, to_be_freed);
+	  t = r_cell_reference_to_type(reference_indices(ref), ref_type, to_be_freed);
 	}
       else if(type_functional_p(ref_type))
 	{
