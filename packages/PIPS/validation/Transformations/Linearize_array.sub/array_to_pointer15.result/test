@@ -96,8 +96,8 @@ void convol3x3(int isi, int isj, float *new_image, float *image, float *kernel)
 int main(int argc, char **argv)
 {
    int image_size = atoi(*(argv+1));
-   float *image;
-   float *new_image;
+   float *image = 0;
+   float *new_image = 0;
    float *kernel = (float *) alloca(sizeof(float[9]));
    int i, j, n;
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
    //     read *, image
    for(i = 0; i <= image_size-1; i += 1)
       for(j = 0; j <= image_size-1; j += 1)
-         *(image+(j+i*image_size)+0) = i*j;
+         *(image+(j+i*image_size)) = i*j;
    
    
    for(n = 0; n <= 0; n += 1)
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
    
    
    for(i = 0; i <= image_size-1; i += 1)
-      printf("%f ", *(new_image+(i+i*image_size)+0));
+      printf("%f ", *(new_image+(i+i*image_size)));
 
    free(image);
    free(new_image);

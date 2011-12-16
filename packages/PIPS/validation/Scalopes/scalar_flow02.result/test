@@ -98,11 +98,9 @@ int main()
       P4A_scmp_malloc((void **) &P4A_var_c0, sizeof(int)*10);
       P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
 
-
       P4A_scmp_kernel_0(&a, &b, *P4A_var_c0);
       P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
    }
-
    P4A_scmp_kernel_1(&a, &b);
 
    return 0;

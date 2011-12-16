@@ -68,11 +68,6 @@ main(int argc, char *argv[])
 #pragma omp parallel for private(a,m)
    for(l = 0; l <= 63; l += 1) {
       // BEGIN BLOCK
-      /* Since this for loop is desugared in a while() with an
-             initialization before, it is a sequence, thus the label which
-             cannor be associated on a sequence is put on a ";" inside the
-             sequence and this is the ";" which is outlined instead of the
-             for-loop... */
 compute:      compute();
       m = 0;
       while (m<M) {

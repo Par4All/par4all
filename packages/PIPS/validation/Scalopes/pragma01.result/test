@@ -3,7 +3,6 @@ int main()
 
    int a[100];
    int i;
-
    p4a_launcher_0(a);
 
    return 0;

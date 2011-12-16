@@ -65,7 +65,6 @@ void p4a_launcher_main()
    //PIPS generated variable
    int d;
    for(d = 0; d <= 1039; d += 1)
-      // To be assigned to a call to P4A_vp_0: d
       p4a_wrapper_main();
 }
 void p4a_launcher_main_1(int finger_mat[64][16], int inv_qpsk_user1[16*64+16], int ovsf_code_ref[16])
@@ -76,7 +75,6 @@ void p4a_launcher_main_1(int finger_mat[64][16], int inv_qpsk_user1[16*64+16], i
    
    
    for(c = 0; c <= 63; c += 1)
-      // To be assigned to a call to P4A_vp_0: c
       p4a_wrapper_main_1(finger_mat, c, inv_qpsk_user1, ovsf_code_ref);
 }
 void p4a_launcher_main_2(int coeff2[16], int finger_mat[64][16], int symbole_flow_user1[64])
@@ -84,7 +82,6 @@ void p4a_launcher_main_2(int coeff2[16], int finger_mat[64][16], int symbole_flo
    //PIPS generated variable
    int j;
    for(j = 0; j <= 15; j += 1)
-      // To be assigned to a call to P4A_vp_0: j
       p4a_wrapper_main_2(coeff2, finger_mat, j, symbole_flow_user1);
 }
 void p4a_launcher_main_3()
@@ -94,7 +91,6 @@ void p4a_launcher_main_3()
    
    //display the channel coefficients
    for(j = 0; j <= 15; j += 1)
-      // To be assigned to a call to P4A_vp_0: j
       p4a_wrapper_main_3(j);
 }
 void p4a_launcher_main_4(int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
@@ -103,8 +99,6 @@ void p4a_launcher_main_4(int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[
    int c, d;
    for(c = 0; c <= 63; c += 1)
       for(d = 0; d <= 15; d += 1)
-         // To be assigned to a call to P4A_vp_1: c
-         // To be assigned to a call to P4A_vp_0: d
          p4a_wrapper_main_4(c, d, inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 }
 int main()
@@ -168,9 +162,6 @@ estimation:      ;
          P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
          P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
-         //#endif
-         
-         
          p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
          P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
          P4A_accel_free(P4A_var_ovsf_code_ref0);
@@ -201,8 +192,6 @@ estimation:      ;
          P4A_accel_free(P4A_var_finger_mat1);
          P4A_accel_free(P4A_var_coeff20);
       }
-      
-      //display the channel coefficients
       p4a_launcher_main_3();
       
       //calculating max power received
@@ -313,9 +302,6 @@ estimation:      ;
          P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
          P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
-         //#endif
-         
-         
          p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
          P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
          P4A_accel_free(P4A_var_ovsf_code_ref0);
@@ -346,8 +332,6 @@ estimation:      ;
          P4A_accel_free(P4A_var_finger_mat1);
          P4A_accel_free(P4A_var_coeff20);
       }
-      
-      //display the channel coefficients
       p4a_launcher_main_3();
       
       //calculating max power received
@@ -458,9 +442,6 @@ estimation:      ;
          P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
          P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
-         //#endif
-         
-         
          p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
          P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
          P4A_accel_free(P4A_var_ovsf_code_ref0);
@@ -491,8 +472,6 @@ estimation:      ;
          P4A_accel_free(P4A_var_finger_mat1);
          P4A_accel_free(P4A_var_coeff20);
       }
-      
-      //display the channel coefficients
       p4a_launcher_main_3();
       
       //calculating max power received
@@ -603,9 +582,6 @@ estimation:      ;
          P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
          P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
-         //#endif
-         
-         
          p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
          P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
          P4A_accel_free(P4A_var_ovsf_code_ref0);
@@ -636,8 +612,6 @@ estimation:      ;
          P4A_accel_free(P4A_var_finger_mat1);
          P4A_accel_free(P4A_var_coeff20);
       }
-      
-      //display the channel coefficients
       p4a_launcher_main_3();
       
       //calculating max power received
@@ -748,9 +722,6 @@ estimation:      ;
          P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
          P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
-         //#endif
-         
-         
          p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
          P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
          P4A_accel_free(P4A_var_ovsf_code_ref0);
@@ -781,8 +752,6 @@ estimation:      ;
          P4A_accel_free(P4A_var_finger_mat1);
          P4A_accel_free(P4A_var_coeff20);
       }
-      
-      //display the channel coefficients
       p4a_launcher_main_3();
       
       //calculating max power received

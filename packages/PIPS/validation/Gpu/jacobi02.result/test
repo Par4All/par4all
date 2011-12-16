@@ -33,7 +33,6 @@ void p4a_launcher_get_data(float_t space[501][501], int i, int j_0[1])
    int j;
    j = *j_0;
    for(j = 0; j <= 500; j += 1)
-      // To be assigned to a call to P4A_vp_0: j
       p4a_wrapper_get_data(space, i, j);
    *j_0 = j;
 }
@@ -46,8 +45,6 @@ void p4a_launcher_iteration(float_t save[501][501], float_t space[501][501])
            could use also a flip-flop dimension instead... */
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_wrapper_iteration(i, j, save, space);
 }
 void p4a_launcher_iteration_1(float_t save[501][501], float_t space[501][501])
@@ -57,8 +54,6 @@ void p4a_launcher_iteration_1(float_t save[501][501], float_t space[501][501])
 
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
-         // To be assigned to a call to P4A_vp_1: i
-         // To be assigned to a call to P4A_vp_0: j
          p4a_wrapper_iteration_1(i, j, save, space);
 }
 void get_data(char filename[])
@@ -125,9 +120,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
 
-      
-      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
       p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
       P4A_accel_free(P4A_var_space0);
@@ -140,7 +132,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
       P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-
 
       p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
@@ -159,9 +150,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
 
-      
-      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
       p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
       P4A_accel_free(P4A_var_space0);
@@ -174,7 +162,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
       P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-
 
       p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);

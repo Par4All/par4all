@@ -53,7 +53,6 @@ void STAP_PulseComp(int tv, float ptrin[tv], int tf, float ptrfiltre[tf], float 
    int i, j, k;
    float R, I;
    for(k = 0; k <= 31; k += 1)
-
       p4a_launcher_STAP_PulseComp(tf, tv, ptrfiltre, ptrin, ptrout);
 }
 int main()
@@ -101,7 +100,6 @@ void p4a_launcher_STAP_PulseComp(int tf, int tv, float ptrfiltre[tf], float ptri
    int i;
 
    for(i = 0; i <= tv-tf+1-1; i += 1)
-      // To be assigned to a call to P4A_vp_0: i
       p4a_wrapper_STAP_PulseComp(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
 }
 void p4a_launcher_trt(float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
@@ -111,9 +109,6 @@ void p4a_launcher_trt(float filtre[16], float in_pulse[5][32][95], float out_pul
 
    for(j = 0; j <= 4; j += 1)
       for(k = 0; k <= 31; k += 1)
-         // To be assigned to a call to P4A_vp_1: j
-         // To be assigned to a call to P4A_vp_0: k
-         
          p4a_wrapper_trt(filtre, j, k, in_pulse, out_pulse, tf, tv);
 }
 void p4a_wrapper_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
@@ -131,7 +126,6 @@ void p4a_wrapper_trt(float filtre[16], int j, int k, float in_pulse[5][32][95], 
 {
    // To be assigned to a call to P4A_vp_1: j
    // To be assigned to a call to P4A_vp_0: k
-   
    p4a_kernel_trt(filtre, j, k, in_pulse, out_pulse, tf, tv);
 }
 void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
@@ -143,6 +137,5 @@ void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
    
    //init_array();
    for(i = 0; i <= 89; i += 1)
-
       p4a_launcher_trt(filtre, in_pulse, out_pulse, tf, tv);
 }

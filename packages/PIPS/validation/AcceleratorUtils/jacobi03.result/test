@@ -93,9 +93,6 @@ void write_data(char filename[])
 void compute()
 {
    int i, j;
-   
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
 kernel1:   launch_kernel1(save, space);
 #pragma omp parallel for private(j)
    for(i = 1; i <= 62; i += 1)

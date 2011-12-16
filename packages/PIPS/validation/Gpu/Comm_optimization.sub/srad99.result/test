@@ -74,7 +74,6 @@ int main(int argc, char *argv[])
       q0sqr = varROI/(meanROI*meanROI);
       {
          int i;
-
          p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
       }
       {
@@ -166,7 +165,6 @@ int main(int argc, char *argv[])
       q0sqr = varROI/(meanROI*meanROI);
       {
          int i;
-
          p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
       }
       {
