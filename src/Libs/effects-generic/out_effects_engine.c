@@ -864,9 +864,6 @@ out_effects_engine(const char* module_name, effects_representation_val represent
     set_in_effects((*db_get_in_effects_func)(module_name));
     set_invariant_in_effects((*db_get_invariant_in_effects_func)(module_name));
 
-    /* Get the out_summary_effects of the current module */
-    l_sum_out = (*db_get_summary_out_effects_func)(module_name);
-
     /* initialise the map for out effects */
     init_out_effects();
 
