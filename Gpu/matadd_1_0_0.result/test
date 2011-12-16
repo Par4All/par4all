@@ -1,15 +1,16 @@
 !!
-!! file for matadd.f
+!! file for P4A_LAUNCHER_MATADD.f
 !!
-      PROGRAM MATADD
-      INTEGER M
-      INTEGER N
-      PARAMETER (M = 402, N = 160)
-      INTEGER I, J
-      REAL A(M, N), B(M, N), C(M, N)
-      CALL P4A_LAUNCHER_MATADD(M, N, B, C)                              0008
-      CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)                         0015
+      SUBROUTINE P4A_LAUNCHER_MATADD(M, N, B, C)
+      INTEGER J, I, M, N
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
 
+      DO I = 1, M                                                       0005
+         DO J = 1, N                                                    0006
+            B(I,J) = I                                                  0007
+            C(I,J) = J                                                  0008
+         ENDDO
+      ENDDO
       END
 !!
 !! file for P4A_LAUNCHER_MATADD_1.f
@@ -25,16 +26,15 @@
       ENDDO
       END
 !!
-!! file for P4A_LAUNCHER_MATADD.f
+!! file for matadd.f
 !!
-      SUBROUTINE P4A_LAUNCHER_MATADD(M, N, B, C)
-      INTEGER J, I, M, N
-      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+      CALL P4A_LAUNCHER_MATADD(M, N, B, C)                              0008
+      CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)                         0015
 
-      DO I = 1, M                                                       0005
-         DO J = 1, N                                                    0006
-            B(I,J) = I                                                  0007
-            C(I,J) = J                                                  0008
-         ENDDO
-      ENDDO
       END
