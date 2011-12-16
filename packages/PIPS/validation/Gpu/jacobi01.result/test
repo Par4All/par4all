@@ -805,8 +805,6 @@ void get_data(char filename[])
    /* Get ONE carriage return */
    fgetc(fp);                                                           /*0043*/
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
-   
-   /* Erase the memory, in case the image is not big enough: */
    p4a_launcher_get_data(space);                                        /*0047*/
    
    /* Read the pixel grey value: */
@@ -823,11 +821,7 @@ void get_data(char filename[])
 void iteration(float_t space[501][501], float_t save[501][501])
 {
    int i, j;                                                            /*0087*/
-   
-   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-        could use also a flip-flop dimension instead... */
    p4a_launcher_iteration(save, space);                                 /*0091*/
-
    p4a_launcher_iteration_1(save, space);                               /*0097*/
 }
 int main(int argc, char *argv[])

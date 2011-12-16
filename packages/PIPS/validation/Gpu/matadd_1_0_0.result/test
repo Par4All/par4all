@@ -34,9 +34,7 @@
       PARAMETER (M = 402, N = 160)
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
-
       CALL P4A_LAUNCHER_MATADD(M, N, B, C)                              0008
-
       CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)                         0015
 
       END

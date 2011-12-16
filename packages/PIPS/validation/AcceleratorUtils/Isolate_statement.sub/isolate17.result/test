@@ -14,12 +14,12 @@ void pain()
    char *t = malloc(10);
    {
       //PIPS generated variable
-      char **t0 = (char **) 0;
-      P4A_accel_malloc((void **) &t0, sizeof(char *)*1);
-      P4A_copy_to_accel_1d(sizeof(char *), &t, *t0);
+      char *(*t0)[3] = (char *(*)[3]) 0;
+      P4A_accel_malloc((void **) &t0, sizeof(char)*3);
+      P4A_copy_to_accel_2d(sizeof(char), 3, 0, &t, *t0);
 
 holy:      sain(*t0);
-      P4A_copy_from_accel_1d(sizeof(char), 1, 2, &t, *t0);
+      P4A_copy_from_accel_2d(sizeof(char), 3, 0, &t, *t0);
       P4A_accel_free(t0);
    }
 }

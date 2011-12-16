@@ -3,8 +3,6 @@ void another_func()
    int tv = 10;
    int k, n = 10;
    int some_array[n][n];
-   
-   
 kernel:   kernel(n, some_array);
 }
 void kernel(int n, int some_array[n][n])

@@ -25,7 +25,6 @@ void p4a_launcher_main(int n, int a[n])
    
 #pragma omp parallel for 
    for(i = 0; i <= n-1; i += 1)
-      // To be assigned to a call to P4A_vp_0: i
       p4a_wrapper_main(n, i, a);
 }
 int main(int argc, char **argv)
@@ -35,8 +34,6 @@ int main(int argc, char **argv)
    int b[n];
    {
       int i;
-      
-      
       p4a_launcher_main(n, a);
    }
 }

@@ -20,8 +20,6 @@ int main(int argc, char **argv)
    int b[n];
    {
       int i;
-      
-      
       p4a_launcher_main(n, a);
    }
 }
@@ -53,8 +51,6 @@ void p4a_launcher_main(int n, int a[n])
 {
    //PIPS generated variable
    int i;
-   
-   
    p4a_launcher_main_1(n, a);
 }
 

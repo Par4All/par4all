@@ -12,6 +12,7 @@ create $WKS $TMP.c
 shell rm $TMP.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+module give
 
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
