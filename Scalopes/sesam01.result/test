@@ -39,7 +39,6 @@ int main()
    int i;
    P4A_sesam_task_main();
    i = 100;
-
    P4A_sesam_task_main_1();
    i = 100;
 }

@@ -342,7 +342,6 @@ l99990:
          P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kernel[0][0], *P4A_var_kernel0);
          P4A_copy_to_accel_2d(sizeof(float), isi, isj, 512, 512, 0, 0, &image[0][0], *P4A_var_image0);
 
-
 l99991:         microcode_launcher(isi, isj, I_1, i_t, j_t, *P4A_var_image0, *P4A_var_kernel0, *P4A_var_new_image0);
          P4A_copy_from_accel_2d(sizeof(float), isi, isj, 512, 512, 0, 0, &new_image[0][0], *P4A_var_new_image0);
          P4A_accel_free(P4A_var_new_image0);

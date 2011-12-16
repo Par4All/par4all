@@ -36,10 +36,7 @@ int main()
 {
 
    int a[N] = {0};
-   
-   
 kernel:   kernel(N, a);
 
    return 0;
 }
-

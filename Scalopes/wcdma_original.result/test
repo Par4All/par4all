@@ -617,86 +617,42 @@ int main()
    //Pilot frames are added to initial frames for the channel estimation.
    for(t = 0; t <= 145635; t += 1) {
       P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, image_in, img_index, ovsf_code_user1, pilot, spreading_signal1, symbole_flow_user1, t);
-      //generate multipath
-      //main path
       P4A_scmp_kernel_1(spreading_signal1, spreading_signals);
 
       for(i = 0; i <= 261; i += 1)
          ;
-      //printf("\n");
-      
-      //initialisation
       P4A_scmp_kernel_2(spreading_signals);
 
       for(i = 0; i <= 261; i += 1)
          ;
-      //printf("\n");
-      
-      
-      //other path
       P4A_scmp_kernel_3(channel_delay1, spreading_signal1, spreading_signals);
 
       for(i = 0; i <= 261; i += 1)
          ;
-      //printf("\n");
-      
       P4A_scmp_kernel_4(channel_delay2, spreading_signal1, spreading_signals);
 
       for(i = 0; i <= 261; i += 1)
          ;
-      //printf("\n");
-      
       P4A_scmp_kernel_5(channel_delay3, spreading_signal1, spreading_signals);
       for(i = 0; i <= 261; i += 1)
          ;
-      //printf("\n");
-      
-      
-      
       P4A_scmp_kernel_6(channel_delay4, spreading_signal1, spreading_signals);
 
       for(i = 0; i <= 261; i += 1)
          ;
       j = 0;
-      //printf("\n");
-      
-      
-      
-      //------------------------------------------ SEND FRAME -----------------------------------------------
-      //---- Conversion serial to parallel
       P4A_scmp_kernel_7(I_user, Q_user, &j, spreading_signals);
-      //---- Modulation QPSK on I
       P4A_scmp_kernel_8(I_user, Signal_I);
-      
-      //---- Modulation QPSK on Q -- we suppose that we dephase it after of PI/2
       P4A_scmp_kernel_9(Q_user, Signal_Q);
-      
-      
-      //---- FIR for I and Q before channel
-      
-      
-      //initialisation
       P4A_scmp_kernel_10(channel_I);
       P4A_scmp_kernel_11(&ptr_x_buffer_user1, x_buffer_user1);
-      
-      //convolution par la réponse impultionelle du filtre (FIR_COEFF)
       P4A_scmp_kernel_12(FIR_COEFF, Signal_I, channel_I, &ptr_x_buffer_user1, x_buffer_user1);
-      
-      //initialisation
       P4A_scmp_kernel_13(channel_Q);
       P4A_scmp_kernel_14(&ptr_x_buffer_user1, x_buffer_user1);
       P4A_scmp_kernel_15(FIR_COEFF, Signal_Q, channel_Q, &ptr_x_buffer_user1, x_buffer_user1);
-      
-      
-      
-      //------------------------------------------ RECEPT FRAME -----------------------------------------------
-      
-      //---- FIR for I and Q after channel
-      
       P4A_scmp_kernel_16(FIR2_I_user1);
       P4A_scmp_kernel_17(FIR2_Q_user1);
       P4A_scmp_kernel_18(&ptr_x_buffer_user1, x_buffer_user1);
-      //convolution par la réponse impultionelle du filtre (FIR_COEFF)
       P4A_scmp_kernel_19(FIR2_I_user1, FIR_COEFF, channel_I, &ptr_x_buffer_user1, x_buffer_user1);
       P4A_scmp_kernel_20(&ptr_x_buffer_user1, x_buffer_user1);
       P4A_scmp_kernel_21(FIR2_Q_user1, FIR_COEFF, channel_Q, &ptr_x_buffer_user1, x_buffer_user1);
@@ -1394,8 +1350,6 @@ int main()
          P4A_scmp_malloc((void **) &P4A_var_spreading_signals0, sizeof(int)*256);
          P4A_copy_to_accel_1d(sizeof(int), 262, 256, 0, &spreading_signal1[0], *P4A_var_spreading_signal11);
 
-         //generate multipath
-         //main path
          P4A_scmp_kernel_1(*P4A_var_spreading_signal11, *P4A_var_spreading_signals0);
          P4A_copy_from_accel_1d(sizeof(int), 262, 256, 0, &spreading_signals[0], *P4A_var_spreading_signals0);
       }
@@ -1408,9 +1362,6 @@ int main()
          P4A_scmp_malloc((void **) &P4A_var_spreading_signals1, sizeof(int)*262);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals1);
 
-         //printf("\n");
-         
-         //initialisation
          P4A_scmp_kernel_2(*P4A_var_spreading_signals1);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals1);
       }
@@ -1425,10 +1376,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal12);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals2);
 
-         //printf("\n");
-         
-         
-         //other path
          P4A_scmp_kernel_3(channel_delay1, *P4A_var_spreading_signal12, *P4A_var_spreading_signals2);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals2);
       }
@@ -1443,8 +1390,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal13);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals3);
 
-         //printf("\n");
-         
          P4A_scmp_kernel_4(channel_delay2, *P4A_var_spreading_signal13, *P4A_var_spreading_signals3);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals3);
       }
@@ -1459,8 +1404,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal14);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals4);
 
-         //printf("\n");
-         
          P4A_scmp_kernel_5(channel_delay3, *P4A_var_spreading_signal14, *P4A_var_spreading_signals4);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals4);
       }
@@ -1474,10 +1417,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal15);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals5);
 
-         //printf("\n");
-         
-         
-         
          P4A_scmp_kernel_6(channel_delay4, *P4A_var_spreading_signal15, *P4A_var_spreading_signals5);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals5);
       }
@@ -1495,12 +1434,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user0);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user0);
 
-         //printf("\n");
-         
-         
-         
-         //------------------------------------------ SEND FRAME -----------------------------------------------
-         //---- Conversion serial to parallel
          P4A_scmp_kernel_7(*P4A_var_I_user0, *P4A_var_Q_user0, &j, *P4A_var_spreading_signals6);
          P4A_copy_from_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user0);
          P4A_copy_from_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user0);
@@ -1514,7 +1447,6 @@ int main()
          P4A_scmp_malloc((void **) &P4A_var_Signal_I0, sizeof(float)*524);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user1);
 
-         //---- Modulation QPSK on I
          P4A_scmp_kernel_8(*P4A_var_I_user1, *P4A_var_Signal_I0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &Signal_I[0], *P4A_var_Signal_I0);
       }
@@ -1527,8 +1459,6 @@ int main()
          P4A_scmp_malloc((void **) &P4A_var_Signal_Q0, sizeof(float)*524);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user1);
 
-         
-         //---- Modulation QPSK on Q -- we suppose that we dephase it after of PI/2
          P4A_scmp_kernel_9(*P4A_var_Q_user1, *P4A_var_Signal_Q0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &Signal_Q[0], *P4A_var_Signal_Q0);
       }
@@ -1537,12 +1467,6 @@ int main()
          float (*P4A_var_channel_I0)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_channel_I0, sizeof(float)*524);
 
-         
-         
-         //---- FIR for I and Q before channel
-         
-         
-         //initialisation
          P4A_scmp_kernel_10(*P4A_var_channel_I0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I0);
       }
@@ -1566,8 +1490,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I1);
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user11);
 
-         
-         //convolution par la réponse impultionelle du filtre (FIR_COEFF)
          P4A_scmp_kernel_12(*P4A_var_FIR_COEFF0, *P4A_var_Signal_I1, *P4A_var_channel_I1, &ptr_x_buffer_user1, *P4A_var_x_buffer_user11);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I1);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user11);
@@ -1577,8 +1499,6 @@ int main()
          float (*P4A_var_channel_Q0)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_channel_Q0, sizeof(float)*524);
 
-         
-         //initialisation
          P4A_scmp_kernel_13(*P4A_var_channel_Q0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_Q[0], *P4A_var_channel_Q0);
       }
@@ -1611,13 +1531,6 @@ int main()
          float (*P4A_var_FIR2_I_user10)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_FIR2_I_user10, sizeof(float)*524);
 
-         
-         
-         
-         //------------------------------------------ RECEPT FRAME -----------------------------------------------
-         
-         //---- FIR for I and Q after channel
-         
          P4A_scmp_kernel_16(*P4A_var_FIR2_I_user10);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user10);
       }
@@ -1649,7 +1562,6 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I2);
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user15);
 
-         //convolution par la réponse impultionelle du filtre (FIR_COEFF)
          P4A_scmp_kernel_19(*P4A_var_FIR2_I_user11, *P4A_var_FIR_COEFF2, *P4A_var_channel_I2, &ptr_x_buffer_user1, *P4A_var_x_buffer_user15);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user11);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user15);

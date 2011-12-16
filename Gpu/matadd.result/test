@@ -854,9 +854,7 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
       PARAMETER (M = 402, N = 160)
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
-
       CALL P4A_LAUNCHER_MATADD(M, N, B, C)
-
       CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)
 
       END
