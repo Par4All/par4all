@@ -17,7 +17,6 @@ int main()
 int main()
 {
    int i;
-
    p4a_launcher_main(N, a, b, c);
 
    return 0;
@@ -28,7 +27,6 @@ void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
    int i;
 
    for(i = 0; i <= 9999; i += 1)
-      // To be assigned to a call to P4A_vp_0: i
       p4a_wrapper_main(N, a, b, c, i);
 }
 void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
@@ -55,7 +53,6 @@ int main()
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &c[0], *c0);
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
 
-
       p4a_launcher_main(N, *a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);
       P4A_accel_free(c0);
@@ -71,7 +68,6 @@ void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
    int i;
 
    for(i = 0; i <= 9999; i += 1)
-      // To be assigned to a call to P4A_vp_0: i
       p4a_wrapper_main(N, a, b, c, i);
 }
 void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
@@ -114,7 +110,6 @@ void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
    int i;
 
    for(i = 0; i <= 9999; i += 1)
-      // To be assigned to a call to P4A_vp_0: i
       p4a_wrapper_main(N, a, b, c, i);
 }
 void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
@@ -137,7 +132,6 @@ int main()
       P4A_accel_malloc((void **) &a0, sizeof(double)*10000);
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &c[0], *c0);
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
-
 
       p4a_launcher_main(N, *a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);

@@ -40,3 +40,4 @@ kernel:   kernel(N, a);
 
    return 0;
 }
+
