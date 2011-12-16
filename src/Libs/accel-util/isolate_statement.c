@@ -649,7 +649,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
         if(!p.ok) break;
     }
     free_callees(c);
-    if(false && p.ok) { // this mean that all checks are ok, but some patching is needed
+    if(p.ok) { // this mean that all checks are ok, but some patching is needed
         // maybe we have registered some regions to extend to avoid interprocedural offset management?
         list regions = load_cumulated_rw_effects_list(s);
         FOREACH(ENTITY,e,p.regions_to_extend) {
