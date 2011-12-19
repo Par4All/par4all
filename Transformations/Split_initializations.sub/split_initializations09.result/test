@@ -1,0 +1,14 @@
+int main()
+{
+   const int n = 0;
+   return n+m;
+}
+#
+# Code after split_initializations for module main
+#
+int main()
+{
+   int n;
+   n = 0;
+   return n+m;
+}
