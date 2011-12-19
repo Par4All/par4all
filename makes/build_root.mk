@@ -136,7 +136,7 @@ $(BUILD.dir):
 
 # just compile
 auto-comp: $(BUILD.dir)
-	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
+	DL.d=$(DOWNLOAD.dir) $(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
 	# manual fix...
 	-[ -d $(BUILD.dir)/src/Scripts/validation ] && \
