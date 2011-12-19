@@ -75,10 +75,11 @@
  */
 #include <signal.h>
 
+// name of environment variable to trigger local timeout
 #define TIMEOUT_ENV "LINEAR_CONVEX_HULL_TIMEOUT"
 
-// global, it may be tested from outside
-bool sc_convex_hull_timeout = false;
+// whether exception is raised by alarm.
+static bool sc_convex_hull_timeout = false;
 
 int get_linear_convex_hull_timeout(void)
 {
