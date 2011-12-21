@@ -413,5 +413,3 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th0].im = 0.;
    }
 }
-seq-ok
-sse-ok

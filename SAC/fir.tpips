@@ -19,10 +19,10 @@ echo
 display PRINTED_FILE
 apply UNSPLIT
 
-shell sed -i -e '1,/FIRFilter/ d' $WS.database/Src/$WS.c
+#shell sed -i -e '1,/FIRFilter/ d' $WS.database/Src/$WS.c
 
-shell ./compileC.sh $WS $WS.c $WS.database/Tmp/test.c
-shell gcc -O3 -I$. -march=native -c  $WS.database/Tmp/test.c
+#shell ./compileC.sh $WS $WS.c $WS.database/Tmp/test.c
+#shell gcc -O3 -I$. -march=native -c  $WS.database/Tmp/test.c
 
 close
 delete $WS
