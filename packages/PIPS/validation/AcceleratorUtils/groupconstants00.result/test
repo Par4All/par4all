@@ -17,5 +17,4 @@ int main()
    return caillou[1];
 }
 test resulting code
-ok
 

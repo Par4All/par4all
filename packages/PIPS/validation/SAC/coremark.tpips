@@ -1,8 +1,8 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv WS="coremark"
 delete $WS
-shell rm -rf $WS.tmpdir
-shell cp -r ${WS}_v1.0 $WS.tmpdir
+#shell rm -rf $WS.tmpdir
+#shell cp -r ${WS}_v1.0 $WS.tmpdir
 setenv PIPS_CPP_FLAGS "-Icoremark.tmpdir -Icoremark.tmpdir/linux -D_IN_PIPS"
 create $WS coremark.tmpdir/*.c coremark.tmpdir/linux/*.c include/SIMD.c
 

@@ -227,4 +227,3 @@ void threshold(float data[128], float val)
    }
    i = 128;
 }
-seq-ok
