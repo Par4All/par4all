@@ -113,7 +113,6 @@ kernel:
 //  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
 //  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
 
-      //PIPS generated variable
       kernel(a, b, c, i);
 }
 
