@@ -225,5 +225,4 @@ short accumulate(unsigned int n, short a[n], short seed)
       seed = seed+a[i1];
    return seed;
 }
-ok
 

@@ -16,5 +16,4 @@ int main()
    return a;
 }
 test resulting code
-ok
 

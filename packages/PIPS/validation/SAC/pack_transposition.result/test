@@ -164,5 +164,3 @@ void pack_transposition(double a[5][5])
    }
 
 }
-seq-ok
-sse-ok

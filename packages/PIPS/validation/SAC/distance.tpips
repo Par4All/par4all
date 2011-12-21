@@ -70,7 +70,7 @@ apply SCALAR_RENAMING
 
 display PRINTED_FILE
 
-make DOTDG_FILE
+#make DOTDG_FILE
 
 apply SIMDIZER
 

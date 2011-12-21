@@ -7,7 +7,6 @@ make PRINTED_FILE[%ALL]
 
 module foo_l
 display PRINTED_FILE 
-make DOTDG_FILE 
 
 apply SIMDIZER
 
