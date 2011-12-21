@@ -3524,6 +3524,15 @@ void split_initializations_in_statement(statement s)
 	    else {
           pips_user_warning("split initializations not implemented yet for structures\n");
 	    }
+        /* if this transformation led to an uninitialized const, remove the const qualifier */
+        if(value_unknown_p(entity_initial(var))) {
+            list tmp = gen_copy_seq(entity_qualifiers(var));
+            FOREACH(QUALIFIER,q,tmp) {
+                if(qualifier_const_p(q))
+                    gen_remove_once(&variable_qualifiers(type_variable(entity_type(var))),q);
+            }
+            gen_free_list(tmp);
+        }
 	  }
 	}
 
