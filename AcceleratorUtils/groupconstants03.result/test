@@ -23,5 +23,4 @@ ou_est_charlie:      printf(caillou[0], caillou[8]+caillou[9]);
    return 0;
 }
 test resulting code
-ok
 
