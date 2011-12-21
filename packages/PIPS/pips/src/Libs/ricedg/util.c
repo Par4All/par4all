@@ -695,15 +695,20 @@ void prettyprint_dot_dependence_graph( FILE * fd,
   const char* inputdep_color = get_string_property( "PRINT_DOTDG_INPUT_DEP_COLOR" );
   const char* inputdep_style = get_string_property( "PRINT_DOTDG_INPUT_DEP_STYLE" );
 
+  bool mask_loop_carried = get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS");
+  set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
 
   // Loop over the graph and print all dependences
   FOREACH( vertex, v1 , graph_vertices( mod_graph ) ) {
     statement s1 = vertex_to_statement( v1 );
+    list loops1 = load_statement_enclosing_loops(s1);
     FOREACH( successor, su, vertex_successors(v1) )
     {
       vertex v2 = successor_vertex( su );
       statement s2 = vertex_to_statement( v2 );
+      list loops2 = load_statement_enclosing_loops(s2);
       dg_arc_label dal = (dg_arc_label) successor_arc_label( su );
+      int nbrcomloops = FindMaximumCommonLevel(loops1, loops2);
       FOREACH( conflict, c, dg_arc_label_conflicts( dal ) )
       {
         action source_act = effect_action( conflict_source( c ) );
@@ -712,6 +717,29 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         reference source_ref = effect_any_reference( conflict_source( c ) );
         const char* color = inputdep_color;
         const char* style = inputdep_style;
+
+        /*
+         * Here we check if this arc is only loop carried or not and we might
+         * skip it if required by property
+         */
+        bool keep_this_conflict = true;
+        if(mask_loop_carried && conflict_cone(c) != cone_undefined) {
+          list lls = cone_levels(conflict_cone(c));
+          keep_this_conflict = false;
+          FOREACH(int, level, lls) {
+            if(level > nbrcomloops) {
+              //
+              keep_this_conflict=true;
+              break;
+            }
+          }
+        }
+        if(!keep_this_conflict) {
+          continue;
+        }
+
+
+        // Ok let's display it now.
 
         if( action_read_p( source_act ) && action_write_p( sink_act ) ) {
           color = antidep_color;
@@ -776,6 +804,9 @@ void prettyprint_dot_dependence_graph( FILE * fd,
   }
 
   fprintf( fd, "\n}\n" );
+
+  reset_enclosing_loops_map();
+
   debug_off( );
 }
 
@@ -842,7 +873,6 @@ prettyprint_dependence_graph_view(FILE * fd,
         gen_array_free(conflicts_array);
         dg_arc_label_conflicts(dal)=conflicts_list;
       }
-
 	    int nbrcomloops = FindMaximumCommonLevel(loops1, loops2);
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
 		conflict c = CONFLICT(CAR(pc));
