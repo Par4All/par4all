@@ -42,7 +42,9 @@ GCC_MD5_URL = $(GCC_MD5_MIRROR)/gcc/releases/gcc-$(PIPS_GFC2PIPS_GCC_VERSION)
 
 
 #archive name
-DL.d	= .
+# overriding this variable from the root Makefile does not seem to work?
+# DL.d=.
+DL.d	= ../../../..
 GCC_CORE_ARCHIVE = gcc-core-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
 GCC_FORTRAN_ARCHIVE = gcc-fortran-$(PIPS_GFC2PIPS_GCC_VERSION)$(ARCHIVE_EXT)
 GCC_MD5	= gcc-$(PIPS_GFC2PIPS_GCC_VERSION).md5
