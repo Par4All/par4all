@@ -32,10 +32,10 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc $WS.c -o $WS.database/Tmp/ref
-shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
-shell ./$WS.database/Tmp/ref > $WS.database/Tmp/ref-out
-shell ./$WS.database/Tmp/test > $WS.database/Tmp/test-out
-shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
+#shell ./$WS.database/Tmp/ref > $WS.database/Tmp/ref-out
+#shell ./$WS.database/Tmp/test > $WS.database/Tmp/test-out
+#shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
 
 delete $WS

@@ -8,7 +8,6 @@ activate MUST_REGIONS
 activate RICE_REGIONS_DEPENDENCE_GRAPH
 
 module a
-make DOTDG_FILE
 #activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 setproperty ACCEL_LOAD="load"
@@ -27,7 +26,7 @@ apply UNSPLIT
 
 close
 
-shell cc $WS.c include/delay.c -o $WS.database/Tmp/ref
-shell cc $WS.database/Src/$WS.c include/delay.c -o $WS.database/Tmp/out
-shell test `$WS.database/Tmp/ref` = `$WS.database/Tmp/out`
+#shell cc $WS.c include/delay.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/$WS.c include/delay.c -o $WS.database/Tmp/out
+#shell test `$WS.database/Tmp/ref` = `$WS.database/Tmp/out`
 delete $WS

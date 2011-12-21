@@ -18,10 +18,10 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc $WS.c -o $WS.database/Tmp/ref
-shell cc $WS.database/Src/*.c -o $WS.database/Tmp/candidate
-shell ./$WS.database/Tmp/ref > ./$WS.database/Tmp/ref-out
-shell ./$WS.database/Tmp/candidate > ./$WS.database/Tmp/candidate-out
-shell cmp ./$WS.database/Tmp/ref-out ./$WS.database/Tmp/candidate-out
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/*.c -o $WS.database/Tmp/candidate
+#shell ./$WS.database/Tmp/ref > ./$WS.database/Tmp/ref-out
+#shell ./$WS.database/Tmp/candidate > ./$WS.database/Tmp/candidate-out
+#shell cmp ./$WS.database/Tmp/ref-out ./$WS.database/Tmp/candidate-out
 
 delete $WS

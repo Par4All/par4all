@@ -27,11 +27,11 @@ display PRINTED_FILE
 apply UNSPLIT
 close
 
-shell cc $WS.c -o $WS.database/Tmp/ref
-shell sed -i -e '1 i #define MIN(a,b) ((a)>(b)?(a):(b))' $WS.database/Src/*.c
-shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
-shell ./$WS.database/Tmp/ref 100 10 > $WS.database/Tmp/ref-out
-shell ./$WS.database/Tmp/test 100 10 > $WS.database/Tmp/test-out
-shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell sed -i -e '1 i #define MIN(a,b) ((a)>(b)?(a):(b))' $WS.database/Src/*.c
+#shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
+#shell ./$WS.database/Tmp/ref 100 10 > $WS.database/Tmp/ref-out
+#shell ./$WS.database/Tmp/test 100 10 > $WS.database/Tmp/test-out
+#shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
 
 delete $WS

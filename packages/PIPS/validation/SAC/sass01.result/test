@@ -21,5 +21,4 @@ int main()
    printf("%d-%d-%d", a2, b0, c0);
    return 0;
 }
-ok
 

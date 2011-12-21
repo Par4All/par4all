@@ -287,5 +287,3 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    }
    i_t1 = 4;
 }
-seq-ok
-sse-ok

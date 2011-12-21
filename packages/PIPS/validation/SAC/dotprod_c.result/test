@@ -231,5 +231,3 @@ float dotprod(float b[200], float c[200])
    a = RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+a)));
    return a;
 }
-seq-ok
-sse-ok

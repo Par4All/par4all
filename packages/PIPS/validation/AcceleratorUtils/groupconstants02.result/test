@@ -20,5 +20,4 @@ there:      printf(caillou[0], caillou[1]+caillou[2]);
    return a;
 }
 test resulting code
-ok
 

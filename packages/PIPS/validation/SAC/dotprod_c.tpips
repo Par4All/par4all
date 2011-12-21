@@ -21,17 +21,17 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT
-shell sed -i -e '1,/dotprod/ d'  $WS.database/Src/$module.c
+#shell sed -i -e '1,/dotprod/ d'  $WS.database/Src/$module.c
 
-shell cc kernels/$module/$module.c include/SIMD.c -o $WS.database/Tmp/ref
-shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$module.c
-shell cc -Iinclude $WS.database/Src/$module.c include/SIMD.c -o $WS.database/Tmp/seq
-shell sed -i -e '1 d' $WS.database/Src/$module.c
-shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
+#shell cc kernels/$module/$module.c include/SIMD.c -o $WS.database/Tmp/ref
+#shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$module.c
+#shell cc -Iinclude $WS.database/Src/$module.c include/SIMD.c -o $WS.database/Tmp/seq
+#shell sed -i -e '1 d' $WS.database/Src/$module.c
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
 
-shell ./compileC.sh $WS $module.c $WS.database/Tmp/sse.c
-shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
-shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
+#shell ./compileC.sh $WS $module.c $WS.database/Tmp/sse.c
+#shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/sse`" ; then echo sse-ok ; else echo sse-ko ; fi
 
 close
 delete $WS

@@ -72,13 +72,13 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT
-shell sed -i -e '1,/faust-flag/ d'  $WS.database/Src/$WS.c
+#shell sed -i -e '1,/faust-flag/ d'  $WS.database/Src/$WS.c
 
-shell cc --std=c99 $WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/ref
-shell sed -i -e '1 i #include "SIMD.h"' -e '1 i#define MOD(x,y) (x%y)' $WS.database/Src/$WS.c 
-shell cc --std=c99 -I../SAC/include $WS.database/Src/$WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/seq
-shell sed -i -e '1 d' -e '2 d' $WS.database/Src/$WS.c
-shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
+#shell cc --std=c99 $WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/ref
+#shell sed -i -e '1 i #include "SIMD.h"' -e '1 i#define MOD(x,y) (x%y)' $WS.database/Src/$WS.c 
+#shell cc --std=c99 -I../SAC/include $WS.database/Src/$WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/seq
+#shell sed -i -e '1 d' -e '2 d' $WS.database/Src/$WS.c
+#shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
 
 #shell ./compileC.sh $WS $WS.c $WS.database/Tmp/sse.c
 #shell cc -O3 -I. -march=native $WS.database/Tmp/sse.c -o $WS.database/Tmp/sse
