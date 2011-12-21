@@ -4,7 +4,7 @@ delete $WS
 create $WS $WS.c
 module main
 display PRINTED_FILE
-make DOTDG_FILE
+#make DOTDG_FILE
 apply SCALAR_RENAMING
 display PRINTED_FILE
 

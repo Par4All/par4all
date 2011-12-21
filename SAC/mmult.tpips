@@ -51,7 +51,7 @@ display PRINTED_FILE
 apply SCALAR_RENAMING
 display PRINTED_FILE
 
-make DOTDG_FILE
+#make DOTDG_FILE
 echo
 echo simdized code
 echo
