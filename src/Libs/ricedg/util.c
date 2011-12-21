@@ -804,6 +804,9 @@ void prettyprint_dot_dependence_graph( FILE * fd,
   }
 
   fprintf( fd, "\n}\n" );
+
+  reset_enclosing_loops_map();
+
   debug_off( );
 }
 
