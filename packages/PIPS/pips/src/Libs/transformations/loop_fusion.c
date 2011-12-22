@@ -508,29 +508,76 @@ static bool fusion_loops(statement sloop1,
     dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
     int statement_ordering = dg_vertex_label_statement(dvl);
     statement stmt1 = ordering_to_statement(statement_ordering);
-    // Check that the source of the conflict is in the "second" loop body
-    if(set_belong_p(contained_stmts_loop2,stmt1)) {
-      FOREACH( successor, a_successor, vertex_successors(v) )
+
+    // Look if there's a loop carried dependence, that would be bad, but only
+    // for parallel loop nest !
+    if(maximize_parallelism && loop_parallel_p(loop1)) {
+      FOREACH( successor, a_successor, vertex_successors(v))
       {
         vertex v2 = successor_vertex(a_successor);
-        dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
+        dg_vertex_label dvl2 = (dg_vertex_label) vertex_vertex_label(v2);
+        arc_label dal = successor_arc_label(a_successor);
+        int statement_ordering2 = dg_vertex_label_statement(dvl2);
+        statement stmt2 = ordering_to_statement(statement_ordering2);
+        FOREACH( conflict, c, dg_arc_label_conflicts(dal)) {
+          effect e_sink = conflict_sink(c);
+          effect e_source = conflict_source(c);
+          if((effect_write_p(e_source) && store_effect_p(e_source))
+              || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
+
+            // Inner loop indices conflicts aren't preventing fusion
+            if(statement_loop_p(stmt1) &&
+                effect_variable(e_source) == loop_index(statement_loop(stmt1))) {
+              continue;
+            }
+            if(statement_loop_p(stmt2) &&
+                effect_variable(e_sink) == loop_index(statement_loop(stmt2))) {
+              continue;
+            }
+
+            // Get the levels and try to find out if the fused loop carries the
+            // conflict
+            list levels = cone_levels(conflict_cone(c));
+            FOREACH(INT,l,levels) {
+              if(l==1) {
+                // Hum seems bad... This a loop carried dependence !
+                success = false;
+                break;
+              }
+            }
+          }
+          if(!success) break;
+        }
+      }
+    }
+    if(!success) {
+      break;
+    }
+    // Check that the source of the conflict is in the "second" loop body
+    if(set_belong_p(contained_stmts_loop2,stmt1)) {
+      FOREACH( successor, a_successor, vertex_successors(v))
+      {
+        vertex v2 = successor_vertex(a_successor);
+        dg_vertex_label dvl2 = (dg_vertex_label) vertex_vertex_label(v2);
         arc_label an_arc_label = successor_arc_label(a_successor);
         int statement_ordering2 = dg_vertex_label_statement(dvl2);
         statement stmt2 = ordering_to_statement(statement_ordering2);
 
         // Check that the sink of the conflict is in the "first" loop body
-        if(set_belong_p(contained_stmts_loop1,stmt2)) {
-          FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
+        if(set_belong_p(contained_stmts_loop1, stmt2)) {
+          FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label))
           {
             effect e_sink = conflict_sink(c);
             effect e_source = conflict_source(c);
             ifdebug(6) {
-              pips_debug(0,"Considering arc : from statement %d :",statement_ordering);
+              pips_debug(0,
+                         "Considering arc : from statement %d :",
+                         statement_ordering);
               print_effect(conflict_source(c));
-              pips_debug(0," to statement %d :",statement_ordering2);
+              pips_debug(0, " to statement %d :", statement_ordering2);
               print_effect(conflict_sink(c));
             }
-            if(( effect_write_p(e_source) && store_effect_p(e_source))
+            if((effect_write_p(e_source) && store_effect_p(e_source))
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
 
               // Inner loop indices conflicts aren't preventing fusion
@@ -545,11 +592,12 @@ static bool fusion_loops(statement sloop1,
                 continue;
               }
 
-
               ifdebug(6) {
-                pips_debug(0,"Arc preventing fusion : from statement %d :",statement_ordering);
+                pips_debug(0,
+                           "Arc preventing fusion : from statement %d :",
+                           statement_ordering);
                 print_effect(conflict_source(c));
-                pips_debug(0," to statement %d :",statement_ordering2);
+                pips_debug(0, " to statement %d :", statement_ordering2);
                 print_effect(conflict_sink(c));
               }
               success = false;
@@ -557,12 +605,11 @@ static bool fusion_loops(statement sloop1,
           }
         } else {
           ifdebug(6) {
-            pips_debug(0,"Arc ignored (%d,%d) : from statement %d :",
-                       (int)statement_ordering(sloop2),
-                       (int)statement_ordering(sloop1),
-                       statement_ordering);
+            pips_debug(0,
+                       "Arc ignored (%d,%d) : from statement %d :",
+                       (int)statement_ordering(sloop2), (int)statement_ordering(sloop1), statement_ordering);
             print_statement(ordering_to_statement(statement_ordering));
-            pips_debug(0," to statement %d :",statement_ordering2);
+            pips_debug(0, " to statement %d :", statement_ordering2);
             print_statement(ordering_to_statement(statement_ordering2));
           }
         }
@@ -570,12 +617,14 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
-  // No longer need the DG
+      // No longer need the DG
   free_graph(candidate_dg);
 
 
   bool inner_success = false;
-  if(success && get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
+  if(success && get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")
+      && loop_parallel_p(loop1) && loop_parallel_p(loop2)
+      ) {
     // Check if we have perfect loop nests, and thus prevents losing parallelism
     statement inner_loop1 = get_first_inner_perfectly_nested_loop(body_loop1);
     statement inner_loop2 = get_first_inner_perfectly_nested_loop(body_loop2);
