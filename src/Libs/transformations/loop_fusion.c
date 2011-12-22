@@ -693,7 +693,8 @@ static bool fusion_loops(statement sloop1,
 
     // Merge loop locals
     FOREACH(ENTITY,e,loop_locals(loop2)) {
-      if(!gen_in_list_p(e,loop_locals(loop1))) {
+
+      if(e != loop_index(loop2) && !gen_in_list_p(e,loop_locals(loop1))) {
         loop_locals(loop1) = CONS(ENTITY,e,loop_locals(loop1));
       }
     }
