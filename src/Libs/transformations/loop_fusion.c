@@ -537,6 +537,13 @@ static bool fusion_loops(statement sloop1,
               continue;
             }
 
+            // Scalar can make any conflict ! The loop are parallel thus it has
+            // to be private :-)
+            if(loop_parallel_p(loop2) &&
+                (effect_scalar_p(e_sink) || effect_scalar_p(e_source))) {
+              continue;
+            }
+
             // Get the levels and try to find out if the fused loop carries the
             // conflict
             list levels = cone_levels(conflict_cone(c));
