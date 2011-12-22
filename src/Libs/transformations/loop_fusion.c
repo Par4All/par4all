@@ -546,19 +546,21 @@ static bool fusion_loops(statement sloop1,
 
             // Get the levels and try to find out if the fused loop carries the
             // conflict
-            list levels = cone_levels(conflict_cone(c));
-            FOREACH(INT,l,levels) {
-              if(l==1) {
-                // Hum seems bad... This a loop carried dependence !
-                success = false;
-                ifdebug(2) {
-                  pips_debug(0,"This loop carried dependence is breaking parallism !\n");
-                  fprintf(stderr,"From : ");
-                  print_effect(e_source);
-                  fprintf(stderr,"to : ");
-                  print_effect(e_sink);
+            if(cone_undefined != conflict_cone(c)) {
+              list levels = cone_levels(conflict_cone(c));
+              FOREACH(INT, l, levels) {
+                if(l == 1) {
+                  // Hum seems bad... This a loop carried dependence !
+                  success = false;
+                  ifdebug(2) {
+                    pips_debug(0,"This loop carried dependence is breaking parallism !\n");
+                    fprintf(stderr, "From : ");
+                    print_effect(e_source);
+                    fprintf(stderr, "to : ");
+                    print_effect(e_sink);
+                  }
+                  break;
                 }
-                break;
               }
             }
           }
