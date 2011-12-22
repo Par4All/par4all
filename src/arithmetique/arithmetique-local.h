@@ -108,8 +108,13 @@ typedef long long int Value;
  */
 #define VALUE_MIN (LONG_LONG_MIN+1LL)
 #define VALUE_MAX LONG_LONG_MAX
-#define VALUE_SQRT_MIN long_to_value(LONG_MIN) /* ??? assumes 32 bit long */
-#define VALUE_SQRT_MAX long_to_value(LONG_MAX)
+#if defined(LINEAR_VALUE_ASSUME_SOFTWARE_IDIV) && \
+		defined(__SIZEOF_LONG_LONG__) && \
+		__SIZEOF_LONG_LONG__ != 8
+	#error "long long is expected to be 64-bit to use software idiv"
+#endif
+#define VALUE_SQRT_MIN 3037000499LL /* floor(sqrt(LONG_LONG_MAX)) */
+#define VALUE_SQRT_MAX -3037000499LL
 #define VALUE_ZERO (0LL)
 #define VALUE_ONE  (1LL)
 #define VALUE_MONE (-1LL)
