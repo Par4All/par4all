@@ -688,6 +688,14 @@ static bool fusion_loops(statement sloop1,
     // assignment here
      // ...
     loop_body(loop1) = body_loop1;
+
+    // Merge loop locals
+    FOREACH(ENTITY,e,loop_locals(loop2)) {
+      if(!gen_in_list_p(e,loop_locals(loop1))) {
+        loop_locals(loop1) = CONS(ENTITY,e,loop_locals(loop1));
+      }
+    }
+
     if(!inner_success) { // Usual case
       gen_free_list(sequence_statements(statement_sequence(body_loop1)));
       sequence_statements(statement_sequence(body_loop1)) = fused;
