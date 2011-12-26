@@ -83,10 +83,10 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
+  "in" -> "8 *_";
 }
 // graph for dag "dag_cleaned_2" of module "freia_78" in dot format
 digraph "dag_cleaned_2" {
@@ -110,7 +110,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_aipo_add(t, in, in);                                        /*0008*/
+      freia_aipo_mul_const(t, in, 2);                                   /*0008*/
    freia_aipo_add_const(out, t, 2);                                     /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -196,10 +196,10 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
+  "in" -> "8 *_";
 }
 // graph for dag "dag_cleaned_2" of module "freia_78" in dot format
 digraph "dag_cleaned_2" {
@@ -223,10 +223,9 @@ digraph "freia_78_helper_1_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
 }
 // graph for dag "freia_78_helper_2_0" of module "freia_78" in dot format
 digraph "freia_78_helper_2_0" {
@@ -259,7 +258,8 @@ digraph "freia_78_helper_2_0" {
 // FREIA-SPoC helper function for module freia_78
 freia_status freia_78_helper_1_0_0(
   freia_data2d * o0,
-  const freia_data2d * i0)
+  const freia_data2d * i0,
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -273,12 +273,11 @@ freia_status freia_78_helper_1_0_0(
 
 
   // STAGE 0
-  // in [0 input 0] -> [0 alu] 8 add
+  // in [0 input 0] -> [0 alu] 8 mul_const
   // nope
-  // in [0 input 1] -> [0 alu] 8 add
-  // nope
-  // alu 8 add stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+  // alu 8 mul_const stage 0
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_CONST;
+  sp.alu[0][0].constant = pi0;
 
 
   // output image 0`t on 0
@@ -313,7 +312,7 @@ freia_status freia_78_helper_1_0_0(
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i0);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
 
   return ret;
 }
@@ -392,7 +391,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_78_helper_1_0_0(t, in);                                     /*0008*/
+      freia_78_helper_1_0_0(t, in, 2);                                  /*0008*/
    freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -404,7 +403,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
 
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
-   freia_78_helper_1_0_0(t, in);                                        /*0008*/
+   freia_78_helper_1_0_0(t, in, 2);                                     /*0008*/
    freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -490,10 +489,10 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
+  "in" -> "8 *_";
 }
 // graph for dag "dag_cleaned_2" of module "freia_78" in dot format
 digraph "dag_cleaned_2" {
@@ -517,10 +516,9 @@ digraph "freia_78_helper_1_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
 }
 // graph for dag "freia_78_helper_2_0_0" of module "freia_78" in dot format
 digraph "freia_78_helper_2_0_0" {
@@ -565,12 +563,13 @@ digraph "freia_78_helper_2_0_0" {
  * 1 image operations in dag
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 4
+ * - computation: 3
  * - communication: 64
  */
 freia_status freia_78_helper_1_0_0(
   freia_data2d * o0,
-  const freia_data2d * i0)
+  const freia_data2d * i0,
+  int32_t pi2)
 {
   // declarations:
   freia_microcode mcode;
@@ -585,6 +584,10 @@ freia_status freia_78_helper_1_0_0(
   terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[1];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
   // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
@@ -614,7 +617,7 @@ freia_status freia_78_helper_1_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +(1,1) -> 1
+  // 0: *_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -623,10 +626,18 @@ freia_status freia_78_helper_1_0_0(
   mcu_macro[1][0].xmin2 = imagelet_io_1_1;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin3 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin3 = 0;
-  mcu_macro[1][0].ymin3 = 0;
+  // copy of operation 0 parameters
+  p_0[0] = pi2;
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
   mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][0].iter2 = imagelet_size;
@@ -635,8 +646,8 @@ freia_status freia_78_helper_1_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADD3;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADD3;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_MUL_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_MUL_CONST;
 
 
   // inputs:
@@ -848,7 +859,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_78_helper_1_0_0(t, in);                                     /*0008*/
+      freia_78_helper_1_0_0(t, in, 2);                                  /*0008*/
    freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -860,7 +871,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
 
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
-   freia_78_helper_1_0_0(t, in);                                        /*0008*/
+   freia_78_helper_1_0_0(t, in, 2);                                     /*0008*/
    freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -946,10 +957,10 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
+  "in" -> "8 *_";
 }
 // graph for dag "dag_cleaned_2" of module "freia_78" in dot format
 digraph "dag_cleaned_2" {
@@ -973,10 +984,9 @@ digraph "freia_78_helper_1_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "8 +" [shape=trapezium,orientation=270];
-  "8 +" -> "t";
-  "in" -> "8 +";
-  "in" -> "8 +";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "t";
+  "in" -> "8 *_";
 }
 // graph for dag "freia_78_helper_2_0" of module "freia_78" in dot format
 digraph "freia_78_helper_2_0" {
@@ -1022,7 +1032,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_aipo_add(t, in, in);                                        /*0008*/
+      freia_aipo_mul_const(t, in, 2);                                   /*0008*/
    freia_aipo_add_const(out, t, 2);                                     /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
@@ -1034,7 +1044,7 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
 
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
-   freia_aipo_add(t, in, in);                                           /*0008*/
+   freia_aipo_mul_const(t, in, 2);                                      /*0008*/
    freia_aipo_add_const(out, t, 2);                                     /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
