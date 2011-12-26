@@ -567,13 +567,18 @@ dagvtx copy_dagvtx_norec(dagvtx v)
   return copy;
 }
 
+static bool dagvtx_is_operator_p(const dagvtx v, const string opname)
+{
+  vtxcontent c = dagvtx_content(v);
+  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+  return same_string_p(cat(AIPO, opname), api->function_name);
+}
+
 /* returns whether the vertex is an image copy operation.
  */
 static bool dagvtx_is_copy_p(const dagvtx v)
 {
-  vtxcontent c = dagvtx_content(v);
-  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
-  return same_string_p(AIPO "copy", api->function_name);
+  return dagvtx_is_operator_p(v, "copy");
 }
 
 /* returns whether the vertex is an image measurement operation.
@@ -905,7 +910,7 @@ static int number_of_copies(list /* of dagvtx */ l)
   return n;
 }
 
-// tell whether this is this (short name) aipo function?
+// tell whether this is this (short name) aipo function (static test)?
 #define aipo_op_p(a, name)                      \
   same_string_p(AIPO name, a->function_name)
 
@@ -935,12 +940,15 @@ static void set_aipo_call(dagvtx v, string name, entity img, expression val)
   pstatement ps = vtxcontent_source(c);
   pips_assert("some statement!", pstatement_statement_p(ps));
 
+  // build function name
   string fname = strdup(cat(AIPO, name));
 
-  // remove inputs
+  // remove previous image inputs
   gen_free_list(vtxcontent_inputs(c));
   vtxcontent_inputs(c) =
     (img && img!=entity_undefined)? CONS(entity, img, NIL): NIL;
+
+  // set id & type
   vtxcontent_opid(c) = hwac_freia_api_index(fname);
   pips_assert("function index found", vtxcontent_opid(c)!=-1);
   vtxcontent_optype(c) =
@@ -951,6 +959,8 @@ static void set_aipo_call(dagvtx v, string name, entity img, expression val)
   entity func = local_name_to_top_level_entity(fname);
   pips_assert("AIPO function found", func!=entity_undefined);
   call_function(cf) = func;
+
+  // build expression list in reverse order
   list args = NIL;
   if (val && val!=expression_undefined)
     args = CONS(expression, copy_expression(val), args);
@@ -1239,7 +1249,18 @@ static bool dag_simplify(dag d)
       set_aipo_copy(v, img);
     }
     // another one just for fun: I+I -> 2*I
-    // else if ((
+    // this is good for SPoC
+    else if (dagvtx_is_operator_p(v, "add"))
+    {
+      list preds = dag_vertex_preds(d, v);
+      pips_assert("two args to add", gen_length(preds)==2);
+      if (DAGVTX(CAR(preds))==DAGVTX(CAR(CDR(preds))))
+      {
+        changed = true;
+        set_aipo_call(v, "mul_const",
+                      dagvtx_image(DAGVTX(CAR(preds))), int_to_expression(2));
+      }
+    }
   }
 
   return changed;
