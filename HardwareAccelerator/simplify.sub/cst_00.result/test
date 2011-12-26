@@ -59,8 +59,8 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 
 ! updated function for
@@ -68,7 +68,7 @@ digraph "dag_cleaned_0" {
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   freia_aipo_set_constant(o, 0);                                       /*0009*/
+   freia_aipo_set_constant(o, 0);                                       /*0006*/
    return FREIA_OK;                                                     /*0014*/
 }
 #
@@ -101,8 +101,8 @@ digraph "cst_00_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_00" in dot format
 digraph "dag_0" {
@@ -140,8 +140,8 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 
 ! acceleration function
@@ -172,7 +172,7 @@ freia_status cst_00_helper_0_0_0(
 
 
   // STAGE 0
-  // alu 9 set_constant stage 0
+  // alu 6 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
   sp.alu[0][0].constant = pi0;
 
@@ -219,7 +219,7 @@ freia_status cst_00_helper_0_0_0(
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   cst_00_helper_0_0_0(o, 0);                                           /*0009*/
+   cst_00_helper_0_0_0(o, 0);                                           /*0006*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -228,7 +228,7 @@ freia_status cst_00(freia_data2d *o, uint32_t k)
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   cst_00_helper_0_0_0(o, 0);                                           /*0009*/
+   cst_00_helper_0_0_0(o, 0);                                           /*0006*/
    return 0;                                                            /*0014*/
 }
 #
@@ -261,8 +261,8 @@ digraph "cst_00_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_00" in dot format
 digraph "dag_0" {
@@ -300,8 +300,8 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 
 ! acceleration function
@@ -460,7 +460,7 @@ freia_status cst_00_helper_0_0_0(
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   cst_00_helper_0_0_0(o, 0);                                           /*0009*/
+   cst_00_helper_0_0_0(o, 0);                                           /*0006*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -469,7 +469,7 @@ freia_status cst_00(freia_data2d *o, uint32_t k)
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   cst_00_helper_0_0_0(o, 0);                                           /*0009*/
+   cst_00_helper_0_0_0(o, 0);                                           /*0006*/
    return 0;                                                            /*0014*/
 }
 #
@@ -502,8 +502,8 @@ digraph "cst_00_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_00" in dot format
 digraph "dag_0" {
@@ -541,8 +541,8 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "o";
+  "6 C" [shape=trapezium,orientation=270];
+  "6 C" -> "o";
 }
 
 ! acceleration function
@@ -564,7 +564,7 @@ digraph "dag_cleaned_0" {
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   freia_aipo_set_constant(o, 0);                                       /*0009*/
+   freia_aipo_set_constant(o, 0);                                       /*0006*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -573,7 +573,7 @@ freia_status cst_00(freia_data2d *o, uint32_t k)
 freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
-   freia_aipo_set_constant(o, 0);                                       /*0009*/
+   freia_aipo_set_constant(o, 0);                                       /*0006*/
    return 0;                                                            /*0014*/
 }
 #
