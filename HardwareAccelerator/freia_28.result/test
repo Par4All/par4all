@@ -24,7 +24,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_erode_8c(X0, i, k);                                       /*0018*/
    freia_aipo_global_min(X0, &sB);                                      /*0019*/
    freia_aipo_threshold(tC, X0, sB-10, sB-1, false);                    /*0020*/
-   freia_aipo_add(tC2, tC, tC);                                         /*0021*/
+   freia_aipo_mul(tC2, tC, tC);                                         /*0021*/
    freia_aipo_dilate_8c(X1, tB, k);                                     /*0022*/
    freia_aipo_global_vol(X1, &sC);                                      /*0023*/
    freia_aipo_threshold(tD, X1, sC-10, sC-1, false);                    /*0024*/
@@ -58,11 +58,11 @@ digraph "dag_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -94,11 +94,11 @@ digraph "dag_cleaned_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -132,7 +132,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_erode_8c(X0, i, k);                                       /*0018*/
    freia_aipo_global_min(X0, &sB);                                      /*0019*/
    freia_aipo_threshold(tC, X0, sB-10, sB-1, false);                    /*0020*/
-   freia_aipo_add(tC2, tC, tC);                                         /*0021*/
+   freia_aipo_mul(tC2, tC, tC);                                         /*0021*/
    freia_aipo_dilate_8c(X1, tB, k);                                     /*0022*/
    freia_aipo_global_vol(X1, &sC);                                      /*0023*/
    freia_aipo_threshold(tD, X1, sC-10, sC-1, false);                    /*0024*/
@@ -168,7 +168,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_erode_8c(X0, i, k);                                       /*0018*/
    freia_aipo_global_min(X0, &sB);                                      /*0019*/
    freia_aipo_threshold(tC, X0, sB-10, sB-1, false);                    /*0020*/
-   freia_aipo_add(tC2, tC, tC);                                         /*0021*/
+   freia_aipo_mul(tC2, tC, tC);                                         /*0021*/
    freia_aipo_dilate_8c(X1, tB, k);                                     /*0022*/
    freia_aipo_global_vol(X1, &sC);                                      /*0023*/
    freia_aipo_threshold(tD, X1, sC-10, sC-1, false);                    /*0024*/
@@ -202,11 +202,11 @@ digraph "dag_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -238,11 +238,11 @@ digraph "dag_cleaned_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -304,10 +304,10 @@ digraph "freia_28_helper_0_2" {
   "tC2" [shape=circle];
 
   // computation vertices
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "tC2";
-  "tC" -> "21 +";
-  "tC" -> "21 +";
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "tC2";
+  "tC" -> "21 *";
+  "tC" -> "21 *";
 }
 // graph for dag "freia_28_helper_0_3" of module "freia_28" in dot format
 digraph "freia_28_helper_0_3" {
@@ -568,12 +568,12 @@ freia_status freia_28_helper_0_2_0(
 
 
   // STAGE 0
-  // 0`tC [0 input 0] -> [0 alu] 21 add
+  // 0`tC [0 input 0] -> [0 alu] 21 mul
   // nope
-  // 0`tC [0 input 1] -> [0 alu] 21 add
+  // 0`tC [0 input 1] -> [0 alu] 21 mul
   // nope
-  // alu 21 add stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+  // alu 21 mul stage 0
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
 
 
   // output image 0`tC2 on 0
@@ -761,7 +761,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_erode_8c(X0, i, k);                                       /*0018*/
    freia_aipo_global_min(X0, &sB);                                      /*0019*/
    freia_aipo_threshold(tC, X0, sB-10, sB-1, false);                    /*0020*/
-   freia_aipo_add(tC2, tC, tC);                                         /*0021*/
+   freia_aipo_mul(tC2, tC, tC);                                         /*0021*/
    freia_aipo_dilate_8c(X1, tB, k);                                     /*0022*/
    freia_aipo_global_vol(X1, &sC);                                      /*0023*/
    freia_aipo_threshold(tD, X1, sC-10, sC-1, false);                    /*0024*/
@@ -795,11 +795,11 @@ digraph "dag_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -831,11 +831,11 @@ digraph "dag_cleaned_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -877,11 +877,11 @@ digraph "freia_28_helper_0_1_0" {
   "X1" [shape=circle];
 
   // computation vertices
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "tC2";
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "tC2";
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "X0" -> "20 thr";
   "23 vol" [shape=diamond];
   "22 D8" [shape=box];
@@ -1485,7 +1485,7 @@ freia_status freia_28_helper_0_1_0(
   mcu_macro[1][3].iter4 = 0;
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_THRESHOLD;
-  // 4: +(2,2) -> 1
+  // 4: *(2,2) -> 1
   mcu_macro[0][4].xmin1 = imagelet_io_2_0;
   mcu_macro[1][4].xmin1 = imagelet_io_2_1;
   mcu_macro[0][4].ymin1 = 0;
@@ -1506,8 +1506,8 @@ freia_status freia_28_helper_0_1_0(
   mcu_macro[1][4].iter3 = 0;
   mcu_macro[0][4].iter4 = 0;
   mcu_macro[1][4].iter4 = 0;
-  mcu_macro[0][4].addrStart = TERAPIX_UCODE_ADD3;
-  mcu_macro[1][4].addrStart = TERAPIX_UCODE_ADD3;
+  mcu_macro[0][4].addrStart = TERAPIX_UCODE_MUL3;
+  mcu_macro[1][4].addrStart = TERAPIX_UCODE_MUL3;
   // output copy 3 -> 2
   mcu_macro[0][5].xmin1 = imagelet_3;
   mcu_macro[1][5].xmin1 = imagelet_3;
@@ -1859,7 +1859,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_erode_8c(X0, i, k);                                       /*0018*/
    freia_aipo_global_min(X0, &sB);                                      /*0019*/
    freia_aipo_threshold(tC, X0, sB-10, sB-1, false);                    /*0020*/
-   freia_aipo_add(tC2, tC, tC);                                         /*0021*/
+   freia_aipo_mul(tC2, tC, tC);                                         /*0021*/
    freia_aipo_dilate_8c(X1, tB, k);                                     /*0022*/
    freia_aipo_global_vol(X1, &sC);                                      /*0023*/
    freia_aipo_threshold(tD, X1, sC-10, sC-1, false);                    /*0024*/
@@ -1893,11 +1893,11 @@ digraph "dag_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -1929,11 +1929,11 @@ digraph "dag_cleaned_0" {
   "22 D8" [shape=box];
   "22 D8" -> "24 thr" [label="X1"];
   "22 D8" -> "23 vol" [label="X1"];
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "25 +" [label="tC2"];
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "25 +" [label="tC2"];
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "19 min" [shape=diamond];
   "19 min" -> "20 thr" [arrowhead=empty,label="sB"];
   "18 E8" [shape=box];
@@ -1979,11 +1979,11 @@ digraph "freia_28_helper_0_1" {
   "22 D8" [shape=box];
   "22 D8" -> "23 vol" [label="X1"];
   "22 D8" -> "X1";
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "tC2";
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "tC2";
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "X0" -> "20 thr";
   "17 thr" [shape=parallelogram];
   "17 thr" -> "22 D8" [label="tB"];
@@ -2000,11 +2000,11 @@ digraph "freia_28_helper_0_1_0" {
   "tC2" [shape=circle];
 
   // computation vertices
-  "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "tC2";
+  "21 *" [shape=trapezium,orientation=270];
+  "21 *" -> "tC2";
   "20 thr" [shape=parallelogram];
-  "20 thr" -> "21 +" [label="tC"];
-  "20 thr" -> "21 +" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
+  "20 thr" -> "21 *" [label="tC"];
   "X0" -> "20 thr";
   "17 thr" [shape=parallelogram];
   "17 thr" -> "tB";
@@ -2100,7 +2100,7 @@ static freia_status freia_28_helper_0_1_0_compile(void)
     "    // pixel computations\n"
     "    PIXEL t17 = PIXEL_THRESHOLD(in1, c0, c1, c2);\n"
     "    PIXEL t20 = PIXEL_THRESHOLD(in0, c3, c4, c5);\n"
-    "    PIXEL t21 = PIXEL_ADD(t20, t20);\n"
+    "    PIXEL t21 = PIXEL_MUL(t20, t20);\n"
     "    // set output pixels\n"
     "    p0[i] = t17;\n"
     "    p1[i] = t21;\n"
@@ -2264,7 +2264,7 @@ KERNEL void freia_28_helper_0_1_0(
     // pixel computations
     PIXEL t17 = PIXEL_THRESHOLD(in1, c0, c1, c2);
     PIXEL t20 = PIXEL_THRESHOLD(in0, c3, c4, c5);
-    PIXEL t21 = PIXEL_ADD(t20, t20);
+    PIXEL t21 = PIXEL_MUL(t20, t20);
     // set output pixels
     p0[i] = t17;
     p1[i] = t21;
