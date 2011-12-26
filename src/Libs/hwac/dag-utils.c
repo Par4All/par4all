@@ -1238,6 +1238,8 @@ static bool dag_simplify(dag d)
       changed = true;
       set_aipo_copy(v, img);
     }
+    // another one just for fun: I+I -> 2*I
+    // else if ((
   }
 
   return changed;
@@ -1330,6 +1332,19 @@ void freia_dag_optimize(
     ifdebug(8) {
       pips_debug(4, "after FREIA_NORMALIZE_OPERATIONS:\n");
       dag_dump(stderr, "normalized", d);
+    }
+  }
+
+  // algebraic simplifications
+  // currently constant images are detected and propagated and constant pixels
+  if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
+    dag_simplify(d);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS (1):\n");
+      dag_dump(stderr, "simplified_1", d);
+      // dag_dot_dump_prefix("main", "simplified", 0, d);
     }
   }
 
@@ -1485,13 +1500,17 @@ void freia_dag_optimize(
     }
   }
 
+  // algebraic simplifications *AGAIN*
+  // some duplicate operation removal may have enabled more simplifications
+  // for instance -(a,b) & a=~b => -(a,a) => cst(0)
+  // we may have a convergence loop on both duplicate/simplify
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
   {
     dag_simplify(d);
 
     ifdebug(8) {
-      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
-      dag_dump(stderr, "simplified", d);
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS (2):\n");
+      dag_dump(stderr, "simplified_2", d);
       // dag_dot_dump_prefix("main", "simplified", 0, d);
     }
   }
@@ -1544,6 +1563,8 @@ void freia_dag_optimize(
     while (changed)
     {
       changed = false;
+
+      // first propagate input images through copies
       FOREACH(dagvtx, v, dag_inputs(d))
       {
         list append = NIL;
@@ -1600,12 +1621,21 @@ void freia_dag_optimize(
         vtxcontent c = dagvtx_content(v);
         entity res = vtxcontent_out(c);
         pips_assert("one output and one input to copy",
-                res!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+                    res!=entity_undefined &&
+                    gen_length(preds)==1 &&
+                    gen_length(vtxcontent_inputs(c))==1);
 
-
+        // first check for A->copy->A really useless copies, which are skipped
+        entity inimg = ENTITY(CAR(vtxcontent_inputs(c)));
+        if (inimg==res)
+        {
+          set_add_element(remove, remove, v);
+          if (gen_in_list_p(v, dag_outputs(d)))
+            gen_replace_in_list(dag_outputs(d), v, DAGVTX(CAR(preds)));
+        }
         // check for internal-t -one-copy-and-others-> A (output)
         // could be improved by dealing with the first copy only?
-        if (gen_in_list_p(v, dag_outputs(d)))
+        else if (gen_in_list_p(v, dag_outputs(d)))
         {
           pips_assert("one predecessor to used copy", gen_length(preds)==1);
           dagvtx pred = DAGVTX(CAR(preds));
@@ -1792,10 +1822,11 @@ void freia_dag_optimize(
     // dag_dot_dump_prefix("main", "cleaned", 0, d);
   }
 
-  pips_assert("right output count after optimizations",
-      // former output images are either still computed or copies of computed
-         gen_length(dag_outputs(d)) + gen_length(*lbefore) + gen_length(*lafter)
-              == dag_output_count);
+  // former output images are either still computed or copies of computed
+  size_t recount = gen_length(dag_outputs(d)) +
+    gen_length(*lbefore) + gen_length(*lafter);
+  pips_assert("right output count after dag optimizations",
+              dag_output_count==recount);
 }
 
 /* return whether all vertices in list are mesures...
