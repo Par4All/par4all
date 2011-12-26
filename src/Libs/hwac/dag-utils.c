@@ -1630,8 +1630,13 @@ void freia_dag_optimize(
         if (inimg==res)
         {
           set_add_element(remove, remove, v);
+          dagvtx pred = DAGVTX(CAR(preds));
+          // update predecessor's successors
+          gen_remove(&dagvtx_succs(pred), v);
+          dagvtx_succs(pred) = gen_nconc(dagvtx_succs(pred), dagvtx_succs(v));
+          // fix global output if necessary
           if (gen_in_list_p(v, dag_outputs(d)))
-            gen_replace_in_list(dag_outputs(d), v, DAGVTX(CAR(preds)));
+            gen_replace_in_list(dag_outputs(d), v, pred);
         }
         // check for internal-t -one-copy-and-others-> A (output)
         // could be improved by dealing with the first copy only?
