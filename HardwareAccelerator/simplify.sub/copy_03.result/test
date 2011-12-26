@@ -13,16 +13,15 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_add_const(a, in, 1);                                      /*0011*/
-   freia_aipo_add_const(b, in, 1);                                      /*0012*/
-   freia_aipo_sub(out, a, b);                                           /*0013*/
+   freia_aipo_add_const(a, in, 1);                                      /*0010*/
+   freia_aipo_add_const(b, in, 1);                                      /*0011*/
+   freia_aipo_sub(out, a, b);                                           /*0012*/
 
-   freia_common_destruct_data(a);                                       /*0015*/
-   freia_common_destruct_data(b);                                       /*0016*/
+   freia_common_destruct_data(a);                                       /*0014*/
+   freia_common_destruct_data(b);                                       /*0015*/
 
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! graphs
@@ -36,14 +35,14 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 -" [shape=trapezium,orientation=270];
-  "13 -" -> "out";
-  "12 +_" [shape=trapezium,orientation=270];
-  "12 +_" -> "13 -" [label="b"];
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "out";
   "11 +_" [shape=trapezium,orientation=270];
-  "11 +_" -> "13 -" [label="a"];
-  "in" -> "12 +_";
+  "11 +_" -> "12 -" [label="b"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 -" [label="a"];
   "in" -> "11 +_";
+  "in" -> "10 +_";
 }
 // graph for dag "dag_cleaned_0" of module "copy_03" in dot format
 digraph "dag_cleaned_0" {
@@ -53,8 +52,8 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 
 ! updated function for
@@ -62,12 +61,11 @@ digraph "dag_cleaned_0" {
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_set_constant(out, 0);                                     /*0013*/
+   freia_aipo_set_constant(out, 0);                                     /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 #
 # SPOC
@@ -81,16 +79,15 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_add_const(a, in, 1);                                      /*0011*/
-   freia_aipo_add_const(b, in, 1);                                      /*0012*/
-   freia_aipo_sub(out, a, b);                                           /*0013*/
+   freia_aipo_add_const(a, in, 1);                                      /*0010*/
+   freia_aipo_add_const(b, in, 1);                                      /*0011*/
+   freia_aipo_sub(out, a, b);                                           /*0012*/
 
-   freia_common_destruct_data(a);                                       /*0015*/
-   freia_common_destruct_data(b);                                       /*0016*/
+   freia_common_destruct_data(a);                                       /*0014*/
+   freia_common_destruct_data(b);                                       /*0015*/
 
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! graphs
@@ -103,8 +100,8 @@ digraph "copy_03_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 // graph for dag "dag_0" of module "copy_03" in dot format
 digraph "dag_0" {
@@ -115,14 +112,14 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 -" [shape=trapezium,orientation=270];
-  "13 -" -> "out";
-  "12 +_" [shape=trapezium,orientation=270];
-  "12 +_" -> "13 -" [label="b"];
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "out";
   "11 +_" [shape=trapezium,orientation=270];
-  "11 +_" -> "13 -" [label="a"];
-  "in" -> "12 +_";
+  "11 +_" -> "12 -" [label="b"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 -" [label="a"];
   "in" -> "11 +_";
+  "in" -> "10 +_";
 }
 // graph for dag "dag_cleaned_0" of module "copy_03" in dot format
 digraph "dag_cleaned_0" {
@@ -132,8 +129,8 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 
 ! acceleration function
@@ -164,7 +161,7 @@ freia_status copy_03_helper_0_0_0(
 
 
   // STAGE 0
-  // alu 13 set_constant stage 0
+  // alu 12 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
   sp.alu[0][0].constant = pi0;
 
@@ -211,12 +208,11 @@ freia_status copy_03_helper_0_0_0(
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0013*/
+   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! cleaned up function
@@ -224,12 +220,11 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0013*/
+   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 #
 # TERAPIX
@@ -243,16 +238,15 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_add_const(a, in, 1);                                      /*0011*/
-   freia_aipo_add_const(b, in, 1);                                      /*0012*/
-   freia_aipo_sub(out, a, b);                                           /*0013*/
+   freia_aipo_add_const(a, in, 1);                                      /*0010*/
+   freia_aipo_add_const(b, in, 1);                                      /*0011*/
+   freia_aipo_sub(out, a, b);                                           /*0012*/
 
-   freia_common_destruct_data(a);                                       /*0015*/
-   freia_common_destruct_data(b);                                       /*0016*/
+   freia_common_destruct_data(a);                                       /*0014*/
+   freia_common_destruct_data(b);                                       /*0015*/
 
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! graphs
@@ -265,8 +259,8 @@ digraph "copy_03_helper_0_0_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 // graph for dag "dag_0" of module "copy_03" in dot format
 digraph "dag_0" {
@@ -277,14 +271,14 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 -" [shape=trapezium,orientation=270];
-  "13 -" -> "out";
-  "12 +_" [shape=trapezium,orientation=270];
-  "12 +_" -> "13 -" [label="b"];
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "out";
   "11 +_" [shape=trapezium,orientation=270];
-  "11 +_" -> "13 -" [label="a"];
-  "in" -> "12 +_";
+  "11 +_" -> "12 -" [label="b"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 -" [label="a"];
   "in" -> "11 +_";
+  "in" -> "10 +_";
 }
 // graph for dag "dag_cleaned_0" of module "copy_03" in dot format
 digraph "dag_cleaned_0" {
@@ -294,8 +288,8 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 
 ! acceleration function
@@ -454,12 +448,11 @@ freia_status copy_03_helper_0_0_0(
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0013*/
+   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! cleaned up function
@@ -467,12 +460,11 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0013*/
+   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 #
 # OPENCL
@@ -486,16 +478,15 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_add_const(a, in, 1);                                      /*0011*/
-   freia_aipo_add_const(b, in, 1);                                      /*0012*/
-   freia_aipo_sub(out, a, b);                                           /*0013*/
+   freia_aipo_add_const(a, in, 1);                                      /*0010*/
+   freia_aipo_add_const(b, in, 1);                                      /*0011*/
+   freia_aipo_sub(out, a, b);                                           /*0012*/
 
-   freia_common_destruct_data(a);                                       /*0015*/
-   freia_common_destruct_data(b);                                       /*0016*/
+   freia_common_destruct_data(a);                                       /*0014*/
+   freia_common_destruct_data(b);                                       /*0015*/
 
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! graphs
@@ -508,8 +499,8 @@ digraph "copy_03_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 // graph for dag "dag_0" of module "copy_03" in dot format
 digraph "dag_0" {
@@ -520,14 +511,14 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 -" [shape=trapezium,orientation=270];
-  "13 -" -> "out";
-  "12 +_" [shape=trapezium,orientation=270];
-  "12 +_" -> "13 -" [label="b"];
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "out";
   "11 +_" [shape=trapezium,orientation=270];
-  "11 +_" -> "13 -" [label="a"];
-  "in" -> "12 +_";
+  "11 +_" -> "12 -" [label="b"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 -" [label="a"];
   "in" -> "11 +_";
+  "in" -> "10 +_";
 }
 // graph for dag "dag_cleaned_0" of module "copy_03" in dot format
 digraph "dag_cleaned_0" {
@@ -537,8 +528,8 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 C" [shape=trapezium,orientation=270];
-  "13 C" -> "out";
+  "12 C" [shape=trapezium,orientation=270];
+  "12 C" -> "out";
 }
 
 ! acceleration function
@@ -560,12 +551,11 @@ digraph "dag_cleaned_0" {
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_set_constant(out, 0);                                     /*0013*/
+   freia_aipo_set_constant(out, 0);                                     /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 
 ! cleaned up function
@@ -573,12 +563,11 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
-   
    // check for CSE-enabled constant images
-   freia_aipo_set_constant(out, 0);                                     /*0013*/
+   freia_aipo_set_constant(out, 0);                                     /*0012*/
    
    
-   return 0;                                                            /*0018*/
+   return 0;                                                            /*0017*/
 }
 #
 # FREIA COMPILATION DONE
