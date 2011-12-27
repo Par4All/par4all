@@ -1,0 +1,92 @@
+
+Transformers for slope08
+
+
+//  T() {}
+
+void slope08()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=58}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=58))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (61*y<=55*x+54)
+
+//  T(k) {x+y==k}
+
+      /* x=9, y=9 is reachable */
+      /* The new constraints are derived from points (0,0), (9,9),
+             (49,45) and (58,53) with slopes 1, 9/10 and 8/9 */
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope08
+
+
+//  P() {}
+
+void slope08()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=58))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=58}
+
+
+   if (61*y<=55*x+54)
+
+//  P(k,x,y) {0<=x, x<=58, 10y<=9x+9, 9y<=8x+13, y<=x}
+
+      /* x=9, y=9 is reachable */
+      /* The new constraints are derived from points (0,0), (9,9),
+             (49,45) and (58,53) with slopes 1, 9/10 and 8/9 */
+      k = x+y;
+   else
+
+//  P(k,x,y) {0<=x, x<=58, x<=y+4, 9x+10<=10y}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=58}
+
+
+   return;
+}

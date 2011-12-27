@@ -18,5 +18,9 @@ void slope04()
    */
   if(-3*x+10*y-9<=0)
     k = x + y;
+  else
+    /* Extreme points are (0, 1) and (5,3) and only one intermediate
+       point exists, (3,2); hence the slopes 1/3 and 1/2 */
+    k = x + y;
   return;
 }

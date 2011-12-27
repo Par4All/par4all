@@ -21,7 +21,7 @@ void slope04()
 
       abort();
 
-//  T(k) {}
+//  T(k) {x+y==k}
 
    
    /* Define a horizontal constraint that is slightly increasing in
@@ -34,6 +34,13 @@ void slope04()
 
 //  T(k) {x+y==k}
 
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      /* Extreme points are (0, 1) and (5,3) and only one intermediate
+             point exists, (3,2); hence the slopes 1/3 and 1/2 */
       k = x+y;
 
 //  T() {}
@@ -77,8 +84,15 @@ void slope04()
 //  P(k,x,y) {0<=x, x<=5, y<=x, 3y<=x+2, y<=2}
 
       k = x+y;
+   else
 
-//  P(k,x,y) {0<=x, x<=5}
+//  P(k,x,y) {0<=x, x<=5, x+3<=3y, x+1<=2y}
+
+      /* Extreme points are (0, 1) and (5,3) and only one intermediate
+             point exists, (3,2); hence the slopes 1/3 and 1/2 */
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=5}
 
    return;
 }

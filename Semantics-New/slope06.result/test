@@ -1,0 +1,92 @@
+
+Transformers for slope06
+
+
+//  T() {}
+
+void slope06()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=10}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (-x-12*y-61<=0)
+
+//  T(k) {x+y==k}
+
+      /* x==0 -> y>=-5; x==10 -> 12y>=-71 -> y>=-5 */
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      /* -x-12y-61>=1, x+12y+62<=0*/
+      /* x==0 -> y<=-6; x==10 -> 12y<=72 -> y<=-6 */
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope06
+
+
+//  P() {}
+
+void slope06()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=10}
+
+
+   if (-x-12*y-61<=0)
+
+//  P(k,x,y) {0<=x, x<=10, 0<=y+5}
+
+      /* x==0 -> y>=-5; x==10 -> 12y>=-71 -> y>=-5 */
+      k = x+y;
+   else
+
+//  P(k,x,y) {0<=x, x<=10, y+6<=0}
+
+      /* -x-12y-61>=1, x+12y+62<=0*/
+      /* x==0 -> y<=-6; x==10 -> 12y<=72 -> y<=-6 */
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10}
+
+
+   return;
+}
