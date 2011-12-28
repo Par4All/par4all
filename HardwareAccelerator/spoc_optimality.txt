@@ -1,5 +1,7 @@
 # manually checked spoc optimality
 #
+# if one call only, and assuming there is something to compute, it is optimal
+#
 # for t in *.result/test */*.result/test ; do
 #   name=${t//.result\/*/} ; name=${name//\//__} ;
 #   sed -n -e "s/^freia_status .*_helper_.*/${name}/p;/terapix/q" $t ;
