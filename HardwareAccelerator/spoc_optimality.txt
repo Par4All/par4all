@@ -20,11 +20,11 @@
 #      2 apps.sub__anr999
 #     10 apps.sub__antibio
 #     32 apps.sub__burner
-     17 apps.sub__deblocking
-      8 apps.sub__lp
-      6 apps.sub__oop
-      8 apps.sub__retina
-      7 apps.sub__toggle
+#     17 apps.sub__deblocking
+!      8 apps.sub__lp (7, greedy)
+#      6 apps.sub__oop
+!      8 apps.sub__retina (7, bad line choice)
+#      7 apps.sub__toggle
 #      8 freia_03_1
 #      4 freia_03_2
 #      3 freia_03_3
