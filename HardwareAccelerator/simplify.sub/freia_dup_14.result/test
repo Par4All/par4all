@@ -277,8 +277,8 @@ digraph "dag_cleaned_0" {
   "imin" -> "45 D8";
   "imin" -> "38 E8";
 }
-// graph for dag "freia_dup_14_helper_0_0" of module "freia_dup_14" in dot format
-digraph "freia_dup_14_helper_0_0" {
+// graph for dag "freia_dup_14_spoc_helper_0_0" of module "freia_dup_14" in dot format
+digraph "freia_dup_14_spoc_helper_0_0" {
   // inputs
   "imin" [shape=circle];
 
@@ -308,7 +308,7 @@ digraph "freia_dup_14_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_14
-freia_status freia_dup_14_helper_0_0_0(
+freia_status freia_dup_14_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -415,7 +415,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
+   freia_dup_14_spoc_helper_0_0_0(imout, imin, kernel1x3);              /*0038*/
    
    
    ret_1 = 0;                                                           /*0044*/
@@ -463,7 +463,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
+   freia_dup_14_spoc_helper_0_0_0(imout, imin, kernel1x3);              /*0038*/
    
    
    ret_1 = 0;                                                           /*0044*/
@@ -592,8 +592,8 @@ digraph "dag_cleaned_0" {
   "imin" -> "45 D8";
   "imin" -> "38 E8";
 }
-// graph for dag "freia_dup_14_helper_0_0_0" of module "freia_dup_14" in dot format
-digraph "freia_dup_14_helper_0_0_0" {
+// graph for dag "freia_dup_14_terapix_helper_0_0_0" of module "freia_dup_14" in dot format
+digraph "freia_dup_14_terapix_helper_0_0_0" {
   // inputs
   "imin" [shape=circle];
 
@@ -641,7 +641,7 @@ digraph "freia_dup_14_helper_0_0_0" {
  * - computation: 34
  * - communication: 64
  */
-freia_status freia_dup_14_helper_0_0_0(
+freia_status freia_dup_14_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -850,7 +850,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
+   freia_dup_14_terapix_helper_0_0_0(imout, imin, kernel1x3);           /*0038*/
    
    
    ret_1 = 0;                                                           /*0044*/
@@ -898,7 +898,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
+   freia_dup_14_terapix_helper_0_0_0(imout, imin, kernel1x3);           /*0038*/
    
    
    ret_1 = 0;                                                           /*0044*/
@@ -1027,8 +1027,8 @@ digraph "dag_cleaned_0" {
   "imin" -> "45 D8";
   "imin" -> "38 E8";
 }
-// graph for dag "freia_dup_14_helper_0_0" of module "freia_dup_14" in dot format
-digraph "freia_dup_14_helper_0_0" {
+// graph for dag "freia_dup_14_opencl_helper_0_0" of module "freia_dup_14" in dot format
+digraph "freia_dup_14_opencl_helper_0_0" {
   // inputs
   "imin" [shape=circle];
 

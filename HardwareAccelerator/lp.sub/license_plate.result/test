@@ -1130,8 +1130,8 @@ digraph "dag_cleaned_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
-digraph "license_plate_helper_0_0" {
+// graph for dag "license_plate_spoc_helper_0_0" of module "license_plate" in dot format
+digraph "license_plate_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -1278,8 +1278,8 @@ digraph "license_plate_helper_0_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_1" of module "license_plate" in dot format
-digraph "license_plate_helper_0_1" {
+// graph for dag "license_plate_spoc_helper_0_1" of module "license_plate" in dot format
+digraph "license_plate_spoc_helper_0_1" {
   // inputs
   "in" [shape=circle];
   "out_1" [shape=circle];
@@ -1307,7 +1307,7 @@ digraph "license_plate_helper_0_1" {
 // # SPOC calls: 8
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_0(
+freia_status license_plate_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -1544,7 +1544,7 @@ freia_status license_plate_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_1(
+freia_status license_plate_spoc_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -1792,7 +1792,7 @@ freia_status license_plate_helper_0_0_1(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_2(
+freia_status license_plate_spoc_helper_0_0_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1928,7 +1928,7 @@ freia_status license_plate_helper_0_0_2(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_3(
+freia_status license_plate_spoc_helper_0_0_3(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2086,7 +2086,7 @@ freia_status license_plate_helper_0_0_3(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_4(
+freia_status license_plate_spoc_helper_0_0_4(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
@@ -2222,7 +2222,7 @@ freia_status license_plate_helper_0_0_4(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_5(
+freia_status license_plate_spoc_helper_0_0_5(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
@@ -2358,7 +2358,7 @@ freia_status license_plate_helper_0_0_5(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_0_6(
+freia_status license_plate_spoc_helper_0_0_6(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -2432,7 +2432,7 @@ freia_status license_plate_helper_0_0_6(
 }
 
 // FREIA-SPoC helper function for module license_plate
-freia_status license_plate_helper_0_1_0(
+freia_status license_plate_spoc_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -2550,11 +2550,11 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);          /*0053*/
-   license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);            /*0061*/
+   license_plate_spoc_helper_0_0_0(imopen, imclose, in, kernel1x3);     /*0053*/
+   license_plate_spoc_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);       /*0061*/
 
-   license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);    /*0071*/
-   license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);             /*0079*/
+   license_plate_spoc_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);              /*0071*/
+   license_plate_spoc_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);        /*0079*/
 
    ret_1 = 0;                                                           /*0089*/
    
@@ -2562,14 +2562,14 @@ int license_plate(void)
    
    
    ret_2 = 0;                                                           /*0117*/
-   license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);     /*0118*/
+   license_plate_spoc_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);               /*0118*/
    
    
    ret_3 = 0;                                                           /*0131*/
-   license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);          /*0132*/
+   license_plate_spoc_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);     /*0132*/
    
    
-   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0146*/
+   license_plate_spoc_helper_0_0_6(out, out, freia_morpho_kernel_8c);   /*0146*/
 
    _return1 = ret_0;                                                    /*0087*/
    
@@ -2580,7 +2580,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_1_0(out, in, out);                            /*0152*/
+   license_plate_spoc_helper_0_1_0(out, in, out);                       /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */
@@ -2655,11 +2655,11 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);          /*0053*/
-   license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);            /*0061*/
+   license_plate_spoc_helper_0_0_0(imopen, imclose, in, kernel1x3);     /*0053*/
+   license_plate_spoc_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);       /*0061*/
 
-   license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);    /*0071*/
-   license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);             /*0079*/
+   license_plate_spoc_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);              /*0071*/
+   license_plate_spoc_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);        /*0079*/
 
    ret_1 = 0;                                                           /*0089*/
    
@@ -2667,14 +2667,14 @@ int license_plate(void)
    
    
    ret_2 = 0;                                                           /*0117*/
-   license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);     /*0118*/
+   license_plate_spoc_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);               /*0118*/
    
    
    ret_3 = 0;                                                           /*0131*/
-   license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);          /*0132*/
+   license_plate_spoc_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);     /*0132*/
    
    
-   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0146*/
+   license_plate_spoc_helper_0_0_6(out, out, freia_morpho_kernel_8c);   /*0146*/
 
    _return1 = ret_0;                                                    /*0087*/
    
@@ -2685,7 +2685,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_1_0(out, in, out);                            /*0152*/
+   license_plate_spoc_helper_0_1_0(out, in, out);                       /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */
@@ -3183,8 +3183,8 @@ digraph "dag_cleaned_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
-digraph "license_plate_helper_0_0" {
+// graph for dag "license_plate_terapix_helper_0_0" of module "license_plate" in dot format
+digraph "license_plate_terapix_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -3365,7 +3365,7 @@ digraph "license_plate_helper_0_0" {
  * - computation: 993
  * - communication: 64
  */
-freia_status license_plate_helper_0_0(
+freia_status license_plate_terapix_helper_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2,
@@ -5173,7 +5173,7 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);           /*0053*/
+   license_plate_terapix_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
    
    
    ret_1 = 0;                                                           /*0089*/
@@ -5256,7 +5256,7 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);           /*0053*/
+   license_plate_terapix_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
    
    
    ret_1 = 0;                                                           /*0089*/
@@ -5772,8 +5772,8 @@ digraph "dag_cleaned_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
-digraph "license_plate_helper_0_0" {
+// graph for dag "license_plate_opencl_helper_0_0" of module "license_plate" in dot format
+digraph "license_plate_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -5923,8 +5923,8 @@ digraph "license_plate_helper_0_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_0_1" of module "license_plate" in dot format
-digraph "license_plate_helper_0_0_1" {
+// graph for dag "license_plate_opencl_helper_0_0_1" of module "license_plate" in dot format
+digraph "license_plate_opencl_helper_0_0_1" {
   // inputs
   "imclose" [shape=circle];
   "imopen" [shape=circle];
@@ -5953,18 +5953,18 @@ digraph "license_plate_helper_0_0_1" {
 
 // dag 0: 69 ops and 0 copies, optimized to 69 ops and 0+0+0 copies
 
-// hold kernels for license_plate_helper_0_0_1
-static cl_kernel license_plate_helper_0_0_1_kernel[2];
+// hold kernels for license_plate_opencl_helper_0_0_1
+static cl_kernel license_plate_opencl_helper_0_0_1_kernel[2];
 
-// compile kernels for license_plate_helper_0_0_1
-static freia_status license_plate_helper_0_0_1_compile(void)
+// compile kernels for license_plate_opencl_helper_0_0_1
+static freia_status license_plate_opencl_helper_0_0_1_compile(void)
 {
-  // OpenCL source for license_plate_helper_0_0_1
-  const char * license_plate_helper_0_0_1_source =
+  // OpenCL source for license_plate_opencl_helper_0_0_1
+  const char * license_plate_opencl_helper_0_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function license_plate_helper_0_0_1\n"
-    "KERNEL void license_plate_helper_0_0_1(\n"
+    "// opencl function license_plate_opencl_helper_0_0_1\n"
+    "KERNEL void license_plate_opencl_helper_0_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -6001,13 +6001,13 @@ static freia_status license_plate_helper_0_0_1_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(license_plate_helper_0_0_1_source, "license_plate_helper_0_0_1", "-DPIXEL8", &license_plate_helper_0_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(license_plate_helper_0_0_1_source, "license_plate_helper_0_0_1", "-DPIXEL16", &license_plate_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(license_plate_opencl_helper_0_0_1_source, "license_plate_opencl_helper_0_0_1", "-DPIXEL8", &license_plate_opencl_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_opencl_helper_0_0_1_source, "license_plate_opencl_helper_0_0_1", "-DPIXEL16", &license_plate_opencl_helper_0_0_1_kernel[1]);
   return err;
 }
 
-// helper function license_plate_helper_0_0_1
-freia_status license_plate_helper_0_0_1(
+// helper function license_plate_opencl_helper_0_0_1
+freia_status license_plate_opencl_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -6023,7 +6023,7 @@ freia_status license_plate_helper_0_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= license_plate_helper_0_0_1_compile();
+    err |= license_plate_opencl_helper_0_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -6031,9 +6031,9 @@ freia_status license_plate_helper_0_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = license_plate_helper_0_0_1_kernel[bpp];
+  cl_kernel kernel = license_plate_opencl_helper_0_0_1_kernel[bpp];
 
-  // call kernel license_plate_helper_0_0_1
+  // call kernel license_plate_opencl_helper_0_0_1
   err |= freia_op_call_kernel(kernel, 1, 2, 6, 0, o0, i0, i1, c0, c1, c2, c3, c4, c5);
 
   return err;
@@ -6043,8 +6043,8 @@ freia_status license_plate_helper_0_0_1(
 
 // opencl for dag 0
 
-// opencl function license_plate_helper_0_0_1
-KERNEL void license_plate_helper_0_0_1(
+// opencl function license_plate_opencl_helper_0_0_1
+KERNEL void license_plate_opencl_helper_0_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -6187,7 +6187,7 @@ int license_plate(void)
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0105*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0106*/
 
-   license_plate_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);          /*0112*/
+   license_plate_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);   /*0112*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0117*/
@@ -6348,7 +6348,7 @@ int license_plate(void)
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0105*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0106*/
 
-   license_plate_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);          /*0112*/
+   license_plate_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);   /*0112*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0117*/

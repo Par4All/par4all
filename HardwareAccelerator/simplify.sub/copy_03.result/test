@@ -92,8 +92,8 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_03_helper_0_0" of module "copy_03" in dot format
-digraph "copy_03_helper_0_0" {
+// graph for dag "copy_03_spoc_helper_0_0" of module "copy_03" in dot format
+digraph "copy_03_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -145,7 +145,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module copy_03
-freia_status copy_03_helper_0_0_0(
+freia_status copy_03_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -209,7 +209,7 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
+   copy_03_spoc_helper_0_0_0(out, 0);                                   /*0012*/
    
    
    return 0;                                                            /*0017*/
@@ -221,7 +221,7 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
+   copy_03_spoc_helper_0_0_0(out, 0);                                   /*0012*/
    
    
    return 0;                                                            /*0017*/
@@ -251,8 +251,8 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_03_helper_0_0_0" of module "copy_03" in dot format
-digraph "copy_03_helper_0_0_0" {
+// graph for dag "copy_03_terapix_helper_0_0_0" of module "copy_03" in dot format
+digraph "copy_03_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -322,7 +322,7 @@ digraph "dag_cleaned_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status copy_03_helper_0_0_0(
+freia_status copy_03_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -449,7 +449,7 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
+   copy_03_terapix_helper_0_0_0(out, 0);                                /*0012*/
    
    
    return 0;                                                            /*0017*/
@@ -461,7 +461,7 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 {
    
    // check for CSE-enabled constant images
-   copy_03_helper_0_0_0(out, 0);                                        /*0012*/
+   copy_03_terapix_helper_0_0_0(out, 0);                                /*0012*/
    
    
    return 0;                                                            /*0017*/
@@ -491,8 +491,8 @@ int copy_03(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_03_helper_0_0" of module "copy_03" in dot format
-digraph "copy_03_helper_0_0" {
+// graph for dag "copy_03_opencl_helper_0_0" of module "copy_03" in dot format
+digraph "copy_03_opencl_helper_0_0" {
   // inputs
 
   // outputs

@@ -164,8 +164,8 @@ digraph "dag_cleaned_1" {
   "10 +_" -> "o";
   "i0" -> "10 +_";
 }
-// graph for dag "freia_dead_03_helper_0_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_0_0" {
+// graph for dag "freia_dead_03_spoc_helper_0_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -179,8 +179,8 @@ digraph "freia_dead_03_helper_0_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_dead_03_helper_1_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_1_0" {
+// graph for dag "freia_dead_03_spoc_helper_1_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_spoc_helper_1_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -205,7 +205,7 @@ digraph "freia_dead_03_helper_1_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dead_03
-freia_status freia_dead_03_helper_0_0_0(
+freia_status freia_dead_03_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -272,7 +272,7 @@ freia_status freia_dead_03_helper_0_0_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dead_03
-freia_status freia_dead_03_helper_1_0_0(
+freia_status freia_dead_03_spoc_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0)
@@ -339,9 +339,9 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0006*/
    int32_t v;                                                           /*0008*/
-   freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
+   freia_dead_03_spoc_helper_0_0_0(tmp, i0, i1);                        /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_dead_03_spoc_helper_1_0_0(o, i0, -v);                          /*0010*/
    freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
@@ -352,9 +352,9 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0006*/
    int32_t v;                                                           /*0008*/
-   freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
+   freia_dead_03_spoc_helper_0_0_0(tmp, i0, i1);                        /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_dead_03_spoc_helper_1_0_0(o, i0, -v);                          /*0010*/
    freia_common_destruct_data(tmp);                                     /*0011*/
    return 0;                                                            /*0012*/
 }
@@ -433,8 +433,8 @@ digraph "dag_cleaned_1" {
   "10 +_" -> "o";
   "i0" -> "10 +_";
 }
-// graph for dag "freia_dead_03_helper_0_0_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_0_0_0" {
+// graph for dag "freia_dead_03_terapix_helper_0_0_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -448,8 +448,8 @@ digraph "freia_dead_03_helper_0_0_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_dead_03_helper_1_0_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_1_0_0" {
+// graph for dag "freia_dead_03_terapix_helper_1_0_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_terapix_helper_1_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -492,7 +492,7 @@ digraph "freia_dead_03_helper_1_0_0" {
  * - computation: 4
  * - communication: 96
  */
-freia_status freia_dead_03_helper_0_0_0(
+freia_status freia_dead_03_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -642,7 +642,7 @@ freia_status freia_dead_03_helper_0_0_0(
  * - computation: 3
  * - communication: 64
  */
-freia_status freia_dead_03_helper_1_0_0(
+freia_status freia_dead_03_terapix_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2)
@@ -780,9 +780,9 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0006*/
    int32_t v;                                                           /*0008*/
-   freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
+   freia_dead_03_terapix_helper_0_0_0(tmp, i0, i1);                     /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_dead_03_terapix_helper_1_0_0(o, i0, -v);                       /*0010*/
    freia_common_destruct_data(tmp);                                     /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
@@ -793,9 +793,9 @@ freia_status freia_dead_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0006*/
    int32_t v;                                                           /*0008*/
-   freia_dead_03_helper_0_0_0(tmp, i0, i1);                             /*0007*/
+   freia_dead_03_terapix_helper_0_0_0(tmp, i0, i1);                     /*0007*/
    v = freia_common_get(tmp, 12, 12);                                   /*0009*/
-   freia_dead_03_helper_1_0_0(o, i0, -v);                               /*0010*/
+   freia_dead_03_terapix_helper_1_0_0(o, i0, -v);                       /*0010*/
    freia_common_destruct_data(tmp);                                     /*0011*/
    return 0;                                                            /*0012*/
 }
@@ -874,8 +874,8 @@ digraph "dag_cleaned_1" {
   "10 +_" -> "o";
   "i0" -> "10 +_";
 }
-// graph for dag "freia_dead_03_helper_0_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_0_0" {
+// graph for dag "freia_dead_03_opencl_helper_0_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -889,8 +889,8 @@ digraph "freia_dead_03_helper_0_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_dead_03_helper_1_0" of module "freia_dead_03" in dot format
-digraph "freia_dead_03_helper_1_0" {
+// graph for dag "freia_dead_03_opencl_helper_1_0" of module "freia_dead_03" in dot format
+digraph "freia_dead_03_opencl_helper_1_0" {
   // inputs
   "i0" [shape=circle];
 

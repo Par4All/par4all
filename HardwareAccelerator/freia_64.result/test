@@ -169,8 +169,8 @@ digraph "dag_cleaned_1" {
   "i1" -> "10 -";
   "i0" -> "10 -";
 }
-// graph for dag "freia_64_helper_0_0" of module "freia_64" in dot format
-digraph "freia_64_helper_0_0" {
+// graph for dag "freia_64_spoc_helper_0_0" of module "freia_64" in dot format
+digraph "freia_64_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -184,8 +184,8 @@ digraph "freia_64_helper_0_0" {
   "i1" -> "8 +";
   "i0" -> "8 +";
 }
-// graph for dag "freia_64_helper_1_0" of module "freia_64" in dot format
-digraph "freia_64_helper_1_0" {
+// graph for dag "freia_64_spoc_helper_1_0" of module "freia_64" in dot format
+digraph "freia_64_spoc_helper_1_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -212,7 +212,7 @@ digraph "freia_64_helper_1_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_64
-freia_status freia_64_helper_0_0_0(
+freia_status freia_64_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -279,7 +279,7 @@ freia_status freia_64_helper_0_0_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_64
-freia_status freia_64_helper_1_0_0(
+freia_status freia_64_spoc_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -347,9 +347,9 @@ freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    // two statements that may be out of a sequence...
    if (b)                                                               /*0007*/
-      freia_64_helper_0_0_0(o, i0, i1);                                 /*0008*/
+      freia_64_spoc_helper_0_0_0(o, i0, i1);                            /*0008*/
    else
-      freia_64_helper_1_0_0(o, i0, i1);                                 /*0010*/
+      freia_64_spoc_helper_1_0_0(o, i0, i1);                            /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
 
@@ -359,9 +359,9 @@ freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    // two statements that may be out of a sequence...
    if (b)                                                               /*0007*/
-      freia_64_helper_0_0_0(o, i0, i1);                                 /*0008*/
+      freia_64_spoc_helper_0_0_0(o, i0, i1);                            /*0008*/
    else
-      freia_64_helper_1_0_0(o, i0, i1);                                 /*0010*/
+      freia_64_spoc_helper_1_0_0(o, i0, i1);                            /*0010*/
    return 0;                                                            /*0011*/
 }
 #
@@ -442,8 +442,8 @@ digraph "dag_cleaned_1" {
   "i1" -> "10 -";
   "i0" -> "10 -";
 }
-// graph for dag "freia_64_helper_0_0_0" of module "freia_64" in dot format
-digraph "freia_64_helper_0_0_0" {
+// graph for dag "freia_64_terapix_helper_0_0_0" of module "freia_64" in dot format
+digraph "freia_64_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -457,8 +457,8 @@ digraph "freia_64_helper_0_0_0" {
   "i1" -> "8 +";
   "i0" -> "8 +";
 }
-// graph for dag "freia_64_helper_1_0_0" of module "freia_64" in dot format
-digraph "freia_64_helper_1_0_0" {
+// graph for dag "freia_64_terapix_helper_1_0_0" of module "freia_64" in dot format
+digraph "freia_64_terapix_helper_1_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -503,7 +503,7 @@ digraph "freia_64_helper_1_0_0" {
  * - computation: 4
  * - communication: 96
  */
-freia_status freia_64_helper_0_0_0(
+freia_status freia_64_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -653,7 +653,7 @@ freia_status freia_64_helper_0_0_0(
  * - computation: 4
  * - communication: 96
  */
-freia_status freia_64_helper_1_0_0(
+freia_status freia_64_terapix_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -788,9 +788,9 @@ freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    // two statements that may be out of a sequence...
    if (b)                                                               /*0007*/
-      freia_64_helper_0_0_0(o, i0, i1);                                 /*0008*/
+      freia_64_terapix_helper_0_0_0(o, i0, i1);                         /*0008*/
    else
-      freia_64_helper_1_0_0(o, i0, i1);                                 /*0010*/
+      freia_64_terapix_helper_1_0_0(o, i0, i1);                         /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
 
@@ -800,9 +800,9 @@ freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    // two statements that may be out of a sequence...
    if (b)                                                               /*0007*/
-      freia_64_helper_0_0_0(o, i0, i1);                                 /*0008*/
+      freia_64_terapix_helper_0_0_0(o, i0, i1);                         /*0008*/
    else
-      freia_64_helper_1_0_0(o, i0, i1);                                 /*0010*/
+      freia_64_terapix_helper_1_0_0(o, i0, i1);                         /*0010*/
    return 0;                                                            /*0011*/
 }
 #
@@ -883,8 +883,8 @@ digraph "dag_cleaned_1" {
   "i1" -> "10 -";
   "i0" -> "10 -";
 }
-// graph for dag "freia_64_helper_0_0" of module "freia_64" in dot format
-digraph "freia_64_helper_0_0" {
+// graph for dag "freia_64_opencl_helper_0_0" of module "freia_64" in dot format
+digraph "freia_64_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -898,8 +898,8 @@ digraph "freia_64_helper_0_0" {
   "i1" -> "8 +";
   "i0" -> "8 +";
 }
-// graph for dag "freia_64_helper_1_0" of module "freia_64" in dot format
-digraph "freia_64_helper_1_0" {
+// graph for dag "freia_64_opencl_helper_1_0" of module "freia_64" in dot format
+digraph "freia_64_opencl_helper_1_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];

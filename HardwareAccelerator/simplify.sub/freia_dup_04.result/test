@@ -121,8 +121,8 @@ digraph "dag_cleaned_0" {
   "o0" -> "o1 =";
   "o1 =" -> "o1";
 }
-// graph for dag "freia_dup_04_helper_0_0" of module "freia_dup_04" in dot format
-digraph "freia_dup_04_helper_0_0" {
+// graph for dag "freia_dup_04_spoc_helper_0_0" of module "freia_dup_04" in dot format
+digraph "freia_dup_04_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -147,7 +147,7 @@ digraph "freia_dup_04_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_04
-freia_status freia_dup_04_helper_0_0_0(
+freia_status freia_dup_04_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -217,7 +217,7 @@ freia_status freia_dup_04(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = thr(i)
    // o1 = thr(i)
-   freia_dup_04_helper_0_0_0(o0, i, bas, haut, b);                      /*0010*/
+   freia_dup_04_spoc_helper_0_0_0(o0, i, bas, haut, b);                 /*0010*/
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0012*/
 }
@@ -229,7 +229,7 @@ freia_status freia_dup_04(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = thr(i)
    // o1 = thr(i)
-   freia_dup_04_helper_0_0_0(o0, i, bas, haut, b);                      /*0010*/
+   freia_dup_04_spoc_helper_0_0_0(o0, i, bas, haut, b);                 /*0010*/
    freia_aipo_copy(o1, o0);
    return 0;                                                            /*0012*/
 }
@@ -287,8 +287,8 @@ digraph "dag_cleaned_0" {
   "o0" -> "o1 =";
   "o1 =" -> "o1";
 }
-// graph for dag "freia_dup_04_helper_0_0_0" of module "freia_dup_04" in dot format
-digraph "freia_dup_04_helper_0_0_0" {
+// graph for dag "freia_dup_04_terapix_helper_0_0_0" of module "freia_dup_04" in dot format
+digraph "freia_dup_04_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -331,7 +331,7 @@ digraph "freia_dup_04_helper_0_0_0" {
  * - computation: 5
  * - communication: 64
  */
-freia_status freia_dup_04_helper_0_0_0(
+freia_status freia_dup_04_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2,
@@ -474,7 +474,7 @@ freia_status freia_dup_04(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = thr(i)
    // o1 = thr(i)
-   freia_dup_04_helper_0_0_0(o0, i, bas, haut, b);                      /*0010*/
+   freia_dup_04_terapix_helper_0_0_0(o0, i, bas, haut, b);              /*0010*/
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0012*/
 }
@@ -486,7 +486,7 @@ freia_status freia_dup_04(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = thr(i)
    // o1 = thr(i)
-   freia_dup_04_helper_0_0_0(o0, i, bas, haut, b);                      /*0010*/
+   freia_dup_04_terapix_helper_0_0_0(o0, i, bas, haut, b);              /*0010*/
    freia_aipo_copy(o1, o0);
    return 0;                                                            /*0012*/
 }
@@ -544,8 +544,8 @@ digraph "dag_cleaned_0" {
   "o0" -> "o1 =";
   "o1 =" -> "o1";
 }
-// graph for dag "freia_dup_04_helper_0_0" of module "freia_dup_04" in dot format
-digraph "freia_dup_04_helper_0_0" {
+// graph for dag "freia_dup_04_opencl_helper_0_0" of module "freia_dup_04" in dot format
+digraph "freia_dup_04_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

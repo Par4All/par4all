@@ -311,8 +311,8 @@ digraph "dag_cleaned_0" {
   "21 E8" -> "22 E6" [label="t0"];
   "i" -> "21 E8";
 }
-// graph for dag "freia_20_helper_0_0" of module "freia_20" in dot format
-digraph "freia_20_helper_0_0" {
+// graph for dag "freia_20_spoc_helper_0_0" of module "freia_20" in dot format
+digraph "freia_20_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -361,7 +361,7 @@ digraph "freia_20_helper_0_0" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module freia_20
-freia_status freia_20_helper_0_0_0(
+freia_status freia_20_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -496,7 +496,7 @@ freia_status freia_20_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module freia_20
-freia_status freia_20_helper_0_0_1(
+freia_status freia_20_spoc_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -618,9 +618,9 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_data2d *t7 = freia_common_create_data(16, 128, 128);           /*0018*/
    
    // long pipeline that must be cut
-   freia_20_helper_0_0_0(t7, i, k);                                     /*0021*/
+   freia_20_spoc_helper_0_0_0(t7, i, k);                                /*0021*/
    // should cut here
-   freia_20_helper_0_0_1(o, t7, k);                                     /*0030*/
+   freia_20_spoc_helper_0_0_1(o, t7, k);                                /*0030*/
 
    freia_common_destruct_data(t7);                                      /*0043*/
 
@@ -646,9 +646,9 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_data2d *t7 = freia_common_create_data(16, 128, 128);           /*0018*/
    
    // long pipeline that must be cut
-   freia_20_helper_0_0_0(t7, i, k);                                     /*0021*/
+   freia_20_spoc_helper_0_0_0(t7, i, k);                                /*0021*/
    // should cut here
-   freia_20_helper_0_0_1(o, t7, k);                                     /*0030*/
+   freia_20_spoc_helper_0_0_1(o, t7, k);                                /*0030*/
 
    freia_common_destruct_data(t7);                                      /*0043*/
 
@@ -784,8 +784,8 @@ digraph "dag_cleaned_0" {
   "21 E8" -> "22 E6" [label="t0"];
   "i" -> "21 E8";
 }
-// graph for dag "freia_20_helper_0_0_0" of module "freia_20" in dot format
-digraph "freia_20_helper_0_0_0" {
+// graph for dag "freia_20_terapix_helper_0_0_0" of module "freia_20" in dot format
+digraph "freia_20_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -807,8 +807,8 @@ digraph "freia_20_helper_0_0_0" {
   "21 E8" -> "22 E6" [label="t0"];
   "i" -> "21 E8";
 }
-// graph for dag "freia_20_helper_0_0_1" of module "freia_20" in dot format
-digraph "freia_20_helper_0_0_1" {
+// graph for dag "freia_20_terapix_helper_0_0_1" of module "freia_20" in dot format
+digraph "freia_20_terapix_helper_0_0_1" {
   // inputs
   "t5" [shape=circle];
 
@@ -863,7 +863,7 @@ digraph "freia_20_helper_0_0_1" {
  * - computation: 75
  * - communication: 64
  */
-freia_status freia_20_helper_0_0_0(
+freia_status freia_20_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -1131,7 +1131,7 @@ freia_status freia_20_helper_0_0_0(
  * - computation: 90
  * - communication: 64
  */
-freia_status freia_20_helper_0_0_1(
+freia_status freia_20_terapix_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -1441,8 +1441,8 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_data2d *t5 = freia_common_create_data(16, 128, 128);           /*0018*/
    
    // long pipeline that must be cut
-   freia_20_helper_0_0_0(t5, i, k);                                     /*0021*/
-   freia_20_helper_0_0_1(o, t5, k);                                     /*0027*/
+   freia_20_terapix_helper_0_0_0(t5, i, k);                             /*0021*/
+   freia_20_terapix_helper_0_0_1(o, t5, k);                             /*0027*/
    // should cut here
    
    freia_common_destruct_data(t5);                                      /*0041*/
@@ -1469,8 +1469,8 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_data2d *t5 = freia_common_create_data(16, 128, 128);           /*0018*/
    
    // long pipeline that must be cut
-   freia_20_helper_0_0_0(t5, i, k);                                     /*0021*/
-   freia_20_helper_0_0_1(o, t5, k);                                     /*0027*/
+   freia_20_terapix_helper_0_0_0(t5, i, k);                             /*0021*/
+   freia_20_terapix_helper_0_0_1(o, t5, k);                             /*0027*/
    // should cut here
    
    freia_common_destruct_data(t5);                                      /*0041*/
@@ -1607,8 +1607,8 @@ digraph "dag_cleaned_0" {
   "21 E8" -> "22 E6" [label="t0"];
   "i" -> "21 E8";
 }
-// graph for dag "freia_20_helper_0_0" of module "freia_20" in dot format
-digraph "freia_20_helper_0_0" {
+// graph for dag "freia_20_opencl_helper_0_0" of module "freia_20" in dot format
+digraph "freia_20_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

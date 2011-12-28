@@ -87,8 +87,8 @@ freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 
 ! graphs
 
-// graph for dag "cst_01_helper_0_0" of module "cst_01" in dot format
-digraph "cst_01_helper_0_0" {
+// graph for dag "cst_01_spoc_helper_0_0" of module "cst_01" in dot format
+digraph "cst_01_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -146,7 +146,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module cst_01
-freia_status cst_01_helper_0_0_0(
+freia_status cst_01_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -209,7 +209,7 @@ freia_status cst_01_helper_0_0_0(
 freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 {
    // this means o := 0
-   cst_01_helper_0_0_0(o, (v*2+v+(-v))*v/v);                            /*0012*/
+   cst_01_spoc_helper_0_0_0(o, (v*2+v+(-v))*v/v);                       /*0012*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -218,7 +218,7 @@ freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 {
    // this means o := 0
-   cst_01_helper_0_0_0(o, 2*v*v/v);                                     /*0012*/
+   cst_01_spoc_helper_0_0_0(o, 2*v*v/v);                                /*0012*/
    return 0;                                                            /*0013*/
 }
 #
@@ -242,8 +242,8 @@ freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 
 ! graphs
 
-// graph for dag "cst_01_helper_0_0_0" of module "cst_01" in dot format
-digraph "cst_01_helper_0_0_0" {
+// graph for dag "cst_01_terapix_helper_0_0_0" of module "cst_01" in dot format
+digraph "cst_01_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -319,7 +319,7 @@ digraph "dag_cleaned_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status cst_01_helper_0_0_0(
+freia_status cst_01_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -445,7 +445,7 @@ freia_status cst_01_helper_0_0_0(
 freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 {
    // this means o := 0
-   cst_01_helper_0_0_0(o, (v*2+v+(-v))*v/v);                            /*0012*/
+   cst_01_terapix_helper_0_0_0(o, (v*2+v+(-v))*v/v);                    /*0012*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -454,7 +454,7 @@ freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 {
    // this means o := 0
-   cst_01_helper_0_0_0(o, 2*v*v/v);                                     /*0012*/
+   cst_01_terapix_helper_0_0_0(o, 2*v*v/v);                             /*0012*/
    return 0;                                                            /*0013*/
 }
 #
@@ -478,8 +478,8 @@ freia_status cst_01(freia_data2d *o, uint32_t k, int32_t v)
 
 ! graphs
 
-// graph for dag "cst_01_helper_0_0" of module "cst_01" in dot format
-digraph "cst_01_helper_0_0" {
+// graph for dag "cst_01_opencl_helper_0_0" of module "cst_01" in dot format
+digraph "cst_01_opencl_helper_0_0" {
   // inputs
 
   // outputs

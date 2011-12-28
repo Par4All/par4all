@@ -188,8 +188,8 @@ int anr999_03(void)
 
 ! graphs
 
-// graph for dag "anr999_03_helper_0_0" of module "anr999_03" in dot format
-digraph "anr999_03_helper_0_0" {
+// graph for dag "anr999_03_spoc_helper_0_0" of module "anr999_03" in dot format
+digraph "anr999_03_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -269,7 +269,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module anr999_03
-freia_status anr999_03_helper_0_0_0(
+freia_status anr999_03_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -398,7 +398,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
+   anr999_03_spoc_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);     /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/
@@ -434,7 +434,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
+   anr999_03_spoc_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);     /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/
@@ -499,8 +499,8 @@ int anr999_03(void)
 
 ! graphs
 
-// graph for dag "anr999_03_helper_0_0_0" of module "anr999_03" in dot format
-digraph "anr999_03_helper_0_0_0" {
+// graph for dag "anr999_03_terapix_helper_0_0_0" of module "anr999_03" in dot format
+digraph "anr999_03_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -598,7 +598,7 @@ digraph "dag_cleaned_0" {
  * - computation: 49
  * - communication: 96
  */
-freia_status anr999_03_helper_0_0_0(
+freia_status anr999_03_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -830,7 +830,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
+   anr999_03_terapix_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);  /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/
@@ -866,7 +866,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
+   anr999_03_terapix_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);  /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/
@@ -931,8 +931,8 @@ int anr999_03(void)
 
 ! graphs
 
-// graph for dag "anr999_03_helper_0_0" of module "anr999_03" in dot format
-digraph "anr999_03_helper_0_0" {
+// graph for dag "anr999_03_opencl_helper_0_0" of module "anr999_03" in dot format
+digraph "anr999_03_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 

@@ -214,8 +214,8 @@ digraph "dag_cleaned_2" {
   "9 +_" -> "out";
   "t" -> "9 +_";
 }
-// graph for dag "freia_78_helper_1_0" of module "freia_78" in dot format
-digraph "freia_78_helper_1_0" {
+// graph for dag "freia_78_spoc_helper_1_0" of module "freia_78" in dot format
+digraph "freia_78_spoc_helper_1_0" {
   // inputs
   "in" [shape=circle];
 
@@ -227,8 +227,8 @@ digraph "freia_78_helper_1_0" {
   "8 *_" -> "t";
   "in" -> "8 *_";
 }
-// graph for dag "freia_78_helper_2_0" of module "freia_78" in dot format
-digraph "freia_78_helper_2_0" {
+// graph for dag "freia_78_spoc_helper_2_0" of module "freia_78" in dot format
+digraph "freia_78_spoc_helper_2_0" {
   // inputs
   "t" [shape=circle];
 
@@ -256,7 +256,7 @@ digraph "freia_78_helper_2_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_78
-freia_status freia_78_helper_1_0_0(
+freia_status freia_78_spoc_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0)
@@ -322,7 +322,7 @@ freia_status freia_78_helper_1_0_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_78
-freia_status freia_78_helper_2_0_0(
+freia_status freia_78_spoc_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0)
@@ -391,8 +391,8 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_78_helper_1_0_0(t, in, 2);                                  /*0008*/
-   freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
+      freia_78_spoc_helper_1_0_0(t, in, 2);                             /*0008*/
+   freia_78_spoc_helper_2_0_0(out, t, 2);                               /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
 
@@ -403,8 +403,8 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
 
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
-   freia_78_helper_1_0_0(t, in, 2);                                     /*0008*/
-   freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
+   freia_78_spoc_helper_1_0_0(t, in, 2);                                /*0008*/
+   freia_78_spoc_helper_2_0_0(out, t, 2);                               /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
 #
@@ -507,8 +507,8 @@ digraph "dag_cleaned_2" {
   "9 +_" -> "out";
   "t" -> "9 +_";
 }
-// graph for dag "freia_78_helper_1_0_0" of module "freia_78" in dot format
-digraph "freia_78_helper_1_0_0" {
+// graph for dag "freia_78_terapix_helper_1_0_0" of module "freia_78" in dot format
+digraph "freia_78_terapix_helper_1_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -520,8 +520,8 @@ digraph "freia_78_helper_1_0_0" {
   "8 *_" -> "t";
   "in" -> "8 *_";
 }
-// graph for dag "freia_78_helper_2_0_0" of module "freia_78" in dot format
-digraph "freia_78_helper_2_0_0" {
+// graph for dag "freia_78_terapix_helper_2_0_0" of module "freia_78" in dot format
+digraph "freia_78_terapix_helper_2_0_0" {
   // inputs
   "t" [shape=circle];
 
@@ -566,7 +566,7 @@ digraph "freia_78_helper_2_0_0" {
  * - computation: 3
  * - communication: 64
  */
-freia_status freia_78_helper_1_0_0(
+freia_status freia_78_terapix_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2)
@@ -719,7 +719,7 @@ freia_status freia_78_helper_1_0_0(
  * - computation: 3
  * - communication: 64
  */
-freia_status freia_78_helper_2_0_0(
+freia_status freia_78_terapix_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2)
@@ -859,8 +859,8 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
    if (true)                                                            /*0007*/
-      freia_78_helper_1_0_0(t, in, 2);                                  /*0008*/
-   freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
+      freia_78_terapix_helper_1_0_0(t, in, 2);                          /*0008*/
+   freia_78_terapix_helper_2_0_0(out, t, 2);                            /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
 
@@ -871,8 +871,8 @@ void freia_78(freia_data2d *out, const freia_data2d *in)
 
    freia_data2d *t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);     /*0005*/
    freia_aipo_copy(t, in);
-   freia_78_helper_1_0_0(t, in, 2);                                     /*0008*/
-   freia_78_helper_2_0_0(out, t, 2);                                    /*0009*/
+   freia_78_terapix_helper_1_0_0(t, in, 2);                             /*0008*/
+   freia_78_terapix_helper_2_0_0(out, t, 2);                            /*0009*/
    freia_common_destruct_data(t);                                       /*0010*/
 }
 #
@@ -975,8 +975,8 @@ digraph "dag_cleaned_2" {
   "9 +_" -> "out";
   "t" -> "9 +_";
 }
-// graph for dag "freia_78_helper_1_0" of module "freia_78" in dot format
-digraph "freia_78_helper_1_0" {
+// graph for dag "freia_78_opencl_helper_1_0" of module "freia_78" in dot format
+digraph "freia_78_opencl_helper_1_0" {
   // inputs
   "in" [shape=circle];
 
@@ -988,8 +988,8 @@ digraph "freia_78_helper_1_0" {
   "8 *_" -> "t";
   "in" -> "8 *_";
 }
-// graph for dag "freia_78_helper_2_0" of module "freia_78" in dot format
-digraph "freia_78_helper_2_0" {
+// graph for dag "freia_78_opencl_helper_2_0" of module "freia_78" in dot format
+digraph "freia_78_opencl_helper_2_0" {
   // inputs
   "t" [shape=circle];
 

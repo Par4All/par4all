@@ -83,8 +83,8 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "cst_02_helper_0_0" of module "cst_02" in dot format
-digraph "cst_02_helper_0_0" {
+// graph for dag "cst_02_spoc_helper_0_0" of module "cst_02" in dot format
+digraph "cst_02_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -136,7 +136,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module cst_02
-freia_status cst_02_helper_0_0_0(
+freia_status cst_02_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -199,7 +199,7 @@ freia_status cst_02_helper_0_0_0(
 freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 {
    // o := 0
-   cst_02_helper_0_0_0(o, 0);                                           /*0011*/
+   cst_02_spoc_helper_0_0_0(o, 0);                                      /*0011*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -208,7 +208,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 {
    // o := 0
-   cst_02_helper_0_0_0(o, 0);                                           /*0011*/
+   cst_02_spoc_helper_0_0_0(o, 0);                                      /*0011*/
    return 0;                                                            /*0014*/
 }
 #
@@ -233,8 +233,8 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "cst_02_helper_0_0_0" of module "cst_02" in dot format
-digraph "cst_02_helper_0_0_0" {
+// graph for dag "cst_02_terapix_helper_0_0_0" of module "cst_02" in dot format
+digraph "cst_02_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -304,7 +304,7 @@ digraph "dag_cleaned_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status cst_02_helper_0_0_0(
+freia_status cst_02_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -430,7 +430,7 @@ freia_status cst_02_helper_0_0_0(
 freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 {
    // o := 0
-   cst_02_helper_0_0_0(o, 0);                                           /*0011*/
+   cst_02_terapix_helper_0_0_0(o, 0);                                   /*0011*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -439,7 +439,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 {
    // o := 0
-   cst_02_helper_0_0_0(o, 0);                                           /*0011*/
+   cst_02_terapix_helper_0_0_0(o, 0);                                   /*0011*/
    return 0;                                                            /*0014*/
 }
 #
@@ -464,8 +464,8 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "cst_02_helper_0_0" of module "cst_02" in dot format
-digraph "cst_02_helper_0_0" {
+// graph for dag "cst_02_opencl_helper_0_0" of module "cst_02" in dot format
+digraph "cst_02_opencl_helper_0_0" {
   // inputs
 
   // outputs

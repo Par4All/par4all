@@ -197,8 +197,8 @@ int copy_01(void)
 
 ! graphs
 
-// graph for dag "copy_01_helper_0_0" of module "copy_01" in dot format
-digraph "copy_01_helper_0_0" {
+// graph for dag "copy_01_spoc_helper_0_0" of module "copy_01" in dot format
+digraph "copy_01_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -267,7 +267,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module copy_01
-freia_status copy_01_helper_0_0_0(
+freia_status copy_01_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -373,7 +373,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
+   copy_01_spoc_helper_0_0_0(out, in, kernel1x3);                       /*0028*/
    
    
    
@@ -413,7 +413,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
+   copy_01_spoc_helper_0_0_0(out, in, kernel1x3);                       /*0028*/
    
    
    
@@ -485,8 +485,8 @@ int copy_01(void)
 
 ! graphs
 
-// graph for dag "copy_01_helper_0_0_0" of module "copy_01" in dot format
-digraph "copy_01_helper_0_0_0" {
+// graph for dag "copy_01_terapix_helper_0_0_0" of module "copy_01" in dot format
+digraph "copy_01_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -573,7 +573,7 @@ digraph "dag_cleaned_0" {
  * - computation: 45
  * - communication: 64
  */
-freia_status copy_01_helper_0_0_0(
+freia_status copy_01_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -795,7 +795,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
+   copy_01_terapix_helper_0_0_0(out, in, kernel1x3);                    /*0028*/
    
    
    
@@ -835,7 +835,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
+   copy_01_terapix_helper_0_0_0(out, in, kernel1x3);                    /*0028*/
    
    
    
@@ -907,8 +907,8 @@ int copy_01(void)
 
 ! graphs
 
-// graph for dag "copy_01_helper_0_0" of module "copy_01" in dot format
-digraph "copy_01_helper_0_0" {
+// graph for dag "copy_01_opencl_helper_0_0" of module "copy_01" in dot format
+digraph "copy_01_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 

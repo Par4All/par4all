@@ -138,8 +138,8 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_04_helper_0_0" of module "copy_04" in dot format
-digraph "copy_04_helper_0_0" {
+// graph for dag "copy_04_spoc_helper_0_0" of module "copy_04" in dot format
+digraph "copy_04_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -217,7 +217,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module copy_04
-freia_status copy_04_helper_0_0_0(
+freia_status copy_04_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -312,7 +312,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_spoc_helper_0_0_0(out, in, 2, 7);                            /*0018*/
    
    
    return 0;                                                            /*0025*/
@@ -328,7 +328,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_spoc_helper_0_0_0(out, in, 2, 7);                            /*0018*/
    
    
    return 0;                                                            /*0025*/
@@ -366,8 +366,8 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_04_helper_0_0_0" of module "copy_04" in dot format
-digraph "copy_04_helper_0_0_0" {
+// graph for dag "copy_04_terapix_helper_0_0_0" of module "copy_04" in dot format
+digraph "copy_04_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -463,7 +463,7 @@ digraph "dag_cleaned_0" {
  * - computation: 10
  * - communication: 64
  */
-freia_status copy_04_helper_0_0_0(
+freia_status copy_04_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2,
@@ -665,7 +665,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_terapix_helper_0_0_0(out, in, 2, 7);                         /*0018*/
    
    
    return 0;                                                            /*0025*/
@@ -681,7 +681,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_terapix_helper_0_0_0(out, in, 2, 7);                         /*0018*/
    
    
    return 0;                                                            /*0025*/
@@ -719,8 +719,8 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
 
 ! graphs
 
-// graph for dag "copy_04_helper_0_0" of module "copy_04" in dot format
-digraph "copy_04_helper_0_0" {
+// graph for dag "copy_04_opencl_helper_0_0" of module "copy_04" in dot format
+digraph "copy_04_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -737,8 +737,8 @@ digraph "copy_04_helper_0_0" {
   "in" -> "19 +_";
   "in" -> "18 +_";
 }
-// graph for dag "copy_04_helper_0_0_0" of module "copy_04" in dot format
-digraph "copy_04_helper_0_0_0" {
+// graph for dag "copy_04_opencl_helper_0_0_0" of module "copy_04" in dot format
+digraph "copy_04_opencl_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -814,18 +814,18 @@ digraph "dag_cleaned_0" {
 
 // dag 0: 7 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for copy_04_helper_0_0_0
-static cl_kernel copy_04_helper_0_0_0_kernel[2];
+// hold kernels for copy_04_opencl_helper_0_0_0
+static cl_kernel copy_04_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for copy_04_helper_0_0_0
-static freia_status copy_04_helper_0_0_0_compile(void)
+// compile kernels for copy_04_opencl_helper_0_0_0
+static freia_status copy_04_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for copy_04_helper_0_0_0
-  const char * copy_04_helper_0_0_0_source =
+  // OpenCL source for copy_04_opencl_helper_0_0_0
+  const char * copy_04_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function copy_04_helper_0_0_0\n"
-    "KERNEL void copy_04_helper_0_0_0(\n"
+    "// opencl function copy_04_opencl_helper_0_0_0\n"
+    "KERNEL void copy_04_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -854,13 +854,13 @@ static freia_status copy_04_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(copy_04_helper_0_0_0_source, "copy_04_helper_0_0_0", "-DPIXEL8", &copy_04_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(copy_04_helper_0_0_0_source, "copy_04_helper_0_0_0", "-DPIXEL16", &copy_04_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(copy_04_opencl_helper_0_0_0_source, "copy_04_opencl_helper_0_0_0", "-DPIXEL8", &copy_04_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(copy_04_opencl_helper_0_0_0_source, "copy_04_opencl_helper_0_0_0", "-DPIXEL16", &copy_04_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function copy_04_helper_0_0_0
-freia_status copy_04_helper_0_0_0(
+// helper function copy_04_opencl_helper_0_0_0
+freia_status copy_04_opencl_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
@@ -871,7 +871,7 @@ freia_status copy_04_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= copy_04_helper_0_0_0_compile();
+    err |= copy_04_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -879,9 +879,9 @@ freia_status copy_04_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = copy_04_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = copy_04_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel copy_04_helper_0_0_0
+  // call kernel copy_04_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1);
 
   return err;
@@ -891,8 +891,8 @@ freia_status copy_04_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function copy_04_helper_0_0_0
-KERNEL void copy_04_helper_0_0_0(
+// opencl function copy_04_opencl_helper_0_0_0
+KERNEL void copy_04_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -931,7 +931,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_opencl_helper_0_0_0(out, in, 2, 7);                          /*0018*/
    
    
    return 0;                                                            /*0025*/
@@ -947,7 +947,7 @@ int copy_04(freia_data2d *out, const freia_data2d *in)
    // now these are common expressions
    
    // followed by some computations
-   copy_04_helper_0_0_0(out, in, 2, 7);                                 /*0018*/
+   copy_04_opencl_helper_0_0_0(out, in, 2, 7);                          /*0018*/
    
    
    return 0;                                                            /*0025*/

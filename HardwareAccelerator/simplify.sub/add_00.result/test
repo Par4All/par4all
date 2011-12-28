@@ -62,8 +62,8 @@ void add_00(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "add_00_helper_0_0" of module "add_00" in dot format
-digraph "add_00_helper_0_0" {
+// graph for dag "add_00_spoc_helper_0_0" of module "add_00" in dot format
+digraph "add_00_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -116,7 +116,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module add_00
-freia_status add_00_helper_0_0_0(
+freia_status add_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0)
@@ -181,14 +181,14 @@ freia_status add_00_helper_0_0_0(
 
 void add_00(freia_data2d *o, const freia_data2d *i)
 {
-   add_00_helper_0_0_0(o, i, 2);                                        /*0005*/
+   add_00_spoc_helper_0_0_0(o, i, 2);                                   /*0005*/
 }
 
 ! cleaned up function
 
 void add_00(freia_data2d *o, const freia_data2d *i)
 {
-   add_00_helper_0_0_0(o, i, 2);                                        /*0005*/
+   add_00_spoc_helper_0_0_0(o, i, 2);                                   /*0005*/
 }
 #
 # TERAPIX
@@ -203,8 +203,8 @@ void add_00(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "add_00_helper_0_0_0" of module "add_00" in dot format
-digraph "add_00_helper_0_0_0" {
+// graph for dag "add_00_terapix_helper_0_0_0" of module "add_00" in dot format
+digraph "add_00_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -275,7 +275,7 @@ digraph "dag_cleaned_0" {
  * - computation: 3
  * - communication: 64
  */
-freia_status add_00_helper_0_0_0(
+freia_status add_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2)
@@ -411,14 +411,14 @@ freia_status add_00_helper_0_0_0(
 
 void add_00(freia_data2d *o, const freia_data2d *i)
 {
-   add_00_helper_0_0_0(o, i, 2);                                        /*0005*/
+   add_00_terapix_helper_0_0_0(o, i, 2);                                /*0005*/
 }
 
 ! cleaned up function
 
 void add_00(freia_data2d *o, const freia_data2d *i)
 {
-   add_00_helper_0_0_0(o, i, 2);                                        /*0005*/
+   add_00_terapix_helper_0_0_0(o, i, 2);                                /*0005*/
 }
 #
 # OPENCL
@@ -433,8 +433,8 @@ void add_00(freia_data2d *o, const freia_data2d *i)
 
 ! graphs
 
-// graph for dag "add_00_helper_0_0" of module "add_00" in dot format
-digraph "add_00_helper_0_0" {
+// graph for dag "add_00_opencl_helper_0_0" of module "add_00" in dot format
+digraph "add_00_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

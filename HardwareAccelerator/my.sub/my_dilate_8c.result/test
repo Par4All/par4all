@@ -86,8 +86,8 @@ digraph "dag_cleaned_0" {
   "5 D8" -> "o";
   "i0" -> "5 D8";
 }
-// graph for dag "my_dilate_8c_helper_0_0" of module "my_dilate_8c" in dot format
-digraph "my_dilate_8c_helper_0_0" {
+// graph for dag "my_dilate_8c_spoc_helper_0_0" of module "my_dilate_8c" in dot format
+digraph "my_dilate_8c_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -112,7 +112,7 @@ digraph "my_dilate_8c_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module my_dilate_8c
-freia_status my_dilate_8c_helper_0_0_0(
+freia_status my_dilate_8c_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -179,14 +179,14 @@ freia_status my_dilate_8c_helper_0_0_0(
 
 freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_dilate_8c_helper_0_0_0(o, i0, p0);                         /*0005*/
+   return my_dilate_8c_spoc_helper_0_0_0(o, i0, p0);                    /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_dilate_8c_helper_0_0_0(o, i0, p0);                         /*0005*/
+   return my_dilate_8c_spoc_helper_0_0_0(o, i0, p0);                    /*0005*/
 }
 #
 # TERAPIX
@@ -227,8 +227,8 @@ digraph "dag_cleaned_0" {
   "5 D8" -> "o";
   "i0" -> "5 D8";
 }
-// graph for dag "my_dilate_8c_helper_0_0_0" of module "my_dilate_8c" in dot format
-digraph "my_dilate_8c_helper_0_0_0" {
+// graph for dag "my_dilate_8c_terapix_helper_0_0_0" of module "my_dilate_8c" in dot format
+digraph "my_dilate_8c_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -271,7 +271,7 @@ digraph "my_dilate_8c_helper_0_0_0" {
  * - computation: 15
  * - communication: 64
  */
-freia_status my_dilate_8c_helper_0_0_0(
+freia_status my_dilate_8c_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -428,14 +428,14 @@ freia_status my_dilate_8c_helper_0_0_0(
 
 freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_dilate_8c_helper_0_0_0(o, i0, p0);                         /*0005*/
+   return my_dilate_8c_terapix_helper_0_0_0(o, i0, p0);                 /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_dilate_8c_helper_0_0_0(o, i0, p0);                         /*0005*/
+   return my_dilate_8c_terapix_helper_0_0_0(o, i0, p0);                 /*0005*/
 }
 #
 # OPENCL
@@ -476,8 +476,8 @@ digraph "dag_cleaned_0" {
   "5 D8" -> "o";
   "i0" -> "5 D8";
 }
-// graph for dag "my_dilate_8c_helper_0_0" of module "my_dilate_8c" in dot format
-digraph "my_dilate_8c_helper_0_0" {
+// graph for dag "my_dilate_8c_opencl_helper_0_0" of module "my_dilate_8c" in dot format
+digraph "my_dilate_8c_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
 

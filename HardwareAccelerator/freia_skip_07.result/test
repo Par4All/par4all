@@ -151,8 +151,8 @@ digraph "dag_cleaned_0" {
   "i" -> "10 *";
   "i" -> "10 *";
 }
-// graph for dag "freia_skip_07_helper_0_0" of module "freia_skip_07" in dot format
-digraph "freia_skip_07_helper_0_0" {
+// graph for dag "freia_skip_07_spoc_helper_0_0" of module "freia_skip_07" in dot format
+digraph "freia_skip_07_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -185,7 +185,7 @@ digraph "freia_skip_07_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_skip_07
-freia_status freia_skip_07_helper_0_0_0(
+freia_status freia_skip_07_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -285,7 +285,7 @@ freia_status freia_skip_07_helper_0_0_0(
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_spoc_helper_0_0_0(o, i, 111, 111);                     /*0010*/
 }
 
 ! cleaned up function
@@ -293,7 +293,7 @@ void freia_skip_07(freia_data2d *o, freia_data2d *i)
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_spoc_helper_0_0_0(o, i, 111, 111);                     /*0010*/
 }
 #
 # TERAPIX
@@ -361,8 +361,8 @@ digraph "dag_cleaned_0" {
   "i" -> "10 *";
   "i" -> "10 *";
 }
-// graph for dag "freia_skip_07_helper_0_0_0" of module "freia_skip_07" in dot format
-digraph "freia_skip_07_helper_0_0_0" {
+// graph for dag "freia_skip_07_terapix_helper_0_0_0" of module "freia_skip_07" in dot format
+digraph "freia_skip_07_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -413,7 +413,7 @@ digraph "freia_skip_07_helper_0_0_0" {
  * - computation: 14
  * - communication: 64
  */
-freia_status freia_skip_07_helper_0_0_0(
+freia_status freia_skip_07_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2,
@@ -633,7 +633,7 @@ freia_status freia_skip_07_helper_0_0_0(
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_terapix_helper_0_0_0(o, i, 111, 111);                  /*0010*/
 }
 
 ! cleaned up function
@@ -641,7 +641,7 @@ void freia_skip_07(freia_data2d *o, freia_data2d *i)
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_terapix_helper_0_0_0(o, i, 111, 111);                  /*0010*/
 }
 #
 # OPENCL
@@ -709,8 +709,8 @@ digraph "dag_cleaned_0" {
   "i" -> "10 *";
   "i" -> "10 *";
 }
-// graph for dag "freia_skip_07_helper_0_0" of module "freia_skip_07" in dot format
-digraph "freia_skip_07_helper_0_0" {
+// graph for dag "freia_skip_07_opencl_helper_0_0" of module "freia_skip_07" in dot format
+digraph "freia_skip_07_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -730,8 +730,8 @@ digraph "freia_skip_07_helper_0_0" {
   "i" -> "10 *";
   "i" -> "10 *";
 }
-// graph for dag "freia_skip_07_helper_0_0_0" of module "freia_skip_07" in dot format
-digraph "freia_skip_07_helper_0_0_0" {
+// graph for dag "freia_skip_07_opencl_helper_0_0_0" of module "freia_skip_07" in dot format
+digraph "freia_skip_07_opencl_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -762,18 +762,18 @@ digraph "freia_skip_07_helper_0_0_0" {
 
 // dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
 
-// hold kernels for freia_skip_07_helper_0_0_0
-static cl_kernel freia_skip_07_helper_0_0_0_kernel[2];
+// hold kernels for freia_skip_07_opencl_helper_0_0_0
+static cl_kernel freia_skip_07_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for freia_skip_07_helper_0_0_0
-static freia_status freia_skip_07_helper_0_0_0_compile(void)
+// compile kernels for freia_skip_07_opencl_helper_0_0_0
+static freia_status freia_skip_07_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for freia_skip_07_helper_0_0_0
-  const char * freia_skip_07_helper_0_0_0_source =
+  // OpenCL source for freia_skip_07_opencl_helper_0_0_0
+  const char * freia_skip_07_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_skip_07_helper_0_0_0\n"
-    "KERNEL void freia_skip_07_helper_0_0_0(\n"
+    "// opencl function freia_skip_07_opencl_helper_0_0_0\n"
+    "KERNEL void freia_skip_07_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -803,13 +803,13 @@ static freia_status freia_skip_07_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_skip_07_helper_0_0_0_source, "freia_skip_07_helper_0_0_0", "-DPIXEL8", &freia_skip_07_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_skip_07_helper_0_0_0_source, "freia_skip_07_helper_0_0_0", "-DPIXEL16", &freia_skip_07_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_skip_07_opencl_helper_0_0_0_source, "freia_skip_07_opencl_helper_0_0_0", "-DPIXEL8", &freia_skip_07_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_skip_07_opencl_helper_0_0_0_source, "freia_skip_07_opencl_helper_0_0_0", "-DPIXEL16", &freia_skip_07_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function freia_skip_07_helper_0_0_0
-freia_status freia_skip_07_helper_0_0_0(
+// helper function freia_skip_07_opencl_helper_0_0_0
+freia_status freia_skip_07_opencl_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
@@ -820,7 +820,7 @@ freia_status freia_skip_07_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_skip_07_helper_0_0_0_compile();
+    err |= freia_skip_07_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -828,9 +828,9 @@ freia_status freia_skip_07_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_skip_07_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = freia_skip_07_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel freia_skip_07_helper_0_0_0
+  // call kernel freia_skip_07_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1);
 
   return err;
@@ -840,8 +840,8 @@ freia_status freia_skip_07_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function freia_skip_07_helper_0_0_0
-KERNEL void freia_skip_07_helper_0_0_0(
+// opencl function freia_skip_07_opencl_helper_0_0_0
+KERNEL void freia_skip_07_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -876,7 +876,7 @@ KERNEL void freia_skip_07_helper_0_0_0(
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_opencl_helper_0_0_0(o, i, 111, 111);                   /*0010*/
 }
 
 ! cleaned up function
@@ -884,7 +884,7 @@ void freia_skip_07(freia_data2d *o, freia_data2d *i)
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
+   freia_skip_07_opencl_helper_0_0_0(o, i, 111, 111);                   /*0010*/
 }
 #
 # FREIA COMPILATION DONE

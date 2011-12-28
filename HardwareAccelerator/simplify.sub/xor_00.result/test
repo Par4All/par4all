@@ -93,8 +93,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "o";
 }
-// graph for dag "xor_00_helper_0_0" of module "xor_00" in dot format
-digraph "xor_00_helper_0_0" {
+// graph for dag "xor_00_spoc_helper_0_0" of module "xor_00" in dot format
+digraph "xor_00_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -117,7 +117,7 @@ digraph "xor_00_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module xor_00
-freia_status xor_00_helper_0_0_0(
+freia_status xor_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -181,7 +181,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0_0(o, 0);                                           /*0007*/
+   xor_00_spoc_helper_0_0_0(o, 0);                                      /*0007*/
    return FREIA_OK;                                                     /*0008*/
 }
 
@@ -191,7 +191,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0_0(o, 0);                                           /*0007*/
+   xor_00_spoc_helper_0_0_0(o, 0);                                      /*0007*/
    return 0;                                                            /*0008*/
 }
 #
@@ -235,8 +235,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "o";
 }
-// graph for dag "xor_00_helper_0_0_0" of module "xor_00" in dot format
-digraph "xor_00_helper_0_0_0" {
+// graph for dag "xor_00_terapix_helper_0_0_0" of module "xor_00" in dot format
+digraph "xor_00_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -277,7 +277,7 @@ digraph "xor_00_helper_0_0_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status xor_00_helper_0_0_0(
+freia_status xor_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -404,7 +404,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0_0(o, 0);                                           /*0007*/
+   xor_00_terapix_helper_0_0_0(o, 0);                                   /*0007*/
    return FREIA_OK;                                                     /*0008*/
 }
 
@@ -414,7 +414,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0_0(o, 0);                                           /*0007*/
+   xor_00_terapix_helper_0_0_0(o, 0);                                   /*0007*/
    return 0;                                                            /*0008*/
 }
 #
@@ -458,8 +458,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "o";
 }
-// graph for dag "xor_00_helper_0_0" of module "xor_00" in dot format
-digraph "xor_00_helper_0_0" {
+// graph for dag "xor_00_opencl_helper_0_0" of module "xor_00" in dot format
+digraph "xor_00_opencl_helper_0_0" {
   // inputs
 
   // outputs

@@ -112,8 +112,8 @@ digraph "dag_cleaned_0" {
   "out" -> "9 +";
   "in" -> "9 +";
 }
-// graph for dag "freia_46_helper_0_0" of module "freia_46" in dot format
-digraph "freia_46_helper_0_0" {
+// graph for dag "freia_46_spoc_helper_0_0" of module "freia_46" in dot format
+digraph "freia_46_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -140,7 +140,7 @@ digraph "freia_46_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_46
-freia_status freia_46_helper_0_0_0(
+freia_status freia_46_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -207,7 +207,7 @@ freia_status freia_46_helper_0_0_0(
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
+   freia_46_spoc_helper_0_0_0(out, in, out);                            /*0009*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -216,7 +216,7 @@ freia_status freia_46(freia_data2d *in, freia_data2d *out)
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
+   freia_46_spoc_helper_0_0_0(out, in, out);                            /*0009*/
    return 0;                                                            /*0012*/
 }
 #
@@ -270,8 +270,8 @@ digraph "dag_cleaned_0" {
   "out" -> "9 +";
   "in" -> "9 +";
 }
-// graph for dag "freia_46_helper_0_0_0" of module "freia_46" in dot format
-digraph "freia_46_helper_0_0_0" {
+// graph for dag "freia_46_terapix_helper_0_0_0" of module "freia_46" in dot format
+digraph "freia_46_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -316,7 +316,7 @@ digraph "freia_46_helper_0_0_0" {
  * - computation: 4
  * - communication: 96
  */
-freia_status freia_46_helper_0_0_0(
+freia_status freia_46_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -450,7 +450,7 @@ freia_status freia_46_helper_0_0_0(
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
+   freia_46_terapix_helper_0_0_0(out, in, out);                         /*0009*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -459,7 +459,7 @@ freia_status freia_46(freia_data2d *in, freia_data2d *out)
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
+   freia_46_terapix_helper_0_0_0(out, in, out);                         /*0009*/
    return 0;                                                            /*0012*/
 }
 #
@@ -513,8 +513,8 @@ digraph "dag_cleaned_0" {
   "out" -> "9 +";
   "in" -> "9 +";
 }
-// graph for dag "freia_46_helper_0_0" of module "freia_46" in dot format
-digraph "freia_46_helper_0_0" {
+// graph for dag "freia_46_opencl_helper_0_0" of module "freia_46" in dot format
+digraph "freia_46_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];

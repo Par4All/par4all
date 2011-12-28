@@ -213,8 +213,8 @@ digraph "dag_cleaned_0" {
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
-// graph for dag "my_convolution_helper_0_0" of module "my_convolution" in dot format
-digraph "my_convolution_helper_0_0" {
+// graph for dag "my_convolution_opencl_helper_0_0" of module "my_convolution" in dot format
+digraph "my_convolution_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
 
