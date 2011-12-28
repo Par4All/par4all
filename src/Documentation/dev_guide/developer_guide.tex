@@ -1744,6 +1744,11 @@ Several compilations and validations run at CRI:
 \item[32BIT] compilation and validation on Debian Lenny i686 (riquet).
 \end{description}
 
+The different error conditions and possible status of the working
+copies participating to such a compilation and validation test
+are quite complex. There is a \texttt{LOCK} directory in the \texttt{prod}
+to avoid the script to run twice at the same time.
+
 \subsection{Validation Makefile}
 \label{sec:validation-makefile}
 
