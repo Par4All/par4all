@@ -47,26 +47,26 @@
 !      5 freia_33 (4)
 !      6 freia_42 (5?)
 !      6 freia_43 (5, idem previous)
-      2 freia_49
-      3 freia_51
-     18 freia_52
-      2 freia_53
-      3 freia_55
-      2 freia_58
-      3 freia_59
-      3 freia_60
-      2 freia_61
-      2 freia_62
-      2 freia_64
+#      2 freia_49
+#      3 freia_51
+!     18 freia_52 (??, just a guess, retina variation...)
+#      2 freia_53 (idem 49)
+!      3 freia_55 (1, bad greedy choice, some optim disabled for tests)
+#      2 freia_58
+#      3 freia_59
+#      3 freia_60
+#      2 freia_61
+#      2 freia_62
+#      2 freia_64
 !      2 freia_67 (should be 1)
 !      2 freia_68 (should be 1)
-      3 freia_69
-      4 freia_70
-      2 freia_77
-      2 freia_78
-      2 freia_79
-      2 freia_dead_00
-      2 freia_dead_03
+!      3 freia_69 (2, successive +_ could be merged)
+!      4 freia_70 (3, or even 2 if ! is recomputed)
+#      2 freia_77
+#      2 freia_78 (on structure, could be 1 on partial eval)
+#      2 freia_79 (idem)
+#      2 freia_dead_00
+#      2 freia_dead_03
 #      2 simplify.sub__copy_00
 #      2 simplify.sub__freia_dup_05 (could be 1 with advanced trafo? not sure)
 #      2 freia_reuse_01
@@ -82,7 +82,7 @@
 #      2 freia_skip_03
 #      2 freia_skip_04
 #      2 freia_skip_06 (ok, i is live)
-      2 freia_skip_08
+#      2 freia_skip_08
 !      4 lp.sub__license_plate_1 (3, greedy)
 !      5 lp.sub__license_plate_2 (4, greedy)
 !      6 lp.sub__license_plate_copies_12 (5, greedy)
@@ -124,5 +124,5 @@
 !      5 vs.sub__vs_core_2_6 (4, greedy)
 #      4 vs.sub__vs_core_2_7
 #      4 vs.sub__vs_core_2
-      5 vs.sub__vs_core_loop
+!      5 vs.sub__vs_core_loop (4? greedy?)
 #      4 vs.sub__vs_core
