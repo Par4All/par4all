@@ -280,6 +280,13 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub(r'\(void \*\) 0',
                      "NULL", content)
 
+    # flag all static functions as device functions, after splitting them
+    if True or content.find("P4A_call_accel_kernel") == -1: # not a sufficient condition still ...
+        old_content=""
+        while old_content != content:
+            old_content=content
+            content=re.sub(r"static (\w+) (\w+)(\([^)]+\)), (\w+)(\([^)]+\))",r"static \1 \2\3;\nstatic \1 \4\5", content)
+        content = re.sub(r'\n(static \w+ \w+\()', r'\n__device__ \1', content)
 
     if verbose:
         print content,

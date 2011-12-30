@@ -669,7 +669,13 @@ class p4a_processor(object):
         # Fortran case, we want the launcher to be wrapped in an
         # independent Fortran function so that it will be prettyprinted
         # later in... C (for OpenCL or CUDA kernel definition). :-)
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False, 
+
+        # go through the call graph in a top - down fashion
+        head = [ m for m in all_modules if not m.callers ]
+        while head:
+            tmp=list()
+            for m in head:
+                m.gpu_ify(GPU_USE_WRAPPER = False, 
                             GPU_USE_KERNEL = False,                             
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
@@ -677,13 +683,14 @@ class p4a_processor(object):
                             GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,                            
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
-                            annotate_loop_nests = True, # annotate for recover parallel loops later
-                            concurrent=True)
+                            annotate_loop_nests = True) # annotate for recover parallel loops later
+                tmp.extend([c for c in m.callees if c.name.find(self.get_launcher_prefix ()) !=0])
+            head=tmp
 
         # Select kernel launchers by using the fact that all the generated
         # functions have their names beginning with the launcher prefix:
         launcher_prefix = self.get_launcher_prefix ()
-        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
+        kernel_launcher_filter_re = re.compile(launcher_prefix + "_[^!]*$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # We flag loops in kernel launchers as parallel, based on the annotation
@@ -723,7 +730,7 @@ class p4a_processor(object):
         # Unfold kernel,  ususally won't hurt code size, but less painful with
         # callees declared in others compilation units (unsupported in CUDA and
         # OpenCL) and can allow some opportunities for scalarization & others
-        kernels.unfold()
+        # kernels.unfold()
 
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
@@ -779,6 +786,7 @@ class p4a_processor(object):
         f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\w+$")
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
 
+
         # Unfortunately CUDA (at least up to 4.0) does not accept C99
         # array declarations with sizes also passed as parameters in
         # kernels. So, we degrade the quality of the generated code by
@@ -788,6 +796,15 @@ class p4a_processor(object):
             skip_static_length_arrays = self.c99 and not self.opencl
             use_pointer = self.c99 or self.opencl
             kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
+            for kl in kernel_launchers:
+                callees=kl.callees
+                while callees:
+                    tmp=list()
+                    for c in callees:
+                        c.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
+                        tmp.extend(c.callees)
+                    callees=tmp
+
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
             
