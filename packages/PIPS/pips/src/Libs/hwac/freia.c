@@ -200,7 +200,7 @@ static void switch_cast_to_copy(statement s)
 /*************************************************************** BASIC UTILS */
 
 /* return malloc'ed "foo.database/Src/%{module}_helper_functions.c"
- * should depend on target? could mix targets?
+ * should it depend on the target? no, because we could mix targets?
  */
 static string helper_file_name(string func_name)
 {
