@@ -9,7 +9,7 @@
 !!  - NITER  [10]: number of iterations
 !!  - NPES    [8]: number of processing elements
 !
-! $Id: adi2d.F,v 1.5 1997/05/03 16:23:44 coelho Exp $
+! $Id$
 !
 ! note about (sequential) performances: 
 !  - many divisions that are really expensive... (6 cycles?)

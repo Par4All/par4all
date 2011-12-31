@@ -1,6 +1,6 @@
 /*
   variable.h
-  $Id: variable.h,v 1.8 2009/04/05 08:02:03 h_vogt Exp $
+  $Id$
 */
 
 #ifndef _VARIABLE_H

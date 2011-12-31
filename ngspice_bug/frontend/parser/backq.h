@@ -1,7 +1,7 @@
 /*************
  * Header file for backq.c
  * 1999 E. Rouat
- * $Id: backq.h,v 1.2 2005/05/30 20:28:44 sjborley Exp $
+ * $Id$
  ************/
 
 #ifndef BACKQ_H_INCLUDED

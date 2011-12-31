@@ -1,7 +1,7 @@
 /*************
  * Header file for graf.c
  * 1999 E. Rouat
- * $Id: graf.h,v 1.2 2005/05/30 20:28:44 sjborley Exp $
+ * $Id$
  ************/
 
 #ifndef GRAF_H

@@ -1,6 +1,6 @@
 /*
 
-  $Id: test.c 15590 2009-10-20 13:56:39Z guelton $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 
