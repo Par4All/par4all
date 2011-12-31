@@ -36,7 +36,8 @@ my $status =
 
 # other miscellaneous issues
 my $others =
-  'skipped|multi-script|multi-source|nofilter|broken-directory|missing';
+  'skipped|multi-script|multi-source|nofilter|broken-directory|missing' .
+  '|empty-test';
 
 # return ref to zero count status hash
 sub zeroed()
@@ -159,7 +160,8 @@ my $not_passed = $n{failed} + $n{changed} + $n{timeout} + $n{noref};
 my $cannot_execute = $n{orphan};
 my $count = ${not_passed} + ${cannot_execute} + $n{passed};
 my $warned = $n{skipped} + $n{nofilter} +  $n{'multi-script'} + $n{missing} +
-    $n{'multi-source'} +  $n{keptout} + $n{bug} + $n{later} + $n{slow};
+    $n{'multi-source'} +  $n{keptout} + $n{bug} + $n{later} + $n{slow} +
+    $n{'empty-test'};
 
 # status change summary
 my $status_changes = '';
@@ -198,7 +200,8 @@ print
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
   " * multi-source: $n{'multi-source'} " .
     "(source files for test with different suffixes)\n" .
-  " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n"
+  " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n" .
+  " * empty-test: $n{'empty-test'} empty 'test' result file\n"
     if $warned;
 
 print

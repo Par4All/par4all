@@ -1,7 +1,7 @@
 /*************
  * Header file for parse.c
  * 1999 E. Rouat
- * $Id: parse.h,v 1.4 2006/10/12 02:51:13 danmc Exp $
+ * $Id$
  ************/
 
 #ifndef _PARSE_H

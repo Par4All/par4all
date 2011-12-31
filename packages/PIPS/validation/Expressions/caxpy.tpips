@@ -12,5 +12,5 @@ apply UNSPLIT
 shell gfortran -c $WS.database/Src/$WS.f -o /dev/null
 
 close
-#delete $WS
+delete $WS
 quit

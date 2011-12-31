@@ -1,6 +1,6 @@
 /*************
 * Header file for com_rehsh.c
-* $Id: com_rehash.h,v 1.1 2005/05/30 20:28:30 sjborley Exp $
+* $Id$
 ************/
 
 #ifndef COM_REHASH_H

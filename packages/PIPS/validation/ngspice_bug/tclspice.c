@@ -6,7 +6,7 @@
  *
  * Under LGPLv2 licence since 2008, December 1st
  *
- * $Id: tclspice.c,v 1.13 2009/04/20 21:01:00 h_vogt Exp $	
+ * $Id$	
  */
 
 /*******************/

@@ -1,4 +1,4 @@
-# $Id: Makefile 17253 2010-05-31 08:43:19Z creusillet $
+# $Id$
 #
 # Copyright 1989-2010 MINES ParisTech
 #

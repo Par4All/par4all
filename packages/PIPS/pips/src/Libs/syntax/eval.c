@@ -24,11 +24,6 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* 	%A% ($Date: 1998/04/14 21:28:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_syntax_eval[] = "%A% ($Date: 1998/04/14 21:28:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
 
 /* This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the

@@ -1,6 +1,6 @@
 /**********
  * Header file for control.c
- * $Id: control.h,v 1.3 2005/05/30 20:28:30 sjborley Exp $
+ * $Id$
 **********/
 
 #ifndef CONTROL_H

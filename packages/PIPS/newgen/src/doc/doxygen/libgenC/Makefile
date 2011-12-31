@@ -1,4 +1,4 @@
-# $Id: developer_guide.tex 12778 2007-08-28 15:10:30Z keryell $
+# $Id$
 
 ifdef NEWGEN_ROOT
 ROOT    = $(NEWGEN_ROOT)

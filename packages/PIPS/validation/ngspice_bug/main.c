@@ -5,7 +5,7 @@
    Author: 1985 Wayne A. Christopher
 
    The main routine for ngspice
-   $Id: main.c,v 1.50 2009/04/12 21:08:18 h_vogt Exp $
+   $Id$
 */
 
 #include "ngspice.h"

@@ -1,6 +1,6 @@
 /*
 
-  $Id: main_tpips.c 19061 2011-03-04 18:34:54Z coelho $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 

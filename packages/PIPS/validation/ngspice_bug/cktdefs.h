@@ -2,7 +2,7 @@
  * Copyright (c) 1985 Thomas L. Quarles
  * Modified 1999 Paolo Nenzi - Removed non STDC definitions
  * Modified 2000 AlansFixes
- * $Id: cktdefs.h,v 1.18 2005/05/30 20:30:09 sjborley Exp $
+ * $Id$
  */
 #ifndef CKT
 #define CKT "CKTdefs.h $Revision: 1.18 $  on $Date: 2005/05/30 20:30:09 $ "
