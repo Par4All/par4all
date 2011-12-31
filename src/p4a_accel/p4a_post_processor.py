@@ -114,8 +114,8 @@ def p4a_launcher_clean_up(match_object):
     if verbose:
         print 'vb', variables_before, 'end'
 
-    # Inside loop nest, just remove the for loops:
-    variables_in_loop_nest = re.sub("(?s)\\s*for\\([^\n]*", "", loop_nest)
+    # Inside loop nest, just remove the for loops and the attached pragmas if any:
+    variables_in_loop_nest = re.sub("(?s)\s*(#pragma[^\n]*\s*)*for\\([^\n]*", "", loop_nest)
     # Remove also the '// To be assigned to a call to P4A_vp_...' that
     # should no be stay here:
     variables_in_loop_nest = re.sub("(?s)\\s*// To be assigned to a call to P4A_vp_[^\n]*", "", variables_in_loop_nest)
