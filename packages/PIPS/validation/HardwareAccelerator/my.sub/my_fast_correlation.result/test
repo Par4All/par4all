@@ -229,8 +229,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "5 corr";
   "i0" -> "5 corr";
 }
-// graph for dag "my_fast_correlation_helper_0_0" of module "my_fast_correlation" in dot format
-digraph "my_fast_correlation_helper_0_0" {
+// graph for dag "my_fast_correlation_opencl_helper_0_0" of module "my_fast_correlation" in dot format
+digraph "my_fast_correlation_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];

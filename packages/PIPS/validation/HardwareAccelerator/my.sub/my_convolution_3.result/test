@@ -86,8 +86,8 @@ digraph "dag_cleaned_0" {
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
-// graph for dag "my_convolution_3_helper_0_0" of module "my_convolution_3" in dot format
-digraph "my_convolution_3_helper_0_0" {
+// graph for dag "my_convolution_3_spoc_helper_0_0" of module "my_convolution_3" in dot format
+digraph "my_convolution_3_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -112,7 +112,7 @@ digraph "my_convolution_3_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module my_convolution_3
-freia_status my_convolution_3_helper_0_0_0(
+freia_status my_convolution_3_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t * pi0,
@@ -181,14 +181,14 @@ freia_status my_convolution_3_helper_0_0_0(
 
 freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_3_helper_0_0_0(o, i, k, 3, 3);                 /*0004*/
+   return my_convolution_3_spoc_helper_0_0_0(o, i, k, 3, 3);            /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_3_helper_0_0_0(o, i, k, 3, 3);                 /*0004*/
+   return my_convolution_3_spoc_helper_0_0_0(o, i, k, 3, 3);            /*0004*/
 }
 #
 # TERAPIX
@@ -229,8 +229,8 @@ digraph "dag_cleaned_0" {
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
-// graph for dag "my_convolution_3_helper_0_0_0" of module "my_convolution_3" in dot format
-digraph "my_convolution_3_helper_0_0_0" {
+// graph for dag "my_convolution_3_terapix_helper_0_0_0" of module "my_convolution_3" in dot format
+digraph "my_convolution_3_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -273,7 +273,7 @@ digraph "my_convolution_3_helper_0_0_0" {
  * - computation: 35
  * - communication: 64
  */
-freia_status my_convolution_3_helper_0_0_0(
+freia_status my_convolution_3_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t * pi2,
@@ -432,14 +432,14 @@ freia_status my_convolution_3_helper_0_0_0(
 
 freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_3_helper_0_0_0(o, i, k, 3, 3);                 /*0004*/
+   return my_convolution_3_terapix_helper_0_0_0(o, i, k, 3, 3);         /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_3_helper_0_0_0(o, i, k, 3, 3);                 /*0004*/
+   return my_convolution_3_terapix_helper_0_0_0(o, i, k, 3, 3);         /*0004*/
 }
 #
 # OPENCL
@@ -480,8 +480,8 @@ digraph "dag_cleaned_0" {
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
-// graph for dag "my_convolution_3_helper_0_0" of module "my_convolution_3" in dot format
-digraph "my_convolution_3_helper_0_0" {
+// graph for dag "my_convolution_3_opencl_helper_0_0" of module "my_convolution_3" in dot format
+digraph "my_convolution_3_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

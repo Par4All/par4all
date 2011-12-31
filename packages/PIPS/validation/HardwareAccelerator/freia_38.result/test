@@ -204,8 +204,8 @@ digraph "dag_cleaned_0" {
   "i" -> "11 D8";
   "i" -> "10 E8";
 }
-// graph for dag "freia_38_helper_0_0" of module "freia_38" in dot format
-digraph "freia_38_helper_0_0" {
+// graph for dag "freia_38_spoc_helper_0_0" of module "freia_38" in dot format
+digraph "freia_38_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -243,7 +243,7 @@ digraph "freia_38_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_38
-freia_status freia_38_helper_0_0_0(
+freia_status freia_38_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -371,7 +371,7 @@ freia_status freia_38(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_38_helper_0_0_0(o, i, kern);                                   /*0010*/
+   freia_38_spoc_helper_0_0_0(o, i, kern);                              /*0010*/
    
    
    
@@ -389,7 +389,7 @@ freia_status freia_38(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_38_helper_0_0_0(o, i, kern);                                   /*0010*/
+   freia_38_spoc_helper_0_0_0(o, i, kern);                              /*0010*/
    
    
    
@@ -482,8 +482,8 @@ digraph "dag_cleaned_0" {
   "i" -> "11 D8";
   "i" -> "10 E8";
 }
-// graph for dag "freia_38_helper_0_0_0" of module "freia_38" in dot format
-digraph "freia_38_helper_0_0_0" {
+// graph for dag "freia_38_terapix_helper_0_0_0" of module "freia_38" in dot format
+digraph "freia_38_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -539,7 +539,7 @@ digraph "freia_38_helper_0_0_0" {
  * - computation: 94
  * - communication: 64
  */
-freia_status freia_38_helper_0_0_0(
+freia_status freia_38_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -821,7 +821,7 @@ freia_status freia_38(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_38_helper_0_0_0(o, i, kern);                                   /*0010*/
+   freia_38_terapix_helper_0_0_0(o, i, kern);                           /*0010*/
    
    
    
@@ -839,7 +839,7 @@ freia_status freia_38(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_38_helper_0_0_0(o, i, kern);                                   /*0010*/
+   freia_38_terapix_helper_0_0_0(o, i, kern);                           /*0010*/
    
    
    
@@ -932,8 +932,8 @@ digraph "dag_cleaned_0" {
   "i" -> "11 D8";
   "i" -> "10 E8";
 }
-// graph for dag "freia_38_helper_0_0" of module "freia_38" in dot format
-digraph "freia_38_helper_0_0" {
+// graph for dag "freia_38_opencl_helper_0_0" of module "freia_38" in dot format
+digraph "freia_38_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

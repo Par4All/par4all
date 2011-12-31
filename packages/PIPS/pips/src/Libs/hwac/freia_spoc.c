@@ -2282,7 +2282,7 @@ list freia_spoc_compile_calls
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
 
-  string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
+  string fname_fulldag = strdup(cat(module, "_spoc", HELPER, itoa(number)));
 
   // split dag in one-pipe dags.
   list ld = split_dag(fulld, output_images);

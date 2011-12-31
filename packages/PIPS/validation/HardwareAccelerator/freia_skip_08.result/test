@@ -166,8 +166,8 @@ digraph "dag_cleaned_0" {
   "8 ^_" -> "9 +_" [label="t"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_0" {
+// graph for dag "freia_skip_08_spoc_helper_0_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -183,8 +183,8 @@ digraph "freia_skip_08_helper_0_0" {
   "8 ^_" -> "9 +_" [label="t_2"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_1" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_1" {
+// graph for dag "freia_skip_08_spoc_helper_0_1" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_spoc_helper_0_1" {
   // inputs
   "t_1" [shape=circle];
 
@@ -212,7 +212,7 @@ digraph "freia_skip_08_helper_0_1" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module freia_skip_08
-freia_status freia_skip_08_helper_0_0_0(
+freia_status freia_skip_08_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -299,7 +299,7 @@ freia_status freia_skip_08_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module freia_skip_08
-freia_status freia_skip_08_helper_0_1_0(
+freia_status freia_skip_08_spoc_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -378,12 +378,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_spoc_helper_0_0_0(t, i, 111, 12, &max);                /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, true, -12);             /*0015*/
+   freia_skip_08_spoc_helper_0_1_0(o, t, 8, seuil-4, true, -12);        /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 
@@ -394,12 +394,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_spoc_helper_0_0_0(t, i, 111, 12, &max);                /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, 1, -12);                /*0015*/
+   freia_skip_08_spoc_helper_0_1_0(o, t, 8, seuil-4, 1, -12);           /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 #
@@ -475,8 +475,8 @@ digraph "dag_cleaned_0" {
   "8 ^_" -> "9 +_" [label="t"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_0_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_0_0" {
+// graph for dag "freia_skip_08_terapix_helper_0_0_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -492,8 +492,8 @@ digraph "freia_skip_08_helper_0_0_0" {
   "8 ^_" -> "9 +_" [label="t_2"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_1_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_1_0" {
+// graph for dag "freia_skip_08_terapix_helper_0_1_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_terapix_helper_0_1_0" {
   // inputs
   "t_1" [shape=circle];
 
@@ -538,7 +538,7 @@ digraph "freia_skip_08_helper_0_1_0" {
  * - computation: 9
  * - communication: 64
  */
-freia_status freia_skip_08_helper_0_0_0(
+freia_status freia_skip_08_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2,
@@ -799,7 +799,7 @@ freia_status freia_skip_08_helper_0_0_0(
  * - computation: 8
  * - communication: 64
  */
-freia_status freia_skip_08_helper_0_1_0(
+freia_status freia_skip_08_terapix_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi2,
@@ -978,12 +978,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_terapix_helper_0_0_0(t, i, 111, 12, &max);             /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, true, -12);             /*0015*/
+   freia_skip_08_terapix_helper_0_1_0(o, t, 8, seuil-4, true, -12);     /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 
@@ -994,12 +994,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_terapix_helper_0_0_0(t, i, 111, 12, &max);             /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, 1, -12);                /*0015*/
+   freia_skip_08_terapix_helper_0_1_0(o, t, 8, seuil-4, 1, -12);        /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 #
@@ -1075,8 +1075,8 @@ digraph "dag_cleaned_0" {
   "8 ^_" -> "9 +_" [label="t_2"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_0" {
+// graph for dag "freia_skip_08_opencl_helper_0_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -1092,8 +1092,8 @@ digraph "freia_skip_08_helper_0_0" {
   "8 ^_" -> "9 +_" [label="t_2"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_0_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_0_0" {
+// graph for dag "freia_skip_08_opencl_helper_0_0_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_opencl_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -1109,8 +1109,8 @@ digraph "freia_skip_08_helper_0_0_0" {
   "8 ^_" -> "9 +_" [label="t_2"];
   "i" -> "8 ^_";
 }
-// graph for dag "freia_skip_08_helper_0_1" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_1" {
+// graph for dag "freia_skip_08_opencl_helper_0_1" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_opencl_helper_0_1" {
   // inputs
   "t_1" [shape=circle];
 
@@ -1124,8 +1124,8 @@ digraph "freia_skip_08_helper_0_1" {
   "15 thr" -> "16 +_" [label="t"];
   "t_1" -> "15 thr";
 }
-// graph for dag "freia_skip_08_helper_0_1_0" of module "freia_skip_08" in dot format
-digraph "freia_skip_08_helper_0_1_0" {
+// graph for dag "freia_skip_08_opencl_helper_0_1_0" of module "freia_skip_08" in dot format
+digraph "freia_skip_08_opencl_helper_0_1_0" {
   // inputs
   "t_1" [shape=circle];
 
@@ -1150,18 +1150,18 @@ digraph "freia_skip_08_helper_0_1_0" {
 
 // dag 0: 5 ops and 0 copies, optimized to 5 ops and 0+0+0 copies
 
-// hold kernels for freia_skip_08_helper_0_0_0
-static cl_kernel freia_skip_08_helper_0_0_0_kernel[2];
+// hold kernels for freia_skip_08_opencl_helper_0_0_0
+static cl_kernel freia_skip_08_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for freia_skip_08_helper_0_0_0
-static freia_status freia_skip_08_helper_0_0_0_compile(void)
+// compile kernels for freia_skip_08_opencl_helper_0_0_0
+static freia_status freia_skip_08_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for freia_skip_08_helper_0_0_0
-  const char * freia_skip_08_helper_0_0_0_source =
+  // OpenCL source for freia_skip_08_opencl_helper_0_0_0
+  const char * freia_skip_08_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_skip_08_helper_0_0_0\n"
-    "KERNEL void freia_skip_08_helper_0_0_0(\n"
+    "// opencl function freia_skip_08_opencl_helper_0_0_0\n"
+    "KERNEL void freia_skip_08_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -1200,13 +1200,13 @@ static freia_status freia_skip_08_helper_0_0_0_compile(void)
     "  redX[idy].max = mmax.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_skip_08_helper_0_0_0_source, "freia_skip_08_helper_0_0_0", "-DPIXEL8", &freia_skip_08_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_skip_08_helper_0_0_0_source, "freia_skip_08_helper_0_0_0", "-DPIXEL16", &freia_skip_08_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_skip_08_opencl_helper_0_0_0_source, "freia_skip_08_opencl_helper_0_0_0", "-DPIXEL8", &freia_skip_08_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_skip_08_opencl_helper_0_0_0_source, "freia_skip_08_opencl_helper_0_0_0", "-DPIXEL16", &freia_skip_08_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function freia_skip_08_helper_0_0_0
-freia_status freia_skip_08_helper_0_0_0(
+// helper function freia_skip_08_opencl_helper_0_0_0
+freia_status freia_skip_08_opencl_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
@@ -1218,7 +1218,7 @@ freia_status freia_skip_08_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_skip_08_helper_0_0_0_compile();
+    err |= freia_skip_08_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -1226,12 +1226,12 @@ freia_status freia_skip_08_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_skip_08_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = freia_skip_08_opencl_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel freia_skip_08_helper_0_0_0
+  // call kernel freia_skip_08_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 1, 2, 1, o0, i0, c0, c1, &redres);
 
   // return reduction results
@@ -1240,18 +1240,18 @@ freia_status freia_skip_08_helper_0_0_0(
   return err;
 }
 
-// hold kernels for freia_skip_08_helper_0_1_0
-static cl_kernel freia_skip_08_helper_0_1_0_kernel[2];
+// hold kernels for freia_skip_08_opencl_helper_0_1_0
+static cl_kernel freia_skip_08_opencl_helper_0_1_0_kernel[2];
 
-// compile kernels for freia_skip_08_helper_0_1_0
-static freia_status freia_skip_08_helper_0_1_0_compile(void)
+// compile kernels for freia_skip_08_opencl_helper_0_1_0
+static freia_status freia_skip_08_opencl_helper_0_1_0_compile(void)
 {
-  // OpenCL source for freia_skip_08_helper_0_1_0
-  const char * freia_skip_08_helper_0_1_0_source =
+  // OpenCL source for freia_skip_08_opencl_helper_0_1_0
+  const char * freia_skip_08_opencl_helper_0_1_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_skip_08_helper_0_1_0\n"
-    "KERNEL void freia_skip_08_helper_0_1_0(\n"
+    "// opencl function freia_skip_08_opencl_helper_0_1_0\n"
+    "KERNEL void freia_skip_08_opencl_helper_0_1_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -1281,13 +1281,13 @@ static freia_status freia_skip_08_helper_0_1_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_skip_08_helper_0_1_0_source, "freia_skip_08_helper_0_1_0", "-DPIXEL8", &freia_skip_08_helper_0_1_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_skip_08_helper_0_1_0_source, "freia_skip_08_helper_0_1_0", "-DPIXEL16", &freia_skip_08_helper_0_1_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_skip_08_opencl_helper_0_1_0_source, "freia_skip_08_opencl_helper_0_1_0", "-DPIXEL8", &freia_skip_08_opencl_helper_0_1_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_skip_08_opencl_helper_0_1_0_source, "freia_skip_08_opencl_helper_0_1_0", "-DPIXEL16", &freia_skip_08_opencl_helper_0_1_0_kernel[1]);
   return err;
 }
 
-// helper function freia_skip_08_helper_0_1_0
-freia_status freia_skip_08_helper_0_1_0(
+// helper function freia_skip_08_opencl_helper_0_1_0
+freia_status freia_skip_08_opencl_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
@@ -1300,7 +1300,7 @@ freia_status freia_skip_08_helper_0_1_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_skip_08_helper_0_1_0_compile();
+    err |= freia_skip_08_opencl_helper_0_1_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -1308,9 +1308,9 @@ freia_status freia_skip_08_helper_0_1_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_skip_08_helper_0_1_0_kernel[bpp];
+  cl_kernel kernel = freia_skip_08_opencl_helper_0_1_0_kernel[bpp];
 
-  // call kernel freia_skip_08_helper_0_1_0
+  // call kernel freia_skip_08_opencl_helper_0_1_0
   err |= freia_op_call_kernel(kernel, 1, 1, 4, 0, o0, i0, c0, c1, c2, c3);
 
   return err;
@@ -1320,8 +1320,8 @@ freia_status freia_skip_08_helper_0_1_0(
 
 // opencl for dag 0
 
-// opencl function freia_skip_08_helper_0_0_0
-KERNEL void freia_skip_08_helper_0_0_0(
+// opencl function freia_skip_08_opencl_helper_0_0_0
+KERNEL void freia_skip_08_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -1360,8 +1360,8 @@ KERNEL void freia_skip_08_helper_0_0_0(
   redX[idy].max = mmax.x;
 }
 
-// opencl function freia_skip_08_helper_0_1_0
-KERNEL void freia_skip_08_helper_0_1_0(
+// opencl function freia_skip_08_opencl_helper_0_1_0
+KERNEL void freia_skip_08_opencl_helper_0_1_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -1398,12 +1398,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_opencl_helper_0_0_0(t, i, 111, 12, &max);              /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, true, -12);             /*0015*/
+   freia_skip_08_opencl_helper_0_1_0(o, t, 8, seuil-4, true, -12);      /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 
@@ -1414,12 +1414,12 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
+   freia_skip_08_opencl_helper_0_0_0(t, i, 111, 12, &max);              /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, 1, -12);                /*0015*/
+   freia_skip_08_opencl_helper_0_1_0(o, t, 8, seuil-4, 1, -12);         /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
 }
 #

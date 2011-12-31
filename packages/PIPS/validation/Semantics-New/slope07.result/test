@@ -1,0 +1,149 @@
+
+Transformers for slope07
+
+
+//  T() {}
+
+void slope07()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=58}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=58))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (61*y<=55*x+54)
+
+//  T(k) {x+y==k}
+
+      /* x=9, y=9 is reachable */
+      /* The new constraints are derived from points (0,0), (9,9),
+             (49,45) and (58,53) with slopes 1, 9/10 and 8/9 */
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T(x) {}
+
+
+   scanf("%d", &x);
+
+//  T() {0<=y, y<=9}
+
+   /* create another bounding box */
+   if (!(0<=y&&y<=9))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (61*y<=55*x+54)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope07
+
+
+//  P() {}
+
+void slope07()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=58))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=58}
+
+
+   if (61*y<=55*x+54)
+
+//  P(k,x,y) {0<=x, x<=58, 10y<=9x+9, 9y<=8x+13, y<=x}
+
+      /* x=9, y=9 is reachable */
+      /* The new constraints are derived from points (0,0), (9,9),
+             (49,45) and (58,53) with slopes 1, 9/10 and 8/9 */
+      k = x+y;
+   else
+
+//  P(k,x,y) {9x==10y-10, 0<=x, x<=58, x<=y+4}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 8k<=15x+18, 10k<=19x+10, 0<=x, x<=58}
+
+
+   scanf("%d", &x);
+
+//  P(k,x,y) {19y<=9k+10, 15y<=7k+18, y<=k, k<=y+58}
+
+   /* create another bounding box */
+   if (!(0<=y&&y<=9))
+
+//  P(k,x,y) {21y+10<=11k, 19y<=9k+10, 15y<=7k+18, y<=k, k<=y+58}
+
+      abort();
+
+//  P(k,x,y) {19y<=9k+10, 15y<=7k+18, y<=k, k<=y+58, 0<=y, y<=9}
+
+
+   if (61*y<=55*x+54)
+
+//  P(k,x,y) {19y<=9k+10, 15y<=7k+18, y<=k, k<=y+58, y<=x, 0<=y, y<=9}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {19y<=9k+10, 15y<=7k+18, y<=k, k<=y+58, x+1<=y, 0<=y,
+//    y<=9}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, x<=k, k<=x+9}
+
+
+   return;
+}

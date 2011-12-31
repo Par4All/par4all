@@ -5230,8 +5230,8 @@ digraph "dag_cleaned_3" {
   "456 <_" -> "460 >" [label="imZone1"];
   "imZone1" -> "456 <_";
 }
-// graph for dag "main_helper_1_0" of module "main" in dot format
-digraph "main_helper_1_0" {
+// graph for dag "main_spoc_helper_1_0" of module "main" in dot format
+digraph "main_spoc_helper_1_0" {
   // inputs
   "in" [shape=circle];
 
@@ -6048,8 +6048,8 @@ digraph "main_helper_1_0" {
   "in" -> "226 D8";
   "in" -> "25 D8";
 }
-// graph for dag "main_helper_1_1" of module "main" in dot format
-digraph "main_helper_1_1" {
+// graph for dag "main_spoc_helper_1_1" of module "main" in dot format
+digraph "main_spoc_helper_1_1" {
   // inputs
   "imClose" [shape=circle];
   "imin" [shape=circle];
@@ -6069,8 +6069,8 @@ digraph "main_helper_1_1" {
   "imin" -> "427 -";
   "imClose" -> "427 -";
 }
-// graph for dag "main_helper_1_2" of module "main" in dot format
-digraph "main_helper_1_2" {
+// graph for dag "main_spoc_helper_1_2" of module "main" in dot format
+digraph "main_spoc_helper_1_2" {
   // inputs
   "imZone1" [shape=circle];
   "imZone2" [shape=circle];
@@ -6084,8 +6084,8 @@ digraph "main_helper_1_2" {
   "imZone2" -> "431 >";
   "imZone1" -> "431 >";
 }
-// graph for dag "main_helper_1_3" of module "main" in dot format
-digraph "main_helper_1_3" {
+// graph for dag "main_spoc_helper_1_3" of module "main" in dot format
+digraph "main_spoc_helper_1_3" {
   // inputs
   "imWork1_2" [shape=circle];
   "imZone3" [shape=circle];
@@ -6109,8 +6109,8 @@ digraph "main_helper_1_3" {
   "imZone3" -> "432 >";
   "imWork1_2" -> "432 >";
 }
-// graph for dag "main_helper_2_0" of module "main" in dot format
-digraph "main_helper_2_0" {
+// graph for dag "main_spoc_helper_2_0" of module "main" in dot format
+digraph "main_spoc_helper_2_0" {
   // inputs
   "imWork1" [shape=circle];
   "out" [shape=circle];
@@ -6163,8 +6163,8 @@ digraph "main_helper_2_0" {
   "439 E8" -> "440 >" [label="out_216"];
   "out" -> "439 E8";
 }
-// graph for dag "main_helper_3_0" of module "main" in dot format
-digraph "main_helper_3_0" {
+// graph for dag "main_spoc_helper_3_0" of module "main" in dot format
+digraph "main_spoc_helper_3_0" {
   // inputs
   "imZone1" [shape=circle];
   "imZone2" [shape=circle];
@@ -6182,8 +6182,8 @@ digraph "main_helper_3_0" {
   "456 <_" -> "460 >" [label="imZone1"];
   "imZone1" -> "456 <_";
 }
-// graph for dag "main_helper_3_1" of module "main" in dot format
-digraph "main_helper_3_1" {
+// graph for dag "main_spoc_helper_3_1" of module "main" in dot format
+digraph "main_spoc_helper_3_1" {
   // inputs
   "imWork1_203" [shape=circle];
   "imZone3" [shape=circle];
@@ -6199,8 +6199,8 @@ digraph "main_helper_3_1" {
   "458 <_" -> "461 >" [label="imZone3"];
   "imZone3" -> "458 <_";
 }
-// graph for dag "main_helper_3_2" of module "main" in dot format
-digraph "main_helper_3_2" {
+// graph for dag "main_spoc_helper_3_2" of module "main" in dot format
+digraph "main_spoc_helper_3_2" {
   // inputs
   "imWork1" [shape=circle];
   "out" [shape=circle];
@@ -6235,7 +6235,7 @@ digraph "main_helper_3_2" {
 // # SPOC calls: 28
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_0(
+freia_status main_spoc_helper_1_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -6473,7 +6473,7 @@ freia_status main_helper_1_0_0(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_1(
+freia_status main_spoc_helper_1_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -6712,7 +6712,7 @@ freia_status main_helper_1_0_1(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_2(
+freia_status main_spoc_helper_1_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -6951,7 +6951,7 @@ freia_status main_helper_1_0_2(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_3(
+freia_status main_spoc_helper_1_0_3(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -7190,7 +7190,7 @@ freia_status main_helper_1_0_3(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_4(
+freia_status main_spoc_helper_1_0_4(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -7429,7 +7429,7 @@ freia_status main_helper_1_0_4(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_5(
+freia_status main_spoc_helper_1_0_5(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -7668,7 +7668,7 @@ freia_status main_helper_1_0_5(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_6(
+freia_status main_spoc_helper_1_0_6(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -7907,7 +7907,7 @@ freia_status main_helper_1_0_6(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_7(
+freia_status main_spoc_helper_1_0_7(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -8146,7 +8146,7 @@ freia_status main_helper_1_0_7(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_8(
+freia_status main_spoc_helper_1_0_8(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -8385,7 +8385,7 @@ freia_status main_helper_1_0_8(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_9(
+freia_status main_spoc_helper_1_0_9(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -8624,7 +8624,7 @@ freia_status main_helper_1_0_9(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_10(
+freia_status main_spoc_helper_1_0_10(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -8863,7 +8863,7 @@ freia_status main_helper_1_0_10(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_11(
+freia_status main_spoc_helper_1_0_11(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -9102,7 +9102,7 @@ freia_status main_helper_1_0_11(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_12(
+freia_status main_spoc_helper_1_0_12(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -9343,7 +9343,7 @@ freia_status main_helper_1_0_12(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_13(
+freia_status main_spoc_helper_1_0_13(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -9582,7 +9582,7 @@ freia_status main_helper_1_0_13(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_14(
+freia_status main_spoc_helper_1_0_14(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -9821,7 +9821,7 @@ freia_status main_helper_1_0_14(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_15(
+freia_status main_spoc_helper_1_0_15(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -10060,7 +10060,7 @@ freia_status main_helper_1_0_15(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_16(
+freia_status main_spoc_helper_1_0_16(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -10299,7 +10299,7 @@ freia_status main_helper_1_0_16(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_17(
+freia_status main_spoc_helper_1_0_17(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -10538,7 +10538,7 @@ freia_status main_helper_1_0_17(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_18(
+freia_status main_spoc_helper_1_0_18(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -10777,7 +10777,7 @@ freia_status main_helper_1_0_18(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_19(
+freia_status main_spoc_helper_1_0_19(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -11016,7 +11016,7 @@ freia_status main_helper_1_0_19(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_20(
+freia_status main_spoc_helper_1_0_20(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -11255,7 +11255,7 @@ freia_status main_helper_1_0_20(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_21(
+freia_status main_spoc_helper_1_0_21(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -11494,7 +11494,7 @@ freia_status main_helper_1_0_21(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_22(
+freia_status main_spoc_helper_1_0_22(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -11733,7 +11733,7 @@ freia_status main_helper_1_0_22(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_23(
+freia_status main_spoc_helper_1_0_23(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -11972,7 +11972,7 @@ freia_status main_helper_1_0_23(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_0_24(
+freia_status main_spoc_helper_1_0_24(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -12230,7 +12230,7 @@ freia_status main_helper_1_0_24(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_1_0(
+freia_status main_spoc_helper_1_1_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -12335,7 +12335,7 @@ freia_status main_helper_1_1_0(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_2_0(
+freia_status main_spoc_helper_1_2_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -12398,7 +12398,7 @@ freia_status main_helper_1_2_0(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_1_3_0(
+freia_status main_spoc_helper_1_3_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -12528,7 +12528,7 @@ freia_status main_helper_1_3_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_2_0_0(
+freia_status main_spoc_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -12764,7 +12764,7 @@ freia_status main_helper_2_0_0(
 // # SPOC calls: 3
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_3_0_0(
+freia_status main_spoc_helper_3_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -12851,7 +12851,7 @@ freia_status main_helper_3_0_0(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_3_1_0(
+freia_status main_spoc_helper_3_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -12926,7 +12926,7 @@ freia_status main_helper_3_1_0(
 }
 
 // FREIA-SPoC helper function for module main
-freia_status main_helper_3_2_0(
+freia_status main_spoc_helper_3_2_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -13041,53 +13041,53 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0225*/
 
-   main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0025*/
-   main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0033*/
-   main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0041*/
-   main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0049*/
-   main_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0057*/
-   main_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0065*/
-   main_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0073*/
-   main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0081*/
-   main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0089*/
-   main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0097*/
-   main_helper_1_0_10(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);        /*0105*/
-   main_helper_1_0_11(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);        /*0113*/
-   main_helper_1_0_12(imWork1, out, imWork1, out, freia_morpho_k8_center_east, neighborTransposed_0, freia_morpho_k8_center_north, neighborTransposed_1);         /*0121*/
+   main_spoc_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);              /*0025*/
+   main_spoc_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0033*/
+   main_spoc_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0041*/
+   main_spoc_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0049*/
+   main_spoc_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0057*/
+   main_spoc_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0065*/
+   main_spoc_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0073*/
+   main_spoc_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0081*/
+   main_spoc_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0089*/
+   main_spoc_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0097*/
+   main_spoc_helper_1_0_10(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);   /*0105*/
+   main_spoc_helper_1_0_11(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);   /*0113*/
+   main_spoc_helper_1_0_12(imWork1, out, imWork1, out, freia_morpho_k8_center_east, neighborTransposed_0, freia_morpho_k8_center_north, neighborTransposed_1);    /*0121*/
 
-   main_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0129*/
-   main_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0137*/
-   main_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0145*/
-   main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0153*/
-   main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0161*/
-   main_helper_1_0_18(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
-   main_helper_1_0_19(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0177*/
-   main_helper_1_0_20(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0185*/
-   main_helper_1_0_21(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0193*/
-   main_helper_1_0_22(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0201*/
-   main_helper_1_0_23(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0209*/
-   main_helper_1_0_24(imClose, imZone3, imWork1, out, neighborTransposed_0, neighborTransposed_1, 100, 150, 1);      /*0217*/
+   main_spoc_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0129*/
+   main_spoc_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0137*/
+   main_spoc_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0145*/
+   main_spoc_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0153*/
+   main_spoc_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0161*/
+   main_spoc_helper_1_0_18(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0169*/
+   main_spoc_helper_1_0_19(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0177*/
+   main_spoc_helper_1_0_20(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0185*/
+   main_spoc_helper_1_0_21(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0193*/
+   main_spoc_helper_1_0_22(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0201*/
+   main_spoc_helper_1_0_23(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0209*/
+   main_spoc_helper_1_0_24(imClose, imZone3, imWork1, out, neighborTransposed_0, neighborTransposed_1, 100, 150, 1);                /*0217*/
    
    
    
-   main_helper_1_1_0(imZone1, imZone2, imClose, imin, 105, 255, 1, 60, 105, 1);        /*0427*/
+   main_spoc_helper_1_1_0(imZone1, imZone2, imClose, imin, 105, 255, 1, 60, 105, 1);   /*0427*/
    
    
-   main_helper_1_2_0(imWork1, imZone1, imZone2);                        /*0431*/
-   main_helper_1_3_0(imWork1, out, imWork1, imZone3, freia_morpho_kernel_8c, &volcurrent);            /*0432*/
+   main_spoc_helper_1_2_0(imWork1, imZone1, imZone2);                   /*0431*/
+   main_spoc_helper_1_3_0(imWork1, out, imWork1, imZone3, freia_morpho_kernel_8c, &volcurrent);       /*0432*/
    
    
    do {                                                                 /*0437*/
       volprevious = volcurrent;                                         /*0438*/
-      main_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);       /*0439*/
+      main_spoc_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);  /*0439*/
    }
    while (volcurrent!=volprevious);                                     /*0437*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);               /*0456*/
+   main_spoc_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);          /*0456*/
 
-   main_helper_3_1_0(imWork1, imWork1, imZone3, 170);                   /*0458*/
-   main_helper_3_2_0(out, imWork1, out, 250);                           /*0459*/
+   main_spoc_helper_3_1_0(imWork1, imWork1, imZone3, 170);              /*0458*/
+   main_spoc_helper_3_2_0(out, imWork1, out, 250);                      /*0459*/
    
    // output
    freia_common_tx_image(imin, &fdout);                                 /*0463*/
@@ -13151,53 +13151,53 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0225*/
 
-   main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0025*/
-   main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0033*/
-   main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0041*/
-   main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0049*/
-   main_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0057*/
-   main_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0065*/
-   main_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0073*/
-   main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0081*/
-   main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0089*/
-   main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0097*/
-   main_helper_1_0_10(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);        /*0105*/
-   main_helper_1_0_11(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);        /*0113*/
-   main_helper_1_0_12(imWork1, out, imWork1, out, freia_morpho_k8_center_east, neighborTransposed_0, freia_morpho_k8_center_north, neighborTransposed_1);         /*0121*/
+   main_spoc_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);              /*0025*/
+   main_spoc_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0033*/
+   main_spoc_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0041*/
+   main_spoc_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0049*/
+   main_spoc_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0057*/
+   main_spoc_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0065*/
+   main_spoc_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0073*/
+   main_spoc_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0081*/
+   main_spoc_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0089*/
+   main_spoc_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0097*/
+   main_spoc_helper_1_0_10(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);   /*0105*/
+   main_spoc_helper_1_0_11(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);   /*0113*/
+   main_spoc_helper_1_0_12(imWork1, out, imWork1, out, freia_morpho_k8_center_east, neighborTransposed_0, freia_morpho_k8_center_north, neighborTransposed_1);    /*0121*/
 
-   main_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0129*/
-   main_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0137*/
-   main_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0145*/
-   main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0153*/
-   main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0161*/
-   main_helper_1_0_18(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
-   main_helper_1_0_19(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0177*/
-   main_helper_1_0_20(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0185*/
-   main_helper_1_0_21(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0193*/
-   main_helper_1_0_22(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0201*/
-   main_helper_1_0_23(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0209*/
-   main_helper_1_0_24(imClose, imZone3, imWork1, out, neighborTransposed_0, neighborTransposed_1, 100, 150, 1);      /*0217*/
+   main_spoc_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0129*/
+   main_spoc_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0137*/
+   main_spoc_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0145*/
+   main_spoc_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0153*/
+   main_spoc_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0161*/
+   main_spoc_helper_1_0_18(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0169*/
+   main_spoc_helper_1_0_19(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0177*/
+   main_spoc_helper_1_0_20(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0185*/
+   main_spoc_helper_1_0_21(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0193*/
+   main_spoc_helper_1_0_22(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0201*/
+   main_spoc_helper_1_0_23(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);   /*0209*/
+   main_spoc_helper_1_0_24(imClose, imZone3, imWork1, out, neighborTransposed_0, neighborTransposed_1, 100, 150, 1);                /*0217*/
    
    
    
-   main_helper_1_1_0(imZone1, imZone2, imClose, imin, 105, 255, 1, 60, 105, 1);        /*0427*/
+   main_spoc_helper_1_1_0(imZone1, imZone2, imClose, imin, 105, 255, 1, 60, 105, 1);   /*0427*/
    
    
-   main_helper_1_2_0(imWork1, imZone1, imZone2);                        /*0431*/
-   main_helper_1_3_0(imWork1, out, imWork1, imZone3, freia_morpho_kernel_8c, &volcurrent);            /*0432*/
+   main_spoc_helper_1_2_0(imWork1, imZone1, imZone2);                   /*0431*/
+   main_spoc_helper_1_3_0(imWork1, out, imWork1, imZone3, freia_morpho_kernel_8c, &volcurrent);       /*0432*/
    
    
    do {                                                                 /*0437*/
       volprevious = volcurrent;                                         /*0438*/
-      main_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);       /*0439*/
+      main_spoc_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);  /*0439*/
    }
    while (volcurrent!=volprevious);                                     /*0437*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);               /*0456*/
+   main_spoc_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);          /*0456*/
 
-   main_helper_3_1_0(imWork1, imWork1, imZone3, 170);                   /*0458*/
-   main_helper_3_2_0(out, imWork1, out, 250);                           /*0459*/
+   main_spoc_helper_3_1_0(imWork1, imWork1, imZone3, 170);              /*0458*/
+   main_spoc_helper_3_2_0(out, imWork1, out, 250);                      /*0459*/
    
    // output
    freia_common_tx_image(imin, &fdout);                                 /*0463*/
@@ -15545,8 +15545,8 @@ digraph "dag_cleaned_3" {
   "484 <_" -> "489 >" [label="imZone1"];
   "imZone1" -> "484 <_";
 }
-// graph for dag "main_helper_1_0_0" of module "main" in dot format
-digraph "main_helper_1_0_0" {
+// graph for dag "main_terapix_helper_1_0_0" of module "main" in dot format
+digraph "main_terapix_helper_1_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -15598,8 +15598,8 @@ digraph "main_helper_1_0_0" {
   "in" -> "258 D8";
   "in" -> "54 D8";
 }
-// graph for dag "main_helper_1_0_1" of module "main" in dot format
-digraph "main_helper_1_0_1" {
+// graph for dag "main_terapix_helper_1_0_1" of module "main" in dot format
+digraph "main_terapix_helper_1_0_1" {
   // inputs
   "imWork1_193" [shape=circle];
   "out_192" [shape=circle];
@@ -15652,8 +15652,8 @@ digraph "main_helper_1_0_1" {
   "64 D8" -> "65 D8" [label="imWork1_192"];
   "imWork1_193" -> "64 D8";
 }
-// graph for dag "main_helper_1_0_10" of module "main" in dot format
-digraph "main_helper_1_0_10" {
+// graph for dag "main_terapix_helper_1_0_10" of module "main" in dot format
+digraph "main_terapix_helper_1_0_10" {
   // inputs
   "imWork1_100" [shape=circle];
   "out_99" [shape=circle];
@@ -15710,8 +15710,8 @@ digraph "main_helper_1_0_10" {
   "158 E8" -> "159 E8" [label="imWork1_99"];
   "imWork1_100" -> "158 E8";
 }
-// graph for dag "main_helper_1_0_11" of module "main" in dot format
-digraph "main_helper_1_0_11" {
+// graph for dag "main_terapix_helper_1_0_11" of module "main" in dot format
+digraph "main_terapix_helper_1_0_11" {
   // inputs
   "imWork1_89" [shape=circle];
   "out_88" [shape=circle];
@@ -15768,8 +15768,8 @@ digraph "main_helper_1_0_11" {
   "169 E8" -> "170 E8" [label="imWork1_88"];
   "imWork1_89" -> "169 E8";
 }
-// graph for dag "main_helper_1_0_12" of module "main" in dot format
-digraph "main_helper_1_0_12" {
+// graph for dag "main_terapix_helper_1_0_12" of module "main" in dot format
+digraph "main_terapix_helper_1_0_12" {
   // inputs
   "imWork1_78" [shape=circle];
   "out_77" [shape=circle];
@@ -15826,8 +15826,8 @@ digraph "main_helper_1_0_12" {
   "180 E8" -> "181 E8" [label="imWork1_77"];
   "imWork1_78" -> "180 E8";
 }
-// graph for dag "main_helper_1_0_13" of module "main" in dot format
-digraph "main_helper_1_0_13" {
+// graph for dag "main_terapix_helper_1_0_13" of module "main" in dot format
+digraph "main_terapix_helper_1_0_13" {
   // inputs
   "imWork1_67" [shape=circle];
   "out_66" [shape=circle];
@@ -15884,8 +15884,8 @@ digraph "main_helper_1_0_13" {
   "191 E8" -> "192 E8" [label="imWork1_66"];
   "imWork1_67" -> "191 E8";
 }
-// graph for dag "main_helper_1_0_14" of module "main" in dot format
-digraph "main_helper_1_0_14" {
+// graph for dag "main_terapix_helper_1_0_14" of module "main" in dot format
+digraph "main_terapix_helper_1_0_14" {
   // inputs
   "imWork1_56" [shape=circle];
   "out_55" [shape=circle];
@@ -15942,8 +15942,8 @@ digraph "main_helper_1_0_14" {
   "202 E8" -> "203 E8" [label="imWork1_55"];
   "imWork1_56" -> "202 E8";
 }
-// graph for dag "main_helper_1_0_15" of module "main" in dot format
-digraph "main_helper_1_0_15" {
+// graph for dag "main_terapix_helper_1_0_15" of module "main" in dot format
+digraph "main_terapix_helper_1_0_15" {
   // inputs
   "imWork1_45" [shape=circle];
   "out_44" [shape=circle];
@@ -16000,8 +16000,8 @@ digraph "main_helper_1_0_15" {
   "213 E8" -> "214 E8" [label="imWork1_44"];
   "imWork1_45" -> "213 E8";
 }
-// graph for dag "main_helper_1_0_16" of module "main" in dot format
-digraph "main_helper_1_0_16" {
+// graph for dag "main_terapix_helper_1_0_16" of module "main" in dot format
+digraph "main_terapix_helper_1_0_16" {
   // inputs
   "imWork1_34" [shape=circle];
   "out_33" [shape=circle];
@@ -16058,8 +16058,8 @@ digraph "main_helper_1_0_16" {
   "224 E8" -> "225 E8" [label="imWork1_33"];
   "imWork1_34" -> "224 E8";
 }
-// graph for dag "main_helper_1_0_17" of module "main" in dot format
-digraph "main_helper_1_0_17" {
+// graph for dag "main_terapix_helper_1_0_17" of module "main" in dot format
+digraph "main_terapix_helper_1_0_17" {
   // inputs
   "imWork1_23" [shape=circle];
   "out_22" [shape=circle];
@@ -16116,8 +16116,8 @@ digraph "main_helper_1_0_17" {
   "235 E8" -> "236 E8" [label="imWork1_22"];
   "imWork1_23" -> "235 E8";
 }
-// graph for dag "main_helper_1_0_18" of module "main" in dot format
-digraph "main_helper_1_0_18" {
+// graph for dag "main_terapix_helper_1_0_18" of module "main" in dot format
+digraph "main_terapix_helper_1_0_18" {
   // inputs
   "imWork1_12" [shape=circle];
   "imin" [shape=circle];
@@ -16199,8 +16199,8 @@ digraph "main_helper_1_0_18" {
   "246 E8" [shape=box];
   "246 E8" -> "247 E8" [label="imWork1_11"];
 }
-// graph for dag "main_helper_1_0_2" of module "main" in dot format
-digraph "main_helper_1_0_2" {
+// graph for dag "main_terapix_helper_1_0_2" of module "main" in dot format
+digraph "main_terapix_helper_1_0_2" {
   // inputs
   "imWork1_183" [shape=circle];
   "out_182" [shape=circle];
@@ -16253,8 +16253,8 @@ digraph "main_helper_1_0_2" {
   "74 D8" -> "75 D8" [label="imWork1_182"];
   "imWork1_183" -> "74 D8";
 }
-// graph for dag "main_helper_1_0_3" of module "main" in dot format
-digraph "main_helper_1_0_3" {
+// graph for dag "main_terapix_helper_1_0_3" of module "main" in dot format
+digraph "main_terapix_helper_1_0_3" {
   // inputs
   "imWork1_173" [shape=circle];
   "out_172" [shape=circle];
@@ -16307,8 +16307,8 @@ digraph "main_helper_1_0_3" {
   "84 D8" -> "85 D8" [label="imWork1_172"];
   "imWork1_173" -> "84 D8";
 }
-// graph for dag "main_helper_1_0_4" of module "main" in dot format
-digraph "main_helper_1_0_4" {
+// graph for dag "main_terapix_helper_1_0_4" of module "main" in dot format
+digraph "main_terapix_helper_1_0_4" {
   // inputs
   "imWork1_163" [shape=circle];
   "out_162" [shape=circle];
@@ -16361,8 +16361,8 @@ digraph "main_helper_1_0_4" {
   "94 D8" -> "95 D8" [label="imWork1_162"];
   "imWork1_163" -> "94 D8";
 }
-// graph for dag "main_helper_1_0_5" of module "main" in dot format
-digraph "main_helper_1_0_5" {
+// graph for dag "main_terapix_helper_1_0_5" of module "main" in dot format
+digraph "main_terapix_helper_1_0_5" {
   // inputs
   "imWork1_153" [shape=circle];
   "out_152" [shape=circle];
@@ -16415,8 +16415,8 @@ digraph "main_helper_1_0_5" {
   "104 D8" -> "105 D8" [label="imWork1_152"];
   "imWork1_153" -> "104 D8";
 }
-// graph for dag "main_helper_1_0_6" of module "main" in dot format
-digraph "main_helper_1_0_6" {
+// graph for dag "main_terapix_helper_1_0_6" of module "main" in dot format
+digraph "main_terapix_helper_1_0_6" {
   // inputs
   "imWork1_143" [shape=circle];
   "out_142" [shape=circle];
@@ -16469,8 +16469,8 @@ digraph "main_helper_1_0_6" {
   "114 D8" -> "115 D8" [label="imWork1_142"];
   "imWork1_143" -> "114 D8";
 }
-// graph for dag "main_helper_1_0_7" of module "main" in dot format
-digraph "main_helper_1_0_7" {
+// graph for dag "main_terapix_helper_1_0_7" of module "main" in dot format
+digraph "main_terapix_helper_1_0_7" {
   // inputs
   "imWork1_133" [shape=circle];
   "out_132" [shape=circle];
@@ -16527,8 +16527,8 @@ digraph "main_helper_1_0_7" {
   "124 D8" -> "125 D8" [label="imWork1_132"];
   "imWork1_133" -> "124 D8";
 }
-// graph for dag "main_helper_1_0_8" of module "main" in dot format
-digraph "main_helper_1_0_8" {
+// graph for dag "main_terapix_helper_1_0_8" of module "main" in dot format
+digraph "main_terapix_helper_1_0_8" {
   // inputs
   "imWork1_122" [shape=circle];
   "out_121" [shape=circle];
@@ -16585,8 +16585,8 @@ digraph "main_helper_1_0_8" {
   "135 D8" -> "136 D8" [label="imWork1_121"];
   "imWork1_122" -> "135 D8";
 }
-// graph for dag "main_helper_1_0_9" of module "main" in dot format
-digraph "main_helper_1_0_9" {
+// graph for dag "main_terapix_helper_1_0_9" of module "main" in dot format
+digraph "main_terapix_helper_1_0_9" {
   // inputs
   "imWork1_111" [shape=circle];
   "out_110" [shape=circle];
@@ -16643,8 +16643,8 @@ digraph "main_helper_1_0_9" {
   "146 D8" -> "147 D8" [label="imWork1_110"];
   "imWork1_111" -> "146 D8";
 }
-// graph for dag "main_helper_2_0_0" of module "main" in dot format
-digraph "main_helper_2_0_0" {
+// graph for dag "main_terapix_helper_2_0_0" of module "main" in dot format
+digraph "main_terapix_helper_2_0_0" {
   // inputs
   "imWork1" [shape=circle];
   "out" [shape=circle];
@@ -16662,8 +16662,8 @@ digraph "main_helper_2_0_0" {
   "477 E8" -> "478 >" [label="out_202"];
   "out" -> "477 E8";
 }
-// graph for dag "main_helper_3_0_0" of module "main" in dot format
-digraph "main_helper_3_0_0" {
+// graph for dag "main_terapix_helper_3_0_0" of module "main" in dot format
+digraph "main_terapix_helper_3_0_0" {
   // inputs
   "imZone1" [shape=circle];
   "imZone2" [shape=circle];
@@ -16726,7 +16726,7 @@ digraph "main_helper_3_0_0" {
  * - computation: 300
  * - communication: 96
  */
-freia_status main_helper_1_0_0(
+freia_status main_terapix_helper_1_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -17359,7 +17359,7 @@ freia_status main_helper_1_0_0(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_1(
+freia_status main_terapix_helper_1_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -17998,7 +17998,7 @@ freia_status main_helper_1_0_1(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_2(
+freia_status main_terapix_helper_1_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -18637,7 +18637,7 @@ freia_status main_helper_1_0_2(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_3(
+freia_status main_terapix_helper_1_0_3(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -19276,7 +19276,7 @@ freia_status main_helper_1_0_3(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_4(
+freia_status main_terapix_helper_1_0_4(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -19915,7 +19915,7 @@ freia_status main_helper_1_0_4(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_5(
+freia_status main_terapix_helper_1_0_5(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -20554,7 +20554,7 @@ freia_status main_helper_1_0_5(
  * - computation: 300
  * - communication: 128
  */
-freia_status main_helper_1_0_6(
+freia_status main_terapix_helper_1_0_6(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -21193,7 +21193,7 @@ freia_status main_helper_1_0_6(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_7(
+freia_status main_terapix_helper_1_0_7(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -21878,7 +21878,7 @@ freia_status main_helper_1_0_7(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_8(
+freia_status main_terapix_helper_1_0_8(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -22563,7 +22563,7 @@ freia_status main_helper_1_0_8(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_9(
+freia_status main_terapix_helper_1_0_9(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -23276,7 +23276,7 @@ freia_status main_helper_1_0_9(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_10(
+freia_status main_terapix_helper_1_0_10(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -23961,7 +23961,7 @@ freia_status main_helper_1_0_10(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_11(
+freia_status main_terapix_helper_1_0_11(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -24646,7 +24646,7 @@ freia_status main_helper_1_0_11(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_12(
+freia_status main_terapix_helper_1_0_12(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -25331,7 +25331,7 @@ freia_status main_helper_1_0_12(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_13(
+freia_status main_terapix_helper_1_0_13(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -26016,7 +26016,7 @@ freia_status main_helper_1_0_13(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_14(
+freia_status main_terapix_helper_1_0_14(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -26701,7 +26701,7 @@ freia_status main_helper_1_0_14(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_15(
+freia_status main_terapix_helper_1_0_15(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -27386,7 +27386,7 @@ freia_status main_helper_1_0_15(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_16(
+freia_status main_terapix_helper_1_0_16(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -28071,7 +28071,7 @@ freia_status main_helper_1_0_16(
  * - computation: 330
  * - communication: 128
  */
-freia_status main_helper_1_0_17(
+freia_status main_terapix_helper_1_0_17(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -28756,7 +28756,7 @@ freia_status main_helper_1_0_17(
  * - computation: 338
  * - communication: 256
  */
-freia_status main_helper_1_0_18(
+freia_status main_terapix_helper_1_0_18(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -29752,7 +29752,7 @@ freia_status main_helper_1_0_18(
  * - computation: 22
  * - communication: 96
  */
-freia_status main_helper_2_0_0(
+freia_status main_terapix_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -30014,7 +30014,7 @@ freia_status main_helper_2_0_0(
  * - computation: 24
  * - communication: 160
  */
-freia_status main_helper_3_0_0(
+freia_status main_terapix_helper_3_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -30393,28 +30393,28 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
-   main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0054*/
+   main_terapix_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);           /*0054*/
 
-   main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0064*/
-   main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0074*/
-   main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0084*/
-   main_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0094*/
-   main_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0104*/
-   main_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0114*/
-   main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0124*/
-   main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0135*/
-   main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);          /*0146*/
+   main_terapix_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0064*/
+   main_terapix_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0074*/
+   main_terapix_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0084*/
+   main_terapix_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0094*/
+   main_terapix_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0104*/
+   main_terapix_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0114*/
+   main_terapix_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0124*/
+   main_terapix_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0135*/
+   main_terapix_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);  /*0146*/
    
    
-   main_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0158*/
-   main_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
-   main_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0180*/
-   main_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0191*/
-   main_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0202*/
-   main_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0213*/
-   main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0224*/
-   main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0235*/
-   main_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);     /*0246*/
+   main_terapix_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0158*/
+   main_terapix_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0169*/
+   main_terapix_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0180*/
+   main_terapix_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0191*/
+   main_terapix_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0202*/
+   main_terapix_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0213*/
+   main_terapix_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0224*/
+   main_terapix_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0235*/
+   main_terapix_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);            /*0246*/
    
    
    
@@ -30422,12 +30422,12 @@ int main(int argc, char *argv[])
    
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
-      main_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);       /*0477*/
+      main_terapix_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);              /*0477*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);          /*0484*/
+   main_terapix_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);  /*0484*/
    
    
    // output
@@ -30490,28 +30490,28 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
-   main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0054*/
+   main_terapix_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);           /*0054*/
 
-   main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0064*/
-   main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0074*/
-   main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0084*/
-   main_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0094*/
-   main_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0104*/
-   main_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0114*/
-   main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0124*/
-   main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0135*/
-   main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);          /*0146*/
+   main_terapix_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0064*/
+   main_terapix_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0074*/
+   main_terapix_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0084*/
+   main_terapix_helper_1_0_4(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0094*/
+   main_terapix_helper_1_0_5(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0104*/
+   main_terapix_helper_1_0_6(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0114*/
+   main_terapix_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0124*/
+   main_terapix_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);                /*0135*/
+   main_terapix_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);  /*0146*/
    
    
-   main_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0158*/
-   main_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
-   main_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0180*/
-   main_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0191*/
-   main_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0202*/
-   main_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0213*/
-   main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0224*/
-   main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0235*/
-   main_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);     /*0246*/
+   main_terapix_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0158*/
+   main_terapix_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0169*/
+   main_terapix_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0180*/
+   main_terapix_helper_1_0_13(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0191*/
+   main_terapix_helper_1_0_14(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0202*/
+   main_terapix_helper_1_0_15(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0213*/
+   main_terapix_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0224*/
+   main_terapix_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);               /*0235*/
+   main_terapix_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);            /*0246*/
    
    
    
@@ -30519,12 +30519,12 @@ int main(int argc, char *argv[])
    
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
-      main_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);       /*0477*/
+      main_terapix_helper_2_0_0(out, imWork1, out, freia_morpho_kernel_8c, &volcurrent);              /*0477*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);          /*0484*/
+   main_terapix_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);  /*0484*/
    
    
    // output
@@ -32872,8 +32872,8 @@ digraph "dag_cleaned_3" {
   "484 <_" -> "489 >" [label="imZone1"];
   "imZone1" -> "484 <_";
 }
-// graph for dag "main_helper_1_0" of module "main" in dot format
-digraph "main_helper_1_0" {
+// graph for dag "main_opencl_helper_1_0" of module "main" in dot format
+digraph "main_opencl_helper_1_0" {
   // inputs
   "imin" [shape=circle];
   "in" [shape=circle];
@@ -33718,8 +33718,8 @@ digraph "main_helper_1_0" {
   "in" -> "258 D8";
   "in" -> "54 D8";
 }
-// graph for dag "main_helper_1_0_1" of module "main" in dot format
-digraph "main_helper_1_0_1" {
+// graph for dag "main_opencl_helper_1_0_1" of module "main" in dot format
+digraph "main_opencl_helper_1_0_1" {
   // inputs
   "imWork1_3" [shape=circle];
   "imin" [shape=circle];
@@ -33757,8 +33757,8 @@ digraph "main_helper_1_0_1" {
   "out_2" -> "460 <";
   "imWork1_3" -> "460 <";
 }
-// graph for dag "main_helper_2_0" of module "main" in dot format
-digraph "main_helper_2_0" {
+// graph for dag "main_opencl_helper_2_0" of module "main" in dot format
+digraph "main_opencl_helper_2_0" {
   // inputs
   "imWork1" [shape=circle];
   "out" [shape=circle];
@@ -33776,8 +33776,8 @@ digraph "main_helper_2_0" {
   "477 E8" -> "478 >" [label="out_202"];
   "out" -> "477 E8";
 }
-// graph for dag "main_helper_2_0_1" of module "main" in dot format
-digraph "main_helper_2_0_1" {
+// graph for dag "main_opencl_helper_2_0_1" of module "main" in dot format
+digraph "main_opencl_helper_2_0_1" {
   // inputs
   "imWork1" [shape=circle];
   "out_202" [shape=circle];
@@ -33793,8 +33793,8 @@ digraph "main_helper_2_0_1" {
   "imWork1" -> "478 >";
   "out_202" -> "478 >";
 }
-// graph for dag "main_helper_3_0" of module "main" in dot format
-digraph "main_helper_3_0" {
+// graph for dag "main_opencl_helper_3_0" of module "main" in dot format
+digraph "main_opencl_helper_3_0" {
   // inputs
   "imZone1" [shape=circle];
   "imZone2" [shape=circle];
@@ -33824,8 +33824,8 @@ digraph "main_helper_3_0" {
   "484 <_" -> "489 >" [label="imZone1"];
   "imZone1" -> "484 <_";
 }
-// graph for dag "main_helper_3_0_0" of module "main" in dot format
-digraph "main_helper_3_0_0" {
+// graph for dag "main_opencl_helper_3_0_0" of module "main" in dot format
+digraph "main_opencl_helper_3_0_0" {
   // inputs
   "imZone1" [shape=circle];
   "imZone2" [shape=circle];
@@ -33868,18 +33868,18 @@ digraph "main_helper_3_0_0" {
 
 // dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0+0 copies
 
-// hold kernels for main_helper_1_0_1
-static cl_kernel main_helper_1_0_1_kernel[2];
+// hold kernels for main_opencl_helper_1_0_1
+static cl_kernel main_opencl_helper_1_0_1_kernel[2];
 
-// compile kernels for main_helper_1_0_1
-static freia_status main_helper_1_0_1_compile(void)
+// compile kernels for main_opencl_helper_1_0_1
+static freia_status main_opencl_helper_1_0_1_compile(void)
 {
-  // OpenCL source for main_helper_1_0_1
-  const char * main_helper_1_0_1_source =
+  // OpenCL source for main_opencl_helper_1_0_1
+  const char * main_opencl_helper_1_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function main_helper_1_0_1\n"
-    "KERNEL void main_helper_1_0_1(\n"
+    "// opencl function main_opencl_helper_1_0_1\n"
+    "KERNEL void main_opencl_helper_1_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -33940,13 +33940,13 @@ static freia_status main_helper_1_0_1_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL8", &main_helper_1_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL16", &main_helper_1_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_1_source, "main_opencl_helper_1_0_1", "-DPIXEL8", &main_opencl_helper_1_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_1_source, "main_opencl_helper_1_0_1", "-DPIXEL16", &main_opencl_helper_1_0_1_kernel[1]);
   return err;
 }
 
-// helper function main_helper_1_0_1
-freia_status main_helper_1_0_1(
+// helper function main_opencl_helper_1_0_1
+freia_status main_opencl_helper_1_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -33969,7 +33969,7 @@ freia_status main_helper_1_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= main_helper_1_0_1_compile();
+    err |= main_opencl_helper_1_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -33977,9 +33977,9 @@ freia_status main_helper_1_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = main_helper_1_0_1_kernel[bpp];
+  cl_kernel kernel = main_opencl_helper_1_0_1_kernel[bpp];
 
-  // call kernel main_helper_1_0_1
+  // call kernel main_opencl_helper_1_0_1
   err |= freia_op_call_kernel(kernel, 4, 3, 9, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2, c3, c4, c5, c6, c7, c8);
 
   return err;
@@ -33987,18 +33987,18 @@ freia_status main_helper_1_0_1(
 
 // dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for main_helper_2_0_1
-static cl_kernel main_helper_2_0_1_kernel[2];
+// hold kernels for main_opencl_helper_2_0_1
+static cl_kernel main_opencl_helper_2_0_1_kernel[2];
 
-// compile kernels for main_helper_2_0_1
-static freia_status main_helper_2_0_1_compile(void)
+// compile kernels for main_opencl_helper_2_0_1
+static freia_status main_opencl_helper_2_0_1_compile(void)
 {
-  // OpenCL source for main_helper_2_0_1
-  const char * main_helper_2_0_1_source =
+  // OpenCL source for main_opencl_helper_2_0_1
+  const char * main_opencl_helper_2_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function main_helper_2_0_1\n"
-    "KERNEL void main_helper_2_0_1(\n"
+    "// opencl function main_opencl_helper_2_0_1\n"
+    "KERNEL void main_opencl_helper_2_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -34038,13 +34038,13 @@ static freia_status main_helper_2_0_1_compile(void)
     "  redX[idy].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(main_helper_2_0_1_source, "main_helper_2_0_1", "-DPIXEL8", &main_helper_2_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(main_helper_2_0_1_source, "main_helper_2_0_1", "-DPIXEL16", &main_helper_2_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(main_opencl_helper_2_0_1_source, "main_opencl_helper_2_0_1", "-DPIXEL8", &main_opencl_helper_2_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_2_0_1_source, "main_opencl_helper_2_0_1", "-DPIXEL16", &main_opencl_helper_2_0_1_kernel[1]);
   return err;
 }
 
-// helper function main_helper_2_0_1
-freia_status main_helper_2_0_1(
+// helper function main_opencl_helper_2_0_1
+freia_status main_opencl_helper_2_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -34055,7 +34055,7 @@ freia_status main_helper_2_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= main_helper_2_0_1_compile();
+    err |= main_opencl_helper_2_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -34063,12 +34063,12 @@ freia_status main_helper_2_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = main_helper_2_0_1_kernel[bpp];
+  cl_kernel kernel = main_opencl_helper_2_0_1_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel main_helper_2_0_1
+  // call kernel main_opencl_helper_2_0_1
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 1, o0, i0, i1, &redres);
 
   // return reduction results
@@ -34079,18 +34079,18 @@ freia_status main_helper_2_0_1(
 
 // dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0+0 copies
 
-// hold kernels for main_helper_3_0_0
-static cl_kernel main_helper_3_0_0_kernel[2];
+// hold kernels for main_opencl_helper_3_0_0
+static cl_kernel main_opencl_helper_3_0_0_kernel[2];
 
-// compile kernels for main_helper_3_0_0
-static freia_status main_helper_3_0_0_compile(void)
+// compile kernels for main_opencl_helper_3_0_0
+static freia_status main_opencl_helper_3_0_0_compile(void)
 {
-  // OpenCL source for main_helper_3_0_0
-  const char * main_helper_3_0_0_source =
+  // OpenCL source for main_opencl_helper_3_0_0
+  const char * main_opencl_helper_3_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function main_helper_3_0_0\n"
-    "KERNEL void main_helper_3_0_0(\n"
+    "// opencl function main_opencl_helper_3_0_0\n"
+    "KERNEL void main_opencl_helper_3_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -34137,13 +34137,13 @@ static freia_status main_helper_3_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(main_helper_3_0_0_source, "main_helper_3_0_0", "-DPIXEL8", &main_helper_3_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(main_helper_3_0_0_source, "main_helper_3_0_0", "-DPIXEL16", &main_helper_3_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(main_opencl_helper_3_0_0_source, "main_opencl_helper_3_0_0", "-DPIXEL8", &main_opencl_helper_3_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_3_0_0_source, "main_opencl_helper_3_0_0", "-DPIXEL16", &main_opencl_helper_3_0_0_kernel[1]);
   return err;
 }
 
-// helper function main_helper_3_0_0
-freia_status main_helper_3_0_0(
+// helper function main_opencl_helper_3_0_0
+freia_status main_opencl_helper_3_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -34159,7 +34159,7 @@ freia_status main_helper_3_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= main_helper_3_0_0_compile();
+    err |= main_opencl_helper_3_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -34167,9 +34167,9 @@ freia_status main_helper_3_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = main_helper_3_0_0_kernel[bpp];
+  cl_kernel kernel = main_opencl_helper_3_0_0_kernel[bpp];
 
-  // call kernel main_helper_3_0_0
+  // call kernel main_opencl_helper_3_0_0
   err |= freia_op_call_kernel(kernel, 1, 4, 4, 0, o0, i0, i1, i2, i3, c0, c1, c2, c3);
 
   return err;
@@ -34181,8 +34181,8 @@ freia_status main_helper_3_0_0(
 
 // opencl for dag 1
 
-// opencl function main_helper_1_0_1
-KERNEL void main_helper_1_0_1(
+// opencl function main_opencl_helper_1_0_1
+KERNEL void main_opencl_helper_1_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -34245,8 +34245,8 @@ KERNEL void main_helper_1_0_1(
 
 // opencl for dag 2
 
-// opencl function main_helper_2_0_1
-KERNEL void main_helper_2_0_1(
+// opencl function main_opencl_helper_2_0_1
+KERNEL void main_opencl_helper_2_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -34288,8 +34288,8 @@ KERNEL void main_helper_2_0_1(
 
 // opencl for dag 3
 
-// opencl function main_helper_3_0_0
-KERNEL void main_helper_3_0_0(
+// opencl function main_opencl_helper_3_0_0
+KERNEL void main_opencl_helper_3_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -34783,7 +34783,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0457*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0458*/
 
-   main_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);               /*0460*/
+   main_opencl_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);        /*0460*/
    
    
    
@@ -34794,12 +34794,12 @@ int main(int argc, char *argv[])
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
       freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);            /*0477*/
-      main_helper_2_0_1(out, imWork1, out, &volcurrent);                /*0478*/
+      main_opencl_helper_2_0_1(out, imWork1, out, &volcurrent);         /*0478*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);          /*0484*/
+   main_opencl_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);   /*0484*/
    
    
    // output
@@ -35270,7 +35270,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0457*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0458*/
 
-   main_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);               /*0460*/
+   main_opencl_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);        /*0460*/
    
    
    
@@ -35281,12 +35281,12 @@ int main(int argc, char *argv[])
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
       freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);            /*0477*/
-      main_helper_2_0_1(out, imWork1, out, &volcurrent);                /*0478*/
+      main_opencl_helper_2_0_1(out, imWork1, out, &volcurrent);         /*0478*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
    // Change  pixel values for the display
-   main_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);          /*0484*/
+   main_opencl_helper_3_0_0(out, imZone1, imZone2, imZone3, out, 40, 100, 170, 250);   /*0484*/
    
    
    // output

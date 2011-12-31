@@ -567,13 +567,18 @@ dagvtx copy_dagvtx_norec(dagvtx v)
   return copy;
 }
 
+static bool dagvtx_is_operator_p(const dagvtx v, const string opname)
+{
+  vtxcontent c = dagvtx_content(v);
+  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+  return same_string_p(cat(AIPO, opname), api->function_name);
+}
+
 /* returns whether the vertex is an image copy operation.
  */
 static bool dagvtx_is_copy_p(const dagvtx v)
 {
-  vtxcontent c = dagvtx_content(v);
-  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
-  return same_string_p(AIPO "copy", api->function_name);
+  return dagvtx_is_operator_p(v, "copy");
 }
 
 /* returns whether the vertex is an image measurement operation.
@@ -905,7 +910,7 @@ static int number_of_copies(list /* of dagvtx */ l)
   return n;
 }
 
-// tell whether this is this (short name) aipo function?
+// tell whether this is this (short name) aipo function (static test)?
 #define aipo_op_p(a, name)                      \
   same_string_p(AIPO name, a->function_name)
 
@@ -935,12 +940,15 @@ static void set_aipo_call(dagvtx v, string name, entity img, expression val)
   pstatement ps = vtxcontent_source(c);
   pips_assert("some statement!", pstatement_statement_p(ps));
 
+  // build function name
   string fname = strdup(cat(AIPO, name));
 
-  // remove inputs
+  // remove previous image inputs
   gen_free_list(vtxcontent_inputs(c));
   vtxcontent_inputs(c) =
     (img && img!=entity_undefined)? CONS(entity, img, NIL): NIL;
+
+  // set id & type
   vtxcontent_opid(c) = hwac_freia_api_index(fname);
   pips_assert("function index found", vtxcontent_opid(c)!=-1);
   vtxcontent_optype(c) =
@@ -951,6 +959,8 @@ static void set_aipo_call(dagvtx v, string name, entity img, expression val)
   entity func = local_name_to_top_level_entity(fname);
   pips_assert("AIPO function found", func!=entity_undefined);
   call_function(cf) = func;
+
+  // build expression list in reverse order
   list args = NIL;
   if (val && val!=expression_undefined)
     args = CONS(expression, copy_expression(val), args);
@@ -1238,6 +1248,19 @@ static bool dag_simplify(dag d)
       changed = true;
       set_aipo_copy(v, img);
     }
+    // another one just for fun: I+I -> 2*I
+    // this is good for SPoC
+    else if (dagvtx_is_operator_p(v, "add"))
+    {
+      list preds = dag_vertex_preds(d, v);
+      pips_assert("two args to add", gen_length(preds)==2);
+      if (DAGVTX(CAR(preds))==DAGVTX(CAR(CDR(preds))))
+      {
+        changed = true;
+        set_aipo_call(v, "mul_const",
+                      dagvtx_image(DAGVTX(CAR(preds))), int_to_expression(2));
+      }
+    }
   }
 
   return changed;
@@ -1330,6 +1353,19 @@ void freia_dag_optimize(
     ifdebug(8) {
       pips_debug(4, "after FREIA_NORMALIZE_OPERATIONS:\n");
       dag_dump(stderr, "normalized", d);
+    }
+  }
+
+  // algebraic simplifications
+  // currently constant images are detected and propagated and constant pixels
+  if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
+    dag_simplify(d);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS (1):\n");
+      dag_dump(stderr, "simplified_1", d);
+      // dag_dot_dump_prefix("main", "simplified", 0, d);
     }
   }
 
@@ -1485,13 +1521,17 @@ void freia_dag_optimize(
     }
   }
 
+  // algebraic simplifications *AGAIN*
+  // some duplicate operation removal may have enabled more simplifications
+  // for instance -(a,b) & a=~b => -(a,a) => cst(0)
+  // we may have a convergence loop on both duplicate/simplify
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
   {
     dag_simplify(d);
 
     ifdebug(8) {
-      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
-      dag_dump(stderr, "simplified", d);
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS (2):\n");
+      dag_dump(stderr, "simplified_2", d);
       // dag_dot_dump_prefix("main", "simplified", 0, d);
     }
   }
@@ -1544,6 +1584,8 @@ void freia_dag_optimize(
     while (changed)
     {
       changed = false;
+
+      // first propagate input images through copies
       FOREACH(dagvtx, v, dag_inputs(d))
       {
         list append = NIL;
@@ -1600,12 +1642,26 @@ void freia_dag_optimize(
         vtxcontent c = dagvtx_content(v);
         entity res = vtxcontent_out(c);
         pips_assert("one output and one input to copy",
-                res!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+                    res!=entity_undefined &&
+                    gen_length(preds)==1 &&
+                    gen_length(vtxcontent_inputs(c))==1);
 
-
+        // first check for A->copy->A really useless copies, which are skipped
+        entity inimg = ENTITY(CAR(vtxcontent_inputs(c)));
+        if (inimg==res)
+        {
+          set_add_element(remove, remove, v);
+          dagvtx pred = DAGVTX(CAR(preds));
+          // update predecessor's successors
+          gen_remove(&dagvtx_succs(pred), v);
+          dagvtx_succs(pred) = gen_nconc(dagvtx_succs(pred), dagvtx_succs(v));
+          // fix global output if necessary
+          if (gen_in_list_p(v, dag_outputs(d)))
+            gen_replace_in_list(dag_outputs(d), v, pred);
+        }
         // check for internal-t -one-copy-and-others-> A (output)
         // could be improved by dealing with the first copy only?
-        if (gen_in_list_p(v, dag_outputs(d)))
+        else if (gen_in_list_p(v, dag_outputs(d)))
         {
           pips_assert("one predecessor to used copy", gen_length(preds)==1);
           dagvtx pred = DAGVTX(CAR(preds));
@@ -1792,10 +1848,11 @@ void freia_dag_optimize(
     // dag_dot_dump_prefix("main", "cleaned", 0, d);
   }
 
-  pips_assert("right output count after optimizations",
-      // former output images are either still computed or copies of computed
-         gen_length(dag_outputs(d)) + gen_length(*lbefore) + gen_length(*lafter)
-              == dag_output_count);
+  // former output images are either still computed or copies of computed
+  size_t recount = gen_length(dag_outputs(d)) +
+    gen_length(*lbefore) + gen_length(*lafter);
+  pips_assert("right output count after dag optimizations",
+              dag_output_count==recount);
 }
 
 /* return whether all vertices in list are mesures...

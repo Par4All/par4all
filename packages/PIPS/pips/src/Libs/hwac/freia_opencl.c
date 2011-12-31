@@ -745,7 +745,7 @@ list freia_opencl_compile_calls
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld,
                       added_before, added_after);
 
-  string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
+  string fname_fulldag = strdup(cat(module, "_opencl", HELPER, itoa(number)));
 
   list ld =
     dag_split_on_scalars(fulld, dagvtx_other_stuff_p, choose_opencl_vertex,

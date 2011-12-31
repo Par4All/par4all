@@ -349,12 +349,9 @@ text semantic_to_text(
  * FI: what is it supposed to do? Is it allowed to return with
  * equal==0, which leads to an assert failure later above
  * vect_lexicographic_unsafe_compare_generic ().
- *
- * Too many functions share this name. It should be something like
- * semantics_is_inferior_pvarval()
  */
 static int
-is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+semantics_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     /* The constant term is given the highest weight to push constant
        terms at the end of the constraints and to make those easy
@@ -461,7 +458,7 @@ text text_transformer(transformer tran)
       append(" ");
 
       ps = sc_copy(predicate_system(transformer_relation(tran)));
-      sc_lexicographic_sort(ps, is_inferior_pvarval);
+      sc_lexicographic_sort(ps, semantics_is_inferior_pvarval);
 
       ifdebug(7) {
 	pips_debug(7, "sys %p\n", ps);

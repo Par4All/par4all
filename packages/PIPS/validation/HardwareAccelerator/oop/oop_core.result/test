@@ -629,8 +629,8 @@ digraph "dag_cleaned_0" {
   "img0" -> "67 D8";
   "img0" -> "68 E8";
 }
-// graph for dag "oop_core_helper_0_0" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0" {
+// graph for dag "oop_core_spoc_helper_0_0" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_0" {
   // inputs
   "img0" [shape=circle];
 
@@ -647,8 +647,8 @@ digraph "oop_core_helper_0_0" {
   "img0" -> "68 E8";
   "img0" -> "67 D8";
 }
-// graph for dag "oop_core_helper_0_1" of module "oop_core" in dot format
-digraph "oop_core_helper_0_1" {
+// graph for dag "oop_core_spoc_helper_0_1" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_1" {
   // inputs
   "imgtt2" [shape=circle];
 
@@ -665,8 +665,8 @@ digraph "oop_core_helper_0_1" {
   "imgtt2" -> "77 E8";
   "imgtt2" -> "76 D8";
 }
-// graph for dag "oop_core_helper_0_2" of module "oop_core" in dot format
-digraph "oop_core_helper_0_2" {
+// graph for dag "oop_core_spoc_helper_0_2" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_2" {
   // inputs
   "img1_3" [shape=circle];
   "imgtmp" [shape=circle];
@@ -684,8 +684,8 @@ digraph "oop_core_helper_0_2" {
   "img1_3" -> "81 -|";
   "imgtmp" -> "81 -|";
 }
-// graph for dag "oop_core_helper_0_3" of module "oop_core" in dot format
-digraph "oop_core_helper_0_3" {
+// graph for dag "oop_core_spoc_helper_0_3" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_3" {
   // inputs
   "imgtt4" [shape=circle];
 
@@ -702,8 +702,8 @@ digraph "oop_core_helper_0_3" {
   "imgtt4" -> "96 E8";
   "imgtt4" -> "95 D8";
 }
-// graph for dag "oop_core_helper_0_4" of module "oop_core" in dot format
-digraph "oop_core_helper_0_4" {
+// graph for dag "oop_core_spoc_helper_0_4" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_4" {
   // inputs
   "img1_3" [shape=circle];
   "img2_3" [shape=circle];
@@ -721,8 +721,8 @@ digraph "oop_core_helper_0_4" {
   "img2_3" -> "100 -|";
   "img1_3" -> "100 -|";
 }
-// graph for dag "oop_core_helper_0_5" of module "oop_core" in dot format
-digraph "oop_core_helper_0_5" {
+// graph for dag "oop_core_spoc_helper_0_5" of module "oop_core" in dot format
+digraph "oop_core_spoc_helper_0_5" {
   // inputs
   "img1" [shape=circle];
   "img2" [shape=circle];
@@ -756,7 +756,7 @@ digraph "oop_core_helper_0_5" {
 // # SPOC calls: 6
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_0_0(
+freia_status oop_core_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -836,7 +836,7 @@ freia_status oop_core_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_1_0(
+freia_status oop_core_spoc_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -916,7 +916,7 @@ freia_status oop_core_helper_0_1_0(
 }
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_2_0(
+freia_status oop_core_spoc_helper_0_2_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1001,7 +1001,7 @@ freia_status oop_core_helper_0_2_0(
 }
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_3_0(
+freia_status oop_core_spoc_helper_0_3_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -1081,7 +1081,7 @@ freia_status oop_core_helper_0_3_0(
 }
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_4_0(
+freia_status oop_core_spoc_helper_0_4_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1166,7 +1166,7 @@ freia_status oop_core_helper_0_4_0(
 }
 
 // FREIA-SPoC helper function for module oop_core
-freia_status oop_core_helper_0_5_0(
+freia_status oop_core_spoc_helper_0_5_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1300,17 +1300,17 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
+   oop_core_spoc_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);    /*0067*/
 
-   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
+   oop_core_spoc_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);  /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
+   oop_core_spoc_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);           /*0081*/
 
-   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
+   oop_core_spoc_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);    /*0095*/
 
-   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
+   oop_core_spoc_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);             /*0100*/
 
-   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   oop_core_spoc_helper_0_5_0(img3, img1, img2, 15, 255, 1);            /*0104*/
    
    
    // skipped stuff... drawing on img0...
@@ -1400,17 +1400,17 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
+   oop_core_spoc_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);    /*0067*/
 
-   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
+   oop_core_spoc_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);  /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
+   oop_core_spoc_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);           /*0081*/
 
-   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
+   oop_core_spoc_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);    /*0095*/
 
-   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
+   oop_core_spoc_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);             /*0100*/
 
-   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   oop_core_spoc_helper_0_5_0(img3, img1, img2, 15, 255, 1);            /*0104*/
    
    
    // skipped stuff... drawing on img0...
@@ -1691,8 +1691,8 @@ digraph "dag_cleaned_0" {
   "img0" -> "67 D8";
   "img0" -> "68 E8";
 }
-// graph for dag "oop_core_helper_0_0_0" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0_0" {
+// graph for dag "oop_core_terapix_helper_0_0_0" of module "oop_core" in dot format
+digraph "oop_core_terapix_helper_0_0_0" {
   // inputs
   "img0" [shape=circle];
   "imgtt2" [shape=circle];
@@ -1775,7 +1775,7 @@ digraph "oop_core_helper_0_0_0" {
  * - computation: 159
  * - communication: 128
  */
-freia_status oop_core_helper_0_0_0(
+freia_status oop_core_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2384,7 +2384,7 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0067*/
+   oop_core_terapix_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);           /*0067*/
    
    
    
@@ -2466,7 +2466,7 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0067*/
+   oop_core_terapix_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);           /*0067*/
    
    
    
@@ -2748,8 +2748,8 @@ digraph "dag_cleaned_0" {
   "img0" -> "67 D8";
   "img0" -> "68 E8";
 }
-// graph for dag "oop_core_helper_0_0" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0" {
+// graph for dag "oop_core_opencl_helper_0_0" of module "oop_core" in dot format
+digraph "oop_core_opencl_helper_0_0" {
   // inputs
   "img0" [shape=circle];
   "imgtt2" [shape=circle];
@@ -2801,8 +2801,8 @@ digraph "oop_core_helper_0_0" {
   "img0" -> "68 E8";
   "img0" -> "67 D8";
 }
-// graph for dag "oop_core_helper_0_0_1" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0_1" {
+// graph for dag "oop_core_opencl_helper_0_0_1" of module "oop_core" in dot format
+digraph "oop_core_opencl_helper_0_0_1" {
   // inputs
   "img1_4" [shape=circle];
   "img2_4" [shape=circle];
@@ -2834,8 +2834,8 @@ digraph "oop_core_helper_0_0_1" {
   "imgtmp_1" -> "69 -";
   "imtmp_4" -> "69 -";
 }
-// graph for dag "oop_core_helper_0_0_3" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0_3" {
+// graph for dag "oop_core_opencl_helper_0_0_3" of module "oop_core" in dot format
+digraph "oop_core_opencl_helper_0_0_3" {
   // inputs
   "img1" [shape=circle];
   "img2" [shape=circle];
@@ -2862,18 +2862,18 @@ digraph "oop_core_helper_0_0_3" {
 
 // dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+0+0 copies
 
-// hold kernels for oop_core_helper_0_0_1
-static cl_kernel oop_core_helper_0_0_1_kernel[2];
+// hold kernels for oop_core_opencl_helper_0_0_1
+static cl_kernel oop_core_opencl_helper_0_0_1_kernel[2];
 
-// compile kernels for oop_core_helper_0_0_1
-static freia_status oop_core_helper_0_0_1_compile(void)
+// compile kernels for oop_core_opencl_helper_0_0_1
+static freia_status oop_core_opencl_helper_0_0_1_compile(void)
 {
-  // OpenCL source for oop_core_helper_0_0_1
-  const char * oop_core_helper_0_0_1_source =
+  // OpenCL source for oop_core_opencl_helper_0_0_1
+  const char * oop_core_opencl_helper_0_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function oop_core_helper_0_0_1\n"
-    "KERNEL void oop_core_helper_0_0_1(\n"
+    "// opencl function oop_core_opencl_helper_0_0_1\n"
+    "KERNEL void oop_core_opencl_helper_0_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -2926,13 +2926,13 @@ static freia_status oop_core_helper_0_0_1_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(oop_core_helper_0_0_1_source, "oop_core_helper_0_0_1", "-DPIXEL8", &oop_core_helper_0_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(oop_core_helper_0_0_1_source, "oop_core_helper_0_0_1", "-DPIXEL16", &oop_core_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(oop_core_opencl_helper_0_0_1_source, "oop_core_opencl_helper_0_0_1", "-DPIXEL8", &oop_core_opencl_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(oop_core_opencl_helper_0_0_1_source, "oop_core_opencl_helper_0_0_1", "-DPIXEL16", &oop_core_opencl_helper_0_0_1_kernel[1]);
   return err;
 }
 
-// helper function oop_core_helper_0_0_1
-freia_status oop_core_helper_0_0_1(
+// helper function oop_core_opencl_helper_0_0_1
+freia_status oop_core_opencl_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -2947,7 +2947,7 @@ freia_status oop_core_helper_0_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= oop_core_helper_0_0_1_compile();
+    err |= oop_core_opencl_helper_0_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2955,26 +2955,26 @@ freia_status oop_core_helper_0_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = oop_core_helper_0_0_1_kernel[bpp];
+  cl_kernel kernel = oop_core_opencl_helper_0_0_1_kernel[bpp];
 
-  // call kernel oop_core_helper_0_0_1
+  // call kernel oop_core_opencl_helper_0_0_1
   err |= freia_op_call_kernel(kernel, 2, 6, 0, 0, o0, o1, i0, i1, i2, i3, i4, i5);
 
   return err;
 }
 
-// hold kernels for oop_core_helper_0_0_3
-static cl_kernel oop_core_helper_0_0_3_kernel[2];
+// hold kernels for oop_core_opencl_helper_0_0_3
+static cl_kernel oop_core_opencl_helper_0_0_3_kernel[2];
 
-// compile kernels for oop_core_helper_0_0_3
-static freia_status oop_core_helper_0_0_3_compile(void)
+// compile kernels for oop_core_opencl_helper_0_0_3
+static freia_status oop_core_opencl_helper_0_0_3_compile(void)
 {
-  // OpenCL source for oop_core_helper_0_0_3
-  const char * oop_core_helper_0_0_3_source =
+  // OpenCL source for oop_core_opencl_helper_0_0_3
+  const char * oop_core_opencl_helper_0_0_3_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function oop_core_helper_0_0_3\n"
-    "KERNEL void oop_core_helper_0_0_3(\n"
+    "// opencl function oop_core_opencl_helper_0_0_3\n"
+    "KERNEL void oop_core_opencl_helper_0_0_3(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -3007,13 +3007,13 @@ static freia_status oop_core_helper_0_0_3_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(oop_core_helper_0_0_3_source, "oop_core_helper_0_0_3", "-DPIXEL8", &oop_core_helper_0_0_3_kernel[0]);
-  err |= freia_op_compile_kernel(oop_core_helper_0_0_3_source, "oop_core_helper_0_0_3", "-DPIXEL16", &oop_core_helper_0_0_3_kernel[1]);
+  err |= freia_op_compile_kernel(oop_core_opencl_helper_0_0_3_source, "oop_core_opencl_helper_0_0_3", "-DPIXEL8", &oop_core_opencl_helper_0_0_3_kernel[0]);
+  err |= freia_op_compile_kernel(oop_core_opencl_helper_0_0_3_source, "oop_core_opencl_helper_0_0_3", "-DPIXEL16", &oop_core_opencl_helper_0_0_3_kernel[1]);
   return err;
 }
 
-// helper function oop_core_helper_0_0_3
-freia_status oop_core_helper_0_0_3(
+// helper function oop_core_opencl_helper_0_0_3
+freia_status oop_core_opencl_helper_0_0_3(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -3026,7 +3026,7 @@ freia_status oop_core_helper_0_0_3(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= oop_core_helper_0_0_3_compile();
+    err |= oop_core_opencl_helper_0_0_3_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -3034,9 +3034,9 @@ freia_status oop_core_helper_0_0_3(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = oop_core_helper_0_0_3_kernel[bpp];
+  cl_kernel kernel = oop_core_opencl_helper_0_0_3_kernel[bpp];
 
-  // call kernel oop_core_helper_0_0_3
+  // call kernel oop_core_opencl_helper_0_0_3
   err |= freia_op_call_kernel(kernel, 1, 2, 3, 0, o0, i0, i1, c0, c1, c2);
 
   return err;
@@ -3046,8 +3046,8 @@ freia_status oop_core_helper_0_0_3(
 
 // opencl for dag 0
 
-// opencl function oop_core_helper_0_0_1
-KERNEL void oop_core_helper_0_0_1(
+// opencl function oop_core_opencl_helper_0_0_1
+KERNEL void oop_core_opencl_helper_0_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -3100,8 +3100,8 @@ KERNEL void oop_core_helper_0_0_1(
   }
 }
 
-// opencl function oop_core_helper_0_0_3
-KERNEL void oop_core_helper_0_0_3(
+// opencl function oop_core_opencl_helper_0_0_3
+KERNEL void oop_core_opencl_helper_0_0_3(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -3212,14 +3212,14 @@ int oop_core(void)
    freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
    freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
 
-   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
+   oop_core_opencl_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);     /*0097*/
 
    freia_aipo_erode_6c(img1, img1_2, freia_morpho_kernel_6c);           /*0082*/
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
-   oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   oop_core_opencl_helper_0_0_3(img3, img1, img2, 15, 255, 1);          /*0104*/
    
    
    freia_common_destruct_data(imtmp_4);                                 /*0071*/
@@ -3331,14 +3331,14 @@ int oop_core(void)
    freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
    freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
 
-   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
+   oop_core_opencl_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);     /*0097*/
 
    freia_aipo_erode_6c(img1, img1_2, freia_morpho_kernel_6c);           /*0082*/
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
-   oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   oop_core_opencl_helper_0_0_3(img3, img1, img2, 15, 255, 1);          /*0104*/
    
    
    freia_common_destruct_data(imtmp_4);                                 /*0071*/

@@ -33,6 +33,8 @@
 #include "freia_terapix.h"
 #include "freia_opencl.h"
 
+#define HELPER "_helper_"
+
 // do not require NULL at the end of a vararg.
 #define cat(args...) concatenate(args , NULL)
 #define sb_cat(args...) string_buffer_cat(args , NULL)

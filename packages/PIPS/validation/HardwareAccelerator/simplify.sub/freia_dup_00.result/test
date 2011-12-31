@@ -96,8 +96,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 ?=";
   "i" -> "7 max";
 }
-// graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
-digraph "freia_dup_00_helper_0_0" {
+// graph for dag "freia_dup_00_spoc_helper_0_0" of module "freia_dup_00" in dot format
+digraph "freia_dup_00_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -120,7 +120,7 @@ digraph "freia_dup_00_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_00
-freia_status freia_dup_00_helper_0_0_0(
+freia_status freia_dup_00_spoc_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po0)
 {
@@ -174,7 +174,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   freia_dup_00_spoc_helper_0_0_0(i, &max1);                            /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
@@ -185,7 +185,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   freia_dup_00_spoc_helper_0_0_0(i, &max1);                            /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
@@ -231,8 +231,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 ?=";
   "i" -> "7 max";
 }
-// graph for dag "freia_dup_00_helper_0_0_0" of module "freia_dup_00" in dot format
-digraph "freia_dup_00_helper_0_0_0" {
+// graph for dag "freia_dup_00_terapix_helper_0_0_0" of module "freia_dup_00" in dot format
+digraph "freia_dup_00_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -273,7 +273,7 @@ digraph "freia_dup_00_helper_0_0_0" {
  * - computation: 3
  * - communication: 32
  */
-freia_status freia_dup_00_helper_0_0_0(
+freia_status freia_dup_00_terapix_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po1)
 {
@@ -441,7 +441,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   freia_dup_00_terapix_helper_0_0_0(i, &max1);                         /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
@@ -452,7 +452,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   freia_dup_00_terapix_helper_0_0_0(i, &max1);                         /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
@@ -498,8 +498,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 ?=";
   "i" -> "7 max";
 }
-// graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
-digraph "freia_dup_00_helper_0_0" {
+// graph for dag "freia_dup_00_opencl_helper_0_0" of module "freia_dup_00" in dot format
+digraph "freia_dup_00_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

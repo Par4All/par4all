@@ -305,8 +305,8 @@ digraph "dag_cleaned_1" {
   "24 E8" -> "25 >" [label="out"];
   "out" -> "24 E8";
 }
-// graph for dag "freia_66_helper_1_0" of module "freia_66" in dot format
-digraph "freia_66_helper_1_0" {
+// graph for dag "freia_66_spoc_helper_1_0" of module "freia_66" in dot format
+digraph "freia_66_spoc_helper_1_0" {
   // inputs
   "out" [shape=circle];
   "t" [shape=circle];
@@ -345,7 +345,7 @@ digraph "freia_66_helper_1_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_66
-freia_status freia_66_helper_1_0_0(
+freia_status freia_66_spoc_helper_1_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -477,7 +477,7 @@ int freia_66(int32_t *kernel)
    freia_aipo_copy(t, in);
 
    while (n--)                                                          /*0022*/
-      freia_66_helper_1_0_0(out, t, out, t, kernel);                    /*0024*/
+      freia_66_spoc_helper_1_0_0(out, t, out, t, kernel);               /*0024*/
    
    // output
    freia_common_tx_image(out, &fdout);                                  /*0031*/
@@ -515,7 +515,7 @@ int freia_66(int32_t *kernel)
    freia_aipo_copy(t, in);
 
    while (n--)                                                          /*0022*/
-      freia_66_helper_1_0_0(out, t, out, t, kernel);                    /*0024*/
+      freia_66_spoc_helper_1_0_0(out, t, out, t, kernel);               /*0024*/
    
    // output
    freia_common_tx_image(out, &fdout);                                  /*0031*/
@@ -661,8 +661,8 @@ digraph "dag_cleaned_1" {
   "24 E8" -> "25 >" [label="out"];
   "out" -> "24 E8";
 }
-// graph for dag "freia_66_helper_1_0_0" of module "freia_66" in dot format
-digraph "freia_66_helper_1_0_0" {
+// graph for dag "freia_66_terapix_helper_1_0_0" of module "freia_66" in dot format
+digraph "freia_66_terapix_helper_1_0_0" {
   // inputs
   "out" [shape=circle];
   "t" [shape=circle];
@@ -718,7 +718,7 @@ digraph "freia_66_helper_1_0_0" {
  * - computation: 38
  * - communication: 128
  */
-freia_status freia_66_helper_1_0_0(
+freia_status freia_66_terapix_helper_1_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -959,7 +959,7 @@ int freia_66(int32_t *kernel)
    freia_aipo_copy(t, in);
 
    while (n--)                                                          /*0022*/
-      freia_66_helper_1_0_0(out, t, out, t, kernel);                    /*0024*/
+      freia_66_terapix_helper_1_0_0(out, t, out, t, kernel);            /*0024*/
    
    // output
    freia_common_tx_image(out, &fdout);                                  /*0031*/
@@ -997,7 +997,7 @@ int freia_66(int32_t *kernel)
    freia_aipo_copy(t, in);
 
    while (n--)                                                          /*0022*/
-      freia_66_helper_1_0_0(out, t, out, t, kernel);                    /*0024*/
+      freia_66_terapix_helper_1_0_0(out, t, out, t, kernel);            /*0024*/
    
    // output
    freia_common_tx_image(out, &fdout);                                  /*0031*/
@@ -1143,8 +1143,8 @@ digraph "dag_cleaned_1" {
   "24 E8" -> "25 >" [label="out_1"];
   "out" -> "24 E8";
 }
-// graph for dag "freia_66_helper_1_0" of module "freia_66" in dot format
-digraph "freia_66_helper_1_0" {
+// graph for dag "freia_66_opencl_helper_1_0" of module "freia_66" in dot format
+digraph "freia_66_opencl_helper_1_0" {
   // inputs
   "out" [shape=circle];
   "t" [shape=circle];

@@ -21,17 +21,26 @@ void slope04()
 
       abort();
 
-//  T(k) {}
+//  T(k) {x+y==k}
 
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-3, 0) to point(7,3), 10y<=3x+9. It
-      * should be simplified into y<=x, y<=5, and 3*y<=x+2.
+      * should be simplified into y<=x, y<=2, and 3*y<=x+2, using
+      * intermediates integer points (1,1) and (4,2) and extreme points
+      * (0,0) and (5, 2).
       */
    if (-3*x+10*y-9<=0)
 
 //  T(k) {x+y==k}
 
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      /* Extreme points are (0, 1) and (5,3) and only one intermediate
+             point exists, (3,2); hence the slopes 1/3 and 1/2 */
       k = x+y;
 
 //  T() {}
@@ -66,15 +75,24 @@ void slope04()
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-3, 0) to point(7,3), 10y<=3x+9. It
-      * should be simplified into y<=x, y<=5, and 3*y<=x+2.
+      * should be simplified into y<=x, y<=2, and 3*y<=x+2, using
+      * intermediates integer points (1,1) and (4,2) and extreme points
+      * (0,0) and (5, 2).
       */
    if (-3*x+10*y-9<=0)
 
-//  P(k,x,y) {0<=x, x<=5, 10y<=3x+9}
+//  P(k,x,y) {0<=x, x<=5, y<=x, 3y<=x+2, y<=2}
 
       k = x+y;
+   else
 
-//  P(k,x,y) {0<=x, x<=5}
+//  P(k,x,y) {0<=x, x<=5, x+3<=3y, x+1<=2y}
+
+      /* Extreme points are (0, 1) and (5,3) and only one intermediate
+             point exists, (3,2); hence the slopes 1/3 and 1/2 */
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=5}
 
    return;
 }
