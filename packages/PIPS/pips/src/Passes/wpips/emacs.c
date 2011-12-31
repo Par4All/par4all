@@ -25,11 +25,6 @@
     #include "pips_config.h"
 #endif
 
-#ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1998/04/16 14:45:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
-
 /* Here are all the stuff to interface Pips with Emacs. */
 
 /* Ronan.Keryell@cri.ensmp.fr, 23/05/1995. */

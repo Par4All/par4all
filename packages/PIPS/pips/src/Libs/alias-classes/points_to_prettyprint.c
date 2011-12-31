@@ -1,6 +1,6 @@
 /*
 
-  $Id: prettyprint.c 14802 2009-08-12 12:27:53Z mensi $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 

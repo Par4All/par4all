@@ -1,6 +1,6 @@
 /*
 
-  $Id: scalarization.c 14503 2009-07-10 15:11:52Z mensi $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 

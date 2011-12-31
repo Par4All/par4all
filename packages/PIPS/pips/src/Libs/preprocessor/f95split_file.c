@@ -1,6 +1,6 @@
 /*
 
- $Id: $
+ $Id$
 
  Copyright 1989-2010 MINES ParisTech
 

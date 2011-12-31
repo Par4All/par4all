@@ -1,6 +1,6 @@
 /*
 
-  $Id: outlining.c -1   $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
