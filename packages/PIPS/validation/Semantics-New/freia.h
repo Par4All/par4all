@@ -1,4 +1,4 @@
-// $Id: freia.h 4188 2011-08-02 13:54:58Z coelho $
+// $Id$
 // Minimal self contained types for these headers
 
 #ifndef _freia_h_included_

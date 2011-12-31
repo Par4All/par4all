@@ -1,7 +1,7 @@
 /*************
  * Header file for signal_handler.c
  * 1999 E. Rouat
- * $Id: signal_handler.h,v 1.2 2005/05/30 17:21:11 sjborley Exp $
+ * $Id$
  ************/
 
 #ifndef SIGNAL_HANDLER_H_INCLUDED

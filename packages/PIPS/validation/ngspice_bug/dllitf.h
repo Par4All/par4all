@@ -1,7 +1,7 @@
 /* 
    DLL load interface
    (c)2000 Arpad Buermen
-   $Id: dllitf.h,v 1.4 2005/05/22 20:37:06 sjborley Exp $
+   $Id$
 */
 
 #ifndef __DLLITF_H

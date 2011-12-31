@@ -11,7 +11,7 @@ Georgia Tech Research Corporation
 Atlanta, Georgia 30332
 All Rights Reserved
 
-$Id: cm.h,v 1.4 2005/05/22 20:37:06 sjborley Exp $
+$Id$
 
 PROJECT A-8503
 

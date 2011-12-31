@@ -1,6 +1,6 @@
 /*
  * numparam.h 
- * $Id: numparam.h,v 1.13 2009/03/22 21:03:02 h_vogt Exp $
+ * $Id$
  */
 
 /*** interface to spice frontend  subckt.c ***/
