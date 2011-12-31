@@ -21,7 +21,10 @@
 
 # macros related to use of 64 bits arithmetic.
 
+# hardwired integer division assumed.
+
 CPPFLAGS += \
 	-DLINEAR_VALUE_IS_LONGLONG \
 	-DLINEAR_VALUE_PROTECT_MULTIPLY \
-	-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV 
+	-ULINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+
