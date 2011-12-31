@@ -1,4 +1,4 @@
-/* $Id: pnode.h,v 1.2 2005/05/26 19:30:53 sjborley Exp $ */
+/* $Id$ */
 #ifndef _PNODE_H
 #define _PNODE_H
 

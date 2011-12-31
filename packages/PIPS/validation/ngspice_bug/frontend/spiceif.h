@@ -1,7 +1,7 @@
 /*************
  * Header file for spiceif.c
  * 1999 E. Rouat
- * $Id: spiceif.h,v 1.4 2009/01/15 16:46:31 pnenzi Exp $
+ * $Id$
  ************/
 
 #ifndef SPICEIF_H_INCLUDED

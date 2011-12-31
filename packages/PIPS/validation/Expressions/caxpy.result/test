@@ -1,0 +1,81 @@
+      SUBROUTINE CAXPY(N,CA,CX,INCX,CY,INCY)
+*     .. Scalar Arguments ..
+      COMPLEX CA
+      INTEGER INCX,INCY,N
+*     ..
+*     .. Array Arguments ..
+      COMPLEX CX(*),CY(*)
+*     ..
+*
+*  Purpose
+*  =======
+*
+*     CAXPY constant times a vector plus a vector.
+*
+*  Further Details
+*  ===============
+*
+*     jack dongarra, linpack, 3/11/78.
+*     modified 12/3/93, array(1) declarations changed to array(*)
+*
+*     .. Local Scalars ..
+      INTEGER I,IX,IY
+*     ..
+*     .. External Functions ..
+      REAL SCABS1
+      EXTERNAL SCABS1
+*     ..
+      IF (N.LE.0) RETURN                                                0028
+      IF (SCABS1(CA).EQ.0.0E+0) RETURN                                  0029
+      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0030
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+      IX = 1                                                            0035
+      IY = 1                                                            0036
+      IF (INCX.LT.0) IX = (-N+1)*INCX+1                                 0037
+      IF (INCY.LT.0) IY = (-N+1)*INCY+1                                 0038
+      DO 10 I = 1, N                                                    0039
+         CY(IY) = CY(IY)+CA*CX(IX)                                      0040
+         IX = IX+INCX                                                   0041
+         IY = IY+INCY                                                   0042
+10       CONTINUE                                                       0043
+      RETURN
+*
+*        code for both increments equal to 1
+*
+20    DO 30 I = 1, N                                                    0048
+         CY(I) = CY(I)+CA*CX(I)                                         0049
+30       CONTINUE                                                       0050
+      END
+      SUBROUTINE CAXPY(N, CA, CX, INCX, CY, INCY)
+      REAL*4 SCABS1
+      EXTERNAL SCABS1
+      INTEGER N, INCX, INCY, I, IX, IY
+      REAL*8 IM0, CA, CX(1:*), CY(1:*)
+*     ..
+      IF (N.LE.0) RETURN                                                0028
+      IF (SCABS1(CA).EQ.0.0E+0) RETURN                                  0029
+      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0030
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+      IX = 1                                                            0035
+      IY = 1                                                            0036
+      IF (INCX.LT.0) IX = (-N+1)*INCX+1                                 0037
+      IF (INCY.LT.0) IY = (-N+1)*INCY+1                                 0038
+      DO 10 I = 1, N                                                    0039
+         CY(IY) = CY(IY)+IM0*CY(IY)+(CA+IM0*CA)*(CX(IX)+IM0*CX(IX))     0040
+         IX = IX+INCX                                                   0041
+         IY = IY+INCY                                                   0042
+10       CONTINUE                                                       0043
+      RETURN
+*
+*        code for both increments equal to 1
+*
+20    DO 30 I = 1, N                                                    0048
+         CY(I) = CY(I)+IM0*CY(I)+(CA+IM0*CA)*(CX(I)+IM0*CX(I))          0049
+30       CONTINUE                                                       0050
+      END
