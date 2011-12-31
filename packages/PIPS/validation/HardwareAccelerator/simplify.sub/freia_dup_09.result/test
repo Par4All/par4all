@@ -91,8 +91,8 @@ digraph "dag_cleaned_0" {
   "6 min" [shape=diamond];
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_09_helper_0_0" of module "freia_dup_09" in dot format
-digraph "freia_dup_09_helper_0_0" {
+// graph for dag "freia_dup_09_spoc_helper_0_0" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_spoc_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -115,7 +115,7 @@ digraph "freia_dup_09_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_09
-freia_status freia_dup_09_helper_0_0_0(
+freia_status freia_dup_09_spoc_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po0)
 {
@@ -168,7 +168,7 @@ freia_status freia_dup_09_helper_0_0_0(
 void freia_dup_09(freia_data2d *in0, int32_t *x)
 {
    // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_09_spoc_helper_0_0_0(in0, x);                              /*0006*/
 }
 
 ! cleaned up function
@@ -176,7 +176,7 @@ void freia_dup_09(freia_data2d *in0, int32_t *x)
 void freia_dup_09(freia_data2d *in0, int32_t *x)
 {
    // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_09_spoc_helper_0_0_0(in0, x);                              /*0006*/
 }
 #
 # TERAPIX
@@ -219,8 +219,8 @@ digraph "dag_cleaned_0" {
   "6 min" [shape=diamond];
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_09_helper_0_0_0" of module "freia_dup_09" in dot format
-digraph "freia_dup_09_helper_0_0_0" {
+// graph for dag "freia_dup_09_terapix_helper_0_0_0" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_terapix_helper_0_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -261,7 +261,7 @@ digraph "freia_dup_09_helper_0_0_0" {
  * - computation: 3
  * - communication: 32
  */
-freia_status freia_dup_09_helper_0_0_0(
+freia_status freia_dup_09_terapix_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po1)
 {
@@ -428,7 +428,7 @@ freia_status freia_dup_09_helper_0_0_0(
 void freia_dup_09(freia_data2d *in0, int32_t *x)
 {
    // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_09_terapix_helper_0_0_0(in0, x);                           /*0006*/
 }
 
 ! cleaned up function
@@ -436,7 +436,7 @@ void freia_dup_09(freia_data2d *in0, int32_t *x)
 void freia_dup_09(freia_data2d *in0, int32_t *x)
 {
    // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_09_terapix_helper_0_0_0(in0, x);                           /*0006*/
 }
 #
 # OPENCL
@@ -479,8 +479,8 @@ digraph "dag_cleaned_0" {
   "6 min" [shape=diamond];
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_09_helper_0_0" of module "freia_dup_09" in dot format
-digraph "freia_dup_09_helper_0_0" {
+// graph for dag "freia_dup_09_opencl_helper_0_0" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_opencl_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 

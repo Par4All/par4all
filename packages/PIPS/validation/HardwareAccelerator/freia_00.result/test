@@ -118,8 +118,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_00_helper_0_0" of module "freia_00" in dot format
-digraph "freia_00_helper_0_0" {
+// graph for dag "freia_00_spoc_helper_0_0" of module "freia_00" in dot format
+digraph "freia_00_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -149,7 +149,7 @@ digraph "freia_00_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_00
-freia_status freia_00_helper_0_0_0(
+freia_status freia_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -227,7 +227,7 @@ freia_status freia_00_helper_0_0_0(
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_spoc_helper_0_0_0(o, i0, i1);                               /*0007*/
    return FREIA_OK;                                                     /*0010*/
 }
 
@@ -235,7 +235,7 @@ freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_spoc_helper_0_0_0(o, i0, i1);                               /*0007*/
    return 0;                                                            /*0010*/
 }
 #
@@ -291,8 +291,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_00_helper_0_0_0" of module "freia_00" in dot format
-digraph "freia_00_helper_0_0_0" {
+// graph for dag "freia_00_terapix_helper_0_0_0" of module "freia_00" in dot format
+digraph "freia_00_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -340,7 +340,7 @@ digraph "freia_00_helper_0_0_0" {
  * - computation: 8
  * - communication: 96
  */
-freia_status freia_00_helper_0_0_0(
+freia_status freia_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -496,7 +496,7 @@ freia_status freia_00_helper_0_0_0(
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_terapix_helper_0_0_0(o, i0, i1);                            /*0007*/
    return FREIA_OK;                                                     /*0010*/
 }
 
@@ -504,7 +504,7 @@ freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_terapix_helper_0_0_0(o, i0, i1);                            /*0007*/
    return 0;                                                            /*0010*/
 }
 #
@@ -560,8 +560,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_00_helper_0_0" of module "freia_00" in dot format
-digraph "freia_00_helper_0_0" {
+// graph for dag "freia_00_opencl_helper_0_0" of module "freia_00" in dot format
+digraph "freia_00_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -578,8 +578,8 @@ digraph "freia_00_helper_0_0" {
   "i1" -> "7 +";
   "i0" -> "7 +";
 }
-// graph for dag "freia_00_helper_0_0_0" of module "freia_00" in dot format
-digraph "freia_00_helper_0_0_0" {
+// graph for dag "freia_00_opencl_helper_0_0_0" of module "freia_00" in dot format
+digraph "freia_00_opencl_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -607,18 +607,18 @@ digraph "freia_00_helper_0_0_0" {
 
 // dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
-// hold kernels for freia_00_helper_0_0_0
-static cl_kernel freia_00_helper_0_0_0_kernel[2];
+// hold kernels for freia_00_opencl_helper_0_0_0
+static cl_kernel freia_00_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for freia_00_helper_0_0_0
-static freia_status freia_00_helper_0_0_0_compile(void)
+// compile kernels for freia_00_opencl_helper_0_0_0
+static freia_status freia_00_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for freia_00_helper_0_0_0
-  const char * freia_00_helper_0_0_0_source =
+  // OpenCL source for freia_00_opencl_helper_0_0_0
+  const char * freia_00_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_00_helper_0_0_0\n"
-    "KERNEL void freia_00_helper_0_0_0(\n"
+    "// opencl function freia_00_opencl_helper_0_0_0\n"
+    "KERNEL void freia_00_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -648,13 +648,13 @@ static freia_status freia_00_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_00_helper_0_0_0_source, "freia_00_helper_0_0_0", "-DPIXEL8", &freia_00_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_00_helper_0_0_0_source, "freia_00_helper_0_0_0", "-DPIXEL16", &freia_00_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_00_opencl_helper_0_0_0_source, "freia_00_opencl_helper_0_0_0", "-DPIXEL8", &freia_00_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_00_opencl_helper_0_0_0_source, "freia_00_opencl_helper_0_0_0", "-DPIXEL16", &freia_00_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function freia_00_helper_0_0_0
-freia_status freia_00_helper_0_0_0(
+// helper function freia_00_opencl_helper_0_0_0
+freia_status freia_00_opencl_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -664,7 +664,7 @@ freia_status freia_00_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_00_helper_0_0_0_compile();
+    err |= freia_00_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -672,9 +672,9 @@ freia_status freia_00_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_00_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = freia_00_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel freia_00_helper_0_0_0
+  // call kernel freia_00_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1);
 
   return err;
@@ -684,8 +684,8 @@ freia_status freia_00_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function freia_00_helper_0_0_0
-KERNEL void freia_00_helper_0_0_0(
+// opencl function freia_00_opencl_helper_0_0_0
+KERNEL void freia_00_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -719,7 +719,7 @@ KERNEL void freia_00_helper_0_0_0(
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_opencl_helper_0_0_0(o, i0, i1);                             /*0007*/
    return FREIA_OK;                                                     /*0010*/
 }
 
@@ -727,7 +727,7 @@ freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
 freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_00_helper_0_0_0(o, i0, i1);                                    /*0007*/
+   freia_00_opencl_helper_0_0_0(o, i0, i1);                             /*0007*/
    return 0;                                                            /*0010*/
 }
 #

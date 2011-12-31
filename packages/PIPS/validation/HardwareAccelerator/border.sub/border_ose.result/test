@@ -69,8 +69,8 @@ void border_ose(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_ose_helper_0_0" of module "border_ose" in dot format
-digraph "border_ose_helper_0_0" {
+// graph for dag "border_ose_spoc_helper_0_0" of module "border_ose" in dot format
+digraph "border_ose_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -121,7 +121,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module border_ose
-freia_status border_ose_helper_0_0_0(
+freia_status border_ose_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -191,7 +191,7 @@ void border_ose(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 1, 1, 1, 1, 1, 1};                  /*0007*/
-   border_ose_helper_0_0_0(out, in, kernel);                            /*0008*/
+   border_ose_spoc_helper_0_0_0(out, in, kernel);                       /*0008*/
 }
 
 ! cleaned up function
@@ -201,7 +201,7 @@ void border_ose(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 1, 1, 1, 1, 1, 1};                  /*0007*/
-   border_ose_helper_0_0_0(out, in, kernel);                            /*0008*/
+   border_ose_spoc_helper_0_0_0(out, in, kernel);                       /*0008*/
 }
 #
 # TERAPIX
@@ -219,8 +219,8 @@ void border_ose(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_ose_helper_0_0_0" of module "border_ose" in dot format
-digraph "border_ose_helper_0_0_0" {
+// graph for dag "border_ose_terapix_helper_0_0_0" of module "border_ose" in dot format
+digraph "border_ose_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -289,7 +289,7 @@ digraph "dag_cleaned_0" {
  * - computation: 15
  * - communication: 64
  */
-freia_status border_ose_helper_0_0_0(
+freia_status border_ose_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -449,7 +449,7 @@ void border_ose(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 1, 1, 1, 1, 1, 1};                  /*0007*/
-   border_ose_helper_0_0_0(out, in, kernel);                            /*0008*/
+   border_ose_terapix_helper_0_0_0(out, in, kernel);                    /*0008*/
 }
 
 ! cleaned up function
@@ -459,7 +459,7 @@ void border_ose(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 1, 1, 1, 1, 1, 1};                  /*0007*/
-   border_ose_helper_0_0_0(out, in, kernel);                            /*0008*/
+   border_ose_terapix_helper_0_0_0(out, in, kernel);                    /*0008*/
 }
 #
 # OPENCL
@@ -477,8 +477,8 @@ void border_ose(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_ose_helper_0_0" of module "border_ose" in dot format
-digraph "border_ose_helper_0_0" {
+// graph for dag "border_ose_opencl_helper_0_0" of module "border_ose" in dot format
+digraph "border_ose_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 

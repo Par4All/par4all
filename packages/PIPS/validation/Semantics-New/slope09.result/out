@@ -1,0 +1,80 @@
+
+Transformers for slope09
+
+
+//  T() {}
+
+void slope09()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=y, y<=9}
+
+   if (!(0<=y&&y<=9))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (61*y<=55*x+54)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope09
+
+
+//  P() {}
+
+void slope09()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   if (!(0<=y&&y<=9))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=y, y<=9}
+
+
+   if (61*y<=55*x+54)
+
+//  P(k,x,y) {y<=x, 0<=y, y<=9}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {x+1<=y, 0<=y, y<=9}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, x<=k, k<=x+9}
+
+
+   return;
+}

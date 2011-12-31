@@ -842,8 +842,8 @@ digraph "dag_cleaned_3" {
   "imbg16'" -> "imbg =";
   "imbg =" -> "imbg'";
 }
-// graph for dag "vs_core_loop_helper_0_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_0_0" {
+// graph for dag "vs_core_loop_spoc_helper_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -853,8 +853,8 @@ digraph "vs_core_loop_helper_0_0" {
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
 }
-// graph for dag "vs_core_loop_helper_3_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_0" {
+// graph for dag "vs_core_loop_spoc_helper_3_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_spoc_helper_3_0" {
   // inputs
   "imbg" [shape=circle];
   "imstab" [shape=circle];
@@ -876,8 +876,8 @@ digraph "vs_core_loop_helper_3_0" {
   "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
-// graph for dag "vs_core_loop_helper_3_1" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_1" {
+// graph for dag "vs_core_loop_spoc_helper_3_1" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_spoc_helper_3_1" {
   // inputs
   "imbg16" [shape=circle];
   "imtmp3" [shape=circle];
@@ -895,8 +895,8 @@ digraph "vs_core_loop_helper_3_1" {
   "92 *_" -> "93 +" [label="imbg16_2"];
   "imbg16" -> "92 *_";
 }
-// graph for dag "vs_core_loop_helper_3_2" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_2" {
+// graph for dag "vs_core_loop_spoc_helper_3_2" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_spoc_helper_3_2" {
   // inputs
   "immotion_6" [shape=circle];
 
@@ -923,8 +923,8 @@ digraph "vs_core_loop_helper_3_2" {
   "105 thr" -> "106 E8" [label="immotion_5"];
   "immotion_6" -> "105 thr";
 }
-// graph for dag "vs_core_loop_helper_3_3" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_3" {
+// graph for dag "vs_core_loop_spoc_helper_3_3" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_spoc_helper_3_3" {
   // inputs
   "immotion_1" [shape=circle];
   "imstab" [shape=circle];
@@ -951,7 +951,7 @@ digraph "vs_core_loop_helper_3_3" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_0_0_0(
+freia_status vs_core_loop_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -1023,7 +1023,7 @@ freia_status vs_core_loop_helper_0_0_0(
 // # SPOC calls: 4
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_0_0(
+freia_status vs_core_loop_spoc_helper_3_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -1138,7 +1138,7 @@ freia_status vs_core_loop_helper_3_0_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_1_0(
+freia_status vs_core_loop_spoc_helper_3_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1223,7 +1223,7 @@ freia_status vs_core_loop_helper_3_1_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_2_0(
+freia_status vs_core_loop_spoc_helper_3_2_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -1357,7 +1357,7 @@ freia_status vs_core_loop_helper_3_2_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_3_0(
+freia_status vs_core_loop_spoc_helper_3_3_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -1461,7 +1461,7 @@ int vs_core_loop(void)
    xshiftacc = 0;                                                       /*0059*/
    yshiftacc = 0;                                                       /*0060*/
 
-   vs_core_loop_helper_0_0_0(imbg16, 0);                                /*0054*/
+   vs_core_loop_spoc_helper_0_0_0(imbg16, 0);                           /*0054*/
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
@@ -1488,23 +1488,23 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);           /*0087*/
+   vs_core_loop_spoc_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);      /*0087*/
    
    // measures
    
    // background update
-   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
+   vs_core_loop_spoc_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);     /*0092*/
 
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);  /*0105*/
+   vs_core_loop_spoc_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);            /*0105*/
    
    
    // save contrast motion detection
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
+   vs_core_loop_spoc_helper_3_3_0(immotion, immotion, imstab);
    
    
    // output image
@@ -1572,7 +1572,7 @@ int vs_core_loop(void)
    xshiftacc = 0;                                                       /*0059*/
    yshiftacc = 0;                                                       /*0060*/
 
-   vs_core_loop_helper_0_0_0(imbg16, 0);                                /*0054*/
+   vs_core_loop_spoc_helper_0_0_0(imbg16, 0);                           /*0054*/
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
@@ -1600,23 +1600,23 @@ l99998:   ;
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);           /*0087*/
+   vs_core_loop_spoc_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);      /*0087*/
    
    // measures
    
    // background update
-   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
+   vs_core_loop_spoc_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);     /*0092*/
 
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);  /*0105*/
+   vs_core_loop_spoc_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);            /*0105*/
    
    
    // save contrast motion detection
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
+   vs_core_loop_spoc_helper_3_3_0(immotion, immotion, imstab);
    
    
    // output image
@@ -1998,8 +1998,8 @@ digraph "dag_cleaned_3" {
   "imbg16'" -> "imbg =";
   "imbg =" -> "imbg'";
 }
-// graph for dag "vs_core_loop_helper_0_0_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_0_0_0" {
+// graph for dag "vs_core_loop_terapix_helper_0_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -2009,8 +2009,8 @@ digraph "vs_core_loop_helper_0_0_0" {
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
 }
-// graph for dag "vs_core_loop_helper_3_0_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_0_0" {
+// graph for dag "vs_core_loop_terapix_helper_3_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_terapix_helper_3_0_0" {
   // inputs
   "imbg" [shape=circle];
   "imbg16" [shape=circle];
@@ -2040,8 +2040,8 @@ digraph "vs_core_loop_helper_3_0_0" {
   "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
-// graph for dag "vs_core_loop_helper_3_1_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_1_0" {
+// graph for dag "vs_core_loop_terapix_helper_3_1_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_terapix_helper_3_1_0" {
   // inputs
   "immotion_6" [shape=circle];
   "imstab" [shape=circle];
@@ -2103,7 +2103,7 @@ digraph "vs_core_loop_helper_3_1_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status vs_core_loop_helper_0_0_0(
+freia_status vs_core_loop_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -2249,7 +2249,7 @@ freia_status vs_core_loop_helper_0_0_0(
  * - computation: 23
  * - communication: 160
  */
-freia_status vs_core_loop_helper_3_0_0(
+freia_status vs_core_loop_terapix_helper_3_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -2690,7 +2690,7 @@ freia_status vs_core_loop_helper_3_0_0(
  * - computation: 79
  * - communication: 96
  */
-freia_status vs_core_loop_helper_3_1_0(
+freia_status vs_core_loop_terapix_helper_3_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -3099,7 +3099,7 @@ int vs_core_loop(void)
    xshiftacc = 0;                                                       /*0059*/
    yshiftacc = 0;                                                       /*0060*/
 
-   vs_core_loop_helper_0_0_0(imbg16, 0);                                /*0054*/
+   vs_core_loop_terapix_helper_0_0_0(imbg16, 0);                        /*0054*/
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
@@ -3126,7 +3126,7 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);           /*0087*/
+   vs_core_loop_terapix_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);   /*0087*/
    
    // measures
    
@@ -3136,7 +3136,7 @@ l99979:   ;                                                                    /
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);           /*0105*/
+   vs_core_loop_terapix_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);   /*0105*/
    
    
    // save contrast motion detection
@@ -3201,7 +3201,7 @@ int vs_core_loop(void)
    xshiftacc = 0;                                                       /*0059*/
    yshiftacc = 0;                                                       /*0060*/
 
-   vs_core_loop_helper_0_0_0(imbg16, 0);                                /*0054*/
+   vs_core_loop_terapix_helper_0_0_0(imbg16, 0);                        /*0054*/
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
@@ -3229,7 +3229,7 @@ l99998:   ;
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);           /*0087*/
+   vs_core_loop_terapix_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);   /*0087*/
    
    // measures
    
@@ -3239,7 +3239,7 @@ l99998:   ;
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);           /*0105*/
+   vs_core_loop_terapix_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);   /*0105*/
    
    
    // save contrast motion detection
@@ -3623,8 +3623,8 @@ digraph "dag_cleaned_3" {
   "imbg16'" -> "imbg =";
   "imbg =" -> "imbg'";
 }
-// graph for dag "vs_core_loop_helper_0_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_0_0" {
+// graph for dag "vs_core_loop_opencl_helper_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_opencl_helper_0_0" {
   // inputs
 
   // outputs
@@ -3634,8 +3634,8 @@ digraph "vs_core_loop_helper_0_0" {
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
 }
-// graph for dag "vs_core_loop_helper_3_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_0" {
+// graph for dag "vs_core_loop_opencl_helper_3_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_opencl_helper_3_0" {
   // inputs
   "imbg" [shape=circle];
   "imbg16" [shape=circle];
@@ -3665,8 +3665,8 @@ digraph "vs_core_loop_helper_3_0" {
   "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
-// graph for dag "vs_core_loop_helper_3_0_0" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_0_0" {
+// graph for dag "vs_core_loop_opencl_helper_3_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_opencl_helper_3_0_0" {
   // inputs
   "imbg" [shape=circle];
   "imbg16" [shape=circle];
@@ -3696,8 +3696,8 @@ digraph "vs_core_loop_helper_3_0_0" {
   "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
-// graph for dag "vs_core_loop_helper_3_1" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_1" {
+// graph for dag "vs_core_loop_opencl_helper_3_1" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_opencl_helper_3_1" {
   // inputs
   "immotion_6" [shape=circle];
   "imstab" [shape=circle];
@@ -3728,8 +3728,8 @@ digraph "vs_core_loop_helper_3_1" {
   "105 thr" -> "106 E8" [label="immotion_5"];
   "immotion_6" -> "105 thr";
 }
-// graph for dag "vs_core_loop_helper_3_1_2" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_1_2" {
+// graph for dag "vs_core_loop_opencl_helper_3_1_2" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_opencl_helper_3_1_2" {
   // inputs
   "immotion_4" [shape=circle];
   "imstab" [shape=circle];
@@ -3768,18 +3768,18 @@ digraph "vs_core_loop_helper_3_1_2" {
 
 // dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+0+1 copies
 
-// hold kernels for vs_core_loop_helper_3_0_0
-static cl_kernel vs_core_loop_helper_3_0_0_kernel[2];
+// hold kernels for vs_core_loop_opencl_helper_3_0_0
+static cl_kernel vs_core_loop_opencl_helper_3_0_0_kernel[2];
 
-// compile kernels for vs_core_loop_helper_3_0_0
-static freia_status vs_core_loop_helper_3_0_0_compile(void)
+// compile kernels for vs_core_loop_opencl_helper_3_0_0
+static freia_status vs_core_loop_opencl_helper_3_0_0_compile(void)
 {
-  // OpenCL source for vs_core_loop_helper_3_0_0
-  const char * vs_core_loop_helper_3_0_0_source =
+  // OpenCL source for vs_core_loop_opencl_helper_3_0_0
+  const char * vs_core_loop_opencl_helper_3_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function vs_core_loop_helper_3_0_0\n"
-    "KERNEL void vs_core_loop_helper_3_0_0(\n"
+    "// opencl function vs_core_loop_opencl_helper_3_0_0\n"
+    "KERNEL void vs_core_loop_opencl_helper_3_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -3836,13 +3836,13 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "  redX[idy].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_0_0_source, "vs_core_loop_helper_3_0_0", "-DPIXEL8", &vs_core_loop_helper_3_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_0_0_source, "vs_core_loop_helper_3_0_0", "-DPIXEL16", &vs_core_loop_helper_3_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(vs_core_loop_opencl_helper_3_0_0_source, "vs_core_loop_opencl_helper_3_0_0", "-DPIXEL8", &vs_core_loop_opencl_helper_3_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(vs_core_loop_opencl_helper_3_0_0_source, "vs_core_loop_opencl_helper_3_0_0", "-DPIXEL16", &vs_core_loop_opencl_helper_3_0_0_kernel[1]);
   return err;
 }
 
-// helper function vs_core_loop_helper_3_0_0
-freia_status vs_core_loop_helper_3_0_0(
+// helper function vs_core_loop_opencl_helper_3_0_0
+freia_status vs_core_loop_opencl_helper_3_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -3859,7 +3859,7 @@ freia_status vs_core_loop_helper_3_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= vs_core_loop_helper_3_0_0_compile();
+    err |= vs_core_loop_opencl_helper_3_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -3867,12 +3867,12 @@ freia_status vs_core_loop_helper_3_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = vs_core_loop_helper_3_0_0_kernel[bpp];
+  cl_kernel kernel = vs_core_loop_opencl_helper_3_0_0_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel vs_core_loop_helper_3_0_0
+  // call kernel vs_core_loop_opencl_helper_3_0_0
   err |= freia_op_call_kernel(kernel, 2, 3, 3, 1, o0, o1, i0, i1, i2, c0, c1, c2, &redres);
 
   // return reduction results
@@ -3882,18 +3882,18 @@ freia_status vs_core_loop_helper_3_0_0(
   return err;
 }
 
-// hold kernels for vs_core_loop_helper_3_1_2
-static cl_kernel vs_core_loop_helper_3_1_2_kernel[2];
+// hold kernels for vs_core_loop_opencl_helper_3_1_2
+static cl_kernel vs_core_loop_opencl_helper_3_1_2_kernel[2];
 
-// compile kernels for vs_core_loop_helper_3_1_2
-static freia_status vs_core_loop_helper_3_1_2_compile(void)
+// compile kernels for vs_core_loop_opencl_helper_3_1_2
+static freia_status vs_core_loop_opencl_helper_3_1_2_compile(void)
 {
-  // OpenCL source for vs_core_loop_helper_3_1_2
-  const char * vs_core_loop_helper_3_1_2_source =
+  // OpenCL source for vs_core_loop_opencl_helper_3_1_2
+  const char * vs_core_loop_opencl_helper_3_1_2_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function vs_core_loop_helper_3_1_2\n"
-    "KERNEL void vs_core_loop_helper_3_1_2(\n"
+    "// opencl function vs_core_loop_opencl_helper_3_1_2\n"
+    "KERNEL void vs_core_loop_opencl_helper_3_1_2(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -3931,13 +3931,13 @@ static freia_status vs_core_loop_helper_3_1_2_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_2_source, "vs_core_loop_helper_3_1_2", "-DPIXEL8", &vs_core_loop_helper_3_1_2_kernel[0]);
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_2_source, "vs_core_loop_helper_3_1_2", "-DPIXEL16", &vs_core_loop_helper_3_1_2_kernel[1]);
+  err |= freia_op_compile_kernel(vs_core_loop_opencl_helper_3_1_2_source, "vs_core_loop_opencl_helper_3_1_2", "-DPIXEL8", &vs_core_loop_opencl_helper_3_1_2_kernel[0]);
+  err |= freia_op_compile_kernel(vs_core_loop_opencl_helper_3_1_2_source, "vs_core_loop_opencl_helper_3_1_2", "-DPIXEL16", &vs_core_loop_opencl_helper_3_1_2_kernel[1]);
   return err;
 }
 
-// helper function vs_core_loop_helper_3_1_2
-freia_status vs_core_loop_helper_3_1_2(
+// helper function vs_core_loop_opencl_helper_3_1_2
+freia_status vs_core_loop_opencl_helper_3_1_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -3950,7 +3950,7 @@ freia_status vs_core_loop_helper_3_1_2(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= vs_core_loop_helper_3_1_2_compile();
+    err |= vs_core_loop_opencl_helper_3_1_2_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -3958,9 +3958,9 @@ freia_status vs_core_loop_helper_3_1_2(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = vs_core_loop_helper_3_1_2_kernel[bpp];
+  cl_kernel kernel = vs_core_loop_opencl_helper_3_1_2_kernel[bpp];
 
-  // call kernel vs_core_loop_helper_3_1_2
+  // call kernel vs_core_loop_opencl_helper_3_1_2
   err |= freia_op_call_kernel(kernel, 1, 3, 2, 0, o0, i0, i1, i2, c0, c1);
 
   return err;
@@ -3976,8 +3976,8 @@ freia_status vs_core_loop_helper_3_1_2(
 
 // opencl for dag 3
 
-// opencl function vs_core_loop_helper_3_0_0
-KERNEL void vs_core_loop_helper_3_0_0(
+// opencl function vs_core_loop_opencl_helper_3_0_0
+KERNEL void vs_core_loop_opencl_helper_3_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -4034,8 +4034,8 @@ KERNEL void vs_core_loop_helper_3_0_0(
   redX[idy].min = mmin.x;
 }
 
-// opencl function vs_core_loop_helper_3_1_2
-KERNEL void vs_core_loop_helper_3_1_2(
+// opencl function vs_core_loop_opencl_helper_3_1_2
+KERNEL void vs_core_loop_opencl_helper_3_1_2(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -4141,7 +4141,7 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
+   vs_core_loop_opencl_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);    /*0087*/
    
    // measures
    
@@ -4157,7 +4157,7 @@ l99979:   ;                                                                    /
 
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);       /*0112*/
-   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_opencl_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);         /*0113*/
    
    // save contrast motion detection
    freia_aipo_copy(imbg, imbg16);
@@ -4255,7 +4255,7 @@ l99998:   ;
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
+   vs_core_loop_opencl_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);    /*0087*/
    
    // measures
    
@@ -4271,7 +4271,7 @@ l99998:   ;
 
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);       /*0112*/
-   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_opencl_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);         /*0113*/
    
    // save contrast motion detection
    freia_aipo_copy(imbg, imbg16);

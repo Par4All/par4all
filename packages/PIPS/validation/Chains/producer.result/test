@@ -1,0 +1,7 @@
+
+ *********************** Use-Def Chains *********************
+
+	24 --> 25 with conflicts
+		from <array1[0].re-W-EXACT> to <array1[0].re-R-EXACT>
+
+****************** End of Dependence Graph ******************

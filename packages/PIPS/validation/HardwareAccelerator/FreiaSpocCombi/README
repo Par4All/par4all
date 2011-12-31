@@ -8,4 +8,7 @@ To run this validation:
   # generate 1005 files
   sh> make validate-test
   # there should be no coredumps, i.e. no remaining databases
+  # all SPoC should require one accelerated function only
+  # but a few with 3 outputs
+  # idem Terapix
   sh> make full-clean   

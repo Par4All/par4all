@@ -149,8 +149,8 @@ digraph "dag_cleaned_0" {
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
-// graph for dag "my_convolution_35_helper_0_0_0" of module "my_convolution_35" in dot format
-digraph "my_convolution_35_helper_0_0_0" {
+// graph for dag "my_convolution_35_terapix_helper_0_0_0" of module "my_convolution_35" in dot format
+digraph "my_convolution_35_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -193,7 +193,7 @@ digraph "my_convolution_35_helper_0_0_0" {
  * - computation: 53
  * - communication: 64
  */
-freia_status my_convolution_35_helper_0_0_0(
+freia_status my_convolution_35_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t * pi2,
@@ -352,14 +352,14 @@ freia_status my_convolution_35_helper_0_0_0(
 
 freia_status my_convolution_35(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_35_helper_0_0_0(o, i, k, 3, 5);                /*0004*/
+   return my_convolution_35_terapix_helper_0_0_0(o, i, k, 3, 5);        /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_convolution_35(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   return my_convolution_35_helper_0_0_0(o, i, k, 3, 5);                /*0004*/
+   return my_convolution_35_terapix_helper_0_0_0(o, i, k, 3, 5);        /*0004*/
 }
 #
 # OPENCL
@@ -400,8 +400,8 @@ digraph "dag_cleaned_0" {
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
-// graph for dag "my_convolution_35_helper_0_0" of module "my_convolution_35" in dot format
-digraph "my_convolution_35_helper_0_0" {
+// graph for dag "my_convolution_35_opencl_helper_0_0" of module "my_convolution_35" in dot format
+digraph "my_convolution_35_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

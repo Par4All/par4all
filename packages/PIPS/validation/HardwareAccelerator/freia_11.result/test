@@ -99,8 +99,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 -";
   "i" -> "8 -";
 }
-// graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
-digraph "freia_11_helper_0_0" {
+// graph for dag "freia_11_spoc_helper_0_0" of module "freia_11" in dot format
+digraph "freia_11_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -126,7 +126,7 @@ digraph "freia_11_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_11
-freia_status freia_11_helper_0_0_0(
+freia_status freia_11_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0)
 {
@@ -193,7 +193,7 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   freia_11_spoc_helper_0_0_0(o, i);                                    /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }
 
@@ -203,7 +203,7 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   freia_11_spoc_helper_0_0_0(o, i);                                    /*0008*/
    return 0;                                                            /*0009*/
 }
 #
@@ -250,8 +250,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 -";
   "i" -> "8 -";
 }
-// graph for dag "freia_11_helper_0_0_0" of module "freia_11" in dot format
-digraph "freia_11_helper_0_0_0" {
+// graph for dag "freia_11_terapix_helper_0_0_0" of module "freia_11" in dot format
+digraph "freia_11_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -295,7 +295,7 @@ digraph "freia_11_helper_0_0_0" {
  * - computation: 4
  * - communication: 64
  */
-freia_status freia_11_helper_0_0_0(
+freia_status freia_11_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0)
 {
@@ -420,7 +420,7 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   freia_11_terapix_helper_0_0_0(o, i);                                 /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }
 
@@ -430,7 +430,7 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
    // o = i - i
-   freia_11_helper_0_0_0(o, i);                                         /*0008*/
+   freia_11_terapix_helper_0_0_0(o, i);                                 /*0008*/
    return 0;                                                            /*0009*/
 }
 #
@@ -477,8 +477,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 -";
   "i" -> "8 -";
 }
-// graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
-digraph "freia_11_helper_0_0" {
+// graph for dag "freia_11_opencl_helper_0_0" of module "freia_11" in dot format
+digraph "freia_11_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

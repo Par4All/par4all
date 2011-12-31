@@ -1584,8 +1584,8 @@ digraph "dag_cleaned_0" {
   "in" -> "64 E8";
   "in" -> "244 &";
 }
-// graph for dag "license_plate_copies_helper_0_0" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0" {
+// graph for dag "license_plate_copies_spoc_helper_0_0" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -1732,8 +1732,8 @@ digraph "license_plate_copies_helper_0_0" {
   "in" -> "136 D8";
   "in" -> "64 E8";
 }
-// graph for dag "license_plate_copies_helper_0_1" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_1" {
+// graph for dag "license_plate_copies_spoc_helper_0_1" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_spoc_helper_0_1" {
   // inputs
   "in" [shape=circle];
   "out_1" [shape=circle];
@@ -1761,7 +1761,7 @@ digraph "license_plate_copies_helper_0_1" {
 // # SPOC calls: 3
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_0(
+freia_status license_plate_copies_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
@@ -2427,7 +2427,7 @@ freia_status license_plate_copies_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_1(
+freia_status license_plate_copies_spoc_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
@@ -2711,7 +2711,7 @@ freia_status license_plate_copies_helper_0_0_1(
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_1_0(
+freia_status license_plate_copies_spoc_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -2874,14 +2874,14 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);        /*0064*/
+   license_plate_copies_spoc_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);   /*0064*/
    
    
    
    
    
    
-   license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0187*/
+   license_plate_copies_spoc_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);                /*0187*/
    
    
    
@@ -2901,7 +2901,7 @@ int license_plate_copies(void)
 
    _return3 = ret_3;                                                    /*0235*/
 
-   license_plate_copies_helper_0_1_0(out, in, out);                     /*0244*/
+   license_plate_copies_spoc_helper_0_1_0(out, in, out);                /*0244*/
    
    
    
@@ -2973,14 +2973,14 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);        /*0064*/
+   license_plate_copies_spoc_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);   /*0064*/
    
    
    
    
    
    
-   license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0187*/
+   license_plate_copies_spoc_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);                /*0187*/
    
    
    
@@ -3000,7 +3000,7 @@ int license_plate_copies(void)
 
    _return3 = ret_3;                                                    /*0235*/
 
-   license_plate_copies_helper_0_1_0(out, in, out);                     /*0244*/
+   license_plate_copies_spoc_helper_0_1_0(out, in, out);                /*0244*/
    
    
    
@@ -3718,8 +3718,8 @@ digraph "dag_cleaned_0" {
   "in" -> "64 E8";
   "in" -> "244 &";
 }
-// graph for dag "license_plate_copies_helper_0_0_0" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_0" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_0" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -3735,8 +3735,8 @@ digraph "license_plate_copies_helper_0_0_0" {
   "in" -> "136 D8";
   "in" -> "64 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_1" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_1" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_1" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_1" {
   // inputs
   "imclose_15" [shape=circle];
   "imopen_29" [shape=circle];
@@ -3757,8 +3757,8 @@ digraph "license_plate_copies_helper_0_0_1" {
   "66 E8" -> "68 E8" [label="imopen_28"];
   "imopen_29" -> "66 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_10" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_10" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_10" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_10" {
   // inputs
   "imopen_11" [shape=circle];
 
@@ -3772,8 +3772,8 @@ digraph "license_plate_copies_helper_0_0_10" {
   "104 D8" -> "106 D8" [label="imopen_10"];
   "imopen_11" -> "104 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_11" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_11" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_11" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_11" {
   // inputs
   "imopen_9" [shape=circle];
 
@@ -3787,8 +3787,8 @@ digraph "license_plate_copies_helper_0_0_11" {
   "108 D8" -> "110 D8" [label="imopen_8"];
   "imopen_9" -> "108 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_12" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_12" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_12" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_12" {
   // inputs
   "imopen_7" [shape=circle];
 
@@ -3802,8 +3802,8 @@ digraph "license_plate_copies_helper_0_0_12" {
   "112 D8" -> "114 D8" [label="imopen_6"];
   "imopen_7" -> "112 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_13" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_13" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_13" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_13" {
   // inputs
   "imopen_5" [shape=circle];
 
@@ -3817,8 +3817,8 @@ digraph "license_plate_copies_helper_0_0_13" {
   "116 D8" -> "118 D8" [label="imopen_4"];
   "imopen_5" -> "116 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_14" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_14" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_14" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_14" {
   // inputs
   "imopen_3" [shape=circle];
 
@@ -3832,8 +3832,8 @@ digraph "license_plate_copies_helper_0_0_14" {
   "120 D8" -> "122 D8" [label="imopen_2"];
   "imopen_3" -> "120 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_15" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_15" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_15" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_15" {
   // inputs
   "imcloseth" [shape=circle];
   "imopen_1" [shape=circle];
@@ -3855,8 +3855,8 @@ digraph "license_plate_copies_helper_0_0_15" {
   "124 D8" -> "176 thr" [label="imopen"];
   "imopen_1" -> "124 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_16" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_16" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_16" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_16" {
   // inputs
   "imfilt_6" [shape=circle];
 
@@ -3868,8 +3868,8 @@ digraph "license_plate_copies_helper_0_0_16" {
   "189 E8" -> "imfilt_5";
   "imfilt_6" -> "189 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_17" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_17" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_17" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_17" {
   // inputs
   "imfilt_5" [shape=circle];
 
@@ -3881,8 +3881,8 @@ digraph "license_plate_copies_helper_0_0_17" {
   "191 E8" -> "imfilt_4";
   "imfilt_5" -> "191 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_18" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_18" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_18" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_18" {
   // inputs
   "imfilt_4" [shape=circle];
 
@@ -3894,8 +3894,8 @@ digraph "license_plate_copies_helper_0_0_18" {
   "195 D8" -> "imfilt_3";
   "imfilt_4" -> "195 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_19" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_19" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_19" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_19" {
   // inputs
   "imfilt_3" [shape=circle];
 
@@ -3907,8 +3907,8 @@ digraph "license_plate_copies_helper_0_0_19" {
   "197 D8" -> "imfilt_2";
   "imfilt_3" -> "197 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_2" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_2" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_2" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_2" {
   // inputs
   "imclose_13" [shape=circle];
   "imopen_27" [shape=circle];
@@ -3929,8 +3929,8 @@ digraph "license_plate_copies_helper_0_0_2" {
   "70 E8" -> "72 E8" [label="imopen_26"];
   "imopen_27" -> "70 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_20" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_20" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_20" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_20" {
   // inputs
   "imfilt_2" [shape=circle];
 
@@ -3942,8 +3942,8 @@ digraph "license_plate_copies_helper_0_0_20" {
   "199 D8" -> "imfilt_1";
   "imfilt_2" -> "199 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_21" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_21" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_21" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_21" {
   // inputs
   "imfilt_1" [shape=circle];
 
@@ -3957,8 +3957,8 @@ digraph "license_plate_copies_helper_0_0_21" {
   "201 D8" -> "213 E8" [label="imfilt"];
   "imfilt_1" -> "201 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_22" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_22" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_22" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_22" {
   // inputs
   "imout_7" [shape=circle];
 
@@ -3972,8 +3972,8 @@ digraph "license_plate_copies_helper_0_0_22" {
   "215 E8" -> "217 E8" [label="imout_6"];
   "imout_7" -> "215 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_23" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_23" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_23" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_23" {
   // inputs
   "imout_5" [shape=circle];
 
@@ -3987,8 +3987,8 @@ digraph "license_plate_copies_helper_0_0_23" {
   "219 E8" -> "223 D8" [label="imout_4"];
   "imout_5" -> "219 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_24" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_24" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_24" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_24" {
   // inputs
   "imout_3" [shape=circle];
 
@@ -4002,8 +4002,8 @@ digraph "license_plate_copies_helper_0_0_24" {
   "225 D8" -> "227 D8" [label="imout_2"];
   "imout_3" -> "225 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_25" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_25" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_25" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_25" {
   // inputs
   "imout_1" [shape=circle];
 
@@ -4017,8 +4017,8 @@ digraph "license_plate_copies_helper_0_0_25" {
   "229 D8" -> "237 D8" [label="imout"];
   "imout_1" -> "229 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_26" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_26" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_26" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_26" {
   // inputs
   "in" [shape=circle];
   "out_3" [shape=circle];
@@ -4036,8 +4036,8 @@ digraph "license_plate_copies_helper_0_0_26" {
   "238 D8" -> "239 D8" [label="out_2"];
   "in" -> "244 &";
 }
-// graph for dag "license_plate_copies_helper_0_0_3" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_3" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_3" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_3" {
   // inputs
   "imclose_11" [shape=circle];
   "imopen_25" [shape=circle];
@@ -4058,8 +4058,8 @@ digraph "license_plate_copies_helper_0_0_3" {
   "74 E8" -> "76 E8" [label="imopen_24"];
   "imopen_25" -> "74 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_4" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_4" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_4" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_4" {
   // inputs
   "imclose_9" [shape=circle];
   "imopen_23" [shape=circle];
@@ -4080,8 +4080,8 @@ digraph "license_plate_copies_helper_0_0_4" {
   "78 E8" -> "80 E8" [label="imopen_22"];
   "imopen_23" -> "78 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_5" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_5" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_5" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_5" {
   // inputs
   "imclose_7" [shape=circle];
   "imopen_21" [shape=circle];
@@ -4102,8 +4102,8 @@ digraph "license_plate_copies_helper_0_0_5" {
   "82 E8" -> "84 E8" [label="imopen_20"];
   "imopen_21" -> "82 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_6" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_6" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_6" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_6" {
   // inputs
   "imclose_5" [shape=circle];
   "imopen_19" [shape=circle];
@@ -4124,8 +4124,8 @@ digraph "license_plate_copies_helper_0_0_6" {
   "86 E8" -> "88 E8" [label="imopen_18"];
   "imopen_19" -> "86 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_7" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_7" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_7" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_7" {
   // inputs
   "imclose_3" [shape=circle];
   "imopen_17" [shape=circle];
@@ -4146,8 +4146,8 @@ digraph "license_plate_copies_helper_0_0_7" {
   "90 E8" -> "92 E8" [label="imopen_16"];
   "imopen_17" -> "90 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_8" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_8" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_8" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_8" {
   // inputs
   "imclose_1" [shape=circle];
   "imopen_15" [shape=circle];
@@ -4168,8 +4168,8 @@ digraph "license_plate_copies_helper_0_0_8" {
   "96 D8" -> "98 D8" [label="imopen_14"];
   "imopen_15" -> "96 D8";
 }
-// graph for dag "license_plate_copies_helper_0_0_9" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_9" {
+// graph for dag "license_plate_copies_terapix_helper_0_0_9" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_terapix_helper_0_0_9" {
   // inputs
   "imopen_13" [shape=circle];
 
@@ -4214,7 +4214,7 @@ digraph "license_plate_copies_helper_0_0_9" {
  * - computation: 30
  * - communication: 24
  */
-freia_status license_plate_copies_helper_0_0_0(
+freia_status license_plate_copies_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -4419,7 +4419,7 @@ freia_status license_plate_copies_helper_0_0_0(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_1(
+freia_status license_plate_copies_terapix_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -4676,7 +4676,7 @@ freia_status license_plate_copies_helper_0_0_1(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_2(
+freia_status license_plate_copies_terapix_helper_0_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -4933,7 +4933,7 @@ freia_status license_plate_copies_helper_0_0_2(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_3(
+freia_status license_plate_copies_terapix_helper_0_0_3(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -5190,7 +5190,7 @@ freia_status license_plate_copies_helper_0_0_3(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_4(
+freia_status license_plate_copies_terapix_helper_0_0_4(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -5447,7 +5447,7 @@ freia_status license_plate_copies_helper_0_0_4(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_5(
+freia_status license_plate_copies_terapix_helper_0_0_5(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -5704,7 +5704,7 @@ freia_status license_plate_copies_helper_0_0_5(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_6(
+freia_status license_plate_copies_terapix_helper_0_0_6(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -5961,7 +5961,7 @@ freia_status license_plate_copies_helper_0_0_6(
  * - computation: 60
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_7(
+freia_status license_plate_copies_terapix_helper_0_0_7(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -6218,7 +6218,7 @@ freia_status license_plate_copies_helper_0_0_7(
  * - computation: 50
  * - communication: 32
  */
-freia_status license_plate_copies_helper_0_0_8(
+freia_status license_plate_copies_terapix_helper_0_0_8(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -6473,7 +6473,7 @@ freia_status license_plate_copies_helper_0_0_8(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_9(
+freia_status license_plate_copies_terapix_helper_0_0_9(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -6649,7 +6649,7 @@ freia_status license_plate_copies_helper_0_0_9(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_10(
+freia_status license_plate_copies_terapix_helper_0_0_10(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -6825,7 +6825,7 @@ freia_status license_plate_copies_helper_0_0_10(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_11(
+freia_status license_plate_copies_terapix_helper_0_0_11(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -7001,7 +7001,7 @@ freia_status license_plate_copies_helper_0_0_11(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_12(
+freia_status license_plate_copies_terapix_helper_0_0_12(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -7177,7 +7177,7 @@ freia_status license_plate_copies_helper_0_0_12(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_13(
+freia_status license_plate_copies_terapix_helper_0_0_13(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -7353,7 +7353,7 @@ freia_status license_plate_copies_helper_0_0_13(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_14(
+freia_status license_plate_copies_terapix_helper_0_0_14(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -7529,7 +7529,7 @@ freia_status license_plate_copies_helper_0_0_14(
  * - computation: 54
  * - communication: 24
  */
-freia_status license_plate_copies_helper_0_0_15(
+freia_status license_plate_copies_terapix_helper_0_0_15(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -7815,7 +7815,7 @@ freia_status license_plate_copies_helper_0_0_15(
  * - computation: 15
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_16(
+freia_status license_plate_copies_terapix_helper_0_0_16(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -7987,7 +7987,7 @@ freia_status license_plate_copies_helper_0_0_16(
  * - computation: 15
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_17(
+freia_status license_plate_copies_terapix_helper_0_0_17(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -8159,7 +8159,7 @@ freia_status license_plate_copies_helper_0_0_17(
  * - computation: 15
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_18(
+freia_status license_plate_copies_terapix_helper_0_0_18(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -8331,7 +8331,7 @@ freia_status license_plate_copies_helper_0_0_18(
  * - computation: 15
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_19(
+freia_status license_plate_copies_terapix_helper_0_0_19(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -8503,7 +8503,7 @@ freia_status license_plate_copies_helper_0_0_19(
  * - computation: 15
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_20(
+freia_status license_plate_copies_terapix_helper_0_0_20(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -8675,7 +8675,7 @@ freia_status license_plate_copies_helper_0_0_20(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_21(
+freia_status license_plate_copies_terapix_helper_0_0_21(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2,
@@ -8865,7 +8865,7 @@ freia_status license_plate_copies_helper_0_0_21(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_22(
+freia_status license_plate_copies_terapix_helper_0_0_22(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -9041,7 +9041,7 @@ freia_status license_plate_copies_helper_0_0_22(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_23(
+freia_status license_plate_copies_terapix_helper_0_0_23(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -9217,7 +9217,7 @@ freia_status license_plate_copies_helper_0_0_23(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_24(
+freia_status license_plate_copies_terapix_helper_0_0_24(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -9393,7 +9393,7 @@ freia_status license_plate_copies_helper_0_0_24(
  * - computation: 30
  * - communication: 16
  */
-freia_status license_plate_copies_helper_0_0_25(
+freia_status license_plate_copies_terapix_helper_0_0_25(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2,
@@ -9583,7 +9583,7 @@ freia_status license_plate_copies_helper_0_0_25(
  * - computation: 34
  * - communication: 24
  */
-freia_status license_plate_copies_helper_0_0_26(
+freia_status license_plate_copies_terapix_helper_0_0_26(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -9834,25 +9834,25 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);   /*0064*/
+   license_plate_copies_terapix_helper_0_0_0(imopen, imclose, in, kernel1x3);          /*0064*/
 
-   license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);     /*0066*/
-   license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);     /*0070*/
-   license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);     /*0074*/
-   license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);     /*0078*/
+   license_plate_copies_terapix_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);            /*0066*/
+   license_plate_copies_terapix_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);            /*0070*/
+   license_plate_copies_terapix_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);            /*0074*/
+   license_plate_copies_terapix_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);            /*0078*/
 
-   license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);     /*0082*/
-   license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);     /*0086*/
-   license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);     /*0090*/
+   license_plate_copies_terapix_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);            /*0082*/
+   license_plate_copies_terapix_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);            /*0086*/
+   license_plate_copies_terapix_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);            /*0090*/
 
-   license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0096*/
-   license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);        /*0100*/
-   license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);       /*0104*/
-   license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);       /*0108*/
-   license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);       /*0112*/
-   license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);       /*0116*/
-   license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);       /*0120*/
-   license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0124*/
+   license_plate_copies_terapix_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);            /*0096*/
+   license_plate_copies_terapix_helper_0_0_9(imopen, imopen, kernel1x3);               /*0100*/
+   license_plate_copies_terapix_helper_0_0_10(imopen, imopen, kernel1x3);              /*0104*/
+   license_plate_copies_terapix_helper_0_0_11(imopen, imopen, kernel1x3);              /*0108*/
+   license_plate_copies_terapix_helper_0_0_12(imopen, imopen, kernel1x3);              /*0112*/
+   license_plate_copies_terapix_helper_0_0_13(imopen, imopen, kernel1x3);              /*0116*/
+   license_plate_copies_terapix_helper_0_0_14(imopen, imopen, kernel1x3);              /*0120*/
+   license_plate_copies_terapix_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
    
    
    
@@ -9864,27 +9864,27 @@ int license_plate_copies(void)
    _return0 = ret_1;                                                    /*0174*/
 
    ret_2 = 0;                                                           /*0183*/
-   license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);       /*0189*/
-   license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);       /*0191*/
+   license_plate_copies_terapix_helper_0_0_16(imfilt, imfilt, kernel3x1);              /*0189*/
+   license_plate_copies_terapix_helper_0_0_17(imfilt, imfilt, kernel3x1);              /*0191*/
 
-   license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);       /*0195*/
-   license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);       /*0197*/
-   license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);       /*0199*/
-   license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);            /*0201*/
+   license_plate_copies_terapix_helper_0_0_18(imfilt, imfilt, kernel3x1);              /*0195*/
+   license_plate_copies_terapix_helper_0_0_19(imfilt, imfilt, kernel3x1);              /*0197*/
+   license_plate_copies_terapix_helper_0_0_20(imfilt, imfilt, kernel3x1);              /*0199*/
+   license_plate_copies_terapix_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);    /*0201*/
    
    
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
-   license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);         /*0215*/
-   license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);         /*0219*/
+   license_plate_copies_terapix_helper_0_0_22(imout, imout, kernel1x3);                /*0215*/
+   license_plate_copies_terapix_helper_0_0_23(imout, imout, kernel1x3);                /*0219*/
 
-   license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);         /*0225*/
-   license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);  /*0229*/
+   license_plate_copies_terapix_helper_0_0_24(imout, imout, kernel1x3);                /*0225*/
+   license_plate_copies_terapix_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);         /*0229*/
    
    
    _return3 = ret_3;                                                    /*0235*/
-   license_plate_copies_helper_0_0_26(out, in, out, freia_morpho_kernel_8c);           /*0238*/
+   license_plate_copies_terapix_helper_0_0_26(out, in, out, freia_morpho_kernel_8c);   /*0238*/
    
    
    
@@ -9969,25 +9969,25 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);   /*0064*/
+   license_plate_copies_terapix_helper_0_0_0(imopen, imclose, in, kernel1x3);          /*0064*/
 
-   license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);     /*0066*/
-   license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);     /*0070*/
-   license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);     /*0074*/
-   license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);     /*0078*/
+   license_plate_copies_terapix_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);            /*0066*/
+   license_plate_copies_terapix_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);            /*0070*/
+   license_plate_copies_terapix_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);            /*0074*/
+   license_plate_copies_terapix_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);            /*0078*/
 
-   license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);     /*0082*/
-   license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);     /*0086*/
-   license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);     /*0090*/
+   license_plate_copies_terapix_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);            /*0082*/
+   license_plate_copies_terapix_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);            /*0086*/
+   license_plate_copies_terapix_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);            /*0090*/
 
-   license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0096*/
-   license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);        /*0100*/
-   license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);       /*0104*/
-   license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);       /*0108*/
-   license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);       /*0112*/
-   license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);       /*0116*/
-   license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);       /*0120*/
-   license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0124*/
+   license_plate_copies_terapix_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);            /*0096*/
+   license_plate_copies_terapix_helper_0_0_9(imopen, imopen, kernel1x3);               /*0100*/
+   license_plate_copies_terapix_helper_0_0_10(imopen, imopen, kernel1x3);              /*0104*/
+   license_plate_copies_terapix_helper_0_0_11(imopen, imopen, kernel1x3);              /*0108*/
+   license_plate_copies_terapix_helper_0_0_12(imopen, imopen, kernel1x3);              /*0112*/
+   license_plate_copies_terapix_helper_0_0_13(imopen, imopen, kernel1x3);              /*0116*/
+   license_plate_copies_terapix_helper_0_0_14(imopen, imopen, kernel1x3);              /*0120*/
+   license_plate_copies_terapix_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
    
    
    
@@ -9999,27 +9999,27 @@ int license_plate_copies(void)
    _return0 = ret_1;                                                    /*0174*/
 
    ret_2 = 0;                                                           /*0183*/
-   license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);       /*0189*/
-   license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);       /*0191*/
+   license_plate_copies_terapix_helper_0_0_16(imfilt, imfilt, kernel3x1);              /*0189*/
+   license_plate_copies_terapix_helper_0_0_17(imfilt, imfilt, kernel3x1);              /*0191*/
 
-   license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);       /*0195*/
-   license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);       /*0197*/
-   license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);       /*0199*/
-   license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);            /*0201*/
+   license_plate_copies_terapix_helper_0_0_18(imfilt, imfilt, kernel3x1);              /*0195*/
+   license_plate_copies_terapix_helper_0_0_19(imfilt, imfilt, kernel3x1);              /*0197*/
+   license_plate_copies_terapix_helper_0_0_20(imfilt, imfilt, kernel3x1);              /*0199*/
+   license_plate_copies_terapix_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);    /*0201*/
    
    
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
-   license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);         /*0215*/
-   license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);         /*0219*/
+   license_plate_copies_terapix_helper_0_0_22(imout, imout, kernel1x3);                /*0215*/
+   license_plate_copies_terapix_helper_0_0_23(imout, imout, kernel1x3);                /*0219*/
 
-   license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);         /*0225*/
-   license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);  /*0229*/
+   license_plate_copies_terapix_helper_0_0_24(imout, imout, kernel1x3);                /*0225*/
+   license_plate_copies_terapix_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);         /*0229*/
    
    
    _return3 = ret_3;                                                    /*0235*/
-   license_plate_copies_helper_0_0_26(out, in, out, freia_morpho_kernel_8c);           /*0238*/
+   license_plate_copies_terapix_helper_0_0_26(out, in, out, freia_morpho_kernel_8c);   /*0238*/
    
    
    
@@ -10742,8 +10742,8 @@ digraph "dag_cleaned_0" {
   "in" -> "64 E8";
   "in" -> "244 &";
 }
-// graph for dag "license_plate_copies_helper_0_0" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0" {
+// graph for dag "license_plate_copies_opencl_helper_0_0" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -10893,8 +10893,8 @@ digraph "license_plate_copies_helper_0_0" {
   "in" -> "136 D8";
   "in" -> "64 E8";
 }
-// graph for dag "license_plate_copies_helper_0_0_1" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0_1" {
+// graph for dag "license_plate_copies_opencl_helper_0_0_1" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_opencl_helper_0_0_1" {
   // inputs
   "imclose" [shape=circle];
   "imopen" [shape=circle];
@@ -10923,18 +10923,18 @@ digraph "license_plate_copies_helper_0_0_1" {
 
 // dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0+0 copies
 
-// hold kernels for license_plate_copies_helper_0_0_1
-static cl_kernel license_plate_copies_helper_0_0_1_kernel[2];
+// hold kernels for license_plate_copies_opencl_helper_0_0_1
+static cl_kernel license_plate_copies_opencl_helper_0_0_1_kernel[2];
 
-// compile kernels for license_plate_copies_helper_0_0_1
-static freia_status license_plate_copies_helper_0_0_1_compile(void)
+// compile kernels for license_plate_copies_opencl_helper_0_0_1
+static freia_status license_plate_copies_opencl_helper_0_0_1_compile(void)
 {
-  // OpenCL source for license_plate_copies_helper_0_0_1
-  const char * license_plate_copies_helper_0_0_1_source =
+  // OpenCL source for license_plate_copies_opencl_helper_0_0_1
+  const char * license_plate_copies_opencl_helper_0_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function license_plate_copies_helper_0_0_1\n"
-    "KERNEL void license_plate_copies_helper_0_0_1(\n"
+    "// opencl function license_plate_copies_opencl_helper_0_0_1\n"
+    "KERNEL void license_plate_copies_opencl_helper_0_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -10971,13 +10971,13 @@ static freia_status license_plate_copies_helper_0_0_1_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(license_plate_copies_helper_0_0_1_source, "license_plate_copies_helper_0_0_1", "-DPIXEL8", &license_plate_copies_helper_0_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(license_plate_copies_helper_0_0_1_source, "license_plate_copies_helper_0_0_1", "-DPIXEL16", &license_plate_copies_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_1_source, "license_plate_copies_opencl_helper_0_0_1", "-DPIXEL8", &license_plate_copies_opencl_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_1_source, "license_plate_copies_opencl_helper_0_0_1", "-DPIXEL16", &license_plate_copies_opencl_helper_0_0_1_kernel[1]);
   return err;
 }
 
-// helper function license_plate_copies_helper_0_0_1
-freia_status license_plate_copies_helper_0_0_1(
+// helper function license_plate_copies_opencl_helper_0_0_1
+freia_status license_plate_copies_opencl_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -10993,7 +10993,7 @@ freia_status license_plate_copies_helper_0_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= license_plate_copies_helper_0_0_1_compile();
+    err |= license_plate_copies_opencl_helper_0_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -11001,9 +11001,9 @@ freia_status license_plate_copies_helper_0_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = license_plate_copies_helper_0_0_1_kernel[bpp];
+  cl_kernel kernel = license_plate_copies_opencl_helper_0_0_1_kernel[bpp];
 
-  // call kernel license_plate_copies_helper_0_0_1
+  // call kernel license_plate_copies_opencl_helper_0_0_1
   err |= freia_op_call_kernel(kernel, 1, 2, 6, 0, o0, i0, i1, c0, c1, c2, c3, c4, c5);
 
   return err;
@@ -11013,8 +11013,8 @@ freia_status license_plate_copies_helper_0_0_1(
 
 // opencl for dag 0
 
-// opencl function license_plate_copies_helper_0_0_1
-KERNEL void license_plate_copies_helper_0_0_1(
+// opencl function license_plate_copies_opencl_helper_0_0_1
+KERNEL void license_plate_copies_opencl_helper_0_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -11162,7 +11162,7 @@ int license_plate_copies(void)
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
 
-   license_plate_copies_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);   /*0176*/
+   license_plate_copies_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0176*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
@@ -11337,7 +11337,7 @@ int license_plate_copies(void)
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
 
-   license_plate_copies_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);   /*0176*/
+   license_plate_copies_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0176*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/

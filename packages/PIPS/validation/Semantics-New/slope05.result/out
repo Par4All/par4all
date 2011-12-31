@@ -1,0 +1,178 @@
+
+Transformers for slope05
+
+
+//  T() {}
+
+void slope05()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x, x<=10}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-1, 5) to point(11,6), 12y=x+61. It
+      * should be simplified into y<=5.
+      */
+   if (-x+12*y-61<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T(k) {x+y==k}
+
+
+   if (-x-12*y-61<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T(k) {x+y==k}
+
+
+   if (x-12*y-61<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T(k) {x+y==k}
+
+
+   if (x+12*y-61<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope05
+
+
+//  P() {}
+
+void slope05()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   
+   /* create a bounding box */
+   // assert(0<=x && x<=10 && 0<=y && 0<=10);
+   if (!(0<=x&&x<=10))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x, x<=10}
+
+   
+   /* Define a horizontal constraint that is slightly increasing in
+      * rationals.  It links point (-1, 5) to point(11,6), 12y=x+61. It
+      * should be simplified into y<=5.
+      */
+   if (-x+12*y-61<=0)
+
+//  P(k,x,y) {0<=x, x<=10, y<=5}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {0<=x, x<=10, 6<=y}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10}
+
+
+   if (-x-12*y-61<=0)
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, 0<=y+5}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, y+6<=0}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10}
+
+
+   if (x-12*y-61<=0)
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, x<=9y+46, 0<=y+5}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, 2y+12<=x, y+5<=0}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10}
+
+
+   if (x+12*y-61<=0)
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, x+9y<=46, y<=5}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10, 12<=x+2y, 5<=y}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x, x<=10}
+
+
+   return;
+}

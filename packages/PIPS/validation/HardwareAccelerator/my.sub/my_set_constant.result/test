@@ -78,8 +78,8 @@ digraph "dag_cleaned_0" {
   "4 C" [shape=trapezium,orientation=270];
   "4 C" -> "o";
 }
-// graph for dag "my_set_constant_helper_0_0" of module "my_set_constant" in dot format
-digraph "my_set_constant_helper_0_0" {
+// graph for dag "my_set_constant_spoc_helper_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -102,7 +102,7 @@ digraph "my_set_constant_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module my_set_constant
-freia_status my_set_constant_helper_0_0_0(
+freia_status my_set_constant_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0)
 {
@@ -164,14 +164,14 @@ freia_status my_set_constant_helper_0_0_0(
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_spoc_helper_0_0_0(o, p0);                     /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_spoc_helper_0_0_0(o, p0);                     /*0004*/
 }
 #
 # TERAPIX
@@ -208,8 +208,8 @@ digraph "dag_cleaned_0" {
   "4 C" [shape=trapezium,orientation=270];
   "4 C" -> "o";
 }
-// graph for dag "my_set_constant_helper_0_0_0" of module "my_set_constant" in dot format
-digraph "my_set_constant_helper_0_0_0" {
+// graph for dag "my_set_constant_terapix_helper_0_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -250,7 +250,7 @@ digraph "my_set_constant_helper_0_0_0" {
  * - computation: 2
  * - communication: 32
  */
-freia_status my_set_constant_helper_0_0_0(
+freia_status my_set_constant_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -375,14 +375,14 @@ freia_status my_set_constant_helper_0_0_0(
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_terapix_helper_0_0_0(o, p0);                  /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_terapix_helper_0_0_0(o, p0);                  /*0004*/
 }
 #
 # OPENCL
@@ -419,8 +419,8 @@ digraph "dag_cleaned_0" {
   "4 C" [shape=trapezium,orientation=270];
   "4 C" -> "o";
 }
-// graph for dag "my_set_constant_helper_0_0" of module "my_set_constant" in dot format
-digraph "my_set_constant_helper_0_0" {
+// graph for dag "my_set_constant_opencl_helper_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_opencl_helper_0_0" {
   // inputs
 
   // outputs
@@ -430,8 +430,8 @@ digraph "my_set_constant_helper_0_0" {
   "4 C" [shape=trapezium,orientation=270];
   "4 C" -> "o";
 }
-// graph for dag "my_set_constant_helper_0_0_0" of module "my_set_constant" in dot format
-digraph "my_set_constant_helper_0_0_0" {
+// graph for dag "my_set_constant_opencl_helper_0_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_opencl_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -452,18 +452,18 @@ digraph "my_set_constant_helper_0_0_0" {
 
 // dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
 
-// hold kernels for my_set_constant_helper_0_0_0
-static cl_kernel my_set_constant_helper_0_0_0_kernel[2];
+// hold kernels for my_set_constant_opencl_helper_0_0_0
+static cl_kernel my_set_constant_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for my_set_constant_helper_0_0_0
-static freia_status my_set_constant_helper_0_0_0_compile(void)
+// compile kernels for my_set_constant_opencl_helper_0_0_0
+static freia_status my_set_constant_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for my_set_constant_helper_0_0_0
-  const char * my_set_constant_helper_0_0_0_source =
+  // OpenCL source for my_set_constant_opencl_helper_0_0_0
+  const char * my_set_constant_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function my_set_constant_helper_0_0_0\n"
-    "KERNEL void my_set_constant_helper_0_0_0(\n"
+    "// opencl function my_set_constant_opencl_helper_0_0_0\n"
+    "KERNEL void my_set_constant_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  int width,\n"
@@ -484,13 +484,13 @@ static freia_status my_set_constant_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(my_set_constant_helper_0_0_0_source, "my_set_constant_helper_0_0_0", "-DPIXEL8", &my_set_constant_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(my_set_constant_helper_0_0_0_source, "my_set_constant_helper_0_0_0", "-DPIXEL16", &my_set_constant_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(my_set_constant_opencl_helper_0_0_0_source, "my_set_constant_opencl_helper_0_0_0", "-DPIXEL8", &my_set_constant_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(my_set_constant_opencl_helper_0_0_0_source, "my_set_constant_opencl_helper_0_0_0", "-DPIXEL16", &my_set_constant_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function my_set_constant_helper_0_0_0
-freia_status my_set_constant_helper_0_0_0(
+// helper function my_set_constant_opencl_helper_0_0_0
+freia_status my_set_constant_opencl_helper_0_0_0(
   freia_data2d * o0,
   int32_t c0)
 {
@@ -499,7 +499,7 @@ freia_status my_set_constant_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= my_set_constant_helper_0_0_0_compile();
+    err |= my_set_constant_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -507,9 +507,9 @@ freia_status my_set_constant_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel = my_set_constant_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = my_set_constant_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel my_set_constant_helper_0_0_0
+  // call kernel my_set_constant_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 0, 1, 0, o0, c0);
 
   return err;
@@ -519,8 +519,8 @@ freia_status my_set_constant_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function my_set_constant_helper_0_0_0
-KERNEL void my_set_constant_helper_0_0_0(
+// opencl function my_set_constant_opencl_helper_0_0_0
+KERNEL void my_set_constant_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   int width,
@@ -545,14 +545,14 @@ KERNEL void my_set_constant_helper_0_0_0(
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_opencl_helper_0_0_0(o, p0);                   /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
+   return my_set_constant_opencl_helper_0_0_0(o, p0);                   /*0004*/
 }
 #
 # FREIA COMPILATION DONE

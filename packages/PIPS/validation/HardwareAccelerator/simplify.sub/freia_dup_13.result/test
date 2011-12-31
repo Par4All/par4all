@@ -90,8 +90,8 @@ digraph "dag_cleaned_0" {
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
-digraph "freia_dup_13_helper_0_0" {
+// graph for dag "freia_dup_13_spoc_helper_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_spoc_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -114,7 +114,7 @@ digraph "freia_dup_13_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_13
-freia_status freia_dup_13_helper_0_0_0(
+freia_status freia_dup_13_spoc_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po0)
 {
@@ -167,7 +167,7 @@ freia_status freia_dup_13_helper_0_0_0(
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_13_spoc_helper_0_0_0(in0, x);                              /*0006*/
    *y = *x;                                                             /*0007*/
 }
 
@@ -176,7 +176,7 @@ void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_13_spoc_helper_0_0_0(in0, x);                              /*0006*/
    *y = *x;                                                             /*0007*/
 }
 #
@@ -219,8 +219,8 @@ digraph "dag_cleaned_0" {
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_13_helper_0_0_0" of module "freia_dup_13" in dot format
-digraph "freia_dup_13_helper_0_0_0" {
+// graph for dag "freia_dup_13_terapix_helper_0_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_terapix_helper_0_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -261,7 +261,7 @@ digraph "freia_dup_13_helper_0_0_0" {
  * - computation: 3
  * - communication: 32
  */
-freia_status freia_dup_13_helper_0_0_0(
+freia_status freia_dup_13_terapix_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po1)
 {
@@ -428,7 +428,7 @@ freia_status freia_dup_13_helper_0_0_0(
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_13_terapix_helper_0_0_0(in0, x);                           /*0006*/
    *y = *x;                                                             /*0007*/
 }
 
@@ -437,7 +437,7 @@ void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_dup_13_terapix_helper_0_0_0(in0, x);                           /*0006*/
    *y = *x;                                                             /*0007*/
 }
 #
@@ -480,8 +480,8 @@ digraph "dag_cleaned_0" {
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
-digraph "freia_dup_13_helper_0_0" {
+// graph for dag "freia_dup_13_opencl_helper_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_opencl_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 

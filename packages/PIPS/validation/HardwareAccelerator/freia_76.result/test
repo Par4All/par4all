@@ -106,8 +106,8 @@ digraph "dag_cleaned_0" {
   "in" -> "8 vol";
   "in" -> "7 max";
 }
-// graph for dag "freia_76_helper_0_0" of module "freia_76" in dot format
-digraph "freia_76_helper_0_0" {
+// graph for dag "freia_76_spoc_helper_0_0" of module "freia_76" in dot format
+digraph "freia_76_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -134,7 +134,7 @@ digraph "freia_76_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_76
-freia_status freia_76_helper_0_0_0(
+freia_status freia_76_spoc_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po0,
   int32_t * po1,
@@ -205,7 +205,7 @@ freia_status freia_76_helper_0_0_0(
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_spoc_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);          /*0007*/
    return vol/(pmin+pmax)*2;                                            /*0010*/
 }
 
@@ -214,7 +214,7 @@ int freia_76(const freia_data2d *in)
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_spoc_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);          /*0007*/
    return 2*(vol/(pmax+pmin));                                          /*0010*/
 }
 #
@@ -264,8 +264,8 @@ digraph "dag_cleaned_0" {
   "in" -> "8 vol";
   "in" -> "7 max";
 }
-// graph for dag "freia_76_helper_0_0_0" of module "freia_76" in dot format
-digraph "freia_76_helper_0_0_0" {
+// graph for dag "freia_76_terapix_helper_0_0_0" of module "freia_76" in dot format
+digraph "freia_76_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -310,7 +310,7 @@ digraph "freia_76_helper_0_0_0" {
  * - computation: 9
  * - communication: 32
  */
-freia_status freia_76_helper_0_0_0(
+freia_status freia_76_terapix_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po1,
   int32_t * po2,
@@ -653,7 +653,7 @@ freia_status freia_76_helper_0_0_0(
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_terapix_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);       /*0007*/
    return vol/(pmin+pmax)*2;                                            /*0010*/
 }
 
@@ -662,7 +662,7 @@ int freia_76(const freia_data2d *in)
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_terapix_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);       /*0007*/
    return 2*(vol/(pmax+pmin));                                          /*0010*/
 }
 #
@@ -712,8 +712,8 @@ digraph "dag_cleaned_0" {
   "in" -> "8 vol";
   "in" -> "7 max";
 }
-// graph for dag "freia_76_helper_0_0" of module "freia_76" in dot format
-digraph "freia_76_helper_0_0" {
+// graph for dag "freia_76_opencl_helper_0_0" of module "freia_76" in dot format
+digraph "freia_76_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -727,8 +727,8 @@ digraph "freia_76_helper_0_0" {
   "in" -> "8 vol";
   "in" -> "7 max";
 }
-// graph for dag "freia_76_helper_0_0_0" of module "freia_76" in dot format
-digraph "freia_76_helper_0_0_0" {
+// graph for dag "freia_76_opencl_helper_0_0_0" of module "freia_76" in dot format
+digraph "freia_76_opencl_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -753,18 +753,18 @@ digraph "freia_76_helper_0_0_0" {
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for freia_76_helper_0_0_0
-static cl_kernel freia_76_helper_0_0_0_kernel[2];
+// hold kernels for freia_76_opencl_helper_0_0_0
+static cl_kernel freia_76_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for freia_76_helper_0_0_0
-static freia_status freia_76_helper_0_0_0_compile(void)
+// compile kernels for freia_76_opencl_helper_0_0_0
+static freia_status freia_76_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for freia_76_helper_0_0_0
-  const char * freia_76_helper_0_0_0_source =
+  // OpenCL source for freia_76_opencl_helper_0_0_0
+  const char * freia_76_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_76_helper_0_0_0\n"
-    "KERNEL void freia_76_helper_0_0_0(\n"
+    "// opencl function freia_76_opencl_helper_0_0_0\n"
+    "KERNEL void freia_76_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
     "  int width,\n"
@@ -800,13 +800,13 @@ static freia_status freia_76_helper_0_0_0_compile(void)
     "  redX[idy].min_y = idy;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_76_helper_0_0_0_source, "freia_76_helper_0_0_0", "-DPIXEL8", &freia_76_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_76_helper_0_0_0_source, "freia_76_helper_0_0_0", "-DPIXEL16", &freia_76_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_76_opencl_helper_0_0_0_source, "freia_76_opencl_helper_0_0_0", "-DPIXEL8", &freia_76_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_76_opencl_helper_0_0_0_source, "freia_76_opencl_helper_0_0_0", "-DPIXEL16", &freia_76_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function freia_76_helper_0_0_0
-freia_status freia_76_helper_0_0_0(
+// helper function freia_76_opencl_helper_0_0_0
+freia_status freia_76_opencl_helper_0_0_0(
   const freia_data2d * i0,
   int32_t * po1,
   int32_t * po2,
@@ -819,7 +819,7 @@ freia_status freia_76_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_76_helper_0_0_0_compile();
+    err |= freia_76_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -827,12 +827,12 @@ freia_status freia_76_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_76_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = freia_76_opencl_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel freia_76_helper_0_0_0
+  // call kernel freia_76_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 0, 1, 0, 1, i0, &redres);
 
   // return reduction results
@@ -849,8 +849,8 @@ freia_status freia_76_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function freia_76_helper_0_0_0
-KERNEL void freia_76_helper_0_0_0(
+// opencl function freia_76_opencl_helper_0_0_0
+KERNEL void freia_76_opencl_helper_0_0_0(
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
   int width,
@@ -891,7 +891,7 @@ KERNEL void freia_76_helper_0_0_0(
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_opencl_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);        /*0007*/
    return vol/(pmin+pmax)*2;                                            /*0010*/
 }
 
@@ -900,7 +900,7 @@ int freia_76(const freia_data2d *in)
 int freia_76(const freia_data2d *in)
 {
    int vol, pmin, pmax, x, y;                                           /*0006*/
-   freia_76_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);               /*0007*/
+   freia_76_opencl_helper_0_0_0(in, &pmax, &vol, &pmin, &x, &y);        /*0007*/
    return 2*(vol/(pmax+pmin));                                          /*0010*/
 }
 #

@@ -213,8 +213,8 @@ digraph "dag_cleaned_0" {
   "in" -> "25 E8";
   "in" -> "23 D8";
 }
-// graph for dag "freia_dup_15_helper_0_0" of module "freia_dup_15" in dot format
-digraph "freia_dup_15_helper_0_0" {
+// graph for dag "freia_dup_15_spoc_helper_0_0" of module "freia_dup_15" in dot format
+digraph "freia_dup_15_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -246,7 +246,7 @@ digraph "freia_dup_15_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_15
-freia_status freia_dup_15_helper_0_0_0(
+freia_status freia_dup_15_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -365,7 +365,7 @@ int freia_dup_15(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0021*/
 
-   freia_dup_15_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);       /*0023*/
+   freia_dup_15_spoc_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);  /*0023*/
 
    freia_common_tx_image(od, &fdout);                                   /*0028*/
    freia_common_tx_image(og, &fdout);                                   /*0029*/
@@ -399,7 +399,7 @@ int freia_dup_15(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0021*/
 
-   freia_dup_15_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);       /*0023*/
+   freia_dup_15_spoc_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);  /*0023*/
 
    freia_common_tx_image(od, &fdout);                                   /*0028*/
    freia_common_tx_image(og, &fdout);                                   /*0029*/
@@ -501,8 +501,8 @@ digraph "dag_cleaned_0" {
   "in" -> "25 E8";
   "in" -> "23 D8";
 }
-// graph for dag "freia_dup_15_helper_0_0_0" of module "freia_dup_15" in dot format
-digraph "freia_dup_15_helper_0_0_0" {
+// graph for dag "freia_dup_15_terapix_helper_0_0_0" of module "freia_dup_15" in dot format
+digraph "freia_dup_15_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -552,7 +552,7 @@ digraph "freia_dup_15_helper_0_0_0" {
  * - computation: 34
  * - communication: 96
  */
-freia_status freia_dup_15_helper_0_0_0(
+freia_status freia_dup_15_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -761,7 +761,7 @@ int freia_dup_15(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0021*/
 
-   freia_dup_15_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);       /*0023*/
+   freia_dup_15_terapix_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);              /*0023*/
 
    freia_common_tx_image(od, &fdout);                                   /*0028*/
    freia_common_tx_image(og, &fdout);                                   /*0029*/
@@ -795,7 +795,7 @@ int freia_dup_15(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0021*/
 
-   freia_dup_15_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);       /*0023*/
+   freia_dup_15_terapix_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);              /*0023*/
 
    freia_common_tx_image(od, &fdout);                                   /*0028*/
    freia_common_tx_image(og, &fdout);                                   /*0029*/
@@ -897,8 +897,8 @@ digraph "dag_cleaned_0" {
   "in" -> "25 E8";
   "in" -> "23 D8";
 }
-// graph for dag "freia_dup_15_helper_0_0" of module "freia_dup_15" in dot format
-digraph "freia_dup_15_helper_0_0" {
+// graph for dag "freia_dup_15_opencl_helper_0_0" of module "freia_dup_15" in dot format
+digraph "freia_dup_15_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
