@@ -121,8 +121,8 @@ digraph "dag_cleaned_0" {
   "11 E8" -> "o0";
   "i0" -> "11 E8";
 }
-// graph for dag "freia_12_helper_0_0" of module "freia_12" in dot format
-digraph "freia_12_helper_0_0" {
+// graph for dag "freia_12_spoc_helper_0_0" of module "freia_12" in dot format
+digraph "freia_12_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -152,7 +152,7 @@ digraph "freia_12_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_12
-freia_status freia_12_helper_0_0_0(
+freia_status freia_12_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -252,7 +252,7 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two parallel computations
    // o0 = h(i0)
    // o1 = h(i1)
-   freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   freia_12_spoc_helper_0_0_0(o0, o1, i0, i1, kern);                    /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -263,7 +263,7 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two parallel computations
    // o0 = h(i0)
    // o1 = h(i1)
-   freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   freia_12_spoc_helper_0_0_0(o0, o1, i0, i1, kern);                    /*0011*/
    return 0;                                                            /*0013*/
 }
 #
@@ -320,8 +320,8 @@ digraph "dag_cleaned_0" {
   "11 E8" -> "o0";
   "i0" -> "11 E8";
 }
-// graph for dag "freia_12_helper_0_0_0" of module "freia_12" in dot format
-digraph "freia_12_helper_0_0_0" {
+// graph for dag "freia_12_terapix_helper_0_0_0" of module "freia_12" in dot format
+digraph "freia_12_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -369,7 +369,7 @@ digraph "freia_12_helper_0_0_0" {
  * - computation: 30
  * - communication: 128
  */
-freia_status freia_12_helper_0_0_0(
+freia_status freia_12_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -568,7 +568,7 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two parallel computations
    // o0 = h(i0)
    // o1 = h(i1)
-   freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   freia_12_terapix_helper_0_0_0(o0, o1, i0, i1, kern);                 /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -579,7 +579,7 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two parallel computations
    // o0 = h(i0)
    // o1 = h(i1)
-   freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   freia_12_terapix_helper_0_0_0(o0, o1, i0, i1, kern);                 /*0011*/
    return 0;                                                            /*0013*/
 }
 #
@@ -636,8 +636,8 @@ digraph "dag_cleaned_0" {
   "11 E8" -> "o0";
   "i0" -> "11 E8";
 }
-// graph for dag "freia_12_helper_0_0" of module "freia_12" in dot format
-digraph "freia_12_helper_0_0" {
+// graph for dag "freia_12_opencl_helper_0_0" of module "freia_12" in dot format
+digraph "freia_12_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];

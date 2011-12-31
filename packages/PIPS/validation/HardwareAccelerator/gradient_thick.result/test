@@ -151,8 +151,8 @@ digraph "dag_cleaned_0" {
   "in" -> "12 D8";
   "in" -> "11 E8";
 }
-// graph for dag "gradient_thick_helper_0_0" of module "gradient_thick" in dot format
-digraph "gradient_thick_helper_0_0" {
+// graph for dag "gradient_thick_spoc_helper_0_0" of module "gradient_thick" in dot format
+digraph "gradient_thick_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -182,7 +182,7 @@ digraph "gradient_thick_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module gradient_thick
-freia_status gradient_thick_helper_0_0_0(
+freia_status gradient_thick_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -270,7 +270,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   gradient_thick_spoc_helper_0_0_0(out, in, kernel);                   /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
@@ -287,7 +287,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   gradient_thick_spoc_helper_0_0_0(out, in, kernel);                   /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
@@ -358,8 +358,8 @@ digraph "dag_cleaned_0" {
   "in" -> "12 D8";
   "in" -> "11 E8";
 }
-// graph for dag "gradient_thick_helper_0_0_0" of module "gradient_thick" in dot format
-digraph "gradient_thick_helper_0_0_0" {
+// graph for dag "gradient_thick_terapix_helper_0_0_0" of module "gradient_thick" in dot format
+digraph "gradient_thick_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -407,7 +407,7 @@ digraph "gradient_thick_helper_0_0_0" {
  * - computation: 34
  * - communication: 64
  */
-freia_status gradient_thick_helper_0_0_0(
+freia_status gradient_thick_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -597,7 +597,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   gradient_thick_terapix_helper_0_0_0(out, in, kernel);                /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
@@ -614,7 +614,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   gradient_thick_helper_0_0_0(out, in, kernel);                        /*0011*/
+   gradient_thick_terapix_helper_0_0_0(out, in, kernel);                /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
@@ -685,8 +685,8 @@ digraph "dag_cleaned_0" {
   "in" -> "12 D8";
   "in" -> "11 E8";
 }
-// graph for dag "gradient_thick_helper_0_0" of module "gradient_thick" in dot format
-digraph "gradient_thick_helper_0_0" {
+// graph for dag "gradient_thick_opencl_helper_0_0" of module "gradient_thick" in dot format
+digraph "gradient_thick_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 

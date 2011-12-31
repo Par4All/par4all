@@ -538,8 +538,8 @@ digraph "dag_cleaned_2" {
   "out" -> "47 -";
   "in" -> "47 -";
 }
-// graph for dag "freia_51_helper_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_0_0" {
+// graph for dag "freia_51_spoc_helper_0_0" of module "freia_51" in dot format
+digraph "freia_51_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -564,8 +564,8 @@ digraph "freia_51_helper_0_0" {
   "15 !" -> "18 D8" [label="out_1"];
   "in" -> "15 !";
 }
-// graph for dag "freia_51_helper_1_0" of module "freia_51" in dot format
-digraph "freia_51_helper_1_0" {
+// graph for dag "freia_51_spoc_helper_1_0" of module "freia_51" in dot format
+digraph "freia_51_spoc_helper_1_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -618,8 +618,8 @@ digraph "freia_51_helper_1_0" {
   "30 D8" -> "31 <" [label="out_16"];
   "out" -> "30 D8";
 }
-// graph for dag "freia_51_helper_2_0" of module "freia_51" in dot format
-digraph "freia_51_helper_2_0" {
+// graph for dag "freia_51_spoc_helper_2_0" of module "freia_51" in dot format
+digraph "freia_51_spoc_helper_2_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -648,7 +648,7 @@ digraph "freia_51_helper_2_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_51
-freia_status freia_51_helper_0_0_0(
+freia_status freia_51_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
@@ -777,7 +777,7 @@ freia_status freia_51_helper_0_0_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_51
-freia_status freia_51_helper_1_0_0(
+freia_status freia_51_spoc_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1011,7 +1011,7 @@ freia_status freia_51_helper_1_0_0(
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_51
-freia_status freia_51_helper_2_0_0(
+freia_status freia_51_spoc_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -1097,16 +1097,16 @@ int freia_51(int32_t *k)
    freia_common_rx_image(in, &fdin);                                    /*0011*/
    
    
-   freia_51_helper_0_0_0(out, in, k, 255, 255, &volcurrent);            /*0015*/
+   freia_51_spoc_helper_0_0_0(out, in, k, 255, 255, &volcurrent);       /*0015*/
    
    
    do {                                                                 /*0028*/
       volprevious = volcurrent;                                         /*0029*/
-      freia_51_helper_1_0_0(out, in, out, k, &volcurrent);              /*0030*/
+      freia_51_spoc_helper_1_0_0(out, in, out, k, &volcurrent);         /*0030*/
    }
    while (volcurrent!=volprevious);                                     /*0028*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_spoc_helper_2_0_0(out, in, out, 2);                         /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0049*/
 
@@ -1130,16 +1130,16 @@ int freia_51(int32_t *k)
    freia_common_rx_image(in, &fdin);                                    /*0011*/
    
    
-   freia_51_helper_0_0_0(out, in, k, 255, 255, &volcurrent);            /*0015*/
+   freia_51_spoc_helper_0_0_0(out, in, k, 255, 255, &volcurrent);       /*0015*/
    
    
    do {                                                                 /*0028*/
       volprevious = volcurrent;                                         /*0029*/
-      freia_51_helper_1_0_0(out, in, out, k, &volcurrent);              /*0030*/
+      freia_51_spoc_helper_1_0_0(out, in, out, k, &volcurrent);         /*0030*/
    }
    while (volcurrent!=volprevious);                                     /*0028*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_spoc_helper_2_0_0(out, in, out, 2);                         /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0049*/
 
@@ -1357,8 +1357,8 @@ digraph "dag_cleaned_2" {
   "out" -> "47 -";
   "in" -> "47 -";
 }
-// graph for dag "freia_51_helper_0_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_0_0_0" {
+// graph for dag "freia_51_terapix_helper_0_0_0" of module "freia_51" in dot format
+digraph "freia_51_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -1383,8 +1383,8 @@ digraph "freia_51_helper_0_0_0" {
   "23 !" -> "28 D8" [label="out_1"];
   "in" -> "23 !";
 }
-// graph for dag "freia_51_helper_1_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_1_0_0" {
+// graph for dag "freia_51_terapix_helper_1_0_0" of module "freia_51" in dot format
+digraph "freia_51_terapix_helper_1_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -1402,8 +1402,8 @@ digraph "freia_51_helper_1_0_0" {
   "41 D8" -> "42 <" [label="out_2"];
   "out" -> "41 D8";
 }
-// graph for dag "freia_51_helper_2_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_2_0_0" {
+// graph for dag "freia_51_terapix_helper_2_0_0" of module "freia_51" in dot format
+digraph "freia_51_terapix_helper_2_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -1450,7 +1450,7 @@ digraph "freia_51_helper_2_0_0" {
  * - computation: 47
  * - communication: 64
  */
-freia_status freia_51_helper_0_0_0(
+freia_status freia_51_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2,
@@ -1816,7 +1816,7 @@ freia_status freia_51_helper_0_0_0(
  * - computation: 22
  * - communication: 96
  */
-freia_status freia_51_helper_1_0_0(
+freia_status freia_51_terapix_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2078,7 +2078,7 @@ freia_status freia_51_helper_1_0_0(
  * - computation: 7
  * - communication: 96
  */
-freia_status freia_51_helper_2_0_0(
+freia_status freia_51_terapix_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2257,16 +2257,16 @@ int freia_51(int32_t *k)
    freia_common_rx_image(in, &fdin);                                    /*0018*/
    
    
-   freia_51_helper_0_0_0(out, in, k, 255, 255, &volcurrent);            /*0023*/
+   freia_51_terapix_helper_0_0_0(out, in, k, 255, 255, &volcurrent);    /*0023*/
    
    
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
-      freia_51_helper_1_0_0(out, in, out, k, &volcurrent);              /*0041*/
+      freia_51_terapix_helper_1_0_0(out, in, out, k, &volcurrent);      /*0041*/
    }
    while (volcurrent!=volprevious);                                     /*0045*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_terapix_helper_2_0_0(out, in, out, 2);                      /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0050*/
 
@@ -2290,16 +2290,16 @@ int freia_51(int32_t *k)
    freia_common_rx_image(in, &fdin);                                    /*0018*/
    
    
-   freia_51_helper_0_0_0(out, in, k, 255, 255, &volcurrent);            /*0023*/
+   freia_51_terapix_helper_0_0_0(out, in, k, 255, 255, &volcurrent);    /*0023*/
    
    
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
-      freia_51_helper_1_0_0(out, in, out, k, &volcurrent);              /*0041*/
+      freia_51_terapix_helper_1_0_0(out, in, out, k, &volcurrent);      /*0041*/
    }
    while (volcurrent!=volprevious);                                     /*0045*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_terapix_helper_2_0_0(out, in, out, 2);                      /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0050*/
 
@@ -2517,8 +2517,8 @@ digraph "dag_cleaned_2" {
   "out" -> "47 -";
   "in" -> "47 -";
 }
-// graph for dag "freia_51_helper_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_0_0" {
+// graph for dag "freia_51_opencl_helper_0_0" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -2543,8 +2543,8 @@ digraph "freia_51_helper_0_0" {
   "23 !" -> "28 D8" [label="out_1"];
   "in" -> "23 !";
 }
-// graph for dag "freia_51_helper_0_0_4" of module "freia_51" in dot format
-digraph "freia_51_helper_0_0_4" {
+// graph for dag "freia_51_opencl_helper_0_0_4" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_0_0_4" {
   // inputs
   "t4" [shape=circle];
 
@@ -2561,8 +2561,8 @@ digraph "freia_51_helper_0_0_4" {
   "t4" -> "36 <";
   "t4" -> "34 <_";
 }
-// graph for dag "freia_51_helper_1_0" of module "freia_51" in dot format
-digraph "freia_51_helper_1_0" {
+// graph for dag "freia_51_opencl_helper_1_0" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_1_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -2580,8 +2580,8 @@ digraph "freia_51_helper_1_0" {
   "41 D8" -> "42 <" [label="out_2"];
   "out" -> "41 D8";
 }
-// graph for dag "freia_51_helper_1_0_1" of module "freia_51" in dot format
-digraph "freia_51_helper_1_0_1" {
+// graph for dag "freia_51_opencl_helper_1_0_1" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_1_0_1" {
   // inputs
   "in" [shape=circle];
   "out_2" [shape=circle];
@@ -2597,8 +2597,8 @@ digraph "freia_51_helper_1_0_1" {
   "in" -> "42 <";
   "out_2" -> "42 <";
 }
-// graph for dag "freia_51_helper_2_0" of module "freia_51" in dot format
-digraph "freia_51_helper_2_0" {
+// graph for dag "freia_51_opencl_helper_2_0" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_2_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -2614,8 +2614,8 @@ digraph "freia_51_helper_2_0" {
   "out" -> "47 -";
   "in" -> "47 -";
 }
-// graph for dag "freia_51_helper_2_0_0" of module "freia_51" in dot format
-digraph "freia_51_helper_2_0_0" {
+// graph for dag "freia_51_opencl_helper_2_0_0" of module "freia_51" in dot format
+digraph "freia_51_opencl_helper_2_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -2642,18 +2642,18 @@ digraph "freia_51_helper_2_0_0" {
 
 // dag 0: 14 ops and 1 copies, optimized to 7 ops and 0+0+0 copies
 
-// hold kernels for freia_51_helper_0_0_4
-static cl_kernel freia_51_helper_0_0_4_kernel[2];
+// hold kernels for freia_51_opencl_helper_0_0_4
+static cl_kernel freia_51_opencl_helper_0_0_4_kernel[2];
 
-// compile kernels for freia_51_helper_0_0_4
-static freia_status freia_51_helper_0_0_4_compile(void)
+// compile kernels for freia_51_opencl_helper_0_0_4
+static freia_status freia_51_opencl_helper_0_0_4_compile(void)
 {
-  // OpenCL source for freia_51_helper_0_0_4
-  const char * freia_51_helper_0_0_4_source =
+  // OpenCL source for freia_51_opencl_helper_0_0_4
+  const char * freia_51_opencl_helper_0_0_4_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_51_helper_0_0_4\n"
-    "KERNEL void freia_51_helper_0_0_4(\n"
+    "// opencl function freia_51_opencl_helper_0_0_4\n"
+    "KERNEL void freia_51_opencl_helper_0_0_4(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -2691,13 +2691,13 @@ static freia_status freia_51_helper_0_0_4_compile(void)
     "  redX[idy].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_51_helper_0_0_4_source, "freia_51_helper_0_0_4", "-DPIXEL8", &freia_51_helper_0_0_4_kernel[0]);
-  err |= freia_op_compile_kernel(freia_51_helper_0_0_4_source, "freia_51_helper_0_0_4", "-DPIXEL16", &freia_51_helper_0_0_4_kernel[1]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_0_0_4_source, "freia_51_opencl_helper_0_0_4", "-DPIXEL8", &freia_51_opencl_helper_0_0_4_kernel[0]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_0_0_4_source, "freia_51_opencl_helper_0_0_4", "-DPIXEL16", &freia_51_opencl_helper_0_0_4_kernel[1]);
   return err;
 }
 
-// helper function freia_51_helper_0_0_4
-freia_status freia_51_helper_0_0_4(
+// helper function freia_51_opencl_helper_0_0_4
+freia_status freia_51_opencl_helper_0_0_4(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
@@ -2708,7 +2708,7 @@ freia_status freia_51_helper_0_0_4(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_51_helper_0_0_4_compile();
+    err |= freia_51_opencl_helper_0_0_4_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2716,12 +2716,12 @@ freia_status freia_51_helper_0_0_4(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_51_helper_0_0_4_kernel[bpp];
+  cl_kernel kernel = freia_51_opencl_helper_0_0_4_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel freia_51_helper_0_0_4
+  // call kernel freia_51_opencl_helper_0_0_4
   err |= freia_op_call_kernel(kernel, 1, 1, 1, 1, o0, i0, c0, &redres);
 
   // return reduction results
@@ -2732,18 +2732,18 @@ freia_status freia_51_helper_0_0_4(
 
 // dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for freia_51_helper_1_0_1
-static cl_kernel freia_51_helper_1_0_1_kernel[2];
+// hold kernels for freia_51_opencl_helper_1_0_1
+static cl_kernel freia_51_opencl_helper_1_0_1_kernel[2];
 
-// compile kernels for freia_51_helper_1_0_1
-static freia_status freia_51_helper_1_0_1_compile(void)
+// compile kernels for freia_51_opencl_helper_1_0_1
+static freia_status freia_51_opencl_helper_1_0_1_compile(void)
 {
-  // OpenCL source for freia_51_helper_1_0_1
-  const char * freia_51_helper_1_0_1_source =
+  // OpenCL source for freia_51_opencl_helper_1_0_1
+  const char * freia_51_opencl_helper_1_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_51_helper_1_0_1\n"
-    "KERNEL void freia_51_helper_1_0_1(\n"
+    "// opencl function freia_51_opencl_helper_1_0_1\n"
+    "KERNEL void freia_51_opencl_helper_1_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -2783,13 +2783,13 @@ static freia_status freia_51_helper_1_0_1_compile(void)
     "  redX[idy].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_51_helper_1_0_1_source, "freia_51_helper_1_0_1", "-DPIXEL8", &freia_51_helper_1_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(freia_51_helper_1_0_1_source, "freia_51_helper_1_0_1", "-DPIXEL16", &freia_51_helper_1_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_1_0_1_source, "freia_51_opencl_helper_1_0_1", "-DPIXEL8", &freia_51_opencl_helper_1_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_1_0_1_source, "freia_51_opencl_helper_1_0_1", "-DPIXEL16", &freia_51_opencl_helper_1_0_1_kernel[1]);
   return err;
 }
 
-// helper function freia_51_helper_1_0_1
-freia_status freia_51_helper_1_0_1(
+// helper function freia_51_opencl_helper_1_0_1
+freia_status freia_51_opencl_helper_1_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2800,7 +2800,7 @@ freia_status freia_51_helper_1_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_51_helper_1_0_1_compile();
+    err |= freia_51_opencl_helper_1_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2808,12 +2808,12 @@ freia_status freia_51_helper_1_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_51_helper_1_0_1_kernel[bpp];
+  cl_kernel kernel = freia_51_opencl_helper_1_0_1_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel freia_51_helper_1_0_1
+  // call kernel freia_51_opencl_helper_1_0_1
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 1, o0, i0, i1, &redres);
 
   // return reduction results
@@ -2824,18 +2824,18 @@ freia_status freia_51_helper_1_0_1(
 
 // dag 2: 2 ops and 0 copies, optimized to 2 ops and 0+0+0 copies
 
-// hold kernels for freia_51_helper_2_0_0
-static cl_kernel freia_51_helper_2_0_0_kernel[2];
+// hold kernels for freia_51_opencl_helper_2_0_0
+static cl_kernel freia_51_opencl_helper_2_0_0_kernel[2];
 
-// compile kernels for freia_51_helper_2_0_0
-static freia_status freia_51_helper_2_0_0_compile(void)
+// compile kernels for freia_51_opencl_helper_2_0_0
+static freia_status freia_51_opencl_helper_2_0_0_compile(void)
 {
-  // OpenCL source for freia_51_helper_2_0_0
-  const char * freia_51_helper_2_0_0_source =
+  // OpenCL source for freia_51_opencl_helper_2_0_0
+  const char * freia_51_opencl_helper_2_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function freia_51_helper_2_0_0\n"
-    "KERNEL void freia_51_helper_2_0_0(\n"
+    "// opencl function freia_51_opencl_helper_2_0_0\n"
+    "KERNEL void freia_51_opencl_helper_2_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -2866,13 +2866,13 @@ static freia_status freia_51_helper_2_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(freia_51_helper_2_0_0_source, "freia_51_helper_2_0_0", "-DPIXEL8", &freia_51_helper_2_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(freia_51_helper_2_0_0_source, "freia_51_helper_2_0_0", "-DPIXEL16", &freia_51_helper_2_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_2_0_0_source, "freia_51_opencl_helper_2_0_0", "-DPIXEL8", &freia_51_opencl_helper_2_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_51_opencl_helper_2_0_0_source, "freia_51_opencl_helper_2_0_0", "-DPIXEL16", &freia_51_opencl_helper_2_0_0_kernel[1]);
   return err;
 }
 
-// helper function freia_51_helper_2_0_0
-freia_status freia_51_helper_2_0_0(
+// helper function freia_51_opencl_helper_2_0_0
+freia_status freia_51_opencl_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2883,7 +2883,7 @@ freia_status freia_51_helper_2_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= freia_51_helper_2_0_0_compile();
+    err |= freia_51_opencl_helper_2_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2891,9 +2891,9 @@ freia_status freia_51_helper_2_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = freia_51_helper_2_0_0_kernel[bpp];
+  cl_kernel kernel = freia_51_opencl_helper_2_0_0_kernel[bpp];
 
-  // call kernel freia_51_helper_2_0_0
+  // call kernel freia_51_opencl_helper_2_0_0
   err |= freia_op_call_kernel(kernel, 1, 2, 1, 0, o0, i0, i1, c0);
 
   return err;
@@ -2903,8 +2903,8 @@ freia_status freia_51_helper_2_0_0(
 
 // opencl for dag 0
 
-// opencl function freia_51_helper_0_0_4
-KERNEL void freia_51_helper_0_0_4(
+// opencl function freia_51_opencl_helper_0_0_4
+KERNEL void freia_51_opencl_helper_0_0_4(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -2944,8 +2944,8 @@ KERNEL void freia_51_helper_0_0_4(
 
 // opencl for dag 1
 
-// opencl function freia_51_helper_1_0_1
-KERNEL void freia_51_helper_1_0_1(
+// opencl function freia_51_opencl_helper_1_0_1
+KERNEL void freia_51_opencl_helper_1_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -2987,8 +2987,8 @@ KERNEL void freia_51_helper_1_0_1(
 
 // opencl for dag 2
 
-// opencl function freia_51_helper_2_0_0
-KERNEL void freia_51_helper_2_0_0(
+// opencl function freia_51_opencl_helper_2_0_0
+KERNEL void freia_51_opencl_helper_2_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -3040,17 +3040,17 @@ int freia_51(int32_t *k)
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
-   freia_51_helper_0_0_4(out, t4, 255, &volcurrent);                    /*0034*/
+   freia_51_opencl_helper_0_0_4(out, t4, 255, &volcurrent);             /*0034*/
    
    
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
       freia_aipo_dilate_8c(out, out, k);                                /*0041*/
-      freia_51_helper_1_0_1(out, in, out, &volcurrent);                 /*0042*/
+      freia_51_opencl_helper_1_0_1(out, in, out, &volcurrent);          /*0042*/
    }
    while (volcurrent!=volprevious);                                     /*0045*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_opencl_helper_2_0_0(out, in, out, 2);                       /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0050*/
 
@@ -3084,17 +3084,17 @@ int freia_51(int32_t *k)
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
-   freia_51_helper_0_0_4(out, t4, 255, &volcurrent);                    /*0034*/
+   freia_51_opencl_helper_0_0_4(out, t4, 255, &volcurrent);             /*0034*/
    
    
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
       freia_aipo_dilate_8c(out, out, k);                                /*0041*/
-      freia_51_helper_1_0_1(out, in, out, &volcurrent);                 /*0042*/
+      freia_51_opencl_helper_1_0_1(out, in, out, &volcurrent);          /*0042*/
    }
    while (volcurrent!=volprevious);                                     /*0045*/
 
-   freia_51_helper_2_0_0(out, in, out, 2);                              /*0047*/
+   freia_51_opencl_helper_2_0_0(out, in, out, 2);                       /*0047*/
 
    freia_common_tx_image(out, &fdout);                                  /*0050*/
 

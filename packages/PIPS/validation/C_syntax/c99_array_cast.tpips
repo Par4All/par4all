@@ -1,0 +1,6 @@
+delete c99_array_cast
+#setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create c99_array_cast c99_array_cast.c
+display PRINTED_FILE[%ALLFUNC]
+close
+delete c99_array_cast

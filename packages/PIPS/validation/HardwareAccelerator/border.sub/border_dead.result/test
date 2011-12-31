@@ -72,8 +72,8 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_dead_helper_0_0" of module "border_dead" in dot format
-digraph "border_dead_helper_0_0" {
+// graph for dag "border_dead_spoc_helper_0_0" of module "border_dead" in dot format
+digraph "border_dead_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -124,7 +124,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module border_dead
-freia_status border_dead_helper_0_0_0(
+freia_status border_dead_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -195,7 +195,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+   border_dead_spoc_helper_0_0_0(out, in, kernel);                      /*0009*/
 }
 
 ! cleaned up function
@@ -206,7 +206,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+   border_dead_spoc_helper_0_0_0(out, in, kernel);                      /*0009*/
 }
 #
 # TERAPIX
@@ -225,8 +225,8 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_dead_helper_0_0_0" of module "border_dead" in dot format
-digraph "border_dead_helper_0_0_0" {
+// graph for dag "border_dead_terapix_helper_0_0_0" of module "border_dead" in dot format
+digraph "border_dead_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -295,7 +295,7 @@ digraph "dag_cleaned_0" {
  * - computation: 15
  * - communication: 64
  */
-freia_status border_dead_helper_0_0_0(
+freia_status border_dead_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -456,7 +456,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+   border_dead_terapix_helper_0_0_0(out, in, kernel);                   /*0009*/
 }
 
 ! cleaned up function
@@ -467,7 +467,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
+   border_dead_terapix_helper_0_0_0(out, in, kernel);                   /*0009*/
 }
 #
 # OPENCL
@@ -486,8 +486,8 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_dead_helper_0_0" of module "border_dead" in dot format
-digraph "border_dead_helper_0_0" {
+// graph for dag "border_dead_opencl_helper_0_0" of module "border_dead" in dot format
+digraph "border_dead_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 

@@ -392,8 +392,8 @@ digraph "dag_cleaned_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_0" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_0" {
+// graph for dag "vs_core_2_spoc_helper_0_0" of module "vs_core_2" in dot format
+digraph "vs_core_2_spoc_helper_0_0" {
   // inputs
   "bg" [shape=circle];
   "in" [shape=circle];
@@ -415,8 +415,8 @@ digraph "vs_core_2_helper_0_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_1" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_1" {
+// graph for dag "vs_core_2_spoc_helper_0_1" of module "vs_core_2" in dot format
+digraph "vs_core_2_spoc_helper_0_1" {
   // inputs
   "t0" [shape=circle];
   "bg" [shape=circle];
@@ -434,8 +434,8 @@ digraph "vs_core_2_helper_0_1" {
   "20 *_" -> "21 +" [label="bg_2"];
   "bg" -> "20 *_";
 }
-// graph for dag "vs_core_2_helper_0_2" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_2" {
+// graph for dag "vs_core_2_spoc_helper_0_2" of module "vs_core_2" in dot format
+digraph "vs_core_2_spoc_helper_0_2" {
   // inputs
   "mv_6" [shape=circle];
 
@@ -462,8 +462,8 @@ digraph "vs_core_2_helper_0_2" {
   "32 thr" -> "35 E8" [label="mv_5"];
   "mv_6" -> "32 thr";
 }
-// graph for dag "vs_core_2_helper_0_3" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_3" {
+// graph for dag "vs_core_2_spoc_helper_0_3" of module "vs_core_2" in dot format
+digraph "vs_core_2_spoc_helper_0_3" {
   // inputs
   "mv_1" [shape=circle];
   "stab" [shape=circle];
@@ -493,7 +493,7 @@ digraph "vs_core_2_helper_0_3" {
 // # SPOC calls: 4
 
 // FREIA-SPoC helper function for module vs_core_2
-freia_status vs_core_2_helper_0_0_0(
+freia_status vs_core_2_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -608,7 +608,7 @@ freia_status vs_core_2_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_2
-freia_status vs_core_2_helper_0_1_0(
+freia_status vs_core_2_spoc_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -693,7 +693,7 @@ freia_status vs_core_2_helper_0_1_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_2
-freia_status vs_core_2_helper_0_2_0(
+freia_status vs_core_2_spoc_helper_0_2_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t pi0,
@@ -827,7 +827,7 @@ freia_status vs_core_2_helper_0_2_0(
 }
 
 // FREIA-SPoC helper function for module vs_core_2
-freia_status vs_core_2_helper_0_3_0(
+freia_status vs_core_2_spoc_helper_0_3_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1)
@@ -902,24 +902,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    // hardware accelerator generated variable
    freia_data2d *mv_6 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
-   vs_core_2_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);         /*0015*/
+   vs_core_2_spoc_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);    /*0015*/
    // was cast
    // was cast
    
    // measure
    
    // bg update
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
+   vs_core_2_spoc_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);               /*0020*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
-   vs_core_2_helper_0_2_0(mv, mv_6, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);              /*0032*/
+   vs_core_2_spoc_helper_0_2_0(mv, mv_6, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);         /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
+   vs_core_2_spoc_helper_0_3_0(mv, mv, stab);                           /*0045*/
 
    freia_common_destruct_data(t0);                                      /*0047*/
    freia_common_destruct_data(mv_6);
@@ -939,24 +939,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    // hardware accelerator generated variable
    freia_data2d *mv_6 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
-   vs_core_2_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);         /*0015*/
+   vs_core_2_spoc_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);    /*0015*/
    // was cast
    // was cast
    
    // measure
    
    // bg update
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
+   vs_core_2_spoc_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);               /*0020*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
-   vs_core_2_helper_0_2_0(mv, mv_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);  /*0032*/
+   vs_core_2_spoc_helper_0_2_0(mv, mv_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);            /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
+   vs_core_2_spoc_helper_0_3_0(mv, mv, stab);                           /*0045*/
 
    freia_common_destruct_data(t0);                                      /*0047*/
    freia_common_destruct_data(mv_6);
@@ -1132,8 +1132,8 @@ digraph "dag_cleaned_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_0_0" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_0_0" {
+// graph for dag "vs_core_2_terapix_helper_0_0_0" of module "vs_core_2" in dot format
+digraph "vs_core_2_terapix_helper_0_0_0" {
   // inputs
   "bg" [shape=circle];
   "in" [shape=circle];
@@ -1162,8 +1162,8 @@ digraph "vs_core_2_helper_0_0_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_1_0" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_1_0" {
+// graph for dag "vs_core_2_terapix_helper_0_1_0" of module "vs_core_2" in dot format
+digraph "vs_core_2_terapix_helper_0_1_0" {
   // inputs
   "mv_6" [shape=circle];
   "stab" [shape=circle];
@@ -1225,7 +1225,7 @@ digraph "vs_core_2_helper_0_1_0" {
  * - computation: 23
  * - communication: 128
  */
-freia_status vs_core_2_helper_0_0_0(
+freia_status vs_core_2_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -1676,7 +1676,7 @@ freia_status vs_core_2_helper_0_0_0(
  * - computation: 79
  * - communication: 96
  */
-freia_status vs_core_2_helper_0_1_0(
+freia_status vs_core_2_terapix_helper_0_1_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2058,7 +2058,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
-   vs_core_2_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
+   vs_core_2_terapix_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);    /*0015*/
    // was cast
    // was cast
    
@@ -2068,7 +2068,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
-   vs_core_2_helper_0_1_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);          /*0032*/
+   vs_core_2_terapix_helper_0_1_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);  /*0032*/
    
    // open
    
@@ -2088,7 +2088,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
-   vs_core_2_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
+   vs_core_2_terapix_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);    /*0015*/
    // was cast
    // was cast
    
@@ -2098,7 +2098,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
-   vs_core_2_helper_0_1_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);             /*0032*/
+   vs_core_2_terapix_helper_0_1_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);     /*0032*/
    
    // open
    
@@ -2277,8 +2277,8 @@ digraph "dag_cleaned_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_0" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_0" {
+// graph for dag "vs_core_2_opencl_helper_0_0" of module "vs_core_2" in dot format
+digraph "vs_core_2_opencl_helper_0_0" {
   // inputs
   "bg" [shape=circle];
   "in" [shape=circle];
@@ -2307,8 +2307,8 @@ digraph "vs_core_2_helper_0_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_0_0" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_0_0" {
+// graph for dag "vs_core_2_opencl_helper_0_0_0" of module "vs_core_2" in dot format
+digraph "vs_core_2_opencl_helper_0_0_0" {
   // inputs
   "bg" [shape=circle];
   "in" [shape=circle];
@@ -2337,8 +2337,8 @@ digraph "vs_core_2_helper_0_0_0" {
   "in" -> "19 *_";
   "in" -> "15 -|";
 }
-// graph for dag "vs_core_2_helper_0_1" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_1" {
+// graph for dag "vs_core_2_opencl_helper_0_1" of module "vs_core_2" in dot format
+digraph "vs_core_2_opencl_helper_0_1" {
   // inputs
   "mv_6" [shape=circle];
   "stab" [shape=circle];
@@ -2369,8 +2369,8 @@ digraph "vs_core_2_helper_0_1" {
   "32 thr" -> "35 E8" [label="mv_5"];
   "mv_6" -> "32 thr";
 }
-// graph for dag "vs_core_2_helper_0_1_2" of module "vs_core_2" in dot format
-digraph "vs_core_2_helper_0_1_2" {
+// graph for dag "vs_core_2_opencl_helper_0_1_2" of module "vs_core_2" in dot format
+digraph "vs_core_2_opencl_helper_0_1_2" {
   // inputs
   "t2" [shape=circle];
   "mv_4" [shape=circle];
@@ -2403,18 +2403,18 @@ digraph "vs_core_2_helper_0_1_2" {
 
 // dag 0: 16 ops and 2 copies, optimized to 16 ops and 0+0+0 copies
 
-// hold kernels for vs_core_2_helper_0_0_0
-static cl_kernel vs_core_2_helper_0_0_0_kernel[2];
+// hold kernels for vs_core_2_opencl_helper_0_0_0
+static cl_kernel vs_core_2_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for vs_core_2_helper_0_0_0
-static freia_status vs_core_2_helper_0_0_0_compile(void)
+// compile kernels for vs_core_2_opencl_helper_0_0_0
+static freia_status vs_core_2_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for vs_core_2_helper_0_0_0
-  const char * vs_core_2_helper_0_0_0_source =
+  // OpenCL source for vs_core_2_opencl_helper_0_0_0
+  const char * vs_core_2_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function vs_core_2_helper_0_0_0\n"
-    "KERNEL void vs_core_2_helper_0_0_0(\n"
+    "// opencl function vs_core_2_opencl_helper_0_0_0\n"
+    "KERNEL void vs_core_2_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -2467,13 +2467,13 @@ static freia_status vs_core_2_helper_0_0_0_compile(void)
     "  redX[idy].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(vs_core_2_helper_0_0_0_source, "vs_core_2_helper_0_0_0", "-DPIXEL8", &vs_core_2_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(vs_core_2_helper_0_0_0_source, "vs_core_2_helper_0_0_0", "-DPIXEL16", &vs_core_2_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(vs_core_2_opencl_helper_0_0_0_source, "vs_core_2_opencl_helper_0_0_0", "-DPIXEL8", &vs_core_2_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(vs_core_2_opencl_helper_0_0_0_source, "vs_core_2_opencl_helper_0_0_0", "-DPIXEL16", &vs_core_2_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function vs_core_2_helper_0_0_0
-freia_status vs_core_2_helper_0_0_0(
+// helper function vs_core_2_opencl_helper_0_0_0
+freia_status vs_core_2_opencl_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -2489,7 +2489,7 @@ freia_status vs_core_2_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= vs_core_2_helper_0_0_0_compile();
+    err |= vs_core_2_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2497,12 +2497,12 @@ freia_status vs_core_2_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = vs_core_2_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = vs_core_2_opencl_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel vs_core_2_helper_0_0_0
+  // call kernel vs_core_2_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 2, 2, 3, 1, o0, o1, i0, i1, c0, c1, c2, &redres);
 
   // return reduction results
@@ -2512,18 +2512,18 @@ freia_status vs_core_2_helper_0_0_0(
   return err;
 }
 
-// hold kernels for vs_core_2_helper_0_1_2
-static cl_kernel vs_core_2_helper_0_1_2_kernel[2];
+// hold kernels for vs_core_2_opencl_helper_0_1_2
+static cl_kernel vs_core_2_opencl_helper_0_1_2_kernel[2];
 
-// compile kernels for vs_core_2_helper_0_1_2
-static freia_status vs_core_2_helper_0_1_2_compile(void)
+// compile kernels for vs_core_2_opencl_helper_0_1_2
+static freia_status vs_core_2_opencl_helper_0_1_2_compile(void)
 {
-  // OpenCL source for vs_core_2_helper_0_1_2
-  const char * vs_core_2_helper_0_1_2_source =
+  // OpenCL source for vs_core_2_opencl_helper_0_1_2
+  const char * vs_core_2_opencl_helper_0_1_2_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function vs_core_2_helper_0_1_2\n"
-    "KERNEL void vs_core_2_helper_0_1_2(\n"
+    "// opencl function vs_core_2_opencl_helper_0_1_2\n"
+    "KERNEL void vs_core_2_opencl_helper_0_1_2(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -2561,13 +2561,13 @@ static freia_status vs_core_2_helper_0_1_2_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(vs_core_2_helper_0_1_2_source, "vs_core_2_helper_0_1_2", "-DPIXEL8", &vs_core_2_helper_0_1_2_kernel[0]);
-  err |= freia_op_compile_kernel(vs_core_2_helper_0_1_2_source, "vs_core_2_helper_0_1_2", "-DPIXEL16", &vs_core_2_helper_0_1_2_kernel[1]);
+  err |= freia_op_compile_kernel(vs_core_2_opencl_helper_0_1_2_source, "vs_core_2_opencl_helper_0_1_2", "-DPIXEL8", &vs_core_2_opencl_helper_0_1_2_kernel[0]);
+  err |= freia_op_compile_kernel(vs_core_2_opencl_helper_0_1_2_source, "vs_core_2_opencl_helper_0_1_2", "-DPIXEL16", &vs_core_2_opencl_helper_0_1_2_kernel[1]);
   return err;
 }
 
-// helper function vs_core_2_helper_0_1_2
-freia_status vs_core_2_helper_0_1_2(
+// helper function vs_core_2_opencl_helper_0_1_2
+freia_status vs_core_2_opencl_helper_0_1_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2580,7 +2580,7 @@ freia_status vs_core_2_helper_0_1_2(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= vs_core_2_helper_0_1_2_compile();
+    err |= vs_core_2_opencl_helper_0_1_2_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2588,9 +2588,9 @@ freia_status vs_core_2_helper_0_1_2(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = vs_core_2_helper_0_1_2_kernel[bpp];
+  cl_kernel kernel = vs_core_2_opencl_helper_0_1_2_kernel[bpp];
 
-  // call kernel vs_core_2_helper_0_1_2
+  // call kernel vs_core_2_opencl_helper_0_1_2
   err |= freia_op_call_kernel(kernel, 1, 3, 2, 0, o0, i0, i1, i2, c0, c1);
 
   return err;
@@ -2600,8 +2600,8 @@ freia_status vs_core_2_helper_0_1_2(
 
 // opencl for dag 0
 
-// opencl function vs_core_2_helper_0_0_0
-KERNEL void vs_core_2_helper_0_0_0(
+// opencl function vs_core_2_opencl_helper_0_0_0
+KERNEL void vs_core_2_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -2654,8 +2654,8 @@ KERNEL void vs_core_2_helper_0_0_0(
   redX[idy].min = mmin.x;
 }
 
-// opencl function vs_core_2_helper_0_1_2
-KERNEL void vs_core_2_helper_0_1_2(
+// opencl function vs_core_2_opencl_helper_0_1_2
+KERNEL void vs_core_2_opencl_helper_0_1_2(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -2704,7 +2704,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
-   vs_core_2_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);            /*0015*/
+   vs_core_2_opencl_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);     /*0015*/
    // was cast
    // was cast
    
@@ -2723,7 +2723,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    // gradient
    freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0039*/
    freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0040*/
-   vs_core_2_helper_0_1_2(mv, t2, mv, stab, -1, 1);                     /*0041*/
+   vs_core_2_opencl_helper_0_1_2(mv, t2, mv, stab, -1, 1);              /*0041*/
    
    
    freia_common_destruct_data(t1);                                      /*0048*/
@@ -2742,7 +2742,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
-   vs_core_2_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);            /*0015*/
+   vs_core_2_opencl_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);     /*0015*/
    // was cast
    // was cast
    
@@ -2761,7 +2761,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    // gradient
    freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0039*/
    freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0040*/
-   vs_core_2_helper_0_1_2(mv, t2, mv, stab, -1, 1);                     /*0041*/
+   vs_core_2_opencl_helper_0_1_2(mv, t2, mv, stab, -1, 1);              /*0041*/
    
    
    freia_common_destruct_data(t1);                                      /*0048*/

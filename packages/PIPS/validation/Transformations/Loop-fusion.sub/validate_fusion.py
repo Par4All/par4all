@@ -3,6 +3,7 @@ import pyps
 
 def validate_fusion(self,parallelize=False, flatten=True):
     if parallelize==True:
+        self.privatize_module()
         self.coarse_grain_parallelization()
 
     if flatten==True:

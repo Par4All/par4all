@@ -123,8 +123,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "i";
 }
-// graph for dag "sub_00_helper_0_0" of module "sub_00" in dot format
-digraph "sub_00_helper_0_0" {
+// graph for dag "sub_00_spoc_helper_0_0" of module "sub_00" in dot format
+digraph "sub_00_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -152,7 +152,7 @@ digraph "sub_00_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module sub_00
-freia_status sub_00_helper_0_0_0(
+freia_status sub_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   int32_t pi0,
@@ -251,14 +251,14 @@ freia_status sub_00_helper_0_0_0(
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+   sub_00_spoc_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);              /*0007*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+   sub_00_spoc_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                 /*0007*/
 }
 #
 # TERAPIX
@@ -315,8 +315,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "i";
 }
-// graph for dag "sub_00_helper_0_0_0" of module "sub_00" in dot format
-digraph "sub_00_helper_0_0_0" {
+// graph for dag "sub_00_terapix_helper_0_0_0" of module "sub_00" in dot format
+digraph "sub_00_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -362,7 +362,7 @@ digraph "sub_00_helper_0_0_0" {
  * - computation: 9
  * - communication: 64
  */
-freia_status sub_00_helper_0_0_0(
+freia_status sub_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   int32_t pi2,
@@ -569,14 +569,14 @@ freia_status sub_00_helper_0_0_0(
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+   sub_00_terapix_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);           /*0007*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+   sub_00_terapix_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);              /*0007*/
 }
 #
 # OPENCL
@@ -633,8 +633,8 @@ digraph "dag_cleaned_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "i";
 }
-// graph for dag "sub_00_helper_0_0" of module "sub_00" in dot format
-digraph "sub_00_helper_0_0" {
+// graph for dag "sub_00_opencl_helper_0_0" of module "sub_00" in dot format
+digraph "sub_00_opencl_helper_0_0" {
   // inputs
 
   // outputs
@@ -649,8 +649,8 @@ digraph "sub_00_helper_0_0" {
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "i";
 }
-// graph for dag "sub_00_helper_0_0_0" of module "sub_00" in dot format
-digraph "sub_00_helper_0_0_0" {
+// graph for dag "sub_00_opencl_helper_0_0_0" of module "sub_00" in dot format
+digraph "sub_00_opencl_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -676,18 +676,18 @@ digraph "sub_00_helper_0_0_0" {
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for sub_00_helper_0_0_0
-static cl_kernel sub_00_helper_0_0_0_kernel[2];
+// hold kernels for sub_00_opencl_helper_0_0_0
+static cl_kernel sub_00_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for sub_00_helper_0_0_0
-static freia_status sub_00_helper_0_0_0_compile(void)
+// compile kernels for sub_00_opencl_helper_0_0_0
+static freia_status sub_00_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for sub_00_helper_0_0_0
-  const char * sub_00_helper_0_0_0_source =
+  // OpenCL source for sub_00_opencl_helper_0_0_0
+  const char * sub_00_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function sub_00_helper_0_0_0\n"
-    "KERNEL void sub_00_helper_0_0_0(\n"
+    "// opencl function sub_00_opencl_helper_0_0_0\n"
+    "KERNEL void sub_00_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -718,13 +718,13 @@ static freia_status sub_00_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(sub_00_helper_0_0_0_source, "sub_00_helper_0_0_0", "-DPIXEL8", &sub_00_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(sub_00_helper_0_0_0_source, "sub_00_helper_0_0_0", "-DPIXEL16", &sub_00_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(sub_00_opencl_helper_0_0_0_source, "sub_00_opencl_helper_0_0_0", "-DPIXEL8", &sub_00_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(sub_00_opencl_helper_0_0_0_source, "sub_00_opencl_helper_0_0_0", "-DPIXEL16", &sub_00_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function sub_00_helper_0_0_0
-freia_status sub_00_helper_0_0_0(
+// helper function sub_00_opencl_helper_0_0_0
+freia_status sub_00_opencl_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   int32_t c0,
@@ -738,7 +738,7 @@ freia_status sub_00_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= sub_00_helper_0_0_0_compile();
+    err |= sub_00_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -746,9 +746,9 @@ freia_status sub_00_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel = sub_00_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = sub_00_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel sub_00_helper_0_0_0
+  // call kernel sub_00_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 2, 0, 5, 0, o0, o1, c0, c1, c2, c3, c4);
 
   return err;
@@ -758,8 +758,8 @@ freia_status sub_00_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function sub_00_helper_0_0_0
-KERNEL void sub_00_helper_0_0_0(
+// opencl function sub_00_opencl_helper_0_0_0
+KERNEL void sub_00_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -794,14 +794,14 @@ KERNEL void sub_00_helper_0_0_0(
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+   sub_00_opencl_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);            /*0007*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+   sub_00_opencl_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);               /*0007*/
 }
 #
 # FREIA COMPILATION DONE

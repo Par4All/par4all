@@ -27,7 +27,7 @@ void slope02()
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-1, 5) to point(11,7), 6y=x+31. It
-      * should be simplified into y<=5 and 5y<x+25.
+      * should be simplified into y<=6 and 5y<x+25.
       *
       * Due to division, the left point must be moved to (-2,5) for dx=13
       */
@@ -71,7 +71,7 @@ void slope02()
    
    /* Define a horizontal constraint that is slightly increasing in
       * rationals.  It links point (-1, 5) to point(11,7), 6y=x+31. It
-      * should be simplified into y<=5 and 5y<x+25.
+      * should be simplified into y<=6 and 5y<x+25.
       *
       * Due to division, the left point must be moved to (-2,5) for dx=13
       */

@@ -4,10 +4,12 @@
 void perfect(int n, int a[n][n], int b[n][n])
 {
    int i, j;
+#pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)
          a[i][j] = 0;
+#pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1) {
          a[i][j] = 0;
@@ -21,16 +23,18 @@ void perfect(int n, int a[n][n], int b[n][n])
 void perfect(int n, int a[n][n], int b[n][n])
 {
    int i, j;
-   for(i = 0; i <= n-1; i += 1) {
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)
          a[i][j] = 0;
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1) {
          a[i][j] = 0;
          // The following prevents inner loop parallelization
          b[i][a[i][j]]++;
       }
-   }
 }
 //
 // Code before fusion
@@ -38,16 +42,18 @@ void perfect(int n, int a[n][n], int b[n][n])
 void perfect(int n, int a[n][n], int b[n][n])
 {
    int i, j;
-   for(i = 0; i <= n-1; i += 1) {
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)
          a[i][j] = 0;
+#pragma omp parallel for private(j)
+   for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1) {
          a[i][j] = 0;
          // The following prevents inner loop parallelization
          b[i][a[i][j]]++;
       }
-   }
 }
 //
 // Code after fusion
@@ -55,6 +61,7 @@ void perfect(int n, int a[n][n], int b[n][n])
 void perfect(int n, int a[n][n], int b[n][n])
 {
    int i, j;
+#pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1) {
 #pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)

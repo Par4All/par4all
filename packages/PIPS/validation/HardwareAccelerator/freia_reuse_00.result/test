@@ -149,8 +149,8 @@ digraph "dag_cleaned_0" {
   "12 E6" -> "13 D6" [label="t"];
   "i" -> "12 E6";
 }
-// graph for dag "freia_reuse_00_helper_0_0" of module "freia_reuse_00" in dot format
-digraph "freia_reuse_00_helper_0_0" {
+// graph for dag "freia_reuse_00_spoc_helper_0_0" of module "freia_reuse_00" in dot format
+digraph "freia_reuse_00_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -181,7 +181,7 @@ digraph "freia_reuse_00_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_reuse_00
-freia_status freia_reuse_00_helper_0_0_0(
+freia_status freia_reuse_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0)
@@ -283,7 +283,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_spoc_helper_0_0_0(o, i, k);                           /*0012*/
    
    
    return FREIA_OK;                                                     /*0019*/
@@ -298,7 +298,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_spoc_helper_0_0_0(o, i, k);                           /*0012*/
    
    
    return 0;                                                            /*0019*/
@@ -367,8 +367,8 @@ digraph "dag_cleaned_0" {
   "12 E6" -> "13 D6" [label="t"];
   "i" -> "12 E6";
 }
-// graph for dag "freia_reuse_00_helper_0_0_0" of module "freia_reuse_00" in dot format
-digraph "freia_reuse_00_helper_0_0_0" {
+// graph for dag "freia_reuse_00_terapix_helper_0_0_0" of module "freia_reuse_00" in dot format
+digraph "freia_reuse_00_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -417,7 +417,7 @@ digraph "freia_reuse_00_helper_0_0_0" {
  * - computation: 50
  * - communication: 64
  */
-freia_status freia_reuse_00_helper_0_0_0(
+freia_status freia_reuse_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -629,7 +629,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_terapix_helper_0_0_0(o, i, k);                        /*0012*/
    
    
    return FREIA_OK;                                                     /*0019*/
@@ -644,7 +644,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_terapix_helper_0_0_0(o, i, k);                        /*0012*/
    
    
    return 0;                                                            /*0019*/
@@ -713,8 +713,8 @@ digraph "dag_cleaned_0" {
   "12 E6" -> "13 D6" [label="t_2"];
   "i" -> "12 E6";
 }
-// graph for dag "freia_reuse_00_helper_0_0" of module "freia_reuse_00" in dot format
-digraph "freia_reuse_00_helper_0_0" {
+// graph for dag "freia_reuse_00_opencl_helper_0_0" of module "freia_reuse_00" in dot format
+digraph "freia_reuse_00_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
 

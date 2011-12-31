@@ -443,8 +443,8 @@ int anr999(void)
 
 ! graphs
 
-// graph for dag "anr999_helper_0_0" of module "anr999" in dot format
-digraph "anr999_helper_0_0" {
+// graph for dag "anr999_spoc_helper_0_0" of module "anr999" in dot format
+digraph "anr999_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -656,7 +656,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_0(
+freia_status anr999_spoc_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -906,7 +906,7 @@ freia_status anr999_helper_0_0_0(
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_1(
+freia_status anr999_spoc_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -1085,9 +1085,9 @@ int anr999(void)
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
 
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
+   anr999_spoc_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);          /*0038*/
 
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0048*/
+   anr999_spoc_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);    /*0048*/
    
    
    
@@ -1149,9 +1149,9 @@ int anr999(void)
    I_10_0 = 0;                                                          /*0085*/
    I_13 = 0;                                                            /*0090*/
 
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
+   anr999_spoc_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);          /*0038*/
 
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0048*/
+   anr999_spoc_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);    /*0048*/
    
    
    
@@ -1278,8 +1278,8 @@ int anr999(void)
 
 ! graphs
 
-// graph for dag "anr999_helper_0_0_0" of module "anr999" in dot format
-digraph "anr999_helper_0_0_0" {
+// graph for dag "anr999_terapix_helper_0_0_0" of module "anr999" in dot format
+digraph "anr999_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -1315,8 +1315,8 @@ digraph "anr999_helper_0_0_0" {
   "in" -> "39 vol";
   "in" -> "38 min";
 }
-// graph for dag "anr999_helper_0_0_1" of module "anr999" in dot format
-digraph "anr999_helper_0_0_1" {
+// graph for dag "anr999_terapix_helper_0_0_1" of module "anr999" in dot format
+digraph "anr999_terapix_helper_0_0_1" {
   // inputs
   "od_5" [shape=circle];
   "og_6" [shape=circle];
@@ -1523,7 +1523,7 @@ digraph "dag_cleaned_0" {
  * - computation: 156
  * - communication: 96
  */
-freia_status anr999_helper_0_0_0(
+freia_status anr999_terapix_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -2039,7 +2039,7 @@ freia_status anr999_helper_0_0_0(
  * - computation: 154
  * - communication: 128
  */
-freia_status anr999_helper_0_0_1(
+freia_status anr999_terapix_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
@@ -2463,10 +2463,10 @@ int anr999(void)
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
 
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
+   anr999_terapix_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);       /*0038*/
    
    
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0046*/
+   anr999_terapix_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);                /*0046*/
    
    
    
@@ -2527,10 +2527,10 @@ int anr999(void)
    I_10_0 = 0;                                                          /*0085*/
    I_13 = 0;                                                            /*0090*/
 
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
+   anr999_terapix_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);       /*0038*/
    
    
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0046*/
+   anr999_terapix_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);                /*0046*/
    
    
    
@@ -2656,8 +2656,8 @@ int anr999(void)
 
 ! graphs
 
-// graph for dag "anr999_helper_0_0" of module "anr999" in dot format
-digraph "anr999_helper_0_0" {
+// graph for dag "anr999_opencl_helper_0_0" of module "anr999" in dot format
+digraph "anr999_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -2716,8 +2716,8 @@ digraph "anr999_helper_0_0" {
   "in" -> "39 vol";
   "in" -> "38 min";
 }
-// graph for dag "anr999_helper_0_0_1" of module "anr999" in dot format
-digraph "anr999_helper_0_0_1" {
+// graph for dag "anr999_opencl_helper_0_0_1" of module "anr999" in dot format
+digraph "anr999_opencl_helper_0_0_1" {
   // inputs
   "in" [shape=circle];
   "od" [shape=circle];
@@ -2887,18 +2887,18 @@ digraph "dag_cleaned_0" {
 
 // dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0+0 copies
 
-// hold kernels for anr999_helper_0_0_1
-static cl_kernel anr999_helper_0_0_1_kernel[2];
+// hold kernels for anr999_opencl_helper_0_0_1
+static cl_kernel anr999_opencl_helper_0_0_1_kernel[2];
 
-// compile kernels for anr999_helper_0_0_1
-static freia_status anr999_helper_0_0_1_compile(void)
+// compile kernels for anr999_opencl_helper_0_0_1
+static freia_status anr999_opencl_helper_0_0_1_compile(void)
 {
-  // OpenCL source for anr999_helper_0_0_1
-  const char * anr999_helper_0_0_1_source =
+  // OpenCL source for anr999_opencl_helper_0_0_1
+  const char * anr999_opencl_helper_0_0_1_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function anr999_helper_0_0_1\n"
-    "KERNEL void anr999_helper_0_0_1(\n"
+    "// opencl function anr999_opencl_helper_0_0_1\n"
+    "KERNEL void anr999_opencl_helper_0_0_1(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -2944,13 +2944,13 @@ static freia_status anr999_helper_0_0_1_compile(void)
     "  redX[idy].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(anr999_helper_0_0_1_source, "anr999_helper_0_0_1", "-DPIXEL8", &anr999_helper_0_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(anr999_helper_0_0_1_source, "anr999_helper_0_0_1", "-DPIXEL16", &anr999_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(anr999_opencl_helper_0_0_1_source, "anr999_opencl_helper_0_0_1", "-DPIXEL8", &anr999_opencl_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(anr999_opencl_helper_0_0_1_source, "anr999_opencl_helper_0_0_1", "-DPIXEL16", &anr999_opencl_helper_0_0_1_kernel[1]);
   return err;
 }
 
-// helper function anr999_helper_0_0_1
-freia_status anr999_helper_0_0_1(
+// helper function anr999_opencl_helper_0_0_1
+freia_status anr999_opencl_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -2963,7 +2963,7 @@ freia_status anr999_helper_0_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= anr999_helper_0_0_1_compile();
+    err |= anr999_opencl_helper_0_0_1_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -2971,12 +2971,12 @@ freia_status anr999_helper_0_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = anr999_helper_0_0_1_kernel[bpp];
+  cl_kernel kernel = anr999_opencl_helper_0_0_1_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel anr999_helper_0_0_1
+  // call kernel anr999_opencl_helper_0_0_1
   err |= freia_op_call_kernel(kernel, 1, 3, 0, 1, o0, i0, i1, i2, &redres);
 
   // return reduction results
@@ -2990,8 +2990,8 @@ freia_status anr999_helper_0_0_1(
 
 // opencl for dag 0
 
-// opencl function anr999_helper_0_0_1
-KERNEL void anr999_helper_0_0_1(
+// opencl function anr999_opencl_helper_0_0_1
+KERNEL void anr999_opencl_helper_0_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -3103,7 +3103,7 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
 
-   anr999_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);     /*0087*/
+   anr999_opencl_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);             /*0087*/
    
    
    
@@ -3186,7 +3186,7 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
 
-   anr999_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);     /*0087*/
+   anr999_opencl_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);             /*0087*/
    
    
    

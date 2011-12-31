@@ -213,8 +213,8 @@ digraph "dag_cleaned_0" {
   "4 =()" -> "o";
   "i0" -> "4 =()";
 }
-// graph for dag "my_cast_helper_0_0" of module "my_cast" in dot format
-digraph "my_cast_helper_0_0" {
+// graph for dag "my_cast_opencl_helper_0_0" of module "my_cast" in dot format
+digraph "my_cast_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
 

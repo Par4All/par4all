@@ -83,8 +83,8 @@ freia_status cst_03(freia_data2d *o)
 
 ! graphs
 
-// graph for dag "cst_03_helper_0_0" of module "cst_03" in dot format
-digraph "cst_03_helper_0_0" {
+// graph for dag "cst_03_spoc_helper_0_0" of module "cst_03" in dot format
+digraph "cst_03_spoc_helper_0_0" {
   // inputs
 
   // outputs
@@ -150,7 +150,7 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module cst_03
-freia_status cst_03_helper_0_0_0(
+freia_status cst_03_spoc_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi0,
   int32_t pi1,
@@ -242,7 +242,7 @@ freia_status cst_03_helper_0_0_0(
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_spoc_helper_0_0_0(o, 0, 1, 2, 3);                             /*0005*/
    return FREIA_OK;                                                     /*0009*/
 }
 
@@ -250,7 +250,7 @@ freia_status cst_03(freia_data2d *o)
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_spoc_helper_0_0_0(o, 0, 1, 2, 3);                             /*0005*/
    return 0;                                                            /*0009*/
 }
 #
@@ -270,8 +270,8 @@ freia_status cst_03(freia_data2d *o)
 
 ! graphs
 
-// graph for dag "cst_03_helper_0_0_0" of module "cst_03" in dot format
-digraph "cst_03_helper_0_0_0" {
+// graph for dag "cst_03_terapix_helper_0_0_0" of module "cst_03" in dot format
+digraph "cst_03_terapix_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -355,7 +355,7 @@ digraph "dag_cleaned_0" {
  * - computation: 11
  * - communication: 32
  */
-freia_status cst_03_helper_0_0_0(
+freia_status cst_03_terapix_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1,
   int32_t pi2,
@@ -588,7 +588,7 @@ freia_status cst_03_helper_0_0_0(
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_terapix_helper_0_0_0(o, 0, 1, 2, 3);                          /*0005*/
    return FREIA_OK;                                                     /*0009*/
 }
 
@@ -596,7 +596,7 @@ freia_status cst_03(freia_data2d *o)
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_terapix_helper_0_0_0(o, 0, 1, 2, 3);                          /*0005*/
    return 0;                                                            /*0009*/
 }
 #
@@ -616,8 +616,8 @@ freia_status cst_03(freia_data2d *o)
 
 ! graphs
 
-// graph for dag "cst_03_helper_0_0" of module "cst_03" in dot format
-digraph "cst_03_helper_0_0" {
+// graph for dag "cst_03_opencl_helper_0_0" of module "cst_03" in dot format
+digraph "cst_03_opencl_helper_0_0" {
   // inputs
 
   // outputs
@@ -633,8 +633,8 @@ digraph "cst_03_helper_0_0" {
   "5 C" [shape=trapezium,orientation=270];
   "5 C" -> "6 +s_" [label="o_3"];
 }
-// graph for dag "cst_03_helper_0_0_0" of module "cst_03" in dot format
-digraph "cst_03_helper_0_0_0" {
+// graph for dag "cst_03_opencl_helper_0_0_0" of module "cst_03" in dot format
+digraph "cst_03_opencl_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -698,18 +698,18 @@ digraph "dag_cleaned_0" {
 
 // dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
 
-// hold kernels for cst_03_helper_0_0_0
-static cl_kernel cst_03_helper_0_0_0_kernel[2];
+// hold kernels for cst_03_opencl_helper_0_0_0
+static cl_kernel cst_03_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for cst_03_helper_0_0_0
-static freia_status cst_03_helper_0_0_0_compile(void)
+// compile kernels for cst_03_opencl_helper_0_0_0
+static freia_status cst_03_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for cst_03_helper_0_0_0
-  const char * cst_03_helper_0_0_0_source =
+  // OpenCL source for cst_03_opencl_helper_0_0_0
+  const char * cst_03_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function cst_03_helper_0_0_0\n"
-    "KERNEL void cst_03_helper_0_0_0(\n"
+    "// opencl function cst_03_opencl_helper_0_0_0\n"
+    "KERNEL void cst_03_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  int width,\n"
@@ -736,13 +736,13 @@ static freia_status cst_03_helper_0_0_0_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(cst_03_helper_0_0_0_source, "cst_03_helper_0_0_0", "-DPIXEL8", &cst_03_helper_0_0_0_kernel[0]);
-  err |= freia_op_compile_kernel(cst_03_helper_0_0_0_source, "cst_03_helper_0_0_0", "-DPIXEL16", &cst_03_helper_0_0_0_kernel[1]);
+  err |= freia_op_compile_kernel(cst_03_opencl_helper_0_0_0_source, "cst_03_opencl_helper_0_0_0", "-DPIXEL8", &cst_03_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(cst_03_opencl_helper_0_0_0_source, "cst_03_opencl_helper_0_0_0", "-DPIXEL16", &cst_03_opencl_helper_0_0_0_kernel[1]);
   return err;
 }
 
-// helper function cst_03_helper_0_0_0
-freia_status cst_03_helper_0_0_0(
+// helper function cst_03_opencl_helper_0_0_0
+freia_status cst_03_opencl_helper_0_0_0(
   freia_data2d * o0,
   int32_t c0,
   int32_t c1,
@@ -754,7 +754,7 @@ freia_status cst_03_helper_0_0_0(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= cst_03_helper_0_0_0_compile();
+    err |= cst_03_opencl_helper_0_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -762,9 +762,9 @@ freia_status cst_03_helper_0_0_0(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel = cst_03_helper_0_0_0_kernel[bpp];
+  cl_kernel kernel = cst_03_opencl_helper_0_0_0_kernel[bpp];
 
-  // call kernel cst_03_helper_0_0_0
+  // call kernel cst_03_opencl_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 0, 4, 0, o0, c0, c1, c2, c3);
 
   return err;
@@ -774,8 +774,8 @@ freia_status cst_03_helper_0_0_0(
 
 // opencl for dag 0
 
-// opencl function cst_03_helper_0_0_0
-KERNEL void cst_03_helper_0_0_0(
+// opencl function cst_03_opencl_helper_0_0_0
+KERNEL void cst_03_opencl_helper_0_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   int width,
@@ -806,7 +806,7 @@ KERNEL void cst_03_helper_0_0_0(
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_opencl_helper_0_0_0(o, 0, 1, 2, 3);                           /*0005*/
    return FREIA_OK;                                                     /*0009*/
 }
 
@@ -814,7 +814,7 @@ freia_status cst_03(freia_data2d *o)
 
 freia_status cst_03(freia_data2d *o)
 {
-   cst_03_helper_0_0_0(o, 0, 1, 2, 3);                                  /*0005*/
+   cst_03_opencl_helper_0_0_0(o, 0, 1, 2, 3);                           /*0005*/
    return 0;                                                            /*0009*/
 }
 #
