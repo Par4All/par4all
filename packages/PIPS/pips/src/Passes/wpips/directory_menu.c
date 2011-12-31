@@ -27,10 +27,6 @@
 /* Generate a menu from the current directory to serve as a directory
    chooser. */
 
-#ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1998/04/16 14:45:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
 #include <xview/xview.h>
 #include <xview/panel.h>
 /* To have SunOS 5.5 happy about MAXNAMELEN (in SunOS 4, it is already

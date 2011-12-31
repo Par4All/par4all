@@ -1,6 +1,6 @@
 /*
 
- $Id: loop_fusion.c 15900 2009-12-23 16:00:55Z amini $
+ $Id$
 
  Copyright 1989-2009 MINES ParisTech
 

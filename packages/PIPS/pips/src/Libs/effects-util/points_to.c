@@ -1,6 +1,6 @@
 /*
 
-  $Id: utils.c 17413 2010-06-24 06:59:11Z creusillet $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
   Copyright 2009-2010 HPC Project

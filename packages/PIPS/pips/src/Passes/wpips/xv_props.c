@@ -25,10 +25,6 @@
     #include "pips_config.h"
 #endif
 
-#ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 2002/03/15 07:55:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

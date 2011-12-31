@@ -1,6 +1,6 @@
 /*
 
-  $Id: methods.c 15658 2009-11-02 11:21:36Z creusillet $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
