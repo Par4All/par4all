@@ -85,6 +85,8 @@ typedef struct fusion_block {
   fbset rr_predecessors; // set of blocks that use data reused in this one, false dep
   bool is_a_loop;
   int count_fusion; // Count the number of fusion that have occur
+  bool processed; // Flag that indicates if the block have already been processed
+  // (multiple paths can lead to multiple costly tried of the same fusion)
 }*fusion_block;
 
 /* Newgen list foreach compatibility */
@@ -474,7 +476,7 @@ static bool fusion_loops(statement sloop1,
 
   // Build chains
   // do not debug on/off all the time : costly (read environment + atoi )?
-  // debug_on("CHAINS_DEBUG_LEVEL");
+  //debug_on("CHAINS_DEBUG_LEVEL");
   graph candidate_dg = statement_dependence_graph(sloop1);
   //debug_off();
 
@@ -487,7 +489,7 @@ static bool fusion_loops(statement sloop1,
   // do not debug on/off all the time : costly (read environment + atoi )?
   //debug_on("RICEDG_DEBUG_LEVEL");
   candidate_dg = compute_dg_on_statement_from_chains_in_place(sloop1, candidate_dg);
-  // debug_off();
+  //debug_off();
 
   // Cleaning
   clean_enclosing_loops();
@@ -535,14 +537,30 @@ static bool fusion_loops(statement sloop1,
               continue;
             }
 
+            // Scalar can make any conflict ! The loop are parallel thus it has
+            // to be private :-)
+            if(loop_parallel_p(loop2) &&
+                (effect_scalar_p(e_sink) || effect_scalar_p(e_source))) {
+              continue;
+            }
+
             // Get the levels and try to find out if the fused loop carries the
             // conflict
-            list levels = cone_levels(conflict_cone(c));
-            FOREACH(INT,l,levels) {
-              if(l==1) {
-                // Hum seems bad... This a loop carried dependence !
-                success = false;
-                break;
+            if(cone_undefined != conflict_cone(c)) {
+              list levels = cone_levels(conflict_cone(c));
+              FOREACH(INT, l, levels) {
+                if(l == 1) {
+                  // Hum seems bad... This a loop carried dependence !
+                  success = false;
+                  ifdebug(2) {
+                    pips_debug(0,"This loop carried dependence is breaking parallism !\n");
+                    fprintf(stderr, "From : ");
+                    print_effect(e_source);
+                    fprintf(stderr, "to : ");
+                    print_effect(e_sink);
+                  }
+                  break;
+                }
               }
             }
           }
@@ -672,6 +690,15 @@ static bool fusion_loops(statement sloop1,
     // assignment here
      // ...
     loop_body(loop1) = body_loop1;
+
+    // Merge loop locals
+    FOREACH(ENTITY,e,loop_locals(loop2)) {
+
+      if(e != loop_index(loop2) && !gen_in_list_p(e,loop_locals(loop1))) {
+        loop_locals(loop1) = CONS(ENTITY,e,loop_locals(loop1));
+      }
+    }
+
     if(!inner_success) { // Usual case
       gen_free_list(sequence_statements(statement_sequence(body_loop1)));
       sequence_statements(statement_sequence(body_loop1)) = fused;
@@ -721,6 +748,7 @@ static fusion_block make_empty_block(int num) {
   block->rr_predecessors = fbset_make();
   block->is_a_loop = false;
   block->count_fusion = 0;
+  block->processed = false;
 
   return block;
 }
@@ -1072,7 +1100,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
                                         bool maximize_parallelism,
                                         unsigned int fuse_limit) {
   // First step is to try to fuse with each successor
-  if(b->is_a_loop && b->num>=0 && b->count_fusion < fuse_limit) {
+  if(!b->processed && b->is_a_loop && b->num>=0 && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     FBSET_FOREACH( succ, b->successors)
     {
@@ -1093,6 +1121,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
       return true;
   }
 
+  b->processed = false;
   return false;
 }
 

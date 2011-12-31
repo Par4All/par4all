@@ -1842,7 +1842,7 @@ list freia_trpx_compile_calls
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
 
-  string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
+  string fname_fulldag = strdup(cat(module, "_terapix", HELPER, itoa(number)));
 
   // First, split only on scalar deps...
   // is it that simple? NO!
