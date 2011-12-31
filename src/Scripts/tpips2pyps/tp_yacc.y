@@ -1,6 +1,6 @@
 /*
 
-  $Id: tp_yacc.y 18855 2011-01-13 14:33:48Z irigoin $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 

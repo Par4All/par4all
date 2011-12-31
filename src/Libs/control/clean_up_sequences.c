@@ -31,13 +31,6 @@
 
    */
 
-/* 	%A% ($Date: 2004/02/16 15:24:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 2004/02/16 15:24:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>

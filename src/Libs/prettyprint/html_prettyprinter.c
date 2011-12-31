@@ -1,6 +1,6 @@
 /*
 
- $Id: cprettyprinter.c 15792 2009-11-27 10:26:07Z amini $
+ $Id$
 
  Copyright 1989-2009 MINES ParisTech
 

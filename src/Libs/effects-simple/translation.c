@@ -1,6 +1,6 @@
 /*
 
-  $Id: interprocedural.c 17469 2010-07-06 08:13:53Z creusillet $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 

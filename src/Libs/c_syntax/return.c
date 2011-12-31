@@ -1,6 +1,6 @@
 /*
 
-  $Id: return.c 16236 2010-03-04 14:39:43Z guelton $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 

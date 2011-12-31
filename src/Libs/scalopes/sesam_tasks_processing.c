@@ -1,6 +1,6 @@
 /*
 
-  $Id: sesam_task_detection.c 18948 2011-02-08 19:50:54Z creusillet $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
