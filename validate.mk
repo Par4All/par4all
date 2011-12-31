@@ -512,6 +512,16 @@ multi-source:
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
+# empty 'test' result file
+.PHONY: empty-test
+empty-test:
+	@for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
+          if test -d $$base.result -a -e $$base.result/test -a ! -s $$base.result/test ; \
+          then \
+            echo "empty-test: $(SUBDIR)/$$base" ; \
+          fi ; \
+        done >> $(RESULTS)
+
 # check that all tpips2 have a corresponding flt
 .PHONY: nofilter
 nofilter:
@@ -522,7 +532,7 @@ nofilter:
 
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script nofilter
+inconsistencies: skipped orphan multi-source multi-script nofilter empty-test
 	@[ "$(D.rec)" ] && $(MAKE) FORWARD=inconsistencies $(D.rec) || exit 0
 
 ########################################################### LOCAL CHECK HELPERS
