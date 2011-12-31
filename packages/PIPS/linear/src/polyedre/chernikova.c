@@ -1059,7 +1059,7 @@ Ppolynome sc_enumerate(Psysteme ordered_sc, Pbase ordered_base, const char* vari
 
       C = Universe_Polyhedron(base_dimension(ordered_base));
 
-      ehrhart = Polyhedron_Enumerate(A, C, MAX_NB_RAYS, (char**)variable_names);
+      ehrhart = Polyhedron_Enumerate(A, C, MAX_NB_RAYS, variable_names);
       // Value vals[2]= {0,0};
       // Value *val = compute_poly(ehrhart,&vals[0]);
       // printf("%lld\n",*val);
