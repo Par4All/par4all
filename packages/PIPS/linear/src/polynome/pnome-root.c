@@ -1,6 +1,6 @@
 /*
 
-  $Id: pnome-reduc.c 1341 2010-06-04 15:49:54Z guelton $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
