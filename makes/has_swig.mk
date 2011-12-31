@@ -1,4 +1,4 @@
-# $Id: has_swig.mk 969 2009-06-02 16:52:03Z coelho $
+# $Id$
 #
 # Copyright 1989-2010 MINES ParisTech
 #
