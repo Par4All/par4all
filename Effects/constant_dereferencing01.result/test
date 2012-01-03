@@ -1,4 +1,3 @@
-int main();
 int main()
 {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
