@@ -290,11 +290,12 @@ live_in_paths_of_statement(statement s,
   /* live in paths may have already been computed,
      for instance for sequences
   */
+  pips_debug(1,"begin for statement with ordering: %03zd and number: %03zd\n",
+	     statement_ordering(s), statement_number(s));
+
   if ( !bound_live_in_paths_p(s) )
     {
-      pips_debug(1,"begin for statement with ordering: %03zd and number: %03zd\n",
-		 statement_ordering(s), statement_number(s));
-
+      pips_debug(1, "not bound\n");
       /* First, we get the live out paths of the statement */
       list l_live_out = effects_dup(load_live_out_paths_list(s));
 
@@ -321,8 +322,8 @@ live_in_paths_of_statement(statement s,
 
       reset_converted_rw_effects(&l_write, ctxt);
 
-      pips_debug(1,"end\n");
     }
+  pips_debug(1,"end\n");
   return;
 }
 
@@ -383,6 +384,8 @@ live_paths_from_block_to_statements(sequence seq,
   statement seq_stmt = (statement) gen_get_ancestor(statement_domain, seq);
   list l_stmt = sequence_statements(seq);
 
+  pips_debug(1, "begin\n");
+
   if (ENDP(l_stmt))
     {
       if (get_bool_property("WARN_ABOUT_EMPTY_SEQUENCES"))
@@ -419,8 +422,9 @@ live_paths_from_block_to_statements(sequence seq,
 
       gen_free_list(l_rev_stmt);
     }
+  pips_debug(1, "end\n");
 
- return false;
+ return true;
 }
 
 static bool
