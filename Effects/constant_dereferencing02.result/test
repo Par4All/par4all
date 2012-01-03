@@ -1,0 +1,8 @@
+int main();
+int main()
+{
+   char c;
+//             <    is written>: c
+   c = *"era";
+   return 0;
+}
