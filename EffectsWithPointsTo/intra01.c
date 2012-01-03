@@ -2,6 +2,7 @@
    compute proper and cumulated effects with points to for intra02
    compute proper and cumulated pointer effects for intra03
 */
+#include<stdio.h>
 void bar(int **pp, int **qq) {
   *pp = *qq;
   printf("pointers exchanged");
