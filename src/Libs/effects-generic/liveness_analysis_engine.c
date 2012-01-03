@@ -281,11 +281,180 @@ bool live_out_summary_paths_engine(const char* module_name)
   return true;
 }
 
-/********************* GENERIC INTRAPROCEDURAL LIVE_IN AND LIVE_OUT PATHS ANALYSIS */
+/**************** GENERIC INTRAPROCEDURAL LIVE_IN AND LIVE_OUT PATHS ANALYSIS */
+
+static void
+live_in_paths_of_statement(statement s,
+			   live_paths_analysis_context *ctxt)
+{
+  /* live in paths may have already been computed,
+     for instance for sequences
+  */
+  if ( !bound_live_in_paths_p(s) )
+    {
+      pips_debug(1,"begin for statement with ordering: %03zd and number: %03zd\n",
+		 statement_ordering(s), statement_number(s));
+
+      /* First, we get the live out paths of the statement */
+      list l_live_out = effects_dup(load_live_out_paths_list(s));
+
+      /* Live_in(S) = (live_out(S) o T(S) - W(S)) U IN (S) */
+
+      // first move the live_out effects of the statement in the store
+      // before the statement
+      transformer t = (*load_completed_transformer_func)(s);
+
+      (*effects_transformer_composition_op)(l_live_out, t);
+
+      // then remove the effects written by the statement
+      // and add the in effects of the statement
+      list l_write =  convert_rw_effects(load_rw_effects_list(s),ctxt);
+      list l_in = load_in_effects_list(s);
+
+      list l_live_in = (*effects_union_op)
+	(effects_dup(l_in),
+	 (*effects_sup_difference_op)(l_live_out, effects_dup(l_write),
+				      r_w_combinable_p),
+	 effects_same_action_p);
+
+      store_live_in_paths_list(s, l_live_in);
+
+      reset_converted_rw_effects(&l_write, ctxt);
+
+      pips_debug(1,"end\n");
+    }
+  return;
+}
+
+static bool
+live_paths_from_unstructured_to_nodes(unstructured unstr, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_paths_from_forloop_to_body(forloop l, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_paths_from_whileloop_to_body(whileloop l, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_out_paths_from_test_to_branches(test t, live_paths_analysis_context *ctxt)
+{
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, t);
+
+  pips_debug(1,"begin\n");
+
+  /* First, we get the live out paths of the statement corresponding to the test
+   */
+  list l_live_out_test = load_live_out_paths_list(current_stmt);
+
+  /* The live out paths for each branch are the live_out_paths
+     of the test
+  */
+  store_live_out_paths_list(test_true(t), effects_dup(l_live_out_test));
+  store_live_out_paths_list(test_false(t), effects_dup(l_live_out_test));
+
+  /* The live in paths of the test are computed with  the surrounding
+     sequence live paths computation.
+  */
+  pips_debug(1,"end\n");
+
+  return true;
+}
+
+static bool
+live_paths_from_block_to_statements(sequence seq,
+				    live_paths_analysis_context *ctxt)
+{
+  statement seq_stmt = (statement) gen_get_ancestor(statement_domain, seq);
+  list l_stmt = sequence_statements(seq);
+
+  if (ENDP(l_stmt))
+    {
+      if (get_bool_property("WARN_ABOUT_EMPTY_SEQUENCES"))
+	pips_user_warning("empty sequence\n");
+      store_live_in_paths_list(seq_stmt, NIL);
+    }
+  else
+    {
+      list l_rev_stmt = NIL; /* reversed version of the sequence to avoid recursion*/
+      FOREACH(STATEMENT, stmt, l_stmt)
+	{
+	  l_rev_stmt = CONS(STATEMENT, stmt, l_rev_stmt);
+	}
+
+      list l_next_stmt_live_in = load_live_out_paths_list(seq_stmt);
+      FOREACH(STATEMENT, stmt, l_rev_stmt)
+	{
+	  /* the live out paths of the current statement are the live in paths
+	     of the next statement (or the live out of the while block
+	     if last statement)
+	  */
+	  list l_live_out = l_next_stmt_live_in;
+	  store_live_out_paths_list(stmt, effects_dup(l_live_out));
+
+	  /* Now let us compute the live in paths */
+	  live_in_paths_of_statement(stmt, ctxt);
+	  l_next_stmt_live_in = load_live_in_paths_list(stmt);
+	}
+
+      /* The block live in paths are the live in paths of the first statement
+         which is the last visited statement
+      */
+      store_live_in_paths_list(seq_stmt, effects_dup(l_next_stmt_live_in));
+
+      gen_free_list(l_rev_stmt);
+    }
+
+ return false;
+}
+
+static bool
+__attribute__ ((__unused__)) live_paths_from_instruction_to_expression(instruction instr,
+					  live_paths_analysis_context *ctxt)
+{
+  if (instruction_expression_p(instr))
+    {
+    }
+  return false;
+}
+
 
 static void
 live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt)
 {
+
+  gen_context_multi_recurse
+    (stmt, ctxt,
+     statement_domain, gen_true, live_in_paths_of_statement,
+     //instruction_domain, live_paths_from_instruction_to_expression, gen_null,
+     /* for expression instructions solely, equivalent to gen_true otherwise */
+     sequence_domain, live_paths_from_block_to_statements, gen_null,
+     test_domain, live_out_paths_from_test_to_branches, gen_null,
+     loop_domain, live_paths_from_loop_to_body, gen_null,
+     whileloop_domain, live_paths_from_whileloop_to_body, gen_null,
+     forloop_domain, live_paths_from_forloop_to_body, gen_null,
+     unstructured_domain, live_paths_from_unstructured_to_nodes, gen_null,
+
+     /* Stop on these nodes: */
+     call_domain, gen_false, gen_null, /* calls are treated in another phase*/
+     expression_domain, gen_false, gen_null,
+     NULL);
+
   return;
 }
 
@@ -322,10 +491,10 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
 
   /* Get the live_out_summary_paths of the current module */
   list l_sum_live_out = (*db_get_live_out_summary_paths_func)(module_name);
-  /* And stores them as the out regions of the module statement */
+  /* And stores them as the live out paths of the module statement */
   store_live_out_paths_list(module_statement, effects_dup(l_sum_live_out));
 
-  /* Compute the out_effects of the module. */
+  /* Compute the live paths of the module. */
   live_paths_analysis_context ctxt;
   init_live_paths_context(&ctxt, representation);
   live_paths_of_module_statement(module_statement, &ctxt);
@@ -333,6 +502,7 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
   pips_debug(1, "end\n");
 
   (*db_put_live_out_paths_func)(module_name, get_live_out_paths());
+  (*db_put_live_in_paths_func)(module_name, get_live_in_paths());
 
   reset_rw_effects();
   reset_invariant_rw_effects();

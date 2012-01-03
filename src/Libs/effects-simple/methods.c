@@ -634,13 +634,24 @@ void set_methods_for_inout_effects_prettyprint(const char* module_name __attribu
   effects_to_text_func = simple_inout_effects_to_text;
 }
 
-void set_methods_for_live_paths_prettyprint(const char* module_name __attribute__ ((unused)))
+void set_methods_for_live_in_paths_prettyprint(const char* module_name __attribute__ ((unused)))
 {
-  set_action_interpretation(ACTION_LIVE, ACTION_WRITE);/* Live paths are read paths */
+  set_action_interpretation(ACTION_LIVE_IN, ACTION_WRITE);/* Live paths are read paths */
   effects_prettyprint_func = print_effects;
   effect_prettyprint_func = print_effect;
-  effects_to_text_func = simple_live_paths_to_text;
+  effects_to_text_func = simple_live_in_paths_to_text;
 }
+
+void set_methods_for_live_out_paths_prettyprint(const char* module_name __attribute__ ((unused)))
+{
+  set_action_interpretation(ACTION_LIVE_OUT, ACTION_WRITE);/* Live paths are read paths */
+  effects_prettyprint_func = print_effects;
+  effect_prettyprint_func = print_effect;
+  effects_to_text_func = simple_live_out_paths_to_text;
+}
+
+
+
 
 void reset_methods_for_effects_prettyprint(const char* module_name __attribute__ ((unused)))
 {
