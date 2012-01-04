@@ -10,29 +10,32 @@
             PSI2 = MY POS(2,2)
             PSI3 = MY POS(3,2)
             IF (MY LID.LE.8) THEN
-               DO TMP3 = 0, (-PSI1-2*PSI3+7)/4
-                  PSIp1 = PSI1+2*PSI3+4*TMP3-2
-                  T LID = 2*PSIp1-1
+               DO TMP3 = 0, 1
+                  DO PSIp1 = PSI1+2*PSI3+4*TMP3-2, MIN(5, PSI1+2*PSI3
+     &            +4*TMP3-2)
+                     T LID = 2*PSIp1-1
 ! - lazy broadcasting
-                  BUF INDEX = 0
-                  SEND NOT INITIALIZED = .TRUE.
-                  GAMMAp1 = PSI2-1
-                  DO LALPHA1 = 10*GAMMAp1-10*PSI2+2*PSIp1+9, 10*
-     &            GAMMAp1-10*PSI2+2*PSIp1+10
-                     LALPHAp1 = -8*GAMMAp1+LALPHA1+10*PSI2-2*PSIp1-8
-                     BUF INDEX = BUF INDEX+1
-                     HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
-                     IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
+                     BUF INDEX = 0
+                     SEND NOT INITIALIZED = .TRUE.
+                     GAMMAp1 = PSI2-1
+                     DO LALPHA1 = 10*GAMMAp1-10*PSI2+2*PSIp1+9, 10*
+     &               GAMMAp1-10*PSI2+2*PSIp1+10
+                        LALPHAp1 = -8*GAMMAp1+LALPHA1+10*PSI2-2*PSIp1
+     &                  -8
+                        BUF INDEX = BUF INDEX+1
+                        HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
+                        IF (BUF INDEX.EQ.HPFC REAL4 BUFF SIZE) THEN
+                           CALL HPFC REAL4 BUFPCK
+                           CALL HPFC REMAPBRD 1(2, T LID, 2, 1)
+                           BUF INDEX = 0
+                           SEND NOT INITIALIZED = .TRUE.
+                        ENDIF
+                     ENDDO
+                     IF (BUF INDEX.NE.0) THEN
                         CALL HPFC REAL4 BUFPCK
                         CALL HPFC REMAPBRD 1(2, T LID, 2, 1)
-                        BUF INDEX = 0
-                        SEND NOT INITIALIZED = .TRUE.
                      ENDIF
                   ENDDO
-                  IF (BUF INDEX.NE.0) THEN
-                     CALL HPFC REAL4 BUFPCK
-                     CALL HPFC REMAPBRD 1(2, T LID, 2, 1)
-                  ENDIF
                ENDDO
             ENDIF
 ! receive part
@@ -170,7 +173,7 @@
       include "hpfc_includes.h"
       include "REPLICATED_SOURCE_parameters.h"
       INTEGER I_1, I_2, I_3, I_4, I_5, I_6, PSIp2, LALPHA1, LALPHAp1
-     &, GAMMAp1, T LID, TMP3, PSIp1, PSI3, PSI2, PSI1
+     &, GAMMAp1, PSIp1, T LID, TMP3, PSI3, PSI2, PSI1
       REAL*4 F_0, A(1:10), A_1(1:6)
       CALL HPFC INIT NODE
 ! all livenesss for A
