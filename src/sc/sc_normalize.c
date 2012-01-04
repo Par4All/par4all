@@ -44,6 +44,28 @@
 #include "contrainte.h"
 #include "sc.h"
 
+
+static void negate_value_interval(Value * pmin, Value * pmax)
+{
+  Value t = value_uminus(*pmin);
+  *pmin = value_uminus(*pmax);
+  *pmax = t;
+}
+
+static void swap_values(Value * p1, Value * p2)
+{
+  Value t = *p1;
+  *p1 = *p2;
+  *p2 = t;
+}
+
+static void swap_value_intervals(Value * px_min, Value * px_max,
+				 Value * py_min, Value * py_max)
+{
+  swap_values(px_min, py_min);
+  swap_values(px_max, py_max);
+}
+
 /* Bounded normalization relies on numerical bounds l and b for vector
  * x, such that l<=x<=b.
  *
@@ -272,20 +294,24 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
   }
 }
 
-/* v is supposed to be the equation of a line in a 2-D
- * space. Retrieve, when they exist, the bounds for x and y, x being
- * the first variable to appear in v and y the second one.
+/* v is supposed to be the equation of a line in a 2-D space. l, lb, u
+ * and ub define a bounding box for variables in v. Retrieve, when
+ * possible, two variables x and y, such that the coefficients for y in v
+ * is greater than the interval for x in the bounding box.
+ *
+ * Also, make sure that a, the coefficient for x is negative and that
+ * b, the coefficient for y is positive. If it is not true, change the
+ * frame accordingly and indicate it in *pcb for later conversions.
  *
  * The bounds are assumed initialized to VALUE_MIN and VALUE_MAX.
  *
- * Note: a bit dangerous to rely on the order of variables in a linear
- * sparce vector.
  */
 static Pvecteur compute_x_and_y_bounds(Pvecteur v,
-				   Pvecteur l, Pvecteur lb, 
-				   Pvecteur u, Pvecteur ub,
-				   Variable * px, Variable * py,
-				   Value * px_min, Value * px_max)
+				       Pvecteur l, Pvecteur lb, 
+				       Pvecteur u, Pvecteur ub,
+				       Variable * px, Variable * py,
+				       Value * px_min, Value * px_max,
+				       int * pcb)
 {
   Pvecteur vc;
   Value delta_1 = VALUE_MAX;
@@ -298,6 +324,7 @@ static Pvecteur compute_x_and_y_bounds(Pvecteur v,
   Value delta_x = VALUE_MAX;
   Pvecteur nv = VECTEUR_NUL;
 
+  /* Retrieve the coefficients, the variables and their intervals */
   for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
     Variable var = vecteur_var(vc);
     if(var!=TCST) {
@@ -370,8 +397,33 @@ static Pvecteur compute_x_and_y_bounds(Pvecteur v,
 	    (long long int) c);
   }
 
+  if(value_pos_p(a)) {
+    a = value_uminus(a);
+    negate_value_interval(px_min, px_max);
+    *pcb |= 4;
+  }
+  if(value_neg_p(b)) {
+    b = value_uminus(b);
+    *pcb |= 2;
+  }
+  if(false && value_gt(value_abs(a),value_abs(b))) {
+    /* Let's forget about the slope in ]0,1[, let's try positive slopes */
+    ;
+  }
+
+  ifscdebug(1) {
+    /* For debugging: init_variable_debug_name(entity_local_name) */
+    fprintf(stderr,
+	    "Constraint after change of frame: %lld %s + %lld %s + %lld\n",
+	    (long long int) a, variable_debug_name(*px),
+	    (long long int) b, variable_debug_name(*py),
+	    (long long int) c);
+    fprintf(stderr, "Change of frame: %d\n", *pcb);
+  }
+
   nv = vect_make(nv, *px, a, *py, b, NULL, NULL, NULL);
   vect_add_elem(&nv, TCST, c);
+  vect_normalize(nv);
 
   ifscdebug(1) {
     fprintf(stderr, "New constraint nv: ");
@@ -383,7 +435,7 @@ static Pvecteur compute_x_and_y_bounds(Pvecteur v,
 
 /* Is it possible to reduce the magnitude of at least one constraint
  * coefficient because it is larger than the intervals defined by
- * the bouding box?
+ * the bounding box for the other variable?
  *
  * Note: the modularity wastes computations. It would be nice to
  * benefit from a, b, dx and dy.
@@ -422,14 +474,14 @@ static bool eligible_for_coefficient_reduction_with_bounding_box_p(Pvecteur v,
 	    dx = var_bounded_p?
 	      value_minus(vect_coeff(var,u),vect_coeff(var,l))
 	      : VALUE_MAX;
-	    a = vect_coeff(var, vc);
+	    a = value_abs(vect_coeff(var, vc));
 	    x = var;
 	}
 	else {
 	  dy = var_bounded_p?
 	    value_minus(vect_coeff(var,u),vect_coeff(var,l))
 	    : VALUE_MAX;
-	  b = vect_coeff(var, vc);
+	  b = value_abs(vect_coeff(var, vc));
 	}
       }
     }
@@ -452,6 +504,8 @@ static bool eligible_for_coefficient_reduction_with_bounding_box_p(Pvecteur v,
  * Internal check used after a change of frame.
  *
  * Note: dangerous use of term ordering inside a linear sparse vector.
+ *
+ * Should work, although inefficiently for large slopes.
  */
 static bool small_slope_and_first_quadrant_p(Pvecteur v)
 {
@@ -478,27 +532,6 @@ static bool small_slope_and_first_quadrant_p(Pvecteur v)
   ok_p = value_neg_p(a) && value_pos_p(b) && value_gt(b, value_uminus(a));
 
   return ok_p;
-}
-
-static void negate_value_interval(Value * pmin, Value * pmax)
-{
-  Value t = value_uminus(*pmin);
-  *pmin = value_uminus(*pmax);
-  *pmax = t;
-}
-
-static void swap_values(Value * p1, Value * p2)
-{
-  Value t = *p1;
-  *p1 = *p2;
-  *p2 = t;
-}
-
-static void swap_value_intervals(Value * px_min, Value * px_max,
-				 Value * py_min, Value * py_max)
-{
-  swap_values(px_min, py_min);
-  swap_values(px_max, py_max);
 }
 
 /* Compute a normalized version of the constraint v and the
@@ -611,25 +644,531 @@ new_constraint_for_coefficient_reduction_with_bounding_box(Pvecteur v,
  *
  * (x1-x0) y = (y1 -y0) (x - x0) + y0 (x1-x0)
  *
- * as ax+by+c=0
-*/
-static Pvecteur vect_make_line(Variable x, Variable y, Value x0, Value y0, Value x1, Value y1)
+ * as ax+by+c=0, where a, b and c are prime together.
+ */
+static Pvecteur vect_make_line(Variable x, Variable y,
+			       Value x0, Value y0, Value x1, Value y1)
 {
   Value dx = value_minus(x1,x0);
   Value dy = value_minus(y1,y0);
   Value a = dy;
   Value b = -dx;
+  assert(dx!=0 || dy!=0);
   /* constant term: -x0 dy + y0 dx */
   Value c = value_minus(value_mult(y0, dx), value_mult(x0, dy));
   Pvecteur v = vect_new(x, a);
   vect_add_elem(&v, y, b);
   vect_add_elem(&v, TCST, c);
+  vect_normalize(v);
   return v;
 }
 
-/* The set of constraints returned may be empty if the constraint does
-   not intersect the bounding box or contain, maybe, up to three new
-   constraints. Usually one or two. */
+/* Find the first *significant* integer point (*pfx, *pfy) starting
+   from (x0,y0) moving by (dx,dy) steps towards (xf,yf) that is
+   between the constraint up_c and low_c such that *pfx!=xf and
+   *pfx!=x0. Let x be *pfx and y be *pfy. Between the constraints
+   means up_c(x,y)<=0 and low_c(x,y)>0.
+
+   The two constraints up_c and low_c have a positive slope with
+   respect to variables xv and yv over interval [x0,xf] or [xf,x0].
+
+   Value yf is only useful for debugging.
+
+   It would be possible to find the intermediate points faster using
+   intersections with the constraints instead of using an incremental
+   step-by-step approach.
+ */
+static bool find_first_integer_point_in_between(Value x0,
+						Value y0,
+						Pvecteur up_c,
+						Pvecteur low_c,
+						Variable xv, Variable yv,
+						Value dx, Value dy,
+						Value xf, Value yf __attribute__ ((unused)),
+						Value * pfx, Value * pfy)
+{
+  /* Retrieve coefficients of the two constraints */
+  Value a_up = vect_coeff(xv, up_c);
+  Value a_low = vect_coeff(xv, low_c);
+  Value b_up = vect_coeff(yv, up_c);
+  Value b_low = vect_coeff(yv, low_c);
+  Value c_up = vect_coeff(TCST, up_c);
+  Value c_low = vect_coeff(TCST, low_c);
+  /* FI: I am tired of using value macros */
+  Value up_0 = a_up * x0 + b_up * y0 + c_up;
+  Value low_0 = a_low * x0 + b_low * y0 + c_low;
+  Value up = up_0;
+  Value low = low_0;
+  Value x = x0, y = y0;
+  bool found = false; // (up <= 0 && low >=0); the first point is not
+  // relevant as intermediate point
+
+  /* The two constraints have positive slopes, but not necessarily in
+     the ]0,1[ interval */
+  assert(a_up<0 && b_up>0 /* && b_up>-a_up */ );
+  assert(a_low<0 && b_low>0 /* && b_low>-a_low */ );
+
+  /* Constraint up is higher than constraint low on interval [x0,xf] */
+  assert(!(up>0&&low<0));
+
+  if(x0!=xf) {
+    /* There are other points to explore */
+    assert(dx!=0);
+    assert((xf>x0 && dx>0) || (xf<x0 && dx<0));
+
+    while(!found && x!=xf) {
+      if(up>=0) {
+	if(dx>0) {
+	  x += dx;
+	  up += a_up*dx;
+	  low += a_low*dx;
+	}
+	else {
+	  y += dy;
+	  up += b_up*dy;
+	  low += b_low*dy;
+	}
+      }
+      if(low<=0 ) {
+	if(dx>0) {
+	  y += dy;
+	  up += b_up*dy;
+	  low += b_low*dy;
+	}
+	else {
+	  x += dx;
+	  up += a_up*dx;
+	  low += a_low*dx;
+	}
+      }
+      /* The intermediate point si strictly over the lower constraint
+	 and meet the upper constraint. It is not the initial nor the
+	 final point. */
+      found = (up <= 0 && low >0) && x!=x0 && x!=xf;
+      assert(!(up>0&&low<0) || x==x0 || x==xf);
+    }
+  }
+
+  if(found) {
+    if(y-y0==0) { // slope12.c: this procedure may skip useful
+      //intermediate points, e.g. when the slope oscillates between 1/50 and
+      // 1/49...; it might be OK when the slope is down to 0...
+    /* Are there more integer points along this direction? If yes,
+     * find the last one.
+     *
+     * let ndx = x-x0, ndy = y - y0
+     *
+     * let x = x0 + th ndx and y = y0 + th ndy (x and y are new variables)
+     *
+     * what is the largest integer value for th such that up<=0?
+     *
+     * a_up x0 + a_up th ndx + b_up y0 + b_up th ndy + c_up <= 0
+     *
+     * th <= (-a_up x0 - b_up y0 - c_up)/(a_up ndx + b_up ndy)
+     *
+     * if a_up dx + b_up dy >=0. Else
+     *
+     * th >= (a_up x0 + b_up y0 + c_up)/(-a_up ndx - b_up ndy)
+     */
+    Value ndx = x - x0;
+    Value ndy = y - y0;
+    Value n = a_up*x0+b_up*y0+c_up;
+    Value d = a_up*ndx+b_up*ndy;
+    // The test might be useless, depending on pdiv's behavior
+    Value th = d>0? value_pdiv(value_uminus(n),d)
+      :value_pdiv(n-d-1,value_uminus(d));
+    // th==0 is always solution since (x0,y0) is solution
+    // d>0 implies an upper bound, and d<0 a lower bound
+    assert((d>0 && th>=0) || (d<0 && th<=0));
+
+    /* then you should find the last one in the [x0,xf] interval...
+     *
+     * if ndx > 0, x0+k ndx<=xf else x0+ k ndx >= xf, x0-xf>=-k ndx
+     */
+    Value k = ndx>0? value_pdiv(xf-x0,ndx) : value_pdiv(x0-xf,-ndx);
+    assert(k>=0);
+
+    /* The constraint on th is d th + n <=0 */
+    if(d<0) {
+      /* lower bound for th: any th positive is good */
+      assert(th<=0);
+      x = x0+k*ndx;
+      y = y0+k*ndy;
+      found = x!=xf; // Useful intermediate integer point?
+    }
+    else { /* d>0, upper bound for th */
+      /* This should occur for slope07, 08 and 09 */
+      assert(th>=0);
+      Value lambda = value_min(k,th);
+      x = x0+lambda*ndx;
+      y = y0+lambda*ndy;
+      found = x!=xf; // Useful intermediate integer point?
+    }
+    }
+    /* Make sure that (x,y) meets all the constraints */
+    if(found) {
+      assert(a_up*x+b_up*y+c_up<=0);
+      assert(a_low*x+b_low*y+c_low>=0);
+      assert(x!=x0); // y may be equal to y0
+      assert(x!=xf); // y may be equal to yf
+    }
+
+    /* return the final resut */
+    *pfx = x;
+    *pfy = y;
+  }
+
+  ifscdebug(1) {
+    if(found) {
+      fprintf(stderr, "Intermediate point: (%lld, %lld) for "
+	      "[(%lld,%lld),(%lld,%lld)] "
+	      "with saturations low %lld and up %lld\n",
+	      x, y, x0, y0, xf, yf,
+	      (a_low*x+b_low*y+c_low)/b_low,
+	      (a_up*x+b_up*y+c_up)/b_up);
+      fprintf(stderr, "for constraints low and up:\n");
+      vect_dump(low_c);
+      vect_dump(up_c);
+    }
+    else {
+      fprintf(stderr, "No intermediate point found\n");
+    }
+  }
+
+  return found;
+}
+
+static bool find_integer_point_to_the_right(Value x0,
+					    Value y0,
+					    Pvecteur up,
+					    Pvecteur low,
+					    Variable x, Variable y,
+					    Value xf, Value yf,
+					    Value * pfx, Value * pfy)
+{
+  assert(value_ge(xf,x0));
+	 return find_first_integer_point_in_between(x0,	y0, up, low, x, y,
+						    VALUE_ONE, VALUE_ONE,
+						    xf, yf, pfx, pfy);
+}
+
+static bool find_integer_point_to_the_left(Value x0,
+					    Value y0,
+					    Pvecteur up,
+					    Pvecteur low,
+					    Variable x, Variable y,
+					    Value xf, Value yf,
+					    Value * pfx, Value * pfy)
+{
+  assert(value_le(xf,x0));
+	 return find_first_integer_point_in_between(x0,	y0, up, low, x, y,
+						    VALUE_MONE, VALUE_MONE,
+						    xf, yf, pfx, pfy);
+}
+
+static Value eval_2D_vecteur(Pvecteur v, Variable x, Variable y, Value xv, Value yv)
+{
+  Value k = VALUE_ZERO;
+  Value a = vect_coeff(x, v);
+  Value b = vect_coeff(y, v);
+  Value c = vect_coeff(TCST, v);
+
+  /* FI: overflow control should be added */
+  k = a*xv + b*yv + c;
+  return k;
+}
+
+
+/* Use the first eni+2 points in ilmpx and ilmpy to build at most
+ * eni+1 convex constraints, all upper bounds for y. As we build a
+ * partial convex hull, there should always be a solution.
+ *
+ * The value in ilmpx are assumed to be striclty increasing. The value
+ * in ilmpy are increasing. To be convex, the slopes of the successive
+ * cosntraints must be decreasing.
+ */
+static
+Pcontrainte build_convex_constraints_from_vertices(Variable x, Variable y,
+						   int ni, int eni,
+						   Value ilmpx[ni+2], Value ilmpy[ni+2])
+{
+  int nli = eni; // number of left intermediate points
+  int left = 0; // index of the first point
+  int right = 1;
+  int rightmost = eni+1; // index of the last point
+  assert(eni>=0);
+  assert(ni>=eni);
+  Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+  int count = 0;
+  int i;
+
+  ifscdebug(1) {
+    fprintf(stderr, "%s: input arrays with %d effective points\n", __FUNCTION__, eni);
+    for(i=0;i<eni+2;i++)
+      fprintf(stderr, "(%lld, %lld)%s", ilmpx[i], ilmpy[i], i==eni+1? "":", ");
+    fprintf(stderr, "\n");
+  }
+
+  while(nli>=0) {
+    /* build a constraint between left and right */
+    Pvecteur nv = vect_make_line(x, y, ilmpx[left], ilmpy[left],
+				 ilmpx[right], ilmpy[right]);
+    nv = vect_multiply(nv, VALUE_MONE);
+    /* Check that all points meet the constraint */
+    bool failed_p = false;
+    for(i=0; i<eni+2 && !failed_p; i++) {
+      /* We could skip the left and right points... */
+      failed_p = value_pos_p(eval_2D_vecteur(nv, x, y, ilmpx[i], ilmpy[i]));
+    }
+    if(failed_p) {
+      ifscdebug(1)
+	fprintf(stderr, "%s: point %d =(%lld, %lld) is skipped (left=%d is unchanged).\n",
+		__FUNCTION__, right, ilmpx[right], ilmpy[right], left);
+      vect_rm(nv);
+      right++;
+    }
+    else {
+      ifscdebug(1)
+	fprintf(stderr, "%s: points %d =(%lld, %lld) and %d =(%lld, %lld) "
+		"are used as vertices to define a new constraint.\n",
+		__FUNCTION__, left, ilmpx[left], ilmpy[left],
+		right, ilmpx[right], ilmpy[right]);
+      left = right;
+      right++;
+      Pcontrainte nc = contrainte_make(nv);
+      contrainte_succ(nc) = ineq;
+      ineq = nc;
+      count++;
+    }
+    nli--;
+  }
+  /* There is always at least one constraint. */
+  assert(!CONTRAINTE_UNDEFINED_P(ineq));
+  /* All points have been used*/
+  assert(right-1==rightmost);
+  /* The constraints are chained backwards with respect to the vectices */
+  ifscdebug(1) {
+    fprintf(stderr, "%s: %d constraints obtained:\n", __FUNCTION__, count);
+    inegalites_dump(ineq);
+  }
+  return ineq;
+}
+
+/* Find a set ineq of 2-D constraints equivalent to 2-D constraint
+   v==ax+by+c over the interval [lmpx,rmpx]. The slope of the
+   constraint v is assumed positive. The values lmpy and rmpy could be
+   computed from v and lmpx and rmpx but are passed down to simplify
+   debugging. The coefficients of the new constraints are smaller than
+   the coefficient of v, assuming that abs(b) is greater than
+   rmpx-lmpx.
+
+   The function looks for intermediate points and build the
+   constraints fromm this set of points, making sure to skip some
+   intermediate points if the constraint they generate do not respect
+   convexity.
+ */
+Pcontrainte find_intermediate_constraints_recursively(Pvecteur v,
+						      Variable x, Variable y,
+						      Value lmpx, Value lmpy,
+						      Value rmpx, Value rmpy)
+{
+  Pcontrainte ineq;
+  /* No interesting intermediate point exists if lmpx and rmpx or lmpy
+     and rmpy are too close. No values would be available for their
+     coordinates. */
+  Value delta_x = rmpx-lmpx-1; // cardinal of ]lmpx,rmpx[
+  Value delta_y = rmpy-lmpy; // cardinal of ]lmpy,rmpy], y may not
+  //vary between the last two points
+  assert(delta_x>=0);
+  assert(delta_y>=0);
+  /* maximal number of intermediate points */
+  int ni = (int) value_min(delta_x, delta_y);
+  /* Look for at most for ni intermediate points, but reserve space to
+     add the initial point and (perhaps) the final point. */
+  Value ilmpx[ni+2], ilmpy[ni+2];
+  /* The first element is the left most point */
+  ilmpx[0] = lmpx;
+  ilmpy[0] = lmpy;
+  /* Effective number of intermediate points */
+  int eni = 0;
+  bool more_to_find_p = ni>0;
+
+  /* The control structure of this piece of code could be improved by
+     initializing ilmpx[0] and ilmpy[0] right away and by using a
+     while(more_to_find_p) to avoid code replication. */
+
+  while(more_to_find_p) {
+    /* A lower upper bound for v */
+    Pvecteur nv = vect_make_line(x, y, ilmpx[eni], ilmpy[eni], rmpx, rmpy);
+    nv = vect_multiply(nv, VALUE_MONE);
+
+    bool rfound = find_integer_point_to_the_right(ilmpx[eni],
+						  ilmpy[eni],
+						  v,
+						  nv,
+						  x, y,
+						  rmpx, rmpy,
+						  &ilmpx[eni+1], &ilmpy[eni+1]);
+    if(rfound) {
+      eni++;
+      Value nlmpx = ilmpx[eni];
+      Value nlmpy = ilmpy[eni];
+      Value ndelta_x = rmpx-nlmpx-1;
+      Value ndelta_y = rmpy-nlmpy; // the constraint may be horizontal
+      assert(ndelta_x>=0);
+      assert(ndelta_y>=0);
+      int nni = (int) value_min(ndelta_x, ndelta_y);
+      assert(nni<=ni);
+      more_to_find_p = nni>0;
+    }
+    else
+      more_to_find_p = false;
+  }
+
+  if(eni>0) {
+    /* add the final point to the arrays ilmpx and ilmpy */
+    ilmpx[eni+1] = rmpx;
+    ilmpy[eni+1] = rmpy;
+    /* Process the intermediate points */
+    ineq = build_convex_constraints_from_vertices(x, y, ni, eni,
+						  ilmpx, ilmpy);
+  }
+
+  if(ni==0||eni==0) {
+    /* One constraint generated by (lmpx,lmpy) and (rmpx,rmpy) */
+    Pvecteur uv = vect_make_line(x, y, lmpx,lmpy,rmpx,rmpy);
+    uv = vect_multiply(uv, VALUE_MONE);
+    ineq = contrainte_make(uv);
+  }
+
+  return ineq;
+}
+
+/* Find a set ineq of 2-D constraints equivalent to 2-D constraint
+   v==ax+by+c over the interval [lmpx,rmpx]. The slope of the
+   constraints is assumed positive. The values lmpy and rmpy could be
+   computed from v and lmpx and rmpx but are passed down to simplify
+   debugging. The coefficients of the new constraints are smaller than
+   the coefficient of v, assuming that abs(b) is greater than
+   rmpx-lmpx.
+
+   This function was based on the wrong assumption that at most three
+   constraints were sufficient to replace exactly v. This is proved
+   wrong by slope15.c.
+ */
+Pcontrainte find_intermediate_constraints(Pvecteur v, Variable x, Variable y,
+					  Value lmpx, Value lmpy,
+					  Value rmpx, Value rmpy)
+{
+  Pcontrainte ineq;
+
+  /* Look for intermediate points */
+  Value ilmpx, ilmpy, irmpx, irmpy;
+  /* A lower upper bound */
+  Pvecteur nv = vect_make_line(x, y, lmpx, lmpy, rmpx, rmpy);
+  nv = vect_multiply(nv, VALUE_MONE);
+
+  /* Start with the initial point in order to be able to compute
+     the slope of the new constraint later */
+  bool rfound = find_integer_point_to_the_right(lmpx,
+						lmpy,
+						v,
+						nv,
+						x, y,
+						rmpx, rmpy,
+						&ilmpx, &ilmpy);
+  bool lfound = find_integer_point_to_the_left(rmpx,
+					       rmpy,
+					       v,
+					       nv,
+					       x, y,
+					       lmpx, lmpy,
+					       &irmpx, &irmpy);
+  assert(rfound==lfound);
+  if(rfound) {
+    if(ilmpx==irmpx) {
+      /* Two constraints */
+      double slope1 = ((double)(ilmpy-lmpy))/((double)(ilmpx-lmpx));
+      double slope3 = ((double)(rmpy-irmpy))/((double)(rmpx-irmpx));
+      Pvecteur fv = vect_make_line(x, y, lmpx,lmpy,ilmpx,ilmpy);
+      fv = vect_multiply(fv, VALUE_MONE);
+      Pvecteur lv = vect_make_line(x, y, irmpx,irmpy,rmpx,rmpy);
+      lv = vect_multiply(lv, VALUE_MONE);
+      ineq = contraintes_make(fv,lv, VECTEUR_NUL);
+      /* assert convexity */
+      assert(slope1>slope3);
+    }
+    else {
+      /* Three constraints at most: be careful about the convexity, the
+	 slopes must be decreasing... */
+      double slope1 = ((double)(ilmpy-lmpy))/((double)(ilmpx-lmpx));
+      double slope2 = ((double)(irmpy-ilmpy))/((double)(irmpx-ilmpx));
+      double slope3 = ((double)(rmpy-irmpy))/((double)(rmpx-irmpx));
+      if(slope1>slope2 && slope2>slope3) {
+	/* We still might have some integer points between
+	   (ilmpx,ilmpy) and (rmlpx,rlmpy)... */
+	Pvecteur fv = vect_make_line(x, y, lmpx,lmpy,ilmpx,ilmpy);
+	fv = vect_multiply(fv, VALUE_MONE);
+	Pvecteur mv = vect_make_line(x, y, ilmpx,ilmpy,irmpx,irmpy);
+	mv = vect_multiply(mv, VALUE_MONE);
+	Pvecteur lv = vect_make_line(x, y, irmpx,irmpy,rmpx,rmpy);
+	lv = vect_multiply(lv, VALUE_MONE);
+	ineq = contraintes_make(fv, mv, lv, VECTEUR_NUL);
+      }
+      else if(slope2>slope1) {
+	/* The first intermediate point, (ilmpx,ilmpy), cannot be used */
+	double slope12 =  ((double)(irmpy-lmpy))/((double)(irmpx-lmpx));
+	if(slope12>slope3) {
+	  Pvecteur fv = vect_make_line(x, y, lmpx,lmpy,irmpx,irmpy);
+	  fv = vect_multiply(fv, VALUE_MONE);
+	  Pvecteur lv = vect_make_line(x, y, irmpx,irmpy,rmpx,rmpy);
+	  lv = vect_multiply(lv, VALUE_MONE);
+	  ineq = contraintes_make(fv, lv, VECTEUR_NUL);
+	}
+	else {
+	  /* FI: I assume it never happens... by definition of an
+	     intermediate point */
+	  fprintf(stderr, "not implemented.\n");
+	  abort();
+	}
+      }
+      else {
+	/* We must have slope2<slope3*/
+	double slope23 =  ((double)(rmpy-ilmpy))/((double)(rmpx-ilmpx));
+	if(slope1>slope23) {
+	  Pvecteur fv = vect_make_line(x, y, lmpx,lmpy,ilmpx,ilmpy);
+	  fv = vect_multiply(fv, VALUE_MONE);
+	  Pvecteur lv = vect_make_line(x, y, ilmpx,ilmpy,rmpx,rmpy);
+	  lv = vect_multiply(lv, VALUE_MONE);
+	  ineq = contraintes_make(fv, lv, VECTEUR_NUL);
+	}
+	else {
+	  /* FI: I assume it never happens... by definition of an
+	     intermediate point. */
+	  fprintf(stderr, "not implemented.\n");
+	  abort();
+	}
+      }
+    }
+  }
+  else {
+    /* One constraint generated by (lmpx,lmpy) and (rmpx,rmpy) */
+    Pvecteur uv = vect_make_line(x, y, lmpx,lmpy,rmpx,rmpy);
+    uv = vect_multiply(uv, VALUE_MONE);
+    ineq = contrainte_make(uv);
+  }
+  return ineq;
+}
+
+/* Replace 2-D constraint v by a set of constraints when possible
+   because variable x is bounded by [x_min,x_max].  The set of
+   constraints contains one, two or three new constraints.
+
+   The slope of constraint v wrt variable x is in interval ]0,1[. On
+   other words, if v is interpreted as a x + b y + c <=0, a is
+   negative and b is greater than -a. Also b is greater than
+   |low-up|. All these constraints have been checked earlier.
+ */
 static Pcontrainte
 small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
 							   Variable x,
@@ -674,23 +1213,26 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
      ax+by+c=0, y = (- c - ax)/b */
   assert(value_ne(x_min, VALUE_MIN) && value_ne(x_max, VALUE_MAX));
 
-  /* Reminder: the slope is positive, the function is increasing */
+  /* Reminder: the slope is positive, the function is increasing and
+     y_x_min and y_x_max are upper bounds */
   Value y_x_min =
-    value_div(value_plus(value_uminus(c),value_mult(value_uminus(a), x_min)), b);
+    value_pdiv(value_plus(value_uminus(c),value_mult(value_uminus(a), x_min)), b);
   Value y_x_max =
-    value_div(value_plus(value_uminus(c),value_mult(value_uminus(a), x_max)), b);
+    value_pdiv(value_plus(value_uminus(c),value_mult(value_uminus(a), x_max)), b);
 
-  /* x must be bounded, but y bounds are useless; they simply make the resolution more complex */
-  /* In case, both x and y are bounded we think it useful to take advantage of the interval product */
+  /* x must be bounded, but y bounds are useless; they simply make the
+     resolution more complex */
+  /* In case, both x and y are bounded we think it useful to take
+     advantage of the interval product */
   if(false) {
     Value x_y_min, x_y_max;
     bool found_p, redundant_p;
     /* Compute two integer vertices for y_min and y_max using constraint
        ax+by+c=0, x = (- c - by)/a */
     x_y_min =
-      value_div(value_plus(value_uminus(c),value_mult(value_uminus(b), y_min)), a);
+      value_pdiv(value_plus(value_uminus(c),value_mult(value_uminus(b), y_min)), a);
     x_y_max =
-      value_div(value_plus(value_uminus(c),value_mult(value_uminus(b), y_max)), a);
+      value_pdiv(value_plus(value_uminus(c),value_mult(value_uminus(b), y_max)), a);
 
     /* The constraint ax+by+c=0 has at most two valid intersections with
        the bounding box. Because the slope is positive, 0<-a/b<1, the
@@ -763,8 +1305,10 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
   lmpy = y_x_min;
   rmpx = x_max;
   rmpy = y_x_max;
-  fprintf(stderr, "lmpx=%d, lmpy=%d\n", (int) lmpx, (int) lmpy);
-  fprintf(stderr, "rmpx=%d, rmpy=%d\n", (int) rmpx, (int) rmpy);
+  ifscdebug(1) {
+    fprintf(stderr, "lmpx=%d, lmpy=%d\n", (int) lmpx, (int) lmpy);
+    fprintf(stderr, "rmpx=%d, rmpy=%d\n", (int) rmpx, (int) rmpy);
+  }
 
   if(value_le(value_minus(rmpy,lmpy), VALUE_ZERO)) {
     /* One new horizontal constraint defined by the two vertices lmp
@@ -773,13 +1317,13 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
     nv =  vect_make(nv, y, VALUE_ONE, NULL, NULL, NULL);
     vect_add_elem(&nv, TCST, value_uminus(lmpy));
     ineq = contrainte_make(nv);
-    fprintf(stderr, "Case slope01\n");
+    ifscdebug(1) fprintf(stderr, "Case slope01\n");
   }
   else if(value_le(value_minus(rmpy,lmpy), VALUE_ONE)) {
     /* There may be one vertex on the left of rmp, lrmp, with a lrmpx
        + b rmpy <= -c, b rmpy + c <= -ax, lrmpx >= (c + b rmpy -a -1)/(-a) */
     Value lrmpx =
-      value_div(
+      value_pdiv(
 		value_plus(c, value_plus(value_mult(b, rmpy),
 					 value_plus(value_uminus(a),
 						    VALUE_MONE))),
@@ -796,14 +1340,14 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
       Pcontrainte ineq2 = contrainte_make(nv2);
       contrainte_succ(ineq1) = ineq2;
       ineq = ineq1;
-      fprintf(stderr, "Case slope02\n");
+      ifscdebug(1) fprintf(stderr, "Case slope02\n");
     }
     else if(value_eq(lrmpx, rmpx)) {
       /* Only one constraint defined by : test case slope03.c  */
       Pvecteur nv = vect_make_line(x, y, lmpx, lmpy, lrmpx, rmpy);
       nv = vect_multiply(nv, VALUE_MONE);
       ineq = contrainte_make(nv);
-      fprintf(stderr, "Case slope03\n");
+      ifscdebug(1) fprintf(stderr, "Case slope03\n");
     }
   }
   else {
@@ -822,44 +1366,149 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
 
        Else ilmpx<irmpx, three constraints are necessary and they are
        defined by the segments delimited by the four points, (lmpx,
-       lmpy), (ilmpx, ilmpy), (irmpx, irmpy) and (rmpx,rmpy).
+       lmpy), (ilmpx, ilmpy), (irmpx, irmpy) and (rmpx,rmpy). Only if
+       no new intermediate point exists between the two intermediate
+       points.
 
        Test case: slope04.c
-  */
+    */
     /* Default option */
-    if(true) {
+    if(false) {
       Pvecteur nv = vect_copy(v);
       ineq = contrainte_make(nv); // equivalent to doing nothing
-      fprintf(stderr, "Not implemented yet");
+      fprintf(stderr, "Not implemented yet\n");
     }
     else {
-      /* Look for intermediate points */
-      //Value ilmpx, ilmpy, irmpx, irmpy;
-      /* A lower upper bound */
-      Pvecteur nv = vect_make_line(x, y, lmpx, lmpy, rmpx, rmpy);
-      nv = vect_multiply(nv, VALUE_MONE);
-
-      /* To be completed according to previous comment */
-
       /*
-      find_integer_point_to_the_right(value_plus(lmpx, VALUE_ONE),
-				      value_plus(lmpy, VALUE_ONE),
-				      v,
-				      nv,
-				      x, y,
-				      rmpx,
-				      &ilmpx, &ilmpy);
-      find_integer_point_to_the_left(value_plus(lmpx, VALUE_ONE),
-				     value_plus(lmpy, VALUE_MONE),
-				     v,
-				     nv,
-				     x, y,
-				     lmpx,
-				     &irmpx, &irmpy);
+      ineq = find_intermediate_constraints(v, x, y,
+					  lmpx, lmpy,
+					  rmpx, rmpy);
       */
+      ineq = find_intermediate_constraints_recursively(v, x, y,
+						       lmpx, lmpy,
+						       rmpx, rmpy);
     }
   }
   return ineq;
+}
+
+/* Perform a reverse change of base to go back into the source code
+   frame */
+static void update_coefficient_signs_in_vector(Pvecteur v, int cb,
+					       Variable x, Variable y)
+{
+  if(cb&4) {
+    Value a = vect_coeff(x, v);
+    vect_chg_coeff(&v, x, value_uminus(a));
+  }
+  if(cb&2) {
+    Value b = vect_coeff(y, v);
+    vect_chg_coeff(&v, y, value_uminus(b));
+  }
+}
+
+/* Perform the inverse change of basis and update the intervals for
+   later checks. */
+static void update_coefficient_signs_in_constraints(Pcontrainte eq, int cb,
+						    Variable x, Variable y,
+						    Value *x_min, Value *x_max,
+						    Value *y_min, Value *y_max
+)
+{
+  Pcontrainte ceq;
+  for(ceq=eq; !CONTRAINTE_UNDEFINED_P(ceq); ceq = contrainte_succ(ceq)) {
+    Pvecteur v = contrainte_vecteur(ceq);
+    update_coefficient_signs_in_vector(v, cb, x, y);
+  }
+  if(cb&4)
+    negate_value_interval(x_min,x_max);
+  if(cb&2)
+    negate_value_interval(y_min,y_max);
+}
+
+/* debug function: check that all 2-D constraints c in ineq are equivalent
+   to contraint v on interval [x_min,x_max].
+
+   It is assumed that ineq contains 1, 2 or three constraints.
+ */
+static void check_coefficient_reduction(Pvecteur v, Pcontrainte ineq,
+					Variable x, Variable y,
+					Value x_min, Value x_max)
+{
+  Value a_v = vect_coeff(x,v);
+  Value b_v = vect_coeff(y,v);
+  Value c_v = vect_coeff(TCST,v);
+  bool upper_p = value_pos_p(b_v);
+  assert(a_v!=0 && b_v!=0);
+
+  // FI: a tighter bound could be found with min(delta_x-1, delta_y-1);
+#define MAX_NUMBER_OF_CONSTRAINTS (x_max-x_min)
+  Value a[MAX_NUMBER_OF_CONSTRAINTS];
+  Value b[MAX_NUMBER_OF_CONSTRAINTS];
+  Value c[MAX_NUMBER_OF_CONSTRAINTS];
+
+  Value i;
+  int n=0; // number of constraints in ineq
+  Pcontrainte cc;
+
+  for(cc=ineq;
+      !CONTRAINTE_UNDEFINED_P(cc)&&n<MAX_NUMBER_OF_CONSTRAINTS;
+      cc = contrainte_succ(cc)) {
+    Pvecteur cv = contrainte_vecteur(cc);
+    /* FI: if the constraint list were properly built, there would be
+       no NULL vector in the list... */
+    if(!VECTEUR_NUL_P(cv)) {
+      a[n] = vect_coeff(x, cv);
+      b[n] = vect_coeff(y, cv);
+      c[n] = vect_coeff(TCST, cv);
+      if(upper_p) {
+	assert(value_posz_p(b[n]));
+      }
+      else {
+	assert(value_negz_p(b[n]));
+      }
+      // We could also assert a[n]<=a_v and b[n]<=b_v
+      n++;
+    }
+  }
+
+  /* FI: linked_regions02; I do not understand whu a NULL constraint
+     is present in ineq... */
+  assert(CONTRAINTE_UNDEFINED_P(cc)||CONTRAINTE_NULLE_P(cc));
+  assert(n>0);
+  assert(value_gt(x_min, VALUE_MIN));
+  assert(value_gt(VALUE_MAX, x_max));
+  assert(value_ge(x_max,x_min));
+
+  /* Scan the x interval */
+  for(i=x_min;value_le(i,x_max); i++) {
+    /* compute bound for y according to v */
+    Value y_v = upper_p? value_pdiv(-a_v*i-c_v, b_v) :
+      value_pdiv(a_v*i+c_v-b_v-1, -b_v);
+    Value y_ineq = upper_p? VALUE_MAX:VALUE_MIN;
+    int j;
+    for(j=0;j<n;j++) {
+      Value y_j = upper_p? value_pdiv(-a[j]*i-c[j], b[j]) :
+	value_pdiv(a[j]*i+c[j]-b[j]-1, -b[j]);
+      if(upper_p)
+	// Decrease the upper bound
+	y_ineq = (y_ineq>y_j)? y_j : y_ineq;
+      else
+	// Increase the lower bound
+	y_ineq = (y_ineq<y_j)? y_j : y_ineq;
+    }
+    if(y_ineq!=y_v) {
+      fprintf(stderr,
+	      "Discrepancy at x=%lld: initial bound=%lld, new bound=%lld\n",
+	      (long long int) i,
+	      (long long int) y_v, (long long int) y_ineq);
+      fprintf(stderr, "Initial constraint: ");
+      vect_dump(v);
+      fprintf(stderr, "\nNew constraints: ");
+      inegalites_dump(ineq);
+      abort();
+    }
+  }
 }
 
 /* If at least one of the coefficients of constraint v == ax+by<=c are
@@ -885,8 +1534,7 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
  * 3. Apply M^-1 to the new contraints on (x',y') in order to obtain
  * constraints on x and y, and return the constraint list.
  */
-//static 
-Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
+static Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
 							 Pvecteur l,
 							 Pvecteur lb,
 							 Pvecteur u,
@@ -906,7 +1554,7 @@ Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
     vect_fprint(stderr, v, variable_debug_name);
   }
 
-  nv = compute_x_and_y_bounds(v, l, lb, u, ub, &x, &y, &x_min, &x_max);
+  nv = compute_x_and_y_bounds(v, l, lb, u, ub, &x, &y, &x_min, &x_max, &cb);
 
   ifscdebug(1) {
     fprintf(stderr, "Bounds for the first variable %s: ", variable_debug_name(x));
@@ -926,7 +1574,13 @@ Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
 
   /* Perform the reverse change of basis cb on constraints in
      constraint list ineq */
-  assert(cb==0);
+  if(cb!=0) {
+    update_coefficient_signs_in_constraints(ineq, cb, x, y,
+					    &x_min, &x_max, &y_min, &y_max);
+  }
+
+  if(!CONTRAINTE_UNDEFINED_P(ineq))
+    check_coefficient_reduction(v, ineq, x, y, x_min, x_max);
 
   return ineq;
 }
@@ -996,8 +1650,10 @@ Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
  * bounds cannot return directly two pieces of information: the
  * constraint system is empty or the constraint is redundant.
  *
- * It would be easier to simplify all constraints and then to add
- * the bounding box constraints.
+ * It would be easier to simplify all constraints and then to add the
+ * bounding box constraints. Constraints must be normalized initially
+ * to avoid destroying useful constraints. For instance, 2i<=99
+ * generates i<=49 whicg proves 21<=99 striclty redundant.
  *
  * Software engineering remarks
  *
@@ -1038,7 +1694,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 
   /* First look for bounds in equalities, although they may have been
      exploited otherwise */
-  for(eq = sc_egalites(ps); !CONTRAINTE_UNDEFINED_P(eq); eq = contrainte_succ(eq)) {
+  for(eq = sc_egalites(ps); !CONTRAINTE_UNDEFINED_P(eq) && !empty_p;
+      eq = contrainte_succ(eq)) {
+    empty_p = !egalite_normalize(eq);
     Pvecteur v = contrainte_vecteur(eq);
     int n = vect_size(v);
     Value k;
@@ -1064,6 +1722,7 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 
       Value r = modulo(k,c);
       if(r==0) {
+	/* FI: value_div() instead of value_pdiv(); reason? */
 	Value b_var = -value_div(k,c);
 	empty_p = update_lower_and_upper_bounds(&u, &ub, &l, &lb, var, b_var);
       }
@@ -1076,7 +1735,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 
   if(!empty_p) {
     /* Secondly look for bounds in inequalities */
-    for(eq=sc_inegalites(ps); !CONTRAINTE_UNDEFINED_P(eq); eq = contrainte_succ(eq)) {
+    for(eq=sc_inegalites(ps); !CONTRAINTE_UNDEFINED_P(eq)&& !empty_p;
+	eq = contrainte_succ(eq)) {
+      empty_p = !inegalite_normalize(eq);
       Pvecteur v = contrainte_vecteur(eq);
       int n = vect_size(v);
       Value k = VALUE_ZERO;
@@ -1086,9 +1747,9 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	  /* The variable is bounded by zero */
 	  Value c = vecteur_val(v);
 	  if(c>0) /* upper bound */
-	    update_lower_or_upper_bound(&u, &ub, var, VALUE_ZERO, c>0);
+	    update_lower_or_upper_bound(&u, &ub, var, VALUE_ZERO, !c>0);
 	  else /* lower bound */
-	    update_lower_or_upper_bound(&l, &lb, var, VALUE_ZERO, c>0);
+	    update_lower_or_upper_bound(&l, &lb, var, VALUE_ZERO, !c>0);
 	}
       }
       else if(n==2 && (k=vect_coeff(TCST,v))!=0) {
@@ -1103,11 +1764,11 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	   need here... This explains why the divisions are replicated
 	   after the test on the sign of the coefficient. */
 	if(value_pos_p(c)) { /* upper bound */
-	  Value b_var = -value_pdiv(k,c);
+	  Value b_var = value_pdiv(-k,c);
 	  update_lower_or_upper_bound(&u, &ub, var, b_var, !value_pos_p(c));
 	}
 	else { /* lower bound */
-	  Value b_var = -value_pdiv(k,c);
+	  Value b_var = value_pdiv(k-c-1,-c);
 	  update_lower_or_upper_bound(&l, &lb, var, b_var, !value_pos_p(c));
 	}
       }
@@ -1270,7 +1931,7 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 		|| (n==2 && value_notzero_p(vect_coeff(TCST, v)) && pos_p)
 		|| (n==1 && value_zero_p(vect_coeff(TCST, v)) && pos_p)) {
 	      /* The constraint eq is redundant */
-	      if(false) {
+	      ifscdebug(1) {
 		fprintf(stderr, "Redundant constraint:\n");
 		vect_dump(v);
 	      }
@@ -1297,16 +1958,17 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     }
     vect_rm(cb);
   }
-  if(false && !empty_p) {
+  if(!empty_p) {
     /* FI: this section is not completed; the change of frame is not
-     * impplemented as well as the computation of new constraints when
+     * implemented as well as the computation of new constraints when
      * the slope is not very small.
      */
-    // Pcontrainte ncl = CONTRAINTE_UNDEFINED;
+    Pcontrainte ncl = CONTRAINTE_UNDEFINED;
     for(eq=sc_inegalites(ps);
 	!CONTRAINTE_UNDEFINED_P(eq) && !empty_p; eq = contrainte_succ(eq)) {
+      (void) contrainte_normalize(eq, false);
       Pvecteur v = contrainte_vecteur(eq);
-      if(eligible_for_coefficient_reduction_with_bounding_box_p(v, l, lb, u, ub)) {
+      if(eligible_for_coefficient_reduction_with_bounding_box_p(v,l,lb,u,ub)) {
 	Pcontrainte nc = reduce_coefficients_with_bounding_box(v, l, lb, u, ub);
 	if(!CONTRAINTE_UNDEFINED_P(nc)) {
 	  ifscdebug(1) {
@@ -1315,14 +1977,19 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	  }
 	  /* Remove constraint v */
 	  eq_set_vect_nul(eq);
-	  /* Add the new constraints */
-	  sc_add_inegalites(ps, nc);
+	  /* Add the new constraints to the new constraint list, ncl */
+	  ncl = contrainte_append(ncl, nc);
 	}
 	else {
 	  empty_p = true;
 	}
       }
     }
+    /* add the new constraint list to the system */
+    assert(!cyclic_constraint_list_p(ncl));
+    assert(sc_consistent_p(ps));
+    sc_add_inegalites(ps, ncl);
+    assert(sc_consistent_p(ps));
   }
 
   if(empty_p) {
