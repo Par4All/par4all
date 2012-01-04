@@ -1737,6 +1737,10 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     /* Secondly look for bounds in inequalities */
     for(eq=sc_inegalites(ps); !CONTRAINTE_UNDEFINED_P(eq)&& !empty_p;
 	eq = contrainte_succ(eq)) {
+      /* This normalization is necessary in case a division is
+	 involved, or a useful constraint may be removed. For instance
+	 2*i<=99 generates i<=49 which make 2*i<=99 strictly
+	 redundant. */
       empty_p = !inegalite_normalize(eq);
       Pvecteur v = contrainte_vecteur(eq);
       int n = vect_size(v);
