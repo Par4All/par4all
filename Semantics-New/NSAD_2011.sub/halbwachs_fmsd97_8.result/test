@@ -28,9 +28,9 @@ void ts_singlestate(void)
       checking_error();
 
 //  T(b,d,s,t) {0<=b, b#init<=b,
-//    3138b#init+3918s#init+1309t<=3138b+3918s+1309t#init,
 //    283b#init+109s#init+109t<=283b+109s+109t#init,
 //    182b#init+111s#init+91t<=182b+111s+91t#init,
+//    98b#init+125s#init+40t<=98b+125s+40t#init,
 //    87b#init+237s#init+79t#init<=87b+237s+79t,
 //    87b#init+192s#init+64t#init<=87b+192s+64t,
 //    87b#init+147s#init+49t#init<=87b+147s+49t,

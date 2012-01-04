@@ -15,7 +15,7 @@ void whileif(void)
 
    x = y = 0;
 
-//  T(x,y) {x#init==0, y#init==0, x<=58, 61y<=55x+54, y<=x, 6y<=x+50,
+//  T(x,y) {x#init==0, y#init==0, x<=58, 10y<=9x+9, y<=x, 6y<=x+50,
 //    0<=y}
 
    while (x<=58)
@@ -142,15 +142,15 @@ void whileif(void)
 
       if (y<=8) {
 
-//  P(x,y) {y<=x, 9x<=58y, 0<=y, y<=8}
+//  P(x,y) {y<=x, x<=6y+3, 7x<=45y, 0<=y, y<=8}
 
          x++;
 
-//  P(x,y) {x<=59, y+1<=x, 9x<=58y+9, 0<=y, y<=8}
+//  P(x,y) {x<=59, y+1<=x, x<=6y+4, 7x<=45y+7, 0<=y, y<=8}
 
          y++;
 
-//  P(x,y) {x<=59, y<=x, 9x+49<=58y, 1<=y, y<=9}
+//  P(x,y) {x<=59, y<=x, x+2<=6y, 7x+38<=45y, 1<=y, y<=9}
 
          if (6*y>x+50)
 
