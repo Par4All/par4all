@@ -534,7 +534,7 @@ c
 ! collecting distributed variable A
       IF (1.LE.LAST.AND.LAST.LE.2) THEN
          DO PSI1 = 1, 2
-            DO PSI2 = (50*PSI1-11)/39, 2
+            DO PSI2 = PSI1, 2
                BUF INDEX = 0
                RECEIVED NOT PERFORMED = .FALSE.
                SIZE OF RECEIVED BUFFER = 0
@@ -603,7 +603,7 @@ c
       IF (1.LE.LAST.AND.LAST.LE.2) THEN
          PSI1 = MY POS(1,3)
          PSI2 = MY POS(2,3)
-         IF (50*PSI1.LE.39*PSI2+49) THEN
+         IF (PSI1.LE.PSI2) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
             DO ALPHA2 = MAX(50*PSI1-49, 39*PSI2-38), MIN(77, 50*PSI1
