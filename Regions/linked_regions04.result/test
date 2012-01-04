@@ -1,0 +1,310 @@
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(ii,jj,x0) {}
+
+   int ii, jj, x0;
+
+//  T() {}
+
+   double x1;
+
+
+//  T(N) {N==100}
+
+   int N = 100;
+
+//  T() {}
+
+   double A[100][100];
+
+//  T(ii,jj,x0) {ii<=N, 1<=ii}
+
+
+   for(ii = 1; ii <= N; ii += 1)
+
+//  T(jj,x0) {jj<=N, 1<=jj}
+
+      for(jj = 1; jj <= N; jj += 1) {
+
+//  T(x0) {}
+
+         x0 = ii*jj;
+
+//  T() {}
+
+         x1 = (double) N/2;
+
+//  T() {}
+
+         if (x0<x1) {
+
+//  T() {ii+1<=N, N<=ii+100, 1<=ii+jj, ii+jj<=100}
+
+            A[N-ii-1][ii+jj-1] = 1.0;
+
+//  T() {ii+jj+1<=N, N<=ii+jj+100, 1<=ii, ii<=100}
+
+            A[ii-1][N-ii-jj-1] = 1.0;
+         }
+
+//  T() {}
+
+         if (ii==jj)
+
+//  T() {1<=ii, ii<=100, 1<=jj, jj<=100}
+
+            A[ii-1][jj-1] = 1.0;
+      }
+   {
+
+//  T(i) {}
+
+      int i;
+
+//  T(i) {i+1<=N, 0<=i}
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  T(j) {}
+
+         int j;
+
+//  T(j) {j+1<=N, 0<=j}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  T() {0<=i, i<=99, 0<=j, j<=99}
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+//  T(main) {main==0}
+
+   return 0;
+}
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int ii, jj, x0;
+
+//  P(ii,jj,x0) {}
+
+   double x1;
+
+
+//  P(ii,jj,x0) {}
+
+   int N = 100;
+
+//  P(N,ii,jj,x0) {N==100}
+
+   double A[100][100];
+
+//  P(N,ii,jj,x0) {N==100}
+
+
+   for(ii = 1; ii <= N; ii += 1)
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=100}
+
+      for(jj = 1; jj <= N; jj += 1) {
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=100, 1<=jj, jj<=100}
+
+         x0 = ii*jj;
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=100, 1<=jj, jj<=100}
+
+         x1 = (double) N/2;
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=100, 1<=jj, jj<=100}
+
+         if (x0<x1) {
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=99, ii+jj<=100, 1<=jj, jj<=100}
+
+            A[N-ii-1][ii+jj-1] = 1.0;
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=99, ii+jj<=99, 1<=jj, jj<=100}
+
+            A[ii-1][N-ii-jj-1] = 1.0;
+         }
+
+//  P(N,ii,jj,x0) {N==100, 1<=ii, ii<=100, 1<=jj, jj<=100}
+
+         if (ii==jj)
+
+//  P(N,ii,jj,x0) {N==100, ii==jj, 1<=ii, ii<=100}
+
+            A[ii-1][jj-1] = 1.0;
+      }
+   {
+
+//  P(N,ii,jj,x0) {N==100, ii==101, jj==101}
+
+      int i;
+
+//  P(N,i,ii,jj,x0) {N==100, ii==101, jj==101}
+
+      for(i = 0; i <= N-1; i += 1) {
+
+//  P(N,i,ii,jj,x0) {N==100, ii==101, jj==101, 0<=i, i<=99}
+
+         int j;
+
+//  P(N,i,ii,j,jj,x0) {N==100, ii==101, jj==101, 0<=i, i<=99}
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  P(N,i,ii,j,jj,x0) {N==100, ii==101, jj==101, 0<=i, i<=99, 0<=j,
+//    j<=99}
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+
+//  P(N,ii,jj,x0) {N==100, ii==101, jj==101}
+
+   return 0;
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+   int ii, jj, x0;
+   double x1;
+
+   int N = 100;
+   double A[100][100];
+
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1,
+//    4612306447PHI2<=48039651PHI1+456618338253,
+//    2306155649PHI2<=24017400PHI1+228309409251,
+//    2282861147PHI2<=23774850PHI1+226003253553,
+//    480053PHI2<=490149PHI1+47525247,
+//    480151PHI2<=490149PHI1+47534949,
+//    1421341PHI2<=490149PHI1+140712759,
+//    237650PHI2<=242649PHI1+23527350,
+//    23294453PHI2<=242649PHI1+2306150847,
+//    475300PHI2<=14751PHI1+47054700, 955549PHI2<=14751PHI1+94599351,
+//    480053PHI2<=9900PHI1+47525247, 480151PHI2<=9900PHI1+47534949,
+//    1421341PHI2<=9900PHI1+140712759, 4753PHI2<=5049PHI1+470547,
+//    4753PHI2<=4950PHI1+470547, 475349PHI2<=4950PHI1+47059551,
+//    475397PHI2<=4950PHI1+47064303, 480151PHI2<=4950PHI1+47534949,
+//    190159PHI2<=990PHI1+18825741, 4753PHI2<=198PHI1+470547,
+//    4753PHI2<=99PHI1+470547, 9506PHI2<=99PHI1+941094,
+//    9604PHI2<=99PHI1+950796, 98PHI2<=PHI1+9704, PHI1<=PHI2+97,
+//    PHI1+PHI2<=198, 37PHI1+12PHI2<=4851, 49PHI1+48PHI2<=9702,
+//    98PHI1<=PHI2+9603, 99PHI1<=19703PHI2+9603,
+//    99PHI1<=9803PHI2+9603, 99PHI1<=9802PHI2+9702,
+//    99PHI1<=101PHI2+9603, 99PHI1<=PHI2+9801,
+//    4752PHI1<=475447PHI2+470547, 4754PHI1+4655PHI2<=936341,
+//    4851PHI1<=9703PHI2+47064303, 4950PHI1<=PHI2+489951,
+//    9605PHI1<=196PHI2+941094, 9801PHI1<=10001PHI2+950697,
+//    9900PHI1<=PHI2+980001, 19701PHI1<=101PHI2+1950201,
+//    242550PHI1+235273PHI2<=47304477, 480150PHI1<=49PHI2+47534949,
+//    970497PHI1<=989905PHI2+94138209,
+//    970497PHI1<=989903PHI2+94138407,
+//    23536953PHI1<=24007648PHI2+2283094044,
+//    47554353PHI1<=47564057PHI2+4705959753, 0<=PHI2, N==100}>
+
+
+   for(ii = 1; ii <= N; ii += 1)
+
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+PHI2<=198,
+//    9801ii<=4950PHI1+4949PHI2+480348,
+//    470596PHI2<=4901PHI1+ii+46588905, 9801ii<=99PHI1+196PHI2+950895,
+//    99ii<=99PHI1+98PHI2+99, 9801ii<=99PHI1+98PHI2+960597,
+//    4851ii<=99PHI1+49PHI2+475398,
+//    941092PHI2+9801ii<=99PHI1+94138407, 49PHI2<=50PHI1+ii+4752,
+//    49PHI2<=PHI1+ii+4752, 98PHI2<=PHI1+ii+9603, PHI1+1<=98PHI2+ii,
+//    48PHI1+49PHI2<=ii+9603, 49PHI1+48PHI2+ii<=9703,
+//    99PHI1<=99PHI2+2ii+9601, 4802PHI1<=49PHI2+50ii+470497,
+//    4852PHI1<=4949PHI2+ii+470546, 9605PHI1+97ii<=196PHI2+941191,
+//    9703PHI1<=98PHI2+ii+950795, 99PHI1<=ii+9701,
+//    9603PHI1<=197ii+940897, N==100, 1<=ii}>
+
+      for(jj = 1; jj <= N; jj += 1) {
+         x0 = ii*jj;
+         x1 = (double) N/2;
+
+//  <A[PHI1][PHI2]-W-MAY-{ii+4801<=50PHI1+49PHI2+49jj,
+//    49PHI2+49jj<=50PHI1+ii+4801, 4803<=48PHI1+49PHI2+ii+49jj,
+//    48PHI1+49PHI2<=ii+49jj+4703, 49PHI1+48PHI2+ii<=48jj+4803,
+//    PHI1+jj<=PHI2+98, 99ii+99jj<=PHI2+9801, N==100, 1<=ii, 1<=jj}>
+
+         if (x0<x1) {
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1+ii==99, ii+jj==PHI2+1, N==100, 1<=ii,
+//    ii<=99, ii+jj<=100, 1<=jj}>
+
+            A[N-ii-1][ii+jj-1] = 1.0;
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==ii-1, PHI2+ii+jj==99, N==100, 1<=ii,
+//    ii<=99, ii+jj<=99, 1<=jj}>
+
+            A[ii-1][N-ii-jj-1] = 1.0;
+         }
+
+//  <A[PHI1][PHI2]-W-MAY-{PHI1==ii-1, PHI2==jj-1, N==100, ii==jj,
+//    1<=ii, ii<=100}>
+
+         if (ii==jj)
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==ii-1, PHI2==jj-1, N==100, ii==jj,
+//    1<=ii, ii<=100}>
+
+            A[ii-1][jj-1] = 1.0;
+      }
+   {
+      int i;
+
+//  <A[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    N==100, ii==101, jj==101}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      for(i = 0; i <= N-1; i += 1) {
+         int j;
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, N==100,
+//    ii==101, jj==101, 0<=i, i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         for(j = 0; j <= N-1; j += 1)
+
+//  <A[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, N==100, ii==101,
+//    jj==101, 0<=j, j<=99, 0<=i, i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+            printf("%f\n", A[i][j]);
+      }
+   }
+   return 0;
+}
