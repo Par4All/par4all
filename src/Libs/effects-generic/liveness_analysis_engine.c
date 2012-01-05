@@ -346,9 +346,102 @@ live_paths_from_whileloop_to_body(whileloop l, live_paths_analysis_context *ctxt
 }
 
 static bool
-live_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
+live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
 {
-  return false;
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement
+    body = loop_body(l);
+
+  pips_debug(1,"begin\n");
+
+  /* First, we get the live out paths of the statement corresponding to the test
+   */
+  list l_live_out_loop = load_live_out_paths_list(current_stmt);
+
+  /* We then compute the live out paths of the loop body */
+  /* The live out paths of an iteration are the paths that
+       - belong to the live in paths of the next iteration if it exists;
+       - or belong to the live out of the whole loop if the next iteration
+         does not exist.
+   */
+  list l_live_out_body = NIL;
+  list l_inv_in_body = effects_dup(load_invariant_in_effects_list(body));
+  effects_to_may_effects(l_inv_in_body);
+
+  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+
+  l_live_out_loop = effects_dup(l_live_out_loop);
+  effects_to_may_effects(l_live_out_loop);
+
+  l_live_out_body = (*effects_union_op)(l_live_out_loop,
+					l_inv_in_body,
+					effects_same_action_p);
+
+  pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
+
+  store_live_out_paths_list(body, l_live_out_body);
+
+  pips_debug(1,"end\n");
+  return true;
+}
+
+static void
+live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
+{
+
+  /* The live in paths of a loop statement are the live in paths of its header
+     plus the live in paths of its first iteration if it is exectuted
+  */
+
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement
+    body = loop_body(l);
+
+  pips_debug(1,"begin\n");
+
+  /* Live in effects of header  */
+  /* We assume that there is no side effect in the loop header;
+     thus the live in effects of the header are similar to its proper read effects
+  */
+  list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+  list l_live_in_header =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+  reset_converted_rw_effects(&l_prop_header, ctxt);
+  pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+  /* Live in effects of first iteration if it exists */
+  list l_live_in_first_iter = effects_dup(load_live_in_paths_list(body));
+
+  if (! normalizable_and_linear_loop_p(loop_index(l), loop_range(l)))
+    {
+      pips_debug(7, "non linear loop range.\n");
+      effects_to_may_effects(l_live_in_first_iter);
+    }
+  else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
+    {
+      if (!loop_executed_at_least_once_p(l))
+	effects_to_may_effects(l_live_in_first_iter);
+    }
+  else
+    {
+      pips_internal_error("live paths of loop not implemented for convex paths\n");
+    }
+
+  pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
+
+  /* put them together */
+  list l_live_in_loop = (*effects_union_op)(l_live_in_header,
+					    l_live_in_first_iter,
+					    effects_same_action_p);
+
+  pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+  store_live_in_paths_list(current_stmt, l_live_in_loop);
+
+  pips_debug(1,"end\n");
 }
 
 static bool
@@ -449,7 +542,7 @@ live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt
      /* for expression instructions solely, equivalent to gen_true otherwise */
      sequence_domain, live_paths_from_block_to_statements, gen_null,
      test_domain, live_out_paths_from_test_to_branches, gen_null,
-     loop_domain, live_paths_from_loop_to_body, gen_null,
+     loop_domain, live_out_paths_from_loop_to_body, live_in_paths_of_loop,
      whileloop_domain, live_paths_from_whileloop_to_body, gen_null,
      forloop_domain, live_paths_from_forloop_to_body, gen_null,
      unstructured_domain, live_paths_from_unstructured_to_nodes, gen_null,
@@ -481,6 +574,7 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
 
   /* Get the various effects and in_effects of the module. */
 
+  set_proper_rw_effects((*db_get_proper_rw_effects_func)(module_name));
   set_rw_effects((*db_get_rw_effects_func)(module_name));
   set_invariant_rw_effects((*db_get_invariant_rw_effects_func)(module_name));
 
@@ -508,6 +602,7 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
   (*db_put_live_out_paths_func)(module_name, get_live_out_paths());
   (*db_put_live_in_paths_func)(module_name, get_live_in_paths());
 
+  reset_proper_rw_effects();
   reset_rw_effects();
   reset_invariant_rw_effects();
   reset_in_effects();
