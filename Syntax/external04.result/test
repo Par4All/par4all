@@ -1,0 +1,6 @@
+PARSER[EXTERNAL04] (CheckLeftHandSide) user error
+PARSER[EXTERNAL04] (CheckLeftHandSide) Illegal assignment to variable F with type functional
+PARSER[EXTERNAL04] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module EXTERNAL04.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE
