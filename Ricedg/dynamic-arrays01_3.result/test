@@ -343,9 +343,10 @@ int main(int argc, char **argv)
 Loops are parallelized:
 
 CONSTANT_PATHS_EFFECTS is FALSE
-TRUST_CONSTANT_PATHS_EFFECTS_IN_CONFLICTS is TRUE
--> no conflicts are assumed between dereferencing references
-from different entities
+TRUST_CONSTANT_PATHS_EFFECTS_IN_CONFLICTS is FALSE
+use POINTS_TO with flow-sensitive ABSTRACT_HEAP_LOCATIONS
+-> no conflicts are assumed between references to two
+different dynamically allocated array elements
 
 int main(int argc, char **argv)
 {
