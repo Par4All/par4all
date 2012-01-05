@@ -1,4 +1,7 @@
 
+Transformers
+
+
 //  T(main) {main==0}
 
 int main()
@@ -64,6 +67,9 @@ int main()
 
    return 0;
 }
+
+Preconditions
+
 
 //  P() {}
 
@@ -131,6 +137,9 @@ int main()
 
    return 0;
 }
+
+Regions
+
 
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
