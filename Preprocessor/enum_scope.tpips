@@ -1,11 +1,11 @@
 delete enum_scope
 create enum_scope enum_scope.c
 
-close
-delete enum_scope
-quit
+#close
+#delete enum_scope
+#quit
 
-activate C_PARSER
+#activate C_PARSER
 
 display PRINTED_FILE[main]
 display PRINTED_FILE[hue]
