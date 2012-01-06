@@ -1,0 +1,48 @@
+int main()
+{
+   int a, b, max;
+
+   a = 0;
+   b = 1;
+   max = 10;
+   while (a<max)
+      a = a+b;
+   return a;
+}
+int main()
+{
+   int a, b, max;
+
+   a = 0;
+//             <    is alive (in)>: a
+   b = 1;
+//             <may be alive (in)>: b
+//             <    is alive (in)>: a
+   max = 10;
+//             <may be alive (in)>: b
+//             <    is alive (in)>: a max
+   while (a<max)
+//             <    is alive (in)>: a b max
+      a = a+b;
+//             <    is alive (in)>: a
+   return a;
+}
+int main()
+{
+   int a, b, max;
+//             <    is alive (out)>: a
+
+   a = 0;
+//             <may be alive (out)>: b
+//             <    is alive (out)>: a
+   b = 1;
+//             <may be alive (out)>: b
+//             <    is alive (out)>: a max
+   max = 10;
+//             <    is alive (out)>: a
+   while (a<max)
+//             <may be alive (out)>: b
+//             <    is alive (out)>: a max
+      a = a+b;
+   return a;
+}
