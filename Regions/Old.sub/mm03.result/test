@@ -115,15 +115,15 @@ C
 C     
       M = MOD(N, 4)                                                     0011
 
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
-C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
-C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3, 1<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
 
       DO I = 1, M                                                       0012
 
-C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
-C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3, 1<=N}>
+C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
+C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
 
          X(I) = X(I)+S*Y(I)                                             0013
       ENDDO
