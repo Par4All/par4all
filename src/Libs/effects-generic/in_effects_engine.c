@@ -506,22 +506,55 @@ static void in_effects_of_forloop(forloop f, in_effects_context *ctxt)
   reset_converted_rw_effects(&lrw, ctxt);
 }
 
-/* Rin[while (c) s] = Rr[while (c) s] * may
+/* Rin[while (c) s] = Rin[c] U (Rr[while (c) s] * may)
  */
 static void in_effects_of_whileloop(whileloop w, in_effects_context *ctxt)
 {
   statement current;
+  bool before_p = evaluation_before_p(whileloop_evaluation(w));
 
   pips_debug(1, "considering while loop 0x%p\n", (void *) w);
 
   current = effects_private_current_stmt_head();
-  list lrw = convert_rw_effects(load_rw_effects_list(current), ctxt);
-  list lin = effects_read_effects_dup(lrw);
+  list l_rw = convert_rw_effects(load_rw_effects_list(current), ctxt);
+  list l_in = effects_read_effects_dup(l_rw);
   /* switch to MAY... */
-  effects_to_may_effects(lin);
-  store_in_effects_list(current, lin);
+  effects_to_may_effects(l_in);
+
+  /* add the loop condition evaluation effects */
+  if (before_p)
+    {
+      list l_prop_cond = convert_rw_effects(load_proper_rw_effects_list(current),
+					    ctxt);
+
+      pips_debug_effects(3, "effects of condition:\n", l_prop_cond);
+
+      /* We don't have the in effects of the condition evaluation
+	 we safely approximate them by its may read proper effects
+	 if there are write effects during its evaluation
+      */
+      list l_in_cond = effects_read_effects_dup(l_prop_cond);
+
+      if ( gen_length(l_in_cond) != gen_length(l_prop_cond))
+	/* there are write effects in the condition */
+	effects_to_may_effects(l_in_cond);
+      else
+	l_in_cond = proper_to_summary_effects(l_in_cond);
+
+      pips_debug_effects(3, "approximation of in effects of condition:\n", l_in_cond);
+
+      l_in = (*effects_union_op)(l_in,
+				l_in_cond,
+				effects_same_action_p);
+
+
+      reset_converted_rw_effects(&l_prop_cond, ctxt);
+
+    }
+
+  store_in_effects_list(current, l_in);
   store_invariant_in_effects_list(current, NIL);
-  reset_converted_rw_effects(&lrw, ctxt);
+  reset_converted_rw_effects(&l_rw, ctxt);
 }
 
 /* list in_effects_of_loop(loop l)
