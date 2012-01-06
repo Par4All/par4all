@@ -18,8 +18,7 @@ int main()
    b = 1;
 //             <    is alive (in)>: a b
    for(i = 0; i <= 9; i += 1)
-//             <may be alive (in)>: i
-//             <    is alive (in)>: a b
+//             <    is alive (in)>: a b i
       a = a+b;
 //             <    is alive (in)>: a i
 
@@ -35,7 +34,8 @@ int main()
    b = 1;
 //             <    is alive (out)>: a i
    for(i = 0; i <= 9; i += 1)
-//             <may be alive (out)>: a b i
+//             <may be alive (out)>: a b
+//             <    is alive (out)>: i
       a = a+b;
 
    return a+i;
