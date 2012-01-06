@@ -546,16 +546,16 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
   /* We then compute the live out paths of the loop body */
   /* The live out paths of an iteration are the paths that
        - belong to the in effects of the next iterations if there exist some,
-         except for the loop index and the loop locals if the loop is parallel;
+         except for the loop locals if the loop is parallel;
        - or belong to the live out of the whole loop if the next iteration
          does not exist.
+       - to these, for the C language, we must add the read effects resulting
+         from the evaluation of the incremental expression and of the upper
+	 bound. This includes an exact path for the loop index.
    */
   list l_masked_vars = NIL;
   if(loop_parallel_p(l))
     l_masked_vars = loop_locals(l);
-  /* beware: potential sharing with loop_locals(l) */
-  l_masked_vars = CONS(ENTITY, index, l_masked_vars);
-
 
   list l_inv_in_body =
     effects_dup_without_variables(load_invariant_in_effects_list(body),
@@ -563,14 +563,23 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
   effects_to_may_effects(l_inv_in_body);
   pips_debug_effects(3, "live in paths of an iteration:\n", l_inv_in_body);
 
-  /* free l_masked_vars: beware of the potential sharing with loop_locals */
-  if (loop_parallel_p(l))
-    CDR(l_masked_vars) = NIL;
-  gen_free_list(l_masked_vars);
-
   list l_live_out_body = (*effects_union_op)(l_live_out_loop,
 					     l_inv_in_body,
 					     effects_same_action_p);
+
+  list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+  list l_live_in_header =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+  reset_converted_rw_effects(&l_prop_header, ctxt);
+  list l_index = generic_proper_effects_of_read_reference(make_reference(index, NIL));
+  l_live_in_header = gen_nconc(l_index, l_live_in_header);
+
+  pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+  l_live_out_body = (*effects_union_op)(l_live_out_body,
+					l_live_in_header,
+					effects_same_action_p);
 
   pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
 
@@ -623,7 +632,7 @@ live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
 				  l_masked_vars);
 
   /* free l_masked_vars: beware of the potential sharing with loop_locals */
-  if (loop_parallel_p(l))
+  if (loop_parallel_p(l) && !ENDP(l_masked_vars))
     CDR(l_masked_vars) = NIL;
   gen_free_list(l_masked_vars);
 
