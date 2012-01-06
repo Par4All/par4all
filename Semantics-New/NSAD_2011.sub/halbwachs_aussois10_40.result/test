@@ -977,7 +977,7 @@ void ts_singlestate(void)
 
          if (!(2*v<=t+10&&5*v>=t-10))
 
-//  P(d,t,v,x) {t==5v+11, d<=10, d<=5v+11, 5x+11<=d, 0<=v}
+//  P(d,t,v,x) {t==5v+11, d<=10, 5x+11<=d, 0<=v}
 
             checking_error();
       }
