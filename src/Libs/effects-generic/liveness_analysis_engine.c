@@ -352,31 +352,45 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
     current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement
     body = loop_body(l);
+  entity
+    index = loop_index(l);
 
   pips_debug(1,"begin\n");
 
   /* First, we get the live out paths of the statement corresponding to the test
    */
-  list l_live_out_loop = load_live_out_paths_list(current_stmt);
+  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+  effects_to_may_effects(l_live_out_loop);
 
   /* We then compute the live out paths of the loop body */
   /* The live out paths of an iteration are the paths that
-       - belong to the live in paths of the next iteration if it exists;
+       - belong to the live in paths of the next iteration if it exists,
+         except for the loop index and the loop locals if the loop is parallel;
        - or belong to the live out of the whole loop if the next iteration
          does not exist.
    */
-  list l_live_out_body = NIL;
-  list l_inv_in_body = effects_dup(load_invariant_in_effects_list(body));
+  list l_masked_vars = NIL;
+  if(loop_parallel_p(l))
+    l_masked_vars = loop_locals(l);
+  /* beware: potential sharing with loop_locals(l) */
+  l_masked_vars = CONS(ENTITY, index, l_masked_vars);
+
+
+  list l_inv_in_body =
+    effects_dup_without_variables(load_invariant_in_effects_list(body),
+				  l_masked_vars);
   effects_to_may_effects(l_inv_in_body);
+  pips_debug_effects(3, "live in paths of an iteration:\n", l_inv_in_body);
 
-  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+  /* free l_masked_vars: beware of the potential sharing with loop_locals */
+  if (loop_parallel_p(l))
+    CDR(l_masked_vars) = NIL;
+  gen_free_list(l_masked_vars);
 
-  l_live_out_loop = effects_dup(l_live_out_loop);
-  effects_to_may_effects(l_live_out_loop);
-
-  l_live_out_body = (*effects_union_op)(l_live_out_loop,
-					l_inv_in_body,
-					effects_same_action_p);
+  list l_live_out_body = (*effects_union_op)(l_live_out_loop,
+					     l_inv_in_body,
+					     effects_same_action_p);
 
   pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
 
@@ -398,6 +412,8 @@ live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
     current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement
     body = loop_body(l);
+  entity
+    index = loop_index(l);
 
   pips_debug(1,"begin\n");
 
@@ -412,10 +428,26 @@ live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
   reset_converted_rw_effects(&l_prop_header, ctxt);
   pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
 
-  /* Live in effects of first iteration if it exists */
-  list l_live_in_first_iter = effects_dup(load_live_in_paths_list(body));
+  /* Live in effects of first iteration if it exists minus read effects
+     on the loop index, which are masked by its initialization in the header,
+     and read effects on loop locals if the loop is parallel;
+  */
+  list l_masked_vars = NIL;
+  if(loop_parallel_p(l))
+    l_masked_vars = loop_locals(l);
+  /* beware: potential sharing with loop_locals(l) */
+  l_masked_vars = CONS(ENTITY, index, l_masked_vars);
 
-  if (! normalizable_and_linear_loop_p(loop_index(l), loop_range(l)))
+  list l_live_in_first_iter =
+    effects_dup_without_variables(load_live_in_paths_list(body),
+				  l_masked_vars);
+
+  /* free l_masked_vars: beware of the potential sharing with loop_locals */
+  if (loop_parallel_p(l))
+    CDR(l_masked_vars) = NIL;
+  gen_free_list(l_masked_vars);
+
+  if (! normalizable_and_linear_loop_p(index, loop_range(l)))
     {
       pips_debug(7, "non linear loop range.\n");
       effects_to_may_effects(l_live_in_first_iter);
