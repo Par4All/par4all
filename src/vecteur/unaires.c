@@ -51,17 +51,16 @@
  *	       i
  *    ->   ->
  *    v := v / pgcd
- * 
+ *
  * Le pgcd est toujours positif.
  *
  * Ancien nom: vect_norm()
  */
-void vect_normalize(v)
-Pvecteur v;
+void vect_normalize(Pvecteur v)
 {
-    Value gcd = vect_pgcd_all(v);
-    if (value_notzero_p(gcd) && value_notone_p(gcd))
-	(void) vect_div(v, gcd);
+  Value gcd = vect_pgcd_all(v);
+  if (value_notzero_p(gcd) && value_notone_p(gcd))
+    (void) vect_div(v, gcd);
 }
 
 /* void vect_add_elem(Pvecteur * pvect, Variable var, Value val):
@@ -70,26 +69,25 @@ Pvecteur v;
  * ----->    ----->       --->
  * *pvect := *pvect + val evar
  */
-void vect_add_elem(pvect,var,val)
-Pvecteur *pvect;
-Variable var;
-Value val;
+void vect_add_elem(Pvecteur * pvect,Variable var, Value val)
 {
+  if (val!=0)
+  {
     Pvecteur vect;
-
-    if (val!=0) {
-	for (vect=(*pvect);vect!=NULL;vect=vect->succ) {
-	    if (var_of(vect)==var) {
-		value_addto(val_of(vect), val);
-		if (value_zero_p(val_of(vect)))
-		    vect_erase_var(pvect, var_of(vect));
-		return;
+    for (vect=(*pvect); vect!=NULL; vect=vect->succ)
+    {
+	    if (var_of(vect)==var)
+      {
+        value_addto(val_of(vect), val);
+        if (value_zero_p(val_of(vect)))
+          vect_erase_var(pvect, var_of(vect));
+        return;
 	    }
-	}
-	/* le coefficient valait 0 et n'etait pas represente */
-	*pvect = vect_chain(*pvect,var,val);
     }
-	/* sinon, le vecteur est inchange et on ne fait rien */
+    // else: le coefficient valait 0 et n'etait pas represente
+    *pvect = vect_chain(*pvect, var, val);
+  }
+	// sinon, le vecteur est inchange et on ne fait rien
 }
 
 /* void vect_erase_var(Pvecteur * ppv, Variable v): projection du
