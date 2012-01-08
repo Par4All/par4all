@@ -107,15 +107,13 @@ Pvecteur v;
  * Modifications:
  *  - a 0 coeff generates a null vector; Francois Irigoin, 26 March 1991
  */
-Pvecteur vect_new(var,coeff)
-Variable var;
-Value coeff;
+Pvecteur vect_new(Variable var, Value coeff)
 {
-    Pvecteur v;
+  Pvecteur v;
 
-    if(coeff!=0) {
-	v = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_new");
-	if (v == NULL) {
+  if(coeff!=0) {
+    v = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_new");
+    if (v == NULL) {
 	    (void) fprintf(stderr,"vect_new: Out of memory space\n");
 	    /* fprintf(stderr, "%10.3f MB",
 	       (sbrk(0) - etext)/(double)(1 << 20)); // not portable */
@@ -125,12 +123,11 @@ Value coeff;
 	var_of(v) = var;
 	val_of(v) = coeff;
 	v->succ = NULL;
+  }
+  else
+    v = NULL;
 
-    }
-    else
-	v = NULL;
-
-    return (v);
+  return v;
 }
 
 /* void dbg_vect_rm(Pvecteur v, char * f): desallocation d'un vecteur
@@ -152,40 +149,38 @@ void dbg_vect_rm(Pvecteur v,
 }
 
 /* Pvecteur vect_make(v, [var, val,]* 0, val)
- * Pvecteur v;
+ * Pvecteur v; // may be NULL, use assigne anyway
  * Variable var;
  * Value val;
  *
  * Builds a vector from the list of arguments, by successive additions.
  * ends when a 0 Variable (that is TCST!) is encountered.
  *
- * Because of the var val order, this function cannot be called directly 
- * with a va_list, but (va_list, 0) should be used, since the val argument 
+ * Because of the var val order, this function cannot be called directly
+ * with a va_list, but (va_list, 0) should be used, since the val argument
  * is expected, read and used anyway.
  *
  * CAUTION: the initial vector is modified by the process!
  */
-Pvecteur 
-vect_make(Pvecteur v, Variable var, Value val, ...)
+Pvecteur vect_make(Pvecteur v, Variable var, Value val, ...)
 {
-    va_list the_args;
+  va_list the_args;
 
-    /* handle fist argument */
+  // handle fist argument
+  vect_add_elem(&v, var, val);
+
+  // get others
+  va_start(the_args, val);
+
+  while (var != (Variable) 0)
+  {
+    var = va_arg(the_args, Variable);
+    val = va_arg(the_args, Value);
     vect_add_elem(&v, var, val);
+  }
 
-    /* get others */
-    va_start (the_args, val);
-
-    while (var != (Variable) 0)
-    {
-	var = va_arg(the_args, Variable);
-	val = va_arg(the_args, Value);
-	vect_add_elem(&v, var, val);
-    }
-
-    va_end (the_args);
-
-    return v;
+  va_end (the_args);
+  return v;
 }
 
 /* Allocate a new vector v whose coefficient are given by the list of
