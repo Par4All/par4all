@@ -1,0 +1,394 @@
+
+// Points To IN:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+
+
+// Points To OUT:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+int main(int argc, char **argv)
+{
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+
+   int i;
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+
+
+   if (argc>1)
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+
+      N = atoi(argv[1]);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+
+
+   array_a = (float *) malloc(N*sizeof(float));
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+
+   array_b = (float *) malloc(N*sizeof(float));
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+
+   array_c = (float *) malloc(N*sizeof(float));
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+
+   array_d = (float *) malloc(N*sizeof(float));
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+   
+   
+   array_a[0] = 2.0f;
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+   array_b[0] = 2.0f;
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+   array_c[0] = 2.0f;
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+
+   for(i = 1; i <= N-1; i += 1) {
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      array_a[i] = 1.0f/((float) i);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      array_b[i] = 1.0f/((float) 2*i);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      array_a[i] = array_b[i]+array_c[i];
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      array_d[i] = array_a[i-1]*2;
+   }
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+
+   for(i = 1; i <= N-1; i += 1)
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+// Points To:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
+// array_a -> *HEAP*_l_21[0] , EXACT
+// array_b -> *HEAP*_l_23[0] , EXACT
+// array_c -> *HEAP*_l_25[0] , EXACT
+// array_d -> *HEAP*_l_27[0] , EXACT
+
+
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int i;
+//             <    is read   >: argc
+
+   if (argc>1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: N
+      N = atoi(argv[1]);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_a _MALLOC_EFFECTS:_MALLOC_
+
+   array_a = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_a
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_b _MALLOC_EFFECTS:_MALLOC_
+   array_b = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_b
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_c _MALLOC_EFFECTS:_MALLOC_
+   array_c = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_c
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_d _MALLOC_EFFECTS:_MALLOC_
+   array_d = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_d
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+//             <    is read   >: array_a
+//             <    is written>: *HEAP*_l_21[0]
+   
+   
+   array_a[0] = 2.0f;
+//             <    is read   >: array_b
+//             <    is written>: *HEAP*_l_23[0]
+   array_b[0] = 2.0f;
+//             <    is read   >: array_c
+//             <    is written>: *HEAP*_l_25[0]
+   array_c[0] = 2.0f;
+//             <    is read   >: N
+//             <    is written>: i
+
+   for(i = 1; i <= N-1; i += 1) {
+//             <    is read   >: N array_a i
+//             <    is written>: *HEAP*_l_21[i]
+      array_a[i] = 1.0f/((float) i);
+//             <    is read   >: N array_b i
+//             <    is written>: *HEAP*_l_23[i]
+      array_b[i] = 1.0f/((float) 2*i);
+//             <    is read   >: N array_c i
+//             <    is written>: *HEAP*_l_25[i]
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+//             <    is read   >: N
+//             <    is written>: i
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+//             <    is read   >: *HEAP*_l_23[i] *HEAP*_l_25[i] N 
+//                               array_a array_b array_c i
+//             <    is written>: *HEAP*_l_21[i]
+      array_a[i] = array_b[i]+array_c[i];
+//             <    is read   >: *HEAP*_l_21[i-1] N array_a array_d i
+//             <    is written>: *HEAP*_l_27[i]
+      array_d[i] = array_a[i-1]*2;
+   }
+//             <    is read   >: N
+//             <    is written>: i
+
+   for(i = 1; i <= N-1; i += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: *HEAP*_l_21[i] *HEAP*_l_27[i] N 
+//                               array_a array_d i stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+   return 0;
+}
+
+ **************** Effective Dependence Graph ****************
+
+	48 --> 48 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY> at levels  1
+	48 --> 48 with conflicts
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT> at levels  1
+	48 --> 48 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY> at levels  1
+	48 --> 48 with conflicts
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT> at levels  1
+	48 --> 48 with conflicts
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY> at levels  1
+	48 --> 48 with conflicts
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT> at levels  1
+	43 --> 44 with conflicts
+		from <*HEAP*_l_21[i]-W-EXACT> to <*HEAP*_l_21[i-1]-R-EXACT> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Loops are parallelized:
+
+CONSTANT_PATHS_EFFECTS is FALSE
+TRUST_CONSTANT_PATHS_EFFECTS_IN_CONFLICTS is FALSE
+use POINTS_TO with flow-sensitive ABSTRACT_HEAP_LOCATIONS
+-> no conflicts are assumed between references to two
+different dynamically allocated array elements
+
+int main(int argc, char **argv)
+{
+   int i;
+
+   if (argc>1)
+      N = atoi(argv[1]);
+
+   array_a = (float *) malloc(N*sizeof(float));
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+   array_b = (float *) malloc(N*sizeof(float));
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+   array_c = (float *) malloc(N*sizeof(float));
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+   array_d = (float *) malloc(N*sizeof(float));
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+   
+   
+   array_a[0] = 2.0f;
+   array_b[0] = 2.0f;
+   array_c[0] = 2.0f;
+
+#pragma omp parallel for
+   for(i = 1; i <= N-1; i += 1)
+      array_a[i] = 1.0f/((float) i);
+#pragma omp parallel for
+   for(i = 1; i <= N-1; i += 1)
+      array_b[i] = 1.0f/((float) 2*i);
+#pragma omp parallel for
+   for(i = 1; i <= N-1; i += 1)
+      array_c[i] = 1.0f/((float) 3*i);
+   
+   
+#pragma omp parallel for
+   for(i = 1; i <= N-1; i += 1)
+      array_a[i] = array_b[i]+array_c[i];
+#pragma omp parallel for
+   for(i = 1; i <= N-1; i += 1)
+      array_d[i] = array_a[i-1]*2;
+
+   for(i = 1; i <= N-1; i += 1)
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+   return 0;
+}

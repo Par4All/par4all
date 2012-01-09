@@ -35,7 +35,8 @@
 #define ACTION_COPYIN		"COPYIN"
 #define ACTION_COPYOUT		"COPYOUT"
 #define ACTION_PRIVATE		"PRIVATE"
-#define ACTION_LIVE		"ALIVE"
+#define ACTION_LIVE_IN		"ALIVE (IN)"
+#define ACTION_LIVE_OUT		"ALIVE (OUT)"
 
 /* for debug 
 */

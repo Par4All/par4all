@@ -24,11 +24,12 @@ void flatten_code12(void)
 }
 int main()
 {
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               flatten_code12:0`1`foo foo_0
+//             <    is written>: __IO_EFFECTS:LUNS[1] 
 //                               flatten_code12:0`1`foo
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               flatten_code12:0`1`foo
-//             <    is read   >: foo_0
    flatten_code12();
 
    return 0;
@@ -113,11 +114,12 @@ void flatten_code12(void)
 }
 int main()
 {
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               flatten_code12:0`1`foo foo_0
+//             <    is written>: __IO_EFFECTS:LUNS[1] 
 //                               flatten_code12:0`1`foo
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               flatten_code12:0`1`foo
-//             <    is read   >: foo_0
    flatten_code12();
 
    return 0;

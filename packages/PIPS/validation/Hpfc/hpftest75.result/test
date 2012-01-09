@@ -9,7 +9,7 @@
             PSI1 = MY POS(1,1)
             IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
-                  DO PSIp2 = (3*PSI1+2)/5, MIN(2, (3*PSI1+4)/5)
+                  DO PSIp2 = (PSI1+1)/2, MIN(2, PSI1)
                      T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy sending
@@ -44,7 +44,7 @@
             PSIp1 = MY POS(1,2)
             PSIp2 = MY POS(2,2)
             IF (MY LID.LE.4) THEN
-               DO PSI1 = (5*PSIp2-2)/3, (5*PSIp2+2)/3
+               DO PSI1 = PSIp2, 2*PSIp2
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
@@ -99,7 +99,7 @@
 ! remapping A[3]: A_1[2] -> A[3]
             PSI1 = MY POS(1,1)
             IF (MY LID.LE.4) THEN
-               DO PSIp1 = (3*PSI1+2)/5, MIN(2, (3*PSI1+4)/5)
+               DO PSIp1 = (PSI1+1)/2, MIN(2, PSI1)
                   DO PSIp2 = 1, 2
                      T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
@@ -135,7 +135,7 @@
             PSIp1 = MY POS(1,2)
             PSIp2 = MY POS(2,2)
             IF (MY LID.LE.4) THEN
-               DO PSI1 = (5*PSIp1-2)/3, (5*PSIp1+2)/3
+               DO PSI1 = PSIp1, 2*PSIp1
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
@@ -191,7 +191,7 @@
             PSI1 = MY POS(1,2)
             PSI2 = MY POS(2,2)
             IF (MY LID.LE.4) THEN
-               DO PSIp1 = (5*PSI2-2)/3, (5*PSI2+2)/3
+               DO PSIp1 = PSI2, 2*PSI2
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy sending
@@ -225,7 +225,7 @@
             PSIp1 = MY POS(1,1)
             IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
-                  DO PSI2 = (3*PSIp1+2)/5, MIN(2, (3*PSIp1+4)/5)
+                  DO PSI2 = (PSIp1+1)/2, MIN(2, PSIp1)
                      T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
@@ -282,7 +282,7 @@
             PSI1 = MY POS(1,2)
             PSI2 = MY POS(2,2)
             IF (MY LID.LE.4) THEN
-               DO PSIp1 = (5*PSI1-2)/3, (5*PSI1+2)/3
+               DO PSIp1 = PSI1, 2*PSI1
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy sending
@@ -315,7 +315,7 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             IF (MY LID.LE.4) THEN
-               DO PSI1 = (3*PSIp1+2)/5, MIN(2, (3*PSIp1+4)/5)
+               DO PSI1 = (PSIp1+1)/2, MIN(2, PSIp1)
                   DO PSI2 = 1, 2
                      T LID = 2*PSI1+PSI2-2
                      IF (MY LID.NE.T LID) THEN

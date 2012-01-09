@@ -878,9 +878,14 @@ transformer statement_to_postcondition(
 	 *
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
+	 *
+	 * FI: redundancy possibly added. See asopt02. Maybe this
+	 * should be moved up before the normalization step.
 	 */
-	if(get_bool_property("SEMANTICS_FILTER_INITIAL_VALUES"))
+	if(get_bool_property("SEMANTICS_FILTER_INITIAL_VALUES")) {
 	  pre = transformer_filter(pre, non_initial_values);
+	  pre = transformer_normalize(pre, 2);
+	}
 
 	/* store the precondition in the ri */
 	store_statement_precondition(s, pre);

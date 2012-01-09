@@ -1,0 +1,36 @@
+int main()
+{
+   int a, b, c;
+
+   a = 1;
+   b = 2;
+   a = 3;
+   c = a+b;
+   return c;
+}
+int main()
+{
+   int a, b, c;
+
+   a = 1;
+   b = 2;
+//             <    is alive (in)>: b
+   a = 3;
+//             <    is alive (in)>: a b
+   c = a+b;
+//             <    is alive (in)>: c
+   return c;
+}
+int main()
+{
+   int a, b, c;
+
+   a = 1;
+//             <    is alive (out)>: b
+   b = 2;
+//             <    is alive (out)>: a b
+   a = 3;
+//             <    is alive (out)>: c
+   c = a+b;
+   return c;
+}

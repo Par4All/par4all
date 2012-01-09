@@ -170,8 +170,7 @@ int main()
    int N = 100;
    double A[100][100];
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99,
-//    2401PHI1+7251PHI2<=953147, 7251PHI1+2401PHI2<=953147, 0<=PHI2,
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, PHI1+PHI2<=197, 0<=PHI2,
 //    PHI2<=99, N==100}>
 
 

@@ -22962,62 +22962,50 @@ static void clearblock(unsigned char *cur[], int i0, int j0)
    if (chroma_format!=3) {
 //  P(h,i,j,w) {h==16, i==16, j==16, w==16, 0<=i0, i0+1<=width, 0<=j0}
       i0 >>= 1;
-//  P(h,i,i0,j,w) {h==16, i==16, j==16, w==16, 0<=2i0+1, 2i0+1<=width,
+//  P(h,i,i0,j,w) {h==16, i==16, j==16, w==16, 0<=i0, 2i0+1<=width,
 //    0<=j0, 1<=width}
       w >>= 1;
    }
-//  P(h,i,i0,j,w) {h==16, i==16, j==16, w<=16i0+16, w<=8i0+16,
-//    i0+1<=width, 0<=j0, 8<=w, w<=16, 1<=width}
+//  P(h,i,i0,j,w) {h==16, i==16, j==16, 0<=i0, i0+1<=width, 0<=j0,
+//    8<=w, w<=16, 1<=width}
    if (chroma_format==1) {
-//  P(h,i,i0,j,w) {chroma_format==1, h==16, i==16, j==16, w<=16i0+16,
-//    w<=16i0+16, w<=8i0+16, w<=8i0+16, i0+1<=width, i0+1<=width,
-//    0<=j0, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,w) {chroma_format==1, h==16, i==16, j==16, 0<=i0,
+//    i0+1<=width, 0<=j0, 8<=w, w<=16, 1<=width}
       j0 >>= 1;
-//  P(h,i,i0,j,j0,w) {chroma_format==1, h==16, i==16, j==16,
-//    w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16, i0+1<=width,
-//    i0+1<=width, 0<=2j0+1, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {chroma_format==1, h==16, i==16, j==16, 0<=i0,
+//    i0+1<=width, 0<=j0, 8<=w, w<=16, 1<=width}
       h >>= 1;
    }
-//  P(h,i,i0,j,j0,w) {i==16, j==16, 8<=h, h<=16, h<=16j0+16,
-//    h<=8j0+16, w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16,
-//    i0+1<=width, i0+1<=width, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {i==16, j==16, 8<=h, h<=16, 0<=i0, i0+1<=width,
+//    0<=j0, 8<=w, w<=16, 1<=width}
    p = cur[1]+(pict_struct==2?chrom_width:0)+i0+chrom_width2*j0;
-//  P(h,i,i0,j,j0,w) {i==16, j==16, 8<=h, h<=16, h<=16j0+16,
-//    h<=8j0+16, w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16,
-//    i0+1<=width, i0+1<=width, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {i==16, j==16, 8<=h, h<=16, 0<=i0, i0+1<=width,
+//    0<=j0, 8<=w, w<=16, 1<=width}
    for(j = 0; j <= h-1; j += 1) {
-//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, h<=16j0+16, h<=8j0+16,
-//    w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16, i0+1<=width,
-//    i0+1<=width, 0<=j, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, 0<=i0, i0+1<=width, 0<=j,
+//    0<=j0, 8<=w, w<=16, 1<=width}
       for(i = 0; i <= w-1; i += 1)
-//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, h<=16j0+16, h<=8j0+16,
-//    0<=i, i+1<=w, w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16,
-//    i0+1<=width, i0+1<=width, 0<=j, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, 0<=i, i+1<=w, 0<=i0,
+//    i0+1<=width, 0<=j, 0<=j0, 8<=w, w<=16, 1<=width}
          p[i] = 128;
-//  P(h,i,i0,j,j0,w) {i==w, 8<=h, h<=16, j+1<=h, h<=16j0+16,
-//    h<=8j0+16, 8<=i, i<=16, i<=16i0+16, i<=16i0+16, i<=8i0+16,
-//    i<=8i0+16, i0+1<=width, i0+1<=width, 0<=j, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {i==w, 8<=h, h<=16, j+1<=h, 8<=i, i<=16, 0<=i0,
+//    i0+1<=width, 0<=j, 0<=j0, 1<=width}
       p += chrom_width2;
    }
-//  P(h,i,i0,j,j0,w) {h==j, i==w, 8<=h, h<=16, h<=16j0+16, h<=8j0+16,
-//    8<=i, i<=16, i<=16i0+16, i<=16i0+16, i<=8i0+16, i<=8i0+16,
-//    i0+1<=width, i0+1<=width, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {h==j, i==w, 8<=h, h<=16, 8<=i, i<=16, 0<=i0,
+//    i0+1<=width, 0<=j0, 1<=width}
    p = cur[2]+(pict_struct==2?chrom_width:0)+i0+chrom_width2*j0;
-//  P(h,i,i0,j,j0,w) {h==j, i==w, 8<=h, h<=16, h<=16j0+16, h<=8j0+16,
-//    8<=i, i<=16, i<=16i0+16, i<=16i0+16, i<=8i0+16, i<=8i0+16,
-//    i0+1<=width, i0+1<=width, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {h==j, i==w, 8<=h, h<=16, 8<=i, i<=16, 0<=i0,
+//    i0+1<=width, 0<=j0, 1<=width}
    for(j = 0; j <= h-1; j += 1) {
-//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, h<=16j0+16, h<=8j0+16,
-//    w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16, i0+1<=width,
-//    i0+1<=width, 0<=j, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, 0<=i0, i0+1<=width, 0<=j,
+//    0<=j0, 8<=w, w<=16, 1<=width}
       for(i = 0; i <= w-1; i += 1)
-//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, h<=16j0+16, h<=8j0+16,
-//    0<=i, i+1<=w, w<=16i0+16, w<=16i0+16, w<=8i0+16, w<=8i0+16,
-//    i0+1<=width, i0+1<=width, 0<=j, 8<=w, w<=16, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {8<=h, h<=16, j+1<=h, 0<=i, i+1<=w, 0<=i0,
+//    i0+1<=width, 0<=j, 0<=j0, 8<=w, w<=16, 1<=width}
          p[i] = 128;
-//  P(h,i,i0,j,j0,w) {i==w, 8<=h, h<=16, j+1<=h, h<=16j0+16,
-//    h<=8j0+16, 8<=i, i<=16, i<=16i0+16, i<=16i0+16, i<=8i0+16,
-//    i<=8i0+16, i0+1<=width, i0+1<=width, 0<=j, 1<=width, 1<=width}
+//  P(h,i,i0,j,j0,w) {i==w, 8<=h, h<=16, j+1<=h, 8<=i, i<=16, 0<=i0,
+//    i0+1<=width, 0<=j, 0<=j0, 1<=width}
       p += chrom_width2;
    }
 }
@@ -23726,32 +23714,29 @@ void profile_and_level_checks()
 //    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
    if (profile>=4) {
-//  P(i) {1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
+//  P(i) {chroma_format==1, 1<=M, 0<=dc_prec, dc_prec<=3,
 //    1<=frame_rate_code, frame_rate_code<=8, 1<=horizontal_size,
 //    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
 //    profile<=5, 0<=prog_seq, prog_seq<=1, 0<=repeatfirst,
 //    repeatfirst<=1, 1<=vbv_buffer_size, vbv_buffer_size<=262143,
 //    1<=vertical_size, vertical_size<=16383}
       if (frame_rate_code<=2&&repeatfirst)
-//  P(i) {repeatfirst==1, 1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
-//    1<=frame_rate_code, frame_rate_code<=2, 1<=horizontal_size,
-//    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
-//    profile<=5, 0<=prog_seq, prog_seq<=1, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
+//  P(i) {chroma_format==1, repeatfirst==1, 1<=M, 0<=dc_prec,
+//    dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=2,
+//    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
+//    4<=profile, profile<=5, 0<=prog_seq, prog_seq<=1,
+//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
+//    vertical_size<=16383}
          error("repeat_first_first must be zero");
-//  P(i) {1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
+//  P(i) {chroma_format==1, 1<=M, 0<=dc_prec, dc_prec<=3,
 //    1<=frame_rate_code, frame_rate_code<=8, 1<=horizontal_size,
 //    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
 //    profile<=5, 0<=prog_seq, prog_seq<=1, 0<=repeatfirst,
 //    repeatfirst<=1, 1<=vbv_buffer_size, vbv_buffer_size<=262143,
 //    1<=vertical_size, vertical_size<=16383}
       if (frame_rate_code<=6&&prog_seq&&repeatfirst)
-//  P(i) {prog_seq==1, repeatfirst==1, 1<=M, 1<=chroma_format,
-//    chroma_format<=3, 2chroma_format+profile<=7, 0<=dc_prec,
-//    dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=6,
+//  P(i) {chroma_format==1, prog_seq==1, repeatfirst==1, 1<=M,
+//    0<=dc_prec, dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=6,
 //    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
 //    4<=profile, profile<=5, 1<=vbv_buffer_size,
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
@@ -24043,20 +24028,19 @@ void putAC(int run, int signed_level, int vlcformat)
       len = ptab->len;
    }
    else if (run<32&&level<6) {
-//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5, 41<=0`level+20run,
-//    0<=0`level+signed_level, signed_level<=0`level, 0<=run, run<=31}
+//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5,
+//    0<=0`level+signed_level, signed_level<=0`level, 2<=run, run<=31}
       /* vlcformat selects either of Table B-14 / B-15 */
       if (vlcformat)
-//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5, 41<=0`level+20run,
-//    0<=0`level+signed_level, signed_level<=0`level, 0<=run, run<=31}
+//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5,
+//    0<=0`level+signed_level, signed_level<=0`level, 2<=run, run<=31}
          ptab = &dct_code_tab2a[run-2][level-1];
       else
 //  P(0`level,len) {len==0, vlcformat==0, 1<=0`level, 0`level<=5,
-//    41<=0`level+20run, 0<=0`level+signed_level,
-//    signed_level<=0`level, 0<=run, run<=31}
+//    0<=0`level+signed_level, signed_level<=0`level, 2<=run, run<=31}
          ptab = &dct_code_tab2[run-2][level-1];
-//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5, 41<=0`level+20run,
-//    0<=0`level+signed_level, signed_level<=0`level, 0<=run, run<=31}
+//  P(0`level,len) {len==0, 1<=0`level, 0`level<=5,
+//    0<=0`level+signed_level, signed_level<=0`level, 2<=run, run<=31}
       len = ptab->len;
    }
 //  P(0`level,len) {1<=0`level, 0<=0`level+signed_level,
@@ -24189,17 +24173,15 @@ void putaddrinc(int addrinc)
    while (addrinc>33) {
 //  P(addrinc,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
 //    {34<=addrinc, putbits!:bytecnt#init<=putbits!:bytecnt,
-//    24putbits!:bytecnt#init+3putbits!:outcnt<=24putbits!:bytecnt+3
+//    8putbits!:bytecnt#init+putbits!:outcnt<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
 //    putbits!:outcnt#init}
       putbits(0x08, 11);
 //  P(addrinc,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
 //    {34<=addrinc, putbits!:bytecnt#init<=putbits!:bytecnt,
-//    45putbits!:bytecnt#init+6putbits!:outcnt+33<=45putbits!:bytecnt+
-//    6putbits!:outcnt#init,
-//    24putbits!:bytecnt#init+3putbits!:outcnt+33<=24putbits!:bytecnt+
-//    3putbits!:outcnt#init,
+//    15putbits!:bytecnt#init+2putbits!:outcnt+11<=15putbits!:bytecnt+
+//    2putbits!:outcnt#init,
 //    8putbits!:bytecnt#init+putbits!:outcnt+11<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -24209,7 +24191,7 @@ void putaddrinc(int addrinc)
    }
 //  P(addrinc,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
 //    {addrinc<=33, putbits!:bytecnt#init<=putbits!:bytecnt,
-//    24putbits!:bytecnt#init+3putbits!:outcnt<=24putbits!:bytecnt+3
+//    8putbits!:bytecnt#init+putbits!:outcnt<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
 //    putbits!:outcnt#init}
@@ -24669,45 +24651,44 @@ void putmv(int dmv, int f_code)
 //    dmv+1<=16f, dmv+16f+1<=0, 0<=f}
       dmv += dv;
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
-//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=64f}
+//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=f}
    /* check value */
    if (dmv<vmin||dmv>vmax)
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
-//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=64f,
-//    0<=f}
+//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=f}
       if (!quiet)
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
-//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=64f,
-//    0<=f, quiet<=0}
+//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=f,
+//    quiet<=0}
          fprintf(stderr, "invalid motion vector\n");
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
-//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=64f}
+//    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, 0<=f}
    /* split dmv into motion_code and motion_residual */
    temp = (dmv<0?-dmv:dmv)+f-1;
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1,
-//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=64f}
+//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=f}
    motion_code = temp>>r_size;
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1,
-//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=64f}
+//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=f}
    if (dmv<0)
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1, dmv+1<=0,
-//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=64f, 0<=f}
+//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=f}
       motion_code = -motion_code;
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1,
-//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=64f}
+//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=f}
    motion_residual = temp&f-1;
 //  P(dmv,dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {dv==32f, 16f==vmax+1, 16f+vmin==0, f_code==r_size+1,
-//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=64f}
+//    f<=dmv+temp+1, dmv+f<=temp+1, 0<=f}
    putmotioncode(motion_code);
 //  P(dmv,dv,f,motion_code,motion_residual,putbits!:bytecnt,
 //    putbits!:outbfr,putbits!:outcnt,r_size,temp,vmax,vmin) {dv==32f,
 //    16f==vmax+1, 16f+vmin==0, f_code==r_size+1, f<=dmv+temp+1,
-//    dmv+f<=temp+1, 0<=64f, putbits!:bytecnt#init<=putbits!:bytecnt,
+//    dmv+f<=temp+1, 0<=f, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
 //    putbits!:outcnt#init}
    /* variable length code */
@@ -24715,8 +24696,7 @@ void putmv(int dmv, int f_code)
 //  P(dmv,dv,f,motion_code,motion_residual,putbits!:bytecnt,
 //    putbits!:outbfr,putbits!:outcnt,r_size,temp,vmax,vmin) {dv==32f,
 //    16f==vmax+1, 16f+vmin==0, f_code==r_size+1, f<=dmv+temp+1,
-//    dmv+f<=temp+1, 0<=64f, 0<=f,
-//    putbits!:bytecnt#init<=putbits!:bytecnt,
+//    dmv+f<=temp+1, 0<=f, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
 //    putbits!:outcnt#init}
       putbits(motion_residual, r_size);
@@ -29046,14 +29026,14 @@ static void putDC(sVLCtable *tab, int val)
 //  P(absval,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,size)
 //    {absval==0, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
-//    putbits!:outcnt#init, 1<=size, 0<=2047size+2val, 0<=val+2047,
+//    putbits!:outcnt#init, 1<=size, 1<=1024size+val, 0<=val+2047,
 //    val+1<=0}
          absval = val+(1<<size)-1;
 //  P(absval,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,size)
 //    {2051val<=2049absval+2047size, 2049val<=2048absval+2047,
 //    val<=absval+1, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
-//    putbits!:outcnt#init, 1<=size, 0<=2047size+2val, 2val<=2047size,
+//    putbits!:outcnt#init, 1<=size, 2val<=2047size, 1<=1024size+val,
 //    0<=val+2047, val<=2047}
       /* val + (2 ^ size) - 1 */
       putbits(absval, size);

@@ -231,7 +231,8 @@ c
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO LALPHA1 = (-PSI2+7)/2, (-PSI2+15)/2
+            DO LALPHA1 = 3+HPFC DIVIDE(PSI1-PSI2, 2), (PSI1-PSI2+13)/
+     &      2
                DO LALPHA2 = MAX(1, LALPHA1-1+HPFC DIVIDE(-PSI1+PSI2, 
      &         2)), MIN(5, LALPHA1+HPFC DIVIDE(-PSI1+PSI2-3, 2))
                   ALPHA2 = 2*LALPHA2+PSI1-2
@@ -513,7 +514,7 @@ c
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = (-PSI2+7)/2, (-PSI2+15)/2
+      DO LALPHA1 = 3+HPFC DIVIDE(PSI1-PSI2, 2), (PSI1-PSI2+13)/2
          DO LALPHA2 = MAX(1, LALPHA1-1+HPFC DIVIDE(-PSI1+PSI2, 2)), 
      &   MIN(5, LALPHA1+HPFC DIVIDE(-PSI1+PSI2-3, 2))
             ALPHA2 = 2*LALPHA2+PSI1-2

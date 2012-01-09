@@ -1,0 +1,9 @@
+PARSER[EQUIV22] (MakeEquivAtom) Formal parameter N appears in EQUIVALENCE declaration
+PARSER[EQUIV22] (MakeEquivAtom) user error
+PARSER[EQUIV22] (MakeEquivAtom) Parser error between lines 6 and 6
+Formal parameter in equivalence chain
+
+PARSER[EQUIV22] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV22.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

@@ -1,3 +1,5 @@
+// Bug in main declaration
+
 void main ()
 {
   int a[10];

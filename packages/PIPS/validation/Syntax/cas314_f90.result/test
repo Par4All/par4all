@@ -1,0 +1,8 @@
+PARSER[CAS314_F90] (MakeAtom) user error
+PARSER[CAS314_F90] (MakeAtom) Parser error between lines 14 and 14
+Substring operations can only be applied to strings in Fortran 77
+
+PARSER[CAS314_F90] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module CAS314_F90.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

@@ -1,0 +1,80 @@
+
+Transformers for slope13
+
+
+//  T() {}
+
+void slope13()
+{
+
+//  T(k,x,y) {}
+
+   int x, y, k;
+
+//  T() {0<=x+105, x+45<=0}
+
+   if (!(-105<=x&&x<=-45))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {x+y==k}
+
+
+   if (-1551*x+76799*y-7525551<=0)
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+   else
+
+//  T(k) {x+y==k}
+
+      k = x+y;
+
+//  T() {}
+
+
+   return;
+}
+
+Preconditions for slope13
+
+
+//  P() {}
+
+void slope13()
+{
+
+//  P() {}
+
+   int x, y, k;
+
+//  P(k,x,y) {}
+
+   if (!(-105<=x&&x<=-45))
+
+//  P(k,x,y) {}
+
+      abort();
+
+//  P(k,x,y) {0<=x+105, x+45<=0}
+
+
+   if (-1551*x+76799*y-7525551<=0)
+
+//  P(k,x,y) {0<=x+105, x+45<=0, 7y<=x+770, 49y<=x+4802, y<=97}
+
+      k = x+y;
+   else
+
+//  P(k,x,y) {0<=x+105, x+45<=0, x+4803<=49y, x+535<=5y, 96<=y}
+
+      k = x+y;
+
+//  P(k,x,y) {x+y==k, 0<=x+105, x+45<=0}
+
+
+   return;
+}

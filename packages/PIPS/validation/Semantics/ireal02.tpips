@@ -1,0 +1,20 @@
+delete ireal02
+
+# Lots of typing errors
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ireal02 ireal02.f
+module IREAL02
+
+#setenv SEMANTICS_DEBUG_LEVEL=1
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[IREAL02]
+
+close
+delete ireal02
+quit

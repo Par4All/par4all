@@ -14,13 +14,17 @@ Proper effetcs for "array02"
 
 void array02()
 {
+//             <    is declared>: x
    float x[11][2];
+//             <    is declared>: i
    int i;
 //             <    is written>: i
+//             <    is referenced>: i
 
    for(i = 1; i <= 9; i += 1)
 //             <    is read   >: i
 //             <    is written>: x[i][1]
+//             <    is referenced>: i x
       x[i][1] = 0.;
 }
 
@@ -28,15 +32,19 @@ Cumulated effetcs for "array02"
 
 void array02()
 {
+//             <    is declared>: x
    float x[11][2];
+//             <    is declared>: i
    int i;
 //             <may be written>: x[*][1]
 //             <    is read   >: i
 //             <    is written>: i
+//             <    is referenced>: i x
 
    for(i = 1; i <= 9; i += 1)
 //             <may be written>: x[*][1]
 //             <    is read   >: i
+//             <    is referenced>: i x
       x[i][1] = 0.;
 }
 
@@ -96,14 +104,19 @@ Printed files with regions
 
 void array02()
 {
+
+//  <x-WE-EXACT-{}>
+
    float x[11][2];
    int i;
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1][PHI2]-W-EXACT-{PHI2==1, 1<=PHI1, PHI1<=9}>
 
 
    for(i = 1; i <= 9; i += 1)
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 1<=i, i<=9}>
 
       x[i][1] = 0.;

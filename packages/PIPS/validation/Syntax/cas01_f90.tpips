@@ -1,8 +1,9 @@
+# f90 is not parsed by a f77 parser
+
 delete cas01_f90
 create cas01_f90 cas01_f90.f
 display PRINTED_FILE 
 close
+shell cat cas01_f90.database/Warnings
 delete cas01_f90
 quit
-EOF
-

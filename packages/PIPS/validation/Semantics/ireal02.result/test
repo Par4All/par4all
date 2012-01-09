@@ -1,0 +1,18 @@
+
+C  T() {}
+
+C     Bug found in ireal01. The bug disappear if the first statement is
+C     removed... or if SEMANTICS_DEBUG_LEVEL is greater than 1...
+
+      PROGRAM IREAL02
+
+C  T(I) {}
+
+
+      I = MIN(1.2, K)                                                   0006
+
+C  T(LWIDTH) {72<=LWIDTH, LWIDTH<=132}
+
+      LWIDTH = MIN(MAX(IFIELD, 72), 132)                                0007
+
+      END

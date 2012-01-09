@@ -1,0 +1,7 @@
+pips error in basic_of_intrinsic: (../../../../src/Libs/ri-util/type.c:1204) assertion failed
+
+ 'not calling basic_of_intrinsic on something returning void' not verified
+
+Abort trap: 6
+
+under mac osx

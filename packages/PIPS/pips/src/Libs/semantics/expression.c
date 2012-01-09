@@ -1786,6 +1786,14 @@ static transformer integer_multiply_to_transformer(entity v,
   if(transformer_undefined_p(tf)) {
     /* let's assume no impact from side effects */
     if(expression_equal_p(e1, e2)) {
+      // FI: we could do a much better job here
+      // a different function such as integer_square_to_transformer()
+      // should be called to also generate the first terms
+      // v>=t, v>=-t, v>=3t-2, v>=-3t-2
+      // This terms are useful when t is connected because e1 is
+      // affine and when the programmer plays on the behavior of
+      // square around 0
+      // See cavern01.c
       Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
       tf = transformer_identity();
       tf = transformer_inequality_add(tf, vineq);

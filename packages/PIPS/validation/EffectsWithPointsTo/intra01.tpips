@@ -1,0 +1,37 @@
+delete intra01
+create intra01 intra01.c 
+
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+
+echo
+echo CUMULATED  EFFECTS 
+echo
+activate CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+
+close
+delete intra01
+quit

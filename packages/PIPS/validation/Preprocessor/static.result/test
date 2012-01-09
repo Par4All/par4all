@@ -1,0 +1,6 @@
+main()
+{
+  static int i;
+}
+
+extern main();

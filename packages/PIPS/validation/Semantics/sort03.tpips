@@ -1,0 +1,13 @@
+# setenv SEMANTICS_DEBUG_LEVEL 8
+setenv WS=sort03
+setenv PRETTYPRINT_DEBUG_LEVEL 1
+delete $WS
+create $WS $WS.c
+module $WS
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WS]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+close
+# delete $WS
+quit

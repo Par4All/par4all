@@ -994,7 +994,7 @@ transformer transformer_normalize(transformer t, int level)
 	    case 4:
 	      /* Too expensive according to measurements by Beatrice
 	       * Creusillet to be used anywhere but before storing
-	       * transformers or preconditons or before printing
+	       * transformers or preconditions or before printing
 	       * them. Lots of calls to string operations when C is the
 	       * analyzed language because variable names used for sorting
 	       * are easy to extract due to scope information. It is not

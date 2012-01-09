@@ -201,19 +201,15 @@ int ofl_ctrl;
 	return;
 
     sc = sc_init_with_sc(ps);
-    if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,true)) { 
-	Pvecteur v = vect_new(TCST, VALUE_ONE);
-	Pcontrainte eq = contrainte_make(v);
-	sc->egalites = eq;
-	sc->nb_eq =1;
-	sc_rm(ps);
-	*psc =sc;
-	return;
+    if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,true)) {
+      sc=sc_empty(base_dup(ps->base));
+      sc_rm(ps);
+      *psc =sc;
+      return;
     }
 
     sc->egalites = contraintes_copy(ps->egalites);
     sc->nb_eq = ps->nb_eq;
- 
     for (ineq = ps->inegalites;
 	 !CONTRAINTE_UNDEFINED_P(ineq) &&
 	   /* if more than 6 exceptions are thrown from within the loop,

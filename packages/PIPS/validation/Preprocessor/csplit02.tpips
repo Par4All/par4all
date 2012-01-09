@@ -1,5 +1,13 @@
 delete csplit02
+
+# Impossible to use: the validation script does not really like aborts...
+# setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_C="N"
+
+echo "Before create"
 create csplit02 csplit02.c
+shell if test -d $WSPACE.database ; then echo "database exists and should not" ; else echo "database does not exists, as expected"; fi
+
 
 # The creation is doomed on purpose, see source code.
 
@@ -7,11 +15,12 @@ close
 delete csplit02
 quit
 
-activate C_PARSER
+# activate C_PARSER
 
 display PRINTED_FILE[main]
 display PRINTED_FILE[print_hello_too]
 
 close
+shell cat csplit02.database/Warnings
 delete csplit02
 quit
