@@ -300,7 +300,7 @@ out_effects(const char* module_name)
 static bool
 print_code_effects(
     const char* module_name,
-    bool is_rw,
+    simple_effects_actions_interpretations ac_inter,
     bool is_user_view,
     bool is_attached,
     string resource_name,
@@ -309,8 +309,16 @@ print_code_effects(
 {
     bool ok;
 
-    if (is_rw) set_methods_for_rw_effects_prettyprint(module_name);
-    else       set_methods_for_inout_effects_prettyprint(module_name);
+    if (ac_inter == act_rw)
+      set_methods_for_rw_effects_prettyprint(module_name);
+    else if (ac_inter == act_inout)
+      set_methods_for_inout_effects_prettyprint(module_name);
+    else if (ac_inter == act_live_in)
+      set_methods_for_live_in_paths_prettyprint(module_name);
+    else if (ac_inter == act_live_out)
+      set_methods_for_live_out_paths_prettyprint(module_name);
+    else
+      pips_internal_error("erroneous actions interpretation\n");
 
     set_is_user_view_p(is_user_view);
     set_prettyprint_with_attachments(is_attached);
@@ -327,70 +335,70 @@ print_code_effects(
 bool
 print_code_proper_pointer_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+  return print_code_effects(module_name, act_rw, false, true,
 			      DBR_PROPER_POINTER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_pointer_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_rw, false, true,
 		      DBR_CUMULATED_POINTER_EFFECTS, DBR_SUMMARY_POINTER_EFFECTS, ".cumu");
 }
 
 bool
 print_code_proper_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_rw, false, true,
 			      DBR_PROPER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_rw, false, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".cumu");
 }
 
 bool
 print_code_proper_references(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_rw, false, true,
 		      DBR_PROPER_REFERENCES, string_undefined, ".propref");
 }
 
 bool
 print_code_cumulated_references(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_rw, false, true,
 		      DBR_CUMULATED_REFERENCES, string_undefined, ".cumuref");
 }
 
 bool
 print_code_in_effects(const char* module_name)
 {
-    return print_code_effects(module_name, false, false, false,
+    return print_code_effects(module_name, act_inout, false, false,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".ineff");
 }
 
 bool
 print_code_out_effects(const char* module_name)
 {
-    return print_code_effects(module_name, false, false, false,
+    return print_code_effects(module_name, act_inout, false, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".outeff");
 }
 
 bool
 print_source_proper_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, true, true,
+    return print_code_effects(module_name, act_rw, true, true,
 		      DBR_PROPER_EFFECTS, string_undefined, ".uprop");
 }
 
 bool
 print_source_cumulated_effects(const char* module_name)
 {
-    return print_code_effects(module_name, true, true, true,
+    return print_code_effects(module_name, act_rw, true, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".ucumu");
 }
 
@@ -405,7 +413,7 @@ print_source_in_effects(const char* module_name)
 bool
 print_source_out_effects(const char* module_name)
 {
-    return print_code_effects(module_name, false, true, false,
+    return print_code_effects(module_name, act_inout, true, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".uouteff");
 }
 
@@ -883,13 +891,13 @@ live_out_summary_paths(const char* module_name)
 bool
 print_code_live_in_paths(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_live_in, false, true,
 		      DBR_LIVE_IN_PATHS, DBR_LIVE_IN_SUMMARY_PATHS, ".live_in");
 }
 
 bool
 print_code_live_out_paths(const char* module_name)
 {
-    return print_code_effects(module_name, true, false, true,
+    return print_code_effects(module_name, act_live_out, false, true,
 		      DBR_LIVE_OUT_PATHS, DBR_LIVE_OUT_SUMMARY_PATHS, ".live_out");
 }

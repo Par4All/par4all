@@ -2667,6 +2667,15 @@ instruction. However, this not true for the last statement of
 conditional or loop bodies and the first statement of the next
 instruction.
 
+\begin{PipsPass}{live_out_summary_paths}
+\end{PipsPass}
+
+\begin{PipsMake}
+live_out_summary_paths     > MODULE.live_out_summary_paths
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.live_out_paths
+\end{PipsMake}
 
 
 \begin{PipsPass}{live_paths}
@@ -2677,7 +2686,9 @@ live_paths     > MODULE.live_in_paths
                > MODULE.live_out_paths
         < PROGRAM.entities
         < MODULE.code
-        < CALLEES.live_out_summary_paths
+        < MODULE.cumulated_effects
+        < MODULE.in_effects
+        < MODULE.live_out_summary_paths
 \end{PipsMake}
 
 \begin{PipsPass}{live_summary_paths}
@@ -2691,15 +2702,6 @@ live_in_summary_paths     > MODULE.live_in_summary_paths
         < MODULE.live_in_paths
 \end{PipsMake}
 
-\begin{PipsPass}{live_out_summary_paths}
-\end{PipsPass}
-
-\begin{PipsMake}
-live_out_summary_paths     > MODULE.live_out_summary_paths
-        < PROGRAM.entities
-        < MODULE.code
-        < CALLERS.live_out_paths
-\end{PipsMake}
 
 
 \section{Reductions}
