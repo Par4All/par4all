@@ -19,19 +19,12 @@ log_file_path = ''
 # Define directories for validation, path for log file, and check P4A_ROOT exists.
 for root, subfolders, files in os.walk(os.getcwd()):
 	if os.path.exists(root+'/p4a_validate_class.py'):
-		if os.getenv('P4A_ROOT') is None:
-			p4a_root = root
-			par4ll_validation_dir = str(p4a_root)+'/../../packages/PIPS/validation/'
-		else:
-			p4a_root = os.getenv('P4A_ROOT')
-			par4ll_validation_dir = str(p4a_root)+'/packages/PIPS/validation/'
+		p4a_root = root
+		par4ll_validation_dir = str(p4a_root)+'/../../packages/PIPS/validation/'
 
 		# path for log file
 		log_file_path = root
 
-	if (not p4a_root):
-		print ('You need to define P4A_ROOT environment variable')
-		exit()
 
 extension = ['.c','.F','.f','.f90','.f95']
 script = ['.tpips','.tpips2','.test','.py']
@@ -783,10 +776,13 @@ def valid_test(arg_test):
 	# Launch test in multithread
 	multithread_test(test_list,log_file)
 
-	f=open(log_file)
-	for line in f:
-		print line.strip('\n')
-	f.close()
+	if os.path.isfile(log_file):
+		f=open(log_file)
+		for line in f:
+			print line.strip('\n')
+		f.close()
+	else:
+		print ("%s does not exist"%(log_file))
 
 ###### Launch make validate of pips validation ################
 def make_validate(options):
