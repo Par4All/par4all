@@ -3192,3 +3192,27 @@ Psysteme sc_strong_normalize_and_check_feasibility2
     }
   return new_ps;
 }
+
+
+/* sc_gcd_normalize(ps)
+ * 
+ * Normalization by gcd's of equalities and inequalities
+ */
+void sc_gcd_normalize(ps)
+Psysteme ps;
+{
+  Pcontrainte eq1,ineq1;
+
+  if (SC_UNDEFINED_P(ps))
+    return(SC_UNDEFINED);
+
+  /* Normalization by gcd's */
+
+  for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
+    vect_normalize(eq1->vecteur);
+  }
+
+  for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
+    (void) contrainte_normalize(ineq1, false);
+  }
+}
