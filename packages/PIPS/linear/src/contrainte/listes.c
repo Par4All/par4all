@@ -66,6 +66,36 @@ bool contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
   return false;
 }
 
+/* Return the rank of constraint c in constraint list lc. 1 for the
+ * first element, and so on, Fortran style. 0 when c is not in lc.
+ *
+ * The comparisons are based on the pointers, not on the values of the
+ * constraints. It is mainly useful to detect cycles in constraint list.
+ */
+int constraint_rank(Pcontrainte c, Pcontrainte lc)
+{
+  Pcontrainte cc;
+  int rank = 0;
+
+  assert(!CONTRAINTE_UNDEFINED_P(c));
+
+  if (CONTRAINTE_NULLE_P(c))
+    ;
+  else {
+    for (cc=lc; !CONTRAINTE_UNDEFINED_P(cc); cc=cc->succ) {
+      rank++;
+      // This would be useful to detect duplicate constraints
+      // if (vect_equal((c1->vecteur),(c->vecteur))) {
+
+      // Physical check
+      if(cc==c)
+	break;
+    }
+  }
+
+  return rank;
+}
+
 /* bool egalite_in_liste(Pcontrainte eg, Pcontrainte leg): test si une
  * egalite appartient a une liste d'egalites
  *
@@ -93,15 +123,53 @@ bool egalite_in_liste(Pcontrainte v, Pcontrainte listev)
  * dans une liste de contraintes
  *
  * Ancien nom: nb_elems_eq()
+ *
+ * Cycles are not detected
  */
 int nb_elems_list(Pcontrainte list)
 {
-	int i;
+  int i;
+  Pcontrainte c;
 
-	for(i=0;list!=NULL;i++,list=list->succ)
+  for(i=0, c=list;c!=NULL;i++,c=c->succ)
     ;
 
 	return i;
+}
+
+/* Check if list l contains a cycle */
+bool cyclic_constraint_list_p(Pcontrainte l)
+{
+  int i;
+  Pcontrainte c;
+  bool cyclic_p = false;
+
+  for(i=0, c=l; c!=NULL; i++, c=c->succ) {
+    int r = constraint_rank(c, l);
+    if(r>0 && r<i) {
+      cyclic_p = true;
+      break;
+    }
+  }
+
+  return cyclic_p;
+}
+
+/* Compute the number of elements in the list if it is less than n. n
+   is assumed positive. A negative value is returned if the number of
+   elements is strictly greater than n, for instance because the list
+   is cyclic. */
+int safe_nb_elems_list(Pcontrainte list, int n)
+{
+  int i;
+  Pcontrainte c;
+
+  assert(n>=0);
+
+  for(i=0, c=list;c!=NULL && i<=n ;i++,c=c->succ)
+    ;
+
+  return i<=n? i : -1;
 }
 
 /* @return a constraint list without constraint with large coeffs

@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -73,6 +74,28 @@ Pcontrainte contrainte_make(Pvecteur pv)
 {
   Pcontrainte c = contrainte_new();
   contrainte_vecteur(c) = pv;
+  return(c);
+}
+
+/* Convert a list of vectors into a list of constraints */
+Pcontrainte contraintes_make(Pvecteur pv,...)
+{
+  va_list the_args;
+
+  Pcontrainte c = contrainte_new();
+  Pcontrainte lc = c;
+  contrainte_vecteur(c) = pv;
+
+  va_start(the_args, pv);
+  Pvecteur nv = pv;
+  while(nv!=VECTEUR_NUL) {
+    nv = va_arg(the_args, Pvecteur);
+    Pcontrainte nc = contrainte_new();
+    contrainte_vecteur(nc) = nv;
+    contrainte_succ(lc) = nc;
+    lc = nc;
+  }
+
   return(c);
 }
 

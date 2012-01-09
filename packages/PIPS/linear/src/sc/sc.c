@@ -249,50 +249,61 @@ Variable var;
  *  - there is no explicit check of TCST in the basis; TCST should *not* be in the
  * basis
  */
-bool sc_consistent_p(sc)
-Psysteme sc;
+bool sc_consistent_p(Psysteme sc)
 {
-    bool consistent;
+  bool consistent;
+  bool flawed = false; 
 
-    consistent = !SC_UNDEFINED_P(sc);
+  consistent = !SC_UNDEFINED_P(sc);
 
-    if(consistent) {
-	consistent = (sc->nb_eq == nb_elems_list(sc_egalites(sc)))
-	    && 
-		(sc->nb_ineq == nb_elems_list(sc_inegalites(sc)))
-		    &&
-			(sc_dimension(sc) == base_dimension(sc_base(sc)))
-			    &&
-				base_normalized_p(sc_base(sc));
+  if(consistent) {
+    if(sc->nb_eq != safe_nb_elems_list(sc_egalites(sc), sc->nb_eq)) {
+      fprintf(stderr, "Inconsistent number of equalities\n");
+      flawed = true;
     }
-					      
-
-    if(consistent) {
-	Pcontrainte eq = CONTRAINTE_UNDEFINED;
-	Pbase diagonale = BASE_UNDEFINED;
-	Pvecteur pv = VECTEUR_UNDEFINED;
-	Pbase diff = BASE_UNDEFINED;
-
-	for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
-	}
-	for(eq = sc->inegalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
-	}
-	diff = base_difference(diagonale, sc_base(sc));
-	consistent = BASE_NULLE_P(diff);
+    if(sc->nb_ineq != safe_nb_elems_list(sc_inegalites(sc), sc->nb_ineq)) {
+      fprintf(stderr, "Inconsistent number of inequalities\n");
+      flawed = true;
     }
+    if(sc_dimension(sc) != base_dimension(sc_base(sc))) {
+      fprintf(stderr, "Inconsistent dimension\n");
+      flawed = true;
+    }
+    if(!base_normalized_p(sc_base(sc))) {
+      fprintf(stderr, "Inconsistent base\n");
+      flawed = true;
+    }
+  }      
+  consistent = consistent && !flawed;
 
-/* This assert is too bad ! I remove it.
- *
- * Alexis Platonoff, 31 january 1995 */
-/*    assert(consistent); */
+  if(consistent) {
+    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+    Pbase diagonale = BASE_UNDEFINED;
+    Pvecteur pv = VECTEUR_UNDEFINED;
+    Pbase diff = BASE_UNDEFINED;
 
-    return consistent;
+    for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
+      for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+	if (pv->var != TCST)
+	  vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
+    }
+    for(eq = sc->inegalites; eq!= NULL; eq=eq->succ) {
+      for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+	if (pv->var != TCST)
+	  vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
+    }
+    diff = base_difference(diagonale, sc_base(sc));
+    consistent = BASE_NULLE_P(diff);
+    if(!consistent)
+      fprintf(stderr, "The base does not cover all the constraints\n");
+  }
+
+  /* This assert is too bad ! I remove it.
+   *
+   * Alexis Platonoff, 31 january 1995 */
+  /*    assert(consistent); */
+
+  return consistent;
 }
 
 /* check that sc is well defined, that the numbers of equalities and
