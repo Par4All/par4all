@@ -684,7 +684,7 @@ class p4a_processor(object):
         # functions have their names beginning with the launcher prefix:
         launcher_prefix = self.get_launcher_prefix ()
         kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
-        kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+        kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name) and not m.static_p())
 
         # We flag loops in kernel launchers as parallel, based on the annotation
         # previously made
