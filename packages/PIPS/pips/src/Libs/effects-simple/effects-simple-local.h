@@ -21,6 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+/* actions interpretation for simple effects prettyprinting */
+typedef enum {act_rw, act_inout, act_live_in, act_live_out}
+  simple_effects_actions_interpretations;
+
 /* copies an effect with no subcript expression */
 #define make_sdfi_effect(e) \
  (reference_indices(effect_any_reference(e)) == NIL) ? \

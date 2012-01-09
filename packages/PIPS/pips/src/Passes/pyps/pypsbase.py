@@ -110,6 +110,7 @@ class module(object): # deriving from object is needed for overloaded setter
         self.__source=source
         self.__ws=ws
         self.re_compilation_units = re.compile("^.*!$")
+        self.re_static_function = re.compile("^.*!.+$")
         
     @property
     def cu(self):
@@ -131,6 +132,9 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def compilation_unit_p(self):
         return self.re_compilation_units.match(self.name)
+
+    def static_p(self):
+        return self.re_static_function.match(self.name)
 
     def edit(self,editor=os.getenv("EDITOR","vi")):
         """edits module using given editor

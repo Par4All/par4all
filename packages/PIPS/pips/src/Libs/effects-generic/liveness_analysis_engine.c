@@ -281,11 +281,498 @@ bool live_out_summary_paths_engine(const char* module_name)
   return true;
 }
 
-/********************* GENERIC INTRAPROCEDURAL LIVE_IN AND LIVE_OUT PATHS ANALYSIS */
+/**************** GENERIC INTRAPROCEDURAL LIVE_IN AND LIVE_OUT PATHS ANALYSIS */
+
+static void
+live_in_paths_of_statement(statement s,
+			   live_paths_analysis_context *ctxt)
+{
+  /* live in paths may have already been computed,
+     for instance for sequences
+  */
+  pips_debug(1,"begin for statement with ordering: %03zd and number: %03zd\n",
+	     statement_ordering(s), statement_number(s));
+
+  if ( !bound_live_in_paths_p(s) )
+    {
+      pips_debug(1, "not bound\n");
+      /* First, we get the live out paths of the statement */
+      list l_live_out = effects_dup(load_live_out_paths_list(s));
+
+      /* Live_in(S) = (live_out(S) o T(S) - W(S)) U IN (S) */
+
+      // first move the live_out effects of the statement in the store
+      // before the statement
+      transformer t = (*load_completed_transformer_func)(s);
+
+      (*effects_transformer_composition_op)(l_live_out, t);
+
+      // then remove the effects written by the statement
+      // and add the in effects of the statement
+      list l_write =  convert_rw_effects(load_rw_effects_list(s),ctxt);
+      list l_in = load_in_effects_list(s);
+
+      list l_live_in = (*effects_union_op)
+	(effects_dup(l_in),
+	 (*effects_sup_difference_op)(l_live_out, effects_dup(l_write),
+				      r_w_combinable_p),
+	 effects_same_action_p);
+
+      store_live_in_paths_list(s, l_live_in);
+
+      reset_converted_rw_effects(&l_write, ctxt);
+
+    }
+  pips_debug(1,"end\n");
+  return;
+}
+
+static bool
+live_paths_from_unstructured_to_nodes(unstructured unstr, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_paths_from_forloop_to_body(forloop l, live_paths_analysis_context *ctxt)
+{
+  return false;
+}
+
+static bool
+live_out_paths_from_whileloop_to_body(whileloop l, live_paths_analysis_context *ctxt)
+{
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement body = whileloop_body(l);
+
+  pips_debug(1,"begin\n");
+
+  /* The live out paths of an iteration are the paths that
+       - belong to the live in paths of the next iteration if it exists,
+         that is to say if the condition evaluates to true;
+	 the write effects of the condition evaluation mask the
+	 live in paths of the next iteration; and the in effects
+	 of the condition evaluation must be added.
+       - or belong to the live out of the whole loop if the next iteration
+         does not exist. However, the condition is evaluated,
+	 and its write effects mask the live out paths at the end of the
+	 whole loop.
+  */
+
+  /* First, we get the live out paths of the whole loop
+   */
+  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+  effects_to_may_effects(l_live_out_loop); /* It may be executed... */
+
+  /* ...or another next iteration of the loop body */
+  list l_in_next_iter = effects_dup(load_invariant_in_effects_list(body));
+  effects_to_may_effects(l_in_next_iter);
+  pips_debug_effects(3, "in effects of next iterations:\n",
+		     l_in_next_iter);
+
+  list l_live_out_after_cond =
+    (*effects_union_op)(l_live_out_loop,
+			l_in_next_iter,
+			effects_same_action_p);
+
+  pips_debug_effects(3, "live out paths after any condition evaluation:\n",
+		     l_live_out_after_cond);
+
+  /* Take into account the effects of the condition */
+  list l_prop_cond = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+
+  list l_write_cond =
+    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+  pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
+
+
+  /* We don't have the in effects of the condition evaluation
+     we safely approximate them by its may read proper effects
+     if there are write effects during its evaluation
+  */
+  list l_in_cond =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+  if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
+  pips_debug_effects(3, "approximation of in effects of condition:\n", l_in_cond);
+
+  list l_live_out_body =
+    (*effects_union_op)(l_in_cond,
+			(*effects_sup_difference_op)(l_live_out_after_cond,
+						     l_write_cond,
+						     r_w_combinable_p),
+			effects_same_action_p);
+
+
+  reset_converted_rw_effects(&l_prop_cond, ctxt);
+
+  pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
+
+  store_live_out_paths_list(body, l_live_out_body);
+
+  pips_debug(1,"end\n");
+
+  return true;
+}
+
+static void
+live_in_paths_of_whileloop(whileloop l, live_paths_analysis_context *ctxt)
+{
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  bool before_p = evaluation_before_p(whileloop_evaluation(l));
+  statement body = whileloop_body(l);
+
+  list l_live_in_loop = NIL;
+
+  pips_debug(1,"begin\n");
+
+  /* If the loop belongs to a sequence of statements, which is
+     generally the case, its live in paths have already been computed.
+     I don't yet know if they may be much more precisely computed here.
+     For performance reasons, I don't try to recompute them if they
+     are already available.
+     see also the comment inside the else branch of if (!before_p)
+     about the way of computing live in paths.
+  */
+  if ( !bound_live_in_paths_p(current_stmt) )
+    {
+      list l_live_in_body = effects_dup(load_live_in_paths_list(body));
+      pips_debug_effects(3, "live in paths of loop body:\n", l_live_in_body);
+
+      if (!before_p)
+	{
+	  pips_debug(1, "do while loop: live in paths are those of the body\n");
+	  l_live_in_loop = l_live_in_body;
+	}
+      else
+	{
+	  /* the live in paths of the loop are either those of the
+	     first iteration if there is one, or the live out paths
+	     of the whole loop is there is no iteration;
+	     we must remove the write effects and add the in effects
+	     of the condition evaluation
+	  */
+
+	  /* As we currently only compute simple live paths,
+	     I wonder if there is a difference with the live out paths
+	     of the loop body...
+	  */
+
+	  /* Get the live out paths of the whole loop
+	   */
+	  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+	  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+	  effects_to_may_effects(l_live_out_loop); /* It may be executed... */
+
+	  /* ...or the first iteration of the loop body */
+	  effects_to_may_effects(l_live_in_body);
+
+	  list l_live_out_after_cond =
+	    (*effects_union_op)(l_live_out_loop,
+				l_live_in_body,
+				effects_same_action_p);
+
+	  pips_debug_effects(3, "live out paths after first condition evaluation:\n",
+			     l_live_out_after_cond);
+
+	  /* Take into account the effects of the condition */
+	  list l_prop_cond =
+	    convert_rw_effects(load_proper_rw_effects_list(current_stmt), ctxt);
+
+	  list l_write_cond =
+	    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+	  pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
+
+	  /* We don't have the in effects of the condition evaluation
+	     we safely approximate them by its may read proper effects
+	     if there are write effects during its evaluation
+	  */
+	  list l_in_cond =
+	    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+	  if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
+	  pips_debug_effects(3, "approximation of in effects of condition:\n",
+			     l_in_cond);
+
+	  l_live_in_loop =
+	    (*effects_union_op)(l_in_cond,
+				(*effects_sup_difference_op)(l_live_out_after_cond,
+							     l_write_cond,
+							     r_w_combinable_p),
+				effects_same_action_p);
+
+
+	  reset_converted_rw_effects(&l_prop_cond, ctxt);
+
+
+	}
+
+      pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+      store_live_in_paths_list(current_stmt, l_live_in_loop);
+    }
+  else
+    {
+      pips_debug(1, "already bound\n");
+    }
+
+  pips_debug(1,"end\n");
+
+  return;
+}
+
+
+static bool
+live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
+{
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement
+    body = loop_body(l);
+  entity
+    index = loop_index(l);
+
+  pips_debug(1,"begin\n");
+
+  /* First, we get the live out paths of the statement corresponding to the
+     whole loop
+   */
+  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+  effects_to_may_effects(l_live_out_loop);
+
+  /* We then compute the live out paths of the loop body */
+  /* The live out paths of an iteration are the paths that
+       - belong to the in effects of the next iterations if there exist some,
+         except for the loop locals if the loop is parallel;
+       - or belong to the live out of the whole loop if the next iteration
+         does not exist.
+       - to these, for the C language, we must add the read effects resulting
+         from the evaluation of the incremental expression and of the upper
+	 bound. This includes an exact path for the loop index.
+   */
+  list l_masked_vars = NIL;
+  if(loop_parallel_p(l))
+    l_masked_vars = loop_locals(l);
+
+  list l_inv_in_body =
+    effects_dup_without_variables(load_invariant_in_effects_list(body),
+				  l_masked_vars);
+  effects_to_may_effects(l_inv_in_body);
+  pips_debug_effects(3, "live in paths of an iteration:\n", l_inv_in_body);
+
+  list l_live_out_body = (*effects_union_op)(l_live_out_loop,
+					     l_inv_in_body,
+					     effects_same_action_p);
+
+  list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+  list l_live_in_header =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+  reset_converted_rw_effects(&l_prop_header, ctxt);
+  list l_index = generic_proper_effects_of_read_reference(make_reference(index, NIL));
+  l_live_in_header = gen_nconc(l_index, l_live_in_header);
+
+  pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+  l_live_out_body = (*effects_union_op)(l_live_out_body,
+					l_live_in_header,
+					effects_same_action_p);
+
+  pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
+
+  store_live_out_paths_list(body, l_live_out_body);
+
+  pips_debug(1,"end\n");
+  return true;
+}
+
+static void
+live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
+{
+
+  /* The live in paths of a loop statement are the live in paths of its header
+     plus the live in paths of its first iteration if it is exectuted
+  */
+
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement
+    body = loop_body(l);
+  entity
+    index = loop_index(l);
+
+  pips_debug(1,"begin\n");
+
+  /* Live in effects of header  */
+  /* We assume that there is no side effect in the loop header;
+     thus the live in effects of the header are similar to its proper read effects
+  */
+  list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+  list l_live_in_header =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+  reset_converted_rw_effects(&l_prop_header, ctxt);
+  pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+  /* Live in effects of first iteration if it exists minus read effects
+     on the loop index, which are masked by its initialization in the header,
+     and read effects on loop locals if the loop is parallel;
+  */
+  list l_masked_vars = NIL;
+  if(loop_parallel_p(l))
+    l_masked_vars = loop_locals(l);
+  /* beware: potential sharing with loop_locals(l) */
+  l_masked_vars = CONS(ENTITY, index, l_masked_vars);
+
+  list l_live_in_first_iter =
+    effects_dup_without_variables(load_live_in_paths_list(body),
+				  l_masked_vars);
+
+  /* free l_masked_vars: beware of the potential sharing with loop_locals */
+  if (loop_parallel_p(l) && !ENDP(l_masked_vars))
+    CDR(l_masked_vars) = NIL;
+  gen_free_list(l_masked_vars);
+
+  if (! normalizable_and_linear_loop_p(index, loop_range(l)))
+    {
+      pips_debug(7, "non linear loop range.\n");
+      effects_to_may_effects(l_live_in_first_iter);
+    }
+  else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
+    {
+      if (!loop_executed_at_least_once_p(l))
+	effects_to_may_effects(l_live_in_first_iter);
+    }
+  else
+    {
+      pips_internal_error("live paths of loop not implemented for convex paths\n");
+    }
+
+  pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
+
+  /* put them together */
+  list l_live_in_loop = (*effects_union_op)(l_live_in_header,
+					    l_live_in_first_iter,
+					    effects_same_action_p);
+
+  pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+  store_live_in_paths_list(current_stmt, l_live_in_loop);
+
+  pips_debug(1,"end\n");
+}
+
+static bool
+live_out_paths_from_test_to_branches(test t, live_paths_analysis_context *ctxt)
+{
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, t);
+
+  pips_debug(1,"begin\n");
+
+  /* First, we get the live out paths of the statement corresponding to the test
+   */
+  list l_live_out_test = load_live_out_paths_list(current_stmt);
+
+  /* The live out paths for each branch are the live_out_paths
+     of the test
+  */
+  store_live_out_paths_list(test_true(t), effects_dup(l_live_out_test));
+  store_live_out_paths_list(test_false(t), effects_dup(l_live_out_test));
+
+  /* The live in paths of the test are computed with  the surrounding
+     sequence live paths computation.
+  */
+  pips_debug(1,"end\n");
+
+  return true;
+}
+
+static bool
+live_paths_from_block_to_statements(sequence seq,
+				    live_paths_analysis_context *ctxt)
+{
+  statement seq_stmt = (statement) gen_get_ancestor(statement_domain, seq);
+  list l_stmt = sequence_statements(seq);
+
+  pips_debug(1, "begin\n");
+
+  if (ENDP(l_stmt))
+    {
+      if (get_bool_property("WARN_ABOUT_EMPTY_SEQUENCES"))
+	pips_user_warning("empty sequence\n");
+      store_live_in_paths_list(seq_stmt, NIL);
+    }
+  else
+    {
+      list l_rev_stmt = NIL; /* reversed version of the sequence to avoid recursion*/
+      FOREACH(STATEMENT, stmt, l_stmt)
+	{
+	  l_rev_stmt = CONS(STATEMENT, stmt, l_rev_stmt);
+	}
+
+      list l_next_stmt_live_in = load_live_out_paths_list(seq_stmt);
+      FOREACH(STATEMENT, stmt, l_rev_stmt)
+	{
+	  /* the live out paths of the current statement are the live in paths
+	     of the next statement (or the live out of the while block
+	     if last statement)
+	  */
+	  list l_live_out = l_next_stmt_live_in;
+	  store_live_out_paths_list(stmt, effects_dup(l_live_out));
+
+	  /* Now let us compute the live in paths */
+	  live_in_paths_of_statement(stmt, ctxt);
+	  l_next_stmt_live_in = load_live_in_paths_list(stmt);
+	}
+
+      /* The block live in paths are the live in paths of the first statement
+         which is the last visited statement
+      */
+      store_live_in_paths_list(seq_stmt, effects_dup(l_next_stmt_live_in));
+
+      gen_free_list(l_rev_stmt);
+    }
+  pips_debug(1, "end\n");
+
+ return true;
+}
+
+static bool
+__attribute__ ((__unused__)) live_paths_from_instruction_to_expression(instruction instr,
+					  live_paths_analysis_context *ctxt)
+{
+  if (instruction_expression_p(instr))
+    {
+    }
+  return false;
+}
+
 
 static void
 live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt)
 {
+
+  gen_context_multi_recurse
+    (stmt, ctxt,
+     statement_domain, gen_true, live_in_paths_of_statement,
+     //instruction_domain, live_paths_from_instruction_to_expression, gen_null,
+     /* for expression instructions solely, equivalent to gen_true otherwise */
+     sequence_domain, live_paths_from_block_to_statements, gen_null,
+     test_domain, live_out_paths_from_test_to_branches, gen_null,
+     loop_domain, live_out_paths_from_loop_to_body, live_in_paths_of_loop,
+     whileloop_domain, live_out_paths_from_whileloop_to_body, live_in_paths_of_whileloop,
+     forloop_domain, live_paths_from_forloop_to_body, gen_null,
+     unstructured_domain, live_paths_from_unstructured_to_nodes, gen_null,
+
+     /* Stop on these nodes: */
+     call_domain, gen_false, gen_null, /* calls are treated in another phase*/
+     expression_domain, gen_false, gen_null,
+     NULL);
+
   return;
 }
 
@@ -308,6 +795,7 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
 
   /* Get the various effects and in_effects of the module. */
 
+  set_proper_rw_effects((*db_get_proper_rw_effects_func)(module_name));
   set_rw_effects((*db_get_rw_effects_func)(module_name));
   set_invariant_rw_effects((*db_get_invariant_rw_effects_func)(module_name));
 
@@ -322,10 +810,10 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
 
   /* Get the live_out_summary_paths of the current module */
   list l_sum_live_out = (*db_get_live_out_summary_paths_func)(module_name);
-  /* And stores them as the out regions of the module statement */
+  /* And stores them as the live out paths of the module statement */
   store_live_out_paths_list(module_statement, effects_dup(l_sum_live_out));
 
-  /* Compute the out_effects of the module. */
+  /* Compute the live paths of the module. */
   live_paths_analysis_context ctxt;
   init_live_paths_context(&ctxt, representation);
   live_paths_of_module_statement(module_statement, &ctxt);
@@ -333,7 +821,9 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
   pips_debug(1, "end\n");
 
   (*db_put_live_out_paths_func)(module_name, get_live_out_paths());
+  (*db_put_live_in_paths_func)(module_name, get_live_in_paths());
 
+  reset_proper_rw_effects();
   reset_rw_effects();
   reset_invariant_rw_effects();
   reset_in_effects();
