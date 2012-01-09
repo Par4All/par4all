@@ -1,4 +1,8 @@
 delete csplit07
+
+#setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_C="N"
+
 create csplit07 csplit07.c
 
 # Bug: the workspace should not be created, an error code is not returned
@@ -6,8 +10,9 @@ create csplit07 csplit07.c
 
 # quit
 
-activate C_PARSER
+#activate C_PARSER
 
 display PRINTED_FILE[main]
 
+#shell cat csplit07.database/Warnings
 quit

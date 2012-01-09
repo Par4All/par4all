@@ -19,31 +19,41 @@ void struct07()
 Cumulated effetcs for "struct07"
 
 //             <may be written>: imageout[*][1].re
+//             <    is referenced>: imageout
 void struct07()
 {
+//             <    is declared>: imagein imageout
    extern complex imagein[256][256], imageout[256][256];
+//             <    is declared>: i j k l
    int i, j, k, l;
+//             <    is declared>: z1 z2
    float z1, z2;
+//             <    is declared>: x
    float x[256][256];
 //             <may be written>: imageout[*][1].re
 //             <    is read   >: k z1
 //             <    is written>: k
+//             <    is referenced>: imageout k z1
 
    for(k = 0; k <= 255; k += 1)
 //             <may be written>: imageout[*][1].re
 //             <    is read   >: k z1
+//             <    is referenced>: imageout k z1
       imageout[k][1].re = z1;
 //             <may be written>: x[*][*]
 //             <    is read   >: i j
 //             <    is written>: i j
+//             <    is referenced>: i j x
 
    for(i = 0; i <= 255; i += 1)
 //             <may be written>: x[*][*]
 //             <    is read   >: i j
 //             <    is written>: j
+//             <    is referenced>: i j x
       for(j = 0; j <= 255; j += 1)
 //             <may be written>: x[*][*]
 //             <    is read   >: i j
+//             <    is referenced>: i j x
          x[i][j] = 0.;
 }
 
@@ -54,31 +64,43 @@ Printed files with regions
 
 void struct07()
 {
+
+//  <imagein-WE-EXACT-{}>
+//  <imageout-WE-EXACT-{}>
+
    extern complex imagein[256][256], imageout[256][256];
    int i, j, k, l;
    float z1, z2;
+
+//  <x-WE-EXACT-{}>
+
    float x[256][256];
 
+//  <imageout-RE-EXACT-{}>
 //  <imageout[PHI1][PHI2].re-W-MAY-{PHI2==1, 0<=PHI1, PHI1<=255}>
 
 
    for(k = 0; k <= 255; k += 1)
 
+//  <imageout-RE-EXACT-{}>
 //  <imageout[PHI1][PHI2].re-W-EXACT-{PHI1==k, PHI2==1, 0<=k, k<=255}>
 
       imageout[k][1].re = z1;
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=255, 0<=PHI2, PHI2<=255,
 //    k==256}>
 
 
    for(i = 0; i <= 255; i += 1)
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2<=255, k==256, 0<=i,
 //    i<=255}>
 
       for(j = 0; j <= 255; j += 1)
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, k==256, 0<=i, i<=255,
 //    0<=j, j<=255}>
 

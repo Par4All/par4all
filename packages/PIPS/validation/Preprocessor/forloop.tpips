@@ -1,3 +1,6 @@
+# default test case cannot be used because of the include which leads
+# to a non-portable output
+
 delete forloop
 create forloop forloop.c
 

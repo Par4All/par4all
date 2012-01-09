@@ -1,0 +1,38 @@
+int main()
+{
+   int a, b;
+
+   a = 0;
+   b = 10;
+   while (a<b)
+      a = a+1;
+   return a;
+}
+int main()
+{
+   int a, b;
+
+   a = 0;
+//             <    is alive (in)>: a
+   b = 10;
+//             <    is alive (in)>: a b
+   while (a<b)
+//             <    is alive (in)>: a b
+      a = a+1;
+//             <    is alive (in)>: a
+   return a;
+}
+int main()
+{
+   int a, b;
+//             <    is alive (out)>: a
+
+   a = 0;
+//             <    is alive (out)>: a b
+   b = 10;
+//             <    is alive (out)>: a
+   while (a<b)
+//             <    is alive (out)>: a b
+      a = a+1;
+   return a;
+}

@@ -16,8 +16,7 @@ void whilewhile03()
 
    while (i<=10)
 
-//  T(i) {0<=i, i<=11, 12i#init+1<=11i, i#init<=i, i<=i#init+11,
-//    i#init<=10}
+//  T(i) {0<=i, i<=11, i#init+1<=i, i<=i#init+11, i#init<=10}
 
       if (1) {
 
@@ -118,8 +117,7 @@ void whilewhile03()
 
    while (i<=10)
 
-//  T(i) {0<=i, i<=11, 12i#init+1<=11i, i<=12i#init+11, 0<=i#init+1,
-//    i#init<=10}
+//  T(i) {1<=i, i<=11, i#init+1<=i, 0<=i#init, i#init<=10}
 
       if (1) {
 
@@ -139,7 +137,7 @@ void whilewhile03()
 
             i--;
 
-//  T() {0<=i, i<=11}
+//  T() {1<=i, i<=11}
 
          // Never reached
          ;

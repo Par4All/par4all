@@ -231,8 +231,8 @@ int main(void)
 
    while (1) {
 
-//  T(x,y) {b+x==x#init+1, b+y#init==x#init, x#init==y, 0<=b, b<=1,
-//    b<=x#init, 0<=ok, ok<=1, 1<=ok+x#init}
+//  T(x,y) {b+x==x#init+1, x==y#init+1, x#init==y, 0<=ok, ok<=1,
+//    1<=ok+x#init, 1<=x, x#init<=x, x<=x#init+1}
 
       if (b)
 

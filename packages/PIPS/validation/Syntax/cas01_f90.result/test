@@ -1,0 +1,10 @@
+PARSER[CAS01_F90] (syn_error) Syntax error - syntax error, unexpected TK_COMMA, expecting TK_RPAR line 3 near ","
+PARSER[CAS01_F90] (syn_error) Non analyzed source text stored in logfile
+PARSER[CAS01_F90] (syn_error) user error
+PARSER[CAS01_F90] (syn_error) Parser error between lines 9 and 9
+Syntax error
+
+PARSER[CAS01_F90] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module CAS01_F90.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

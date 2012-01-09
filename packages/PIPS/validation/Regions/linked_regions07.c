@@ -1,8 +1,10 @@
 // same as linked_regions01.c but all constant integer variables
 // have been replaced by their values
 
-// There are no regions on A for the first loop nest inner block
+// There were no regions on A for the first loop nest inner block
 // and consequently for the first loop nest loops.
+
+// The result is still too complicated
 
 #include <stdio.h>
 

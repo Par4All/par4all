@@ -1,0 +1,17 @@
+linked_regions01: the initial issue from T222
+
+linked_regions02: floating point variable removed and test streamlined
+
+linked_regions03: declarations are moved out of the loop nest
+
+linked_regions04: use array declarations for transformers and preconditions
+
+linked_regions05: square region
+
+linked_regions06: same as linked_regions01, but x1 is declared integer
+
+linked_regions07: constant propagation applied to linked_regions01
+
+linked_regions08: same as linked_regions01, but with property
+                  REGIONS_WITH_ARRAY_BOUNDS; no interesting impact at
+                  first sight...

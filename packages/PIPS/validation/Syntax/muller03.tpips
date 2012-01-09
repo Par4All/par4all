@@ -7,5 +7,6 @@ setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 
 display PRINTED_FILE
 close
+shell cat muller03.database/Warnings
 delete muller03
 quit

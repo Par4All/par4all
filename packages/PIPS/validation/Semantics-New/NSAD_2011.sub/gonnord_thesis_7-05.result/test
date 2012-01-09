@@ -231,15 +231,15 @@ void ts_singlestate(void)
 
             deadlock();
 
-//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=3, 0<=t}
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
 
          d++;
 
-//  P(d,s,t) {s+4<=4d, d<=s+4t+1, 0<=s, s<=3, 0<=t}
+//  P(d,s,t) {s+3<=3d, d<=s+4t+1, 0<=s, s<=3, 0<=t}
 
          s++;
 
-//  P(d,s,t) {s+3<=4d, d<=s+4t, 1<=s, s<=4, 0<=t}
+//  P(d,s,t) {s+2<=3d, d<=s+4t, 1<=s, s<=4, 0<=t}
 
          if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
 

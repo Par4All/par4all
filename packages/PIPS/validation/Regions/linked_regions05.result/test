@@ -1,4 +1,7 @@
 
+Transformers
+
+
 //  T(main) {main==0}
 
 int main()
@@ -64,6 +67,9 @@ int main()
 
    return 0;
 }
+
+Preconditions
+
 
 //  P() {}
 
@@ -132,6 +138,9 @@ int main()
    return 0;
 }
 
+Regions
+
+
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
@@ -145,8 +154,8 @@ int main()
    int N = 11;
    double A[N][N];
 
-//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=10, 10PHI2<=PHI1+99, 0<=PHI2,
-//    N==11}>
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=10, PHI2<=10PHI1+9, 0<=PHI2,
+//    PHI2<=10, N==11}>
 
 
    for(i = 0; i <= N-1-1; i += 1) {

@@ -1,0 +1,60 @@
+
+Transformers for multiply01
+
+
+//  T() {N==100, 1<=i, i<=100, 1<=j, j<=100}
+
+void multiply01(int i, int j, int N)
+{
+
+//  T(k) {}
+
+   int k;
+
+//  T() {N==100, 1<=i, i<=100, 1<=j, j<=100}
+
+   if (!(1<=i&&i<=100&&1<=j&&j<=100&&N==100))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {k#init<=k, k<=k#init+1}
+
+
+   if (2*i*j<N)
+
+//  T(k) {k==k#init+1}
+
+      k++;
+}
+
+Preconditions for multiply01
+
+
+//  P() {}
+
+void multiply01(int i, int j, int N)
+{
+
+//  P() {}
+
+   int k;
+
+//  P(k) {}
+
+   if (!(1<=i&&i<=100&&1<=j&&j<=100&&N==100))
+
+//  P(k) {}
+
+      abort();
+
+//  P(k) {N==100, 1<=i, i<=100, 1<=j, j<=100}
+
+
+   if (2*i*j<N)
+
+//  P(k) {N==100, 1<=i, i<=49, 1<=j, j<=49}
+
+      k++;
+}
