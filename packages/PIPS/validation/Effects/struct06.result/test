@@ -21,25 +21,31 @@ Cumulated effetcs for "struct06"
 
 int struct06()
 {
+//             <    is declared>: three
    struct three {
       int first;
       int second;
    };
+//             <    is declared>: four x
    struct four {
       struct three un;
       struct three deux;
    } x[10];
 //             <    is written>: i
+//             <    is referenced>: i
+//             <    is declared>: i
    int i = 0;
 //             <may be read   >: x[*].deux.second
 //             <may be written>: x[*].un.first
 //             <    is read   >: i
 //             <    is written>: i
+//             <    is referenced>: i x
 
    for(i = 0; i <= 9; i += 1)
 //             <may be read   >: x[*].deux.second
 //             <may be written>: x[*].un.first
 //             <    is read   >: i
+//             <    is referenced>: i x
       x[i].un.first = x[i].deux.second;
 }
 
@@ -47,22 +53,31 @@ Printed files with regions
 
 int struct06()
 {
+
+//  <three-WE-EXACT-{}>
+
    struct three {
       int first;
       int second;
    };
+
+//  <four-WE-EXACT-{}>
+//  <x-WE-EXACT-{}>
+
    struct four {
       struct three un;
       struct three deux;
    } x[10];
    int i = 0;
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1].deux.second-R-MAY-{0<=PHI1, PHI1<=9}>
 //  <x[PHI1].un.first-W-MAY-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
+//  <x-RE-EXACT-{}>
 //  <x[PHI1].deux.second-R-EXACT-{PHI1==i, 0<=i, i<=9}>
 //  <x[PHI1].un.first-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 

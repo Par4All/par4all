@@ -475,7 +475,7 @@ void run(void)
             }
             else
 
-//  P(b,t,x) {b==x-1, 1<=b, 0<=b+t+1, 0<=t}
+//  P(b,t,x) {b==x-1, 1<=b, 0<=t}
 
                while (1)
 

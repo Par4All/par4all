@@ -1,0 +1,62 @@
+
+//  T(sort03) {sort03==0}
+
+int sort03()
+{
+
+//  T(i,j,k,l) {}
+
+   int i, j, k, l;
+
+//  T(i,k,l) {i#init<=i, i<=i#init+1}
+
+   if (i==j) {
+
+//  T(k) {i==k}
+
+      k = i;
+
+//  T(l) {j==l}
+
+      l = j;
+
+//  T(i) {i==i#init+1}
+
+      i++;
+   }
+
+//  T(sort03) {sort03==0}
+
+   return 0;
+}
+
+//  P() {}
+
+int sort03()
+{
+
+//  P() {}
+
+   int i, j, k, l;
+
+//  P(i,j,k,l) {}
+
+   if (i==j) {
+
+//  P(i,j,k,l) {i==j}
+
+      k = i;
+
+//  P(i,j,k,l) {i==j, j==k}
+
+      l = j;
+
+//  P(i,j,k,l) {i==j, j==k, j==l}
+
+      i++;
+   }
+
+//  P(i,j,k,l) {}
+
+   return 0;
+}

@@ -1,0 +1,6 @@
+int main()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: a
+   int a = *((int *) 1);
+}

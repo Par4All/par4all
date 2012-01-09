@@ -3,9 +3,9 @@ create zroots zroots.c
 
 # quit
 
-activate C_PARSER
+#activate C_PARSER
 
-setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_LANGUAGE "C"
 
 display PRINTED_FILE[zroots]
 quit

@@ -1,0 +1,129 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=x+1, x<=1, 0<=y+1, y<=1}
+
+void asopt02(int x, int y)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0, 0<=x+1, x<=1, 0<=y+1, y<=1}
+
+   if (!(-1<=x&&x<=1&&-1<=y&&y<=1))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(i,x,y) {i==0, i#init==0, y#init<=2y+1, 2y<=y#init+1,
+//    0<=y#init+1, y#init<=1}
+
+   if (x<=0) {
+
+//  T(y) {i==0, 0<=x+1, x<=0, 0<=x+y+1, x<=y, y<=0, 0<=y#init+1,
+//    y#init<=1}
+
+      // Expect y==0, obtain eventually y==0
+      //
+      // if e1 * e2 is analyzed and if e1 is bounded, e2 should be
+      // analyzed again after adding e1==l or e1==u.
+      //
+      // Furthermore, once e1 is set to a constant, if e2 is affine then
+      // the result is the convex hull of l*e2 and u*e2.
+      //
+      // Here if x==-1 then y==-x-1 and if x==0 then y==0. The convex
+      // hull should yield y==0.
+      //
+      // More generally, we could look at the sign of the first and
+      // second derivatives over the evaluation internal. This would not
+      // work here, unless we look at the minimum of the function over
+      // real numbers.
+      y = x*(x+1);
+
+//  T(x) {i==0, 0<=x#init+1, x#init<=0, 0<=x#init+y+1, x#init<=y,
+//    y<=0}
+
+      scanf("%d", &x);
+
+//  T(i) {i==1, i#init==0, y==0}
+
+      // To project x and get simple information about y
+      i++;
+
+//  T(i) {i==0, i#init==1, y==0}
+
+      // to anchor the result
+      i--;
+   }
+
+//  T() {i==0, 0<=y+1, y<=1}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void asopt02(int x, int y)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   if (!(-1<=x&&x<=1&&-1<=y&&y<=1))
+
+//  P(i) {i==0}
+
+      abort();
+
+//  P(i) {i==0, 0<=x+1, x<=1, 0<=y+1, y<=1}
+
+   if (x<=0) {
+
+//  P(i) {i==0, 0<=x+1, x<=0, 0<=y+1, y<=1}
+
+      // Expect y==0, obtain eventually y==0
+      //
+      // if e1 * e2 is analyzed and if e1 is bounded, e2 should be
+      // analyzed again after adding e1==l or e1==u.
+      //
+      // Furthermore, once e1 is set to a constant, if e2 is affine then
+      // the result is the convex hull of l*e2 and u*e2.
+      //
+      // Here if x==-1 then y==-x-1 and if x==0 then y==0. The convex
+      // hull should yield y==0.
+      //
+      // More generally, we could look at the sign of the first and
+      // second derivatives over the evaluation internal. This would not
+      // work here, unless we look at the minimum of the function over
+      // real numbers.
+      y = x*(x+1);
+
+//  P(i,y) {i==0, 0<=x+1, x<=0, 0<=x+y+1, x<=y, y<=0}
+
+      scanf("%d", &x);
+
+//  P(i,x,y) {i==0, 0<=y, y<=0}
+
+      // To project x and get simple information about y
+      i++;
+
+//  P(i,x,y) {i==1, y==0}
+
+      // to anchor the result
+      i--;
+   }
+
+//  P(i,x,y) {i==0, 0<=y+1, y<=1}
+
+   return;
+}

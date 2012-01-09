@@ -1,0 +1,36 @@
+int main()
+{
+   int a[2], b, c;
+
+   a[0] = 1;
+   a[1] = 2;
+   b = 2;
+   c = b+a[1];
+   return c;
+}
+int main()
+{
+   int a[2], b, c;
+
+   a[0] = 1;
+   a[1] = 2;
+//             <    is alive (in)>: a[1]
+   b = 2;
+//             <    is alive (in)>: a[1] b
+   c = b+a[1];
+//             <    is alive (in)>: c
+   return c;
+}
+int main()
+{
+   int a[2], b, c;
+
+   a[0] = 1;
+//             <    is alive (out)>: a[1]
+   a[1] = 2;
+//             <    is alive (out)>: a[1] b
+   b = 2;
+//             <    is alive (out)>: c
+   c = b+a[1];
+   return c;
+}

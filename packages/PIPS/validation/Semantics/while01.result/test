@@ -125,7 +125,7 @@ int while01()
       // END BLOCK
    }
 
-//  P(0`n,i,j) {0`n==0, i==5, 2i==j-1}
+//  P(0`n,i,j) {0`n==0, i==5, j==11}
 
 
    return i+j;

@@ -1,0 +1,80 @@
+
+TRANSFORMERS
+
+
+//  T(cavern01) {}
+
+int cavern01(int x1, int x2, int x3)
+{
+
+//  T(r) {r==x2}
+
+   int r = x2;
+
+//  T(r) {r==r#init, r==x2}
+
+   // assert(x1>=2); // statement r=x1 is found not reachable
+   // assert(x1<=-2); // statement r=x1 is found not reachable
+   // assert(x1>=1);
+   if (x1==x2&&x2==x3)
+
+//  T(r) {r==r#init, r==x1, r==x2, r==x3}
+
+      if (x1*x2==x3)
+
+//  T(r) {r==r#init, r==x1, r==x2, r==x3}
+
+         r = x1;
+
+//  T(r) {r#init==x2}
+
+   if (x1*x1==x1)
+
+//  T(r) {r==x1, r#init==x2, 0<=r}
+
+      r = x1;
+
+//  T(cavern01) {cavern01==r}
+
+   return r;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int cavern01(int x1, int x2, int x3)
+{
+
+//  P() {}
+
+   int r = x2;
+
+//  P(r) {r==x2}
+
+   // assert(x1>=2); // statement r=x1 is found not reachable
+   // assert(x1<=-2); // statement r=x1 is found not reachable
+   // assert(x1>=1);
+   if (x1==x2&&x2==x3)
+
+//  P(r) {r==x1, r==x2, r==x3}
+
+      if (x1*x2==x3)
+
+//  P(r) {r==x1, r==x2, r==x3}
+
+         r = x1;
+
+//  P(r) {r==x2}
+
+   if (x1*x1==x1)
+
+//  P(r) {r==x2, 0<=x1}
+
+      r = x1;
+
+//  P(r) {}
+
+   return r;
+}

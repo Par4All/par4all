@@ -101,20 +101,19 @@
 
 ! collecting distributed variable A_1
       DO PSI1 = 1, 2
-         DO PSI2 = 1, 2
-            BUF INDEX = 0
-            RECEIVED NOT PERFORMED = .FALSE.
-            SIZE OF RECEIVED BUFFER = 0
-            T LID = 2*PSI1+PSI2-2
-            CALL HPFC RCV FROM NODE(T LID)
-            CALL HPFC REAL4 BUFUPK
-            DO LALPHA1 = 1, (-PSI2+3)/2
-               DO LALPHA2 = 1, (-PSI1+3)/2
-                  ALPHA2 = 1
-                  ALPHA1 = 1
-                  BUF INDEX = BUF INDEX+1
-                  A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
-               ENDDO
+         PSI2 = 1
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = 2*PSI1+PSI2-2
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC REAL4 BUFUPK
+         DO LALPHA1 = 1, -PSI2+2
+            DO LALPHA2 = 1, (-PSI1+3)/2
+               ALPHA2 = 1
+               ALPHA1 = 1
+               BUF INDEX = BUF INDEX+1
+               A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
             ENDDO
          ENDDO
       ENDDO
@@ -241,18 +240,20 @@
 ! collecting distributed variable A_1
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      DO LALPHA1 = 1, (-PSI2+3)/2
-         DO LALPHA2 = 1, (-PSI1+3)/2
-            ALPHA2 = 1
-            ALPHA1 = 1
-            BUF INDEX = BUF INDEX+1
-            HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
+      IF (PSI2.LE.1) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         DO LALPHA1 = 1, -PSI2+2
+            DO LALPHA2 = 1, (-PSI1+3)/2
+               ALPHA2 = 1
+               ALPHA1 = 1
+               BUF INDEX = BUF INDEX+1
+               HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
+            ENDDO
          ENDDO
-      ENDDO
-      CALL HPFC REAL4 BUFPCK
-      CALL HPFC SND TO HOST
+         CALL HPFC REAL4 BUFPCK
+         CALL HPFC SND TO HOST
+      ENDIF
 ! end of collect
 
       CALL HPFC NODE END

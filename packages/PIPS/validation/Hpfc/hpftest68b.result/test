@@ -17,7 +17,7 @@
                   CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                   LAZY SEND = .FALSE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp1+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -44,7 +44,7 @@
 ! - lazy receiving
                   LAZY RECV = .TRUE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp1+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         IF (LAZY RECV) THEN
@@ -62,7 +62,7 @@
                ELSE
 ! - lazy copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp1+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp1+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,LALPHA2)
@@ -97,7 +97,7 @@
                   CALL pvmfinitsend(PvmDataRaw, HPFC BUFID)
                   LAZY SEND = .FALSE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp2+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -124,7 +124,7 @@
 ! - lazy receiving
                   LAZY RECV = .TRUE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp2+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         IF (LAZY RECV) THEN
@@ -142,7 +142,7 @@
                ELSE
 ! - lazy copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(-15*PSIp2+35, 15)
+                     DO LALPHA1 = 1, -10*PSIp2+25
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A_1(LALPHAp1,LALPHAp2) = A(LALPHA1,LALPHA2)

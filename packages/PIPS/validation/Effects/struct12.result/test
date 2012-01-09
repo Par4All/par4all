@@ -14,11 +14,3 @@ int main()
 //             <    is read   >: im1 im2
    return im1+im2;
 }
-struct complex {
-   int re;
-   int im;
-};
-
-struct complex i();
-
-int main();

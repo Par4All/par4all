@@ -1,10 +1,13 @@
-// this test case is the same as linked_regions03, but the tpips
+// This test case is the same as linked_regions03, but the tpips
 // script sets properties to use information about the declaration and
 // references to array A. The number of exceptions is reduced with
 // respect to linked_region03, but there are still exceptions.
 
-// the regions of the main loop nest is erroneously empty
-// despite recent changes in normalization strategy (r20629)
+// The regions of the main loop nest is erroneously empty
+// despite recent changes in normalization strategy (r20629).
+
+// The regions of the main loop is no longer empty... but not really
+// satisfying.
 
 #include <stdio.h>
 

@@ -1,0 +1,12 @@
+# setenv SEMANTICS_DEBUG_LEVEL 8
+setenv PRETTYPRINT_DEBUG_LEVEL 1
+delete sort02
+create sort02 sort02.c
+module sort02
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[sort02]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[sort02]
+close
+delete sort02
+quit

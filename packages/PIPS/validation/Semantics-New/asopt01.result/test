@@ -1,0 +1,85 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=x+1, x<=1, 0<=y+1, y<=1}
+
+void asopt01(int x, int y)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0, 0<=x+1, x<=1, 0<=y+1, y<=1}
+
+   if (!(-1<=x&&x<=1&&-1<=y&&y<=1))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(i,x,y) {i#init==0, i<=1, i+y<=1, y#init<=2i+y, y<=i+y#init,
+//    0<=y+1, 0<=y#init+1, y#init<=1}
+
+   if (x<=0) {
+
+//  T(y) {i==0, 0<=x+1, x<=0, x<=y, y<=0, 0<=y#init+1, y#init<=1}
+
+      y = x*x+x;
+
+//  T(x) {i==0, 0<=x#init+1, x#init<=0, x#init<=y, y<=0}
+
+      scanf("%d", &x);
+
+//  T(i) {i==1, i#init==0, 0<=y+1, y<=0}
+
+      i++;
+   }
+
+//  T() {0<=i, i<=1, y<=i+1, i+y<=1, 0<=y+1}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void asopt01(int x, int y)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   if (!(-1<=x&&x<=1&&-1<=y&&y<=1))
+
+//  P(i) {i==0}
+
+      abort();
+
+//  P(i) {i==0, 0<=x+1, x<=1, 0<=y+1, y<=1}
+
+   if (x<=0) {
+
+//  P(i) {i==0, 0<=x+1, x<=0, 0<=y+1, y<=1}
+
+      y = x*x+x;
+
+//  P(i,y) {i==0, 0<=x+1, x<=0, x<=y, y<=0}
+
+      scanf("%d", &x);
+
+//  P(i,x,y) {i==0, 0<=y+1, y<=0}
+
+      i++;
+   }
+
+//  P(i,x,y) {0<=i, i<=1, y<=i+1, i+y<=1, 0<=y+1}
+
+   return;
+}

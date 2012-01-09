@@ -1,3 +1,6 @@
+
+setenv PIPS_CHECK_FORTRAN="N"
+
 delete external05
 create external05 external05.f
 
@@ -7,5 +10,6 @@ setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
 display PRINTED_FILE[EXTERNAL05]
 
 close
+shell cat external05.database/Warnings
 delete external05
 quit
