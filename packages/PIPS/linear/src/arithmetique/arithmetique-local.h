@@ -276,7 +276,9 @@ typedef int Value;
 
 /* binary operators on values
  *
- * FI: some information about pdiv and pmod?
+ * pdiv and pmod always return a positive remainder and a positive
+ * modulo. E.g. -1/100 = -1 and its remainder is 99. The modulo
+ * operator is periodic and not symmetric around zero.
  */
 #define value_plus(v1,v2)  		((v1)+(v2))
 #define value_div(v1,v2)   		((v1)/(v2))

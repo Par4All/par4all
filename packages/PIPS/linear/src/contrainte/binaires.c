@@ -255,7 +255,7 @@ Pcontrainte c1,c2;
 /* Pcontrainte contrainte_append(c1, c2)
  * Pcontrainte c1, c2;
  *
- * append directly c2 to c1. Both c1 and c2 are not relevant 
+ * append directly c2 to c1. Neither c1 nor c2 are relevant 
  * when the result is returned.
  */
 Pcontrainte contrainte_append(c1, c2)

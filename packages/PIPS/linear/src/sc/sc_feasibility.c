@@ -405,7 +405,7 @@ static bool internal_sc_feasibility
   
   /*End size filters*/
 #endif
-
+  if (int_p) sc_gcd_normalize(sc);
   switch(heuristic) {
   case (HEURISTIC1):
     {
@@ -727,10 +727,9 @@ int ofl_ctrl;
       fprintf(stderr, "[sc_fourier_motzkin_feasibility_ofl_ctrl] system:\n");
       sc_fprint(stderr, s, default_variable_to_string);
     }
-  
-  s = sc_elim_double_constraints(s);
-
-  if (s != NULL)
+  if (integer_p) sc_gcd_normalize(s);
+  s = sc_safe_elim_db_constraints(s);
+  if (s != NULL && !sc_empty_p(s))
   {
     /* a small basis if possible... (FC).
      */
