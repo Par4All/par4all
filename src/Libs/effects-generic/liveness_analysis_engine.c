@@ -133,31 +133,41 @@ typedef struct {
 static void
 set_live_out_summary_engine_context(live_out_summary_engine_context *ctxt, entity callee)
 {
-  ctxt->l_current_paths = NIL;
+  ctxt->current_callee = callee;
+  ctxt->l_current_paths = list_undefined;
 }
 
 static void
 reset_live_out_summary_engine_context(live_out_summary_engine_context *ctxt)
 {
   ctxt->current_callee = entity_undefined;
-  ctxt->l_current_paths = NIL;
+  ctxt->l_current_paths = list_undefined;
 }
 
 static void
 update_live_out_summary_engine_context_paths(live_out_summary_engine_context *ctxt, list l_paths)
 {
   pips_debug_effects(3, "adding paths\n", l_paths);
-  ctxt->l_current_paths = (*effects_test_union_op)(ctxt->l_current_paths , l_paths,
-					   effects_same_action_p);
+  if (list_undefined_p(ctxt->l_current_paths))
+    ctxt->l_current_paths = l_paths;
+  else
+    ctxt->l_current_paths = (*effects_test_union_op)(ctxt->l_current_paths , l_paths,
+						     effects_same_action_p);
 
   pips_debug_effects(3, "current paths\n", ctxt->l_current_paths);
 }
 
-static void
+static bool
 live_out_paths_from_call_site_to_callee(call c, live_out_summary_engine_context *ctxt)
 {
+  pips_debug(1, "considering call to %s\n", entity_name(call_function(c)));
+    pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
+
     if (call_function(c) != ctxt->current_callee)
-	return;
+      {
+	return (true);
+      }
+    pips_debug(1, "good candidate\n");
 
     statement current_stmt = (statement) gen_get_ancestor(statement_domain, c);
 
@@ -178,10 +188,12 @@ live_out_paths_from_call_site_to_callee(call c, live_out_summary_engine_context 
     */
     list l_out = load_live_out_paths_list(current_stmt);
 
+    pips_debug_effects(3, "current statement live_out_paths:\n", l_out);
     list l_paths = generic_effects_forward_translation(ctxt->current_callee,
 						call_arguments(c), l_out,
 						stmt_context);
     update_live_out_summary_engine_context_paths(ctxt, l_paths);
+    return true;
 }
 
 static bool
@@ -196,14 +208,15 @@ static void
 live_out_paths_from_caller_to_callee(entity caller, entity callee,
 				     live_out_summary_engine_context *ctxt)
 {
-    const char *caller_name;
+   const char *caller_name;
     statement caller_statement;
 
     reset_current_module_entity();
     set_current_module_entity(caller);
     caller_name = module_local_name(caller);
-    pips_debug(2, "begin for caller: %s\n", caller_name);
-
+    pips_debug(2, "begin for caller: %s, and callee: %s\n", caller_name,
+	       entity_name(callee));
+    pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
     /* All we need to perform the translation */
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, caller_name, true) );
@@ -213,8 +226,8 @@ live_out_paths_from_caller_to_callee(entity caller, entity callee,
 
     set_live_out_paths( (*db_get_live_out_paths_func)(caller_name));
 
-    ctxt->current_callee = callee;
-    gen_context_multi_recurse(caller_statement, &ctxt,
+    //ctxt->current_callee = callee;
+    gen_context_multi_recurse(caller_statement, ctxt,
 		      statement_domain, live_out_summary_paths_stmt_filter, gen_null,
 		      call_domain, live_out_paths_from_call_site_to_callee, gen_null,
 		      NULL);
@@ -239,7 +252,6 @@ bool live_out_summary_paths_engine(const char* module_name)
   set_current_module_entity(callee);
   make_effects_private_current_context_stack();
 
-  debug_on("LIVE_OUT_EFFECTS_DEBUG_LEVEL");
   ifdebug(1)
     {
       pips_debug(1, "begin for %s with %td callers\n",
@@ -252,12 +264,15 @@ bool live_out_summary_paths_engine(const char* module_name)
 
   live_out_summary_engine_context ctxt;
   set_live_out_summary_engine_context(&ctxt, callee);
+  debug_on("LIVE_PATHS_DEBUG_LEVEL");
   FOREACH(STRING, caller_name, callees_callees(callers))
     {
       entity caller = module_name_to_entity(caller_name);
       live_out_paths_from_caller_to_callee(caller, callee, &ctxt);
     }
-
+  debug_off();
+  if (list_undefined_p(ctxt.l_current_paths))
+    ctxt.l_current_paths = NIL;
   (*db_put_live_out_summary_paths_func)(module_name, ctxt.l_current_paths);
 
   ifdebug(1)
@@ -277,7 +292,6 @@ bool live_out_summary_paths_engine(const char* module_name)
   reset_current_module_entity();
   free_effects_private_current_context_stack();
 
-  debug_off();
   return true;
 }
 
@@ -319,18 +333,24 @@ live_in_paths_of_statement(statement s,
 
       // next, remove the effects written by the statement
       // and add the in effects of the statement
-      list l_write =  convert_rw_effects(load_rw_effects_list(s),ctxt);
+      list l_rw =  convert_rw_effects(load_rw_effects_list(s),ctxt);
+      list l_write = effects_write_effects_dup(l_rw);
+      pips_debug_effects(5, "write effects:\n", l_write);
+
       list l_in = load_in_effects_list(s);
+      pips_debug_effects(5, "in effects:\n", l_in);
 
       list l_live_in = (*effects_union_op)
 	(effects_dup(l_in),
-	 (*effects_sup_difference_op)(l_live_out, effects_dup(l_write),
+	 (*effects_sup_difference_op)(l_live_out, l_write,
 				      r_w_combinable_p),
 	 effects_same_action_p);
+      pips_debug_effects(5, "resulting live in paths:\n", l_live_in);
+
 
       store_live_in_paths_list(s, l_live_in);
 
-      reset_converted_rw_effects(&l_write, ctxt);
+      reset_converted_rw_effects(&l_rw, ctxt);
 
     }
   pips_debug(1,"end\n");
@@ -899,7 +919,11 @@ live_paths_from_block_to_statements(sequence seq,
 	     of the next statement (or the live out of the while block
 	     if last statement)
 	  */
+	  pips_debug(1,"dealing with statement with ordering: %03zd and number: %03zd\n",
+		     statement_ordering(stmt), statement_number(stmt));
+
 	  list l_live_out = l_next_stmt_live_in;
+	  pips_debug_effects(3, "storing effects:\n", l_live_out);
 	  store_live_out_paths_list(stmt, effects_dup(l_live_out));
 
 	  /* Now let us compute the live in paths */

@@ -1019,11 +1019,6 @@ transformer context;
     int arg_num;
     list l_formal = NIL;
     list r_args = real_args;
-    list l_sum_rw_reg =
-	effects_to_list((effects) db_get_memory_resource
-			(DBR_SUMMARY_REGIONS,
-			 module_local_name(func),
-			 true));
 
     /* for each actual parameter expression, we search in the actual regions
      * the corresponding elements. If it exists, we make the corresponding
@@ -1094,21 +1089,6 @@ transformer context;
 
     } /* for */
 
-    /* il faut calculer l'intersection avec les summary regions de la
-     * fonction pour e'viter certains proble`mes comme avec:
-     *
-     *      <A(PHI1)-OUT-MUST-{PHI1==I}
-     *      CALL TOTO(A(I), A(I))
-     *
-     *      <I-R-MUST-{}>, <J-W-MUST-{}
-     *      SUBROUTINE TOTO(I,J)
-     *
-     * si on ne fait pas attention, on obtient <I-OUT-MUST-{}>, <J-OUT-MUST>
-     * ve'rifier que c'est compatible avec la norme. Inutile de faire des
-     * choses inutiles.
-     */
-    l_formal = RegionsIntersection(l_formal, effects_dup(l_sum_rw_reg),
-				   effects_same_action_p);
 
     return(l_formal);
 }

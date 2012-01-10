@@ -145,6 +145,28 @@ out_effects_from_call_site_to_callee(call c)
     l_tmp = generic_effects_forward_translation(current_callee,
 					      call_arguments(c), l_out,
 					      context);
+
+    list l_sum_rw_eff = (*db_get_summary_rw_effects_func)(module_local_name(current_callee));
+
+    /* It's necessary to take the intersection with the summary regions of the
+   * callee to avoid problems due to multiple usages of the same actual
+   * parameter for different formal ones :
+   *
+   *      <a(PHI1)-OUT-MUST-{PHI1==i}
+   *      foo(a, a, i)
+   *
+   *      <tab1-R-MUST-{PHI1==i}>, <tab2-W-MUST-{PHI1==i}
+   *      void foo(int tab1[], int tab2[], int i)
+   *
+   * Without the intersection, we would obtain :
+   *
+   *      <tab1-OUT-MUST-{PHI1==i}>, <tab2-OUT-MUST-{PHI1==i}
+   */
+    pips_debug_effects(2, "R/W effects : \n", l_sum_rw_eff);
+    l_tmp = (*effects_intersection_op)(l_tmp, effects_dup(l_sum_rw_eff),
+					  effects_same_action_p);
+    pips_debug_effects(2, "l_tmp after intersection : \n", l_tmp);
+
     update_out_summary_effects_list(l_tmp);
 }
 
