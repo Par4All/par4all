@@ -338,13 +338,89 @@ live_in_paths_of_statement(statement s,
 }
 
 static bool
-live_paths_from_unstructured_to_nodes(unstructured unstr, live_paths_analysis_context *ctxt)
+live_out_paths_from_unstructured_to_nodes(unstructured unstr,
+					  live_paths_analysis_context *ctxt)
 {
+  pips_debug(1,"begin\n");
+
+  /* Adopt a very conservative strategy:
+     live_out(node)=  live_out(unstructured)*may U (U_{n \in nodes} IN(nodes))
+     If convex paths were to be computed, transformers should be taken into account.
+  */
+  /* The exit node is a particular case: its live_out paths are the live_out paths
+     of the unstructured.
+  */
+
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, unstr);
+  control exit_ctrl = unstructured_exit( unstr );
+  statement exit_node = control_statement(exit_ctrl);
+
+  list l_live_out_unstr = effects_dup(load_live_out_paths_list(current_stmt));
+  pips_debug_effects(3, "live out paths of whole unstructured:\n", l_live_out_unstr);
+  store_live_out_paths_list(exit_node, l_live_out_unstr);
+
+  if(control_predecessors(exit_ctrl) == NIL && control_successors(exit_ctrl) == NIL)
+    {
+      /* there is only one statement in u; */
+      pips_debug(6, "unique node\n");
+    }
+  else
+    {
+      l_live_out_unstr = effects_dup(l_live_out_unstr);
+      effects_to_may_effects(l_live_out_unstr); /* It may be executed... */
+
+      list l_in = NIL;
+
+      list l_nodes = NIL;
+      UNSTRUCTURED_CONTROL_MAP
+	(ctrl, unstr, l_nodes,
+	 {
+	   statement node_stmt = control_statement(ctrl);
+	   pips_debug(3, "visiting node statement with ordering: "
+		      "%03zd and number: %03zd\n",
+		      statement_ordering(node_stmt),
+		      statement_number(node_stmt));
+
+	   list l_in_node = effects_dup(load_in_effects_list(node_stmt));
+	   effects_to_may_effects(l_in_node);
+
+	   l_in = (*effects_union_op)(l_in_node, l_in,
+				      effects_same_action_p);
+	   pips_debug_effects(5, "current in effects:\n", l_in);
+	 });
+
+      list l_live_out_nodes = (*effects_union_op)(l_in, l_live_out_unstr,
+						  effects_same_action_p);
+      pips_debug_effects(3, "l_live_out_nodes:\n", l_live_out_nodes);
+
+      FOREACH(CONTROL, ctrl, l_nodes)
+	{
+
+	  statement node_stmt = control_statement(ctrl);
+
+	  /* be sure live_out paths are not stored twice, in particular
+	     for the exit node
+	  */
+	  if ( !bound_live_out_paths_p(node_stmt) )
+	    {
+	       pips_debug(3, "storing live out paths for node statement "
+			  "with ordering: %03zd and number: %03zd\n",
+			  statement_ordering(node_stmt),
+			  statement_number(node_stmt));
+	      store_live_out_paths_list(node_stmt, effects_dup(l_live_out_nodes));
+	    }
+	}
+    }
+
+  pips_debug(1,"end\n");
+
   return true;
 }
 
 static bool
-live_out_paths_from_forloop_to_body(forloop l, live_paths_analysis_context *ctxt)
+live_out_paths_from_forloop_to_body(forloop l,
+				    live_paths_analysis_context *ctxt)
 {
 
   statement
@@ -868,7 +944,7 @@ live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt
      loop_domain, live_out_paths_from_loop_to_body, live_in_paths_of_loop,
      whileloop_domain, live_out_paths_from_whileloop_to_body, live_in_paths_of_whileloop,
      forloop_domain, live_out_paths_from_forloop_to_body, gen_null,
-     unstructured_domain, live_paths_from_unstructured_to_nodes, gen_null,
+     unstructured_domain, live_out_paths_from_unstructured_to_nodes, gen_null,
 
      /* Stop on these nodes: */
      call_domain, gen_false, gen_null, /* calls are treated in another phase*/
