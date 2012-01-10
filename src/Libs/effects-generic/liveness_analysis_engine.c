@@ -301,13 +301,23 @@ live_in_paths_of_statement(statement s,
 
       /* Live_in(S) = (live_out(S) o T(S) - W(S)) U IN (S) */
 
-      // first move the live_out effects of the statement in the store
+      /* first take care of declarations */
+      if (c_module_p(get_current_module_entity()) &&
+	  (declaration_statement_p(s) ))
+	{
+	  FOREACH(ENTITY, decl, statement_declarations(s))
+	    {
+	       l_live_out = filter_effects_with_declaration(l_live_out, decl);
+	    }
+	}
+
+      // then move the live_out effects of the statement in the store
       // before the statement
       transformer t = (*load_completed_transformer_func)(s);
 
       (*effects_transformer_composition_op)(l_live_out, t);
 
-      // then remove the effects written by the statement
+      // next, remove the effects written by the statement
       // and add the in effects of the statement
       list l_write =  convert_rw_effects(load_rw_effects_list(s),ctxt);
       list l_in = load_in_effects_list(s);
