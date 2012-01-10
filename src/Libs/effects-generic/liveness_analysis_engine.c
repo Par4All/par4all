@@ -330,13 +330,90 @@ live_in_paths_of_statement(statement s,
 static bool
 live_paths_from_unstructured_to_nodes(unstructured unstr, live_paths_analysis_context *ctxt)
 {
-  return false;
+  return true;
 }
 
 static bool
-live_paths_from_forloop_to_body(forloop l, live_paths_analysis_context *ctxt)
+live_out_paths_from_forloop_to_body(forloop l, live_paths_analysis_context *ctxt)
 {
-  return false;
+
+  statement
+    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  statement body = forloop_body(l);
+
+  pips_debug(1,"begin\n");
+
+  /* The live out paths of an iteration are the paths that
+       - belong to the live in paths of the next iteration if it exists,
+         that is to say if the condition evaluates to true;
+	 the write effects of the condition evaluation mask the
+	 live in paths of the next iteration; and the in effects
+	 of the condition evaluation must be added.
+       - or belong to the live out of the whole loop if the next iteration
+         does not exist. However, the condition is evaluated,
+	 and its write effects mask the live out paths at the end of the
+	 whole loop.
+  */
+
+  /* First, we get the live out paths of the whole loop
+   */
+  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+  effects_to_may_effects(l_live_out_loop); /* It may be executed... */
+
+  /* ...or another next iteration of the loop body */
+  list l_in_next_iter = effects_dup(load_invariant_in_effects_list(body));
+  effects_to_may_effects(l_in_next_iter);
+  pips_debug_effects(3, "in effects of next iterations:\n",
+		     l_in_next_iter);
+
+  list l_live_out_after_cond =
+    (*effects_union_op)(l_live_out_loop,
+			l_in_next_iter,
+			effects_same_action_p);
+
+  pips_debug_effects(3, "live out paths after header evaluation:\n",
+		     l_live_out_after_cond);
+
+  /* Take into account the effects of the header */
+  list l_prop_cond = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					  ctxt);
+
+  list l_write_cond =
+    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+  pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
+
+
+  /* We don't have the in effects of the header evaluation
+     we safely approximate them by its may read proper effects
+     if there are write effects during its evaluation
+     We could be much more precise here by distinguishing
+     the three different components and re-computing their effects.
+     However, for loops are generally converted to loops or while loops
+     by the controlizer, so I leave this as it is for the time being.
+  */
+  list l_in_cond =
+    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+  if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
+  pips_debug_effects(3, "approximation of in effects of condition:\n", l_in_cond);
+
+  list l_live_out_body =
+    (*effects_union_op)(l_in_cond,
+			(*effects_sup_difference_op)(l_live_out_after_cond,
+						     l_write_cond,
+						     r_w_combinable_p),
+			effects_same_action_p);
+
+
+  reset_converted_rw_effects(&l_prop_cond, ctxt);
+
+  pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
+
+  store_live_out_paths_list(body, l_live_out_body);
+
+  pips_debug(1,"end\n");
+
+  return true;
 }
 
 static bool
@@ -780,7 +857,7 @@ live_paths_of_module_statement(statement stmt, live_paths_analysis_context *ctxt
      test_domain, live_out_paths_from_test_to_branches, gen_null,
      loop_domain, live_out_paths_from_loop_to_body, live_in_paths_of_loop,
      whileloop_domain, live_out_paths_from_whileloop_to_body, live_in_paths_of_whileloop,
-     forloop_domain, live_paths_from_forloop_to_body, gen_null,
+     forloop_domain, live_out_paths_from_forloop_to_body, gen_null,
      unstructured_domain, live_paths_from_unstructured_to_nodes, gen_null,
 
      /* Stop on these nodes: */
