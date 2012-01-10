@@ -1156,7 +1156,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 
 	ifdebug(3)
 	{
-	    pips_debug(3, "initial region :\n");
+	  pips_debug(3, "variable: %s, and initial region :\n", entity_name(var));
 	    print_region(reg);
 	}
 
@@ -1184,13 +1184,26 @@ void region_exact_projection_along_variable(region reg, entity var)
 
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
+		  ifdebug(8) {
+		    pips_debug(8, "system before projection (1): \n");
+		    sc_syst_debug(sc);
+		  }
+
 		  Psysteme volatile * psc = &sc;
 		    sc_projection_along_variable_ofl_ctrl(psc,(Variable) var,
 							  FWD_OFL_CTRL);
 		    sc_base_remove_variable(sc, (Variable) var);
 		    // sometimes produces erroneous systems - BC 11/8/2011
 		    // sc = region_sc_normalize(sc,2);
+		    ifdebug(8) {
+		      pips_debug(8, "system before normalization: \n");
+		      sc_syst_debug(sc);
+		    }
 		    sc = region_sc_normalize(sc,1);
+		     ifdebug(8) {
+		      pips_debug(8, "system after normalization: \n");
+		      sc_syst_debug(sc);
+		    }
 		    region_system_(reg) = newgen_Psysteme(sc);
 
 		    if (op_statistics_p() &&
@@ -1203,12 +1216,26 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    bool is_proj_exact = true;
 
 		    vect_add_elem(&pv_var, (Variable) var, VALUE_ONE);
+
+		    ifdebug(8) {
+		      pips_debug(8, "system before projection (2): \n");
+		      sc_syst_debug(sc);
+		    }
+
 		    sc = sc_projection_ofl_along_variables_with_test
 			(sc, pv_var,  &is_proj_exact);
 		    vect_rm(pv_var);
 		    // sometimes produces erroneous systems - BC 11/8/2011
 		    // sc = region_sc_normalize(sc,2);
+		    ifdebug(8) {
+		      pips_debug(8, "system before normalization: \n");
+		      sc_syst_debug(sc);
+		    }
 		    sc = region_sc_normalize(sc,1);
+		    ifdebug(8) {
+		      pips_debug(8, "system after normalization: \n");
+		      sc_syst_debug(sc);
+		    }
 		    region_system_(reg)= newgen_Psysteme(sc);
 
 		    if (region_approximation_tag(reg) == is_approximation_exact)
