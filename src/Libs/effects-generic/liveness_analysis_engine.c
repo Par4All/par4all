@@ -436,6 +436,8 @@ live_in_paths_of_whileloop(whileloop l, live_paths_analysis_context *ctxt)
      are already available.
      see also the comment inside the else branch of if (!before_p)
      about the way of computing live in paths.
+     The code below is likely to be seldom executed;
+     however, it has been tested on small cases.
   */
   if ( !bound_live_in_paths_p(current_stmt) )
     {
@@ -606,61 +608,73 @@ live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
 
   pips_debug(1,"begin\n");
 
-  /* Live in effects of header  */
-  /* We assume that there is no side effect in the loop header;
-     thus the live in effects of the header are similar to its proper read effects
+  /* If the loop belongs to a sequence of statements, which is
+     generally the case, its live in paths have already been computed.
+     I don't yet know if they may be much more precisely computed here.
+     For performance reasons, I don't try to recompute them if they
+     are already available.
+     The code below is likely to be seldom executed;
+     however, it has been tested on small cases.
   */
-  list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
-					  ctxt);
-  list l_live_in_header =
-    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
-  reset_converted_rw_effects(&l_prop_header, ctxt);
-  pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
-
-  /* Live in effects of first iteration if it exists minus read effects
-     on the loop index, which are masked by its initialization in the header,
-     and read effects on loop locals if the loop is parallel;
-  */
-  list l_masked_vars = NIL;
-  if(loop_parallel_p(l))
-    l_masked_vars = loop_locals(l);
-  /* beware: potential sharing with loop_locals(l) */
-  l_masked_vars = CONS(ENTITY, index, l_masked_vars);
-
-  list l_live_in_first_iter =
-    effects_dup_without_variables(load_live_in_paths_list(body),
-				  l_masked_vars);
-
-  /* free l_masked_vars: beware of the potential sharing with loop_locals */
-  if (loop_parallel_p(l) && !ENDP(l_masked_vars))
-    CDR(l_masked_vars) = NIL;
-  gen_free_list(l_masked_vars);
-
-  if (! normalizable_and_linear_loop_p(index, loop_range(l)))
+  if ( !bound_live_in_paths_p(current_stmt) )
     {
-      pips_debug(7, "non linear loop range.\n");
-      effects_to_may_effects(l_live_in_first_iter);
+
+      /* Live in effects of header  */
+      /* We assume that there is no side effect in the loop header;
+	 thus the live in effects of the header are similar to its proper read effects
+      */
+      list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+					      ctxt);
+      list l_live_in_header =
+	proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+      reset_converted_rw_effects(&l_prop_header, ctxt);
+      pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+      /* Live in effects of first iteration if it exists minus read effects
+	 on the loop index, which are masked by its initialization in the header,
+	 and read effects on loop locals if the loop is parallel;
+      */
+      list l_masked_vars = NIL;
+      if(loop_parallel_p(l))
+	l_masked_vars = loop_locals(l);
+      /* beware: potential sharing with loop_locals(l) */
+      l_masked_vars = CONS(ENTITY, index, l_masked_vars);
+
+      list l_live_in_first_iter =
+	effects_dup_without_variables(load_live_in_paths_list(body),
+				      l_masked_vars);
+
+      /* free l_masked_vars: beware of the potential sharing with loop_locals */
+      if (loop_parallel_p(l) && !ENDP(l_masked_vars))
+	CDR(l_masked_vars) = NIL;
+      gen_free_list(l_masked_vars);
+
+      if (! normalizable_and_linear_loop_p(index, loop_range(l)))
+	{
+	  pips_debug(7, "non linear loop range.\n");
+	  effects_to_may_effects(l_live_in_first_iter);
+	}
+      else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
+	{
+	  if (!loop_executed_at_least_once_p(l))
+	    effects_to_may_effects(l_live_in_first_iter);
+	}
+      else
+	{
+	  pips_internal_error("live paths of loop not implemented for convex paths\n");
+	}
+
+      pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
+
+      /* put them together */
+      list l_live_in_loop = (*effects_union_op)(l_live_in_header,
+						l_live_in_first_iter,
+						effects_same_action_p);
+
+      pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+      store_live_in_paths_list(current_stmt, l_live_in_loop);
     }
-  else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
-    {
-      if (!loop_executed_at_least_once_p(l))
-	effects_to_may_effects(l_live_in_first_iter);
-    }
-  else
-    {
-      pips_internal_error("live paths of loop not implemented for convex paths\n");
-    }
-
-  pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
-
-  /* put them together */
-  list l_live_in_loop = (*effects_union_op)(l_live_in_header,
-					    l_live_in_first_iter,
-					    effects_same_action_p);
-
-  pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
-
-  store_live_in_paths_list(current_stmt, l_live_in_loop);
 
   pips_debug(1,"end\n");
 }
@@ -682,6 +696,7 @@ live_out_paths_from_test_to_branches(test t, live_paths_analysis_context *ctxt)
   */
   store_live_out_paths_list(test_true(t), effects_dup(l_live_out_test));
   store_live_out_paths_list(test_false(t), effects_dup(l_live_out_test));
+  
 
   /* The live in paths of the test are computed with  the surrounding
      sequence live paths computation.
