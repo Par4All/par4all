@@ -308,7 +308,12 @@ static void rw_effects_of_forloop(forloop w)
 
     /* effects of incrementation expression  */
     linc = generic_proper_effects_of_expression(forloop_increment(w));
-
+    if (contract_p)
+      {
+	li = proper_to_summary_effects(li);
+	lc = proper_to_summary_effects(lc);
+ 	linc = proper_to_summary_effects(linc);
+     }
     l_init = gen_nconc(li, lc);
     l_cond_inc = (*effects_union_op)(effects_dup(lc), linc, effects_same_action_p);
 
