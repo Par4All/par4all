@@ -1,0 +1,49 @@
+int main()
+{
+   int a, b;
+
+   a = 0;
+   b = 2;
+   int tab[2];
+   tab[a] = 1;
+   tab[b] = 2;
+   return tab[a]+tab[b];
+}
+int main()
+{
+   int a, b;
+
+   a = 0;
+//             <    is alive (in)>: a
+   b = 2;
+//             <    is alive (in)>: a b
+   int tab[2];
+//             <may be alive (in)>: tab[*]
+//             <    is alive (in)>: a b
+   tab[a] = 1;
+//             <may be alive (in)>: tab[*]
+//             <    is alive (in)>: a b
+   tab[b] = 2;
+//             <may be alive (in)>: tab[*]
+//             <    is alive (in)>: a b
+   return tab[a]+tab[b];
+}
+int main()
+{
+   int a, b;
+//             <    is alive (out)>: a
+
+   a = 0;
+//             <    is alive (out)>: a b
+   b = 2;
+//             <may be alive (out)>: tab[*]
+//             <    is alive (out)>: a b
+   int tab[2];
+//             <may be alive (out)>: tab[*]
+//             <    is alive (out)>: a b
+   tab[a] = 1;
+//             <may be alive (out)>: tab[*]
+//             <    is alive (out)>: a b
+   tab[b] = 2;
+   return tab[a]+tab[b];
+}
