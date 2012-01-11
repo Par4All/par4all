@@ -382,19 +382,31 @@ EffectsInfDifference(list l1, list l2,
 effect proper_to_summary_simple_effect(effect eff)
 {
   if (!effect_scalar_p(eff)) {
-    //cell c = effect_cell(eff);
-    reference r = effect_any_reference(eff);
-    //entity e = reference_variable(r);
-    //type ut = ultimate_type(entity_type(e));
-    list inds = reference_indices(r);
-    list cind = list_undefined;
+    cell eff_c = effect_cell(eff);
     bool may_p = false;
+    reference ref = reference_undefined;
+
+    if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+    else
+    {
+      /* it's a reference : let'us modify it */
+      ref = cell_reference(eff_c);
+    }
 
     ifdebug(8) {
-      pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, r,
+      pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, ref,
 		 words_to_string(words_effect(eff)));
     }
 
+    list inds = reference_indices(ref);
+    list cind = list_undefined;
     for(cind = inds; !ENDP(cind); POP(cind)) {
       expression se = EXPRESSION(CAR(cind));
 
@@ -404,10 +416,10 @@ effect proper_to_summary_simple_effect(effect eff)
       }
 
       if(!extended_integer_constant_expression_p(se)) {
-	if(!unbounded_expression_p(se)) 
+	if(!unbounded_expression_p(se))
 	  {
 	    /* it may still be a field entity */
-	    if (!(expression_reference_p(se) && 
+	    if (!(expression_reference_p(se) &&
 		  entity_field_p(expression_variable(se))))
 	    {
 	      may_p = true;
@@ -422,7 +434,7 @@ effect proper_to_summary_simple_effect(effect eff)
       effect_approximation_tag(eff) = is_approximation_may;
 
     ifdebug(8) {
-      pips_debug(8, "Summary simple effect %p with reference %p: %s\n", eff, r,
+      pips_debug(8, "Summary simple effect %p with reference %p: %s\n", eff, ref,
 		 words_to_string(words_effect(eff)));
     }
 
