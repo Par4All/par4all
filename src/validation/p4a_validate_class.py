@@ -336,11 +336,11 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 				#status of the test
 				status = 'succeeded'
 
-			# Check to see if there is multi-script or multi-source
-			multi_status = multi_source_script(directory_test_path,os.path.basename(test_name_path))
+	# Check to see if there is multi-script or multi-source
+	multi_status = multi_source_script(directory_test_path,os.path.basename(test_name_path))
 
-			if multi_status != '':
-				status = status.replace(':','')+'_'+multi_status
+	if multi_status != '':
+		status = status.replace(':','')+'_'+multi_status
 
 	# Write status
 	write_log(status,log_file,test_file_path)
