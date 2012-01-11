@@ -2056,9 +2056,299 @@ simple_effects_forward_translation(
     return gen_nconc(lr, lc);
 }
 
-list c_simple_effects_on_actual_parameter_forward_translation
-(entity  __attribute__ ((unused)) callee, expression  __attribute__ ((unused)) real_exp, entity  __attribute__ ((unused)) formal_ent, list  __attribute__ ((unused)) l_eff, transformer  __attribute__ ((unused)) context)
+list
+c_simple_effects_on_actual_parameter_forward_translation (entity  callee,
+							  expression  real_exp,
+							  entity  formal_ent,
+							  list l_eff,
+							  transformer __attribute__ ((unused)) context)
 {
-  pips_internal_error("not yet implemented");
-  return NIL;
+
+
+  syntax real_s = expression_syntax(real_exp);
+  list l_formal = NIL;
+
+  pips_debug_effects(6,"initial effects :\n", l_eff);
+
+
+  switch (syntax_tag(real_s))
+    {
+    case is_syntax_call:
+      {
+	call real_call = syntax_call(real_s);
+	entity real_op = call_function(real_call);
+	list args = call_arguments(real_call);
+	type uet = ultimate_type(entity_type(real_op));
+	value real_op_v = entity_initial(real_op);
+
+	pips_debug(5, "call case, function %s \n", module_local_name(real_op));
+	if(type_functional_p(uet))
+	  {
+	    if (value_code_p(real_op_v))
+	      {
+		pips_debug(5, "external function\n");
+		pips_user_warning("Nested function calls are ignored. Consider splitting the code before running PIPS\n");
+		l_formal = NIL;
+		break;
+	      }
+	    else /* it's an intrinsic */
+	      {
+		pips_debug(5, "intrinsic function\n");
+
+		if (ENTITY_ASSIGN_P(real_op))
+		  {
+		    pips_debug(5, "assignment case\n");
+		    l_formal = c_simple_effects_on_actual_parameter_forward_translation
+		      (callee, EXPRESSION(CAR(CDR(args))), formal_ent, l_eff, context);
+		    break;
+		  }
+		else if(ENTITY_ADDRESS_OF_P(real_op))
+		  {
+		    expression arg1 = EXPRESSION(CAR(args));
+		    list l_real_arg = NIL;
+		    bool general_case = true;
+
+		    pips_debug(5, "address of case\n");
+
+		    /* first we compute an effect on the argument of the address_of operator.
+		       This is to distinguish between the general case and the case where
+                       the operand of the & operator is an array element.
+		    */
+		    list l_eff_real = NIL;
+		    l_real_arg = generic_proper_effects_of_complex_address_expression
+		      (arg1, &l_eff_real, true);
+		    gen_full_free_list(l_real_arg);
+
+		    effect eff_real = EFFECT(CAR(l_eff_real)); /* there should be a FOREACH here to scan the whole list */
+		    gen_free_list(l_eff_real);
+
+		    reference eff_real_ref = effect_any_reference(eff_real);
+		    list l_inds_real = reference_indices(eff_real_ref);
+		    int nb_phi_real = (int) gen_length(l_inds_real);
+
+
+		    /* there are indices but we don't know if they represent array dimensions,
+		       struct/union/enum fields, or pointer dimensions.
+		    */
+		    if(nb_phi_real > 0)
+		      {
+			type t = type_undefined;
+
+			t = simple_effect_reference_type(eff_real_ref);
+
+			if (type_undefined_p(t))
+			  pips_internal_error("undefined type not expected ");
+
+			if(type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
+			  {
+			    pips_debug(5,"array element or sub-array case\n");
+			    /* array element operand : we replace the last index with
+			       an unbounded dimension */
+			    simple_effect_change_ith_dimension_expression(eff_real,
+									  make_unbounded_expression(),
+									  nb_phi_real);
+			    general_case = false;
+			  }
+			else
+			  pips_debug(5, "general case\n");
+		      }
+
+
+		    FOREACH(EFFECT, eff_orig, l_eff)
+		      {
+			list l_inds_orig = reference_indices(effect_any_reference(eff_orig));
+
+			/* First we have to test if the eff_real access path leads to the eff_orig access path */
+
+			/* to do that, if the entities are the same (well in fact we should also
+			   take care of aliasing), we add the constraints of eff_real to those of eff_orig,
+			   and the system must be feasible.
+			   We should also take care of linearization here.
+			*/
+			bool exact_p;
+			if(path_preceding_p(eff_real, eff_orig, transformer_undefined, false, &exact_p))
+			  {
+			    /* At least part of the original effect corresponds to the actual argument :
+			       we need to translate it
+			    */
+			    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_orig);
+
+			    /* Then we skip the dimensions common to the two regions
+			       except the last one if we are not in the general case */
+			    /* This is only valid when there is no linearization.
+			    */
+			    int i_max = general_case? nb_phi_real : nb_phi_real-1;
+			    for(int i = 1; i<= i_max; i++, POP(l_inds_orig));
+			    list l_new_inds = gen_full_copy_list(l_inds_orig);
+
+			    /* Then, we must add a first dimension with index 0 constraint
+			       in the general case.
+			       We must also change the resulting effect
+			       entity for the formal entity in all cases.
+			    */
+
+			    if (general_case)
+			      l_new_inds = CONS(EXPRESSION, int_to_expression(0), l_new_inds);
+
+			    effect eff_formal = make_reference_simple_effect(make_reference(formal_ent,l_new_inds),
+									     copy_action(effect_action(eff_orig)),
+									     exact_p? copy_approximation(effect_approximation(eff_orig))
+									     : make_approximation_may());
+
+			    pips_debug_effect(5, "resulting eff_formal\n", eff_formal);
+
+			    l_formal = EffectsMustUnion(l_formal, CONS(EFFECT, eff_formal, NIL),
+							effects_same_action_p);
+			    pips_debug_effects(6,"l_formal after adding new effect : \n", l_formal);
+
+
+			  } /* if(path_preceding_p...)*/
+
+		      } /* FOREACH */
+
+		    break;
+		  }
+		else
+		  {
+		    pips_debug(5, "Other intrinsic case : entering general case \n");
+		  }
+	      }
+	  }
+	else if(type_variable_p(uet))
+	  {
+	    pips_user_warning("Effects of call thru functional pointers are ignored\n");
+	    l_formal = NIL;
+	    break;
+	  }
+	/* entering general case which includes general calls*/
+      }
+    case is_syntax_reference:
+    case is_syntax_subscript:
+      {
+	effect eff_real = effect_undefined;
+
+	pips_debug(5, "general case\n");
+
+	/* first we compute an effect on the real_arg */
+	if (syntax_reference_p(real_s))
+	  eff_real = reference_to_simple_effect(syntax_reference(real_s), make_action_write_memory(), true);
+	else
+	  {
+	    list l_eff_real = NIL;
+	    list l_real_arg = generic_proper_effects_of_complex_address_expression
+	      (real_exp, &l_eff_real, true);
+	    gen_full_free_list(l_real_arg);
+	    if (!ENDP(l_eff_real))
+	      eff_real = EFFECT(CAR(l_eff_real)); /*there should be a foreach to scan all the elements */
+	    gen_free_list(l_eff_real);
+	  }
+
+	if (!effect_undefined_p(eff_real))
+	  {
+	    FOREACH(EFFECT, eff_orig, l_eff)
+	      {
+		int nb_phi_orig = (int) gen_length(reference_indices(effect_any_reference(eff_orig)));
+		int nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
+		/* First we have to test if the eff_real access path leads to the eff_orig access path */
+
+		bool exact_p;
+		if(path_preceding_p(eff_real, eff_orig, transformer_undefined, true, &exact_p)
+		   &&  nb_phi_orig >= nb_phi_real)
+		  {
+		    /* At least part of the original effect corresponds to the actual argument :
+		       we need to translate it
+		    */
+		    reference ref_formal = make_reference(formal_ent, NIL);
+		    effect eff_formal = reference_to_simple_effect(ref_formal, copy_action(effect_action(eff_orig)),
+								   false);
+
+		    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_orig);
+
+		    /* first we perform the path translation */
+		    reference n_eff_ref;
+		    descriptor n_eff_d;
+		    effect n_eff;
+		    bool exact_translation_p;
+		    simple_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(eff_orig),
+										   effect_descriptor(eff_orig),
+										   ref_formal,
+										   effect_descriptor(eff_formal),
+										   nb_phi_real,
+										   &n_eff_ref, &n_eff_d,
+										   &exact_translation_p);
+		    n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff_orig)),
+					exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may(),
+					n_eff_d);
+		    pips_debug_effect(5, "final eff_formal : \n", n_eff);
+
+		    pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
+
+		    l_formal = EffectsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),effects_same_action_p);
+		    pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
+
+		  } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
+
+
+
+		/* */
+
+	      } /* FOREACH */
+	  }
+
+	break;
+      }
+    case is_syntax_application:
+      {
+	pips_internal_error("Application not supported yet");
+	break;
+      }
+
+    case is_syntax_cast:
+      {
+	pips_debug(6, "cast expression\n");
+	type formal_ent_type = entity_basic_concrete_type(formal_ent);
+	expression cast_exp = cast_expression(syntax_cast(real_s));
+	type cast_exp_type = expression_to_type(cast_exp);
+	if (basic_concrete_types_compatible_for_effects_interprocedural_translation_p(cast_exp_type, formal_ent_type))
+	  {
+	    l_formal =
+	      c_simple_effects_on_actual_parameter_forward_translation
+	      (callee, cast_exp,
+	       formal_ent, l_eff, context);
+	  }
+	else
+	  {
+	    expression formal_exp = entity_to_expression(formal_ent);
+	    l_formal = c_actual_argument_to_may_summary_effects(formal_exp, 'w');
+	    free_expression(formal_exp);
+	  }
+	free_type(cast_exp_type);
+	break;
+      }
+    case is_syntax_range:
+      {
+	pips_user_error("Illegal effective parameter: range\n");
+	break;
+      }
+
+    case is_syntax_sizeofexpression:
+      {
+	pips_debug(6, "sizeofexpression : -> NIL");
+	l_formal = NIL;
+	break;
+      }
+    case is_syntax_va_arg:
+      {
+	pips_internal_error("va_arg not supported yet");
+	break;
+      }
+    default:
+      pips_internal_error("Illegal kind of syntax");
+
+    } /* switch */
+
+
+  pips_debug_effects(6,"resulting effects :\n", l_formal);
+  return(l_formal);
+
 }

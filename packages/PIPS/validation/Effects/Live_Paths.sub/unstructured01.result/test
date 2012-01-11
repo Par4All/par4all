@@ -1,0 +1,162 @@
+int unstructured02()
+{
+   int begin, end, step, current;
+   int i;
+
+   step = 1;
+   begin = 0;
+   end = 10;
+   current = begin;
+l99997:   ;
+   if (!(current!=end)) goto _break_1;
+   i = 0;
+l99998:   ;
+   if (!(i<20)) goto l99999;
+   if (current==end) goto SKIP;
+   i++;
+   goto l99998;
+SKIP:   if (current==end) goto _break_1;
+   current = end;
+   goto l99997;
+l99999:   ;
+
+   if (step==0) goto l99996;
+   if (current<end) goto SKIP;
+   current -= step;
+   goto SKIP;
+l99996:   ;
+   if (current==end) goto SKIP;
+   if (current==begin) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+_break_1:   ;
+
+   return 1;
+}
+int unstructured02()
+{
+   int begin, end, step, current;
+   int i;
+//             <may be alive (in)>: i
+
+   step = 1;
+//             <may be alive (in)>: i step
+   begin = 0;
+//             <may be alive (in)>: i step
+//             <    is alive (in)>: begin
+   end = 10;
+//             <may be alive (in)>: end i step
+//             <    is alive (in)>: begin
+   current = begin;
+l99997:   ;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: current end
+   if (!(current!=end)) goto _break_1;
+//             <may be alive (in)>: begin current end step
+   i = 0;
+l99998:   ;
+//             <may be alive (in)>: begin current end step
+//             <    is alive (in)>: i
+   if (!(i<20)) goto l99999;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: current end
+   if (current==end) goto SKIP;
+//             <may be alive (in)>: begin current end step
+//             <    is alive (in)>: i
+   i++;
+   goto l99998;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: current end
+SKIP:   if (current==end) goto _break_1;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: end
+   current = end;
+   goto l99997;
+l99999:   ;
+//             <may be alive (in)>: begin current end i
+//             <    is alive (in)>: step
+
+   if (step==0) goto l99996;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: current end
+   if (current<end) goto SKIP;
+//             <may be alive (in)>: begin end i
+//             <    is alive (in)>: current step
+   current -= step;
+   goto SKIP;
+l99996:   ;
+//             <may be alive (in)>: begin i step
+//             <    is alive (in)>: current end
+   if (current==end) goto SKIP;
+//             <may be alive (in)>: end i step
+//             <    is alive (in)>: begin current
+   if (current==begin) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+_break_1:   ;
+
+   return 1;
+}
+int unstructured02()
+{
+   int begin, end, step, current;
+//             <may be alive (out)>: i
+   int i;
+//             <may be alive (out)>: i step
+
+   step = 1;
+//             <may be alive (out)>: i step
+//             <    is alive (out)>: begin
+   begin = 0;
+//             <may be alive (out)>: end i step
+//             <    is alive (out)>: begin
+   end = 10;
+//             <may be alive (out)>: begin current end i step
+   current = begin;
+l99997:   ;
+//             <may be alive (out)>: begin current end i step
+   if (!(current!=end)) goto _break_1;
+//             <may be alive (out)>: begin current end i step
+   i = 0;
+l99998:   ;
+//             <may be alive (out)>: begin current end i step
+   if (!(i<20)) goto l99999;
+//             <may be alive (out)>: begin current end i step
+   if (current==end) goto SKIP;
+//             <may be alive (out)>: begin current end i step
+   i++;
+   goto l99998;
+//             <may be alive (out)>: begin current end i step
+SKIP:   if (current==end) goto _break_1;
+//             <may be alive (out)>: begin current end i step
+   current = end;
+   goto l99997;
+l99999:   ;
+//             <may be alive (out)>: begin current end i step
+
+   if (step==0) goto l99996;
+//             <may be alive (out)>: begin current end i step
+   if (current<end) goto SKIP;
+//             <may be alive (out)>: begin current end i step
+   current -= step;
+   goto SKIP;
+l99996:   ;
+//             <may be alive (out)>: begin current end i step
+   if (current==end) goto SKIP;
+//             <may be alive (out)>: begin current end i step
+   if (current==begin) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+_break_1:   ;
+
+   return 1;
+}
