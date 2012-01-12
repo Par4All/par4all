@@ -124,6 +124,7 @@ class p4a_processor_input(object):
     Some of the options are used during the output file generation.
     """
     project_name = ""
+    noalias = False
     accel = False
     cuda = False
     opencl = False
@@ -205,12 +206,13 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False,
+                 filter_exclude = None, noalias = False, accel = False, cuda = False,
                  opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, atomic = False, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
+        self.noalias = noalias
         self.recover_includes = recover_includes
         self.native_recover_includes = native_recover_includes
         self.accel = accel
@@ -308,6 +310,14 @@ class p4a_processor(object):
             # Array regions are a must! :-) Ask for most precise array
             # regions:
             self.workspace.activate("MUST_REGIONS")
+
+            if self.noalias:
+                # currently, as default  PIPS phases do not select pointer analysis, setting
+                # properties is sufficient.
+                # activating phases may become necessary if the default behavior
+                # changes in Pips
+                properties["CONSTANT_PATH_EFFECTS"] = False
+                properties["TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS"] = True
 
             # set the workspace properties
             self.set_properties(properties)

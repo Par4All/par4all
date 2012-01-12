@@ -48,6 +48,9 @@ def add_own_options(parser):
 
     proc_group = optparse.OptionGroup(parser, "PIPS processing options")
 
+    proc_group.add_option("--no-pointer-aliasing", action = "store_true", default = False,
+        help = "Assume there is no aliasing in input program, thus enabling more optimizations. This option currently only controls PIPS internal processing and is not taken into account for back-end compilation.")
+
     proc_group.add_option("--accel", "-A", action = "store_true", default = False,
         help = "Parallelize for heterogeneous accelerators by using the Par4All Accel run-time that allows executing code for various hardware accelerators such as GPU or even OpenMP emulation.")
 
@@ -537,6 +540,7 @@ def main():
             # will be serialized (pickle'd) to ease the
             # passing of parameters to the processor.
             input = p4a_processor.p4a_processor_input()
+            input.noalias = options.no_pointer_aliasing
             input.c99 = options.c99
             input.project_name = project_name
             input.accel = options.accel
