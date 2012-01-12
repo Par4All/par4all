@@ -74,12 +74,12 @@ def process(input):
             )
             if input.accel:
                 p4a_util.warn("Activating fine-grain parallelization for accelerator mode")
-                input.fine = True
-                
+                input.fine_grain = True
+
             output.database_dir = processor.get_database_directory()
 
             # First apply some generic parallelization:
-            processor.parallelize(fine = input.fine,
+            processor.parallelize(fine_grain = input.fine_grain,
                                   apply_phases_before = input.apply_phases['abp'],
                                   apply_phases_after = input.apply_phases['aap'],
                                   omp=input.openmp and not input.accel)
@@ -89,7 +89,7 @@ def process(input):
                 # have an OpenMP implementation of it if OpenMP option is set
                 # too:
                 processor.gpuify(
-                        fine = input.fine,
+                        fine_grain = input.fine_grain,
                         apply_phases_kernel = input.apply_phases['akg'],
                         apply_phases_kernel_launcher = input.apply_phases['aklg'],
                         apply_phases_wrapper = input.apply_phases['awg'],
@@ -100,7 +100,7 @@ def process(input):
                 processor.ompify(
                         apply_phases_before = input.apply_phases['abo'],
                         apply_phases_after = input.apply_phases['aao'])
-                    
+
             # Write the output files.
             output.files = processor.save(input.output_dir,
                                           input.output_prefix,

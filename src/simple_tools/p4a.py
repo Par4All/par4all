@@ -72,8 +72,8 @@ def add_own_options(parser):
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
         help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
-    proc_group.add_option("--fine", "-F", action = "store_true", default = False,
-        help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
+    proc_group.add_option("--fine-grain", "-F", action = "store_true", default = False,
+        help = "Use a fine-grain parallelization algorithm instead of a coarse-grain one.")
 
     proc_group.add_option("--atomic", action = "store_true", default = False,
         help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
@@ -547,7 +547,7 @@ def main():
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.scmp = options.scmp
-            input.fine = options.fine
+            input.fine_grain = options.fine_grain
             input.atomic = options.atomic
             input.pocc = options.pocc
             input.select_modules = options.select_modules
