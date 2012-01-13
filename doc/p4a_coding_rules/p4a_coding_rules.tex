@@ -153,14 +153,15 @@ but with some limitations in their usage.
 \subsection{Pointers}
 \label{sec:pointers}
 
-Pointers allow to designate a single memory location using several names:
-this is called aliasing. However practical it may be, it may render
-subsequent program analyses more complicated. To generate safe results,
-the default behaviour of \Apips is to generate imprecise results in case
-of pointer dereferencing. If you know that you very safely use
-pointers, you can turn off this default behaviour, by setting the right
-property (see the \texttt{pipsmake-rc} guide for more details). \Apfa, as
-a pragmatic tool, does this right for you.
+Pointers allow to designate a single memory location using several
+names: this is called aliasing. However practical it may be, it may
+render subsequent program analyses more complicated. To generate safe
+results, the default behaviour of \Apips is to generate imprecise
+results in case of pointer dereferencing. If you know that you very
+safely use pointers, you can turn off this default behaviour, by
+setting the right properties (see the \texttt{pipsmake-rc} guide for
+more details). \Apfa, as a pragmatic tool, can do this right for you,
+if you specify the \texttt{--no-pointer-aliasing} command-line option.
 
 A pointer analysis phase, called \emph{Pointer Values}, is currently being
 integrated to \Apips to avoid these drawbacks\footnote{Expert users can
