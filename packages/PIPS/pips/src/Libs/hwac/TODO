@@ -114,6 +114,7 @@
 + cleanup declarations in the generated code, when not used?
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
+- dynamic optimal tile size computation instead of static?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
