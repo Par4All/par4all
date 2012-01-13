@@ -68,7 +68,7 @@ static char * sc_symbol_table(char *);
 <TEXT>"<="			{ RETURN(INFEGAL); }
 <TEXT>"{"			{ RETURN(ACCOUVR); }
 <TEXT>"}"			{ RETURN(ACCFERM); }
-<TEXT>[\t\n]*		;
+<TEXT>[ \t\r\n]*		;
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
