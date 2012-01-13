@@ -56,6 +56,7 @@ def process(input):
                 files = input.files,
                 filter_select = input.select_modules,
                 filter_exclude = input.exclude_modules,
+                noalias = input.noalias,
                 accel = input.accel,
                 cuda = input.cuda,
                 opencl = input.opencl,

@@ -66,6 +66,7 @@ class p4a_scmp_compiler(p4a_processor):
         p4a_processor.__init__(self, workspace, project_name,
                                cpp_flags,
                                verbose, files, filter_select, filter_exclude,
+                               False,
                                False, False, False, False, False, 2, False,
                                recover_includes,
                                native_recover_includes,
