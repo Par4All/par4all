@@ -1,0 +1,36 @@
+int foo(int p[5])
+{
+   return p[3];
+}
+int main()
+{
+   int b[10][10], c;
+   c = foo(&b[1][5]);
+   return c;
+}
+//             <    is alive (in)>: p[3]
+int foo(int p[5])
+{
+//             <    is alive (in)>: p[3]
+   return p[3];
+}
+int main()
+{
+   int b[10][10], c;
+//             <    is alive (in)>: b[1][8]
+   c = foo(&b[1][5]);
+//             <    is alive (in)>: c
+   return c;
+}
+int foo(int p[5])
+{
+   return p[3];
+}
+int main()
+{
+//             <    is alive (out)>: b[1][8]
+   int b[10][10], c;
+//             <    is alive (out)>: c
+   c = foo(&b[1][5]);
+   return c;
+}

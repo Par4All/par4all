@@ -1,0 +1,47 @@
+int foo(int *p)
+{
+   *p = 10;
+   return *p+1;
+}
+int main()
+{
+   int a, b;
+   a = 10;
+
+   b = foo(&a);
+   return b;
+}
+//             <    is alive (in)>: p
+int foo(int *p)
+{
+//             <    is alive (in)>: p
+   *p = 10;
+//             <    is alive (in)>: p p[0]
+   return *p+1;
+}
+int main()
+{
+   int a, b;
+   a = 10;
+//             <    is alive (in)>: a
+
+   b = foo(&a);
+//             <    is alive (in)>: b
+   return b;
+}
+int foo(int *p)
+{
+//             <    is alive (out)>: p p[0]
+   *p = 10;
+   return *p+1;
+}
+int main()
+{
+   int a, b;
+//             <    is alive (out)>: a
+   a = 10;
+//             <    is alive (out)>: b
+
+   b = foo(&a);
+   return b;
+}
