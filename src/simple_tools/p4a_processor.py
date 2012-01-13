@@ -133,7 +133,7 @@ class p4a_processor_input(object):
     fftw3 = False
     openmp = False
     scmp = False
-    fine = False
+    fine_grain = False
     c99 = False
     select_modules = ""
     exclude_modules = ""
@@ -182,7 +182,7 @@ class p4a_processor(object):
     # - the list of module with interfaces:
     interface_modules = []
     # - the generated header files:
-    header_files = []  
+    header_files = []
     # - the set of CUDA modules:
     cuda_modules = set ()
     # - the set of C modules:
@@ -217,7 +217,7 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
-        self.opencl = opencl        
+        self.opencl = opencl
         self.openmp = openmp
         self.com_optimization = com_optimization
         self.cuda_cc = cuda_cc
@@ -242,8 +242,8 @@ class p4a_processor(object):
             self.project_name = project_name
 
             # The generated kernels source files will go into a directory named
-            # with project_name.generated 
-            self.new_files_folder = self.project_name + '.generated' 
+            # with project_name.generated
+            self.new_files_folder = self.project_name + '.generated'
 
             if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
@@ -583,12 +583,14 @@ class p4a_processor(object):
         m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
-    def parallelize(self, fine = False, filter_select = None,
+    def parallelize(self, fine_grain = False, filter_select = None,
                     filter_exclude = None, apply_phases_before = [], apply_phases_after = [], omp=False):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
-        if fine:
+        
+
+        if fine_grain:
             # Set to False (mandatory) for A&K algorithm on C source file
             self.workspace.props.memory_effects_only = self.fortran
 
@@ -599,14 +601,14 @@ class p4a_processor(object):
         all_modules.privatize_module()
 
         # Use a different //izing scheme for openmp and the other accelerators
-        # Wait for p4a 2.0 for better engineering 
+        # Wait for p4a 2.0 for better engineering
         if omp:
             # first step is to find big parallel loops
             all_modules.coarse_grain_parallelization(concurrent=True)
             # and the one with reductions
             all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
             # on the **others**, try to distribute them
-            if fine:
+            if fine_grain:
                 self.workspace.props.parallelize_again_parallel_code=False
                 self.workspace.props.memory_effects_only = False # mandatory for internalize_parallel_code
                 all_modules.internalize_parallel_code(concurrent=True)
@@ -614,7 +616,7 @@ class p4a_processor(object):
                 # !! Show first a test case where it is useful !!
                 # all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
         else:
-            if fine:
+            if fine_grain:
                 # Use a fine-grain parallelization à la Allen & Kennedy:
                 all_modules.internalize_parallel_code(concurrent=True)
 
@@ -626,13 +628,13 @@ class p4a_processor(object):
         #all_modules.simplify_control(concurrent=True)
         all_modules.loop_fusion(concurrent=True)
         #all_modules.localize_declaration(concurrent=True)
-        
+
         # Scalarization doesn't preserve perfect loop nest at that time
         #all_modules.scalarization(concurrent=True)
 
         # Privatization information has been lost because of flatten_code
         #all_modules.privatize_module()
-        #if fine:
+        #if fine_grain:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             #all_modules.internalize_parallel_code(concurrent=True)
 
@@ -643,7 +645,7 @@ class p4a_processor(object):
 
     def gpuify(self, filter_select = None,
                 filter_exclude = None,
-                fine = False,
+                fine_grain = False,
                 apply_phases_kernel = [],
                 apply_phases_kernel_launcher = [],
                 apply_phases_wrapper = [],
@@ -652,7 +654,7 @@ class p4a_processor(object):
         workspace to generate GPU-oriented code
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
-		
+
         # Some "risky" optimizations
         #all_modules.flatten_code(unroll=False,concurrent=True)
         #all_modules.simplify_control(concurrent=True)
@@ -681,13 +683,13 @@ class p4a_processor(object):
         # Fortran case, we want the launcher to be wrapped in an
         # independent Fortran function so that it will be prettyprinted
         # later in... C (for OpenCL or CUDA kernel definition). :-)
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False, 
-                            GPU_USE_KERNEL = False,                             
+        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
+                            GPU_USE_KERNEL = False,
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,                            
+                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             annotate_loop_nests = True, # annotate for recover parallel loops later
                             concurrent=True)
@@ -719,9 +721,9 @@ class p4a_processor(object):
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
-								 # opencl option will produce independent kernel and wrapper files                       
+								 # opencl option will produce independent kernel and wrapper files
 								 GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.opencl,
-								 GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = False,								 
+								 GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = False,
 								 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
 								 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
 								 concurrent=True)
@@ -740,7 +742,7 @@ class p4a_processor(object):
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
         kernels.scalarization(concurrent=True)
-        
+
 		# Apply requested phases to kernel:
         apply_user_requested_phases(kernels, apply_phases_kernel)
 
@@ -802,9 +804,9 @@ class p4a_processor(object):
             kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
-            
+
         # add sentinel around loop nests in launcher, used to replace the loop
-        # nest with a call kernel in post-processing             
+        # nest with a call kernel in post-processing
         kernel_launchers.gpu_loop_nest_annotate(parallel=True);
 
         # Update the list of CUDA modules:
@@ -869,16 +871,16 @@ class p4a_processor(object):
 
         # Save the list of kernels for later work:
         self.kernels.extend (map(lambda x:x.name, kernels))
-        if self.cuda:        
+        if self.cuda:
 			self.launchers.extend (map(lambda x:x.name, kernel_launchers))
         if self.opencl:
             # Comment the place where the opencl wrapper declaration must be placed
             # from the post-process
             for launcher in kernel_launchers:
-                self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")           
+                self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")
             self.generated_modules.extend(map(lambda x:x.name, wrappers))
 
-        
+
 
         # To be able to inject Par4All accelerator run time initialization
         # later:
@@ -999,14 +1001,14 @@ class p4a_processor(object):
                                         kernel + ".c")
             launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
-                                        
+
             if self.cuda:
 				p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
 				# remove the wrapper from the modules to be processed since already
 				#in the kernel
 				self.generated_modules.remove (wrapper)
 				self.generated_modules.remove (launcher)
-                
+
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
         for header in self.header_files:
@@ -1057,18 +1059,18 @@ class p4a_processor(object):
                 extension_out = ".cu"
 #            elif (self.opencl == True):
                 #extension_in = ".cl"
-#                extension_out = ".cl"                
+#                extension_out = ".cl"
             else:
                 extension_out = ".c"
-        #p4a_util.warn("generated modules length "+str(len(self.generated_modules))) 
-            
+        #p4a_util.warn("generated modules length "+str(len(self.generated_modules)))
+
         for name in self.generated_modules:
             p4a_util.debug("Save generated : '" + name + "'")
             # Where the file actually is in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
-            
-            #p4a_util.warn("pips_file " +pips_file)                                                                                  
+
+            #p4a_util.warn("pips_file " +pips_file)
             if self.accel and (p4a_util.c_file_p(pips_file) or p4a_util.opencl_file_p(pips_file)):
                 # We generate code for P4A Accel, so first post process
                 # the output and produce the result in the P4A subdiretory
@@ -1086,14 +1088,14 @@ class p4a_processor(object):
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
-            result.append(output_file)      
-            
+            result.append(output_file)
+
             if (self.opencl == True):
                 # Merging the content of the p4a_accel_wrapper-OpenCL.h
                 # in the .cl kernel file
                 end_file =  os.path.join(subs_dir, output_name)
                 #p4a_util.warn("end file "+end_file)
-                # In the merge operation, the output file is only open in 
+                # In the merge operation, the output file is only open in
                 # append mode. When multiple compilation are launched,
                 # without cleaning, the resulting file cumulates all
                 # the versions. Removing the file before, prevent from this
@@ -1104,7 +1106,7 @@ class p4a_processor(object):
                 h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
                 p4a_util.merge_files (end_file, [h_file, output_file])
                 #p4a_util.warn("end_file after join "+end_file)
-                     
+
 
             if (self.fortran == False):
                 # for C generate the header file
@@ -1176,14 +1178,14 @@ class p4a_processor(object):
                 # the output:
 
                 self.accel_post(pips_file,
-					os.path.join(self.workspace.dirname, "P4A"))                                
+					os.path.join(self.workspace.dirname, "P4A"))
                 # Where the P4A output file does dwell in the .database
                 # workspace:
                 p4a_file = os.path.join(self.workspace.dirname, "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
                 #p4a_util.warn("pips_file save_user_file 2 "+pips_file)
-                                
+
                 if (self.cuda == True) and (self.c99 == False):
                     # some C99 syntax is forbidden with Cuda. That's why there is
                     # a --c99 option that allows to generate a unique call site into the
@@ -1193,9 +1195,9 @@ class p4a_processor(object):
 					output_file = p4a_util.change_file_ext(output_file, ".cu")
                 #if (self.opencl == True):
                     #self.merge_function_launcher(pips_file)
-                    #self.accel_post(pips_file)                                      
+                    #self.accel_post(pips_file)
                     #output_file = p4a_util.change_file_ext(output_file, ".c")
-					
+
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append (output_file)
@@ -1254,13 +1256,13 @@ class p4a_processor(object):
             self.launchers_insert_extern_C ()
             #no longer needed
             #self.merge_lwk ()
-            
+
 
         # save the user files
-        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))        
-        
+        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
+
         if self.opencl:
-            # HACK inside : we expect the wrapper and the kernel to be in the 
+            # HACK inside : we expect the wrapper and the kernel to be in the
             # same file which MUST be called wrapper_name.c
             for kernel in self.kernels:
                 # find the associated wrapper with the kernel
@@ -1269,12 +1271,12 @@ class p4a_processor(object):
                 kernel = os.path.join(src_dir,kernel+".c")
                 shutil.copyfile(kernel, wrapper)
 
-        
+
         # save pips generated files in the dedicated folder
         output_files.extend (self.save_crough (output_dir))
         output_files.extend (self.save_interface (output_dir))
         output_files.extend (self.save_generated (output_dir, subs_dir))
-        #output_files.extend (self.save_generated (output_dir))        
+        #output_files.extend (self.save_generated (output_dir))
         #p4a_util.warn("output_dir "+ output_dir)
 
 
