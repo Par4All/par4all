@@ -1,0 +1,61 @@
+void foo(int *p, int value)
+{
+   *p = value;
+}
+int main()
+{
+   int a, b, val;
+   val = 3;
+   foo(&a, val);
+   if (val<5)
+      b = a;
+   else
+      b = val;
+   return b;
+}
+//             <    is alive (in)>: p value
+void foo(int *p, int value)
+{
+//             <    is alive (in)>: p value
+   *p = value;
+}
+int main()
+{
+   int a, b, val;
+   val = 3;
+//             <    is alive (in)>: val
+   foo(&a, val);
+//             <may be alive (in)>: a
+//             <    is alive (in)>: val
+   if (val<5)
+//             <    is alive (in)>: a
+      b = a;
+   else
+//             <    is alive (in)>: val
+      b = val;
+//             <    is alive (in)>: b
+   return b;
+}
+//             <may be alive (out)>: p[0]
+void foo(int *p, int value)
+{
+//             <may be alive (out)>: p[0]
+   *p = value;
+}
+int main()
+{
+   int a, b, val;
+//             <    is alive (out)>: val
+   val = 3;
+//             <may be alive (out)>: a
+//             <    is alive (out)>: val
+   foo(&a, val);
+//             <    is alive (out)>: b
+   if (val<5)
+//             <    is alive (out)>: b
+      b = a;
+   else
+//             <    is alive (out)>: b
+      b = val;
+   return b;
+}

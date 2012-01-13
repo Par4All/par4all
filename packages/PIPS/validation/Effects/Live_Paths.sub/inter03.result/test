@@ -1,0 +1,38 @@
+int foo(int *p)
+{
+   return *p+1;
+}
+int main()
+{
+   int a, b[10], c;
+   c = b[foo(&a)];
+   return c;
+}
+//             <    is alive (in)>: p p[0]
+int foo(int *p)
+{
+//             <    is alive (in)>: p p[0]
+   return *p+1;
+}
+int main()
+{
+   int a, b[10], c;
+//             <may be alive (in)>: b[*]
+//             <    is alive (in)>: a
+   c = b[foo(&a)];
+//             <    is alive (in)>: c
+   return c;
+}
+int foo(int *p)
+{
+   return *p+1;
+}
+int main()
+{
+//             <may be alive (out)>: b[*]
+//             <    is alive (out)>: a
+   int a, b[10], c;
+//             <    is alive (out)>: c
+   c = b[foo(&a)];
+   return c;
+}
