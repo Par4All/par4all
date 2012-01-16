@@ -1,5 +1,5 @@
 # Makefile for Stars-pm
-TARGET= stars-pm
+LOCAL_TARGET= stars-pm
 
 # can be overwrite on cmdline
 SIZE?=128
