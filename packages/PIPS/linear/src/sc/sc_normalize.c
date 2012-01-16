@@ -3204,7 +3204,7 @@ Psysteme ps;
   Pcontrainte eq1,ineq1;
 
   if (SC_UNDEFINED_P(ps))
-    return(SC_UNDEFINED);
+    return;
 
   /* Normalization by gcd's */
 
