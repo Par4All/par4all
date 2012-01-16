@@ -321,7 +321,11 @@ live_in_paths_of_statement(statement s,
 	{
 	  FOREACH(ENTITY, decl, statement_declarations(s))
 	    {
-	       l_live_out = filter_effects_with_declaration(l_live_out, decl);
+	      storage decl_storage = entity_storage(decl);
+	      if (storage_ram_p(decl_storage)
+		  // keep paths on static variables
+		  && !static_area_p(ram_section(storage_ram(decl_storage))))
+		l_live_out = filter_effects_with_declaration(l_live_out, decl);
 	    }
 	}
 
