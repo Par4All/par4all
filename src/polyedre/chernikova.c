@@ -281,8 +281,8 @@ static void sc_to_matrix(Psysteme sc, Matrix *mat)
        peq=peq->succ, i++)
     contrainte_to_matrix_ligne(peq,mat,i,sc->base);
 
-  for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv);
-       mat->p[i][j] = 0, pv=pv->succ, j++);
+  for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ, j++)
+    mat->p[i][j] = 0;
   mat->p[i][j]=1;
 }
 
