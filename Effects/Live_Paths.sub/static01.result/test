@@ -1,0 +1,73 @@
+int main()
+{
+   static01();
+   static01();
+   static01();
+}
+void static01()
+{
+   static int i = 0;
+
+   i++;
+   printf("%d\n", i);
+}
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+int main()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+   static01();
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+   static01();
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+   static01();
+}
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+void static01()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+   static int i = 0;
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+
+   i++;
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
+int main()
+{
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+   static01();
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1] 
+//                               static01:0`i
+   static01();
+   static01();
+}
+//             <may be alive (out)>: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+void static01()
+{
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+   static int i = 0;
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+
+   i++;
+//             <may be alive (out)>: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+   printf("%d\n", i);
+}
