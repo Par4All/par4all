@@ -61,7 +61,7 @@
 
 typedef struct {
   bool memory_effects_only;
-  bool memory_in_out_regions_only;
+  bool memory_in_out_effects_only;
   effects_representation_val representation;
 } out_effects_context;
 
@@ -70,15 +70,34 @@ static void init_out_effects_context(out_effects_context *ctxt,
 			     effects_representation_val representation)
 {
   ctxt->memory_effects_only = get_bool_property("MEMORY_EFFECTS_ONLY");
-  ctxt->memory_in_out_regions_only = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  ctxt->memory_in_out_effects_only = get_bool_property("MEMORY_IN_OUT_EFFECTS_ONLY");
+
+  if (!  ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
+    // if the MEMORY_EFFECTS_ONLY is FALSE on input, and
+    // we don't want to compute OUT non-memory effects,
+    // we have to temporarily set MEMORY_EFFECTS_ONLY to
+    // TRUE so that functions computing R/W effects
+    // do not compute non memory effects which would have to be filtered.
+    set_bool_property("MEMORY_EFFECTS_ONLY", true);
   ctxt->representation = representation;
 }
 
+static void reset_out_effects_context(out_effects_context *ctxt)
+{
+  if (!  ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
+    // if the MEMORY_EFFECTS_ONLY is FALSE on input, and
+    // we did not want to compute IN non-memory effects,
+    // we have to reset MEMORY_EFFECTS_ONLY to FALSE.
+    set_bool_property("MEMORY_EFFECTS_ONLY", false);
+}
+
+
 static list convert_rw_effects(list lrw, out_effects_context *ctxt)
 {
-  if (ctxt->representation == convex
-      && !ctxt->memory_effects_only
-      && ctxt->memory_in_out_regions_only)
+  if (!ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
     lrw = effects_store_effects(lrw);
 
   return lrw;
@@ -87,9 +106,8 @@ static list convert_rw_effects(list lrw, out_effects_context *ctxt)
 
 static void reset_converted_rw_effects(list *lrw, out_effects_context *ctxt)
 {
-  if (ctxt->representation == convex
-      && !ctxt->memory_effects_only
-      && ctxt->memory_in_out_regions_only)
+  if (!ctxt->memory_effects_only
+      && ctxt->memory_in_out_effects_only)
     gen_free_list(*lrw);
   *lrw = NIL;
 }
@@ -899,6 +917,7 @@ out_effects_engine(const char* module_name, effects_representation_val represent
     out_effects_context ctxt;
     init_out_effects_context(&ctxt, representation);
     out_effects_of_module_statement(module_stat, &ctxt);
+    reset_out_effects_context(&ctxt);
 
     pips_debug(1, "end\n");
 
