@@ -31,6 +31,7 @@ apply PRIVATIZE_MODULE
 setproperty LOOP_LABEL "l99993"
 setproperty LOOP_EXPANSION_SIZE "126"
 apply LOOP_EXPANSION
+setproperty LOOP_LABEL ""
 display PRINTED_FILE
 
 echo
@@ -39,6 +40,7 @@ echo
 setproperty LOOP_LABEL "l99993"
 setproperty LOOP_TILING_MATRIX "126 0,0 5"
 apply LOOP_TILING
+setproperty LOOP_LABEL ""
 display PRINTED_FILE
 
 echo
@@ -58,6 +60,7 @@ setproperty LOOP_LABEL "l99991"
 setproperty LOOP_EXPANSION_SIZE "128"
 apply PRIVATIZE_MODULE
 apply LOOP_EXPANSION
+setproperty LOOP_LABEL ""
 display PRINTED_FILE
 
 apply IF_CONVERSION_INIT
