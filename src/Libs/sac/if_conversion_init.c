@@ -151,7 +151,7 @@ static statement make_if_converted_test_statement(expression cond, statement bra
     statement s =  instruction_to_statement(
                                 make_instruction_test(
                                     make_test(cond,branch,make_empty_statement())));
-    extensions_extension(statement_extensions(s))=CONS(EXTENSION,make_extension(make_pragma_string(strdup(IF_TO_CONVERT))),NIL);
+    extensions_extension(statement_extensions(s))=CONS(EXTENSION,make_extension_pragma(make_pragma_string(strdup(IF_TO_CONVERT))),NIL);
     return s;
 }
 
