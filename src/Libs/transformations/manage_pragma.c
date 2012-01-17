@@ -1,25 +1,25 @@
 /*
-  Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2010 MINES ParisTech
 
-  This file is part of PIPS.
+ This file is part of PIPS.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  any later version.
+ PIPS is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.
+ PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+ See the GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
-  Pierre.Villalon@hpc-project.com
-  Copyright HPC Project
-*/
+ Pierre.Villalon@hpc-project.com
+ Copyright HPC Project
+ */
 
 /**
  * @file manage_pragma.c
@@ -31,7 +31,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include "genC.h"
 #include "misc.h"
@@ -47,26 +47,26 @@
 #include "control.h"
 
 bool statement_has_omp_parallel_directive_p(statement s) {
-  bool found=false;
+  bool found = false;
   FOREACH(EXTENSION, ex, extensions_extension(statement_extensions(s))) {
     pragma p = extension_pragma(ex);
     if(pragma_string_p(p)) {
       string ps = pragma_string(p);
-      if((found=(strstr(ps,"omp parallel")||strstr(ps,"OMP PARALLEL"))))
+      if((found = (strstr(ps, "omp parallel") || strstr(ps, "OMP PARALLEL"))))
         goto found;
-    }
-    else if(pragma_expression_p(p)) {
-      FOREACH(EXPRESSION,pe, pragma_expression(p)) {
+    } else if(pragma_expression_p(p)) {
+      FOREACH(EXPRESSION, pe, pragma_expression(p))
+      {
         if(expression_call_p(pe)) {
-          call c =expression_call(pe);
-          if((found=(same_entity_p(call_function(c),CreateIntrinsic(OMP_OMP_FUNCTION_NAME)))))
+          call c = expression_call(pe);
+          if((found = (same_entity_p(call_function(c),
+                                     CreateIntrinsic(OMP_OMP_FUNCTION_NAME)))))
             goto found;
         }
       }
     }
   }
-found:
-  return found;
+  found: return found;
 }
 
 /**
@@ -84,8 +84,8 @@ bool pragma_omp_p(pragma p) {
         pragma_omp = true;
       }
     }
-  } else if(pragma_string_p(p)){
-    if(strncasecmp("omp",pragma_string(p),3) == 0) {
+  } else if(pragma_string_p(p)) {
+    if(strncasecmp("omp", pragma_string(p), 3) == 0) {
       pragma_omp = true;
     }
   } else {
@@ -93,7 +93,6 @@ bool pragma_omp_p(pragma p) {
   }
   return pragma_omp;
 }
-
 
 /**
  * Callback for gen_recurse that build a list of OpenMP pragma to be merged.
@@ -103,11 +102,10 @@ bool pragma_omp_p(pragma p) {
  * It'll ignore all pragma that are not begining with "omp".
  */
 
-static void build_omp_pragma_list (extensions exts,
-                                   list *l_pragma) {
+static void build_omp_pragma_list(extensions exts, list *l_pragma) {
   list tmp = NIL;
   list l_exts = extensions_extension (exts);
-  FOREACH (EXTENSION, ext, l_exts) {
+  FOREACH(EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
     // if (extension_is_pragma_p ())
@@ -115,83 +113,84 @@ static void build_omp_pragma_list (extensions exts,
     if(pragma_omp_p(p)) {
       if(!pragma_expression_p(p)) {
         pips_user_warning("We have an omp string pragma, we don't know yet to "
-            "parse it and thus it'll be ignored.\n");
+        "parse it and thus it'll be ignored.\n");
       } else {
         // We record it so that we'll remove it from current stmt list later
-        tmp = gen_extension_cons (ext, tmp);
+        tmp = gen_extension_cons(ext, tmp);
         // Record in global list
-        *l_pragma = gen_pragma_cons (p, *l_pragma);
-        pips_debug (5, "adding pragma : %s for merging\n",
-                    pragma_to_string (p));
+        *l_pragma = gen_pragma_cons(p, *l_pragma);
+        pips_debug(5, "adding pragma : %s for merging\n", pragma_to_string (p));
       }
     } else {
-      pips_debug (5, "Ignore pragma : %s, it's not an openmp one !\n",
-                  pragma_to_string (p));
+      pips_debug(5,
+                 "Ignore pragma : %s, it's not an openmp one !\n",
+                 pragma_to_string (p));
     }
   }
   // remove the extensions that will be merger at outer level
-  gen_list_and_not (&l_exts, tmp);
+  gen_list_and_not(&l_exts, tmp);
   // update the extensions field
   extensions_extension (exts) = l_exts;
 }
 
-
 //@brief we need to go through all the extensions and reset
 //the flag to true
-static bool inner_filter (loop l, bool *inner_flag) {
-  pips_debug (5, "processing loop : %p.\n", (void*) l);
+static bool inner_filter(loop l, bool *inner_flag) {
+  pips_debug(5, "processing loop : %p.\n", (void*) l);
   *inner_flag = true;
   return true;
 }
 
 //@brief keep the inner pragma and remove the others. This is the bottum up part
 //of the gen_recuse to merge pragma at the inner level
-static void inner_rewrite (loop l, bool *inner_flag) {
+static void inner_rewrite(loop l, bool *inner_flag) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   extensions exts = statement_extensions (stmt);
   list l_exts = extensions_extension (exts);
   list tmp = NIL;
 
-  FOREACH (EXTENSION, ext, l_exts) {
+  FOREACH(EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
     // if (extension_is_pragma_p ())
-    if (*inner_flag == true) {
+    if(*inner_flag == true) {
       // this is the inner pragma we have to keep it so set the flag to false
       // to remove next extensions and exit
-      pips_debug (5, "keeping pragma : %s from extensions %p.\n",
-		  pragma_to_string (extension_pragma (ext)), (void*) exts);
+      pips_debug(5,
+                 "keeping pragma : %s from extensions %p.\n",
+                 pragma_to_string (extension_pragma (ext)), (void*) exts);
       *inner_flag = false;
       return;
     } else {
       // we need to remove that extension because it is not an inner one
-      tmp = gen_extension_cons (ext, tmp);
-      pips_debug (5, "removing pragma : %s from extensions %p.\n",
-		  pragma_to_string (extension_pragma (ext)), (void*) exts);
+      tmp = gen_extension_cons(ext, tmp);
+      pips_debug(5,
+                 "removing pragma : %s from extensions %p.\n",
+                 pragma_to_string (extension_pragma (ext)), (void*) exts);
     }
     //}
   }
-  gen_list_and_not (&l_exts, tmp);
+  gen_list_and_not(&l_exts, tmp);
   // update the extensions field
   extensions_extension (exts) = l_exts;
   return;
 }
 
 // keep track of outer loop with pragma and return false
-static bool build_outer (loop l, list *l_outer) {
+static bool build_outer(loop l, list *l_outer) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   list l_exts = extensions_extension (statement_extensions (stmt));
 
-  FOREACH (EXTENSION, ext, l_exts) {
+  FOREACH(EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
     // if (extension_is_pragma_p ())
     pragma pr = extension_pragma (ext);
-    pips_debug (5, "processing pragma : %s\n", pragma_to_string (pr));
+    pips_debug(5, "processing pragma : %s\n", pragma_to_string (pr));
     // only the pragma as expressions are managed
-    if (pragma_expression_p (pr) == true) {
-      *l_outer = gen_statement_cons (stmt, *l_outer);
-      pips_debug (5, "outer pragma as expression found\n");
+    if(pragma_expression_p (pr) == true) {
+      *l_outer = gen_statement_cons(stmt, *l_outer);
+      pips_debug(5, "outer pragma as expression found\n");
       return false;
     }
   }
@@ -200,37 +199,42 @@ static bool build_outer (loop l, list *l_outer) {
 
 /// @brief merge the omp pragma on the most outer parallel loop
 /// @return void
-static void merge_on_outer (list l_outer) {
-  FOREACH (STATEMENT, stmt, l_outer) {
+static void merge_on_outer(list l_outer) {
+  FOREACH(STATEMENT, stmt, l_outer) {
     // The list of pragma to be merged
     list l_pragma = NIL;
-    list outer_extensions = gen_copy_seq(extensions_extension(statement_extensions(stmt)));
+    list outer_extensions =
+        gen_copy_seq(extensions_extension(statement_extensions(stmt)));
     // collect the pragma and detach them from their statement
-    gen_context_recurse  (stmt, &l_pragma, extensions_domain, gen_true, build_omp_pragma_list);
-    list l_expr = pragma_omp_merge_expr (outer_extensions, l_pragma);
+    gen_context_recurse(stmt,
+                        &l_pragma,
+                        extensions_domain,
+                        gen_true,
+                        build_omp_pragma_list);
+    list l_expr = pragma_omp_merge_expr(outer_extensions, l_pragma);
     gen_free_list(outer_extensions);
 
     // We have to removed locally declared variables from the pragma clause,
     // else generated code won't compile !
     list locally_decls = statement_to_declarations(stmt);
     ifdebug(4) {
-      pips_debug(4,"Filter out local variables from pragma : ");
+      pips_debug(4, "Filter out local variables from pragma : ");
       print_entities(locally_decls);
-      fprintf(stderr,"\n");
+      fprintf(stderr, "\n");
     }
-    l_expr= filter_variables_in_pragma_expr(l_expr,locally_decls);
+    l_expr = filter_variables_in_pragma_expr(l_expr, locally_decls);
     gen_free_list(locally_decls);
 
     // The pragma can now be added to the statement
-    add_pragma_expr_to_statement (stmt, l_expr);
-    gen_free_list (l_pragma);
+    add_pragma_expr_to_statement(stmt, l_expr);
+    gen_free_list(l_pragma);
   }
   return;
 }
 
-static void build_iteration_list (range r, list *l_iters) {
-  expression iter = range_to_expression(r , range_to_nbiter);
-  *l_iters = gen_expression_cons (iter, *l_iters);
+static void build_iteration_list(range r, list *l_iters) {
+  expression iter = range_to_expression(r, range_to_nbiter);
+  *l_iters = gen_expression_cons(iter, *l_iters);
 }
 
 /// @brief add a if condition to the omp pragma
@@ -240,7 +244,7 @@ static void add_loop_parallel_threshold(pragma pr) {
   // only the pragma as expressions are managed
   if(pragma_expression_p (pr) == true) {
     // we need to get the loop index
-    statement stmt = (statement)gen_get_ancestor(statement_domain, pr);
+    statement stmt = (statement) gen_get_ancestor(statement_domain, pr);
     instruction inst = statement_instruction (stmt);
     if(instruction_tag (inst) == is_instruction_loop) {
       // The list of number of iteration (as expression) to be used in the if clause
@@ -249,7 +253,11 @@ static void add_loop_parallel_threshold(pragma pr) {
       // evaluate the number of iteration according to the property value
       if(get_bool_property("OMP_IF_CLAUSE_RECURSIVE") == true) {
         // collect the number of iteration of current loop and inner loops
-        gen_context_recurse (stmt, &l_iters, range_domain, gen_true, build_iteration_list);
+        gen_context_recurse(stmt,
+                            &l_iters,
+                            range_domain,
+                            gen_true,
+                            build_iteration_list);
       } else {
         // get the number of iteration of the current loop only
         expression iter = range_to_expression(loop_range (l), range_to_nbiter);
@@ -275,12 +283,12 @@ static void add_loop_parallel_threshold(pragma pr) {
 // the phase function name
 
 /**
-   merge the pragma on the outer loop
-**/
-bool omp_merge_pragma (const const char* module_name) {
+ merge the pragma on the outer loop
+ **/
+bool omp_merge_pragma(const const char* module_name) {
   // Use this module name and this environment variable to set
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
-   					  "OPMIFY_CODE_DEBUG_LEVEL");
+      "OPMIFY_CODE_DEBUG_LEVEL");
 
   /* // generate pragma string or expression using the correct language: */
   value mv = entity_initial(module_name_to_entity(module_name));
@@ -293,34 +301,40 @@ bool omp_merge_pragma (const const char* module_name) {
   }
 
   // getting the properties to configure the phase
-  const char* merge_policy = get_string_property ("OMP_MERGE_POLICY");
-  bool outer = (strcmp (merge_policy, "outer") == 0);
-
+  const char* merge_policy = get_string_property("OMP_MERGE_POLICY");
+  bool outer = (strcmp(merge_policy, "outer") == 0);
 
   // The list of outer loop as a list of statements
   list l_outer = NIL;
 
-
   // build the list of outer loop with pragma this is also needed by the
   // inner mode
-  gen_context_recurse(mod_stmt, &l_outer, loop_domain, build_outer, gen_identity);
+  gen_context_recurse(mod_stmt,
+                      &l_outer,
+                      loop_domain,
+                      build_outer,
+                      gen_identity);
 
-  if (outer == true) {
-    pips_debug (3, "outer mode\n");
+  if(outer == true) {
+    pips_debug(3, "outer mode\n");
     // merge the pragma on the outer loop
-    merge_on_outer (l_outer);
-  }
-  else { //inner
-    pips_debug (3, "inner mode\n");
+    merge_on_outer(l_outer);
+  } else { //inner
+    pips_debug(3, "inner mode\n");
     // The inner flag
     bool inner_flag = true;
-    FOREACH (statement, stmt, l_outer) {
-      gen_context_recurse (stmt, &inner_flag, loop_domain, inner_filter, inner_rewrite);
+    FOREACH(statement, stmt, l_outer)
+    {
+      gen_context_recurse(stmt,
+                          &inner_flag,
+                          loop_domain,
+                          inner_filter,
+                          inner_rewrite);
     }
   }
 
   // freeing memory
-  gen_free_list (l_outer);
+  gen_free_list(l_outer);
 
   //Put back the new statement module
   PIPS_PHASE_POSTLUDE(mod_stmt);
@@ -328,7 +342,7 @@ bool omp_merge_pragma (const const char* module_name) {
   return true;
 }
 
-bool omp_loop_parallel_threshold_set (const const char* module_name) {
+bool omp_loop_parallel_threshold_set(const const char* module_name) {
   debug_on("OPMIFY_CODE_DEBUG_LEVEL");
   statement mod_stmt = statement_undefined;
   // Get the code and tell PIPS_DBM we do want to modify it
@@ -350,8 +364,7 @@ bool omp_loop_parallel_threshold_set (const const char* module_name) {
   }
 
   // Add the parallel threshold to all the omp for pragmas
-  gen_recurse(mod_stmt, pragma_domain, gen_true,
-	      add_loop_parallel_threshold);
+  gen_recurse(mod_stmt, pragma_domain, gen_true, add_loop_parallel_threshold);
 
   /* Put the new CODE ressource into PIPS: */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stmt);
@@ -362,5 +375,161 @@ bool omp_loop_parallel_threshold_set (const const char* module_name) {
   pips_debug(2, "done for %s\n", module_name);
   debug_off();
 
+  return true;
+}
+
+/* Remove all pragma attached to a given statement */
+void clear_pragma_on_statement(statement s) {
+  list exs = extensions_extension(statement_extensions(s));
+  list keep_exs = NIL;
+  FOREACH(EXTENSION, ex, exs) {
+    if(!extension_pragma_p(ex))
+      keep_exs = CONS(EXTENSION,ex,keep_exs);
+  }
+  extensions_extension(statement_extensions(s)) = keep_exs;
+  gen_free_list(exs);
+}
+
+/** Clear all pragma
+ * This should be done on any input with unhandled pragma, we don't what
+ * semantic we might break...
+ */
+bool clear_pragma(const const char* module_name) {
+  debug_on("CLEAR_PRAGMA_DEBUG_LEVEL");
+  statement mod_stmt = statement_undefined;
+  // Get the code and tell PIPS_DBM we do want to modify it
+  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+
+  // Set the current module entity and the current module statement that are
+  // required to have many things working in PIPS
+  set_current_module_statement(mod_stmt);
+  set_current_module_entity(module_name_to_entity(module_name));
+
+  // Add the parallel threshold to all the omp for pragmas
+  gen_recurse(mod_stmt, statement_domain, gen_true, clear_pragma_on_statement);
+
+  /* Put the new CODE ressource into PIPS: */
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stmt);
+
+  // There is no longer a current module:
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  pips_debug(2, "done for %s\n", module_name);
+  debug_off();
+
+  return true;
+}
+
+/*********
+ *  Outline a sequence of statement between two sentinels pragmas
+ *
+ */
+#include "accel-util.h" // For outliner()
+#include "callgraph.h" // For compute_callees()
+#include "effects-generic.h" // For compute_callees()
+
+
+// Litteral programming is good for you :)
+#define statement_has_this_pragma_string_p(stmt,str) \
+  (get_extension_from_statement_with_pragma(stmt,str)!=NULL)
+
+typedef struct {
+  string pragma_begin;
+  string pragma_end;
+  string prefix;
+  bool outline_done;
+} context;
+
+/*
+ * compute iteratively SCoPs to outline --> lists_to_outline and then
+ * call the outliner
+ */
+bool outline_stmts_between_pragmas_in_sequence(sequence s, void *_ctx) {
+  context *ctx = (context *) _ctx;
+  bool in_scop = false;
+  list stmts = sequence_statements(s);
+  list stmts_to_outline = NIL;
+
+  FOREACH(statement, stmt, stmts) {
+    // Flag that check if we are at the end of a list of stmts to outline
+    bool has_to_outline_p = false;
+
+    if(!in_scop && statement_has_this_pragma_string_p(stmt,ctx->pragma_begin)) {
+      in_scop = true;
+      clear_pragma_on_statement(stmt);
+    } else if(in_scop
+        && statement_has_this_pragma_string_p(stmt,ctx->pragma_end)) {
+      in_scop = false;
+      has_to_outline_p = true;
+      clear_pragma_on_statement(stmt);
+    }
+
+    if(in_scop) {
+      stmts_to_outline = CONS(STATEMENT, stmt, stmts_to_outline );
+    }
+
+    if(has_to_outline_p && !ENDP(stmts_to_outline)) {
+      stmts_to_outline = gen_nreverse(stmts_to_outline);
+      string func_name = build_new_top_level_module_name(ctx->prefix, false);
+      // Here we call the outliner on the collected statements
+      outliner(func_name, stmts_to_outline);
+      // Free the list of statement so that we can continue to build one
+      gen_free_list(stmts_to_outline);
+      stmts_to_outline = NIL;
+
+      // Mark that a substitution have been done
+      ctx->outline_done = true;
+    }
+  }
+  if(in_scop) {
+    pips_user_warning("End of a sequence with a sentinel starting SCoP pragma "
+    "(%s) but did not encountered any pragma end (%s)\n",
+                      ctx->pragma_begin, ctx->pragma_end);
+  }
+  return true;
+}
+
+/*
+ * This phase outline a sequence of statements contained between two
+ * pragmas
+ */
+bool pragma_outliner(char * module_name) {
+  set_current_module_entity(local_name_to_top_level_entity(module_name));
+
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
+                                                                  module_name,
+                                                                  true));
+  statement module_stat = get_current_module_statement();
+
+  // Needed for outliner !
+  set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+                                                                      module_name,
+                                                                      true));
+
+  // Recursion context
+  context ctx;
+  ctx.pragma_begin = (string) get_string_property("PRAGMA_OUTLINER_BEGIN");
+  ctx.pragma_end = (string) get_string_property("PRAGMA_OUTLINER_END");
+  ctx.prefix = (string) get_string_property("PRAGMA_OUTLINER_PREFIX");
+  ctx.outline_done = false;
+  // Recurse over sequence
+  gen_context_recurse(module_stat,
+                      &ctx,
+                      sequence_domain,
+                      outline_stmts_between_pragmas_in_sequence,
+                      gen_null);
+
+  if(ctx.outline_done) {
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES,
+                           module_name,
+                           compute_callees(module_stat));
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+  }
+
+  reset_cumulated_rw_effects();
+  reset_current_module_entity();
+  reset_current_module_statement();
   return true;
 }
