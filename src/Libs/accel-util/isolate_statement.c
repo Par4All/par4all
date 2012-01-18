@@ -505,11 +505,17 @@ statement effects_to_dma(statement stat,
               expression init = int_to_expression(0);
 
               /* Replace the reference to the array re to *eto: */
-	      type re_type = ultimate_array_type(entity_type(re));
-	      basic re_basic = basic_undefined;
-	      pips_assert("the type of the considered effect is expected to be variable",
-			  type_variable_p(re_type));
-	      re_basic = variable_basic(type_variable(re_type));
+              type re_type = ultimate_array_type(entity_type(re));
+              basic re_basic = basic_undefined;
+              pips_assert("the type of the considered effect is expected to be variable",
+                          type_variable_p(re_type));
+              re_basic = variable_basic(type_variable(re_type));
+              // MA: quick hack because of pointers, all of that seems dirty anyway :(
+              if(basic_pointer_p(re_basic)) {
+                type pointed = basic_pointer(re_basic);
+                pips_assert("type variable expected", type_variable_p(pointed));
+                re_basic = variable_basic(type_variable(pointed));
+              }
               entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(re_basic),the_dims);
               entity declaring_module =
                 get_current_module_entity();
