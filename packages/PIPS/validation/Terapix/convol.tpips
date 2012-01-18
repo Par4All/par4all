@@ -54,6 +54,8 @@ setproperty KERNELIZE_NBNODES 128
 setproperty KERNELIZE_KERNEL_NAME "microcode"
 setproperty KERNELIZE_HOST_CALL_NAME "work"
 apply KERNELIZE
+setproperty LOOP_LABEL ""
+
 display PRINTED_FILE[convol]
 display PRINTED_FILE[work]
 display PRINTED_FILE[microcode]

@@ -43,6 +43,7 @@ setproperty KERNELIZE_NBNODES 128
 setproperty KERNELIZE_HOST_CALL_NAME "launch_microcode1"
 apply KERNELIZE[convol]
 apply KERNEL_LOAD_STORE[convol]
+setproperty LOOP_LABEL ""
 
 display PRINTED_FILE[convol]
 
