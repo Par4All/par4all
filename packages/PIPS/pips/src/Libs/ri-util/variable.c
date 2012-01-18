@@ -644,35 +644,37 @@ entity make_new_scalar_variable(entity module, basic b)
   return make_new_scalar_variable_with_prefix("", module, b);
 }
 
-/* J'ai ameliore la fonction make_scalar_entity afin de l'etendre  a des tableau   */
-static entity make_array_entity(name, module_name, base,lis)
-const char* name;
-const char* module_name;
-basic base;
-list lis;
-{
+/** Create an array entity
+ * @param module_name is the name of the module part of the entity name
+ * @param name is the user name of the entity
+ * @param base is the basic type for the array
+ * @param dimensions is the list of dimensions for the array
+ */
+static entity make_array_entity(const char* name,
+                                const char* module_name,
+                                basic base,
+                                list dimensions) {
   string full_name;
   entity e, f, a;
   basic b = base;
   asprintf(&full_name,"%s"MODULE_SEP_STRING"%s",module_name,name);
   pips_debug(8, "name %s\n", full_name);
   int n =0;
-  while(!entity_undefined_p(gen_find_tabulated(full_name, entity_domain)))
-  {
+  while(!entity_undefined_p(gen_find_tabulated(full_name, entity_domain))) {
       free(full_name);
       asprintf(&full_name,"%s"MODULE_SEP_STRING"%s%d",module_name,name,n++);
   }
   e = make_entity(full_name, type_undefined, storage_undefined, value_undefined);
 
-  entity_type(e) = (type) MakeTypeVariable(b, lis);
+  entity_type(e) = (type) MakeTypeVariable(b, dimensions);
   f = local_name_to_top_level_entity(module_name);
   a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
   entity_storage(e) =
     make_storage(is_storage_ram,
-		 make_ram(f, a,
-			  (basic_tag(base)!=is_basic_overloaded)?
-			  (add_variable_to_area(a, e)):(0),
-			  NIL));
+                 make_ram(f, a,
+                          (basic_tag(base)!=is_basic_overloaded)?
+                              (add_variable_to_area(a, e)):(0),
+                              NIL));
   entity_initial(e) = make_value_unknown();
   return(e);
 }
