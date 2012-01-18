@@ -244,30 +244,48 @@ void loop_normalize_statement(statement s) {
 
     @return true
 */
-bool loop_normalize(char *mod_name)
-{
-    /* prelude */
-    debug_on("LOOP_NORMALIZE_DEBUG_LEVEL");
-    pips_debug(1, "\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
+bool loop_normalize(char *mod_name) {
+  /* prelude */
+  debug_on("LOOP_NORMALIZE_DEBUG_LEVEL");
+  pips_debug(1, "\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
 
-    set_current_module_entity(module_name_to_entity(mod_name));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, mod_name, true));
+  set_current_module_entity(module_name_to_entity(mod_name));
+  set_current_module_statement(
+      (statement) db_get_memory_resource(DBR_CODE, mod_name, true));
 
-
+  string loop_label = (string)get_string_property("LOOP_LABEL");
+  //print_statement(get_current_module_statement());
+  if (!empty_string_p(loop_label)) {
+    /*
+     * User gave a label, we will work on this label only
+     */
+    entity elabel = entity_undefined;
+    statement sloop = statement_undefined;
+    elabel = find_label_entity(get_current_module_name(), loop_label);
+    if (!entity_undefined_p(elabel)) {
+      sloop = find_loop_from_label(get_current_module_statement(), elabel);
+    }
+    if (!statement_undefined_p(sloop)) {
+      loop_normalize_statement(sloop);
+    } else {
+      pips_user_error("No loop for label %s\n", loop_label);
+    }
+  } else {
     /* Compute the loops normalization of the module. */
-    gen_recurse(get_current_module_statement(),statement_domain,gen_true,loop_normalize_statement);
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true,
+        loop_normalize_statement);
+  }
+  /* commit changes */
+  module_reorder(get_current_module_statement()); ///< we may have had statements
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
-    /* commit changes */
-    module_reorder(get_current_module_statement()); ///< we may have had statements
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
+  /* postlude */
+  pips_debug(1, "\n\n *** LOOP_NORMALIZE done\n");
+  debug_off();
+  reset_current_module_entity();
+  reset_current_module_statement();
 
-    /* postlude */
-    pips_debug(1, "\n\n *** LOOP_NORMALIZE done\n");
-    debug_off();
-    reset_current_module_entity();
-    reset_current_module_statement();
-
-    return true;
+  return true;
 }
 
 static void do_linearize_loop_range(statement st, bool * did_something) {
@@ -303,9 +321,29 @@ bool linearize_loop_range(const char *module_name) {
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
 
     bool did_something = false;
-    gen_context_recurse(get_current_module_statement(), &did_something,
-            statement_domain, gen_true, do_linearize_loop_range);
 
+
+    string loop_label = (string)get_string_property("LOOP_LABEL");
+    //print_statement(get_current_module_statement());
+    if (!empty_string_p(loop_label)) {
+      /*
+       * User gave a label, we will work on this label only
+       */
+      entity elabel = entity_undefined;
+      statement sloop = statement_undefined;
+      elabel = find_label_entity(get_current_module_name(), loop_label);
+      if (!entity_undefined_p(elabel)) {
+        sloop = find_loop_from_label(get_current_module_statement(), elabel);
+      }
+      if (!statement_undefined_p(sloop)) {
+        do_linearize_loop_range(sloop,&did_something);
+      } else {
+        pips_user_error("No loop for label %s\n", loop_label);
+      }
+    } else {
+      gen_context_recurse(get_current_module_statement(), &did_something,
+          statement_domain, gen_true, do_linearize_loop_range);
+    }
     if(did_something) {
         module_reorder(get_current_module_statement()); ///< we may have had statements
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());

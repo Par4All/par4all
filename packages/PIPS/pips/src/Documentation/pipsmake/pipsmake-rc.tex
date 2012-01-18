@@ -2180,6 +2180,48 @@ The pragma can be append or prepend thanks to this property:
 PRAGMA_PREPEND TRUE
 \end{PipsProp}
 
+
+\begin{PipsPass}{clear_pragma}
+The pass \PipsPassRef{clear_pragma} clears all pragma, this should be done on 
+any input with unhandled pragma, we don't what semantic we might break.
+\end{PipsPass}
+
+\begin{PipsMake}
+clear_pragma > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+
+\begin{PipsPass}{pragma_outliner}
+  The pass \PipsPassRef{pragma_outliner} is used for outlining a sequence of 
+  statements contained between two given sentinel pragmas using properties 
+  \PipsPropRef{PRAGMA_OUTLINER_BEGIN} and \PipsPropRef{PRAGMA_OUTLINER_END}.
+  The name of the new function is controlled using 
+  \PipsPropRef{PRAGMA_OUTLINER_PREFIX}.
+\end{PipsPass}
+
+\begin{PipsMake}
+pragma_outliner      >     MODULE.code
+    > MODULE.callees
+    < PROGRAM.entities
+    < MODULE.code
+    < MODULE.cumulated_effects
+\end{PipsMake}
+
+\begin{PipsProp}{PRAGMA_OUTLINER_BEGIN}
+PRAGMA_OUTLINER_BEGIN "begin"
+\end{PipsProp}
+\begin{PipsProp}{PRAGMA_OUTLINER_END}
+PRAGMA_OUTLINER_END "end"
+\end{PipsProp}
+\begin{PipsProp}{PRAGMA_OUTLINER_PREFIX}
+PRAGMA_OUTLINER_PREFIX "pips_outlined"
+\end{PipsProp}
+
+
+
+
 \begin{PipsPass}{remove_useless_label}
 Remove labels that are not usefull
 \end{PipsPass}
@@ -5157,13 +5199,13 @@ the region descriptors. Both options have their advantages and drawbacks.
 REGIONS_WITH_ARRAY_BOUNDS FALSE
 \end{PipsProp}
 
-Property \PipsPropRef{MEMORY_IN_OUT_REGIONS_ONLY}'s default value is
-set to {\tt TRUE} to avoid computing IN and OUT regions on non-memory
+Property \PipsPropRef{MEMORY_IN_OUT_EFFECTS_ONLY}'s default value is
+set to {\tt TRUE} to avoid computing IN and OUT effects or regions on non-memory
 effects, even if \PipsPropRef{MEMORY_EFFECTS_ONLY} is set to {\tt
   FALSE}.
 
-\begin{PipsProp}{MEMORY_IN_OUT_REGIONS_ONLY}
-MEMORY_IN_OUT_REGIONS_ONLY TRUE
+\begin{PipsProp}{MEMORY_IN_OUT_EFFECTS_ONLY}
+MEMORY_IN_OUT_EFFECTS_ONLY TRUE
 \end{PipsProp}
 
 
@@ -15183,43 +15225,13 @@ pocc_prettyprinter      >    MODULE.code
 \end{PipsMake}
 
 
-\begin{PipsPass}{scop_outliner}
-  This pass is used for outlining the static control parts (SCoP)
-  computed by the previous pass, pocc prettyprinted.  Instrumented
-  code can be an input for any PoCC compiler.
-\end{PipsPass}
 
-\begin{PipsMake}
-
-alias scop_outliner 'scop_outliner'
-
-scop_outliner      >     MODULE.code
-    > MODULE.callees
-    < PROGRAM.entities
-    < MODULE.code
-    < MODULE.cumulated_effects
-\end{PipsMake}
-
-
-For the outlinig of the control static parts, function prefix names to
+For the outlining of the control static parts, function prefix names to
 be used during the generation:
 \begin{PipsProp}{SCOP_PREFIX}
 SCOP_PREFIX "SCoP"
 \end{PipsProp}
 
-To generalize the outlining for other purposes, the two delimiter
-pragma used can be redefined using the next two
-properties:
-\begin{PipsProp}{PRAGMA_BEGIN_OUTLINING}
-PRAGMA_BEGIN_OUTLINING "scop"
-\end{PipsProp}
-\begin{PipsProp}{PRAGMA_END_OUTLINING}
-PRAGMA_END_OUTLINING "endscop"
-\end{PipsProp}
-which maybe redundant with property
-\PipsPropRef{EXTERNALIZED_CODE_PRAGMA_BEGIN} of libraries
-\verb/phrase/ and \verb/safescale/. But both of these libraries are
-currently not maintained and not tested.
 
 Because of user function calls are not allowed in PoCC static control
 parts, whereas they are generally accepted in PIPS (see Arnauld

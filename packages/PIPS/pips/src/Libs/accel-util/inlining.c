@@ -106,17 +106,6 @@ typedef struct {
 static
 void inline_return_remover(statement s,inlining_parameters p)
 {
-  /*
-    Delete pragmas scop & endscop after inlining to give back original structure to user's program
-  */
-  const char* pragma_begin = get_string_property("PRAGMA_BEGIN_OUTLINING");
-  const char* pragma_end = get_string_property("PRAGMA_END_OUTLINING");
-  list l_exts = extensions_extension (statement_extensions (s));
-  FOREACH (EXTENSION, ext, l_exts) {
-    pragma pr = extension_pragma (ext);
-    if(strcmp(pragma_string(pr),pragma_begin)==0 || strcmp(pragma_string(pr),pragma_end)==0)
-      free_extension(ext);
-  }
   if( return_statement_p( s ) )
     update_statement_instruction(s,make_instruction_goto(copy_statement(laststmt(p))));
 }

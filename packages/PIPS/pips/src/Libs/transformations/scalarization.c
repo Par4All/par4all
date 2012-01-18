@@ -662,7 +662,7 @@ static bool loop_scalarization(loop l)
   effects crwe = load_cumulated_rw_effects(s);
 
   bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
-  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_EFFECTS_ONLY");
 
   list irl = effects_effects(ie);
   list orl = effects_effects(oe);
@@ -890,7 +890,7 @@ static bool statement_scalarization(statement s)
   // Psysteme D       = predicate_system(transformer_relation(transformer_range(prec)));
 
   bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
-  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_EFFECTS_ONLY");
 
   effects ie   = load_in_effects(s);
   effects oe   = load_out_effects(s);
@@ -1217,7 +1217,7 @@ static void scalarization_statement_out(statement s)
 	 when using gdb... */
 
       /* Privatize each of them, with copy_in or copy_out when necessary */
-      bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+      bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_EFFECTS_ONLY");
 
       effects ie   = load_in_effects(s);
       effects oe   = load_out_effects(s);
