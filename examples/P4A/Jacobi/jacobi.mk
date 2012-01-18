@@ -5,7 +5,8 @@ SOURCES= $(LOCAL_TARGET:=.c)
 
 RUN_ARG=Logo_HPC-Project-GTC.pgm
 
-CLEAN_OTHERS+=output.pgm
+CLEAN_OTHERS += output.pgm output_accel-openmp.pgm output_cuda-opt.pgm \
+	output_cuda.pgm output_opencl.pgm output_openmp.pgm output_seq.pgm
 
 
 display% : run%
@@ -24,3 +25,4 @@ check% : run%
 	# point computations or different implementations of floating
 	# point computations on GPUs:
 	-diff -q output$*.pgm output-ref.pgm
+
