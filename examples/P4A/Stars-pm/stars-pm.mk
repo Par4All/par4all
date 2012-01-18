@@ -82,17 +82,6 @@ include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GR
 	rm -f include/stars-pm-generated_* *.o
 	cproto  `pkg-config --cflags-only-I gtk+-2.0` $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
 
-# If we ask for GTK version, compile as is:
-%_gtk:
-	$(MAKE) gtk=1 $*
-
-# Default display use GTK version:
-display_%: run_%_gtk ;
-
-# If we ask for OpenGL version, compile as is:
-%_opengl: demo_opengl_message
-	$(MAKE) opengl=1 $*
-
 opengl_display_%: demo_opengl_message run_%_opengl ;
 
 demo_opengl_message:
@@ -100,3 +89,26 @@ demo_opengl_message:
 	(command "make demo_opengl"), this allows the execution of the next demo\n"
 
 demo_opengl : opengl_display_seq opengl_display_openmp opengl_display_accel-openmp opengl_display_cuda opengl_display_cuda-opt opengl_display_opencl;
+
+
+# Changing between OpenGL and GTK still needs a make clean in between...
+
+# If we ask for GTK version, compile as is:
+%_gtk:
+	$(MAKE) gtk=1 $*
+
+
+# If we ask for OpenGL version, compile as is:
+%_opengl: demo_opengl_message
+	$(MAKE) opengl=1 $*
+
+default_gtk=
+ifneq ($(gtk),1)
+  ifneq ($(opengl),1)
+	# Default display use GTK version if not asked already for OpenGL
+	#nor GTK:
+	default_gtk=_gtk
+  endif
+endif
+
+display_%: run_%$(default_gtk) ;

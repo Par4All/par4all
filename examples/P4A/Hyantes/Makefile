@@ -15,9 +15,10 @@ display% : run%
 	gnuplot -persist -e "set pm3d map; set size ratio 1; splot 'output$*'"
 
 hyantes-static-99-cuda-opt:
-	@echo "CUDA communication optimisation is not yet supported here but it would not be interesting here"
+	@echo "CUDA communication optimisation is not yet supported here but it would not be interesting here anyway..."
 
 run_cuda-opt: hyantes-static-99-cuda-opt
+	# Do nothing
 
 display_cuda-opt: hyantes-static-99-cuda-opt
-
+	# Do nothing
