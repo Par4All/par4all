@@ -478,7 +478,7 @@ After testing and validation, this branch can be published\footnote{But
   \texttt{gitk} because it may be cumbersome for the community to remove
   some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
-p4a_git --branch-action git push origin p4a\$suffix
+p4a_git --branch-action git push origin \$branch
 \end{verbatim}
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
