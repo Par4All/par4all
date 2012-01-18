@@ -283,8 +283,7 @@ call dimensions_to_dma(entity from,
 	    /* Build the sizes of the array block to transfer: */
 	    list /*of expressions*/ transfer_sizes = NIL;
 	    FOREACH(DIMENSION,d,ld) {
-	      expression transfer_size=
-		SizeOfDimension(d);
+	      expression transfer_size= SizeOfDimension(d);
 	      transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
 	    }
 	    transfer_sizes=gen_nreverse(transfer_sizes);
@@ -294,7 +293,8 @@ call dimensions_to_dma(entity from,
 	    /* We may skip the size of the first dimension since it is not
 	       used in adress calculation. But since it depends of Fortran
 	       or C in the runtime, postpone this micro-optimization... */
-	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
+	    type utype_from = ultimate_type(entity_type(from));
+	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(utype_from))) {
 	      from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
 	    }
 	    from_dims=gen_nreverse(from_dims);
@@ -318,25 +318,38 @@ call dimensions_to_dma(entity from,
 	//    offsets = make_expression_list(int_to_expression(0));
 	//  }
 
-	  expression source = entity_to_address(from);
-	  /* Generate host and accel adresses: */
-	  args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
-	  //if(dma_load_p(m))
-	  //    args=gen_nreverse(args);
-	  /* Output parameters in an order compatible with some C99
-	     implementation of the runtime: size and block size first, so
-	     that some arguments can be defined with them: */
-	  /* Insert offset: */
-	  args = gen_append(offsets, args);
-	  /* Insert the block size to transfert: */
-	  args = gen_append(transfer_sizes, args);
-	  /* Insert the array sizes: */
-	  args = gen_append(from_dims, args);
-	  /* Insert the element size expression: */
-	  expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
-	  args = CONS(EXPRESSION,
-                sizeof_exp,
-                args);
+	    expression source;
+	    if(entity_pointer_p(from)) { // Not sure this test is bullet proof :-(
+	      // No dereferencing needed for pointers
+	      source = entity_to_expression(from);
+
+	      // Pointers don't have dimensions, hack to add a fake one here
+	      // Obviously we're only 1D compliant here
+	      if(ENDP(from_dims)) {
+	        from_dims=gen_copy_seq(transfer_sizes);
+	      }
+	    } else {
+	      source = entity_to_address(from);
+	    }
+
+	    /* Generate host and accel adresses: */
+	    args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+	    //if(dma_load_p(m))
+	    //    args=gen_nreverse(args);
+	    /* Output parameters in an order compatible with some C99
+	       implementation of the runtime: size and block size first, so
+	       that some arguments can be defined with them: */
+	    /* Insert offset: */
+	    args = gen_append(offsets, args);
+	    /* Insert the block size to transfert: */
+	    args = gen_append(transfer_sizes, args);
+	    /* Insert the array sizes: */
+	    args = gen_append(from_dims, args);
+	    /* Insert the element size expression: */
+	    expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
+	    args = CONS(EXPRESSION,
+	                sizeof_exp,
+	                args);
 	} break;
       default:
           pips_internal_error("should not happen");
