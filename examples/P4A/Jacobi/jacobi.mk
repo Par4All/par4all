@@ -1,9 +1,9 @@
 # A GNU makefile to run a demo of Par4All on Jacobi application excerpt
-TARGET= jacobi
+LOCAL_TARGET= jacobi
 
-SOURCES= $(TARGET:=.c)
+SOURCES= $(LOCAL_TARGET:=.c)
 
-RUN_ARG=Logo_HPC-Project-GTC.pgm 
+RUN_ARG=Logo_HPC-Project-GTC.pgm
 
 CLEAN_OTHERS+=output.pgm
 
@@ -14,8 +14,8 @@ display% : run%
 	@echo "Please close the window at the end of the execution"
 	eog output$*.pgm
 
-display_cuda-opt:
-	@echo "Cuda optimisation is not yet supported"
+#display_cuda-opt:
+#	@echo "CUDA optimisation is not yet supported"
 
 check% : run%
 	mv output.pgm output$*.pgm
@@ -24,5 +24,3 @@ check% : run%
 	# point computations or different implementations of floating
 	# point computations on GPUs:
 	-diff -q output$*.pgm output-ref.pgm
-
-
