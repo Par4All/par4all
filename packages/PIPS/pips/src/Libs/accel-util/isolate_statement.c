@@ -51,7 +51,6 @@
 #include "text-util.h"
 #include "parser_private.h"
 #include "semantics.h"
-#include "transformer.h"
 #include "callgraph.h"
 #include "expressions.h"
 #include "accel-util.h"
@@ -284,8 +283,7 @@ call dimensions_to_dma(entity from,
 	    /* Build the sizes of the array block to transfer: */
 	    list /*of expressions*/ transfer_sizes = NIL;
 	    FOREACH(DIMENSION,d,ld) {
-	      expression transfer_size=
-		SizeOfDimension(d);
+	      expression transfer_size= SizeOfDimension(d);
 	      transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
 	    }
 	    transfer_sizes=gen_nreverse(transfer_sizes);
@@ -295,7 +293,8 @@ call dimensions_to_dma(entity from,
 	    /* We may skip the size of the first dimension since it is not
 	       used in adress calculation. But since it depends of Fortran
 	       or C in the runtime, postpone this micro-optimization... */
-	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(ultimate_type(entity_type(from))))) {
+	    type utype_from = ultimate_type(entity_type(from));
+	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(utype_from))) {
 	      from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
 	    }
 	    from_dims=gen_nreverse(from_dims);
@@ -319,25 +318,38 @@ call dimensions_to_dma(entity from,
 	//    offsets = make_expression_list(int_to_expression(0));
 	//  }
 
-	  expression source = entity_to_address(from);
-	  /* Generate host and accel adresses: */
-	  args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
-	  //if(dma_load_p(m))
-	  //    args=gen_nreverse(args);
-	  /* Output parameters in an order compatible with some C99
-	     implementation of the runtime: size and block size first, so
-	     that some arguments can be defined with them: */
-	  /* Insert offset: */
-	  args = gen_append(offsets, args);
-	  /* Insert the block size to transfert: */
-	  args = gen_append(transfer_sizes, args);
-	  /* Insert the array sizes: */
-	  args = gen_append(from_dims, args);
-	  /* Insert the element size expression: */
-	  expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
-	  args = CONS(EXPRESSION,
-                sizeof_exp,
-                args);
+	    expression source;
+	    if(entity_pointer_p(from)) { // Not sure this test is bullet proof :-(
+	      // No dereferencing needed for pointers
+	      source = entity_to_expression(from);
+
+	      // Pointers don't have dimensions, hack to add a fake one here
+	      // Obviously we're only 1D compliant here
+	      if(ENDP(from_dims)) {
+	        from_dims=gen_copy_seq(transfer_sizes);
+	      }
+	    } else {
+	      source = entity_to_address(from);
+	    }
+
+	    /* Generate host and accel adresses: */
+	    args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+	    //if(dma_load_p(m))
+	    //    args=gen_nreverse(args);
+	    /* Output parameters in an order compatible with some C99
+	       implementation of the runtime: size and block size first, so
+	       that some arguments can be defined with them: */
+	    /* Insert offset: */
+	    args = gen_append(offsets, args);
+	    /* Insert the block size to transfert: */
+	    args = gen_append(transfer_sizes, args);
+	    /* Insert the array sizes: */
+	    args = gen_append(from_dims, args);
+	    /* Insert the element size expression: */
+	    expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
+	    args = CONS(EXPRESSION,
+	                sizeof_exp,
+	                args);
 	} break;
       default:
           pips_internal_error("should not happen");
@@ -366,8 +378,8 @@ statement effects_to_dma(statement stat,
 			 bool fine_grain_analysis, const char* prefix,
 			 const char* suffix)
 {
-    /* if no dma is provided, skip the computation
-     * it is used for scalope at least */
+  /* if no dma is provided, skip the computation
+   * it is used for scalope at least */
   if(empty_string_p(get_dma_name(s,dma1D)))
     return statement_undefined;
 
@@ -403,35 +415,35 @@ statement effects_to_dma(statement stat,
   /* filter out relevant effects depending on operation mode */
   FOREACH(EFFECT,e,rw_effects) {
     if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
-	&& action_read_p(effect_action(e)))
+        && action_read_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
     else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
-	     && action_write_p(effect_action(e)))
-        effects=CONS(EFFECT,e,effects);
+             && action_write_p(effect_action(e)))
+      effects=CONS(EFFECT,e,effects);
   }
 
   /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
    */
   if(!fine_grain_analysis) {
     FOREACH(EFFECT,eff,rw_effects) {
-        if(entity_pointer_p(reference_variable(region_any_reference(eff)))
-                && ! std_file_effect_p(eff)) {
-          print_effect(eff);
-            pips_user_error("pointers wreak havoc with isolate_statement\n");
-        }
+      if(entity_pointer_p(reference_variable(region_any_reference(eff)))
+          && ! std_file_effect_p(eff)) {
+        print_effect(eff);
+        pips_user_error("pointers wreak havoc with isolate_statement\n");
+      }
       descriptor d = effect_descriptor(eff);
       if(descriptor_convex_p(d)) {
-          Psysteme sc_old = descriptor_convex(d);
-          Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
-          sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
-          sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
-          sc_old=sc_normalize2(sc_old);
-          sc_new=sc_normalize2(sc_new);
-          if(!sc_equal_p(sc_old,sc_new)) {
-              sc_free(sc_old);
-              descriptor_convex(d)=sc_new;
-              effect_approximation_tag(eff)=is_approximation_may;
-          }
+        Psysteme sc_old = descriptor_convex(d);
+        Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
+        sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
+        sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
+        sc_old=sc_normalize2(sc_old);
+        sc_new=sc_normalize2(sc_new);
+        if(!sc_equal_p(sc_old,sc_new)) {
+          sc_free(sc_old);
+          descriptor_convex(d)=sc_new;
+          effect_approximation_tag(eff)=is_approximation_may;
+        }
       }
     }
   }
@@ -489,7 +501,6 @@ statement effects_to_dma(statement stat,
           "avoid using pointer or activate some pointer analyzes.\n");
     }
 
-
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
@@ -507,11 +518,17 @@ statement effects_to_dma(statement stat,
               expression init = int_to_expression(0);
 
               /* Replace the reference to the array re to *eto: */
-	      type re_type = ultimate_array_type(entity_type(re));
-	      basic re_basic = basic_undefined;
-	      pips_assert("the type of the considered effect is expected to be variable",
-			  type_variable_p(re_type));
-	      re_basic = variable_basic(type_variable(re_type));
+              type re_type = ultimate_array_type(entity_type(re));
+              basic re_basic = basic_undefined;
+              pips_assert("the type of the considered effect is expected to be variable",
+                          type_variable_p(re_type));
+              re_basic = variable_basic(type_variable(re_type));
+              // MA: quick hack because of pointers, all of that seems dirty anyway :(
+              if(basic_pointer_p(re_basic)) {
+                type pointed = basic_pointer(re_basic);
+                pips_assert("type variable expected", type_variable_p(pointed));
+                re_basic = variable_basic(type_variable(pointed));
+              }
               entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(re_basic),the_dims);
               entity declaring_module =
                 get_current_module_entity();
@@ -734,7 +751,7 @@ void do_isolate_statement(statement s, const char* prefix, const char* suffix) {
     hash_table e2e ;
     if(!do_isolate_statement_preconditions_satisified_p(s)) {
         pips_user_warning("isolated statement has callees, transfers will be approximated\n");
-        fine_grain_analysis = false;
+        fine_grain_analysis = false; // FIXME : This could be true most of the time, especially in Par4All !
     }
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
@@ -1058,19 +1075,22 @@ isolate_statement(const char* module_name)
 
     /* get user input */
     const char* stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
-    statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
+    statement statement_to_isolate;
+    if(!empty_string_p(stmt_label)) {
+      statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
+    } else {
+      statement_to_isolate = get_current_module_statement();
+    }
     /* and proceed */
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
-    else
-      {
-	const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
-	const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
-	pips_debug (5, "isolate_statement prefix : %s\n", prefix);
-	pips_debug (5, "isolate_statement suffix : %s\n", suffix);
-	do_isolate_statement(statement_to_isolate, prefix, suffix);
-      }
-
+    else {
+      const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
+      const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
+      pips_debug (5, "isolate_statement prefix : %s\n", prefix);
+      pips_debug (5, "isolate_statement suffix : %s\n", suffix);
+      do_isolate_statement(statement_to_isolate, prefix, suffix);
+    }
 
 
     /* validate */
