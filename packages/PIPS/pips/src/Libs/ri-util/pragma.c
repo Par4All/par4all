@@ -517,7 +517,7 @@ void add_pragma_str_to_statement(statement st, const char* s, bool copy_flag) {
    * the statement's extension list
    */
   extensions es = statement_extensions(st);
-  extension e = make_extension(p);
+  extension e = make_extension_pragma(p);
   list el = extensions_extension(es);
   el = gen_extension_cons(e, el);
   extensions_extension(es) = el;
@@ -546,7 +546,7 @@ add_pragma_expr_to_statement(statement st, list l) {
   /* Make a new pragma: */
   pragma p = pragma_undefined;
   p = make_pragma_expression(l);
-  extension e = make_extension(p);
+  extension e = make_extension_pragma(p);
   /* Add the new pragma to the extension list: */
   list el = extensions_extension(es);
   el = gen_extension_cons(e, el);
