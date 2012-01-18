@@ -3420,9 +3420,9 @@ struct fswp {
 bool statement_with_pragma_p(statement s) {
   list exs = extensions_extension(statement_extensions(s));
   FOREACH(EXTENSION, ex, exs) {
-    pragma pr = extension_pragma(ex);
-    if(pragma_string_p(pr) || pragma_expression_p (pr))
+    if(extension_pragma_p(ex)) {
       return true;
+    }
   }
   return false;
 }

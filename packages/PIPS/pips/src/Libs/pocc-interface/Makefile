@@ -1,9 +1,8 @@
 TARGET	= pocc-interface
 
 LIB_CFILES=	\
-	        pocc_prettyprinter.c \
-		 scop_outliner.c 		
-
+	        pocc_prettyprinter.c 
+	        
 INC_TARGET =    $(TARGET).h
 
 LIB_TARGET =    lib$(TARGET).a
