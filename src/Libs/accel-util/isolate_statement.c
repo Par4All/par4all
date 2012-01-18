@@ -51,7 +51,6 @@
 #include "text-util.h"
 #include "parser_private.h"
 #include "semantics.h"
-#include "transformer.h"
 #include "callgraph.h"
 #include "expressions.h"
 #include "accel-util.h"
@@ -366,8 +365,8 @@ statement effects_to_dma(statement stat,
 			 bool fine_grain_analysis, const char* prefix,
 			 const char* suffix)
 {
-    /* if no dma is provided, skip the computation
-     * it is used for scalope at least */
+  /* if no dma is provided, skip the computation
+   * it is used for scalope at least */
   if(empty_string_p(get_dma_name(s,dma1D)))
     return statement_undefined;
 
@@ -403,35 +402,35 @@ statement effects_to_dma(statement stat,
   /* filter out relevant effects depending on operation mode */
   FOREACH(EFFECT,e,rw_effects) {
     if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
-	&& action_read_p(effect_action(e)))
+        && action_read_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
     else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
-	     && action_write_p(effect_action(e)))
-        effects=CONS(EFFECT,e,effects);
+             && action_write_p(effect_action(e)))
+      effects=CONS(EFFECT,e,effects);
   }
 
   /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
    */
   if(!fine_grain_analysis) {
     FOREACH(EFFECT,eff,rw_effects) {
-        if(entity_pointer_p(reference_variable(region_any_reference(eff)))
-                && ! std_file_effect_p(eff)) {
-          print_effect(eff);
-            pips_user_error("pointers wreak havoc with isolate_statement\n");
-        }
+      if(entity_pointer_p(reference_variable(region_any_reference(eff)))
+          && ! std_file_effect_p(eff)) {
+        print_effect(eff);
+        pips_user_error("pointers wreak havoc with isolate_statement\n");
+      }
       descriptor d = effect_descriptor(eff);
       if(descriptor_convex_p(d)) {
-          Psysteme sc_old = descriptor_convex(d);
-          Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
-          sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
-          sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
-          sc_old=sc_normalize2(sc_old);
-          sc_new=sc_normalize2(sc_new);
-          if(!sc_equal_p(sc_old,sc_new)) {
-              sc_free(sc_old);
-              descriptor_convex(d)=sc_new;
-              effect_approximation_tag(eff)=is_approximation_may;
-          }
+        Psysteme sc_old = descriptor_convex(d);
+        Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
+        sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
+        sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
+        sc_old=sc_normalize2(sc_old);
+        sc_new=sc_normalize2(sc_new);
+        if(!sc_equal_p(sc_old,sc_new)) {
+          sc_free(sc_old);
+          descriptor_convex(d)=sc_new;
+          effect_approximation_tag(eff)=is_approximation_may;
+        }
       }
     }
   }
@@ -488,7 +487,6 @@ statement effects_to_dma(statement stat,
       pips_user_error("We can't handle abstract locations here. Please try to "
           "avoid using pointer or activate some pointer analyzes.\n");
     }
-
 
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
@@ -1058,19 +1056,22 @@ isolate_statement(const char* module_name)
 
     /* get user input */
     const char* stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
-    statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
+    statement statement_to_isolate;
+    if(!empty_string_p(stmt_label)) {
+      statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
+    } else {
+      statement_to_isolate = get_current_module_statement();
+    }
     /* and proceed */
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
-    else
-      {
-	const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
-	const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
-	pips_debug (5, "isolate_statement prefix : %s\n", prefix);
-	pips_debug (5, "isolate_statement suffix : %s\n", suffix);
-	do_isolate_statement(statement_to_isolate, prefix, suffix);
-      }
-
+    else {
+      const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
+      const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
+      pips_debug (5, "isolate_statement prefix : %s\n", prefix);
+      pips_debug (5, "isolate_statement suffix : %s\n", suffix);
+      do_isolate_statement(statement_to_isolate, prefix, suffix);
+    }
 
 
     /* validate */
