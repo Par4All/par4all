@@ -732,7 +732,7 @@ void do_isolate_statement(statement s, const char* prefix, const char* suffix) {
     hash_table e2e ;
     if(!do_isolate_statement_preconditions_satisified_p(s)) {
         pips_user_warning("isolated statement has callees, transfers will be approximated\n");
-        fine_grain_analysis = false;
+        fine_grain_analysis = false; // FIXME : This could be true most of the time, especially in Par4All !
     }
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
