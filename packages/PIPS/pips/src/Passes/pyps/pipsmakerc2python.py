@@ -65,12 +65,12 @@ def printPythonMethod(name,doc):
 			if prop == "loop_label":
 				has_loop_label = True;
 				extraparamsetter += '\tif self.workspace:self.workspace.cpypips.push_property("LOOP_LABEL",pypsutils.formatprop(self.label))\n'
-				extraparamresetter = '\tif self.workspace:self.workspace.cpypips.pop_property("LOOP_LABEL")\n'  + extraparamresetter
+				extraparamresetter = '\t\tif self.workspace:self.workspace.cpypips.pop_property("LOOP_LABEL")\n'  + extraparamresetter
 			else:
 				props.append(arg)
 				extraparamsetter += '\tif '+short_prop+' == None and self.workspace:'+short_prop+'=self.workspace.props.'+prop + '\n'
 				extraparamsetter += '\tif self.workspace:self.workspace.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop)
-				extraparamresetter = '\tif self.workspace:self.workspace.cpypips.pop_property("%s")\n' % (prop.upper()) + extraparamresetter
+				extraparamresetter = '\t\tif self.workspace:self.workspace.cpypips.pop_property("%s")\n' % (prop.upper()) + extraparamresetter
 
 		if len(props) > 0:
 			extraparams = ",".join(props) + ","
@@ -100,13 +100,17 @@ def printPythonMethod(name,doc):
 		print extraparamsetter
 		print '\tif '+mself+'.workspace: old_props = pypsutils.set_properties(self.workspace,pypsutils.update_props("'+name.upper()+'",props))'
 
+		print '\ttry:'
 		if generator != "-modules":
-			print '\tpypsutils.apply('+mself+',\"'+name+'\")'
+			print '\t\tpypsutils.apply('+mself+',\"'+name+'\")'
 		else:
-			print '\tif concurrent: pypsutils.capply(self,\"'+name+'\")'
-			print '\telse:'
-			print '\t\tfor m in self: pypsutils.apply(m,\"'+name+'\")'
-		print '\tif '+mself+'.workspace: pypsutils.set_properties('+mself+'.workspace,old_props)'
+			print '\t\tif concurrent: pypsutils.capply(self,\"'+name+'\")'
+			print '\t\telse:'
+			print '\t\t\tfor m in self: pypsutils.apply(m,\"'+name+'\")'
+		print '\texcept:'
+		print '\t\traise'
+		print '\tfinally:'
+		print '\t\tif '+mself+'.workspace: pypsutils.set_properties('+mself+'.workspace,old_props)'
 		print '\n' + extraparamresetter
 		print generator[1:] + "." + name + "=" + name
 
