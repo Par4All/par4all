@@ -85,7 +85,9 @@ void P4A_copy_from_accel(size_t element_size,
   }
 
   toolTestExecMessage(cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost),
-                      "cudaMemcpy failed, probably an internal Par4All bug, please report. The runtime error is:"    );
+                      "It seems that cudaMemcpy failed, but to be sure run again with environment "
+                      "variable P4A_DEBUG set to a value >1. This failure is probably an internal "
+                      "Par4All bug, please report. The runtime error is:"    );
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
@@ -122,7 +124,9 @@ void P4A_copy_to_accel(size_t element_size,
   }
 
   toolTestExecMessage(cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice),
-                      "cudaMemcpy failed, probably an internal Par4All bug, please report. The runtime error is:"    );
+                      "It seems that cudaMemcpy failed, but to be sure run again with environment "
+                      "variable P4A_DEBUG set to a value >1. This failure is probably an internal "
+                      "Par4All bug, please report. The runtime error is:"    );
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
