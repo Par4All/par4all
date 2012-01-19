@@ -4,7 +4,7 @@
 # The %(here)s variable will be replaced with the parent directory of this file
 #
 [DEFAULT]
-debug = true
+debug = false
 # Uncomment and replace with the address which should receive any error reports
 #email_to = you@yourdomain.com
 smtp_server = localhost
@@ -12,8 +12,8 @@ error_email_from = paste@localhost
 
 [server:main]
 use = egg:Paste#http
-host = 10.2.14.184
-port = 5004
+host = 0.0.0.0
+port = 5000
 
 [app:main]
 use = egg:pawsapp
@@ -33,7 +33,7 @@ beaker.session.secret = somesecret
 # WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to
 # execute malicious code after an exception is raised.
-#set debug = false
+set debug = false
 
 
 # Logging configuration
