@@ -84,7 +84,7 @@ void P4A_copy_from_accel(size_t element_size,
     P4A_TIMING_accel_timer_start;
   }
 
-  cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
+  checkErrorInline(cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost),__FILE__,__LINE__);
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
@@ -120,7 +120,7 @@ void P4A_copy_to_accel(size_t element_size,
     P4A_TIMING_accel_timer_start;
   }
 
-  cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
+  checkErrorInline(cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice),__FILE__,__LINE__);
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
