@@ -1,105 +1,70 @@
-<!DOCTYPE html>
+<%doc>
+  Main template
+</%doc>
 
-<%inherit file="skeleton.mako"/>
-
-<%def name="level_head()">
-<link type="text/css" href="/css/base.css" rel="stylesheet" />
-<script type="text/javascript" src="/js/base.js"></script>
+## Page title
+<%def name="pagetitle()">
+PAWS
 </%def>
 
-<%def name="content()">
-<iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
-
-<div id="dialog-error-examples" title="ERROR">
-  <p>Error while loading examples, try again!</p>
-</div>		
-
-<div id="dialog-load-examples" title="Select an example.">
-  <div class="select-examples" id="select-examples-buttons">
-    <input value="LOAD" type="submit">
-  </div>
-</div>	
-
-<div id="dialog-choose-function" title="Select function to transform.">
-  <div class="choose-function" id="choose-function-buttons"></div>
-</div>
-
-<table class="ui-widget ui-widget-content ui-corner-all"><tr valign="top"><td width="20%">
-
-      <div id="left_side">
-	<div id='resizing_source'>
-	  <div style="text-align: right; width: 100%; float: left;"><input name="Aplus" value="A+" type="submit" onClick="resize(1)"/><input name="Aminus" value="A-" type="submit" onClick="resize(0)"/></div>
-	</div>
-	<br/><br/>
-	<p><h3>TYPE OR SELECT SOURCE CODE FROM:</h3></p>
-	<br/>
-	<br/>
-	<div class="load_examples left_side_buttons">
-	  <p><b>A set of classic examples:</b></p>
-	  <input value="BROWSE" type="submit"/>
-	</div>
-	<div class="load_client_file_form left_side_buttons">
-	  <p><b>Or from your own test cases:</b></p>
-	  <input type="submit" value="BROWSE" id="pseudobutton"/>
-	  <input type="file" id="inp" name="file" class="hide"/>
-	  <input type="text" id="pseudotextfile" readonly="readonly"/>
-	</div>
-	<br/><br/>
-	<form action="/" id="buttons">
-	  <div class="operation left_side_buttons">
-	    <input type="submit"/>
-	  </div>
-	</form>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
-	<div class="save_results left_side_buttons">
-	  <p><a href="/res/result_file" id="save_button_link" style="text-decoration: none"><input value="SAVE RESULT" type="submit" id="save_button"/></a></p>
-	</div>
-	<div class="print_results left_side_buttons">
-	  <p><input value="PRINT RESULT" type="submit" id="print_button"/></p>
-	</div>
-	<br/>
-	<br/>
-	<div class="left_side_buttons">
-	  <p><a href=${self.link()}><b>advanced mode</b></a></p>
-	</div>
-      </div>
-    </td><td>
-      <div id="tabs">
-	<ul>
-	  <li><a href="#tabs-1" id="source_tab_link1">SOURCE</a></li>
-	  <li><a href="#result"  id="result_tab_link">${self.operation_id()}</a></li>
-	  <li><a href="#graph">GRAPH</a></li>
-	</ul>
-	<div id="tabs-1">
-	  <form name="language1">
-	    <label for="lang1">Language: </label>
-	    <input name="lang1" value="not yet detected." readonly="readonly"/>
-	  </form>
-	  <table><tr><td>
-		<form name="source1">
-		  <textarea name="sourcecode1" id="sourcecode1" rows="27" cols="120" onkeydown="handle_key_down(this, event)">Put your source code here.</textarea>
-	  </form></td></tr></table>
-	</div>
-	<div id="result">
-	  <div id="multiple-functions">
-	  </div>
-	  <div id="resultcode">
-	    Result of the transformation will be displayed here.
-	  </div>
-	</div>
-	<div id="graph">
-	  <div id="dependence_graph">
-	    Please wait, it might take long time.
-	  </div>
-	</div>
-      </div>
-    </td>
-  </tr>
-</table>
+## Title
+<%def name="title()">
+PAWS
 </%def>
 
+## Custom CSS
+<%def name="js_slot()">
+</%def>
+
+## Custom Javascript
+<%def name="css_slot()">
+</%def>
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+  <head>
+ 
+   <title>${self.pagetitle()}</title>
+    
+    ## Stylesheets
+    ${h.stylesheet_link(url("/css/jq/cupertino/jquery-ui-1.8.10.custom.css"), media="all")}
+    ##${h.stylesheet_link(url("/css/jq/jquery-linedtextarea.css"), media="all")}
+    ##${h.stylesheet_link(url("/css/jq/jquery.jqzoom.css"), media="all")}
+    ##${h.stylesheet_link(url("/css/pygments.css"), media="all")}
+    ${h.stylesheet_link(url("/css/normal.css"), media="all")}
+    ${h.stylesheet_link(url("/css/print.css"),  media="print")}
+    ${self.css_slot()}
+
+    ## Javascript
+    ${h.javascript_link(url("/jq/jquery-1.4.4.min.js"))}
+    ${h.javascript_link(url("/jq/jquery-ui-1.8.10.custom.min.js"))}
+    ##${h.javascript_link(url("/jq/jquery-linedtextarea.js"))}
+    ##${h.javascript_link(url("/jq/jquery.jqzoom-core.js"))}
+    ${h.javascript_link(url("/js/base.js"))}
+    ${self.js_slot()}
+  </head>
+
+  <body>
+
+    ## Header
+    <div id="header">
+      <a href="/">${h.image("/img/paws-small.png", "PAWS Logo")}</a>
+      <h1>${self.title()}</h1>
+    </div>
+
+    ## Main content
+    <div id="site-content">
+      ${self.content()}
+    </div>
+
+    ## Footer
+    <div id="footer">
+      <p><a href="http://pips4u.org" target="_blank">
+	${h.image("/img/pips-small.png", "PIPS4u logo")}</a> INSIDE!</p>
+      <p id="copyright">© 2011-2012 MINES ParisTech</p>
+    </div>
+
+  </body>
+</html>

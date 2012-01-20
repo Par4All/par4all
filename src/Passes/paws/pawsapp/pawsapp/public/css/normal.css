@@ -1,0 +1,24 @@
+body {
+    padding: 1em 5em;
+    margin: 0;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: 80%;
+}
+
+#header h1 {
+    display: inline;
+    position: relative;
+    top: -10px;
+    left: 50px;
+}
+
+#site-content {
+}
+
+#footer #copyright {
+    font-size: 85%;
+    text-align: right;
+}
+
+
+h2 { font-size: 100% }
