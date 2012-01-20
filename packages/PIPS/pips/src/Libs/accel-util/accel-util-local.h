@@ -10,4 +10,6 @@ enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
 #define OUTLINE_IGNORE "outline_ignore"
 
 
-
+/* Dependences for accel.h */
+#include "transformer.h"
+#include "effects.h"
