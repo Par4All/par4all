@@ -26,7 +26,7 @@ void p4a_init_cuda_accel() {
 
   // We prefer to have more L1 cache and less shared since we don't make use of it
   cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 );
-  toolTestExecMessage("P4A CUDA cache config failed");
+  toolTestExecMessage(cudaGetLastError(),"P4A CUDA cache config failed");
 
 }
 
@@ -84,7 +84,10 @@ void P4A_copy_from_accel(size_t element_size,
     P4A_TIMING_accel_timer_start;
   }
 
-  cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
+  toolTestExecMessage(cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost),
+                      "It seems that cudaMemcpy failed, but to be sure run again with environment "
+                      "variable P4A_DEBUG set to a value >1. This failure is probably an internal "
+                      "Par4All bug, please report. The runtime error is:"    );
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
@@ -120,7 +123,10 @@ void P4A_copy_to_accel(size_t element_size,
     P4A_TIMING_accel_timer_start;
   }
 
-  cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
+  toolTestExecMessage(cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice),
+                      "It seems that cudaMemcpy failed, but to be sure run again with environment "
+                      "variable P4A_DEBUG set to a value >1. This failure is probably an internal "
+                      "Par4All bug, please report. The runtime error is:"    );
 
   if(p4a_timing) {
     P4A_TIMING_accel_timer_stop;
