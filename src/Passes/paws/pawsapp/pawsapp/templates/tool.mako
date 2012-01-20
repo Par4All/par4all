@@ -1,13 +1,27 @@
-<!DOCTYPE html>
+<%doc>
+  Generic page for a tool
+</%doc>
 
-<%inherit file="skeleton.mako"/>
 
-<%def name="level_head()">
-<link type="text/css" href="/css/base.css" rel="stylesheet" />
-<script type="text/javascript" src="/js/base_tools.js"></script>
+<%inherit file="base.mako"/>
+
+
+<%def name="css_slot()">
+${h.stylesheet_link(url("/css/jq/jquery-linedtextarea.css"), media="all")}
+${h.stylesheet_link(url("/css/jq/jquery.jqzoom.css"), media="all")}
+${h.stylesheet_link(url("/css/pygments.css"), media="all")}
+${h.stylesheet_link(url("/css/tool.css"), media="all")}
 </%def>
 
-<%def name="content()">
+<%def name="js_slot()">
+${h.javascript_link(url("/jq/jquery-linedtextarea.js"))}
+${h.javascript_link(url("/jq/jquery.jqzoom-core.js"))}
+${h.javascript_link(url("/js/tool.js"))}
+</%def>
+
+
+## Page content
+
 <iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
 
 <div id="dialog-error-examples" title="ERROR">
@@ -65,14 +79,14 @@
 	<br/>
 	<br/>
 	<div class="left_side_buttons">
-	  <p><a href=${self.link()}><b>advanced mode</b></a></p>
+	  <p><a href=${c.link}><b>advanced mode</b></a></p>
 	</div>
       </div>
     </td><td>
       <div id="tabs">
 	<ul>
 	  <li><a href="#tabs-1" id="source_tab_link1">SOURCE</a></li>
-	  <li><a href="#result"  id="result_tab_link">${self.operation_id()}</a></li>
+	  <li><a href="#result"  id="result_tab_link">${c.id}</a></li>
 	  <li><a href="#graph">GRAPH</a></li>
 	</ul>
 	<div id="tabs-1">
@@ -101,5 +115,3 @@
     </td>
   </tr>
 </table>
-</%def>
-

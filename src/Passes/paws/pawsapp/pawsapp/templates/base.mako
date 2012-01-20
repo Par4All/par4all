@@ -56,7 +56,7 @@ PAWS
 
     ## Main content
     <div id="site-content">
-      ${self.content()}
+      ${self.body()}
     </div>
 
     ## Footer

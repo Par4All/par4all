@@ -41,7 +41,6 @@ PYPS AS A WEB SERVICE
 
 ## Page content
 
-<%def name="content()">
 <div id="main" class="ui-widget ui-widget-content ui-corner-all">
   <table>
     <tr>
@@ -90,5 +89,3 @@ PYPS AS A WEB SERVICE
     </tr>
   </table>
 </div>
-</%def>
-
