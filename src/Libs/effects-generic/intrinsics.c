@@ -1225,6 +1225,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
+  /* GNU Extension*/
+  {SECOND_FUNCTION_NAME,                   no_write_effects},
+
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},
   {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},

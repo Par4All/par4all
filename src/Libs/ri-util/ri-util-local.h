@@ -378,6 +378,9 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
+/* GNU Extension*/
+#define SECOND_FUNCTION_NAME            "SECOND"
+
 /* F95 */
 #define ALLOCATE_FUNCTION_NAME          "ALLOCATE"
 #define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
