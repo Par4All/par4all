@@ -8,12 +8,14 @@ except ImportError:
 setup(
     name='pawsapp',
     version='0.1',
-    description='',
+    description='Web Interface for PIPS',
     author='Maria SZYMCZAK',
     author_email='',
-    url='',
+    url='http://paws.pips4u.org',
     install_requires=[
         "Pylons>=1.0",
+        "pyro",
+        "pil",
     ],
     setup_requires=["PasteScript>=1.6.3"],
     packages=find_packages(exclude=['ez_setup']),
