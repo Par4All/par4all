@@ -159,7 +159,7 @@ can be obtained by adding SIZE=32 or SIZE=64 to the make command line.
 Have a look at *.sh file in current directory for example.
 
 
-
+Note that this application needs cproto to be compiled.
 
 
 ### Local Variables:
