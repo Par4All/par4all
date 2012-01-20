@@ -2,6 +2,12 @@
 
  * Par4All 1.3.1
 
+   * Check for CUDA memory allocation errors
+
+   * Restore PIPS properties after a PyPS exception
+
+   * Manage better pointers on 1D array on GPU
+
    * Fix loop bound generation in the presence of unsigned index types
 
    * Fix p4a --report
