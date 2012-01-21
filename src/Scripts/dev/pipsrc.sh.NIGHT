@@ -10,7 +10,7 @@ export LINEAR_SVN=http://svn.cri.ensmp.fr/svn/linear
 export PIPS_SVN=http://svn.cri.ensmp.fr/svn/pips
 
 # software prods
-prod=/home/local/fabien/NIGHT/prod
+prod=/home/fabien/NIGHT/prod
 
 # fix path
 PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH
