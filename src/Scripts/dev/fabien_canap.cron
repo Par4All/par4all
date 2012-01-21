@@ -1,9 +1,0 @@
-# $Id$
-#
-# Ubuntu 9.10 Karmic x86_64
-#
-# account crontab at CRI on canapville
-# bootstrap with: login@canap> setup_pips.sh /home/local/fabien/<version>
-# fix <version>/pipsrc.sh
-# must fix PIPS_F77 and PIPS_FLINT, g77 package is needed
-03 23 * * * /home/local/fabien/NIGHT/pips_check_compile --force --report --nlpmake=htdoc --source=/home/local/fabien/NIGHT/pipsrc.sh --exec=/home/local/fabien/NIGHT/pips_publish_www.sh pips-validation@cri.ensmp.fr /home/local/fabien/NIGHT/prod /home/local/fabien/NIGHT/validation
