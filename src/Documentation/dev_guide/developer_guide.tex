@@ -1737,7 +1737,7 @@ Several compilations and validations run at CRI:
 
 \item[CROSS] 32-bit cross-compilation, on Debian Squeeze (compiegne).
 
-\item[NIGHT] compilation and validation on Ubuntu Karmic (canapville).
+\item[NIGHT] compilation and validation on Ubuntu Oneiric (andorre).
 
 \item[PRIVE] compilation and private validation on Debian Squeeze (compiegne).
 
@@ -1747,7 +1747,9 @@ Several compilations and validations run at CRI:
 The different error conditions and possible status of the working
 copies participating to such a compilation and validation test
 are quite complex. There is a \texttt{LOCK} directory in the \texttt{prod}
-to avoid the script to run twice at the same time.
+to avoid the script to run twice at the same time. It may be necessary
+to remove this lock manually if the host was rebooted unexpectedly.
+Note that subversion uses locks as well.
 
 \subsection{Validation Makefile}
 \label{sec:validation-makefile}
