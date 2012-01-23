@@ -10,7 +10,6 @@ var marker = '\", \"';
 var multiple = false;
 var file_name;
 
-var result_id = 'result'; // linked to the div!
 var graph_id = 'graph';
 
 var directory;
@@ -157,6 +156,7 @@ function upload_add_multiple(splited) {
     multiple = true;
 }
 
+
 /*********************************************************************
 *								     *
 * Helper functions for performing operations.			     *
@@ -238,12 +238,12 @@ function get_directory(panel_id) {
 	url: '/operations/get_directory',
 	async: false,
 	error: function() {
-	    if (panel_id == result_id)
+	    if (panel_id == 'result')
 		$('#resultcode').html('Web error, try again!');
 	},
 	success: function(data) {
 	    directory = data;
-	    if (panel_id == result_id)
+	    if (panel_id == 'result')
 		document.getElementById('save_button_link').href = '/res/' + directory + '/' + directory;
 	}
     });
@@ -297,7 +297,7 @@ function check_sources(index, panel_id) {
 	languages = new Array(files_no);
 
     get_directory(panel_id);
-
+    
     for (var i = 1; i <= files_no; i++) {
 	sources[i] = document.forms['source' + i].elements['sourcecode' + i].value;
     }
@@ -361,7 +361,7 @@ function enable_dependence_graph(data) {
 
 /*********************************************************************
 *								     *
-* Helper functions for keeping consistence between input and output. *
+* Helper functions for keeping consistency between input and output. *
 *								     *
 *********************************************************************/
 
@@ -572,36 +572,29 @@ function initialize() {
 	
     // Resize buttons
     $('#aplus').click(function()  { resize(1) });
-    $('#aminus').click(function() { resize(0) });
-    
+    $('#aminus').click(function() { resize(0) });    
 
     // Load classic examples
-    $('#classic-examples-dialog').dialog({
-        autoOpen: false,
-        width: 400
-    });
-    $("#classic-examples-button").button()
-    .click(function() {
+    $('#classic-examples-dialog').dialog({ autoOpen: false, width: 400 });
+    $("#classic-examples-button").button().click(function() {
 	$('#classic-examples-dialog').dialog('open');
     });
     $('#classic-examples-dialog input').button().click(load_example);
 
-    $('#sourcecode1').linedtextarea();
-    $('#sourcecode1').attr('spellcheck', false);
+    // Source code input field
+    $('#sourcecode1').linedtextarea().attr('spellcheck', false);
 
-    $('#dialog-choose-function').dialog({
-	    autoOpen: false,
-	    width: 400
-	});
+    $('#dialog-choose-function').dialog({ autoOpen: false, width: 400 });
 
     // Main tabs
     $('#tabs').tabs({
 	tabTemplate: "<li><a href='#{href}'>#{label}</a></li>",
 	select: function(event, ui) {
-	    if ((performed == false) && ui.panel.id == result_id) {
+	    if ((performed == false) && ui.panel.id == 'result') {
+		// Compute_results
 		event.preventDefault();
 		performed = true;
-		perform_operation(ui.index, result_id);
+		perform_operation(ui.index, 'result');
 	    } else if ((created_graph == false) && ui.panel.id == graph_id) {
 		event.preventDefault();
 		created_graph = true;
@@ -610,32 +603,23 @@ function initialize() {
 	}
     });
 
-    add_tab_title(operation);
+    // Run button (indirectly call computation)
+    $("#run-button").button().click(function() {
+	$('#tabs').tabs('select', '#result');
+    });
 
-    $("input:submit", ".load_client_file_form").button();
-
+    // Save/print buttons
     $("input:submit", ".save_results").button();
-    $("input:submit", ".print_results").button();
-    $("input:submit", ".print_results").click(function(event) {
-            var content = document.getElementById("resultcode");
-            var printFrame = document.getElementById("iframetoprint").contentWindow;
-            printFrame.document.open();
-            printFrame.document.write(content.innerHTML);
-            printFrame.document.close();
-            printFrame.focus();
-            printFrame.print();
-	});
-
+    $("input:submit", ".print_results").button().click(function(event) {
+        var content = document.getElementById("resultcode");
+        var printFrame = document.getElementById("iframetoprint").contentWindow;
+        printFrame.document.ope();
+        printFrame.document.write(content.innerHTML);
+        printFrame.document.close();
+        printFrame.focus();
+        printFrame.print();
+    });
     deactivate_buttons();
-
-    $("input:submit", ".operation").button();
-    $("input:submit", ".operation").button("option", "label", "RUN");
-    $("input:submit", ".operation").click(function(event) {
-            event.preventDefault();
-	    $('#tabs').tabs('select', 0);
-	    $('#tabs').tabs('select', '#' + result_id);
-        });
-
 
     $('#resizing_source input:submit').button();
 }

@@ -2,12 +2,6 @@ $(function(){
 
     initialize();
 
-    // Classic examples
-    $('#dialog-load-examples').dialog({
-        autoOpen: false,
-        width: 400
-    });
-
 });
 
 $(document).ready(function() {
@@ -41,8 +35,8 @@ function invoke_operation(source_code, lang) {
     $.ajax({
 	type: "POST",
 	data: {
-	    code: source_code,
-	    language: lang,
+	    code:      source_code,
+	    language:  lang,
 	    operation: operation
 	},
 	cache: false,
@@ -57,9 +51,12 @@ function invoke_operation(source_code, lang) {
     });
 }
 
+
 function perform_operation(index, panel_id) {
     clear_result_tab();
+
     if (check_sources(index, panel_id)) { // all files are ok
+
 	if (multiple) {
 	    choose_function();
 	} else {

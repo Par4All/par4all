@@ -9,11 +9,16 @@ pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.includes = pyramid_debugtoolbar
 
+debugtoolbar.hosts =
+
 # Paws settings
+paws.cookie_secret = (SECRET)
+paws.validation    = %(here)s/../validation/Paws
+paws.tempdir       = %(here)s/files
+
 paws.public       = %(here)s/pawsapp/public/
 paws.result_dir   = %(here)s/res/
 paws.results      = public + result_dir
-paws.validation   = %(here)s/../validation/Paws
 paws.modules      = validation + 'pyps_modules'
 paws.demo         = validation + 'tutorial/'
 paws.marker       = '<END OF THE STEP>'
