@@ -25,5 +25,8 @@ def main(global_config, **settings):
     # Dynamic routes
     config.add_route('home', '/')
 
+    config.add_route('tool_basic',    '/tools/{tool}')
+    config.add_route('tool_advanced', '/tools/{tool}/advanced')
+
     config.scan()
     return config.make_wsgi_app()

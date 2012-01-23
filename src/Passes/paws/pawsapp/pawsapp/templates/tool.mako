@@ -6,25 +6,25 @@
 <%inherit file="base.mako"/>
 
 <%def name="title()">
-${c.title}
-% if c.adv:
+${descr}
+% if advanced:
 (advanced)
 % endif
 </%def>
 
 <%def name="css_slot()">
-${h.stylesheet_link(url("/css/jq/jquery-linedtextarea.css"), media="all")}
-${h.stylesheet_link(url("/css/jq/jquery.jqzoom.css"), media="all")}
-${h.stylesheet_link(url("/css/pygments.css"), media="all")}
-${h.stylesheet_link(url("/css/tool.css"), media="all")}
+${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea.css"), media="all")}
+${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom.css"), media="all")}
+${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments.css"), media="all")}
+${h.stylesheet_link(request.static_url("pawsapp:static/css/tool.css"), media="all")}
 </%def>
 
 <%def name="js_slot()">
-${h.javascript_link(url("/jq/jquery-linedtextarea.js"))}
-${h.javascript_link(url("/jq/jquery.jqzoom-core.js"))}
-${h.javascript_link(url("/js/tool.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
 <script type="text/javascript">
-  operation = "${c.id}";
+  operation = "${tool}";
 </script>
 </%def>
 
@@ -76,10 +76,10 @@ ${h.javascript_link(url("/js/tool.js"))}
 	<br/>
 	<br/>
 	<div class="left_side_buttons">
-	  % if c.adv:
-	  ${h.link_to(u"basic mode", url="/tools/%s" % c.id)}
+	  % if advanced:
+	  ${h.link_to(u"basic mode", url=request.route_url("tool_basic", tool=tool))}
 	  % else:
-	  ${h.link_to(u"advanced mode", url="/tools/%s/advanced" % c.id)}
+	  ${h.link_to(u"advanced mode", url=request.route_url("tool_advanced", tool=tool))}
 	  % endif
 	</div>
       </div>
@@ -87,7 +87,7 @@ ${h.javascript_link(url("/js/tool.js"))}
       <div id="tabs">
 	<ul>
 	  <li><a href="#tabs-1" id="source_tab_link1">SOURCE</a></li>
-	  <li><a href="#result"  id="result_tab_link">${c.id}</a></li>
+	  <li><a href="#result"  id="result_tab_link">${tool}</a></li>
 	  <li><a href="#graph">GRAPH</a></li>
 	</ul>
 	<div id="tabs-1">
@@ -122,7 +122,7 @@ ${h.javascript_link(url("/js/tool.js"))}
 
 ## Classic examples popup
 <div id="dialog-load-examples" title="Select an example.">
-    % for ex in c.examples:
+    % for ex in examples:
     ${h.submit(ex, ex)}<br/>
     % endfor
 </div>	

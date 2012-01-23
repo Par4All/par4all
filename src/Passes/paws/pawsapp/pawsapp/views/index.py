@@ -4,7 +4,7 @@ import os, json
 
 from pyramid.view import view_config
 
-# PAWS home page
+
 @view_config(route_name='home', renderer='pawsapp:templates/index.mako')
 def index(request):
     """PAWS home page
