@@ -141,12 +141,11 @@ C     END BLOCK
 
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
 C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
 C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
-C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1}>
+C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=NP}>
 C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
 
 C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
@@ -165,12 +164,11 @@ C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
 
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
 C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
 C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
-C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1}>
+C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=NP}>
 C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
 
 C     BEGIN BLOCK
@@ -191,23 +189,22 @@ C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=N,
 C    N==3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=N,
 C    N==3NP}>
-C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP}>
-C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
-C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, N==3NP}>
-C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=N}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=N}>
+C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, N==3NP, 1<=N}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=N}>
 
       DO 2 J = 1, N                                                     0018
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
+C    J<=3NP, 1<=N}>
 C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
-C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP}>
+C    J<=3NP, 1<=N}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP}>
 C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
-C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, N==3NP, 1<=J,
-C    J<=3NP}>
+C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, N==3NP, 1<=J, J<=3NP}>
 C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
 
 C        BEGIN BLOCK
@@ -227,13 +224,12 @@ C  <Z2(PHI1)-W-EXACT-{PHI1==K, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
 3           Z2(K) = Z1(K)*B(K,J)                                        0020
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
+C    J<=3NP, 1<=N}>
 C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
-C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP}>
-C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, N==3NP, 1<=J,
-C    J<=3NP}>
+C    J<=3NP, 1<=N}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP, 1<=N}>
+C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=N+2, N==3NP, 1<=J, J<=3NP, 1<=N}>
 
          DO 4 K = 1, N, 3                                               0021
 
@@ -241,10 +237,10 @@ C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
 C    J<=3NP, 1<=K, K<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
 C    J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1,
-C    1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <Z2(PHI1)-R-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1, N==3NP,
-C    1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1, PHI1<=K+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}>
+C  <Z2(PHI1)-R-EXACT-{K<=PHI1, PHI1<=K+2, N==3NP, 1<=J, J<=3NP, 1<=K,
+C    K<=3NP, 1<=NP}>
 
             DO 4 I = 1, N                                               0022
 
@@ -252,11 +248,10 @@ C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
 C    1<=J, J<=3NP, 1<=K, K<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
 C    1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-R-EXACT-{PHI2==I, K<=PHI1, PHI1<=K+2,
-C    2PHI1<=2K+3NP+1, 1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K,
-C    K<=3NP}>
-C  <Z2(PHI1)-R-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1, N==3NP,
-C    1<=I, I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-R-EXACT-{PHI2==I, K<=PHI1, PHI1<=K+2, 1<=PHI2,
+C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}>
+C  <Z2(PHI1)-R-EXACT-{K<=PHI1, PHI1<=K+2, N==3NP, 1<=I, I<=3NP, 1<=J,
+C    J<=3NP, 1<=K, K<=3NP, 1<=NP}>
 
 4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
      &         *Z2(K+2)                                                 0023
@@ -266,10 +261,9 @@ C     END BLOCK
       END
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
 C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
-C  <Z2(PHI1)-IN-MAY-{1<=PHI1, 3NP+1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1}>
+C  <Z2(PHI1)-IN-MAY-{3NP+1<=PHI1, PHI1<=3NP+2, 1<=3NP}>
 
 C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
 C Adjustable array's bounds must be a dummy argument or in a common block
@@ -286,10 +280,9 @@ C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
       DIMENSION A(N,N),B(N,N),RL(N,N)
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
 C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
-C  <Z2(PHI1)-IN-MAY-{1<=PHI1, 3NP+1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1}>
+C  <Z2(PHI1)-IN-MAY-{3NP+1<=PHI1, PHI1<=3NP+2, 1<=3NP}>
 
 C     BEGIN BLOCK
 C     added to simulate actual preconditions
@@ -305,21 +298,20 @@ C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, N==3NP, 1<=K, K<=3NP}>
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=N,
 C    N==3NP}>
-C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP}>
-C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
-C  <Z2(PHI1)-IN-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, 3NP+1<=PHI1,
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP,
 C    N==3NP, 1<=N}>
+C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=N}>
+C  <Z2(PHI1)-IN-MAY-{PHI1<=N+2, 3NP+1<=PHI1, N==3NP, 1<=N}>
 
       DO 2 J = 1, N                                                     0018
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
-C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 2PHI1<=9NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP}>
-C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
-C  <Z2(PHI1)-IN-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, 3NP+1<=PHI1,
+C    J<=3NP, 1<=N}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP,
 C    N==3NP, 1<=J, J<=3NP}>
+C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+C  <Z2(PHI1)-IN-MAY-{1<=PHI1, PHI1<=N+2, 3NP+1<=PHI1, N==3NP, 1<=J,
+C    J<=3NP, 1<=N}>
 
 C        BEGIN BLOCK
 
@@ -336,30 +328,28 @@ C  <Z1(PHI1)-IN-EXACT-{PHI1==K, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
 3           Z2(K) = Z1(K)*B(K,J)                                        0020
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
-C    J<=3NP}>
-C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, 1<=PHI2,
-C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP}>
-C  <Z2(PHI1)-IN-MAY-{1<=PHI1, PHI1<=N+2, 2PHI1<=2N+3NP+1, N==3NP,
-C    1<=J, J<=3NP}>
+C    J<=3NP, 1<=N}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=N+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP, 1<=N}>
+C  <Z2(PHI1)-IN-MAY-{1<=PHI1, PHI1<=N+2, N==3NP, 1<=J, J<=3NP, 1<=N}>
 
          DO 4 K = 1, N, 3                                               0021
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
 C    J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1,
-C    1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1, N==3NP,
-C    1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1, PHI1<=K+2, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}>
+C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=K+2, N==3NP, 1<=J, J<=3NP, 1<=K,
+C    K<=3NP, 1<=NP}>
 
             DO 4 I = 1, N                                               0022
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
 C    1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{PHI2==I, K<=PHI1, PHI1<=K+2,
-C    2PHI1<=2K+3NP+1, 1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K,
-C    K<=3NP}>
-C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=K+2, 2PHI1<=2K+3NP+1, N==3NP,
-C    1<=I, I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-IN-EXACT-{PHI2==I, K<=PHI1, PHI1<=K+2, 1<=PHI2,
+C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}>
+C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=K+2, N==3NP, 1<=I, I<=3NP, 1<=J,
+C    J<=3NP, 1<=K, K<=3NP, 1<=NP}>
 
 4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
      &         *Z2(K+2)                                                 0023

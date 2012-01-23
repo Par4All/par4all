@@ -326,9 +326,9 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2, 1<=NP}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, 1<=PHI2, PHI2<=NP, KM==1, KP==2,
 C    1<=I, I<=NP}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2, 1<=I,
-C    I<=NP}>
+C    I<=NP, 1<=NP}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2, 1<=I,
-C    I<=NP}>
+C    I<=NP, 1<=NP}>
 
          DO 22 J = 1, NP                                                0231
 
@@ -602,11 +602,11 @@ C    KP==2, 1<=J, NP+1<=J}>
       V(NP-1,1) = C3                                                    0339
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==1, 2<=PHI1, PHI1+2<=NP, 1<=PHI3,
-C    PHI3<=3, K==3, KM==1, KP==2, 1<=J, NP+1<=J}>
+C    PHI3<=3, K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-R-EXACT-{2<=PHI1, PHI1+2<=NP, NP<=PHI2+1, PHI2<=NP,
 C    K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI2==NP, 2<=PHI1, PHI1+2<=NP, K==3, KM==1,
-C    KP==2, 1<=J, NP+1<=J}>
+C    KP==2, NP+1<=J}>
 
 
 
@@ -617,12 +617,12 @@ C     -------------------------
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, 2<=PHI1, PHI1+2<=NP, NP<=PHI2+1,
 C    PHI2<=NP, K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==NP, K==3, KM==1, KP==2, 2<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          V(I,NP) = 2/(1/V(I,NP)+1/V(I,NP-1))                            0345
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==NP, K==3, KM==1, KP==2, 2<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          W = V(I,NP)*DELTAT                                             0346
 
@@ -632,7 +632,7 @@ C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
          B(I,1,1) = 1-1/(W+H)*(2*H+W*W/H)                               0347
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==1, PHI3==2, K==3, KM==1,
-C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
+C    KP==2, 2<=I, I+2<=NP, NP+1<=J}>
 
          B(I,1,2) = 2*H/(W+H)                                           0348
 
@@ -643,11 +643,11 @@ C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
 41       CONTINUE                                                       0350
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==2, 3<=PHI1, PHI1+2<=NP, 1<=PHI3,
-C    PHI3<=3, K==3, KM==1, KP==2, 1<=J, NP+1<=J}>
+C    PHI3<=3, K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-R-EXACT-{NP<=PHI1+1, PHI1<=NP, 3<=PHI2, PHI2+2<=NP,
 C    K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==NP, 3<=PHI2, PHI2+2<=NP, K==3, KM==1,
-C    KP==2, 1<=J, NP+1<=J}>
+C    KP==2, NP+1<=J}>
 
 
       DO 42 I = 3, NP-2                                                 0352
@@ -655,12 +655,12 @@ C    KP==2, 1<=J, NP+1<=J}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==I, NP<=PHI1+1, PHI1<=NP, 3<=PHI2,
 C    PHI2+2<=NP, K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==NP, PHI2==I, K==3, KM==1, KP==2, 3<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          V(NP,I) = 2/(1/V(NP,I)+1/V(NP-1,I))                            0353
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==NP, PHI2==I, K==3, KM==1, KP==2, 3<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          W = V(NP,I)*DELTAT                                             0354
 
@@ -670,7 +670,7 @@ C    KP==2, 3<=I, I+2<=NP, 1<=J, NP+1<=J}>
          B(I,2,1) = 1-1/(W+H)*(2*H+W*W/H)                               0355
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==2, PHI3==2, K==3, KM==1,
-C    KP==2, 3<=I, I+2<=NP, 1<=J, NP+1<=J}>
+C    KP==2, 3<=I, I+2<=NP, NP+1<=J}>
 
          B(I,2,2) = 2*H/(W+H)                                           0356
 
@@ -681,11 +681,11 @@ C    KP==2, 3<=I, I+2<=NP, 1<=J, NP+1<=J}>
 42       CONTINUE                                                       0358
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==3, 2<=PHI1, PHI1+2<=NP, 1<=PHI3,
-C    PHI3<=3, K==3, KM==1, KP==2, 1<=J, NP+1<=J}>
+C    PHI3<=3, K==3, KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-R-EXACT-{2<=PHI1, PHI1+2<=NP, 1<=PHI2, PHI2<=2, K==3,
-C    KM==1, KP==2, 1<=J, NP+1<=J}>
+C    KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI2==1, 2<=PHI1, PHI1+2<=NP, K==3, KM==1,
-C    KP==2, 1<=J, NP+1<=J}>
+C    KP==2, NP+1<=J}>
 
 
       DO 43 I = 2, NP-2                                                 0360
@@ -693,12 +693,12 @@ C    KP==2, 1<=J, NP+1<=J}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=2, K==3, KM==1,
 C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==1, K==3, KM==1, KP==2, 2<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          V(I,1) = 2/(1/V(I,1)+1/V(I,2))                                 0361
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==1, K==3, KM==1, KP==2, 2<=I,
-C    I+2<=NP, 1<=J, NP+1<=J}>
+C    I+2<=NP, NP+1<=J}>
 
          W = V(I,1)*DELTAT                                              0362
 
@@ -708,7 +708,7 @@ C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
          B(I,3,1) = 1-1/(W+H)*(2*H+W*W/H)                               0363
 
 C  <B(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==3, PHI3==2, K==3, KM==1,
-C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
+C    KP==2, 2<=I, I+2<=NP, NP+1<=J}>
 
          B(I,3,2) = 2*H/(W+H)                                           0364
 
@@ -719,9 +719,9 @@ C    KP==2, 2<=I, I+2<=NP, 1<=J, NP+1<=J}>
 43       CONTINUE                                                       0366
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==2, 3<=PHI1, PHI1+1<=NP, K==3, KM==1,
-C    KP==2, 1<=J, NP+1<=J}>
+C    KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI2==2, 3<=PHI1, PHI1+1<=NP, K==3, KM==1,
-C    KP==2, 1<=J, NP+1<=J}>
+C    KP==2, NP+1<=J}>
 
 
 C
@@ -730,41 +730,41 @@ C     ------------------------------------------------------
       DO 51 I = 3, NP-1                                                 0371
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==2, K==3, KM==1, KP==2, 3<=I,
-C    I+1<=NP, 1<=J, NP+1<=J}>
+C    I+1<=NP, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==2, K==3, KM==1, KP==2, 3<=I,
-C    I+1<=NP, 1<=J, NP+1<=J}>
+C    I+1<=NP, NP+1<=J}>
 
          V(I,2) = (V(I,2)*DELTAT/H)**2                                  0372
 51       CONTINUE                                                       0373
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==NP-1, 3<=PHI1, PHI1+1<=NP, K==3,
-C    KM==1, KP==2, 1<=J, NP+1<=J}>
+C    KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI2==NP-1, 3<=PHI1, PHI1+1<=NP, K==3,
-C    KM==1, KP==2, 1<=J, NP+1<=J}>
+C    KM==1, KP==2, NP+1<=J}>
 
 
       DO 52 I = 3, NP-1                                                 0375
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==NP-1, K==3, KM==1, KP==2,
-C    3<=I, I+1<=NP, 1<=J, NP+1<=J}>
+C    3<=I, I+1<=NP, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==NP-1, K==3, KM==1, KP==2,
-C    3<=I, I+1<=NP, 1<=J, NP+1<=J}>
+C    3<=I, I+1<=NP, NP+1<=J}>
 
          V(I,NP-1) = (V(I,NP-1)*DELTAT/H)**2                            0376
 52       CONTINUE                                                       0377
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==NP-1, 3<=PHI2, PHI2+2<=NP, K==3,
-C    KM==1, KP==2, 1<=J, NP+1<=J}>
+C    KM==1, KP==2, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==NP-1, 3<=PHI2, PHI2+2<=NP, K==3,
-C    KM==1, KP==2, 1<=J, NP+1<=J}>
+C    KM==1, KP==2, NP+1<=J}>
 
 
       DO 53 I = 3, NP-2                                                 0379
 
 C  <V(PHI1,PHI2)-R-EXACT-{PHI1==NP-1, PHI2==I, K==3, KM==1, KP==2,
-C    3<=I, I+2<=NP, 1<=J, NP+1<=J}>
+C    3<=I, I+2<=NP, NP+1<=J}>
 C  <V(PHI1,PHI2)-W-EXACT-{PHI1==NP-1, PHI2==I, K==3, KM==1, KP==2,
-C    3<=I, I+2<=NP, 1<=J, NP+1<=J}>
+C    3<=I, I+2<=NP, NP+1<=J}>
 
          V(NP-1,I) = (V(NP-1,I)*DELTAT/H)**2                            0380
 53       CONTINUE                                                       0381
@@ -927,7 +927,7 @@ C     ------------------------------------------------
 
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{J+1<=PHI1+PHI2, PHI2+1<=PHI1+J,
 C    PHI1+J<=PHI2+NP, PHI1+PHI2<=J+NP, J<=PHI2+2, PHI2<=J+2, K==3,
-C    3<=J, J+2<=NP, 2<=N, N<=NT}>
+C    3<=J, J+2<=NP, 2<=N, N<=NT, 5<=NP}>
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==J, PHI3==KP, 3<=PHI1, PHI1+2<=NP,
 C    K==3, 3<=J, J+2<=NP, 2<=N, N<=NT}>
 C  <V(PHI1,PHI2)-R-EXACT-{PHI2==J, 3<=PHI1, PHI1+2<=NP, K==3, 3<=J,
@@ -1041,10 +1041,10 @@ C  <B(PHI1,PHI2,PHI3)-R-EXACT-{PHI2==1, 3<=PHI1, PHI1+2<=NP, 1<=PHI3,
 C    PHI3<=3, K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{2<=PHI1, PHI1+1<=NP, NP<=PHI2+1,
 C    PHI2<=NP, K==3, NP<=J+1, 2<=N, N<=NT, 5<=NP}>
-C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==1, 3<=PHI1, PHI1+2<=NP, K==3, 3<=J,
+C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==1, 3<=PHI1, PHI1+2<=NP, K==3,
 C    NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
 C
@@ -1059,9 +1059,9 @@ C    K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I<=PHI1+1, PHI1<=I+1, NP<=PHI2+1,
 C    PHI2<=NP, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
 C  <UB(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==1, K==3, 3<=I, I+2<=NP,
-C    3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             UINT(I) = B(I,1,1)*(U(I,NP,KP)+U(I,NP-1,KP))-UB(I,1)+B(I,   0499
      &      1,2)*(U(I,NP,KM)+U(I,NP-1,KM))+B(I,1,3)*(U(I+1,NP-1,KP)+U   0499
@@ -1069,17 +1069,17 @@ C    2<=N, N<=NT}>
 92          CONTINUE                                                    0504
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==NP, PHI3==KP, 3<=PHI1,
-C    PHI1+2<=NP, K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    PHI1+2<=NP, K==3, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
          DO 93 I = 3, NP-2                                              0506
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==NP, PHI3==KP, K==3,
-C    3<=I, I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    3<=I, I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             U(I,NP,KP) = UINT(I)                                        0507
 93          CONTINUE                                                    0508
@@ -1088,10 +1088,10 @@ C  <B(PHI1,PHI2,PHI3)-R-EXACT-{PHI2==2, 3<=PHI1, PHI1+2<=NP, 1<=PHI3,
 C    PHI3<=3, K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{NP<=PHI1+1, PHI1<=NP, 2<=PHI2,
 C    PHI2+1<=NP, K==3, NP<=J+1, 2<=N, N<=NT, 5<=NP}>
-C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==2, 3<=PHI1, PHI1+2<=NP, K==3, 3<=J,
+C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==2, 3<=PHI1, PHI1+2<=NP, K==3,
 C    NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
 C
@@ -1106,9 +1106,9 @@ C    K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{NP<=PHI1+1, PHI1<=NP, I<=PHI2+1,
 C    PHI2<=I+1, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
 C  <UB(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==2, K==3, 3<=I, I+2<=NP,
-C    3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             UINT(I) = B(I,2,1)*(U(NP,I,KP)+U(NP-1,I,KP))-UB(I,2)+B(I,   0516
      &      2,2)*(U(NP,I,KM)+U(NP-1,I,KM))+B(I,2,3)*(U(NP-1,I+1,KP)+U   0516
@@ -1116,17 +1116,17 @@ C    2<=N, N<=NT}>
 94          CONTINUE                                                    0521
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==NP, PHI3==KP, 3<=PHI2,
-C    PHI2+2<=NP, K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    PHI2+2<=NP, K==3, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
          DO 95 I = 3, NP-2                                              0523
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==NP, PHI2==I, PHI3==KP, K==3,
-C    3<=I, I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    3<=I, I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             U(NP,I,KP) = UINT(I)                                        0524
 95          CONTINUE                                                    0525
@@ -1135,10 +1135,10 @@ C  <B(PHI1,PHI2,PHI3)-R-EXACT-{PHI2==3, 3<=PHI1, PHI1+2<=NP, 1<=PHI3,
 C    PHI3<=3, K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{2<=PHI1, PHI1+1<=NP, 1<=PHI2, PHI2<=2,
 C    K==3, NP<=J+1, 2<=N, N<=NT, 5<=NP}>
-C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==3, 3<=PHI1, PHI1+2<=NP, K==3, 3<=J,
+C  <UB(PHI1,PHI2)-R-EXACT-{PHI2==3, 3<=PHI1, PHI1+2<=NP, K==3,
 C    NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
 C
@@ -1153,9 +1153,9 @@ C    K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
 C  <U(PHI1,PHI2,PHI3)-R-MAY-{I<=PHI1+1, PHI1<=I+1, 1<=PHI2, PHI2<=2,
 C    K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
 C  <UB(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==3, K==3, 3<=I, I+2<=NP,
-C    3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-W-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             UINT(I) = B(I,3,1)*(U(I,1,KP)+U(I,2,KP))-UB(I,3)+B(I,3,2)   0533
      &      *(U(I,1,KM)+U(I,2,KM))+B(I,3,3)*(U(I+1,2,KP)+U(I+1,1,KP)+   0533
@@ -1163,17 +1163,17 @@ C    2<=N, N<=NT}>
 96          CONTINUE                                                    0538
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==1, PHI3==KP, 3<=PHI1, PHI1+2<=NP,
-C    K==3, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    K==3, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{3<=PHI1, PHI1+2<=NP, K==3, NP<=J+1, 2<=N,
+C    N<=NT}>
 
 
          DO 97 I = 3, NP-2                                              0540
 
 C  <U(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==1, PHI3==KP, K==3, 3<=I,
-C    I+2<=NP, 3<=J, NP<=J+1, 2<=N, N<=NT}>
-C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, 3<=J, NP<=J+1,
-C    2<=N, N<=NT}>
+C    I+2<=NP, NP<=J+1, 2<=N, N<=NT}>
+C  <UINT(PHI1)-R-EXACT-{PHI1==I, K==3, 3<=I, I+2<=NP, NP<=J+1, 2<=N,
+C    N<=NT}>
 
             U(I,1,KP) = UINT(I)                                         0541
 97          CONTINUE                                                    0542
@@ -1320,7 +1320,7 @@ C    3<=J, NP<=J+1, 2<=N, NT+1<=N}>
       WRITE (2, *) NT                                                   0605
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=NT,
-C    KM+KP==3, 3<=I, 2<=N, NT+1<=N}>
+C    KM+KP==3, 3<=I, NT+1<=N}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, KM+KP==3, 3<=I, NT+1<=N,
 C    1<=NT}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, KM+KP==3, 3<=I, NT+1<=N,
@@ -1329,7 +1329,7 @@ C    1<=NT}>
       DO 82 K = 1, NBTRAC                                               0606
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, 1<=PHI2, PHI2<=NT, KM+KP==3,
-C    3<=I, 1<=K, K<=50, 2<=N, NT+1<=N}>
+C    3<=I, 1<=K, K<=50, NT+1<=N}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, KM+KP==3, 3<=I, 1<=K,
 C    K<=50, NT+1<=N, 1<=NT}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, KM+KP==3, 3<=I, 1<=K,
@@ -1338,11 +1338,11 @@ C    K<=50, NT+1<=N, 1<=NT}>
          DO 83 J = 1, NT                                                0607
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, KM+KP==3, 3<=I, 1<=J,
-C    J<=NT, 1<=K, K<=50, 2<=N, NT+1<=N}>
+C    J<=NT, 1<=K, K<=50, NT+1<=N}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, KM+KP==3, 3<=I, 1<=J,
-C    J<=NT, 1<=K, K<=50, 2<=N, NT+1<=N}>
+C    J<=NT, 1<=K, K<=50, NT+1<=N}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, KM+KP==3, 3<=I, 1<=J,
-C    J<=NT, 1<=K, K<=50, 2<=N, NT+1<=N}>
+C    J<=NT, 1<=K, K<=50, NT+1<=N}>
 
             WRITE (2, *) SISMO(K,J)                                     0608
 83          CONTINUE                                                    0609
@@ -1477,17 +1477,17 @@ C    4<=I+J, J<=I, 1<=J, NP+1<=J, 2<=N, NT+1<=N}>
       SISMIN = SISMO(1,1)                                               0663
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=NT,
-C    K==51, KM+KP==3, 2<=N, NT+1<=N}>
+C    K==51, KM+KP==3, NT+1<=N}>
 
       DO 111 I = 1, NBTRAC                                              0664
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=NT, K==51,
-C    KM+KP==3, 1<=I, I<=50, 2<=N, NT+1<=N}>
+C    KM+KP==3, 1<=I, I<=50, NT+1<=N}>
 
          DO 121 J = 1, NT                                               0665
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
-C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
+C    I<=50, 1<=J, J<=NT, NT+1<=N}>
 
             IF (SISMO(I,J).LT.SISMIN) THEN                              0666
 
@@ -1498,7 +1498,7 @@ C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
             ENDIF
 
 C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, K==51, KM+KP==3, 1<=I,
-C    I<=50, 1<=J, J<=NT, 2<=N, NT+1<=N}>
+C    I<=50, 1<=J, J<=NT, NT+1<=N}>
 
             IF (SISMO(I,J).GT.SISMAX) THEN                              0669
 

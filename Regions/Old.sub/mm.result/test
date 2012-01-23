@@ -1,18 +1,18 @@
 
-C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
-C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
-C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
-C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=N}>
+C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
 
 C
       SUBROUTINE MM(N, A, B, C)
       INTEGER N
       REAL A(N, *), B(N, *), C(N, *)
 
-C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
-C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
-C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
-C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=N}>
+C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=N}>
 
 C
       DO I = 1, N                                                       0006
@@ -29,7 +29,7 @@ C
       END
 
 C  <M(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=D, 1<=PHI2, PHI2<=D}>
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D, 1<=D}>
 C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D}>
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=D}>
 
@@ -41,7 +41,7 @@ C
       REAL X(*), Y(*), M(D, *)
 
 C  <M(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=D, 1<=PHI2, PHI2<=D}>
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D, 1<=D}>
 C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D}>
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=D}>
 
@@ -54,8 +54,8 @@ C  <Y(PHI1)-W-EXACT-{PHI1==J, J<=D, 1<=J}>
 
 C  <M(PHI1,PHI2)-R-EXACT-{PHI1==J, 1<=PHI2, PHI2<=D, J<=D, 1<=J}>
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=D, J<=D, 1<=J}>
-C  <Y(PHI1)-R-EXACT-{PHI1==J, J<=D, 1<=J}>
-C  <Y(PHI1)-W-EXACT-{PHI1==J, J<=D, 1<=J}>
+C  <Y(PHI1)-R-EXACT-{PHI1==J, 1<=D, J<=D, 1<=J}>
+C  <Y(PHI1)-W-EXACT-{PHI1==J, 1<=D, J<=D, 1<=J}>
 
          DO K = 1, D                                                    0010
 

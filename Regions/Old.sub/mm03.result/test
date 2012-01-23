@@ -115,15 +115,15 @@ C
 C     
       M = MOD(N, 4)                                                     0011
 
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
-C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
-C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, M<=3}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, 0<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, 0<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=M, PHI1<=N, 0<=M, M<=3, 1<=N}>
 
       DO I = 1, M                                                       0012
 
-C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
-C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, M<=3}>
+C  <X(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, 0<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, 0<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, PHI1<=N, 1<=I, I<=M, 0<=M, M<=3, 1<=N}>
 
          X(I) = X(I)+S*Y(I)                                             0013
       ENDDO
@@ -135,21 +135,21 @@ C  <Y(PHI1)-R-EXACT-{M+1<=PHI1, PHI1<=N, 0<=M, M<=3}>
 C     
       DO I = M+1, N, 4                                                  0016
 
-C  <X(PHI1)-R-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3}>
-C  <X(PHI1)-W-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3}>
+C  <X(PHI1)-R-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, M+1<=I, I<=N, 0<=M, M<=3, 1<=N}>
 
          X(I) = X(I)+S*Y(I)                                             0017
 
-C  <X(PHI1)-R-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3}>
-C  <X(PHI1)-W-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3}>
+C  <X(PHI1)-R-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I+1, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
 
          X(I+1) = X(I+1)+S*Y(I+1)                                       0018
 
-C  <X(PHI1)-R-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3}>
-C  <X(PHI1)-W-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3}>
+C  <X(PHI1)-R-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
+C  <X(PHI1)-W-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I+2, PHI1<=N, M+1<=I, 0<=M, M<=3, 1<=N}>
 
          X(I+2) = X(I+2)+S*Y(I+2)                                       0019
 
@@ -162,9 +162,9 @@ C  <Y(PHI1)-R-EXACT-{PHI1==I+3, PHI1<=N, M+1<=I, 0<=M, M<=3}>
 C
       END
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
-C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
-C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 0<=N}>
+C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 0<=N}>
 C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
 
 C     
@@ -193,7 +193,8 @@ C  <C(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N, 1<=J, J<=N}>
          ENDDO
       ENDDO
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, I==N+1}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, I==N+1,
+C    2<=I}>
 C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2+1<=I,
 C    I==N+1}>
 C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2+1<=I,
@@ -209,9 +210,9 @@ C    J+1<=I, 1<=J}>
 C  <B(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
 C    I==N+1}>
 C  <C(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    I==N+1}>
+C    I==N+1, 2<=I}>
 C  <C(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    I==N+1}>
+C    I==N+1, 2<=I}>
 
          DO K = 1, N                                                    0019
 

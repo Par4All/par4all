@@ -16,15 +16,15 @@ C the must approximation for the array WORK.
 
 C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=N}>
 C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=N}>
-C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N}>
-C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=N}>
+C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=N}>
 
       IF (K.GT.0) THEN                                                  0012
 
 C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
-C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N}>
-C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N}>
+C  <WORK(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=N}>
+C  <WORK(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=N}>
 
          DO I = 1, N                                                    0013
 
@@ -40,8 +40,8 @@ C    J<=N}>
 
             CALL TOTO(K)                                                0018
 
-C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
-C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
 C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2+1, PHI2<=K,
 C    1<=I, I<=N}>
 C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=N}>
