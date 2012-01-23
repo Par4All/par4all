@@ -18,9 +18,16 @@ def make_map(config):
     map.connect('/error/{action}', controller='error')
     map.connect('/error/{action}/{id}', controller='error')
 
-    # CUSTOM ROUTES HERE
-    map.connect('/', controller='index', method='index')
 
+    ## CUSTOM ROUTES HERE
+
+    map.connect('/',                      controller='index', method='index')
+
+    # Tools
+    map.connect('/tools/{tool}',          controller='tool',  method='index')
+    map.connect('/tools/{tool}/{level}',  controller='tool',  method='index')
+
+    # Generic routes
     map.connect('/{controller}/{action}')
     map.connect('/{controller}/{action}/{id}')
 

@@ -5,6 +5,12 @@
 
 <%inherit file="base.mako"/>
 
+<%def name="title()">
+${c.title}
+% if c.adv:
+(advanced)
+% endif
+</%def>
 
 <%def name="css_slot()">
 ${h.stylesheet_link(url("/css/jq/jquery-linedtextarea.css"), media="all")}
@@ -17,6 +23,9 @@ ${h.stylesheet_link(url("/css/tool.css"), media="all")}
 ${h.javascript_link(url("/jq/jquery-linedtextarea.js"))}
 ${h.javascript_link(url("/jq/jquery.jqzoom-core.js"))}
 ${h.javascript_link(url("/js/tool.js"))}
+<script type="text/javascript">
+  operation = "${c.id}";
+</script>
 </%def>
 
 
@@ -24,30 +33,18 @@ ${h.javascript_link(url("/js/tool.js"))}
 
 <iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
 
-<div id="dialog-error-examples" title="ERROR">
-  <p>Error while loading examples, try again!</p>
-</div>		
-
-<div id="dialog-load-examples" title="Select an example.">
-  <div class="select-examples" id="select-examples-buttons">
-    <input value="LOAD" type="submit">
-  </div>
-</div>	
-
-<div id="dialog-choose-function" title="Select function to transform.">
-  <div class="choose-function" id="choose-function-buttons"></div>
-</div>
-
 <table class="ui-widget ui-widget-content ui-corner-all"><tr valign="top"><td width="20%">
 
       <div id="left_side">
-	<div id='resizing_source'>
-	  <div style="text-align: right; width: 100%; float: left;"><input name="Aplus" value="A+" type="submit" onClick="resize(1)"/><input name="Aminus" value="A-" type="submit" onClick="resize(0)"/></div>
+
+	<div id="resizing_source">
+	  <div style="text-align: right; width: 100%; float: left;">
+	    <input name="Aplus" value="A+" type="submit" onClick="resize(1)"/>
+	    <input name="Aminus" value="A-" type="submit" onClick="resize(0)"/>
+	  </div>
 	</div>
-	<br/><br/>
-	<p><h3>TYPE OR SELECT SOURCE CODE FROM:</h3></p>
-	<br/>
-	<br/>
+
+	<h3>TYPE OR SELECT SOURCE CODE FROM:</h3>
 	<div class="load_examples left_side_buttons">
 	  <p><b>A set of classic examples:</b></p>
 	  <input value="BROWSE" type="submit"/>
@@ -79,7 +76,11 @@ ${h.javascript_link(url("/js/tool.js"))}
 	<br/>
 	<br/>
 	<div class="left_side_buttons">
-	  <p><a href=${c.link}><b>advanced mode</b></a></p>
+	  % if c.adv:
+	  ${h.link_to(u"basic mode", url="/tools/%s" % c.id)}
+	  % else:
+	  ${h.link_to(u"advanced mode", url="/tools/%s/advanced" % c.id)}
+	  % endif
 	</div>
       </div>
     </td><td>
@@ -115,3 +116,18 @@ ${h.javascript_link(url("/js/tool.js"))}
     </td>
   </tr>
 </table>
+
+
+## Dialog boxes
+
+## Classic examples popup
+<div id="dialog-load-examples" title="Select an example.">
+    % for ex in c.examples:
+    ${h.submit(ex, ex)}<br/>
+    % endfor
+</div>	
+
+<div id="dialog-choose-function" title="Select function to transform.">
+  <div class="choose-function" id="choose-function-buttons"></div>
+</div>
+

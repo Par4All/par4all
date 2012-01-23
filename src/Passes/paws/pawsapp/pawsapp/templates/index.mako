@@ -71,9 +71,9 @@ PYPS AS A WEB SERVICE
 	      <div>
 		<div>${t['descr']}</div>
 		<p>
-        	  <b>${h.link_to("basic", url="/%s_%s/index" % (s["path"], t["name"]))}</b>
+        	  <b>${h.link_to("basic", url="/%s/%s" % (s["path"], t["name"]))}</b>
 		  % if s["advmode"]:
-        	  <b>${h.link_to("advanced", url="/%s_%s/advanced" % (s["path"], t["name"]))}</b>
+        	  <b>${h.link_to("advanced", url="/%s/%s/advanced" % (s["path"], t["name"]))}</b>
 		  % endif
 		</p>
 	      </div>
