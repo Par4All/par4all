@@ -181,8 +181,8 @@ C ----------------------------------------------
          DO PSI2 = 1, 4
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA2 = 200*PSI2-199, 200*PSI2
-               DO ALPHA1 = 200*PSI1-199, 200*PSI1
+            DO ALPHA2 = 200*PSI2-199, MIN(800, 200*PSI2)
+               DO ALPHA1 = 200*PSI1-199, MIN(800, 200*PSI1)
                   LALPHA1 = ALPHA1-200*PSI1+200
                   LALPHA2 = ALPHA2-200*PSI2+200
                   BUF INDEX = BUF INDEX+1
@@ -366,7 +366,6 @@ C     -----------------------------
       WRITE (2, *) NBTRAC
       WRITE (2, *) NT
 ! collecting distributed variable SISMO
-      PSI1 = 1
       PSI2 = 4
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -375,7 +374,7 @@ C     -----------------------------
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL8 BUFUPK
       DO ALPHA2 = 1, 4000
-         DO ALPHA1 = 1, 200*PSI2-750
+         DO ALPHA1 = 1, 50
             LALPHA1 = ALPHA1
             LALPHA2 = ALPHA2
             BUF INDEX = BUF INDEX+1
@@ -663,8 +662,8 @@ C ---------------------------------
       SIZE OF RECEIVED BUFFER = 0
       CALL HPFC RCV FROM HOST
       CALL HPFC REAL8 BUFUPK
-      DO ALPHA2 = 200*PSI2-199, 200*PSI2
-         DO ALPHA1 = 200*PSI1-199, 200*PSI1
+      DO ALPHA2 = 200*PSI2-199, MIN(800, 200*PSI2)
+         DO ALPHA1 = 200*PSI1-199, MIN(800, 200*PSI1)
             LALPHA1 = ALPHA1-200*PSI1+200
             LALPHA2 = ALPHA2-200*PSI2+200
             BUF INDEX = BUF INDEX+1
@@ -1279,11 +1278,11 @@ C
 ! collecting distributed variable SISMO
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (4.LE.PSI2.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.4) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA2 = 1, 4000
-            DO ALPHA1 = 1, 200*PSI2-750
+            DO ALPHA1 = 1, 50
                LALPHA1 = ALPHA1
                LALPHA2 = ALPHA2
                BUF INDEX = BUF INDEX+1
