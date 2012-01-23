@@ -159,7 +159,7 @@ int main()
 
       j = i;
 
-//  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, i<=j, n<=2}
+//  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, 0<=n, n<=2}
 
       for(n = 0; n <= BlockEnd-1; n += 1) {
 
@@ -223,7 +223,7 @@ int main()
 
       for(n = 0; n <= BlockEnd-1; n += 1) {
 
-//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, n<=2}
+//  P(BlockEnd,foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, 0<=n, n<=2}
 
          int k, l;
 
@@ -233,7 +233,7 @@ int main()
          k = foo((j, n));
 
 //  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, foo:0`l+i==j,
-//    foo:0`l==k, foo:0`l==n, foo:0`l<=2, i<=15, i<=j}
+//    foo:0`l==k, foo:0`l==n, 0<=foo:0`l, foo:0`l<=2, i<=15}
 
          l = k;
 
