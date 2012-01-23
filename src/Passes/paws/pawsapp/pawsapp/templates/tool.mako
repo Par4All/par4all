@@ -87,7 +87,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
       <div id="tabs">
 	<ul>
 	  <li><a href="#tabs-1" id="source_tab_link1">SOURCE</a></li>
-	  <li><a href="#result"  id="result_tab_link">${tool}</a></li>
+	  <li><a href="#result"  id="result_tab_link">${tool.upper()}</a></li>
 	  <li><a href="#graph">GRAPH</a></li>
 	</ul>
 	<div id="tabs-1">

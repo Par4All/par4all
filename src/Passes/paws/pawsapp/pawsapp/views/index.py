@@ -17,9 +17,9 @@ def index(request):
     # Sections
     sections = json.load(file(os.path.join(valid_path, 'main', 'functionalities.txt')))
     for s in sections:
-        path = os.path.join(valid_path, s['path'])            
+        path = os.path.join(valid_path, os.path.basename(s['path']))
         s['tools'] = [ { 'name'  : t,
-                         'descr' : file(os.path.join(valid_path, s['path'], t, '%s.txt' % t)).read(),
+                         'descr' : file(os.path.join(path, t, '%s.txt' % t)).read(),
                          }
                        for t in os.listdir(path) if not t.startswith('.') 
                        ]
