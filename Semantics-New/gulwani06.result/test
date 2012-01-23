@@ -36,7 +36,7 @@ int main()
 
       scanf("%d", &z);
 
-//  T(lock,x,y) {lock+y==x+1, x==y#init, 0<=lock, lock<=1}
+//  T(lock,x,y) {lock+y==x+1, x==y#init, y<=x+1, x<=y}
 
       if (z>=0) {
 

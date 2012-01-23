@@ -17,8 +17,8 @@ int cavern02(int i)
 
    int j = 100;
 
-//  T(i,j) {i+j==i#init+100, i+j==r+100, j#init==100, 2<=i#init,
-//    100<=j, j<=r+98}
+//  T(i,j) {i+j==i#init+100, i+j==r+100, j#init==100, 2<=i, 2<=i#init,
+//    100<=j}
 
    while (i>1)
 

@@ -54,9 +54,8 @@ void ts_singlestate(void)
 
    while (rand_b())
 
-//  T(i,j1,j2) {b+j1#init==j1, i+2j1#init==i#init+2j1-1,
-//    j1+j2==j1#init+j2#init+1, 2j1<=i+2j1#init, i+2j1#init+2<=2j1+n,
-//    j1#init<=j1, j1<=j1#init+1, j1+m<=n, j2<=m, 1<=m, m+1<=n}
+//  T(i,j1,j2) {2b+i#init==i+1, b+j1#init==j1, b+j2==j2#init+1, 0<=b,
+//    b<=1, 2b<=i, i+2<=2b+n, j1+m<=n, j2<=m, 1<=m, m+1<=n}
 
       if (rand_b()) {
 
@@ -221,7 +220,7 @@ void ts_restructured(void)
    else {
 
 //  T(i,j2) {b==0, i+j2==i#init+j2#init, i+j2==m, j1==0, 1<=i,
-//    i<=i#init, i+j2+1<=n, 0<=j2}
+//    i<=i#init, i<=m, m+1<=n}
 
       while (rand_b()) {
 
@@ -393,8 +392,8 @@ void ts_singlestate(void)
 //  P(b,i,j1,j2,m,n) {i+j2==j1+m, 0<=b, b<=1, 2b+j2<=i+m,
 //    5b+2j2<=i+2m+2, 2i+2j2+3<=5b+m+2n, i+j2+2<=2b+m+n,
 //    3i+2j2+3<=5b+3n, 2i+j2+2<=2b+2n, 3b+3j2<=j1+3m, j1+m+1<=b+n,
-//    1<=b+j2, 2b+2j2+1<=m+n, 5b+2j2<=m+n+2, 2b+j2<=n, m<=i+j2,
-//    i+j2<=n, 0<=j2, j2<=m, 1<=m, m+1<=n}
+//    1<=b+j2, 2b+2j2+1<=m+n, 5b+2j2<=m+n+2, 2b+j2<=n, i+j2<=n, 0<=j1,
+//    0<=j2, j2<=m, 1<=m, m+1<=n}
 
             deadlock();
 
@@ -419,10 +418,9 @@ void ts_singlestate(void)
 
          if (!(j1<=n-m&&j2<=m&&j1*j2==0))
 
-//  P(b,i,j1,j2,m,n) {b==0, i+j2==j1+m, 0<=i, j1<=i+1, i+1<=j1+m,
-//    i+2j1+2m+4<=3n, j2<=i+m+2, 2j2<=i+2m+5, i+j2+2<=m+n,
-//    2i+j2+3<=2n, i+2<=n, 0<=j1, j1+m<=n, 2j1+m+3<=2n, 2j2<=m+n+4,
-//    j2<=n+1, 1<=m, m+1<=n}
+//  P(b,i,j1,j2,m,n) {b==0, i+j2==j1+m, 0<=i, j1<=i+1, i+2j1+2m+4<=3n,
+//    j2<=i+m+2, 2j2<=i+2m+5, i+j2+2<=m+n, 2i+j2+3<=2n, i+2<=n, 0<=j1,
+//    j1+m<=n, 2j1+m+3<=2n, 1<=j2, 2j2<=m+n+4, j2<=n+1, 1<=m, m+1<=n}
 
             checking_error();
       }
@@ -545,7 +543,8 @@ void ts_restructured(void)
 
          if (!(0<i&&i<n&&b==0&&1<i))
 
-//  P(b,i,j1,j2,m,n) {b==0, i==1, j1==0, j2==m-1, 0<=j2, j2+2<=n}
+//  P(b,i,j1,j2,m,n) {b==0, i+j2==m, j1==0, 1<=i, 0<=j2, m<=j2+1,
+//    m+1<=n}
 
             deadlock();
 

@@ -561,7 +561,7 @@ void ts_singlestate(void)
 
          if (!(x+y<=-1&&z<0))
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, 0<=x0, 0<=y0, 0<=z}
 
             deadlock();
 

@@ -5668,8 +5668,8 @@ void putpict(unsigned char *frame)
 //  T(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {0<=j,
 //    j+1<=mb_height2, k#init<=k}
    for(j = 0; j <= mb_height2-1; j += 1)
-//  T(MBAinc,cbp,cc,comp,i,k,mb_type,prev_mquant) {i+k#init==k,
-//    i+1<=mb_width, k#init<=k}
+//  T(MBAinc,cbp,cc,comp,i,k,mb_type,prev_mquant) {i+k#init==k, 0<=i,
+//    i+1<=mb_width}
       /* macroblock row loop */
       for(i = 0; i <= mb_width-1; i += 1) {
 //  T(MBAinc,cc) {}
@@ -6504,7 +6504,7 @@ void dct_type_estimation(unsigned char *pred, unsigned char *cur, struct mbinfo 
             for(j = 0; j <= 7; j += 1) {
 //  T(offs) {}
                offs = width*((j<<1)+j0)+i0;
-//  T(i,offs) {i+offs#init==offs, i<=15, offs#init<=offs}
+//  T(i,offs) {i+offs#init==offs, 0<=i, i<=15}
                for(i = 0; i <= 15; i += 1) {
 //  T() {}
                   blk0[16*j+i] = cur[offs]-pred[offs];
@@ -11305,8 +11305,8 @@ void putpict(unsigned char *frame)
 //  T(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {0<=j,
 //    j+1<=mb_height2, k#init<=k}
    for(j = 0; j <= mb_height2-1; j += 1)
-//  T(MBAinc,cbp,cc,comp,i,k,mb_type,prev_mquant) {i+k#init==k,
-//    i+1<=mb_width, k#init<=k}
+//  T(MBAinc,cbp,cc,comp,i,k,mb_type,prev_mquant) {i+k#init==k, 0<=i,
+//    i+1<=mb_width}
       /* macroblock row loop */
       for(i = 0; i <= mb_width-1; i += 1) {
 //  T(MBAinc,cc) {}
@@ -14208,7 +14208,7 @@ void stats(void)
    k = 0;
 //  T(i,j,k,mb_type) {0<=j, j+1<=mb_height2, k#init<=k}
    for(j = 0; j <= mb_height2-1; j += 1) {
-//  T(i,k,mb_type) {i+k#init==k, i+1<=mb_width, k#init<=k}
+//  T(i,k,mb_type) {i+k#init==k, 0<=i, i+1<=mb_width}
       for(i = 0; i <= mb_width-1; i += 1) {
 //  T() {}
          mbi = mbinfo+k;
@@ -14274,7 +14274,7 @@ _break_5:            ;
    k = 0;
 //  T(i,j,k) {0<=j, j+1<=mb_height2, k#init<=k}
    for(j = 0; j <= mb_height2-1; j += 1) {
-//  T(i,k) {i+k#init==k, i+1<=mb_width, k#init<=k}
+//  T(i,k) {i+k#init==k, 0<=i, i+1<=mb_width}
       for(i = 0; i <= mb_width-1; i += 1) {
 //  T() {}
          if (i==0||mbinfo[k].mquant!=mbinfo[k-1].mquant)

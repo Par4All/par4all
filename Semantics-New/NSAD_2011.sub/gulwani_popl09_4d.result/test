@@ -488,7 +488,7 @@ void ts_restructured(void)
             checking_error();
 
 //  T(c2,y) {c1==n, c1==x, c2==y, c2#init==y#init, s==2, 1<=c1, 0<=c2,
-//    c2+1<=m, y#init<=c2}
+//    c2#init<=c2, c2+1<=m}
 
          while (rand_b()) {
 

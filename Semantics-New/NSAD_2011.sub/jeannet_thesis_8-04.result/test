@@ -36,9 +36,9 @@ void ts_singlestate(void)
       checking_error();
 
 //  T(s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s,
-//    s#init+x#init<=s+x, 6s#init+5y#init<=6s+5y,
-//    3s#init+2y#init<=3s+2y, 2x#init+y<=2x+y#init, y<=2x, 0<=y,
-//    y#init<=y}
+//    18s#init+2x#init+13y#init<=18s+2x+13y,
+//    6s#init+2x#init+3y#init<=6s+2x+3y, 2x#init+y<=2x+y#init, y<=2x,
+//    0<=y, y#init<=y}
 
    while (rand_b())
 
@@ -378,24 +378,26 @@ void ts_singlestate(void)
 
    while (rand_b())
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
       if (rand_b()) {
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
          if (!(s==1&&e==1))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+1<=s, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x,
-//    0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+1<=s, e+s<=3, 0<=f, f<=1, 1<=s,
+//    4<=4s+2x+3y, 0<=2s+2x+3y, y<=2x}
 
             deadlock();
 
-//  P(e,f,s,x,y) {e==1, s==1, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==1, s==1, 0<=f, f<=1, 0<=2x+3y, y<=2x}
 
          s = 2;
 
-//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, 0<=2x+3y, y<=2x}
 
          if (!(y<=2*x))
 
@@ -405,20 +407,21 @@ void ts_singlestate(void)
       }
       else if (rand_b()) {
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
          if (!(s==1&&e==0))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, 2<=e+s, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x,
-//    0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, 2<=e+s, e+s<=3, 0<=f, f<=1, 1<=s,
+//    4<=4s+2x+3y, 0<=2s+2x+3y, y<=2x}
 
             deadlock();
 
-//  P(e,f,s,x,y) {e==0, s==1, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==1, 0<=f, f<=1, 0<=2x+3y, y<=2x}
 
          s = 3;
 
-//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, 0<=2x+3y, y<=2x}
 
          if (!(y<=2*x))
 
@@ -428,24 +431,25 @@ void ts_singlestate(void)
       }
       else if (rand_b()) {
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
          if (!(s==2&&e==1))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 2e+s<=3, 0<=f, f<=1, 1<=s,
-//    y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 2e+s<=3, 2e<=2s+2x+3y, 0<=f,
+//    f<=1, 1<=s, 4<=4s+2x+3y, 0<=2s+2x+3y, y<=2x}
 
             deadlock();
 
-//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, 0<=2x+3y+4, y<=2x}
 
          x++;
 
-//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, y+2<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, 0<=2x+3y+2, y+2<=2x}
 
          y += f;
 
-//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, y+2<=f+2x, f<=y}
+//  P(e,f,s,x,y) {e==1, s==2, 0<=f, f<=1, y+2<=f+2x, 3f<=2x+3y+2}
 
          if (!(y<=2*x))
 
@@ -455,19 +459,21 @@ void ts_singlestate(void)
       }
       else if (rand_b()) {
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
          if (!(s==2&&e==0))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 3<=e+3s+2x+3y, 0<=f, f<=1, 1<=s,
+//    4<=4s+2x+3y, 0<=2s+2x+3y, y<=2x}
 
             deadlock();
 
-//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, 0<=2x+3y+4, y<=2x}
 
          s = 3;
 
-//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, 0<=2x+3y+4, y<=2x}
 
          if (!(y<=2*x))
 
@@ -477,27 +483,29 @@ void ts_singlestate(void)
       }
       else {
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
          if (!(s==3))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, 0<=f, f<=1, 1<=s, s<=2, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, 0<=f, f<=1, 1<=s, s<=2, 4<=4s+2x+3y,
+//    0<=2s+2x+3y, y<=2x}
 
             deadlock();
 
-//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==3, 0<=f, f<=1, 0<=2x+3y+6, y<=2x}
 
          s = 2;
 
-//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, y<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, 0<=2x+3y+6, y<=2x}
 
          x++;
 
-//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, y+2<=2x, 0<=y}
+//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, 0<=2x+3y+4, y+2<=2x}
 
          y += 2;
 
-//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, y<=2x, 2<=y}
+//  P(e,f,s,x,y) {e==0, s==2, 0<=f, f<=1, 2<=2x+3y, y<=2x}
 
          if (!(y<=2*x))
 

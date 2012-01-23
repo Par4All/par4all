@@ -159,8 +159,8 @@ void ts_restructured(void)
       checking_error();
 
 //  T(b0,b1,b_tmp,ok,x,y) {b0==b1, b0#init==b1#init, ok==1, x==y,
-//    x#init==y#init, 0<=b0, b0<=1, b1#init+y#init<=b0+x,
-//    b0+y#init<=b1#init+x, b0<=x}
+//    x#init==y#init, 0<=b0, b0<=1, b1#init+x#init<=b0+x,
+//    b0+x#init<=b1#init+x, b0<=x}
 
    while (rand_b()) {
 
