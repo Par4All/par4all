@@ -2773,7 +2773,7 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 true);
 
       // The normalization of tfe and tfne below is key because
-      // transformer_empty_p() is quite weak (but fast)
+      // transformer_empty_p() is quite weak (but fast) [FI: transformer_is_empty_p]
       tfe = transformer_normalize(tfe, 2);
       /* if the transformer is not feasible, return false */
       if(transformer_empty_p(tfe)) {
