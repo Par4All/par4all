@@ -7,6 +7,7 @@ Generic tool controller
 
 import os
 
+from zipfile      import ZipFile
 from pyramid.view import view_config
 
 
@@ -39,3 +40,47 @@ def tool(request):
                 advanced = bool(request.matched_route.name.endswith('advanced')),
                 examples = _get_examples(tool, request),
                 )
+
+
+@view_config(route_name='upload_userfile', renderer='json')
+def upload(request):
+    """Handle file upload. Multiple files can be sent inside a single zip file.
+    """
+    source   = request.POST['file']
+    filename = source.filename
+
+    if os.path.splitext(filename)[1].lower() == '.zip':
+
+        # Multiples source files inside a Zip file
+
+        zip   = ZipFile(source.file, 'r')
+        files = zip.namelist()
+
+        if len(files) > 5:
+            return [['ERROR', 'Maximum 5 files in archive allowed.']]
+
+        if len(set([os.path.splitext(f)[1] for f in files])) > 1:
+            return [['ERROR', 'All of the sources have to be written in the same language.']]
+
+        return [(f, zip.read(f).replace('<', '&lt;').replace('>', '&gt;')) for f in files]
+
+    else:
+
+        # Single source file
+
+        text = source.file.read()
+        return [[filename, text.replace('<', '&lt;').replace('>', '&gt;')]]
+
+@view_config(route_name='get_example_file', renderer='json')
+def get_example_file(request):
+    """
+    """
+    # Sanitize file path
+    tool     = os.path.basename(request.matchdict['tool'])
+    filename = os.path.basename(request.matchdict['filename'])
+    path = os.path.abspath(os.path.join(request.registry.settings['paws.validation'], 'tools', tool, filename))
+    return file(path).read()
+
+    return file(paws.examples + operation + '/'+ name).read()
+    return self.get_file_content(request.params['operation'], request.params['name'])
+

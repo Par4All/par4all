@@ -306,7 +306,7 @@ function check_sources(index, panel_id) {
 	u = u + 1;
     }
     if (u == files_no + 1) {
-	get_functions("preconditions");
+	get_functions(operation);
 	return true;
     }
     return false;
@@ -432,55 +432,35 @@ function removeTabs() {
     multiple = false;
 }
 
+
 /*********************************************************************
 *								     *
 * Functions for loading examples.				     *
 *								     *
 *********************************************************************/
 
-function load_examples() {
+function load_example() {
     if (multiple)
 	removeTabs();
+    file_name = $(this).attr('value');
+    $("#source_tab_link1").text(file_name);
     $.ajax({
-        type: "POST",
-        data: {operation: operation},
+        type: "GET",
         cache: false,
-        url: "/examples/get_examples",
+        url: "/examples/get_file/" + operation + '/' + file_name,
         error: function() {
-            $('#dialog-error-examples').dialog('open');
+            document.source1.sourcecode1.value = "Web error, please try again later.";
         },
-	success: function(data) {
-            var dialog_content = data;
-            $('#select-examples-buttons').html(dialog_content);
-            $('#select-examples-buttons input:submit').button();
-            $('#select-examples-buttons input:submit').click(function() {
-                file_name = $(this).attr('value');
-                $("#source_tab_link1").text(file_name);
-                $.ajax({
-                    type: "POST",
-                    data: {
-                        name: file_name,
-                        operation: operation
-                    },
-                    cache: false,
-                    url: "/examples/get_file",
-                    error: function() {
-                        document.source1.sourcecode1.value = "Web error, try again later.";
-                    },
-                    success: function(data) {
-                        document.source1.sourcecode1.value = data;
-                        setPseudoTextFileValue("");
-                        change_tab_focus_src();
-                        deactivate_buttons();
-                        load_example_success();
-			language_detection(data, 1);
-                    }
-                });
-                $('#dialog-load-examples').dialog("close");
-            });
-            $('#dialog-load-examples').dialog('open');
+        success: function(data) {
+            document.source1.sourcecode1.value = data;
+            setPseudoTextFileValue("");
+            change_tab_focus_src();
+            deactivate_buttons();
+            load_example_success();
+	    language_detection(data, 1);
         }
     });
+    $('#classic-examples-dialog').dialog("close");
 }
 
 function load_example_success() {
@@ -489,7 +469,8 @@ function load_example_success() {
     clear_result_tab();
     clear_multiple();
 }
-    
+
+
 /*********************************************************************
 *								     *
 * Functions for handling special keys.				     *
@@ -580,6 +561,7 @@ function changeLinesHeight() {
     $('.lines').css('height', size);
 }
 
+
 /*********************************************************************
 *								     *
 * Function for components initialization.			     *
@@ -588,19 +570,24 @@ function changeLinesHeight() {
 
 function initialize() {
 	
+    // Resize buttons
+    $('#aplus').click(function()  { resize(1) });
+    $('#aminus').click(function() { resize(0) });
+    
+
+    // Load classic examples
+    $('#classic-examples-dialog').dialog({
+        autoOpen: false,
+        width: 400
+    });
+    $("#classic-examples-button").button()
+    .click(function() {
+	$('#classic-examples-dialog').dialog('open');
+    });
+    $('#classic-examples-dialog input').button().click(load_example);
+
     $('#sourcecode1').linedtextarea();
     $('#sourcecode1').attr('spellcheck', false);
-
-    $('#dialog-error-examples').dialog({
-            autoOpen: false,
-		width: 400,
-            buttons: { "OK": function() { $(this).dialog("close");} }
-	});
-
-    $('#dialog-load-examples').dialog({
-            autoOpen: false,
-		width: 400
-		});
 
     $('#dialog-choose-function').dialog({
 	    autoOpen: false,
@@ -649,11 +636,6 @@ function initialize() {
 	    $('#tabs').tabs('select', '#' + result_id);
         });
 
-    $("input:submit", ".load_examples").button();
-    $("input:submit", ".load_examples").click(function(event) {     
-            event.preventDefault();
-            load_examples("preconditions");
-        });
 
     $('#resizing_source input:submit').button();
 }

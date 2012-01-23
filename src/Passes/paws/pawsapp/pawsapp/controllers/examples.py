@@ -9,16 +9,10 @@ from pawsapp.lib.fileutils import FileUtils
 
 class ExamplesController(BaseController, FileUtils):
 
-    def get_file(self):
-	return self.get_file_content(request.params['operation'], request.params['name'])
-
     def demo(self):
 	filename = request.params['name']
 	return self.get_file_content(request.params['operation'], filename[ : filename.index('.')] + '.tpips')
     
-    def get_file_content(self, operation, name):
-	return file(paws.examples + operation + '/'+ name).read()
-
     def perform(self):
 	name = request.params['name']
 	return self.run_tpips(paws.examples + request.params['operation'] + '/' + name[: name.rindex('.')], name[name.rindex('.') + 1])

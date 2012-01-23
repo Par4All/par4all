@@ -1,8 +1,7 @@
 body {
     padding: 1em 5em;
     margin: 0;
-    font-family: "Trebuchet MS", sans-serif;
-    font-size: 80%;
+    font: 70% "Trebuchet MS", sans-serif;
 }
 
 #header h1 {
@@ -12,12 +11,34 @@ body {
     left: 50px;
 }
 
-#site-content {
-}
-
 #footer #copyright {
     font-size: 85%;
     text-align: right;
 }
 
-h2 { font-size: 100% }
+
+/* Home page */
+
+#sections {
+    font-size: 100%;
+}
+#sections h2 {
+    font-size: 120%;
+}
+#sections h3 {
+    font-size: 110%;
+}
+#sections .section {
+    padding-bottom: 1em;
+}
+
+/* Tool page */
+
+h1 {
+    font-size: 150%;
+}
+
+#classic-examples-dialog input {
+    width: 100%;
+    margin-bottom: 2px;
+}

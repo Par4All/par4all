@@ -56,8 +56,9 @@ PAWS
 
     ## Footer
     <div id="footer">
-      <p><a href="http://pips4u.org" target="_blank">
-	${h.image(request.static_url("pawsapp:static/img/pips-small.png"), u"PIPS4u logo")}</a> INSIDE!</p>
+      <p>
+	<a href="http://pips4u.org" target="_blank">
+	  ${h.image(request.static_url("pawsapp:static/img/pips-small.png"), u"PIPS4u logo")}</a> INSIDE!</p>
       <p id="copyright">© 2011-2012 MINES ParisTech</p>
     </div>
 

@@ -10,7 +10,11 @@ from pygments.formatters import HtmlFormatter
 
 class FileUtils:
 
-    extensions = { "C" : ".c", "Fortran95" : ".f90", "Fortran77" : ".f", "Fortran" : ".f"}
+    extensions = { "C"         : ".c",
+                   "Fortran95" : ".f90",
+                   "Fortran77" : ".f",
+                   "Fortran"   : ".f"}
+
     temporary_files_path = "files/"
 
     def create_directory(self):

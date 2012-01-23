@@ -37,18 +37,18 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
 
       <div id="left_side">
 
-	<div id="resizing_source">
-	  <div style="text-align: right; width: 100%; float: left;">
-	    <input name="Aplus" value="A+" type="submit" onClick="resize(1)"/>
-	    <input name="Aminus" value="A-" type="submit" onClick="resize(0)"/>
-	  </div>
+	<div id="resizing_source" style="text-align:right">
+	  ${h.submit("Aplus", value="A+")}
+	  ${h.submit("Aminus", value="A-")}
 	</div>
 
 	<h3>TYPE OR SELECT SOURCE CODE FROM:</h3>
-	<div class="load_examples left_side_buttons">
+
+	<div>
 	  <p><b>A set of classic examples:</b></p>
-	  <input value="BROWSE" type="submit"/>
+	  ${h.submit("classic-examples-button", u"BROWSE")}
 	</div>
+
 	<div class="load_client_file_form left_side_buttons">
 	  <p><b>Or from your own test cases:</b></p>
 	  <input type="submit" value="BROWSE" id="pseudobutton"/>
@@ -121,7 +121,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
 ## Dialog boxes
 
 ## Classic examples popup
-<div id="dialog-load-examples" title="Select an example.">
+<div id="classic-examples-dialog" title="Please select an example">
     % for ex in examples:
     ${h.submit(ex, ex)}<br/>
     % endfor

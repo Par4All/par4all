@@ -19,7 +19,6 @@ PYPS AS A WEB SERVICE
   #main td { vertical-align: top }
   #left    { width: 25%; padding: 0 2em }
   #right   { padding: 1em }
-  #sections .section { padding-bottom: 1em }
 </style>
 </%def>
 
@@ -42,6 +41,7 @@ PYPS AS A WEB SERVICE
 ## Page content
 
 <div id="main" class="ui-widget ui-widget-content ui-corner-all">
+
   <table>
     <tr>
 
@@ -66,14 +66,14 @@ PYPS AS A WEB SERVICE
 	    <td style="width:100%" id="${s['path']}" class="section">
 
 	      ## Subsection
-	      % for t in s['tools']:
+	      % for t in s["tools"]:
 	      <h3>${h.link_to(t["name"].upper(), url="#")}</a></h3>
 	      <div>
-		<div>${t['descr']}</div>
+		<div>${t["descr"]|n}</div>
 		<p>
-        	  <b>${h.link_to("basic", url="/%s/%s" % (s["path"], t["name"]))}</b>
+        	  <b>${h.link_to(u"basic", url="/%s/%s" % (s["path"], t["name"]))}</b>
 		  % if s["advmode"]:
-        	  <b>${h.link_to("advanced", url="/%s/%s/advanced" % (s["path"], t["name"]))}</b>
+        	  <b>${h.link_to(u"advanced", url="/%s/%s/advanced" % (s["path"], t["name"]))}</b>
 		  % endif
 		</p>
 	      </div>
