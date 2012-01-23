@@ -77,6 +77,24 @@ Pcontrainte contrainte_make(Pvecteur pv)
   return(c);
 }
 
+/* Generate a constraint a x <= b or a x >= b, according to less_p, or
+ * ax==b, regardless of less_p.
+ *
+ * Since equalities and inequalities are not distinguished, less_p is
+ * not relevant when equations are built.
+ */
+Pcontrainte contrainte_make_1D(Value a, Variable x, Value b, bool less_p)
+{
+  Pvecteur v = VECTEUR_UNDEFINED;
+  if(less_p)
+    v = vect_make_1D(a, x, value_uminus(b));
+  else
+    v = vect_make_1D(value_uminus(a), x, b);
+  Pcontrainte c = contrainte_make(v);
+  return c;
+}
+
+
 /* Convert a list of vectors into a list of constraints */
 Pcontrainte contraintes_make(Pvecteur pv,...)
 {
@@ -165,6 +183,9 @@ Pcontrainte contraintes_dup(Pcontrainte c_in)
  */
 Pcontrainte contrainte_free(Pcontrainte c)
 {
+  // Cannot be used at the contrainte level
+  //ifscdebug(1)
+  //  fprintf(stderr, "Constraint %p is going to be freed\n", c);
   if (!CONTRAINTE_UNDEFINED_P(c))
   {
     if (c->eq_sat != NULL) {

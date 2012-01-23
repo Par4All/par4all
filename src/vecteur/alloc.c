@@ -222,6 +222,13 @@ Pvecteur vect_make_dense(Pbase b, Value val, ...)
     return v;
 }
 
+/* Generate a sparse vector a x + b TCST */
+Pvecteur vect_make_1D(Value a, Variable x, Value b)
+{
+  Pvecteur v = vect_new(x, a);
+  vect_add_elem(&v, TCST, b);
+  return v;
+}
 
 /* direct duplication.
  * vect_dup() and vect_reversal() do the same thing :

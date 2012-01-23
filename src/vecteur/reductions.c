@@ -523,9 +523,12 @@ Variable var;
  *
  * new version to test linear_hashtable. better for large vectors,
  * but much worse for small ones I guess. FC.
+ *
+ * Especially for the NULL vector. FI.
  */
-bool vect_check(Pvecteur v)
+bool vect_check(Pvecteur cv)
 {
+  Pvecteur v = cv;
   register bool
     consistent = true,
     tcst_seen = false;
