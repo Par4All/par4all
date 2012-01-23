@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# No compilation issue
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete equiv25
+create equiv25 equiv25.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EQUIV25]
+
+close
+delete equiv25
+quit
+EOF
