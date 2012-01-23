@@ -49,7 +49,6 @@ c
 10    FORMAT(F8.2,F8.2,F8.2,F8.2,F8.2)
 ! collecting distributed variable TEMP
       IF (1.LE.OLD.AND.OLD.LE.2) THEN
-         PSI1 = 1
          PSI2 = 1
          BUF INDEX = 0
          RECEIVED NOT PERFORMED = .FALSE.
@@ -308,7 +307,7 @@ c
       IF (1.LE.OLD.AND.OLD.LE.2) THEN
          PSI1 = MY POS(1,1)
          PSI2 = MY POS(2,1)
-         IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
+         IF (PSI2.EQ.1) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
             DO ALPHA2 = 12, 60

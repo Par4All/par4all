@@ -24,7 +24,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = 5*PSI1-4, 5*PSI1
+         DO ALPHA1 = 5*PSI1-4, MIN(20, 5*PSI1)
             ALPHA2 = 2
             LALPHA1 = ALPHA1-5*PSI1+5
             LALPHA2 = 2
@@ -129,7 +129,7 @@
       PSI1 = MY POS(1,2)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = 5*PSI1-4, 5*PSI1
+      DO ALPHA1 = 5*PSI1-4, MIN(20, 5*PSI1)
          ALPHA2 = 2
          LALPHA1 = ALPHA1-5*PSI1+5
          LALPHA2 = 2

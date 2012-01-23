@@ -69,7 +69,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = 5*PSI1-4, 5*PSI1
+         DO ALPHA1 = 5*PSI1-4, MIN(10, 5*PSI1)
             LALPHA1 = ALPHA1-5*PSI1+5
             BUF INDEX = BUF INDEX+1
             A(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -150,7 +150,7 @@
 ! end of update
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
-      IF (PSI1.LE.1) THEN
+      IF (PSI1.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA1 = 5*PSI1-4, 3
@@ -184,7 +184,7 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = 5*PSI1-4, 5*PSI1
+      DO ALPHA1 = 5*PSI1-4, MIN(10, 5*PSI1)
          LALPHA1 = ALPHA1-5*PSI1+5
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1)

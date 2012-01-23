@@ -196,7 +196,6 @@
       CALL HPFC INIT HOST
       CALL INIT_HOST
 ! collecting distributed variable A
-      PSI1 = 1
       PSI2 = 2
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -322,7 +321,7 @@
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (2.LE.PSI2.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 15

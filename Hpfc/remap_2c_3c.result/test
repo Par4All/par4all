@@ -14,8 +14,7 @@
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO I_1 = (-3*PSI1+3*PSIp1+5)/6, (-3*PSI1+3*PSIp1
-     &               +57)/6
+                     DO I_1 = (-PSI1+PSIp1+2)/3, (-PSI1+PSIp1+29)/3
                         LALPHAp1 = PSI1-PSIp1+2*I_1+1
                         LALPHA1 = PSI1-PSIp1+3*I_1+1
                         BUF INDEX = BUF INDEX+1
@@ -44,8 +43,7 @@
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO I_1 = (-3*PSI1+3*PSIp1+5)/6, (-3*PSI1+3*PSIp1
-     &               +57)/6
+                     DO I_1 = (-PSI1+PSIp1+2)/3, (-PSI1+PSIp1+29)/3
                         LALPHAp1 = PSI1-PSIp1+2*I_1+1
                         LALPHA1 = PSI1-PSIp1+3*I_1+1
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
@@ -59,8 +57,7 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO I_1 = (-3*PSI1+3*PSIp1+5)/6, (-3*PSI1+3*PSIp1
-     &               +57)/6
+                     DO I_1 = (-PSI1+PSIp1+2)/3, (-PSI1+PSIp1+29)/3
                         LALPHAp1 = PSI1-PSIp1+2*I_1+1
                         LALPHA1 = PSI1-PSIp1+3*I_1+1
                         A_1(LALPHAp1) = A(LALPHA1)

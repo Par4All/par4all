@@ -21,8 +21,8 @@
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(5*PSI1-8, 5*PSI2-4, -PSI1+4, -4*PSI1+7), 
-     &      MIN(9, 5*PSI2, 5*PSI1+3, -7*PSI1+23)
+            DO ALPHA2 = MAX(5*PSI1-8, 2, 5*PSI2-4, -4*PSI1+7), MIN(-7
+     &      *PSI1+23, 9, 5*PSI2, 5*PSI1+3)
                DO ALPHA1 = MAX(5*PSI1-4, HPFC DIVIDE(-4*ALPHA2+28, 3)
      &         , ALPHA2-3), MIN(ALPHA2+4, HPFC DIVIDE(-3*ALPHA2+51, 4
      &         ), 5*PSI1)
@@ -232,8 +232,8 @@
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = MAX(5*PSI1-8, 5*PSI2-4, -PSI1+4, -4*PSI1+7), MIN(9
-     &, 5*PSI2, 5*PSI1+3, -7*PSI1+23)
+      DO ALPHA2 = MAX(5*PSI1-8, 2, 5*PSI2-4, -4*PSI1+7), MIN(-7*PSI1+
+     &23, 9, 5*PSI2, 5*PSI1+3)
          DO ALPHA1 = MAX(5*PSI1-4, HPFC DIVIDE(-4*ALPHA2+28, 3), 
      &   ALPHA2-3), MIN(ALPHA2+4, HPFC DIVIDE(-3*ALPHA2+51, 4), 5*
      &   PSI1)

@@ -187,7 +187,6 @@ c
       CALL HPFC HTIMEON
       CALL HPFC HTIMEOFF('empty measure')
 ! collecting distributed variable B
-      PSI1 = 1
       PSI2 = 1
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -452,7 +451,7 @@ c
 ! collecting distributed variable B
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA2 = MAX(256*PSI2-255, 256*PSI1-252), MIN(13, 256*

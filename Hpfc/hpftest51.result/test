@@ -25,7 +25,6 @@ c print results
       PRINT *, 'results:'
 10    FORMAT(F8.2,F8.2,F8.2,F8.2,F8.2)
 ! collecting distributed variable TC
-      PSI1 = 1
       PSI2 = 1
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -278,7 +277,7 @@ c computation and copy back (dataparallel semantic)
 ! collecting distributed variable TC
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA2 = 2, 10

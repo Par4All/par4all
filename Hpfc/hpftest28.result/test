@@ -26,11 +26,10 @@
       CALL HPFC HCAST
 ! end of update
 ! updating distributed variable NORTH
-      PSI1 = 1
       DO PSI2 = 1, 2
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA1 = 5*PSI2-4, 5*PSI2
+         DO ALPHA1 = 5*PSI2-4, MIN(10, 5*PSI2)
             LALPHA1 = ALPHA1-5*PSI2+5
             BUF INDEX = BUF INDEX+1
             HPFC REAL4 BUFF(BUF INDEX) = NORTH(ALPHA1)
@@ -56,7 +55,7 @@ c print results
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(2, 5*PSI2-4), MIN(9, 5*PSI2)
+            DO ALPHA2 = MAX(5*PSI2-4, 2), MIN(9, 5*PSI2)
                DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(9, 5*PSI1)
                   LALPHA1 = ALPHA1-5*PSI1+5
                   LALPHA2 = ALPHA2-5*PSI2+5
@@ -211,18 +210,16 @@ c print results
 ! updating distributed variable NORTH
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI1.LE.1) THEN
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         CALL HPFC RCV FROM HOST
-         CALL HPFC REAL4 BUFUPK
-         DO ALPHA1 = 5*PSI2-4, 5*PSI2
-            LALPHA1 = ALPHA1-5*PSI2+5
-            BUF INDEX = BUF INDEX+1
-            NORTH(LALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
-         ENDDO
-      ENDIF
+      BUF INDEX = 0
+      RECEIVED NOT PERFORMED = .FALSE.
+      SIZE OF RECEIVED BUFFER = 0
+      CALL HPFC RCV FROM HOST
+      CALL HPFC REAL4 BUFUPK
+      DO ALPHA1 = 5*PSI2-4, MIN(10, 5*PSI2)
+         LALPHA1 = ALPHA1-5*PSI2+5
+         BUF INDEX = BUF INDEX+1
+         NORTH(LALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
+      ENDDO
 ! end of update
       IF (MY POS(1,1).EQ.1) THEN
          DO I_4 = I_5, I_6
@@ -322,7 +319,7 @@ c computation and copy back (dataparallel semantic)
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = MAX(2, 5*PSI2-4), MIN(9, 5*PSI2)
+      DO ALPHA2 = MAX(5*PSI2-4, 2), MIN(9, 5*PSI2)
          DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(9, 5*PSI1)
             LALPHA1 = ALPHA1-5*PSI1+5
             LALPHA2 = ALPHA2-5*PSI2+5

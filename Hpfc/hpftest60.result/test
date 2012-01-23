@@ -26,7 +26,7 @@
          T LID = 2*PSI1+PSI2-2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA3 = MAX(5*PSI2-4, 5*PSI1-4), MIN(5*PSI2, 5*PSI1)
+         DO ALPHA3 = MAX(5*PSI2-4, 5*PSI1-4), MIN(10, 5*PSI2, 5*PSI1)
             ALPHA2 = ALPHA3
             ALPHA1 = ALPHA3
             LALPHA1 = ALPHA1
@@ -134,7 +134,7 @@
       IF (PSI2.LE.PSI1.AND.PSI1.LE.PSI2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA3 = MAX(5*PSI2-4, 5*PSI1-4), MIN(5*PSI2, 5*PSI1)
+         DO ALPHA3 = MAX(5*PSI2-4, 5*PSI1-4), MIN(10, 5*PSI2, 5*PSI1)
             ALPHA2 = ALPHA3
             ALPHA1 = ALPHA3
             LALPHA1 = ALPHA1

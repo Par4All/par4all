@@ -386,7 +386,7 @@
 ! end remappings
 ! collecting distributed variable SOL
       PSI1 = MY POS(1,2)
-      IF (PSI1.LE.1) THEN
+      IF (PSI1.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA1 = 1

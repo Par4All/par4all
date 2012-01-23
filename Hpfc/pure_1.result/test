@@ -91,7 +91,7 @@ cfcd$ pure
       ENDDO
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
-      IF (PSI1.LE.3.AND.3.LE.PSI1) THEN
+      IF (PSI1.EQ.3) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA1 = 51

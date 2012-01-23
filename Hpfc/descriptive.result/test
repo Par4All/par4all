@@ -256,7 +256,7 @@
       INTEGER A(OUTPUT A LO1:OUTPUT A UP1)
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
-      IF (PSI1.LE.2.AND.2.LE.PSI1) THEN
+      IF (PSI1.EQ.2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA1 = 45, 50

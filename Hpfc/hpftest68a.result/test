@@ -162,7 +162,6 @@
       CALL HPFC INIT HOST
       PRINT *, 'DYNAMIC TEST (68) RUNNING'
 ! collecting distributed variable A
-      PSI1 = 1
       PSI2 = 2
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -181,7 +180,6 @@
       PRINT *, 'after transpose'
       PRINT *, 'after unused remapping'
 ! collecting distributed variable A_1
-      PSI1 = 2
       PSI2 = 1
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -206,7 +204,7 @@
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(15*PSI1-14, 15*PSI2-15), MIN(19, 15*PSI2-
+            DO ALPHA2 = MAX(15*PSI2-15, 15*PSI1-14), MIN(19, 15*PSI2-
      &      1, 15*PSI1)
                ALPHA1 = ALPHA2+1
                LALPHA1 = ALPHA1-15*PSI2+15
@@ -228,7 +226,6 @@
       CALL HPFC HCAST
 ! end of update
 ! collecting distributed variable A
-      PSI1 = 1
       PSI2 = 2
       BUF INDEX = 0
       RECEIVED NOT PERFORMED = .FALSE.
@@ -392,7 +389,7 @@
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (2.LE.PSI2.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
@@ -427,7 +424,7 @@
 ! collecting distributed variable A_1
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI2.LE.1.AND.2.LE.PSI1) THEN
+      IF (PSI2.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
@@ -446,7 +443,7 @@
       IF (PSI1.LE.PSI2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = MAX(15*PSI1-14, 15*PSI2-15), MIN(19, 15*PSI2-1, 
+         DO ALPHA2 = MAX(15*PSI2-15, 15*PSI1-14), MIN(19, 15*PSI2-1, 
      &   15*PSI1)
             ALPHA1 = ALPHA2+1
             LALPHA1 = ALPHA1-15*PSI2+15
@@ -478,7 +475,7 @@
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (2.LE.PSI2.AND.PSI1.LE.1) THEN
+      IF (PSI2.EQ.2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20

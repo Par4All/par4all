@@ -20,7 +20,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL4 BUFUPK
-         DO ALPHA1 = MAX(2, 5*PSI1-4), 5*PSI1
+         DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(10, 5*PSI1)
             ALPHA2 = 1
             LALPHA1 = ALPHA1-5*PSI1+5
             LALPHA2 = 1
@@ -156,7 +156,7 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = MAX(2, 5*PSI1-4), 5*PSI1
+      DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(10, 5*PSI1)
          ALPHA2 = 1
          LALPHA1 = ALPHA1-5*PSI1+5
          LALPHA2 = 1
