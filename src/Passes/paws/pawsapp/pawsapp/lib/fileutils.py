@@ -1,16 +1,12 @@
-import logging
+# -*- coding: utf-8 -*-
+
 import re, os, shutil
 import tempfile
-
-import pawsapp.config.paws as paws
 
 from pygments import highlight
 from pygments.lexers import CLexer, FortranLexer
 from pygments.formatters import HtmlFormatter
 
-from pylons import session
-
-log = logging.getLogger(__name__)
 
 class FileUtils:
 

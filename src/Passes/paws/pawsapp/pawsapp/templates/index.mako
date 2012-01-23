@@ -26,7 +26,7 @@ PYPS AS A WEB SERVICE
 <%def name="js_slot()">
 <script type="text/javascript">
     $(function() {
-% for s in c.sections:
+% for s in sections:
 	$("#${s['path']}").accordion({ 
 	    active: false,
 	    animated: 'bounceslide',
@@ -48,7 +48,7 @@ PYPS AS A WEB SERVICE
       ## Left column
 
       <td id="left">
-	<h4>${c.text|n}</h4>
+	<h4>${text|n}</h4>
       </td>
 
       ## Right column
@@ -58,7 +58,7 @@ PYPS AS A WEB SERVICE
 	<table id="sections">
 
 	  ## Section
-	  % for s in c.sections:
+	  % for s in sections:
 	  <tr>
 	    <td style="width:200px; white-space: nowrap">
 	      <h2>${s["title"]}</h2>

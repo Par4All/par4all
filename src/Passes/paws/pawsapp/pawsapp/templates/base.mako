@@ -29,15 +29,15 @@ PAWS
     <title>${self.pagetitle()}</title>
     
     ## Stylesheets
-    ${h.stylesheet_link(url("/css/jq/cupertino/jquery-ui-1.8.10.custom.css"), media="all")}
-    ${h.stylesheet_link(url("/css/normal.css"), media="all")}
-    ${h.stylesheet_link(url("/css/print.css"),  media="print")}
+    ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/cupertino/jquery-ui-1.8.10.custom.css"), media="all")}
+    ${h.stylesheet_link(request.static_url("pawsapp:static/css/normal.css"), media="all")}
+    ${h.stylesheet_link(request.static_url("pawsapp:static/css/print.css"),  media="print")}
     ${self.css_slot()}
 
     ## Javascript
-    ${h.javascript_link(url("/jq/jquery-1.7.1.min.js"))}
-    ${h.javascript_link(url("/jq/jquery-ui-1.8.10.custom.min.js"))}
-    ${h.javascript_link(url("/js/base.js"))}
+    ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-1.7.1.min.js"))}
+    ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-ui-1.8.10.custom.min.js"))}
+    ${h.javascript_link(request.static_url("pawsapp:static/js/base.js"))}
     ${self.js_slot()}
   </head>
 
@@ -45,7 +45,7 @@ PAWS
 
     ## Header
     <div id="header">
-      <a href="/">${h.image("/img/paws-small.png", "PAWS Logo")}</a>
+      <a href="/">${h.image(request.static_url("pawsapp:static/img/paws-small.png"), u"PAWS Logo")}</a>
       <h1>${self.title()}</h1>
     </div>
 
@@ -57,7 +57,7 @@ PAWS
     ## Footer
     <div id="footer">
       <p><a href="http://pips4u.org" target="_blank">
-	${h.image("/img/pips-small.png", "PIPS4u logo")}</a> INSIDE!</p>
+	${h.image(request.static_url("pawsapp:static/img/pips-small.png"), u"PIPS4u logo")}</a> INSIDE!</p>
       <p id="copyright">© 2011-2012 MINES ParisTech</p>
     </div>
 
