@@ -76,7 +76,7 @@ void complete01()
 
       int j = 0;                                                        /*0014*/
 
-//  T(i,j) {i+j#init==j, i<=9, j#init<=j}
+//  T(i,j) {i+j#init==j, 0<=i, i<=9}
 
       for (i = 0;i<10;i++)                                              /*0015*/
 

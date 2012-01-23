@@ -183,11 +183,11 @@ int main(void)
       // flip-flop
       b = !b;
 
-//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=ok+y, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, 0<=ok, ok<=1, 1<=ok+y, 1<=x}
 
       ok = ok&&x>=y;
 
-//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=x, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, 0<=ok, ok<=1, 1<=x, 0<=y}
 
       // If the previous boolean assignment is changed into
       //if(x<y)
@@ -231,8 +231,8 @@ int main(void)
 
    while (1) {
 
-//  T(x,y) {b+x==x#init+1, x==y#init+1, x#init==y, 0<=ok, ok<=1,
-//    1<=ok+x#init, 1<=x, x#init<=x, x<=x#init+1}
+//  T(x,y) {b+x==x#init+1, b+y#init==x#init, x#init==y, 0<=b, b<=1,
+//    b<=x#init, 0<=ok, ok<=1, 1<=ok+x#init}
 
       if (b)
 
@@ -317,11 +317,11 @@ int main(void)
       // flip-flop
       b = !b;
 
-//  P(b,ok,x,y) {b+y==x, ok==1, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, 1<=x}
 
       ok = ok&&x>=y;
 
-//  P(b,ok,x,y) {b+y==x, ok==1, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, 1<=x}
 
       // If the previous boolean assignment is changed into
       //if(x<y)

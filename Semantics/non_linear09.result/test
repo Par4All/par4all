@@ -8,7 +8,7 @@ C  T() {}
 
 C  T(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {K==LK, KU+NU==KN,
 C    KU==LI+1, 2KU==LJ+2, 0<=K, L<=K, 2L<=K+2, 2M+NU+1<=KN+2L,
-C    M+NU+2<=KN+L, NU+1<=KN, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    M+NU+2<=KN+L, 1<=KU, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,1)
 C     BEGIN BLOCK

@@ -7,11 +7,11 @@
       SUBROUTINE LOOP_MINBOUND(N,M)
       INTEGER T(100)
 
-C  <T(PHI1)-W-MAY-{0<=PHI1, PHI1<=M, PHI1<=N, 0<=M, 0<=N}>
+C  <T(PHI1)-W-MAY-{0<=PHI1, PHI1<=M, PHI1<=N}>
 
       DO I = 0, MIN(N, M)                                               0003
 
-C  <T(PHI1)-W-EXACT-{PHI1==I, 0<=I, I<=M, I<=N, 0<=M, 0<=N}>
+C  <T(PHI1)-W-EXACT-{PHI1==I, 0<=I, I<=M, I<=N}>
 
          T(I) = 0.                                                      0004
       ENDDO

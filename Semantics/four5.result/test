@@ -390,7 +390,7 @@ C    1<=M, M<=MMAX, 2<=MMAX, MMAX+2<=4N, MMAX+1<=2N, 1<=N}
                J = I+MMAX                                               0058
 
 C  P(I,ISTEP,IXX,J,M,MMAX,NN) {I+MMAX==J, ISTEP==2MMAX, 2N==NN,
-C    I+2<=J, I+M<=J, J+1<=I+2N, M<=I, I<=2N, 1<=M, MMAX+2<=4N, 1<=N}
+C    I+M<=J, J+1<=I+2N, M<=I, I<=2N, 1<=M, 2<=MMAX, MMAX+2<=4N, 1<=N}
 
                TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)              0059
 
