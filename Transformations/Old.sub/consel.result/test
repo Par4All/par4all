@@ -86,7 +86,7 @@ C    I+1023<=MLEN, LEN<=MLEN}>
 C (0,6)
          DO J = I, MLEN                                                 0011
 
-C  <BUFFER(PHI1)-OUT-EXACT-{PHI1+I==J+1, 1<=I, I<=J, I<=LEN,
+C  <BUFFER(PHI1)-OUT-EXACT-{PHI1+I==J+1, 1<=PHI1, 1<=I, I<=LEN,
 C    I+1023<=MLEN, J<=MLEN, LEN<=MLEN}>
 
 C (0,7)

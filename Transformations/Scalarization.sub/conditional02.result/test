@@ -17,9 +17,9 @@ int main(int argc, char **argv)
       for(i = 1; i <= N; i += 1) {
          int j;
 
-//  <a[PHI1][PHI2]-W-MAY-{PHI1+i<=2PHI2+N, PHI1+i<=PHI2+N,
-//    PHI1+2PHI2+3<=i+2N, 3PHI1+2PHI2+5<=i+4N, i<=PHI1+1, PHI1+1<=N,
-//    0<=PHI2, N==argc, 1<=i}>
+//  <a[PHI1][PHI2]-W-MAY-{PHI1+i<=PHI2+N, PHI1+2PHI2+3<=i+2N,
+//    3PHI1+2PHI2+5<=i+4N, i<=PHI1+1, PHI1+1<=N, 0<=PHI2, PHI2+2<=i+N,
+//    N==argc, 1<=i}>
 
          for(j = 1; j <= N; j += 1) {
 
@@ -30,12 +30,12 @@ int main(int argc, char **argv)
             if (i*j<N/2) {
 
 //  <a[PHI1][PHI2]-W-EXACT-{PHI1+i==N-1, j+i==PHI2+1, N==argc, 1<=j,
-//    2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
+//    j<=N, 2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
 
                a[N-1-i][i+j-1] = 1;
 
 //  <a[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2+j+i==N-1, N==argc, 1<=j,
-//    2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
+//    j<=N, 2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
 
                a[i-1][N-i-j-1] = 1;
             }

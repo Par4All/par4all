@@ -31,13 +31,13 @@ C    1<=SZ}>
       DO I = 1, SZ, T                                                   0011
 
 C  <A(PHI1,PHI2)-R-MAY-{I<=PHI1, PHI1<=I+9, 1<=PHI2, PHI2<=SZ+9, 1<=I,
-C    I<=SZ}>
+C    I<=SZ, 1<=SZ}>
 C  <A(PHI1,PHI2)-W-MAY-{I<=PHI1, PHI1<=I+9, 1<=PHI2, PHI2<=SZ+9, 1<=I,
-C    I<=SZ}>
+C    I<=SZ, 1<=SZ}>
 C  <B(PHI1,PHI2)-R-MAY-{I<=PHI1+1, PHI1<=I+10, 0<=PHI2, PHI2<=SZ+10,
-C    1<=I, I<=SZ}>
+C    1<=I, I<=SZ, 1<=SZ}>
 C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=SZ}>
+C    1<=I, I<=SZ, 1<=SZ}>
 
          DO J = 1, SZ, T                                                0012
 
@@ -116,8 +116,8 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=SZ}>
       DO I = 1, SZ                                                      0026
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
-C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 1<=I, I<=SZ}>
-C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=I, I<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=SZ}>
 
          DO J = 1, SZ                                                   0027
 
@@ -156,9 +156,9 @@ C    1<=SZ}>
       DO I = 1, SZ, T                                                   0011
 
 C  <B(PHI1,PHI2)-IN-MAY-{I<=PHI1+1, PHI1<=I+10, 0<=PHI2, PHI2<=SZ+10,
-C    1<=I, I<=SZ}>
+C    1<=I, I<=SZ, 1<=SZ}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=SZ}>
+C    1<=I, I<=SZ, 1<=SZ}>
 
          DO J = 1, SZ, T                                                0012
 
@@ -248,7 +248,7 @@ C    1<=SZ}>
       DO I = 1, SZ, T                                                   0011
 
 C  <A(PHI1,PHI2)-OUT-MAY-{1<=PHI1, I<=PHI1, PHI1<=I+9, PHI1<=SZ,
-C    1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
+C    1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ, 1<=SZ}>
 
          DO J = 1, SZ, T                                                0012
 
