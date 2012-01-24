@@ -199,9 +199,9 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
    for(i = 0; i <= nrec-ntt+1-1; i += 1)
 
 //  <ptrin[PHI1][PHI2].im-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
-//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec}>
+//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 1<=nsa}>
 //  <ptrin[PHI1][PHI2].re-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
-//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec}>
+//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 1<=nsa}>
 //  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5].im-W-EXACT-{PHI1==i,
 //    0<=PHI2, PHI2+1<=ntt, 0<=PHI3, PHI3+1<=nsa, 0<=PHI4,
 //    PHI4+1<=ntt, 0<=PHI5, PHI5+1<=nsa, 0<=i, i+ntt<=nrec}>
@@ -213,9 +213,9 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
 
 //  <ptrin[PHI1][PHI2].im-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
-//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 0<=j1, j1+1<=ntt}>
+//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 0<=j1, j1+1<=ntt, 1<=nsa}>
 //  <ptrin[PHI1][PHI2].re-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
-//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 0<=j1, j1+1<=ntt}>
+//    PHI2+1<=nsa, 0<=i, i+ntt<=nrec, 0<=j1, j1+1<=ntt, 1<=nsa}>
 //  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5].im-W-EXACT-{PHI1==i,
 //    PHI2==j1, 0<=PHI3, PHI3+1<=nsa, 0<=PHI4, PHI4+1<=ntt, 0<=PHI5,
 //    PHI5+1<=nsa, 0<=i, i+ntt<=nrec, 0<=j1, j1+1<=ntt}>
