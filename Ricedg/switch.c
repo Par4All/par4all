@@ -2,7 +2,7 @@
 // the expression case was not handled.
 // It is in the validation to avoid a regression
 
-void main (int argc, char** argv) {
+int main (int argc, char** argv) {
   int i, j, k;
   int a[10];
   i = 0;

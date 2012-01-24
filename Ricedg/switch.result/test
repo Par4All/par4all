@@ -1,5 +1,5 @@
 // OMP style
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
    int i, j, k;                                                         /*0006*/
    int a[10];                                                           /*0007*/
@@ -29,4 +29,4 @@ _break_1:   ;
 // the expression case was not handled.
 // It is in the validation to avoid a regression
 
-void main(int argc, char **argv);                                       /*0005*/
+int main(int argc, char **argv);                                        /*0005*/
