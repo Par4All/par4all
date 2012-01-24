@@ -325,6 +325,8 @@ class p4a_processor(object):
             if pointer_analysis:
                 properties["ABSTRACT_HEAP_LOCATIONS"]="context-sensitive"
                 self.workspace.activate("proper_effects_with_points_to")
+                self.workspace.activate("cumulated_effects_with_points_to")
+                self.workspace.activate("must_regions_with_points_to")
 
             # set the workspace properties
             self.set_properties(properties)
