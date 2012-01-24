@@ -1,0 +1,46 @@
+
+Dependence graph for module "INDUC2"
+
+
+ **************** Effective Dependence Graph ****************
+
+	08 --> 08 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT> at levels  1
+	08 --> 08 with conflicts
+		from <J-W-EXACT> to <J-R-EXACT> at levels  1
+	08 --> 08 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1
+	08 --> 07 with conflicts
+		from <J-W-EXACT> to <J-R-EXACT> at levels  1
+	07 --> 08 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1 2
+
+****************** End of Dependence Graph ******************
+
+Dependence graph for module "INDUC2"
+
+
+ **************** Effective Dependence Graph ****************
+
+	08 --> 08 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT> at levels  1
+	08 --> 08 with conflicts
+		from <J-W-EXACT> to <J-R-EXACT> at levels  1
+	08 --> 08 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1
+	08 --> 07 with conflicts
+		from <J-W-EXACT> to <J-R-EXACT> at levels  1
+	07 --> 08 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1 2
+	07 --> 07 with conflicts
+		from <A(J)-W-EXACT> to <A(J)-W-EXACT> at levels  1
+	07 --> 07 with conflicts
+		from <A(J)-W-EXACT> to <A(J-1)-R-EXACT> at levels  1
+	07 --> 07 with conflicts
+		from <A(J)-W-EXACT> to <A(J)-R-EXACT> at levels  1
+	07 --> 07 with conflicts
+		from <A(J-1)-R-EXACT> to <A(J)-W-EXACT> at levels  1
+	07 --> 07 with conflicts
+		from <A(J)-R-EXACT> to <A(J)-W-EXACT> at levels  1
+
+****************** End of Dependence Graph ******************

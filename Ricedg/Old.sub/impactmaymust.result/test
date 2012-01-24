@@ -1,0 +1,72 @@
+
+      SUBROUTINE FOO(X,Y)
+      COMMON /COM/ T
+      X = 0                                                             0004
+      IF (T.GT.0) THEN                                                  0005
+         X = 1                                                          0006
+         DO WHILE (T.GT.10)                                             0007
+            X = X+1                                                     0008
+            T = T-1                                                     0009
+         ENDDO
+      ELSE
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+         Y = 2                                                          0012
+      ENDIF
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = X+1
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New anti-dependence with statement
+C	X = X+1
+      Y = 10                                                            0014
+C	Attention: impact alias MAY at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = X+1
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New anti-dependence with statement
+C	X = X+1
+C Y = 10
+      CALL FOO1(X)                                                      0015
+C	Attention: impact alias MAY at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	C	Attention: impact alias MAY at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = X+1
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New output-dependence with statement
+C	X = 0
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New anti-dependence with statement
+C	X = X+1
+C Y = 10
+CALL FOO1(X)
+C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
+C	New anti-dependence with statement
+C	X = X+1
+      Y = 3                                                             0016
+      END
+
+      SUBROUTINE FOO1(X)
+      IF (T.GT.0) THEN                                                  0003
+         X = 10                                                         0004
+C      ELSE
+C         X = 9   
+      ENDIF
+      END
+      PROGRAM IMPACT
+      COMMON /COM/ T
+      INTEGER A
+      CALL FOO(A, A)                                                    0004
+      END

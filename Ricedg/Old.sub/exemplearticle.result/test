@@ -1,0 +1,14 @@
+      PROGRAM EXEMPLEARTICLE
+      INTEGER A, C
+      CALL EXEMPLEARTICLEFOO(A, A, C)                                   0003
+      PRINT *, A, C                                                     0004
+      END
+      SUBROUTINE EXEMPLEARTICLEFOO(A, B, C)
+      INTEGER A, B, C
+      READ *, A                                                         0003
+      B = 3*A                                                           0004
+C	Attention: impact alias MUST at (EXEMPLEARTICLE:(0,2))  between B and A
+C	New flow-dependence with statement
+C	B = 3*A
+      C = A*B                                                           0005
+      END

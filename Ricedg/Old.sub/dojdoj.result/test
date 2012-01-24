@@ -1,0 +1,13 @@
+c     Test pour la reutilisation des indices des boucles
+      PROGRAM DOJDOJ
+      REAL *8 T(11,11)
+
+      DO I = 1, 10                                                      0005
+         DOALL J = 1, 5                                                 0006
+            T(I,J) = T(I-1,J-1)                                         0007
+         ENDDO
+         DOALL J = 6, 10                                                0010
+            T(I+1,J+1) = T(I,J)                                         0011
+         ENDDO
+      ENDDO
+      END

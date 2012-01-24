@@ -1,0 +1,33 @@
+      PROGRAM SWAP
+      INTEGER I, J, T
+      READ *, I, J, T                                                   0003
+      CALL SWAPFOO(I, I, T)                                             0004
+      PRINT *, I, J, T                                                  0005
+      READ *, I, J, T                                                   0006
+      CALL SWAPFOO(I, J, I)                                             0007
+      PRINT *, I, J, T                                                  0008
+      READ *, I, J, T                                                   0009
+      CALL SWAPFOO(I, J, J)                                             0010
+      PRINT *, I, J, T                                                  0011
+      END
+      SUBROUTINE SWAPFOO(I, J, T)
+      INTEGER I, J, T
+      T = I                                                             0003
+C	Attention: impact alias MUST at (SWAP:(0,9))  between T and J
+C	New flow-dependence with statement
+C	T = I
+C	Attention: impact alias MUST at (SWAP:(0,6))  between T and I
+C	New output-dependence with statement
+C	T = I
+      I = J                                                             0004
+C	Attention: impact alias MUST at (SWAP:(0,6))  between T and I
+C	New flow-dependence with statement
+C	C	Attention: impact alias MUST at (SWAP:(0,6))  between T and I
+C	New output-dependence with statement
+C	T = I
+C I = J
+C	Attention: impact alias MUST at (SWAP:(0,3))  between J and I
+C	New output-dependence with statement
+C	I = J
+      J = T                                                             0005
+      END

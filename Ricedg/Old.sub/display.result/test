@@ -1,0 +1,110 @@
+
+Printed file for "IMPACTMAYMUST"
+
+
+      SUBROUTINE FOO(X,Y,Z,ZZ)
+      COMMON /COM/ T
+      INTEGER X, Y, Z(5), ZZ, I
+C             <    is read   >: X
+C             <    is written>: X
+      X = X+1                                                           0005
+C             <    is read   >: Y
+C             <    is written>: T
+      T = Y                                                             0006
+C             <    is written>: I
+      I = 6                                                             0007
+C             <    is read   >: I
+      DO WHILE (I.LT.5)                                                 0008
+C             <    is read   >: I Z(I) ZZ
+C             <    is written>: Z(I)
+         Z(I) = ZZ*Z(I)                                                 0009
+      ENDDO
+C             <    is written>: Y
+      Y = 2                                                             0011
+C             <    is read   >: Y
+C             <    is written>: I
+      DO I = 1, Y                                                       0012
+C             <    is read   >: X Y
+C             <    is written>: X
+         X = X+2                                                        0013
+      ENDDO
+      END
+
+Printed file with cumulated effects for "IMPACTMAYMUST"
+
+C             <may be read   >: Z(*) ZZ
+C             <may be written>: Z(*)
+C             <    is read   >: X Y
+C             <    is written>: T X Y
+
+      SUBROUTINE FOO(X,Y,Z,ZZ)
+      COMMON /COM/ T
+      INTEGER X, Y, Z(5), ZZ, I
+C             <    is read   >: X
+C             <    is written>: X
+      X = X+1                                                           0005
+C             <    is read   >: Y
+C             <    is written>: T
+      T = Y                                                             0006
+C             <    is written>: I
+      I = 6                                                             0007
+C             <may be read   >: Z(*) ZZ
+C             <may be written>: Z(*)
+C             <    is read   >: I
+      DO WHILE (I.LT.5)                                                 0008
+C             <may be read   >: Z(*)
+C             <may be written>: Z(*)
+C             <    is read   >: I ZZ
+         Z(I) = ZZ*Z(I)                                                 0009
+      ENDDO
+C             <    is written>: Y
+      Y = 2                                                             0011
+C             <may be read   >: X
+C             <may be written>: X
+C             <    is read   >: Y
+C             <    is written>: I
+      DO I = 1, Y                                                       0012
+C             <    is read   >: X Y
+C             <    is written>: X
+         X = X+2                                                        0013
+      ENDDO
+      END
+
+Whole dependence graph for "IMPACTMAYMUST"
+
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	05 --> 13 with conflicts
+		from <X-W-EXACT> to <X-W-EXACT>
+		from <X-W-EXACT> to <X-R-EXACT>
+		from <X-R-EXACT> to <X-W-EXACT>
+	06 --> 11 with conflicts
+		from <Y-R-EXACT> to <Y-W-EXACT>
+	07 --> 08 with conflicts
+		from <I-W-EXACT> to <I-R-EXACT>
+	07 --> 09 with conflicts
+		from <I-W-EXACT> to <I-R-EXACT>
+	07 --> 12 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	08 --> 12 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	09 --> 09 with conflicts
+		from <Z(I)-W-EXACT> to <Z(I)-W-EXACT>
+		from <Z(I)-W-EXACT> to <Z(I)-R-EXACT>
+		from <Z(I)-R-EXACT> to <Z(I)-W-EXACT>
+	09 --> 12 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	11 --> 12 with conflicts
+		from <Y-W-EXACT> to <Y-R-EXACT>
+	11 --> 13 with conflicts
+		from <Y-W-EXACT> to <Y-R-EXACT>
+	13 --> 13 with conflicts
+		from <X-W-EXACT> to <X-W-EXACT> at levels  1
+
+		from <X-W-EXACT> to <X-R-EXACT> at levels  1
+
+		from <X-R-EXACT> to <X-W-EXACT> at levels  1
+
+
+****************** End of Dependence Graph ******************

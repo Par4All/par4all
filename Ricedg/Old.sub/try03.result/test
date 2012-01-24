@@ -1,0 +1,6 @@
+
+First dependence graph
+
+8 8 W R <S(2*I)> - <S(I)> levels(1) ddv(<)
+8 8 R W <S(I)> - <S(2*I)> levels(1) ddv(<)
+
