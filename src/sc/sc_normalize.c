@@ -1777,6 +1777,8 @@ Psysteme sc_bounded_normalization(Psysteme ps)
   Pcontrainte eq = CONTRAINTE_UNDEFINED; /* can be an equation or an inequality */
   bool empty_p = false;
 
+  assert(sc_consistent_p(ps));
+
   /* First look for bounds in equalities, although they may have been
      exploited otherwise */
   for(eq = sc_egalites(ps); !CONTRAINTE_UNDEFINED_P(eq) && !empty_p;

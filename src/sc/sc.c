@@ -294,8 +294,15 @@ bool sc_consistent_p(Psysteme sc)
     }
     diff = base_difference(diagonale, sc_base(sc));
     consistent = BASE_NULLE_P(diff);
-    if(!consistent)
+    if(!consistent) {
       fprintf(stderr, "The base does not cover all the constraints\n");
+      fprintf(stderr, "Current base\n");
+      vect_dump(sc_base(sc));
+      fprintf(stderr, "Necessary base\n");
+      vect_dump(diagonale);
+      fprintf(stderr, "Base difference\n");
+      vect_dump(diff);
+    }
   }
 
   /* This assert is too bad ! I remove it.
