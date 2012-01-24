@@ -4,7 +4,6 @@ var frameId = 'frame_ID';       // hidden frame id
 var jFrame = null;              // hidden frame object
 var formId = 'form_ID';         // hidden form id
 var jForm = null;               // hidden form object
-var uploadUrl = '/userfiles/upload';
 var files_no = 1;
 var marker = '\", \"';
 var multiple = false;
@@ -96,12 +95,8 @@ function upload_get_response(jframe) {
     var myFrame = document.getElementById(jframe.attr('name'));
     var bod = $(myFrame.contentWindow.document.body);
     var response = $(myFrame.contentWindow.document.body).text().substring(3, bod.text().length - 3);
-    setPseudoTextFileValue(document.getElementById('inp').value);
+    $('#pseudotextfile').value($('#inp').value());
     return response;
-}
-
-function setPseudoTextFileValue(text) {
-    document.getElementById('pseudotextfile').value = text;
 }
 
 function createUploadIframe(id) {
@@ -111,7 +106,7 @@ function createUploadIframe(id) {
 };
 
 function createForm(formId) {
-    return $('<form method="post" action="' + uploadUrl + '" name="' + formId + '" id="' + formId +
+    return $('<form method="post" action="/userfiles/upload" name="' + formId + '" id="' + formId +
 	     '" enctype="multipart/form-data" style="position:absolute;width:10px;height:10px;left:45px;top:-45px;padding:5px;-moz-opacity:0;"></form>');
 };
 
@@ -121,7 +116,7 @@ function split_response(response, sequence) {
 
 function set_response_to_first_tab(splited_0) {
     $("#source_tab_link1").text(splited_0[0]);
-    document.source1.sourcecode1.value = splited_0[1];
+    $('#sourcecode1').val(splited_0[1]);
     language_detection(splited_0[1], 1);
 }
                
@@ -147,7 +142,7 @@ function upload_load(response){
 function upload_add_multiple(splited) {
     for (var i = 1; i < splited.length; i++) {
 	var no = i + 1;
-	df = $('<div id="tabs-' + no + '"><form name="language' + no + '"><label for="lang' + no + '">Language: </label><input name="lang' + no + '" value="not yet detected." readonly="readonly" /></form><table><tr><td><form name="source' + no + '"><textarea name="sourcecode' + no + '" id="sourcecode' + no + '" rows="27" cols="120" onkeydown="handle_key_down(this, event)">' + splited[i].split(marker)[1] + '</textarea></form></td></tr></table></div>');
+	df = $('<div id="tabs-' + no + '"><form name="language' + no + '"><label for="lang' + no + '">Language: </label><input name="lang' + no + '" value="not yet detected." readonly="readonly" /></form><table><tr><td><form name="source' + no + '"><textarea name="sourcecode' + no + '" id="sourcecode' + no + '" rows="27" cols="120" onkeydown="handle_keydown(this, event)">' + splited[i].split(marker)[1] + '</textarea></form></td></tr></table></div>');
 	df.appendTo('#tabs');
 	$('#sourcecode' + no).attr('spellcheck', false);
 	$('#tabs').tabs('add', '#tabs-' + no, splited[i].split(marker)[0], i);
@@ -169,7 +164,7 @@ function language_detection(source, number) {
         type: "POST",
 	data: {code: source},
 	cache: false,
-	url: "/detector/detect_language",
+	url: routes['detect_language'],
         async: false,
         error: function() {
             $('#language_detection').html("Language not recognised!");
@@ -177,10 +172,10 @@ function language_detection(source, number) {
 	},
         success: function(data) {
             if (data != "none") {
-                document.forms['language' + number].elements['lang' + number].value = data;
+		$('#lang' + number).val(data);
                 test = true;
 	    } else {
-                document.language1.lang1.value = " not supported.";
+		$('#lang' + number).val(" not supported.");
                 test = false;
             }
         }
@@ -192,12 +187,9 @@ function compile(source, number) {
     var test;
     $.ajax({
         type: "POST",
-        data: {
-            code: source,
-            language: document.forms['language' + number].elements['lang' + number].value
-        },
+        data: { code: source, language: $('#lang' + number).val() },
         cache: false,
-        url: "/detector/compile",
+        url: routes['compile'],
         async: false,
         error: function() {
             $('#language_detection').html("Cannot be compiled!");
@@ -227,7 +219,7 @@ function preprocess_input(source, result_tab_index, tab_index, panel_id) {
 	
 function check_language(index) {
     var selected = $('#tabs').tabs('option', 'selected') + 1;
-    var sourcee = document.forms['source' + selected].elements['sourcecode' + selected].value;
+    var sourcee  = $('#sourcecode' + selected).val();
     language_detection(sourcee, selected);
 }
 
@@ -235,7 +227,7 @@ function get_directory(panel_id) {
     $.ajax({
 	type: 'GET',
 	cache: false,
-	url: '/operations/get_directory',
+	url: routes['get_directory'],
 	async: false,
 	error: function() {
 	    if (panel_id == 'result')
@@ -244,7 +236,7 @@ function get_directory(panel_id) {
 	success: function(data) {
 	    directory = data;
 	    if (panel_id == 'result')
-		document.getElementById('save_button_link').href = '/res/' + directory + '/' + directory;
+		$('save-button').attr('href', '/res/' + directory + '/' + directory);
 	}
     });
 }
@@ -253,10 +245,10 @@ function get_functions() {
     var datas = {};
     datas['number'] = files_no;
     for(var u = 0; u < files_no; u++) {
-	datas['code' + u] = document.forms['source' + (u + 1)].elements['sourcecode' + (u + 1)].value;
+	datas['code' + u] = $('#sourcecode' + (u+1)).val();
     }
     for(var t = 0; t < files_no; t++) {
-	datas['lang' + t] = document.forms['language' + (t + 1)].elements['lang' + (t + 1)].value;
+	datas['lang' + t] = $('#lang' + (t+1)).val();
     }
     $.ajax({
         type: "POST",
@@ -269,7 +261,6 @@ function get_functions() {
 	success: function(data) {
 	    functions = data;
 	    $('#dialog-choose-function').html(data);
-	    $('#dialog-choose-function input:submit').button();
 	    $('#dialog-choose-function input:submit').click(function() {
 		$.ajax({
 		    type: "POST",
@@ -299,7 +290,7 @@ function check_sources(index, panel_id) {
     get_directory(panel_id);
     
     for (var i = 1; i <= files_no; i++) {
-	sources[i] = document.forms['source' + i].elements['sourcecode' + i].value;
+	sources[i] = $('#sourcecode' + i).text();
     }
     var u = 1;
     while ((u <= files_no) && preprocess_input(sources[u], index, u, panel_id)) {
@@ -322,35 +313,20 @@ function create_graph(index, panel_id) {
     clear_graph_tab();
     if (check_sources(index, panel_id)) {
 	if (multiple) {
-	    $.ajax({
-                type: "GET",
-                cache: false,
-		url: "/graph/dependence_graph_multi",
-		error: function() {
-                },
-		success: function(data) {
-		    enable_dependence_graph(data);
-		}
-	    });
+	    $.get( route['dependence_graph_multi'],		
+		   enable_dependence_graph		   
+		 );
 	} else {
-	    var lang = document.language1.lang1.value;
-	    var source_code = document.source1.sourcecode1.value;
-	    $.ajax({
-		type: "POST",
-		data: {
-                    code: source_code,
-                    language: lang
+	    $.post(
+		route['dependence_graph'], 
+		{ code:     $('#sourcecode1').text(),
+                  language: $('#lang1').val()
                 },
-                cache: false,
-                url: "/graph/dependence_graph",
-		error: function() {
-		},
-		success: function(data) {
-		    enable_dependence_graph(data);
-		}
-	    });
+		enable_dependence_graph
+	    );
 	}
     }
+    return true; //TODO
 }
 
 function enable_dependence_graph(data) {
@@ -365,8 +341,17 @@ function enable_dependence_graph(data) {
 *								     *
 *********************************************************************/
 
-function change_tab_focus_src() {
-    $('#tabs').tabs("select", 0);
+function activate_tab(id) {
+
+    $link = $('#' + id, '#op-tabs');
+
+    // Activate selected tab
+    $('li', '#op-tabs').removeClass('active');
+    $link.parent().addClass('active');
+
+    // Activate corresponding panel
+    $('.tab-pane', '#op-tabs').removeClass('active');
+    $($link.attr('href')).addClass('active');
 }
 
 function add_tab_title(text) {
@@ -390,13 +375,13 @@ function add_choose_function_notification() {
 }
 
 function activate_buttons() {
-    $("input:submit", ".save_results").button("option", "disabled", false);
-    $("input:submit", ".print_results").button("option", "disabled", false);
+    $("input:submit", ".save_results").removeClass("disabled");
+    $("input:submit", ".print_results").removeClass("disabled");
 }
 
 function deactivate_buttons() {
-    $("input:submit", ".save_results").button("option", "disabled", true);
-    $("input:submit", ".print_results").button("option", "disabled", true);
+    $("input:submit", ".save_results").addClass("disabled");
+    $("input:submit", ".print_results").addClass("disabled");
 }
 
 function deactivate_graph_buttons() {
@@ -411,7 +396,7 @@ function clear_result_tab() {
     deactivate_buttons();
     $('#resultcode').html('');
     // all of other tabs are removed
-    document.language1.lang1.value = 'not yet detected';
+    $('#lang1').val('not yet detected');
 }
 
 function clear_graph_tab() {
@@ -439,35 +424,26 @@ function removeTabs() {
 *								     *
 *********************************************************************/
 
-function load_example() {
+
+function load_example(filename) {
+
+    $('#classic-examples-dialog').modal('hide');
     if (multiple)
 	removeTabs();
-    file_name = $(this).attr('value');
-    $("#source_tab_link1").text(file_name);
-    $.ajax({
-        type: "GET",
-        cache: false,
-        url: "/examples/get_file/" + operation + '/' + file_name,
-        error: function() {
-            document.source1.sourcecode1.value = "Web error, please try again later.";
-        },
-        success: function(data) {
-            document.source1.sourcecode1.value = data;
-            setPseudoTextFileValue("");
-            change_tab_focus_src();
-            deactivate_buttons();
-            load_example_success();
-	    language_detection(data, 1);
-        }
-    });
-    $('#classic-examples-dialog').dialog("close");
-}
+    $("#source_tab_link1").text(filename);
 
-function load_example_success() {
-    performed = false;
-    created_graph = false;
-    clear_result_tab();
-    clear_multiple();
+    var url = routes['get_example_file'].replace('{tool}', operation).replace('{filename}', filename);
+    $.get(url, function(data) {
+        $('#sourcecode1').text(data);
+        $('#pseudotextfile').val('');
+        activate_tab('source_tab_link1');
+        deactivate_buttons();
+	performed     = false;
+	created_graph = false;
+	clear_result_tab();
+	clear_multiple();
+	language_detection(data, 1);
+    });
 }
 
 
@@ -477,7 +453,8 @@ function load_example_success() {
 *								     *
 *********************************************************************/
 
-function handle_key_down(item, event) {
+function handle_keydown(item, event) {
+    console.log('keydown');
     c = event.keyCode;
     if (c == 9) {
 	catch_tab(item);
@@ -564,62 +541,63 @@ function changeLinesHeight() {
 
 /*********************************************************************
 *								     *
-* Function for components initialization.			     *
+* Functions for tool.js			                             *
 *								     *
 *********************************************************************/
 
-function initialize() {
-	
-    // Resize buttons
-    $('#aplus').click(function()  { resize(1) });
-    $('#aminus').click(function() { resize(0) });    
-
-    // Load classic examples
-    $('#classic-examples-dialog').dialog({ autoOpen: false, width: 400 });
-    $("#classic-examples-button").button().click(function() {
-	$('#classic-examples-dialog').dialog('open');
-    });
-    $('#classic-examples-dialog input').button().click(load_example);
-
-    // Source code input field
-    $('#sourcecode1').linedtextarea().attr('spellcheck', false);
-
-    $('#dialog-choose-function').dialog({ autoOpen: false, width: 400 });
-
-    // Main tabs
-    $('#tabs').tabs({
-	tabTemplate: "<li><a href='#{href}'>#{label}</a></li>",
-	select: function(event, ui) {
-	    if ((performed == false) && ui.panel.id == 'result') {
-		// Compute_results
-		event.preventDefault();
-		performed = true;
-		perform_operation(ui.index, 'result');
-	    } else if ((created_graph == false) && ui.panel.id == graph_id) {
-		event.preventDefault();
-		created_graph = true;
-		create_graph(ui.index, graph_id);
+function choose_function() {
+    $('#multiple-functions').html(functions);
+    $('#multiple-functions input:submit').button()
+    .click(function() {
+	$.ajax({
+	    type: "POST",
+	    data: { function: $(this).attr('value'),
+		    operation: operation,
+		    language: $('#lang1').val()
+		  },
+	    cache: false,
+	    url: routes['perform_multiple'],
+	    error: function() {},
+	    success: function(data) {
+		$('#resultcode').html(data);
+		activate_buttons();
 	    }
+	});
+    });
+    add_choose_function_notification();
+}
+		
+
+function perform_operation(index, panel_id) {
+
+    clear_result_tab();
+
+    if (check_sources(index, panel_id)) { // all files are ok
+
+	if (multiple) {
+	    choose_function();
+
+	} else {
+
+	    $.ajax({
+		type: "POST",
+		data: { 
+		    code:      $('#sourcecode'+index).text(),
+		    language:  $('#lang'+index).val(),
+		    operation: operation
+		},
+		cache: false,
+		url: routes['perform'],
+		error: function() {
+		    $("#resultcode").html("Web error, try again!");
+		},
+		success: function(data) {
+		    $("#resultcode").html(data);
+		    activate_buttons();
+		}
+	    });
+
 	}
-    });
-
-    // Run button (indirectly call computation)
-    $("#run-button").button().click(function() {
-	$('#tabs').tabs('select', '#result');
-    });
-
-    // Save/print buttons
-    $("input:submit", ".save_results").button();
-    $("input:submit", ".print_results").button().click(function(event) {
-        var content = document.getElementById("resultcode");
-        var printFrame = document.getElementById("iframetoprint").contentWindow;
-        printFrame.document.ope();
-        printFrame.document.write(content.innerHTML);
-        printFrame.document.close();
-        printFrame.focus();
-        printFrame.print();
-    });
-    deactivate_buttons();
-
-    $('#resizing_source input:submit').button();
+    }
+    return true; //TODO
 }

@@ -31,18 +31,26 @@ def main(global_config, **settings):
     # Dynamic routes
     config.add_route('home', '/')
 
-    config.add_route('tool_basic',       '/tools/{tool}')
-    config.add_route('tool_advanced',    '/tools/{tool}/advanced')
+    config.add_route('tool_basic',              '/tools/{tool}')
+    config.add_route('tool_advanced',           '/tools/{tool}/advanced')
 
-    config.add_route('upload_userfile',  '/userfiles/upload')
-    config.add_route('get_example_file', '/examples/get_file/{tool}/{filename}')
+    config.add_route('upload_userfile',         '/userfiles/upload')
+    config.add_route('get_example_file',        '/examples/get_file/{tool}/{filename}')
 
-    config.add_route('detect_language',  '/detector/detect_language')
-    config.add_route('compile',          '/detector/compile')
+    config.add_route('detect_language',         '/detector/detect_language')
+    config.add_route('compile',                 '/detector/compile')
 
-    config.add_route('get_directory',    '/operations/get_directory')
-    config.add_route('get_functions',    '/operations/get_functions')
-    config.add_route('perform',          '/operations/perform')
+    config.add_route('get_directory',           '/operations/get_directory')
+    config.add_route('get_functions',           '/operations/get_functions')
+
+    config.add_route('perform',                 '/operations/perform')
+    config.add_route('perform_multiple',        '/operations/perform_multiple')
+
+    config.add_route('dependence_graph',        '/graph/dependence_graph')
+    config.add_route('dependence_graph_multi',  '/graph/dependence_graph_multi') ##TODO
+
+    config.add_route('routes.js',        '/routes.js')
 
     config.scan()
+
     return config.make_wsgi_app()

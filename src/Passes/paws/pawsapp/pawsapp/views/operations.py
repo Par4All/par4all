@@ -145,11 +145,8 @@ def _highlight_code(request, code, language, demo=False):
         lexer = FortranLexer()
     if lexer:
         code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
-        lines = [ l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
-        return render( 'pawsapp:templates/lib/add_lines.mako',
-                       { 'lines' : lines },
-                       request = request,
-                       )
+        lines = [ '<li>%s</li>' % l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
+        return '<div class="highlight"><pre><ol>%s</ol></pre></div>' % ''.join(lines) # absolutely NO blank spaces!
 
 
 #

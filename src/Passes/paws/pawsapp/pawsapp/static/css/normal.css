@@ -1,44 +1,20 @@
-body {
-    padding: 1em 5em;
-    margin: 0;
-    font: 70% "Trebuchet MS", sans-serif;
-}
-
-#header h1 {
-    display: inline;
-    position: relative;
-    top: -10px;
-    left: 50px;
-}
-
-#footer #copyright {
-    font-size: 85%;
-    text-align: right;
-}
-
-
 /* Home page */
 
-#sections {
-    font-size: 100%;
-}
-#sections h2 {
-    font-size: 120%;
-}
-#sections h3 {
-    font-size: 110%;
-}
-#sections .section {
-    padding-bottom: 1em;
+
+
+/* Sidebar */
+
+.sidebar h5 {
+    margin: 1em 0;
+    line-height: 1em;
 }
 
-/* Tool page */
+/* Main column */
 
-h1 {
-    font-size: 150%;
-}
-
-#classic-examples-dialog input {
-    width: 100%;
+#classic-examples-dialog a {
     margin-bottom: 2px;
+}
+
+#sourcecode1, #resultcode {
+    width: 1000px;
 }

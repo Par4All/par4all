@@ -64,7 +64,7 @@ def upload_userfile(request):
         return [[filename, text.replace('<', '&lt;').replace('>', '&gt;')]]
 
 
-@view_config(route_name='get_example_file', renderer='json')
+@view_config(route_name='get_example_file', renderer='string')
 def get_example_file(request):
     """Return
     """
