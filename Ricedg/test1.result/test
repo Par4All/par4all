@@ -1,7 +1,12 @@
+#
+# Code after internalize_parallel_code for module TEST1
+#
       PROGRAM TEST1
       REAL T(10)
 
-      DOALL I = 1, 10                                                   0004
+
+!$OMP PARALLEL DO 
+      DO I = 1, 10                                                      0004
          T(I) = 0.0                                                     0005
       ENDDO
       END

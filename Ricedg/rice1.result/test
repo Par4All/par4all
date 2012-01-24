@@ -1,14 +1,25 @@
+#
+# Code after internalize_parallel_code for module RICE1
+#
       PROGRAM RICE1      
       REAL A(1:101,1:101,1:101),X(1:101,1:101,1:101)
 
       DO I = 1, 100                                                     0004
-         DOALL J = 1, 100                                               0005
-            DOALL K = 1, 100                                            0006
+
+!$OMP    PARALLEL DO 
+         DO J = 1, 100                                                  0005
+
+!$OMP       PARALLEL DO 
+            DO K = 1, 100                                               0006
                X(I,J+1,K) = A(I,J,K)+10                                 0007
             ENDDO
          ENDDO
-         DOALL J = 1, 100                                               0005
-            DOALL L = 1, 50                                             0009
+
+!$OMP    PARALLEL DO 
+         DO J = 1, 100                                                  0005
+
+!$OMP       PARALLEL DO 
+            DO L = 1, 50                                                0009
                A(I+1,J,L) = X(I,J,L)+5                                  0010
             ENDDO
          ENDDO

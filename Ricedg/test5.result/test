@@ -1,13 +1,24 @@
+#
+# Code after internalize_parallel_code for module TEST5
+#
       PROGRAM TEST5
       REAL V1(10,10),V2(10,10)
 
-      DOALL I = 1, 10                                                   0004
-         DOALL J = 1, 10                                                0005
+
+!$OMP PARALLEL DO 
+      DO I = 1, 10                                                      0004
+
+!$OMP    PARALLEL DO 
+         DO J = 1, 10                                                   0005
             V2(I,J) = V2(I,J)+V1(I+1,J)                                 0007
          ENDDO
       ENDDO
-      DOALL I = 1, 10                                                   0004
-         DOALL J = 1, 10                                                0005
+
+!$OMP PARALLEL DO 
+      DO I = 1, 10                                                      0004
+
+!$OMP    PARALLEL DO 
+         DO J = 1, 10                                                   0005
             V1(I,J) = 0.0                                               0006
          ENDDO
       ENDDO
