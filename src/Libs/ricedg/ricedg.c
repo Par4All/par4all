@@ -1175,12 +1175,10 @@ static list TestDependence(list n1,
   /* Elimination of loop indices from loop variants llv */
   /* We use n2 because we take care of variables modified in
    an iteration only for the second system. */
-  MAP(STATEMENT, s,
-      {
-        entity i = loop_index(statement_loop(s));
-        gen_remove(&llv,i); /* llv is dead, must be freed... */
-      },
-      n2);
+  FOREACH(STATEMENT, s, n2) {
+    entity i = loop_index(statement_loop(s));
+    gen_remove(&llv,i); /* llv is dead, must be freed... */
+  }
 
   ifdebug(6) {
     pips_debug(6, "loop variants after removing loop indices :\n");
@@ -1204,7 +1202,10 @@ static list TestDependence(list n1,
   /* Further construction of the dependence system; Constant and GCD tests
    * at the same time.
    */
+
+  // FI: why is dep_syst only weekly consistent here?
   assert(sc_weak_consistent_p(dep_syst));
+
   if(gcd_and_constant_dependence_test(r1, r2, llv, n2, &dep_syst)) {
     /* independence proved */
     /* FI: the next statement was commented out... */
@@ -1216,6 +1217,8 @@ static list TestDependence(list n1,
     return NIL;
   }
 
+  pips_assert("The dependence system is consistent", sc_consistent_p(dep_syst));
+
   gen_free_list(llv);
 
   dependence_system_add_lci_and_di(&dep_syst, n1, &DiIncNonCons);
@@ -1224,6 +1227,8 @@ static list TestDependence(list n1,
     fprintf(stderr, "\ninitial system is:\n");
     sc_syst_debug(dep_syst);
   }
+
+  pips_assert("The dependence system is consistent", sc_consistent_p(dep_syst));
 
   /* Consistency Test */
   if(sc_empty_p(dep_syst = sc_normalize(dep_syst))) {
@@ -1238,6 +1243,8 @@ static list TestDependence(list n1,
 
   cl = FindMaximumCommonLevel(n1, n2);
 
+  pips_assert("The dependence system is consistent", sc_consistent_p(dep_syst));
+
   if(TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == true) {
     /* find independences (non loop carried dependence, intra-statement).*/
     /* Such dependences are counted here as independence, but other
@@ -1251,6 +1258,8 @@ static list TestDependence(list n1,
 
     return (NIL);
   }
+
+  pips_assert("The dependence system is consistent", sc_consistent_p(dep_syst));
 
   is_test_exact = true;
   is_test_inexact_eq = false;
@@ -1291,12 +1300,14 @@ static list TestDependence(list n1,
       UNCATCH(overflow_error);
   }
 
-  base_rm(tmp_base);
-
   ifdebug(6) {
     fprintf(stderr, "projected system is:\n");
     sc_syst_debug(dep_syst);
   }
+
+  pips_assert("The dependence system is consistent", sc_consistent_p(dep_syst));
+
+  base_rm(tmp_base); // FI: delayed to help with debugging
 
   if(!sc_faisabilite_optim(dep_syst)) {
     /* Here, the long jump overflow buffer is handled at a lower level! */pips_debug(4, "projected system not feasible\n");
@@ -1818,15 +1829,28 @@ static bool gcd_and_constant_dependence_test(reference r1,
   }
 
   if(pc1 != NIL || pc2 != NIL) {
-    /* Part of preprocessor.h, unfortunately */
     if(fortran_module_p(get_current_module_entity())) {
       pips_internal_error("numbers of subscript expressions differ");
     } else {
-      /* C assumed */pips_user_warning("dependence tested between two memory access paths"
-          " of different lengths for variable \"%s\".\n",
-          entity_user_name(reference_variable(r1)));
+      /* C assumed */
+      pips_user_warning("dependence tested between two memory access paths"
+			" of different lengths for variable \"%s\".\n",
+			entity_user_name(reference_variable(r1)));
     }
   }
+
+  /* Update base of *psc_dep */
+  Pbase mb = sc_to_minimal_basis(*psc_dep);
+  Pbase cb = sc_base(*psc_dep);
+  if(!vect_in_basis_p(mb, cb)) {
+    Pbase nb = base_union(cb, mb);
+    sc_base(*psc_dep) = nb;
+    sc_dimension(*psc_dep) = vect_size(nb); // base_dimension(nb);
+    vect_rm(cb);
+  }
+  vect_rm(mb);
+
+  pips_assert("The dependence system is consistent", sc_consistent_p(*psc_dep));
 
   return (false);
 }
