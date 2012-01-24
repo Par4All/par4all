@@ -240,74 +240,96 @@ int main(int argc, char **argv)
 }
 int main(int argc, char **argv)
 {
+//             <    is declared>: i
    int i;
 //             <    is read   >: argc
+//             <    is referenced>: argc
 
    if (argc>1)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: N
+//             <    is referenced>: N argv
       N = atoi(argv[1]);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_a _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: N array_a
 
    array_a = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_a
+//             <    is referenced>: array_a
    array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_b _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: N array_b
    array_b = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_b
+//             <    is referenced>: array_b
    array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_c _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: N array_c
    array_c = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_c
+//             <    is referenced>: array_c
    array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_d _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: N array_d
    array_d = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_d
+//             <    is referenced>: array_d
    array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
 //             <    is read   >: array_a
 //             <    is written>: *HEAP*_l_21[0]
+//             <    is referenced>: array_a
    
    
    array_a[0] = 2.0f;
 //             <    is read   >: array_b
 //             <    is written>: *HEAP*_l_23[0]
+//             <    is referenced>: array_b
    array_b[0] = 2.0f;
 //             <    is read   >: array_c
 //             <    is written>: *HEAP*_l_25[0]
+//             <    is referenced>: array_c
    array_c[0] = 2.0f;
 //             <    is read   >: N
 //             <    is written>: i
+//             <    is referenced>: N i
 
    for(i = 1; i <= N-1; i += 1) {
 //             <    is read   >: N array_a i
 //             <    is written>: *HEAP*_l_21[i]
+//             <    is referenced>: N array_a i
       array_a[i] = 1.0f/((float) i);
 //             <    is read   >: N array_b i
 //             <    is written>: *HEAP*_l_23[i]
+//             <    is referenced>: N array_b i
       array_b[i] = 1.0f/((float) 2*i);
 //             <    is read   >: N array_c i
 //             <    is written>: *HEAP*_l_25[i]
+//             <    is referenced>: N array_c i
       array_c[i] = 1.0f/((float) 3*i);
    }
 //             <    is read   >: N
 //             <    is written>: i
+//             <    is referenced>: N i
    
    
    for(i = 1; i <= N-1; i += 1) {
 //             <    is read   >: *HEAP*_l_23[i] *HEAP*_l_25[i] N 
 //                               array_a array_b array_c i
 //             <    is written>: *HEAP*_l_21[i]
+//             <    is referenced>: N array_a array_b array_c i
       array_a[i] = array_b[i]+array_c[i];
 //             <    is read   >: *HEAP*_l_21[i-1] N array_a array_d i
 //             <    is written>: *HEAP*_l_27[i]
+//             <    is referenced>: N array_a array_d i
       array_d[i] = array_a[i-1]*2;
    }
 //             <    is read   >: N
 //             <    is written>: i
+//             <    is referenced>: N i
 
    for(i = 1; i <= N-1; i += 1)
 //             <may be read   >: stdout[0]
@@ -316,6 +338,7 @@ int main(int argc, char **argv)
 //                               array_a array_d i stdout 
 //                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <    is referenced>: N array_a array_d i
       printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
 
    return 0;
