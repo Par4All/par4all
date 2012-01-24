@@ -134,8 +134,15 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core.js"
   </div>
 </div>
 
-<div id="dialog-choose-function" title="Select function to transform.">
-  <div class="choose-function" id="choose-function-buttons"></div>
+## Functions dialog
+
+<div class="modal hide fade" id="choose-function-dialog" style="display: none;">
+  <div class="modal-header">
+    <a class="close" href="#">×</a>
+    <h3>Select function to transform</h3>
+  </div>
+  <div class="modal-body" >
+  </div>
 </div>
 
 </%def>

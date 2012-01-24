@@ -37,6 +37,7 @@ def routes(request):
     return dict(routes = [ dict(name=name, pattern=introspector.get('routes', name)['pattern'])
                            for name in ('get_example_file',
                                         'get_directory',
+                                        'get_functions',
                                         'detect_language',
                                         'compile',
                                         'perform',

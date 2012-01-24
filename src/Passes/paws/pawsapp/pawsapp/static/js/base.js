@@ -9,8 +9,6 @@ var marker = '\", \"';
 var multiple = false;
 var file_name;
 
-var graph_id = 'graph';
-
 var directory;
 var performed = false;
 var created_graph = false;
@@ -35,7 +33,7 @@ var ns6 = document.getElementById && !document.all;
 var ie4 = document.all;
 
 function popup(msg) {
-    var content = "<div class=boxpopup>" + msg + "</div>";
+    var content = '<div class="boxpopup">' + msg + "</div>";
     yyy = OffsetY;
     if (ns4) {skn.document.write(content); skn.document.close(); skn.visibility="visible";}
     if (ns6) {document.getElementById('pdqbox').innerHTML = content; skn.display = ""; skn.visibility="visible";}
@@ -242,44 +240,32 @@ function get_directory(panel_id) {
 }
  	
 function get_functions() {
+
     var datas = {};
     datas['number'] = files_no;
-    for(var u = 0; u < files_no; u++) {
-	datas['code' + u] = $('#sourcecode' + (u+1)).val();
+    for(var i=0; i<files_no; i++) {
+	datas['code' + i] = $('#sourcecode' + (i+1)).text();
+	datas['lang' + i] = $('#lang' + (i+1)).val();
     }
-    for(var t = 0; t < files_no; t++) {
-	datas['lang' + t] = $('#lang' + (t+1)).val();
-    }
-    $.ajax({
-        type: "POST",
-        data: datas,
-        cache: false,
-        url: "/operations/get_functions",
-        async: false,
-	error: function() {
-	},
-	success: function(data) {
+    $.post(
+	routes['get_functions'],
+	datas,
+	function(data) {
 	    functions = data;
-	    $('#dialog-choose-function').html(data);
-	    $('#dialog-choose-function input:submit').click(function() {
-		$.ajax({
-		    type: "POST",
-		    data: {
-                        functions: $(this).attr('value'),
-			operation: operation
-                    },
-                    cache: false,
-		    url: "/operations/perform_multiple",
-		    error: function() {},
-		    success: function(data) {
+	    $('#choose-function-dialog .modal-body').html(data);
+	    $('#choose-function-dialog input:submit').click(function() {
+		$.post(
+		    routes['perform_multiple'],
+		    { functions: $(this).attr('value'),
+		      operation: operation
+		    },
+		    function(data) {
                         $('#resultcode').html(data);
 			activate_buttons();
-		    }
-		});
-		$('#dialog-choose-function').dialog('close');
+		    });
+		$('#dialog-choose-function').modal('hide');
 	    });
-	}
-    });
+	});
 }
 	
 function check_sources(index, panel_id) {
@@ -297,7 +283,7 @@ function check_sources(index, panel_id) {
 	u = u + 1;
     }
     if (u == files_no + 1) {
-	get_functions(operation);
+	get_functions();
 	return true;
     }
     return false;
@@ -310,6 +296,7 @@ function check_sources(index, panel_id) {
 *********************************************************************/
 
 function create_graph(index, panel_id) {
+    console.error('createg!');
     clear_graph_tab();
     if (check_sources(index, panel_id)) {
 	if (multiple) {
@@ -365,7 +352,7 @@ function change_tab_focus_res(result_tab_index, panel_id) {
 
 function add_waiting_notification(panel_id) {
     var tab = '#resultcode';
-    if (panel_id == graph_id)
+    if (panel_id == 'graph')
 	tab = '#dependence_graph';
     $(tab).html("<p><b>Please wait while processing...<br/>It might take long time.</b><br/></p>");
 }
@@ -375,13 +362,13 @@ function add_choose_function_notification() {
 }
 
 function activate_buttons() {
-    $("input:submit", ".save_results").removeClass("disabled");
-    $("input:submit", ".print_results").removeClass("disabled");
+    $("#save-button").removeClass("disabled");
+    $("#print-button").removeClass("disabled");
 }
 
 function deactivate_buttons() {
-    $("input:submit", ".save_results").addClass("disabled");
-    $("input:submit", ".print_results").addClass("disabled");
+    $("#save-button").addClass("disabled");
+    $("#print-button").addClass("disabled");
 }
 
 function deactivate_graph_buttons() {
@@ -454,7 +441,6 @@ function load_example(filename) {
 *********************************************************************/
 
 function handle_keydown(item, event) {
-    console.log('keydown');
     c = event.keyCode;
     if (c == 9) {
 	catch_tab(item);
@@ -569,34 +555,22 @@ function choose_function() {
 		
 
 function perform_operation(index, panel_id) {
-
     clear_result_tab();
-
     if (check_sources(index, panel_id)) { // all files are ok
-
 	if (multiple) {
 	    choose_function();
-
 	} else {
-
-	    $.ajax({
-		type: "POST",
-		data: { 
-		    code:      $('#sourcecode'+index).text(),
-		    language:  $('#lang'+index).val(),
-		    operation: operation
+	    $.post(
+		routes['perform'],
+		{ code:      $('#sourcecode'+index).text(),
+		  language:  $('#lang'+index).val(),
+		  operation: operation
 		},
-		cache: false,
-		url: routes['perform'],
-		error: function() {
-		    $("#resultcode").html("Web error, try again!");
-		},
-		success: function(data) {
+		function(data) {
 		    $("#resultcode").html(data);
 		    activate_buttons();
 		}
-	    });
-
+	    );
 	}
     }
     return true; //TODO

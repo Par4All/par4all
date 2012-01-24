@@ -7,7 +7,6 @@
 
 $(function(){
 
-
     // A+ / A- buttons
     $('#aplus').click(function(ev) {
 	ev.preventDefault();
@@ -26,24 +25,23 @@ $(function(){
     });
 
     // Source code input field
-    $('#sourcecode1')
-    //.keydown(handle_keydown)
-    .linedtextarea()
-    .attr('spellcheck', false);
+    $('#sourcecode1').linedtextarea().attr('spellcheck', false);
 
 
-    //$('#dialog-choose-function').dialog({ autoOpen: false, width: 400 });
+    // "Choose function" dialog
+    $('#choose-function-dialog').modal();
 
-    // Main tabs
+    // "RESULTS" tab
     $('#result_tab_link').click(function(ev) {
 	ev.preventDefault();
 	if (performed == false)
 	    performed = perform_operation(1, 'result');
     });
+    // "GRAPH" tab
     $('#graph_tab_link').click(function(ev) {
 	ev.preventDefault();
 	if (created_graph == false)
-	    created_graph = create_graph(ui.index, graph_id);
+	    created_graph = create_graph(1, 'graph');
     });
 
     // Run button

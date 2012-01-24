@@ -173,7 +173,7 @@ def get_functions(request):
                 for i in range(int(form['number']))]
     request.session['sources'] = sources
     print request.session['sources'][0][0]
-    return '\n'.join([ submit(f, f) for f in _analyze_functions(request, sources) ])
+    return '\n'.join([ submit(f, f, class_='btn small') for f in _analyze_functions(request, sources) ])
 
 
 @view_config(route_name='perform', renderer='string')
