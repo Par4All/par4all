@@ -2,7 +2,8 @@ If you do not have write access to this directory, copy its content (with
 cp -a for example) somewhere you can write into and try the examples from
 this new location.
 
-This directory contains par4all basic examples : Hyantes, Jacobi, Stars-pm.
+This directory contains par4all basic examples : Hyantes, Jacobi, Stars-pm
+and saxpy_c99.
 
 To run one example, go into one of the directories.
 
