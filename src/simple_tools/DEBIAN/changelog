@@ -1,6 +1,17 @@
+2012-01-24 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.3.2
+
+
 2012-01-18  Serge Guelton <serge.guelton@hpc-project.com>
 
  * Par4All 1.3.1
+
+   * Check for CUDA memory allocation errors
+
+   * Restore PIPS properties after a PyPS exception
+
+   * Manage better pointers on 1D array on GPU
 
    * Fix loop bound generation in the presence of unsigned index types
 
