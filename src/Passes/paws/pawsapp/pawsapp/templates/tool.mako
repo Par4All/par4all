@@ -5,6 +5,8 @@
 
 <%inherit file="base.mako"/>
 
+<%namespace name="adv" file="pawsapp:templates/lib/advanced.mako"/>
+
 <%def name="css_slot()">
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
@@ -33,7 +35,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   ${h.link_to(u"A-", id="aminus", class_="btn small")}
 </div>
 
-<h5>Type or select source code from:</h5>
+<h4>Type or select source code from:</h4>
 
 <dl>
   <dt>A set of classic examples:</dt>
@@ -48,6 +50,16 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
     <input type="text" id="pseudotextfile" readonly="readonly" class="span3"/>
   </dd>
 </dl>
+
+## Properties (for advanced mode)
+% if advanced:
+<form class="form-stacked">
+  ${adv.properties_fields(props)}
+  ${adv.analyses_fields(analyses)}
+  ${adv.phases_fields(phases)}
+</form>
+% endif
+
 
 <p>${h.link_to(u"RUN", id="run-button", class_="btn small")}</p>
 <p>${h.link_to(u"SAVE RESULT",  id="save-button",  class_="btn small disabled")}</p>
@@ -91,11 +103,15 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
     ## Source code panel
     <div id="tabs-1" class="active tab-pane">
-      <p>
-	<label for="lang1">Language: </label>
-	<input id="lang1" value="not yet detected." readonly="readonly"/>
-      </p>
+      <form>
+	<fieldset style="padding-top:0">
+	  <label for="lang1">Language </label>
+	  <div class="input">
+	    <input id="lang1" value="not yet detected." readonly="readonly"/>
+	  </div>
+	</fieldset>
       <textarea id="sourcecode1" class="span16" rows="27" onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
+      </form>
     </div>
 
     ## Result panel
