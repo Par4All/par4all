@@ -1,0 +1,6 @@
+delete decreasing_loop01
+create decreasing_loop01 decreasing_loop01.c
+
+display PARSED_PRINTED_FILE[decreasing]
+display PRINTED_FILE[decreasing]
+
