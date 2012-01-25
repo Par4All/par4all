@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from pyramid.config  import Configurator
-from pyramid.events  import subscriber, BeforeRender
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
+from pyramid.config         import Configurator
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization  import ACLAuthorizationPolicy
+from pyramid.security       import authenticated_userid
+from pyramid.events         import subscriber, BeforeRender
+from pyramid.session        import UnencryptedCookieSessionFactoryConfig
 
+from   security             import groupfinder
 import helpers
+
 
 
 # Paramètres supplémentaires envoyés aux templates
@@ -12,24 +17,37 @@ import helpers
 def add_global(event):
     """Paramètres supplémentaires envoyés aux templates
     """
-    event['h'] = helpers
+    request = event['request']
+    userid  = authenticated_userid(request)
+
+    event['h']      = helpers
+    event['userid'] = userid
 
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    # Security
+    authn_policy = AuthTktAuthenticationPolicy(settings['paws.authn_secret'], callback=groupfinder)
+    authz_policy = ACLAuthorizationPolicy()
+
     # Sessions
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['paws.cookie_secret'])
 
-    config = Configurator( settings=settings,
-                           session_factory = session_factory,
+    config = Configurator( settings              = settings,
+                           root_factory          = 'pawsapp.security.RootFactory',
+                           authentication_policy = authn_policy,
+                           authorization_policy  = authz_policy,
+                           session_factory       = session_factory,
                            )
 
     # Static routes
     config.add_static_view('static', 'static', cache_max_age=3600)
 
     # Dynamic routes
-    config.add_route('home', '/')
+    config.add_route('home',                    '/')
+    config.add_route('login',                   '/login')
+    config.add_route('logout',                  '/logout')
 
     config.add_route('tool_basic',              '/tools/{tool}')
     config.add_route('tool_advanced',           '/tools/{tool}/advanced')
@@ -49,7 +67,12 @@ def main(global_config, **settings):
     config.add_route('dependence_graph',        '/graph/dependence_graph')
     config.add_route('dependence_graph_multi',  '/graph/dependence_graph_multi') ##TODO
 
-    config.add_route('routes.js',        '/routes.js')
+    config.add_route('routes.js',               '/routes.js')
+
+    ## Special views
+    config.add_view('pawsapp.views.login.login',
+                    context='pyramid.httpexceptions.HTTPForbidden',
+                    renderer='pawsapp:templates/login.mako')
 
     config.scan()
 

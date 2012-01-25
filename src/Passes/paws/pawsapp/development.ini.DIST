@@ -13,6 +13,7 @@ debugtoolbar.hosts =
 
 # Paws settings
 paws.cookie_secret = (SECRET)
+paws.authn_secret  = (SECRET)
 paws.validation    = %(here)s/../validation/Paws
 paws.tempdir       = %(here)s/files
 paws.publicdir     = %(here)s/pawsapp/static

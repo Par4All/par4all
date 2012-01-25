@@ -68,7 +68,14 @@ ${h.Doctype().xhtml1()}
             <li><a href="http://pips4u.org">About</a></li>
             <li><a href="http://pips4u.org">Contact</a></li>
           </ul>
-          <p class="pull-right">Logged in as <a href="#">username</a></p>
+          <p class="pull-right">
+	    % if userid:
+	    Logged in as <a href="#">${userid}</a> |
+	    ${h.link_to(u"log out", url=request.route_url("logout"))}
+	    % else:
+	    ${h.link_to(u"Log in", url=request.route_url("login"))}
+	    % endif
+	  </p>
         </div>
       </div>
     </div>

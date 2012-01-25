@@ -28,8 +28,8 @@ def _get_examples(tool, request):
              and (f.endswith('.c') or f.endswith('.f'))]
 
 
-@view_config(route_name='tool_basic',    renderer='pawsapp:templates/tool.mako')
-@view_config(route_name='tool_advanced', renderer='pawsapp:templates/tool.mako')
+@view_config(route_name='tool_basic',    renderer='pawsapp:templates/tool.mako', permission='view')
+@view_config(route_name='tool_advanced', renderer='pawsapp:templates/tool.mako', permission='view')
 def tool(request):
     """Generic tool view (basic and advanced modes).
     """
