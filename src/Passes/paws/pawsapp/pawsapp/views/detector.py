@@ -29,7 +29,7 @@ def _compile(code, language):
     return '0' if p.returncode == 0 else p.communicate()[1].replace('\n', '<br/>')
 
 
-@view_config(route_name='detect_language', renderer='string')
+@view_config(route_name='detect_language', renderer='string', permission='view')
 def detect(request):
     """Heuristics to try and identify source code language.
     """
@@ -49,7 +49,7 @@ def detect(request):
     return lang
 
 
-@view_config(route_name='compile', renderer='string')
+@view_config(route_name='compile', renderer='string', permission='view')
 def compile(request):
     """
     """

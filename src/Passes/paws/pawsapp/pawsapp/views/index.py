@@ -27,7 +27,7 @@ def index(request):
     return dict(text=text, sections = sections)
 
 
-@view_config(route_name='routes.js', renderer='pawsapp:templates/routes.js.mako', http_cache=3600)
+@view_config(route_name='routes.js', renderer='pawsapp:templates/routes.js.mako', permission='view', http_cache=3600)
 def routes(request):
     """Export selected routes to Javascript
     """

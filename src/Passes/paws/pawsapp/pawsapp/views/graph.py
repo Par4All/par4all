@@ -65,7 +65,7 @@ def _get_ws_functions(ws):
     return functions
 
 
-@view_config(route_name='dependence_graph', renderer='pawsapp:templates/lib/images.mako')
+@view_config(route_name='dependence_graph', renderer='pawsapp:templates/lib/images.mako', permission='view')
 def dependence_graph(request):
     """
     """
@@ -79,7 +79,7 @@ def dependence_graph(request):
     return dict(images=images)
 
 
-@view_config(route_name='dependence_graph_multi', renderer='pawsapp:templates/lib/images.mako')
+@view_config(route_name='dependence_graph_multi', renderer='pawsapp:templates/lib/images.mako', permission='view')
 def dependence_graph_multi(request):
     """
     """

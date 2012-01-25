@@ -41,7 +41,7 @@ def tool(request):
                 )
 
 
-@view_config(route_name='upload_userfile', renderer='json')
+@view_config(route_name='upload_userfile', renderer='json', permission='view')
 def upload_userfile(request):
     """Handle file upload. Multiple files can be sent inside a single zip file.
     """
@@ -64,7 +64,7 @@ def upload_userfile(request):
         return [[filename, text.replace('<', '&lt;').replace('>', '&gt;')]]
 
 
-@view_config(route_name='get_example_file', renderer='string')
+@view_config(route_name='get_example_file', renderer='string', permission='view')
 def get_example_file(request):
     """Return
     """

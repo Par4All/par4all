@@ -154,7 +154,7 @@ def _highlight_code(request, code, language, demo=False):
 #
 
 
-@view_config(route_name='get_directory', renderer='string')
+@view_config(route_name='get_directory', renderer='string', permission='view')
 def get_directory(request):
     """Create and return a per-session temporary working directory
     """
@@ -164,7 +164,7 @@ def get_directory(request):
     return request.session['workdir']
 
 
-@view_config(route_name='get_functions', renderer='string')
+@view_config(route_name='get_functions', renderer='string', permission='view')
 def get_functions(request):
     """
     """
@@ -176,7 +176,7 @@ def get_functions(request):
     return '\n'.join([ submit(f, f, class_='btn small') for f in _analyze_functions(request, sources) ])
 
 
-@view_config(route_name='perform', renderer='string')
+@view_config(route_name='perform', renderer='string', permission='view')
 def perform(request):
     """Perform transformation
     """
