@@ -48,10 +48,10 @@ void tiling05(int n, float a[n][n])
 
 l100:
    for(i_t = (-n+3)/10; i_t <= (n-2)/10; i_t += 1)
-      for(j_t = pips_max(2, -i_t-1, i_t); j_t <= pips_min(3, (-5*i_t+n-2)/5, (5*i_t+n+1)/5, (n-3)/5); j_t += 1)
+      for(j_t = pips_max(2, -i_t-1, i_t); j_t <= pips_min(3, (5*i_t+n+1)/5, (-5*i_t+n-2)/5, (n-3)/5); j_t += 1)
 
          for(i = 1; i <= n-1; i += 1)
-            for(j = pips_max(3, -i+10*j_t+2, i-10*i_t-9, 1); j <= pips_min(3, -i+10*j_t+11, i-10*i_t, n-2); j += 1)
+            for(j = pips_max(3, -i+10*j_t+2, i-10*i_t-9, 1); j <= pips_min(3, i-10*i_t, -i+10*j_t+11, n-2); j += 1)
                a[i][j] = 0.25*(a[i-1][j-1]+2*a[i-1][j]+a[i-1][j+1]);
 }
 

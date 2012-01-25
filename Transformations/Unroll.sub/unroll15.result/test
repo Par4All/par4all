@@ -18,7 +18,7 @@ C
       DO J_t = 0, (N2-1)/4                                              0015
          DO I_t = 0, N1-1
 
-            DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+            DO J = 4*J_t+1, MIN(4*J_t+4, N2)                            0015
                DO I = I_t+1, I_t+1                                      0016
                   A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)              0017
 300               CONTINUE                                              0018
@@ -54,7 +54,7 @@ C
       DO J_t = 0, (N2-1)/4                                              0015
          DO I_t = 0, N1-1
 
-            DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+            DO J = 4*J_t+1, MIN(4*J_t+4, N2)                            0015
                I = I_t+1
                A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)                 0017
 300            CONTINUE                                                 0018
@@ -84,7 +84,7 @@ C
 99997 DO J_t = 0, (N2-1)/4                                              0015
 99998    DO I_t = 0, N1-1
 
-99999       DO J = 4*J_t+1, MIN(N2, 4*J_t+4)                            0015
+99999       DO J = 4*J_t+1, MIN(4*J_t+4, N2)                            0015
                I = I_t+1
                A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)                 0017
 300            CONTINUE                                                 0018
@@ -114,7 +114,7 @@ C
 99997 DO J_t = 0, (N2-1)/4                                              0015
 99998    DO I_t = 0, N1-1
 
-99999       DO J = 4*J_t+1, 4*J_t+1+4*((MIN(N2, 4*J_t+4)-(4*J_t+1)+1)
+99999       DO J = 4*J_t+1, 4*J_t+1+4*((MIN(4*J_t+4, N2)-(4*J_t+1)+1)
      &      /4)-1, 4
                I = I_t+1
                A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
@@ -129,8 +129,8 @@ C
                A(I,J+3) = A(I+1,J+3)*B(I,J+3)+A(I,J+3+1)*C(I,J+3)
                I = I_t+1+1
             ENDDO
-            DO J = 4*J_t+1+4*((MIN(N2, 4*J_t+4)-(4*J_t+1)+1)/4), MIN(
-     &      N2, 4*J_t+4)
+            DO J = 4*J_t+1+4*((MIN(4*J_t+4, N2)-(4*J_t+1)+1)/4), MIN(
+     &      4*J_t+4, N2)
                I = I_t+1
                A(I,J) = A(I+1,J)*B(I,J)+A(I,J+1)*C(I,J)
                I = I_t+1+1

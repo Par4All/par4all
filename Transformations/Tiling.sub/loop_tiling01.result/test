@@ -26,7 +26,7 @@ l1:
    for(i_t = 0; i_t <= (ni-1)/10; i_t += 1)
       for(j_t = 0; j_t <= (nj-1)/10; j_t += 1)
 
-         for(i = 10*i_t; i <= pips_min(2, ni-1, 10*i_t+9); i += 1)
+         for(i = 10*i_t; i <= pips_min(2, 10*i_t+9, ni-1); i += 1)
             for(j = 10*j_t; j <= pips_min(2, 10*j_t+9, nj-1); j += 1)
                x[i][j] = 0.;
 }
