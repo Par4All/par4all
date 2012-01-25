@@ -491,6 +491,11 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
  *
  * Furthermore, vectors representing equalities and inequalities must not
  * be handled in the same way because only equalities can be multiplied by -1.
+ *
+ * Not satisfying for Transformations/Tiling.sub/tiling05: 0 constant
+ * terms should be handled in a special way so as to have "i" be less
+ * than "i-1". Since -1 is less than 0, the longest constraint comes
+ * first.
  */
 int
 vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
