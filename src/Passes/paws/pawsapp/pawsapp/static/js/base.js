@@ -317,7 +317,7 @@ function create_graph(index, panel_id) {
 }
 
 function enable_dependence_graph(data) {
-    $('#dependence_graph').html(data);
+    $('#graph').html(data);
     $('.ZOOM_IMAGE').jqzoom(options);
     activate_graph_buttons();
 }
@@ -347,14 +347,14 @@ function add_tab_title(text) {
 
 function change_tab_focus_res(result_tab_index, panel_id) {
     $('#tabs').tabs("select", result_tab_index);
-    add_waiting_notification(panel_id);
+    add_wait_notification(panel_id);
 }
 
-function add_waiting_notification(panel_id) {
+function add_wait_notification(panel_id) {
     var tab = '#resultcode';
     if (panel_id == 'graph')
-	tab = '#dependence_graph';
-    $(tab).html("<p><b>Please wait while processing...<br/>It might take long time.</b><br/></p>");
+	tab = '#graph';
+    $(tab).html('<div class="alert-message info"><b>Please wait while processing...</b> It might take a long time.</div>');
 }
 
 function add_choose_function_notification() {
@@ -388,7 +388,7 @@ function clear_result_tab() {
 
 function clear_graph_tab() {
     deactivate_graph_buttons();
-    $('dependence_graph').html('');
+    add_wait_notification('graph');
 }
 
 function clear_multiple() {

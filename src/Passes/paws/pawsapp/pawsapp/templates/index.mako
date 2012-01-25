@@ -1,5 +1,5 @@
 <%doc>
-  Home page
+  PAWS home page
 </%doc>
 
 
@@ -10,82 +10,79 @@
 PYPS DEMO PAGE
 </%def>
 
-<%def name="title()">
-PYPS AS A WEB SERVICE
-</%def>
-
-<%def name="css_slot()">
-<style>
-  #main td { vertical-align: top }
-  #left    { width: 25%; padding: 0 2em }
-  #right   { padding: 1em }
-</style>
-</%def>
-
 <%def name="js_slot()">
+${h.javascript_link(request.static_url("pawsapp:static/jq/bootstrap-twipsy-min.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/jq/bootstrap-popover-min.js"))}
 <script type="text/javascript">
-    $(function() {
+  $(function () {
 % for s in sections:
-	$("#${s['path']}").accordion({ 
-	    active: false,
-	    animated: 'bounceslide',
-	    collapsible: true,
-	    autoHeight: false
-	});
+% for t in s["tools"]:
+    $("${'#%s-%s' % (s['path'], t['name'])}").popover({html:true, placement: "left"});
 % endfor
-    });
+% endfor
+  });
 </script>
 </%def>
 
 
-## Page content
+## LEFT COLUMN
 
-<div id="main" class="ui-widget ui-widget-content ui-corner-all">
+<%def name="left_column()">
+${text|n}
+</%def>
 
-  <table>
-    <tr>
 
-      ## Left column
+## MAIN COLUMN
 
-      <td id="left">
-	<h4>${text|n}</h4>
-      </td>
+<%def name="main_column()">
 
-      ## Right column
-
-      <td id="right">
-
-	<table id="sections">
-
-	  ## Section
-	  % for s in sections:
-	  <tr>
-	    <td style="width:200px; white-space: nowrap">
-	      <h2>${s["title"]}</h2>
-	    </td>
-	    <td style="width:100%" id="${s['path']}" class="section">
-
-	      ## Subsection
-	      % for t in s["tools"]:
-	      <h3>${h.link_to(t["name"].upper(), url="#")}</a></h3>
-	      <div>
-		<div>${t["descr"]|n}</div>
-		<p>
-        	  <b>${h.link_to(u"basic", url="/%s/%s" % (s["path"], t["name"]))}</b>
-		  % if s["advmode"]:
-        	  <b>${h.link_to(u"advanced", url="/%s/%s/advanced" % (s["path"], t["name"]))}</b>
-		  % endif
-		</p>
-	      </div>
-	      % endfor
-
-	    </td>
-	  </tr>
-	  % endfor
-
-	</table>
-
-      </td>
-    </tr>
-  </table>
+<div class="hero-unit">
+  <h1>${h.image(request.static_url("pawsapp:static/img/paws-small.png"), u"PAWS Logo")} PIPS as a Web Service</h1>
+  <p>Vestibulum id ligula porta felis euismod semper. Integer posuere
+    erat a ante venenatis dapibus posuere velit aliquet. Duis mollis,
+    est non commodo luctus, nisi erat porttitor ligula, eget lacinia
+    odio sem nec elit.</p>
+  <p><a class="btn primary large" href="http://pips4u.org" target="_blank">Learn more »</a></p>
 </div>
+
+<div class="row">
+  <p class="span11 offset5">
+    <span class="label notice">Notice</span>
+    Run the mouse over a heading to see the corresponding description.
+  </p>
+</div>
+
+## Section
+% for s in sections:
+
+<hr/>
+
+## Subsection
+% for t in s["tools"]:
+<% first = bool(s["tools"].index(t) == 0) %>
+<div class="row">
+  % if first:
+  <div class="span5">
+    <h2>${s["title"]}</h2>
+  </div>
+  % endif
+  <div class="${h.css_classes([('span4', True), ('offset5', not first)])}">
+    <h3 id="${s['path'] + '-' + t['name']}" title="${t['name'].upper()}" data-content="${t['descr']}">${t["name"].upper()}</h3>
+  </div>
+  <div class="span4">
+    <b>${h.link_to(u"basic »", url="/%s/%s" % (s["path"], t["name"]), class_="btn primary")}</b>
+    % if s["advmode"]:
+    <b>${h.link_to(u"advanced »", url="/%s/%s/advanced" % (s["path"], t["name"]), class_="btn success")}</b>
+    % endif
+  </div>
+</div>
+% endfor
+
+% if not s["tools"]:
+<div class="span5">
+  <h2>${s["title"]}</h2>
+</div>
+% endif
+
+% endfor
+</%def>

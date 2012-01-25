@@ -9,6 +9,7 @@ from pyramid.view import view_config
 from .operations  import _create_file, _create_result_graphs, _delete_dir
 
 
+# Default image size
 _size = (512, 512)
 
 
@@ -35,58 +36,57 @@ def _create_zoom_image(request, image):
     outfile   = _create_thumbnail(request, os.path.join(resultdir, image))
     link      = '/' + os.path.relpath(os.path.join(resultdir, image), os.path.join(publicdir, '..'))
 
-    print 'o', link, outfile
-    return '<a href="%s" class="ZOOM_IMAGE"><img src="%s"/></a>' % (link, outfile)
+    return dict(link=link, image=outfile)
 
 
-@view_config(route_name='dependence_graph', renderer='string')
+def _create_dot_images(request, functions):
+    workdir = request.session['workdir']
+    images  = []
+    for fu in functions:
+        filename = 'files/%s/%s.png' % (workdir, fu)
+        p = Popen( ['dot', '-Tpng', '-o', filename, '%s.database/%s/%s.dot' % (workdir, fu, fu)], stdout=PIPE, stderr=PIPE)
+        p.wait()
+        _create_result_graphs(request, filename)
+        image = _create_zoom_image(request, '%s/%s.png' % (workdir, fu))
+        image['fu'] = fu
+        images.append(image)
+    return images
+
+
+def _get_ws_functions(ws):
+    functions = []
+    for fu in ws.fun:
+        try:
+            functions.append(fu.name)
+            fu.print_dot_dependence_graph()
+        except:
+            ws.close()
+            raise
+    return functions
+
+
+@view_config(route_name='dependence_graph', renderer='pawsapp:templates/lib/images.mako')
 def dependence_graph(request):
     """
     """
-    source_file = _create_file(request, '', request.params['code'], request.params['language'])
-    workdir     = request.session['workdir']
-    ws = pworkspace(str(source_file), name=workdir, deleteOnClose=True)
-    functions = []
-    images = ''
-    for fu in ws.fun:
-        try:
-            functions.append(fu.name)
-            fu.print_dot_dependence_graph()
-        except:
-            ws.close()
-            raise
-    for fu in functions:
-        filename = 'files/%s/%s.png' % (workdir, fu)
-        p = Popen( ['dot', '-Tpng', '-o', filename, '%s.database/%s/%s.dot' % (workdir, fu, fu)],
-                   stdout=PIPE, stderr=PIPE)
-        p.wait()
-        _create_result_graphs(request, filename)
-        images += '<div style="clear: both;width:100%%"><b>%s:</b><br/>%s</div>' % (fu, _create_zoom_image(request, '%s/%s.png' % (workdir, fu)))
-    _delete_dir(source_file)
+    source    = _create_file(request, '', request.params['code'], request.params['language'])
+    workdir   = request.session['workdir']
+    ws        = pworkspace(str(source), name=workdir, deleteOnClose=True)
+    functions = _get_ws_functions(ws)
+    images    = _create_dot_images(request, functions)
+    _delete_dir(source)
     ws.close()
-    return images
+    return dict(images=images)
 
-@view_config(route_name='dependence_graph_multi', renderer='string')
+
+@view_config(route_name='dependence_graph_multi', renderer='pawsapp:templates/lib/images.mako')
 def dependence_graph_multi(request):
     """
     """
-    sources = session['sources']
-    print sources[0][0]
-    ws = pworkspace(*sources, name=session['directory'], deleteOnClose=True)
-    functions = []
-    images = ''
-    for fu in ws.fun:
-        try:
-            functions.append(fu.name)
-            fu.print_dot_dependence_graph()
-        except:
-            ws.close()
-            raise
-    for fu in functions:
-        filename = 'files/' + session['directory'] + '/' + fu + '.png'
-        p = Popen(['dot', '-Tpng', '-o', filename, session['directory'] + '.database/' + fu + '/' + fu + '.dot'], stdout = PIPE, stderr = PIPE)
-        p.wait()
-        _create_result_graphs(request, filename)
-        images += '<div style="clear:both; width:100%%"><b>%s:</b><br/>%s</div>' % (fu, _create_zoom_image(request, '%s/%s.png' % (workdir, fu)))
+    sources   = request.session['sources']
+    workdir   = request.session['workdir']
+    ws        = pworkspace(*sources, name=workdir, deleteOnClose=True)
+    functions = _get_ws_functions(ws)
+    images    = _create_dot_images(request, functions)
     ws.close()
-    return images
+    return dict(images=images)

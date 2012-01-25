@@ -3,7 +3,7 @@
 </%doc>
 
 
-<%inherit file="fluid.mako"/>
+<%inherit file="base.mako"/>
 
 <%def name="css_slot()">
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
@@ -20,6 +20,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
 <script type="text/javascript">
   operation = "${tool}";
 </script>
+${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 </%def>
 
 
@@ -69,11 +70,13 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
 
 <iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
 
-<h2 style="padding-bottom:1em">${descr}
-% if advanced:
-(advanced)
-% endif
-</h2>
+<div class="hero-unit" style="padding:.5em 1em">
+  <h2>${descr}
+    % if advanced:
+    <span class="label important">advanced</span>
+    % endif
+  </h2>
+</div>
 
 <div id="op-tabs">
 
@@ -92,23 +95,20 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
 	<label for="lang1">Language: </label>
 	<input id="lang1" value="not yet detected." readonly="readonly"/>
       </p>
-      <textarea id="sourcecode1" rows="27" onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
+      <textarea id="sourcecode1" class="span16" rows="27" onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
     </div>
 
     ## Result panel
     <div id="result" class="tab-pane">
       <div id="multiple-functions">
       </div>
-      <div id="resultcode">
+      <div id="resultcode" class="span16">
 	Result of the transformation will be displayed here.
       </div>
     </div>
 
     ## Graph panel
     <div id="graph" class="tab-pane">
-      <div id="dependence_graph">
-	Please wait, it might take a long time.
-      </div>
     </div>
 
   </div>
