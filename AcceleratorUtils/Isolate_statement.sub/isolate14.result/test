@@ -128,7 +128,7 @@ void erode(int isi, int isj, int new_image[isi][isj], int image[isi][isj])
       for(i = 2; i <= isi-3; i += 1)
 
 //  <image[PHI1][PHI2]-R-EXACT-{PHI1==i, 2<=PHI1, PHI1+3<=isj,
-//    1<=PHI2, PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4}>
+//    1<=PHI2, PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4, 5<=isj}>
 //  <new_image[PHI1][PHI2]-W-EXACT-{PHI1==i, 2<=PHI2, PHI2+3<=isj,
 //    isi==isj, 2<=i, i+3<=isi, 0<=0`l, 0`l<=4}>
 
