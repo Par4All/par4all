@@ -109,16 +109,16 @@ void run_kernel(int a[100], int b[100], int c[100])
 kernel:
    for(i = 0; i <= 99; i += 10)
 
-//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
-//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
-//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
 
       kernel(a, b, c, i);
 }
 
-//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
-//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
-//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i, i<=99}>
+//  <a[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+//  <b[PHI1]-R-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
+//  <c[PHI1]-W-MAY-{PHI1<=99, i<=PHI1, PHI1<=i+9, 0<=i}>
 
 void kernel(int a[100], int b[100], int c[100], int i)
 {
