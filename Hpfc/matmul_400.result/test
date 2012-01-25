@@ -10,7 +10,7 @@
             PSI2 = MY POS(2,1)
             IF (MY LID.LE.4.AND.PSI2.EQ.PSI1) THEN
                DO TMP3 = 0, 1
-                  PSIp1 = PSI2
+                  PSIp1 = PSI1
                   PSIp2 = TMP3+1
                   T LID = 2*PSIp1+PSIp2-2
                   IF (MY LID.NE.T LID.AND..NOT.HPFC TWIN P(2, T LID)

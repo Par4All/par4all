@@ -99,7 +99,7 @@
 ! remapping A[3]: A_1[2] -> A[3]
             PSI1 = MY POS(1,1)
             IF (MY LID.LE.4) THEN
-               DO PSIp1 = (PSI1+1)/2, MIN(2, 1+PSI1/2)
+               DO PSIp1 = (PSI1+1)/2, MIN(2, PSI1)
                   DO PSIp2 = 1, 2
                      T LID = 2*PSIp1+PSIp2-2
                      IF (MY LID.NE.T LID) THEN
@@ -108,7 +108,7 @@
                         SEND NOT INITIALIZED = .TRUE.
                         DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
                            DO LALPHA1 = MAX(1, -3*PSI1+5*PSIp1-1), 
-     &                     MIN(3, -3*PSI1+5*PSIp1+3)
+     &                     MIN(-3*PSI1+5*PSIp1+3, 3)
                               LALPHAp2 = LALPHA2-5*PSIp2+5
                               LALPHAp1 = LALPHA1+3*PSI1-5*PSIp1+2
                               BUF INDEX = BUF INDEX+1
@@ -143,8 +143,8 @@
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
                      DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
-                        DO LALPHA1 = MAX(1, -3*PSI1+5*PSIp1-1), MIN(3
-     &                  , -3*PSI1+5*PSIp1+3)
+                        DO LALPHA1 = MAX(1, -3*PSI1+5*PSIp1-1), MIN(
+     &                  -3*PSI1+5*PSIp1+3, 3)
                            LALPHAp2 = LALPHA2-5*PSIp2+5
                            LALPHAp1 = LALPHA1+3*PSI1-5*PSIp1+2
                            IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
@@ -161,8 +161,8 @@
                   ELSE
 ! - lazy copying
                      DO LALPHA2 = 5*PSIp2-4, 5*PSIp2
-                        DO LALPHA1 = MAX(1, -3*PSI1+5*PSIp1-1), MIN(3
-     &                  , -3*PSI1+5*PSIp1+3)
+                        DO LALPHA1 = MAX(1, -3*PSI1+5*PSIp1-1), MIN(
+     &                  -3*PSI1+5*PSIp1+3, 3)
                            LALPHAp2 = LALPHA2-5*PSIp2+5
                            LALPHAp1 = LALPHA1+3*PSI1-5*PSIp1+2
                            A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,LALPHA2
@@ -289,8 +289,8 @@
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
                      DO LALPHA2 = 1, 5
-                        DO LALPHA1 = MAX(1, -5*PSI1+3*PSIp1+3), MIN(5
-     &                  , -5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5)
+                        DO LALPHA1 = MAX(1, -5*PSI1+3*PSIp1+3), MIN(
+     &                  -5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5, 5)
                            LALPHAp2 = LALPHA2+5*PSI2-5
                            LALPHAp1 = LALPHA1+5*PSI1-3*PSIp1-2
                            BUF INDEX = BUF INDEX+1
@@ -325,7 +325,7 @@
                         SIZE OF RECEIVED BUFFER = 0
                         DO LALPHA2 = 1, 5
                            DO LALPHA1 = MAX(1, -5*PSI1+3*PSIp1+3), 
-     &                     MIN(5, -5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5
+     &                     MIN(-5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5, 5
      &                     )
                               LALPHAp2 = LALPHA2+5*PSI2-5
                               LALPHAp1 = LALPHA1+5*PSI1-3*PSIp1-2
@@ -344,7 +344,7 @@
 ! - lazy copying
                         DO LALPHA2 = 1, 5
                            DO LALPHA1 = MAX(1, -5*PSI1+3*PSIp1+3), 
-     &                     MIN(5, -5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5
+     &                     MIN(-5*PSI1+PSIp1+11, -5*PSI1+3*PSIp1+5, 5
      &                     )
                               LALPHAp2 = LALPHA2+5*PSI2-5
                               LALPHAp1 = LALPHA1+5*PSI1-3*PSIp1-2
