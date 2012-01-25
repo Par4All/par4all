@@ -29,14 +29,12 @@ PAWS
     <title>${self.pagetitle()}</title>
     
     ## Stylesheets
-    ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/cupertino/jquery-ui-1.8.10.custom.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/normal.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/print.css"),  media="print")}
     ${self.css_slot()}
 
     ## Javascript
     ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-1.7.1.min.js"))}
-    ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-ui-1.8.10.custom.min.js"))}
     ${h.javascript_link(request.static_url("pawsapp:static/js/base.js"))}
     ${self.js_slot()}
   </head>

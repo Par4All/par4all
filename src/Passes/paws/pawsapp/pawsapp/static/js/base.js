@@ -296,16 +296,16 @@ function check_sources(index, panel_id) {
 *********************************************************************/
 
 function create_graph(index, panel_id) {
-    console.error('createg!');
     clear_graph_tab();
     if (check_sources(index, panel_id)) {
 	if (multiple) {
-	    $.get( route['dependence_graph_multi'],		
-		   enable_dependence_graph		   
-		 );
+	    $.get(
+		routes['dependence_graph_multi'],		
+		enable_dependence_graph		   
+	    );
 	} else {
 	    $.post(
-		route['dependence_graph'], 
+		routes['dependence_graph'], 
 		{ code:     $('#sourcecode1').text(),
                   language: $('#lang1').val()
                 },
@@ -533,8 +533,7 @@ function changeLinesHeight() {
 
 function choose_function() {
     $('#multiple-functions').html(functions);
-    $('#multiple-functions input:submit').button()
-    .click(function() {
+    $('#multiple-functions input:submit').click(function(ev) {
 	$.ajax({
 	    type: "POST",
 	    data: { function: $(this).attr('value'),

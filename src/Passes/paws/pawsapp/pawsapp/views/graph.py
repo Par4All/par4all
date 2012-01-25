@@ -2,37 +2,50 @@
 
 import os, sys, shutil
 import Image
-from subprocess import Popen, PIPE
-
-from pyps       import workspace, module
-from pyrops     import pworkspace
-
-
-class Images(object):
-
-    size = (512, 512)
-
-    def create_thumbnail(self, image):
-        outfile = os.path.splitext(image)[0] + '.thumbnail.png'
-	try:
-            ii = Image.open(image)
-            ii.thumbnail(self.size)
-            ii.save(outfile, 'PNG')
-	except IOError:
-            print 'ERROR'
-        return outfile[len(paws.public) - 1 : ]
- 
-    def create_zoom_image(self, image):
-        outfile = self.create_thumbnail(paws.results + image)
-	print 'o', outfile
-	return '<a href="/' + paws.result_dir + image + '" class=' + paws.images_class + ' ><img src="' + outfile + '" /></a>'
+from subprocess   import Popen, PIPE
+from pyps         import workspace, module
+from pyrops       import pworkspace
+from pyramid.view import view_config
+from .operations  import _create_file, _create_result_graphs, _delete_dir
 
 
-def dependence_graph(self):
+_size = (512, 512)
+
+
+def _create_thumbnail(request, image):
     """
     """
-    source_file = self.create_file('', request.params['code'], request.params['language'])
-    ws = pworkspace(str(source_file), name=session['directory'], deleteOnClose=True)
+    publicdir = request.registry.settings['paws.publicdir']
+    outfile   = '%s.thumbnail.png' % os.path.splitext(image)[0]
+    try:
+        ii = Image.open(image)
+        ii.thumbnail(_size)
+        ii.save(outfile, 'PNG')
+    except IOError:
+        print 'ERROR'
+    return '/' + os.path.relpath(outfile, os.path.join(publicdir, '..'))
+
+
+def _create_zoom_image(request, image):
+    """
+    """
+    resultdir = request.registry.settings['paws.resultdir']
+    publicdir = request.registry.settings['paws.publicdir']
+
+    outfile   = _create_thumbnail(request, os.path.join(resultdir, image))
+    link      = '/' + os.path.relpath(os.path.join(resultdir, image), os.path.join(publicdir, '..'))
+
+    print 'o', link, outfile
+    return '<a href="%s" class="ZOOM_IMAGE"><img src="%s"/></a>' % (link, outfile)
+
+
+@view_config(route_name='dependence_graph', renderer='string')
+def dependence_graph(request):
+    """
+    """
+    source_file = _create_file(request, '', request.params['code'], request.params['language'])
+    workdir     = request.session['workdir']
+    ws = pworkspace(str(source_file), name=workdir, deleteOnClose=True)
     functions = []
     images = ''
     for fu in ws.fun:
@@ -43,16 +56,18 @@ def dependence_graph(self):
             ws.close()
             raise
     for fu in functions:
-        filename = 'files/' + session['directory'] + '/' + fu + '.png'
-        p = Popen(['dot', '-Tpng', '-o', filename, session['directory'] + '.database/' + fu + '/' + fu + '.dot'], stdout = PIPE, stderr = PIPE)
+        filename = 'files/%s/%s.png' % (workdir, fu)
+        p = Popen( ['dot', '-Tpng', '-o', filename, '%s.database/%s/%s.dot' % (workdir, fu, fu)],
+                   stdout=PIPE, stderr=PIPE)
         p.wait()
-        self.create_result_graphs(filename)
-        images += '<div style="clear: both;width:100%"><b>' + fu + ':</b><br/>' + self.create_zoom_image(session['directory'] + '/' + fu + '.png') + '</div>'
-    self.delete_dir(source_file)
+        _create_result_graphs(request, filename)
+        images += '<div style="clear: both;width:100%%"><b>%s:</b><br/>%s</div>' % (fu, _create_zoom_image(request, '%s/%s.png' % (workdir, fu)))
+    _delete_dir(source_file)
     ws.close()
     return images
 
-def dependence_graph_multi(self):
+@view_config(route_name='dependence_graph_multi', renderer='string')
+def dependence_graph_multi(request):
     """
     """
     sources = session['sources']
@@ -71,7 +86,7 @@ def dependence_graph_multi(self):
         filename = 'files/' + session['directory'] + '/' + fu + '.png'
         p = Popen(['dot', '-Tpng', '-o', filename, session['directory'] + '.database/' + fu + '/' + fu + '.dot'], stdout = PIPE, stderr = PIPE)
         p.wait()
-        self.create_result_graphs(filename)
-        images += '<div style="clear: both;width:100%"><b>' + fu + ':</b><br/>' + self.create_zoom_image(session['directory'] + '/' + fu + '.png') + '</div>'
+        _create_result_graphs(request, filename)
+        images += '<div style="clear:both; width:100%%"><b>%s:</b><br/>%s</div>' % (fu, _create_zoom_image(request, '%s/%s.png' % (workdir, fu)))
     ws.close()
     return images

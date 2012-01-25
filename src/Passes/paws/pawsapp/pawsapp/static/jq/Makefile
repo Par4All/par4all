@@ -5,8 +5,8 @@ F.png	= $(wildcard *.png)
 F.js	= $(wildcard *.js)
 F.css	= $(wildcard *.css)
 
-F.src-js	= $(filter-out %-min.js,$(F.js)) 
-F.src-css	= $(filter-out %-min.css,$(F.css)) 
+F.src-js	= $(filter-out %-min.js %.min.js,$(F.js)) 
+F.src-css	= $(filter-out %-min.css %.min.css,$(F.css)) 
 
 F.min	= $(F.src-js:%.js=%-min.js) $(F.src-css:%.css=%-min.css) 
 
