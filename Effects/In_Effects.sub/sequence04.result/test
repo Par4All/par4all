@@ -1,0 +1,62 @@
+int main()
+{
+   // BEGIN BLOCK
+   int a[2], b, c;
+//             <    is written>: a[0]
+
+   a[0] = 0;
+//             <    is written>: a[1]
+   a[1] = 1;
+//             <may be read   >: a[1]
+//             <may be written>: a[1] b
+   if (1) {
+//             <    is read   >: a[1]
+//             <    is written>: a[1] b
+      // BEGIN BLOCK
+//             <    is written>: a[1]
+      a[1] = 2;
+//             <    is read   >: a[1]
+//             <    is written>: b
+      b = a[1];
+      // END BLOCK
+   }
+//             <    is written>: a[0]
+
+   a[0] = 2;
+//             <    is written>: a[1]
+   a[1] = 3;
+//             <may be read   >: a[*]
+//             <may be written>: b
+   if (1)
+//             <may be read   >: a[*]
+//             <    is written>: b
+      b = a[0]+a[1];
+//             <    is read   >: b
+   return b;
+   // END BLOCK
+}
+int main()
+{
+   // BEGIN BLOCK
+   int a[2], b, c;
+
+   a[0] = 0;
+   a[1] = 1;
+   if (1) {
+      // BEGIN BLOCK
+      a[1] = 2;
+//             <    is imported>: a[1]
+      b = a[1];
+      // END BLOCK
+   }
+
+   a[0] = 2;
+   a[1] = 3;
+//             <may be imported>: a[*]
+   if (1)
+//             <may be imported>: a[*]
+      b = a[0]+a[1];
+//             <    is imported>: b
+   return b;
+   // END BLOCK
+}
