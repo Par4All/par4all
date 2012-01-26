@@ -13,8 +13,6 @@ C_syntax
 C99_syntax
 F95_syntax
 Effects
-# To check effects extended to environment and type declarations
-Effects-New
 # Specific directory for Effects of C intrinsics
 CIntrinsics
 # Preconditions and transformers, using PIPS initial default options
