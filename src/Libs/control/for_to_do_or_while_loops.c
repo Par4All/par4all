@@ -123,7 +123,8 @@ static bool condition_expression_to_final_bound(expression cond,
    Test if a for-loop incrementation expression is do-loop compatible
    (i.e. the number of iterations can be computed before entering the
    loop and hence the increment is known and unchanged) and, if yes,
-   compute the increment expression.
+   compute the increment expression. We *have* to fail on symbolic increments
+   because we won't be able to restore a correct code.
 
    Most of this could be trivial by using the transformers but this
    function is to be used from the controlizer where the semantics
@@ -137,10 +138,9 @@ static bool condition_expression_to_final_bound(expression cond,
    - @param pincrement is generated with the detected increment value expression
  */
 static bool incrementation_expression_to_increment(expression incr,
-						   entity li,
-						   bool * is_increasing_p,
-                           expression * pincrement)
-{
+                                                   entity li,
+                                                   bool * is_increasing_p,
+                                                   expression * pincrement) {
     bool success = false;
     syntax incr_s = expression_syntax(incr);
 
@@ -201,6 +201,8 @@ static bool incrementation_expression_to_increment(expression incr,
                             * pincrement = copy_expression(inc_v);
                             *is_increasing_p = entity_plus_update_p;
                             success = true;
+                            // Here we have to fail to be safe ! See validation/C_syntax/decreasing_loop01
+                            success = false;
                         }
                     }
                     else {
@@ -230,6 +232,8 @@ static bool incrementation_expression_to_increment(expression incr,
                                 * pincrement = copy_expression(inc_v);
                                 * is_increasing_p = true;
                                 success = true;
+                                // Here we have to fail to be safe ! See validation/C_syntax/decreasing_loop01
+                                success = false;
                             }
                         }
                         /* SG: i am duplicating code, next generation of phd will clean it */
@@ -259,11 +263,13 @@ static bool incrementation_expression_to_increment(expression incr,
                                     * pincrement = inc_v;
                                     * is_increasing_p = false;
                                     success = true;
+                                    // Here we have to fail to be safe ! See validation/C_syntax/decreasing_loop01
+                                    success = false;
                                 }
                             }
                         }
                     }
-                    }
+                }
             }
         }
     }
