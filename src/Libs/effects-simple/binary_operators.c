@@ -214,7 +214,35 @@ effect effect_may_union(effect eff1, effect eff2)
     else
     {
       eff = (*effect_dup_func)(eff1);
-      approximation_tag(effect_approximation(eff)) = approximation_and(app1,app2);
+      cell eff_c = effect_cell(eff);
+
+      if (cell_preference_p(eff_c))
+	{
+	  /* it's a preference : we change for a reference cell */
+	  pips_debug(8, "It's a preference\n");
+	  reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
+	  free_cell(eff_c);
+	  effect_cell(eff) = make_cell_reference(ref);
+	}
+
+      /* let us check the indices */
+      list l1 = reference_indices(effect_any_reference(eff));
+      list l2 = reference_indices(effect_any_reference(eff2));
+
+      tag app_tag =  approximation_and(app1,app2);
+
+      for(; !ENDP(l1); POP(l1), POP(l2))
+	{
+	  expression exp1 = EXPRESSION(CAR(l1));
+	  expression exp2 = EXPRESSION(CAR(l2));
+	  if (!expression_equal_p(exp1, exp2))
+	    {
+	      EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
+	      app_tag = is_approximation_may;
+	    }
+	}
+
+      approximation_tag(effect_approximation(eff)) = app_tag;
     }
     return(eff);
 }
@@ -280,19 +308,35 @@ effect effect_must_union(effect eff1, effect eff2)
     }
     else
     {
-      /* FI: I do change this a lot, because the keys used in
-	 proper_effects_combine() are now much more extensive for
-	 C. */
-      /* we might have must effects for struct or array elements */
-      /*pips_assert("The tags for non scalar effects are may",
-	app1==app2 && app1 == is_approximation_may); */
-	/*
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(is_approximation_may, UU));
-	*/
       eff = (*effect_dup_func)(eff1);
-	effect_approximation_tag(eff) = approximation_or(app1,app2);
+      cell eff_c = effect_cell(eff);
+      if (cell_preference_p(eff_c))
+	{
+	  /* it's a preference : we change for a reference cell */
+	  pips_debug(8, "It's a preference\n");
+	  reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
+	  free_cell(eff_c);
+	  effect_cell(eff) = make_cell_reference(ref);
+	}
+
+      /* let us check the indices */
+      list l1 = reference_indices(effect_any_reference(eff));
+      list l2 = reference_indices(effect_any_reference(eff2));
+
+      tag app_tag = approximation_or(app1,app2);
+
+      for(; !ENDP(l1); POP(l1), POP(l2))
+	{
+	  expression exp1 = EXPRESSION(CAR(l1));
+	  expression exp2 = EXPRESSION(CAR(l2));
+	  if (!expression_equal_p(exp1, exp2))
+	    {
+	      EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
+	      app_tag = is_approximation_may;
+	    }
+	}
+
+      effect_approximation_tag(eff) = app_tag;
     }
     return(eff);
 }

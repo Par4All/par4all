@@ -1395,7 +1395,7 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 	    {
 	      pips_debug(8,"computing the union\n");
 	      list l_const = (*effect_to_constant_path_effects_func)(eff);
-	      le = (*effects_union_op)(l_const, le, effects_same_action_p);
+	      le = (*effects_union_op)(l_const, le, effects_scalars_and_same_action_p);
 	    }
 	}
       else
