@@ -346,10 +346,29 @@ static list
 effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
 {
     list l_res = NIL;
-    if (effect_exact_p(eff2))
-	l_res = NIL;
+    reference ref1 = effect_any_reference(eff1);
+    reference ref2 = effect_any_reference(eff2);
+
+    /* We already know that effects are combinable and they are not abstract locations
+       (or they are context_sensitive heap locations)
+    */
+    if (reference_equal_p(ref1, ref2)) // a[1] - a[1] or a[*] - a[*]_may
+      {
+	if (effect_may_p(eff2))
+	  l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
+	// else: empty list
+      }
     else
-      l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
+      {
+	if (effect_exact_p(eff1) && effect_exact_p(eff2)) // a[1] - a[2]
+	  l_res = effect_to_list((*effect_dup_func)(eff1));
+	else
+	  {
+	    // a[*] - a[1] or a[1] - a[*]_may for instance
+	    l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
+	  }
+      }
+
     return(l_res);
 }
 
