@@ -9,10 +9,8 @@ int main()
       printf("fread failed");
    fclose(fp);
 }
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[*]
 int main()
 {
    FILE *fp;

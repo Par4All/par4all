@@ -25,12 +25,11 @@ int main()
 
 Cumulated effetcs for "memcmp01"
 
-//             <may be read   >: stdin[0] stdout[0]
-//             <may be written>: stdin[0] stdout[0]
-//             <    is read   >: stdin stdout __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdin[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stdin[0] stdout[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stdin stdout
 int main()
 {
    char str1[256];

@@ -6,11 +6,9 @@ Cumulated effects for "putnonintrablk"
 //             <may be read   >: alternate_scan[*] blk[*] errortext[*]
 //                               mpeg1 outfile outfile[0] stderr 
 //                               stderr[0] zig_zag_scan[*] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <    is read   >: altscan blk
@@ -25,13 +23,12 @@ void putnonintrablk(short *blk)
 //             <may be read   >: alternate_scan[*] blk[*] errortext[*]
 //                               first mpeg1 outfile outfile[0] stderr
 //                               stderr[0] zig_zag_scan[*] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] first outfile[0] 
-//                               stderr[0] __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <    is read   >: altscan blk n run signed_level
 //             <    is written>: n run signed_level
 
@@ -44,33 +41,31 @@ void putnonintrablk(short *blk)
       signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
 //             <may be read   >: errortext[*] first mpeg1 outfile 
 //                               outfile[0] stderr stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] first outfile[0] 
-//                               stderr[0] __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <    is read   >: run signed_level
 //             <    is written>: run
 
       if (signed_level!=0) {
 //             <may be read   >: errortext[*] mpeg1 outfile outfile[0]
-//                               stderr stderr[0] __IO_EFFECTS:LUNS[2]
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <may be written>: errortext[*] first outfile[0] 
-//                               stderr[0] __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <    is read   >: first run signed_level
          if (first) {
 //             <may be read   >: errortext[*] mpeg1 outfile outfile[0]
-//                               stderr stderr[0] __IO_EFFECTS:LUNS[2]
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <    is read   >: run signed_level
@@ -81,11 +76,10 @@ void putnonintrablk(short *blk)
          }
          else
 //             <may be read   >: errortext[*] outfile outfile[0] 
-//                               stderr stderr[0] __IO_EFFECTS:LUNS[2]
-//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
-//                               putbits!:outbfr putbits!:outcnt
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
-//                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
 //             <    is read   >: mpeg1 run signed_level

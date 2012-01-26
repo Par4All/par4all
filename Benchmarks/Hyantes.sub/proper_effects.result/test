@@ -81,10 +81,8 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
 }
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
@@ -107,10 +105,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               pFileReference[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: configuration pFileReference stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: nb the_towns _MALLOC_EFFECTS:_MALLOC_
-//                               __IO_EFFECTS:LUNS[2]
    hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
 //             <    is read   >: latRange lonRange 
 //                               _MALLOC_EFFECTS:_MALLOC_
@@ -204,10 +200,8 @@ hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_n
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
 }
 unsigned long int hs_status()
@@ -237,10 +231,6 @@ static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range
 _switch_1_default:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
@@ -254,10 +244,6 @@ _switch_1_default:   ;
 _switch_1_case_4:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
@@ -271,10 +257,6 @@ _switch_1_case_4:   ;
 _switch_1_case_3:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
@@ -288,10 +270,6 @@ _switch_1_case_3:   ;
 _switch_1_case_2:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
@@ -305,10 +283,6 @@ _switch_1_case_2:   ;
 _switch_1_case_1:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
@@ -322,10 +296,6 @@ _switch_1_case_1:   ;
 _switch_1_case_0:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
 //                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].lon the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 

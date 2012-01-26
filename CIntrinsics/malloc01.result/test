@@ -27,15 +27,13 @@ int main()
 Cumulated effetcs for "malloc01"
 
 //             <may be read   >: stdin[0] stdout[0] 
-//                               *ANY_MODULE*:*ANYWHERE*
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stdin[0] stdout[0] 
-//                               *ANY_MODULE*:*ANYWHERE*
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: stdin stdout _MALLOC_EFFECTS:_MALLOC_
-//                               __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
    int i, n;

@@ -17,22 +17,19 @@ int main()
 Cumulated effetcs for "strcmp01"
 
 //             <may be read   >: stdin stdin[0] stdout[0] 
-//                               __IO_EFFECTS:LUNS[0]
+//                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stdin[0] stdout[0] 
-//                               __IO_EFFECTS:LUNS[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stdout
 int main()
 {
 //             <may be written>: szKey[*]
    char szKey[] = "apple";
    char szInput[80];
 //             <may be read   >: stdin stdin[0] stdout stdout[0] 
-//                               __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
+//                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stdin[0] stdout[0] szInput[*] 
-//                               __IO_EFFECTS:LUNS[0] 
-//                               __IO_EFFECTS:LUNS[1]
+//                               __IO_EFFECTS:LUNS[*]
    do {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

@@ -108,30 +108,24 @@ int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
 {
 //             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
 }
 //             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
 //             <    is read   >: _resoLat _resoLon
@@ -152,10 +146,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               pFileReference[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: configuration pFileReference stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: nb the_towns _MALLOC_EFFECTS:_MALLOC_
-//                               __IO_EFFECTS:LUNS[2]
    hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
 //             <    is read   >: latRange lonRange 
 //                               _MALLOC_EFFECTS:_MALLOC_
@@ -244,10 +236,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
 {
 //             <    is written>: config.fid config.fparam 
@@ -267,10 +257,8 @@ hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_n
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
 }
 //             <    is read   >: g_config.status
@@ -383,9 +371,7 @@ _break_1:   ;
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
+//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -406,8 +392,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon t[*].pot total_sum 
 //                               town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
@@ -428,8 +412,6 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
@@ -631,9 +613,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
+//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -654,8 +634,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon t[*].pot total_sum 
 //                               town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
@@ -676,8 +654,6 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
@@ -879,9 +855,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
+//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -902,8 +876,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon t[*].pot total_sum 
 //                               town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
@@ -924,8 +896,6 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
@@ -1127,9 +1097,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
+//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -1150,8 +1118,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon t[*].pot total_sum 
 //                               town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
@@ -1172,8 +1138,6 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
@@ -1375,9 +1339,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
+//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -1398,8 +1360,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon t[*].pot 
 //                               0`1`2`3`4`5`6`7`8`9`tmp 
 //                               0`1`2`3`4`5`6`7`8`9`tmp total_sum 
@@ -1422,8 +1382,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //                               latStep latStep lonMin lonMin 
 //                               lonRange lonStep lonStep pt[*][*].pot
 //                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
 //                               t[*].lon t[*].lon 
 //                               0`1`2`3`4`5`6`7`8`9`tmp 
 //                               0`1`2`3`4`5`6`7`8`9`tmp total_sum
@@ -1642,10 +1600,8 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <may be written>: config[0].herrno fd[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fd len stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: len[0] _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: len[0] _MALLOC_EFFECTS:_MALLOC_
 static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
 {
 //             <    is written>: curr
