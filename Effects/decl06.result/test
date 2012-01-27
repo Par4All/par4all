@@ -1,0 +1,18 @@
+int main()
+{
+   int a;
+//             <    is written>: a
+   a = 0;
+//             <    is read   >: a
+//             <    is written>: b
+   int b = a*a;
+//             <    is read   >: b
+   return b;
+}
+int main()
+{
+   int a;
+   a = 0;
+   int b = a*a;
+   return b;
+}
