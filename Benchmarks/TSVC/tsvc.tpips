@@ -9,7 +9,8 @@
 delete tsvc
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+# we don't need to generate any file since SECOND intrinsic is now supported
+#setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 create tsvc mains.f loops.f
 
@@ -17,9 +18,10 @@ create tsvc mains.f loops.f
 # an outdated version of %ALL
 
 apply PRINT_CODE[%ALL]
-apply INITIAL_PRECONDITION[SECOND]
+# SECOND is now an intrinsic, do not apply INITIAL_PRECONDITION on it
+#apply INITIAL_PRECONDITION[SECOND]
 
-setenv modules=`(cd tsvc.database; for i in S[1-9]*; do echo -n $i ""; done)`
+setenv modules=`(cd tsvc.database; for i in S[1-9]*; do echo -n $i ""; mkdir Tmp; done)`
 #echo $modules
 
 
