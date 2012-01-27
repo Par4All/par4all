@@ -55,8 +55,7 @@ POINTS-TO
 // x -> _x_3[0] , EXACT
 
 
-// Points To OUT:
-// x -> _x_3[0] , EXACT
+// Points To OUT: none
 
 void call05(int r, int m, int *x)
 {
@@ -155,7 +154,6 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//             <may be written>: y[i][*]
 //             <    is read   >: d1 d2 i
       call05(i, d2, y[i]);
 //             <    is read   >: d1
@@ -201,12 +199,8 @@ int main()
 		from <d2-W-EXACT> to <d2-R-EXACT>
 	18 --> 21 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	19 --> 19 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
 	19 --> 21 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	19 --> 23 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][j]-R-EXACT>
 	22 --> 22 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	23 --> 22 with conflicts

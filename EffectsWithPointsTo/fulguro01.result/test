@@ -187,10 +187,7 @@ POINTS-TO
 // datdest -> _datdest_1[0] , EXACT
 
 
-// Points To OUT:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
+// Points To OUT: none
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
@@ -344,10 +341,7 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 // datdest -> _datdest_1[0] , EXACT
 
 
-// Points To OUT:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
+// Points To OUT: none
 
 FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
@@ -629,10 +623,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgBIT(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -644,10 +635,7 @@ int flgr2d_arith_add_fgBIT(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -659,10 +647,7 @@ int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -674,10 +659,7 @@ int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -689,10 +671,7 @@ int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // datdest -> _datdest_1[0] , EXACT
 
 
-// Points To OUT:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
+// Points To OUT: none
 
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
@@ -789,10 +768,7 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -804,10 +780,7 @@ int flgr2d_arith_add_fgINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgUINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -819,10 +792,7 @@ int flgr2d_arith_add_fgUINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgUINT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -834,10 +804,7 @@ int flgr2d_arith_add_fgUINT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // f3 -> _f3_3[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_arith_add_fgUINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
@@ -848,9 +815,7 @@ int flgr2d_arith_add_fgUINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 // f2 -> _f2_2[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
+// Points To OUT: none
 
 int flgr2d_is_data_same_attributes(FLGR_Data2D *f1, FLGR_Data2D *f2)
 {
@@ -869,8 +834,7 @@ int flgr_get_type_string(enum FLGR_TYPE f1)
 // array -> _array_1[0] , EXACT
 
 
-// Points To OUT:
-// array -> _array_1[0] , EXACT
+// Points To OUT: none
 
 static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
 {
@@ -885,8 +849,7 @@ static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
 // array -> _array_1[0] , EXACT
 
 
-// Points To OUT:
-// array -> _array_1[0] , EXACT
+// Points To OUT: none
 
 static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
@@ -914,8 +877,7 @@ static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
 // array -> _array_1[0] , EXACT
 
 
-// Points To OUT:
-// array -> _array_1[0] , EXACT
+// Points To OUT: none
 
 static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
 {
@@ -930,8 +892,7 @@ static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
 // array -> _array_1[0] , EXACT
 
 
-// Points To OUT:
-// array -> _array_1[0] , EXACT
+// Points To OUT: none
 
 static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
@@ -968,16 +929,15 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 //             <    is read   >: length
 //             <    is written>: j
    for(j = 0; j <= length-1; j += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j length psrc1
 //             <    is written>: v1
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j length psrc2
 //             <    is written>: v2
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
 //             <    is read   >: length v1 v2
 //             <    is written>: result
       result = flgr_defop_add_fgINT32(v1, v2);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: j length pdest result
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
@@ -1045,7 +1005,6 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 //             <    is read   >: _datdest_1[0].type datdest
    if (datdest->type==FLGR_INT32) {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       flgr2d_arith_add_fgINT32(datdest, data1, data2);
       return FLGR_RET_OK;
    }
@@ -1098,7 +1057,6 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
 //             <    is read   >: _data1_2[0].size_y data1 i
    while (i<data1->size_y) {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
 //             <    is read   >: i p1 p2 pdest
 //             <    is written>: i p1 p2 pdest
@@ -1126,13 +1084,11 @@ int flgr_get_type_string(enum FLGR_TYPE f1)
 }
 static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
 {
-//             <may be read   >: _array_1[*]
 //             <    is read   >: array pos
    return flgr_get_array_fgINT32(array, pos);
 }
 static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
-//             <may be written>: _array_1[*]
 //             <    is read   >: array pos value
    flgr_set_array_fgINT32(array, pos, value);
 }

@@ -33,7 +33,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_10.p -> j , EXACT
 
 int main()
 {

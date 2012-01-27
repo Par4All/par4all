@@ -3,32 +3,30 @@ POINTS-TO
 
 
 // Points To IN:
-// _pp_1 -> __pp_1_1 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
 
 // Points To OUT:
-// _pp_1 -> __qq_2_2 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
-// pp -> _pp_1 , EXACT
-// qq -> _qq_2 , EXACT
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 
 void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1 -> __pp_1_1 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
    *pp = *qq;
 
 // Points To:
-// _pp_1 -> __qq_2_2 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
@@ -86,8 +84,7 @@ CUMULATED  EFFECTS WITH POINTS TO
 
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: _qq_2 pp qq stdout 
-//                               __IO_EFFECTS:LUNS[1]
+//             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 void bar(int **pp, int **qq)
 {

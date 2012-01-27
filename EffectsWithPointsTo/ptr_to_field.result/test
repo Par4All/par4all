@@ -39,7 +39,11 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_12.p -> j , EXACT
+// *HEAP*_l_12.q -> i , EXACT
+// *HEAP*_l_13.p -> i , EXACT
+// *HEAP*_l_13.q -> j , EXACT
 
 int ptr_to_field()
 {

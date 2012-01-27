@@ -38,8 +38,7 @@ POINTS-TO
 // x -> _x_3[0] , EXACT
 
 
-// Points To OUT:
-// x -> _x_3[0] , EXACT
+// Points To OUT: none
 
 void call06(int r, int m, int *x)
 {
@@ -130,7 +129,6 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//             <may be written>: y[i][*]
 //             <    is read   >: d1 d2 i
       call06(i, d2, &y[i][0]);
    exit(0);
@@ -144,7 +142,5 @@ int main()
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	15 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
-	20 --> 20 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
 
 ****************** End of Dependence Graph ******************

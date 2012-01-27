@@ -25,7 +25,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// p -> _p_28650032[0] , EXACT
+// p -> p[0] , EXACT
 
 int main()
 {
@@ -42,25 +42,25 @@ int main()
    q = p;
 
 // Points To:
-// _p_28650032[0] -> __p_28650032_28650032[0] , EXACT
-// p -> _p_28650032[0] , EXACT
-// q -> _p_28650032[0] , EXACT
+// p[0] -> p[0] , EXACT
+// p -> p[0] , EXACT
+// q -> p[0] , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    *q = &i;
 
 // Points To:
-// _p_28650032[0] -> i , EXACT
-// p -> _p_28650032[0] , EXACT
-// q -> _p_28650032[0] , EXACT
+// p[0] -> i , EXACT
+// p -> p[0] , EXACT
+// q -> p[0] , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = &**q;
 
 // Points To:
-// _p_28650032[0] -> i , EXACT
-// p -> _p_28650032[0] , EXACT
-// q -> _p_28650032[0] , EXACT
+// p[0] -> i , EXACT
+// p -> p[0] , EXACT
+// q -> p[0] , EXACT
 // r -> i , EXACT
 
 
@@ -77,9 +77,9 @@ int main()
 
    q = p;
 //             <    is read   >: q
-//             <    is written>: _p_28650032[0]
+//             <    is written>: p[0]
    *q = &i;
-//             <    is read   >: _p_28650032[0] q
+//             <    is read   >: p[0] q
 //             <    is written>: r
    r = &**q;
 
@@ -93,6 +93,6 @@ int main()
 	09 --> 11 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
 	10 --> 11 with conflicts
-		from <_p_28650032[0]-W-EXACT> to <_p_28650032[0]-R-EXACT>
+		from <p[0]-W-EXACT> to <p[0]-R-EXACT>
 
 ****************** End of Dependence Graph ******************
