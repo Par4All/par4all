@@ -446,13 +446,8 @@ global_effect_translation(
       //return CONS(EFFECT, make_sdfi_effect(ef), NIL);
 	return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);
 
-    if (malloc_effect_p(ef))
+    if (effects_package_entity_p(eff_ent))
       return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);
-
-
-    if (io_entity_p(eff_ent))
-      //return CONS(EFFECT, make_sdfi_effect(ef), NIL);
-	return CONS(EFFECT, translate_effect_to_sdfi_effect(ef), NIL);
 
     /* First, we search if the common is declared in the target function;
      * if not, we have to deterministically choose an arbitrary function
