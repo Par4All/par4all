@@ -1244,7 +1244,7 @@ static bool call_selection(call c, nest_context_p nest __attribute__ ((unused)))
   /* pour le moment distribution systematique de tout call */
   /* il faut recuperer les appels de fonction value_code_p(entity_initial(f)*/
   entity f = call_function(c);
-  if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f))
+  if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f)|| entity_function_p(f))
     {
       return true;
     }
@@ -1270,8 +1270,8 @@ static bool push_test(test t  __attribute__ ((unused)),
 		      nest_context_p nest  __attribute__ ((unused)))
 {
   /* encapsulation de l'ensemble des instructions appartenant au test*/
-  /* on ne fait rien pour le moment */
-  return false;
+ 
+  return true;
 }
 
 
@@ -2240,6 +2240,10 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
       int i ;
       int val =0;
       int inc =0;
+      Variable phi;
+      Value min, max;
+      Psysteme ps1;
+      bool  feasible;
 
       sc_transform_eg_in_ineg(ps_reg);
       string_buffer_append_word("Pattern",buffer_pattern);
@@ -2250,14 +2254,22 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 	bound_inf = CONTRAINTE_UNDEFINED;
 	bound_up = CONTRAINTE_UNDEFINED;
 	pattern_up_bound = CONTRAINTE_UNDEFINED;
+	voffset =vect_new(TCST,0);
 	//printf("find pattern for entity %s [dim=%d]\n",entity_local_name(var),i);
 	//sc_fprint(stdout,ps_reg,(char * (*)(Variable)) entity_local_name);
 	find_pattern(ps_reg, paving_indices, formal_parameters, i, &bound_inf, &bound_up, &pattern_up_bound, &iterator);
 
-	if (!CONTRAINTE_UNDEFINED_P(bound_inf) &&   !VECTEUR_NUL_P(bound_inf->vecteur))
-	  voffset = bound_inf->vecteur;
-	else
-	  voffset = vect_new(TCST,0);
+		phi = (Variable) make_phi_entity(dim);
+	if(base_contains_variable_p(sc_base(ps_reg),phi)) {
+	  ps1 = sc_dup(ps_reg);
+	  feasible = sc_minmax_of_variable(ps1, (Variable)phi, &min, &max);
+	  if (feasible && min!=VALUE_MIN)
+	    voffset = vect_new(TCST,min);
+	}
+	//if (!CONTRAINTE_UNDEFINED_P(bound_inf) &&   !VECTEUR_NUL_P(bound_inf->vecteur))
+	// voffset = bound_inf->vecteur;
+	//else
+	// voffset = vect_new(TCST,0);
 
 	if (!CONTRAINTE_UNDEFINED_P(pattern_up_bound) &&   !VECTEUR_NUL_P(pattern_up_bound->vecteur))
 	  vpattern_up_bound = pattern_up_bound->vecteur;
@@ -2474,7 +2486,8 @@ static void xml_Region_Parameter(list pattern_region, string_buffer sb_result)
       reg = REGION(CAR(lr));
       ref = effect_any_reference(reg);
       v = reference_variable(ref);
-      if (array_entity_p(reference_variable(ref)) && vect_coeff(v,vl)) {
+      if (array_entity_p(reference_variable(ref)) && vect_coeff(v,vl)
+	  && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
 	string ts = strdup(entity_user_name(v));
 	if (!string_in_list_p(ts,lrr)) {
 	  lrr = gen_nconc(lrr,CONS(STRING,ts,NIL));
@@ -2539,6 +2552,8 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, Variable 
   bool effet_read = true;
   region rwr = region_undefined;
   region rre = region_undefined;
+  const char* datatype ="";
+  int size=0;
   reference ref;
   region reg;
   entity v;
@@ -2568,12 +2583,14 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, Variable 
       v = var, effet_read = true;
   }
   if (pavp) {
+    type_and_size_of_var(v, &datatype,&size);
     add_margin(global_margin,sb_result);
     string_buffer_append(sb_result,
 			 concatenate(OPENANGLE,
 				     (assign_function)?"AssignParameter":"TaskParameter"," Name=",
 				     QUOTE,entity_user_name(v),QUOTE, BL,
 				     "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
+				     "DataType=",QUOTE,datatype,QUOTE,BL,
 				     "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
 				     "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL,
 				     "Kind=", QUOTE,  "VARIABLE",QUOTE,
@@ -2762,7 +2779,7 @@ static string memory_location_for_array_p(const char* sa)
 
 static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 {
-  const char* datatype ="";;
+  const char* datatype ="";
   list ld, ldim = variable_dimensions(type_variable(entity_type(var)));
   int i,j, size =0;
   int nb_dim = (int) gen_length(ldim);
@@ -2896,6 +2913,8 @@ static void xml_GlobalArrays(Psysteme prec,string_buffer sb_result)
 	    && ((nb_dim = variable_entity_dimension(v))>0)
 	    && !io_entity_p(v)
 	    &&  (storage_ram_p(entity_storage(v)))
+	    && top_level_entity_p(v)
+	    //  && entity_module_name(ram_section(storage_ram(entity_storage(v))))get_current_module_name()
 	    && !storage_formal_p(entity_storage(v))
 	    && !vect_coeff(v,v_already_seen)) {
 	  vect_add_elem(&v_already_seen,v,1);
@@ -3230,6 +3249,7 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
 {
   Pmatrix mat;
   int i,j;
+  Pvecteur pv;
   string_buffer_append_word("Connection",sb_result);
   mat = matrix_new(ActualArrayDim,FormalArrayDim);
   matrix_init(mat,ActualArrayDim,FormalArrayDim);
@@ -3243,7 +3263,10 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
   // Normalise les expressions lors du premier parcours
   // Utile aussi a  xml_LoopOffset
   MAP(EXPRESSION, e , {
-          NORMALIZE_EXPRESSION(e);
+      if (expression_normalized(e) == normalized_undefined)
+	expression_normalized(e)= NormalizeExpression(e);
+      pv = (Pvecteur)normalized_linear(expression_normalized(e));
+      //        NORMALIZE_EXPRESSION(e);
     },
     ActualArrayInd);
 
@@ -3448,7 +3471,7 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
 }
 
 
-void  xml_Compute_and_Need(list effects_list, string_buffer sb_result)
+void  xml_Compute_and_Need(entity func,list effects_list, string_buffer sb_result)
 {
   string_buffer buffer_needs = string_buffer_make(true);
   string string_needs = "";
@@ -3462,7 +3485,8 @@ void  xml_Compute_and_Need(list effects_list, string_buffer sb_result)
     reference r = effect_any_reference(e);
     action ac = effect_action(e);
     entity v =  reference_variable(r);
-    if ( array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v)  && vect_coeff(v,vl)) {
+    if ( array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v)  && vect_coeff(v,vl)
+	 && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
       if (action_read_p(ac)) {
 	vect_chg_coeff(&vl,v,0);
 	entity t =  hash_get(hash_entity_def_to_task,(char *) v);
@@ -3485,6 +3509,7 @@ void  xml_Compute_and_Need(list effects_list, string_buffer sb_result)
 					 QUOTE,entity_user_name(v),QUOTE,"/",
 					 CLOSEANGLE,NL,
 					 NULL));
+	hash_put(hash_entity_def_to_task, (char *) v,(char *)func);
 	global_margin--;
       }
     }
@@ -3524,7 +3549,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 				       QUOTE,n,QUOTE, CLOSEANGLE,NL,
 				       NULL));
 
-      xml_Compute_and_Need(effects_list,sb_result);
+      xml_Compute_and_Need(func,effects_list,sb_result);
       string_buffer_append_word("/TaskRef",sb_result);
     }
     regions_free(effects_list);
@@ -3564,7 +3589,8 @@ static void xml_Boxes(const char* module_name, int code_tag,string_buffer sb_res
   }
   else {
     string_buffer_append_word("GlobalArrays/",sb_result);
-    string_buffer_append_word("LocalArrays/",sb_result);
+    xml_LocalArrays(module,prec,sb_result);
+    //    string_buffer_append_word("LocalArrays/",sb_result);
     string_buffer_append_word("FormalArrays/",sb_result);
   }
   /* Search calls in Box */
@@ -3605,7 +3631,7 @@ static void xml_Application(const char* module_name, int code_tag,string_buffer 
 		       concatenate(OPENANGLE,
 				   "!DOCTYPE Application SYSTEM ",
 				   QUOTE,
-				   "APPLI_TERAOPS_v11.dtd",
+				   "APPLI_TERAOPS_v14.dtd",
 				   QUOTE,CLOSEANGLE,NL, NULL));
   string_buffer_append(sb_result,
 		       concatenate(OPENANGLE,
@@ -3623,7 +3649,7 @@ static void xml_Application(const char* module_name, int code_tag,string_buffer 
   global_margin ++;
   insert_include_files(sb_result);
   xml_GlobalArrays( prec,sb_result);
-  xml_LocalArrays(module,prec,sb_result);
+  // xml_LocalArrays(module,prec,sb_result);
   add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
 		       concatenate(OPENANGLE,
@@ -3644,7 +3670,7 @@ static void xml_Application(const char* module_name, int code_tag,string_buffer 
 
   cumulated_list = NIL;
   gen_recurse(s, statement_domain, gen_true, cumul_effects_of_statement);
-  xml_Compute_and_Need(cumulated_list,  sb_ac);
+  xml_Compute_and_Need(module,cumulated_list,  sb_ac);
   string_buffer_append_word("/TaskRef",sb_ac);
   global_margin --;
   string_buffer_append_word("/ApplicationGraph",sb_ac);
