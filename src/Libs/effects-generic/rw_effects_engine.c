@@ -685,7 +685,10 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
 	  // and then add the effects due to the initialization part
 	  if(!expression_undefined_p(exp_init))
 	    {
-	      lrw_before_decls = (*effects_union_op)(generic_proper_effects_of_expression(exp_init),
+	      list l_exp_init = generic_proper_effects_of_expression(exp_init);
+	      if (contract_p)
+		l_exp_init = proper_to_summary_effects(l_exp_init);
+	      lrw_before_decls = (*effects_union_op)(l_exp_init,
 						     lrw_before_decls, effects_same_action_p);
 	    }
 

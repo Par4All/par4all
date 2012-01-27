@@ -1095,6 +1095,9 @@ bool cells_combinable_p(cell c1, cell c2)
       /* let us check the indices */
       list l1 = reference_indices(r1);
       list l2 = reference_indices(r2);
+      
+      if (gen_length(l1) != gen_length(l2))
+	combinable_p = false;
 
       bool finished_p = false;
 
