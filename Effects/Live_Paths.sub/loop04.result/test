@@ -1,0 +1,45 @@
+int main()
+{
+   int i, a, b, c;
+
+   a = 0;
+   b = 1;
+   c = 2;
+   for(i = 0; i <= 9; i += 1)
+      a = b;
+
+   return a+c;
+}
+int main()
+{
+   int i, a, b, c;
+
+   a = 0;
+   b = 1;
+//             <    is alive (in)>: b
+   c = 2;
+//             <    is alive (in)>: b c
+   for(i = 0; i <= 9; i += 1)
+//             <    is alive (in)>: b c i
+      a = b;
+//             <    is alive (in)>: a c
+
+   return a+c;
+}
+int main()
+{
+   int i, a, b, c;
+
+   a = 0;
+//             <    is alive (out)>: b
+   b = 1;
+//             <    is alive (out)>: b c
+   c = 2;
+//             <    is alive (out)>: a c
+   for(i = 0; i <= 9; i += 1)
+//             <may be alive (out)>: b
+//             <    is alive (out)>: c i
+      a = b;
+
+   return a+c;
+}
