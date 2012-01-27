@@ -269,7 +269,6 @@ ppm_dim get_ppm_dim(FILE *f)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: f
 //             <    is written>: _width
    int _width = get_ppm_unsigned(f);
 //             <    is read   >: _width
@@ -285,7 +284,6 @@ ppm_dim get_ppm_dim(FILE *f)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: f
 //             <    is written>: _height
    int _height = get_ppm_unsigned(f);
 //             <    is read   >: _height
@@ -347,7 +345,6 @@ int main(int argc, char *raw_argv[])
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: inf[0] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: inf
 //             <    is written>: dim.height dim.width
    ppm_dim dim = get_ppm_dim(inf);
    return 0;
@@ -357,7 +354,6 @@ int read_ppm(FILE *f, int *max_color_value, int height, int width, IMAGE_RGB ima
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: f
 //             <    is written>: dim.height dim.width
    ppm_dim dim = get_ppm_dim(f);
 //             <    is read   >: dim.height dim.width
