@@ -5518,7 +5518,7 @@ CreateIntrinsics( set module_list )
         {VWARNX_FUNCTION_NAME,  2, 	   overloaded_to_void_type, 0, 0},
 
         /* GNU Extension*/
-        {SECOND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SECOND_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
 
         /* F95 */
         {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
