@@ -1,6 +1,19 @@
 delete decreasing_loop01
 create decreasing_loop01 decreasing_loop01.c
 
-display PARSED_PRINTED_FILE[decreasing]
-display PRINTED_FILE[decreasing]
+echo
+echo Parsed code for "decreasing_loop01"
+echo
+
+display PARSED_PRINTED_FILE[decreasing_loop01]
+
+echo
+echo Controlized code for "decreasing_loop01"
+echo
+
+display PRINTED_FILE[decreasing_loop01]
+
+close
+delete decreasing_loop01
+quit
 

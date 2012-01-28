@@ -1,0 +1,18 @@
+
+Parsed code for "increasing_loop02"
+
+void increasing_loop02(unsigned int T, int NJ)
+{
+   int tj;
+   for (tj = T;tj<NJ-T;tj = tj+T)
+      ;
+}
+
+Controlized code for "increasing_loop02"
+
+void increasing_loop02(unsigned int T, int NJ)
+{
+   int tj;
+   for(tj = T; tj < NJ-T; tj += T)
+      ;
+}
