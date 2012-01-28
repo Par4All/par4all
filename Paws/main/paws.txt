@@ -20,6 +20,6 @@
 </p>
 
 <p>
-  Finally you can use a full-fledge graphical interface and request
+  Finally you can use a full-fledged graphical interface and request
   any analysis or transformation on any function of your application.
 </p>
