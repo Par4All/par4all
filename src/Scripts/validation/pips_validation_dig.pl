@@ -60,11 +60,14 @@ sub vdiff()
       my $pre = $current+1;
       my $short = $code;
       $short =~ s/\/trunk$//; # compress output
-      # get authors of differing commits on the url *only*
+      # get authors of differing commits on the url *only*, in reverse order
       my $who = `svn log --quiet --revision $pre:$previous $url{$code}`;
       $who =~ s/^\-+\n//sg;
       $who =~ s/r(\d+) \| (\w+) \| .*\n/$1($2),/sg;
       $who =~ s/,$//;
+      # hmmm... not sure why this may happen...
+      $who = "$previous?" if $who eq '' and $pre=$previous;
+      $who = '???' if $who eq '';
       # format as pips@123(coelho),124(irigoin)
       $vdiff .= "$short\@$who ";
     }
