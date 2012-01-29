@@ -1,0 +1,138 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,k) {}
+
+   int i, k;
+
+//  T(N) {N==100}
+
+   int N = 100;
+
+//  T() {}
+
+   double A[N][N];
+
+//  T(i,k) {i+1<=N, 0<=i}
+
+
+   for(i = 0; i <= N-1; i += 1)
+
+//  T(k) {k+1<=N, 0<=k}
+
+      for(k = 0; k <= N-1; k += 1)
+
+//  T() {}
+
+         if (1) {
+
+//  T() {}
+
+            A[i][k] = 1.;
+
+//  T() {}
+
+            A[N/2][N/2] = 0.;
+         }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, k;
+
+//  P(i,k) {}
+
+   int N = 100;
+
+//  P(N,i,k) {N==100}
+
+   double A[N][N];
+
+//  P(N,i,k) {N==100}
+
+
+   for(i = 0; i <= N-1; i += 1)
+
+//  P(N,i,k) {N==100, 0<=i, i<=99}
+
+      for(k = 0; k <= N-1; k += 1)
+
+//  P(N,i,k) {N==100, 0<=i, i<=99, 0<=k, k<=99}
+
+         if (1) {
+
+//  P(N,i,k) {N==100, 0<=i, i<=99, 0<=k, k<=99}
+
+            A[i][k] = 1.;
+
+//  P(N,i,k) {N==100, 0<=i, i<=99, 0<=k, k<=99}
+
+            A[N/2][N/2] = 0.;
+         }
+
+//  P(N,i,k) {N==100, i==100, k==100}
+
+
+   return 0;
+}
+
+Regions for "main"
+
+int main()
+{
+   int i, k;
+   int N = 100;
+   double A[N][N];
+
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    N==100}>
+
+
+   for(i = 0; i <= N-1; i += 1)
+
+//  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 50i<=50PHI1+49PHI2,
+//    PHI2+i<=PHI1+99, PHI1<=PHI2+i, 49PHI1+50PHI2<=49i+4950,
+//    50i<=99PHI1, 99PHI1<=49i+4950, N==100, 0<=i, i<=99}>
+
+      for(k = 0; k <= N-1; k += 1)
+
+//  <A[PHI1][PHI2]-W-MAY-{50i<=50PHI1+49PHI2, PHI2+i<=PHI1+99,
+//    PHI1<=PHI2+i, 49PHI1+50PHI2<=49i+4950, 50k<=49PHI1+50PHI2,
+//    PHI2<=PHI1+k, PHI1+k<=PHI2+99, 50PHI1+49PHI2<=49k+4950,
+//    50i<=99PHI1, 99PHI1<=49i+4950, 50k<=99PHI2, 99PHI2<=49k+4950,
+//    N==100, 0<=i, i<=99, 0<=k, k<=99}>
+
+         if (1) {
+
+//  <A[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==k, N==100, 0<=i, i<=99,
+//    0<=k, k<=99}>
+
+            A[i][k] = 1.;
+
+//  <A[PHI1][PHI2]-W-MAY-{50<=PHI1, PHI1<=50, 50<=PHI2, PHI2<=50,
+//    N==100, 0<=i, i<=99, 0<=k, k<=99}>
+
+            A[N/2][N/2] = 0.;
+         }
+
+   return 0;
+}
