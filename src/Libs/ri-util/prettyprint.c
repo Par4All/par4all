@@ -553,9 +553,12 @@ list C_loop_range(range obj, entity i, list pdl)
         pc = CHAIN_SWORD(pc, " < ");
       else if(negative_expression_p(inc))
         pc = CHAIN_SWORD(pc, " > ");
-      else
-	pips_internal_error("loop range cannot be prettyprinted because increment sign"
-			    " is unknown\n");
+      else {
+	//pips_internal_error("loop range cannot be prettyprinted because increment sign"
+	//		    " is unknown\n");
+	pips_user_warning("loop increment sign is unknown: assumed positive\n");
+        pc = CHAIN_SWORD(pc, " < ");
+      }
       pc = gen_nconc(pc, words_subexpression(ru_minus_one, 0, true, pdl));
     }
     else {
@@ -565,9 +568,12 @@ list C_loop_range(range obj, entity i, list pdl)
         pc = CHAIN_SWORD(pc, " <= ");
       else if(negative_expression_p(inc))
         pc = CHAIN_SWORD(pc, " >= ");
-      else
-	pips_internal_error("loop range cannot be prettyprinted because increment sign"
-			    " is unknown\n");
+      else {
+	//pips_internal_error("loop range cannot be prettyprinted because increment sign"
+	//		    " is unknown\n");
+	pips_user_warning("loop increment sign is unknown: assumed positive\n");
+        pc = CHAIN_SWORD(pc, " <= ");
+      }
       pc = gen_nconc(pc, words_subexpression(ru, 0, true, pdl));
     }
     free_expression(ru_minus_one);

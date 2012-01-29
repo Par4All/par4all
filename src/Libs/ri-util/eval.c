@@ -691,7 +691,7 @@ bool negative_expression_p(expression e)
   bool negative_p = false; // In general, false because no conclusion can be reached
   intptr_t v;
   if(expression_integer_value(e, &v)) {
-    negative_p = v>=0;
+    negative_p = v<=0;
   }
   else {
     syntax s = expression_syntax(e);
