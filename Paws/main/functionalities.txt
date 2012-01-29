@@ -6,7 +6,7 @@
  },
 
  { "title":   "2. TUTORIAL",
-   "path":    "tutorial",
+   "path":    "tutorials",
    "advmode": false
  },
 
