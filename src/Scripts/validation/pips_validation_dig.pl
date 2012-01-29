@@ -61,18 +61,20 @@ sub vdiff()
       my $short = $code;
       $short =~ s/\/trunk$//; # compress output
       # get authors of differing commits on the url *only*, in reverse order
+      # there may be several authors if there are several commits
       my $who = `svn log --quiet --revision $pre:$previous $url{$code}`;
       $who =~ s/^\-+\n//sg;
       $who =~ s/r(\d+) \| (\w+) \| .*\n/$1($2),/sg;
       $who =~ s/,$//;
-      # hmmm... not sure why this may happen...
+      # this may happen if the validation diff is non-deterministic?
       $who = "$previous?" if $who eq '' and $pre=$previous;
+      # this should never happen??
       $who = '???' if $who eq '';
-      # format as pips@123(coelho),124(irigoin)
+      # format as pips@123(calvin),124(hobbes)
       $vdiff .= "$short\@$who ";
     }
   }
-  # this may occur for undeterministic diffs
+  # this may occur for undeterministic diffs??
   $vdiff = 'nodiff' unless $vdiff;
   return $vdiff;
 }
