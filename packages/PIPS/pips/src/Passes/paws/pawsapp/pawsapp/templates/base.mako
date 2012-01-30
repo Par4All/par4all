@@ -3,21 +3,37 @@
 </%doc>
 
 ## Page title
-<%def name="pagetitle()">
-PAWS
-</%def>
+<%def name="pagetitle()">PAWS</%def>
 
-## Custom CSS
-<%def name="js_slot()">
-</%def>
+## Custom CSS / Javascript
+<%def name="css_slot()"></%def>
+<%def name="js_slot()"></%def>
 
-## Custom Javascript
-<%def name="css_slot()">
-</%def>
+## 2-columns (aka "fluid" layout)
+<%def name="left_column()"></%def>
+<%def name="main_column()"></%def>
 
+## Body (default: "fluid" layout)
+<%def name="content()">
+<div class="container-fluid">
+  <div class="sidebar">
+    <div class="well">
+      ${self.left_column()}
+    </div>
+    <a href="http://pips4u.org" target="_blank">
+      ${h.image(request.static_url("pawsapp:static/img/pips-small.png"), u"PIPS4u logo")}</a> INSIDE!
+  </div>
+  <div class="content">
+    ${self.main_column()}
+    <footer>
+      <p>© 2011-2012 MINES ParisTech</p>
+    </footer>
+  </div>
+</div>
+</%def>
+	   
 ## Dialogs
-<%def name="dialogs()">
-</%def>
+<%def name="dialogs()"></%def>
 
 
 ${h.Doctype().xhtml1()}
@@ -45,10 +61,7 @@ ${h.Doctype().xhtml1()}
     ${self.css_slot()}
 
     ## Fav and touch icons
-    <link rel="shortcut icon" href="images/favicon.ico">
-    ##<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    ##<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    ##<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <link rel="shortcut icon" href="${request.static_url('pawsapp:static/favicon.ico')}">
 
     ## Javascript
     ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-1.7.1.min.js"))}
@@ -58,7 +71,6 @@ ${h.Doctype().xhtml1()}
   </head>
 
   <body>
-
     <div class="topbar">
       <div class="topbar-inner">
         <div class="container-fluid">
@@ -66,7 +78,7 @@ ${h.Doctype().xhtml1()}
           <ul class="nav">
             <li class="active">${h.link_to(u"Home", url=request.route_url("home"))}</li>
             <li><a href="http://pips4u.org">About</a></li>
-            <li><a href="http://pips4u.org">Contact</a></li>
+            <li><a href="http://pips4u.org/current_team.html">Contact</a></li>
           </ul>
           <p class="pull-right">
 	    % if userid:
@@ -79,27 +91,7 @@ ${h.Doctype().xhtml1()}
         </div>
       </div>
     </div>
-
-    <div class="container-fluid">
-
-      <div class="sidebar">
-        <div class="well">
-	  ${self.left_column()}
-        </div>
-	<a href="http://pips4u.org" target="_blank">
-	  ${h.image(request.static_url("pawsapp:static/img/pips-small.png"), u"PIPS4u logo")}</a> INSIDE!
-      </div>
-
-      <div class="content">
-	${self.main_column()}
-        <footer>
-	  <p>© 2011-2012 MINES ParisTech</p>
-        </footer>
-      </div>
-
-      ${self.dialogs()}
-
-    </div>
-
+    ${self.content()}
+    ${self.dialogs()}
   </body>
 </html>

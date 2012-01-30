@@ -35,7 +35,8 @@ def routes(request):
 
     request.response.content_type = 'text/javascript'
     return dict(routes = [ dict(name=name, pattern=introspector.get('routes', name)['pattern'])
-                           for name in ('get_example_file',
+                           for name in ('load_example_file',
+                                        'source_panel',
                                         'get_directory',
                                         'get_functions',
                                         'detect_language',

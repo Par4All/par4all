@@ -19,9 +19,6 @@ paws.tempdir       = %(here)s/files
 paws.publicdir     = %(here)s/pawsapp/static
 paws.resultdir     = %(here)s/pawsapp/static/res
 
-paws.demo         = validation + 'tutorial/'
-paws.marker       = '<END OF THE STEP>'
-
 
 [server:main]
 use = egg:waitress#main
