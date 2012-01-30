@@ -76,7 +76,7 @@ def add_own_options(parser):
         help = "This option is useful when generating some CUDA code from C99 sources. Indeed nvcc doesn't support the following C99 syntax : foo (int n, int a[n]), then if the --c99 option is enabled, p4a will automatically generates the CUDA code in new C89 files (with no VLA but pointers with linearized accesses instead) that will be compiled by nvcc. A simple call to each kernel will be inserted into the original file that can be compiled with your usual C99 compiler.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
+        help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit.")
 
     proc_group.add_option("--fine-grain", "-F", action = "store_true", default = False,
         help = "Use a fine-grain parallelization algorithm instead of a coarse-grain one.")
@@ -85,7 +85,10 @@ def add_own_options(parser):
         help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
 
     proc_group.add_option("--pocc", action = "store_true", default = False,
-        help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection")
+        help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection.")
+
+    proc_group.add_option("--pocc-options", action = "store", default = "",
+        help = "Options to pass to PoCC.")
 
     proc_group.add_option("--cuda-cc", action = "store", default = "2.0",
         help = "Compute capabilities of CUDA target (default is 2.0). For example if you have a message like 'P4A CUDA kernel execution failed : invalid device function' at execution time, the generated code may be incompatible with your GPU and you have to use this option to select the good architecture version.")
@@ -558,6 +561,7 @@ def main():
             input.fine_grain = options.fine_grain
             input.atomic = options.atomic
             input.pocc = options.pocc
+            input.pocc_options = options.pocc_options
             input.select_modules = options.select_modules
             input.exclude_modules = options.exclude_modules
             input.cpp_flags = " ".join(builder.cpp_flags)
