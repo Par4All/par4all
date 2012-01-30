@@ -57,6 +57,7 @@ def process(input):
                 filter_select = input.select_modules,
                 filter_exclude = input.exclude_modules,
                 noalias = input.noalias,
+                pointer_analysis = input.pointer_analysis,
                 accel = input.accel,
                 cuda = input.cuda,
                 opencl = input.opencl,

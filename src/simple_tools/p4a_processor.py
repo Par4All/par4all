@@ -125,6 +125,7 @@ class p4a_processor_input(object):
     """
     project_name = ""
     noalias = False
+    pointer_analysis = False
     accel = False
     cuda = False
     opencl = False
@@ -206,13 +207,15 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, noalias = False, accel = False, cuda = False,
-                 opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
+                 filter_exclude = None, noalias = False, pointer_analysis = False, 
+                 accel = False, cuda = False, opencl = False, openmp = False, 
+                 com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, atomic = False, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
         self.noalias = noalias
+        self.pointer_analysis = pointer_analysis
         self.recover_includes = recover_includes
         self.native_recover_includes = native_recover_includes
         self.accel = accel
@@ -318,6 +321,12 @@ class p4a_processor(object):
                 # changes in Pips
                 properties["CONSTANT_PATH_EFFECTS"] = False
                 properties["TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS"] = True
+                
+            if pointer_analysis:
+                properties["ABSTRACT_HEAP_LOCATIONS"]="context-sensitive"
+                self.workspace.activate("proper_effects_with_points_to")
+                self.workspace.activate("cumulated_effects_with_points_to")
+                self.workspace.activate("must_regions_with_points_to")
 
             # set the workspace properties
             self.set_properties(properties)
@@ -340,6 +349,7 @@ class p4a_processor(object):
         self.main_filter = (lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name)))
+        
 
     def set_properties (self, user_properties):
         """ Initialize the properties according to the default defined properties

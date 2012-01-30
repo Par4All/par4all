@@ -14,6 +14,9 @@ using p4a.
 
   - Jacobi : example of simple Jacobi solver applied to an image;
 
+  - saxpy_c99 : SAXPY (Single-precision real Alpha X Plus Y) combines
+	scalar multiplication and vector addition, written in C99;
+
 - the Benchmarks directory contains open source benchmarks that are used
   to measure Par4All performance, for example to publish some
   articles. Useful to reproduce article results too;
