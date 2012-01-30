@@ -307,13 +307,15 @@ list ndf_normalized_test(expression exp, list *ell)
 	pips_debug(7, "doing\n");
 	if ( (exp == expression_undefined) ||
 		(syntax_tag(expression_syntax( exp )) != is_syntax_call) ) {
-		return( list_undefined );
+		return  NIL;
 	}
 	pips_debug(7, "input exp : %s\n",
 		   words_to_string(words_expression( exp, NIL )) );
 
 	fun = call_function(syntax_call(expression_syntax( exp )));
 	args = call_arguments(syntax_call(expression_syntax( exp )));
+	if(ENDP(args)) return NIL;
+
 	if (splc_positive_relation_p(exp, ell))  {
 		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp );
 		return( ret_list );
@@ -426,7 +428,7 @@ list ndf_normalized_test(expression exp, list *ell)
 		}, l1 );
 		return( ret_list );
 	}
-	else return( list_undefined );
+	else return NIL;
 }
 	
 
@@ -446,7 +448,7 @@ list *ell;
 	expression	ret_exp  = expression_undefined , ret_exp1  = expression_undefined, ret_exp2  = expression_undefined;
 	expression 	e, ne, arg1, arg2, arg3, arg4;
 
-	if (exp == expression_undefined) return( exp );
+	if (exp == expression_undefined || args == NIL) return( exp );
 	pips_debug(7, "exp : %s\n",
 		   words_to_string(words_expression( exp, NIL )) );
 	if (syntax_tag( s ) != is_syntax_call) return( ret_exp );
@@ -598,7 +600,7 @@ expression sc_conditional(expression exp, list *ell)
 	if ( syntax_tag(s) != is_syntax_call ) return( ret_exp );
 	e = normalize_test_leaves(exp, ell);
 	ndf_list = ndf_normalized_test(e, ell);
-	if (ndf_list != list_undefined) {
+	if (ndf_list != NIL) {
 		ret_exp = EXPRESSION(CAR( ndf_list ));
 		ndf_list = CDR( ndf_list );
 		MAPL( exp_ptr,{
@@ -896,7 +898,7 @@ list sc_entity_to_formal_integer_parameters(f)
 entity f;
 {
     list formals_or_ram_integer = NIL;
-    list decl = list_undefined;
+    list decl = NIL;
 
     pips_assert("sc_entity_to_formal_integer_parameters",entity_module_p(f));
 
