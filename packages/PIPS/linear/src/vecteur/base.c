@@ -466,6 +466,27 @@ Pbase base_union(Pbase b1, Pbase b2)
   return b;
 }
 
+/* Return variables/dimensions present in bases b1 and b2. Order is not preserved. */
+Pbase base_intersection(Pbase b1, Pbase b2)
+{
+  Pbase b = BASE_NULLE;
+  bool
+    bn1 = BASE_NULLE_P(b1),
+    bn2 = BASE_NULLE_P(b2);
+
+  if(!bn1 && !bn2) {
+    Pbase bc;
+    for(bc=b1; !BASE_UNDEFINED_P(bc); bc = vecteur_succ(bc)) {
+      Variable var = vecteur_var(bc);
+      if(base_contains_variable_p(b2, var)) {
+	b = base_add_variable(b, var);
+      }
+    }
+  }
+
+  return b;
+}
+
 /* this function returns the rank of the variable var in the base 
  * 0 encodes TCST, but I do not know why, TCST may be in base, sometimes
  * -1 encodes an error
