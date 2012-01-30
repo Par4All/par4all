@@ -575,25 +575,23 @@ Psysteme base_complete(sys, var_l, par_l, new_l)
 /* Psysteme sc_add_egalite_at_end(ps, co): idem "sc_add_egalite()" except that
  * it puts the new constraint at the end of the list of constraints.
  *
+ * The system basis is not updated. ps may be inconsistent on return.
+ *
  * AC 94/03/17
  */
-
-Psysteme sc_add_egalite_at_end(ps, co)
-
- Psysteme     ps;
- Pcontrainte  co;
+Psysteme sc_add_egalite_at_end(Psysteme ps,  Pcontrainte  co)
 {
- Pcontrainte  co_aux;
+  Pcontrainte  co_aux;
 
- if (ps->egalites == NULL) ps->egalites = co;
- else
+  if (ps->egalites == NULL) ps->egalites = co;
+  else
     {
-     for (co_aux = ps->egalites; co_aux->succ != NULL; co_aux = co_aux->succ) ;
-     co_aux->succ = co;
+      for (co_aux = ps->egalites; co_aux->succ != NULL; co_aux = co_aux->succ) ;
+      co_aux->succ = co;
     }
- ps->nb_eq++;
+  ps->nb_eq++;
 
- return(ps);
+  return ps;
 }
 
 /*=========================================================================*/

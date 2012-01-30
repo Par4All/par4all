@@ -47,7 +47,7 @@ void quick_privatize_graph(graph dep_graph) {
       entity ind = loop_index(l);
 
       if(gen_find_eq(ind, locals) == entity_undefined) {
-        if(quick_privatize_loop(s1, successors)) {
+        if(entity_privatizable_in_loop_p(ind, l) && quick_privatize_loop(s1, successors)) {
           pips_debug(1, "Index for loop %" PRIdPTR " privatized\n",
               statement_number(s1));
           loop_locals(l) = CONS(ENTITY, ind, locals);

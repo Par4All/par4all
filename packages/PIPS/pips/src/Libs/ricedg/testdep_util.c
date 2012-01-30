@@ -391,7 +391,7 @@ int dep_type(ac1, ac2)
   return -1;
 }
 
-/* int sc_proj_optim_on_di(cl, sc)  
+/* int sc_proj_optim_on_di_ofl(cl, sc)  
  *
  * This function projects a system onto a set of di variables. This set is
  * defined by cl, the common nesting level of the two array references
@@ -411,16 +411,15 @@ int dep_type(ac1, ac2)
  * a long jump buffer must have been initialized to handle overflows
  * The value returned is true if the system is feasible, false otherwise.
  */
-
-int sc_proj_optim_on_di_ofl(cl, psc)
-  int cl;Psysteme *psc; {
+int sc_proj_optim_on_di_ofl(int cl, Psysteme *psc)
+{
   Pbase coord;
   Pvecteur pv = VECTEUR_NUL;
   Variable v;
   int l;
   int res;
 
-  debug(6, "sc_proj_on_di_ofl", "begin\n");
+  pips_debug(6, "begin\n");
 
   /* find the set of variables to be eliminated */
   for (coord = (*psc)->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -437,19 +436,28 @@ int sc_proj_optim_on_di_ofl(cl, psc)
   }
   is_test_Di = true;
 
+  pips_assert("Dependence system *psc is consistent before projection",
+	      sc_consistent_p(*psc));
+
   *psc = sc_projection_optim_along_vecteur_ofl(*psc, pv);
 
-  if(sc_empty_p(*psc)) {
+  pips_assert("Dependence system *psc is consistent after projection",
+	      sc_consistent_p(*psc));
+
+  if(sc_empty_p(*psc))
     res = false;
-  } else {
+  else
     res = true;
-  }
+
 
   vect_rm(pv);
 
-  debug(6, "sc_proj_on_di_ofl", "end\n");
 
-  return (res);
+  pips_assert("Dependence system *psc is consistent after empty test",
+	      sc_consistent_p(*psc));
+  pips_debug(6, "end\n");
+
+  return res;
 }
 
 /* bool sc_faisabilite_optim (Psysteme sc) :
@@ -515,12 +523,14 @@ bool sc_faisabilite_optim(sc)
 }
 
 /* bool combiner_ofl_with_test(Psysteme sc, Variable v): 
+ *
  * the copy of combiner() adding the test of suffisants conditions of integer 
  * combination. 
+ *
  * It returns true if exact
  */
-static bool combiner_ofl_with_test(sc, v)
-  Psysteme sc;Variable v; {
+static bool combiner_ofl_with_test(Psysteme sc, Variable v)
+{
   Psysteme sc1;
   Pcontrainte pos, neg, nul;
   Pcontrainte pc, pcp, pcn;
@@ -543,10 +553,12 @@ static bool combiner_ofl_with_test(sc, v)
     if(value_pos_p(c = vect_coeff(v,pc->vecteur))) {
       pc->succ = pos;
       pos = pc;
-    } else if(value_neg_p(c)) {
+    }
+    else if(value_neg_p(c)) {
       pc->succ = neg;
       neg = pc;
-    } else {
+    }
+    else {
       pc->succ = nul;
       nul = pc;
       nnul += 1;
@@ -612,280 +624,342 @@ static bool combiner_ofl_with_test(sc, v)
   return (true);
 }
 
-/* Psysteme sc_projection_optim_along_vecteur(Psysteme sc, Pvecteur pv)
- * This fonction returns the projected system resulting of 
- * the SUCCESSIVE projections of the system sc along the variables contained 
- * in vecteur pv.
- * The projection is done first by eliminating variables in the part of
- * equations. The variable whose coefficient is 1 is considered before 
- * (in such case it's integer elimination), and the rest by elimination of   
- * Fourier-Motzkin.
- * If the system sc is not faisable, SC_EMPTY is return
+/* Psysteme sc_projection_optim_along_vecteur_ofl(Psysteme sc, Pvecteur pv)
+ *
+ * This fonction returns the projected system resulting of the
+ * SUCCESSIVE projections of the system sc along the variables
+ * contained in vecteur pv. Variables are only more or less projected
+ * according to their order in pv.
+ *
+ * The projection is done first by eliminating variables constrained
+ * by equations. The variables whose coefficients are 1 (or -1?) are
+ * considered first (in such case it is a valide integer elimination),
+ * then variables appearing in equations with non unit coefficient,
+ * and finally all left over variables in pv using Fourier-Motzkin
+ * elimination. At each step, the order in pv is used.
+ *
+ * If the system sc is not faisable, SC_EMPTY is returned.
+ *
+ * FI: this function could be moved to linear... but for the debugging
+ * stuff. Also, it could be broken into three parts. And the number of
+ * return statements should be reduced to one.
  */
-Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
-  Psysteme sc;Pvecteur pv; {
+Psysteme sc_projection_optim_along_vecteur_ofl( Psysteme sc, Pvecteur pv)
+{
   Pcontrainte eq;
   Pvecteur pv1, prv, pve;
   Variable v;
   Value coeff;
   int syst_size_init;
   Pbase base_sc = base_dup(sc->base);
+  Pbase lb = BASE_NULLE;
+
+  pips_assert("The input constraint system is consistent", sc_consistent_p(sc));
+  ifdebug(7) {
+    pips_debug(7, "All variables to project: ");
+    vect_dump(pv);
+  }
 
   pve = vect_dup(pv);
   Pvecteur pve_to_free = pve;
 
-  /* The elimination of variables by the part of equations */
-  if(pve != NULL && sc->nb_eq != 0) {
+  do {
+    /* The elimination of variables using  equations */
+    if(pve != NULL && sc->nb_eq != 0) {
 
-    /* First,carry out the integer elimination possible */
-    debug(7,
-          "sc_projection_optim_along_vecteur_ofl",
-          "carry out the integer elimination by equation:\n");
+      /* First,carry out the integer elimination possible */
+      pips_debug(7, "carry out the integer elimination by equation:\n");
 
-    prv = NULL;
-    pv1 = pve;
-    while(!VECTEUR_NUL_P(pv1) && (sc->nb_eq != 0)) {
-      v = pv1->var;
-      eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, false);
-      if((eq == NULL) || value_notone_p(coeff)) {
-        prv = pv1;
-        pv1 = pv1->succ;
-      } else {
-        ifdebug(7) {
-          fprintf(stderr, "eliminate %s by :", entity_local_name((entity)v));
-          egalite_debug(eq);
-        }
-        /* coeff == 1, do this integer elimination for variable
-         * v with the others contrainte(equations and inequations */
-        sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, FWD_OFL_CTRL);
+      prv = NULL;
+      pv1 = pve;
+      while(!VECTEUR_NUL_P(pv1) && (sc->nb_eq != 0)) {
+	v = pv1->var;
+	eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, false);
+	if((eq == NULL) || value_notone_p(coeff)) {
+	  prv = pv1;
+	  pv1 = pv1->succ;
+	} else {
+	  ifdebug(7) {
+	    fprintf(stderr, "eliminate %s by :", entity_local_name((entity)v));
+	    egalite_debug(eq);
+	  }
+	  /* coeff == 1, do this integer elimination for variable
+	   * v with the others contrainte(equations and inequations */
+	  sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, FWD_OFL_CTRL);
 
-        if(sc_empty_p(sc)) {
-          if(is_test_Di)
-            NbrTestProjEqDi++;
-          else
-            NbrTestProjEq++;
-          debug(7,
-                "sc_projection_optim_along_vecteur_ofl",
-                "projection infaisable\n");
-          for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-            v = pv1->var;
-            sc_base_remove_variable(sc, v);
-          }
-          base_rm(base_sc);
-          vect_rm(pve_to_free);
-          return (sc);
-        }
-        sc = sc_normalize(sc);
+	  if(sc_empty_p(sc)) {
+	    if(is_test_Di)
+	      NbrTestProjEqDi++;
+	    else
+	      NbrTestProjEq++;
+	    pips_debug(7, "projection infaisable\n");
+	    for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+	      v = pv1->var;
+	      sc_base_remove_variable(sc, v);
+	    }
+	    base_rm(base_sc);
+	    vect_rm(pve_to_free);
 
-        if(sc_empty_p(sc)) {
-          if(is_test_Di)
-            NbrTestProjEqDi++;
-          else
-            NbrTestProjEq++;
-          debug(7,
-                "sc_projection_optim_along_vecteur_ofl",
-                "normalisation infaisable\n");
+	    pips_debug(7, "Return 1: empty\n");
+	    return (sc);
+	  }
+	  sc = sc_normalize(sc);
 
-          for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-            v = pv1->var;
-            sc_base_remove_variable(sc, v);
-          }
+	  if(sc_empty_p(sc)) { // FI: another normalization step is going to occur here
+	    if(is_test_Di)
+	      NbrTestProjEqDi++;
+	    else
+	      NbrTestProjEq++;
+	    pips_debug(7, "normalisation infaisable\n");
 
-          vect_rm(pve_to_free);
-          return (sc);
+	    for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+	      v = pv1->var;
+	      sc_base_remove_variable(sc, v);
+	    }
 
-        }
-        ifdebug(7) {
-          fprintf(stderr, "projected normalised system is:\n");
-          sc_syst_debug(sc);
-        }
-        /*eliminate v in the list of variables pve*/
-        if(prv == NULL) /* it's in head */
-          pve = pv1 = pv1->succ;
-        else {
-          prv->succ = pv1->succ;
-          free(pv1);
-          pv1 = prv->succ;
-        }
+	    vect_rm(pve_to_free);
+
+	    pips_debug(7, "Return 2: empty\n");
+	    return (sc);
+
+	  }
+
+	  // The removal is delayed till the end of the function. sc is
+	  // still consistent. However, too many variables might be left if an
+	  // intermediate return occurs
+	  // sc_base_remove_variable(sc, v);
+	
+	  ifdebug(7) {
+	    fprintf(stderr, "projected normalised system is:\n");
+	    sc_syst_debug(sc);
+	  }
+
+	  /* remove v from the list of variables to be projected pve */
+	  if(prv == NULL) /* it's in head */
+	    pve = pv1 = pv1->succ;
+	  else {
+	    prv->succ = pv1->succ;
+	    free(pv1);
+	    pv1 = prv->succ;
+	  }
+	}
       }
     }
-  }
 
-  /* carry out the elimination non-exact if necessary and possible by the
-   rest equations*/
-  if(pve != NULL && sc->egalites != NULL) {
-    debug(7,
-          "sc_projection_optim_along_vecteur_ofl",
-          "carry out the no integer elimination by equation:\n");
-    pv1 = pve;
-    prv = NULL;
-    while((sc->egalites != 0) && (pv1 != NULL)) {
-      v = pv1->var;
-      eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, true);
-      if(eq == NULL && pv1 != NULL) {
-        prv = pv1;
-        pv1 = pv1->succ;
-      } else {
-        if(eq != NULL) {
-          /* find a variable which appears in the equations, eliminate it*/ifdebug(7) {
-            fprintf(stderr, "eliminate %s by :", entity_local_name((entity)v));
-            egalite_debug(eq);
-          }
-          if(is_test_inexact_eq == false)
-            is_test_inexact_eq = true;
-          if(is_test_exact)
-            is_test_exact = false;
+    pips_assert("sc is consistent after the first use of equations",
+		sc_consistent_p(sc));
+    ifdebug(7) {
+      pips_debug(7, "Variables left to project after the first step: ");
+      vect_dump(pv);
+    }
 
-          sc = sc_variable_substitution_with_eq_ofl_ctrl(sc,
-                                                         eq,
-                                                         v,
-                                                         FWD_OFL_CTRL);
-          if(sc_empty_p(sc)) {
-            if(is_test_Di)
-              NbrTestProjEqDi++;
-            else
-              NbrTestProjEq++;
-            debug(7,
-                  "sc_projection_optim_along_vecteur_ofl",
-                  "projection-infaisable\n");
+    /* carry out the non-exact elimination if necessary and possible
+       using other equations */
+    if(pve != NULL && sc->egalites != NULL) {
+      pips_debug(7, "carry out the non integer elimination by equation:\n");
+      pv1 = pve;
+      prv = NULL;
+      while((sc->egalites != 0) && (pv1 != NULL)) {
+	v = pv1->var;
+	eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, true);
+	if(eq == NULL && pv1 != NULL) {
+	  prv = pv1;
+	  pv1 = pv1->succ;
+	} else {
+	  if(eq != NULL) {
+	    /* find a variable which appears in the equations, eliminate it*/
+	    ifdebug(7) {
+	      fprintf(stderr, "eliminate %s by :", entity_local_name((entity)v));
+	      egalite_debug(eq);
+	    }
+	    if(is_test_inexact_eq == false)
+	      is_test_inexact_eq = true;
+	    if(is_test_exact)
+	      is_test_exact = false;
 
-            for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-              v = pv1->var;
-              sc_base_remove_variable(sc, v);
-            }
-            base_rm(base_sc);
-            vect_rm(pve_to_free);
-            return (sc);
-          }
+	    sc = sc_variable_substitution_with_eq_ofl_ctrl(sc,
+							   eq,
+							   v,
+							   FWD_OFL_CTRL);
+	    if(sc_empty_p(sc)) {
+	      if(is_test_Di)
+		NbrTestProjEqDi++;
+	      else
+		NbrTestProjEq++;
+	      pips_debug(7, "projection-infaisable\n");
 
-          sc = sc_normalize(sc);
+	      for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+		v = pv1->var;
+		sc_base_remove_variable(sc, v);
+	      }
+	      base_rm(base_sc);
+	      vect_rm(pve_to_free);
 
-          if(sc_empty_p(sc)) {
-            debug(7,
-                  "sc_projection_optim_along_vecteur_ofl",
-                  "normalisation-infaisable\n");
-            if(is_test_Di)
-              NbrTestProjEqDi++;
-            else
-              NbrTestProjEq++;
+	      pips_debug(7, "Return 3: empty\n");
+	      return sc;
+	    }
 
-            for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-              v = pv1->var;
-              sc_base_remove_variable(sc, v);
-            }
+	    sc = sc_normalize(sc);
 
-            vect_rm(pve_to_free);
-            return (sc);
-          }
-          ifdebug(7) {
-            fprintf(stderr, "projected normalised system is:\n");
-            sc_syst_debug(sc);
-          }
-          /*eliminate v in the list of variables pve*/
-          if(prv == NULL) /* it's in head */
-            pve = pv1 = pv1->succ;
-          else
-            prv->succ = pv1 = pv1->succ;
-        }
+	    if(sc_empty_p(sc)) { // FI: should be sc_is_empty_p... or
+	      // the normalization is repeated...
+	      pips_debug(7, "normalization detects a non-feasible constraint system\n");
+	      if(is_test_Di)
+		NbrTestProjEqDi++;
+	      else
+		NbrTestProjEq++;
+
+	      for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+		v = pv1->var;
+		sc_base_remove_variable(sc, v);
+	      }
+
+	      vect_rm(pve_to_free);
+
+	      pips_debug(7, "Return 4: empty\n");
+	      return sc;
+	    }
+
+	    // FI: the removal is delayed to end of this function, but
+	    // sc is nevertheless consistent
+	    // sc_base_remove_variable(sc, v);
+	    ifdebug(7) {
+	      fprintf(stderr, "projected normalised system is:\n");
+	      sc_syst_debug(sc);
+	    }
+	    /*eliminate v in the list of variables pve*/
+	    if(prv == NULL) /* it's in head */
+	      pve = pv1 = pv1->succ;
+	    else
+	      prv->succ = pv1 = pv1->succ;
+	  }
+	}
       }
     }
-  }
 
-  /* carry out the elimination of Fourier-Motzkin for the rest variables */
-  if(pve != NULL) {
-    pv1 = pve;
-
-    while(pv1 != NULL) {
-
-      NbrProjFMTotal++;
-      syst_size_init = nb_elems_list(sc->inegalites);
-      v = pv1->var;
-
-      ifdebug(7) {
-        fprintf(stderr, "eliminate %s by F-M\n", entity_local_name((entity)v));
-        debug(7,
-              "sc_projection_optim_along_vecteur_ofl",
-              "is_test_exact before: ");
-        if(is_test_exact)
-          fprintf(stderr, "%s\n", "exact");
-        else
-          fprintf(stderr, "%s\n", "not exact");
-      }
-
-      if(combiner_ofl_with_test(sc, v) == false) {
-        /* detection of non faisability of Psysteme */
-        if(is_test_Di)
-          NbrTestProjFMDi++;
-        else
-          NbrTestProjFM++;
-        sc_rm(sc);
-        sc = sc_empty(base_sc);
-        for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-          v = pv1->var;
-          sc_base_remove_variable(sc, v);
-        }
-
-        vect_rm(pve_to_free);
-        return (sc);
-      }
-
-      sc = sc_normalize(sc);
-
-      if(sc_empty_p(sc)) {
-        if(is_test_Di)
-          NbrTestProjFMDi++;
-        else
-          NbrTestProjFM++;
-        debug(7,
-              "sc_projection_optim_along_vecteur_ofl",
-              "normalisation-infaisable\n");
-        for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
-          v = pv1->var;
-          sc_base_remove_variable(sc, v);
-        }
-
-        vect_rm(pve_to_free);
-        return (sc);
-      }
-
-      /* 	    sc->inegalites = contrainte_sort(sc->inegalites, sc->base, BASE_NULLE, */
-      /* 					     true, false); */
-
-      /* 	    ifdebug(8) { */
-      /* 		debug(8, "", "Sorted system :\n"); */
-      /* 		sc_syst_debug(sc); */
-      /* 	    } */
-
-      build_sc_nredund_2pass_ofl_ctrl(&sc, FWD_OFL_CTRL);
-
-      ifdebug(7) {
-        debug(7,
-              "sc_projection_optim_along_vecteur_ofl",
-              "is_test_exact after: ");
-        if(is_test_exact)
-          fprintf(stderr, "%s\n", "exact");
-        else
-          fprintf(stderr, "%s\n", "not exact");
-        fprintf(stderr, "projected normalised system is:\n");
-        sc_syst_debug(sc);
-      }
-      if(nb_elems_list(sc->inegalites) <= syst_size_init)
-        NbrFMSystNonAug++;
-      pv1 = pv1->succ;
+    pips_assert("sc is consistent after the second use of equations",
+		sc_consistent_p(sc));
+    ifdebug(7) {
+      pips_debug(7, "Variables left to project with Fourier-Motzkin: ");
+      vect_dump(pve);
     }
-  }
 
-  /* change of base and dimension */
+    /* carry out the elimination using Fourier-Motzkin for the other variables */
+
+    if(pve != NULL) {
+      pv1 = pve;
+
+      while(pv1 != NULL) {
+
+	NbrProjFMTotal++;
+	syst_size_init = nb_elems_list(sc->inegalites);
+	v = pv1->var;
+
+	ifdebug(7) {
+	  fprintf(stderr, "eliminate %s by F-M\n", entity_local_name((entity)v));
+	  pips_debug(7, "is_test_exact before: ");
+	  if(is_test_exact)
+	    fprintf(stderr, "%s\n", "exact");
+	  else
+	    fprintf(stderr, "%s\n", "not exact");
+	}
+
+	if(combiner_ofl_with_test(sc, v) == false) {
+	  /* detection of non feasability of Psysteme sc */
+	  if(is_test_Di)
+	    NbrTestProjFMDi++;
+	  else
+	    NbrTestProjFM++;
+	  sc_rm(sc);
+	  sc = sc_empty(base_sc);
+	  for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+	    v = pv1->var;
+	    sc_base_remove_variable(sc, v);
+	  }
+
+	  vect_rm(pve_to_free);
+
+	  pips_debug(7, "Return 5: empty\n");
+	  return sc;
+	}
+
+	sc = sc_normalize(sc);
+
+	if(sc_empty_p(sc)) {
+	  if(is_test_Di)
+	    NbrTestProjFMDi++;
+	  else
+	    NbrTestProjFM++;
+	  pips_debug(7, "normalisation-infaisable\n");
+	  for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
+	    v = pv1->var;
+	    sc_base_remove_variable(sc, v);
+	  }
+
+	  vect_rm(pve_to_free);
+
+	  pips_debug(7, "Return 6: empty\n");
+	  return sc;
+	}
+
+	/* 	    sc->inegalites = contrainte_sort(sc->inegalites, sc->base, BASE_NULLE, */
+	/* 					     true, false); */
+
+	/* 	    ifdebug(8) { */
+	/* 		debug(8, "", "Sorted system :\n"); */
+	/* 		sc_syst_debug(sc); */
+	/* 	    } */
+
+	build_sc_nredund_2pass_ofl_ctrl(&sc, FWD_OFL_CTRL);
+
+	ifdebug(7) {
+	  pips_debug(7, "is_test_exact after: ");
+	  if(is_test_exact)
+	    fprintf(stderr, "%s\n", "exact");
+	  else
+	    fprintf(stderr, "%s\n", "not exact");
+	  fprintf(stderr, "projected normalised system is:\n");
+	  sc_syst_debug(sc);
+	}
+	if(nb_elems_list(sc->inegalites) <= syst_size_init)
+	  NbrFMSystNonAug++;
+	pv1 = pv1->succ;
+      }
+    }
+
+    pips_assert("sc is consistent before base update", sc);
+
+    /* Are we done? This used to be always true, but sc_normalize()
+       may promote inequalities as equations. Since the projection
+       steps may reveal some implicit equations, we are not sure here
+       that all projections have been performed by the three steps
+       (equations, equations, inequalities).
+
+       See for instance the test dependence in SAC/sgemm for such an example.
+    */
+    Pbase mb = sc_to_minimal_basis(sc);
+    lb = base_intersection(mb, pv);
+    vect_rm(mb);
+    
+  } while(!BASE_NULLE_P(lb)); // No need to free lb since it is empty
+
+  /* Update the base and the dimension of the constraint system sc */
+
   sc->nb_ineq = nb_elems_list(sc->inegalites);
   for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
     v = pv1->var;
     sc_base_remove_variable(sc, v);
   }
 
+  pips_assert("sc is consistent after base update", sc);
+
+  /* Clean up auxiliary data structures */
   vect_rm(pve_to_free);
   base_rm(base_sc);
-  debug(7, "sc_projection_optim_along_vecteur_ofl", "faisable\n");
-  return (sc);
+
+  pips_debug(7, "final return: faisable\n");
+
+  return sc;
 }
 
 /* void sc_minmax_of_variable_optim(Psysteme ps, Variable var, Value *pmin, *pmax):
