@@ -68,6 +68,7 @@ def process(input):
                 c99 = input.c99,
                 atomic = input.atomic,
                 use_pocc = input.pocc,
+                pocc_options = input.pocc_options,
                 recover_includes = input.recover_includes,
                 native_recover_includes = input.native_recover_includes,
                 properties = input.properties,

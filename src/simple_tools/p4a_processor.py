@@ -211,7 +211,7 @@ class p4a_processor(object):
                  accel = False, cuda = False, opencl = False, openmp = False, 
                  com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False, atomic = False, brokers="",
+                 c99 = False, use_pocc = False, pocc_options = "", atomic = False, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
         self.noalias = noalias
@@ -227,6 +227,7 @@ class p4a_processor(object):
         self.fftw3 = fftw3
         self.c99 = c99
         self.pocc = use_pocc
+        self.pocc_options = pocc_options
         self.atomic = atomic
         self.apply_phases = apply_phases
 
@@ -927,11 +928,12 @@ class p4a_processor(object):
         modules.omp_merge_pragma(concurrent=True)
 
         if self.pocc:
-            try:
-                modules.poccify()
-            except RuntimeError:
-                e = sys.exc_info()
-                p4a_util.warn("PoCC returned an error : " + str(e[1]))
+            for m in modules:
+                try:
+                    m.poccify(options=self.pocc_options)
+                except RuntimeError:
+                    e = sys.exc_info()
+                    p4a_util.warn("PoCC returned an error : " + str(e[1]))
 
 		# Apply requested phases after ompify to modules:
         apply_user_requested_phases(modules, apply_phases_after)
