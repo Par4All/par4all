@@ -328,7 +328,7 @@ static void terapix_gram_allocate
 
 /********************************** TERAPIX CODE GENERATION HELPER FUNCTIONS */
 
-/* Return the first/last available imagelet.
+/* Return the first/last available imagelet, or create one if necessary
  * This ensures that the choice is deterministic.
  * Moreover, as first numbers are IO imagelets, this help putting outputs
  * in the right imagelet so as to avoid additionnal copies, if possible.
@@ -754,6 +754,7 @@ static _int freia_terapix_call
    list /* of expression */ *params)
 {
   // total number of imagelets used for computing the dag
+  // will be updated later, implicitely derived from the scheduling
   int n_imagelets = 0;
   // number of input images
   int n_ins = gen_length(dag_inputs(thedag));
@@ -1001,7 +1002,8 @@ static _int freia_terapix_call
     if (api->arg_img_out==1)
     {
       bool is_output = gen_in_list_p(current, dag_outputs(thedag));
-      // SELECT one available
+      // SELECT one available imagelet
+      // if none is available, a new one is implicitely created
       choice = select_imagelet(avail_img, &n_imagelets, is_output);
       sb_cat(body, " -> ", itoa((int) choice));
       // there is a subtlety here, if no I/O image was available

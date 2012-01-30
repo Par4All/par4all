@@ -1095,6 +1095,9 @@ bool cells_combinable_p(cell c1, cell c2)
       /* let us check the indices */
       list l1 = reference_indices(r1);
       list l2 = reference_indices(r2);
+      
+      if (gen_length(l1) != gen_length(l2))
+	combinable_p = false;
 
       bool finished_p = false;
 
@@ -1111,22 +1114,52 @@ bool cells_combinable_p(cell c1, cell c2)
 	    }
 	  else
 	    {
-	      expression e1 = EXPRESSION(CAR(l1));
-	      expression e2 = EXPRESSION(CAR(l2));
+	      expression exp1 = EXPRESSION(CAR(l1));
+	      syntax s1 = expression_syntax(exp1);
+	      expression exp2 = EXPRESSION(CAR(l2));
+	      syntax s2 = expression_syntax(exp2);
 
-	      /* check if the expressions are the same;
-	         former test was based on  string comparison;
-		 try expression_equal_p to lessen comparison cost,
+	      /* check if the index expressions are the same for regions
+		 or are comparable for simple effects.
+		 For instance a[1] and a[2] can be merged into a[*] even
+		 if the indices are not the same. The same for a[*] and a[1].
+	         former tests were first based on string comparisons;
+		 then expression_equal_p was used to lessen comparison cost,
 		 especially for regions, where expressions are
 		 references to PHI entities.
+		 However, a[1] and a[2] were then considered as not comparable,
+		 which resulted in long lists of effects, and was not compatible
+		 with the generic binary operators which assume that there is at
+		 most one effect/region per path kind.
 	      */
 
-	      if (!expression_equal_p(e1, e2))
+	      if (syntax_reference_p(s1))
 		{
-		  combinable_p = false;
-		  finished_p = true;
+		  entity es1 = reference_variable(syntax_reference(s1));
+		  if (syntax_reference_p(s2))
+		    {
+		      entity es2 = reference_variable(syntax_reference(s2));
+		      if (es1 != es2)
+			{
+			  if (variable_phi_p(es1) || variable_phi_p(es2)
+			      || entity_field_p(es1) /* and then necessarily entity_field_p(e2) is true */)
+			    {
+			      combinable_p = false;
+			      finished_p = true;
+			    }
+			}
+		    }
+		  else
+		    {
+		      // it cannot be a region; it's a simple effect and the current indices are array
+		      // indices or a pointer dimension
+		      pips_assert( "the current index must be an array index or a pointer dimension",
+				   (!variable_phi_p(es1)) && (!entity_field_p(es1)));
+		      combinable_p = true;
+		      finished_p = false;
+		    }
 		}
-	      else
+	      if (!finished_p)
 		{
 		  POP(l1);
 		  POP(l2);

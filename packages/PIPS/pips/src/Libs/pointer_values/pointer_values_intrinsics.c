@@ -989,6 +989,9 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
+  /* GNU Extension*/
+  {SECOND_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 unknown_intrinsic_to_post_pv},
   {DEALLOCATE_FUNCTION_NAME,               unknown_intrinsic_to_post_pv},

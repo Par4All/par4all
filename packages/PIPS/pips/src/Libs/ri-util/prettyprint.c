@@ -539,7 +539,9 @@ list C_loop_range(range obj, entity i, list pdl)
             int_to_expression(1)
             );
 
-    /* Additionally, we want to pretty print a strict comparison if certain conditions are met. This could be the default choice , but the impact on the validation would be huge */
+    /* Additionally, we want to pretty print a strict comparison if
+       certain conditions are met. This could be the default choice ,
+       but the impact on the validation would be huge */
     set re = get_referenced_entities(ru);
     bool references_unsigned_entity_p = false;
     SET_FOREACH(entity,e,re) {
@@ -547,12 +549,32 @@ list C_loop_range(range obj, entity i, list pdl)
     }
     set_free(re);
     if( references_unsigned_entity_p ) {
-        pc = CHAIN_SWORD(pc, expression_negative_integer_value_p(inc) ? " > " : " < ");
-        pc = gen_nconc(pc, words_subexpression(ru_minus_one, 0, true, pdl));
+      if(positive_expression_p(inc))
+        pc = CHAIN_SWORD(pc, " < ");
+      else if(negative_expression_p(inc))
+        pc = CHAIN_SWORD(pc, " > ");
+      else {
+	//pips_internal_error("loop range cannot be prettyprinted because increment sign"
+	//		    " is unknown\n");
+	pips_user_warning("loop increment sign is unknown: assumed positive\n");
+        pc = CHAIN_SWORD(pc, " < ");
+      }
+      pc = gen_nconc(pc, words_subexpression(ru_minus_one, 0, true, pdl));
     }
     else {
-        pc = CHAIN_SWORD(pc, expression_negative_integer_value_p(inc) ? " >= " : " <= ");
-        pc = gen_nconc(pc, words_subexpression(ru, 0, true, pdl));
+      // FI: when inc is not a constant integer,
+      // expression_negative_integer_value_p() always return false
+      if(positive_expression_p(inc))
+        pc = CHAIN_SWORD(pc, " <= ");
+      else if(negative_expression_p(inc))
+        pc = CHAIN_SWORD(pc, " >= ");
+      else {
+	//pips_internal_error("loop range cannot be prettyprinted because increment sign"
+	//		    " is unknown\n");
+	pips_user_warning("loop increment sign is unknown: assumed positive\n");
+        pc = CHAIN_SWORD(pc, " <= ");
+      }
+      pc = gen_nconc(pc, words_subexpression(ru, 0, true, pdl));
     }
     free_expression(ru_minus_one);
     pc = CHAIN_SWORD(pc,"; ");

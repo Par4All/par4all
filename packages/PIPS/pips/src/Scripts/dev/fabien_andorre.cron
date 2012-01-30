@@ -1,0 +1,9 @@
+# $Id$
+#
+# Ubuntu 11.10 Oneiric x86_64
+#
+# account crontab at CRI on andorre
+# bootstrap with: login@andorre> setup_pips.sh /home/local/fabien/<version>
+# fix <version>/pipsrc.sh
+# must fix PIPS_F77 and PIPS_FLINT, g77 package is needed
+03 23 * * * /home/fabien/NIGHT/pips_check_compile --force --report --nlpmake=htdoc --source=/home/fabien/NIGHT/pipsrc.sh --exec=/home/fabien/NIGHT/pips_publish_www.sh pips-validation@cri.ensmp.fr /home/fabien/NIGHT/prod /home/fabien/NIGHT/validation

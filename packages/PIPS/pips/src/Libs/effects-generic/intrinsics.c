@@ -1225,6 +1225,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
+  /* GNU Extension*/
+  {SECOND_FUNCTION_NAME,                   time_effects},
+
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},
   {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},
@@ -1446,11 +1449,11 @@ conditional_effects(entity e __attribute__ ((__unused__)),list args)
   list lt = generic_proper_effects_of_expression(et);
   list lf = generic_proper_effects_of_expression(ef);
 
-  le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
+  le = (*effects_test_union_op)(lt, lf, effects_scalars_and_same_action_p);
 
   pips_debug_effects(8, "Effects for the two branches:\n", le);
 
-  le = (*effects_union_op)(le, lc, effects_same_action_p);
+  le = (*effects_union_op)(le, lc, effects_scalars_and_same_action_p);
 
   pips_debug(5, "end\n");
   return le;

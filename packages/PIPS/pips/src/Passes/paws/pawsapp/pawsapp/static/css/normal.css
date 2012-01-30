@@ -1,0 +1,16 @@
+/* Home page */
+
+
+
+/* Sidebar */
+
+.sidebar h4 {
+    margin: 1em 0;
+    line-height: 1em;
+}
+
+/* Main column */
+
+#classic-examples-dialog a {
+    margin-bottom: 2px;
+}
