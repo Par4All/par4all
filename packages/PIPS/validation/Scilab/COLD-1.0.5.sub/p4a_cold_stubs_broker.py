@@ -1,6 +1,5 @@
 import broker
 import os.path
-import p4a_util
 
 class p4a_cold_stubs_broker(broker.broker):
     """ broker that automatically gather stub files for the par4all runtime
