@@ -37,7 +37,7 @@ ${text|n}
 <%def name="main_column()">
 
 <div class="hero-unit">
-  <h1>${h.image(request.static_url("pawsapp:static/img/paws-small.png"), u"PAWS Logo")} PIPS as a Web Service</h1>
+  <h1>${h.image(request.static_url("pawsapp:static/img/paws-small-trans.gif"), u"PAWS Logo")} PIPS as a Web Service</h1>
   <p>Vestibulum id ligula porta felis euismod semper. Integer posuere
     erat a ante venenatis dapibus posuere velit aliquet. Duis mollis,
     est non commodo luctus, nisi erat porttitor ligula, eget lacinia
