@@ -52,8 +52,11 @@ def main(global_config, **settings):
     config.add_route('tool_basic',              '/tools/{tool}')
     config.add_route('tool_advanced',           '/tools/{tool}/advanced')
 
-    config.add_route('upload_userfile',         '/userfiles/upload')
-    config.add_route('get_example_file',        '/examples/get_file/{tool}/{filename}')
+    config.add_route('tutorial',                '/tutorials/{tutorial}')
+
+    config.add_route('upload_user_file',        '/files/upload')
+    config.add_route('load_example_file',       '/files/{tool}/{name}')
+    config.add_route('source_panel',            '/util/source_panel/{index}')
 
     config.add_route('detect_language',         '/detector/detect_language')
     config.add_route('compile',                 '/detector/compile')

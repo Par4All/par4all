@@ -1,12 +1,16 @@
-/* Home page */
-
-
+.inp-hide {
+    height: 30px;
+    left: -90px;
+    opacity: 0;
+    position: absolute;
+    z-index: 2;
+}
 
 /* Sidebar */
 
 .sidebar h4 {
     margin: 1em 0;
-    line-height: 1em;
+    line-height: 1.1em;
 }
 
 /* Main column */
