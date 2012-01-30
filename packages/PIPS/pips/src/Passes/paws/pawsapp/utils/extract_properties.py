@@ -1,8 +1,7 @@
 import os, re
 
-path = '/home/local/szymczak/MYPIPS/prod/pips/src/Libs/semantics/'
-path1 = '/home/local/szymczak/MYPIPS/prod/pips/src/Libs/transformer/'
-
+#path = '/home/local/szymczak/MYPIPS/prod/pips/src/Libs/semantics/'
+#path1 = '/home/local/szymczak/MYPIPS/prod/pips/src/Libs/transformer/'
 
 def search(directory):
 	files = os.listdir(directory)

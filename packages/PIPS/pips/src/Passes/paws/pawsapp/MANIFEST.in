@@ -1,3 +1,2 @@
-include pawsapp/config/deployment.ini_tmpl
-recursive-include pawsapp/public *
-recursive-include pawsapp/templates *
+include *.txt *.ini *.cfg *.rst
+recursive-include pawsapp *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml

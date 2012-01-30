@@ -1,0 +1,34 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t207.sce: temp insertion */
+   int _u_b[1][2];
+   _u_b[0][0] = 1;
+   _u_b[0][1] = 2;
+   int _tmpxx0;
+   scilab_rt_sum_i2_i0(1, 2, _u_b, &_tmpxx0);
+   _u_b[0][1-1] = _tmpxx0;
+   scilab_rt_display_s0i2_("b", 1, 2, _u_b);
+   int _u_a[1][4];
+   _u_a[0][0] = 1;
+   _u_a[0][1] = 2;
+   _u_a[0][2] = 3;
+   _u_a[0][3] = 4;
+   scilab_rt_display_s0i2_("a", 1, 4, _u_a);
+
+   _u_b[0][0] = 10;
+   _u_b[0][1] = 11;
+   scilab_rt_display_s0i2_("b", 1, 2, _u_b);
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+      //PIPS generated variable
+      register int _tmpxx1_0, _u_b_0 = _u_b[0][__lv2];
+      _tmpxx1_0 = _u_b_0+_u_b_0;
+      _u_a[0][__lv2] = _tmpxx1_0;
+   }
+   __lv1 = 0+1;
+   scilab_rt_display_s0i2_("a", 1, 4, _u_a);
+
+   scilab_rt_terminate();
+}

@@ -108,30 +108,24 @@ int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
 {
 //             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
 }
 //             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
 {
 //             <    is read   >: _resoLat _resoLon
@@ -152,10 +146,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               pFileReference[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: configuration pFileReference stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: nb the_towns _MALLOC_EFFECTS:_MALLOC_
-//                               __IO_EFFECTS:LUNS[2]
    hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
 //             <    is read   >: latRange lonRange 
 //                               _MALLOC_EFFECTS:_MALLOC_
@@ -244,10 +236,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
 {
 //             <    is written>: config.fid config.fparam 
@@ -267,10 +257,8 @@ hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_n
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
 }
 //             <    is read   >: g_config.status
@@ -383,10 +371,8 @@ _break_1:   ;
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
-//                               t[*].pot __IO_EFFECTS:LUNS[2]
+//                               t[*].lat t[*].lon t[*].pot 
+//                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: config latRange lonRange nb
@@ -402,14 +388,10 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
    config->status = 0;
    {
       size_t k;
-//             <may be read   >: config k k k k latMin latMin latRange
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon t[*].pot total_sum 
-//                               town_sum
+//             <may be read   >: config k latMin latRange latStep 
+//                               lonMin lonRange lonStep pt[*][*].pot 
+//                               range t[*].lat t[*].lon t[*].pot 
+//                               total_sum town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
 //                               total_sum town_sum
 //             <    is read   >: nb
@@ -424,13 +406,9 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: nb pot town_sum
 //             <    is written>: town_sum
          town_sum += pot;
-//             <may be read   >: k k k k latMin latMin latRange 
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon total_sum
+//             <may be read   >: k latMin latRange latStep lonMin 
+//                               lonRange lonStep pt[*][*].pot range 
+//                               t[*].lat t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
          /* only process if it is relevant */
@@ -510,22 +488,18 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               jmax jmin k k k k latMin latMin 
-//                               latStep latStep lonMin lonMin lonStep
-//                               lonStep pot range sum t[*].lat 
-//                               t[*].lat t[*].lon t[*].lon
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i jmax jmin k
+//                               latMin latStep lonMin lonStep pot 
+//                               range sum t[*].lat t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
                for(i = imin; i < imax; i += 1) {
                   size_t j;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep pot 
-//                               range sum t[*].lat t[*].lat t[*].lon 
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j k latMin latStep 
+//                               lonMin lonStep pot range sum t[*].lat
 //                               t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin jmax jmin nb
@@ -631,10 +605,8 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
-//                               t[*].pot __IO_EFFECTS:LUNS[2]
+//                               t[*].lat t[*].lon t[*].pot 
+//                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: config latRange lonRange nb
@@ -650,14 +622,10 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
    config->status = 0;
    {
       size_t k;
-//             <may be read   >: config k k k k latMin latMin latRange
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon t[*].pot total_sum 
-//                               town_sum
+//             <may be read   >: config k latMin latRange latStep 
+//                               lonMin lonRange lonStep pt[*][*].pot 
+//                               range t[*].lat t[*].lon t[*].pot 
+//                               total_sum town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
 //                               total_sum town_sum
 //             <    is read   >: nb
@@ -672,13 +640,9 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: nb pot town_sum
 //             <    is written>: town_sum
          town_sum += pot;
-//             <may be read   >: k k k k latMin latMin latRange 
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon total_sum
+//             <may be read   >: k latMin latRange latStep lonMin 
+//                               lonRange lonStep pt[*][*].pot range 
+//                               t[*].lat t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
          /* only process if it is relevant */
@@ -758,22 +722,18 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               jmax jmin k k k k latMin latMin 
-//                               latStep latStep lonMin lonMin lonStep
-//                               lonStep pot range sum t[*].lat 
-//                               t[*].lat t[*].lon t[*].lon
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i jmax jmin k
+//                               latMin latStep lonMin lonStep pot 
+//                               range sum t[*].lat t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
                for(i = imin; i < imax; i += 1) {
                   size_t j;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep pot 
-//                               range sum t[*].lat t[*].lat t[*].lon 
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j k latMin latStep 
+//                               lonMin lonStep pot range sum t[*].lat
 //                               t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin jmax jmin nb
@@ -879,10 +839,8 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
-//                               t[*].pot __IO_EFFECTS:LUNS[2]
+//                               t[*].lat t[*].lon t[*].pot 
+//                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: config latRange lonRange nb
@@ -898,14 +856,10 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
    config->status = 0;
    {
       size_t k;
-//             <may be read   >: config k k k k latMin latMin latRange
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon t[*].pot total_sum 
-//                               town_sum
+//             <may be read   >: config k latMin latRange latStep 
+//                               lonMin lonRange lonStep pt[*][*].pot 
+//                               range t[*].lat t[*].lon t[*].pot 
+//                               total_sum town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
 //                               total_sum town_sum
 //             <    is read   >: nb
@@ -920,13 +874,9 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: nb pot town_sum
 //             <    is written>: town_sum
          town_sum += pot;
-//             <may be read   >: k k k k latMin latMin latRange 
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon total_sum
+//             <may be read   >: k latMin latRange latStep lonMin 
+//                               lonRange lonStep pt[*][*].pot range 
+//                               t[*].lat t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
          /* only process if it is relevant */
@@ -1006,22 +956,18 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               jmax jmin k k k k latMin latMin 
-//                               latStep latStep lonMin lonMin lonStep
-//                               lonStep pot range sum t[*].lat 
-//                               t[*].lat t[*].lon t[*].lon
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i jmax jmin k
+//                               latMin latStep lonMin lonStep pot 
+//                               range sum t[*].lat t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
                for(i = imin; i < imax; i += 1) {
                   size_t j;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep pot 
-//                               range sum t[*].lat t[*].lat t[*].lon 
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j k latMin latStep 
+//                               lonMin lonStep pot range sum t[*].lat
 //                               t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin jmax jmin nb
@@ -1127,10 +1073,8 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
-//                               t[*].pot __IO_EFFECTS:LUNS[2]
+//                               t[*].lat t[*].lon t[*].pot 
+//                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: config latRange lonRange nb
@@ -1146,14 +1090,10 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
    config->status = 0;
    {
       size_t k;
-//             <may be read   >: config k k k k latMin latMin latRange
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon t[*].pot total_sum 
-//                               town_sum
+//             <may be read   >: config k latMin latRange latStep 
+//                               lonMin lonRange lonStep pt[*][*].pot 
+//                               range t[*].lat t[*].lon t[*].pot 
+//                               total_sum town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
 //                               total_sum town_sum
 //             <    is read   >: nb
@@ -1168,13 +1108,9 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: nb pot town_sum
 //             <    is written>: town_sum
          town_sum += pot;
-//             <may be read   >: k k k k latMin latMin latRange 
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon total_sum
+//             <may be read   >: k latMin latRange latStep lonMin 
+//                               lonRange lonStep pt[*][*].pot range 
+//                               t[*].lat t[*].lon total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
          /* only process if it is relevant */
@@ -1254,22 +1190,18 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               jmax jmin k k k k latMin latMin 
-//                               latStep latStep lonMin lonMin lonStep
-//                               lonStep pot range sum t[*].lat 
-//                               t[*].lat t[*].lon t[*].lon
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i jmax jmin k
+//                               latMin latStep lonMin lonStep pot 
+//                               range sum t[*].lat t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin nb
 //             <    is written>: 0`1`2`3`4`i
 
                for(i = imin; i < imax; i += 1) {
                   size_t j;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep pot 
-//                               range sum t[*].lat t[*].lat t[*].lon 
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j k latMin latStep 
+//                               lonMin lonStep pot range sum t[*].lat
 //                               t[*].lon
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin jmax jmin nb
@@ -1375,10 +1307,8 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 }
 //             <may be read   >: latMin latStep lonMin lonStep 
 //                               pt[*][*].pot range stderr stderr[0] 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lon t[*].lon t[*].lon t[*].lon 
-//                               t[*].pot __IO_EFFECTS:LUNS[2]
+//                               t[*].lat t[*].lon t[*].pot 
+//                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: pt[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is read   >: config latRange lonRange nb
@@ -1394,14 +1324,9 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
    config->status = 0;
    {
       size_t k;
-//             <may be read   >: config k k k k latMin latMin latRange
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon t[*].pot 
-//                               0`1`2`3`4`5`6`7`8`9`tmp 
+//             <may be read   >: config k latMin latRange latStep 
+//                               lonMin lonRange lonStep pt[*][*].pot 
+//                               range t[*].lat t[*].lon t[*].pot 
 //                               0`1`2`3`4`5`6`7`8`9`tmp total_sum 
 //                               town_sum
 //             <may be written>: config[0].status pt[*][*].pot 
@@ -1418,14 +1343,9 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: nb pot town_sum
 //             <    is written>: town_sum
          town_sum += pot;
-//             <may be read   >: k k k k latMin latMin latRange 
-//                               latStep latStep lonMin lonMin 
-//                               lonRange lonStep lonStep pt[*][*].pot
-//                               range range t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lat t[*].lat 
-//                               t[*].lat t[*].lat t[*].lon t[*].lon 
-//                               t[*].lon t[*].lon 
-//                               0`1`2`3`4`5`6`7`8`9`tmp 
+//             <may be read   >: k latMin latRange latStep lonMin 
+//                               lonRange lonStep pt[*][*].pot range 
+//                               t[*].lat t[*].lon 
 //                               0`1`2`3`4`5`6`7`8`9`tmp total_sum
 //             <may be written>: pt[*][*].pot total_sum
 //             <    is read   >: nb pot
@@ -1506,12 +1426,9 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               jmax jmin k k k k latMin latMin 
-//                               latStep latStep lonMin lonMin lonStep
-//                               lonStep pot range sum t[*].lat 
-//                               t[*].lat t[*].lon t[*].lon 
-//                               0`1`2`3`4`5`6`7`8`9`tmp 
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i jmax jmin k
+//                               latMin latStep lonMin lonStep pot 
+//                               range sum t[*].lat t[*].lon 
 //                               0`1`2`3`4`5`6`7`8`9`tmp
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin nb
@@ -1519,13 +1436,10 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 
                for(i = imin; i < imax; i += 1) {
                   size_t j;
-//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 0`1`2`3`4`i
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep pot 
-//                               range sum t[*].lat t[*].lat t[*].lon 
-//                               t[*].lon 0`1`2`3`4`5`6`7`8`9`tmp 
-//                               0`1`2`3`4`5`6`7`8`9`tmp
+//             <may be read   >: contrib[*][*] 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j k latMin latStep 
+//                               lonMin lonStep pot range sum t[*].lat
+//                               t[*].lon 0`1`2`3`4`5`6`7`8`9`tmp
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
@@ -1536,7 +1450,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is written>: 0`1`2`3`4`5`6`7`tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <may be read   >: contrib[*][*] pot sum 
-//                               0`1`2`3`4`5`6`7`8`9`tmp 
 //                               0`1`2`3`4`5`6`7`8`9`tmp
 //             <may be written>: contrib[*][*] sum
 //             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
@@ -1546,7 +1459,6 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                      if (tmp<range) {
 //             <may be read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
 //                               jmax jmin nb pot range 
-//                               0`1`2`3`4`5`6`7`8`9`tmp 
 //                               0`1`2`3`4`5`6`7`8`9`tmp
 //             <may be written>: contrib[*][*]
                         do {
@@ -1642,10 +1554,8 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <may be written>: config[0].herrno fd[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fd len stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: len[0] _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: len[0] _MALLOC_EFFECTS:_MALLOC_
 static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
 {
 //             <    is written>: curr

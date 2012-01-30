@@ -1,0 +1,23 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_a1[1][1];
+   _u_a1[0][0] = 1-2;
+   scilab_rt_display_s0i2_("a1", 1, 1, _u_a1);
+   int _u_a2[1][1];
+   _u_a2[0][0] = 1-2;
+   scilab_rt_display_s0i2_("a2", 1, 1, _u_a2);
+   int _u_a3[1][2];
+   _u_a3[0][0] = 1;
+   _u_a3[0][1] = -2;
+   scilab_rt_display_s0i2_("a3", 1, 2, _u_a3);
+   int _u_b1 = 1-2;
+   scilab_rt_display_s0i0_("b1", _u_b1);
+   int _u_b2 = 1-2;
+   scilab_rt_display_s0i0_("b2", _u_b2);
+   int _u_b3 = 1-2;
+   scilab_rt_display_s0i0_("b3", _u_b3);
+
+   scilab_rt_terminate();
+}

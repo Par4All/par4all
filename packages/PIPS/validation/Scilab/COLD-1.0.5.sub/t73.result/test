@@ -1,0 +1,43 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t73.sce: testing allocation with reals, rt */
+   double _tmp0[3][3];
+   (int) 3.5==3&&(int) 3.5==3?(void) 0:__assert_fail("(int)3.5 == 3 && (int)3.5 == 3", ".t73.tmp/t73.c", 27, (const char *) 0);
+   double _tmp1[3][3];
+   (int) 3.5==3&&(int) 3.5==3?(void) 0:__assert_fail("(int)3.5 == 3 && (int)3.5 == 3", ".t73.tmp/t73.c", 30, (const char *) 0);
+   double _tmp2[3][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         register double _tmp1_0;
+         _tmp0[__lv1][__lv2] = (double) 1.0;
+         if (__lv1==__lv2)
+            _tmp1_0 = (double) 1.0;
+         else
+            _tmp1_0 = (double) 0.0;
+         _tmp2[__lv1][__lv2] = (double) 0.0;
+         _tmp1[__lv1][__lv2] = _tmp1_0;
+      }
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp0);
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp1);
+   (int) 3.5==3&&(int) 3.5==3?(void) 0:__assert_fail("(int)3.5 == 3 && (int)3.5 == 3", ".t73.tmp/t73.c", 33, (const char *) 0);
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp2);
+   double _tmp3[3][3];
+   (int) 3.5==3&&(int) 3.5==3?(void) 0:__assert_fail("(int)3.5 == 3 && (int)3.5 == 3", ".t73.tmp/t73.c", 36, (const char *) 0);
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _tmp3[__lv1][__lv2] = (double) rand()/((double) 2147483647);
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp3);
+
+   scilab_rt_terminate();
+}

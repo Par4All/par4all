@@ -83,17 +83,17 @@ void test(int n, ab src[n])
 }
 with r-w regions
 
-//  <src[PHI1].a-W-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <src[PHI1].a-W-EXACT-{0<=PHI1, PHI1+1<=n, 0<=n}>
 
 void test(int n, ab src[n])
 {
    unsigned int i, j;
 
-//  <src[PHI1].a-W-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <src[PHI1].a-W-EXACT-{0<=PHI1, PHI1+1<=n, 0<=n}>
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <src[PHI1].a-W-EXACT-{PHI1==i, 0<=i, i+1<=n}>
+//  <src[PHI1].a-W-EXACT-{PHI1==i, 0<=i, i+1<=n, 0<=n}>
 
       src[i].a = 2;
 }

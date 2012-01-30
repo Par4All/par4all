@@ -1,0 +1,109 @@
+void fiff__d2(int _u_U_n0, int _u_U_n1, double _u_U[_u_U_n0][_u_U_n1])
+{
+   double _u_a = 2.5;
+   double _u_b = 1.5;
+   double _u_c = 0.5;
+   int _u_n = 350;
+   int _u_m = 350;
+   int _tmpxx1 = _u_n-1;
+   double _u_h = _u_a/_tmpxx1;
+   int _tmpxx2 = _u_m-1;
+   double _u_k = _u_b/_tmpxx2;
+   double _tmpxx3 = _u_c*_u_k;
+   double _u_r = _tmpxx3/_u_h;
+   double _tmpxx4 = _u_c*_u_k;
+   //PIPS generated variable
+   int _u_i1_0;
+   //PIPS generated variable
+   int _u_j1;
+   _u_r = _tmpxx4/_u_h;
+   double _u_r2 = pow(_u_r, 2);
+   double _tmpxx5 = pow(_u_r, 2);
+   double _u_r22 = _tmpxx5/2;
+   double _tmpxx6 = pow(_u_r, 2);
+   double _u_s1 = 1-_tmpxx6;
+   double _tmpxx7 = pow(_u_r, 2);
+   double _tmpxx8 = 2*_tmpxx7;
+   double _u_s2 = 2-_tmpxx8;
+   (int) _u_m==_u_U_n0&&(int) _u_n==_u_U_n1?(void) 0:__assert_fail("(int)_u_m == _u_U_n0 && (int)_u_n == _u_U_n1", ".t235.tmp/t235.c", 42, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_U_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_U_n1-1; __lv2 += 1)
+         _u_U[__lv1][__lv2] = (double) 0.0;
+   }
+#pragma omp parallel for 
+   for(_u_i1_0 = 2; _u_i1_0 <= _u_n-1; _u_i1_0 += 1) {
+      //PIPS generated variable
+      double _tmpxx9;
+      _tmpxx9 = sin(SCILAB_PI*_u_h*(_u_i1_0-1))+sin(2*SCILAB_PI*_u_h*(_u_i1_0-1));
+      _u_U[_u_i1_0-1][0] = _tmpxx9;
+   }
+#pragma omp parallel for 
+   for(_u_i1_0 = 2; _u_i1_0 <= _u_n-1; _u_i1_0 += 1) {
+      //PIPS generated variable
+      double _tmpxx10;
+      _tmpxx10 = _u_s1*(sin(SCILAB_PI*_u_h*(_u_i1_0-1))+sin(2*SCILAB_PI*_u_h*(_u_i1_0-1)))+_u_r22*(sin(SCILAB_PI*_u_h*_u_i1_0)+sin(2*SCILAB_PI*_u_h*_u_i1_0)+sin(SCILAB_PI*_u_h*(_u_i1_0-2))+sin(2*SCILAB_PI*_u_h*(_u_i1_0-2)));
+      _u_U[_u_i1_0-1][1] = _tmpxx10;
+   }
+   for(_u_j1 = 3; _u_j1 <= _u_m; _u_j1 += 1) {
+      //PIPS generated variable
+      int _u_i1_1;
+#pragma omp parallel for 
+      for(_u_i1_1 = 2; _u_i1_1 <= _u_n-1; _u_i1_1 += 1) {
+         //PIPS generated variable
+         double _tmpxx11;
+         _tmpxx11 = _u_s2*_u_U[_u_i1_1-1][_u_j1-1-1]+_u_r2*(_u_U[_u_i1_1-1-1][_u_j1-1-1]+_u_U[_u_i1_1+1-1][_u_j1-1-1])-_u_U[_u_i1_1-1][_u_j1-2-1];
+         _u_U[_u_i1_1-1][_u_j1-1] = _tmpxx11;
+      }
+   }
+}
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_ii;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t235.sce - from mcgill/fiff_function.sce */
+   /* -----------------------------------------------------------------   */
+   /*  - fiff.sce without function */
+   /*  */
+   /*  - This function finds the finite-difference solution */
+   /* 	to the wave equation */
+   /*  */
+   /* 			     2 */
+   /* 		u  (x, t) = c u  (x, t), */
+   /* 		 tt	       xx */
+   /*  */
+   /* 	with the boundary conditions */
+   /*  */
+   /* 		u(0, t) = 0, u(a, t) = 0 for all 0 <= t <= b, */
+   /*  */
+   /* 		u(x, 0) = sin(pi*x)+sin(2*pi*x), for all 0 < x < a, */
+   /*  */
+   /* 		u (x, 0) = 0 for all 0 < x < a.t */
+   /* ------------------------------------------------------------------- */
+   scilab_rt_tic__();
+   double _u_R[350][350];
+   fiff__d2(350, 350, _u_R);
+   double _u_elapsedTime = scilab_rt_toc__();
+   /* disp("Elapsed Time:"); */
+   /* disp(elapsedTime); */
+   double _u_acc = 0.0;
+   for(_u_ii = 1; _u_ii <= 350; _u_ii += 1) {
+      //PIPS generated variable
+      double _tmpxx0;
+      //PIPS generated variable
+      int _u_jj;
+      for(_u_jj = 1; _u_jj <= 350; _u_jj += 1) {
+         _tmpxx0 = _u_R[_u_ii-1][_u_jj-1];
+         _u_acc = _u_acc+_tmpxx0;
+      }
+   }
+   scilab_rt_disp_s0_("Accumulated sum of all elements of U");
+   scilab_rt_disp_d0_(_u_acc);
+
+   scilab_rt_terminate();
+}

@@ -18,7 +18,7 @@ C
 
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
 C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
-C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=N}>
 C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
 
@@ -32,8 +32,8 @@ C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=N, 1<=I, I<=N}>
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=I, I<=N}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
-C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
 
          DO J = 1, N                                                    0013
 

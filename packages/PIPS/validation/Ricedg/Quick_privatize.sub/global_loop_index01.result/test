@@ -1,0 +1,15 @@
+#
+# Code after internalize_parallel_code for module main
+#
+int main()
+{
+   int j, a[10];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+
+   for(j = 0; j <= 9; j += 1)
+      printf("a[%d] = %d\n", j, a[j]);
+
+   return 0;
+}

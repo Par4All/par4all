@@ -770,7 +770,20 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
    */
   list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
   pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
-  effects_to_may_effects(l_live_out_loop);
+
+  list l_rw_body = convert_rw_effects(load_rw_effects_list(body),
+					 ctxt);
+  list l_w_body = effects_write_effects_dup(l_rw_body);
+  reset_converted_rw_effects(&l_rw_body, ctxt);
+
+  if (!loop_executed_at_least_once_p(l))
+    effects_to_may_effects(l_w_body);
+  l_live_out_loop = (*effects_sup_difference_op)(l_live_out_loop, l_w_body,
+						 r_w_combinable_p);
+  pips_debug_effects(3, "live out paths of an iteration due to live out paths of whole loop\n", l_live_out_loop);
+
+
+
 
   /* We then compute the live out paths of the loop body */
   /* The live out paths of an iteration are the paths that

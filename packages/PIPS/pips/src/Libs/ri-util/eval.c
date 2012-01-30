@@ -575,8 +575,10 @@ ipow(int vg, int vd)
 
 
 /*
-  computes the value of an integer expression.
-  returns true if an integer value has been found and placed in pval.
+  evaluates statically the value of an integer expression.
+
+  returns true if an integer value could be computed and placed in pval.
+
   returns false otherwise.
 */
 bool
@@ -595,14 +597,145 @@ expression_integer_value(expression e, intptr_t * pval)
 }
 
 
-/* Return true iff the expression has an integer value and this value is
-   negative.
-*/
-bool
-expression_negative_integer_value_p(expression e) {
+/* Return true iff the expression has an integer value known
+ * statically and this value is negative. All leaves of the expression
+ * tree must be constant integer.
+ *
+ * If preconditions are available, a more general expression can be
+ * evaluated using precondition_minmax_of_expression().
+ */
+bool expression_negative_integer_value_p(expression e) {
   intptr_t v;
   return expression_integer_value(e, &v) && (v < 0);
 }
+
+/* Use constants and type information to decide if the value of
+ * sigma(e) is always positive, e.g. >=0
+ *
+ * See negative_expression_p()
+ *
+ * Should we define positive_integer_expression_p() and check the expression type?
+ */
+bool positive_expression_p(expression e)
+{
+  bool positive_p = false; // In general, false because no conclusion can be reached
+  intptr_t v;
+  if(expression_integer_value(e, &v)) {
+    positive_p = v>=0;
+  }
+  else {
+    syntax s = expression_syntax(e);
+
+    if(syntax_reference_p(s)) {
+      entity v = reference_variable(syntax_reference(s));
+      type t = ultimate_type(entity_type(v));
+      positive_p = unsigned_type_p(t);
+    }
+    else if(syntax_call_p(s)) {
+      call c = syntax_call(s);
+      entity f = call_function(c);
+      type t = entity_type(f);
+      pips_assert("t is a functional type", type_functional_p(t));
+      type rt = functional_result(type_functional(t));
+      if(unsigned_type_p(rt))
+	positive_p = true;
+      else if(overloaded_type_p(rt)) { /* We assume an operator is used */
+	/* We can check a few cases recursively... */
+	list args = call_arguments(c);
+	intptr_t l = gen_length(args);
+	if(l==1) {
+	  expression arg = EXPRESSION(CAR(args));
+	  if(ENTITY_UNARY_MINUS_P(f)) {
+	    positive_p = negative_expression_p(arg); // Maybe zero, but no chance for sigma(x)>0
+	  }
+	  else if(ENTITY_IABS_P(f) || ENTITY_ABS_P(f) || ENTITY_DABS_P(f)
+		  || ENTITY_CABS_P(f)) {
+	    positive_p = true;
+	  }
+	}
+	else if(l==2) {
+	  expression arg1 = EXPRESSION(CAR(args));
+	  expression arg2 = EXPRESSION(CAR(CDR(args)));
+	  if(ENTITY_MINUS_P(f)) {
+	    positive_p = positive_expression_p(arg1) && negative_expression_p(arg2);
+	  }
+	  else if(ENTITY_PLUS_P(f)) {
+	    positive_p = positive_expression_p(arg1) && positive_expression_p(arg2);
+	  }
+	  else if(ENTITY_MULTIPLY_P(f)) {
+	    positive_p = (positive_expression_p(arg1) && positive_expression_p(arg2))
+	      || (negative_expression_p(arg1) && negative_expression_p(arg2));
+	  }
+	  else if(ENTITY_DIVIDE_P(f)) {
+	    positive_p = (positive_expression_p(arg1) && positive_expression_p(arg2))
+	      || (negative_expression_p(arg1) && negative_expression_p(arg2));
+	  }
+	}
+      }
+    }
+  }
+  return positive_p;
+}
+
+/* Use constants and type information to decide if the value of
+ * sigma(e) is always negative, e.g. <=0. If this can be proven, true is returned.
+ *
+ * false is returned when no decision can be made,
+ * i.e. negative_expression_p(e)==false does not imply
+ * positive_expression_p(e)
+ *
+ * Similar and linked to previous function
+ */
+bool negative_expression_p(expression e)
+{
+  bool negative_p = false; // In general, false because no conclusion can be reached
+  intptr_t v;
+  if(expression_integer_value(e, &v)) {
+    negative_p = v<=0;
+  }
+  else {
+    syntax s = expression_syntax(e);
+
+    if(syntax_call_p(s)) {
+      call c = syntax_call(s);
+      entity f = call_function(c);
+      type t = entity_type(f);
+      pips_assert("t is a functional type", type_functional_p(t));
+      type rt = functional_result(type_functional(t));
+      if(overloaded_type_p(rt)) { /* We assume an operator is used */
+	/* We can check a few cases recursively... */
+	list args = call_arguments(c);
+	intptr_t l = gen_length(args);
+	if(l==1) {
+	  expression arg = EXPRESSION(CAR(args));
+	  if(ENTITY_UNARY_MINUS_P(f)) {
+	    negative_p = positive_expression_p(arg); // Maybe zero, but no chance for sigma(x)>0
+	  }
+	}
+	else if(l==2) {
+	  expression arg1 = EXPRESSION(CAR(args));
+	  expression arg2 = EXPRESSION(CAR(CDR(args)));
+	  if(ENTITY_MINUS_P(f)) {
+	    negative_p = negative_expression_p(arg1) && positive_expression_p(arg2);
+	  }
+	  else if(ENTITY_PLUS_P(f)) {
+	    negative_p = negative_expression_p(arg1) && negative_expression_p(arg2);
+	  }
+	  else if(ENTITY_MULTIPLY_P(f)) {
+	    negative_p = (negative_expression_p(arg1) && positive_expression_p(arg2))
+	      || (positive_expression_p(arg1) && negative_expression_p(arg2));
+	  }
+	  else if(ENTITY_DIVIDE_P(f)) {
+	    negative_p = (negative_expression_p(arg1) && positive_expression_p(arg2))
+	      || (positive_expression_p(arg1) && negative_expression_p(arg2));
+	  }
+	}
+      }
+    }
+  }
+  return negative_p;
+}
+
 /* returns if e is normalized and linear.
  */
 bool expression_linear_p(expression e)

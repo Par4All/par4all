@@ -1,0 +1,68 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_j_0;
+   //PIPS generated variable
+   int _u_j_1;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t242.sce - from mcgill/trid.sce */
+   /*  trid.sce */
+   /* tic(); */
+   int _u_n = 1000;
+   double _u_a[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t242.tmp/t242.c", 30, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_a[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_b[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t242.tmp/t242.c", 32, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_b[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_c[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t242.tmp/t242.c", 34, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_c[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_d[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t242.tmp/t242.c", 36, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_d[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_x[1][1000];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_x[0][__lv2] = _u_d[0][__lv2];
+   __lv1 = 0+1;
+   int _u_l;
+   *&_u_l = 1*1000;
+   for(_u_j_0 = 1; _u_j_0 <= _u_l-1; _u_j_0 += 1) {
+      //PIPS generated variable
+      double _tmpxx0, _tmpxx1, _tmpxx2, _tmpxx3, _u_mu;
+      _tmpxx0 = _u_a[0][_u_j_0-1];
+      _tmpxx1 = _u_b[0][_u_j_0-1];
+      _u_mu = _tmpxx0/_tmpxx1;
+      _tmpxx2 = _u_b[0][_u_j_0+1-1]-_u_mu*_u_c[0][_u_j_0-1];
+      _u_b[0][_u_j_0+1-1] = _tmpxx2;
+      _tmpxx3 = _u_x[0][_u_j_0+1-1]-_u_mu*_u_x[0][_u_j_0-1];
+      _u_x[0][_u_j_0+1-1] = _tmpxx3;
+   }
+   double _tmpxx4 = _u_x[0][_u_l-1]/_u_b[0][_u_l-1];
+   _u_x[0][_u_l-1] = _tmpxx4;
+   for(_u_j_1 = _u_l-1; _u_j_1 >= 1; _u_j_1 += -1) {
+      //PIPS generated variable
+      double _tmpxx5;
+      _tmpxx5 = (_u_x[0][_u_j_1-1]-_u_c[0][_u_j_1-1]*_u_x[0][_u_j_1+1-1])/_u_b[0][_u_j_1-1];
+      _u_x[0][_u_j_1-1] = _tmpxx5;
+   }
+   /* elapsedTime = toc(); */
+   /* disp("Elapsed Time: "); */
+   /* disp(elapsedTime); */
+   scilab_rt_disp_s0_("Mean value of matrix X: ");
+   double _tmpxx6;
+   scilab_rt_mean_d2_d0(1, 1000, _u_x, &_tmpxx6);
+   scilab_rt_disp_d0_(_tmpxx6);
+
+   scilab_rt_terminate();
+}

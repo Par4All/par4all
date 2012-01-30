@@ -1,0 +1,99 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int j, i_0, i_1;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t141.sce: testing stdev */
+   int _u_a[3][2];
+   _u_a[0][0] = 3;
+   _u_a[0][1] = 4;
+   _u_a[1][0] = 3;
+   _u_a[1][1] = 9;
+   _u_a[2][0] = 8;
+   _u_a[2][1] = 6;
+   double _u_ad[3][2];
+   _u_ad[0][0] = 3;
+   _u_ad[0][1] = 4.0;
+   _u_ad[1][0] = 3;
+   _u_ad[1][1] = 9.0;
+   _u_ad[2][0] = 8;
+   _u_ad[2][1] = 6;
+   double _u_a3[3][2][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
+            _u_a3[__lv1][__lv2][__lv3] = (double) 1.0;
+      }
+   }
+
+#pragma omp parallel for 
+   for(j = 0; j <= 1; j += 1) {
+      //PIPS generated variable
+      int k_0;
+#pragma omp parallel for 
+      for(k_0 = 0; k_0 <= 2; k_0 += 1)
+         _u_a3[1][j][k_0] = 10;
+   }
+
+#pragma omp parallel for 
+   for(i_0 = 0; i_0 <= 2; i_0 += 1) {
+      //PIPS generated variable
+      int k_1;
+#pragma omp parallel for 
+      for(k_1 = 0; k_1 <= 2; k_1 += 1)
+         _u_a3[i_0][1][k_1] = 20;
+   }
+
+#pragma omp parallel for 
+   for(i_1 = 0; i_1 <= 2; i_1 += 1)
+      _u_a3[i_1][1][2] = 30;
+   int _u_b[1][1];
+   _u_b[0][0] = 1;
+   double _u_c = 5.;
+   double _u_d;
+   scilab_rt_stdev_i2_d0(1, 1, _u_b, &_u_d);
+   scilab_rt_display_s0d0_("d", _u_d);
+   double _u_e;
+   scilab_rt_stdev_i2i0_d0(1, 1, _u_b, 1, &_u_e);
+   scilab_rt_display_s0d0_("e", _u_e);
+   double _u_f;
+   scilab_rt_stdev_i2s0_d0(1, 1, _u_b, "r", &_u_f);
+   scilab_rt_display_s0d0_("f", _u_f);
+   double _u_g = scilab_rt_stdev_d0_(_u_c);
+   scilab_rt_display_s0d0_("g", _u_g);
+   double _u_h = scilab_rt_stdev_d0i0_(_u_c, 2);
+   scilab_rt_display_s0d0_("h", _u_h);
+   double _u_i = scilab_rt_stdev_d0s0_(_u_c, "c");
+   scilab_rt_display_s0d0_("i", _u_i);
+   double _u_j;
+   scilab_rt_stdev_i2_d0(3, 2, _u_a, &_u_j);
+   scilab_rt_display_s0d0_("j", _u_j);
+   double _u_k[3][1];
+   scilab_rt_stdev_i2i0_d2(3, 2, _u_a, 2, 3, 1, _u_k);
+   scilab_rt_display_s0d2_("k", 3, 1, _u_k);
+   double _u_l[3][1];
+   scilab_rt_stdev_i2s0_d2(3, 2, _u_a, "c", 3, 1, _u_l);
+   scilab_rt_display_s0d2_("l", 3, 1, _u_l);
+   double _u_m;
+   scilab_rt_stdev_d3_d0(3, 2, 3, _u_a3, &_u_m);
+   scilab_rt_display_s0d0_("m", _u_m);
+   double _u_n;
+   scilab_rt_stdev_d2_d0(3, 2, _u_ad, &_u_n);
+   scilab_rt_display_s0d0_("n", _u_n);
+   double _u_o[3][1];
+   scilab_rt_stdev_d2i0_d2(3, 2, _u_ad, 2, 3, 1, _u_o);
+   scilab_rt_display_s0d2_("o", 3, 1, _u_o);
+   double _u_p[3][1];
+   scilab_rt_stdev_d2s0_d2(3, 2, _u_ad, "c", 3, 1, _u_p);
+   scilab_rt_display_s0d2_("p", 3, 1, _u_p);
+
+   scilab_rt_terminate();
+}

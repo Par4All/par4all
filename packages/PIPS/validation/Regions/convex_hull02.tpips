@@ -1,0 +1,33 @@
+setenv WS convex_hull02
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+#setproperty CONSTANT_PATH_EFFECTS  FALSE
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS 
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Regions for "main"
+echo
+
+activate PRINT_CODE_REGIONS 
+display PRINTED_FILE[main]
+
+close
+#delete $WS
+quit

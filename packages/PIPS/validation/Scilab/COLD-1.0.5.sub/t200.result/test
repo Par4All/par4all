@@ -1,0 +1,15 @@
+void foo_i0_(int _u_t)
+{
+   scilab_rt_disp_i0_(_u_t);
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t200.sce: parser */
+   int _u_t = 1;
+   scilab_rt_display_s0i0_("t", _u_t);
+   foo_i0_(_u_t);
+
+   scilab_rt_terminate();
+}

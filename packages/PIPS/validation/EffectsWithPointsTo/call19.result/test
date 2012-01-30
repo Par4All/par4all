@@ -57,8 +57,7 @@ POINTS-TO
 // p -> _p_1[0] , EXACT
 
 
-// Points To OUT:
-// p -> _p_1[0] , EXACT
+// Points To OUT: none
 
 int bla(int *p)
 {
@@ -78,8 +77,7 @@ int bla(int *p)
 // q -> _q_1[0] , EXACT
 
 
-// Points To OUT:
-// q -> _q_1[0] , EXACT
+// Points To OUT: none
 
 int call19(int *q)
 {
@@ -174,20 +172,20 @@ int call19(int *q)
    int i, k;
    something st;
 //             <    is read   >: q
-//             <    is written>: _q_1[0] i
+//             <    is written>: i
    // bla(int *)
    i = bla(q);
 //             <    is read   >: _q_1[0] i q
 //             <    is written>: i
    i += *q;
 //             <    is read   >: i
-//             <    is written>: i k
+//             <    is written>: i
    i += bla(&k);
 //             <    is read   >: i k
 //             <    is written>: i
    i += k;
 //             <    is read   >: i
-//             <    is written>: i st.data
+//             <    is written>: i
    i += bla(&st.data);
 //             <    is read   >: i st.data
 //             <    is written>: i

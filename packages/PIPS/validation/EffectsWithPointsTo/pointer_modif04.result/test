@@ -67,8 +67,7 @@ void compute_s(s_t s, int max)
 // Points To IN: none
 
 
-// Points To OUT:
-// s.tab -> *HEAP*_l_8[0] , EXACT
+// Points To OUT: none
 
 void init_s(s_t s, int max)
 {

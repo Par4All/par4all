@@ -238,7 +238,7 @@
 ! collecting distributed variable B
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI2.LE.1) THEN
+      IF (PSI2.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA1 = MAX(2, 5*PSI1-4), MIN(9, 5*PSI1)

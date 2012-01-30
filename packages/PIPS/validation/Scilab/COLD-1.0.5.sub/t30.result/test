@@ -1,0 +1,16 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   double _Complex _u_a = 1.0iF;
+   scilab_rt_display_s0z0_("a", _u_a);
+   double _Complex _u_b = 1.0-1.0iF;
+   scilab_rt_display_s0z0_("b", _u_b);
+   double _Complex _u_c = 1.0+1.0iF;
+   scilab_rt_display_s0z0_("c", _u_c);
+   double _Complex _u_d = _u_b*_u_c;
+   scilab_rt_display_s0z0_("d", _u_d);
+   double _Complex _u_e = _u_c-_u_b;
+   scilab_rt_display_s0z0_("e", _u_e);
+
+   scilab_rt_terminate();
+}

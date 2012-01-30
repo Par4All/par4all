@@ -1,0 +1,118 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(k) {}
+
+   int k;
+
+//  T(N) {N==100}
+
+   int N = 100;
+
+//  T() {}
+
+   double A[N];
+
+//  T(k) {k+1<=N, 0<=k}
+
+
+   for(k = 0; k <= N-1; k += 1)
+
+//  T() {}
+
+      if (1) {
+
+//  T() {}
+
+         A[k] = 1.;
+
+//  T() {}
+
+         A[N/2] = 0.;
+      }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int k;
+
+//  P(k) {}
+
+   int N = 100;
+
+//  P(N,k) {N==100}
+
+   double A[N];
+
+//  P(N,k) {N==100}
+
+
+   for(k = 0; k <= N-1; k += 1)
+
+//  P(N,k) {N==100, 0<=k, k<=99}
+
+      if (1) {
+
+//  P(N,k) {N==100, 0<=k, k<=99}
+
+         A[k] = 1.;
+
+//  P(N,k) {N==100, 0<=k, k<=99}
+
+         A[N/2] = 0.;
+      }
+
+//  P(N,k) {N==100, k==100}
+
+
+   return 0;
+}
+
+Regions for "main"
+
+int main()
+{
+   int k;
+   int N = 100;
+   double A[N];
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99, N==100}>
+
+
+   for(k = 0; k <= N-1; k += 1)
+
+//  <A[PHI1]-W-MAY-{50k<=99PHI1, 99PHI1<=49k+4950, N==100, 0<=k,
+//    k<=99}>
+
+      if (1) {
+
+//  <A[PHI1]-W-EXACT-{PHI1==k, N==100, 0<=k, k<=99}>
+
+         A[k] = 1.;
+
+//  <A[PHI1]-W-MAY-{50<=PHI1, PHI1<=50, N==100, 0<=k, k<=99}>
+
+         A[N/2] = 0.;
+      }
+
+   return 0;
+}

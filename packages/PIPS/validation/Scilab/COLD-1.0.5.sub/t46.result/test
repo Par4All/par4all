@@ -1,0 +1,11 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_x = 1;
+   while (_u_x<10)
+      _u_x = _u_x+1;
+   scilab_rt_display_s0i0_("x", _u_x);
+
+   scilab_rt_terminate();
+}

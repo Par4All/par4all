@@ -1,0 +1,20 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   1;
+   2;
+   3;
+   4;
+   5;
+   6;
+   7;
+   8;
+   9;
+   int _tmpc0;
+   *&_tmpc0 = 3*3;
+   int _u_c;
+   *&_u_c = 3*3;
+   scilab_rt_display_s0i0_("c", _u_c);
+
+   scilab_rt_terminate();
+}

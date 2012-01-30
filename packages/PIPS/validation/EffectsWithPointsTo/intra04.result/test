@@ -3,32 +3,30 @@ POINTS-TO
 
 
 // Points To IN:
-// _pp_1 -> __pp_1_1 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
 
 // Points To OUT:
-// _pp_1 -> __qq_2_2 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
-// pp -> _pp_1 , EXACT
-// qq -> _qq_2 , EXACT
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 
 void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1 -> __pp_1_1 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
    *pp = *qq;
 
 // Points To:
-// _pp_1 -> __qq_2_2 , EXACT
-// _qq_2 -> __qq_2_2 , EXACT
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 

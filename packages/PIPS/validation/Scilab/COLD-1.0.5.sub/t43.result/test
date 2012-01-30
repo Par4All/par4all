@@ -1,0 +1,9 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   double _u_a = exp(2.);
+   double _u_b = log(_u_a);
+   scilab_rt_display_s0d0_("b", _u_b);
+
+   scilab_rt_terminate();
+}

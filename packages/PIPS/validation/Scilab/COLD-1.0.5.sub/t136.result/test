@@ -1,0 +1,235 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int j, i_0, i_1;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t136.sce: testing or function */
+   int _u_a2[3][3];
+   _u_a2[0][0] = 1;
+   _u_a2[0][1] = 2;
+   _u_a2[0][2] = 3;
+   _u_a2[1][0] = 4;
+   _u_a2[1][1] = 5;
+   _u_a2[1][2] = 6;
+   _u_a2[2][0] = 7;
+   _u_a2[2][1] = 8;
+   _u_a2[2][2] = 9;
+   int _u_b;
+   *&_u_b = (int) 0;
+   for(__lv0 = 0; __lv0 <= 2; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+         *&_u_b |= _u_a2[__lv0][__lv1]!=(int) 0;
+   }
+   scilab_rt_display_s0i0_("b", _u_b);
+   int _u_c[1][3];
+   if (*"r"=='r')
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         register int _u_c_0;
+         //PIPS generated variable
+         int __lv1;
+         _u_c_0 = (int) 0;
+         for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+            _u_c_0 |= _u_a2[__lv1][__lv2]!=(int) 0;
+         _u_c[0][__lv2] = _u_c_0;
+      }
+   else if (*"r"=='c') {
+      __assert_fail("3 == 1", ".t136.tmp/t136.c", 40, (const char *) 0);
+      _u_c[0][0] = (int) 0;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _u_c[0][0] |= _u_a2[0][__lv2]!=(int) 0;
+      __lv1 = 0+1;
+   }
+   else
+      exit(1);
+   scilab_rt_display_s0i2_("c", 1, 3, _u_c);
+   _u_a2[2][1] = 0;
+   int _u_d;
+   *&_u_d = (int) 0;
+   for(__lv0 = 0; __lv0 <= 2; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+         *&_u_d |= _u_a2[__lv0][__lv1]!=(int) 0;
+   }
+   scilab_rt_display_s0i0_("d", _u_d);
+   double _u_a3[3][2][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
+            _u_a3[__lv1][__lv2][__lv3] = (double) 1.0;
+      }
+   }
+   scilab_rt_display_s0d3_("a3", 3, 2, 3, _u_a3);
+
+#pragma omp parallel for 
+   for(j = 0; j <= 1; j += 1) {
+      //PIPS generated variable
+      int k_0;
+#pragma omp parallel for 
+      for(k_0 = 0; k_0 <= 2; k_0 += 1)
+         _u_a3[1][j][k_0] = 10;
+   }
+
+#pragma omp parallel for 
+   for(i_0 = 0; i_0 <= 2; i_0 += 1) {
+      //PIPS generated variable
+      int k_1;
+#pragma omp parallel for 
+      for(k_1 = 0; k_1 <= 2; k_1 += 1)
+         _u_a3[i_0][1][k_1] = 20;
+   }
+
+#pragma omp parallel for 
+   for(i_1 = 0; i_1 <= 2; i_1 += 1)
+      _u_a3[i_1][1][2] = 30;
+   int _u_e;
+   *&_u_e = (int) 0;
+   for(__lv0 = 0; __lv0 <= 2; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+         for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+            *&_u_e |= _u_a3[__lv0][__lv1][__lv2]!=(double) 0;
+      }
+   }
+   scilab_rt_display_s0i0_("e", _u_e);
+   _u_a3[0][0][1] = 0;
+   int _u_f;
+   *&_u_f = (int) 0;
+   for(__lv0 = 0; __lv0 <= 2; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+         for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+            *&_u_f |= _u_a3[__lv0][__lv1][__lv2]!=(double) 0;
+      }
+   }
+   scilab_rt_display_s0i0_("f", _u_f);
+   double _u_ad[2][3];
+   _u_ad[0][0] = 1;
+   _u_ad[0][1] = 2;
+   _u_ad[0][2] = 3.4;
+   _u_ad[1][0] = 4;
+   _u_ad[1][1] = 5;
+   _u_ad[1][2] = 6.2;
+   int _u_g;
+   *&_u_g = (int) 0;
+   double _Complex _tmpxx0 = 3*1.0iF;
+   double _Complex _tmpxx1 = 1*1.0iF;
+   double _Complex _tmpxx2 = 2*1.0iF;
+   double _Complex _tmpxx3 = 2*1.0iF;
+   double _Complex _u_ac[2][2];
+   _u_ac[0][0] = 2+_tmpxx0;
+   _u_ac[0][1] = 3+_tmpxx1;
+   _u_ac[1][0] = 5+_tmpxx2;
+   _u_ac[1][1] = 4+_tmpxx3;
+   int _u_h;
+   *&_u_h = (int) 0;
+   double _u_z2[2][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _u_z2[__lv1][__lv2] = (double) 0.0;
+   }
+   double _u_z3[2][3][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
+            _u_z3[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   int _u_i;
+   *&_u_i = (int) 0;
+   int _u_j;
+   *&_u_j = (int) 0;
+   for(__lv0 = 0; __lv0 <= 1; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+         *&_u_g |= _u_ad[__lv0][__lv1]!=(double) 0;
+      for(__lv1 = 0; __lv1 <= 1; __lv1 += 1)
+         *&_u_h |= _u_ac[__lv0][__lv1]!=(double _Complex) 0;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+         *&_u_i |= _u_z2[__lv0][__lv1]!=(double) 0;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+         for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+            *&_u_j |= _u_z3[__lv0][__lv1][__lv2]!=(double) 0;
+      }
+   }
+   scilab_rt_display_s0i0_("g", _u_g);
+   scilab_rt_display_s0z2_("ac", 2, 2, _u_ac);
+   scilab_rt_display_s0i0_("h", _u_h);
+   scilab_rt_display_s0i0_("i", _u_i);
+   scilab_rt_display_s0i0_("j", _u_j);
+   double _u_o2[2][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _u_o2[__lv1][__lv2] = (double) 1.0;
+   }
+   double _u_o3[2][3][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
+            _u_o3[__lv1][__lv2][__lv3] = (double) 1.0;
+      }
+   }
+   int _u_k;
+   *&_u_k = (int) 0;
+   int _u_l;
+   *&_u_l = (int) 0;
+   for(__lv0 = 0; __lv0 <= 1; __lv0 += 1) {
+      //PIPS generated variable
+      int __lv1;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
+         *&_u_k |= _u_o2[__lv0][__lv1]!=(double) 0;
+      for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+         for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+            *&_u_l |= _u_o3[__lv0][__lv1][__lv2]!=(double) 0;
+      }
+   }
+   scilab_rt_display_s0i0_("k", _u_k);
+   scilab_rt_display_s0i0_("l", _u_l);
+
+   scilab_rt_terminate();
+}

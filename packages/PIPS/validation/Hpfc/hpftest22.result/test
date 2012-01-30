@@ -21,7 +21,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = 2*PSI1-1, 2*PSI1
+         DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
             LALPHA1 = ALPHA1-2*PSI1+2
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -36,7 +36,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = 2*PSI1-1, 2*PSI1
+         DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
             LALPHA1 = ALPHA1-2*PSI1+2
             BUF INDEX = BUF INDEX+1
             K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -63,7 +63,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = 2*PSI1-1, 2*PSI1
+         DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
             LALPHA1 = ALPHA1-2*PSI1+2
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -165,7 +165,7 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = 2*PSI1-1, 2*PSI1
+      DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
          LALPHA1 = ALPHA1-2*PSI1+2
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
@@ -177,7 +177,7 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = 2*PSI1-1, 2*PSI1
+      DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
          LALPHA1 = ALPHA1-2*PSI1+2
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)
@@ -198,7 +198,7 @@
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = 2*PSI1-1, 2*PSI1
+      DO ALPHA1 = 2*PSI1-1, MIN(10, 2*PSI1)
          LALPHA1 = ALPHA1-2*PSI1+2
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
@@ -208,7 +208,7 @@
 ! end of collect
 ! collecting distributed variable K
       PSI1 = MY POS(1,1)
-      IF (PSI1.LE.4.AND.2.LE.PSI1) THEN
+      IF (2.LE.PSI1.AND.PSI1.LE.4) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA1 = MAX(3, 2*PSI1-1), MIN(7, 2*PSI1)

@@ -1,0 +1,16 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t114 - parser test - if without then */
+   int _u_a = 1;
+   int _u_b = 2;
+   if (_u_a==_u_b)
+      scilab_rt_disp_s0_("ok");
+   scilab_rt_disp_s0_("----");
+   _u_a = 2;
+   if (_u_a==_u_b)
+      scilab_rt_disp_s0_("ok");
+
+   scilab_rt_terminate();
+}

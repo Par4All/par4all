@@ -122,8 +122,10 @@ static bool condition_expression_to_final_bound(expression cond,
 /*
    Test if a for-loop incrementation expression is do-loop compatible
    (i.e. the number of iterations can be computed before entering the
-   loop and hence the increment is known and unchanged) and, if yes,
-   compute the increment expression.
+   loop and hence the increment sign is known and the increment is
+   unchanged by the loop iterations) and, if yes, compute the
+   increment expression. We *have* to fail on symbolic increments with
+   unknown sign because we won't be able to restore a correct code.
 
    Most of this could be trivial by using the transformers but this
    function is to be used from the controlizer where the semantics
@@ -139,7 +141,7 @@ static bool condition_expression_to_final_bound(expression cond,
 static bool incrementation_expression_to_increment(expression incr,
 						   entity li,
 						   bool * is_increasing_p,
-                           expression * pincrement)
+						   expression * pincrement)
 {
     bool success = false;
     syntax incr_s = expression_syntax(incr);
@@ -198,9 +200,29 @@ static bool incrementation_expression_to_increment(expression incr,
                          * but we will not know if the increment is positive or not, assume yes ?
                          */
                         else {
-                            * pincrement = copy_expression(inc_v);
-                            *is_increasing_p = entity_plus_update_p;
-                            success = true;
+			  // We must know the sign of inc_v and be
+			  // sure that its value cannot be changed by the loop body
+			  bool pos_p = positive_expression_p(inc_v);
+			  bool neg_p = negative_expression_p(inc_v);
+			  if(pos_p || neg_p) {
+			    /* FI: Not safe: inc_v is assumed
+			       positive... I guess unsigned type could
+			       be exploited. See
+			       C_syntax/decreasing_loop01 */
+			    if(entity_minus_update_p) {
+			      // FI: I assume we are not dealing with pointers
+			      entity uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+			      * pincrement = MakeUnaryCall(uminus, copy_expression(inc_v));
+			    }
+			    else
+			      * pincrement = copy_expression(inc_v);
+			    *is_increasing_p = (entity_plus_update_p && pos_p)
+			      || (entity_minus_update_p && neg_p);
+			    success = true;
+			  }
+			  else
+                            // Here we have to fail to be safe ! See validation/C_syntax/decreasing_loop01
+                            success = false;
                         }
                     }
                     else {
@@ -228,8 +250,17 @@ static bool incrementation_expression_to_increment(expression incr,
                              */
                             else {
                                 * pincrement = copy_expression(inc_v);
-                                * is_increasing_p = true;
-                                success = true;
+				if(positive_expression_p(inc_v)) {
+				  * is_increasing_p = true;
+				  success = true;
+				}
+				else if(negative_expression_p(inc_v)) {
+				  * is_increasing_p = false;
+				  success = true;
+				}
+				  else
+                                // Here we have to fail to be safe ! See validation/C_syntax/decreasing_loop01
+				    success = false;
                             }
                         }
                         /* SG: i am duplicating code, next generation of phd will clean it */
@@ -256,14 +287,24 @@ static bool incrementation_expression_to_increment(expression incr,
                                  * but we will not know if the increment is positive or not, assume yes ?
                                  */
                                 else {
+				  // FI: I'm lost here
                                     * pincrement = inc_v;
-                                    * is_increasing_p = false;
-                                    success = true;
+				    if(positive_expression_p(inc_v)) {
+				      * is_increasing_p = false;
+				      success = true;
+				    }
+				    else if(negative_expression_p(inc_v)) {
+				      * is_increasing_p = true;
+				      success = true;
+				    }
+				    else
+				      // Here we have to fail to be safe!
+				      success = false;
                                 }
                             }
                         }
                     }
-                    }
+                }
             }
         }
     }
@@ -357,7 +398,7 @@ expression guess_loop_increment_walker(expression e, entity loop_index, statemen
 {
     if(expression_call_p(e))
     {
-        call c =expression_call(e);
+        call c = expression_call(e);
         list args = call_arguments(c);
         entity op = call_function(c);
         if( ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
@@ -552,11 +593,16 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                 }
                 set_free(upper_bound_entities);
                 if(!upper_bound_entity_written){
-                    /* we got a candidate loop index and final bound, let's check the increment */
-                    expression increment_expression = guess_loop_increment(incr,loop_index,body);
+                    /* We got a candidate loop index and final bound,
+		       let's check the increment */
+                    expression increment_expression =
+		      guess_loop_increment(incr,loop_index,body);
                     expression increment;
                     if( !expression_undefined_p(increment_expression) &&
-                            incrementation_expression_to_increment(increment_expression,loop_index,&is_increasing_p,&increment))
+			incrementation_expression_to_increment(increment_expression,
+							       loop_index,
+							       &is_increasing_p,
+							       &increment))
                     {
                         /* We have found a do-loop compatible for-loop: */
                         output=make_sequence(NIL);
@@ -584,8 +630,16 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                         if (is_upper_p && !is_increasing_p)
                             pips_user_warning("Loop with upper bound and decreasing index %s\n", entity_local_name(loop_index));
 
-                        range lr = make_range(lower_bound, upper_bound, increment);
-                        loop l = make_loop(loop_index, lr, body, statement_label(parent),make_execution_sequential(),NIL);
+                        range lr;
+			if(is_upper_p)
+			  lr = make_range(lower_bound, upper_bound, increment);
+			else {
+			  // FI: Unfortunately, the problem must be
+			  // postponed to the prettyprinter
+			  lr = make_range(lower_bound, upper_bound, increment);
+			}
+                        loop l = make_loop(loop_index, lr, body, statement_label(parent),
+					   make_execution_sequential(),NIL);
 
                         /* try hard to reproduce statement content */
                         statement sl = make_statement(

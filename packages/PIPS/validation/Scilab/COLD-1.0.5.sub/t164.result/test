@@ -1,0 +1,28 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int i;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t164.sce - aref with triplet (boundaries unknown) */
+   int _u_N1 = 5;
+   scilab_rt_display_s0i0_("N1", _u_N1);
+   int _u_N2 = 5;
+   scilab_rt_display_s0i0_("N2", _u_N2);
+   int _u_N = _u_N1+_u_N2;
+   scilab_rt_display_s0i0_("N", _u_N);
+   double _u_dx[10][1];
+   (int) _u_N==10?(void) 0:__assert_fail("(int)_u_N == 10 && (int)1 == 1", ".t164.tmp/t164.c", 33, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      _u_dx[__lv1][0] = (double) 0.0;
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+
+#pragma omp parallel for 
+   for(i = 5; i <= 9; i += 1)
+      _u_dx[i][0] = 1;
+   scilab_rt_display_s0d2_("dx", 10, 1, _u_dx);
+
+   scilab_rt_terminate();
+}

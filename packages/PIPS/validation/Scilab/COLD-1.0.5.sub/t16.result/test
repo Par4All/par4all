@@ -1,0 +1,10 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   double _tmpxx0 = cos(1);
+   double _tmpxx1 = cos(2);
+   double _u_a = _tmpxx0+_tmpxx1;
+   scilab_rt_display_s0d0_("a", _u_a);
+
+   scilab_rt_terminate();
+}

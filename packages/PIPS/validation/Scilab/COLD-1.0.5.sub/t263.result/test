@@ -1,0 +1,44 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t263.sce: trigo functions */
+   double _u_cos1 = cos(0.5);
+   scilab_rt_display_s0d0_("cos1", _u_cos1);
+   double _u_cosd1 = cos(0.5*SCILAB_PI/180.0);
+   scilab_rt_display_s0d0_("cosd1", _u_cosd1);
+   double _u_cosh1 = cosh(0.5);
+   scilab_rt_display_s0d0_("cosh1", _u_cosh1);
+   double _u_acos1 = acos(0.5);
+   scilab_rt_display_s0d0_("acos1", _u_acos1);
+   double _u_acosd1 = acos(0.5)*180.0/SCILAB_PI;
+   scilab_rt_display_s0d0_("acosd1", _u_acosd1);
+   double _u_acosh1 = acosh(1.5);
+   scilab_rt_display_s0d0_("acosh1", _u_acosh1);
+   double _u_sin1 = sin(0.5);
+   scilab_rt_display_s0d0_("sin1", _u_sin1);
+   double _u_sind1 = sin(0.5*SCILAB_PI/180.0);
+   scilab_rt_display_s0d0_("sind1", _u_sind1);
+   double _u_sinh1 = sinh(0.5);
+   scilab_rt_display_s0d0_("sinh1", _u_sinh1);
+   double _u_asin1 = asin(0.5);
+   scilab_rt_display_s0d0_("asin1", _u_asin1);
+   double _u_asind1 = asin(0.5)*180.0/SCILAB_PI;
+   scilab_rt_display_s0d0_("asind1", _u_asind1);
+   double _u_asinh1 = asinh(0.5);
+   scilab_rt_display_s0d0_("asinh1", _u_asinh1);
+   double _u_tan1 = tan(0.5);
+   scilab_rt_display_s0d0_("tan1", _u_tan1);
+   double _u_tand1 = tan(0.5*SCILAB_PI/180.0);
+   scilab_rt_display_s0d0_("tand1", _u_tand1);
+   double _u_tanh1 = tanh(0.5);
+   scilab_rt_display_s0d0_("tanh1", _u_tanh1);
+   double _u_atan1 = atan(0.5);
+   scilab_rt_display_s0d0_("atan1", _u_atan1);
+   double _u_atand1 = atan(0.5)*180.0/SCILAB_PI;
+   scilab_rt_display_s0d0_("atand1", _u_atand1);
+   double _u_atanh1 = atanh(0.5);
+   scilab_rt_display_s0d0_("atanh1", _u_atanh1);
+
+   scilab_rt_terminate();
+}

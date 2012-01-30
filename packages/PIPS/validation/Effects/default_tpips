@@ -3,6 +3,8 @@ create $WSPACE $FILE
 setproperty ABORT_ON_USER_ERROR TRUE
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[%ALLFUNC]
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALLFUNC]
 close
 delete $WSPACE
 quit

@@ -1,0 +1,171 @@
+Test COLD OpenMP (no compile)
+/*
+ * file for t221-pre-p4a.c
+ */
+/*
+ * (c) HPC Project - 2010-2011 - All rights reserved
+ *
+ */
+
+#include "scilab_rt.h"
+
+
+int __lv0;
+int __lv1;
+int __lv2;
+int __lv3;
+
+/*----------------------------------------------------*/
+
+double capr__();
+
+
+
+
+/*----------------------------------------------------*/
+
+int main(int argc, char *argv[]);
+double capr__()
+{
+   int _u_scale = 1;
+   double _u_a = 0.3257463*2;
+   double _u_b = 8.65*0.04039;
+   double _u_c = 3.29*0.55982;
+   double _u_d = 0.727561*6.171;
+   int _u_n = floor(56.0980*0.36);
+   //PIPS generated variable
+   int _u_time;
+   //PIPS generated variable
+   double _u_x[1][21];
+   //PIPS generated variable
+   double _u_y[1][50], _u_f[21][50], _u_mask[21][50];
+   _u_n = 20;
+   double _u_tol = 1.3E-13;
+   double _u_rel = 0.90;
+   double _u_cap = 0.0;
+   for(_u_time = 1; _u_time <= _u_scale*10; _u_time += 1) {
+      //PIPS generated variable
+      int __lv1;
+      //PIPS generated variable
+      double _tmpxx0, _tmpxx1, _tmpxx10, _tmpxx11, _tmpxx12, _tmpxx13, _tmpxx14, _tmpxx15, _tmpxx16, _tmpxx17, _tmpxx2, _tmpxx3, _tmpxx8, _tmpxx9, _u_h;
+      //PIPS generated variable
+      int _u_ii_0, _u_ii_1, _u_ii_2, _u_iter, _u_jj_1, _u_jj_3, _u_m, _u_mb, _u_na;
+      //PIPS generated variable
+      double _u_oldcap, _u_q;
+      _tmpxx0 = 0.5*_u_c;
+      _u_h = _tmpxx0/_u_n;
+      _tmpxx1 = 0.5*_u_a;
+      _u_na = round(_tmpxx1/_u_h);
+      scilab_rt_linspace_d0d0i0_d2(0, 0.5*_u_c, _u_n+1, 1, 21, _u_x);
+      _tmpxx2 = 0.5*_u_d;
+      _u_m = round(_tmpxx2/_u_h);
+      _u_m = 49;
+      _tmpxx3 = 0.5*_u_b;
+      _u_mb = round(_tmpxx3/_u_h);
+      scilab_rt_linspace_d0d0i0_d2(0, 0.5*_u_d, _u_m+1, 1, 50, _u_y);
+#pragma omp parallel for
+      for(__lv1 = 0; __lv1 <= 20; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+         for(__lv2 = 0; __lv2 <= 49; __lv2 += 1) {
+            //PIPS generated variable
+            register double _tmpxx4_0;
+            _u_f[__lv1][__lv2] = (double) 0.0;
+            _tmpxx4_0 = (double) 1.0;
+            _u_mask[__lv1][__lv2] = _tmpxx4_0*_u_rel;
+         }
+      }
+#pragma omp parallel for
+      for(_u_ii_0 = 1; _u_ii_0 <= _u_na+1; _u_ii_0 += 1) {
+         //PIPS generated variable
+         int _u_jj_0;
+         for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
+            _u_mask[_u_ii_0-1][_u_jj_0-1] = 0;
+         for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
+            _u_f[_u_ii_0-1][_u_jj_0-1] = 1;
+      }
+      _u_oldcap = 0;
+      //PIPS generated variable
+      //PIPS generated variable
+      _u_iter = 1;
+l99998:      ;
+      if (_u_iter<=1000) {
+      }
+      else {
+         goto l99999;
+      }
+      /* f = seidel(f, mask, n, m, na, mb); */
+      /* /   Function seidel     ////////////// */
+#pragma omp parallel for
+      for(_u_ii_2 = 2; _u_ii_2 <= _u_n; _u_ii_2 += 1) {
+         //PIPS generated variable
+         int _u_jj_2;
+         for(_u_jj_2 = 2; _u_jj_2 <= _u_m; _u_jj_2 += 1) {
+            //PIPS generated variable
+            double _tmpxx5;
+            _tmpxx5 = _u_f[_u_ii_2-1][_u_jj_2-1]+_u_mask[_u_ii_2-1][_u_jj_2-1]*(0.25*(_u_f[_u_ii_2-1-1][_u_jj_2-1]+_u_f[_u_ii_2+1-1][_u_jj_2-1]+_u_f[_u_ii_2-1][_u_jj_2-1-1]+_u_f[_u_ii_2-1][_u_jj_2+1-1])-_u_f[_u_ii_2-1][_u_jj_2-1]);
+            _u_f[_u_ii_2-1][_u_jj_2-1] = _tmpxx5;
+         }
+      }
+      _u_ii_1 = 1;
+#pragma omp parallel for
+      for(_u_jj_3 = 2; _u_jj_3 <= _u_m; _u_jj_3 += 1) {
+         //PIPS generated variable
+         double _tmpxx6;
+         _tmpxx6 = _u_f[_u_ii_1-1][_u_jj_3-1]+_u_mask[_u_ii_1-1][_u_jj_3-1]*(0.25*(_u_f[_u_ii_1+1-1][_u_jj_3-1]+_u_f[_u_ii_1+1-1][_u_jj_3-1]+_u_f[_u_ii_1-1][_u_jj_3-1-1]+_u_f[_u_ii_1-1][_u_jj_3+1-1])-_u_f[_u_ii_1-1][_u_jj_3-1]);
+         _u_f[_u_ii_1-1][_u_jj_3-1] = _tmpxx6;
+      }
+      _u_jj_1 = 1;
+#pragma omp parallel for
+      for(_u_ii_1 = 2; _u_ii_1 <= _u_n; _u_ii_1 += 1) {
+         //PIPS generated variable
+         double _tmpxx7;
+         _tmpxx7 = _u_f[_u_ii_1-1][_u_jj_1-1]+_u_mask[_u_ii_1-1][_u_jj_1-1]*(0.25*(_u_f[_u_ii_1-1-1][_u_jj_1-1]+_u_f[_u_ii_1+1-1][_u_jj_1-1]+_u_f[_u_ii_1-1][_u_jj_1+1-1]+_u_f[_u_ii_1-1][_u_jj_1+1-1])-_u_f[_u_ii_1-1][_u_jj_1-1]);
+         _u_f[_u_ii_1-1][_u_jj_1-1] = _tmpxx7;
+      }
+      /* ////////////////////////////////////// */
+      /*     cap = gauss(n, m, h, f); */
+      /* ////Function Gauss   ///////////////// */
+      _u_q = 0;
+      for(_u_ii_1 = 1; _u_ii_1 <= _u_n; _u_ii_1 += 1) {
+         _tmpxx8 = _u_f[_u_ii_1-1][_u_m-1];
+         _tmpxx9 = _u_f[_u_ii_1+1-1][_u_m-1];
+         _tmpxx10 = _tmpxx8+_tmpxx9;
+         _tmpxx11 = _tmpxx10*0.5;
+         _u_q = _u_q+_tmpxx11;
+      }
+      for(_u_jj_1 = 1; _u_jj_1 <= _u_m; _u_jj_1 += 1) {
+         _tmpxx12 = _u_f[_u_n-1][_u_jj_1-1];
+         _tmpxx13 = _u_f[_u_n-1][_u_jj_1+1-1];
+         _tmpxx14 = _tmpxx12+_tmpxx13;
+         _tmpxx15 = _tmpxx14*0.5;
+         _u_q = _u_q+_tmpxx15;
+      }
+      _u_cap = _u_q*4;
+      _u_cap = _u_cap*8.854187;
+      /* ///////////////////////////////////// */
+      _tmpxx16 = fabs(_u_cap-_u_oldcap);
+      _tmpxx17 = _tmpxx16/_u_cap;
+      if (_tmpxx17<_u_tol) goto l99999;
+      _u_oldcap = _u_cap;
+      _u_iter++;
+      goto l99998;
+l99999:      ;
+   }
+   return _u_cap;
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t221.sce - from mcgill/capr_function.sce */
+   scilab_rt_tic__();
+   double _u_cap = capr__();
+   double _u_elapsedTime = scilab_rt_toc__();
+   /* disp("Elapsed Time: "); */
+   /* disp(elapsedTime); */
+   scilab_rt_disp_s0_("Value of cap: ");
+   scilab_rt_disp_d0_(_u_cap);
+
+   scilab_rt_terminate();
+}

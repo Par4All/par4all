@@ -1,0 +1,46 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t203.sce - dyn alloc of arrays in function (from demo rlc) */
+   /*     to help debug when checking array shapes in assign */
+   double _tmp0[10][10];
+   newlhs_i0i0i0_d2(1, 300, 10, 10, 10, _tmp0);
+   scilab_rt_display_s0d2_("ans", 10, 10, _tmp0);
+
+   scilab_rt_terminate();
+}
+void newlhs_i0i0i0_d2(int _u_N, int _u_h, int _u_msiz, int _u_lhs_n0, int _u_lhs_n1, double _u_lhs[_u_lhs_n0][_u_lhs_n1])
+{
+   (int) _u_msiz==_u_lhs_n0&&(int) _u_msiz==_u_lhs_n1?(void) 0:__assert_fail("(int)_u_msiz == _u_lhs_n0 && (int)_u_msiz == _u_lhs_n1", ".t203.tmp/t203.c", 29, (const char *) 0);
+   for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
+         _u_lhs[__lv1][__lv2] = (double) 0.0;
+   }
+   double _tmpxx0[_u_msiz][_u_msiz];
+   setlhs_d2i0i0_d2(_u_lhs_n0, _u_lhs_n1, _u_lhs, 1, _u_h, _u_msiz, _u_msiz, _tmpxx0);
+   _u_msiz==_u_lhs_n0&&_u_msiz==_u_lhs_n1?(void) 0:__assert_fail("_u_msiz == _u_lhs_n0 && _u_msiz == _u_lhs_n1", ".t203.tmp/t203.c", 33, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
+         _u_lhs[__lv1][__lv2] = _tmpxx0[__lv1][__lv2];
+   }
+}
+void setlhs_d2i0i0_d2(int _c_0_n0, int _c_0_n1, double _c_0[_c_0_n0][_c_0_n1], int _u_k, int _u_h, int _u_lhs_n0, int _u_lhs_n1, double _u_lhs[_u_lhs_n0][_u_lhs_n1])
+{
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
+         _u_lhs[__lv1][__lv2] = _c_0[__lv1][__lv2];
+   }
+   _u_lhs[0][0] = 1.0;
+}

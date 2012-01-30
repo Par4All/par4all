@@ -80,8 +80,8 @@ static bool loop_in(loop l, privatizable_ctxt *ctxt)
   return ctxt->loop_index_p;
 }
 
-/* privatizable() checks whether the entity e is privatizablein statement s. */
-static bool privatizable(entity e, statement st)
+/* privatizable() checks whether the entity e is privatizable in statement s. */
+bool entity_privatizable_in_loop_p(entity e, loop l)
 {
     storage s = entity_storage( e ) ;
     bool result = true;
@@ -111,7 +111,7 @@ static bool privatizable(entity e, statement st)
 	pips_debug(3, "global variable\n");
 	privatizable_ctxt ctxt = {e, false};
 	/* check if e is an internal loop index */
-	gen_context_recurse(st, &ctxt, loop_domain, loop_in, gen_null);
+	gen_context_recurse(loop_body(l), &ctxt, loop_domain, loop_in, gen_null);
 	result = ctxt.loop_index_p;
       }
 
@@ -157,7 +157,7 @@ static void scan_statement(statement s, list loops)
 
             if(!anywhere_effect_p(f)
                && action_write_p( effect_action( f ))
-               &&  privatizable( e, b )
+               &&  entity_privatizable_in_loop_p( e, l )
                &&  gen_find_eq( e, locals ) == entity_undefined ) {
                 locals = CONS( ENTITY, e, locals ) ;
             }

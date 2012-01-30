@@ -1,0 +1,11 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   int _tmpxx0 = 2*3;
+   int _u_b[1][2];
+   _u_b[0][0] = 1+_tmpxx0;
+   _u_b[0][1] = 4;
+   scilab_rt_display_s0i2_("b", 1, 2, _u_b);
+
+   scilab_rt_terminate();
+}

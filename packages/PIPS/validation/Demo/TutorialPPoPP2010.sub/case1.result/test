@@ -344,8 +344,8 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2.,
-//    m==10, n==10, 1<=i, i<=10}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1<=10, 1<=PHI2, PHI2<=10,
+//    h==2., m==10, n==10, 1<=i}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;

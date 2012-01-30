@@ -1,0 +1,12 @@
+extern void scilab_rt_variance_i2_d0(int sin00, int sin01, int in0[sin00][sin01], double *out0);
+extern void scilab_rt_variance_d2_d0(int sin00, int sin01, double in0[sin00][sin01], double *out0);
+extern void scilab_rt_variance_i3_d0(int sin00, int sin01, int sin02, int in0[sin00][sin01][sin02], double *out0);
+extern void scilab_rt_variance_d3_d0(int sin00, int sin01, int sin02, double in0[sin00][sin01][sin02], double *out0);
+extern void scilab_rt_variance_i2s0_d2(int sin00, int sin01, int in0[sin00][sin01], char* in1, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_d2s0_d2(int sin00, int sin01, double in0[sin00][sin01], char* in1, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_i2i0_d2(int sin00, int sin01, int in0[sin00][sin01], int in1, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_d2i0_d2(int sin00, int sin01, double in0[sin00][sin01], int in1, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_i2s0i0_d2(int sin00, int sin01, int in0[sin00][sin01], char* in1, int in2, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_d2s0i0_d2(int sin00, int sin01, double in0[sin00][sin01], char* in1, int in2, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_i2i0i0_d2(int sin00, int sin01, int in0[sin00][sin01], int in1, int in2, int sout00, int sout01, double out0[sout00][sout01]);
+extern void scilab_rt_variance_d2i0i0_d2(int sin00, int sin01, double in0[sin00][sin01], int in1, int in2, int sout00, int sout01, double out0[sout00][sout01]);

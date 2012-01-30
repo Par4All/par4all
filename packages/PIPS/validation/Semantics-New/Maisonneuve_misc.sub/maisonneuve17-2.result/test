@@ -455,8 +455,8 @@ void run(void)
          }
          else {
 
-//  T(x,y) {x+y#init==x#init+y, x<=6, x#init+28<=4x+3y#init,
-//    x+y#init<=x#init+6, 2x+x#init+3y#init<=26, 3<=x#init, 3<=y#init}
+//  T(x,y) {x+y#init==x#init+y, 3<=x#init, y#init+28<=3x#init+4y,
+//    x#init+y<=y#init+6, 3x#init+2y+y#init<=26, y<=6, 3<=y#init}
 
             if (flip())
 

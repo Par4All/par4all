@@ -1,0 +1,15 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_i;
+   scilab_rt_init(argc, argv, 0);
+
+   for(_u_i = 1; _u_i <= 10; _u_i += 1) {
+      //PIPS generated variable
+      int _u_j;
+      for(_u_j = 1; _u_j <= 10; _u_j += 1)
+         scilab_rt_disp_i0_(_u_i+_u_j);
+   }
+
+   scilab_rt_terminate();
+}

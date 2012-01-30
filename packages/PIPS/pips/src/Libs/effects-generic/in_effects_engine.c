@@ -254,6 +254,7 @@ static list in_effects_of_declarations(list lin_after_decls, list l_decl, in_eff
 		 to may
 	      */
 	      list l_full_rw_exp_init = generic_proper_effects_of_expression(exp_init);
+	      l_full_rw_exp_init = proper_to_summary_effects(l_full_rw_exp_init);
 	      list l_rw_exp_init = convert_rw_effects(l_full_rw_exp_init, ctxt);
 
 	      list l_w_exp_init = effects_write_effects(l_rw_exp_init);

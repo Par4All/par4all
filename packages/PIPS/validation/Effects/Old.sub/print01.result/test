@@ -1,0 +1,76 @@
+
+Parsed printed file for "PRINT01"
+
+      PROGRAM PRINT01
+
+      REAL X(10)
+
+      READ *, X                                                         0005
+
+      PRINT *, X                                                        0007
+
+      END
+
+Proper effetcs for "PRINT01"
+
+      PROGRAM PRINT01
+
+      REAL X(10)
+C             <may be written>: X(*)
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: __IO_EFFECTS:LUNS(5)
+
+      READ *, X                                                         0005
+C             <may be read   >: X(*)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, X                                                        0007
+
+      END
+
+Cumulated effetcs for "PRINT01"
+
+C             <may be read   >: __IO_EFFECTS:LUNS(*)
+C             <may be written>: __IO_EFFECTS:LUNS(*)
+      PROGRAM PRINT01
+
+      REAL X(10)
+C             <may be written>: X(*)
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: __IO_EFFECTS:LUNS(5)
+
+      READ *, X                                                         0005
+C             <may be read   >: X(*)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, X                                                        0007
+
+      END
+
+Regions for "PRINT01"
+
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{5<=PHI1, PHI1<=6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{5<=PHI1, PHI1<=6}>
+
+      PROGRAM PRINT01
+
+      REAL X(10)
+
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+
+      READ *, X                                                         0005
+
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+
+      PRINT *, X                                                        0007
+
+      END

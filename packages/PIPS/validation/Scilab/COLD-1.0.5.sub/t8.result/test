@@ -1,0 +1,11 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   char *_u_a = (char *) malloc(4);
+   strcpy(_u_a, "foo");
+   char *_u_b = (char *) malloc(4);
+   strcpy(_u_b, "foo");
+
+   scilab_rt_terminate();
+}

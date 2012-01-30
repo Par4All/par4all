@@ -28,7 +28,7 @@ C     Check tiling: use integer lower loop bounds and symbolic upper bounds
       DO I_t = M1/5, M2/5                                               0007
          DO J_t = N1/5, N2/5
 
-            DO I = MAX(M1, 5*I_t), MIN(M2, 5*I_t+4)                     0007
+            DO I = MAX(5*I_t, M1), MIN(5*I_t+4, M2)                     0007
                DO J = MAX(5*J_t, N1), MIN(5*J_t+4, N2)                  0008
                   X(I,J) = FLOAT(I+J)                                   0009
 200               CONTINUE                                              0010

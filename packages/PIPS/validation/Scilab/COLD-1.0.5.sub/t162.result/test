@@ -1,0 +1,29 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int j, i;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t162.sce - aref */
+   int _u_n = 1;
+   _u_n = 2;
+   int _u_a[2][2];
+   1;
+   _u_a[0][1] = 2;
+   _u_a[1][0] = 3;
+   _u_a[1][1] = 4;
+
+   int _u_b[1][2];
+#pragma omp parallel for 
+   for(j = 0; j <= 1; j += 1)
+      _u_b[0][j] = _u_a[_u_n-1][j];
+   scilab_rt_display_s0i2_("b", 1, 2, _u_b);
+
+   int _u_c[2][1];
+#pragma omp parallel for 
+   for(i = 0; i <= 1; i += 1)
+      _u_c[i][0] = _u_a[i][_u_n-1];
+   scilab_rt_display_s0i2_("c", 2, 1, _u_c);
+
+   scilab_rt_terminate();
+}

@@ -2376,6 +2376,8 @@ static list generic_proper_effects_of_declaration(entity decl)
 	    }
 	  l_eff= gen_nconc(l_eff, l_tmp);
 	}
+      if (contract_p)
+	l_eff = proper_effects_contract(l_eff);
       pips_debug_effects(1, "ending with:", l_eff);
     }
   return l_eff;

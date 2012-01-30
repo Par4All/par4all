@@ -81,10 +81,8 @@ hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pF
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
 }
 hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
@@ -107,10 +105,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //                               pFileReference[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: configuration pFileReference stderr 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: nb the_towns _MALLOC_EFFECTS:_MALLOC_
-//                               __IO_EFFECTS:LUNS[2]
    hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
 //             <    is read   >: latRange lonRange 
 //                               _MALLOC_EFFECTS:_MALLOC_
@@ -204,10 +200,8 @@ hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_n
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
 }
 unsigned long int hs_status()
@@ -236,12 +230,7 @@ static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range
    if (configuration->fid==F_PARETO) goto _switch_1_case_4;
 _switch_1_default:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -253,12 +242,7 @@ _switch_1_default:   ;
    goto _break_1;
 _switch_1_case_4:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -270,12 +254,7 @@ _switch_1_case_4:   ;
    goto _break_1;
 _switch_1_case_3:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -287,12 +266,7 @@ _switch_1_case_3:   ;
    goto _break_1;
 _switch_1_case_2:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -304,12 +278,7 @@ _switch_1_case_2:   ;
    goto _break_1;
 _switch_1_case_1:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -321,12 +290,7 @@ _switch_1_case_1:   ;
    goto _break_1;
 _switch_1_case_0:   ;
 //             <may be read   >: plots[*][*].pot stderr stderr[0] 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lat the_towns[*].lat 
-//                               the_towns[*].lon the_towns[*].lon 
-//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lat the_towns[*].lon 
 //                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: plots[*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]
@@ -366,10 +330,10 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is written>: sum
             data_t sum = 0.;
 
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmax
             data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmin
             data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
 //             <    is read   >: k latmin nb t[k].lat
@@ -395,7 +359,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
-//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
 //             <    is read   >: deltalon k t[k].lon
@@ -433,11 +397,9 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j < jmax; j += 1) {
-//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep 
-//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`5`6`j k latMin 
+//                               latStep lonMin lonStep t[k].lat 
+//                               t[k].lat t[k].lon t[k].lon
 //             <    is written>: tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <    is read   >: imax imin jmax jmin nb range tmp
@@ -540,10 +502,10 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is written>: sum
             data_t sum = 0.;
 
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmax
             data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmin
             data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
 //             <    is read   >: k latmin nb t[k].lat
@@ -569,7 +531,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
-//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
 //             <    is read   >: deltalon k t[k].lon
@@ -607,11 +569,9 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j < jmax; j += 1) {
-//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep 
-//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`5`6`j k latMin 
+//                               latStep lonMin lonStep t[k].lat 
+//                               t[k].lat t[k].lon t[k].lon
 //             <    is written>: tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <    is read   >: imax imin jmax jmin nb range tmp
@@ -714,10 +674,10 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is written>: sum
             data_t sum = 0.;
 
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmax
             data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmin
             data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
 //             <    is read   >: k latmin nb t[k].lat
@@ -743,7 +703,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
-//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
 //             <    is read   >: deltalon k t[k].lon
@@ -781,11 +741,9 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j < jmax; j += 1) {
-//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep 
-//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`5`6`j k latMin 
+//                               latStep lonMin lonStep t[k].lat 
+//                               t[k].lat t[k].lon t[k].lon
 //             <    is written>: tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <    is read   >: imax imin jmax jmin nb range tmp
@@ -888,10 +846,10 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is written>: sum
             data_t sum = 0.;
 
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmax
             data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmin
             data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
 //             <    is read   >: k latmin nb t[k].lat
@@ -917,7 +875,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
-//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
 //             <    is read   >: deltalon k t[k].lon
@@ -955,11 +913,9 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j < jmax; j += 1) {
-//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep 
-//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`5`6`j k latMin 
+//                               latStep lonMin lonStep t[k].lat 
+//                               t[k].lat t[k].lon t[k].lon
 //             <    is written>: tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <    is read   >: imax imin jmax jmin nb range tmp
@@ -1062,10 +1018,10 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is written>: sum
             data_t sum = 0.;
 
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmax
             data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
-//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: latmin
             data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
 //             <    is read   >: k latmin nb t[k].lat
@@ -1091,7 +1047,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: latRange nb
 //             <    is written>: imax
                imax = latRange;
-//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is read   >: k range t[k].lat t[k].lat
 //             <    is written>: deltalon
             data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
 //             <    is read   >: deltalon k t[k].lon
@@ -1129,11 +1085,9 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is read   >: imax imin jmax jmin nb
 //             <    is written>: 0`1`2`3`4`5`6`j
                   for(j = jmin; j < jmax; j += 1) {
-//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
-//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
-//                               k latMin latMin latStep latStep 
-//                               lonMin lonMin lonStep lonStep 
-//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`5`6`j k latMin 
+//                               latStep lonMin lonStep t[k].lat 
+//                               t[k].lat t[k].lon t[k].lon
 //             <    is written>: 0`1`2`3`4`5`6`7`tmp
                      data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
 //             <    is read   >: imax imin jmax jmin nb range 
@@ -1141,8 +1095,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
                      /* if distance from town is within range, set contribution */
                      if (tmp<range) {
                         do {
-//             <    is read   >: 0`1`2`3`4`5`6`7`8`9`tmp 
-//                               0`1`2`3`4`5`6`7`8`9`tmp
+//             <    is read   >: 0`1`2`3`4`5`6`7`8`9`tmp
 //             <    is written>: 0`1`2`3`4`5`6`7`8`9`tmp
                            data_t tmp = tmp*tmp;
 //             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
@@ -1347,10 +1300,10 @@ _switch_1_case_5:   ;
    goto _break_1;
 _switch_1_case_4:   ;
    {
-//             <    is read   >: ap ap ap[0]
+//             <    is read   >: ap ap[0]
 //             <    is written>: ap[0] fname
       char *fname = va_arg(*ap, char *);
-//             <    is read   >: ap ap ap[0]
+//             <    is read   >: ap ap[0]
 //             <    is written>: ap[0] fparam
       double fparam = va_arg(*ap, double);
 //             <    is read   >: config fparam

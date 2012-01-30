@@ -1,9 +1,14 @@
+#
+# Code after internalize_parallel_code for module GCDTEST
+#
 c     test for GCD     
       PROGRAM GCDTEST
       REAL A(100)
 
       DO I = 1, 10                                                      0005
-         DOALL J = 1, 10                                                0006
+
+!$OMP    PARALLEL DO 
+         DO J = 1, 10                                                   0006
             A(2*I+4*J) = A(2*I+2*J+1)                                   0007
          ENDDO
       ENDDO

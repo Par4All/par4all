@@ -31,7 +31,7 @@ void ts_singlestate(void)
 
    while (rand_b())
 
-//  T(d,x) {d+x#init==x, 0<=d+1, d<=1, 1<=d+2x#init, d+2x#init<=1999}
+//  T(d,x) {d+x#init==x, 0<=d+1, d<=1, 2x<=d+1999, d+1<=2x}
 
       if (rand_b()) {
 

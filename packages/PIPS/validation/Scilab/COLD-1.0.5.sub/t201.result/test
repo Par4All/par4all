@@ -1,0 +1,30 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t201.sce: parser */
+   double _u_x[10][10];
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         _u_x[__lv1][__lv2] = (double) 1.0;
+   }
+   double _u_lhs[10][10];
+   setlhs_d2_d2(10, 10, _u_x, 10, 10, _u_lhs);
+   scilab_rt_display_s0d2_("lhs", 10, 10, _u_lhs);
+
+   scilab_rt_terminate();
+}
+void setlhs_d2_d2(int _c_0_n0, int _c_0_n1, double _c_0[_c_0_n0][_c_0_n1], int _u_lhs_n0, int _u_lhs_n1, double _u_lhs[_u_lhs_n0][_u_lhs_n1])
+{
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
+         _c_0[__lv1][__lv2];
+   }
+}

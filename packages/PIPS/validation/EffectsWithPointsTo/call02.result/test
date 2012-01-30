@@ -46,9 +46,7 @@ POINTS-TO
 // q[*] -> _q_4 , EXACT
 
 
-// Points To OUT:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
+// Points To OUT: none
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
