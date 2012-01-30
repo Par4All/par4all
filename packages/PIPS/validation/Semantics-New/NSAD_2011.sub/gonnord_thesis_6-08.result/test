@@ -189,8 +189,8 @@ void ts_restructured(void)
             checking_error();
       }
 
-//  T(x,y) {s==1, x+y==x#init+y#init+2, x#init<=100,
-//    y+99<=x#init+y#init, y#init<=x#init, y#init<=y, 0<=y#init}
+//  T(x,y) {s==1, x+y==x#init+y#init+2, 101<=x, 2y#init+2<=x+y,
+//    x+y<=y#init+102, y#init<=y, 0<=y#init}
 
    if (rand_b()) {
 

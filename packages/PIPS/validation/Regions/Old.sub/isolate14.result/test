@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
             ((*new_image)[i])[j] = i*j;
 
-//  <image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI1==0, PHI2==PHI3, 2<=PHI3,
+//  <image[PHI1][PHI2][PHI3]-OUT-EXACT-{PHI1==0, PHI2==PHI3, 2<=PHI2,
 //    PHI3+3<=image_size, i==image_size, j==image_size, 6<=i}>
 
 

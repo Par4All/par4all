@@ -265,8 +265,8 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
-//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <may be read   >: e1[*] t t2
+//             <may be written>: e1[*]
 //             <    is read   >: n3
       pa(e1);
 //             <    is written>: j
@@ -454,8 +454,7 @@ int main()
 
 "main" file with cumulated effects
 
-//             <may be read   >: e1[0] e1[1] e1[2] e1[3] e1[*] j k l t
-//                               t1 t2 x x1 x2 x3 x4 y
+//             <may be read   >: e1[*] j k l t t1 t2 x x1 x2 x3 x4 y
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: n1 n10 n11 n2 n3 n4 n6 n7 n8 n9
 int main()
@@ -527,29 +526,33 @@ int main()
    /* MODULE 2:  array elements */
    
    e1[0] = 1.0;
-//             <    is written>: e1[1] e1[2] e1[3]
+//             <may be written>: e1[*]
    e1[1] = e1[2] = e1[3] = -1.0;
-//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t
-//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <may be read   >: e1[*] t
+//             <may be written>: e1[*]
 //             <    is read   >: n2
 //             <    is written>: i
 
    for(i = 1; i <= n2; i += 1) {
-//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <may be read   >: e1[*]
+//             <    is read   >: n2 t
 //             <    is written>: e1[0]
       e1[0] = (e1[0]+e1[1]+e1[2]-e1[3])*t;
-//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <may be read   >: e1[*]
+//             <    is read   >: n2 t
 //             <    is written>: e1[1]
       e1[1] = (e1[0]+e1[1]-e1[2]+e1[3])*t;
-//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <may be read   >: e1[*]
+//             <    is read   >: n2 t
 //             <    is written>: e1[2]
       e1[2] = (e1[0]-e1[1]+e1[2]+e1[3])*t;
-//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <may be read   >: e1[*]
+//             <    is read   >: n2 t
 //             <    is written>: e1[3]
       e1[3] = (-e1[0]+e1[1]+e1[2]+e1[3])*t;
    }
-//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
-//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <may be read   >: e1[*] t t2
+//             <may be written>: e1[*]
 //             <    is read   >: n3
 //             <    is written>: i
    
@@ -559,8 +562,8 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
-//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <may be read   >: e1[*] t t2
+//             <may be written>: e1[*]
 //             <    is read   >: n3
       pa(e1);
 //             <    is written>: j

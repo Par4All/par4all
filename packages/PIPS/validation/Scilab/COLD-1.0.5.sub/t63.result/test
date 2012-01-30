@@ -1,0 +1,6 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   scilab_rt_terminate();
+}

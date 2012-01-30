@@ -1,0 +1,16 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_a = 1;
+l99999:   ;
+   _u_a = _u_a+1;
+   if (_u_a>10) {
+   }
+   else {
+      goto l99999;
+   }
+   scilab_rt_disp_i0_(_u_a);
+
+   scilab_rt_terminate();
+}

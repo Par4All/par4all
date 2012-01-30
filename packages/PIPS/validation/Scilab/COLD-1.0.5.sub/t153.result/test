@@ -1,0 +1,65 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_i;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t153.sce: multiplication */
+   int _u_a[3][3];
+   _u_a[0][0] = 1;
+   _u_a[0][1] = 2;
+   _u_a[0][2] = 3;
+   _u_a[1][0] = 4;
+   _u_a[1][1] = 5;
+   _u_a[1][2] = 6;
+   _u_a[2][0] = 7;
+   _u_a[2][1] = 8;
+   _u_a[2][2] = 9;
+   int _u_b[3][3];
+   _u_b[0][0] = 1;
+   _u_b[0][1] = 2;
+   _u_b[0][2] = 3;
+   _u_b[1][0] = 4;
+   _u_b[1][1] = 5;
+   _u_b[1][2] = 6;
+   _u_b[2][0] = 7;
+   _u_b[2][1] = 8;
+   _u_b[2][2] = 9;
+   int _u_c[3][3];
+   scilab_rt_mul_i2i2_i2(3, 3, _u_a, 3, 3, _u_b, 3, 3, _u_c);
+   scilab_rt_display_s0i2_("c", 3, 3, _u_c);
+   int _u_n = 100;
+   double _u_x[100][100];
+   (int) _u_n==100&&(int) _u_n==100?(void) 0:__assert_fail("(int)_u_n == 100 && (int)_u_n == 100", ".t153.tmp/t153.c", 51, (const char *) 0);
+   double _u_y[100][100];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 99; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 99; __lv2 += 1) {
+         _u_x[__lv1][__lv2] = (double) 1.0;
+         _u_y[__lv1][__lv2] = (double) 1.0;
+      }
+   }
+   (int) _u_n==100&&(int) _u_n==100?(void) 0:__assert_fail("(int)_u_n == 100 && (int)_u_n == 100", ".t153.tmp/t153.c", 53, (const char *) 0);
+#pragma omp parallel for 
+   for(_u_i = 1; _u_i <= _u_n; _u_i += 1) {
+      //PIPS generated variable
+      int _u_j;
+#pragma omp parallel for 
+      for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
+         _u_x[_u_i-1][_u_j-1] = _u_i;
+#pragma omp parallel for 
+      for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
+         _u_y[_u_i-1][_u_j-1] = _u_j;
+   }
+   /* tic(); */
+   double _u_z[100][100];
+   scilab_rt_mul_d2d2_d2(100, 100, _u_x, 100, 100, _u_y, 100, 100, _u_z);
+   /* elap = toc() */
+   double _tmp0 = _u_z[69][71];
+   scilab_rt_display_s0d0_("ans", _tmp0);
+
+   scilab_rt_terminate();
+}

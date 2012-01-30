@@ -1,10 +1,17 @@
+#
+# Code after internalize_parallel_code for module TEST4
+#
       PROGRAM TEST4
       REAL T(10),V(10)
 
-      DOALL I = 1, 10                                                   0004
+
+!$OMP PARALLEL DO 
+      DO I = 1, 10                                                      0004
          T(I) = 0.0                                                     0005
       ENDDO
-      DOALL I = 1, 10                                                   0004
+
+!$OMP PARALLEL DO 
+      DO I = 1, 10                                                      0004
          V(I) = T(I)**2                                                 0006
       ENDDO
       END

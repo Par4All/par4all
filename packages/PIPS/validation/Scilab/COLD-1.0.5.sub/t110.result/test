@@ -1,0 +1,10 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   int _tmp0 = fmod(5, 6);
+   scilab_rt_display_s0i0_("ans", _tmp0);
+   double _tmp1 = fmod(5.2, 6);
+   scilab_rt_display_s0d0_("ans", _tmp1);
+
+   scilab_rt_terminate();
+}

@@ -1,7 +1,25 @@
-<p><br/><b><a href="htpp://pips4u.org" target="_blank">PIPS</a></b> is not one tool, but an extensible toolbox designed to analyze, transform and instrument C and Frotran programs.</p>
+<p>
+  <b><a href="htpp://pips4u.org" target="_blank">PIPS</a></b> is not
+  one tool, but an extensible toolbox designed to analyze, transform
+  and instrument C and Fortran programs.
+</p>
 
-<p>You can look at the <a href="http://pips4u.org/doc/tutorial" target="_blank">whole toolbox</a> and <a href="http://pips4u.org/copy_of_getting-pips" target="_blank">install it on your computer</a>, but you may prefer to try it first with your own code or with supplied examples. For instance, you can request preconditions or OpenMP code.</p>
+<p>
+  You can look at the <a href="http://pips4u.org/doc/tutorial" target="_blank">whole toolbox</a>
+  and <a href="http://pips4u.org/copy_of_getting-pips" target="_blank">install it on your computer</a>,
+  but you may prefer to try it first with your own code or with supplied examples. For instance,
+  you can request preconditions or OpenMP code.
+</p>
 
-<p>You can also run PIPS in a tutorial mode to discover its pass manager, tpips and pyps by executing scripts step by step. Using for instance the ACCA 2011 running example you can learn about the different transformations applied to optimize and parallelize a C function. You can modify a provided source code.</p>
+<p>
+  You can also run PIPS in a tutorial mode to discover its pass
+  manager, tpips and pyps by executing scripts step by step. Using for
+  instance the ACCA 2011 running example you can learn about the
+  different transformations applied to optimize and parallelize a C
+  function. You can modify a provided source code.
+</p>
 
-<p>Finally you can use a full-fledge graphical interface and request any analysis or transformation on any function of your application.</p>
+<p>
+  Finally you can use a full-fledged graphical interface and request
+  any analysis or transformation on any function of your application.
+</p>

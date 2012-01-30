@@ -1,0 +1,46 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int __tri0;
+   scilab_rt_init(argc, argv, 0);
+   for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+      __lv1 = 0+1;
+   double _u_y[10][1];
+   double _u_z[10][1];
+   double _u_a[10][1];
+   double _u_b[10][1];
+   double _u_c[10][1];
+#pragma omp parallel for 
+   for(__tri0 = 0; __tri0 <= 9; __tri0 += 1) {
+      //PIPS generated variable
+      register double _tmpxx0_0, _tmpxx1_0, _tmpxx2_0, _u_x_0;
+      _tmpxx0_0 = 0.1+__tri0*0.1;
+      _tmpxx1_0 = _tmpxx0_0;
+      _u_x_0 = _tmpxx1_0;
+      _u_y[__tri0][0] = _u_x_0*(double) 2;
+      _u_z[__tri0][0] = _u_x_0*_u_x_0;
+      _u_a[__tri0][0] = _u_x_0/((double) 3);
+      _tmpxx2_0 = _u_x_0+0.1;
+      _u_b[__tri0][0] = _u_x_0/_tmpxx2_0;
+      _u_c[__tri0][0] = _u_x_0+_u_x_0;
+   }
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   scilab_rt_display_s0d2_("y", 10, 1, _u_y);
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   scilab_rt_display_s0d2_("z", 10, 1, _u_z);
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   scilab_rt_display_s0d2_("a", 10, 1, _u_a);
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   scilab_rt_display_s0d2_("b", 10, 1, _u_b);
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+      __lv2 = 0+1;
+   scilab_rt_display_s0d2_("c", 10, 1, _u_c);
+
+   scilab_rt_terminate();
+}

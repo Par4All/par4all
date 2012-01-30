@@ -1,0 +1,36 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t55.sce: testing length function */
+   int _u_a = (int) 1;
+   scilab_rt_display_s0i0_("a", _u_a);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         (double) 1.0;
+   }
+   int _u_c;
+   *&_u_c = 10*10;
+   scilab_rt_display_s0i0_("c", _u_c);
+   int _u_d = strlen("foobar");
+   scilab_rt_display_s0i0_("d", _u_d);
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
+            (double) rand()/((double) 2147483647);
+      }
+   }
+   int _u_e;
+   *&_u_e = (int) 3;
+   scilab_rt_display_s0i0_("e", _u_e);
+
+   scilab_rt_terminate();
+}

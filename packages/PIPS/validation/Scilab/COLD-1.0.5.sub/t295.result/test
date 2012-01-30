@@ -1,0 +1,29 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t295.sce _ Fixed a bug when the RT is called with the new type of an array */
+   double _Complex _u_a[1][3];
+   _u_a[0][0] = 1.0iF;
+   _u_a[0][1] = 1.0iF;
+   _u_a[0][2] = 1.0iF;
+   scilab_rt_display_s0z2_("a", 1, 3, _u_a);
+   __lv1 = 0+1;
+   double _Complex _u_b[1][3];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+      //PIPS generated variable
+      register double _tmpCT0_0;
+      _tmpCT0_0 = (double) 1.0;
+      _u_b[0][__lv2] = (double _Complex) _tmpCT0_0;
+   }
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("b", 1, 3, _u_b);
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+      _u_b[0][__lv2] = _u_a[0][__lv2];
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("b", 1, 3, _u_b);
+
+   scilab_rt_terminate();
+}

@@ -29,8 +29,7 @@ int main()
 
       x = 0;
 
-//  T(l,t,x) {l+t#init==l#init+t, l#init+x==l, x#init==0, l#init<=l,
-//    x<=9}
+//  T(l,t,x) {l+t#init==l#init+t, l#init+x==l, x#init==0, 0<=x, x<=9}
 
       while (x<=9&&alea()) {
 

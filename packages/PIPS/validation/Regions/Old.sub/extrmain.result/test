@@ -66,21 +66,21 @@ C    2<=K}>
 
       DO 300 J = J1, JA                                                 0014
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1<=52, PHI2<=21, K<=PHI2,
-C    PHI2<=K+1, 1<=PHI3, PHI3<=60, L<=PHI3, PHI3<=L+2, J2==2JA-1,
-C    K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, 2<=PHI1, PHI1<=52, 1<=PHI2,
+C    PHI2<=21, K<=PHI2, PHI2<=K+1, 1<=PHI3, PHI3<=60, L<=PHI3,
+C    PHI3<=L+2, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
 
          S1 = D(J, K, J, K+1)                                           0015
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1<=52, PHI2<=21, K+1<=PHI2,
-C    PHI2<=K+2, 1<=PHI3, PHI3<=60, L<=PHI3, PHI3<=L+2, J2==2JA-1,
-C    K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, 2<=PHI1, PHI1<=52, 1<=PHI2,
+C    PHI2<=21, K+1<=PHI2, PHI2<=K+2, 1<=PHI3, PHI3<=60, L<=PHI3,
+C    PHI3<=L+2, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
 
          S2 = D(J, K+1, J, K+2)+S1                                      0016
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1<=52, PHI2<=21, K+2<=PHI2,
-C    PHI2<=K+3, 1<=PHI3, PHI3<=60, L<=PHI3, PHI3<=L+2, J2==2JA-1,
-C    K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, 2<=PHI1, PHI1<=52, 1<=PHI2,
+C    PHI2<=21, K+2<=PHI2, PHI2<=K+3, 1<=PHI3, PHI3<=60, L<=PHI3,
+C    PHI3<=L+2, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
 
          S3 = D(J, K+2, J, K+3)+S2                                      0017
 

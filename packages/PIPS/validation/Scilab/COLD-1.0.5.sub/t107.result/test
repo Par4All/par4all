@@ -1,0 +1,31 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t107.sce: testing fix function */
+   double _u_a[2][3];
+   _u_a[0][0] = 1.5;
+   _u_a[0][1] = 6.8;
+   _u_a[0][2] = -9.1;
+   _u_a[1][0] = 8.2;
+   _u_a[1][1] = 65.5;
+   _u_a[1][2] = -78.123;
+   scilab_rt_display_s0d2_("a", 2, 3, _u_a);
+   int _u_b[2][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         register double _u_a_0 = _u_a[__lv1][__lv2];
+         _u_b[__lv1][__lv2] = _u_a_0>=0?floor(_u_a_0):ceil(_u_a_0);
+      }
+   }
+   scilab_rt_display_s0i2_("b", 2, 3, _u_b);
+   int _u_c = _u_a[0][0]>=0?floor(_u_a[0][0]):ceil(_u_a[0][0]);
+   scilab_rt_display_s0i0_("c", _u_c);
+
+   scilab_rt_terminate();
+}

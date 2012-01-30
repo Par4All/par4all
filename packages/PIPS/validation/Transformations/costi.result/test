@@ -37,7 +37,7 @@ c      FK = 0.D0
       KC = NP1-1                                                        0015
 
 C  T(K,KC) {K+KC==KC#init+2, KC#init==N, KC#init==NM1+1,
-C    KC#init==NP1-1, K<=NS2, KC<=KC#init, 4<=KC#init, 2NS2<=KC#init,
+C    KC#init==NP1-1, 2<=K, K<=NS2, 4<=KC#init, 2NS2<=KC#init,
 C    KC#init<=2NS2+1}
 
       DO 101 K = 2, NS2                                                 0016
@@ -109,30 +109,30 @@ C    KC<=2NS2+1}
 
       DO 101 K = 2, NS2                                                 0016
 
-C  P(K,KC,NM1,NP1,NS2) {K+KC==N+2, N==NM1+1, N==NP1-1, K<=NS2, KC<=N,
+C  P(K,KC,NM1,NP1,NS2) {K+KC==N+2, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
 C    4<=N, 2NS2<=N, N<=2NS2+1}
 
 C         KC = NP1-K
          KC = KC-1                                                      0018
 
-C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, K<=NS2,
-C    KC+1<=N, 4<=N, 2NS2<=N, N<=2NS2+1}
+C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
+C    4<=N, 2NS2<=N, N<=2NS2+1}
 
 C         FK = FK+1.
          FK = FLOAT(K-1)                                                0020
 
-C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, K<=NS2,
-C    KC+1<=N, 4<=N, 2NS2<=N, N<=2NS2+1}
+C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
+C    4<=N, 2NS2<=N, N<=2NS2+1}
 
          WSAVE(K) = 2.D0*DSIN(FK*DT)                                    0021
 
-C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, K<=NS2,
-C    KC+1<=N, 4<=N, 2NS2<=N, N<=2NS2+1}
+C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
+C    4<=N, 2NS2<=N, N<=2NS2+1}
 
          WSAVE(KC) = 2.D0*DCOS(FK*DT)                                   0022
 
-C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, K<=NS2,
-C    KC+1<=N, 4<=N, 2NS2<=N, N<=2NS2+1}
+C  P(K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
+C    4<=N, 2NS2<=N, N<=2NS2+1}
 
 101      CONTINUE                                                       0023
 C      CALL RFFTI (NM1,WSAVE(N+1))

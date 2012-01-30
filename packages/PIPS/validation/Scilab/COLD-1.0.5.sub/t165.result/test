@@ -1,0 +1,43 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   double _Complex _tmpxx0 = 3*1.0iF;
+   double _Complex _u_a = 2+_tmpxx0;
+   scilab_rt_display_s0z0_("a", _u_a);
+   double _Complex _tmpxx1 = 2*1.0iF;
+   double _Complex _tmpxx2 = 4*1.0iF;
+   double _Complex _tmpxx3 = 6*1.0iF;
+   double _Complex _tmpxx4 = 8*1.0iF;
+   double _Complex _tmpxx5 = 10*1.0iF;
+   double _Complex _tmpxx6 = 12*1.0iF;
+   double _Complex _u_b[3][2];
+   _u_b[0][0] = 1+_tmpxx1;
+   _u_b[0][1] = 3+_tmpxx2;
+   _u_b[1][0] = 5+_tmpxx3;
+   _u_b[1][1] = 7+_tmpxx4;
+   _u_b[2][0] = 9+_tmpxx5;
+   _u_b[2][1] = 11+_tmpxx6;
+   scilab_rt_display_s0z2_("b", 3, 2, _u_b);
+   double _u_aReal = creal(_u_a);
+   scilab_rt_display_s0d0_("aReal", _u_aReal);
+   double _u_aImag = cimag(_u_a);
+   scilab_rt_display_s0d0_("aImag", _u_aImag);
+   double _u_bReal[3][2];
+   double _u_bImag[3][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         register double _Complex _u_b_0 = _u_b[__lv1][__lv2];
+         _u_bReal[__lv1][__lv2] = creal(_u_b_0);
+         _u_bImag[__lv1][__lv2] = cimag(_u_b_0);
+      }
+   }
+   scilab_rt_display_s0d2_("bReal", 3, 2, _u_bReal);
+   scilab_rt_display_s0d2_("bImag", 3, 2, _u_bImag);
+
+   scilab_rt_terminate();
+}

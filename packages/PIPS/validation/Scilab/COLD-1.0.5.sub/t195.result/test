@@ -1,0 +1,9 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t195.sce: parser */
+   scilab_rt_disp_s0_("...");
+
+   scilab_rt_terminate();
+}

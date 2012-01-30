@@ -1,0 +1,67 @@
+#
+# Code after internalize_parallel_code for module main
+#
+int main()
+{
+   int i, k, j, cpi, cpj;
+   // indexes used in loops
+   float l[128*128];
+   
+   // Number of blocks
+   int n = 128/16;
+
+   for(k = 0; k <= n-1; k += 1) {
+      
+      /* Temporary block */
+      float tmp[16*16];
+#pragma omp parallel for 
+      for(cpi = 0; cpi <= 255; cpi += 1)
+         tmp[cpi] = cpi;
+#pragma omp parallel for 
+      for(cpi = 0; cpi <= 15; cpi += 1)
+#pragma omp parallel for 
+         for(cpj = 0; cpj <= 15; cpj += 1)
+            l[(k*16+cpi)*128+k*16+cpj] = tmp[cpi*16+cpj];
+      float _tmp1[16*16];
+#pragma omp parallel for 
+      for(cpi = 0; cpi <= 15; cpi += 1)
+#pragma omp parallel for 
+         for(cpj = cpi+1; cpj <= 15; cpj += 1) {
+            unsigned int idx1 = cpi*16+cpj;
+            unsigned int idx2 = cpj*16+cpi;
+            _tmp1[idx2] = tmp[idx1];
+         }
+#pragma omp parallel for 
+      for(cpi = 0; cpi <= 15; cpi += 1)
+#pragma omp parallel for 
+         for(cpj = cpi+1; cpj <= 15; cpj += 1) {
+            unsigned int idx1 = cpi*16+cpj;
+            unsigned int idx2 = cpj*16+cpi;
+            tmp[idx1] = tmp[idx2];
+            tmp[idx2] = _tmp1[idx2];
+         }
+#pragma omp parallel for 
+      for(i = k+1; i <= n-1; i += 1) {
+         float lik[16*16];
+#pragma omp parallel for 
+         for(cpi = 0; cpi <= 15; cpi += 1)
+#pragma omp parallel for 
+            for(cpj = 0; cpj <= 15; cpj += 1)
+               lik[cpi*16+cpj] = tmp[cpi*16+cpj]+k;
+#pragma omp parallel for 
+         for(cpi = 0; cpi <= 15; cpi += 1)
+#pragma omp parallel for 
+            for(cpj = 0; cpj <= 15; cpj += 1)
+               l[(i*16+cpi)*128+k*16+cpj] = lik[cpi*16+cpj];
+      }
+   }
+   // End of k loop 
+   
+   
+   // Prints the result matrix l[0] in a file
+   printf("Block algorithm : L result matrix \n");
+
+   for(i = 0; i <= 16383; i += 1)
+      printf("% 6.3f ", l[i]);
+   return 0;
+}

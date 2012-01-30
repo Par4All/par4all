@@ -1,0 +1,62 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   double _u_a[10][10];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         _u_a[__lv1][__lv2] = (double) 1.0;
+   }
+   int _u_b[10][1];
+   if (*"c"=='r') {
+      __assert_fail("10 == 1", ".t59.tmp/t59.c", 28, (const char *) 0);
+      _u_b[0][0] = (int) 1;
+      for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+         _u_b[0][0] &= _u_a[__lv1][0]!=(double) 0;
+      __lv2 = 0+1;
+   }
+   else if (*"c"=='c')
+#pragma omp parallel for 
+      for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+         //PIPS generated variable
+         register int _u_b_0;
+         //PIPS generated variable
+         int __lv2;
+         _u_b_0 = (int) 1;
+         for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+            _u_b_0 &= _u_a[__lv1][__lv2]!=(double) 0;
+         _u_b[__lv1][0] = _u_b_0;
+      }
+   else
+      exit(1);
+   scilab_rt_display_s0i2_("b", 10, 1, _u_b);
+   int _u_c[1][10];
+   if (*"r"=='r')
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1) {
+         //PIPS generated variable
+         register int _u_c_0;
+         //PIPS generated variable
+         int __lv1;
+         _u_c_0 = (int) 1;
+         for(__lv1 = 0; __lv1 <= 9; __lv1 += 1)
+            _u_c_0 &= _u_a[__lv1][__lv2]!=(double) 0;
+         _u_c[0][__lv2] = _u_c_0;
+      }
+   else if (*"r"=='c') {
+      __assert_fail("10 == 1", ".t59.tmp/t59.c", 31, (const char *) 0);
+      _u_c[0][0] = (int) 1;
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         _u_c[0][0] &= _u_a[0][__lv2]!=(double) 0;
+      __lv1 = 0+1;
+   }
+   else
+      exit(1);
+   scilab_rt_display_s0i2_("c", 1, 10, _u_c);
+
+   scilab_rt_terminate();
+}

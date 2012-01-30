@@ -1,7 +1,12 @@
+#
+# Code after internalize_parallel_code for module TEST10
+#
       PROGRAM TEST10
       PARAMETER (N=50)
       REAL A(100)
-      DOALL I = 1, N, 2                                                 0004
+
+!$OMP PARALLEL DO 
+      DO I = 1, N, 2                                                    0004
          A(I) = A(2*I)                                                  0005
       ENDDO
       STOP                                                              0007

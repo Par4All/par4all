@@ -293,7 +293,7 @@ C             <may be written>: B(*,*)
 C             <may be referenced>: B(*,*)
 
       CALL TRANSPOSE(B, N)                                              0018
-C             <may be read   >: C(*,*,*) C(*,*,*)
+C             <may be read   >: C(*,*,*)
 C             <may be written>: C(*,*,*)
 C             <may be referenced>: C(*,*,*)
 
@@ -303,10 +303,8 @@ C             <    is written>: INIT:DFI INIT:PX __IO_EFFECTS:LUNS(5)
 C             <    is referenced>: INIT:DFI INIT:PX __IO_EFFECTS:LUNS
 
       CALL INIT                                                         0022
-C             <may be read   >: __IO_EFFECTS:LUNS(0)
-C                               __IO_EFFECTS:LUNS(6)
-C             <may be written>: __IO_EFFECTS:LUNS(0)
-C                               __IO_EFFECTS:LUNS(6)
+C             <may be read   >: __IO_EFFECTS:LUNS(*)
+C             <may be written>: __IO_EFFECTS:LUNS(*)
 C             <may be referenced>: __IO_EFFECTS:LUNS
 C             <    is read   >: DIGITALIZE:M INIT:DFI INIT:PX
 C             <    is written>: DIGITALIZE:M DIGITALIZE:MM1 
@@ -579,6 +577,10 @@ C             <    is referenced>: I J N T X
 		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
 		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-R-EXACT>
 		from <__IO_EFFECTS:LUNS(5)-R-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
+	12 --> 23 with conflicts
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(*)-W-MAY>
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(*)-R-MAY>
+		from <__IO_EFFECTS:LUNS(5)-R-EXACT> to <__IO_EFFECTS:LUNS(*)-W-MAY>
 	14 --> 16 with conflicts
 		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
 		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
@@ -590,8 +592,11 @@ C             <    is referenced>: I J N T X
 		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
 		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
 	22 --> 23 with conflicts
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(*)-W-MAY>
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(*)-R-MAY>
 		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
 		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
+		from <__IO_EFFECTS:LUNS(5)-R-EXACT> to <__IO_EFFECTS:LUNS(*)-W-MAY>
 	23 --> 24 with conflicts
 		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
 		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>

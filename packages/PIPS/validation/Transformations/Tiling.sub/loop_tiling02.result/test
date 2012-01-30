@@ -29,7 +29,7 @@ l1:
 l2:
       for(j_t = 0; j_t <= (nj-1)/10; j_t += 1)
          for(k_t = 0; k_t <= (nk-1)/10; k_t += 1)
-            for(j = 10*j_t; j <= pips_min(2, nj-1, 10*j_t+9); j += 1)
+            for(j = 10*j_t; j <= pips_min(2, 10*j_t+9, nj-1); j += 1)
                for(k = 10*k_t; k <= pips_min(2, 10*k_t+9, nk-1); k += 1)
                   x[i][j][k] = 0.;
 }

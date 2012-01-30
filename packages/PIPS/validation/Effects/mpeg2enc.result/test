@@ -1,0 +1,105 @@
+accurate analysis
+restructuring
+
+Cumulated effects for "putnonintrablk"
+
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               mpeg1 outfile outfile[0] stderr 
+//                               stderr[0] zig_zag_scan[*] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <may be written>: errortext[*] outfile[0] stderr[0] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: altscan blk
+void putnonintrablk(short *blk)
+{
+   int n, run, signed_level, first;
+//             <    is written>: run
+
+   run = 0;
+//             <    is written>: first
+   first = 1;
+//             <may be read   >: alternate_scan[*] blk[*] errortext[*]
+//                               first mpeg1 outfile outfile[0] stderr
+//                               stderr[0] zig_zag_scan[*] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <may be written>: errortext[*] first outfile[0] 
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <    is read   >: altscan blk n run signed_level
+//             <    is written>: n run signed_level
+
+   for(n = 0; n <= 63; n += 1) {
+//             <may be read   >: alternate_scan[*] blk[*] 
+//                               zig_zag_scan[*]
+//             <    is read   >: altscan blk n
+//             <    is written>: signed_level
+      /* use appropriate entropy scanning pattern */
+      signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
+//             <may be read   >: errortext[*] first mpeg1 outfile 
+//                               outfile[0] stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <may be written>: errortext[*] first outfile[0] 
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <    is read   >: run signed_level
+//             <    is written>: run
+
+      if (signed_level!=0) {
+//             <may be read   >: errortext[*] mpeg1 outfile outfile[0]
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <may be written>: errortext[*] first outfile[0] 
+//                               stderr[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <    is read   >: first run signed_level
+         if (first) {
+//             <may be read   >: errortext[*] mpeg1 outfile outfile[0]
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <may be written>: errortext[*] outfile[0] stderr[0] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: run signed_level
+            /* first coefficient in non-intra block */
+            putACfirst(run, signed_level);
+//             <    is written>: first
+            first = 0;
+         }
+         else
+//             <may be read   >: errortext[*] outfile outfile[0] 
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[*]
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+//             <may be written>: errortext[*] outfile[0] stderr[0] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: mpeg1 run signed_level
+            putAC(run, signed_level, 0);
+//             <    is written>: run
+
+         run = 0;
+      }
+      else
+//             <    is read   >: run
+//             <    is written>: run
+         run++;
+   }
+//             <may be read   >: outfile outfile[0] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
+//             <may be written>: outfile[0] __IO_EFFECTS:LUNS[*] 
+//                               putbits!:bytecnt putbits!:outbfr 
+//                               putbits!:outcnt
+   
+   /* End of Block -- normative block punctuation  */
+   putbits(2, 2);
+}

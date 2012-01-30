@@ -601,7 +601,7 @@
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL8 BUFUPK
       DO ALPHA2 = 10, 11
-         DO ALPHA1 = MAX(10, 128*PSI1-127), MIN(-ALPHA2+21, 128*PSI1)
+         DO ALPHA1 = MAX(10, 128*PSI1-127), -ALPHA2+21
             LALPHA1 = ALPHA1-128*PSI1+128
             LALPHA2 = ALPHA2
             BUF INDEX = BUF INDEX+1
@@ -1075,12 +1075,11 @@
       CALL NPOST SUM HPFC REAL8(S, 1)
 ! collecting distributed variable U
       PSI1 = MY POS(1,1)
-      IF (PSI1.LE.1) THEN
+      IF (PSI1.EQ.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA2 = 10, 11
-            DO ALPHA1 = MAX(10, 128*PSI1-127), MIN(-ALPHA2+21, 128*
-     &      PSI1)
+            DO ALPHA1 = MAX(10, 128*PSI1-127), -ALPHA2+21
                LALPHA1 = ALPHA1-128*PSI1+128
                LALPHA2 = ALPHA2
                BUF INDEX = BUF INDEX+1

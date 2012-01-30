@@ -1,0 +1,45 @@
+double foo_i2_(int _u_tab_n0, int _u_tab_n1, int _u_tab[_u_tab_n0][_u_tab_n1])
+{
+   int _u_val = 0;
+   //PIPS generated variable
+   int _u_i;
+   for(_u_i = 1; _u_i <= 5; _u_i += 1) {
+      //PIPS generated variable
+      int _tmpxx1;
+      _tmpxx1 = _u_tab[_u_i-1][0];
+      if (_tmpxx1>2)
+         _u_val = _u_val+1;
+   }
+   scilab_rt_disp_s0_("val");
+   scilab_rt_disp_i0_(_u_val);
+   double _u_tmpTab[_u_val][1];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_val-1; __lv1 += 1)
+      _u_tmpTab[__lv1][0] = (double) 1.0;
+   for(__lv1 = 0; __lv1 <= _u_val-1; __lv1 += 1)
+      __lv2 = 0+1;
+   double _u_r;
+   scilab_rt_sum_d2_d0(_u_val, 1, _u_tmpTab, &_u_r);
+   return _u_r;
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t273.sce _ fixed PR-163.sce */
+   int _tmpxx0[5][2];
+   _tmpxx0[0][0] = 1;
+   1;
+   _tmpxx0[1][0] = 2;
+   2;
+   _tmpxx0[2][0] = 3;
+   3;
+   _tmpxx0[3][0] = 4;
+   4;
+   _tmpxx0[4][0] = 5;
+   5;
+   double _tmp0 = foo_i2_(5, 2, _tmpxx0);
+   scilab_rt_display_s0d0_("ans", _tmp0);
+
+   scilab_rt_terminate();
+}

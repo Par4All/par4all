@@ -1,0 +1,43 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_i, lv0;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t191.sce: p4a */
+   double _u_a[10][10];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         _u_a[__lv1][__lv2] = (double) 1.0;
+   }
+#pragma omp parallel for 
+   for(_u_i = 1; _u_i <= 10; _u_i += 1) {
+      //PIPS generated variable
+      int _u_j;
+#pragma omp parallel for 
+      for(_u_j = 1; _u_j <= 10; _u_j += 1) {
+         //PIPS generated variable
+         int _tmpxx0;
+         _tmpxx0 = _u_i+_u_j;
+         _u_a[_u_i-1][_u_j-1] = _tmpxx0;
+      }
+   }
+   double _u_b;
+   *&_u_b = -__huge_val.__d;
+   for(lv0 = 0; lv0 <= 9; lv0 += 1) {
+      //PIPS generated variable
+      int lv1;
+      for(lv1 = 0; lv1 <= 9; lv1 += 1) {
+         //PIPS generated variable
+         register double _u_a_0 = _u_a[lv0][lv1];
+         *&_u_b = _u_a_0>*&_u_b?_u_a_0:*&_u_b;
+      }
+   }
+   scilab_rt_display_s0d0_("b", _u_b);
+
+   scilab_rt_terminate();
+}

@@ -220,9 +220,9 @@ void ts_restructured(void)
 
    if (x<n)
 
-//  T(c1,c2,s,x,y) {c1+x#init==n, c1+x0==n, c1#init==0, c2==0,
-//    c2#init==0, n==x, s==1, s#init==1, y#init==y0, y#init<=m, 0<=n,
-//    x#init+1<=n, 0<=x#init, y#init<=y, 0<=y#init}
+//  T(c1,c2,s,x,y) {c1+x#init==n, c1#init==0, c2==0, c2#init==0, n==x,
+//    s==1, s#init==1, x#init==x0, y#init==y0, 1<=c1, y#init<=m,
+//    0<=x#init, y#init<=y, 0<=y#init}
 
       if (y<m) {
 
@@ -348,8 +348,9 @@ void ts_restructured(void)
 
             checking_error();
 
-//  T(c2,y) {c1+x0==x, c2+y#init==c2#init+y, s==2, c2+y0<=m, y0+1<=m,
-//    0<=n, x+1<=n, x0+1<=n, x0<=x, 0<=x0, y#init<=y, y0<=y, 0<=y0}
+//  T(c2,y) {c1+x0==x, c2+y#init==c2#init+y, s==2, c2#init<=c2,
+//    c2+y0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n, x0<=x, 0<=x0, y0<=y,
+//    0<=y0}
 
          while (rand_b()) {
 
@@ -498,7 +499,7 @@ void ts_restructured(void)
       else {
 
 //  T(c1,c2,s,x) {c1+x#init==c1#init+x, c1+x0==x, c2==0, m==y, m==y0,
-//    s==1, s#init==1, c1#init<=c1, c2#init<=0, 0<=m, x+1<=n, x0<=x,
+//    s==1, s#init==1, c2#init<=0, 0<=m, x+1<=n, x#init<=x, x0<=x,
 //    0<=x0}
 
          while (rand_b()) {
@@ -705,8 +706,8 @@ void ts_singlestate(void)
 
          if (!(s==1&&x<n))
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, c2+y0<=m, y0<=m, x<=n, 1<=s,
-//    s<=2, x0<=x, 0<=x0, y0<=y, 0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, 0<=c1, c2+y0<=m, y0<=m, x<=n,
+//    1<=s, s<=2, 0<=x0, y0<=y, 0<=y0}
 
             deadlock();
 
@@ -1056,15 +1057,15 @@ void ts_restructured(void)
 
             y++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 0<=c2,
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 0<=c1, 0<=c2,
 //    c2+2y0+1<=2m, c2+y0+1<=m, 0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n,
-//    x0<=x, 0<=x0, 0<=y0}
+//    0<=x0, 0<=y0}
 
             c2++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 1<=c2, c2+2y0<=2m,
-//    c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n, x0<=x, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 0<=c1, 1<=c2,
+//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n,
+//    0<=x0, 0<=y0}
 
             if (!(c1<=n-x0&&c2<=m-y0))
 
@@ -1072,44 +1073,40 @@ void ts_restructured(void)
 
                checking_error();
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 1<=c2, c2+2y0<=2m,
-//    c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n, x0<=x, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 0<=c1, 1<=c2,
+//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+1<=n, x0+1<=n,
+//    0<=x0, 0<=y0}
 
             if (!(s==2&&x==n-1))
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 1<=c2, c2+2y0<=2m,
-//    c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+2<=n, x0+1<=n, x0<=x, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==x, m==y, s==2, 0<=c1, 1<=c2,
+//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x+2<=n, x0+1<=n,
+//    0<=x0, 0<=y0}
 
                deadlock();
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x+1, s==2, 1<=c2,
-//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x0+1<=n, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x+1, s==2, 0<=c1,
+//    1<=c2, c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, 0<=x0, 0<=y0}
 
             s = 1;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x+1, s==1, 1<=c2,
-//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x0+1<=n, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x+1, s==1, 0<=c1,
+//    1<=c2, c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, 0<=x0, 0<=y0}
 
             x++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x, s==1, 1<=c2,
-//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x0+1<=n, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, m==y, n==x, s==1, 0<=c1,
+//    1<=c2, c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, 0<=x0, 0<=y0}
 
             c1++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, m==y, n==x, s==1, 1<=c2,
-//    c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, x0+1<=n, 0<=x0,
-//    0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, m==y, n==x, s==1, 1<=c1,
+//    1<=c2, c2+2y0<=2m, c2+y0<=m, 0<=m, y0+1<=m, 0<=n, 0<=x0, 0<=y0}
 
             c2 = 0;
 
 //  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, c2==0, m==y, n==x, s==1,
-//    1<=c1, c1<=n, 0<=m, y0+1<=m, 0<=n, 0<=y0}
+//    1<=c1, 0<=m, y0+1<=m, 0<=n, 0<=x0, 0<=y0}
 
             if (!(c1<=n-x0&&c2<=m-y0))
 
@@ -1134,26 +1131,26 @@ void ts_restructured(void)
 
             s = 1;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, n==x+1, s==1, 0<=c2,
-//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, x0+1<=n,
-//    0<=x0, y0<=y, 0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, n==x+1, s==1, 0<=c1, 0<=c2,
+//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, 0<=x0,
+//    y0<=y, 0<=y0}
 
             x++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, n==x, s==1, 0<=c2,
-//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, x0+1<=n,
-//    0<=x0, y0<=y, 0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n-1, n==x, s==1, 0<=c1, 0<=c2,
+//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, 0<=x0,
+//    y0<=y, 0<=y0}
 
             c1++;
 
-//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, n==x, s==1, 0<=c2,
-//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, x0+1<=n,
-//    0<=x0, y0<=y, 0<=y0}
+//  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, n==x, s==1, 1<=c1, 0<=c2,
+//    c2+2y0<=m+y, c2+y0+1<=m, c2+y0<=y, 0<=m, y0+1<=m, 0<=n, 0<=x0,
+//    y0<=y, 0<=y0}
 
             c2 = 0;
 
 //  P(c1,c2,m,n,s,x,x0,y,y0) {c1+x0==n, c2==0, n==x, s==1, 1<=c1,
-//    c1<=n, 0<=m, 2y0<=m+y, y0+1<=m, 0<=n, y0<=y, 0<=y0}
+//    0<=m, 2y0<=m+y, y0+1<=m, 0<=n, 0<=x0, y0<=y, 0<=y0}
 
             if (!(c1<=n-x0&&c2<=m-y0))
 

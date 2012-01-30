@@ -1,0 +1,16 @@
+void foo1_i0_(int _u_m)
+{
+}
+void foo2_i0_(int _u_n)
+{
+   foo1_i0_(_u_n);
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t170.sce: user function */
+   foo2_i0_(10);
+
+   scilab_rt_terminate();
+}

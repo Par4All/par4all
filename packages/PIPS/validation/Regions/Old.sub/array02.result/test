@@ -330,8 +330,8 @@ void compute(int maxcompute)
 
    for(i = 0; i <= maxcompute-1; i += 1)
 
-//  <image[PHI1][PHI2].re-OUT-EXACT-{PHI1==i, 0<=PHI2, PHI2<=31,
-//    maxcompute==32, 0<=i, i<=31}>
+//  <image[PHI1][PHI2].re-OUT-EXACT-{PHI1==i, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32, 0<=i}>
 
       for(j = 0; j <= maxcompute-1; j += 1) {
 

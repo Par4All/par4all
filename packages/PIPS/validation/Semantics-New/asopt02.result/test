@@ -112,7 +112,7 @@ void asopt02(int x, int y)
 
       scanf("%d", &x);
 
-//  P(i,x,y) {i==0, 0<=y, y<=0}
+//  P(i,x,y) {i==0, y==0}
 
       // To project x and get simple information about y
       i++;

@@ -1,0 +1,13 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /* testing getdate */
+   int _u_a[1][10];
+   scilab_rt_getdate__i2(1, 10, _u_a);
+   double _u_x = scilab_rt_getdate_s0_("s");
+   int _u_b[1][10];
+   scilab_rt_getdate_d0_i2(_u_x, 1, 10, _u_b);
+
+   scilab_rt_terminate();
+}

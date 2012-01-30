@@ -1,0 +1,33 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t145.sce - testing string op == and ~= */
+   if (strcmp("a", "b")==0)
+      scilab_rt_disp_s0_("oops");
+   char *_u_a = (char *) malloc(2);
+   strcpy(_u_a, "a");
+   char *_u_b = (char *) malloc(2);
+   strcpy(_u_b, "b");
+   if (strcmp(_u_a, _u_b)==0)
+      scilab_rt_disp_s0_("a = b _ wrong");
+   if (strcmp(_u_a, _u_b)!=0)
+      scilab_rt_disp_s0_("a != b _ ok");
+   free(_u_b);
+   _u_b = (char *) malloc(2);
+   strcpy(_u_b, "a");
+   if (strcmp(_u_a, _u_b)==0)
+      scilab_rt_disp_s0_("a = b _ ok");
+   if (strcmp(_u_a, _u_b)!=0)
+      scilab_rt_disp_s0_("a != b _ wrong");
+   int _u_true_eq = strcmp(_u_a, _u_b)==0;
+   scilab_rt_display_s0i0_("true_eq", _u_true_eq);
+   int _u_false_eq = strcmp("foo", "bar")==0;
+   scilab_rt_display_s0i0_("false_eq", _u_false_eq);
+   int _u_false_ne = strcmp(_u_a, _u_b)!=0;
+   scilab_rt_display_s0i0_("false_ne", _u_false_ne);
+   int _u_true_ne = strcmp("foo", "bar")!=0;
+   scilab_rt_display_s0i0_("true_ne", _u_true_ne);
+
+   scilab_rt_terminate();
+}

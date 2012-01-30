@@ -1,0 +1,2 @@
+global loop index i must not be privatized in foo since its value is
+re-used in subsequent call to bar inside main.

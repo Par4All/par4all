@@ -1,0 +1,2 @@
+The loop with index i in foo should not be parallelized as the value
+of i is used afterwards in the call to bar from main.

@@ -57,7 +57,8 @@ int main()
 
 //  <a-RE-EXACT-{}>
 //  <a-RE-EXACT-{}>
-//  <a[PHI1]-R-MAY-{1<=PHI1, PHI1<=2}>
+//  <a[PHI1]-R-EXACT-{PHI1==2}>
+//  <a[PHI1]-R-EXACT-{PHI1==1}>
 
    return a[1]+a[2];                                                    /*0012*/
 }
@@ -75,9 +76,11 @@ int main()
 	10 --> 11 with conflicts
 		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
 	10 --> 12 with conflicts
-		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-MAY>
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
 	11 --> 12 with conflicts
-		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-MAY>
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 

@@ -53,8 +53,7 @@ int main()
 {
    int X[13][13], Y[8][8], H[8][13], K[8][8];
    int OUT[8][8], COEFF[6], i, j;
-//             <    is written>: COEFF[0] COEFF[1] COEFF[2] COEFF[3] 
-//                               COEFF[4] COEFF[5]
+//             <may be written>: COEFF[*]
 
    init_coeff(COEFF);
 //             <    is written>: i

@@ -1,0 +1,14 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_a = 1;
+   int _u_b = 1;
+   if (_u_a) {
+      scilab_rt_disp_s0_("titi");
+      if (_u_b)
+         scilab_rt_disp_s0_("tutu");
+   }
+
+   scilab_rt_terminate();
+}

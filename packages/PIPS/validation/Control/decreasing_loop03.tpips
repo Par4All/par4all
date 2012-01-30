@@ -1,0 +1,19 @@
+delete decreasing_loop03
+create decreasing_loop03 decreasing_loop03.c
+
+echo
+echo Parsed code for "decreasing_loop03"
+echo
+
+display PARSED_PRINTED_FILE[decreasing_loop03]
+
+echo
+echo Controlized code for "decreasing_loop03"
+echo
+
+display PRINTED_FILE[decreasing_loop03]
+
+close
+delete decreasing_loop03
+quit
+

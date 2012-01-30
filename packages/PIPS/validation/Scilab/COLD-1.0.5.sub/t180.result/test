@@ -1,0 +1,81 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_a[3][3];
+   _u_a[0][0] = 0;
+   _u_a[0][1] = 0;
+   _u_a[0][2] = 0;
+   _u_a[1][0] = 1;
+   _u_a[1][1] = 1;
+   _u_a[1][2] = 1;
+   _u_a[2][0] = 0;
+   _u_a[2][1] = 0;
+   _u_a[2][2] = 0;
+   scilab_rt_display_s0i2_("a", 3, 3, _u_a);
+   int _u_aBool[3][3];
+   int _u_b[3][3];
+   _u_b[0][0] = 0;
+   _u_b[0][1] = 2;
+   _u_b[0][2] = 3;
+   _u_b[1][0] = 4;
+   _u_b[1][1] = 0;
+   _u_b[1][2] = 6;
+   _u_b[2][0] = 7;
+   _u_b[2][1] = 8;
+   _u_b[2][2] = 0;
+   int _u_bBool[3][3];
+   double _u_c[3][3];
+   _u_c[0][0] = 0;
+   _u_c[0][1] = 2;
+   _u_c[0][2] = 3.2;
+   _u_c[1][0] = 4;
+   _u_c[1][1] = 0.0;
+   _u_c[1][2] = 6;
+   _u_c[2][0] = 7;
+   _u_c[2][1] = 8.9;
+   _u_c[2][2] = 0;
+   int _u_cBool[3][3];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         _u_aBool[__lv1][__lv2] = _u_a[__lv1][__lv2]==0?0:1;
+         _u_bBool[__lv1][__lv2] = _u_b[__lv1][__lv2]==0?0:1;
+         _u_cBool[__lv1][__lv2] = _u_c[__lv1][__lv2]==0?0:1;
+      }
+   }
+   scilab_rt_display_s0i2_("aBool", 3, 3, _u_aBool);
+   scilab_rt_display_s0i2_("b", 3, 3, _u_b);
+   scilab_rt_display_s0i2_("bBool", 3, 3, _u_bBool);
+   scilab_rt_display_s0d2_("c", 3, 3, _u_c);
+   scilab_rt_display_s0i2_("cBool", 3, 3, _u_cBool);
+   int _u_d[3][4];
+   _u_d[0][0] = 0;
+   _u_d[0][1] = 2;
+   _u_d[0][2] = 3;
+   _u_d[0][3] = 3;
+   _u_d[1][0] = 4;
+   _u_d[1][1] = 0;
+   _u_d[1][2] = 6;
+   _u_d[1][3] = 6;
+   _u_d[2][0] = 7;
+   _u_d[2][1] = 8;
+   _u_d[2][2] = 0;
+   _u_d[2][3] = 0;
+   scilab_rt_display_s0i2_("d", 3, 4, _u_d);
+   int _u_dBool[3][4];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 3; __lv2 += 1)
+         _u_dBool[__lv1][__lv2] = _u_d[__lv1][__lv2]==0?0:1;
+   }
+   scilab_rt_display_s0i2_("dBool", 3, 4, _u_dBool);
+
+   scilab_rt_terminate();
+}

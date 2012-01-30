@@ -35,9 +35,7 @@ POINTS-TO
 // q -> _q_2[0] , EXACT
 
 
-// Points To OUT:
-// pi -> _pi_1[*] , EXACT
-// q -> _q_2[0] , EXACT
+// Points To OUT: none
 
 void call01(int *pi, tf_t *q)
 {
@@ -114,7 +112,6 @@ int main()
 {
    int i;
    tf_t s;
-//             <    is written>: i s.one s.two[4]
 
    call01(&i, &s);
 }

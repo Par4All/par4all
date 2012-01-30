@@ -1,0 +1,8 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   /*  (a == b) & (c == d) */
+   /*  ~ not supported */
+   
+   scilab_rt_terminate();
+}
