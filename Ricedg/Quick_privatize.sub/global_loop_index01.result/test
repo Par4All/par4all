@@ -5,7 +5,6 @@ int main()
 {
    int j, a[10];
 
-#pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       a[i] = i;
 
