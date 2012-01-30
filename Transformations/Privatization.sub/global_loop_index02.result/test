@@ -1,0 +1,32 @@
+#
+# Code after privatize_module for module main
+#
+int main()
+{
+   int j, a[10];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+
+#pragma omp for private(j)
+   for(j = 0; j <= 9; j += 1)
+      printf("a[%d] = %d\n", j, a[j]);
+
+   return i;
+}
+#
+# Code after localize_declaration for module main
+#
+int main()
+{
+   int j, a[10];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+
+#pragma omp for private(j)
+   for(j = 0; j <= 9; j += 1)
+      printf("a[%d] = %d\n", j, a[j]);
+
+   return i;
+}
