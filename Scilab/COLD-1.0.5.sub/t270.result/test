@@ -1,0 +1,23 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int __tri0;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t270.sce _ triplet notation */
+   int _u_x = 1;
+   scilab_rt_display_s0i0_("x", _u_x);
+   int _u_y = 10;
+   scilab_rt_display_s0i0_("y", _u_y);
+   int _u_X[1][2];
+#pragma omp parallel for 
+   for(__tri0 = 0; __tri0 <= 1; __tri0 += 1) {
+      //PIPS generated variable
+      register int _tmpxx0_0;
+      _tmpxx0_0 = 1+__tri0*9;
+      _u_X[0][__tri0] = _tmpxx0_0;
+   }
+   scilab_rt_display_s0i2_("X", 1, 2, _u_X);
+
+   scilab_rt_terminate();
+}

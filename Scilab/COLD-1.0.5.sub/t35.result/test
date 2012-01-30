@@ -1,0 +1,33 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _tmpxx0[1][2];
+   _tmpxx0[0][0] = 1;
+   _tmpxx0[0][1] = 2;
+   int _tmpxx1[1][2];
+   _tmpxx1[0][0] = 3;
+   _tmpxx1[0][1] = 4;
+   int _u_a[1][2];
+   __lv1 = 0+1;
+   int _tmpxx2[1][2];
+   _tmpxx2[0][0] = 4;
+   _tmpxx2[0][1] = 6;
+   int _tmpif0[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+      _u_a[0][__lv2] = _tmpxx0[0][__lv2]+_tmpxx1[0][__lv2];
+      _tmpif0[0][__lv2] = _u_a[0][__lv2]!=_tmpxx2[0][__lv2];
+   }
+   scilab_rt_display_s0i2_("a", 1, 2, _u_a);
+   __lv1 = 0+1;
+   int _tmpif1;
+   *&_tmpif1 = (int) 1;
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1)
+      *&_tmpif1 &= _tmpif0[0][__lv1]!=(int) 0;
+   __lv0 = 0+1;
+   if (_tmpif1)
+      scilab_rt_exit_i0_(1);
+
+   scilab_rt_terminate();
+}

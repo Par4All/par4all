@@ -1,0 +1,24 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int __tri0, __tri1;
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_lx[1][10];
+#pragma omp parallel for 
+   for(__tri0 = 0; __tri0 <= 9; __tri0 += 1)
+      _u_lx[0][__tri0] = 1+__tri0*1;
+   int _u_ly[1][10];
+#pragma omp parallel for 
+   for(__tri1 = 0; __tri1 <= 9; __tri1 += 1)
+      _u_ly[0][__tri1] = 1+__tri1*1;
+   double _u_x[10][10];
+   double _u_y[10][10];
+   scilab_rt_meshgrid_i2i2_d2d2(1, 10, _u_lx, 1, 10, _u_ly, 10, 10, _u_x, 10, 10, _u_y);
+   scilab_rt_disp_s0_("x");
+   scilab_rt_display_s0d2_("x", 10, 10, _u_x);
+   scilab_rt_disp_s0_("y");
+   scilab_rt_display_s0d2_("y", 10, 10, _u_y);
+
+   scilab_rt_terminate();
+}

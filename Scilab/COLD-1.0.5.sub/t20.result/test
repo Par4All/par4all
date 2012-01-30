@@ -1,0 +1,33 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   double _u_b[10][10];
+   double _u_c[10][10];
+   double _tmpxx2[10][10];
+   double _tmpxx3[10][10];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1) {
+         //PIPS generated variable
+         register double _tmpxx0_0, _tmpxx1_0, _u_a_0, _u_b_0;
+         _u_a_0 = (double) 1.0;
+         _tmpxx0_0 = _u_a_0+_u_a_0;
+         _u_b_0 = _tmpxx0_0+_u_a_0;
+         _tmpxx1_0 = _u_b_0*2.;
+         _u_c[__lv1][__lv2] = _tmpxx1_0+3.;
+         _tmpxx2[__lv1][__lv2] = _u_a_0+_u_b_0;
+         _tmpxx3[__lv1][__lv2] = _u_c[__lv1][__lv2]+(double) 2;
+         _u_b[__lv1][__lv2] = _u_b_0;
+      }
+   }
+   scilab_rt_display_s0d2_("b", 10, 10, _u_b);
+   scilab_rt_display_s0d2_("c", 10, 10, _u_c);
+   double _u_d[10][10];
+   scilab_rt_mul_d2d2_d2(10, 10, _tmpxx2, 10, 10, _tmpxx3, 10, 10, _u_d);
+   scilab_rt_display_s0d2_("d", 10, 10, _u_d);
+
+   scilab_rt_terminate();
+}

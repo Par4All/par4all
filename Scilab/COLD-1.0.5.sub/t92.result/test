@@ -1,0 +1,13 @@
+void foo__()
+{
+   scilab_rt_disp_s0_("foo");
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t92.sce: testing user function with no args, no return value */
+   foo__();
+
+   scilab_rt_terminate();
+}

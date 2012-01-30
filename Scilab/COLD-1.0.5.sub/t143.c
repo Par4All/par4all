@@ -1,0 +1,42 @@
+/*
+ * (c) HPC Project - 2010-2011 - All rights reserved
+ *
+ */
+
+#include "scilab_rt.h"
+
+
+int __lv0;
+int __lv1;
+int __lv2;
+int __lv3;
+
+/*----------------------------------------------------*/
+
+
+/*----------------------------------------------------*/
+
+int main(int argc, char* argv[])
+{
+  scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+
+  /* testing eomday */
+  int _u_a[2][2];
+  _u_a[0][0]=1954;
+  _u_a[0][1]=1983;
+  _u_a[1][0]=2004;
+  _u_a[1][1]=2005;
+  int _u_b[2][2];
+  _u_b[0][0]=12;
+  _u_b[0][1]=3;
+  _u_b[1][0]=2;
+  _u_b[1][1]=9;
+  int _u_c = scilab_rt_eomday_i0i0_(2012,2);
+  scilab_rt_display_s0i0_("c",_u_c);
+  int _u_d[2][2];
+  scilab_rt_eomday_i2i2_i2(2,2,_u_a,2,2,_u_b,2,2,_u_d);
+  scilab_rt_display_s0i2_("d",2,2,_u_d);
+
+  scilab_rt_terminate();
+}
+

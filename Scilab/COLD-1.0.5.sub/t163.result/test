@@ -1,0 +1,54 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int j_0, i_1, j_2;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t163.sce: aref = aref and aref = adef */
+   double _u_a[10][10];
+   double _u_b[10][10];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1) {
+         _u_a[__lv1][__lv2] = (double) 1.0;
+         _u_b[__lv1][__lv2] = (double) 0.0;
+      }
+   }
+
+#pragma omp parallel for 
+   for(j_0 = 0; j_0 <= 9; j_0 += 1) {
+      _u_a[0][j_0] = _u_b[0][j_0];
+      _u_a[j_0][0] = _u_b[j_0][0];
+   }
+
+#pragma omp parallel for 
+   for(i_1 = 3; i_1 <= 4; i_1 += 1) {
+      //PIPS generated variable
+      int j_1;
+#pragma omp parallel for 
+      for(j_1 = 3; j_1 <= 4; j_1 += 1)
+         _u_a[i_1][j_1] = _u_b[i_1][j_1];
+   }
+   scilab_rt_display_s0d2_("a", 10, 10, _u_a);
+   int _tmpxx0[1][10];
+   _tmpxx0[0][0] = 1;
+   _tmpxx0[0][1] = 2;
+   _tmpxx0[0][2] = 3;
+   _tmpxx0[0][3] = 4;
+   _tmpxx0[0][4] = 5;
+   _tmpxx0[0][5] = 6;
+   _tmpxx0[0][6] = 7;
+   _tmpxx0[0][7] = 8;
+   _tmpxx0[0][8] = 9;
+   _tmpxx0[0][9] = 10;
+
+#pragma omp parallel for 
+   for(j_2 = 0; j_2 <= 9; j_2 += 1)
+      _u_a[0][j_2] = _tmpxx0[0][j_2];
+   scilab_rt_display_s0d2_("a", 10, 10, _u_a);
+
+   scilab_rt_terminate();
+}

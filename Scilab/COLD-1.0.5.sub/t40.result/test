@@ -1,0 +1,23 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int __tri0, __n0;
+   scilab_rt_init(argc, argv, 0);
+   int _u_a[1][10];
+#pragma omp parallel for 
+   for(__tri0 = 0; __tri0 <= 9; __tri0 += 1) {
+      //PIPS generated variable
+      register int _tmpxx0_0;
+      _tmpxx0_0 = 1+__tri0*1;
+      _u_a[0][__tri0] = _tmpxx0_0;
+   }
+   scilab_rt_display_s0i2_("a", 1, 10, _u_a);
+   for(__n0 = 0; __n0 <= 9; __n0 += 1) {
+      //PIPS generated variable
+      int _u_i;
+      _u_i = _u_a[0][__n0];
+      scilab_rt_disp_i0_(_u_i);
+   }
+
+   scilab_rt_terminate();
+}

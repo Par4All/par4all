@@ -1,0 +1,16 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_i, _u_j, _u_k;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t96.sce: testing loop with negative increment */
+   for(_u_i = 2; _u_i <= 5; _u_i += 1)
+      scilab_rt_display_s0i0_("i", _u_i);
+   for(_u_j = -5; _u_j <= -2; _u_j += 1)
+      scilab_rt_display_s0i0_("j", _u_j);
+   for(_u_k = 10; _u_k >= 5; _u_k += -1)
+      scilab_rt_display_s0i0_("k", _u_k);
+
+   scilab_rt_terminate();
+}

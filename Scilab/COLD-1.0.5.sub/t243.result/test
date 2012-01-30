@@ -1,0 +1,77 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t243.sce - from mcgill/trid_function.sce */
+   /*  trid.sce */
+   scilab_rt_tic__();
+   double _u_x[1][1000];
+   trid__d2(1, 1000, _u_x);
+   double _u_elapsedTime = scilab_rt_toc__();
+   /* disp("Elapsed Time: "); */
+   /* disp(elapsedTime); */
+   scilab_rt_disp_s0_("Mean value of matrix x: ");
+   double _tmpxx0;
+   scilab_rt_mean_d2_d0(1, 1000, _u_x, &_tmpxx0);
+   scilab_rt_disp_d0_(_tmpxx0);
+
+   scilab_rt_terminate();
+}
+void trid__d2(int _u_x_n0, int _u_x_n1, double _u_x[_u_x_n0][_u_x_n1])
+{
+   int _u_n = 1000;
+   double _u_a[1][1000];
+   //PIPS generated variable
+   int _u_j_0;
+   //PIPS generated variable
+   int _u_j_1;
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t243.tmp/t243.c", 22, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_a[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_b[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t243.tmp/t243.c", 24, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_b[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_c[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t243.tmp/t243.c", 26, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_c[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   double _u_d[1][1000];
+   (int) _u_n==1000?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 1000", ".t243.tmp/t243.c", 28, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 999; __lv2 += 1)
+      _u_d[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   1==_u_x_n0&&1000==_u_x_n1?(void) 0:__assert_fail("1 == _u_x_n0 && 1000 == _u_x_n1", ".t243.tmp/t243.c", 30, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_x_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_x_n1-1; __lv2 += 1)
+         _u_x[__lv1][__lv2] = _u_d[__lv1][__lv2];
+   }
+   int _u_l;
+   *&_u_l = _u_x_n0*_u_x_n1;
+   for(_u_j_0 = 1; _u_j_0 <= _u_l-1; _u_j_0 += 1) {
+      //PIPS generated variable
+      double _tmpxx1, _tmpxx2, _tmpxx3, _tmpxx4, _u_mu;
+      _tmpxx1 = _u_a[0][_u_j_0-1];
+      _tmpxx2 = _u_b[0][_u_j_0-1];
+      _u_mu = _tmpxx1/_tmpxx2;
+      _tmpxx3 = _u_b[0][_u_j_0+1-1]-_u_mu*_u_c[0][_u_j_0-1];
+      _u_b[0][_u_j_0+1-1] = _tmpxx3;
+      _tmpxx4 = _u_x[0][_u_j_0+1-1]-_u_mu*_u_x[0][_u_j_0-1];
+      _u_x[0][_u_j_0+1-1] = _tmpxx4;
+   }
+   double _tmpxx5 = _u_x[0][_u_l-1]/_u_b[0][_u_l-1];
+   _u_x[0][_u_l-1] = _tmpxx5;
+   for(_u_j_1 = _u_l-1; _u_j_1 >= 1; _u_j_1 += -1) {
+      //PIPS generated variable
+      double _tmpxx6;
+      _tmpxx6 = (_u_x[0][_u_j_1-1]-_u_c[0][_u_j_1-1]*_u_x[0][_u_j_1+1-1])/_u_b[0][_u_j_1-1];
+      _u_x[0][_u_j_1-1] = _tmpxx6;
+   }
+}

@@ -1,0 +1,104 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t262.sce: power with complex */
+   int _u_as = 2;
+   scilab_rt_display_s0i0_("as", _u_as);
+   int _tmp0 = pow(_u_as, 3);
+   scilab_rt_display_s0i0_("ans", _tmp0);
+   int _tmp1 = pow(3, _u_as);
+   scilab_rt_display_s0i0_("ans", _tmp1);
+   double _Complex _tmpxx0 = 3*1.0iF;
+   double _Complex _u_bs = 3+_tmpxx0;
+   scilab_rt_display_s0z0_("bs", _u_bs);
+   double _Complex _tmp2 = cpow(_u_bs, 5);
+   scilab_rt_display_s0z0_("ans", _tmp2);
+   double _Complex _tmp3 = cpow(5, _u_bs);
+   scilab_rt_display_s0z0_("ans", _tmp3);
+   double _Complex _tmpxx1 = 1*1.0iF;
+   double _Complex _tmpxx2 = 2*1.0iF;
+   double _Complex _u_a[1][2];
+   _u_a[0][0] = 1+_tmpxx1;
+   _u_a[0][1] = 2+_tmpxx2;
+   scilab_rt_display_s0z2_("a", 1, 2, _u_a);
+   double _Complex _tmpxx3 = 1*1.0iF;
+   double _Complex _tmpxx4 = 2*1.0iF;
+   double _Complex _tmpxx5 = 4*1.0iF;
+   double _Complex _tmpxx6 = 6*1.0iF;
+   double _Complex _u_b[2][2];
+   _u_b[0][0] = 1+_tmpxx3;
+   _u_b[0][1] = 2+_tmpxx4;
+   _u_b[1][0] = 3+_tmpxx5;
+   _u_b[1][1] = 5+_tmpxx6;
+   scilab_rt_display_s0z2_("b", 2, 2, _u_b);
+   double _Complex _tmp4[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _tmp4[0][__lv2] = cpow(_u_a[0][__lv2], 10);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("ans", 1, 2, _tmp4);
+   __lv1 = 0+1;
+   double _Complex _tmpxx8 = 2*1.0iF;
+   double _Complex _tmp5[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+      //PIPS generated variable
+      register double _Complex _tmpxx7_0;
+      _tmpxx7_0 = cpow(_u_a[0][__lv2], 10);
+      _tmp5[0][__lv2] = _tmpxx7_0+_tmpxx8;
+   }
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("ans", 1, 2, _tmp5);
+   double _Complex _tmp6[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _tmp6[0][__lv2] = cpow(1.0iF, _u_a[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("ans", 1, 2, _tmp6);
+   double _Complex _tmp7[2][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+         _tmp7[__lv1][__lv2] = cpow(1.0iF, _u_b[__lv1][__lv2]);
+   }
+   scilab_rt_display_s0z2_("ans", 2, 2, _tmp7);
+   double _Complex _tmpxx9 = 1*1.0iF;
+   double _Complex _tmpxx10 = 2*1.0iF;
+   double _Complex _tmpxx11[1][2];
+   _tmpxx11[0][0] = 1+_tmpxx9;
+   _tmpxx11[0][1] = 2+_tmpxx10;
+   double _Complex _tmp8[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _tmp8[0][__lv2] = cpow(_tmpxx11[0][__lv2], 2);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("ans", 1, 2, _tmp8);
+   int _tmpxx12[1][9];
+   _tmpxx12[0][0] = 1;
+   _tmpxx12[0][1] = 2;
+   _tmpxx12[0][2] = 3;
+   _tmpxx12[0][3] = 4;
+   _tmpxx12[0][4] = 5;
+   _tmpxx12[0][5] = 6;
+   _tmpxx12[0][6] = 7;
+   _tmpxx12[0][7] = 8;
+   _tmpxx12[0][8] = 9;
+   __lv1 = 0+1;
+   double _Complex _tmpxx14 = 2*1.0iF;
+   double _Complex _tmp9[1][9];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 8; __lv2 += 1) {
+      //PIPS generated variable
+      register int _tmpxx13_0;
+      _tmpxx13_0 = pow(_tmpxx12[0][__lv2], 1);
+      _tmp9[0][__lv2] = (double _Complex) _tmpxx13_0+_tmpxx14;
+   }
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("ans", 1, 9, _tmp9);
+
+   scilab_rt_terminate();
+}

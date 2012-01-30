@@ -1,0 +1,46 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   double _tmpxx0;
+   scilab_rt_init(argc, argv, 0);
+
+   double _u_man_eps = 1.0;
+   double _u_save = 0.0;
+   //PIPS generated variable
+l99998:   ;
+   if (_u_man_eps+1!=1) {
+   }
+   else {
+      goto l99999;
+   }
+   _u_save = _u_man_eps;
+   _u_man_eps = _u_man_eps/2;
+   _tmpxx0 = _u_man_eps+1;
+   if (_tmpxx0==1) {
+   }
+   else {
+      goto l99998;
+   }
+l99999:   ;
+   _u_man_eps = _u_save;
+   scilab_rt_display_s0d0_("man_eps", _u_man_eps);
+   scilab_rt_display_s0d0_("%eps", SCILAB_EPS);
+   double _tmpxx1 = _u_man_eps+1;
+   if (_tmpxx1!=1)
+      scilab_rt_disp_s0_("manual eps + 1 =>  different of 1");
+   else
+      scilab_rt_disp_s0_("manual eps + 1 =>  equal to 1");
+   double _tmpxx2 = SCILAB_EPS+1;
+   if (_tmpxx2!=1)
+      scilab_rt_disp_s0_("%eps + 1 ~= different of 1");
+   else
+      scilab_rt_disp_s0_("%eps + 1 => equal to 1");
+   double _tmpxx3 = _u_man_eps/2;
+   double _tmpxx4 = _tmpxx3+1;
+   if (_tmpxx4!=1)
+      scilab_rt_disp_s0_("manual eps/2 + 1 =>  different of 1");
+   else
+      scilab_rt_disp_s0_("manual eps/2 + 1 =>  equal to 1");
+
+   scilab_rt_terminate();
+}

@@ -1,0 +1,26 @@
+double foo_d0_(double _u_a)
+{
+   int _u_n = 1;
+   double _u_res = _u_a+_u_n;
+   return _u_res;
+}
+int foo_i0_(int _u_a)
+{
+   int _u_n = 1;
+   int _u_res = _u_a+_u_n;
+   return _u_res;
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t95.sce: testing user function */
+   int _u_t1 = foo_i0_(1);
+   scilab_rt_display_s0i0_("t1", _u_t1);
+   double _u_t2 = foo_d0_(1.1);
+   scilab_rt_display_s0d0_("t2", _u_t2);
+   int _u_t3 = foo_i0_(2);
+   scilab_rt_display_s0i0_("t3", _u_t3);
+
+   scilab_rt_terminate();
+}

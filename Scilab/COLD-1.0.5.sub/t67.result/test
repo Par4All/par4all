@@ -1,0 +1,77 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t67.sce: testing rand function */
+   double _tmp0[3][3];
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _tmp0[__lv1][__lv2] = (double) rand()/((double) 2147483647);
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp0);
+   double _tmp1[3][3];
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _tmp1[__lv1][__lv2] = (double) rand()/((double) 2147483647);
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp1);
+   double _tmp2[3][3];
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _tmp2[__lv1][__lv2] = (double) rand()/((double) 2147483647);
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp2);
+   1;
+   2;
+   3;
+   4;
+   5;
+   6;
+   7;
+   8;
+   9;
+   double _tmp3[3][3];
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
+         _tmp3[__lv1][__lv2] = (double) rand()/((double) 2147483647);
+   }
+   scilab_rt_display_s0d2_("ans", 3, 3, _tmp3);
+   double _Complex _tmpxx0 = 2*1.0iF;
+   double _Complex _tmpxx1 = 4*1.0iF;
+   double _Complex _tmpxx2 = 6*1.0iF;
+   double _Complex _tmpxx3 = 8*1.0iF;
+   1+_tmpxx0;
+   3+_tmpxx1;
+   5+_tmpxx2;
+   7+_tmpxx3;
+   double _Complex _tmp4[2][2];
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+         _tmp4[__lv1][__lv2] = (double) rand()/((double) 2147483647)+(double) rand()/((double) 2147483647)*1.0iF;
+   }
+   scilab_rt_display_s0z2_("ans", 2, 2, _tmp4);
+   double _tmp5[2][3][2];
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+      for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
+            _tmp5[__lv1][__lv2][__lv3] = (double) rand()/((double) 2147483647);
+      }
+   }
+   scilab_rt_display_s0d3_("ans", 2, 3, 2, _tmp5);
+
+   scilab_rt_terminate();
+}

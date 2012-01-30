@@ -1,0 +1,39 @@
+double foo_i0i2i0_(int _u_s, int _u_sA_n0, int _u_sA_n1, int _u_sA[_u_sA_n0][_u_sA_n1], int _u_p)
+{
+   int _tmpxx1[_u_sA_n0][_u_sA_n1];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_sA_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_sA_n1-1; __lv2 += 1) {
+         //PIPS generated variable
+         register int _tmpxx0_0;
+         _tmpxx0_0 = abs(_u_sA[__lv1][__lv2]);
+         _tmpxx1[__lv1][__lv2] = pow(_tmpxx0_0, _u_p);
+      }
+   }
+   int _tmpxx2;
+   scilab_rt_sum_i2_i0(_u_sA_n0, _u_sA_n1, _tmpxx1, &_tmpxx2);
+   double _tmpxx3 = (double) 1/_u_p;
+   double _tmpxx4 = pow(_tmpxx2, _tmpxx3);
+   double _u_y = _u_s*_tmpxx4;
+   return _u_y;
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t204.sce: CODEGEN for A = call(), user function */
+   int _u_s = 4;
+   int _u_sA[1][4];
+   _u_sA[0][0] = 1;
+   _u_sA[0][1] = 2;
+   _u_sA[0][2] = 3;
+   _u_sA[0][3] = 4;
+   int _u_p = 2;
+   double _tmp0 = foo_i0i2i0_(_u_s, 1, 4, _u_sA, _u_p);
+   scilab_rt_display_s0d0_("ans", _tmp0);
+
+   scilab_rt_terminate();
+}

@@ -1,0 +1,61 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _tmpxx0[1][2];
+   _tmpxx0[0][0] = 1;
+   _tmpxx0[0][1] = 2;
+   int _u_a[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_a[0][__lv2] = -_tmpxx0[0][__lv2];
+   __lv1 = 0+1;
+   scilab_rt_display_s0i2_("a", 1, 2, _u_a);
+   int _tmpxx1[1][2];
+   _tmpxx1[0][0] = 1;
+   _tmpxx1[0][1] = 2;
+   int _u_b[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_b[0][__lv2] = -_tmpxx1[0][__lv2];
+   __lv1 = 0+1;
+   scilab_rt_display_s0i2_("b", 1, 2, _u_b);
+   int _tmpxx2[1][2];
+   _tmpxx2[0][0] = 1;
+   _tmpxx2[0][1] = 2;
+   int _u_c[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_c[0][__lv2] = -_tmpxx2[0][__lv2];
+   __lv1 = 0+1;
+   scilab_rt_display_s0i2_("c", 1, 2, _u_c);
+   int _tmpxx3[1][2];
+   _tmpxx3[0][0] = 1;
+   _tmpxx3[0][1] = 2;
+   int _u_d[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_d[0][__lv2] = -_tmpxx3[0][__lv2];
+   __lv1 = 0+1;
+   scilab_rt_display_s0i2_("d", 1, 2, _u_d);
+   double _tmpxx4 = cos(SCILAB_PI/4.);
+   double _u_e = -_tmpxx4;
+   scilab_rt_display_s0d0_("e", _u_e);
+   double _u_aa[10][10];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
+         _u_aa[__lv1][__lv2] = (double) 1.0;
+   }
+   double _tmpxx5 = _u_aa[0][0];
+   double _tmpxx6 = _u_aa[0][1];
+   double _tmpxx7 = -_tmpxx5;
+   double _tmpxx8 = _tmpxx6*2;
+   double _u_f = _tmpxx7-_tmpxx8;
+   scilab_rt_display_s0d0_("f", _u_f);
+
+   scilab_rt_terminate();
+}

@@ -1,0 +1,23 @@
+void foo__()
+{
+   scilab_rt_disp_s0_("foo");
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t272.sce _ fixed PR-161 */
+   int _u_a;
+   int _u_b;
+   quux__i0i0(&_u_a, &_u_b);
+   scilab_rt_display_s0i0_("b", _u_b);
+   scilab_rt_display_s0i0_("a", _u_a);
+
+   scilab_rt_terminate();
+}
+void quux__i0i0(int *_u_u, int *_u_v)
+{
+   foo__();
+   *_u_u = 1;
+   *_u_v = 1;
+}
