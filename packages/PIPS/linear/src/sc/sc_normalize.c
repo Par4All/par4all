@@ -45,6 +45,8 @@
 #include "sc.h"
 
 
+/* Two candidates for arithmetique/value.c, which does not exist, or
+   for value/value.c, which does not exist either. */
 static void negate_value_interval(Value * pmin, Value * pmax)
 {
   Value t = value_uminus(*pmin);
@@ -66,36 +68,43 @@ static void swap_value_intervals(Value * px_min, Value * px_max,
   swap_values(px_max, py_max);
 }
 
-/* Bounded normalization relies on numerical bounds l and b for vector
- * x, such that l<=x<=b.
+/* Bounding box (not really a box most of the time)
+ *
+ * The bounding box is made of all 1-D constraints found in a
+ * constraint system and is represented by five vectors ub, lb, cb, u
+ * and l.
+ *
+ * The function sc_bounded_normalization() and the function
+ * reduce_coefficients_with_bounding_box() both rely on numerical
+ * bounds l and b for vector x, such that l<=x<=b.
  *
  * However, lower and upper bounds are not always available for all
- * components x_i of x. And 0 is a perfectly valid bound. Hence, the
+ * components x_i of x. And 0 is a perfectly valid bound, that is not
+ * represented with linear sparse vector representation. Hence, the
  * bound information cannot be carried by only two vectors. Four
  * vectors are used, two basis vectors, lb and ub, used to specifiy if
- * a bound is available, and two vectors l and b to contain the bounds.
+ * a bound is available, and two vectors l and b to contain the
+ * bounds.
  *
  * Note that l and u are not usual vectors. The constant bounds appear
  * as variable coefficients. For instance, l=2u+3v, together with
  * lb=u+v+w, means that the lower bounds for x_u, x_v and x_w are 2, 3
  * and 0.
  *
- * Note also that it might be useful to separate the
- * sc_bounded_normalization into two functions, one to create the
- * bounding box and one to eliminate constraints according to the
- * bounding box. For instance, when a system is projected along
- * several dimensions, the bounding box could be computed initially
- * and reused at each projection stage. The advantage is to preserve
- * information that may be killed by a redundancy test. The
- * inconvenient is not to take advantage of the newly created
- * constraints. The best might be to update the bouding box at each
- * stage.
+ * When the lower and upper bounds are known and equal, another base vector,
+ * cb, is introduced to flag the constants.
  *
  * FI: I do not want to introduce a new data structure to represent a
  * bounding box, and I do not like the idea of keeping independently
- * four vectors.
+ * five vectors...
+ *
+ * However, I could not think of a simple data structure to store the
+ * bounding box as a unique object. With more variables, it would be
+ * better to use hash tables to link variables to their lower and
+ * upper bound and to their value when they are constant. Hence the
+ * use of four sparse vectors as explained above.
  */
-
+
 /* Auxiliary functions for sc_bounded_normalization(): build the
  * bounding box
  *
@@ -106,7 +115,9 @@ static void swap_value_intervals(Value * px_min, Value * px_max,
  *
  * lower_p? var <= nb : var>=nb
  *
- * It is not possible to detect an empty system here
+ * It is not possible to detect an empty system here because
+ * information on both bounds is not available simultaneously. lb, l,
+ * ub and u should all be passed for the check.
  */
 static void update_lower_or_upper_bound(Pvecteur * bound_p,
 					Pvecteur * bound_base_p,
@@ -119,6 +130,7 @@ static void update_lower_or_upper_bound(Pvecteur * bound_p,
     Value pb = vect_coeff(var, *bound_p); /* previous bound */
     if(lower_p) { /* bigger is better */
       if(nb>pb) { /* update bound */
+	// vect_chg_coeff() should be used for a simpler update...
 	vect_add_elem(bound_p, var, value_minus(nb,pb));
       }
       else {
@@ -226,9 +238,15 @@ static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
 }
 
 /* Use constants imposed by the bounding box to eliminate constant
-   terms from constraint eq, unless this is the constraint defining
-   the bounding box. Constant variables are defined by basis cb and
-   their value are found in l */
+ * terms from constraint eq.
+ *
+ * Unless this is the constraint defining the bounding box? Destroy it
+ * any way to remove redundancy and expect the bounding box contraints
+ * to be added later.
+ *
+ * Constant variables are defined by basis cb and their value are
+ * found in l (See description of bounding box above).
+ */
 static void
 simplify_constraint_with_bounding_box(Pcontrainte eq,
 				      Pbase cb,
@@ -262,7 +280,7 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
   if(!VECTEUR_NUL_P(dv)) {
     Pvecteur nv = vect_add(v, dv);
     bool substitute_p = true;
-    if(/*!is_inequality_p &&*/ VECTEUR_NUL_P(nv)) {
+    if(false && /*!is_inequality_p &&*/ VECTEUR_NUL_P(nv)) {
       /* do not destroy this equation by simplification if it defines
 	 a constant... */
       int n = vect_size(v);
@@ -273,11 +291,11 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
     if(substitute_p) {
       ifscdebug(1) {
 	/* For debugging: init_variable_debug_name(entity_local_name) */
-	fprintf(stderr, "Initial constraint:\n");
+	fprintf(stderr, "Initial constraint v=%p:\n", v);
 	vect_dump(v);
-	fprintf(stderr, "Difference:\n");
+	fprintf(stderr, "Difference dv=%p:\n", dv);
 	vect_dump(dv);
-	fprintf(stderr, "New constraint:\n");
+	fprintf(stderr, "New constraint nv=%p:\n", nv);
 	vect_dump(nv);
       }
       vect_rm(v);
@@ -499,7 +517,9 @@ static bool eligible_for_coefficient_reduction_with_bounding_box_p(Pvecteur v,
 }
 
 /* Check that the coefficients on the first and second variables, x
- * and y, define a increasing line with a slope less than one.
+ * and y, define a increasing line.
+ *
+ * With a slope less than one? Used to be a condition, but was lifted.
  *
  * Internal check used after a change of frame.
  *
@@ -533,7 +553,7 @@ static bool small_slope_and_first_quadrant_p(Pvecteur v)
 
   return ok_p;
 }
-
+
 /* Compute a normalized version of the constraint v and the
  * corresponding change of basis.
  *
@@ -640,6 +660,7 @@ new_constraint_for_coefficient_reduction_with_bounding_box(Pvecteur v,
   return nv;
 }
 
+/* FI: Could be moved in vecteur library... */
 /* Compute the equation of the line joining (x0,y0) and (x1,y1) 
  *
  * (x1-x0) y = (y1 -y0) (x - x0) + y0 (x1-x0)
@@ -677,6 +698,8 @@ static Pvecteur vect_make_line(Variable x, Variable y,
    It would be possible to find the intermediate points faster using
    intersections with the constraints instead of using an incremental
    step-by-step approach.
+
+   This is an auxiliary function for coefficient reduction.
  */
 static bool find_first_integer_point_in_between(Value x0,
 						Value y0,
@@ -865,7 +888,8 @@ static bool find_integer_point_to_the_left(Value x0,
 						    VALUE_MONE, VALUE_MONE,
 						    xf, yf, pfx, pfy);
 }
-
+
+/* FI: a bit too specific for vecteur library? */
 static Value eval_2D_vecteur(Pvecteur v, Variable x, Variable y, Value xv, Value yv)
 {
   Value k = VALUE_ZERO;
@@ -885,7 +909,7 @@ static Value eval_2D_vecteur(Pvecteur v, Variable x, Variable y, Value xv, Value
  *
  * The value in ilmpx are assumed to be striclty increasing. The value
  * in ilmpy are increasing. To be convex, the slopes of the successive
- * cosntraints must be decreasing.
+ * constraints must be decreasing.
  */
 static
 Pcontrainte build_convex_constraints_from_vertices(Variable x, Variable y,
@@ -1055,6 +1079,13 @@ Pcontrainte find_intermediate_constraints_recursively(Pvecteur v,
    This function was based on the wrong assumption that at most three
    constraints were sufficient to replace exactly v. This is proved
    wrong by slope15.c.
+
+   This function is now obsolete: it was based on the wrong assumption
+   that three constraints at most would be necessary to replace one
+   rational constraint. We ended up with a case requiring four
+   constraints in linked_regions02 and we have no proof that the
+   number of integer vertices, and hence the number of constraints is
+   bounded by a smaller bound than min(dx,dy+1).
  */
 Pcontrainte find_intermediate_constraints(Pvecteur v, Variable x, Variable y,
 					  Value lmpx, Value lmpy,
@@ -1159,7 +1190,7 @@ Pcontrainte find_intermediate_constraints(Pvecteur v, Variable x, Variable y,
   }
   return ineq;
 }
-
+
 /* Replace 2-D constraint v by a set of constraints when possible
    because variable x is bounded by [x_min,x_max].  The set of
    constraints contains one, two or three new constraints.
@@ -1391,7 +1422,7 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
   }
   return ineq;
 }
-
+
 /* Perform a reverse change of base to go back into the source code
    frame */
 static void update_coefficient_signs_in_vector(Pvecteur v, int cb,
@@ -1425,7 +1456,7 @@ static void update_coefficient_signs_in_constraints(Pcontrainte eq, int cb,
   if(cb&2)
     negate_value_interval(y_min,y_max);
 }
-
+
 /* debug function: check that all 2-D constraints c in ineq are equivalent
    to contraint v on interval [x_min,x_max].
 
@@ -1510,7 +1541,7 @@ static void check_coefficient_reduction(Pvecteur v, Pcontrainte ineq,
     }
   }
 }
-
+
 /* If at least one of the coefficients of constraint v == ax+by<=c are
  * greater that the intervals of the bounding box, reduce them to be
  * at most the the size of the intervals.
@@ -1584,12 +1615,63 @@ static Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
 
   return ineq;
 }
+
+/* Add the constraints defined by cb, lb and ub in Psysteme ps
+ * 
+ * This is necessary when all constraints redundant wrt the bounding
+ * box are removed, for instance to detect simple equalities (x<=2 &&
+ * x>=2) and to remove redundant constraints (x<=2 && x<=2).
+ */
+static
+Psysteme add_bounding_box_constraints(Psysteme ps, Pbase cb, Pbase lb, Pbase ub,
+				      Pvecteur l, Pvecteur u)
+{
+  Pvecteur cv;
+  Pcontrainte eq = CONTRAINTE_UNDEFINED;
+  Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+
+  /* add the equalities */
+  for(cv=cb; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+    Variable x = vecteur_var(cv);
+    Value b = vect_coeff(x, l); // u might be used as well
+    Pcontrainte c = contrainte_make_1D(VALUE_ONE, x, b, true);
+    contrainte_succ(c) = eq;
+    eq = c;
+  }
+
+  /* Add the upper bounds */
+  for(cv=ub; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+    Variable x = vecteur_var(cv);
+    if(!base_contains_variable_p(cb,x)) {
+      Value b = vect_coeff(x, u);
+      Pcontrainte c = contrainte_make_1D(VALUE_ONE, x, b, true);
+      contrainte_succ(c) = ineq;
+      ineq = c;
+    }
+  }
+
+  /* Add the lower bounds */
+  for(cv=lb; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+    Variable x = vecteur_var(cv);
+    if(!base_contains_variable_p(cb,x)) {
+      Value b = vect_coeff(x, l);
+      Pcontrainte c = contrainte_make_1D(VALUE_ONE, x, b, false);
+      contrainte_succ(c) = ineq;
+      ineq = c;
+    }
+  }
+
+  sc_add_egalites(ps, eq);
+  sc_add_inegalites(ps, ineq);
+  assert(sc_consistent_p(ps));
+  return ps;
+}
 							 
 
 /* Eliminate trivially redundant integer constraint using a O(n x d^2)
  * algorithm, where n is the number of constraints and d the
  * dimension. And possibly detect an non feasible constraint system
- * ps.
+ * ps. Also, reduce the coefficients of 2-D constraints when possible.
  *
  * This function must not be used to decide emptyness when checking
  * redundancy with Fourier-Motzkin because this may increase the
@@ -1644,7 +1726,7 @@ static Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
  * the function updating the bounds returned the information. Note
  * that non feasability cannot be checked because the opposite bound
  * vectors are not passed. If they were, then no simple return code
- * would do.
+ * would do. THIS HAS BEEN CHANGED.
  *
  * The same is true for equations. But the function updating the
  * bounds cannot return directly two pieces of information: the
@@ -1653,7 +1735,8 @@ static Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
  * It would be easier to simplify all constraints and then to add the
  * bounding box constraints. Constraints must be normalized initially
  * to avoid destroying useful constraints. For instance, 2i<=99
- * generates i<=49 whicg proves 21<=99 striclty redundant.
+ * generates i<=49 whicg proves 21<=99 striclty redundant. THIS HAS
+ * BEEN PARTIALLY CHANGED.
  *
  * Software engineering remarks
  *
@@ -1665,19 +1748,20 @@ static Pcontrainte reduce_coefficients_with_bounding_box(Pvecteur v,
  *
  * This function could be split into three functions, one to compute
  * the bounding box, one to simplify a constraint system according to
- * a bounding box and the third one calling those two. This could be
- * useful when projecting a system because the initial bounding box
- * remains valid all along the projection, no matter that happens to
- * the initial constraint. However, the bounding box might be improved
- * with the projections... Since the bounding box computation is fast
- * enough, the function was not split and the transformer (see PIPS)
- * projection uses it at each stage.
+ * a bounding box and the third one calling those two, and the
+ * coefficient reduction function, which also uses the bounding
+ * box. 
  *
- * However, I could not think of a simple data structure to store the
- * bounding box as a unique object. With more variables, it would be
- * better to use hash tables to link variables to their lower and
- * upper bound and to their value when they are constant. Hence the
- * use of four sparse vectors as explained above.
+ * This split could be useful when projecting a system because the
+ * initial bounding box remains valid all along the projection, no
+ * matter that happens to the initial constraint. However, the
+ * bounding box might be improved with the projections... Since the
+ * bounding box computation is fast enough, the function was not split
+ * and the transformer (see PIPS) projection uses it at each
+ * stage. Note that the bouding box may also disappear via overflows
+ * and redundancy detection. See for instance the disparition of
+ * declaration constraints in convex array regions when the
+ * corresponding option is set to true.
  */
 Psysteme sc_bounded_normalization(Psysteme ps)
 {
@@ -1689,8 +1773,11 @@ Psysteme sc_bounded_normalization(Psysteme ps)
   Pvecteur l = VECTEUR_NUL;
   Pbase ub = BASE_NULLE;
   Pbase lb = BASE_NULLE;
+  Pvecteur cb = VECTEUR_NUL;
   Pcontrainte eq = CONTRAINTE_UNDEFINED; /* can be an equation or an inequality */
   bool empty_p = false;
+
+  assert(sc_consistent_p(ps));
 
   /* First look for bounds in equalities, although they may have been
      exploited otherwise */
@@ -1783,7 +1870,6 @@ Psysteme sc_bounded_normalization(Psysteme ps)
        could be checked above each time a new bound is defined or
        redefined. Also, build the constant base, cb */
     Pvecteur vc;
-    Pvecteur cb = VECTEUR_NUL;
     for(vc=ub; !VECTEUR_UNDEFINED_P(vc) && !empty_p; vc=vecteur_succ(vc)) {
       Variable var = vecteur_var(vc);
       Value upper = vect_coeff(var, u);
@@ -1930,7 +2016,8 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	    /* Do not destroy the constraints defining the bounding box */
 	    bool posz_p = value_posz_p(value_minus(ob,nub));
 	    bool pos_p = value_pos_p(value_minus(ob,nub));
-	    if( (n>2 && posz_p)
+	    if( posz_p
+		|| (n>2 && posz_p)
 		|| (n==2 && value_zero_p(vect_coeff(TCST, v)) && posz_p)
 		|| (n==2 && value_notzero_p(vect_coeff(TCST, v)) && pos_p)
 		|| (n==1 && value_zero_p(vect_coeff(TCST, v)) && pos_p)) {
@@ -1960,13 +2047,11 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	}
       }
     }
-    vect_rm(cb);
   }
+
+  /* Try to reduce coefficients of 2-D constraints when one variable
+     belongs to an interval. */
   if(!empty_p) {
-    /* FI: this section is not completed; the change of frame is not
-     * implemented as well as the computation of new constraints when
-     * the slope is not very small.
-     */
     Pcontrainte ncl = CONTRAINTE_UNDEFINED;
     for(eq=sc_inegalites(ps);
 	!CONTRAINTE_UNDEFINED_P(eq) && !empty_p; eq = contrainte_succ(eq)) {
@@ -2002,13 +2087,17 @@ Psysteme sc_bounded_normalization(Psysteme ps)
     sc_rm(ps);
     ps = ns;
   }
-  else
+  else if(base_dimension(cb)>=1 || base_dimension(lb)>=1 || base_dimension(ub)>=1) {
+    sc_elim_empty_constraints(ps, true);
     sc_elim_empty_constraints(ps, false);
-
+    ps = add_bounding_box_constraints(ps, cb, lb, ub, l, u);
+  }
 
   /* Free all elements of the bounding box */
   vect_rm(l), vect_rm(lb), vect_rm(u), vect_rm(ub);
+  vect_rm(cb);
 
+  assert(sc_consistent_p(ps));
   return ps;
 }
 
@@ -3198,21 +3287,20 @@ Psysteme sc_strong_normalize_and_check_feasibility2
  * 
  * Normalization by gcd's of equalities and inequalities
  */
-void sc_gcd_normalize(ps)
-Psysteme ps;
+void sc_gcd_normalize(Psysteme ps)
 {
   Pcontrainte eq1,ineq1;
 
-  if (SC_UNDEFINED_P(ps))
-    return;
+  if (!SC_UNDEFINED_P(ps)) {
 
-  /* Normalization by gcd's */
+    /* Normalization by gcd's */
 
-  for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
-    vect_normalize(eq1->vecteur);
-  }
+    for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
+      vect_normalize(eq1->vecteur);
+    }
 
-  for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
-    (void) contrainte_normalize(ineq1, false);
+    for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
+      (void) contrainte_normalize(ineq1, false);
+    }
   }
 }

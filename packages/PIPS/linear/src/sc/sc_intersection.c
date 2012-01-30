@@ -48,6 +48,8 @@
  *
  * Note: sc_fusion() est considere comme obsolete; voir sc_intersection()
  * et sc_append().
+ *
+ * The base is not updated.
  */
 Psysteme sc_fusion(Psysteme s1, Psysteme s2)
 {
@@ -119,10 +121,7 @@ Psysteme sc_fusion(Psysteme s1, Psysteme s2)
  * s'il est different de s2 et de s3; sinon, les modifications sont faites
  * en place, sur s2 ou sur s3.
  */
-Psysteme sc_intersection(s1,s2,s3)
-Psysteme s1;
-Psysteme s2;
-Psysteme s3;
+Psysteme sc_intersection(Psysteme s1, Psysteme s2, Psysteme s3)
 {
     if(s1==s2) {
 	s1 = sc_append(s2,s3);
