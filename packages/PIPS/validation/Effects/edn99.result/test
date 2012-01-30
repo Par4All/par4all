@@ -1,0 +1,478 @@
+static int get_ppm_char(FILE *f)
+{
+   int ch = _IO_getc(f);
+   while (ch=='#')
+      do {
+         ch = _IO_getc(f);
+      }
+      while (ch!=-1&&ch!='\n');
+   return ch;
+}
+static int get_ppm_unsigned(FILE *f)
+{
+   int ch;
+   do {
+      ch = get_ppm_char(f);
+   }
+   while ((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISspace);
+   
+   // If it's not a digit, we have a problem.
+   if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) {
+      ungetc(ch, f);
+      return -1;
+   }
+   // Scan all digits, converting to an integer.
+   int i = ch-'0';
+l99999:   ;
+   if (!1) goto _break_2;
+   ch = get_ppm_char(f);
+   if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) goto _break_2;
+   i = 10*i+(ch-'0');
+// Crufty overflow handling.
+   if (i<0) {
+   }
+   else {
+      goto l99999;
+   }
+   i = -1;
+_break_2:   ;
+   ungetc(ch, f);
+   return i;
+}
+ppm_dim get_ppm_dim(FILE *f)
+{
+   rewind(f);
+   ppm_dim dim;
+   // Check magic number.
+   
+   
+   if (get_ppm_char(f)!='P'||get_ppm_char(f)!='6'||!((*__ctype_b_loc())[(int) get_ppm_char(f)]&(unsigned short) _ISspace)) {
+      dim.height = -1;
+      dim.width = -1;
+      return dim;
+   }
+   // Get three numeric header values.
+   int _width = get_ppm_unsigned(f);
+   if (_width==-1) {
+      dim.height = -2;
+      dim.width = -2;
+      return dim;
+   }
+
+   int _height = get_ppm_unsigned(f);
+   if (_height==-1) {
+      dim.height = -3;
+      dim.width = -3;
+      return dim;
+   }
+
+   dim.height = _height;
+   dim.width = _width;
+   return dim;
+}
+int main(int argc, char *raw_argv[])
+{
+   FILE *inf, *outf;
+   char *in_fn = (void *) 0, out_fn[256] = "";
+   
+   // Make the arg list nice.
+   char *argv[argc*2];
+   
+   // Open the input.
+   if (!in_fn) {
+      fprintf(stderr, "%s: missing file name\n", argv[0]);
+      return 7;
+   }
+   inf = fopen(in_fn, "rb");
+   if (inf==(void *) 0) {
+      fprintf(stderr, "%s: can't open '%s' for reading\n", argv[0], argv[1]);
+      return 8;
+   }
+   
+   // Read the input image.
+   ppm_dim dim = get_ppm_dim(inf);
+   return 0;
+}
+int read_ppm(FILE *f, int *max_color_value, int height, int width, IMAGE_RGB image[height][width])
+{
+   ppm_dim dim = get_ppm_dim(f);
+   
+   // Check magic number.
+   if (dim.height==-1&&dim.width==-1)
+      return 1;
+   
+   // Get three numeric header values.
+   if (dim.height==-2&&dim.width==-2||dim.height!=height)
+      return 2;
+
+   if (dim.height==-3&&dim.width==-3||dim.width!=width)
+      return 3;
+
+   if (dim.height<0||dim.width<0)
+      return 4;
+
+   *max_color_value = get_ppm_unsigned(f);
+   if (*max_color_value!=255)
+      return 5;
+   
+   // Get the whitespace delimiter before the data.
+   int delimiter = get_ppm_char(f);
+   if (!((*__ctype_b_loc())[(int) delimiter]&(unsigned short) _ISspace))
+      return 6;
+   {
+      int i;
+      
+      // Read the data.
+      for(i = 0; i <= height-1; i += 1) {
+         int j;
+         for(j = 0; j <= width-1; j += 1)
+            if (fread(&image[i][j], sizeof(image[i][j]), 1, f)!=1)
+               return 100+i;
+      }
+   }
+   
+   // Success!
+   return 0;
+}
+void split_filename(char *fn, char *head, char *tail)
+{
+   char *dot = strrchr(fn, '.');
+   if (dot==(void *) 0) {
+      strcpy(head, fn);
+      strcpy(tail, "");
+   }
+   else {
+      strncpy(head, fn, dot-fn);
+      strcpy(tail, dot);
+   }
+}
+int write_ppm(FILE *f, char *comment, int max_color_value, int height, int width, IMAGE_RGB image[height][width])
+{
+   
+   
+   
+   if (fprintf(f, "P6\n""# %s\n""%d %d\n""%d\n", comment, width, height, max_color_value)<0)
+      return 1;
+   {
+      int i;
+
+      for(i = 0; i <= height-1; i += 1) {
+         int j;
+         for(j = 0; j <= width-1; j += 1)
+            if (fwrite(image[i][j], sizeof(image[i][j]), 1, f)!=1)
+               return 100+i;
+      }
+   }
+
+   return 0;
+}
+static int get_ppm_char(FILE *f)
+{
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+//             <    is written>: ch
+   int ch = _IO_getc(f);
+//             <    is read   >: ch
+   while (ch=='#')
+//             <    is read   >: ch ch
+      do {
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+//             <    is written>: ch
+         ch = _IO_getc(f);
+      }
+      while (ch!=-1&&ch!='\n');
+//             <    is read   >: ch
+   return ch;
+}
+static int get_ppm_unsigned(FILE *f)
+{
+   int ch;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   do {
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+//             <    is written>: ch
+      ch = get_ppm_char(f);
+   }
+   while ((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISspace);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   
+   // If it's not a digit, we have a problem.
+   if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) {
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: ch f
+      ungetc(ch, f);
+      return -1;
+   }
+   // Scan all digits, converting to an integer.
+//             <    is read   >: ch
+//             <    is written>: i
+   int i = ch-'0';
+l99999:   ;
+   if (!1) goto _break_2;
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+//             <    is written>: ch
+   ch = get_ppm_char(f);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (!((*__ctype_b_loc())[(int) ch]&(unsigned short) _ISdigit)) goto _break_2;
+//             <    is read   >: ch i
+//             <    is written>: i
+   i = 10*i+(ch-'0');
+//             <    is read   >: i
+// Crufty overflow handling.
+   if (i<0) {
+   }
+   else {
+      goto l99999;
+   }
+//             <    is written>: i
+   i = -1;
+_break_2:   ;
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: ch f
+   ungetc(ch, f);
+//             <    is read   >: i
+   return i;
+}
+ppm_dim get_ppm_dim(FILE *f)
+{
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+   rewind(f);
+   ppm_dim dim;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] f[0] __IO_EFFECTS:LUNS[*] 
+//                               __IO_EFFECTS:LUNS[*]
+   // Check magic number.
+   
+   
+   if (get_ppm_char(f)!='P'||get_ppm_char(f)!='6'||!((*__ctype_b_loc())[(int) get_ppm_char(f)]&(unsigned short) _ISspace)) {
+//             <    is written>: dim.height
+      dim.height = -1;
+//             <    is written>: dim.width
+      dim.width = -1;
+//             <    is read   >: dim.height dim.width
+      return dim;
+   }
+   // Get three numeric header values.
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is written>: _width
+   int _width = get_ppm_unsigned(f);
+//             <    is read   >: _width
+   if (_width==-1) {
+//             <    is written>: dim.height
+      dim.height = -2;
+//             <    is written>: dim.width
+      dim.width = -2;
+//             <    is read   >: dim.height dim.width
+      return dim;
+   }
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is written>: _height
+   int _height = get_ppm_unsigned(f);
+//             <    is read   >: _height
+   if (_height==-1) {
+//             <    is written>: dim.height
+      dim.height = -3;
+//             <    is written>: dim.width
+      dim.width = -3;
+//             <    is read   >: dim.height dim.width
+      return dim;
+   }
+//             <    is read   >: _height
+//             <    is written>: dim.height
+
+   dim.height = _height;
+//             <    is read   >: _width
+//             <    is written>: dim.width
+   dim.width = _width;
+//             <    is read   >: dim.height dim.width
+   return dim;
+}
+int main(int argc, char *raw_argv[])
+{
+   FILE *inf, *outf;
+//             <may be written>: out_fn[*]
+//             <    is written>: in_fn
+   char *in_fn = (void *) 0, out_fn[256] = "";
+   
+   // Make the arg list nice.
+   char *argv[argc*2];
+//             <    is read   >: in_fn
+   
+   // Open the input.
+   if (!in_fn) {
+//             <may be read   >: argv[0][*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: argv[0] stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "%s: missing file name\n", argv[0]);
+      return 7;
+   }
+//             <may be read   >: in_fn[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is read   >: in_fn
+//             <    is written>: inf
+   inf = fopen(in_fn, "rb");
+//             <    is read   >: inf
+   if (inf==(void *) 0) {
+//             <may be read   >: argv[0][*] argv[1][*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: argv[0] argv[1] stderr 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "%s: can't open '%s' for reading\n", argv[0], argv[1]);
+      return 8;
+   }
+   
+   // Read the input image.
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: inf[0] __IO_EFFECTS:LUNS[*]
+//             <    is written>: dim.height dim.width
+   ppm_dim dim = get_ppm_dim(inf);
+   return 0;
+}
+int read_ppm(FILE *f, int *max_color_value, int height, int width, IMAGE_RGB image[height][width])
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is written>: dim.height dim.width
+   ppm_dim dim = get_ppm_dim(f);
+//             <    is read   >: dim.height dim.width
+   
+   // Check magic number.
+   if (dim.height==-1&&dim.width==-1)
+      return 1;
+//             <    is read   >: dim.height dim.height dim.width 
+//                               height
+   
+   // Get three numeric header values.
+   if (dim.height==-2&&dim.width==-2||dim.height!=height)
+      return 2;
+//             <    is read   >: dim.height dim.width dim.width width
+
+   if (dim.height==-3&&dim.width==-3||dim.width!=width)
+      return 3;
+//             <    is read   >: dim.height dim.width
+
+   if (dim.height<0||dim.width<0)
+      return 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is written>: max_color_value[0]
+
+   *max_color_value = get_ppm_unsigned(f);
+//             <    is read   >: max_color_value max_color_value[0]
+   if (*max_color_value!=255)
+      return 5;
+   
+   // Get the whitespace delimiter before the data.
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f
+//             <    is written>: delimiter
+   int delimiter = get_ppm_char(f);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (!((*__ctype_b_loc())[(int) delimiter]&(unsigned short) _ISspace))
+      return 6;
+   {
+      int i;
+//             <    is read   >: height
+//             <    is written>: i
+      
+      // Read the data.
+      for(i = 0; i <= height-1; i += 1) {
+         int j;
+//             <    is read   >: height width
+//             <    is written>: j
+         for(j = 0; j <= width-1; j += 1)
+//             <may be read   >: f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] image[i][*][*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f height i j width
+            if (fread(&image[i][j], sizeof(image[i][j]), 1, f)!=1)
+//             <    is read   >: height i width
+               return 100+i;
+      }
+   }
+   
+   // Success!
+   return 0;
+}
+void split_filename(char *fn, char *head, char *tail)
+{
+//             <    is read   >: fn
+//             <    is written>: dot
+   char *dot = strrchr(fn, '.');
+//             <    is read   >: dot
+   if (dot==(void *) 0) {
+//             <may be read   >: fn[*]
+//             <may be written>: head[*]
+//             <    is read   >: fn head
+      strcpy(head, fn);
+//             <may be written>: tail[*]
+//             <    is read   >: tail
+      strcpy(tail, "");
+   }
+   else {
+//             <    is read   >: dot fn fn[0:dot-fn-1] head
+//             <    is written>: head[0:dot-fn-1]
+      strncpy(head, fn, dot-fn);
+//             <may be read   >: dot[*]
+//             <may be written>: tail[*]
+//             <    is read   >: dot tail
+      strcpy(tail, dot);
+   }
+}
+int write_ppm(FILE *f, char *comment, int max_color_value, int height, int width, IMAGE_RGB image[height][width])
+{
+//             <may be read   >: comment[*] f[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: comment f height max_color_value 
+//                               width
+   
+   
+   
+   if (fprintf(f, "P6\n""# %s\n""%d %d\n""%d\n", comment, width, height, max_color_value)<0)
+      return 1;
+   {
+      int i;
+//             <    is read   >: height
+//             <    is written>: i
+
+      for(i = 0; i <= height-1; i += 1) {
+         int j;
+//             <    is read   >: height width
+//             <    is written>: j
+         for(j = 0; j <= width-1; j += 1)
+//             <may be read   >: f[0] image[i][j][*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: f[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: f height i j width
+            if (fwrite(image[i][j], sizeof(image[i][j]), 1, f)!=1)
+//             <    is read   >: height i width
+               return 100+i;
+      }
+   }
+
+   return 0;
+}

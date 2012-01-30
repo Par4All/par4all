@@ -1,0 +1,10 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+
+   int _u_a = 99;
+   scilab_rt_disp_s0_("Testing exit () => Error 99");
+   scilab_rt_exit_i0_(_u_a);
+
+   scilab_rt_terminate();
+}

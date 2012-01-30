@@ -1,0 +1,130 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_l_0, _u_k_0, _u_l_1;
+   //PIPS generated variable
+   int _u_i;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t226.sce - from mcgill/dich.sce */
+   /* This function finds the Dirichlet solution to */
+   /* Laplace's equation */
+   /* tic(); */
+   double _u_a = 4.0;
+   double _u_b = 4.0;
+   double _u_h = 0.03;
+   int _tmpxx0 = -5;
+   int _u_tol = pow(10, _tmpxx0);
+   int _u_max1 = 1000;
+   int _u_f1 = 20;
+   int _u_f2 = 180;
+   int _u_f3 = 80;
+   int _u_f4 = 0;
+   int _tmpxx1 = _u_a/_u_h>=0?floor(_u_a/_u_h):ceil(_u_a/_u_h);
+   int _u_n = _tmpxx1+1;
+   int _tmpxx2 = _u_b/_u_h>=0?floor(_u_b/_u_h):ceil(_u_b/_u_h);
+   int _u_m = _tmpxx2+1;
+   _u_n = 134;
+   _u_m = 134;
+   int _tmpxx3 = _u_f1+_u_f2;
+   int _tmpxx4 = _u_f3+_u_f4;
+   double _tmpxx5 = _u_a*_tmpxx3;
+   double _tmpxx6 = _u_b*_tmpxx4;
+   double _tmpxx7 = 2*_u_a;
+   double _tmpxx8 = 2*_u_b;
+   double _tmpxx9 = _tmpxx5+_tmpxx6;
+   double _tmpxx10 = _tmpxx7+_tmpxx8;
+   double _u_ave = _tmpxx9/_tmpxx10;
+   (int) _u_n==134&&(int) _u_m==134?(void) 0:__assert_fail("(int)_u_n == 134 && (int)_u_m == 134", ".t226.tmp/t226.c", 55, (const char *) 0);
+   double _u_U[134][134];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 133; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 133; __lv2 += 1) {
+         //PIPS generated variable
+         register double _tmpxx11_0;
+         _tmpxx11_0 = (double) 1.0;
+         _u_U[__lv1][__lv2] = _u_ave*_tmpxx11_0;
+      }
+   }
+#pragma omp parallel for 
+   for(_u_l_0 = 1; _u_l_0 <= _u_m; _u_l_0 += 1) {
+      _u_U[0][_u_l_0-1] = _u_f3;
+      _u_U[_u_n-1][_u_l_0-1] = _u_f4;
+   }
+#pragma omp parallel for 
+   for(_u_k_0 = 1; _u_k_0 <= _u_n; _u_k_0 += 1) {
+      _u_U[_u_k_0-1][0] = _u_f1;
+      _u_U[_u_k_0-1][_u_m-1] = _u_f2;
+   }
+   double _tmpxx12 = (_u_U[0][1]+_u_U[1][0])/2;
+   _u_U[0][0] = _tmpxx12;
+   double _tmpxx13 = (_u_U[0][_u_m-1-1]+_u_U[1][_u_m-1])/2;
+   _u_U[0][_u_m-1] = _tmpxx13;
+   double _tmpxx14 = (_u_U[_u_n-1-1][0]+_u_U[_u_n-1][1])/2;
+   _u_U[_u_n-1][0] = _tmpxx14;
+   double _tmpxx15 = (_u_U[_u_n-1-1][_u_m-1]+_u_U[_u_n-1][_u_m-1-1])/2;
+   _u_U[_u_n-1][_u_m-1] = _tmpxx15;
+   int _tmpxx16 = _u_n-1;
+   int _tmpxx17 = _u_m-1;
+   double _tmpxx18 = cos(SCILAB_PI/_tmpxx16);
+   double _tmpxx19 = cos(SCILAB_PI/_tmpxx17);
+   double _tmpxx20 = _tmpxx18+_tmpxx19;
+   double _tmpxx21 = pow(_tmpxx20, 2);
+   double _tmpxx22 = sqrt(4-_tmpxx21);
+   double _tmpxx23 = 2+_tmpxx22;
+   double _u_w = 4/_tmpxx23;
+   double _u_err = 1;
+   int _u_cnt = 0;
+   while (_u_err>_u_tol&&_u_cnt<=_u_max1) {
+      _u_err = 0;
+      for(_u_l_1 = 2; _u_l_1 <= _u_m-1; _u_l_1 += 1) {
+         //PIPS generated variable
+         double _tmpxx24, _tmpxx25, _tmpxx26, _tmpxx27, _tmpxx28, _tmpxx29, _tmpxx30, _tmpxx31, _tmpxx32, _tmpxx33, _tmpxx34, _tmpxx35, _tmpxx36;
+         //PIPS generated variable
+         int _u_k_1;
+         //PIPS generated variable
+         double _u_relx;
+         for(_u_k_1 = 2; _u_k_1 <= _u_n-1; _u_k_1 += 1) {
+            _tmpxx24 = _u_U[_u_k_1-1][_u_l_1+1-1];
+            _tmpxx25 = _u_U[_u_k_1-1][_u_l_1-1-1];
+            _tmpxx26 = _tmpxx24+_tmpxx25;
+            _tmpxx27 = _u_U[_u_k_1+1-1][_u_l_1-1];
+            _tmpxx28 = _tmpxx26+_tmpxx27;
+            _tmpxx29 = _u_U[_u_k_1-1-1][_u_l_1-1];
+            _tmpxx30 = _u_U[_u_k_1-1][_u_l_1-1];
+            _tmpxx31 = _tmpxx28+_tmpxx29;
+            _tmpxx32 = 4*_tmpxx30;
+            _tmpxx33 = _tmpxx31-_tmpxx32;
+            _tmpxx34 = _u_w*_tmpxx33;
+            _u_relx = _tmpxx34/4;
+            _tmpxx35 = _u_U[_u_k_1-1][_u_l_1-1]+_u_relx;
+            _u_U[_u_k_1-1][_u_l_1-1] = _tmpxx35;
+            _tmpxx36 = fabs(_u_relx);
+            if (_u_err<=_tmpxx36)
+               _u_err = fabs(_u_relx);
+         }
+      }
+      _u_cnt = _u_cnt+1;
+   }
+   /* elapsedTime = toc(); */
+   /* disp("Elapsed Time: "); */
+   /* disp(elapsedTime); */
+   double _u_acc = 0;
+   for(_u_i = 1; _u_i <= 134; _u_i += 1) {
+      //PIPS generated variable
+      double _tmpxx37;
+      //PIPS generated variable
+      int _u_j;
+      for(_u_j = 1; _u_j <= 134; _u_j += 1) {
+         _tmpxx37 = _u_U[_u_i-1][_u_j-1];
+         _u_acc = _u_acc+_tmpxx37;
+      }
+   }
+   scilab_rt_disp_s0_("Accumulated sum of all elements of the array U:");
+   scilab_rt_disp_d0_(_u_acc);
+
+   scilab_rt_terminate();
+}

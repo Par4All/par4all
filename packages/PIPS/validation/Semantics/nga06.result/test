@@ -30,7 +30,7 @@ C  T(I,J) {I+NSP==I#init+J-1, I#init<=I, I#init<=I+NSP}
 
 C        BEGIN BLOCK
 
-C  T(I,J) {I#init+J==I+1, I#init<=I, J<=NSP}
+C  T(I,J) {I#init+J==I+1, 1<=J, J<=NSP}
 
          DO J = 1, NSP                                                  0015
 

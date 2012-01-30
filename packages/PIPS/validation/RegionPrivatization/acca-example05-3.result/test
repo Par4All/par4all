@@ -55,8 +55,8 @@ void compute(int p, int n, float a[n][n])
 //  <j-W-EXACT-{}>
 //  <n-R-EXACT-{}>
 //  <p-R-EXACT-{}>
-//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 1<=p}>
-//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n}>
+//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 1<=n, 1<=p}>
+//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n, 1<=n}>
 
    for(i = 0; i <= n-1; i += 1) {
 
@@ -273,7 +273,7 @@ void compute(int p, int n, float a[n][n])
    int k = n, i, s;
    int j;
 
-//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, k==n, 1<=k, 1<=p}>
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, k==n, 1<=n, 1<=p}>
 
    for(i = 0; i <= n-1; i += 1) {
 

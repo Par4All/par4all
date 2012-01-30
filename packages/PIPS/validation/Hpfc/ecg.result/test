@@ -12,8 +12,7 @@
       PARAMETER (N = 32768)
       INTEGER*4 N
       PARAMETER (N = 32768)
-      INTEGER ALPHA1, ALPHA2, DELTA1, LALPHA1, LALPHA2, PSI1, T LID, 
-     &V, I
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, T LID, V, I
       REAL*4 SIGNAL(1:N, 1:5)
       include "RESULT_HOST_parameters.h"
       include "RESULT_HOST_host.h"
@@ -34,7 +33,6 @@
       DO PSI1 = 1, 5
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DELTA1 = 0
          DO ALPHA1 = 1, 32768
             ALPHA2 = PSI1
             LALPHA1 = ALPHA1
@@ -111,8 +109,8 @@
       EXTERNAL PROCESS
       INTEGER*4 N
       PARAMETER (N = 32768)
-      INTEGER ALPHA1, ALPHA2, DELTA1, LALPHA1, LALPHA2, PSI1, I_0, 
-     &I_1, I_2, I_3, V, I
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_0, I_1, I_2, 
+     &I_3, V, I
       REAL*4 SIGNAL(1:N, 1:1), POWER
       include "RESULT_NODE_parameters.h"
       include "RESULT_NODE_node.h"
@@ -135,7 +133,6 @@
       SIZE OF RECEIVED BUFFER = 0
       CALL HPFC RCV FROM HOST
       CALL HPFC REAL4 BUFUPK
-      DELTA1 = 0
       DO ALPHA1 = 1, 32768
          ALPHA2 = PSI1
          LALPHA1 = ALPHA1

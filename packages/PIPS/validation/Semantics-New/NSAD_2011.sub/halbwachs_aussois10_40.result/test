@@ -213,9 +213,9 @@ void ts_restructured(void)
       else if (rand_b()) {
 
 //  T(d,t,v,x) {d==10, d#init+t==t#init+10, v+x#init==v#init+x,
-//    d#init<=9, 10v#init+15<=5d#init+4t+5v+15x#init,
-//    d#init+t<=5v#init+25, 3v#init<=3d#init+3t+8x#init+7,
-//    2v#init+3<=d#init+t+2x#init, 2v<=t+10, t<=5v+5x#init+5,
+//    t#init+1<=t, t+10v#init<=5t#init+5v+15x#init+35, 2v<=t+10,
+//    t<=5v+5x#init+5, t#init<=5v#init+15,
+//    3v#init<=3t#init+8x#init+37, 2v#init<=t#init+2x#init+7,
 //    v#init+2<=v+x#init, 0<=3v#init+2x#init+19, x#init<=1}
 
          if (rand_b()) {
@@ -244,7 +244,7 @@ void ts_restructured(void)
 
                checking_error();
 
-//  T(v,x) {d==10, v+x#init==v#init+x, 2v<=t+10, t<=5v+10, x#init<=x}
+//  T(v,x) {d==10, v+x#init==v#init+x, 2v<=t+10, t<=5v+10, v#init<=v}
 
             while (rand_b()) {
 
@@ -502,7 +502,7 @@ void ts_restructured(void)
 
                checking_error();
 
-//  T(v,x) {d==10, v+x#init==v#init+x, 2v<=t+10, t<=5v+10, x#init<=x}
+//  T(v,x) {d==10, v+x#init==v#init+x, 2v<=t+10, t<=5v+10, v#init<=v}
 
             while (rand_b()) {
 
@@ -698,9 +698,9 @@ void ts_restructured(void)
 
 //  T(d,t,v,x) {d==10, d#init+t==t#init+10, v+x#init==v#init+5, x==5,
 //    d#init<=9, 17v<=d#init+10t#init+110,
-//    6t#init+175<=6d#init+45v+55x#init,
-//    2t#init+60<=2d#init+10v+15x#init, 5v<=d#init+4t#init+5x#init+30,
-//    2v<=t#init+11, 0<=v+3, 2<=x#init, x#init<=4}
+//    6t#init+10v<=6d#init+55v#init+100,
+//    2t#init+5v<=2d#init+15v#init+15, 10v<=d#init+4t#init+5v#init+55,
+//    2v<=t#init+11, 0<=v+3, v#init+1<=v, v<=v#init+3}
 
             if (rand_b()) {
 

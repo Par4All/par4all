@@ -47,9 +47,7 @@ POINTS-TO
 // vct -> _vct_4[0] , EXACT
 
 
-// Points To OUT:
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
+// Points To OUT: none
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {

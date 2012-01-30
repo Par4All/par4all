@@ -1,0 +1,425 @@
+void fdtd__d2(int _u_Ets_n0, int _u_Ets_n1, double _u_Ets[_u_Ets_n0][_u_Ets_n1])
+{
+   int _u_scale = 1;
+   double _u_Lx = 0.05;
+   double _u_Ly = 0.04;
+   double _u_Lz = 0.03;
+   int _u_Nx = 25;
+   int _u_Ny = 20;
+   int _u_Nz = 15;
+   double _u_nrm = 866.0254;
+   int _u_Nt = _u_scale*200;
+   /* [Ex, Ey, Ez, Hx, Hy, Hz, Ets] = fdtd(Lx, Ly, Lz, Nx, Ny, Nz, nrm, Nt); */
+   double _u_eps0 = 8.8541878E-12;
+   double _u_mu0 = 4E-7*SCILAB_PI;
+   double _u_c0 = 299792458.0;
+   double _u_Cx = _u_Nx/_u_Lx;
+   double _u_Cy = _u_Ny/_u_Ly;
+   double _u_Cz = _u_Nz/_u_Lz;
+   double _tmpxx1 = _u_c0*_u_nrm;
+   double _u_Dt = 1/_tmpxx1;
+   double _u_Ex[25][21][16];
+   //PIPS generated variable
+   int _u_n;
+   (int) _u_Nx==25&&(int) (_u_Ny+1)==21&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)(_u_Ny+1) == 21 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 39, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            _u_Ex[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Ey[26][20][16];
+   (int) (_u_Nx+1)==26&&(int) _u_Ny==20&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)_u_Ny == 20 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 41, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            _u_Ey[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Ez[26][21][15];
+   (int) (_u_Nx+1)==26&&(int) (_u_Ny+1)==21&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)(_u_Ny+1) == 21 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 43, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            _u_Ez[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Hx[26][20][15];
+   (int) (_u_Nx+1)==26&&(int) _u_Ny==20&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)_u_Ny == 20 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 45, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            _u_Hx[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Hy[25][21][15];
+   (int) _u_Nx==25&&(int) (_u_Ny+1)==21&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)(_u_Ny+1) == 21 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 47, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            _u_Hy[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Hz[25][20][16];
+   (int) _u_Nx==25&&(int) _u_Ny==20&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)_u_Ny == 20 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 49, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            _u_Hz[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   (int) _u_Nt==_u_Ets_n0&&(int) 3==_u_Ets_n1?(void) 0:__assert_fail("(int)_u_Nt == _u_Ets_n0 && (int)3 == _u_Ets_n1", ".t231.tmp/t231.c", 51, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= _u_Ets_n0-1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= _u_Ets_n1-1; __lv2 += 1)
+         _u_Ets[__lv1][__lv2] = (double) 0.0;
+   }
+   _u_Ex[0][1][1] = 1;
+   _u_Ey[1][0][1] = 2;
+   _u_Ez[1][1][0] = 3;
+   double _u_Hxt[26][20][15];
+   (int) (_u_Nx+1)==26&&(int) _u_Ny==20&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)_u_Ny == 20 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 56, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            _u_Hxt[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Hyt[25][21][15];
+   (int) _u_Nx==25&&(int) (_u_Ny+1)==21&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)(_u_Ny+1) == 21 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 58, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            _u_Hyt[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   double _u_Hzt[25][20][16];
+   (int) _u_Nx==25&&(int) _u_Ny==20&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)_u_Ny == 20 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 60, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            _u_Hzt[__lv1][__lv2][__lv3] = (double) 0.0;
+      }
+   }
+   (int) _u_Nx==25&&(int) (_u_Ny+1)==21&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)(_u_Ny+1) == 21 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 62, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            (double) 0.0;
+      }
+   }
+   (int) (_u_Nx+1)==26&&(int) _u_Ny==20&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)_u_Ny == 20 && (int)(_u_Nz+1) == 16", ".t231.tmp/t231.c", 64, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
+            (double) 0.0;
+      }
+   }
+   (int) (_u_Nx+1)==26&&(int) (_u_Ny+1)==21&&(int) _u_Nz==15?(void) 0:__assert_fail("(int)(_u_Nx+1) == 26 && (int)(_u_Ny+1) == 21 && (int)_u_Nz == 15", ".t231.tmp/t231.c", 66, (const char *) 0);
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
+            (double) 0.0;
+      }
+   }
+   for(_u_n = 1; _u_n <= _u_Nt; _u_n += 1) {
+      //PIPS generated variable
+      int __lv1;
+      //PIPS generated variable
+      double _tmpxx11, _tmpxx3, _tmpxx7;
+      //PIPS generated variable
+      int _u_i_0, _u_i_1, _u_i_2, _u_i_3, _u_i_5, _u_i_7;
+      /* Hx = Hx + (Dt/mu0) * ( (Ey(:, :, 2:Nz+1) - Ey(:, :, 1:Nz)) * Cz - (Ez(:, 2:Ny+1, :) - Ez(:, 1:Ny, :)) * Cy );  */
+#pragma omp parallel for 
+      for(_u_i_0 = 1; _u_i_0 <= _u_Nx+1; _u_i_0 += 1) {
+         //PIPS generated variable
+         int _u_j_0;
+#pragma omp parallel for 
+         for(_u_j_0 = 1; _u_j_0 <= _u_Ny; _u_j_0 += 1) {
+            //PIPS generated variable
+            int _u_k_0;
+#pragma omp parallel for 
+            for(_u_k_0 = 1; _u_k_0 <= _u_Nz; _u_k_0 += 1) {
+               //PIPS generated variable
+               double _tmpxx2;
+               _tmpxx2 = (_u_Ey[_u_i_0-1][_u_j_0-1][_u_k_0+1-1]-_u_Ey[_u_i_0-1][_u_j_0-1][_u_k_0-1])*_u_Cz-(_u_Ez[_u_i_0-1][_u_j_0+1-1][_u_k_0-1]-_u_Ez[_u_i_0-1][_u_j_0-1][_u_k_0-1])*_u_Cy;
+               _u_Hxt[_u_i_0-1][_u_j_0-1][_u_k_0-1] = _tmpxx2;
+            }
+         }
+      }
+      _tmpxx3 = _u_Dt/_u_mu0;
+#pragma omp parallel for 
+      for(__lv1 = 0; __lv1 <= 25; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+#pragma omp parallel for 
+         for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+            //PIPS generated variable
+            int __lv3;
+#pragma omp parallel for 
+            for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
+               //PIPS generated variable
+               register double _tmpxx4_0, _tmpxx5_0;
+               _tmpxx4_0 = _tmpxx3*_u_Hxt[__lv1][__lv2][__lv3];
+               _tmpxx5_0 = _u_Hx[__lv1][__lv2][__lv3]+_tmpxx4_0;
+               _u_Hx[__lv1][__lv2][__lv3] = _tmpxx5_0;
+            }
+         }
+      }
+      /* Hy = Hy + (Dt/mu0) * ( (Ez(2:Nx+1, :, :) - Ez(1:Nx, :, :)) * Cx - (Ex(:, :, 2:Nz+1) - Ex(:, :, 1:Nz)) * Cz ); */
+#pragma omp parallel for 
+      for(_u_i_1 = 1; _u_i_1 <= _u_Nx; _u_i_1 += 1) {
+         //PIPS generated variable
+         int _u_j_1;
+#pragma omp parallel for 
+         for(_u_j_1 = 1; _u_j_1 <= _u_Ny+1; _u_j_1 += 1) {
+            //PIPS generated variable
+            int _u_k_1;
+#pragma omp parallel for 
+            for(_u_k_1 = 1; _u_k_1 <= _u_Nz; _u_k_1 += 1) {
+               //PIPS generated variable
+               double _tmpxx6;
+               _tmpxx6 = (_u_Ez[_u_i_1+1-1][_u_j_1-1][_u_k_1-1]-_u_Ez[_u_i_1-1][_u_j_1-1][_u_k_1-1])*_u_Cx-(_u_Ex[_u_i_1-1][_u_j_1-1][_u_k_1+1-1]-_u_Ex[_u_i_1-1][_u_j_1-1][_u_k_1-1])*_u_Cz;
+               _u_Hyt[_u_i_1-1][_u_j_1-1][_u_k_1-1] = _tmpxx6;
+            }
+         }
+      }
+      _tmpxx7 = _u_Dt/_u_mu0;
+#pragma omp parallel for 
+      for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+#pragma omp parallel for 
+         for(__lv2 = 0; __lv2 <= 20; __lv2 += 1) {
+            //PIPS generated variable
+            int __lv3;
+#pragma omp parallel for 
+            for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
+               //PIPS generated variable
+               register double _tmpxx8_0, _tmpxx9_0;
+               _tmpxx8_0 = _tmpxx7*_u_Hyt[__lv1][__lv2][__lv3];
+               _tmpxx9_0 = _u_Hy[__lv1][__lv2][__lv3]+_tmpxx8_0;
+               _u_Hy[__lv1][__lv2][__lv3] = _tmpxx9_0;
+            }
+         }
+      }
+      /* Hz = Hz + (Dt/mu0) * ( (Ex(:, 2:Ny+1, :) - Ex(:, 1:Ny, :)) * Cy - (Ey(2:Nx+1, :, :) - Ey(1:Nx, :, :)) * Cx ); */
+#pragma omp parallel for 
+      for(_u_i_2 = 1; _u_i_2 <= _u_Nx; _u_i_2 += 1) {
+         //PIPS generated variable
+         int _u_j_2;
+#pragma omp parallel for 
+         for(_u_j_2 = 1; _u_j_2 <= _u_Ny; _u_j_2 += 1) {
+            //PIPS generated variable
+            int _u_k_2;
+#pragma omp parallel for 
+            for(_u_k_2 = 1; _u_k_2 <= _u_Nz+1; _u_k_2 += 1) {
+               //PIPS generated variable
+               double _tmpxx10;
+               _tmpxx10 = (_u_Ex[_u_i_2-1][_u_j_2+1-1][_u_k_2-1]-_u_Ex[_u_i_2-1][_u_j_2-1][_u_k_2-1])*_u_Cy-(_u_Ey[_u_i_2+1-1][_u_j_2-1][_u_k_2-1]-_u_Ey[_u_i_2-1][_u_j_2-1][_u_k_2-1])*_u_Cx;
+               _u_Hzt[_u_i_2-1][_u_j_2-1][_u_k_2-1] = _tmpxx10;
+            }
+         }
+      }
+      _tmpxx11 = _u_Dt/_u_mu0;
+#pragma omp parallel for 
+      for(__lv1 = 0; __lv1 <= 24; __lv1 += 1) {
+         //PIPS generated variable
+         int __lv2;
+#pragma omp parallel for 
+         for(__lv2 = 0; __lv2 <= 19; __lv2 += 1) {
+            //PIPS generated variable
+            int __lv3;
+#pragma omp parallel for 
+            for(__lv3 = 0; __lv3 <= 15; __lv3 += 1) {
+               //PIPS generated variable
+               register double _tmpxx12_0, _tmpxx13_0;
+               _tmpxx12_0 = _tmpxx11*_u_Hzt[__lv1][__lv2][__lv3];
+               _tmpxx13_0 = _u_Hz[__lv1][__lv2][__lv3]+_tmpxx12_0;
+               _u_Hz[__lv1][__lv2][__lv3] = _tmpxx13_0;
+            }
+         }
+      }
+      /*   Ex(:, 2:Ny, 2:Nz) = Ex(:, 2:Ny, 2:Nz) + (Dt/eps0) *  */
+      /* ((Hz(:, 2:Ny, 2:Nz)-Hz(:, 1:Ny-1, 2:Nz)) *  */
+      /* Cy - (Hy(:, 2:Ny, 2:Nz) - Hy(:, 2:Ny, 1:Nz-1)) * Cz); */
+#pragma omp parallel for 
+      for(_u_i_3 = 1; _u_i_3 <= _u_Nx; _u_i_3 += 1) {
+         //PIPS generated variable
+         int _u_j_3;
+#pragma omp parallel for 
+         for(_u_j_3 = 2; _u_j_3 <= _u_Ny; _u_j_3 += 1) {
+            //PIPS generated variable
+            int _u_k_3;
+#pragma omp parallel for 
+            for(_u_k_3 = 2; _u_k_3 <= _u_Nz; _u_k_3 += 1) {
+               //PIPS generated variable
+               register double _u_Ext_1;
+               //PIPS generated variable
+               double _tmpxx14, _tmpxx15;
+               _tmpxx14 = (_u_Hz[_u_i_3-1][_u_j_3-1][_u_k_3-1]-_u_Hz[_u_i_3-1][_u_j_3-1-1][_u_k_3-1])*_u_Cy-(_u_Hy[_u_i_3-1][_u_j_3-1][_u_k_3-1]-_u_Hy[_u_i_3-1][_u_j_3-1][_u_k_3-1-1])*_u_Cz;
+               _u_Ext_1 = _tmpxx14;
+               _tmpxx15 = _u_Ex[_u_i_3-1][_u_j_3-1][_u_k_3-1]+_u_Dt/_u_eps0*_u_Ext_1;
+               _u_Ex[_u_i_3-1][_u_j_3-1][_u_k_3-1] = _tmpxx15;
+            }
+         }
+      }
+      /*    Ey(2:Nx, :, 2:Nz) = Ey(2:Nx, :, 2:Nz)+(Dt/eps0) * */
+      /* ((Hx(2:Nx, :, 2:Nz)-Hx(2:Nx, :, 1:Nz-1)) *  */
+      /* Cz -(Hz(2:Nx, :, 2:Nz)-Hz(1:Nx-1, :, 2:Nz))*Cx); */
+#pragma omp parallel for 
+      for(_u_i_5 = 2; _u_i_5 <= _u_Nx; _u_i_5 += 1) {
+         //PIPS generated variable
+         int _u_j_5;
+#pragma omp parallel for 
+         for(_u_j_5 = 1; _u_j_5 <= _u_Ny; _u_j_5 += 1) {
+            //PIPS generated variable
+            int _u_k_5;
+#pragma omp parallel for 
+            for(_u_k_5 = 2; _u_k_5 <= _u_Nz; _u_k_5 += 1) {
+               //PIPS generated variable
+               register double _u_Eyt_1;
+               //PIPS generated variable
+               double _tmpxx16, _tmpxx17;
+               _tmpxx16 = (_u_Hx[_u_i_5-1][_u_j_5-1][_u_k_5-1]-_u_Hx[_u_i_5-1][_u_j_5-1][_u_k_5-1-1])*_u_Cz-(_u_Hz[_u_i_5-1][_u_j_5-1][_u_k_5-1]-_u_Hz[_u_i_5-1-1][_u_j_5-1][_u_k_5-1])*_u_Cx;
+               _u_Eyt_1 = _tmpxx16;
+               _tmpxx17 = _u_Ey[_u_i_5-1][_u_j_5-1][_u_k_5-1]+_u_Dt/_u_eps0*_u_Eyt_1;
+               _u_Ey[_u_i_5-1][_u_j_5-1][_u_k_5-1] = _tmpxx17;
+            }
+         }
+      }
+      /*      Ez(2:Nx, 2:Ny, :) = Ez(2:Nx, 2:Ny, :)+(Dt/eps0) * */
+      /*  ((Hy(2:Nx, 2:Ny, :)-Hy(1:Nx-1, 2:Ny, :)) *  */
+      /* Cx -(Hx(2:Nx, 2:Ny, :)-Hx(2:Nx, 1:Ny-1, :))*Cy); */
+#pragma omp parallel for 
+      for(_u_i_7 = 2; _u_i_7 <= _u_Nx; _u_i_7 += 1) {
+         //PIPS generated variable
+         int _u_j_7;
+#pragma omp parallel for 
+         for(_u_j_7 = 2; _u_j_7 <= _u_Ny; _u_j_7 += 1) {
+            //PIPS generated variable
+            int _u_k_7;
+#pragma omp parallel for 
+            for(_u_k_7 = 1; _u_k_7 <= _u_Nz; _u_k_7 += 1) {
+               //PIPS generated variable
+               register double _u_Ezt_1;
+               //PIPS generated variable
+               double _tmpxx18, _tmpxx19;
+               _tmpxx18 = (_u_Hy[_u_i_7-1][_u_j_7-1][_u_k_7-1]-_u_Hy[_u_i_7-1-1][_u_j_7-1][_u_k_7-1])*_u_Cx-(_u_Hx[_u_i_7-1][_u_j_7-1][_u_k_7-1]-_u_Hx[_u_i_7-1][_u_j_7-1-1][_u_k_7-1])*_u_Cy;
+               _u_Ezt_1 = _tmpxx18;
+               _tmpxx19 = _u_Ez[_u_i_7-1][_u_j_7-1][_u_k_7-1]+_u_Dt/_u_eps0*_u_Ezt_1;
+               _u_Ez[_u_i_7-1][_u_j_7-1][_u_k_7-1] = _tmpxx19;
+            }
+         }
+      }
+      /* Ets(n, :) = [Ex(4, 4, 4) Ey(4, 4, 4) Ez(4, 4, 4)];   */
+      _u_Ets[_u_n-1][0] = _u_Ex[3][3][3];
+      _u_Ets[_u_n-1][1] = _u_Ey[3][3][3];
+      _u_Ets[_u_n-1][2] = _u_Ez[3][3][3];
+   }
+}
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t231.sce - from mcgill/fdtd_function.sce */
+   scilab_rt_tic__();
+   double _u_Ets[200][3];
+   fdtd__d2(200, 3, _u_Ets);
+   double _u_elapsedTime = scilab_rt_toc__();
+   /* disp("Elapsed time: "); */
+   /* disp(elapsedTime); */
+   scilab_rt_disp_s0_("Mean of matrix Ets: ");
+   double _tmpxx0;
+   scilab_rt_mean_d2_d0(200, 3, _u_Ets, &_tmpxx0);
+   scilab_rt_disp_d0_(_tmpxx0);
+
+   scilab_rt_terminate();
+}

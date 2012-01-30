@@ -52,8 +52,7 @@ POINTS-TO
 // x -> _x_3[0] , EXACT
 
 
-// Points To OUT:
-// x -> _x_3[0] , EXACT
+// Points To OUT: none
 
 void call14(int n, int m, int *x)
 {
@@ -144,7 +143,6 @@ int main()
    int d2 = 4;
    int y[d1][d2];
    int i, j;
-//             <may be written>: y[*][*]
 //             <    is read   >: d1 d2
 
    call14(d1, d2, (int *) y);
@@ -187,8 +185,6 @@ int main()
 		from <d2-W-EXACT> to <d2-R-EXACT>
 	16 --> 24 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
-	20 --> 24 with conflicts
-		from <y[*][*]-W-MAY> to <y[i][j]-R-EXACT>
 	23 --> 23 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	24 --> 23 with conflicts

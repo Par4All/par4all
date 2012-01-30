@@ -1,0 +1,7 @@
+delete decl59
+#setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create decl59 decl59.c
+display PARSED_PRINTED_FILE[main]
+close
+#delete decl59
+quit

@@ -32,10 +32,7 @@ POINTS-TO
 // _c -> __c_4[0] , EXACT
 
 
-// Points To OUT:
-// _a -> __a_2[0] , EXACT
-// _b -> __b_3[0] , EXACT
-// _c -> __c_4[0] , EXACT
+// Points To OUT: none
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
@@ -69,10 +66,7 @@ void dotprod(int *a, int *b, int *c);
 // c -> _c_3[0] , EXACT
 
 
-// Points To OUT:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
+// Points To OUT: none
 
 void dotprod(int *a, int *b, int *c)
 {
@@ -124,8 +118,6 @@ void dotprod(int *a, int *b, int *c)
    int i;
 //             <    is written>: i
    for(i = 0; i <= 999999; i += 1)
-//             <may be read   >: _b_2[*] _c_3[*]
-//             <may be written>: _a_1[*]
 //             <    is read   >: a b c i
       call16(i, a, b, c);
    
@@ -135,7 +127,5 @@ void dotprod(int *a, int *b, int *c)
 
  *********************** Use-Def Chains *********************
 
-	11 --> 11 with conflicts
-		from <_a_1[*]-W-MAY> to <_a_1[*]-W-MAY>
 
 ****************** End of Dependence Graph ******************

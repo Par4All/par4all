@@ -14,8 +14,8 @@
 ! - lazy sending
                      BUF INDEX = 0
                      SEND NOT INITIALIZED = .TRUE.
-                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
-     &               -6*PSI1+14, -8*PSI1+5*PSIp1+8)
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(-6*
+     &               PSI1+14, -8*PSI1+5*PSIp1+8)
                         LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         BUF INDEX = BUF INDEX+1
                         HPFC INTEGER4 BUFF(BUF INDEX) = A_1(LALPHA1)
@@ -37,16 +37,15 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             IF (MY LID.LE.2) THEN
-               DO PSI1 = MAX(1, HPFC DIVIDE(5*PSIp1-9, 2)), MIN(2, 
-     &         PSIp1)
+               DO PSI1 = 1, PSIp1
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
 ! - lazy receiving
                      BUF INDEX = 0
                      RECEIVED NOT PERFORMED = .TRUE.
                      SIZE OF RECEIVED BUFFER = 0
-                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
-     &               -6*PSI1+14, -8*PSI1+5*PSIp1+8)
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(-6*
+     &               PSI1+14, -8*PSI1+5*PSIp1+8)
                         LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
      &                  ) THEN
@@ -59,8 +58,8 @@
                      ENDDO
                   ELSE
 ! - lazy copying
-                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(8, 
-     &               -6*PSI1+14, -8*PSI1+5*PSIp1+8)
+                     DO LALPHA1 = MAX(1, -8*PSI1+5*PSIp1+4), MIN(-6*
+     &               PSI1+14, -8*PSI1+5*PSIp1+8)
                         LALPHAp1 = LALPHA1+8*PSI1-5*PSIp1-3
                         A(LALPHAp1) = A_1(LALPHA1)
                      ENDDO

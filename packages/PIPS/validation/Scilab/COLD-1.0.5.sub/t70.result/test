@@ -1,0 +1,8 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t70.sce: parser function */
+   
+   scilab_rt_terminate();
+}

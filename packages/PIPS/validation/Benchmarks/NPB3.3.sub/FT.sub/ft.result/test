@@ -407,8 +407,9 @@ void fftXYZ(int sign, int n1, int n2, int n3, dcomplex x[n3][n2][n1+1], dcomplex
    log = ilog2(n1);
    if (timers_enabled)
       timer_start(7);
-   for(k = 0; k <= n3-1; k += 1)
-      for(bls = 0; bls <= n2-1; bls += fftblock) {
+   for(k = 0; k <= n3-1; k += 1) {
+      bls = 0;
+      while (bls<n2) {
          ble = bls+fftblock-1;
          if (ble>n2)
             ble = n2-1;
@@ -420,7 +421,9 @@ void fftXYZ(int sign, int n1, int n2, int n3, dcomplex x[n3][n2][n1+1], dcomplex
          for(j = bls; j <= ble; j += 1)
             for(i = 0; i <= n1-1; i += 1)
                x[k][j][i] = plane[j-bls+blkp*i];
+         bls += fftblock;
       }
+   }
    if (timers_enabled)
       timer_stop(7);
 
@@ -431,14 +434,17 @@ void fftXYZ(int sign, int n1, int n2, int n3, dcomplex x[n3][n2][n1+1], dcomplex
    log = ilog2(n2);
    if (timers_enabled)
       timer_start(8);
-   for(k = 0; k <= n3-1; k += 1)
-      for(bls = 0; bls <= n1-1; bls += fftblock) {
+   for(k = 0; k <= n3-1; k += 1) {
+      bls = 0;
+      while (bls<n1) {
          ble = bls+fftblock-1;
          if (ble>n1)
             ble = n1-1;
          len = ble-bls+1;
          Swarztrauber(sign, log, len, n2, n1+1, &x[k][0][bls], exp2);
+         bls += fftblock;
       }
+   }
    if (timers_enabled)
       timer_stop(8);
 
@@ -449,8 +455,9 @@ void fftXYZ(int sign, int n1, int n2, int n3, dcomplex x[n3][n2][n1+1], dcomplex
    log = ilog2(n3);
    if (timers_enabled)
       timer_start(9);
-   for(k = 0; k <= n2-1; k += 1)
-      for(bls = 0; bls <= n1-1; bls += fftblock) {
+   for(k = 0; k <= n2-1; k += 1) {
+      bls = 0;
+      while (bls<n1) {
          ble = bls+fftblock-1;
          if (ble>n1)
             ble = n1-1;
@@ -462,7 +469,9 @@ void fftXYZ(int sign, int n1, int n2, int n3, dcomplex x[n3][n2][n1+1], dcomplex
          for(i = 0; i <= n3-1; i += 1)
             for(j = bls; j <= ble; j += 1)
                xout[j+(n1+1)*(k+n2*i)] = plane[j-bls+blkp*i];
+         bls += fftblock;
       }
+   }
    if (timers_enabled)
       timer_stop(9);
    if (timers_enabled)

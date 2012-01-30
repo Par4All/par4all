@@ -1,0 +1,55 @@
+
+Parsed code for "increasing_loop03"
+
+void increasing_loop03(unsigned int T, int NJ)
+{
+   int tj;
+   
+   /* do loop */
+   for (tj = T;tj<NJ-T;tj += T+1)
+      ;
+   /* do loop */
+   for (tj = T;tj<NJ-T;tj += 2*T)
+      ;
+   /* do loop */
+   for (tj = T;tj<NJ-T;tj += 2*T+1)
+      ;
+   /* while loop */
+   for (tj = T;tj<NJ-T;tj += T-1)
+      ;
+   /* while loop */
+   for (tj = T;tj<NJ-T;tj += 2*(T-1))
+      ;
+   /* while loop */
+   for (tj = T;tj<NJ-T;tj += 2*T-1)
+      ;
+}
+
+Controlized code for "increasing_loop03"
+
+void increasing_loop03(unsigned int T, int NJ)
+{
+   int tj;
+   
+   /* do loop */
+   for(tj = T; tj < NJ-T; tj += T+1)
+      ;
+   /* do loop */
+   for(tj = T; tj < NJ-T; tj += 2*T)
+      ;
+   /* do loop */
+   for(tj = T; tj < NJ-T; tj += 2*T+1)
+      ;
+   /* while loop */
+   tj = T;
+   while (tj<NJ-T)
+      tj += T-1;
+   /* while loop */
+   tj = T;
+   while (tj<NJ-T)
+      tj += 2*(T-1);
+   /* while loop */
+   tj = T;
+   while (tj<NJ-T)
+      tj += 2*T-1;
+}

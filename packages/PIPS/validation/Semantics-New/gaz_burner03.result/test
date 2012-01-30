@@ -30,7 +30,7 @@ int main()
       u = v = 0;
 
 //  T(l,t,u,v) {l#init+v==l, t#init+u==t, u#init==0, v#init==0,
-//    l#init<=l, l+t#init<=l#init+t, u<=59}
+//    l+t#init<=l#init+t, u<=59, 0<=v}
 
       while (u<60)
 
@@ -221,7 +221,7 @@ int main()
    u = l = t = v = 0;
 
 //  T(l,t,u,v) {l#init==0, t#init==0, u#init==0, v#init==0, 0<=l,
-//    6l<=t, l+u<=t+v, 6l+u<=t+6v, v<=l, u<=60, 6v<=u, 0<=v}
+//    6l<=t, l+u<=t+v, 6l+u<=t+6v, v<=l, 0<=t, u<=60, 6v<=u, 0<=v}
 
    while (1) {
 
@@ -231,8 +231,8 @@ int main()
       u = v = 0;
 
 //  T(l,t,u,v) {l#init+v==l, t#init+u==t, u#init==0, v#init==0,
-//    l#init<=l, l+t#init<=l#init+t, 0<=l#init, l#init<=t#init,
-//    0<=t#init, u<=59, v<=10}
+//    l+t#init<=l#init+t, 0<=l#init, l#init<=t#init, 0<=t#init, u<=59,
+//    0<=v, v<=10}
 
       while (u<60)
 

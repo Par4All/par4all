@@ -29,8 +29,8 @@
             T LID = 2*PSI1+PSI2-2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = 6*PSI2+39, MIN(55, 5*PSI2+45)
-               DO ALPHA1 = 6*PSI1+39, MIN(55, 5*PSI1+45)
+            DO ALPHA2 = 6*PSI2+39, 5*PSI2+45
+               DO ALPHA1 = 6*PSI1+39, 5*PSI1+45
                   LALPHA1 = ALPHA1-50*PSI1+50
                   LALPHA2 = ALPHA2-50*PSI2+50
                   BUF INDEX = BUF INDEX+1
@@ -140,8 +140,8 @@
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = 6*PSI2+39, MIN(55, 5*PSI2+45)
-         DO ALPHA1 = 6*PSI1+39, MIN(55, 5*PSI1+45)
+      DO ALPHA2 = 6*PSI2+39, 5*PSI2+45
+         DO ALPHA1 = 6*PSI1+39, 5*PSI1+45
             LALPHA1 = ALPHA1-50*PSI1+50
             LALPHA2 = ALPHA2-50*PSI2+50
             BUF INDEX = BUF INDEX+1

@@ -23,7 +23,7 @@ C  T(J) {I==J}
 
             J = I                                                       0009
 
-C  T(K,L,N) {K+N#init==N+1, K<=5, N#init<=N}
+C  T(K,L,N) {K+N#init==N+1, 1<=K, K<=5}
 
             DO 200 K = 1, 5                                             0010
 
@@ -80,7 +80,7 @@ C  P(I,J,K,L,N) {I==J, 5I==N+5, 1<=I, I<=10}
 
             DO 200 K = 1, 5                                             0010
 
-C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 5I<=N+5, K<=5}
+C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 1<=K, K<=5}
 
                L = K                                                    0011
 

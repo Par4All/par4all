@@ -255,8 +255,8 @@ void ts_restructured(void)
       }
 
 //  T(i1,i2,x,z) {i1+x#init==i1#init+x, i1+x0==x,
-//    i2+z#init==i2#init+z, i2+z0==z, n==n0, 0<=i1,
-//    i1#init+z<=i1+z#init, i1+x0+1<=z, z<=i1+x0+z0+1, z<=n, 0<=x0,
+//    i2+z#init==i2#init+z, i2+z0==z, n==n0, i1#init<=i1,
+//    i1#init+z<=i1+z#init, z<=n, x0<=x, x+1<=z, z<=x+z0+1, 0<=x0,
 //    z#init<=z, z0<=z}
 
       while (rand_b())
@@ -696,7 +696,7 @@ void ts_restructured(void)
             if (!(x<n-1&&z>x+1))
 
 //  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x+1, n==n0, x==z-1,
-//    0<=i1, i1<=x, x+1<=n, z0<=x+1, 0<=z0}
+//    0<=i1, x+1<=n, z0<=x+1, 0<=x0, 0<=z0}
 
                deadlock();
 
@@ -728,8 +728,8 @@ void ts_restructured(void)
 
             if (!(x<n-1&&z==x+1))
 
-//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, i1<=x,
-//    z<=n, x+1<=z, z<=x+z0+1, z0<=z}
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, z<=n,
+//    x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
 
                deadlock();
 
@@ -818,8 +818,8 @@ void ts_restructured(void)
 
       if (!(x==n-1&&z>x))
 
-//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, i1<=x,
-//    x+2<=n, z<=n, x+1<=z, z<=x+z0+1, z0<=z}
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, x+2<=n,
+//    z<=n, x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
 
          deadlock();
 

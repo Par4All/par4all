@@ -1,0 +1,57 @@
+/*
+ * (c) HPC Project - 2010-2011 - All rights reserved
+ *
+ */
+
+#include "scilab_rt.h"
+
+
+int __lv0;
+int __lv1;
+int __lv2;
+int __lv3;
+
+/*----------------------------------------------------*/
+
+
+/*----------------------------------------------------*/
+
+int main(int argc, char* argv[])
+{
+  scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+
+  int _u_a = 1;
+  scilab_rt_display_s0i0_("a",_u_a);
+  /*  a=1 */
+  int _tmpxx0 = (-2);
+  int _tmpxx1 = (-_tmpxx0);
+  int _u_b = (-_tmpxx1);
+  scilab_rt_display_s0i0_("b",_u_b);
+  /*  b=-2 */
+  int _tmpxx2 = (-3);
+  int _tmpxx3 = (-_tmpxx2);
+  int _tmpxx4 = (-_tmpxx3);
+  int _u_c = (-_tmpxx4);
+  scilab_rt_display_s0i0_("c",_u_c);
+  /*  c=3 */
+  int _tmpxx5 = (-2);
+  int _u_d = (_u_a-_tmpxx5);
+  scilab_rt_display_s0i0_("d",_u_d);
+  /* d=a+2 */
+  int _tmpxx6 = (-_u_b);
+  int _tmpxx7 = (-_tmpxx6);
+  int _tmpxx8 = (-_tmpxx7);
+  int _u_e = (_u_a+_tmpxx8);
+  scilab_rt_display_s0i0_("e",_u_e);
+  /* e=a-b */
+  int _u_f = (-1);
+  scilab_rt_display_s0i0_("f",_u_f);
+  /*  f=-1 */
+  int _tmpxx9 = (-1);
+  int _u_g = (10*_tmpxx9);
+  scilab_rt_display_s0i0_("g",_u_g);
+  /*  g=-10 */
+
+  scilab_rt_terminate();
+}
+

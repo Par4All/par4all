@@ -23,10 +23,9 @@ void main()
 
    y = foo();
 
-//  T(x1,x2,y) {0<=x1, x1#init+2y#init<=x1+2y, x1#init+y#init<=x1+y,
-//    x1#init+y<=x1+y#init, 1<=x1+x2, x1+x2<=3, x1+2x2<=4, 0<=x1#init,
-//    x1#init+x2#init<=2, 0<=x2, 1<=x2#init, 0<=y, y<=1, 0<=y#init,
-//    y#init<=1}
+//  T(x1,x2,y) {0<=x1, x1#init+2y#init<=x1+2y, x1#init+y<=x1+y#init,
+//    1<=x1+x2, x1+x2<=3, x1+2x2<=4, 0<=x1#init, x1#init+x2#init<=2,
+//    0<=x2, 1<=x2#init, 0<=y, y<=1, 0<=y#init, y#init<=1}
 
    while (2*x1+2*x2<=7&&0<=y&&y<=1) {
 

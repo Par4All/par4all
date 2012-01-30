@@ -1,0 +1,120 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _u_nn;
+   //PIPS generated variable
+   double _u_j = 2;
+   //PIPS generated variable
+   int _u_mmax = 2, _u_isign = 1, _u_i_0;
+   //PIPS generated variable
+   int _u_istep;
+   //PIPS generated variable
+   double _tmpxx5, _u_theta, _u_wtemp, _tmpxx6, _tmpxx7, _u_wpr, _u_wpi, _u_wr, _u_wi, _u_m_1, _tmpxx20, _tmpxx21, _tmpxx22, _tmpxx23, _tmpxx24, _tmpxx25;
+   //PIPS generated variable
+   int _u_i_1;
+   //PIPS generated variable
+   double _tmpxx8, _tmpxx9, _tmpxx10, _tmpxx11, _u_tempr, _tmpxx12, _tmpxx13, _tmpxx14, _tmpxx15, _u_tempi, _tmpxx16, _tmpxx17, _tmpxx18, _tmpxx19;
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t232.sce - from mcgill/fft.sce */
+   /* ----------------------------------------------  */
+   /*  - fft.sce without function */
+   /*  - This function computes the forward transform */
+   /* ---------------------------------------------- */
+   /* tic(); */
+   int _u_scale = 1;
+   double _tmpxx0 = log2(_u_scale);
+   int _u_t0 = round(_tmpxx0);
+   int _tmpxx1 = 1024*1024;
+   int _tmpxx2 = pow(2, _u_t0);
+   int _u_n = _tmpxx1*_tmpxx2;
+   int _u_t1 = 1048576;
+   double _u_data[1][2097152];
+   (int) (2*_u_t1)==2097152?(void) 0:__assert_fail("(int)1 == 1 && (int)(2*_u_t1) == 2097152", ".t232.tmp/t232.c", 39, (const char *) 0);
+   for(__lv2 = 0; __lv2 <= 2097151; __lv2 += 1)
+      _u_data[0][__lv2] = (double) rand()/((double) 2147483647);
+   __lv1 = 0+1;
+   int _tmpxx3 = _u_n<2;
+   int _tmpxx4 = _u_n&_u_n-1;
+   if (_tmpxx3||_tmpxx4)
+      scilab_rt_disp_s0_("n must be power of 2 in four1");
+   else {
+      _u_nn = 2*_u_n;
+      for(_u_i_0 = 2; _u_i_0 <= _u_nn; _u_i_0 += 2) {
+         //PIPS generated variable
+         double _u_m_0, _u_t;
+         if (_u_j>_u_i_0) {
+            _u_t = _u_data[0][(int) (_u_j-1)-1];
+            _u_data[0][(int) (_u_j-1)-1] = _u_data[0][_u_i_0-1-1];
+            _u_data[0][_u_i_0-1-1] = _u_t;
+            _u_t = _u_data[0][(int) _u_j-1];
+            _u_data[0][(int) _u_j-1] = _u_data[0][_u_i_0-1];
+            _u_data[0][_u_i_0-1] = _u_t;
+         }
+         _u_m_0 = _u_n;
+         while (_u_m_0>=2&&_u_j>_u_m_0) {
+            _u_j = _u_j-_u_m_0;
+            _u_m_0 = _u_m_0/2;
+         }
+         _u_j = _u_j+_u_m_0;
+      }
+      while (_u_nn>_u_mmax) {
+         _u_istep = _u_mmax*2;
+         _tmpxx5 = 6.28318530717959/_u_mmax;
+         _u_theta = _u_isign*_tmpxx5;
+         _u_wtemp = sin(0.5*_u_theta);
+         _tmpxx6 = -2.0;
+         _tmpxx7 = _tmpxx6*_u_wtemp;
+         _u_wpr = _tmpxx7*_u_wtemp;
+         _u_wpi = sin(_u_theta);
+         _u_wr = 1.0;
+         _u_wi = 0.0;
+         _u_m_1 = 2;
+         while (_u_m_1<=_u_mmax) {
+            _u_i_1 = _u_m_1;
+            while (_u_i_1<=_u_nn) {
+               _u_j = _u_i_1+_u_mmax;
+               _tmpxx8 = _u_data[0][(int) (_u_j-1)-1];
+               _tmpxx9 = _u_data[0][(int) _u_j-1];
+               _tmpxx10 = _u_wr*_tmpxx8;
+               _tmpxx11 = _u_wi*_tmpxx9;
+               _u_tempr = _tmpxx10-_tmpxx11;
+               _tmpxx12 = _u_data[0][(int) _u_j-1];
+               _tmpxx13 = _u_data[0][(int) (_u_j-1)-1];
+               _tmpxx14 = _u_wr*_tmpxx12;
+               _tmpxx15 = _u_wi*_tmpxx13;
+               _u_tempi = _tmpxx14+_tmpxx15;
+               _tmpxx16 = _u_data[0][_u_i_1-1-1]-_u_tempr;
+               _u_data[0][(int) (_u_j-1)-1] = _tmpxx16;
+               _tmpxx17 = _u_data[0][_u_i_1-1]-_u_tempi;
+               _u_data[0][(int) _u_j-1] = _tmpxx17;
+               _tmpxx18 = _u_data[0][_u_i_1-1-1]+_u_tempr;
+               _u_data[0][_u_i_1-1-1] = _tmpxx18;
+               _tmpxx19 = _u_data[0][_u_i_1-1]+_u_tempi;
+               _u_data[0][_u_i_1-1] = _tmpxx19;
+               _u_i_1 += _u_istep;
+            }
+            _u_wtemp = _u_wr;
+            _tmpxx20 = _u_wtemp*_u_wpr;
+            _tmpxx21 = _u_wi*_u_wpi;
+            _tmpxx22 = _tmpxx20-_tmpxx21;
+            _u_wr = _tmpxx22+_u_wr;
+            _tmpxx23 = _u_wi*_u_wpr;
+            _tmpxx24 = _u_wtemp*_u_wpi;
+            _tmpxx25 = _tmpxx23+_tmpxx24;
+            _u_wi = _tmpxx25+_u_wi;
+            _u_m_1 += 2;
+         }
+         _u_mmax = _u_istep;
+      }
+   }
+   /* elapsedTime = toc(); */
+   /* disp("Elapsed Time"); */
+   /* disp(elapsedTime); */
+   scilab_rt_disp_s0_("Mean value of the vector data");
+   double _tmpxx26;
+   scilab_rt_mean_d2_d0(1, 2097152, _u_data, &_tmpxx26);
+   scilab_rt_disp_d0_(_tmpxx26);
+
+   scilab_rt_terminate();
+}

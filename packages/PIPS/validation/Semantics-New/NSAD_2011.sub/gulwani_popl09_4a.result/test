@@ -140,7 +140,7 @@ void ts_restructured(void)
 L2:   ;
 
 //  T(c2,x) {c1==m, c1==y, c2==x, c2#init==x#init, 0<=c1, 0<=c2,
-//    c2+1<=n, x#init<=c2}
+//    c2#init<=c2, c2+1<=n}
 
    while (rand_b()) {
 

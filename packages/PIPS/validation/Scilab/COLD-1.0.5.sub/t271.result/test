@@ -1,0 +1,63 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   1;
+   2;
+   3;
+   4;
+   5;
+   6;
+   7;
+   8;
+   9;
+   10;
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
+            (double) 1.0;
+      }
+   }
+   int _u_r1;
+   int _u_c1;
+   *&_u_r1 = (int) 1.0;
+   *&_u_c1 = (int) 1.0;
+   scilab_rt_display_s0i0_("c1", _u_c1);
+   scilab_rt_display_s0i0_("r1", _u_r1);
+   int _u_r2;
+   int _u_c2;
+   *&_u_r2 = (int) 2;
+   *&_u_c2 = (int) 5;
+   scilab_rt_display_s0i0_("c2", _u_c2);
+   scilab_rt_display_s0i0_("r2", _u_r2);
+   int _u_r3;
+   int _u_c3;
+   int _u_k3;
+   *&_u_r3 = (int) 3;
+   *&_u_c3 = (int) 2;
+   *&_u_k3 = (int) 3;
+   scilab_rt_display_s0i0_("k3", _u_k3);
+   scilab_rt_display_s0i0_("c3", _u_c3);
+   scilab_rt_display_s0i0_("r3", _u_r3);
+   int _u_s1[1][2];
+   _u_s1[0][0] = (int) 1.0;
+   _u_s1[0][1] = (int) 1.0;
+   scilab_rt_display_s0i2_("s1", 1, 2, _u_s1);
+   int _u_s2[1][2];
+   _u_s2[0][0] = (int) 2;
+   _u_s2[0][1] = (int) 5;
+   scilab_rt_display_s0i2_("s2", 1, 2, _u_s2);
+   int _u_s3[1][3];
+   _u_s3[0][0] = (int) 3;
+   _u_s3[0][1] = (int) 2;
+   _u_s3[0][2] = (int) 3;
+   scilab_rt_display_s0i2_("s3", 1, 3, _u_s3);
+
+   scilab_rt_terminate();
+}

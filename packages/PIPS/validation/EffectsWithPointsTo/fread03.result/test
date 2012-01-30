@@ -87,12 +87,7 @@ POINTS-TO
 // nrl -> _nrl_2[0] , EXACT
 
 
-// Points To OUT:
-// filename -> _filename_1[0] , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// Points To OUT: none
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
@@ -358,9 +353,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // line -> _line_3[0] , EXACT
 
 
-// Points To OUT:
-// file -> _file_1[0] , EXACT
-// line -> _line_3[0] , EXACT
+// Points To OUT: none
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
@@ -385,8 +378,7 @@ int bmatrix(int f1, int f2, int f3, int f4)
 // f1 -> _f1_1[0] , EXACT
 
 
-// Points To OUT:
-// f1 -> _f1_1[0] , EXACT
+// Points To OUT: none
 
 int nrerror(char *f1)
 {
@@ -445,8 +437,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    for(i = 0; i <= height-1; i += 1)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
       ReadPGMrow(file, width, m[i]);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]

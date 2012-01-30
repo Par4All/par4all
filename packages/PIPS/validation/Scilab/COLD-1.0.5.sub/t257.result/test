@@ -1,0 +1,201 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /*  t257.sce: trigonometry with complex */
+   double _Complex _tmpxx0 = 2*1.0iF;
+   double _Complex _u_a = 1+_tmpxx0;
+   scilab_rt_display_s0z0_("a", _u_a);
+   double _Complex _tmpxx1 = 2*1.0iF;
+   double _Complex _tmpxx2 = 4*1.0iF;
+   double _Complex _u_b[1][2];
+   _u_b[0][0] = 1+_tmpxx1;
+   _u_b[0][1] = 3+_tmpxx2;
+   scilab_rt_display_s0z2_("b", 1, 2, _u_b);
+   double _Complex _tmpxx3 = 3*1.0iF;
+   double _Complex _tmpxx5 = 1+_tmpxx3;
+   double _Complex _u_c[2][2][2];
+   double _Complex _u_cos1 = ccos(_u_a);
+   double _Complex _u_cos2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_cos2[0][__lv2] = ccos(_u_b[0][__lv2]);
+   double _Complex _u_cos3[2][2][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1) {
+            //PIPS generated variable
+            register double _tmpxx4_0;
+            _tmpxx4_0 = (double) 1.0;
+            _u_c[__lv1][__lv2][__lv3] = (double _Complex) _tmpxx4_0*_tmpxx5;
+            _u_cos3[__lv1][__lv2][__lv3] = ccos(_u_c[__lv1][__lv2][__lv3]);
+         }
+      }
+   }
+   scilab_rt_display_s0z3_("c", 2, 2, 2, _u_c);
+   /*  COS */
+   scilab_rt_disp_s0_("_________cos");
+   scilab_rt_display_s0z0_("cos1", _u_cos1);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("cos2", 1, 2, _u_cos2);
+   scilab_rt_display_s0z3_("cos3", 2, 2, 2, _u_cos3);
+   /*  COSD */
+   scilab_rt_disp_s0_("_________cosd");
+   /* complex not implemented in siclab */
+   /*  COSH */
+   scilab_rt_disp_s0_("_________cosh");
+   double _Complex _u_acosh1 = ccosh(_u_a);
+   scilab_rt_display_s0z0_("acosh1", _u_acosh1);
+   double _Complex _u_acosh2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_acosh2[0][__lv2] = ccosh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("acosh2", 1, 2, _u_acosh2);
+   /* 3D not implemented in scilab */
+   /*  ACOS */
+   scilab_rt_disp_s0_("_________acos");
+   double _Complex _u_acos1 = cacos(_u_a);
+   scilab_rt_display_s0z0_("acos1", _u_acos1);
+   double _Complex _u_acos2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_acos2[0][__lv2] = cacos(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("acos2", 1, 2, _u_acos2);
+   /* 3D not implemented in scilab */
+   /*  ACOSD */
+   scilab_rt_disp_s0_("_________acosd");
+   /* complex not implemented in siclab */
+   /*  ACOSH */
+   scilab_rt_disp_s0_("_________acosh");
+   _u_acosh1 = cacosh(_u_a);
+   scilab_rt_display_s0z0_("acosh1", _u_acosh1);
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_acosh2[0][__lv2] = cacosh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("acosh2", 1, 2, _u_acosh2);
+   /* 3D not implemented in scilab */
+   /*  sin */
+   scilab_rt_disp_s0_("_________sin");
+   double _Complex _u_sin1 = csin(_u_a);
+   scilab_rt_display_s0z0_("sin1", _u_sin1);
+   double _Complex _u_sin2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_sin2[0][__lv2] = csin(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("sin2", 1, 2, _u_sin2);
+   double _Complex _u_sin3[2][2][2];
+#pragma omp parallel for 
+   for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
+      //PIPS generated variable
+      int __lv2;
+#pragma omp parallel for 
+      for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
+         //PIPS generated variable
+         int __lv3;
+#pragma omp parallel for 
+         for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
+            _u_sin3[__lv1][__lv2][__lv3] = csin(_u_c[__lv1][__lv2][__lv3]);
+      }
+   }
+   scilab_rt_display_s0z3_("sin3", 2, 2, 2, _u_sin3);
+   /*  sinD */
+   scilab_rt_disp_s0_("_________sind");
+   /* complex not implemented in siclab */
+   /*  sinH */
+   scilab_rt_disp_s0_("_________sinh");
+   double _Complex _u_asinh1 = csinh(_u_a);
+   scilab_rt_display_s0z0_("asinh1", _u_asinh1);
+   double _Complex _u_asinh2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_asinh2[0][__lv2] = csinh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("asinh2", 1, 2, _u_asinh2);
+   /* 3D not implemented in scilab */
+   /*  ASIN */
+   scilab_rt_disp_s0_("_________asin");
+   double _Complex _u_asin1 = casin(_u_a);
+   scilab_rt_display_s0z0_("asin1", _u_asin1);
+   double _Complex _u_asin2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_asin2[0][__lv2] = casin(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("asin2", 1, 2, _u_asin2);
+   /* 3D not implemented in scilab */
+   /*  ASIND */
+   scilab_rt_disp_s0_("_________asind");
+   /* complex not implemented in siclab */
+   /*  ASINH */
+   scilab_rt_disp_s0_("_________asinh");
+   _u_asinh1 = casinh(_u_a);
+   scilab_rt_display_s0z0_("asinh1", _u_asinh1);
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_asinh2[0][__lv2] = casinh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("asinh2", 1, 2, _u_asinh2);
+   /* 3D not implemented in scilab */
+   /*  tan */
+   scilab_rt_disp_s0_("_________tan");
+   double _Complex _u_tan1 = ctan(_u_a);
+   scilab_rt_display_s0z0_("tan1", _u_tan1);
+   double _Complex _u_tan2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_tan2[0][__lv2] = ctan(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("tan2", 1, 2, _u_tan2);
+   /* 3D not implemented in scilab */
+   /*  tanD */
+   scilab_rt_disp_s0_("_________tand");
+   /* complex not implemented in siclab */
+   /*  tanH */
+   scilab_rt_disp_s0_("_________tanh");
+   double _Complex _u_atanh1 = ctanh(_u_a);
+   scilab_rt_display_s0z0_("atanh1", _u_atanh1);
+   double _Complex _u_atanh2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_atanh2[0][__lv2] = ctanh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("atanh2", 1, 2, _u_atanh2);
+   /* 3D not implemented in scilab */
+   /*  ATAN */
+   scilab_rt_disp_s0_("_________atan");
+   double _Complex _u_atan1 = catan(_u_a);
+   scilab_rt_display_s0z0_("atan1", _u_atan1);
+   double _Complex _u_atan2[1][2];
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_atan2[0][__lv2] = catan(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("atan2", 1, 2, _u_atan2);
+   /* 3D not implemented in scilab */
+   /*  ATAND */
+   scilab_rt_disp_s0_("_________atand");
+   /* complex not implemented in siclab */
+   /*  ASINH */
+   scilab_rt_disp_s0_("_________atanh");
+   _u_atanh1 = catanh(_u_a);
+   scilab_rt_display_s0z0_("atanh1", _u_atanh1);
+#pragma omp parallel for 
+   for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
+      _u_atanh2[0][__lv2] = catanh(_u_b[0][__lv2]);
+   __lv1 = 0+1;
+   scilab_rt_display_s0z2_("atanh2", 1, 2, _u_atanh2);
+   /* 3D not implemented in scilab */
+   
+   scilab_rt_terminate();
+}

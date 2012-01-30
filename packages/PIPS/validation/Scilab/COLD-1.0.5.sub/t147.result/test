@@ -1,0 +1,10 @@
+int main(int argc, char *argv[])
+{
+   scilab_rt_init(argc, argv, 0);
+   
+   /* testing now */
+   double _u_a = scilab_rt_now__();
+   scilab_rt_display_s0d0_("a", _u_a);
+
+   scilab_rt_terminate();
+}

@@ -1,0 +1,50 @@
+/*
+ * (c) HPC Project - 2010-2011 - All rights reserved
+ *
+ */
+
+#include "scilab_rt.h"
+
+
+int __lv0;
+int __lv1;
+int __lv2;
+int __lv3;
+
+/*----------------------------------------------------*/
+
+
+/*----------------------------------------------------*/
+
+int main(int argc, char* argv[])
+{
+  scilab_rt_init(argc, argv, COLD_MODE_STANDALONE);
+
+  double _u_a1 = 1.E10;
+  scilab_rt_display_s0d0_("a1",_u_a1);
+  double _u_a2 = 1.E+10;
+  scilab_rt_display_s0d0_("a2",_u_a2);
+  double _u_a3 = 1.E-10;
+  scilab_rt_display_s0d0_("a3",_u_a3);
+  double _u_b1 = 1.234E5;
+  scilab_rt_display_s0d0_("b1",_u_b1);
+  double _u_b2 = 1.234E+5;
+  scilab_rt_display_s0d0_("b2",_u_b2);
+  double _u_b3 = 1.234E-5;
+  scilab_rt_display_s0d0_("b3",_u_b3);
+  double _u_c1 = 1.E10;
+  scilab_rt_display_s0d0_("c1",_u_c1);
+  double _u_c2 = 1.E+10;
+  scilab_rt_display_s0d0_("c2",_u_c2);
+  double _u_c3 = 1.E-10;
+  scilab_rt_display_s0d0_("c3",_u_c3);
+  double _u_d1 = 1.234E5;
+  scilab_rt_display_s0d0_("d1",_u_d1);
+  double _u_d2 = 1.234E+5;
+  scilab_rt_display_s0d0_("d2",_u_d2);
+  double _u_d3 = 1.234E-5;
+  scilab_rt_display_s0d0_("d3",_u_d3);
+
+  scilab_rt_terminate();
+}
+

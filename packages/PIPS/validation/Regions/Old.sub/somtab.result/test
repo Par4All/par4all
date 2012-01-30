@@ -5,7 +5,7 @@ C
       DIMENSION AA(5, 5)
       DIMENSION BB(5,5)
 
-C  <AA(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI1<=3}>
+C  <AA(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI2<=3}>
 C  <BB(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1}>
 
 C      
@@ -14,7 +14,7 @@ C
 C
       END
 
-C  <A(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI1<=3}>
+C  <A(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI2, PHI2<=3}>
 C  <B(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1}>
 
 C
@@ -33,7 +33,7 @@ C  <B(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1}>
 C
       B(1,1) = 3                                                        0012
 
-C  <A(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI1<=3}>
+C  <A(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI2, PHI2<=3}>
 
       M = A(1,1)+A(3,3)                                                 0013
 C

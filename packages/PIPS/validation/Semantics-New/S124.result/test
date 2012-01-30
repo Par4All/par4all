@@ -28,7 +28,7 @@ C  T(J) {J==0}
 
          J = 0                                                          0017
 
-C  T(I,J) {I+J#init==J+1, 2I<=N, J#init<=J}
+C  T(I,J) {I+J#init==J+1, 1<=I, 2I<=N}
 
          DO 10 I = 1, N/2                                               0018
 

@@ -29,7 +29,7 @@ C     Check tiling: use integer loop bounds, not mutiple of the tile size
          DO J_t = 0, 2
 
             DO I = 5*I_t, MIN(15, 5*I_t+4)                              0007
-               DO J = 5*J_t, MIN(5*J_t+4, 10)                           0008
+               DO J = 5*J_t, MIN(10, 5*J_t+4)                           0008
                   X(I,J) = FLOAT(I+J)                                   0009
 200               CONTINUE                                              0010
                ENDDO

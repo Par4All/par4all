@@ -1,3 +1,19 @@
-1. TRY PIPS:tools:2
-2. TUTORIAL:tutorial:1
-3. FULL CONTROL:full:1
+[
+
+ { "title":   "1. TRY PIPS",
+   "path":    "tools",
+   "advmode": true
+ },
+
+ { "title":   "2. TUTORIAL",
+   "path":    "tutorials",
+   "advmode": false
+ },
+
+ { "title":   "3. FULL CONTROL",
+   "path":    "full",
+   "advmode": false
+ }
+
+]
+

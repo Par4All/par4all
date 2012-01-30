@@ -148,7 +148,7 @@ void ts_restructured(void)
 L2:   ;
 
 //  T(i,j,k1,k2) {i==k2, i#init==k2#init, j==k1, j==m, 0<=i,
-//    i#init<=i, i+1<=n, 0<=j, j<=j#init}
+//    k2#init<=i, i+1<=n, 0<=j, j<=j#init}
 
    while (rand_b())
 
@@ -599,15 +599,15 @@ L2:   ;
 
          while (rand_b()) {
 
-//  P(i,j,k1,k2,m,n) {i==k2, j==k1, 1<=i, i+1<=n, 0<=j, j+1<=m, 1<=n}
+//  P(i,j,k1,k2,m,n) {i==k2, j==k1, 1<=i, i+1<=n, 0<=j, j+1<=m}
 
             if (!(i<n&&j<m-1))
 
-//  P(i,j,k1,k2,m,n) {i==k2, j==k1, j==m-1, 1<=i, i+1<=n, 0<=j, 1<=n}
+//  P(i,j,k1,k2,m,n) {i==k2, j==k1, j==m-1, 1<=i, i+1<=n, 0<=j}
 
                deadlock();
 
-//  P(i,j,k1,k2,m,n) {i==k2, j==k1, 1<=i, i+1<=n, 0<=j, j+2<=m, 1<=n}
+//  P(i,j,k1,k2,m,n) {i==k2, j==k1, 1<=i, i+1<=n, 0<=j, j+2<=m}
 
             j++;
 

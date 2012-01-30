@@ -147,7 +147,7 @@ void ts_restructured(void)
 L2:   ;
 
 //  T(i1,i2,x,y) {i1==m, i1==y, i2==x, i2#init==x#init, 0<=i1,
-//    i1<=y#init, 0<=i2, i2+1<=n, x#init<=i2}
+//    i1<=y#init, 0<=i2, i2#init<=i2, i2+1<=n}
 
    while (rand_b())
 
@@ -605,18 +605,15 @@ L2:   ;
 
          while (rand_b()) {
 
-//  P(i1,i2,m,n,x,y) {i1==y, i2==x, 0<=i1, i1+1<=m, 1<=i2, i2+1<=n,
-//    1<=n}
+//  P(i1,i2,m,n,x,y) {i1==y, i2==x, 0<=i1, i1+1<=m, 1<=i2, i2+1<=n}
 
             if (!(x<n&&y<m-1))
 
-//  P(i1,i2,m,n,x,y) {i1==m-1, i1==y, i2==x, 0<=i1, 1<=i2, i2+1<=n,
-//    1<=n}
+//  P(i1,i2,m,n,x,y) {i1==m-1, i1==y, i2==x, 0<=i1, 1<=i2, i2+1<=n}
 
                deadlock();
 
-//  P(i1,i2,m,n,x,y) {i1==y, i2==x, 0<=i1, i1+2<=m, 1<=i2, i2+1<=n,
-//    1<=n}
+//  P(i1,i2,m,n,x,y) {i1==y, i2==x, 0<=i1, i1+2<=m, 1<=i2, i2+1<=n}
 
             y++;
 

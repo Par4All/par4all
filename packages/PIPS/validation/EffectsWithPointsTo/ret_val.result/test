@@ -31,62 +31,60 @@ POINTS-TO
 
 
 // Points To IN:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
 
 // Points To OUT:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 
 long long int get_result(int argc, char **argv)
 {
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    long long int result = 0;
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    result = atoll(argv[1]);
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    printf("return value will be %lld\n", result);
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    return result;
 }
 
 // Points To IN:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
 
 // Points To OUT:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 
 int main(int argc, char **argv)
 {
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    long long int size = get_result(argc, argv);
 
 // Points To:
-// _argv_2[0] -> __argv_2_2[0] , EXACT
+// _argv_2[0] -> _argv_2_2[0] , EXACT
 // argv -> _argv_2[0] , EXACT
 
    return size;
