@@ -9,9 +9,9 @@ l300:
    for(i_t = 0; i_t <= (size-1)/1111; i_t += 1)
       for(j_t = 0; j_t <= (size-1)/2222; j_t += 1)
          for(k_t = 0; k_t <= (size-1)/3333; k_t += 1)
-            for(i = 1111*i_t; i <= pips_min(2, 1111*i_t+1110, size-1); i += 1)
+            for(i = 1111*i_t; i <= pips_min(2, size-1, 1111*i_t+1110); i += 1)
                for(j = 2222*j_t; j <= pips_min(2, size-1, 2222*j_t+2221); j += 1)
-                  for(k = 3333*k_t; k <= pips_min(2, 3333*k_t+3332, size-1); k += 1)
+                  for(k = 3333*k_t; k <= pips_min(2, size-1, 3333*k_t+3332); k += 1)
                      a[i][j][k] = 2;
    return 0;
 }
