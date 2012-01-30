@@ -31,6 +31,13 @@ def _get_workdir(request):
     if not os.path.exists(path): os.mkdir(path)
     return path
 
+def _get_directory(request):
+    """Create and return a per-session temporary working directory
+    """
+    workdir = mkdtemp(dir=request.registry.settings['paws.tempdir'])
+    request.session['workdir'] = os.path.basename(workdir)
+    return request.session['workdir']
+
 def _create_result_file(request, code):
     """
     """
@@ -158,6 +165,7 @@ def _highlight_code(request, code, language, demo=False):
 def get_directory(request):
     """Create and return a per-session temporary working directory
     """
+    _get_directory(request)
     # Temporary working directory
     workdir = mkdtemp(dir=request.registry.settings['paws.tempdir'])
     request.session['workdir'] = os.path.basename(workdir)

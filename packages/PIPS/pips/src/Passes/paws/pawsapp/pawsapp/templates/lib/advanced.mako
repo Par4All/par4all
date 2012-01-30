@@ -7,15 +7,13 @@
 
 <%def name="properties_fields(props)">
 
-<fieldset>
-
-  <h4>Properties</h4>
+<table>
 
   ## BOOL properties
   % if "bool" in props:
-  <div class="clearfix">
-    <label id="bools">True/False</label>
-    <div class="input">
+  <tr>
+    <td style="border-top-style: none"><span class="label success">True/False</span></td>
+    <td style="border-top-style: none">
       <ul class="inputs-list">
 	% for p in props["bool"]:
         <li>
@@ -26,15 +24,15 @@
         </li>
 	% endfor
       </ul>
-    </div>
-  </div>
+    </td>
+  </tr>
   % endif
 
   ## INT properties
   % if "int" in props:
-  <div class="clearfix">
-    <label id="ints">Integer</label>
-    <div class="input">
+  <tr>
+    <td><span class="label success">Integer</span></td>
+    <td>
       <ul class="inputs-list">
 	% for p in props["int"]:
         <li>
@@ -46,15 +44,15 @@
         </li>
 	% endfor
       </ul>
-    </div>
-  </div>
+    </td>
+  </tr>
   % endif
 
   ## STR properties
   % if "str" in props:
-  <div class="clearfix">
-    <label id="strs">String</label>
-    <div class="input">
+  <tr>
+    <td><span class="label success">String</span></td>
+    <td>
       <ul class="inputs-list">
 	% for p in props["str"]:
         <li>
@@ -66,11 +64,11 @@
         </li>
 	% endfor
       </ul>
-    </div>
-  </div>
+    </td>
+  </tr>
   % endif
-
-</fieldset>
+  
+</table>
 </%def>
 
 
@@ -78,27 +76,19 @@
 
 <%def name="analyses_fields(analyses)">
 
-<h4>Select analyses</h4>
-
-<form class="form-stacked">
-  <fieldset>
-    <div class="clearfix">
-      <div class="input">
-        <ul class="inputs-list">
-	  % for a in analyses:
-          <li>
-            <label>
-	      ${h.checkbox("analyses", value=a, checked=True)}
-	      <span>${a}</span>
-            </label>
-	    ${h.select(a, "", [(v["name"], v["name"]) for v in analyses[a]])}
-          </li>
-	  % endfor
-        </ul>
-      </div>
-    </div>
-  </fieldset>
-</form>
+<div class="input">
+  <ul class="inputs-list">
+    % for a in analyses:
+    <li class="clearfix">
+      <label>
+	${h.checkbox("analyses", value=a, checked=True)}
+	<span>${a}</span>
+      </label>
+      ${h.select(a, "", [(v["name"], v["name"]) for v in analyses[a]])}
+    </li>
+    % endfor
+  </ul>
+</div>
 
 </%def>
 
@@ -107,23 +97,19 @@
 
 <%def name="phases_fields(phases)">
 
-<h4>Phases</h4>
-
-<fieldset>
-  <div class="clearfix">
-    <div class="input">
-      <ul class="inputs-list">
-	% for p in phases["PHASES"]:
-        <li>
-          <label>
-	    ${h.checkbox("phases", value=p["name"], checked=True)}
-	    <span>${p["name"]}</span>
-          </label>
-        </li>
-	% endfor
-      </ul>
-    </div>
+<div class="clearfix">
+  <div class="input">
+    <ul class="inputs-list">
+      % for p in phases["PHASES"]:
+      <li>
+        <label>
+	  ${h.checkbox("phases", value=p["name"], checked=True)}
+	  <span>${p["name"]}</span>
+        </label>
+      </li>
+      % endfor
+    </ul>
   </div>
-</fieldset>
+</div>
 
 </%def>

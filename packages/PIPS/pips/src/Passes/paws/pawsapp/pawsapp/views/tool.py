@@ -19,7 +19,7 @@ toolName = dict(
     )
 
 
-def _get_examples(tool, request):
+def _list_examples(tool, request):
     """Get list of examples for the specified tool.
     """
     path = os.path.join(request.registry.settings['paws.validation'], 'tools', os.path.basename(tool))
@@ -103,12 +103,12 @@ def tool(request):
                 props    = props,
                 analyses = analyses,
                 phases   = phases,
-                examples = _get_examples(tool, request),
+                examples = _list_examples(tool, request),
                 )
 
 
-@view_config(route_name='upload_userfile', renderer='json', permission='view')
-def upload_userfile(request):
+@view_config(route_name='upload_user_file', renderer='json', permission='view')
+def upload_user_file(request):
     """Handle file upload. Multiple files can be sent inside a single zip file.
     """
     source   = request.POST['file']
@@ -122,26 +122,24 @@ def upload_userfile(request):
             return [['ERROR', 'Maximum 5 files in archive allowed.']]
         if len(set([os.path.splitext(f)[1] for f in files])) > 1:
             return [['ERROR', 'All of the sources have to be written in the same language.']]
-        return [(f, zip.read(f).replace('<', '&lt;').replace('>', '&gt;')) for f in files]
+        return [ (f, zip.read(f)) for f in files ]
 
     else:
         # Single source file
         text = source.file.read()
-        return [[filename, text.replace('<', '&lt;').replace('>', '&gt;')]]
+        return [ (filename, text) ]
 
 
-@view_config(route_name='get_example_file', renderer='string', permission='view')
-def get_example_file(request):
+@view_config(route_name='load_example_file', renderer='string', permission='view')
+def load_example_file(request):
     """Return
     """
     # Sanitize file path (probably unnecessary, but it can't hurt)
-    tool     = os.path.basename(request.matchdict['tool'])
-    filename = os.path.basename(request.matchdict['filename'])
+    tool = os.path.basename(request.matchdict['tool'])
+    name = os.path.basename(request.matchdict['name'])
 
-    path = os.path.abspath(os.path.join(request.registry.settings['paws.validation'], 'tools', tool, filename))
+    path = os.path.abspath(os.path.join(request.registry.settings['paws.validation'], 'tools', tool, name))
     try:
         return file(path).read()
     except:
         return ''
-
-
