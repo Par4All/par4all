@@ -137,12 +137,16 @@ cons * a2;
     return a;
 }
 
-bool arguments_equal_p(a1, a2)
-cons * a1;
-cons * a2;
+/* Check the syntactic equality of lists a1 and a2 
+ *
+ * To check the equality of a1 and a2 as sets, use argument
+ * intersection and a cardinal equality, assuming no entity occurs
+ * more than once in a1 or a2.
+ */
+bool arguments_equal_p(list a1, list a2)
 {
-    cons * ca1;
-    cons * ca2;
+    list ca1;
+    list ca2;
 
     for( ca1 = a1, ca2 = a2; !ENDP(ca1) && !ENDP(ca2); POP(ca1), POP(ca2))
 	if(ENTITY(CAR(ca1))!=ENTITY(CAR(ca2))) break;
@@ -157,20 +161,48 @@ cons * args;
     return gen_find_eq(e, args) != chunk_undefined;
 }
 
-cons * arguments_intersection(a1, a2)
-cons * a1;
-cons * a2;
+/* Build a new list with all entities occuring in both a1 and a2 */
+list arguments_intersection(list a1, list a2)
 {
-    cons * a = NIL;
-    MAPL(ca1, {
-	entity e1 = ENTITY(CAR(ca1));
+    list a = NIL;
+    FOREACH(ENTITY, e1, a1) {
 	if(entity_is_argument_p(e1, a2))
 	    /* should gen_nconc be used ?!? Or is it only useful to
 	     chain stuff at the end of a list? */
 	    a = CONS(ENTITY, e1, a);
-    },
-	 a1);
+    }
+
     return a;
+}
+
+/* Set equality of lists a1 and a2. Check that all entities in a1 also
+ * occur in a2 and vice-versa.
+ *
+ * Might be faster to use the intersection and its cardinal...
+ *
+ * This algorithm is correct if an entity can appear several times in
+ * a list.
+ */
+bool arguments_set_equal_p(list a1, list a2)
+{
+  bool set_equal_p = true;
+
+  FOREACH(ENTITY, e1, a1) {
+    if(!entity_is_argument_p(e1, a2)) {
+      set_equal_p = false;
+      break;
+    }
+  }
+  if(set_equal_p) {
+    FOREACH(ENTITY, e2, a2) {
+      if(!entity_is_argument_p(e2, a1)) {
+	set_equal_p = false;
+	break;
+      }
+    }
+  }
+
+  return set_equal_p;
 }
 
 void free_arguments(args)
