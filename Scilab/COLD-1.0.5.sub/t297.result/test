@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
    double _Complex _u_b[1][3];
    scilab_rt_fft_d2_z2(1, 3, _u_a, 1, 3, _u_b);
    scilab_rt_display_s0z2_("b", 1, 3, _u_b);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       register double _tmpCT0_0;

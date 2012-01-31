@@ -44,11 +44,10 @@ int main(int argc, char *argv[])
    scilab_rt_mean_d2_d0(1, 2, _tmpxx7, &_tmpxx9);
    double _u_SCREENLENGTH = _tmpxx8/_tmpxx9;
    double _u_mag[61][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 60; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
          _u_mag[__lv1][__lv2] = (double) 0.0;
    }

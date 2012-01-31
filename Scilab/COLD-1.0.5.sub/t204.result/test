@@ -1,11 +1,10 @@
 double foo_i0i2i0_(int _u_s, int _u_sA_n0, int _u_sA_n1, int _u_sA[_u_sA_n0][_u_sA_n1], int _u_p)
 {
    int _tmpxx1[_u_sA_n0][_u_sA_n1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_sA_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_sA_n1-1; __lv2 += 1) {
          //PIPS generated variable
          register int _tmpxx0_0;

@@ -5,11 +5,10 @@ int main(int argc, char *argv[])
    /*  t55.sce: testing length function */
    int _u_a = (int) 1;
    scilab_rt_display_s0i0_("a", _u_a);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
          (double) 1.0;
    }

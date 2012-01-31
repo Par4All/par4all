@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
    _tmpxx0[0][0] = 1;
    _tmpxx0[0][1] = 2;
    int _u_a[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_a[0][__lv2] = -_tmpxx0[0][__lv2];
    __lv1 = 0+1;
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
    _tmpxx1[0][0] = 1;
    _tmpxx1[0][1] = 2;
    int _u_b[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_b[0][__lv2] = -_tmpxx1[0][__lv2];
    __lv1 = 0+1;
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
    _tmpxx2[0][0] = 1;
    _tmpxx2[0][1] = 2;
    int _u_c[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_c[0][__lv2] = -_tmpxx2[0][__lv2];
    __lv1 = 0+1;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
    _tmpxx3[0][0] = 1;
    _tmpxx3[0][1] = 2;
    int _u_d[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_d[0][__lv2] = -_tmpxx3[0][__lv2];
    __lv1 = 0+1;
@@ -42,11 +42,10 @@ int main(int argc, char *argv[])
    double _u_e = -_tmpxx4;
    scilab_rt_display_s0d0_("e", _u_e);
    double _u_aa[10][10];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
          _u_aa[__lv1][__lv2] = (double) 1.0;
    }

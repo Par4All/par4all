@@ -32,25 +32,22 @@ int main(int argc, char *argv[])
    double _u_x[100][100];
    (int) _u_n==100&&(int) _u_n==100?(void) 0:__assert_fail("(int)_u_n == 100 && (int)_u_n == 100", ".t153.tmp/t153.c", 51, (const char *) 0);
    double _u_y[100][100];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 99; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 99; __lv2 += 1) {
          _u_x[__lv1][__lv2] = (double) 1.0;
          _u_y[__lv1][__lv2] = (double) 1.0;
       }
    }
    (int) _u_n==100&&(int) _u_n==100?(void) 0:__assert_fail("(int)_u_n == 100 && (int)_u_n == 100", ".t153.tmp/t153.c", 53, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_i = 1; _u_i <= _u_n; _u_i += 1) {
       //PIPS generated variable
       int _u_j;
-#pragma omp parallel for 
       for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
          _u_x[_u_i-1][_u_j-1] = _u_i;
-#pragma omp parallel for 
       for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
          _u_y[_u_i-1][_u_j-1] = _u_j;
    }

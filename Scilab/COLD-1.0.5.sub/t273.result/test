@@ -13,7 +13,7 @@ double foo_i2_(int _u_tab_n0, int _u_tab_n1, int _u_tab[_u_tab_n0][_u_tab_n1])
    scilab_rt_disp_s0_("val");
    scilab_rt_disp_i0_(_u_val);
    double _u_tmpTab[_u_val][1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_val-1; __lv1 += 1)
       _u_tmpTab[__lv1][0] = (double) 1.0;
    for(__lv1 = 0; __lv1 <= _u_val-1; __lv1 += 1)

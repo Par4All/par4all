@@ -5,11 +5,10 @@ int main(int argc, char *argv[])
    double _u_c[10][10];
    double _tmpxx2[10][10];
    double _tmpxx3[10][10];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx0_0, _tmpxx1_0, _u_a_0, _u_b_0;

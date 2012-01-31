@@ -6,40 +6,37 @@ int main(int argc, char *argv[])
    
    /*  t138.sce: testing squeeze function */
    double _u_a[3][1][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv3;
-#pragma omp parallel for 
       for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
          _u_a[__lv1][0][__lv3] = (double) 1.0;
    }
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
       __lv2 = 0+1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(k_0 = 0; k_0 <= 2; k_0 += 1)
       _u_a[1][0][k_0] = 10;
    0+1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_0 = 0; i_0 <= 2; i_0 += 1) {
       //PIPS generated variable
       int k_1;
-#pragma omp parallel for 
       for(k_1 = 0; k_1 <= 2; k_1 += 1)
          _u_a[i_0][0][k_1] = 20;
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_1 = 0; i_1 <= 2; i_1 += 1)
       _u_a[i_1][0][2] = 30;
    double _u_a1[1][6][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 5; __lv2 += 1) {
       //PIPS generated variable
       int __lv3;
-#pragma omp parallel for 
       for(__lv3 = 0; __lv3 <= 2; __lv3 += 1) {
          //PIPS generated variable
          register double _u_a1_0;
@@ -50,7 +47,7 @@ int main(int argc, char *argv[])
    }
    __lv1 = 0+1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(k_3 = 0; k_3 <= 2; k_3 += 1)
       _u_a1[0][3][k_3] = 20;
    0+1;
@@ -58,11 +55,10 @@ int main(int argc, char *argv[])
    _u_a1[0][2][2] = 30;
    0+1;
    double _u_a2[7][3][1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 6; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
          _u_a2[__lv1][__lv2][0] = (double) 1.0;
    }
@@ -73,17 +69,17 @@ int main(int argc, char *argv[])
          __lv3 = 0+1;
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_2 = 0; j_2 <= 2; j_2 += 1)
       _u_a2[3][j_2][0] = 10;
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_2 = 0; j_2 <= 2; j_2 += 1)
       ;
 
    _u_a2[5][1][0] = 20;
    0+1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_4 = 0; i_4 <= 6; i_4 += 1)
       _u_a2[i_4][2][0] = 30;
    double _u_b[3][3];

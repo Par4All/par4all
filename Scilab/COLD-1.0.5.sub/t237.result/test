@@ -51,19 +51,17 @@ void mbrt__d2(int _u_SET_n0, int _u_SET_n1, double _u_SET[_u_SET_n0][_u_SET_n1])
    int _tmpxx8 = _u_side-1;
    double _u_dy = _tmpxx7/_tmpxx8;
    (int) _u_side==_u_SET_n0&&(int) _u_side==_u_SET_n1?(void) 0:__assert_fail("(int)_u_side == _u_SET_n0 && (int)_u_side == _u_SET_n1", ".t237.tmp/t237.c", 40, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_SET_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_SET_n1-1; __lv2 += 1)
          _u_SET[__lv1][__lv2] = (double) 0.0;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_x = 0; _u_x <= _u_side-1; _u_x += 1) {
       //PIPS generated variable
       int _u_y;
-#pragma omp parallel for 
       for(_u_y = 0; _u_y <= _u_side-1; _u_y += 1) {
          //PIPS generated variable
          double _tmpxx10, _tmpxx11, _tmpxx12;

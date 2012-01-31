@@ -151,6 +151,8 @@ with coldValidationWorkspace(cppflags="-I stubs/include") as w:
   w.props.semantics_fix_point_operator="derivative"
   w.props.semantics_keep_do_loop_exit_condition  = False
   w.props.trust_constant_path_effects_in_conflicts = True
+  w.props.prettyprint_sequential_style = "do"
+  
   w.activate("TRANSFORMERS_INTRA_FAST")
   w.activate("PRECONDITIONS_INTRA_FAST")
   w.activate("RICE_FAST_DEPENDENCE_GRAPH")
@@ -171,4 +173,7 @@ with coldValidationWorkspace(cppflags="-I stubs/include") as w:
   all_modules.clean_declarations()
   all_modules.privatize_module()
   all_modules.localize_declaration()
+  all_modules.ompify_code(concurrent=True)
+  all_modules.omp_merge_pragma(concurrent=True)
   all_modules.display()
+  

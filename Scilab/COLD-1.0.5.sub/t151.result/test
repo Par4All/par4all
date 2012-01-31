@@ -18,61 +18,54 @@ int main(int argc, char *argv[])
    _u_b[2][1] = 8.8;
    _u_b[2][2] = 9.9;
    int _u_bi[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
          _u_bi[__lv1][__lv2] = (int) _u_b[__lv1][__lv2];
    }
    scilab_rt_display_s0i2_("bi", 3, 3, _u_bi);
    double _u_c[3][2][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
             _u_c[__lv1][__lv2][__lv3] = (double) 1.0;
       }
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j = 0; j <= 1; j += 1) {
       //PIPS generated variable
       int k_0;
-#pragma omp parallel for 
       for(k_0 = 0; k_0 <= 2; k_0 += 1)
          _u_c[1][j][k_0] = 10;
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_0 = 0; i_0 <= 2; i_0 += 1) {
       //PIPS generated variable
       int k_1;
-#pragma omp parallel for 
       for(k_1 = 0; k_1 <= 2; k_1 += 1)
          _u_c[i_0][1][k_1] = 20;
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_1 = 0; i_1 <= 2; i_1 += 1)
       _u_c[i_1][1][2] = 30;
    int _u_ci[3][2][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
             _u_ci[__lv1][__lv2][__lv3] = (int) _u_c[__lv1][__lv2][__lv3];
       }

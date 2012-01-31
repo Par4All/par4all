@@ -37,11 +37,10 @@ double capr__()
       _u_mb = round(_tmpxx3/_u_h);
       scilab_rt_linspace_d0d0i0_d2(0, 0.5*_u_d, _u_m+1, 1, 50, _u_y);
       (int) (_u_n+1)==21&&(int) (_u_m+1)==50?(void) 0:__assert_fail("(int)(_u_n+1) == 21 && (int)(_u_m+1) == 50", ".t221.tmp/t221.c", 45, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 20; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
          for(__lv2 = 0; __lv2 <= 49; __lv2 += 1) {
             //PIPS generated variable
             register double _tmpxx4_0;
@@ -51,14 +50,12 @@ double capr__()
          }
       }
       (int) (_u_n+1)==21&&(int) (_u_m+1)==50?(void) 0:__assert_fail("(int)(_u_n+1) == 21 && (int)(_u_m+1) == 50", ".t221.tmp/t221.c", 47, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_ii_0 = 1; _u_ii_0 <= _u_na+1; _u_ii_0 += 1) {
          //PIPS generated variable
          int _u_jj_0;
-#pragma omp parallel for 
          for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
             _u_mask[_u_ii_0-1][_u_jj_0-1] = 0;
-#pragma omp parallel for 
          for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
             _u_f[_u_ii_0-1][_u_jj_0-1] = 1;
       }
