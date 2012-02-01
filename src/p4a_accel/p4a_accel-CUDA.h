@@ -156,7 +156,12 @@ void p4a_init_cuda_accel();
 
 // Set of routine for timing kernel executions
 extern float p4a_timing_elapsedTime;
-#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+#define P4A_TIMING_accel_timer_start \
+{ \
+  if(p4a_timing) { \
+    P4A_accel_timer_start; \
+  } \
+}
 #define P4A_TIMING_accel_timer_stop \
 { \
   if(p4a_timing) { \

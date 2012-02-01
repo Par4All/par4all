@@ -80,9 +80,7 @@ void P4A_accel_free(void *address) {
 void P4A_copy_from_accel(size_t element_size,
     void *host_address,
     void const*accel_address) {
-  if(p4a_timing) {
-    P4A_TIMING_accel_timer_start;
-  }
+  P4A_TIMING_accel_timer_start;
 
   toolTestExecMessage(cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost),
                       "It seems that cudaMemcpy failed, but to be sure run again with environment "
@@ -119,9 +117,7 @@ void P4A_copy_from_accel(size_t element_size,
 void P4A_copy_to_accel(size_t element_size,
     void const*host_address,
     void *accel_address) {
-  if(p4a_timing) {
-    P4A_TIMING_accel_timer_start;
-  }
+  P4A_TIMING_accel_timer_start;
 
   toolTestExecMessage(cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice),
                       "It seems that cudaMemcpy failed, but to be sure run again with environment "
