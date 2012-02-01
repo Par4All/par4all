@@ -713,11 +713,12 @@ transformer add_index_range_conditions(transformer pre,
     }
 
     /* When lost, try to exploit type information thanks to unsigned variables */
-    if(incr==0)
+    if(incr==0) {
       if(positive_expression_p(e_incr))
-	incr = 1;
+        incr = 1;
       else if(negative_expression_p(e_incr))
-	incr = -1;
+        incr = -1;
+    }
 
     /* find the real upper and lower bounds */
     if(incr<0) {
