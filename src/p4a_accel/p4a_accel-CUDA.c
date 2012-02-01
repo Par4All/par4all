@@ -8,8 +8,10 @@ void p4a_init_cuda_accel() {
   p4a_main_init();
 
   // Timing stuff
-  toolTestExec(cudaEventCreate(&p4a_start_event));
-  toolTestExec(cudaEventCreate(&p4a_stop_event));
+  if(p4a_timing) {
+    toolTestExec(cudaEventCreate(&p4a_start_event));
+    toolTestExec(cudaEventCreate(&p4a_stop_event));
+  }
 
   // Threads per blocks
   char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
