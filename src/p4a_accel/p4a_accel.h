@@ -48,6 +48,14 @@ extern int p4a_debug_level;
 /* Flag that trigger timing of kernel execution */
 extern int p4a_timing;
 
+/* Flag that trigger the Par4All runtime initialization */
+extern int p4a_runtime_initialized;
+
+#define checkP4ARuntimeInitialized() \
+if(!p4a_runtime_initialized) { \
+  fprintf(stderr,"The Par4All was not initialized, a call to P4A_init_accel() is missing ! It might cause some issues...\n"); \
+}
+
   /* Check we do not have conflicting targets: */
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined at the same time"

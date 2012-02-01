@@ -480,9 +480,16 @@ After testing and validation, this branch can be published\footnote{But
 \begin{verbatim}
 p4a_git --branch-action git push origin \$branch
 \end{verbatim}
+Not that this may be quite verbose, so you may be more comfortable with a
+quite:
+\begin{verbatim}
+p4a_git --branch-action git push origin \$branch >& /dev/null
+\end{verbatim}
+
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
 of steps at the beginning of this section.
+
 
 \subsubsection{More advanced use cases for \protect\texttt{p4a\_git}}
 \label{sec:more-advanced-use}
