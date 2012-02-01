@@ -1,0 +1,38 @@
+delete unsigned05
+create unsigned05 unsigned05.c
+
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+
+#setproperty CONSTANT_PATH_EFFECTS FALSE
+
+#activate C_PARSER
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Regions for "main"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[main]
+
+close
+delete unsigned05
+quit

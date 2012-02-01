@@ -1,0 +1,444 @@
+
+//  P() {}
+
+void orig(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   for(i = 0; i <= NI-1; i += 1)
+
+//  P(i,j) {i+1<=NI, 0<=i}
+
+      for(j = 0; j <= NJ-1; j += 1)
+
+//  P(i,j) {i+1<=NI, j+1<=NJ, 0<=i, 0<=j}
+
+         c[i+j] += a[i]*b[j];
+}
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NI, 1<=NJ}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NJ, 1<=NI}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+//  <c[PHI1]-W-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+
+void orig(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NI, 1<=NJ}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NJ, 1<=NI}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+//  <c[PHI1]-W-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+
+   for(i = 0; i <= NI-1; i += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=NI, 1<=NJ}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NJ, 0<=i, i+1<=NI}>
+//  <c[PHI1]-R-EXACT-{i<=PHI1, PHI1+1<=i+NJ, 0<=i, i+1<=NI}>
+//  <c[PHI1]-W-EXACT-{i<=PHI1, PHI1+1<=i+NJ, 0<=i, i+1<=NI}>
+
+      for(j = 0; j <= NJ-1; j += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=NI, 0<=j, j+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==j, 0<=i, i+1<=NI, 0<=j, j+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{i+j==PHI1, 0<=i, i+1<=NI, 0<=j, j+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{i+j==PHI1, 0<=i, i+1<=NI, 0<=j, j+1<=NJ}>
+
+         c[i+j] += a[i]*b[j];
+}
+***** COARSE GRAIN ******
+void orig(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+   for(i = 0; i <= NI-1; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= NJ-1; j += 1)
+         c[i+j] += a[i]*b[j];
+}
+***** FINE GRAIN ******
+void orig(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+   for(i = 0; i <= NI-1; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= NJ-1; j += 1)
+         c[i+j] += a[i]*b[j];
+}
+
+//  P() {}
+
+void skewed(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   for(j = 0; j <= NJ-1; j += 1)
+
+//  P(i,j) {j+1<=NJ, 0<=j}
+
+      for(i = j; i <= j+NI-1; i += 1)
+
+//  P(i,j) {i+1<=NI+j, j+1<=NJ, j<=i, 0<=j}
+
+         c[i] += a[i-j]*b[j];
+}
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NI, 1<=NJ}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NJ, 1<=NI}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+//  <c[PHI1]-W-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+
+void skewed(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NI, 1<=NJ}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NJ, 1<=NI}>
+//  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+//  <c[PHI1]-W-EXACT-{0<=PHI1, PHI1+2<=NI+NJ, 1<=NI, 1<=NJ}>
+
+   for(j = 0; j <= NJ-1; j += 1)
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=NI, 0<=j, j+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==j, 0<=j, j+1<=NJ, 1<=NI}>
+//  <c[PHI1]-R-EXACT-{j<=PHI1, PHI1+1<=j+NI, 0<=j, j+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{j<=PHI1, PHI1+1<=j+NI, 0<=j, j+1<=NJ}>
+
+      for(i = j; i <= j+NI-1; i += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+j==i, j<=i, i+1<=j+NI, 0<=j, j+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==j, j<=i, i+1<=j+NI, 0<=j, j+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==i, j<=i, i+1<=j+NI, 0<=j, j+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==i, j<=i, i+1<=j+NI, 0<=j, j+1<=NJ}>
+
+         c[i] += a[i-j]*b[j];
+}
+***** COARSE GRAIN ******
+void skewed(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+   for(j = 0; j <= NJ-1; j += 1)
+#pragma omp parallel for 
+      for(i = j; i <= j+NI-1; i += 1)
+         c[i] += a[i-j]*b[j];
+}
+***** FINE GRAIN ******
+void skewed(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int i, j;
+   for(j = 0; j <= NJ-1; j += 1)
+#pragma omp parallel for 
+      for(i = j; i <= j+NI-1; i += 1)
+         c[i] += a[i-j]*b[j];
+}
+
+//  P() {}
+
+void tiled(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+
+//  P() {}
+
+   int tj, ti, ii, jj;
+
+//  P(ii,jj,ti,tj) {}
+
+   for(tj = NJ-1; tj > T; tj += -T)
+
+//  P(ii,jj,ti,tj) {tj+1<=NJ, T<=tj+1}
+
+      for(ti = tj-T+1; ti <= tj+NI+1; ti += T)
+
+//  P(ii,jj,ti,tj) {ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti, T<=tj+1}
+
+         if (1) {
+
+//  P(ii,jj,ti,tj) {ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti, T<=tj+1}
+
+            if (ti>tj&&ti<=tj+NI-T)
+
+//  P(ii,jj,ti,tj) {T+ti<=NI+tj, ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti,
+//    T<=tj+1, tj+1<=ti}
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  P(ii,jj,ti,tj) {T+ti<=NI+tj, ti<=NI+tj+1, tj+1<=NJ, ii+1<=T+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, tj+1<=ti}
+
+                  for(jj = tj; jj > -T+tj+2; jj += -1)
+
+//  P(ii,jj,ti,tj) {T+ti<=NI+tj, ti<=NI+tj+1, tj+1<=NJ, ii+1<=T+ti,
+//    tj+1<=T+jj, tj+1<=T+ti, T<=tj+1, ti<=ii, jj<=tj, tj+1<=ti}
+
+                     c[ii] += a[ii-jj]*b[jj];
+
+//  P(ii,jj,ti,tj) {ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti, T<=tj+1}
+
+            if (ti==tj-T+1)
+
+//  P(ii,jj,ti,tj) {T+ti==tj+1, ti<=NI+tj+1, tj+1<=NJ, T<=tj+1}
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  P(ii,jj,ti,tj) {T+ti==tj+1, ti<=NI+tj+1, tj+1<=NJ, ii+1<=T+ti,
+//    T<=tj+1, ti<=ii}
+
+                  for(jj = ii; jj > -T+tj+2; jj += -1)
+
+//  P(ii,jj,ti,tj) {T+ti==tj+1, ti<=NI+tj+1, tj+1<=NJ, ii+1<=T+ti,
+//    tj+1<=T+jj, T<=tj+1, jj<=ii, ti<=ii}
+
+                     c[ii] += a[ii-jj]*b[jj];
+
+//  P(ii,jj,ti,tj) {ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti, T<=tj+1}
+
+            if (ti==tj+NI+1-T)
+
+//  P(ii,jj,ti,tj) {NI+tj==T+ti-1, ti<=NI+tj+1, tj+1<=NJ, tj+1<=T+ti,
+//    T<=tj+1}
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  P(ii,jj,ti,tj) {NI+tj==T+ti-1, ti<=NI+tj+1, tj+1<=NJ, ii+1<=T+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii}
+
+                  for(jj = tj; jj > -T+ii-ti+tj+3; jj += -1)
+
+//  P(ii,jj,ti,tj) {NI+tj==T+ti-1, ti<=NI+tj+1, tj+1<=NJ,
+//    ii+tj+2<=T+jj+ti, ii+1<=T+ti, tj+1<=T+ti, T<=tj+1, ti<=ii,
+//    jj<=tj}
+
+                     c[ii] += a[ii-jj]*b[jj];
+         }
+}
+
+//  <a[PHI1]-R-MAY-{1<=PHI1+T, 0<=PHI1+T+NI, PHI1+2<=3T+NI,
+//    PHI1+1<=2T+NI, 1<=T, 0<=T+NI, T<=NJ}>
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=NJ, 1<=T, 0<=T+NI, T<=NJ}>
+//  <c[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=T+NI+NJ, 1<=T, 0<=T+NI, T<=NJ}>
+//  <c[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=T+NI+NJ, 1<=T, 0<=T+NI, T<=NJ}>
+
+void tiled(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int tj, ti, ii, jj;
+
+//  <a[PHI1]-R-MAY-{1<=PHI1+T, 0<=PHI1+T+NI, PHI1+2<=3T+NI,
+//    PHI1+1<=2T+NI, 1<=T, 0<=T+NI, T<=NJ}>
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=NJ, 1<=T, 0<=T+NI, T<=NJ}>
+//  <c[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=T+NI+NJ, 1<=T, 0<=T+NI, T<=NJ}>
+//  <c[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=T+NI+NJ, 1<=T, 0<=T+NI, T<=NJ}>
+
+   for(tj = NJ-1; tj > T; tj += -T)
+
+//  <a[PHI1]-R-MAY-{1<=PHI1+T, 0<=PHI1+T+NI, PHI1+2<=3T+NI,
+//    PHI1+1<=2T+NI, 1<=T, T<=tj+1, 0<=T+NI, tj+1<=NJ}>
+//  <b[PHI1]-R-MAY-{tj+1<=PHI1+T, PHI1<=tj, T<=tj+1, 0<=T+NI,
+//    tj+1<=NJ}>
+//  <c[PHI1]-R-MAY-{tj+1<=PHI1+T, PHI1<=T+tj+NI, 1<=T, T<=tj+1,
+//    0<=T+NI, tj+1<=NJ}>
+//  <c[PHI1]-W-MAY-{tj+1<=PHI1+T, PHI1<=T+tj+NI, 1<=T, T<=tj+1,
+//    0<=T+NI, tj+1<=NJ}>
+
+      for(ti = tj-T+1; ti <= tj+NI+1; ti += T)
+
+//  <a[PHI1]-R-MAY-{PHI1+tj+2<=2T+ti, T+2ti<=PHI1+2tj+NI+2,
+//    ti<=PHI1+tj, tj+1<=T+ti, T<=tj+1, ti<=tj+NI+1, tj+1<=NJ}>
+//  <b[PHI1]-R-MAY-{tj+1<=PHI1+T, PHI1<=tj, tj+1<=T+ti, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-R-MAY-{PHI1+1<=T+ti, ti<=PHI1, tj+1<=T+ti, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-W-MAY-{PHI1+1<=T+ti, ti<=PHI1, tj+1<=T+ti, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+
+         if (1) {
+
+//  <a[PHI1]-R-MAY-{PHI1+tj+2<=2T+ti, ti<=PHI1+tj, T+ti<=tj+NI,
+//    T<=tj+1, tj+1<=ti, tj+1<=NJ}>
+//  <b[PHI1]-R-MAY-{tj+1<=PHI1+T, PHI1<=tj, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-R-MAY-{PHI1+1<=T+ti, ti<=PHI1, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-W-MAY-{PHI1+1<=T+ti, ti<=PHI1, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+
+            if (ti>tj&&ti<=tj+NI-T)
+
+//  <a[PHI1]-R-EXACT-{PHI1+tj+2<=2T+ti, ti<=PHI1+tj, T+ti<=tj+NI,
+//    T<=tj+1, tj+1<=ti, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{tj+1<=PHI1+T, PHI1<=tj, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1+1<=T+ti, ti<=PHI1, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1+1<=T+ti, ti<=PHI1, T+ti<=tj+NI, T<=tj+1,
+//    tj+1<=ti, tj+1<=NJ}>
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+tj+1<=T+ii, ii<=PHI1+tj, ii+1<=T+ti,
+//    T+ti<=tj+NI, T<=tj+1, ti<=ii, tj+1<=ti, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{tj+1<=PHI1+T, PHI1<=tj, ii+1<=T+ti, T+ti<=tj+NI,
+//    T<=tj+1, ti<=ii, tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, ii+1<=T+ti, T+ti<=tj+NI, T<=tj+1,
+//    ti<=ii, tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, ii+1<=T+ti, T+ti<=tj+NI, T<=tj+1,
+//    ti<=ii, tj+1<=ti, tj+1<=NJ}>
+
+                  for(jj = tj; jj > -T+tj+2; jj += -1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+jj==ii, ii+1<=T+ti, tj+1<=T+jj,
+//    T+ti<=tj+NI, T<=tj+1, ti<=ii, jj<=tj, tj+1<=ti, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==jj, ii+1<=T+ti, tj+1<=T+jj, T+ti<=tj+NI,
+//    T<=tj+1, ti<=ii, jj<=tj, tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, ii+1<=T+ti, tj+1<=T+jj, T+ti<=tj+NI,
+//    T<=tj+1, ti<=ii, jj<=tj, tj+1<=ti, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, ii+1<=T+ti, tj+1<=T+jj, T+ti<=tj+NI,
+//    T<=tj+1, ti<=ii, jj<=tj, tj+1<=ti, tj+1<=NJ}>
+
+                     c[ii] += a[ii-jj]*b[jj];
+
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1+tj+2<=2T+ti, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <b[PHI1]-R-MAY-{PHI1+1<=T+ti, tj+1<=PHI1+T, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-R-MAY-{PHI1+1<=T+ti, ti<=PHI1, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-W-MAY-{PHI1+1<=T+ti, ti<=PHI1, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+
+            if (ti==tj-T+1)
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+tj+2<=2T+ti, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1+1<=T+ti, tj+1<=PHI1+T, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1+1<=T+ti, ti<=PHI1, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1+1<=T+ti, ti<=PHI1, T+ti==tj+1, T<=tj+1,
+//    ti<=tj+NI+1, tj+1<=NJ}>
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+tj+1<=T+ii, T+ti==tj+1,
+//    ii+1<=T+ti, T<=tj+1, ti<=tj+NI+1, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{tj+1<=PHI1+T, PHI1<=ii, T+ti==tj+1, ii+1<=T+ti,
+//    T<=tj+1, ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+ii,
+//    T<=tj+1, ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+ii,
+//    T<=tj+1, ti<=tj+NI+1, tj+1<=NJ}>
+
+                  for(jj = ii; jj > -T+tj+2; jj += -1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+jj==ii, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+jj,
+//    T<=tj+1, jj<=ii, ti<=tj+NI+1, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==jj, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+jj,
+//    T<=tj+1, jj<=ii, ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+jj,
+//    T<=tj+1, jj<=ii, ti<=tj+NI+1, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, T+ti==tj+1, ii+1<=T+ti, tj+1<=T+jj,
+//    T<=tj+1, jj<=ii, ti<=tj+NI+1, tj+1<=NJ}>
+
+                     c[ii] += a[ii-jj]*b[jj];
+
+//  <a[PHI1]-R-MAY-{PHI1+tj+2<=T+ti, ti<=PHI1+tj, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, tj+1<=NJ}>
+//  <b[PHI1]-R-MAY-{tj+2<=PHI1+T, PHI1<=tj, T+ti==tj+NI+1, tj+1<=T+ti,
+//    T<=tj+1, tj+1<=NJ}>
+//  <c[PHI1]-R-MAY-{PHI1+2<=T+ti, ti<=PHI1, T+ti==tj+NI+1, tj+1<=T+ti,
+//    T<=tj+1, tj+1<=NJ}>
+//  <c[PHI1]-W-MAY-{PHI1+2<=T+ti, ti<=PHI1, T+ti==tj+NI+1, tj+1<=T+ti,
+//    T<=tj+1, tj+1<=NJ}>
+
+            if (ti==tj+NI+1-T)
+
+//  <a[PHI1]-R-EXACT-{PHI1+tj+2<=T+ti, ti<=PHI1+tj, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{tj+2<=PHI1+T, PHI1<=tj, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1+2<=T+ti, ti<=PHI1, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1+2<=T+ti, ti<=PHI1, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, tj+1<=NJ}>
+
+               for(ii = ti; ii < T+ti; ii += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+tj+2<=T+ti, ii<=PHI1+tj, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{ii+tj+2<=PHI1+T+ti, PHI1<=tj, T+ti==tj+NI+1,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, T+ti==tj+NI+1, ii+2<=T+ti, tj+1<=T+ti,
+//    T<=tj+1, ti<=ii, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, T+ti==tj+NI+1, ii+2<=T+ti, tj+1<=T+ti,
+//    T<=tj+1, ti<=ii, tj+1<=NJ}>
+
+                  for(jj = tj; jj > -T+ii-ti+tj+3; jj += -1)
+
+//  <a[PHI1]-R-EXACT-{PHI1+jj==ii, T+ti==tj+NI+1, ii+tj+2<=T+jj+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, jj<=tj, tj+1<=NJ}>
+//  <b[PHI1]-R-EXACT-{PHI1==jj, T+ti==tj+NI+1, ii+tj+2<=T+jj+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, jj<=tj, tj+1<=NJ}>
+//  <c[PHI1]-R-EXACT-{PHI1==ii, T+ti==tj+NI+1, ii+tj+2<=T+jj+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, jj<=tj, tj+1<=NJ}>
+//  <c[PHI1]-W-EXACT-{PHI1==ii, T+ti==tj+NI+1, ii+tj+2<=T+jj+ti,
+//    tj+1<=T+ti, T<=tj+1, ti<=ii, jj<=tj, tj+1<=NJ}>
+
+                     c[ii] += a[ii-jj]*b[jj];
+         }
+}
+***** COARSE GRAIN ******
+void tiled(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int tj, ti, ii, jj;
+   for(tj = NJ-1; tj > T; tj += -T)
+      for(ti = tj-T+1; ti <= tj+NI+1; ti += T)
+         if (1) {
+            if (ti>tj&&ti<=tj+NI-T)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = tj; jj > -T+tj+2; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+            if (ti==tj-T+1)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = ii; jj > -T+tj+2; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+            if (ti==tj+NI+1-T)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = tj; jj > -T+ii-ti+tj+3; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+         }
+}
+***** FINE GRAIN ******
+void tiled(int NI, int NJ, int c[NI+NJ], int a[NI], int b[NJ])
+{
+   int tj, ti, ii, jj;
+   for(tj = NJ-1; tj > T; tj += -T)
+      for(ti = tj-T+1; ti <= tj+NI+1; ti += T)
+         if (1) {
+            if (ti>tj&&ti<=tj+NI-T)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = tj; jj > -T+tj+2; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+            if (ti==tj-T+1)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = ii; jj > -T+tj+2; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+            if (ti==tj+NI+1-T)
+#pragma omp parallel for private(jj)
+               for(ii = ti; ii < T+ti; ii += 1)
+                  for(jj = tj; jj > -T+ii-ti+tj+3; jj += -1)
+                     c[ii] += a[ii-jj]*b[jj];
+         }
+}

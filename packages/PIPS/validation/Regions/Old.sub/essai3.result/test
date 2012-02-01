@@ -186,24 +186,24 @@ C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=K, K<=10}>
 
          DO I = 1, N                                                    0008
 
-C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=I, I<=N, 1<=K,
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=I, 1<=I, I<=N, 1<=K,
 C    K<=10}>
 C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
 C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
 
             DO J = 1, I                                                 0009
 
-C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, J<=I, I<=N, 1<=J, 1<=K,
-C    K<=10}>
-C  <Y(PHI1)-R-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
-C  <Y(PHI1)-W-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=I, J<=I, I<=N, 1<=J,
+C    1<=K, K<=10}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
 
                Y(I) = Y(I)+A(I,J)                                       0010
             ENDDO
          ENDDO
 
-C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1+1<=PHI2, 1<=PHI2, PHI2<=N,
-C    N+1<=I, 1<=K, K<=10}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1+1<=PHI2, PHI2<=N, N+1<=I,
+C    1<=K, K<=10}>
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N, N+1<=I, 1<=K, K<=10}>
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N, N+1<=I, 1<=K, K<=10}>
 

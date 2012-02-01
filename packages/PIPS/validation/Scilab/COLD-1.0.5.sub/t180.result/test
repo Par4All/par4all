@@ -36,11 +36,10 @@ int main(int argc, char *argv[])
    _u_c[2][1] = 8.9;
    _u_c[2][2] = 0;
    int _u_cBool[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
          _u_aBool[__lv1][__lv2] = _u_a[__lv1][__lv2]==0?0:1;
          _u_bBool[__lv1][__lv2] = _u_b[__lv1][__lv2]==0?0:1;
@@ -67,11 +66,10 @@ int main(int argc, char *argv[])
    _u_d[2][3] = 0;
    scilab_rt_display_s0i2_("d", 3, 4, _u_d);
    int _u_dBool[3][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 3; __lv2 += 1)
          _u_dBool[__lv1][__lv2] = _u_d[__lv1][__lv2]==0?0:1;
    }

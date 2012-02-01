@@ -3,7 +3,9 @@ import os.path
 
 class p4a_cold_stubs_broker(broker.broker):
     """ broker that automatically gather stub files for the par4all runtime
-    it extends the default broker and add directory for Cold stubs"""
+    it extends the default broker and add directory for Cold stubs.
+    It will retrieve stubs on demand finding source files according to the
+    name of the missing function."""
     def __init__(self):
         super(p4a_cold_stubs_broker,self).__init__()
         self.stubs_dir = os.path.join('stubs','src')

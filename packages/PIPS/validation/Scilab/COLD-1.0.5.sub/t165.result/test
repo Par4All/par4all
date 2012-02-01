@@ -24,11 +24,10 @@ int main(int argc, char *argv[])
    scilab_rt_display_s0d0_("aImag", _u_aImag);
    double _u_bReal[3][2];
    double _u_bImag[3][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          register double _Complex _u_b_0 = _u_b[__lv1][__lv2];

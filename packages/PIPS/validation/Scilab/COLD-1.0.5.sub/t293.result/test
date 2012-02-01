@@ -4,20 +4,18 @@ void foo_i2_z2(int _u_b_n0, int _u_b_n1, int _u_b[_u_b_n0][_u_b_n1], int _u_a_n0
    2;
    3;
    double _tmpCT0[_u_b_n0][_u_b_n1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_b_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_b_n1-1; __lv2 += 1)
          _tmpCT0[__lv1][__lv2] = cos(_u_b[__lv1][__lv2]);
    }
    _u_b_n0==_u_a_n0&&_u_b_n1==_u_a_n1?(void) 0:__assert_fail("_u_b_n0 == _u_a_n0 && _u_b_n1 == _u_a_n1", ".t293.tmp/t293.c", 28, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_a_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_a_n1-1; __lv2 += 1)
          (double _Complex) _tmpCT0[__lv1][__lv2];
    }
