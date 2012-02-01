@@ -4,10 +4,11 @@
 
 
 ## Modal panel
+
 <%def name="modal(header, content, id)">
-<div class="modal hide fade" id="${id}" style="display: none;">
+<div class="modal hide fade span6" id="${id}" style="display: none;">
   <div class="modal-header">
-    <a class="close" href="#">×</a>
+    <a class="close" data-dismiss="modal">×</a>
     <h3>
       % if callable(header):
       ${header() | n}
@@ -23,28 +24,34 @@
     ${content | n}
     % endif
   </div>
+  <div class="modal-footer" >
+    <button class="pull-right btn" id="${id}-close-button">Close</button>
+  </div>
 </div>
+<script type="text/javascript">
+  $(function() {
+    $("#${id}-close-button").click(function(ev) {
+      ev.preventDefault();
+      $("#${id}").modal("hide");
+    });
+  });
+</script>
 </%def>
 
 
 ## Source tab
+
 <%def name="source_tab(title=u'SOURCE', id=1, active=False)">
-<li class="${h.css_classes([('active', active)])}" id="source-${id}_tab">${h.link_to(title, url="#source-%s" % id)}</li>
+<li class="${h.css_classes([('active', active)])}" id="source-${id}_tab"><a href="#source-${id}" data-toggle="tab">${title}</a></li>
 </%def>
 
 
 ## Source panel
+
 <%def name="source_panel(id=1, active=False)">
-<div id="source-${id}" class="${h.css_classes([('tab_pane', True), ('active', active)])}">
-  <form>
-    <fieldset style="padding-top:0">
-      <label for="lang-${id}">Language </label>
-      <div class="input">
-	<input id="lang-${id}" value="not yet detected." readonly="readonly"/>
-      </div>
-    </fieldset>
-    <textarea id="sourcecode-${id}" class="span16" rows="27"
-	      onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
-  </form>
+<div id="source-${id}" class="${h.css_classes([('tab-pane', True), ('active', active)])}">
+  <p>Language : <span id="lang-${id}" class="label">not yet detected</span></p>
+  <textarea id="sourcecode-${id}" class="span12" rows="27"
+	    onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
 </div>
 </%def>

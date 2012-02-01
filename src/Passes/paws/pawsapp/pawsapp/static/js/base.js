@@ -1,5 +1,7 @@
 // Global vars
 var directory,
+    advanced = false,
+    loaded = false,
     performed = false,
     created_graph = false,
     functions = '',
@@ -27,12 +29,12 @@ function activate_tab(id) {
     $link.parent().addClass('active');
 
     // Activate corresponding panel
-    $('.tab-pane', '#op-tabs').removeClass('active');
+    $('.tab-pane', '.tab-content').removeClass('active');
     $($link.attr('href')).addClass('active');
 }
 
 function change_tab_focus_res(result_tab_index, panel_id) {
-    $('#tabs').tabs("select", result_tab_index);
+    //$('#tabs').tabs("select", result_tab_index);
     add_wait_notification(panel_id);
 }
 
@@ -40,29 +42,33 @@ function add_wait_notification(panel_id) {
     var tab = '#resultcode';
     if (panel_id == 'graph')
 	tab = '#graph';
-    $(tab).html('<div class="alert-message info"><b>Please wait while processing...</b> It might take a long time.</div>');
+    $(tab).html('<div class="alert alert-info"><b>Please wait while processing...</b> It might take a long time.</div>');
 }
 
 function add_choose_function_notification() {
     $('#resultcode').html("<p><b>Choose function to display.</b><br/></p>");
 }
 
-function enable(sel) {
-    $(sel).removeClass("disabled");
-}
-function disable(sel) {
-    $(sel).addClass("disabled");
+function switch_enable(sel, value) {
+    if (value)
+	$(sel).removeClass("disabled");
+    else
+	$(sel).addClass("disabled");	
 }
 
-function activate_buttons() {
-    disable('#run-button');
-    enable('#save-button');
-    enable('#print-button');
+function switch_buttons() {
+    switch_enable('#run-button', loaded && !performed);
+    switch_enable('#save-button', performed);
+    switch_enable('#print-button', performed);
 }
-function deactivate_buttons() {
-    enable('#run-button');
-    disable('#save-button');
-    disable('#print-button');
+
+function switch_adv_mode() {
+    if (advanced) {
+	$('#adv-form').hide();
+    } else {
+	$('#adv-form').fadeIn();
+    }
+    $('#adv-button').html(advanced ? 'advanced mode' : 'basic mode');
 }
 
 function deactivate_graph_buttons() {
@@ -74,10 +80,8 @@ function activate_graph_buttons() {
 }
 
 function clear_result_tab() {
-    deactivate_buttons();
+    switch_buttons();
     $('#resultcode').html('');
-    // all of other tabs are removed
-    $('#lang1').val('not yet detected');
 }
 
 function clear_graph_tab() {
@@ -88,7 +92,7 @@ function clear_graph_tab() {
 // Delete extra source tabs and panels
 function clear_multiple() {
     activate_tab('source-1');
-    var tabs = $('#op-tabs ul.tabs li');
+    var tabs = $('ul#op-tabs li');
     for (var i = 0; i < tabs.length; i++)
 	if (tabs[i].id.search('source-')==0 && tabs[i].id.search('source-1')==-1) {
 	    $($('#' + tabs[i].id + ' a').attr('href')).remove();
@@ -120,23 +124,21 @@ function load_files(files) {
 
 	// Create tab and panel on the fly
 	if (i > 1) {
-	    $("#source-" + (i-1) + "_tab").after('<li id="source-' + i + '_tab"><a href="#source-' + i + '">SOURCE</a></li>');
+	    $("#source-" + (i-1) + "_tab").after($('#source_tab_skel').html().replace(/__skel__/g, i));
 	    $('#source-' + (i-1)).after($('#source_panel_skel').html().replace(/__skel__/g, i));
 	    $('#sourcecode-' + i).attr('spellcheck', false);
+	    //$('#sourcecode-' + i).linedtextarea();
 	}
 	$("#source-" + i + "_tab a").text(fname);
 	$('#sourcecode-' + i).text(code);
 	language_detection(code, i);
     }
-    if (nb_files > 1)
-	for (var i=2; i<= nb_files; i++) {
-	    //$('#sourcecode-' + i).linedtextarea();
-	};
 
-    deactivate_buttons();
     multiple      = (nb_files > 1);
+    loaded        = true;
     performed     = false;
     created_graph = false;
+    switch_buttons();
 }
 
 
@@ -180,11 +182,15 @@ function language_detection(source, number) {
             test = false;
 	},
         success: function(data) {
+	    var $elem = $('#lang-' + number);
+	    $elem.removeClass();	    
             if (data != "none") {
-		$('#lang-' + number).val(data);
+		$elem.html(data);
+		$elem.addClass('label label-success')
                 test = true;
 	    } else {
-		$('#lang-' + number).val(" not supported.");
+		$elem.html("not supported");
+		$elem.addClass('label label-warning')
                 test = false;
             }
         }
@@ -196,7 +202,7 @@ function compile(source, number) {
     var test;
     $.ajax({
         type: "POST",
-        data: { code: source, language: $('#lang-' + number).val() },
+        data: { code: source, language: $('#lang-' + number).html() },
         cache: false,
         url: routes['compile'],
         async: false,
@@ -257,7 +263,7 @@ function get_functions() {
     datas['number'] = nb_files;
     for(var i=0; i<nb_files; i++) {
 	datas['code' + i] = $('#sourcecode-' + (i+1)).text();
-	datas['lang' + i] = $('#lang-' + (i+1)).val();
+	datas['lang' + i] = $('#lang-' + (i+1)).html();
     }
     $.post(
 	routes['get_functions'],
@@ -273,7 +279,7 @@ function get_functions() {
 		    },
 		    function(data) {
                         $('#resultcode').html(data);
-			activate_buttons();
+			switch_buttons();
 		    });
 		$('#dialog-choose-function').modal('hide');
 	    });
@@ -319,7 +325,7 @@ function create_graph(index, panel_id) {
 	    $.post(
 		routes['dependence_graph'], 
 		{ code:     $('#sourcecode-1').text(),
-                  language: $('#lang-1').val()
+                  language: $('#lang-1').html()
                 },
 		enable_dependence_graph
 	    );
@@ -349,10 +355,9 @@ function handle_keydown(item, event) {
     else if (c == 13 || c == 86) {
 	setTimeout("check_language()", 1000);
     }
-    clear_result_tab();
-    enable('#run-button');
     performed = false;
     created_graph = false;
+    switch_buttons();
 }
 
 function replaceSelection(input, replaceString) {
@@ -440,20 +445,20 @@ function choose_function() {
 	    type: "POST",
 	    data: { function: $(this).attr('value'),
 		    operation: operation,
-		    language: $('#lang-1').val()
+		    language: $('#lang-1').html()
 		  },
 	    cache: false,
 	    url: routes['perform_multiple'],
 	    error: function() {},
 	    success: function(data) {
 		$('#resultcode').html(data);
-		activate_buttons();
+		switch_buttons();
 	    }
 	});
     });
     add_choose_function_notification();
 }
-		
+
 
 function perform_operation(index, panel_id) {
     clear_result_tab();
@@ -464,12 +469,12 @@ function perform_operation(index, panel_id) {
 	    $.post(
 		routes['perform'],
 		{ code:      $('#sourcecode-'+index).text(),
-		  language:  $('#lang-'+index).val(),
+		  language:  $('#lang-'+index).html(),
 		  operation: operation
 		},
 		function(data) {
 		    $("#resultcode").html(data);
-		    activate_buttons();
+		    switch_buttons();
 		}
 	    );
 	}
