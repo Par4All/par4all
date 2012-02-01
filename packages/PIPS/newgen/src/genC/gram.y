@@ -31,7 +31,7 @@
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
 
 extern int yyinput(void);
-extern void yyerror(char*);
+extern void yyerror(const char*);
 extern int check_not_keyword(char *); /* in build.c */
 
 struct gen_binding Domains[MAX_DOMAIN];
@@ -334,7 +334,7 @@ Name	: IDENT	{
 
 /* Syntax error routines called by yacc. */
 
-void yyerror(char * s)
+void yyerror(const char * s)
 {
   int c;
 
