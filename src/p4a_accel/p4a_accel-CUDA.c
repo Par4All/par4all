@@ -3,16 +3,114 @@
 
 int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
 
+
+
+static int computeCoresForDevice(int cudacc, int multiproc) {
+  if(cudacc>=10 && cudacc<=13) {
+    return 8*multiproc;
+  } else if (cudacc==20) {
+    return 32*multiproc;
+  } else if (cudacc==21) {
+    return 48*multiproc;
+  } else {
+    P4A_dump_message("Unknown architecture for compute capability %d, assume 32 cores per SM, please report to support@par4all.org\n",cudacc);
+    return 32*multiproc;
+  }
+}
+
+// Print device properties
+static void displayCudaDevices(int nDevices)
+{
+  // Derived from http://gpucoder.livejournal.com/1064.html
+  for(int i = 0; i < nDevices; ++i) {
+    // Get device properties
+    P4A_dump_message("*********** CUDA Device #%d ***********\n", i);
+    cudaDeviceProp devProp;
+    cudaGetDeviceProperties(&devProp, i);
+    P4A_dump_message("Major revision number:         %d\n",  devProp.major);
+    P4A_dump_message("Minor revision number:         %d\n",  devProp.minor);
+    P4A_dump_message("Name:                          %s\n",  devProp.name);
+    P4A_dump_message("Number of multiprocessors:     %d\n",  devProp.multiProcessorCount);
+    P4A_dump_message("Number of cores:               %d\n",  computeCoresForDevice(10*devProp.major+devProp.minor,devProp.multiProcessorCount));
+    P4A_dump_message("Total global memory:           %u\n",  devProp.totalGlobalMem);
+    P4A_dump_message("Total shared memory per block: %u\n",  devProp.sharedMemPerBlock);
+    P4A_dump_message("Total registers per block:     %d\n",  devProp.regsPerBlock);
+    P4A_dump_message("Warp size:                     %d\n",  devProp.warpSize);
+    P4A_dump_message("Maximum memory pitch:          %lu\n",  devProp.memPitch);
+    P4A_dump_message("Maximum threads per block:     %d\n",  devProp.maxThreadsPerBlock);
+    for (int i = 0; i < 3; ++i)
+      P4A_dump_message("Maximum dimension %d of block:  %d\n", i, devProp.maxThreadsDim[i]);
+    for (int i = 0; i < 3; ++i)
+      P4A_dump_message("Maximum dimension %d of grid:   %d\n", i, devProp.maxGridSize[i]);
+    P4A_dump_message("Clock rate:                    %d\n",  devProp.clockRate);
+    P4A_dump_message("Total constant memory:         %lu\n",  devProp.totalConstMem);
+    P4A_dump_message("Texture alignment:             %lu\n",  devProp.textureAlignment);
+    P4A_dump_message("Concurrent copy and execution: %s\n",  (devProp.deviceOverlap ? "Yes" : "No"));
+    P4A_dump_message("Kernel execution timeout:      %s\n",  (devProp.kernelExecTimeoutEnabled ? "Yes" : "No"));
+  }
+}
+
+
 void p4a_init_cuda_accel() {
   // Main p4a initialization
   p4a_main_init();
 
   // Number of CUDA devices
-  int devCount;
-  cudaGetDeviceCount(&devCount); // This also initialize the CUDA runtime
-  if(devCount==0) {
-    fprintf(stderr,"p4a_init_cuda_accel() cannot find any CUDA capable device, aborting.\n");
+  int num_devices;
+  // This also initialize the CUDA runtime
+  toolTestExecMessage(cudaGetDeviceCount(&num_devices),"p4a_init_cuda_accel() cannot find any CUDA capable device, aborting.\n");
+  if(num_devices==0) {
+    P4A_dump_message("p4a_init_cuda_accel() cannot find any CUDA capable device, aborting.\n");
+    exit(-1);
   }
+  P4A_skip_debug(1,P4A_dump_message("There are %d CUDA devices, increase debug level for details or set P4A_CUDA_DEVICE to chose a particular one.\n", num_devices));
+
+
+  // Display devices information
+  P4A_skip_debug(2,displayCudaDevices(num_devices))
+
+  /*
+   * Chose one device accordingly to an environment variable, or the one with the biggest number of cores
+   */
+  int chosen_device = 0;
+  char *env_cuda_device = getenv ("P4A_CUDA_DEVICE");
+  if(env_cuda_device) {
+    P4A_dump_message("P4A_CUDA_DEVICE environment variable is set : '%s'\n",env_cuda_device);
+    errno = 0;
+    int env_device = strtol(env_cuda_device, NULL,10);
+    if(errno==0) {
+      // Sanity check
+      if(env_device>=0 && env_device<num_devices) {
+        P4A_dump_message("Choosing CUDA device %d\n",env_device);
+        chosen_device = env_device;
+      } else {
+        P4A_dump_message("Invalid value for P4A_CUDA_DEVICE  : %s\n",env_cuda_device);
+        exit(-1);
+      }
+    } else {
+      P4A_dump_message("Invalid value for P4A_CUDA_DEVICE: %s\n",env_cuda_device);
+      exit(-1);
+    }
+  } else {
+    // Automatic selection: take the one with the max number of cores
+    if (num_devices > 1) {
+      int max_cores = 0;
+      for (int dev=0; dev<num_devices; dev++) {
+        cudaDeviceProp devProp;
+        cudaGetDeviceProperties(&devProp, dev);
+        int cudacc=devProp.major*10+devProp.minor;
+        int cores = computeCoresForDevice(cudacc,devProp.multiProcessorCount);
+        if (max_cores < cores) {
+          max_cores = cores;
+        }
+      }
+    }
+  }
+
+  // Set the device
+  P4A_skip_debug(1,P4A_dump_message("CUDA device chosen : %d\n",chosen_device));
+  cudaSetDevice(chosen_device);
+
 
 
   // Timing stuff
@@ -30,7 +128,7 @@ void p4a_init_cuda_accel() {
       P4A_dump_message("Setting max TPB to %d\n",tpb);
       p4a_max_threads_per_block = tpb;
     } else {
-      fprintf(stderr,"Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
+      P4A_dump_message("Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
     }
   }
 
@@ -39,7 +137,6 @@ void p4a_init_cuda_accel() {
   toolTestExecMessage(cudaGetLastError(),"P4A CUDA cache config failed");
 
 }
-
 
 
 /** To do basic time measure. Do not nest... */
