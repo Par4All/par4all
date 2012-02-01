@@ -3,17 +3,20 @@
 
 int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
 
+struct cudacc {
+  int major;
+  int minor;
+};
 
-
-static int computeCoresForDevice(int cudacc, int multiproc) {
-  if(cudacc>=10 && cudacc<=13) {
+static int computeCoresForDevice(struct cudacc cc, int multiproc) {
+  if(cc.minor==1) {
     return 8*multiproc;
-  } else if (cudacc==20) {
+  } else if (cc.major==2 and cc.minor==0) {
     return 32*multiproc;
-  } else if (cudacc==21) {
+  } else if (cc.major==2 and cc.minor==1) {
     return 48*multiproc;
   } else {
-    P4A_dump_message("Unknown architecture for compute capability %d, assume 32 cores per SM, please report to support@par4all.org\n",cudacc);
+    P4A_dump_message("Unknown architecture for compute capability %d.%d, assume 32 cores per SM, please report to support@par4all.org\n",cc.major,cc.minor);
     return 32*multiproc;
   }
 }
@@ -31,7 +34,7 @@ static void displayCudaDevices(int nDevices)
     P4A_dump_message("Minor revision number:         %d\n",  devProp.minor);
     P4A_dump_message("Name:                          %s\n",  devProp.name);
     P4A_dump_message("Number of multiprocessors:     %d\n",  devProp.multiProcessorCount);
-    P4A_dump_message("Number of cores:               %d\n",  computeCoresForDevice(10*devProp.major+devProp.minor,devProp.multiProcessorCount));
+    P4A_dump_message("Number of cores:               %d\n",  computeCoresForDevice((struct cudacc){devProp.major,devProp.minor},devProp.multiProcessorCount));
     P4A_dump_message("Total global memory:           %u\n",  devProp.totalGlobalMem);
     P4A_dump_message("Total shared memory per block: %u\n",  devProp.sharedMemPerBlock);
     P4A_dump_message("Total registers per block:     %d\n",  devProp.regsPerBlock);
@@ -98,8 +101,8 @@ void p4a_init_cuda_accel() {
       for (int dev=0; dev<num_devices; dev++) {
         cudaDeviceProp devProp;
         cudaGetDeviceProperties(&devProp, dev);
-        int cudacc=devProp.major*10+devProp.minor;
-        int cores = computeCoresForDevice(cudacc,devProp.multiProcessorCount);
+        struct cudacc cc = {devProp.major,devProp.minor};
+        int cores = computeCoresForDevice(cc,devProp.multiProcessorCount);
         if (max_cores < cores) {
           max_cores = cores;
         }
