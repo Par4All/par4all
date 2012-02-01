@@ -6,15 +6,13 @@
     z-index: 2;
 }
 
-/* Sidebar */
-
-.sidebar h4 {
-    margin: 1em 0;
-    line-height: 1.1em;
-}
-
 /* Main column */
 
 #classic-examples-dialog a {
     margin-bottom: 2px;
+}
+
+
+ol.linenums li span {
+    color: #333;
 }

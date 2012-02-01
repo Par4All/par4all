@@ -11,11 +11,9 @@ class vworkspace(workspace_check.workspace):
     ''' This workspace is intended to handle some special PIPS validation 
     suff'''
     
-    def __init__(self, *sources, **kwargs):
-        """init a workspace from (optional) sources for validation
-           name will be gather from WSPACE and sources from FILE environment variables 
-        """
-        
+    @classmethod
+    def getMainSourceFile(_class):
+        """Get the main source file for current script"""
         file = os.getenv('FILE')
         if file != None and not os.path.isfile(file):
             sys.stderr.write("Error, file " + file + " doesn't exists !!")
@@ -28,6 +26,16 @@ class vworkspace(workspace_check.workspace):
            if file == None :
                raise RuntimeError('''No source files ! Please define FILE environment 
                                     variable or provide %s.{c,f,f95}''' % (basename) )
+        return file
+
+    
+    
+    def __init__(self, *sources, **kwargs):
+        """init a workspace from (optional) sources for validation
+           name will be gather from WSPACE and sources from FILE environment variables 
+        """
+        
+        file = vworkspace.getMainSourceFile()
     
         for f in list(sources):
             if f==file:

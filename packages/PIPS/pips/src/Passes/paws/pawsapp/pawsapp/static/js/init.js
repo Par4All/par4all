@@ -11,7 +11,6 @@ $(function(){
     });
 
     // Classic examples
-    $('#classic-examples-dialog').modal();
     $('#classic-examples-dialog a').click(function(ev) {
 	ev.preventDefault();
 	load_example(ev.target.id);
@@ -26,9 +25,6 @@ $(function(){
     // Source code input field
     $('#sourcecode-1').linedtextarea()
 	.attr('spellcheck', false);
-
-    // "Choose function" dialog
-    $('#choose-function-dialog').modal();
 
     // "RESULTS" tab
     $('#result_tab a').click(function(ev) {
@@ -46,7 +42,7 @@ $(function(){
     // Run button
     $("#run-button").click(function(ev) {
 	ev.preventDefault();
-	activate_tab('result_tab_link');
+	activate_tab('result');
 	if (performed == false)
 	    performed = perform_operation(1, 'result');
     });
@@ -61,6 +57,15 @@ $(function(){
         printFrame.focus();
         printFrame.print();
     });
-    deactivate_buttons();    
+
+    switch_buttons();
+
+    // Switch between modes
+
+    $('#adv-button').click(function(ev) {
+	ev.preventDefault();
+	switch_adv_mode();
+	advanced = !advanced;
+    });
 
 });

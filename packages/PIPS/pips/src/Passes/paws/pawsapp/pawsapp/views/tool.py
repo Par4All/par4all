@@ -92,10 +92,10 @@ def tool(request):
     """Generic tool view (basic and advanced modes).
     """
     tool     = os.path.basename(request.matchdict['tool'])           # (sanitized)
-    advanced = bool(request.matched_route.name.endswith('advanced')) # advanced mode?
-    props    = _get_props(request)    if advanced else {}            # property list
-    analyses = _get_analyses(request) if advanced else {}            # analyses list
-    phases   = _get_phases(request)   if advanced else {}            # phases list
+    advanced = bool(request.matched_route.name.endswith('advanced'))
+    props    = _get_props(request)
+    analyses = _get_analyses(request)
+    phases   = _get_phases(request)
 
     return dict(tool     = tool,
                 descr    = toolName[tool],
