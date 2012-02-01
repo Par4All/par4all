@@ -3266,6 +3266,7 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
       if (expression_normalized(e) == normalized_undefined)
 	expression_normalized(e)= NormalizeExpression(e);
       pv = (Pvecteur)normalized_linear(expression_normalized(e));
+      pv = pv;
       //        NORMALIZE_EXPRESSION(e);
     },
     ActualArrayInd);

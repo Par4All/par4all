@@ -242,7 +242,7 @@ transformer transformer_combine(transformer t1, transformer t2)
      variable projections if handled as a usual transformer. Not
      sufficient to solve Ticket 644. But sufficient to introduce lots
      of bugs... */
-  if(transformer_is_rn_p(t1) && !ENDP(wvl) && arguments_equal_p(a1, wvl)) {
+  if(transformer_is_rn_p(t1) && !ENDP(wvl) && arguments_set_equal_p(a1, wvl)) {
     if(transformer_is_empty_p(t2)) {
       free_transformer(t1);
       t1 = copy_transformer(t2); // t1 is empty
@@ -255,7 +255,7 @@ transformer transformer_combine(transformer t1, transformer t2)
       free_transformer(r);
     }
   }
-  else if(transformer_is_rn_p(t2) && !ENDP(wvl) && arguments_equal_p(a2, wvl)) {
+  else if(transformer_is_rn_p(t2) && !ENDP(wvl) && arguments_set_equal_p(a2, wvl)) {
     if(transformer_is_empty_p(t1))
       //t1 == t1;
       ;
