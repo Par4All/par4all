@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
    int __tri0, __tri1;
    scilab_rt_init(argc, argv, 0);
    int _u_a[1][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 1; __tri0 += 1) {
       //PIPS generated variable
       register int _tmpxx0_0;
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
    scilab_rt_display_s0i2_("a", 1, 3, _u_a);
    int _u_b[1][8];
    _u_b[0][0] = 0;
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri1 = 0; __tri1 <= 5; __tri1 += 1) {
       //PIPS generated variable
       register int _tmpxx1_0;

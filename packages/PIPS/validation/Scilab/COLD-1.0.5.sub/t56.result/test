@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
    int __tri0;
    scilab_rt_init(argc, argv, 0);
    double _u_a[1][11];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 10; __tri0 += 1) {
       //PIPS generated variable
       register double _tmpxx0_0;

@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
    scilab_rt_init(argc, argv, 0);
 
    double _u_a[1][32];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 31; __tri0 += 1)
       _u_a[0][__tri0] = 0+__tri0*0.1;
    scilab_rt_display_s0d2_("a", 1, 32, _u_a);

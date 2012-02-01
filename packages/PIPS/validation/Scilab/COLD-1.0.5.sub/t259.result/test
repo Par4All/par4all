@@ -17,37 +17,35 @@ int main(int argc, char *argv[])
    double _Complex _u_c[2][2][2];
    double _Complex _u_loga = clog(_u_a);
    double _Complex _u_logb[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_logb[0][__lv2] = clog(_u_b[0][__lv2]);
    double _Complex _u_logc[2][2][2];
    double _Complex _u_expa = cexp(_u_a);
    double _Complex _u_expb[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_expb[0][__lv2] = cexp(_u_b[0][__lv2]);
    double _Complex _u_expc[2][2][2];
    double _Complex _u_sqrta = csqrt(_u_a);
    double _Complex _u_sqrtb[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_sqrtb[0][__lv2] = csqrt(_u_b[0][__lv2]);
    double _Complex _u_sqrtc[2][2][2];
    double _u_absa = cabs(_u_a);
    double _u_absb[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_absb[0][__lv2] = cabs(_u_b[0][__lv2]);
    double _u_absc[2][2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 1; __lv3 += 1) {
             //PIPS generated variable
             register double _tmpxx4_0;

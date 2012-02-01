@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
    _u_a[0][1] = 2+_tmpxx2;
    scilab_rt_display_s0z2_("a", 1, 2, _u_a);
    double _Complex _tmp3[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _tmp3[0][__lv2] = cpow(_u_a[0][__lv2], 10);
    __lv1 = 0+1;
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
    __lv1 = 0+1;
    double _Complex _tmpxx4 = 2*1.0iF;
    double _Complex _tmp4[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
       //PIPS generated variable
       register double _Complex _tmpxx3_0;
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
    __lv1 = 0+1;
    scilab_rt_display_s0z2_("ans", 1, 2, _tmp4);
    double _Complex _tmp5[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _tmp5[0][__lv2] = cpow(1.0iF, _u_a[0][__lv2]);
    __lv1 = 0+1;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
    _tmpxx8[0][0] = 1+_tmpxx6;
    _tmpxx8[0][1] = 2+_tmpxx7;
    double _Complex _tmp7[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _tmp7[0][__lv2] = cpow(_tmpxx8[0][__lv2], 2);
    int _tmpxx9[3][3];
@@ -76,11 +76,10 @@ int main(int argc, char *argv[])
    _tmpxx9[2][2] = 9;
    double _Complex _tmpxx11 = 2*1.0iF;
    double _Complex _tmp8[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
          //PIPS generated variable
          register int _tmpxx10_0;
@@ -112,11 +111,10 @@ int main(int argc, char *argv[])
    _tmpxx21[1][0] = 3+_tmpxx18;
    _tmpxx21[1][1] = 4+_tmpxx19;
    double _Complex _tmp9[2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
          _tmp9[__lv1][__lv2] = cpow(_tmpxx20[__lv1][__lv2], _tmpxx21[__lv1][__lv2]);
    }
@@ -129,15 +127,13 @@ int main(int argc, char *argv[])
    double _Complex _tmpxx26 = 3*1.0iF;
    double _Complex _tmpxx28 = 1+_tmpxx26;
    double _Complex _u_f[2][2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 1; __lv3 += 1) {
             //PIPS generated variable
             register double _tmpxx22_0, _tmpxx27_0, _u_b_0;

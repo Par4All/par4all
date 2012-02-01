@@ -16,12 +16,13 @@ ${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), m
 
 <%def name="js_slot()">
 ${h.javascript_link(request.route_url("routes.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/bootstrap-tabs-min.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/bootstrap-modal-min.js"))}
 ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
 ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
 <script type="text/javascript">
   operation = "${tool}";
+  % if advanced:
+  advanced = true;
+  % endif
 </script>
 ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 </%def>
@@ -31,53 +32,49 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <%def name="left_column()">
 
-  <div id="resizing_source" style="text-align:right">
-    <button class="btn small" id="aminus">A-</button>
-    <button class="btn small" id="aplus">A+</button>
-  </div>
+<div style="text-align:right">
+  <button class="btn btn-small" id="aminus">A-</button>
+  <button class="btn btn-small" id="aplus">A+</button>
+</div>
 
-  <h4>Type or select source code from:</h4>
+<h4 style="margin:.5em 0">Type or select source code from:</h4>
+
+  <label>
+    <button id="classic-button" style="width:100%" class="btn btn-primary"
+	    data-toggle="modal" href="#classic-examples-dialog">
+      <i class="icon-folder-open icon-white"></i> Classic examples</button>
+  </label>
 
   <form target="upload_target" action="${request.route_url('upload_user_file')}"
 	enctype="multipart/form-data" method="post" id="upload_form">
-
-    <div class="clearfix">
-      <button class="btn primary span3" id="classic-button"
-	      data-controls-modal="classic-examples-dialog"
-	      data-backdrop="static">Classic examples »</button>
-    </div>
-
-    <div class="clearfix">
-      <p>or from your own test cases:</p>
-      <button id="pseudobutton" class="btn primary span3">Browse »</button>
-      <input type="file" id="upload_input" name="file" class="inp-hide"/>
-      <input type="text" id="pseudotextfile" readonly="readonly" class="span3"/>
-    </div>
-
+    <label for="pseudobutton">or from your own test cases:</label>
+    <button id="pseudobutton" style="width:100%" class="btn btn-primary">
+      <i class="icon-folder-open icon-white"></i> Browse</button>
+    <input type="file" id="upload_input" name="file" class="inp-hide"/><br/>
+    <div id="pseudotextfile">&nbsp;</div>
   </form>
 
-  <div class="clearfix">
-    <p>
-      <button class="btn primary disabled span3" id="run-button">Run »</button>
-    </p>
-    <p>
-      <button class="btn disabled span3" id="save-button">Save Result</button><br/>
-      <button class="btn disabled span3" id="print-button">Print Result</button>
-    </p>
-  </div>
+<p>
+  <button class="btn btn-primary disabled" style="width:100%" id="run-button">
+    <i class="icon-play icon-white"></i> Run</button>
+</p>
+<p>
+  <button class="btn disabled" style="width:100%" id="save-button">
+    <i class="icon-download-alt"></i> Save Result</button><br/>
+  <button class="btn disabled" style="width:100%" id="print-button">
+    <i class="icon-print"></i> Print Result</button>
+</p>
 
-  % if advanced:
+<form id="adv-form" class="${h.css_classes([('form-inline', True), ('hide', not advanced)])}">
 
   <h4>Advanced mode</h4>
 
-  <div class="clearfix">
-    <button class="btn success span3" data-keyboard="true" data-backdrop="static"
-	    data-controls-modal="adv-props-modal">Properties</button><br/>
-    <button class="btn success span3" data-keyboard="true" data-backdrop="static"
-	    data-controls-modal="adv-analyses-modal">Select Analyses</button><br/>
-    <button class="btn success span3" data-keyboard="true" data-backdrop="static"
-	    data-controls-modal="adv-phases-modal">Phases</button>
-  </div>
+  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-props-modal">
+    <i class="icon-cog icon-white"></i> Properties</button><br/>
+  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-analyses-modal">
+    <i class="icon-cog icon-white"></i> Select Analyses</button><br/>
+  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-phases-modal">
+    <i class="icon-cog icon-white"></i> Phases</button>
   
   ## "Properties" modal
   ${w.modal(u"Properties", advprop_body, id="adv-props-modal")}
@@ -97,17 +94,11 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   ${adv.phases_fields(phases)}
   </%def>
 
-  % endif
+</form>
 
-  <div class="clearfix" style="text-align: right">
-    Switch to 
-    % if advanced:
-    ${h.link_to(u"basic mode", url=request.route_url("tool_basic", tool=tool))}
-    % else:
-    ${h.link_to(u"advanced mode", url=request.route_url("tool_advanced", tool=tool))}
-    % endif
-    »
-  </div>
+<div style="text-align: right; white-space:nowrap">
+  Switch to ${h.link_to(u"basic mode" if advanced else u"advanced mode", url="#", id="adv-button")} »
+</div>
 
 </%def>
 
@@ -122,44 +113,42 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   <h2>${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
     ${descr}
     % if advanced:
-    <span class="label important">advanced</span>
+    <span class="label label-success">advanced</span>
     % endif
   </h2>
 </div>
 
-<div id="op-tabs">
-
-  ## Tab headers
-  <ul class="tabs" data-tabs="tabs">
-    ${w.source_tab(id="1", active=True)}
-    <li id="result_tab">${h.link_to(tool.upper(), url="#result")}</li>
-    <li id="graph_tab">${h.link_to(u"GRAPH", url="#graph")}</li>
-  </ul>
+## Tab headers
+<ul id="op-tabs" class="nav nav-tabs">
+  ${w.source_tab(id="1", active=True)}
+  <li id="result_tab"><a href="#result" data-toggle="tab">${tool.upper()}</a></li>
+  <li id="graph_tab"><a href="#graph" data-toggle="tab">GRAPH</a></li>
+</ul>
   
-  <div class="tab-content">
-
-    ## Source code panel
-    ${w.source_panel(id="1", active=True)}
-
-    ## Result panel
-    <div id="result" class="tab-pane">
-      <div id="multiple-functions">
-      </div>
-      <div id="resultcode" class="span16">
-	Result of the transformation will be displayed here.
-      </div>
+## Tab panels
+<div class="tab-content">
+  ## Source code panel
+  ${w.source_panel(id="1", active=True)}
+  ## Result panel
+  <div id="result" class="tab-pane">
+    <div id="multiple-functions">
     </div>
-
-    ## Graph panel
-    <div id="graph" class="tab-pane">
+    <div id="resultcode">
+      Placeholder for results.
     </div>
-
+  </div>
+  ## Graph panel
+  <div id="graph" class="tab-pane">
+    Placeholder for dependence graphs.
   </div>
 </div>
 
 ## Invisible iframe for file upload
 <iframe id="upload_target" name="upload_target" class="hide"></iframe> 
 
+<div id="source_tab_skel" class="hide">
+  ${w.source_tab(id="__skel__")}
+</div>
 <div id="source_panel_skel" class="hide">
   ${w.source_panel(id="__skel__")}
 </div>
@@ -171,13 +160,13 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <%def name="dialogs()">
 
-## Classic examples dialog
+## Classic examples modal
 
-${w.modal(u"Please select an example", classic_body, "classic-examples-dialog")}
+${w.modal(u"Please select an example:", classic_body, "classic-examples-dialog")}
 
 <%def name="classic_body()">
 % for ex in examples:
-${h.link_to(ex, id=ex, class_="btn small span8")}<br/>
+<div>${h.link_to(ex, id=ex, class_="btn small", style="width:90%")}</div>
 % endfor
 </%def>
 

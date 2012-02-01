@@ -5,11 +5,11 @@ int main(int argc, char *argv[])
    scilab_rt_init(argc, argv, 0);
 
    int _u_lx[1][10];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 9; __tri0 += 1)
       _u_lx[0][__tri0] = 1+__tri0*1;
    int _u_ly[1][10];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri1 = 0; __tri1 <= 9; __tri1 += 1)
       _u_ly[0][__tri1] = 1+__tri1*1;
    double _u_x[10][10];

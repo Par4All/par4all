@@ -16,11 +16,10 @@ int main(int argc, char *argv[])
    int _u_c = 4;
    int _u_d = 5;
    int _u_e[2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
          _u_e[__lv1][__lv2] = _u_a[__lv1][__lv2]&_u_b[__lv1][__lv2];
    }

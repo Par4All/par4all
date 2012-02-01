@@ -32,13 +32,13 @@ int main(int argc, char *argv[])
    _u_c[0][10] = 11;
    _u_c[0][11] = 12;
    double _u_d[1][12];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 11; __lv2 += 1)
       _u_d[0][__lv2] = cos(_u_c[0][__lv2]);
    double _u_dr;
    scilab_rt_inttrap_d2_d0(1, 12, _u_d, &_u_dr);
    double _tmpxx0[1][12];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 11; __lv2 += 1)
       _tmpxx0[0][__lv2] = sin(_u_c[0][__lv2]);
    double _u_cr;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
    _u_t[0][9] = 0.9;
    _u_t[0][10] = 1;
    double _tmpxx1[1][11];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 10; __lv2 += 1)
       _tmpxx1[0][__lv2] = sin(_u_t[0][__lv2]);
    double _u_tr;
@@ -72,11 +72,10 @@ int main(int argc, char *argv[])
    _u_r[2][1] = 8;
    _u_r[2][2] = 9;
    double _tmpxx2[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
          _u_b[__lv1][__lv2] = cos(_u_a[__lv1][__lv2]);
          _tmpxx2[__lv1][__lv2] = cos(_u_r[__lv1][__lv2]);
@@ -117,11 +116,10 @@ int main(int argc, char *argv[])
    1.2;
    1.8;
    double _tmpxx4[2][5];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 4; __lv2 += 1) {
          //PIPS generated variable
          register double _u_p_0 = _u_p[__lv1][__lv2];

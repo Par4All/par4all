@@ -17,28 +17,25 @@ int main(int argc, char *argv[])
    _tmpxx3[1][1] = 8;
    double _u_b[2][6];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_2 = 0; i_2 <= 1; i_2 += 1) {
       //PIPS generated variable
       int j_2;
-#pragma omp parallel for 
       for(j_2 = 0; j_2 <= 1; j_2 += 1)
          _u_b[i_2][j_2] = _tmpxx2[i_2][j_2];
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_3 = 0; i_3 <= 1; i_3 += 1) {
       //PIPS generated variable
       int j_3;
-#pragma omp parallel for 
       for(j_3 = 0; j_3 <= 1; j_3 += 1)
          _u_b[i_3][j_3+2] = _tmpxx3[i_3][j_3];
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx0_0, _tmpxx4_0;
@@ -50,11 +47,10 @@ int main(int argc, char *argv[])
       }
    }
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i_1 = 0; i_1 <= 1; i_1 += 1) {
       //PIPS generated variable
       int j_1;
-#pragma omp parallel for 
       for(j_1 = 0; j_1 <= 1; j_1 += 1)
          _u_a[i_1][j_1+2] = _tmpxx1[i_1][j_1];
    }

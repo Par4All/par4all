@@ -14,11 +14,11 @@ int main(int argc, char *argv[])
    _tmpxx1[0][2] = 6;
    int _u_a[1][6];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_0 = 0; j_0 <= 2; j_0 += 1)
       _u_a[0][j_0] = _tmpxx0[0][j_0];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_1 = 0; j_1 <= 2; j_1 += 1)
       _u_a[0][j_1+3] = _tmpxx1[0][j_1];
    scilab_rt_display_s0i2_("a", 1, 6, _u_a);

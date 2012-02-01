@@ -44,11 +44,10 @@ int main(int argc, char *argv[])
    _u_seed = _u_seed+_tmpxx3;
    double _u_R[30][3];
    (int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 40, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
          _u_R[__lv1][__lv2] = (double) 0.0;
    }
@@ -68,11 +67,10 @@ int main(int argc, char *argv[])
          _u_seed = _tmpxx8+_tmpxx9;
       }
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx10_0;
@@ -86,7 +84,7 @@ int main(int argc, char *argv[])
    _u_seed = _u_seed+_tmpxx11;
    double _u_m[30][1];
    (int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)1 == 1", ".t240.tmp/t240.c", 62, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1)
       _u_m[__lv1][0] = (double) 0.0;
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1)
@@ -103,10 +101,10 @@ int main(int argc, char *argv[])
       _tmpxx17 = sqrt(2);
       _u_seed = _tmpxx16+_tmpxx17;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_i_1 = 1; _u_i_1 <= _u_n; _u_i_1 += 1)
       1+1;
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       register double _tmpxx18_0;
@@ -120,11 +118,10 @@ int main(int argc, char *argv[])
    double _u_F[30][3];
    (int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 80, (const char *) 0);
    double _u_V[30][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
          _u_F[__lv1][__lv2] = (double) 0.0;
          _u_V[__lv1][__lv2] = (double) 0.0;
@@ -132,7 +129,7 @@ int main(int argc, char *argv[])
    }
    (int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 82, (const char *) 0);
    double _u_G = 1E-11;
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 29; __tri0 += 1) {
       //PIPS generated variable
       register int _u_vno_0;
@@ -143,11 +140,10 @@ int main(int argc, char *argv[])
       __lv1 = 0+1;
    int _u_ii[30][30];
    int _u_jj[30][30];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx19_0, _tmpxx20_0;
@@ -157,24 +153,22 @@ int main(int argc, char *argv[])
          _u_jj[__lv1][__lv2] = round(_tmpxx20_0);
       }
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_i_2 = 1; _u_i_2 <= 30; _u_i_2 += 1) {
       //PIPS generated variable
       int _u_j_2;
-#pragma omp parallel for 
       for(_u_j_2 = 1; _u_j_2 <= 30; _u_j_2 += 1)
          _u_ii[_u_i_2-1][_u_j_2-1] = _u_j_2;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_i_3 = 1; _u_i_3 <= 30; _u_i_3 += 1) {
       //PIPS generated variable
       int _u_j_3;
-#pragma omp parallel for 
       for(_u_j_3 = 1; _u_j_3 <= 30; _u_j_3 += 1)
          _u_jj[_u_i_3-1][_u_j_3-1] = _u_i_3;
    }
    int _u_kk[1][30];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__tri2 = 0; __tri2 <= 29; __tri2 += 1) {
       //PIPS generated variable
       register int _tmpxx21_0, _tmpxx22_0;
@@ -186,15 +180,13 @@ int main(int argc, char *argv[])
    double _u_dr[30][30][3];
    (int) _u_n==30&&(int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 121, (const char *) 0);
    double _u_fr[30][30][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1) {
             _u_dr[__lv1][__lv2][__lv3] = (double) 0.0;
             _u_fr[__lv1][__lv2][__lv3] = (double) 0.0;
@@ -204,11 +196,10 @@ int main(int argc, char *argv[])
    (int) _u_n==30&&(int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 123, (const char *) 0);
    double _u_a[30][3];
    (int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 125, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
          _u_a[__lv1][__lv2] = (double) 0.0;
    }
@@ -216,15 +207,13 @@ int main(int argc, char *argv[])
    while (_u_t<=_u_T) {
       /* dr(:) = R(jj, :) - R(ii, :); */
       /*  acc = 0; */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_z = 1; _u_z <= 3; _u_z += 1) {
          //PIPS generated variable
          int _u_i_4;
-#pragma omp parallel for 
          for(_u_i_4 = 1; _u_i_4 <= 30; _u_i_4 += 1) {
             //PIPS generated variable
             int _u_j_4;
-#pragma omp parallel for 
             for(_u_j_4 = 1; _u_j_4 <= 30; _u_j_4 += 1) {
                //PIPS generated variable
                double _tmpxx23;
@@ -234,15 +223,13 @@ int main(int argc, char *argv[])
          }
       }
       /*  acc */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
          for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
             //PIPS generated variable
             int __lv3;
-#pragma omp parallel for 
             for(__lv3 = 0; __lv3 <= 2; __lv3 += 1) {
                //PIPS generated variable
                register double _u_dr_0 = _u_dr[__lv1][__lv2][__lv3];
@@ -252,19 +239,17 @@ int main(int argc, char *argv[])
       }
       /*  r = r(:, :, 1) + r(:, :, 2) + r(:, :, 3);  */
       (int) _u_n==30&&(int) _u_n==30?(void) 0:__assert_fail("(int)_u_n == 30 && (int)_u_n == 30", ".t240.tmp/t240.c", 143, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
          for(__lv2 = 0; __lv2 <= 29; __lv2 += 1)
             _u_rt[__lv1][__lv2] = (double) 1.0;
       }
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_5 = 1; _u_i_5 <= 30; _u_i_5 += 1) {
          //PIPS generated variable
          int _u_j_5;
-#pragma omp parallel for 
          for(_u_j_5 = 1; _u_j_5 <= 30; _u_j_5 += 1) {
             //PIPS generated variable
             double _tmpxx24;
@@ -279,7 +264,7 @@ int main(int argc, char *argv[])
          register int _u_kk_0 = _u_kk[0][_u_i_6-1];
          _u_rt[(_u_kk_0-1)%30][(_u_kk_0-1)/30] = 1.0;
       }
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1)
          _tmpxx25[0][__lv1] = _u_m[__lv1][0];
       __lv2 = 0+1;
@@ -290,11 +275,10 @@ int main(int argc, char *argv[])
          register int _u_kk_1 = _u_kk[0][_u_i_7-1];
          _u_MM[(_u_kk_1-1)%30][(_u_kk_1-1)/30] = 0.0;
       }
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
          for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
             //PIPS generated variable
             register double _tmpxx26_0, _tmpxx27_0, _u_rt_0 = _u_rt[__lv1][__lv2];
@@ -308,11 +292,10 @@ int main(int argc, char *argv[])
       /*  dr(:, :, 1) = dr(:, :, 1) ./ r; */
       /*   */
       /* fr(:, :, 1) = f .* dr(:, :, 1); */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_8 = 1; _u_i_8 <= 30; _u_i_8 += 1) {
          //PIPS generated variable
          int _u_j_6;
-#pragma omp parallel for 
          for(_u_j_6 = 1; _u_j_6 <= 30; _u_j_6 += 1) {
             //PIPS generated variable
             register double _u_dr_1 = _u_dr[_u_i_8-1][_u_j_6-1][0];
@@ -327,11 +310,10 @@ int main(int argc, char *argv[])
       }
       /* dr(:, :, 2) = dr(:, :, 2) ./ r; */
       /* fr(:, :, 2) = f .* dr(:, :, 2); */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_9 = 1; _u_i_9 <= 30; _u_i_9 += 1) {
          //PIPS generated variable
          int _u_j_7;
-#pragma omp parallel for 
          for(_u_j_7 = 1; _u_j_7 <= 30; _u_j_7 += 1) {
             //PIPS generated variable
             register double _u_dr_2 = _u_dr[_u_i_9-1][_u_j_7-1][1];
@@ -346,11 +328,10 @@ int main(int argc, char *argv[])
       }
       /* dr(:, :, 3) = dr(:, :, 3) ./ r; */
       /* fr(:, :, 3) = f .* dr(:, :, 3); */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_10 = 1; _u_i_10 <= 30; _u_i_10 += 1) {
          //PIPS generated variable
          int _u_j_8;
-#pragma omp parallel for 
          for(_u_j_8 = 1; _u_j_8 <= 30; _u_j_8 += 1) {
             //PIPS generated variable
             register double _u_dr_3 = _u_dr[_u_i_10-1][_u_j_8-1][2];
@@ -365,22 +346,20 @@ int main(int argc, char *argv[])
       }
       /* F(:) = mean(fr) * n; */
       (int) _u_n==30?(void) 0:__assert_fail("(int)1 == 1 && (int)_u_n == 30 && (int)3 == 3", ".t240.tmp/t240.c", 216, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1)
             _u_mn[0][__lv2][__lv3] = (double) 0.0;
       }
       __lv1 = 0+1;
 
       scilab_rt_mean_d3s0_d3(30, 30, 3, _u_fr, "m", 1, 30, 3, _u_mn);
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_14 = 1; _u_i_14 <= 30; _u_i_14 += 1) {
          //PIPS generated variable
          int _u_j_12;
-#pragma omp parallel for 
          for(_u_j_12 = 1; _u_j_12 <= 3; _u_j_12 += 1) {
             //PIPS generated variable
             double _tmpxx34;
@@ -389,7 +368,7 @@ int main(int argc, char *argv[])
          }
       }
       /*      a(:, 1) = F(:, 1) ./ m; */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_15 = 1; _u_i_15 <= 30; _u_i_15 += 1) {
          //PIPS generated variable
          double _tmpxx35;
@@ -397,7 +376,7 @@ int main(int argc, char *argv[])
          _u_a[_u_i_15-1][0] = _tmpxx35;
       }
       /*      a(:, 2) = F(:, 2) ./ m; */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_16 = 1; _u_i_16 <= 30; _u_i_16 += 1) {
          //PIPS generated variable
          double _tmpxx36;
@@ -405,18 +384,17 @@ int main(int argc, char *argv[])
          _u_a[_u_i_16-1][1] = _tmpxx36;
       }
       /*      a(:, 3) = F(:, 3) ./ m; */
-#pragma omp parallel for 
+#pragma omp parallel for
       for(_u_i_17 = 1; _u_i_17 <= 30; _u_i_17 += 1) {
          //PIPS generated variable
          double _tmpxx37;
          _tmpxx37 = _u_F[_u_i_17-1][2]/_u_m[_u_i_17-1][0];
          _u_a[_u_i_17-1][2] = _tmpxx37;
       }
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
          for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
             //PIPS generated variable
             register double _tmpxx38_0, _tmpxx39_0, _tmpxx40_0, _tmpxx41_0, _u_V_0 = _u_V[__lv1][__lv2];

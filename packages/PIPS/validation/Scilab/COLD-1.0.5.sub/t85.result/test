@@ -1,11 +1,11 @@
 int main(int argc, char *argv[])
 {
    scilab_rt_init(argc, argv, 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       (double) 1.0;
    __lv1 = 0+1;
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1)
       (double) 1.0;
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1)

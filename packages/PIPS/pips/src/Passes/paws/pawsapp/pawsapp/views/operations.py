@@ -153,7 +153,7 @@ def _highlight_code(request, code, language, demo=False):
     if lexer:
         code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
         lines = [ '<li>%s</li>' % l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
-        return '<div class="highlight"><pre><ol>%s</ol></pre></div>' % ''.join(lines) # absolutely NO blank spaces!
+        return '<pre class="prettyprint linenums"><ol class="highlight linenums">%s</ol></pre>' % ''.join(lines) # absolutely NO blank spaces!
 
 
 #

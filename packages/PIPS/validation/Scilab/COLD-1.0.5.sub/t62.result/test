@@ -4,11 +4,10 @@ int main(int argc, char *argv[])
    
    /*  t62.sce: Array reference with one index */
    double _u_a[10][10];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 9; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
          _u_a[__lv1][__lv2] = (double) 1.0;
    }

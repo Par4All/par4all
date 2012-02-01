@@ -29,29 +29,27 @@ void dich__d2(int _u_U_n0, int _u_U_n1, double _u_U[_u_U_n0][_u_U_n1])
    double _u_ave = _tmpxx10/_tmpxx11;
    double _tmpxx12[134][134];
    (int) _u_n==134&&(int) _u_m==134?(void) 0:__assert_fail("(int)_u_n == 134 && (int)_u_m == 134", ".t227.tmp/t227.c", 46, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 133; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 133; __lv2 += 1)
          _tmpxx12[__lv1][__lv2] = (double) 1.0;
    }
    134==_u_U_n0&&134==_u_U_n1?(void) 0:__assert_fail("134 == _u_U_n0 && 134 == _u_U_n1", ".t227.tmp/t227.c", 48, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_U_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_U_n1-1; __lv2 += 1)
          _u_U[__lv1][__lv2] = _u_ave*_tmpxx12[__lv1][__lv2];
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_l_0 = 1; _u_l_0 <= _u_m; _u_l_0 += 1) {
       _u_U[0][_u_l_0-1] = _u_f3;
       _u_U[_u_n-1][_u_l_0-1] = _u_f4;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_k_0 = 1; _u_k_0 <= _u_n; _u_k_0 += 1) {
       _u_U[_u_k_0-1][0] = _u_f1;
       _u_U[_u_k_0-1][_u_m-1] = _u_f2;

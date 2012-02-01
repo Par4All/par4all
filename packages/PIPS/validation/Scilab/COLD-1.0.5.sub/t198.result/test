@@ -45,15 +45,15 @@ void newlhs_i0i0d0d0d0i0_d2(int _u_N, int _u_R, double _u_L, double _u_C, double
    for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
+#pragma omp parallel for
       for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
          _u_lhs[__lv1][__lv2] = (double) 0.0;
    }
    /*  set the lhs */
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_k = 0; _u_k <= _u_N-1; _u_k += 1)
       _u_lhs_n0==_u_msiz&&_u_lhs_n1==_u_msiz?(void) 0:__assert_fail("_u_lhs_n0 == _u_msiz && _u_lhs_n1 == _u_msiz", ".t198.tmp/t198.c", 77, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_k = 0; _u_k <= _u_N-1; _u_k += 1)
       _u_msiz==_u_lhs_n0&&_u_msiz==_u_lhs_n1?(void) 0:__assert_fail("_u_msiz == _u_lhs_n0 && _u_msiz == _u_lhs_n1", ".t198.tmp/t198.c", 81, (const char *) 0);
    for(_u_k = 0; _u_k <= _u_N-1; _u_k += 1) {
@@ -62,7 +62,7 @@ void newlhs_i0i0d0d0d0i0_d2(int _u_N, int _u_R, double _u_L, double _u_C, double
       for(__lv1 = 0; __lv1 <= _u_msiz-1; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
+#pragma omp parallel for
          for(__lv2 = 0; __lv2 <= _u_msiz-1; __lv2 += 1)
             _u_lhs[__lv1][__lv2];
       }
@@ -70,7 +70,7 @@ void newlhs_i0i0d0d0d0i0_d2(int _u_N, int _u_R, double _u_L, double _u_C, double
       for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
          //PIPS generated variable
          int __lv2;
-#pragma omp parallel for 
+#pragma omp parallel for
          for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
             _u_lhs[__lv1][__lv2] = _tmpxx10[__lv1][__lv2];
       }
@@ -86,11 +86,10 @@ void newrhs_i0i0d0d0i0d0d0d2i0_d2(int _u_N, int _u_R, double _u_L, double _u_C, 
    //PIPS generated variable
    int _u_k;
    (int) _u_msiz==_u_rhs_n0&&(int) 1==_u_rhs_n1?(void) 0:__assert_fail("(int)_u_msiz == _u_rhs_n0 && (int)1 == _u_rhs_n1", ".t198.tmp/t198.c", 97, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_rhs_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_rhs_n1-1; __lv2 += 1)
          _u_rhs[__lv1][__lv2] = (double) 0.0;
    }
@@ -163,7 +162,7 @@ void rlcloop_i0i0d0d0i0i0d0d0_d2d2d2(int _u_N, int _u_R, double _u_L, double _u_
    int _u_k;
    //PIPS generated variable
    double _u_rhs[_u_msiz][1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_msiz-1; __lv1 += 1)
       _u_x[__lv1][0] = (double) 0.0;
    for(__lv1 = 0; __lv1 <= _u_msiz-1; __lv1 += 1)
@@ -217,11 +216,10 @@ void rlcloop_i0i0d0d0i0i0d0d0_d2d2d2(int _u_N, int _u_R, double _u_L, double _u_
 }
 void setlhs_i0d0d0d2i0d0_d2(int _u_R, double _u_L, double _u_C, int _c_0_n0, int _c_0_n1, double _c_0[_c_0_n0][_c_0_n1], int _u_k, double _u_h, int _u_lhs_n0, int _u_lhs_n1, double _u_lhs[_u_lhs_n0][_u_lhs_n1])
 {
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_lhs_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_lhs_n1-1; __lv2 += 1)
          _u_lhs[__lv1][__lv2] = _c_0[__lv1][__lv2];
    }
