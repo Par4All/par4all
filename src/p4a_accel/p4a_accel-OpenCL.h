@@ -73,7 +73,6 @@ void   p4a_clean(int exitCode);
     if(CL_SUCCESS != error) {           \
       fprintf(stderr, "%s - The runtime error is %s\n",AT,    \
         (char *)p4a_error_to_string(error));      \
-      checkP4ARuntimeInitialized() \
       p4a_clean(EXIT_FAILURE);            \
     }                 \
   } while (0)
