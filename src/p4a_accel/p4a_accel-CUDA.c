@@ -7,6 +7,14 @@ void p4a_init_cuda_accel() {
   // Main p4a initialization
   p4a_main_init();
 
+  // Number of CUDA devices
+  int devCount;
+  cudaGetDeviceCount(&devCount); // This also initialize the CUDA runtime
+  if(devCount==0) {
+    fprintf(stderr,"p4a_init_cuda_accel() cannot find any CUDA capable device, aborting.\n");
+  }
+
+
   // Timing stuff
   if(p4a_timing) {
     toolTestExec(cudaEventCreate(&p4a_start_event));
