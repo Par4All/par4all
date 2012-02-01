@@ -38,6 +38,7 @@ static inline void checkErrorInline(cudaError_t error,
             currentFile,
             currentLine,
             cudaGetErrorString(error));
+    checkP4ARuntimeInitialized()
     exit(-1);
   }
 }
@@ -53,6 +54,7 @@ static inline void checkErrorMessageInline(cudaError_t error,
             currentLine,
             errorMessage,
             cudaGetErrorString(error));
+    checkP4ARuntimeInitialized();
     exit(-1);
   }
 
@@ -65,6 +67,7 @@ static inline void checkErrorMessageInline(cudaError_t error,
               currentLine,
               errorMessage,
               cudaGetErrorString(error));
+      checkP4ARuntimeInitialized();
       exit(-1);
     }
   }

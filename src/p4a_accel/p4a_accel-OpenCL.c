@@ -413,6 +413,7 @@ void p4a_clean(int exitCode)
   if(p4a_kernel)clReleaseKernel(p4a_kernel);  
   if(p4a_queue)clReleaseCommandQueue(p4a_queue);
   if(p4a_context)clReleaseContext(p4a_context);
+  checkP4ARuntimeInitialized();
   exit(exitCode);
 }
 
