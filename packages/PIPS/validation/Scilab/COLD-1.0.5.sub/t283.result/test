@@ -24,11 +24,10 @@ int main(int argc, char *argv[])
    double _tmpxx1[3][3];
    double _u_b1[3][3];
    double _tmpxx2[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
          //PIPS generated variable
          register double _u_u1_0 = _u_u1[__lv1][__lv2];
@@ -78,11 +77,10 @@ int main(int argc, char *argv[])
    double _tmpxx4[5][5];
    double _u_b2[5][5];
    double _tmpxx5[5][5];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 4; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 4; __lv1 += 1) {
          //PIPS generated variable
          register double _u_u2_0 = _u_u2[__lv1][__lv2];
@@ -115,11 +113,10 @@ int main(int argc, char *argv[])
    _tmpxx7[3][3] = 5;
    double _Complex _tmpxx8 = 1+_tmpxx6;
    double _Complex _u_a3[4][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 3; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 3; __lv2 += 1)
          _u_a3[__lv1][__lv2] = (double _Complex) _tmpxx7[__lv1][__lv2]*_tmpxx8;
    }
@@ -134,11 +131,10 @@ int main(int argc, char *argv[])
    double _Complex _tmpxx10[4][4];
    double _Complex _u_b3[4][4];
    double _Complex _tmpxx11[4][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 3; __lv1 += 1) {
          //PIPS generated variable
          register double _Complex _u_u3_0 = _u_u3[__lv1][__lv2];

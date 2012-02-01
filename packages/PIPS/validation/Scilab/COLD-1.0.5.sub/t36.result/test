@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
    _tmpxx3[0][0] = 7;
    _tmpxx3[0][1] = 10;
    int _tmpif0[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
       //PIPS generated variable
       register int _tmpxx2_0;

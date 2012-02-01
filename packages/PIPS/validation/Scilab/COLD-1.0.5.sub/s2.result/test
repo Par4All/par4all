@@ -41,11 +41,10 @@ int main(int argc, char *argv[])
    _tmpxx0[1][1] = 5;
    _tmpxx0[1][2] = 6;
    int _u_d[3][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 1; __lv1 += 1)
          _u_d[__lv2][__lv1] = _tmpxx0[__lv1][__lv2];
    }
@@ -87,15 +86,15 @@ int main(int argc, char *argv[])
    _tmpxx3[0][3] = 8;
    int _u_e1[2][4];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_0 = 0; j_0 <= 1; j_0 += 1)
       _u_e1[0][j_0] = _tmpxx1[0][j_0];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_1 = 0; j_1 <= 1; j_1 += 1)
       _u_e1[0][j_1+2] = _tmpxx2[0][j_1];
 
-#pragma omp parallel for 
+#pragma omp parallel for
    for(j_2 = 0; j_2 <= 3; j_2 += 1)
       _u_e1[1][j_2] = _tmpxx3[0][j_2];
    scilab_rt_display_s0i2_("e1", 2, 4, _u_e1);
@@ -113,7 +112,7 @@ int main(int argc, char *argv[])
    _tmpxx4[0][3] = _u_i;
    _tmpxx4[0][4] = 3;
    double _Complex _u_o[5][1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 4; __lv2 += 1)
       _u_o[__lv2][0] = conj(_tmpxx4[0][__lv2]);
    for(__lv2 = 0; __lv2 <= 4; __lv2 += 1)
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       __lv1 = 0+1;
    int _u_x[2][1];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
       //PIPS generated variable
       register int _tmpxx6_0;
@@ -138,14 +137,14 @@ int main(int argc, char *argv[])
    __lv1 = 0+1;
    __lv1 = 0+1;
    int _u_t1[4][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       register int _tmpxx7_0;
       _tmpxx7_0 = _u_b[0][__lv2];
       _u_t1[1][__lv2] = _tmpxx7_0;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       register int _tmpxx8_0;

@@ -15,11 +15,10 @@ int main(int argc, char *argv[])
    scilab_rt_display_s0i2_("a", 2, 4, _u_a);
    int _u_acT[4][2];
    int _u_anT[4][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
          //PIPS generated variable
          register int _u_a_0 = _u_a[__lv1][__lv2];
@@ -41,11 +40,10 @@ int main(int argc, char *argv[])
    scilab_rt_display_s0z2_("b", 2, 2, _u_b);
    double _Complex _u_bcT[2][2];
    double _Complex _u_bnT[2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
          //PIPS generated variable
          register double _Complex _u_b_0 = _u_b[__lv1][__lv2];
@@ -58,11 +56,10 @@ int main(int argc, char *argv[])
    double _Complex _tmpxx4 = 3*1.0iF;
    double _Complex _tmpxx6 = 2+_tmpxx4;
    double _Complex _u_c[3][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx5_0;
@@ -73,11 +70,10 @@ int main(int argc, char *argv[])
    scilab_rt_display_s0z2_("c", 3, 4, _u_c);
    double _Complex _u_ccT[4][3];
    double _Complex _u_cnT[4][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 2; __lv1 += 1) {
          //PIPS generated variable
          register double _Complex _u_c_0 = _u_c[__lv1][__lv2];

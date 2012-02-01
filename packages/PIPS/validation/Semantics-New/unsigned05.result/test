@@ -1,0 +1,69 @@
+
+Transformers for "main"
+
+
+//  T() {}
+
+int main(void)
+{
+
+//  T(i) {}
+
+   int i, a[100];
+
+//  T(ui) {}
+
+   unsigned int ui;
+
+//  T(i) {0<=i, i<=99}
+
+
+   for(i = 0; i <= 99; i += ui)
+
+//  T() {}
+
+      a[i] = 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int i, a[100];
+
+//  P(i) {}
+
+   unsigned int ui;
+
+//  P(i,ui) {}
+
+
+   for(i = 0; i <= 99; i += ui)
+
+//  P(i,ui) {0<=i, i<=99}
+
+      a[i] = 0;
+}
+
+Regions for "main"
+
+int main(void)
+{
+   int i, a[100];
+   unsigned int ui;
+
+//  <a[PHI1]-W-MAY-{0<=PHI1, PHI1<=99}>
+
+
+   for(i = 0; i <= 99; i += ui)
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=99}>
+
+      a[i] = 0;
+}

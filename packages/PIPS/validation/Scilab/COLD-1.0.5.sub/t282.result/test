@@ -22,11 +22,10 @@ int main(int argc, char *argv[])
    double _tmpxx0[3][3];
    scilab_rt_mul_d2d2_d2(3, 3, _u_u1, 3, 3, _u_t1, 3, 3, _tmpxx0);
    double _tmpxx1[3][3];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 2; __lv1 += 1)
          _tmpxx1[__lv2][__lv1] = _u_u1[__lv1][__lv2];
    }
@@ -68,11 +67,10 @@ int main(int argc, char *argv[])
    double _tmpxx2[5][5];
    scilab_rt_mul_d2d2_d2(5, 5, _u_u2, 5, 5, _u_t2, 5, 5, _tmpxx2);
    double _tmpxx3[5][5];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 4; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 4; __lv1 += 1)
          _tmpxx3[__lv2][__lv1] = _u_u2[__lv1][__lv2];
    }
@@ -99,11 +97,10 @@ int main(int argc, char *argv[])
    _tmpxx5[3][3] = 5;
    double _Complex _tmpxx6 = 1+_tmpxx4;
    double _Complex _u_a3[4][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 3; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 3; __lv2 += 1)
          _u_a3[__lv1][__lv2] = (double _Complex) _tmpxx5[__lv1][__lv2]*_tmpxx6;
    }
@@ -116,11 +113,10 @@ int main(int argc, char *argv[])
    double _Complex _tmpxx7[4][4];
    scilab_rt_mul_z2z2_z2(4, 4, _u_u3, 4, 4, _u_t3, 4, 4, _tmpxx7);
    double _Complex _tmpxx8[4][4];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
       int __lv1;
-#pragma omp parallel for 
       for(__lv1 = 0; __lv1 <= 3; __lv1 += 1)
          _tmpxx8[__lv2][__lv1] = conj(_u_u3[__lv1][__lv2]);
    }

@@ -17,19 +17,17 @@ int main(int argc, char *argv[])
    double _Complex _u_c[2][2][2];
    double _Complex _u_cos1 = ccos(_u_a);
    double _Complex _u_cos2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_cos2[0][__lv2] = ccos(_u_b[0][__lv2]);
    double _Complex _u_cos3[2][2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 1; __lv3 += 1) {
             //PIPS generated variable
             register double _tmpxx4_0;
@@ -54,7 +52,7 @@ int main(int argc, char *argv[])
    double _Complex _u_acosh1 = ccosh(_u_a);
    scilab_rt_display_s0z0_("acosh1", _u_acosh1);
    double _Complex _u_acosh2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_acosh2[0][__lv2] = ccosh(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -65,7 +63,7 @@ int main(int argc, char *argv[])
    double _Complex _u_acos1 = cacos(_u_a);
    scilab_rt_display_s0z0_("acos1", _u_acos1);
    double _Complex _u_acos2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_acos2[0][__lv2] = cacos(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -78,7 +76,7 @@ int main(int argc, char *argv[])
    scilab_rt_disp_s0_("_________acosh");
    _u_acosh1 = cacosh(_u_a);
    scilab_rt_display_s0z0_("acosh1", _u_acosh1);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_acosh2[0][__lv2] = cacosh(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -89,21 +87,19 @@ int main(int argc, char *argv[])
    double _Complex _u_sin1 = csin(_u_a);
    scilab_rt_display_s0z0_("sin1", _u_sin1);
    double _Complex _u_sin2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_sin2[0][__lv2] = csin(_u_b[0][__lv2]);
    __lv1 = 0+1;
    scilab_rt_display_s0z2_("sin2", 1, 2, _u_sin2);
    double _Complex _u_sin3[2][2][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
          int __lv3;
-#pragma omp parallel for 
          for(__lv3 = 0; __lv3 <= 1; __lv3 += 1)
             _u_sin3[__lv1][__lv2][__lv3] = csin(_u_c[__lv1][__lv2][__lv3]);
       }
@@ -117,7 +113,7 @@ int main(int argc, char *argv[])
    double _Complex _u_asinh1 = csinh(_u_a);
    scilab_rt_display_s0z0_("asinh1", _u_asinh1);
    double _Complex _u_asinh2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_asinh2[0][__lv2] = csinh(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -128,7 +124,7 @@ int main(int argc, char *argv[])
    double _Complex _u_asin1 = casin(_u_a);
    scilab_rt_display_s0z0_("asin1", _u_asin1);
    double _Complex _u_asin2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_asin2[0][__lv2] = casin(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -141,7 +137,7 @@ int main(int argc, char *argv[])
    scilab_rt_disp_s0_("_________asinh");
    _u_asinh1 = casinh(_u_a);
    scilab_rt_display_s0z0_("asinh1", _u_asinh1);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_asinh2[0][__lv2] = casinh(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -152,7 +148,7 @@ int main(int argc, char *argv[])
    double _Complex _u_tan1 = ctan(_u_a);
    scilab_rt_display_s0z0_("tan1", _u_tan1);
    double _Complex _u_tan2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_tan2[0][__lv2] = ctan(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -166,7 +162,7 @@ int main(int argc, char *argv[])
    double _Complex _u_atanh1 = ctanh(_u_a);
    scilab_rt_display_s0z0_("atanh1", _u_atanh1);
    double _Complex _u_atanh2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_atanh2[0][__lv2] = ctanh(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -177,7 +173,7 @@ int main(int argc, char *argv[])
    double _Complex _u_atan1 = catan(_u_a);
    scilab_rt_display_s0z0_("atan1", _u_atan1);
    double _Complex _u_atan2[1][2];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_atan2[0][__lv2] = catan(_u_b[0][__lv2]);
    __lv1 = 0+1;
@@ -190,7 +186,7 @@ int main(int argc, char *argv[])
    scilab_rt_disp_s0_("_________atanh");
    _u_atanh1 = catanh(_u_a);
    scilab_rt_display_s0z0_("atanh1", _u_atanh1);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1)
       _u_atanh2[0][__lv2] = catanh(_u_b[0][__lv2]);
    __lv1 = 0+1;

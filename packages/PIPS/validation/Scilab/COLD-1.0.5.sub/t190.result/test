@@ -1,11 +1,10 @@
 void foo_i0_d2(int _u_n, int _u_x_n0, int _u_x_n1, double _u_x[_u_x_n0][_u_x_n1])
 {
    (int) 10==_u_x_n0&&(int) 10==_u_x_n1?(void) 0:__assert_fail("(int)10 == _u_x_n0 && (int)10 == _u_x_n1", ".t190.tmp/t190.c", 21, (const char *) 0);
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= _u_x_n0-1; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= _u_x_n1-1; __lv2 += 1) {
          (double) 0.0;
          _u_n;

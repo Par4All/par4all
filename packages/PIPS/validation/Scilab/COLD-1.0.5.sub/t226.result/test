@@ -37,11 +37,10 @@ int main(int argc, char *argv[])
    double _u_ave = _tmpxx9/_tmpxx10;
    (int) _u_n==134&&(int) _u_m==134?(void) 0:__assert_fail("(int)_u_n == 134 && (int)_u_m == 134", ".t226.tmp/t226.c", 55, (const char *) 0);
    double _u_U[134][134];
-#pragma omp parallel for 
+#pragma omp parallel for
    for(__lv1 = 0; __lv1 <= 133; __lv1 += 1) {
       //PIPS generated variable
       int __lv2;
-#pragma omp parallel for 
       for(__lv2 = 0; __lv2 <= 133; __lv2 += 1) {
          //PIPS generated variable
          register double _tmpxx11_0;
@@ -49,12 +48,12 @@ int main(int argc, char *argv[])
          _u_U[__lv1][__lv2] = _u_ave*_tmpxx11_0;
       }
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_l_0 = 1; _u_l_0 <= _u_m; _u_l_0 += 1) {
       _u_U[0][_u_l_0-1] = _u_f3;
       _u_U[_u_n-1][_u_l_0-1] = _u_f4;
    }
-#pragma omp parallel for 
+#pragma omp parallel for
    for(_u_k_0 = 1; _u_k_0 <= _u_n; _u_k_0 += 1) {
       _u_U[_u_k_0-1][0] = _u_f1;
       _u_U[_u_k_0-1][_u_m-1] = _u_f2;
