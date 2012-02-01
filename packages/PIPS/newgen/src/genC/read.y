@@ -36,7 +36,7 @@ extern void newgen_lexer_position(FILE *);
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
 
 extern int yyinput(void);
-extern void yyerror(char*);
+extern void yyerror(const char*);
 
 extern FILE * yyin;
 
@@ -347,7 +347,7 @@ static gen_chunk * chunk_for_domain(int domain)
 
 /* YYERROR manages a syntax error while reading an object. */
 
-void yyerror(char * s)
+void yyerror(const char * s)
 {
   int c, n=40;
   newgen_lexer_position(stderr);
