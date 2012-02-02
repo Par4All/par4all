@@ -1,0 +1,39 @@
+int main()
+{
+   int i, j;
+   for(i = 0; i <= 9; i += 1) {
+      int k = i;
+      {
+         int l = 2;
+         {
+            int k = 3;
+            l = l+k;
+         }
+         k = k+l;
+      }
+      j = j+k;
+      {
+         int l = 4;
+         j = j+l;
+      }
+   }
+   return j;
+}
+#
+# Code after merge_sequences for module main
+#
+int main()
+{
+   int i, j;
+   for(i = 0; i <= 9; i += 1) {
+      int k = i;
+      int l = 2;
+      int k0 = 3;
+      l = l+k0;
+      k = k+l;
+      j = j+k;
+      int l0 = 4;
+      j = j+l0;
+   }
+   return j;
+}
