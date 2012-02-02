@@ -1454,3 +1454,284 @@ remove_useless_label(char* module_name)
 
    return true;
 }
+
+
+
+/*
+  MERGE SEQUENCES
+ */
+
+/**
+ * returns a set with the entities declared in statements directly
+ * contained in the input sequence
+ *
+ * @param seq is the input sequence
+ *
+ * @return a set of entities
+ */
+static set
+sequence_proper_declarations(sequence seq)
+{
+  set proper_decls = set_make(set_pointer);
+  FOREACH(STATEMENT, stmt, sequence_statements(seq))
+    {
+      if (declaration_statement_p(stmt))
+	{
+	  ifdebug(4) {
+	    pips_debug(4, "current declaration statement:\n");
+	    print_statement(stmt);
+	  }
+	  proper_decls = set_append_list(proper_decls, statement_declarations(stmt));
+	}
+    }
+  return proper_decls;
+}
+
+/**
+ * change the declarations of declaration statements directly
+ * contained in input sequence according to the input old/new entity mapping
+ *
+ * @param seq is the input sequence
+ * @param renamings is an old/new entity mapping
+ *
+ */
+static void
+sequence_proper_declarations_rename_in_place(sequence seq, hash_table renamings)
+{
+  FOREACH(STATEMENT, stmt, sequence_statements(seq))
+    {
+      if (declaration_statement_p(stmt))
+	{
+	  ifdebug(4) {
+	    pips_debug(4,
+		       "current declaration statement:\n");
+	    print_statement(stmt);
+	  }
+
+	  list l_decl = statement_declarations(stmt);
+	  while (!ENDP(l_decl))
+	    {
+	      entity decl = ENTITY(CAR(l_decl));
+	      entity new_decl = hash_get(renamings, decl);
+	      if(new_decl != HASH_UNDEFINED_VALUE) // we have found the old declaration
+		{
+		  pips_debug(5, "replacing entity %s by %s\n", entity_name(decl), entity_name(new_decl));
+		  CAR(l_decl).p = (gen_chunkp) new_decl;
+		  entity_initial(new_decl) = copy_value(entity_initial(decl));
+		  hash_del(renamings, decl);
+		}
+	      POP(l_decl);
+	    }
+	}
+    }
+}
+
+/**
+ * recursively merge unecessarily nested sequences into the sequence
+ * given as argument
+ *
+ * @param seq is the sequence whose inner sequences are merged into.
+ *
+ */
+static void
+sequence_merge_internal_sequences(sequence seq)
+{
+  list l_stmts = sequence_statements(seq); // the list of statements of the sequence
+  list l_new_stmts = NIL; // the resulting list of statements
+
+  entity module = get_current_module_entity();
+  statement parent_statement = (statement) gen_get_ancestor(statement_domain, seq); // the statement holding the sequence
+
+  ifdebug(2) {
+    pips_debug(2, "Parent statement at entry:\n");
+    print_statement(parent_statement);
+  }
+
+  set parent_proper_decls = sequence_proper_declarations(seq); // declarations from the statements directly in the sequence
+  set new_decls = set_make(set_pointer); // newly declared entities if need be.
+
+  FOREACH(STATEMENT, stmt, l_stmts)
+    {
+      ifdebug(3) {
+	pips_debug(3,"Current statement\n");
+	print_statement(stmt);
+      }
+
+      if (statement_sequence_p(stmt))
+	{
+	  pips_debug(3, "sequence -> to be merged\n");
+
+	  sequence internal_sequence = statement_sequence(stmt);
+	  list l_stmt_to_be_merged = sequence_statements(internal_sequence);
+
+	  // take care of declarations from the statements directly in the internal sequence
+	  set internal_proper_decls = sequence_proper_declarations(internal_sequence);
+	  if (!set_empty_p(internal_proper_decls))
+	    {
+	      hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
+	      bool renamings_p = false;
+
+	      SET_FOREACH(entity, decl, internal_proper_decls)
+		{
+		  pips_debug(3, "dealing with declaration: %s\n", entity_name(decl));
+
+		  // check if there is already a declaration with the same user name
+		  // in the englobing sequence seq
+		  const char * decl_name = entity_user_name(decl);
+		  bool parent_decl_with_same_name = false;
+		  SET_FOREACH(entity, parent_decl, parent_proper_decls)
+		    {
+		      // arghh, this is costly, we should at least memoize user_names...
+		      if (strcmp(entity_user_name(parent_decl), decl_name) == 0)
+			{
+			  parent_decl_with_same_name = true;
+			  break;
+			}
+		    }
+
+		  if (parent_decl_with_same_name)
+		    {
+		      renamings_p = true;
+		      // I should take care of scope here
+		      entity new_decl = make_new_scalar_variable_with_prefix
+			(entity_user_name(decl),
+			 module,
+			 copy_basic(entity_basic(decl))
+			 );
+		      pips_debug(3, "new declaration: %s\n", entity_name(new_decl));
+		      hash_put(renamings, decl, new_decl); // add the correspondance in renamings table for further actual renaming
+		      set_add_element(new_decls, new_decls, new_decl);
+
+		      // after the merge, the new entity is directly declared in the parent sequence:
+		      set_add_element(parent_proper_decls, parent_proper_decls, new_decl);
+
+		      ifdebug(4) {
+			pips_debug(4, "stmt after declaration change:\n");
+			print_statement(stmt);
+		      }
+		    }
+		  else
+		    {
+		      pips_debug(3, "no need to change declaration\n");
+		      // after the merge, the entity is directly declared in the parent sequence:
+		      set_add_element(parent_proper_decls, parent_proper_decls, decl);
+		    }
+
+		}
+
+	      if (renamings_p)
+		{
+		  replace_entities(stmt, renamings); //does not change the declarations themselves
+		  sequence_proper_declarations_rename_in_place(internal_sequence, renamings);
+		}
+	      hash_table_free(renamings);
+	    }
+
+	  // merge the comments of the original internal sequence with the comments
+	  // of the first statement of the sequence
+	  // well, currently the comments attached to a sequence are lost by the
+	  // parser, so this is unuseful and not tested.
+	  string internal_sequence_comments = statement_comments(stmt);
+
+	  if (!empty_comments_p(internal_sequence_comments))
+	    {
+	      statement first_stmt = STATEMENT(CAR(l_stmt_to_be_merged));
+	      string first_stmt_comments = statement_comments(first_stmt);
+	      if (empty_comments_p(first_stmt_comments))
+		{
+		  statement_comments(first_stmt) = internal_sequence_comments;
+		  statement_comments(stmt) = string_undefined;
+		}
+	      else
+		{
+		  statement_comments(first_stmt) =
+		    strdup(concatenate(internal_sequence_comments, first_stmt_comments));
+		  free(first_stmt_comments);
+		  free(internal_sequence_comments);
+		}
+	    }
+
+	  // merge the list with already merged statement, in the right order
+	  l_new_stmts = gen_nconc(l_new_stmts, l_stmt_to_be_merged);
+
+	  // free the original statement, but not its internal statements
+	  sequence_statements(internal_sequence) = NIL;
+	  free_statement(stmt);
+	  set_free(internal_proper_decls);
+
+	}
+      else
+	{
+	  pips_debug(3, "not a sequence -> just push\n");
+	  l_new_stmts = gen_nconc(l_new_stmts, CONS(STATEMENT, stmt, NIL));
+	}
+    }
+
+  gen_free_list(l_stmts);
+  sequence_statements(seq) = l_new_stmts;
+
+  ifdebug(2) {
+    pips_debug(2, "Parent statement before adding new declarations:\n");
+    print_statement(parent_statement);
+  }
+
+  // for consistency: add new entities to module and current_statement declarations
+  SET_FOREACH(entity, decl, new_decls)
+    {
+      pips_debug(3, "adding new declaration for %s\n", entity_name(decl));
+      AddLocalEntityToDeclarationsOnly(decl, module, parent_statement);
+    }
+
+  ifdebug(2) {
+    pips_debug(2, "Parent statement at the end:\n");
+    print_statement(parent_statement);
+  }
+}
+
+/**
+ * recursively merge unecessarily nested sequences into the outermost sequence
+ * do not merge accross loops, tests, unstructured...
+ *
+ * @param stmt is the uppermost statement in the HCFG from which the merge is performed.
+ *
+ */
+void
+merge_statement_sequences(statement stmt)
+{
+
+  debug_on("MERGE_SEQUENCES_DEBUG_LEVEL");
+  gen_recurse(stmt, sequence_domain, gen_true, sequence_merge_internal_sequences);
+  debug_off();
+
+}
+
+/**
+ * recursively merge unecessarily nested sequences into the outermost sequence
+ * do not merge accross loops, tests, unstructured...
+ *
+ * @param module_name module considered
+ *
+ * @return true (never fails)
+ */
+bool
+merge_sequences(char* module_name)
+{
+   /* Get the module ressource */
+   entity module = module_name_to_entity( module_name );
+   statement module_statement =
+       (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+
+   set_current_module_entity( module );
+   set_current_module_statement( module_statement );
+
+   merge_statement_sequences(module_statement);
+
+   module_reorder(module_statement);
+   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
+
+   reset_current_module_entity();
+   reset_current_module_statement();
+
+   return true;
+}
+
