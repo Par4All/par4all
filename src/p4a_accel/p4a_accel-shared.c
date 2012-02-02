@@ -22,6 +22,10 @@ int p4a_debug_level = 0;
 int p4a_runtime_initialized = 0;
 
 void p4a_main_init() {
+  if(p4a_runtime_initialized) {
+    P4A_dump_message("Runtime is initialized more than one time, it probably not intended ! Please report.\n");
+  }
+
   p4a_runtime_initialized = 1;
   checkStackSize();
 
