@@ -2744,6 +2744,7 @@ list entities_to_expressions(list l_ent) {
   FOREACH(ENTITY,e,l_ent) {
     l_exp = CONS(EXPRESSION, entity_to_expression(e), l_exp);
   }
+  l_exp = gen_nreverse(l_exp);
   return(l_exp);
 }
 
