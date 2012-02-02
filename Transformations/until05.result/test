@@ -1,17 +1,18 @@
 ### initial code
 void until05()
 {
-   // BEGIN BLOCK
    int old, new;
    do {
-      // BEGIN BLOCK
       old = new;
       foo(&new);
-      // END BLOCK
+   }
+   while (old!=new);
+   do {
+      old = new;
+      bar(&new);
    }
    while (old!=new);
    printf("%d", old);
-   // END BLOCK
 }
 ### Preconditions
 
@@ -22,10 +23,6 @@ void until05()
 
 //  P() {}
 
-   // BEGIN BLOCK
-
-//  P() {}
-
    int old, new;
 
 //  P(new,old) {}
@@ -34,37 +31,43 @@ void until05()
 
 //  P(new,old) {}
 
-      // BEGIN BLOCK
-
-//  P(new,old) {}
-
       old = new;
 
 //  P(new,old) {new==old}
 
       foo(&new);
-      // END BLOCK
+   }
+   while (old!=new);
+
+//  P(new,old) {new==old}
+
+   do {
+
+//  P(new,old) {new==old}
+
+      old = new;
+
+//  P(new,old) {new==old}
+
+      bar(&new);
    }
    while (old!=new);
 
 //  P(new,old) {new==old}
 
    printf("%d", old);
-   // END BLOCK
 }
 ### suppress dead code
 void until05()
 {
-   // BEGIN BLOCK
    int old, new;
    do {
-      // BEGIN BLOCK
       old = new;
       foo(&new);
-      // END BLOCK
    }
    while (old!=new);
+   old = new;
+   bar(&new);
    printf("%d", old);
-   // END BLOCK
 }
 
