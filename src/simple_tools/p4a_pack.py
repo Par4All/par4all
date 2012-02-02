@@ -98,7 +98,7 @@ def add_module_options(parser):
         help = "Publish only a given file (.deb, tgz, stgz or even whatever for testing) without rebuilding it. Several files are allowed by using this option several times.")
 
     group.add_option("--retry-publish", action = "store_true",  default = False,
-        help = "Retry to publish only files (.deb and/or tgz and/or stgz) from the local directory without rebuilding them. Be sure from what is in your local directory!")
+        help = "Retry to publish only files (.deb and/or tgz and/or stgz) from the local directory without rebuilding them. Be sure from what is in your local directory! To be used with p4a_pack and not with p4a_coffee")
 
     group.add_option("--release", dest = "development", action = "store_false", default = True,
         help = "When publishing, put the packages in release directories instead of development ones.")
