@@ -1,0 +1,74 @@
+### initial code
+void until04()
+{
+   // BEGIN BLOCK
+   int i = 1;
+//:   BEGIN UNSTRUCTURED
+   // BEGIN BLOCK
+l1:   do {
+l2:      i++;
+   }
+   while (0);
+   printf("%d", i);
+   // END BLOCK
+   goto l1;
+//:   END UNSTRUCTURED
+   // END BLOCK
+}
+### Preconditions
+
+//  P() {}
+
+void until04()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+//:   BEGIN UNSTRUCTURED
+
+//  P(i) {1<=i}
+
+   // BEGIN BLOCK
+
+//  P(i) {1<=i}
+
+l1:   do {
+
+//  P(i) {1<=i}
+
+l2:      i++;
+   }
+   while (0);
+
+//  P(i) {2<=i}
+
+   printf("%d", i);
+   // END BLOCK
+   goto l1;
+//:   END UNSTRUCTURED
+   // END BLOCK
+}
+### suppress dead code
+void until04()
+{
+   // BEGIN BLOCK
+   int i = 1;
+//:   BEGIN UNSTRUCTURED
+l99999:   ;
+   // BEGIN BLOCK
+   i++;
+   printf("%d", i);
+   // END BLOCK
+   goto l99999;
+//:   END UNSTRUCTURED
+   // END BLOCK
+}
+

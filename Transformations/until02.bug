@@ -1,0 +1,4 @@
+clean_up_sequences_internal() does not take declarations into
+account. In case of user name conflict, some variables should be
+renamed or the inner sequence should not be merged into the outer one.
+

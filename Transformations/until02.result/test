@@ -1,0 +1,77 @@
+### initial code
+void until02()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j = 3;
+   i++;
+   do {
+      // BEGIN BLOCK
+      int j = 2;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+   printf("%d", i);
+   // END BLOCK
+}
+### Preconditions
+
+//  P() {}
+
+void until02()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   int j = 3;
+
+//  P(0`j,i) {0`j==3, i==1}
+
+   i++;
+
+//  P(0`j,i) {0`j==3, i==2}
+
+   do {
+
+//  P(0`j,i) {0`j==3, i==2}
+
+      // BEGIN BLOCK
+
+//  P(0`j,i) {0`j==3, i==2}
+
+      int j = 2;
+
+//  P(0`1`j,0`j,i) {0`1`j==2, 0`j==3, i==2}
+
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+//  P(0`j,i) {0`j==3, i==4}
+
+   printf("%d", i);
+   // END BLOCK
+}
+### suppress dead code
+void until02()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j = 3;
+   i++;
+   int j = 2;
+   i += j;
+   printf("%d", i);
+   // END BLOCK
+}
+
