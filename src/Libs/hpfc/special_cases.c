@@ -988,7 +988,7 @@ statement generate_full_copy(reference left, reference right)
     
     /* indexes are reused. bounds are taken from the node entity declaration.
      */
-    lindexes = expression_list_to_entity_list(reference_indices(left));
+    lindexes = expressions_to_entities(reference_indices(left));
     ld = variable_dimensions(type_variable(entity_type(new_array)));
 
     for(i=1, l=lindexes; i<=ndim; i++, POP(lindexes), POP(ld))

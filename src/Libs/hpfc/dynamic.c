@@ -1594,7 +1594,7 @@ statement generate_copy_loop_nest(
 		     hpfc_new_variable(module, MakeBasic(is_basic_int)),
 		     indexes);
 
-    idx_expr = entity_list_to_expression_list(indexes);
+    idx_expr = entities_to_expressions(indexes);
 
     /*  builds the assign statement to put in the body.
      *  TRG(indexes) = SRC(indexes)
