@@ -944,7 +944,7 @@ dead_statement_rewrite(statement s)
       list idl = statement_to_direct_declarations(s);
       gen_free_list(dl);
       statement_declarations(s) = idl;
-       break;
+      break;
    }
    case is_instruction_loop:
      break;
@@ -952,9 +952,16 @@ dead_statement_rewrite(statement s)
      ;
    case is_instruction_whileloop:
      {
-     whileloop wl = instruction_whileloop(i);
-     evaluation e = whileloop_evaluation(wl);
-     if(evaluation_after_p(e)) {
+       /* FI: This is buggy code because there is no way to know if
+	* preconditions are used or not; boolean use_precondition_p is
+	* not propagated; one way to do it might be to check if the
+	* transformer and precondition maps are allocated or not...
+	*
+	* Also, RK's statistics are not updated...
+       */
+       whileloop wl = instruction_whileloop(i);
+       evaluation e = whileloop_evaluation(wl);
+       if(evaluation_after_p(e)) {
        /* See if the repeat until is only executed once */
        /* Issue: the precondition holding before the condition is
 	  evaluated has not been stored */
