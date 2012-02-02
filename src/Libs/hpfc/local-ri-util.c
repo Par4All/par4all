@@ -61,13 +61,5 @@ entity e;
     return false; /* else not found */
 }
 
-reference expression_to_reference(e)
-expression e;
-{
-    syntax s = expression_syntax(e);
-    message_assert("reference", syntax_reference_p(s));
-    return syntax_reference(s);
-}
-
 /* that is all
  */
