@@ -947,10 +947,59 @@ dead_statement_rewrite(statement s)
        break;
    }
    case is_instruction_loop:
+     break;
    case is_instruction_forloop:
+     ;
    case is_instruction_whileloop:
-       break;
-
+     {
+     whileloop wl = instruction_whileloop(i);
+     evaluation e = whileloop_evaluation(wl);
+     if(evaluation_after_p(e)) {
+       /* See if the repeat until is only executed once */
+       /* Issue: the precondition holding before the condition is
+	  evaluated has not been stored */
+       statement wb = whileloop_body(wl);
+       transformer prec = load_statement_precondition(s);
+       transformer tf = load_statement_transformer(wb);
+       transformer tp = transformer_apply(tf, prec); // test precondition
+       expression c = whileloop_condition(wl);
+       transformer ct = condition_to_transformer(c, tp, true);
+       if(transformer_empty_p(ct)) {
+	 /* The condition is never true and the until loop can be replaced by its body */
+	 statement_instruction(s) = statement_instruction(wb);
+	 /* We should try to preserve labels and comments and statement numbers...*/
+	 statement_number(s) = statement_number(wb);
+	 /* An issue if we have a label for s and a label for wb... */
+	 ; // FI: to be seen later, wb is unlikely to have a label...
+	 /* Concatenate comments... */
+	 // FI: to be seen later... The parser seems to junk the loop comments
+	 string sc = statement_comments(s);
+	 string wbc = statement_comments(wb); // will be freed with wb
+	 string nc;
+	 if(empty_comments_p(sc)) {
+	   if(empty_comments_p(wbc))
+	     nc = empty_comments;
+	   else
+	     nc = strdup(wbc);
+	 }
+	 else {
+	   if(empty_comments_p(wbc))
+	     nc = strdup(sc);
+	   else
+	     nc = strdup(concatenate(sc, wbc, NULL)); // new comment
+	   free(sc);
+	 }
+	 statement_comments(s) = empty_comments;
+	 insert_comments_to_statement(s, nc);
+	 /* Get rid of obsolete pieces of data structures */
+	 whileloop_body(wl) = statement_undefined;
+	 free_instruction(i);
+	 statement_instruction(wb) = instruction_undefined;
+	 free_statement(wb);
+       }
+     }
+     break;
+     }
    case is_instruction_test:
    {
        statement st_true, st_false;
@@ -990,7 +1039,8 @@ dead_statement_rewrite(statement s)
        break;
    }
 
-   /* If we have now a sequence, clean it up: */
+   /* If we have now a sequence, clean it up, but be careful with
+      declarations and user name conflicts... Bug here. See Transformations/until02.c */
    clean_up_sequences_internal(s);
 
    pips_debug(2, "End for statement %td (%td, %td)\n",
@@ -1263,10 +1313,17 @@ bool generic_simplify_control(string mod_name, bool use_precondition_p)
   set_proper_rw_effects((statement_effects)
       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
-  if(use_precondition_p)
+  if(use_precondition_p) {
+    /* Tnsformers are useful to derive preconditions for control
+       points where they are not stored, e.g. end of body in until
+       loops */
+    set_transformer_map((statement_mapping)
+			 db_get_memory_resource(DBR_TRANSFORMERS,
+						mod_name, true));
     set_precondition_map((statement_mapping)
 			 db_get_memory_resource(DBR_PRECONDITIONS,
 						mod_name, true));
+  }
 
   set_cumulated_rw_effects((statement_effects)
       db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
@@ -1303,8 +1360,10 @@ bool generic_simplify_control(string mod_name, bool use_precondition_p)
 
   reset_current_module_statement();
   reset_current_module_entity();
-  if(use_precondition_p)
+  if(use_precondition_p) {
+    reset_transformer_map();
     reset_precondition_map();
+  }
   reset_proper_rw_effects();
   ifdebug(1) {
     if(use_precondition_p)
