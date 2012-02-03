@@ -2486,13 +2486,17 @@ entity make_entity_copy(entity e)
 
    @return the new entity.
 */
-entity make_entity_copy_with_new_name(entity e,
-				      string global_new_name,
-				      bool move_initialization_p)
+entity generic_make_entity_copy_with_new_name(entity e,
+					      string global_new_name,
+					      bool systematically_add_suffix,
+					      bool move_initialization_p)
 {
   entity ne = entity_undefined;
   char * variable_name = strdup(global_new_name);
   int number = 0;
+
+  if (systematically_add_suffix)
+    asprintf(&variable_name, "%s_%d", global_new_name, number++);
 
   /* Find the first matching non-already existent variable name: */
   while(gen_find_tabulated(variable_name, entity_domain)
@@ -2551,6 +2555,30 @@ entity make_entity_copy_with_new_name(entity e,
   }
   return ne;
 }
+
+
+entity make_entity_copy_with_new_name(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
+{
+  return generic_make_entity_copy_with_new_name(e,
+						global_new_name,
+						false,
+						move_initialization_p);
+}
+
+entity make_entity_copy_with_new_name_and_suffix(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
+{
+  return generic_make_entity_copy_with_new_name(e,
+						global_new_name,
+						true,
+						move_initialization_p);
+}
+
+
+
 
 /* FI: it is assumed that thread safe entities are invariant with
    respect to workspaces. Another mechanism will be needed if user
@@ -2741,28 +2769,13 @@ commutative_call_p(call c)
  **/
 list entities_to_expressions(list l_ent) {
   list l_exp = NIL;
-  for(; !ENDP(l_ent); POP(l_ent)) {
-    entity ent = ENTITY(CAR(l_ent));
-    l_exp = gen_nconc(l_exp,
-		      CONS(EXPRESSION,
-			   make_expression(make_syntax(is_syntax_reference,
-						       make_reference(ent,
-								      NIL)),
-					   normalized_undefined),
-			   NIL));
+  FOREACH(ENTITY,e,l_ent) {
+    l_exp = CONS(EXPRESSION, entity_to_expression(e), l_exp);
   }
+  l_exp = gen_nreverse(l_exp);
   return(l_exp);
-
-  /*PIER My implementation*/
-  /*   FOREACH (ENTITY, e, args_ent) { */
-  /*     reference ref = make_reference (e, NULL); */
-  /*     syntax s = make_syntax_reference (ref); */
-  /*     expression expr = make_expression (s, normalized_undefined); */
-  /*     // append the new expr to the list */
-  /*     args_expr = gen_expression_cons (expr, args_expr); */
-  /*   } */
-
 }
+
 
 entity find_enum_of_member(entity m)
 {

@@ -1,0 +1,27 @@
+delete until03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create until03 until03.c
+
+echo ### parsed code
+display PARSED_PRINTED_FILE
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### Preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SIMPLIFY_CONTROL
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+
+delete until03

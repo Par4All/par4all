@@ -8,6 +8,7 @@ from pyramid.events         import subscriber, BeforeRender
 from pyramid.session        import UnencryptedCookieSessionFactoryConfig
 
 from   security             import groupfinder
+from   utils                import getSiteSections
 import helpers
 
 
@@ -40,6 +41,9 @@ def main(global_config, **settings):
                            authorization_policy  = authz_policy,
                            session_factory       = session_factory,
                            )
+
+    # Request properties
+    config.set_request_property(getSiteSections, 'site_sections', reify=True)
 
     # Static routes
     config.add_static_view('static', 'static', cache_max_age=3600)

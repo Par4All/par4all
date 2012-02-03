@@ -1,16 +1,16 @@
 [
 
- { "title":   "1. TRY PIPS",
+ { "title":   "1. Try PIPS",
    "path":    "tools",
    "advmode": true
  },
 
- { "title":   "2. TUTORIAL",
+ { "title":   "2. Tutorials",
    "path":    "tutorials",
    "advmode": false
  },
 
- { "title":   "3. FULL CONTROL",
+ { "title":   "3. Full Control",
    "path":    "full",
    "advmode": false
  }

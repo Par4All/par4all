@@ -64,11 +64,12 @@ function switch_buttons() {
 
 function switch_adv_mode() {
     if (advanced) {
-	$('#adv-form').hide();
-    } else {
 	$('#adv-form').fadeIn();
+	$('#adv-button').button('toggle');
+    } else {
+	$('#adv-form').hide();
+	$('#basic-button').button('toggle');
     }
-    $('#adv-button').html(advanced ? 'advanced mode' : 'basic mode');
 }
 
 function deactivate_graph_buttons() {
@@ -410,7 +411,6 @@ function catch_tab(item) {
 *********************************************************************/
 
 function resize(direction) {
-    changeFontSize('body', direction);
     changeFontSize('textarea', direction);
     changeFontSize('.highlight', direction);
     changeFontSize('.lineno', direction);

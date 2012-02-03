@@ -1,0 +1,169 @@
+### parsed code
+void until03()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   i++;
+   do {
+      // BEGIN BLOCK
+      int j = 1;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+   do {
+      // BEGIN BLOCK
+      /* Second loop body */
+      int j = 2;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+   do {
+      // BEGIN BLOCK
+      /* Third loop body */
+      int j = 3;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+   printf("%d", i);
+   // END BLOCK
+}
+### initial code
+void until03()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   i++;
+   do {
+      // BEGIN BLOCK
+      int j = 1;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+   do {
+      // BEGIN BLOCK
+      /* Second loop body */
+      int j = 2;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+   do {
+      // BEGIN BLOCK
+      /* Third loop body */
+      int j = 3;
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+   printf("%d", i);
+   // END BLOCK
+}
+### Preconditions
+
+//  P() {}
+
+void until03()
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   i++;
+
+//  P(i) {i==2}
+
+   do {
+
+//  P(i) {i==2}
+
+      // BEGIN BLOCK
+
+//  P(i) {i==2}
+
+      int j = 1;
+
+//  P(0`1`j,i) {0`1`j==1, i==2}
+
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+//  P(i) {i==3}
+
+   do {
+
+//  P(i) {i==3}
+
+      // BEGIN BLOCK
+      /* Second loop body */
+
+//  P(i) {i==3}
+
+      int j = 2;
+
+//  P(0`2`j,i) {0`2`j==2, i==3}
+
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+//  P(i) {i==5}
+
+   do {
+
+//  P(i) {i==5}
+
+      // BEGIN BLOCK
+      /* Third loop body */
+
+//  P(i) {i==5}
+
+      int j = 3;
+
+//  P(0`3`j,i) {0`3`j==3, i==5}
+
+      i += j;
+      // END BLOCK
+   }
+   while (0);
+
+//  P(i) {i==8}
+
+
+   printf("%d", i);
+   // END BLOCK
+}
+### suppress dead code
+void until03()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   i++;
+   int j = 1;
+   i += j;
+   /* Second loop body */
+   int j = 2;
+   i += j;
+   /* Third loop body */
+   int j = 3;
+   i += j;
+
+   printf("%d", i);
+   // END BLOCK
+}
+
