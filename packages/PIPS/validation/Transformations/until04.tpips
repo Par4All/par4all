@@ -1,0 +1,24 @@
+delete until04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create until04 until04.c
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### Preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SIMPLIFY_CONTROL
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+
+delete until04

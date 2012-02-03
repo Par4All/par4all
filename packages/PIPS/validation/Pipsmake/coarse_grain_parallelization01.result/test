@@ -1,0 +1,45 @@
+int main(int argc, char **argv)
+{
+   int i, j;
+   int n = atoi(argv[1]);
+   int a[n][n];
+   {
+      int i;
+
+      for(i = 1; i <= n-1; i += 1) {
+         int j;
+         for(j = i; j <= n-1; j += 1)
+            a[i][j] = a[i-1][j-1]+a[i][j-1];
+      }
+   }
+}
+  BOOTSTRAP                      building   ENTITIES()
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(coarse_grain_parallelization01!)
+  C_PARSER                       building   PARSED_CODE(main)
+                                 building   CALLEES(main)
+  CONTROLIZER                    building   CODE(main)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(main)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(main)
+  CONTROLIZER                    building   CODE(coarse_grain_parallelization01!)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(coarse_grain_parallelization01!)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(coarse_grain_parallelization01!)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(coarse_grain_parallelization01!)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(coarse_grain_parallelization01!)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(main)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(main)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(main)
+  CALLGRAPH                      building   CALLERS(coarse_grain_parallelization01!)
+                                 building   CALLERS(main)
+                                 building   HEIGHT(coarse_grain_parallelization01!)
+                                 building   HEIGHT(main)
+                                 building   DEPTH(coarse_grain_parallelization01!)
+                                 building   DEPTH(main)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(main)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(main)
+  MUST_REGIONS                   building   PROPER_REGIONS(main)
+                                 building   REGIONS(main)
+                                 building   INV_REGIONS(main)
+  COARSE_GRAIN_PARALLELIZATION   updating   CODE(main)
+  PRINT_CODE                     building   PRINTED_FILE(main)
+  COARSE_GRAIN_PARALLELIZATION   updating   CODE(main)
