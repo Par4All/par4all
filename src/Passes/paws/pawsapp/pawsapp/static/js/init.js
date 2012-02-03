@@ -62,10 +62,11 @@ $(function(){
 
     // Switch between modes
 
-    $('#adv-button').click(function(ev) {
+    $('#mode-buttons').click(function(ev) {
 	ev.preventDefault();
-	switch_adv_mode();
 	advanced = !advanced;
+	switch_adv_mode();
     });
+    switch_adv_mode();
 
 });
