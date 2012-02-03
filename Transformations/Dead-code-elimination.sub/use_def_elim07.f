@@ -4,14 +4,18 @@ C
 C     If the line j = j + c is removed, c = c + 1 becomes useless...
 
        SUBROUTINE COUNT(J)
-       STATIC C
+       integer C
+       data C /0/
+       save C
        J = J + C
        C = C + 1
        RETURN
        END
 
        SUBROUTINE LOST_COUNT(J)
-       STATIC C
+       integer C
+       data C /0/
+       save C
        C = C + 1
        RETURN
        END
