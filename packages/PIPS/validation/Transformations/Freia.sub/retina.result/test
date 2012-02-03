@@ -430,24 +430,21 @@ int main(int argc, char *argv[])
    _return4 = err_2;
 
    ret_9 = freia_aipo_global_vol(out, &volcurrent);
-   do {
-      volprevious = volcurrent;
-      
-      
-      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
-      i_16 = 1;
-      
-      
-      _return12 = 0;
-      ret_10 = 0;
-      ret_10 |= freia_aipo_inf(out, out, in);
-      
-      
-      _return7 = ret_10;
-      ret_9 |= _return7;
-      ret_9 |= freia_aipo_global_vol(out, &volcurrent);
-   }
-   while (volcurrent!=volprevious);
+   volprevious = volcurrent;
+   
+   
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
+   i_16 = 1;
+   
+   
+   _return12 = 0;
+   ret_10 = 0;
+   ret_10 |= freia_aipo_inf(out, out, in);
+   
+   
+   _return7 = ret_10;
+   ret_9 |= _return7;
+   ret_9 |= freia_aipo_global_vol(out, &volcurrent);
    
    
    _return0 = ret_9;
