@@ -2486,13 +2486,17 @@ entity make_entity_copy(entity e)
 
    @return the new entity.
 */
-entity make_entity_copy_with_new_name(entity e,
-				      string global_new_name,
-				      bool move_initialization_p)
+entity generic_make_entity_copy_with_new_name(entity e,
+					      string global_new_name,
+					      bool systematically_add_suffix,
+					      bool move_initialization_p)
 {
   entity ne = entity_undefined;
   char * variable_name = strdup(global_new_name);
   int number = 0;
+
+  if (systematically_add_suffix)
+    asprintf(&variable_name, "%s_%d", global_new_name, number++);
 
   /* Find the first matching non-already existent variable name: */
   while(gen_find_tabulated(variable_name, entity_domain)
@@ -2551,6 +2555,30 @@ entity make_entity_copy_with_new_name(entity e,
   }
   return ne;
 }
+
+
+entity make_entity_copy_with_new_name(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
+{
+  return generic_make_entity_copy_with_new_name(e,
+						global_new_name,
+						false,
+						move_initialization_p);
+}
+
+entity make_entity_copy_with_new_name_and_suffix(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
+{
+  return generic_make_entity_copy_with_new_name(e,
+						global_new_name,
+						true,
+						move_initialization_p);
+}
+
+
+
 
 /* FI: it is assumed that thread safe entities are invariant with
    respect to workspaces. Another mechanism will be needed if user

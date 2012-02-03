@@ -1517,7 +1517,6 @@ sequence_proper_declarations_rename_in_place(sequence seq, hash_table renamings)
 		{
 		  pips_debug(5, "replacing entity %s by %s\n", entity_name(decl), entity_name(new_decl));
 		  CAR(l_decl).p = (gen_chunkp) new_decl;
-		  entity_initial(new_decl) = copy_value(entity_initial(decl));
 		  hash_del(renamings, decl);
 		}
 	      POP(l_decl);
@@ -1547,8 +1546,9 @@ sequence_merge_internal_sequences(sequence seq)
     print_statement(parent_statement);
   }
 
-  set parent_proper_decls = sequence_proper_declarations(seq); // declarations from the statements directly in the sequence
-  set new_decls = set_make(set_pointer); // newly declared entities if need be.
+  list l_parent_referenced_entities = statement_to_referenced_entities(parent_statement);
+
+  list l_new_decls = NIL; // newly declared entities if need be.
 
   FOREACH(STATEMENT, stmt, l_stmts)
     {
@@ -1569,7 +1569,6 @@ sequence_merge_internal_sequences(sequence seq)
 	  if (!set_empty_p(internal_proper_decls))
 	    {
 	      hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
-	      bool renamings_p = false;
 
 	      SET_FOREACH(entity, decl, internal_proper_decls)
 		{
@@ -1577,53 +1576,59 @@ sequence_merge_internal_sequences(sequence seq)
 
 		  // check if there is already a declaration with the same user name
 		  // in the englobing sequence seq
-		  const char * decl_name = entity_user_name(decl);
+		  const char * decl_user_name = entity_user_name(decl);
 		  bool parent_decl_with_same_name = false;
-		  SET_FOREACH(entity, parent_decl, parent_proper_decls)
+		  FOREACH(ENTITY, parent_decl, l_parent_referenced_entities)
 		    {
 		      // arghh, this is costly, we should at least memoize user_names...
-		      if (strcmp(entity_user_name(parent_decl), decl_name) == 0)
+		      if (parent_decl != decl
+			  && strcmp(entity_user_name(parent_decl), decl_user_name) == 0)
 			{
 			  parent_decl_with_same_name = true;
 			  break;
 			}
 		    }
 
+		  // find another non-conflicting name and take care of scope
+		  string decl_name = entity_name(decl);
+		  string decl_without_module_and_scope = strrchr(decl_name, BLOCK_SEP_CHAR);
+
+		  if (decl_without_module_and_scope ==NULL)
+		    pips_internal_error("non consistent variable scope\n");
+		  pips_debug(6, "decl name without module+scope: %s\n", decl_without_module_and_scope);
+		  // duplicate the scope, minus the two last characters, which represent the internal
+		  // sequence
+		  string module_and_new_scope = strndup(decl_name, decl_without_module_and_scope-decl_name-1);
+		  pips_debug(6, "module+scope of new decl: %s\n", module_and_new_scope);
+
+		  string new_name = strdup(concatenate(module_and_new_scope, decl_user_name, NULL));
+		  pips_debug(6, "new decl name: %s\n", new_name);
+		  free(module_and_new_scope);
+
+		  entity new_decl = entity_undefined;
 		  if (parent_decl_with_same_name)
-		    {
-		      renamings_p = true;
-		      // I should take care of scope here
-		      entity new_decl = make_new_scalar_variable_with_prefix
-			(entity_user_name(decl),
-			 module,
-			 copy_basic(entity_basic(decl))
-			 );
-		      pips_debug(3, "new declaration: %s\n", entity_name(new_decl));
-		      hash_put(renamings, decl, new_decl); // add the correspondance in renamings table for further actual renaming
-		      set_add_element(new_decls, new_decls, new_decl);
-
-		      // after the merge, the new entity is directly declared in the parent sequence:
-		      set_add_element(parent_proper_decls, parent_proper_decls, new_decl);
-
-		      ifdebug(4) {
-			pips_debug(4, "stmt after declaration change:\n");
-			print_statement(stmt);
-		      }
-		    }
+		    new_decl = make_entity_copy_with_new_name_and_suffix(decl, new_name, true);
 		  else
-		    {
-		      pips_debug(3, "no need to change declaration\n");
-		      // after the merge, the entity is directly declared in the parent sequence:
-		      set_add_element(parent_proper_decls, parent_proper_decls, decl);
-		    }
+		    new_decl = make_entity_copy_with_new_name(decl, new_name, true);
 
+		  pips_debug(3, "new declaration: %s\n", entity_name(new_decl));
+		  hash_put(renamings, decl, new_decl); // add the correspondance in renamings table for further actual renaming
+		  l_new_decls = CONS(ENTITY, new_decl, l_new_decls);
+
+		  // after the merge, the new entity is used in the parent sequence:
+		  l_parent_referenced_entities = CONS(ENTITY, new_decl, l_parent_referenced_entities);
+		  // the old entity is not used anymore in the module and in the parent sequence
+		  gen_remove(&entity_declarations(module), decl);
+		  gen_remove(&statement_declarations(parent_statement), decl);
+		  gen_remove(&l_parent_referenced_entities,decl);
 		}
 
-	      if (renamings_p)
-		{
-		  replace_entities(stmt, renamings); //does not change the declarations themselves
-		  sequence_proper_declarations_rename_in_place(internal_sequence, renamings);
-		}
+	      replace_entities(stmt, renamings); //does not change the declarations themselves
+	      sequence_proper_declarations_rename_in_place(internal_sequence, renamings);
+	      ifdebug(4) {
+		pips_debug(4, "stmt after declaration changes:\n");
+		    print_statement(stmt);
+	      }
 	      hash_table_free(renamings);
 	    }
 
@@ -1670,13 +1675,15 @@ sequence_merge_internal_sequences(sequence seq)
   gen_free_list(l_stmts);
   sequence_statements(seq) = l_new_stmts;
 
+  gen_free_list(l_parent_referenced_entities);
+
   ifdebug(2) {
     pips_debug(2, "Parent statement before adding new declarations:\n");
     print_statement(parent_statement);
   }
 
   // for consistency: add new entities to module and current_statement declarations
-  SET_FOREACH(entity, decl, new_decls)
+  FOREACH(entity, decl, l_new_decls)
     {
       pips_debug(3, "adding new declaration for %s\n", entity_name(decl));
       AddLocalEntityToDeclarationsOnly(decl, module, parent_statement);
