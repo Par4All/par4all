@@ -1302,7 +1302,7 @@ restart_loop: ;
       list block_iter = block_list;
       list prev_block_iter = NIL;
       while(block_iter != NULL) {
-        fusion_block block = (fusion_block)REFCAR(block_iter);
+        fusion_block block = (fusion_block)CAR(block_iter).p;
 
         if(block->num < 0) { // to be removed
           if(prev_block_iter==NIL) {

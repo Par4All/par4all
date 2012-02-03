@@ -32,14 +32,15 @@ def _parse_lst_file(lst_file, callback):
     """Parse a .lst file
     """
     out = {}
-    for line in file(lst_file):
-        match = re.match(r'<<(\w+)>>', line)
-        if match: # Section header
-            section = match.group(1)
-            out[section] = []
-        else:     # Property line
-            p = line.replace('\n', '').split(';')
-            out[section].append(callback(p, section))
+    if os.path.exists(lst_file):
+        for line in file(lst_file):
+            match = re.match(r'<<(\w+)>>', line)
+            if match: # Section header
+                section = match.group(1)
+                out[section] = []
+            else:     # Property line
+                p = line.replace('\n', '').split(';')
+                out[section].append(callback(p, section))
     return out
 
 
@@ -92,13 +93,16 @@ def tool(request):
     """Generic tool view (basic and advanced modes).
     """
     tool     = os.path.basename(request.matchdict['tool'])           # (sanitized)
+    section  = [ s for s in request.site_sections if s['path']=="tools" ][0]
+    entry    = [ e for e in section['entries'] if e['name'] == tool ][0]
     advanced = bool(request.matched_route.name.endswith('advanced'))
     props    = _get_props(request)
     analyses = _get_analyses(request)
     phases   = _get_phases(request)
 
     return dict(tool     = tool,
-                descr    = toolName[tool],
+                name     = toolName[tool],
+                descr    = entry['descr'],
                 advanced = advanced,
                 props    = props,
                 analyses = analyses,

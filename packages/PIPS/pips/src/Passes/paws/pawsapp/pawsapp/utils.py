@@ -4,6 +4,8 @@
 PAWS utility functions
 
 """
+import os, json
+
 
 # Supported languages
 languages = {
@@ -38,3 +40,22 @@ class FortranDecoder(object):
     @classmethod
     def analyze(cls, code):
         return len(filter(lambda t: t in code.lower(), cls.tokens)) * 100.0 / len(cls.tokens)
+
+#
+#
+#
+
+def getSiteSections(request):
+    """Compute site sections for the menu bar and home page.
+    """
+    valid_path = request.registry.settings['paws.validation']
+    sections   = json.load(file(os.path.join(valid_path, 'main', 'functionalities.txt')))
+    for s in sections:
+        path = os.path.join(valid_path, os.path.basename(s['path']))
+        s['entries'] = [ { 'name'  : t,
+                           'descr' : file(os.path.join(path, t, '%s.txt' % t)).read(),
+                           }
+                         for t in os.listdir(path) if not t.startswith('.') 
+                         ]
+
+    return sections

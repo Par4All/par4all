@@ -840,8 +840,10 @@ bool localize_declaration(char *mod_name) {
            with no corresponding effects in loop body (e.g. entities
            already private in inner loops and not used in other
            statements of the current loop body).
+    @param l is the loop to operate one
+    @param changed track if the list have been changed
  */
-static void update_loop_locals(loop l)
+static void update_loop_locals(loop l, bool *changed)
 {
   statement body = loop_body(l);
   list body_effects = load_rw_effects_list(body);
@@ -850,16 +852,19 @@ static void update_loop_locals(loop l)
     print_effects(body_effects);
   }
   list new_loop_locals = NIL;
-  FOREACH(ENTITY, private_variable, loop_locals(l))
-    {
-      pips_debug(1, "considering entity %s\n",
-                 entity_local_name(private_variable));
-      if (effects_may_read_or_write_memory_paths_from_entity_p(body_effects, private_variable))
-        {
-          pips_debug(1, "keeping entity\n");
-          new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
-        }
+  FOREACH(ENTITY, private_variable, loop_locals(l)) {
+    pips_debug(1, "considering entity %s\n",
+               entity_local_name(private_variable));
+    if(effects_may_read_or_write_memory_paths_from_entity_p(body_effects,
+                                                            private_variable)) {
+      pips_debug(1, "keeping entity\n");
+      new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
+    } else {
+      // This is a change :)
+      *changed = true;
     }
+  }
+
   gen_free_list(loop_locals(l));
   loop_locals(l) = new_loop_locals;
   ifdebug(1) {
@@ -896,10 +901,11 @@ bool update_loops_locals(const char* module_name, statement module_stat)
   set_methods_for_simple_effects();
   rw_effects_of_module_statement(module_stat);
 
-  gen_recurse(module_stat,
+  bool changed = false; // Keep track of a change
+  gen_context_recurse(module_stat,&changed,
               loop_domain, gen_true, update_loop_locals);
 
-  pips_debug(1, "end\n");
+  pips_debug(1, "end, %s\n",(changed) ? "There was at least a change": "There was no change at all");
   debug_off();
 
   /* Hope that these close actually free the effects in the mappings */
@@ -909,7 +915,7 @@ bool update_loops_locals(const char* module_name, statement module_stat)
   generic_effects_reset_all_methods();
   reset_current_module_entity();
 
-  return true;
+  return changed;
 }
 
 

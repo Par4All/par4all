@@ -76,7 +76,7 @@
 ## PHASES (advanced mode)
 
 <%def name="phases_fields(phases)">
-% for p in phases["PHASES"]:
+% for p in phases.get("PHASES", []):
 <label>
   ${h.checkbox("phases", value=p["name"], checked=True)}
   <span>${p["name"]}</span>

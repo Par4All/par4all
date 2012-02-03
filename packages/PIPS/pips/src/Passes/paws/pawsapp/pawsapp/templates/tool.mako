@@ -5,8 +5,8 @@
 
 <%inherit file="base.mako"/>
 
-<%namespace name="w"   file="pawsapp:templates/lib/widgets.mako"/>
-<%namespace name="adv" file="pawsapp:templates/lib/advanced.mako"/>
+<%namespace name="w"   file="lib/widgets.mako"/>
+<%namespace name="adv" file="lib/advanced.mako"/>
 
 <%def name="css_slot()">
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
@@ -23,6 +23,9 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
   % if advanced:
   advanced = true;
   % endif
+  $(function () {
+  $(".hero-unit").popover({html:true, placement: "bottom"});
+  });
 </script>
 ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 </%def>
@@ -39,66 +42,86 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <h4 style="margin:.5em 0">Type or select source code from:</h4>
 
-  <label>
-    <button id="classic-button" style="width:100%" class="btn btn-primary"
-	    data-toggle="modal" href="#classic-examples-dialog">
-      <i class="icon-folder-open icon-white"></i> Classic examples</button>
-  </label>
+<label>
+  <button id="classic-button" style="width:100%" class="btn btn-primary"
+	  data-toggle="modal" href="#classic-examples-dialog">
+    ${w.icon("book", True)} Classic examples</button>
+</label>
 
-  <form target="upload_target" action="${request.route_url('upload_user_file')}"
-	enctype="multipart/form-data" method="post" id="upload_form">
-    <label for="pseudobutton">or from your own test cases:</label>
-    <button id="pseudobutton" style="width:100%" class="btn btn-primary">
-      <i class="icon-folder-open icon-white"></i> Browse</button>
-    <input type="file" id="upload_input" name="file" class="inp-hide"/><br/>
-    <div id="pseudotextfile">&nbsp;</div>
-  </form>
+<form target="upload_target" action="${request.route_url('upload_user_file')}" methode="post"
+      enctype="multipart/form-data" id="upload_form" style="margin-bottom:-18px">
+  <label for="pseudobutton">or from your own test cases:</label>
+  <button id="pseudobutton" style="width:100%" class="btn btn-primary">
+     ${w.icon("folder-open", True)} Local file(s)</button>
+  <input type="file" id="upload_input" name="file" class="inp-hide"/><br/>
+  <div id="pseudotextfile">&nbsp;</div>
+</form>
+
+<hr/>
 
 <p>
   <button class="btn btn-primary disabled" style="width:100%" id="run-button">
-    <i class="icon-play icon-white"></i> Run</button>
+    ${w.icon("play", True)} Run</button>
 </p>
+
 <p>
   <button class="btn disabled" style="width:100%" id="save-button">
-    <i class="icon-download-alt"></i> Save Result</button><br/>
+    ${w.icon("download-alt")} Save Result</button><br/>
   <button class="btn disabled" style="width:100%" id="print-button">
-    <i class="icon-print"></i> Print Result</button>
+    ${w.icon("print")} Print Result</button>
 </p>
 
-<form id="adv-form" class="${h.css_classes([('form-inline', True), ('hide', not advanced)])}">
+<hr/>
 
-  <h4>Advanced mode</h4>
+## Mode toggle buttons
+<div class="btn-group" data-toggle="buttons-radio" id="mode-buttons">
+  <button class="btn" id="basic-button" style="width:50%">${w.icon("cog")} Basic</button>
+  <button class="btn" id="adv-button"   style="width:50%">${w.icon("cog")} Adv.</button>
+</div>
 
-  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-props-modal">
-    <i class="icon-cog icon-white"></i> Properties</button><br/>
-  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-analyses-modal">
-    <i class="icon-cog icon-white"></i> Select Analyses</button><br/>
-  <button class="btn btn-success" style="width:100%" data-toggle="modal" href="#adv-phases-modal">
-    <i class="icon-cog icon-white"></i> Phases</button>
-  
+<form id="adv-form" class="${h.css_classes([('form-inline', True), ('hide', not advanced)])}"
+      style="margin-bottom:0">
+
+  <p></p>
+  % if props:
+  <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-props-modal">
+    ${w.icon("list-alt", True)} Properties</button><br/>
+  % else:
+  <div>${w.icon("list-alt")} No properties</div>
+  % endif
+  % if analyses:
+  <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-analyses-modal">
+    ${w.icon("list-alt", True)} Select Analyses</button><br/>
+  % else:
+  <div>${w.icon("list-alt")} No analyses</div>
+  % endif
+  % if phases:
+  <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-phases-modal">
+    ${w.icon("list-alt", True)} Phases</button>
+  % else:
+  <div>${w.icon("list-alt")} No phases</div>
+  % endif
+
   ## "Properties" modal
-  ${w.modal(u"Properties", advprop_body, id="adv-props-modal")}
+  ${w.modal(u"Properties", advprop_body, id="adv-props-modal", icon="list-alt")}
   <%def name="advprop_body()">
   ${adv.properties_fields(props)}
   </%def>
 
   ## "Select Analyses" modal
-  ${w.modal(u"Select Analyses", advanl_body, id="adv-analyses-modal")}
+  ${w.modal(u"Select Analyses", advanl_body, id="adv-analyses-modal", icon="list-alt")}
   <%def name="advanl_body()">
   ${adv.analyses_fields(analyses)}
   </%def>
 
   ## "Phases" modal
-  ${w.modal(u"Phases", advphases_body, id="adv-phases-modal")}
+  ${w.modal(u"Phases", advphases_body, id="adv-phases-modal", icon="list-alt")}
   <%def name="advphases_body()">
   ${adv.phases_fields(phases)}
   </%def>
 
 </form>
 
-<div style="text-align: right; white-space:nowrap">
-  Switch to ${h.link_to(u"basic mode" if advanced else u"advanced mode", url="#", id="adv-button")} »
-</div>
 
 </%def>
 
@@ -109,12 +132,10 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
 
-<div class="hero-unit" style="padding:.5em 1em">
-  <h2>${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
-    ${descr}
-    % if advanced:
-    <span class="label label-success">advanced</span>
-    % endif
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em" data-content="${descr}" data-original-title="${tool}">
+  <h2>
+    ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
+    ${name}
   </h2>
 </div>
 
@@ -166,7 +187,8 @@ ${w.modal(u"Please select an example:", classic_body, "classic-examples-dialog")
 
 <%def name="classic_body()">
 % for ex in examples:
-<div>${h.link_to(ex, id=ex, class_="btn small", style="width:90%")}</div>
+<div><a href="#" id="${ex}" class="btn" style="width:90%; text-align: left">
+    ${w.icon("file")} ${ex}</a></div>
 % endfor
 </%def>
 

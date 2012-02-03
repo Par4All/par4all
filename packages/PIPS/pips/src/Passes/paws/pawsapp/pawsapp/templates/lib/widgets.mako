@@ -5,11 +5,14 @@
 
 ## Modal panel
 
-<%def name="modal(header, content, id)">
-<div class="modal hide fade span6" id="${id}" style="display: none;">
+<%def name="modal(header, content, id, icon=None)">
+<div class="modal hide span6" id="${id}" style="display: none;">
   <div class="modal-header">
     <a class="close" data-dismiss="modal">×</a>
     <h3>
+      % if icon:
+      <i class="icon-${icon}"></i>
+      % endif
       % if callable(header):
       ${header() | n}
       % else:
@@ -36,6 +39,12 @@
     });
   });
 </script>
+</%def>
+
+
+## Icon
+<%def name="icon(name, white=False)">
+<i class="${h.css_classes([('icon-' + name, True), ('icon-white', white)])}"></i>
 </%def>
 
 

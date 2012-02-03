@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, json
+import os
 
 from pyramid.view import view_config
 
@@ -15,14 +15,7 @@ def index(request):
     text = file(os.path.join(valid_path, 'main', 'paws.txt')).read()
 
     # Sections
-    sections = json.load(file(os.path.join(valid_path, 'main', 'functionalities.txt')))
-    for s in sections:
-        path = os.path.join(valid_path, os.path.basename(s['path']))
-        s['tools'] = [ { 'name'  : t,
-                         'descr' : file(os.path.join(path, t, '%s.txt' % t)).read(),
-                         }
-                       for t in os.listdir(path) if not t.startswith('.') 
-                       ]
+    sections = request.site_sections
 
     return dict(text=text, sections = sections)
 

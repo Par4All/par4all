@@ -684,7 +684,7 @@ HANDLER_PROTOTYPE(distribute)
  */
 HANDLER_PROTOTYPE(reduction)
 {
-    list /* of entity */ l = expression_list_to_entity_list(args);
+    list /* of entity */ l = expressions_to_entities(args);
     statement s;
 
     init_ctrl_graph_travel(current_stmt_head(), (bool(*)(statement))gen_true);
@@ -715,7 +715,7 @@ HANDLER_PROTOTYPE(reduction)
  */
 HANDLER_PROTOTYPE(independent)
 {
-    list /* of entities */ l = expression_list_to_entity_list(args);
+    list /* of entities */ l = expressions_to_entities(args);
     statement s;
 
     pips_debug(2, "%zd index(es)\n", gen_length(l));
