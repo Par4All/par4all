@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security       import remember, forget
 from pyramid.renderers      import render_to_response
@@ -13,6 +15,10 @@ from ..security import USERS
 def login(request):
     """
     """
+    # Introductory text
+    valid_path = request.registry.settings['paws.validation']
+    text = file(os.path.join(valid_path, 'main', 'paws.txt')).read()
+
     login_url = request.route_url('login')
     referrer  = request.url
     if referrer == login_url:
@@ -34,7 +40,8 @@ def login(request):
         else:
             message = 'Failed login'
 
-    return dict( message   = message,
+    return dict( text      = text,    # intro text
+                 message   = message,
                  url       = request.application_url + '/login',
                  came_from = came_from,
                  login     = login,

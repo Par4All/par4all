@@ -209,6 +209,19 @@ expression reference_to_expression(reference r)
 }
 
 
+/*
+ * Get a reference from an expression. The expression has to contain
+ * directly a syntax containing directly the reference.
+ */
+reference expression_to_reference(expression e)
+{
+    syntax s = expression_syntax(e);
+    message_assert("reference", syntax_reference_p(s));
+    return syntax_reference(s);
+}
+
+
+
 /* Build an expression that call a function or procedure.
 
    @param c is the call

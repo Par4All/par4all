@@ -21,7 +21,7 @@
 <div class="container-fluid">
   <div class="row-fluid">
     ## Left column
-    <div class="span3" style="width:200px">
+    <div class="span3" style="width:210px">
       <div class="well">
 	${self.left_column()}
       </div>
@@ -51,7 +51,8 @@
 <%def name="dialogs()"></%def>
 
 
-${h.Doctype().xhtml1()}
+## HTML5!!
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -104,13 +105,30 @@ ${h.Doctype().xhtml1()}
             <span class="i-bar"></span>
             <span class="i-bar"></span>
           </a>
-          <a class="brand" href="#">PAWS</a>
+          <a class="brand" href="${request.route_url('home')}">PAWS</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active">${h.link_to(u"Home", url=request.route_url("home"))}</li>
-              <li><a href="http://pips4u.org">About</a></li>
+	      ## Site sections
+	      % for s in request.site_sections:
+	      % if s["entries"]:
+	      <li class="dropdown">
+		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+		  ${s["title"].upper()}
+		  <b class="caret"></b>
+		</a>		
+		<ul class="dropdown-menu">
+		  % for t in s["entries"]:
+		  <li>${h.link_to(t["name"].upper(), url="/%s/%s" % (s["path"], t["name"]), title=t["descr"])}</li>
+		  % endfor
+		</ul>
+	      </li>
+	      % endif
+	      % endfor
+              <li><a href="http://pips4u.org">About PAWS</a></li>
               <li><a href="http://pips4u.org/current_team.html">Contact</a></li>
+
             </ul>
+
             <p class="navbar-text pull-right">
 	      % if userid:
 	      Logged in as <a href="#">${userid}</a> |

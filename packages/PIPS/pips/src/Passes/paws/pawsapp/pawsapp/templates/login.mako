@@ -5,11 +5,12 @@
 
 <%inherit file="base.mako"/>
 
+<%namespace name="index" file="index.mako"/>
 
 ## LEFT COLUMN
 
 <%def name="left_column()">
-In order to use PAWS, you must be logged in.
+${text|n}
 </%def>
 
 
@@ -17,35 +18,30 @@ In order to use PAWS, you must be logged in.
 
 <%def name="main_column()">
 
-<div class="hero-unit" style="padding:.5em 1em">
-  <h2>PAWS Login form</h2>
+${index.site_header()}
+
+<div class="alert alert-message">
+  <i class="icon-warning-sign"></i>
+  In order to use <b>PAWS</b>, you must first log in.
 </div>
+
+
 
 ${h.form(url, method="post")}	
 
-<fieldset>
+${h.hidden("came_from", came_from)}
 
-  ${h.hidden("came_from", came_from)}
+<label for="login">Login</label>
+${h.text("login", value=login, size=20)}
 
-  <div class="clearfix">
-    <label for="login">Login</label>
-    <div class="input">
-      ${h.text("login", value=login, size=20)}
-    </div>
-  </div>
+<label for="password">Password</label>
+${h.password("password", size=20)}
 
-  <div class="clearfix">
-    <label for="password">Password</label>
-    <div class="input">
-      ${h.password("password", size=20)}
-    </div>
-  </div>
-
-  <div class="actions">
-    ${h.submit("form.submitted", u"Login", class_="btn primary")}
-    <button class="btn" type="reset">Cancel</button>
-  </div>
-</fieldset>
+<label>
+  <button class="btn btn-primary" name="form.submitted" type="submit">
+    Login <i class="icon-lock icon-white"></i></button>
+  <button class="btn" type="reset">Cancel</button>
+</label>
 
 ${h.end_form()}
 

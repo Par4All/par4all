@@ -14,7 +14,7 @@ Home Page
 <script type="text/javascript">
   $(function () {
 % for s in sections:
-% for t in s["tools"]:
+% for t in s["entries"]:
     $("${'#%s-%s' % (s['path'], t['name'])}").popover({html:true, placement: "left"});
 % endfor
 % endfor
@@ -30,10 +30,8 @@ ${text|n}
 </%def>
 
 
-## MAIN COLUMN
 
-<%def name="main_column()">
-
+<%def name="site_header()">
 <div class="hero-unit" style="padding:30px 30px 20px 30px">
   <h1>${h.image(request.static_url("pawsapp:static/img/paws-small-trans.gif"), u"PAWS Logo")} PIPS as a Web Service</h1>
   <p>Vestibulum id ligula porta felis euismod semper. Integer posuere
@@ -42,6 +40,13 @@ ${text|n}
     odio sem nec elit.</p>
   <p><a class="btn btn-primary btn-large" href="http://pips4u.org" target="_blank">Learn more »</a></p>
 </div>
+</%def>
+
+## MAIN COLUMN
+
+<%def name="main_column()">
+
+${self.site_header()}
 
 <div class="row">
   <p class="span9 offset3">
@@ -56,12 +61,12 @@ ${text|n}
 <hr/>
 
 ## Subsection
-% for t in s["tools"]:
-<% first = bool(s["tools"].index(t) == 0) %>
+% for t in s["entries"]:
+<% first = bool(s["entries"].index(t) == 0) %>
 <div class="row">
   <div class="span3">
     % if first:
-    <h3>${s["title"]}</h3>
+    <h3>${s["title"].upper()}</h3>
     % else:
     &nbsp;
     % endif
@@ -78,10 +83,10 @@ ${text|n}
 </div>
 % endfor
 
-% if not s["tools"]:
+% if not s["entries"]:
 <div class="row">
   <div class="span3">
-    <h3>${s["title"]}</h3>
+    <h3>${s["title"].upper()}</h3>
   </div>
 </div>
 % endif
