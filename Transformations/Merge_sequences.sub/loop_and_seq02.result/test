@@ -27,13 +27,13 @@ int main()
    int i, j;
    for(i = 0; i <= 9; i += 1) {
       int k = i;
-      int l = 2;
-      int k0 = 3;
-      l = l+k0;
-      k = k+l;
+      int l_0 = 2;
+      int k_0 = 3;
+      l_0 = l_0+k_0;
+      k = k+l_0;
       j = j+k;
-      int l0 = 4;
-      j = j+l0;
+      int l = 4;
+      j = j+l;
    }
    return j;
 }

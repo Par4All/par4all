@@ -22,8 +22,8 @@ int main()
    // comment on first statement of level 2 sequence
    int j = 1;
    // comment on first statement of level 3 sequence
-   int i0 = 2;
-   j = j+i0;
+   int i_0 = 2;
+   j = j+i_0;
    i = i+j;
    return i;
 }

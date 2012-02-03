@@ -13,7 +13,7 @@ int main()
 int main()
 {
    int i = 0, j;
-   int i0 = 1;
-   j = i0;
+   int i_0 = 1;
+   j = i_0;
    return i+j;
 }
