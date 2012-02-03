@@ -91,6 +91,7 @@ GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
 typedef struct coarse_grain_ctx {
   int depth;
   list reduced_loops;
+  bool parallelized_at_least_one_loop;
 } coarse_grain_ctx;
 
 
@@ -292,7 +293,12 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
           ctx->reduced_loops = CONS(int,statement_ordering(loop_stat),ctx->reduced_loops);
         } else {
           pips_debug(1, "PARALLEL LOOP\n");
-          execution_tag(loop_execution(l)) = is_execution_parallel;
+          // If the loop was sequential, we mark it as parallel and register
+          // that we parallelized at least one loop
+          if(loop_sequential_p(l)) {
+            ctx->parallelized_at_least_one_loop = true;
+            execution_tag(loop_execution(l)) = is_execution_parallel;
+          }
         }
       }
 
@@ -325,26 +331,21 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
     @param module_stat is the module statement to parallelize as a code
     reference
 
-    @param module_parallelized_stat is the module statement that will be
-    generated. This function assumes it is a deep copy of module_stat at
-    entry.
+    @param ctx is the context for keeping informations about what was done
  */
-static list coarse_grain_loop_parallelization(statement module_stat)
-{
+static void coarse_grain_loop_parallelization(statement module_stat, coarse_grain_ctx *ctx) {
   pips_debug(1,"begin\n");
 
-  coarse_grain_ctx ctx = { 0, NIL };
 
   // Iterate on the loops to try parallelizing them:
   gen_context_recurse(module_stat,
-                      &ctx,
+                      ctx,
                       loop_domain,
-		      whole_loop_parallelize,
+                      whole_loop_parallelize,
                       gen_true
                       );
 
   pips_debug(1,"end\n");
-  return ctx.reduced_loops;
 }
 
 
@@ -406,8 +407,9 @@ static bool coarse_grain_parallelization_main(const char* module_name,
 
     debug_on("COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL");
 
-    //module_parallelized_stat = copy_statement(module_stat);
-    list loops = coarse_grain_loop_parallelization(module_stat);
+    // Initialize a context to keep track of what is done
+    coarse_grain_ctx ctx = { 0, NIL, false };
+    coarse_grain_loop_parallelization(module_stat, &ctx);
 
     debug_off();
 
@@ -424,7 +426,7 @@ static bool coarse_grain_parallelization_main(const char* module_name,
       reset_statement_reductions();
       DB_PUT_MEMORY_RESOURCE(DBR_REDUCTION_PARALLEL_LOOPS,
            module_name,
-           (char*) make_reduced_loops(loops));
+           (char*) make_reduced_loops(ctx.reduced_loops));
     } else {
       /* update loop_locals according to exhibited parallel loops */
       /* this require recomputing effects */
@@ -433,10 +435,12 @@ static bool coarse_grain_parallelization_main(const char* module_name,
       /* To declare private variables at innermost levels even when loops are not
        * parallel, use another phase prior to this one. BC - 07/2011
        */
-      (void) update_loops_locals(module_name, module_stat);
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE,
-           module_name,
-           (char*) module_stat);
+      bool locals_changed = update_loops_locals(module_name, module_stat);
+      if(ctx.parallelized_at_least_one_loop || locals_changed) {
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE,
+                               module_name,
+                               (char*) module_stat);
+      }
     }
 
     return true;
