@@ -135,9 +135,11 @@ void p4a_init_cuda_accel() {
     }
   }
 
+#if CUDA_VERSION >= 4000
   // We prefer to have more L1 cache and less shared since we don't make use of it
   cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 );
   toolTestExecMessage(cudaGetLastError(),"P4A CUDA cache config failed");
+#endif
 
 }
 
