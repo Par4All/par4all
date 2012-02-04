@@ -64,6 +64,7 @@ freia_status freia_dead_02(void)
 freia_status freia_dead_02(void)
 {
    freia_status ret = 0;                                                /*0006*/
+
    return ret;                                                          /*0009*/
 }
 #
@@ -106,6 +107,7 @@ freia_status freia_dead_02(void)
 freia_status freia_dead_02(void)
 {
    freia_status ret = 0;                                                /*0006*/
+
    return ret;                                                          /*0009*/
 }
 #
@@ -147,6 +149,7 @@ freia_status freia_dead_02(void)
 freia_status freia_dead_02(void)
 {
    freia_status ret = 0;                                                /*0006*/
+
    return ret;                                                          /*0009*/
 }
 #

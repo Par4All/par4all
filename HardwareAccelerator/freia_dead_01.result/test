@@ -219,6 +219,7 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0007*/
    freia_dead_01_spoc_helper_0_0_0(o, i0, i1);                          /*0008*/
+
    return 0;                                                            /*0011*/
 }
 #
@@ -463,6 +464,7 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0007*/
    freia_dead_01_terapix_helper_0_0_0(o, i0, i1);                       /*0008*/
+
    return 0;                                                            /*0011*/
 }
 #
@@ -562,6 +564,7 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0007*/
    freia_aipo_add(o, i0, i1);                                           /*0008*/
+
    return 0;                                                            /*0011*/
 }
 #

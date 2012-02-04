@@ -67,7 +67,8 @@ make SUMMARY_EFFECTS[freia_common_create_data freia_common_destruct_data]
 apply PARTIAL_EVAL[${NAME}]
 # no, too efficient, helper functions are removed.
 #apply USE_DEF_ELIMINATION[${NAME}]
-apply SIMPLIFY_CONTROL[${NAME}]
+# no, too efficient, do/while loops that contain helpers are removed
+#apply SIMPLIFY_CONTROL[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}
