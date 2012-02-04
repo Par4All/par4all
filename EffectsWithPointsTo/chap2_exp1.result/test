@@ -1,0 +1,83 @@
+
+PROPER  EFFECTS 
+
+void main();
+void main()
+{
+   int **a, *b, c;
+//             <    is written>: b
+   b = &c;
+//             <    is written>: a
+   a = &b;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   **a = 7;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+
+// Points To: none
+
+void main();
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void main()
+{
+
+// Points To: none
+
+   int **a, *b, c;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   b = &c;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> c , EXACT
+
+   a = &b;
+
+// Points To:
+// a -> b , EXACT
+// b -> c , EXACT
+
+   **a = 7;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void main();
+void main()
+{
+   int **a, *b, c;
+//             <    is written>: b
+   b = &c;
+//             <    is written>: a
+   a = &b;
+//             <    is read   >: a b
+//             <    is written>: c
+   **a = 7;
+}
+
+ *********************** Use-Def Chains *********************
+
+	03 --> 05 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	04 --> 05 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+
+****************** End of Dependence Graph ******************
