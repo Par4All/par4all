@@ -1576,20 +1576,21 @@ int vs_core_loop(void)
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+l99998:   ;
    
    // video loop
-l99979:   ;                                                                    /*0065*/
+   ;                                                                    /*0065*/
 
    if (end==0) {                                                        /*0067*/
    }
    else {
-      goto l99980;
+      goto l99999;
    }
    
    // stabilization
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
 
-   if (end!=0) goto l99980;                                             /*0077*/
+   if (end!=0) goto l99999;                                             /*0077*/
 
    freia_common_set_wa(imcurrent, 10, 10, fdin.framewidth-20, fdin.frameheight-20);    /*0079*/
    freia_aipo_copy(imstab, imcurrent);
@@ -1622,8 +1623,9 @@ l99979:   ;                                                                    /
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
 
    fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
-   goto l99979;
-l99980:   ;
+   goto l99998;
+l99999:   ;
+
    
    // cleanup at end of application
    freia_common_destruct_data(imcurrent);                               /*0130*/
@@ -3203,20 +3205,21 @@ int vs_core_loop(void)
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+l99998:   ;
    
    // video loop
-l99979:   ;                                                                    /*0065*/
+   ;                                                                    /*0065*/
 
    if (end==0) {                                                        /*0067*/
    }
    else {
-      goto l99980;
+      goto l99999;
    }
    
    // stabilization
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
 
-   if (end!=0) goto l99980;                                             /*0077*/
+   if (end!=0) goto l99999;                                             /*0077*/
 
    freia_common_set_wa(imcurrent, 10, 10, fdin.framewidth-20, fdin.frameheight-20);    /*0079*/
    freia_aipo_copy(imstab, imcurrent);
@@ -3247,8 +3250,9 @@ l99979:   ;                                                                    /
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
 
    fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
-   goto l99979;
-l99980:   ;
+   goto l99998;
+l99999:   ;
+
    
    // cleanup at end of application
    freia_common_destruct_data(imcurrent);                               /*0130*/
@@ -4226,20 +4230,21 @@ int vs_core_loop(void)
    freia_aipo_copy(imbg, imbg16);
 
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+l99998:   ;
    
    // video loop
-l99979:   ;                                                                    /*0065*/
+   ;                                                                    /*0065*/
 
    if (end==0) {                                                        /*0067*/
    }
    else {
-      goto l99980;
+      goto l99999;
    }
    
    // stabilization
    end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
 
-   if (end!=0) goto l99980;                                             /*0077*/
+   if (end!=0) goto l99999;                                             /*0077*/
 
    freia_common_set_wa(imcurrent, 10, 10, fdin.framewidth-20, fdin.frameheight-20);    /*0079*/
    freia_aipo_copy(imstab, imcurrent);
@@ -4277,8 +4282,9 @@ l99979:   ;                                                                    /
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
 
    fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
-   goto l99979;
-l99980:   ;
+   goto l99998;
+l99999:   ;
+
    
    // cleanup at end of application
    freia_common_destruct_data(imcurrent);                               /*0130*/

@@ -1309,28 +1309,20 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
       k = 0;                                                            /*0056*/
       freia_58_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);   /*0005*/
       l = 0;                                                            /*0010*/
-
       j = 0;                                                            /*0015*/
       l = 0;                                                            /*0017*/
-
       j = 0;                                                            /*0022*/
       l = 0;                                                            /*0024*/
-
       j = 0;                                                            /*0029*/
       l = 0;                                                            /*0031*/
-
       j = 0;                                                            /*0036*/
       l = 0;                                                            /*0038*/
-
       j = 0;                                                            /*0043*/
       l = 0;                                                            /*0045*/
-
       j = 0;                                                            /*0050*/
       l = 0;                                                            /*0052*/
-
       j = 0;                                                            /*0057*/
       l = 0;                                                            /*0059*/
-
    }
    while (volcurrent!=volprevious);                                     /*0003*/
    n = m;                                                               /*0062*/
@@ -1946,7 +1938,6 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
       j = 0;                                                            /*0013*/
       freia_58_terapix_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);               /*0010*/
       l = 0;                                                            /*0015*/
-
    }
    while (volcurrent!=volprevious);                                     /*0019*/
    n = m;                                                               /*0020*/
@@ -2276,7 +2267,6 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
       freia_58_opencl_helper_1_0_1(out, in, out, &volcurrent);          /*0014*/
       l = 0;                                                            /*0015*/
-
    }
    while (volcurrent!=volprevious);                                     /*0019*/
    n = m;                                                               /*0020*/

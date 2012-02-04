@@ -815,7 +815,6 @@ int anr999_01(void)
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
-   0;                                                                   /*0046*/
 
    t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
    i_1 = 10;                                                            /*0054*/
@@ -825,9 +824,7 @@ int anr999_01(void)
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
-
    I_13 = 0;                                                            /*0070*/
-   0;                                                                   /*0071*/
 
    anr999_01_spoc_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);        /*0038*/
    
@@ -1657,7 +1654,6 @@ int anr999_01(void)
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
-   0;                                                                   /*0046*/
 
    i_1 = 10;                                                            /*0054*/
 
@@ -1666,9 +1662,7 @@ int anr999_01(void)
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
-
    I_13 = 0;                                                            /*0070*/
-   0;                                                                   /*0071*/
 
    anr999_01_terapix_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);    /*0038*/
    
@@ -2183,7 +2177,6 @@ int anr999_01(void)
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
-   0;                                                                   /*0046*/
 
    t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
    i_1 = 10;                                                            /*0054*/
@@ -2193,9 +2186,7 @@ int anr999_01(void)
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
-
    I_13 = 0;                                                            /*0070*/
-   0;                                                                   /*0071*/
 
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/

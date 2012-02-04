@@ -418,8 +418,7 @@ freia_status freia_61(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0006*/
    freia_61_spoc_helper_0_0_0(t1, o, i0, i1, 100, 200, 0);              /*0007*/
-   if (1)                                                               /*0009*/
-      freia_61_spoc_helper_1_0_0(o, t1, o);                             /*0010*/
+   freia_61_spoc_helper_1_0_0(o, t1, o);                                /*0010*/
 
    freia_common_destruct_data(t1);                                      /*0012*/
    return 0;                                                            /*0013*/
@@ -921,8 +920,7 @@ freia_status freia_61(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0006*/
    freia_61_terapix_helper_0_0_0(t1, o, i0, i1, 100, 200, 0);           /*0007*/
-   if (1)                                                               /*0009*/
-      freia_61_terapix_helper_1_0_0(o, t1, o);                          /*0010*/
+   freia_61_terapix_helper_1_0_0(o, t1, o);                             /*0010*/
 
    freia_common_destruct_data(t1);                                      /*0012*/
    return 0;                                                            /*0013*/
@@ -1228,8 +1226,7 @@ freia_status freia_61(freia_data2d *o, const freia_data2d *i0, const freia_data2
 {
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0006*/
    freia_61_opencl_helper_0_0_0(t1, o, i0, i1, 100, 200, 0);            /*0007*/
-   if (1)                                                               /*0009*/
-      freia_aipo_sub(o, t1, o);                                         /*0010*/
+   freia_aipo_sub(o, t1, o);                                            /*0010*/
 
    freia_common_destruct_data(t1);                                      /*0012*/
    return 0;                                                            /*0013*/
