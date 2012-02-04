@@ -54,6 +54,12 @@ apply FORCE_REGISTER_DECLARATIONS[main]
 # simplify expressions
 apply PARTIAL_EVAL[main]
 
+# (temporary) workaround...
+# we need precise effects on aipo in order not to over simplify
+# but this would require providing stubs. Currently the auto
+# generated functions do not have any effect, hence induce some
+# unwanted control simplifications.
+setproperty SIMPLIFY_CONTROL_DO_WHILE FALSE
 # then control
 apply SIMPLIFY_CONTROL[main]
 
