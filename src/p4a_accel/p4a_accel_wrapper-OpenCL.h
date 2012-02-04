@@ -90,7 +90,14 @@ code that performs writes that may not be supported.
 Pragma to support double floating point precision
 * */
 
-#pragma OPENCL EXTENSION cl_khr_fp64: enable 
+#ifdef cl_khr_fp64
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+#elif defined(cl_amd_fp64)
+#pragma OPENCL EXTENSION cl_amd_fp64 : enable
+#else
+#warning "Your OpenCL device doesn't support double precision"
+#endif
+
 
 
 /**
