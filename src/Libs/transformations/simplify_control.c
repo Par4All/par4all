@@ -952,19 +952,14 @@ dead_statement_rewrite(statement s)
      ;
    case is_instruction_whileloop:
      {
-       /* FI: This is buggy code because there is no way to know if
-	* preconditions are used or not; boolean use_precondition_p is
-	* not propagated; one way to do it might be to check if the
-	* transformer and precondition maps are allocated or not...
-	*
-	* Also, RK's statistics are not updated...
-       */
-       whileloop wl = instruction_whileloop(i);
-       evaluation e = whileloop_evaluation(wl);
-       if(evaluation_after_p(e)) {
-       /* See if the repeat until is only executed once */
-       /* Issue: the precondition holding before the condition is
-	  evaluated has not been stored */
+     whileloop wl = instruction_whileloop(i);
+     evaluation e = whileloop_evaluation(wl);
+     if(evaluation_after_p(e) &&
+        get_bool_property("SIMPLIFY_CONTROL_DO_WHILE"))
+     {
+       // See if the repeat until is only executed once
+       // Issue: the precondition holding before the condition is
+       // evaluated has not been stored
        statement wb = whileloop_body(wl);
        transformer prec = load_statement_precondition(s);
        transformer tf = load_statement_transformer(wb);
@@ -972,37 +967,38 @@ dead_statement_rewrite(statement s)
        expression c = whileloop_condition(wl);
        transformer ct = condition_to_transformer(c, tp, true);
        if(transformer_empty_p(ct)) {
-	 /* The condition is never true and the until loop can be replaced by its body */
-	 statement_instruction(s) = statement_instruction(wb);
-	 /* We should try to preserve labels and comments and statement numbers...*/
-	 statement_number(s) = statement_number(wb);
-	 /* An issue if we have a label for s and a label for wb... */
-	 ; // FI: to be seen later, wb is unlikely to have a label...
-	 /* Concatenate comments... */
-	 // FI: to be seen later... The parser seems to junk the loop comments
-	 string sc = statement_comments(s);
-	 string wbc = statement_comments(wb); // will be freed with wb
-	 string nc;
-	 if(empty_comments_p(sc)) {
-	   if(empty_comments_p(wbc))
-	     nc = empty_comments;
-	   else
-	     nc = strdup(wbc);
-	 }
-	 else {
-	   if(empty_comments_p(wbc))
-	     nc = strdup(sc);
-	   else
-	     nc = strdup(concatenate(sc, wbc, NULL)); // new comment
-	   free(sc);
-	 }
-	 statement_comments(s) = empty_comments;
-	 insert_comments_to_statement(s, nc);
-	 /* Get rid of obsolete pieces of data structures */
-	 whileloop_body(wl) = statement_undefined;
-	 free_instruction(i);
-	 statement_instruction(wb) = instruction_undefined;
-	 free_statement(wb);
+         // The condition is never true
+         // the until loop can be replaced by its body
+         statement_instruction(s) = statement_instruction(wb);
+         // We should try to preserve labels, comments and statement numbers...
+         statement_number(s) = statement_number(wb);
+         // An issue if we have a label for s and a label for wb...
+         ; // FI: to be seen later, wb is unlikely to have a label...
+         // Concatenate comments...
+         // FI: to be seen later... The parser seems to junk the loop comments
+         string sc = statement_comments(s);
+         string wbc = statement_comments(wb); // will be freed with wb
+         string nc;
+         if(empty_comments_p(sc)) {
+           if(empty_comments_p(wbc))
+             nc = empty_comments;
+           else
+             nc = strdup(wbc);
+         }
+         else {
+           if(empty_comments_p(wbc))
+             nc = strdup(sc);
+           else
+             nc = strdup(concatenate(sc, wbc, NULL)); // new comment
+           free(sc);
+         }
+         statement_comments(s) = empty_comments;
+         insert_comments_to_statement(s, nc);
+         // Get rid of obsolete pieces of data structures
+         whileloop_body(wl) = statement_undefined;
+         free_instruction(i);
+         statement_instruction(wb) = instruction_undefined;
+         free_statement(wb);
        }
      }
      break;

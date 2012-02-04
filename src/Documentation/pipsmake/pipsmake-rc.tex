@@ -8729,8 +8729,9 @@ suppress_dead_code          > MODULE.code
   used. It can be useful to clean up input code with constant tests,
   e.g. \verb/3>4/, and constant loop bounds. It can also be used after
   \PipsPassRef{partial_eval} to avoid recomputing the preconditions
-  yet another time. The property \PipsPropRef{SIMPLIFY_CONTROL_DIRECTLY_PRIVATE_LOOP_INDICES}
-  assert that the loop indices don't need a copy out, i.e. the value at the 
+  yet another time. The property
+  \PipsPropRef{SIMPLIFY_CONTROL_DIRECTLY_PRIVATE_LOOP_INDICES}
+  assert that the loop indices don't need a copy out, i.e. the value at the
   exit of the loop can be forgotten.
 \end{PipsPass}
 
@@ -8738,6 +8739,11 @@ suppress_dead_code          > MODULE.code
 SIMPLIFY_CONTROL_DIRECTLY_PRIVATE_LOOP_INDICES FALSE
 \end{PipsProp}
 
+Whether to try to simplify do/while loops (property provided
+as a special lworkaround for FREIA).
+\begin{PipsProp}{SIMPLIFY_CONTROL_DO_WHILE}
+SIMPLIFY_CONTROL_DO_WHILE TRUE
+\end{PipsProp}
 
 \begin{PipsMake}
 alias simplify_control_directly 'Simplify Control Directly'
