@@ -84,7 +84,9 @@ short, ushort, and half will need to include the #pragma OPENCL
 EXTENSION cl_khr_byte_addressable_store : enable directive before any
 code that performs writes that may not be supported. 
 */
+#ifdef cl_khr_byte_addressable_store
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
+#endif
 
 /*
 Pragma to support double floating point precision
