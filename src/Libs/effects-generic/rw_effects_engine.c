@@ -90,12 +90,28 @@ bool summary_rw_effects_engine(const char* module_name)
 
     set_rw_effects((*db_get_rw_effects_func)(module_name));
 
-    l_loc = load_rw_effects_list(module_stat);
-    ifdebug(2){
+    if(empty_statement_p(module_stat)) {
+      if(get_bool_property("MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS")) {
+	l_loc = make_anywhere_read_write_memory_effects();
+      }
+      else if(get_bool_property("MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS")) {
+	entity m = get_current_module_entity();
+	pips_user_error("Property not implemented\n");
+	/* FI: Beatrice was too optimistic about this function. It
+	   uses actual parameter expressions, not the formal
+	   parameters we have here to define the summary effects. More
+	   help from Beatrice would be welcome. */
+	list args = NIL;
+	l_loc = safe_c_effects(m, args);
+      }
+    }
+    if(ENDP(l_loc)) {
+      l_loc = load_rw_effects_list(module_stat);
+      ifdebug(2){
 	pips_debug(2, "local regions, before translation to global scope:\n");
 	(*effects_prettyprint_func)(l_loc);
+      }
     }
-
 
     l_dec = summary_effects_from_declaration(module_name);
     ifdebug(8) {
@@ -892,6 +908,7 @@ bool rw_effects_engine(const char * module_name)
     /* Get the code of the module. */
     set_current_module_statement( (statement)
 		      db_get_memory_resource(DBR_CODE, module_name, true));
+    statement ms = get_current_module_statement();
 
     set_current_module_entity(module_name_to_entity(module_name));
 
@@ -914,7 +931,7 @@ bool rw_effects_engine(const char * module_name)
     debug_on("EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
-    rw_effects_of_module_statement(get_current_module_statement());
+    rw_effects_of_module_statement(ms);
 
     pips_debug(1, "end\n");
     debug_off();

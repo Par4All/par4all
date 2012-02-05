@@ -2695,6 +2695,30 @@ is turned off.
 TIME_EFFECTS_USED FALSE
 \end{PipsProp}
 
+Some source code is sometimes missing. \PIPS does not have any way to
+guess the memory effects of functions whose source code is
+missing. Several approaches are possible to approximate the exact
+effects. Two optimistic ones are implemented: either we assume that
+the function only computes a result and has no side effects thru
+pointer parameters, global variables or static variables (default
+option), or we assume the maximal possible effects through pointers
+(this should be clarified: for all pointers \verb/p/, \verb/*p/ is
+written) but not thru static or global variables.
+
+\begin{PipsProp}{MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS}
+MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS FALSE
+\end{PipsProp}
+
+For safety, a pessimitic option is be implemented and a maximal memory
+effect, \verb/*ANYMODULE*:*ANYWHERE*/, is associated to such unknown
+functions.
+
+\begin{PipsProp}{MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS}
+MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS FALSE
+\end{PipsProp}
+
+These two properties should not be true simultaneously.
+
 \section{Live Memory Access Paths}
 \label{subsection-live-memory-paths}
 \index{Effect}

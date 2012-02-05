@@ -77,7 +77,6 @@
 
 static list time_effects(entity, list );
 static list no_write_effects(entity e,list args);
-static list safe_c_effects(entity e,list args);
 static list safe_c_read_only_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
@@ -1385,8 +1384,11 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
 
 /**
    assumes may read and write effects on the objects pointed to by actual arguments
+
+   Hopefully also used for empty functions, i.e. functions with an
+   empty statement, which, most of the time, are unknown functions.
  */
-static list
+list
 safe_c_effects(entity e __attribute__ ((__unused__)),list args)
 {
   list lw = NIL, lr = NIL;
@@ -2234,7 +2236,7 @@ static list any_heap_effects(entity e, list args)
 /* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses
    a temporary array to copy characters from one object to another. C99
    Note : CreateMemmoveAbstractState() is defined in bootstrap.c  */
-static list memmove_effects(entity e, list args)
+static list memmove_effects(entity e, list args __attribute__ ((unused)))
 {
   list le = NIL;
   entity memmove_entity = entity_undefined;
@@ -2793,7 +2795,7 @@ effects_of_implied_do(expression exp, tag act)
 
 /* Add a time effect, that is a read and a write on a particular hidden time variable */
 static
-list time_effects(entity e, list args) {
+list time_effects(entity e __attribute__ ((unused)), list args) {
 	list le = NIL;
     FOREACH(EXPRESSION,arg,args) // true for at least gettimeofday, clock and time
         le = gen_nconc(le,
@@ -2965,7 +2967,7 @@ static list search_or_sort_effects(entity e, list args)
 /**
     generate effects for strtoxxx functions
  */
-static list strtoxxx_effects(entity e, list args)
+static list strtoxxx_effects(entity e __attribute__ ((unused)), list args)
 {
   list le = NIL;
   expression nptr_exp = EXPRESSION(CAR(args));
