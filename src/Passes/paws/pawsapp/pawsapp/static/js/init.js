@@ -1,5 +1,9 @@
 $(function(){
 
+    //
+    // LEFT COLUMN
+    //
+
     // A+ / A- buttons
     $('#aplus').click(function(ev) {
 	ev.preventDefault();
@@ -10,33 +14,16 @@ $(function(){
 	resize(0)
     });
 
-    // Classic examples
+    // Load classic examples button
     $('#classic-examples-dialog a').click(function(ev) {
 	ev.preventDefault();
 	load_example(ev.target.id);
     });
 
-    // File upload
+    // Upload file button
     $('#upload_input').change(function() {
 	$('#upload_form').submit();
 	$('#upload_target').load(after_upload);
-    });
-
-    // Source code input field
-    $('#sourcecode-1').linedtextarea()
-	.attr('spellcheck', false);
-
-    // "RESULTS" tab
-    $('#result_tab a').click(function(ev) {
-	ev.preventDefault();
-	if (performed == false)
-	    performed = perform_operation(1, 'result');
-    });
-    // "GRAPH" tab
-    $('#graph_tab a').click(function(ev) {
-	ev.preventDefault();
-	if (created_graph == false)
-	    created_graph = create_graph(1, 'graph');
     });
 
     // Run button
@@ -58,15 +45,41 @@ $(function(){
         printFrame.print();
     });
 
-    switch_buttons();
-
-    // Switch between modes
-
+    // Switch between basic/advanced modes
     $('#mode-buttons').click(function(ev) {
 	ev.preventDefault();
 	advanced = !advanced;
 	switch_adv_mode();
     });
+
+    // Initialize tooltips for advance mode form
+    $('#adv-form a').tooltip();
+
+    // Initialize button states
+    switch_buttons();
     switch_adv_mode();
+
+
+    //
+    // MAIN COLUMN
+    //
+
+    // Source code input field
+    $('#sourcecode-1').linedtextarea()
+	.attr('spellcheck', false);
+
+    // "RESULTS" tab
+    $('#result_tab a').click(function(ev) {
+	ev.preventDefault();
+	if (performed == false)
+	    performed = perform_operation(1, 'result');
+    });
+    // "GRAPH" tab
+    $('#graph_tab a').click(function(ev) {
+	ev.preventDefault();
+	if (created_graph == false)
+	    created_graph = create_graph(1, 'graph');
+    });
+
 
 });

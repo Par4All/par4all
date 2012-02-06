@@ -70,6 +70,9 @@ function switch_adv_mode() {
 	$('#adv-form').hide();
 	$('#basic-button').button('toggle');
     }
+    performed = false;
+    graph_created = false;
+    switch_buttons();
 }
 
 function deactivate_graph_buttons() {
@@ -78,11 +81,6 @@ function deactivate_graph_buttons() {
 
 function activate_graph_buttons() {
     //console.debug('ACTIVATING');
-}
-
-function clear_result_tab() {
-    switch_buttons();
-    $('#resultcode').html('');
 }
 
 function clear_graph_tab() {
@@ -114,7 +112,6 @@ function clear_multiple() {
 function load_files(files) {
 
     clear_multiple();
-    clear_result_tab();
 
     nb_files = files.length;
 
@@ -315,6 +312,10 @@ function check_sources(index, panel_id) {
 *********************************************************************/
 
 function create_graph(index, panel_id) {
+
+    if (!loaded)
+	return;
+
     clear_graph_tab();
     if (check_sources(index, panel_id)) {
 	if (multiple) {
@@ -459,18 +460,53 @@ function choose_function() {
     add_choose_function_notification();
 }
 
+function keyval(k, v) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(v);
+}
+
+function get_form_values(sel) {
+    var out = [];
+
+    // INPUT fields
+    var fields = $(sel + " input");
+    for (var i=0; i < fields.length; i++) {
+	var f = fields[i];
+	if ((f.type == 'checkbox' && f.checked) || f.type == 'text' || f.type == 'hidden')
+	    out.push(keyval(f.name, f.value));
+    }
+    // SELECT fields
+    var fields = $(sel + " select");
+    for (var i=0; i < fields.length; i++) {
+	var f = fields[i];
+	out.push(keyval(f.name, f.value))
+    }
+
+    return out;
+}
 
 function perform_operation(index, panel_id) {
-    clear_result_tab();
+    var props    = '',
+	analyses = '',
+	phases   = '';
+
+    if(!loaded)
+	return;
+
+    if (true ||advanced) {
+	params = get_form_values('#adv-form')
+    }
+
     if (check_sources(index, panel_id)) { // all files are ok
 	if (multiple) {
 	    choose_function();
 	} else {
 	    $.post(
 		routes['perform'],
-		{ code:      $('#sourcecode-'+index).text(),
-		  language:  $('#lang-'+index).html(),
-		  operation: operation
+		{ code      :  $('#sourcecode-'+index).text(),
+		  language  :  $('#lang-'+index).html(),
+		  operation : operation,
+		  advanced  : advanced,
+		  params    : params,
 		},
 		function(data) {
 		    $("#resultcode").html(data);

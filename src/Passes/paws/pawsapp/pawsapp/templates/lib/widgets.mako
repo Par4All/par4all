@@ -59,7 +59,7 @@
 
 <%def name="source_panel(id=1, active=False)">
 <div id="source-${id}" class="${h.css_classes([('tab-pane', True), ('active', active)])}">
-  <p>Language : <span id="lang-${id}" class="label">not yet detected</span></p>
+  <p>Language : <span id="lang-${id}" class="label">not yet detected</span> <i>(C and Fortran supported)</i></p>
   <textarea id="sourcecode-${id}" class="span12" rows="27"
 	    onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
 </div>

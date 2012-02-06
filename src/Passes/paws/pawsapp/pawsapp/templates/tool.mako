@@ -125,6 +125,13 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 </%def>
 
+<%def name="no_source_warning()">
+<div class="alert alert-warning">
+  ${w.icon("warning-sign")}
+  <b>Source file(s) not found...</b> Please provide source code first.
+</div>
+</%def>
+
 
 ## MAIN COLUMN
 
@@ -154,13 +161,13 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   <div id="result" class="tab-pane">
     <div id="multiple-functions">
     </div>
-    <div id="resultcode">
-      Placeholder for results.
+   <div id="resultcode">
+     ${self.no_source_warning()}
     </div>
   </div>
   ## Graph panel
   <div id="graph" class="tab-pane">
-    Placeholder for dependence graphs.
+     ${self.no_source_warning()}
   </div>
 </div>
 

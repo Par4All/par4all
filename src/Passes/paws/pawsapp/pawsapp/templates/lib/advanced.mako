@@ -3,6 +3,9 @@
 </%doc>
 
 
+<%namespace name="w" file="widgets.mako"/>
+
+
 ## PROPERTIES (advanced mode)
 
 <%def name="properties_fields(props)">
@@ -14,11 +17,15 @@
   <tr style="vertical-align: top">
     <td><span class="label label-success">True/False</span></td>
     <td>
+      <% n = 0 %>
       % for p in props["bool"]:
       <label>
-	${h.checkbox("bools", value=p["name"], checked=p["val"])}
-	<span>${p["name"]}</span>
+	${h.hidden(".properties.bool.%d.id" % n, value=p["name"])}
+	${h.checkbox(".properties.bool.%d.checked" % n, value="True", checked=p["val"])}
+	${p["name"]}
+	<a rel="tooltip" href="#" data-original-title="${p['descr']}">${w.icon("info-sign")}</a>
       </label><br/>
+      <% n += 1 %>
       % endfor
     </td>
   </tr>
@@ -29,12 +36,16 @@
   <tr style="vertical-align: top">
     <td><span class="label label-success">Integer</span></td>
     <td>
+      <% n = 0 %>
       % for p in props["int"]:
       <label>
-	${h.checkbox("bools", value=p["name"], checked=True)}
-	<span>${p["name"]}</span>
-      ${h.text(p["name"], value=p["val"], size=5)}
+	${h.hidden(".properties.int.%d.id" % n, value=p["name"])}
+	${h.checkbox(".properties.int.%d.checked" % n, value="True", checked=True)}
+	${p["name"]}
+	${h.text(".properties.int.%d.val" % n , value=p["val"], size=5)}
+	<a rel="tooltip" href="#" data-original-title="${p['descr']}">${w.icon("info-sign")}</a>
       </label><br/>
+      <% n += 1 %>
       % endfor
     </td>
   </tr>
@@ -45,12 +56,16 @@
   <tr style="vertical-align: top">
     <td><span class="label label-success">String</span></td>
     <td>
+      <% n = 0 %>
       % for p in props["str"]:
       <label>
-	${h.checkbox("bools", value=p["name"], checked=True)}
-	<span>${p["name"]}</span>
-      ${h.select(p["name"], "", [(v, v) for v in p["val"]])}
+	${h.hidden(".properties.str.%d.id" % n, value=p["name"])}
+	${h.checkbox(".properties.str.%d.checked" % n, value="True", checked=True)}
+	${p["name"]}
+	${h.select(".properties.str.%d.val" % n, "", [(v, v) for v in p["val"]])}
+	<a rel="tooltip" href="#" data-original-title="${p['descr']}">${w.icon("info-sign")}</a>
       </label><br/>
+      <% n += 1 %>
       % endfor
     </td>
   </tr>
@@ -63,12 +78,15 @@
 ## ANALYSES (advanced mode)
 
 <%def name="analyses_fields(analyses)">
+<% n = 0 %>
 % for a in analyses:
 <label>
-  ${h.checkbox("analyses", value=a, checked=True)}
+  ${h.hidden(".analyses.%d.id" % n, value=a)}
+  ${h.checkbox(".analyses.%d.checked" % n, value="True", checked=True)}
   <span>${a}</span>
-  ${h.select(a, "", [(v["name"], v["name"]) for v in analyses[a]])}
+  ${h.select(".analyses.%d.val" % n, "", [(v["name"], v["name"]) for v in analyses[a]])}
 </label>
+<% n += 1 %>
 % endfor
 </%def>
 
@@ -76,10 +94,13 @@
 ## PHASES (advanced mode)
 
 <%def name="phases_fields(phases)">
+<% n = 0 %>
 % for p in phases.get("PHASES", []):
 <label>
-  ${h.checkbox("phases", value=p["name"], checked=True)}
+  ${h.hidden(".phases.%d.id" % n, value=p["name"])}
+  ${h.checkbox(".phases.%d.checked" % n, value="True", checked=True)}
   <span>${p["name"]}</span>
 </label>
+<% n += 1 %>
 % endfor
 </%def>

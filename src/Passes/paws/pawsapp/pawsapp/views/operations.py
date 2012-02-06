@@ -12,6 +12,7 @@ from pyramid.renderers   import render
 
 from ..utils             import languages
 from ..helpers           import submit
+from ..schema            import Params
 
 imports = ''
 
@@ -186,16 +187,24 @@ def get_functions(request):
 
 @view_config(route_name='perform', renderer='string', permission='view')
 def perform(request):
-    """Perform transformation
+    """Perform operation (basic/advanced mode)
     """
     form = request.params
-    return _invoke_module(request, form['operation'], form['code'], form['language'])
+    data = dict(p.split('=') for p in form.getall('params[]'))
+    print data
 
-def perform_advanced(request):
-    """
-    """
-    form = request.params
-    return _invoke_module( request,
-                           form['operation'], form['code'],       form['language'],
-                           form['analyses'],  form['properties'], form['phases'],
-                           True)
+    schema = Params()
+
+    print schema.deserialize(schema.unflatten(data))
+
+
+    return
+
+    if form.get('advanced') == 'true':
+        return _invoke_module( request,
+                               form['operation'], form['code'],       form['language'],
+                               form['analyses'],  form['properties'], form['phases'],
+                               True)
+    else:
+        return _invoke_module( request,
+                               form['operation'], form['code'], form['language'])
