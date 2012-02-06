@@ -2,7 +2,7 @@
 
 // Check that effects are taken into account when available
 
-// See also until06.c
+// See also until05.c. Only a tpips option is different to take potential effects of bar into account
 
 #include <stdio.h>
 
@@ -13,10 +13,9 @@ void foo(int *i)
 
 void bar(int *i)
 {
-  ;
 }
 
-void until05()
+void until06()
 {
   int old, new;
  do {
