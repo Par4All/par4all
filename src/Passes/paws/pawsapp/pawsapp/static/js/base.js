@@ -485,16 +485,12 @@ function get_form_values(sel) {
 }
 
 function perform_operation(index, panel_id) {
-    var props    = '',
-	analyses = '',
-	phases   = '';
 
     if(!loaded)
-	return;
+	return false;
 
-    if (true ||advanced) {
-	params = get_form_values('#adv-form')
-    }
+    // Advanced mode parameters
+    var params = advanced ? get_form_values('#adv-form') : [];
 
     if (check_sources(index, panel_id)) { // all files are ok
 	if (multiple) {
