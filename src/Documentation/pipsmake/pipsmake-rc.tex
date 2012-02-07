@@ -2086,6 +2086,15 @@ By default, do not fuse empty control nodes that have labels or comments:
 FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{PipsProp}
 
+By default, do not fuse sequences with internal declarations. Turning
+this to \texttt{TRUE} results in variable renamings when the same
+variable name is used at several places in the analyzed module.
+\begin{PipsProp}{CLEAN_UP_SEQUENCES_WITH_DECLARATIONS}
+CLEAN_UP_SEQUENCES_WITH_DECLARATIONS FALSE
+\end{PipsProp}
+
+
+
 
 %% FI-> ??: why is it located here?
 
