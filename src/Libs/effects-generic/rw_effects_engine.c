@@ -923,7 +923,7 @@ bool rw_effects_engine(const char * module_name)
 
    if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
-			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true) );
+			   db_get_memory_resource(DBR_POINTS_TO, module_name, true) );
     else if (get_pointer_info_kind() == with_pointer_values)
       set_pv( db_get_simple_pv(module_name));
 

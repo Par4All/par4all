@@ -363,9 +363,10 @@ list expression_to_constant_paths(statement s, expression e, set in)
   cell c = cell_undefined;
   entity nowhere = entity_undefined;
   list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL;
-  bool exact_p = false, *nowhere_p = false;
+  bool exact_p = false, *nowhere_p = false, changed = true;
   bool eval_p = true;
   c = get_memory_path(e, &eval_p);
+  c = simple_cell_to_store_independent_cell(c, &changed);
   reference cr = cell_any_reference(c);
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   /* Take into account global variables which are initialized in demand*/
@@ -1022,21 +1023,23 @@ bool opkill_must_constant_path(cell c1, cell c2)
   type t2 = type_undefined;
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
-  bool type_equal_p = true;
-
-  if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
-    if (entity_abstract_location_p(v1))
-      t1 = entity_type(v1);
-    else
-      t1 = simple_effect_reference_type(r1);
-    if (entity_abstract_location_p(v2))
-      t2 = entity_type(v2);
-    else
-      t2 = simple_effect_reference_type(r2);
-    type_equal_p = opkill_must_type(t1,t2);
-  }
+  bool equal_p = true;
+  t1 = cell_reference_to_type(r1,&equal_p);
+  t2 = cell_reference_to_type(r2, &equal_p);
+  equal_p = type_equal_p(t1,t2);
+  /* if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){ */
+  /*   if (entity_abstract_location_p(v1)) */
+  /*     t1 = entity_type(v1); */
+  /*   else */
+  /*     t1 = simple_effect_reference_type(r1); */
+  /*   if (entity_abstract_location_p(v2)) */
+  /*     t2 = entity_type(v2); */
+  /*   else */
+  /*     t2 = simple_effect_reference_type(r2); */
+  /*   type_equal_p = opkill_must_type(t1,t2); */
+  /* } */
   kill_must_p =opkill_must_module(c1,c2) && opkill_must_name(c1,c2) &&
-    type_equal_p && opkill_must_vreference(c1,c2);
+    equal_p && opkill_must_vreference(c1,c2);
 
    return kill_must_p;
 }

@@ -2397,7 +2397,7 @@ proper_effects                  > MODULE.proper_effects
 proper_effects_with_points_to > MODULE.proper_effects
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.points_to_list
+        < MODULE.points_to
         < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -2453,7 +2453,7 @@ cumulated_pointer_effects_with_points_to > MODULE.cumulated_pointer_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_pointer_effects
-        < MODULE.points_to_list
+        < MODULE.points_to
 \end{PipsMake}
 
 \begin{PipsMake}
@@ -2461,7 +2461,7 @@ cumulated_pointer_effects_with_pointer_values > MODULE.cumulated_pointer_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_pointer_effects
-        < MODULE.points_to_list
+        < MODULE.points_to
 \end{PipsMake}
 
 \begin{PipsMake}
@@ -5052,7 +5052,7 @@ must_pointer_regions_with_points_to > MODULE.proper_pointer_regions
         < MODULE.cumulated_effects
         < MODULE.transformers
         < MODULE.preconditions
-        < MODULE.points_to_list
+        < MODULE.points_to
         < CALLEES.summary_pointer_regions
 \end{PipsMake}
 
@@ -5354,12 +5354,12 @@ alias_classes > MODULE.alias_classes
         < MODULE.alias_lists
 \end{PipsMake}
 
-\subsection{Intraprocedural Summary Points to Analysis}
+\subsection{Init  Points to Analysis}
 
 This phase generates synthetic points-to relations for formal
 parameters. It creates synthetic sinks, i.e. stubs, for formal
 parameters and provides an initial set of points-to to the
-\PipsPassRef{points_to_analysis}.
+\PipsPassRef{intraprocedural_points_to_analysis}.
 
 Currently, it assumes that no sharing exists between the formal
 parameters and within the data structures pointed to by the formal
@@ -5368,44 +5368,71 @@ parameters. Two properties should control this behavior,
 \PipsPropRef{ALIASING_ACROSS_TYPES}. The first one supersedes the
 property \PipsPropRef{ALIASING_INSIDE_DATA_STRUCTURE}.
 \begin{PipsMake}
-alias intraprocedural_summary_points_to_analysis  'Intraprocedural Summary Points To Analysis'
+alias init_points_to_analysis  'Init Points To Analysis'
 
-intraprocedural_summary_points_to_analysis > MODULE.summary_points_to_list
+init_points_to_analysis > MODULE.init_points_to_list
            < PROGRAM.entities
            < MODULE.code
 \end{PipsMake}
 
-\subsection{Points to Analysis}
-\label{subsection-points-to-analysis}
-\index{Points to Analysis}
+\subsection{Intraprocedural Points to Analysis}
+\label{subsection-intraprocedural-points-to-analysis}
+\index{Intraprocedural Points to Analysis}
 
 This function is being implemented by Amira \textsc{Mensi}.
-The \PipsPassRef{points_to_analysis} is implemented in order to
+The \PipsPassRef{intraprocedural_points_to_analysis} is implemented in order to
 compute points-to relations, based on Emami algorithm. \textsc{Emami} algorithm
 is a top-down analysis which calcules the points-to relations by
 applying specific rules to each assignement pattern identified.
 This phase requires another resource which
-is \PipsPassRef{intraprocedural_summary_points_to_analysis}.
+is \PipsPassRef{init_points_to_analysis}.
 Ressources points\_to\_in and points\_to\_out will be used to compute
 the transfer function later. They represent points-to relation at the beginning of functions
 where sources are formal parameters or global variables. Points\_to\_out are points-to relations
 at the end of function's body, it contains return value and it's sink, formal parameters, gloabl 
 variables and heap allocated variables which can be visible beyond function's scope.
-
+And using effects to compute calls impact
+on points-to analysis.
 \begin{PipsMake}
-alias points_to_analysis  'Points To Analysis'
+alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 
-points_to_analysis > MODULE.points_to_list
+intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.summary_points_to_list
-
+        < MODULE.init_points_to_list
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
 \end{PipsMake}
 
 The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
+
+
+\subsection{Interprocedural Points to Analysis}
+\label{subsection-interprocedural-points-to-analysis}
+\index{Interprocedural Points to Analysis}
+
+This pass is being implemented by Amira \textsc{Mensi}.
+The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. 
+This phase requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+
+\begin{PipsMake}
+alias interprocedural_points_to_analysis  'Interprocedural Points To Analysis'
+
+interprocedural_points_to_analysis > MODULE.points_to
+                                  < PROGRAM.entities
+                                  < MODULE.code 
+                                  < MODULE.points_to_out
+                                  < MODULE.points_to_in
+                                  < MODULE.points_to
+                                  < CALLEES.summary_effects
+                                                                    
+\end{PipsMake}
+
 
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
@@ -5431,7 +5458,7 @@ simple_pointer_values > MODULE.simple_pointer_values
 \subsection{Properties for pointer analyses}
 
 The following properties are defined to ensure the safe use
-of \PipsPassRef{points_to_analysis}.
+of \PipsPassRef{intraprocedural_points_to_analysis}.
 
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
 pointers of different effective types can be aliased. The default and
@@ -13050,8 +13077,8 @@ print_code_points_to_list      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-        < MODULE.summary_points_to_list
-        < MODULE.points_to_list
+        < MODULE.init_points_to_list
+        < MODULE.points_to
 \end{PipsMake}
 
 \subsection{Sequential View with Simple Pointer Values}

@@ -88,8 +88,9 @@ bool entity_all_locations_p(entity e)
 entity entity_nowhere_locations()
 {
   static entity nowhere = entity_undefined;
+  static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION ;
+  nowhere = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(nowhere)) {
-      static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION ;
       area a = make_area(0,NIL); /* Size and layout are unknown */
       type t = make_type_area(a);
       nowhere = make_entity(strdup(any_name),
@@ -100,6 +101,9 @@ entity entity_nowhere_locations()
 
    return nowhere;
 }
+
+
+
 /* test if an entity is the bottom of the lattice*/
 bool entity_nowhere_locations_p(entity e)
 {
@@ -163,10 +167,10 @@ entity entity_all_module_locations(entity m)
 bool entity_all_module_locations_p(entity e)
 {
 
-  bool null_pointer_p;
-  null_pointer_p = same_string_p(entity_local_name(e), ANYWHERE_LOCATION);
+  bool all_module_p;
+  all_module_p = same_string_p(entity_local_name(e), ANYWHERE_LOCATION);
 
-  return null_pointer_p;
+  return all_module_p;
 }
 
 /* return m:xxx*ANYWHERE*
@@ -330,6 +334,7 @@ bool entity_all_xxx_locations_p(entity e, string xxx)
 }
 
 
+
 /* return m:*HEAP**ANYWHERE */
 entity entity_all_module_heap_locations(entity m)
 {
@@ -447,9 +452,10 @@ bool entity_stub_sink_p(entity e)
 {
   bool stub_sink_p = false;
   const char * en = entity_local_name(e);
+  storage s = entity_storage(e);
   char first = en[0];
   char penultimate = en[strlen(en) - 2];
-  if(formal_parameter_p(e) && first == '_' && penultimate == '_')
+  if(storage_rom_p(s) && first == '_' && penultimate == '_')
     stub_sink_p = true;
 
   return stub_sink_p;

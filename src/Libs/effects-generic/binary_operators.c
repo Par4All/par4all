@@ -1176,6 +1176,11 @@ bool cells_combinable_p(cell c1, cell c2)
 	{
 	  bool al1_p = entity_abstract_location_p(e1);
 	  bool al2_p = entity_abstract_location_p(e2);
+	  bool heap1_p = al1_p && entity_heap_location_p(e1);
+	  bool heap2_p = al2_p && entity_heap_location_p(e2);
+	  bool heap1_context_sensitive_p = heap1_p && entity_flow_or_context_sentitive_heap_location_p(e1);
+	  bool heap2_context_sensitive_p = heap2_p && entity_flow_or_context_sentitive_heap_location_p(e2);
+	  
 	  /* if one of them is an abstract location, they may be combinable */
 	  if ( al1_p || al2_p)
 	    {
@@ -1209,9 +1214,44 @@ bool cells_combinable_p(cell c1, cell c2)
 		    /*two abstract locations or one abstract location and a scalar */
 		    combinable_p = entities_may_conflict_p(e1,e2);
 		  else
+		    {
+		      if (heap1_p || heap2_p)
+			{
+			  if (heap1_context_sensitive_p && heap2_context_sensitive_p)
+			    {
+			      // they conflict only if they are the same. however, this case
+			      // has already been handled before
+			      combinable_p = false;
+			    }
+			  else if (heap1_p && heap2_p)
+			    {
+			      // the two are heap entities but at most one of them is context sensitive
+			      // they are combinable
+			      combinable_p = true;
+			    }
+			  else 
+			    {
+			      // only one of them is a heap location
+			      // if the other one is not an abstract location, then they are not
+			      // combinable
+			      if ((heap1_p && !al2_p) || (heap2_p && !al1_p))
+				{
+				  combinable_p = false;
+				}
+			      else
+				{
+				  /* here it is more difficult, to be handled later */
+				  pips_internal_error("case not handled yet\n");
+				}
+			    }
+			}
+		      else
+			{
 		    /* here we should consider the type of the non abstract location reference,
 		       whether there is a dereferencement or not to guess the memory area, ... */
 		    pips_internal_error("case not handled yet\n");
+	    }
+		    }
 	    }
 
 	  else combinable_p = false; /* two concrete location paths beginning from different entities
