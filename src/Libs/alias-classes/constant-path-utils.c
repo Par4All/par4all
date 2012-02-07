@@ -1021,8 +1021,8 @@ bool opkill_must_constant_path(cell c1, cell c2)
   reference r2 = cell_any_reference(c2);
   type t1 = type_undefined;
   type t2 = type_undefined;
-  entity v1 = reference_variable(r1);
-  entity v2 = reference_variable(r2);
+  //entity v1 = reference_variable(r1);
+  //entity v2 = reference_variable(r2);
   bool equal_p = true;
   t1 = cell_reference_to_type(r1,&equal_p);
   t2 = cell_reference_to_type(r2, &equal_p);
