@@ -14,13 +14,23 @@ def perform(source_path, op, advanced=False, **params):
         ws = pworkspace(str(source_path), deleteOnClose=True)
 
         if advanced:
-            if 'properties' in params and params['properties'] != "":
-                print params['properties']
-                set_properties(ws, str(properties).split(';')[: -1])
-            if analysis != "":
-                activate(ws, analysis)
-            if phases != "":
-                apply_phases(ws, phases)
+
+            # Set properties
+            for props in params.get('properties', {}).values():
+                for p in props:
+                    if p['checked']:
+                        val = str(p['val']) if isinstance(p['val'], unicode) else p['val'] ##TODO
+                        setattr(ws.props, p['id'], val)
+
+            # Activate analyses
+            for a in params.get('analyses', []):
+                if a['checked']:
+                    ws.activate(str(a['val']))
+
+            # Apply phases
+            for p in params.get('phases', []):
+                if p['checked']:
+                    getattr(ws.all, p['id'])()
 
         functions = ''
         for fu in ws.fun:
@@ -47,28 +57,6 @@ def perform_multiple(sources, op, function_name, advanced=False, **params):
     except:
         ws.close()
         raise
-
-def activate(ws, analyses):
-    for analysis in analyses[ : -1].split(';'):
-        ws.activate(str(analysis))
-
-def apply_phases(ws, phases):
-    for phase in phases[ : -1].split(';'):
-        if phase.split()[1] == 'true':
-            getattr(ws.all, phase.split()[0])()
-
-def set_properties(ws, properties):
-    for prop in properties:
-        pair = prop.split()
-        default = getattr(ws.props, pair[0])
-        if type(default) == int:
-            value = int(pair[1])
-        elif type(default) == bool:
-            value = False if pair[1] == 'false' else True
-        else:
-            value = pair[1]
-        if default != value:
-            setattr(ws.props, pair[0], value)
 
 def get_functions(sources):
     ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
