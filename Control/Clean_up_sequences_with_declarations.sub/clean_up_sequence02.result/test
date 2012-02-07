@@ -1,0 +1,8 @@
+int main(int argc, char *argv[])
+{
+   int i_0;
+   i_0 = 3;
+   int i;
+   i = 4;
+   return 0;
+}

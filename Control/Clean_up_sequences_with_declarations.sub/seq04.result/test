@@ -1,0 +1,9 @@
+int main()
+{
+   int i = 0;
+   int j_0 = 1;
+   i = i+j_0;
+   int j = 2;
+   i = i+j;
+   return i;
+}

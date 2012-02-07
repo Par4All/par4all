@@ -1,0 +1,8 @@
+void block_scope()
+{
+   int x = 6;
+   int x_0;
+lab1:   x_0--;
+   x++;
+   goto lab1;
+}

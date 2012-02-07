@@ -1,0 +1,7 @@
+void block_scope()
+{
+   int x_0;
+   x_0 = 0;
+   int x;
+   x = 1;
+}
