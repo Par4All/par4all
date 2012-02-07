@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace, module
-from pyrops import pworkspace
+from pyps       import workspace, module
+from pyrops     import pworkspace
+
 
 def import_module(operation):
 	return __import__('paws_' + operation, None, None, ['__all__'])
@@ -8,7 +11,7 @@ def import_module(operation):
 def perform(source_path, operation, advanced=False, properties=None, analysis=None, phases=None):
 	mod = import_module(operation)
         try:
-                ws = pworkspace(source_path, deleteOnClose=True)
+                ws = pworkspace(str(source_path), deleteOnClose=True)
                 if advanced:
                         if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
                         if (analysis != ""): activate(ws, analysis)
@@ -25,7 +28,7 @@ def perform(source_path, operation, advanced=False, properties=None, analysis=No
 def perform_multiple(sources, operation, function_name, advanced=False, properties=None, analysis=None, phases=None):
 	mod = import_module(operation)
         try:
-                ws = pworkspace(*sources, deleteOnClose=True)
+                ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
 		if advanced:
                         if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
                         if (analysis != ""): activate(ws, analysis)
@@ -53,17 +56,14 @@ def set_properties(ws, properties):
                 if type(default) == int:
                         value = int(pair[1])
                 elif type(default) == bool:
-                        if pair[1] == 'false':
-                                value = False
-                        else:
-                                value = True
+                        value = False if pair[1] == 'false' else True
                 else:
                         value = pair[1]
                 if default != value:
                         setattr(ws.props, pair[0], value)
 
 def get_functions(sources):
-        ws = pworkspace(*sources, deleteOnClose=True)
+        ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
         functions = []
         for fu in ws.fun:
                 functions.append(fu.name)
