@@ -5,86 +5,64 @@ Generic tool controller
 
 """
 import os, re
-
+from ConfigParser import SafeConfigParser
 from zipfile      import ZipFile
 from pyramid.view import view_config
 
 
-toolName = dict(
-    preconditions = u'Preconditions over scalar integer variables',
-    openmp        = u'Openmp demo page',
-    in_regions    = u'IN regions',
-    out_regions   = u'OUT regions',
-    regions       = u'Array regions',
-    )
+def get_tooldir(request, tool):
+    """Get tool directory full path.
 
-
-def _list_examples(tool, request):
-    """Get list of examples for the specified tool.
+    :request: Pyramid request
+    :tool:    Tool name
     """
-    path = os.path.join(request.registry.settings['paws.validation'], 'tools', os.path.basename(tool))
-    return [ f for f in sorted(os.listdir(path))
-             if os.path.isdir(f) == False
-             and (f.endswith('.c') or f.endswith('.f'))]
+    return os.path.join(request.registry.settings['paws.validation'], 'tools', os.path.basename(tool))
 
 
-def _parse_lst_file(lst_file, callback):
-    """Parse a .lst file
+def list_examples(request, tool):
+    """Get list of examples for the tool.
+
+    :request: Pyramid request
+    :tool:    Tool name
     """
-    out = {}
-    if os.path.exists(lst_file):
-        for line in file(lst_file):
-            match = re.match(r'<<(\w+)>>', line)
-            if match: # Section header
-                section = match.group(1)
-                out[section] = []
-            else:     # Property line
-                p = line.replace('\n', '').split(';')
-                out[section].append(callback(p, section))
-    return out
+    tooldir = get_tooldir(request, tool)
+    return [ f for f in sorted(os.listdir(tooldir))
+             if os.path.isdir(f)==False and (f.endswith('.c') or f.endswith('.f')) ]
 
 
-def _cb_props(p, section):
-    """Callback for property list parsing
+def get_info(request, tool):
+    """Get information about the tool.
+
+    :request: Pyramid request
+    :tool:    Tool name
     """
-    out = { 'name': p[0], 'descr': p[-1] }
-    if section == 'bool':
-        val = bool(p[1].lower() == 'true')
-    elif section == 'int':
-        val = int(p[1])
-    else: # section == 'str'
-        val = p[1:-1]
-    out['val'] = val
-    return out
 
+    # Callback function 
+    def _parse(k, v, sec):
+        out = dict(name=k, descr=v[-1])
+        if sec.startswith('properties:'):
+            if sec == 'properties:bool':
+                val = bool(v[0].lower() == 'true')
+            elif sec == 'properties:int':
+                val = int(v[0])
+                out['alt'] = v[1]
+            else: # sec == 'properties:str'
+                val = v[0:-1]
+            out['val'] = val
+        return out
 
-def _cb_analyses(p, section):
-    """Callback for analyses parsing
-    """
-    return dict(name=p[0], descr=p[-1])
+    cfg = SafeConfigParser()
+    cfg.optionxform = str # case-sensitive keys
+    cfg.read(os.path.join(get_tooldir(request, tool), 'info.ini'))
 
-
-def _get_props(request):
-    """Get properties for tool (advanced mode)
-    """
-    tool = os.path.basename(request.matchdict['tool']) # sanitized
-    return _parse_lst_file( os.path.join(request.registry.settings['paws.validation'], 'tools', tool, 'properties.lst'),
-                            callback = _cb_props)
-
-def _get_analyses(request):
-    """Get analyses for tool (advanced mode)
-    """
-    tool = os.path.basename(request.matchdict['tool']) # sanitized
-    return _parse_lst_file( os.path.join(request.registry.settings['paws.validation'], 'tools', tool, 'analyses.lst'),
-                            callback = _cb_analyses)
-
-
-def _get_phases(request):
-    """Get phases for tool (advanced mode)
-    """
-    tool = os.path.basename(request.matchdict['tool']) # sanitized
-    return _parse_lst_file( os.path.join(request.registry.settings['paws.validation'], 'tools', tool, 'phases.lst'),
-                            callback = _cb_analyses)
+    info = { 'title' : cfg.get('info', 'title'),
+             'descr' : cfg.get('info', 'description'),
+             }
+    for cat in ('properties', 'analyses', 'phases'):        
+        info[cat] = { sec.split(':')[1] : [ _parse(k, v.split(';'), sec) for k,v in cfg.items(sec) ]
+                      for sec in cfg.sections() if sec.startswith(cat + ':')
+                      }
+    return info
 
 
 @view_config(route_name='tool_basic',    renderer='pawsapp:templates/tool.mako', permission='view')
@@ -92,22 +70,13 @@ def _get_phases(request):
 def tool(request):
     """Generic tool view (basic and advanced modes).
     """
-    tool     = os.path.basename(request.matchdict['tool'])           # (sanitized)
-    section  = [ s for s in request.site_sections if s['path']=="tools" ][0]
-    entry    = [ e for e in section['entries'] if e['name'] == tool ][0]
+    tool     = os.path.basename(request.matchdict['tool']) # (sanitized)
     advanced = bool(request.matched_route.name.endswith('advanced'))
-    props    = _get_props(request)
-    analyses = _get_analyses(request)
-    phases   = _get_phases(request)
 
     return dict(tool     = tool,
-                name     = toolName[tool],
-                descr    = entry['descr'],
+                info     = get_info(request, tool),
+                examples = list_examples(request, tool),
                 advanced = advanced,
-                props    = props,
-                analyses = analyses,
-                phases   = phases,
-                examples = _list_examples(tool, request),
                 )
 
 

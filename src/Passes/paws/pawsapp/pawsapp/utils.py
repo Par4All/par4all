@@ -5,6 +5,7 @@ PAWS utility functions
 
 """
 import os, json
+from ConfigParser import SafeConfigParser
 
 
 # Supported languages
@@ -48,14 +49,15 @@ class FortranDecoder(object):
 def getSiteSections(request):
     """Compute site sections for the menu bar and home page.
     """
+    cfg        = SafeConfigParser()
     valid_path = request.registry.settings['paws.validation']
     sections   = json.load(file(os.path.join(valid_path, 'main', 'functionalities.txt')))
     for s in sections:
         path = os.path.join(valid_path, os.path.basename(s['path']))
-        s['entries'] = [ { 'name'  : t,
-                           'descr' : file(os.path.join(path, t, '%s.txt' % t)).read(),
-                           }
-                         for t in os.listdir(path) if not t.startswith('.') 
-                         ]
+        s['entries'] = []
+        for t in os.listdir(path):
+            if not t.startswith('.'):
+                cfg.read(os.path.join(path, t, 'info.ini'))
+                s['entries'].append(dict(name = t, descr=cfg.get('info', 'description')))
 
     return sections

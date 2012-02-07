@@ -83,19 +83,22 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
       style="margin-bottom:0">
 
   <p></p>
-  % if props:
+
+  % if info["properties"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-props-modal">
     ${w.icon("list-alt", True)} Properties</button><br/>
   % else:
   <div>${w.icon("list-alt")} No properties</div>
   % endif
-  % if analyses:
+
+  % if info["analyses"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-analyses-modal">
     ${w.icon("list-alt", True)} Select Analyses</button><br/>
   % else:
   <div>${w.icon("list-alt")} No analyses</div>
   % endif
-  % if phases:
+
+  % if info["phases"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-phases-modal">
     ${w.icon("list-alt", True)} Phases</button>
   % else:
@@ -105,26 +108,26 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   ## "Properties" modal
   ${w.modal(u"Properties", advprop_body, id="adv-props-modal", icon="list-alt")}
   <%def name="advprop_body()">
-  ${adv.properties_fields(props)}
+  ${adv.properties_fields(info["properties"])}
   </%def>
 
   ## "Select Analyses" modal
   ${w.modal(u"Select Analyses", advanl_body, id="adv-analyses-modal", icon="list-alt")}
   <%def name="advanl_body()">
-  ${adv.analyses_fields(analyses)}
+  ${adv.analyses_fields(info["analyses"])}
   </%def>
 
   ## "Phases" modal
   ${w.modal(u"Phases", advphases_body, id="adv-phases-modal", icon="list-alt")}
   <%def name="advphases_body()">
-  ${adv.phases_fields(phases)}
+  ${adv.phases_fields(info["phases"])}
   </%def>
 
 </form>
 
-
 </%def>
 
+## "No source" alert
 <%def name="no_source_warning()">
 <div class="alert alert-warning">
   ${w.icon("warning-sign")}
@@ -133,16 +136,17 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 </%def>
 
 
+
 ## MAIN COLUMN
 
 <%def name="main_column()">
 
 <iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
 
-<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em" data-content="${descr}" data-original-title="${tool}">
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em" data-content="${info['descr']}" data-original-title="${tool}">
   <h2>
     ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
-    ${name}
+    ${info["title"]}
   </h2>
 </div>
 
