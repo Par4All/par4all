@@ -118,7 +118,7 @@
 		</a>		
 		<ul class="dropdown-menu">
 		  % for t in s["entries"]:
-		  <li>${h.link_to(t["name"].upper(), url="/%s/%s" % (s["path"], t["name"]), title=t["descr"])}</li>
+		  <li>${h.link_to(t["name"].upper(), url="/%s/%s" % (s["path"], t["name"]), title=t["title"])}</li>
 		  % endfor
 		</ul>
 	      </li>

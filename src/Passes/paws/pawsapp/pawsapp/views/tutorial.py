@@ -74,7 +74,7 @@ def _create_png(request, function, tutorial):
 def tutorial(request):
 
     tutorial = os.path.basename(request.matchdict['tutorial'])  # (sanitized)
-    name     = tutorialName[tutorial]
+    name     = "tutorialName[tutorial]" ##TODO
     path     = _get_path(request, tutorial)
 
     source   = os.path.join(path, name)
