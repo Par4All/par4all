@@ -17,25 +17,31 @@ from ..schema            import Params
 imports = ''
 
 
-def _create_file(request, functionality, code, language):
+def _create_file(request, op, code, lang):
+    """Create a temp file to receive a source file, and return its full path.
     """
-    """
-    tempdir = request.registry.settings['paws.tempdir']
-    fname   = functionality + "_code" + languages[language]['ext']
-    path    = os.path.join(tempdir, request.session['workdir'], os.path.basename(fname))
+    tmpdir  = request.registry.settings['paws.tempdir']
+    fname   = os.path.basename(op + "_code" + languages[lang]['ext']) # sanitize
+    workdir = os.path.basename(request.session['workdir']) # sanitize
+    path    = os.path.join(tmpdir, workdir, fname)
     file(path, 'w').write(code)
-    return path.replace(tempdir, os.path.basename(tempdir))
+    print "CREATE_FILE", path
+    return path
 
 def _get_workdir(request):
+    """
+    """
     resultdir = request.registry.settings['paws.resultdir']
-    path = os.path.join(resultdir, os.path.basename(request.session['workdir']))
+    workdir   = os.path.basename(request.session['workdir']) # sanitize
+    path = os.path.join(resultdir, workdir)
     if not os.path.exists(path): os.mkdir(path)
     return path
 
 def _get_directory(request):
     """Create and return a per-session temporary working directory
     """
-    workdir = mkdtemp(dir=request.registry.settings['paws.tempdir'])
+    tmpdir  = request.registry.settings['paws.tempdir']
+    workdir = mkdtemp(dir=tmpdir)
     request.session['workdir'] = os.path.basename(workdir)
     return request.session['workdir']
 
@@ -52,34 +58,17 @@ def _create_result_graphs(request, graph):
     file(os.path.join(path, os.path.basename(graph)), 'w').write(file(graph).read()) ##TODO!!
 	
 def _delete_dir(filename):
-    """
+    """Delete the directory containing 'filename'.
     """
     dirname = os.path.dirname(filename)
     if os.path.exists(dirname):
         shutil.rmtree(dirname)
-
 
 def _import_base_module(request):
     """
     """
     sys.path.append(os.path.join(request.registry.settings['paws.validation'], 'pyps_modules')) ##TODO
     return __import__('paws_base', None, None, ['__all__'])
-
-
-def _get_includes(code):
-    """
-    """
-    lines = [l for l in code.split('\n') if re.match("#include", l)]
-    return '\n'.join(lines)
-
-
-def _get_source_file(request, operation, code, language):
-    """
-    """
-    global imports ##TODO
-    imports = _get_includes(code) if language == "C" else ''
-    return _create_file(request, operation, code, language)
-
 
 def _analyze_functions(request, source_files):
     """
@@ -88,31 +77,12 @@ def _analyze_functions(request, source_files):
     request.session['methods'] = mod.get_functions(source_files)
     return request.session['methods']
 
-
 def _catch_error(msg):
     traceback.print_exc(file=sys.stdout)
     traceback_msg = traceback.format_exc()
     return 'EXCEPTION<br/>' + str(msg) + '<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
 
-
-def _invoke_module( request, operation, code, language,
-                    analysis=None, properties=None, phases=None,
-                    advanced=False):
-    """
-    """
-    source_file = _get_source_file(request, operation, code, language)
-    mod = _import_base_module(request)
-    try:
-        functions = mod.perform(os.getcwd() + '/' + str(source_file), operation, advanced, properties, analysis, phases)
-        _delete_dir(source_file)
-        return _highlight_code(request, imports + '\n' + functions, language)
-    except RuntimeError, msg:
-        return _catch_error(msg)
-    except:
-        return _catch_error('')
-
-
-def _invoke_module_multiple( request, sources, operation, function, language,
+def _invoke_module_multiple( request, sources, operation, function, lang,
                              analysis=None, properties=None, phases=None,
                              advanced=False):
     """
@@ -120,7 +90,7 @@ def _invoke_module_multiple( request, sources, operation, function, language,
     mod = _import_base_module(request)
     try:
         result = _perform_multiple(sources, operation, function, advanced, properties, analysis, phases)
-        return _highlight_code(result, language)
+        return _highlight_code(result, lang)
     except RuntimeError, msg:
         return _catch_error(msg)
     except:
@@ -132,7 +102,6 @@ def _perform_multiple(request):
     return _invoke_module_multiple( request.session['sources'], form['operation'],
                                     form['functions'], form['language'])
 
-
 def perform_multiple_advanced(request):
     form = request.params
     return _invoke_module_multiple( request.session['sources'], form['operation'],
@@ -140,16 +109,16 @@ def perform_multiple_advanced(request):
                                     form['properties'], form['phases'], True)
 
 
-def _highlight_code(request, code, language, demo=False):
+def _highlight_code(request, code, lang, demo=False):
     """Apply Pygment formatting
     """
     code = code.replace('\n\n', '\n')
     if not demo:
         _create_result_file(request, code)
     lexer = None
-    if language == 'C':
+    if lang == 'C':
         lexer = CLexer()
-    elif language in ('Fortran77', 'Fortran95'):
+    elif lang in ('Fortran77', 'Fortran95'):
         lexer = FortranLexer()
     if lexer:
         code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
@@ -190,21 +159,32 @@ def perform(request):
     """Perform operation (basic/advanced mode)
     """
     form = request.params
-    data = dict(p.split('=') for p in form.getall('params[]'))
-    print data
+    op   = form.get('op')
+    code = form.get('code')
+    lang = form.get('lang')
+    adv  = bool(form.get('adv') == 'true')
 
-    schema = Params()
-
-    print schema.deserialize(schema.unflatten(data))
-
-
-    return
-
-    if form.get('advanced') == 'true':
-        return _invoke_module( request,
-                               form['operation'], form['code'],       form['language'],
-                               form['analyses'],  form['properties'], form['phases'],
-                               True)
+    if adv:
+        # Advanced mode: deserialize form values
+        schema = Params()
+        data   = dict(p.split('=') for p in form.getall('params[]'))
+        params = schema.deserialize(schema.unflatten(data))
     else:
-        return _invoke_module( request,
-                               form['operation'], form['code'], form['language'])
+        # Basic mode
+        params = {}
+
+    # Perform operation
+    global imports ##TODO
+    imports = '\n'.join(re.findall(r'^\s*#include.*$', code, re.M)) if lang=='C' else '' # C '#include' lines
+    source  = _create_file(request, op, code, lang)
+    mod     = _import_base_module(request)
+    try:
+        functions = mod.perform(source, op, adv, **params)
+        _delete_dir(source)
+        return _highlight_code(request, imports + '\n' + functions, lang)
+    except RuntimeError, msg:
+        return _catch_error(msg)
+    except:
+        return _catch_error('')
+
+

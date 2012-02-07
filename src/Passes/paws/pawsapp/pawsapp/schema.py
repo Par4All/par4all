@@ -11,6 +11,8 @@ import colander
 class DictBool(colander.MappingSchema):
     id      = colander.SchemaNode(colander.String())
     checked = colander.SchemaNode(colander.Boolean(), missing=False)
+    val     = colander.SchemaNode(colander.Boolean(), missing=True)
+    
 
 class DictInt(colander.MappingSchema):
     id      = colander.SchemaNode(colander.String())

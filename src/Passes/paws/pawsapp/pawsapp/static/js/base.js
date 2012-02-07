@@ -498,11 +498,11 @@ function perform_operation(index, panel_id) {
 	} else {
 	    $.post(
 		routes['perform'],
-		{ code      :  $('#sourcecode-'+index).text(),
-		  language  :  $('#lang-'+index).html(),
-		  operation : operation,
-		  advanced  : advanced,
-		  params    : params,
+		{ code   :  $('#sourcecode-'+index).text(),
+		  lang   :  $('#lang-'+index).html(),
+		  op     : operation,
+		  adv    : advanced,
+		  params : params,
 		},
 		function(data) {
 		    $("#resultcode").html(data);
