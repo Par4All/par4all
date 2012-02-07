@@ -2247,22 +2247,6 @@ Loop labels can be kept thanks to this property:
 REMOVE_USELESS_LABEL_KEEP_LOOP_LABEL FALSE
 \end{PipsProp}
 
-\begin{PipsPass}{merge_sequences}
-  Merge sequences directly nested inside another sequence into the
-  latter. This mostly arises when macros are expanded or with
-  automatically generated code. The code is supposed to have been
-  already controlized.
-
-  Declarations are left at their original place, but variables are
-  renamed if they have the same name as another variable of the
-  nesting sequence.
-\end{PipsPass}
-\begin{PipsMake}
-merge_sequences > MODULE.code
-  < PROGRAM.entities
-  < MODULE.code
-\end{PipsMake}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
