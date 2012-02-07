@@ -5,28 +5,36 @@ from pyps       import workspace, module
 from pyrops     import pworkspace
 
 
-def import_module(operation):
-    return __import__('paws_' + operation, None, None, ['__all__'])
+def import_module(op):
+    return __import__('paws_' + op, None, None, ['__all__'])
 
-def perform(source_path, operation, advanced=False, properties=None, analysis=None, phases=None):
-    mod = import_module(operation)
+def perform(source_path, op, advanced=False, **params):
+    mod = import_module(op)
     try:
         ws = pworkspace(str(source_path), deleteOnClose=True)
+
         if advanced:
-            if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
-            if (analysis != ""): activate(ws, analysis)
-            if (phases != ""): apply_phases(ws, phases)
+            if 'properties' in params and params['properties'] != "":
+                print params['properties']
+                set_properties(ws, str(properties).split(';')[: -1])
+            if analysis != "":
+                activate(ws, analysis)
+            if phases != "":
+                apply_phases(ws, phases)
+
         functions = ''
         for fu in ws.fun:
             functions += mod.invoke_function(fu, ws)
+
         ws.close()
         return functions
+
     except:
         ws.close()
         raise
 
-def perform_multiple(sources, operation, function_name, advanced=False, properties=None, analysis=None, phases=None):
-    mod = import_module(operation)
+def perform_multiple(sources, op, function_name, advanced=False, **params):
+    mod = import_module(op)
     try:
         ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
         if advanced:
