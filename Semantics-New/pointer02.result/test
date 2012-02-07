@@ -108,7 +108,7 @@ int main()
 
 Cumulated effects for "foo" with points-to information
 
-//             <    is read   >: _p_1 p
+//             <    is read   >: p
 void foo(double *p)
 {
 //             <    is read   >: _p_1 p

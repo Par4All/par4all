@@ -7,9 +7,7 @@ POINTS TO
 // q -> _q_3[0] , EXACT
 
 
-// Points To OUT:
-// p -> _q_3[0] , EXACT
-// q -> _q_3[0] , EXACT
+// Points To OUT: none
 
 void pointer11(int n, float *p, float *q)
 {
@@ -48,9 +46,7 @@ Proper effects with points-to
 // q -> _q_3[0] , EXACT
 
 
-// Points To OUT:
-// p -> _q_3[0] , EXACT
-// q -> _q_3[0] , EXACT
+// Points To OUT: none
 
 void pointer11(int n, float *p, float *q)
 {

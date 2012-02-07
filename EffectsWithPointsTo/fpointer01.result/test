@@ -46,10 +46,7 @@ POINTS-TO
 // nbout -> _nbout_6 , EXACT
 
 
-// Points To OUT:
-// _stream -> __stream_2 , EXACT
-// col -> _col_4 , EXACT
-// nbout -> _nbout_6 , EXACT
+// Points To OUT: none
 
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
