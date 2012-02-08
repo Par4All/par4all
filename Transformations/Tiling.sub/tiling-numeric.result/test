@@ -44,51 +44,51 @@ C    1<=I, I<=100, 1<=J, J<=100}>
             DO K = I, I+T-1                                             0011
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, J<=PHI2, PHI2<=J+9, 1<=I, I<=100,
-C    K<=I+9, I<=K, 1<=J, J<=100}>
+C    I<=K, K<=I+9, 1<=J, J<=100}>
 C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, J<=PHI2, PHI2<=J+9, 1<=I, I<=100,
-C    K<=I+9, I<=K, 1<=J, J<=100}>
+C    I<=K, K<=I+9, 1<=J, J<=100}>
 C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1+1, PHI1<=K+1, J<=PHI2+1, PHI2<=J+10,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100}>
 C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100}>
 
                DO L = J, J+T-1                                          0012
 
-C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 
                   A(K,L) = 0                                            0013
 
-C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
-C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 C  <B(PHI1,PHI2)-R-EXACT-{K<=PHI1+1, PHI1<=K+1, L<=PHI2+1, PHI2<=L+1,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 
                   DO M = -1, 1                                          0014
 
-C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
-C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 C  <B(PHI1,PHI2)-R-EXACT-{K+M==PHI1, L<=PHI2+1, PHI2<=L+1, 1<=I,
-C    I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C    I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 C  <KERNEL(PHI1,PHI2)-R-EXACT-{PHI1==M+1, 0<=PHI2, PHI2<=2, 1<=I,
-C    I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C    I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 
                      DO N = -1, 1                                       0015
 
-C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=1}>
-C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=1}>
-C  <B(PHI1,PHI2)-R-EXACT-{K+M==PHI1, L+N==PHI2, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=1}>
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1, N<=1}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1, N<=1}>
+C  <B(PHI1,PHI2)-R-EXACT-{K+M==PHI1, L+N==PHI2, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1, N<=1}>
 C  <KERNEL(PHI1,PHI2)-R-EXACT-{PHI1==M+1, PHI2==N+1, 1<=I, I<=100,
-C    K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1,
+C    I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1,
 C    N<=1}>
 
                         A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0016
@@ -163,37 +163,37 @@ C    1<=I, I<=100, 1<=J, J<=100}>
             DO K = I, I+T-1                                             0011
 
 C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1+1, PHI1<=K+1, J<=PHI2+1,
-C    PHI2<=J+10, 1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100}>
+C    PHI2<=J+10, 1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100}>
 
                DO L = J, J+T-1                                          0012
                   A(K,L) = 0                                            0013
 
-C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1+1, PHI1<=K+1, L<=PHI2+1, PHI2<=L+1,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 
                   DO M = -1, 1                                          0014
 
-C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 C  <B(PHI1,PHI2)-IN-EXACT-{K+M==PHI1, L<=PHI2+1, PHI2<=L+1, 1<=I,
-C    I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C    I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{PHI1==M+1, 0<=PHI2, PHI2<=2, 1<=I,
-C    I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1}>
+C    I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1}>
 
                      DO N = -1, 1                                       0015
 
-C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=1}>
-C  <B(PHI1,PHI2)-IN-EXACT-{K+M==PHI1, L+N==PHI2, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1, N<=1}>
+C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1, N<=1}>
+C  <B(PHI1,PHI2)-IN-EXACT-{K+M==PHI1, L+N==PHI2, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1, N<=1}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{PHI1==M+1, PHI2==N+1, 1<=I, I<=100,
-C    K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L, 0<=M+1, M<=1, 0<=N+1,
+C    I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9, 0<=M+1, M<=1, 0<=N+1,
 C    N<=1}>
 
                         A(K,L) = A(K,L)+B(K+M,L+N)*KERNEL(M+1,N+1)      0016
@@ -253,17 +253,17 @@ C    PHI2<=100, J<=PHI2, PHI2<=J+9, 1<=I, I<=100, 1<=J, J<=100}>
             DO K = I, I+T-1                                             0011
 
 C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==K, PHI1<=100, PHI2<=100, J<=PHI2,
-C    PHI2<=J+9, 1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100}>
+C    PHI2<=J+9, 1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100}>
 
                DO L = J, J+T-1                                          0012
 
-C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, K<=I+9,
-C    I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C  <A(PHI1,PHI2)-OUT-EXACT-{PHI1==K, PHI2==L, 1<=I, I<=100, I<=K,
+C    K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 
                   A(K,L) = 0                                            0013
 
 C  <A(PHI1,PHI2)-OUT-MAY-{PHI1==K, PHI2==L, PHI1<=100, PHI2<=100,
-C    1<=I, I<=100, K<=I+9, I<=K, 1<=J, J<=100, L<=J+9, J<=L}>
+C    1<=I, I<=100, I<=K, K<=I+9, 1<=J, J<=100, J<=L, L<=J+9}>
 
                   DO M = -1, 1                                          0014
 
