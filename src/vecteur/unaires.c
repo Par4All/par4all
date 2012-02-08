@@ -471,9 +471,8 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
     return cmp;
 }
 
-int
-vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
-			   int (*compare)(Pvecteur*, Pvecteur*))
+int vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
+				       int (*compare)(Pvecteur*, Pvecteur*))
 {
     int cmp = 0;
 
@@ -482,8 +481,47 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
     return cmp;
 }
 
+/* The two sparse vectors are assumed to have exactly the same
+   structure, the same non-zero components in the same order. */
+static int vect_lexicographic_coefficient_comparison(Pvecteur v1, Pvecteur v2)
+{
+  Pvecteur pv1, pv2;
+  int cmp = 0;
+
+  for(pv1 = v1, pv2 = v2;
+      !VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0;
+      pv1 = pv1->succ, pv2= pv2->succ) {
+    Value c1 = vecteur_val(pv1);
+    Value c2 = vecteur_val(pv2);
+    if(value_gt(c1, c2))
+      cmp = 1;
+    else if(value_gt(c2, c1))
+      cmp = -1;
+  }
+  return cmp;
+}
+
 /* This function is a trade-off between a real lexicographic sort
- * and a prettyprinting function.
+ * and a prettyprinting function also used for code generation.
+ *
+ * Its goal is to sort constraints used as loop bounds or obtained as
+ * preconditions. Each constraint or vector is assumed internally
+ * sorted using the compare function, e.g. 2i + 3j + 4 is correct,
+ * while 3j + 4 + 2i is not if the alphabetical order is used and if
+ * constants appear as last vector elements.
+ *
+ * When multiple constraints appear in a constraint system, we usually
+ * want simpler constraints and vectors first but some order between
+ * variables is still used. E.g. {1, i, i+1, i+j+1, j}. Here, we do
+ * not take into account the vector length as a primary critarion, but
+ * the alphabetical order. The above system is first reduced to a set
+ * of "words" {"", "i", "ij", "j"} and is lexicographically sorted
+ * [This is simplified: each letter in this example is in fact a work
+ * in the general case]. In case, two "words" are identical, e.g. "ij"
+ * and "ij", the length of the two underlying vectors, e.g. i+j,
+ * i+j+1, i+2*j, are compared. If they are equal, the lexicographic
+ * order of the coefficients is used to disambiguate the comparison,
+ * e.g. i+j < i+2j.
  *
  * A lot of problems arise because 0 is not represented. It's
  * hard to compare I==0 and I==1 because they do not have the
@@ -496,131 +534,83 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
  * terms should be handled in a special way so as to have "i" be less
  * than "i-1". Since -1 is less than 0, the longest constraint comes
  * first.
+ *
+ * Not satisfying for Transformations/Tiling.sub/tiling04: scopes had
+ * an impact on the comparisons that is not natural for users.
  */
 int
 vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 					  int (*compare)(Pvecteur*, Pvecteur*),
-					  bool is_equation)
+					  bool is_equation __attribute__ ((unused)))
 {
-    /* it is assumed that vectors v1 and v2 are already
-       lexicographically sorted, according to the same lexicographic ordre.
-       The constant term should always be the last one. */
-    int cmp = 0, cmp2 = 0;
-    Pvecteur pv1 = VECTEUR_UNDEFINED;
-    Pvecteur pv2 = VECTEUR_UNDEFINED;
+    /* It is assumed that vectors v1 and v2 are already
+       lexicographically sorted, according to the same lexicographic
+       order.
 
-    for(pv1 = v1, pv2 = v2;
+       The constant term should always be the last one. But the
+       lexicographic sort now move them ahead! So we have to skip them
+       at each position but we assume that they are both either
+       leading or trailing elements. */
+  int cmp = 0;
+    Pvecteur pv1 = term_cst(v1)? v1->succ : v1;
+    Pvecteur pv2 = term_cst(v2)? v2->succ : v2;
+
+    /* Lexicographic comparison on variable names */
+    for(;
 	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0
 	&& !term_cst(pv1) && !term_cst(pv2);
 	pv1 = pv1->succ, pv2= pv2->succ) {
 
 	cmp = compare(&pv1, &pv2);
-
-	if(cmp==0) {
-	    /* if same coordinate, use coefficient, but only for
-	     the last coordinate */
-	    Value tmp = is_equation?
-		value_minus(value_abs(vecteur_val(pv1)), value_abs(vecteur_val(pv2)))
-		:
-		value_minus(vecteur_val(pv1), vecteur_val(pv2));
-	    if(cmp2==0)
-		cmp2 = value_sign(tmp);
-	}
     }
 
-    if((VECTEUR_UNDEFINED_P(pv1)||term_cst(pv1))
-       && (VECTEUR_UNDEFINED_P(pv2)||term_cst(pv2))) {
-	/* If there is no more information, let's use the lexicographic
-	 * order on values
-	 */
-	if (cmp==0 && is_equation) {
-	    /* The two equations have the same non-zero coefficients.
-	     * Let's use the values of these coefficients to perform
-	     * a second lexicographic sort.
-	     */
-	    cmp = cmp2;
+    if(cmp==0) {
+      if(VECTEUR_UNDEFINED_P(pv1)) {
+	if(VECTEUR_UNDEFINED_P(pv2)) {
+	  /* Use vector lengths as discriminator in case an initial
+	     constant term makes a difference. */
+	  int n1 = vect_size(v1);
+	  int n2 = vect_size(v2);
+	  if(n1>n2)
+	    cmp = 1;
+	  else if(n1<n2)
+	    cmp = -1;
+	  else {
+	    /* Use lexicographic order on coefficients as discriminator */
+	    cmp = vect_lexicographic_coefficient_comparison(v1, v2);
+	  }
 	}
-	/* else if(cmp==0 && VECTEUR_UNDEFINED_P(pv1) && VECTEUR_UNDEFINED_P(pv2)) { */
-	else if(cmp==0 && !is_equation) {
-	    /* Well, the choice should be much more sophisticated! We should
-	     * look for the -1 and 1 coefficients, the number negative coefficients,... */
-	    cmp = cmp2;
-	}
-    }
-
-    if (VECTEUR_UNDEFINED_P(pv1)) {
-	if (VECTEUR_UNDEFINED_P(pv2)) {
-	    /* cmp is left unchanged since there is no more information
-	     * to make a decision!
-	     */
-	    ;
-	}
-        else if(cmp==0) {
-	    if (term_cst(pv2))
-	    {
-		/* This looks strange because you would expect cmp==-1 for
-		 * equations. Unless val_of(pv2)==0... which should never
-		 * occur!
-		 *
-		 * Does it make sense for inequalities?
-		 */
-		Value tmp = is_equation?
-		    value_uminus(value_abs(val_of(pv2)))
-		    :
-		    value_uminus(val_of(pv2));
-		cmp = value_sign(tmp);
+	else
+	  cmp = -1; // v2 is longer
+      }
+      else {
+	if(VECTEUR_UNDEFINED_P(pv2))
+	  cmp = 1; // v1 is longer
+	else {
+	  if(term_cst(pv1)) {
+	    if(term_cst(pv2)) {
+	      // Use only constant terms as differentiator
+	      // cmp = value_comparison(vecteur_val(pv1), vecteur_val(pv2));
+	      // To get lower bounds before upper bounds when only one variables is constrained
+	      cmp = vect_lexicographic_coefficient_comparison(v1, v2);
 	    }
 	    else
-		cmp = -1;
+	      cmp = -1;
+	  }
+	  else {
+	    if(term_cst(pv2))
+	      cmp = 1;
+	    else
+	      /* This point should not be reachable unless the two vectors
+		 are identical and end with two constant terms */
+	      cmp = 0;
+	  }
 	}
-	else {
-	    ;
-	}
-    }
-    else {
-	if(VECTEUR_UNDEFINED_P(pv2)) {
-	    if (cmp==0) {
-		if (term_cst(pv1))
-		{
-		    Value tmp = is_equation?
-			value_abs(vecteur_val(pv1))
-			:
-			vecteur_val(pv1);
-		    cmp = value_sign(tmp);
-		}
-		else
-		    cmp = 1;
-	    }
-	    else {
-		;
-	    }
-	}
-	else {
-	    if(cmp==0) {
-		if(term_cst(pv1) && term_cst(pv2)) {
-		    Value tmp = is_equation?
-			value_minus(value_abs(vecteur_val(pv1)), value_abs(vecteur_val(pv2)))
-			:
-			value_minus(vecteur_val(pv1), vecteur_val(pv2));
-		    cmp = value_sign(tmp);
-		}
-		else if(term_cst(pv1) && !term_cst(pv2)) {
-		    cmp = -1;
-		}
-		else if(!term_cst(pv1) && term_cst(pv2)) {
-		    cmp = 1;
-		}
-		else {
-		    assert(false);
-		}
-	    }
-	    else {
-		/* Should be the standard case for long constraints */
-		;
-	    }
-	}
+      }
     }
 
+    /* We need a total order to avoid non-determinism, i.e. dependence
+       on pointer values */
     assert(cmp!=0 || vect_equal(v1, v2));
 
     return cmp;
