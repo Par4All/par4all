@@ -14,8 +14,6 @@ paws.cookie_secret = (SECRET)
 paws.authn_secret  = (SECRET)
 paws.validation    = %(here)s/../validation/Paws
 paws.tempdir       = %(here)s/data/tmp
-paws.publicdir     = %(here)s/pawsapp/static
-paws.resultdir     = %(here)s/pawsapp/static/res
 
 
 [server:main]

@@ -9,7 +9,7 @@ from subprocess   import Popen, PIPE
 
 from pyramid.view import view_config
 
-from .operations  import _get_directory, _highlight_code
+from .operations  import _create_workdir, _highlight_code
 from .graph       import _create_zoom_image
 
 

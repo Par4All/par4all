@@ -52,7 +52,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
     ${w.icon("book", True)} Classic examples</button>
 </label>
 
-<form target="upload_target" action="${request.route_url('upload_user_file')}" methode="post"
+<form target="upload_target" action="${request.route_url('upload_user_file')}" method="post"
       enctype="multipart/form-data" id="upload_form" style="margin-bottom:-18px">
   <label for="pseudobutton">or from your own test cases:</label>
   <button id="pseudobutton" style="width:100%" class="btn btn-primary">
@@ -64,14 +64,14 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 <hr/>
 
 <p>
-  <button class="btn btn-primary disabled" style="width:100%" id="run-button">
+  <button class="btn btn-primary" style="width:100%" id="run-button">
     ${w.icon("play", True)} Run</button>
 </p>
 
 <p>
-  <button class="btn disabled" style="width:100%" id="save-button">
+  <button class="btn" style="width:100%" id="save-button">
     ${w.icon("download-alt")} Save Result</button><br/>
-  <button class="btn disabled" style="width:100%" id="print-button">
+  <button class="btn" style="width:100%" id="print-button">
     ${w.icon("print")} Print Result</button>
 </p>
 

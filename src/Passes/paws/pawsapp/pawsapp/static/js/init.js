@@ -39,6 +39,11 @@ $(function(){
 	window.print();
     });
 
+    // Save button
+    $("#save-button").click(function() {
+	document.location.href = routes['tool_result'].replace('{tool}', operation);
+    });
+
     // Switch between basic/advanced modes
     $('#mode-buttons').click(function(ev) {
 	ev.preventDefault();

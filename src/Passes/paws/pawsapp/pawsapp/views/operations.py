@@ -14,48 +14,54 @@ from ..utils             import languages
 from ..helpers           import submit
 from ..schema            import Params
 
+
+_resultDirName = '__res__'
+
 imports = ''
 
+
+def _create_workdir(request, force=False):
+    """Create a per-session temporary working directory and return its base name.
+    """
+    tempdir = request.registry.settings['paws.tempdir']
+    workdir = mkdtemp(dir = tempdir)
+    os.mkdir(os.path.join(workdir, _resultDirName))
+    dirname = os.path.basename(workdir)
+    request.session['workdir'] = dirname
+    return dirname
+
+def _get_resdir(request):
+    tempdir = request.registry.settings['paws.tempdir']
+    workdir = os.path.basename(request.session['workdir']) # sanitize
+    return os.path.join(tempdir, workdir, _resultDirName)
 
 def _create_file(request, op, code, lang):
     """Create a temp file to receive a source file, and return its full path.
     """
-    tmpdir  = request.registry.settings['paws.tempdir']
-    fname   = os.path.basename(op + "_code" + languages[lang]['ext']) # sanitize
+    tempdir = request.registry.settings['paws.tempdir']
     workdir = os.path.basename(request.session['workdir']) # sanitize
-    path    = os.path.join(tmpdir, workdir, fname)
+    fname   = os.path.basename(op + "_code" + languages[lang]['ext']) # sanitize
+    path    = os.path.join(tempdir, workdir, fname)
     file(path, 'w').write(code)
-    print "CREATE_FILE", path
     return path
-
-def _get_workdir(request):
-    """
-    """
-    resultdir = request.registry.settings['paws.resultdir']
-    workdir   = os.path.basename(request.session['workdir']) # sanitize
-    path = os.path.join(resultdir, workdir)
-    if not os.path.exists(path): os.mkdir(path)
-    return path
-
-def _get_directory(request):
-    """Create and return a per-session temporary working directory
-    """
-    tmpdir  = request.registry.settings['paws.tempdir']
-    workdir = mkdtemp(dir=tmpdir)
-    request.session['workdir'] = os.path.basename(workdir)
-    return request.session['workdir']
 
 def _create_result_file(request, code):
     """
     """
-    path = _get_workdir(request)
-    file(os.path.join(path, request.session['workdir']), 'w').write(code)
+    resdir  = _get_resdir(request)
+    path    = os.path.join(resdir, 'code')
+    file(path, 'w').write(code)
+    return path
 
 def _create_result_graphs(request, graph):
     """
     """
-    path = _get_workdir(request)
-    file(os.path.join(path, os.path.basename(graph)), 'w').write(file(graph).read()) ##TODO!!
+    resdir  = _get_resdir(request)
+    workdir = os.path.basename(request.session['workdir']) # sanitize
+    graph   = os.path.basename(graph) # sanitize
+    path    = os.path.join(resdir, workdir, graph)
+    file(path, 'w').write(file(graph).read()) ##TODO!!
+    return path
 	
 def _delete_dir(filename):
     """Delete the directory containing 'filename'.
@@ -135,11 +141,7 @@ def _highlight_code(request, code, lang, demo=False):
 def get_directory(request):
     """Create and return a per-session temporary working directory
     """
-    _get_directory(request)
-    # Temporary working directory
-    workdir = mkdtemp(dir=request.registry.settings['paws.tempdir'])
-    request.session['workdir'] = os.path.basename(workdir)
-    return request.session['workdir']
+    return _create_workdir(request)
 
 
 @view_config(route_name='get_functions', renderer='string', permission='view')
@@ -180,7 +182,7 @@ def perform(request):
     mod     = _import_base_module(request)
     try:
         functions = mod.perform(source, op, adv, **params)
-        _delete_dir(source)
+        #_delete_dir(source)
         return _highlight_code(request, imports + '\n' + functions, lang)
     except RuntimeError, msg:
         return _catch_error(msg)

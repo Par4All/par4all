@@ -55,6 +55,7 @@ def main(global_config, **settings):
 
     config.add_route('tool_basic',              '/tools/{tool}')
     config.add_route('tool_advanced',           '/tools/{tool}/advanced')
+    config.add_route('tool_result',             '/tools/{tool}/result')
 
     config.add_route('tutorial',                '/tutorials/{tutorial}')
 

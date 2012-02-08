@@ -9,6 +9,8 @@ from ConfigParser import SafeConfigParser
 from zipfile      import ZipFile
 from pyramid.view import view_config
 
+from .operations  import _get_resdir
+
 
 def get_tooldir(request, tool):
     """Get tool directory full path.
@@ -105,7 +107,7 @@ def upload_user_file(request):
 
 @view_config(route_name='load_example_file', renderer='string', permission='view')
 def load_example_file(request):
-    """Return
+    """Return the content of an example file.
     """
     # Sanitize file path (probably unnecessary, but it can't hurt)
     tool = os.path.basename(request.matchdict['tool'])
@@ -116,3 +118,16 @@ def load_example_file(request):
         return file(path).read()
     except:
         return ''
+
+@view_config(route_name='tool_result', renderer='string', permission='view')
+def get_result_file(request):
+    """Return the content of the transformed code.
+    """
+    resdir = _get_resdir(request)
+    path   = os.path.join(resdir, 'code')
+
+    request.response.headers['Content-type']        = 'text/plain;charset=utf-8'
+    request.response.headers['Content-disposition'] = 'attachment; filename=result-%s.txt' % request.session['workdir']
+
+    return file(path).read()
+

@@ -50,10 +50,7 @@ function add_choose_function_notification() {
 }
 
 function switch_enable(sel, value) {
-    if (value)
-	$(sel).removeClass("disabled");
-    else
-	$(sel).addClass("disabled");	
+    $(sel).attr('disabled', !value);
 }
 
 function switch_buttons() {
@@ -70,6 +67,8 @@ function switch_adv_mode() {
 	$('#adv-form').hide();
 	$('#basic-button').button('toggle');
     }
+    $('#adv-button').attr('disabled', advanced);
+    $('#basic-button').attr('disabled', !advanced);
     performed = false;
     graph_created = false;
     switch_buttons();
@@ -138,7 +137,6 @@ function load_files(files) {
     created_graph = false;
     switch_buttons();
 }
-
 
 function load_example(name) {
 
