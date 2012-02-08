@@ -654,7 +654,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
     ext = get_file_extension(file)
-    return ext == '.f' or ext == '.f77' or ext == '.f90' or ext == '.f95' or ext == '.f03' or ext == '.f08'
+    return ext == '.f' or ext == '.f77' or ext == '.f90' or ext == '.f95' or ext == '.f03' or ext == '.f08' or ext == '.F'
 
 def c_file_p(file):
     '''Tests if a file has a C name.'''
