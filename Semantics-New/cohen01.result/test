@@ -1,0 +1,76 @@
+
+TRANSFORMERS
+
+
+//  T() {n<=0}
+
+void cohen01(int n)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(j) {i==0, j==42}
+
+   int j = 42;
+
+//  T(j) {i==0, j#init==42, 0<=j, 1<=n}
+
+   while (i<n) {
+
+//  T(j) {i==0, j==j#init-2, 1<=n}
+
+      j -= 2;
+
+//  T(j) {i==0, 0<=j, j#init<=j, 1<=n}
+
+      if (j<0)
+
+//  T(j) {i==0, j==0, j#init+1<=0, 1<=n}
+
+         j = 0;
+   }
+
+//  T() {i==0, j==42, n<=0}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void cohen01(int n)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int j = 42;
+
+//  P(i,j) {i==0, j==42}
+
+   while (i<n) {
+
+//  P(i,j) {i==0, 0<=j, 1<=n}
+
+      j -= 2;
+
+//  P(i,j) {i==0, 0<=j+2, 1<=n}
+
+      if (j<0)
+
+//  P(i,j) {i==0, 0<=j+2, j+1<=0, 1<=n}
+
+         j = 0;
+   }
+
+//  P(i,j) {i==0, j==42, n<=0}
+
+   printf("i=%d, j=%d\n", i, j);
+}

@@ -1,0 +1,64 @@
+setenv WS=cohen02
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+#setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WS]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+# setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+echo
+echo FOR LOOP RECOVERY
+echo
+
+apply RECOVER_FOR_LOOP
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+echo
+
+echo CONTROL SIMPLIFICATION: the second internal while loop should be
+echo simplified because you can prove that the loop is always entered and
+echo exited after only one iteration [not working, not implemented]
+
+echo
+
+apply SIMPLIFY_CONTROL
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+echo
+echo PARTIAL EVALUATION: the termination condition of the recovered
+echo for loop should be simplified [not working/not implemented]
+echo
+
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+# delete $WS
+quit
