@@ -39,11 +39,24 @@
 /* Used for sorting each constraint and in between constraints, hopefully */
 int bound_generation_compare_vector_component(Pvecteur *pv1, Pvecteur *pv2)
 {
-  entity e1 = vecteur_var(*pv1);
-  entity e2 = vecteur_var(*pv2);
+  entity e1 = (entity) vecteur_var(*pv1);
+  entity e2 = (entity) vecteur_var(*pv2);
   // FI: is "less" a well-chosen name?
-  int less = strcmp(entity_local_name(e1), entity_local_name(e2));
+  // int less = strcmp(entity_local_name(e1), entity_local_name(e2));
+  int less;
 
+  if(e1==NULL) {
+    if(e2==NULL)
+      less = 0;
+    else
+      less = -1;
+  }
+  else if(e2==NULL)
+    less = 1;
+  else
+    less = strcmp(entity_user_name(e1), entity_user_name(e2));
+
+#if 0
   if(less==0) {
     Value v1 = vecteur_val(*pv1);
     Value v2 = vecteur_val(*pv2);
@@ -51,7 +64,11 @@ int bound_generation_compare_vector_component(Pvecteur *pv1, Pvecteur *pv2)
       less = 1;
     else if(value_lt(v1,v2))
       less = -1;
+    else
+      /* To satisfy a later assert not so well designed */
+      less = pv1<pv2? 1 : -1;
   }
+#endif
 
   return less;
 }
@@ -65,6 +82,9 @@ int bound_generation_compare_vector_component(Pvecteur *pv1, Pvecteur *pv2)
  *
  * Beware of degenerated cases where constraints are reduced to
  * equations because the upper and lower bounds are identical.
+ *
+ * The constraints are sorted according to the lexicographic order
+ * using bound_generation_compare_vector_component().
  */
 void make_bound_expression(Variable index,
 			   Pbase base,
