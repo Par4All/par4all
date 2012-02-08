@@ -8,6 +8,10 @@
 <%namespace name="w"   file="lib/widgets.mako"/>
 <%namespace name="adv" file="lib/advanced.mako"/>
 
+<%def name="pagetitle()">
+${info["title"]}
+</%def>
+
 <%def name="css_slot()">
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
@@ -141,9 +145,8 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <%def name="main_column()">
 
-<iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
-
-<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em" data-content="${info['descr']}" data-original-title="${tool}">
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em"
+     data-content="${info['descr']}" data-original-title="${tool}">
   <h2>
     ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
     ${info["title"]}
@@ -151,7 +154,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 </div>
 
 ## Tab headers
-<ul id="op-tabs" class="nav nav-tabs">
+<ul id="op-tabs" class="nav nav-tabs noprint">
   ${w.source_tab(id="1", active=True)}
   <li id="result_tab"><a href="#result" data-toggle="tab">${tool.upper()}</a></li>
   <li id="graph_tab"><a href="#graph" data-toggle="tab">GRAPH</a></li>

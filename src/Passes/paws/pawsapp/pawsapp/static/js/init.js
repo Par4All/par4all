@@ -34,15 +34,9 @@ $(function(){
 	    performed = perform_operation(1, 'result');
     });
 
-    // Print buttons
-    $("#print-button").click(function(ev) {
-        var content    = $('#resultcode'),
-            printFrame = $('#iframetoprint').contentWindow;
-        printFrame.document.ope();
-        printFrame.document.write(content.innerHTML);
-        printFrame.document.close();
-        printFrame.focus();
-        printFrame.print();
+    // Print button
+    $("#print-button").click(function() {
+	window.print();
     });
 
     // Switch between basic/advanced modes
@@ -52,8 +46,13 @@ $(function(){
 	switch_adv_mode();
     });
 
-    // Initialize tooltips for advance mode form
+    // Advanced mode form
     $('#adv-form a').tooltip();
+    $('#adv-form .watch').change(function() {
+	performed = false;
+	created_graph = false;
+	switch_buttons();
+    });
 
     // Initialize button states
     switch_buttons();

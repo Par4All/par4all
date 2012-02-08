@@ -21,7 +21,7 @@
 <div class="container-fluid">
   <div class="row-fluid">
     ## Left column
-    <div class="span3" style="width:210px">
+    <div class="span3 noprint" style="width:210px">
       <div class="well">
 	${self.left_column()}
       </div>
@@ -56,7 +56,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>${self.pagetitle()} - PAWS</title>
+    <title>${self.pagetitle()} — PAWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="PAWS, a Web Interface for PIPS"/>
     <meta name="keywords" content="pips, paws, computing, compilation, c, fortran, source-to-source, mines, paristech"/>
@@ -71,15 +71,6 @@
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/prettify.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/normal.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/print.css"),  media="print")}
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-    </style>
     ##${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/bootstrap.min.responsive.css"), media="all")}
     ${self.css_slot()}
 
@@ -97,7 +88,7 @@
 
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-fixed-top noprint">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
