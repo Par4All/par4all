@@ -85,6 +85,7 @@ static int get_next_unstructured_number() {
 static int statement_reorder(statement st, int un, int sn)
 {
   instruction i = statement_instruction(st);
+  pips_assert("instruction is defined", i!=instruction_undefined);
 
   // temporary, just to avoid rebooting...
   static int check_depth_hack = 0;
