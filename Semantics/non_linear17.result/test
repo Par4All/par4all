@@ -1,15 +1,15 @@
 
-C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+C  T(KMAX) {KMAX<=KMAX#init, KMAX#init<=KMAX+1}
 
 
       SUBROUTINE FOO(KMAX)
 
-C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+C  T(KMAX) {KMAX<=KMAX#init, KMAX#init<=KMAX+1}
 
 C (0,1)
 C     BEGIN BLOCK
 
-C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+C  T(KMAX) {KMAX<=KMAX#init, KMAX#init<=KMAX+1}
 
 C (0,2)
       IF (KMAX.NE.1) THEN                                               0003

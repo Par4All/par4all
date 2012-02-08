@@ -1,0 +1,29 @@
+--- Preconditions for
+
+C  P() {}
+
+! Check constraint sort (bug spotted in Semantics/altret01)
+
+      PROGRAM PRETTYPRINT02
+
+C  P() {}
+
+
+      IF (1.LE.N.AND.N.LE.2) THEN                                       0005
+
+C  P() {1<=N, N<=2}
+
+         J = 1                                                          0006
+      ENDIF
+
+C  P(J) {}
+
+
+      IF (N.LE.2.AND.1.LE.N) THEN                                       0009
+
+C  P(J) {1<=N, N<=2}
+
+         J = 2                                                          0010
+      ENDIF
+
+      END

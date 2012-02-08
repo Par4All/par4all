@@ -8,12 +8,12 @@ C  T() {}
 
 C  T(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {K==LK, KU+NU==KN,
 C    KU==LI+1, 2KU==LJ+2, 0<=K, L<=K, 2L<=K+2, 2M+NU+1<=KN+2L,
-C    M+NU+2<=KN+L, 1<=KU, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    M+NU+2<=KN+L, 1<=KU, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,1)
 C     BEGIN BLOCK
 
-C  T(N) {M+1<=N, 2M<=N, 0<=N}
+C  T(N) {2M<=N, M+1<=N, 0<=N}
 
 C (0,2)
 C
@@ -21,48 +21,48 @@ C   Set initial parameters.
 C
       N = 2**M                                                          0008
 
-C  T(K) {M+1<=N, 2M<=N, 0<=N}
+C  T(K) {2M<=N, M+1<=N, 0<=N}
 
 C (0,3)
       K = U(1)                                                          0009
 
-C  T(NU) {64NU<=K, K<=64NU+63, M+1<=N, 2M<=N, 0<=N}
+C  T(NU) {64NU<=K, K<=64NU+63, 2M<=N, M+1<=N, 0<=N}
 
 C (0,4)
       NU = K/64                                                         0010
 
-C  T(N1) {64NU<=K, K<=64NU+63, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C  T(N1) {64NU<=K, K<=64NU+63, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,5)
       N1 = N/2                                                          0011
 
-C  T(LK) {64NU<=K, K<=64NU+63, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N,
+C  T(LK) {64NU<=K, K<=64NU+63, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N,
 C    0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,6)
       LK = 2**(L-1)                                                     0012
 
 C  T(LI) {64NU<=K, K<=64NU+63, 2M<=2L+LI, M+1<=L+LI, L<=LK, 2L<=LK+2,
-C    0<=LI, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    0<=LI, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,7)
       LI = 2**(M-L)                                                     0013
 
 C  T(LJ) {2LI==LJ, 64NU<=K, K<=64NU+63, 2M<=2L+LI, M+1<=L+LI, L<=LK,
-C    2L<=LK+2, 0<=LI, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2L<=LK+2, 0<=LI, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,8)
       LJ = 2*LI                                                         0014
 
 C  T(KU) {KU==LI+1, 2KU==LJ+2, 64NU<=K, K<=64NU+63, 1<=KU,
-C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N,
+C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N,
 C    0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,9)
       KU = LI+1                                                         0015
 
 C  T(KN) {KU+NU==KN, KU==LI+1, 2KU==LJ+2, 64NU<=K, K<=64NU+63, 1<=KU,
-C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N,
+C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N,
 C    0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,10)
@@ -70,7 +70,7 @@ C (0,10)
 
 C  T(I,I11,I12,I21,I22,K) {KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=K,
 C    K+1<=LK, 64NU<=K#init, K#init<=64NU+63, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,11)
@@ -79,43 +79,43 @@ C
 
 C  T(I,I11,I12,I21,I22) {I+I11==I12, I+NU==KN-1, I==KU-1, I==LI,
 C    2I==LJ, I21+N1==I22, 0<=I, 2M<=I+2L, M+1<=I+L, 1<=I11, 1<=I21,
-C    0<=K, K+1<=LK, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N,
+C    0<=K, K+1<=LK, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N,
 C    2N1<=N, N<=2N1+1}
 
 C (0,12)
 C        BEGIN BLOCK
 
 C  T(I11) {KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11, 0<=K, K+1<=LK,
-C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N,
-C    2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N,
+C    M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,13)
          I11 = K*LJ+1                                                   0019
 
 C  T(I12) {I11+KU==I12+1, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11,
 C    0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2,
-C    0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,14)
          I12 = I11+LI                                                   0020
 
 C  T(I21) {I11+KU==I12+1, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11,
 C    1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK,
-C    2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,15)
          I21 = K*LI+1                                                   0021
 
 C  T(I22) {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,16)
          I22 = I21+N1                                                   0022
 
 C  T(I) {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,17)
@@ -126,7 +126,7 @@ C
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,18)
@@ -134,7 +134,7 @@ C           BEGIN BLOCK
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,19)
@@ -142,7 +142,7 @@ C (0,19)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,20)
@@ -150,7 +150,7 @@ C (0,20)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,21)
@@ -158,7 +158,7 @@ C (0,21)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,22)
@@ -166,7 +166,7 @@ C (0,22)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,23)
@@ -174,7 +174,7 @@ C (0,23)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,24)
@@ -182,7 +182,7 @@ C (0,24)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,25)
@@ -190,7 +190,7 @@ C (0,25)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,26)
@@ -198,7 +198,7 @@ C (0,26)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,27)
@@ -206,7 +206,7 @@ C (0,27)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,28)
@@ -214,7 +214,7 @@ C (0,28)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,29)
@@ -222,7 +222,7 @@ C (0,29)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,30)
@@ -230,7 +230,7 @@ C (0,30)
 
 C  T() {I11+KU==I12+1, I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    0<=I, I+2<=KU, 1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L,
-C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,31)
@@ -261,57 +261,57 @@ C   Set initial parameters.
 C
       N = 2**M                                                          0008
 
-C  P(N) {M+1<=N, 2M<=N, 0<=N}
+C  P(N) {2M<=N, M+1<=N, 0<=N}
 
 C (0,3)
       K = U(1)                                                          0009
 
-C  P(K,N) {M+1<=N, 2M<=N, 0<=N}
+C  P(K,N) {2M<=N, M+1<=N, 0<=N}
 
 C (0,4)
       NU = K/64                                                         0010
 
-C  P(K,N,NU) {64NU<=K, K<=64NU+63, M+1<=N, 2M<=N, 0<=N}
+C  P(K,N,NU) {64NU<=K, K<=64NU+63, 2M<=N, M+1<=N, 0<=N}
 
 C (0,5)
       N1 = N/2                                                          0011
 
-C  P(K,N,N1,NU) {64NU<=K, K<=64NU+63, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C  P(K,N,N1,NU) {64NU<=K, K<=64NU+63, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,6)
       LK = 2**(L-1)                                                     0012
 
 C  P(K,LK,N,N1,NU) {64NU<=K, K<=64NU+63, L<=LK, 2L<=LK+2, 0<=LK,
-C    M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,7)
       LI = 2**(M-L)                                                     0013
 
 C  P(K,LI,LK,N,N1,NU) {64NU<=K, K<=64NU+63, 2M<=2L+LI, M+1<=L+LI,
-C    L<=LK, 2L<=LK+2, 0<=LI, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N,
+C    L<=LK, 2L<=LK+2, 0<=LI, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N,
 C    N<=2N1+1}
 
 C (0,8)
       LJ = 2*LI                                                         0014
 
 C  P(K,LI,LJ,LK,N,N1,NU) {2LI==LJ, 64NU<=K, K<=64NU+63, 2M<=2L+LI,
-C    M+1<=L+LI, L<=LK, 2L<=LK+2, 0<=LI, 0<=LK, M+1<=N, 2M<=N, 0<=N,
+C    M+1<=L+LI, L<=LK, 2L<=LK+2, 0<=LI, 0<=LK, 2M<=N, M+1<=N, 0<=N,
 C    2N1<=N, N<=2N1+1}
 
 C (0,9)
       KU = LI+1                                                         0015
 
 C  P(K,KU,LI,LJ,LK,N,N1,NU) {KU==LI+1, 2KU==LJ+2, 64NU<=K, K<=64NU+63,
-C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N,
-C    2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N,
+C    M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,10)
       KN = KU+NU                                                        0016
 
 C  P(K,KN,KU,LI,LJ,LK,N,N1,NU) {KU+NU==KN, KU==LI+1, 2KU==LJ+2,
 C    64NU<=K, K<=64NU+63, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK,
-C    2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,11)
 C
@@ -319,28 +319,28 @@ C
 
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {KU+NU==KN, KU==LI+1,
 C    2KU==LJ+2, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK,
-C    2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,12)
 C        BEGIN BLOCK
 
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {KU+NU==KN, KU==LI+1,
 C    2KU==LJ+2, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK,
-C    2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,13)
          I11 = K*LJ+1                                                   0019
 
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {KU+NU==KN, KU==LI+1,
 C    2KU==LJ+2, 1<=I11, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,14)
          I12 = I11+LI                                                   0020
 
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11, 0<=K, K+1<=LK, 1<=KU,
-C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N,
+C    2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N,
 C    0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,15)
@@ -348,8 +348,8 @@ C (0,15)
 
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11, 1<=I21, 0<=K, K+1<=LK,
-C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, M+1<=N,
-C    2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2, 0<=LK, 2M<=N,
+C    M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,16)
          I22 = I21+N1                                                   0022
@@ -357,7 +357,7 @@ C (0,16)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 1<=I11, 1<=I21,
 C    0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L, L<=LK, 2L<=LK+2,
-C    0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,17)
 C
@@ -368,7 +368,7 @@ C
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,18)
 C           BEGIN BLOCK
@@ -376,7 +376,7 @@ C           BEGIN BLOCK
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,19)
             U1 = U(KU+I)                                                0027
@@ -384,7 +384,7 @@ C (0,19)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,20)
             U2 = IS*U(KN+I)                                             0028
@@ -392,7 +392,7 @@ C (0,20)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,21)
             X11 = X(I11+I)                                              0029
@@ -400,7 +400,7 @@ C (0,21)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,22)
             X12 = X(I11+I+N)                                            0030
@@ -408,7 +408,7 @@ C (0,22)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,23)
             X21 = X(I12+I)                                              0031
@@ -416,7 +416,7 @@ C (0,23)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,24)
             X22 = X(I12+I+N)                                            0032
@@ -424,7 +424,7 @@ C (0,24)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,25)
             T1 = X11-X21                                                0033
@@ -432,7 +432,7 @@ C (0,25)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,26)
             T2 = X12-X22                                                0034
@@ -440,7 +440,7 @@ C (0,26)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,27)
             Y(I21+I) = X11+X21                                          0035
@@ -448,7 +448,7 @@ C (0,27)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,28)
             Y(I21+I+N) = X12+X22                                        0036
@@ -456,7 +456,7 @@ C (0,28)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,29)
             Y(I22+I) = U1*T1-U2*T2                                      0037
@@ -464,7 +464,7 @@ C (0,29)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,30)
             Y(I22+I+N) = U1*T2+U2*T1                                    0038
@@ -472,7 +472,7 @@ C (0,30)
 C  P(I,I11,I12,I21,I22,K,KN,KU,LI,LJ,LK,N,N1,NU) {I11+KU==I12+1,
 C    I21+N1==I22, KU+NU==KN, KU==LI+1, 2KU==LJ+2, 0<=I, I+2<=KU,
 C    1<=I11, 1<=I21, 0<=K, K+1<=LK, 1<=KU, 2M+1<=KU+2L, M+2<=KU+L,
-C    L<=LK, 2L<=LK+2, 0<=LK, M+1<=N, 2M<=N, 0<=N, 2N1<=N, N<=2N1+1}
+C    L<=LK, 2L<=LK+2, 0<=LK, 2M<=N, M+1<=N, 0<=N, 2N1<=N, N<=2N1+1}
 
 C (0,31)
 100         CONTINUE                                                    0039

@@ -88,7 +88,7 @@ C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
 
             R = R+1                                                     0012
 
-C  P(I,R,W) {R+W==1, 1<=I, I<=L, 2<=I+R, R<=I}
+C  P(I,R,W) {R+W==1, 1<=I, I<=L, R<=I, 2<=I+R}
 
             W = W-1                                                     0013
          ELSE
@@ -199,7 +199,7 @@ C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
 
             R = R+1                                                     0012
 
-C  P(I,R,W) {R+W==1, 1<=I, I<=L, 2<=I+R, R<=I}
+C  P(I,R,W) {R+W==1, 1<=I, I<=L, R<=I, 2<=I+R}
 
             W = W-1                                                     0013
          ELSE
