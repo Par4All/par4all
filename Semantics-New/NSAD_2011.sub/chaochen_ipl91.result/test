@@ -516,7 +516,7 @@ void ts_singlestate(void)
 
          if (!(6*l<=t+50))
 
-//  P(l,s,t,x) {s==0, 1<=l, t+51<=6l, l<=t, 6l<=t+55, x<=10}
+//  P(l,s,t,x) {s==0, 1<=l, l<=t, t+51<=6l, 6l<=t+55, x<=10}
 
             checking_error();
       }
@@ -839,11 +839,11 @@ void ts_restructured(void)
 
       t++;
 
-//  P(l,s,t,x) {s==1, x==49, 0<=l, l+50<=t, 6l<=t}
+//  P(l,s,t,x) {s==1, x==49, 0<=l, 6l<=t, l+50<=t}
 
       x++;
 
-//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+//  P(l,s,t,x) {s==1, x==50, 0<=l, 6l<=t, l+50<=t}
 
       if (!(6*l<=t+50))
 
@@ -851,7 +851,7 @@ void ts_restructured(void)
 
          checking_error();
 
-//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+//  P(l,s,t,x) {s==1, x==50, 0<=l, 6l<=t, l+50<=t}
 
       while (rand_b()) {
 
@@ -892,11 +892,11 @@ void ts_restructured(void)
 
       x = 0;
 
-//  P(l,s,t,x) {s==1, x==0, 0<=l, l+50<=t, 6l<=t}
+//  P(l,s,t,x) {s==1, x==0, 0<=l, 6l<=t, l+50<=t}
 
       s = 0;
 
-//  P(l,s,t,x) {s==0, x==0, 0<=l, l+50<=t, 6l<=t}
+//  P(l,s,t,x) {s==0, x==0, 0<=l, 6l<=t, l+50<=t}
 
       if (!(6*l<=t+50))
 

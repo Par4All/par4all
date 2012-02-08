@@ -6611,19 +6611,19 @@ void ts_restructured(void)
 
    while (rand_b())
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
       if (rand_b())
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          if (rand_b())
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
             if (rand_b()) {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                if (!(t==1&&b<s+9))
 
@@ -6631,7 +6631,7 @@ void ts_restructured(void)
 
                   deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                b++;
 
@@ -6669,7 +6669,7 @@ void ts_restructured(void)
             }
             else if (rand_b()) {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                if (!(t==1&&b>s-9))
 
@@ -6677,7 +6677,7 @@ void ts_restructured(void)
 
                   deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                s++;
 
@@ -6715,7 +6715,7 @@ void ts_restructured(void)
             }
             else {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                if (!(t==1&&b>s-9))
 
@@ -6723,7 +6723,7 @@ void ts_restructured(void)
 
                   deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
                s++;
 
@@ -6957,7 +6957,7 @@ void ts_restructured(void)
             }
          else {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
             if (!(t==1&&b<s+9))
 
@@ -6965,7 +6965,7 @@ void ts_restructured(void)
 
                deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
             b++;
 
@@ -7199,7 +7199,7 @@ void ts_restructured(void)
          }
       else if (rand_b()) {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          if (!(t==1&&b>s-9))
 
@@ -7207,7 +7207,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          s++;
 
@@ -7579,7 +7579,7 @@ void ts_restructured(void)
       }
       else if (rand_b()) {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          if (!(t==1&&b<s+9))
 
@@ -7587,7 +7587,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          b++;
 
@@ -8423,7 +8423,7 @@ void ts_restructured(void)
       }
       else if (rand_b()) {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          if (!(t==1&&b<s+9))
 
@@ -8431,7 +8431,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          b++;
 
@@ -10013,7 +10013,7 @@ void ts_restructured(void)
       }
       else {
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          if (!(t==1&&b<s+9))
 
@@ -10021,7 +10021,7 @@ void ts_restructured(void)
 
             deadlock();
 
-//  P(b,d,s,t) {d==0, t==1, 19s<=59b, s<=b+8, b<=s+8, 911b<=2871s}
+//  P(b,d,s,t) {d==0, t==1, 19s<=59b, 911b<=2871s, s<=b+8, b<=s+8}
 
          b++;
 

@@ -862,17 +862,17 @@ void ts_singlestate(void)
             deadlock();
 
 //  P(e,i,ne,uo) {0<=e, e<=1, 1<=e+i+ne+uo, 1<=e+i+uo, e+ne<=1, 0<=i,
-//    1<=ne+uo, ne<=uo, 0<=uo}
+//    ne<=uo, 1<=ne+uo, 0<=uo}
 
          i += ne+uo-1;
 
 //  P(e,i,ne,uo) {0<=e, e<=1, 0<=e+i, ne<=e+i, e+ne<=1, ne+uo<=i+1,
-//    1<=ne+uo, ne<=uo, 0<=uo}
+//    ne<=uo, 1<=ne+uo, 0<=uo}
 
          e++;
 
 //  P(e,i,ne,uo) {1<=e, e<=2, 1<=e+i, ne+1<=e+i, e+ne<=2, ne+uo<=i+1,
-//    1<=ne+uo, ne<=uo, 0<=uo}
+//    ne<=uo, 1<=ne+uo, 0<=uo}
 
          ne = 0;
 
@@ -1324,7 +1324,7 @@ void ts_restructured(void)
 
          ne = 0;
 
-//  P(e,i,ne,uo) {e==1, ne==0, 1<=i, uo<=i+1, i<=uo, 2<=uo}
+//  P(e,i,ne,uo) {e==1, ne==0, 1<=i, i<=uo, uo<=i+1, 2<=uo}
 
          uo = 0;
 

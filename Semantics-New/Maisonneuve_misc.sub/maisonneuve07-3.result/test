@@ -108,7 +108,7 @@ void run(void)
 
          while (flip())
 
-//  T(t,x) {t==t#init+1, 1<=b, x#init<=x+1, x<=x#init}
+//  T(t,x) {t==t#init+1, 1<=b, x<=x#init, x#init<=x+1}
 
             if (flip())
 
@@ -189,15 +189,15 @@ void run(void)
 
          if (flip())
 
-//  T(t,x) {t==t#init+1, x==x#init-1, 1<=b, 0<=b+x+1, x<=b}
+//  T(t,x) {t==t#init+1, x==x#init-1, 1<=b, x<=b, 0<=b+x+1}
 
             if (x>=-b) {
 
-//  T(x) {x==x#init-1, 1<=b, 0<=b+x+1, x<=b}
+//  T(x) {x==x#init-1, 1<=b, x<=b, 0<=b+x+1}
 
                x--;
 
-//  T(t) {t==t#init+1, 1<=b, 0<=b+x+1, x<=b}
+//  T(t) {t==t#init+1, 1<=b, x<=b, 0<=b+x+1}
 
                t++;
             }
@@ -446,7 +446,7 @@ void run(void)
 
                x--;
 
-//  P(b,t,x) {1<=b, 0<=b+x+1, x<=b, 0<=t, 0<=t+x+1}
+//  P(b,t,x) {1<=b, x<=b, 0<=b+x+1, 0<=t, 0<=t+x+1}
 
                t++;
             }
@@ -465,7 +465,7 @@ void run(void)
 
             if (x<=b) {
 
-//  P(b,t,x) {1<=b, 0<=b+x+1, x<=b, 0<=t, 0<=t+x}
+//  P(b,t,x) {1<=b, x<=b, 0<=b+x+1, 0<=t, 0<=t+x}
 
                x++;
 

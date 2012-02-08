@@ -1161,7 +1161,7 @@ void ts_restructured(void)
 
          if (!(s==1&&v<=0&&d<=7))
 
-//  P(d,s,t,v) {s==1, t==3, 8<=d+7v, v<=d, 0<=v, v<=1}
+//  P(d,s,t,v) {s==1, t==3, v<=d, 8<=d+7v, 0<=v, v<=1}
 
             deadlock();
 

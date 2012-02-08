@@ -25,8 +25,8 @@ void main()
 
 //  T(x1,x2,y) {0<=x1, x1#init+x2<=x1+x2#init,
 //    2x1+3x2#init<=2x1#init+3x2, x1#init+x2+y#init<=x1+x2#init+y,
-//    2x1+3x2#init+y<=2x1#init+3x2+y#init, x2<=x1+1, x1+x2<=4,
-//    5x1<=7x2, 0<=x1#init, x1#init<=x2#init, x1#init+x2#init<=4,
+//    2x1+3x2#init+y<=2x1#init+3x2+y#init, 5x1<=7x2, x2<=x1+1,
+//    x1+x2<=4, 0<=x1#init, x1#init<=x2#init, x1#init+x2#init<=4,
 //    x2#init<=1, 1<=y, y<=2, 1<=y#init, y#init<=2}
 
    while (x1+x2<=4&&1<=y&&y<=2) {
@@ -44,8 +44,8 @@ void main()
       y = foo();
    }
 
-//  T(y) {y==y#init, 0<=x1, x2<=x1+1, 2x2<=x1+4, x1<=2x2, x1+x2<=9,
-//    2x1<=3x2, 2x1<=x2+12, 4x1<=5x2+6, 5x1<=7x2+1, 0<=x2, x2<=6}
+//  T(y) {y==y#init, 0<=x1, x1<=2x2, 2x1<=3x2, x2<=x1+1, 2x2<=x1+4,
+//    x1+x2<=9, 2x1<=x2+12, 4x1<=5x2+6, 5x1<=7x2+1, 0<=x2, x2<=6}
 
    // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2
    y = y;
@@ -79,7 +79,7 @@ void main()
 
    while (x1+x2<=4&&1<=y&&y<=2) {
 
-//  P(x1,x2,y) {0<=x1, x2<=x1+1, x1+x2<=4, 5x1<=7x2, 1<=y, y<=2}
+//  P(x1,x2,y) {0<=x1, 5x1<=7x2, x2<=x1+1, x1+x2<=4, 1<=y, y<=2}
 
       x1 = x1+2*y-1;
 
@@ -94,7 +94,7 @@ void main()
       y = foo();
    }
 
-//  P(x1,x2,y) {0<=x1, x2<=x1+1, 2x2<=x1+4, x1+x2<=9, 2x1<=3x2,
+//  P(x1,x2,y) {0<=x1, 2x1<=3x2, x2<=x1+1, 2x2<=x1+4, x1+x2<=9,
 //    5x1<=7x2+1}
 
    // Expected result: 0<=x1, x2<=x1+1, x1+x2<=9, 4x2<=2x1+9, 2x1<=3x2

@@ -24,7 +24,7 @@ void asopt02(int x, int y)
 
    if (x<=0) {
 
-//  T(y) {i==0, 0<=x+1, x<=0, 0<=x+y+1, x<=y, y<=0, 0<=y#init+1,
+//  T(y) {i==0, x<=0, 0<=x+1, x<=y, 0<=x+y+1, y<=0, 0<=y#init+1,
 //    y#init<=1}
 
       // Expect y==0, obtain eventually y==0
@@ -44,7 +44,7 @@ void asopt02(int x, int y)
       // real numbers.
       y = x*(x+1);
 
-//  T(x) {i==0, 0<=x#init+1, x#init<=0, 0<=x#init+y+1, x#init<=y,
+//  T(x) {i==0, x#init<=0, 0<=x#init+1, x#init<=y, 0<=x#init+y+1,
 //    y<=0}
 
       scanf("%d", &x);
@@ -89,7 +89,7 @@ void asopt02(int x, int y)
 
    if (x<=0) {
 
-//  P(i) {i==0, 0<=x+1, x<=0, 0<=y+1, y<=1}
+//  P(i) {i==0, x<=0, 0<=x+1, 0<=y+1, y<=1}
 
       // Expect y==0, obtain eventually y==0
       //
@@ -108,7 +108,7 @@ void asopt02(int x, int y)
       // real numbers.
       y = x*(x+1);
 
-//  P(i,y) {i==0, 0<=x+1, x<=0, 0<=x+y+1, x<=y, y<=0}
+//  P(i,y) {i==0, x<=0, 0<=x+1, x<=y, 0<=x+y+1, y<=0}
 
       scanf("%d", &x);
 

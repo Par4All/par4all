@@ -21,7 +21,7 @@ void run(void)
 
    while (1)
 
-//  T(x) {1<=x, x#init<=x+1, x<=x#init}
+//  T(x) {1<=x, x<=x#init, x#init<=x+1}
 
       if (flip())
 
