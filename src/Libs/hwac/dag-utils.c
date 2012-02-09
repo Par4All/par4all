@@ -250,6 +250,7 @@ dagvtx_dot_node_sb(string_buffer sb, const string prefix, const dagvtx v)
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 {
+  // collect prettyprint properties
   bool label_nodes = get_bool_property("FREIA_DAG_LABEL_NODES");
   bool show_arcs = get_bool_property("FREIA_DAG_LABEL_ARCS");
   bool filter_nodes = get_bool_property("FREIA_DAG_FILTER_NODES");
@@ -259,7 +260,17 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   if (vtxcontent_out(co)!=entity_undefined)
     vname = entity_dot_name(vtxcontent_out(co));
 
-  if (dagvtx_number(vtx)!=0)
+  if (dagvtx_number(vtx)==0)
+  {
+    // this is an input image, only image dependencies
+    FOREACH(dagvtx, succ, dagvtx_succs(vtx))
+    {
+      fprintf(out, "  \"%s\"", vname);
+      dagvtx_dot_node(out, " -> ", succ);
+      fprintf(out, ";\n");
+    }
+  }
+  else
   {
     // we are dealing with a computation...
     string attribute = what_operation_shape(vtxcontent_optype(co));
@@ -280,11 +291,24 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
     FOREACH(dagvtx, v, dag_vertices(d))
     {
       list vars = NIL;
-      if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
-                                        dagvtx_statement(v), &vars))
+      if (// another vertex
+          vtx!=v &&
+          // with dependencies
+          freia_scalar_rw_dep(dagvtx_statement(vtx),
+                              dagvtx_statement(v), &vars))
       {
-        dagvtx_dot_node_sb(sa, "  ", vtx);
-        dagvtx_dot_node_sb(sa, " -> ", v);
+        // show scalar dep in sequence order
+        if (dagvtx_number(v)>dagvtx_number(vtx))
+        {
+          dagvtx_dot_node_sb(sa, "  ", vtx);
+          dagvtx_dot_node_sb(sa, " -> ", v);
+        }
+        else
+        {
+          dagvtx_dot_node_sb(sa, "  ", v);
+          dagvtx_dot_node_sb(sa, " -> ", vtx);
+        }
+
         sb_cat(sa, " [" SCL_DEP);
 
         if (vars && show_arcs)
@@ -319,16 +343,6 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 
     // cleanup
     string_buffer_free(&sa);
-  }
-  else
-  {
-    // this is an input image.
-    FOREACH(dagvtx, succ, dagvtx_succs(vtx))
-    {
-      fprintf(out, "  \"%s\"", vname);
-      dagvtx_dot_node(out, " -> ", succ);
-      fprintf(out, ";\n");
-    }
   }
 }
 
