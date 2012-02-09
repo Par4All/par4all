@@ -128,16 +128,14 @@ list written_pointers(list eff) {
 
 bool interprocedural_points_to_analysis(char * module_name)
 {
-  entity module;
-  type t;
   /* list pt_list = NIL; */
   /* set pts_to_set = set_generic_make(set_private, */
   /* 				    points_to_equal_p,points_to_rank); */
 
   set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
+  //entity module = get_current_module_entity();
 
-  t = entity_type(module);
+  //type t = entity_type(module);
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
 
