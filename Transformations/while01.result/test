@@ -1,0 +1,39 @@
+### initial code
+void while01()
+{
+   int i = 1;
+   while (i==1)
+      i++;
+   printf("%d", i);
+}
+### Preconditions
+
+//  P() {}
+
+void while01()
+{
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   while (i==1)
+
+//  P(i) {i==1}
+
+      i++;
+
+//  P(i) {i==2}
+
+   printf("%d", i);
+}
+### suppress dead code
+void while01()
+{
+   int i = 1;
+   i++;
+   printf("%d", i);
+}
+
