@@ -61,13 +61,16 @@ apply FORCE_REGISTER_DECLARATIONS[main]
 apply PARTIAL_EVAL[main]
 
 # (temporary) workaround...  we need precise effects on aipo in order
-# not to over simplify but this would require providing
-# stubs. Currently the auto generated functions do not have any
+# not to over simplify but this would require providing stubs.
+# Currently the auto generated functions do not have any
 # effect, hence induce some unwanted control simplifications. See
 # comments above about MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS
 setproperty SIMPLIFY_CONTROL_DO_WHILE FALSE
 # then control
 apply SIMPLIFY_CONTROL[main]
+
+# help enlarge sequences
+apply DOWHILE_TO_WHILE[main]
 
 # then structures
 setproperty FULL_LOOP_UNROLL_EXCEPTIONS "freia_common_set_wa"

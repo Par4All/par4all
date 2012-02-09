@@ -60,6 +60,10 @@ int main(int argc, char *argv[])
    //PIPS generated variable
    register int32_t volprevious_0;
    //PIPS generated variable
+   freia_status ret0_0;
+   //PIPS generated variable
+   int i0_0;
+   //PIPS generated variable
    register freia_status ret_1;
    //PIPS generated variable
    register int i_3;
@@ -69,6 +73,10 @@ int main(int argc, char *argv[])
    int32_t volcurrent_1;
    //PIPS generated variable
    register int32_t volprevious_1;
+   //PIPS generated variable
+   freia_status ret1_0;
+   //PIPS generated variable
+   int i1_0;
    //PIPS generated variable
    register freia_status ret_3;
    //PIPS generated variable
@@ -138,7 +146,18 @@ int main(int argc, char *argv[])
    _return5 = 0;
 
    ret_0 = freia_aipo_global_vol(w1_0, &volcurrent_0);
-   do {
+   //PIPS generated variable
+   //PIPS generated variable
+   volprevious_0 = volcurrent_0;
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_kernel_8c);
+   i0_0 = 1;
+   _return14 = 0;
+   ret0_0 = 0;
+   ret0_0 |= freia_aipo_inf(w1_0, w1_0, imIn);
+   _return12 = ret0_0;
+   ret_0 |= _return12;
+   ret_0 |= freia_aipo_global_vol(w1_0, &volcurrent_0);
+   while (volcurrent_0!=volprevious_0) {
       volprevious_0 = volcurrent_0;
       
       
@@ -155,13 +174,23 @@ int main(int argc, char *argv[])
       ret_0 |= _return12;
       ret_0 |= freia_aipo_global_vol(w1_0, &volcurrent_0);
    }
-   while (volcurrent_0!=volprevious_0);
    
    
    _return8 = ret_0;
 
    ret_2 = freia_aipo_global_vol(w2_0, &volcurrent_1);
-   do {
+   //PIPS generated variable
+   //PIPS generated variable
+   volprevious_1 = volcurrent_1;
+   freia_aipo_dilate_8c(w2_0, w2_0, freia_morpho_kernel_8c);
+   i1_0 = 1;
+   _return15 = 0;
+   ret1_0 = 0;
+   ret1_0 |= freia_aipo_inf(w2_0, w2_0, imIn);
+   _return13 = ret1_0;
+   ret_2 |= _return13;
+   ret_2 |= freia_aipo_global_vol(w2_0, &volcurrent_1);
+   while (volcurrent_1!=volprevious_1) {
       volprevious_1 = volcurrent_1;
       
       
@@ -178,7 +207,6 @@ int main(int argc, char *argv[])
       ret_2 |= _return13;
       ret_2 |= freia_aipo_global_vol(w2_0, &volcurrent_1);
    }
-   while (volcurrent_1!=volprevious_1);
    
    
    _return9 = ret_2;
