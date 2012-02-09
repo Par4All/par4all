@@ -85,7 +85,7 @@ static int get_next_unstructured_number() {
 static int statement_reorder(statement st, int un, int sn)
 {
   instruction i = statement_instruction(st);
-  pips_assert("instruction is defined", i!=instruction_undefined);
+  pips_assert("instruction is defined", !instruction_undefined_p(i));
 
   // temporary, just to avoid rebooting...
   static int check_depth_hack = 0;
@@ -95,8 +95,8 @@ static int statement_reorder(statement st, int un, int sn)
   pips_debug(5, "entering for %"_intFMT" : (%d,%d)\n",
              statement_number(st), un, sn);
 
+  // update ordering
   statement_ordering(st) = MAKE_ORDERING(un, sn);
-
   sn += 1;
 
   switch (instruction_tag(i))
@@ -128,6 +128,7 @@ static int statement_reorder(statement st, int un, int sn)
   case is_instruction_goto:
   case is_instruction_call:
     pips_debug(5, "goto or call\n");
+    // nothing to do, does not contain statements
     break;
   case is_instruction_expression:
     pips_debug(5, "expression\n");
@@ -136,6 +137,7 @@ static int statement_reorder(statement st, int un, int sn)
     pips_debug(5, "unstructured\n");
     unstructured_reorder(instruction_unstructured(i));
     break;
+    // missing: is_instruction_multitest
   default:
     pips_internal_error("Unknown tag %d", instruction_tag(i));
   }
@@ -145,7 +147,8 @@ static int statement_reorder(statement st, int un, int sn)
 }
 
 
-void control_node_reorder(__attribute__((unused)) control c,__attribute__((unused))  set visited_control) {
+void control_node_reorder(__attribute__((unused)) control c,
+                          __attribute__((unused)) set visited_control) {
 }
 
 /* Reorder an unstructured
