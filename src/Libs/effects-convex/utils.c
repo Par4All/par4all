@@ -3089,6 +3089,29 @@ statement s;
  */
 
 
+/* return true if an expression is a field access or a constant phi with regard to sc */
+static bool expression_is_a_constant_reference_p(expression exp, Psysteme sc) {
+    if(expression_reference_p(exp)) { // a phi or a field ?
+        reference ref = expression_reference(exp);
+        entity var = reference_variable(ref);
+        if(entity_field_p(var)) return true;
+        else if(variable_phi_p(var)) { // we should stop there, unless we have a constant index
+            /* iterate over the region equalities to find this particular phi variable */
+            Psysteme scd = sc_dup(sc);
+            sc_transform_eg_in_ineg(scd);
+            Pcontrainte lower,upper;
+            constraints_for_bounds(var,
+                    &sc_inegalites(scd), &lower, &upper);
+            bool constant_index_p = 
+                (!CONTRAINTE_UNDEFINED_P(upper) && !CONTRAINTE_UNDEFINED_P(lower) && bounds_equal_p(var,lower,upper)) ;
+            sc_free(scd);
+            if(constant_index_p) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 /* computes the rectangular hull of a region
  * if the region indices contain fields and @p nofield is set to true
  * they are removed to ensure a non strided access
@@ -3103,32 +3126,52 @@ region region_rectangular_hull(region reg, bool nofield)
     region hyper = copy_effect(reg);
     if(nofield) {
         /* this is the stride fix */
-        list iter = reference_indices(region_any_reference(hyper));
-        list prev = iter;
-        while(!ENDP(iter)) {
-            expression e = EXPRESSION(CAR(iter));
-            if(!expression_reference_p(e) ||
-                    !entity_field_p(reference_variable(expression_reference(e)))) {
-                break;
+        list iter = reference_indices(region_any_reference(hyper)),prev;
+        prev=iter;
+
+        bool constant_path_head_p = true;
+        while(!ENDP(iter) && constant_path_head_p ) {
+            /* head : keep everything that does not introduce a stride */
+            for(;!ENDP(iter);POP(iter)) {
+                expression e = EXPRESSION(CAR(iter));
+                if(expression_reference_p(e) &&
+                        entity_field_p(reference_variable(expression_reference(e)))) {
+                    break; // stop as soon has we meet a field
+                }
+                constant_path_head_p &= expression_is_a_constant_reference_p(e, region_system(reg));
+                prev=iter;
             }
-            prev=iter;
-            POP(iter);
-        }
-        /* body keep all reference indices */
-        while(!ENDP(iter)) {
-            expression e = EXPRESSION(CAR(iter));
-            if(expression_reference_p(e) &&
-                    entity_field_p(reference_variable(expression_reference(e)))) {
-                break;
+            /* body keep all fields indices if we have a constant path head*/
+            if(constant_path_head_p) {
+                for(;!ENDP(iter);POP(iter)) {
+                    expression e = EXPRESSION(CAR(iter));
+                    prev=iter;
+                    if(!expression_reference_p(e) ||
+                            !entity_field_p(reference_variable(expression_reference(e)))) {
+                        constant_path_head_p &= expression_is_a_constant_reference_p(e, region_system(reg));
+                        break; // eats up all fields
+                    }
+                }
             }
-            prev=iter;
-            POP(iter);
         }
-        /* tail : once a field is met , we cannot go on */
-        if(!ENDP(prev)) CDR(prev)=NIL;
+        /* tail : once a field is met , we cannot go on unless we have a constant path head */
+        list tail = NIL;
+        if(!ENDP(prev)) { tail = CDR(prev) ; CDR(prev)=NIL; }
         /* if we cut the tail , approximation is may */
-        if(!ENDP(iter)) region_approximation_tag(hyper)=is_approximation_may;
-        gen_full_free_list(iter);
+        if(!ENDP(tail)) {
+            region_approximation_tag(hyper)=is_approximation_may;
+            list phis = NIL;
+            FOREACH(EXPRESSION,exp,tail) {
+                if(expression_reference_p(exp) ) {
+                    entity var = reference_variable(expression_reference(exp));
+                    if(variable_phi_p(var)) phis = CONS(ENTITY,var,phis);
+                }
+            }
+            phis=gen_nreverse(phis);
+            region_exact_projection_along_parameters(hyper,phis);
+            gen_free_list(phis);
+        }
+        gen_full_free_list(tail);
     }
 
     /* the real rectangular hull begins now */
