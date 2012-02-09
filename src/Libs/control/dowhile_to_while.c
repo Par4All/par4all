@@ -33,16 +33,21 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
-static void dowhile_to_while_walker(statement stmt)
+/************************************************** SWITCH DO-WHILE TO WHILE */
+
+static void dowhile_to_while_walker(statement stmt, bool * changed)
 {
 	instruction instr = statement_instruction(stmt);
-	if( instruction_whileloop_p(instr) )
+	if ( instruction_whileloop_p(instr) )
 	{
-    statement_instruction(stmt)=instruction_undefined;
 		whileloop wl = instruction_whileloop(instr);
-		// is it a do -while loop?
-		if( evaluation_after_p(whileloop_evaluation(wl) ) )
+
+		// is it a do-while loop?
+		if ( evaluation_after_p(whileloop_evaluation(wl) ) )
 		{
+      // we did something!
+      *changed = true;
+
 			// do-while -> while-do
 			free_evaluation(whileloop_evaluation(wl));
 			whileloop_evaluation(wl) = make_evaluation_before();
@@ -50,7 +55,8 @@ static void dowhile_to_while_walker(statement stmt)
 			// push while-do instruction
 			statement duplicated_stat = make_empty_statement();
 
-			// duplicate while-do statements and push it
+			// duplicate while-do body statements and push it
+      // BUG: it seems that clone does not handle "unstructured"
 			clone_context cc = make_clone_context(
 					get_current_module_entity(),
 					get_current_module_entity(),
@@ -64,6 +70,7 @@ static void dowhile_to_while_walker(statement stmt)
       insert_statement(duplicated_stat, instruction_to_statement(instr), false);
 
 			// see how elegant is the patching ?
+      statement_instruction(stmt)=instruction_undefined;
       update_statement_instruction
         (stmt,
          make_instruction_block(CONS(statement, duplicated_stat, NIL))
@@ -75,24 +82,34 @@ static void dowhile_to_while_walker(statement stmt)
 bool dowhile_to_while(const char* module_name)
 {
 	// prelude
+  debug_on("CONTROL_DEBUG_LEVEL");
 	set_current_module_entity( module_name_to_entity(module_name) );
 	set_current_module_statement(
     (statement) db_get_memory_resource(DBR_CODE, module_name, true)
     );
 
-	/* transformation */
-  gen_recurse(get_current_module_statement(),
-              statement_domain, gen_true, dowhile_to_while_walker);
+  // whether anything was changed
+  bool changed = false;
 
-	/* postlude */
-	module_reorder(get_current_module_statement());
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+	// actual transformation
+  gen_context_recurse(get_current_module_statement(), &changed,
+                      statement_domain, gen_true, dowhile_to_while_walker);
+
+	// postlude
+  if (changed)
+  {
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,
+                           get_current_module_statement());
+  }
 
 	reset_current_module_statement();
 	reset_current_module_entity();
-
+  debug_off();
 	return true;
 }
+
+/************************************************* LOOP TRANSFORMATION UTILS */
 
 /* converts a doloop to a while loop, in place */
 void do_loop_to_while_loop(statement sl)
@@ -141,7 +158,7 @@ void do_loop_to_while_loop(statement sl)
   update_statement_instruction(sl,make_instruction_sequence(seq));
 }
 
-/* converts a doloop to a for loop, in place*/
+/* converts a doloop to a for loop, in place */
 void do_loop_to_for_loop(statement sl)
 {
   pips_assert("statement is a loop",statement_loop_p(sl));
