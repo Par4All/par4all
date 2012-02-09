@@ -372,8 +372,8 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
 //  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
 //    i<=499}>
-//  <space[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
-//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//  <space[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI1<=PHI2+i,
+//    PHI2+i<=PHI1+500, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
 //    i<=499}>
 
       for(j = 1; j <= 499; j += 1)                                      /*0092*/
@@ -394,8 +394,8 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
    for(i = 1; i <= 499; i += 1)                                         /*0097*/
 
-//  <save[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
-//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//  <save[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI1<=PHI2+i,
+//    PHI2+i<=PHI1+500, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
 //    i<=499}>
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
 //    i<=499}>

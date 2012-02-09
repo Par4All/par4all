@@ -1,0 +1,48 @@
+#
+# Initial code for module pain
+#
+int pain(type rdata[10])
+{
+   int i;
+holy:
+   for(i = 0; i <= 99; i += 1)
+      (rdata[3].data)[i] = 'e';
+}
+#
+# Display print_code_regions for module pain
+#
+
+//  <rdata[PHI1].data[PHI3]-W-EXACT-{PHI1==3, 0<=PHI3, PHI3<=99}>
+
+int pain(type rdata[10])
+{
+   int i;
+
+//  <rdata[PHI1].data[PHI3]-W-EXACT-{PHI1==3, 0<=PHI3, PHI3<=99}>
+
+holy:
+   for(i = 0; i <= 99; i += 1)
+
+//  <rdata[PHI1].data[PHI3]-W-EXACT-{PHI1==3, PHI3==i, 0<=i, i<=99}>
+
+      (rdata[3].data)[i] = 'e';
+}
+#
+# Code after isolate_statement for module pain
+#
+int pain(type rdata[10])
+{
+   int i;
+   {
+      //PIPS generated variable
+      type (*rdata0)[1] = (type (*)[1]) 0;
+      P4A_accel_malloc((void **) &rdata0, sizeof(rdata[0])*1);
+
+holy:
+      for(i = 0; i <= 99; i += 1)
+         ((*rdata0)[3-3].data)[i] = 'e';
+      P4A_copy_from_accel_1d(sizeof(rdata[0]), 10, 1, 3, &(rdata[0].data)[0], *rdata0);
+      P4A_accel_free(rdata0);
+   }
+}
+(0, '', '') : (0, '', '')

@@ -1339,8 +1339,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
 
          P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, *P4A_var_image_in0, img_index, *P4A_var_ovsf_code_user10, *P4A_var_pilot0, *P4A_var_spreading_signal10, *P4A_var_symbole_flow_user10, t);
-         P4A_copy_from_accel_1d(sizeof(int), 262, 256, 0, &spreading_signal1[0], *P4A_var_spreading_signal10);
          P4A_copy_from_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 256, 0, &spreading_signal1[0], *P4A_var_spreading_signal10);
       }
       {
          //PIPS generated variable
@@ -1429,13 +1429,13 @@ int main()
          P4A_scmp_malloc((void **) &P4A_var_I_user0, sizeof(int)*131);
          P4A_scmp_malloc((void **) &P4A_var_Q_user0, sizeof(int)*131);
          P4A_scmp_malloc((void **) &P4A_var_spreading_signals6, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals6);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user0);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user0);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals6);
 
          P4A_scmp_kernel_7(*P4A_var_I_user0, *P4A_var_Q_user0, &j, *P4A_var_spreading_signals6);
-         P4A_copy_from_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user0);
          P4A_copy_from_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user0);
+         P4A_copy_from_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user0);
       }
       {
          //PIPS generated variable
@@ -1490,8 +1490,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user11);
 
          P4A_scmp_kernel_12(*P4A_var_FIR_COEFF0, *P4A_var_Signal_I1, *P4A_var_channel_I1, &ptr_x_buffer_user1, *P4A_var_x_buffer_user11);
-         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I1);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user11);
+         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I1);
       }
       {
          //PIPS generated variable
@@ -1522,8 +1522,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user13);
 
          P4A_scmp_kernel_15(*P4A_var_FIR_COEFF1, *P4A_var_Signal_Q1, *P4A_var_channel_Q1, &ptr_x_buffer_user1, *P4A_var_x_buffer_user13);
-         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_Q[0], *P4A_var_channel_Q1);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user13);
+         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_Q[0], *P4A_var_channel_Q1);
       }
       {
          //PIPS generated variable
@@ -1562,8 +1562,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user15);
 
          P4A_scmp_kernel_19(*P4A_var_FIR2_I_user11, *P4A_var_FIR_COEFF2, *P4A_var_channel_I2, &ptr_x_buffer_user1, *P4A_var_x_buffer_user15);
-         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user11);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user15);
+         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user11);
       }
       {
          //PIPS generated variable
@@ -1586,8 +1586,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user17);
 
          P4A_scmp_kernel_21(*P4A_var_FIR2_Q_user11, *P4A_var_FIR_COEFF3, *P4A_var_channel_Q2, &ptr_x_buffer_user1, *P4A_var_x_buffer_user17);
-         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user11);
          P4A_copy_from_accel_1d(sizeof(float), 8, 8, 0, &x_buffer_user1[0], *P4A_var_x_buffer_user17);
+         P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user11);
       }
       {
          //PIPS generated variable
@@ -1602,8 +1602,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(float), 524, 521, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user12);
 
          P4A_scmp_kernel_22(*P4A_var_FIR2_I_user12, *P4A_var_FIR2_Q_user12, *P4A_var_R_pilot0, *P4A_var_inv_qpsk_user10, &j, t);
-         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &R_pilot[0], *P4A_var_R_pilot0);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &R_pilot[0], *P4A_var_R_pilot0);
       }
       {
          //PIPS generated variable
@@ -1620,10 +1620,10 @@ int main()
          P4A_copy_to_accel_2d(sizeof(int), 32, 6, 32, 6, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
 
          P4A_scmp_kernel_23(*P4A_var_R_pilot1, *P4A_var_S_pilot0, *P4A_var_coeff0, *P4A_var_coeff20, *P4A_var_finger_mat0, &flag, &j_bkp, &max, &retro_loop_count, t);
-         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &R_pilot[0], *P4A_var_R_pilot1);
-         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *P4A_var_coeff0);
-         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff2[0], *P4A_var_coeff20);
          P4A_copy_from_accel_2d(sizeof(int), 32, 6, 32, 6, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff2[0], *P4A_var_coeff20);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *P4A_var_coeff0);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &R_pilot[0], *P4A_var_R_pilot1);
       }
       {
          //PIPS generated variable
@@ -1639,8 +1639,8 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *P4A_var_ovsf_code_user11);
 
          P4A_scmp_kernel_24(*P4A_var_coeff1, &data, *P4A_var_finger0, *P4A_var_inv_qpsk_user11, *P4A_var_ovsf_code_user11, *P4A_var_symbole_flow0, t);
-         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *P4A_var_finger0);
          P4A_copy_from_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow[0], *P4A_var_symbole_flow0);
+         P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *P4A_var_finger0);
       }
       
       //---- Store result

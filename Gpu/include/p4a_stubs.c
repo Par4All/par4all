@@ -1,4 +1,7 @@
-#include <stdlib.h>
+#include <stddef.h>
+extern void *malloc(size_t size); // to avoid the bswap issue
+extern void free(void *ptr);
+
 
 /** @defgroup p4a_accel_stubs Equivalent stubs of Par4All runtime to have
     PIPS analyzis happy

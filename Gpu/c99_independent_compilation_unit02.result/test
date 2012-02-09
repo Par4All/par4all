@@ -6,8 +6,8 @@
 /*
  * file for c99_independent_compilation_unit02.c
  */
-#include <stdlib.h>
 #include <stdio.h>
+extern int atoi(const char *nptr);
 
 
 int main(int argc, char **argv);

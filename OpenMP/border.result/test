@@ -1,0 +1,146 @@
+#
+# Code after openmp for module img_border
+#
+void img_border(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+
+   char (*tmp0)[n][m];
+   tmp0 = malloc(sizeof(char)*n*m);
+   img_erode(w, n, m, *tmp0, in);
+
+   char (*tmp1)[n][m];
+   tmp1 = malloc(sizeof(char)*n*m);
+   img_dilate(w, n, m, *tmp1, in);
+
+   img_diff(n, m, out, *tmp1, *tmp0);
+   free(tmp0);
+   free(tmp1);
+}
+#
+# Code after openmp for module img_diff
+#
+void img_diff(size_t n, size_t m, char out[n][m], char self[n][m], char other[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = 0; i < n; i += 1) {
+      size_t j;
+      for(j = 0; j < m; j += 1)
+         out[i][j] = self[i][j]-other[i][j];
+   }
+}
+#
+# Code after openmp for module img_dilate
+#
+void img_dilate(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = w; i < n-w; i += 1) {
+      size_t j;
+      for(j = w; j < m-w; j += 1) {
+         out[i][j] = 127;
+         {
+            size_t k;
+            for(k = -w; k < w+1; k += 1) {
+               size_t l;
+            }
+            for(k = -w; k < w+1; k += 1) {
+               for(l = -w; l < w+1; l += 1)
+                  out[i][j] = MAX(out[i][j], in[i+k][j+k]);
+            }
+         }
+      }
+   }
+}
+#
+# Code after openmp for module img_erode
+#
+void img_erode(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = w; i < n-w; i += 1) {
+      size_t j;
+      for(j = w; j < m-w; j += 1) {
+         out[i][j] = -127-1;
+         {
+            size_t k;
+            for(k = -w; k < w+1; k += 1) {
+               size_t l;
+            }
+            for(k = -w; k < w+1; k += 1) {
+               for(l = -w; l < w+1; l += 1)
+                  out[i][j] = MIN(out[i][j], in[i+k][j+k]);
+            }
+         }
+      }
+   }
+}
+void img_border(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+
+   char (*tmp0)[n][m];
+   tmp0 = malloc(sizeof(char)*n*m);
+   img_erode(w, n, m, *tmp0, in);
+
+   char (*tmp1)[n][m];
+   tmp1 = malloc(sizeof(char)*n*m);
+   img_dilate(w, n, m, *tmp1, in);
+
+   img_diff(n, m, out, *tmp1, *tmp0);
+   free(tmp0);
+   free(tmp1);
+}
+void img_diff(size_t n, size_t m, char out[n][m], char self[n][m], char other[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = 0; i < n; i += 1) {
+      size_t j;
+      for(j = 0; j < m; j += 1)
+         out[i][j] = self[i][j]-other[i][j];
+   }
+}
+void img_dilate(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = w; i < n-w; i += 1) {
+      size_t j;
+      for(j = w; j < m-w; j += 1) {
+         out[i][j] = 127;
+         {
+            size_t k;
+            for(k = -w; k < w+1; k += 1) {
+               size_t l;
+            }
+            for(k = -w; k < w+1; k += 1) {
+               for(l = -w; l < w+1; l += 1)
+                  out[i][j] = MAX(out[i][j], in[i+k][j+k]);
+            }
+         }
+      }
+   }
+}
+void img_erode(size_t w, size_t n, size_t m, char out[n][m], char in[n][m])
+{
+   size_t i;
+#pragma omp parallel for
+   for(i = w; i < n-w; i += 1) {
+      size_t j;
+      for(j = w; j < m-w; j += 1) {
+         out[i][j] = -127-1;
+         {
+            size_t k;
+            for(k = -w; k < w+1; k += 1) {
+               size_t l;
+            }
+            for(k = -w; k < w+1; k += 1) {
+               for(l = -w; l < w+1; l += 1)
+                  out[i][j] = MIN(out[i][j], in[i+k][j+k]);
+            }
+         }
+      }
+   }
+}

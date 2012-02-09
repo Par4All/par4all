@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 typedef float float_t;
 #define SIZE 64
 #define T 64

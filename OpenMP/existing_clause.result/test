@@ -1,0 +1,19 @@
+#
+# Code after openmp for module dotp
+#
+void dotp(int n, int a[n])
+{
+   int i, r;
+   r = 0;
+#pragma omp parallel for reduction(+:r)
+   for(i = 0; i <= n-1; i += 1)
+      r += a[i];
+}
+void dotp(int n, int a[n])
+{
+   int i, r;
+   r = 0;
+#pragma omp parallel for reduction(+:r)
+   for(i = 0; i <= n-1; i += 1)
+      r += a[i];
+}

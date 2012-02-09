@@ -31,8 +31,7 @@ void p4a_wrapper_give(int N, double array[N], int k)
  */
 /* Test kernel_load_store on a scalar modification.
 */
-
-#include <stdlib.h>
+extern void exit(int status);
 enum {N=100};
 
 void give();
