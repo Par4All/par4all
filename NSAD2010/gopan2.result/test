@@ -137,15 +137,13 @@ int main()
    x = 0;
    y = 0;
 
-   while (y>=0) {
-      while (y>=0&&x<=50) {
-         x++;
-         y++;
-      }
-      while (y>=0&&x>50) {
-         y--;
-         x++;
-      }
+   while (y>=0&&x<=50) {
+      x++;
+      y++;
+   }
+   while (y>=0&&x>50) {
+      y--;
+      x++;
    }
    printf("property  verified\n");
 }
