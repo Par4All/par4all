@@ -129,8 +129,7 @@ void cohen02(int n)
          j = j0;
          j -= 2;
       }
-      while (i<n&&j<0)
-         j = 0;
+      j = 0;
       /* j==0 here */
       printf("i=%d, j=%d\n", i, j);
    }
@@ -151,10 +150,9 @@ void cohen02(int n)
          j = j0;
          j -= 2;
       }
-      while (i<n&&j<0)
-         j = 0;
+      j = 0;
       /* j==0 here */
-      printf("i=%d, j=%d\n", 0, j);
+      printf("i=%d, j=%d\n", 0, 0);
    }
    printf("i=%d, j=%d\n", 0, 42);
 }
