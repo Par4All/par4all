@@ -29,8 +29,8 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -50,8 +50,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -101,8 +101,8 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -122,8 +122,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -348,8 +348,8 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -369,8 +369,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -873,8 +873,8 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
@@ -894,8 +894,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
-  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
