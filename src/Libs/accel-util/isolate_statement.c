@@ -614,6 +614,7 @@ statement effects_to_dma(statement stat,
                 may_write_effects=CONS(EFFECT,fake,may_write_effects);
             }
         }
+        may_write_effects=gen_nreverse(may_write_effects);
         /* then we will merge these effects with those
          * that were already gathered
          * because we are manipulating lists, it is not very efficient
