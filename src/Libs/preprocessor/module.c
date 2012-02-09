@@ -388,6 +388,13 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
         module_reorder(s);
         db_put_or_update_memory_resource(DBR_CODE,cum,s,true);
         db_touch_resource(DBR_CODE,cum);
+        if( typedef_entity_p(e) ) {
+            keyword_typedef_table = (hash_table)db_get_memory_resource(DBR_DECLARATIONS, cum, true);
+            put_new_typedef(entity_user_name(e));
+            //SG: we have to do this behind the back of pipsmake. Not Good for serialization, but otherwise it forces the recompilation of the parsed_code of the associated modules, not good :(
+            //DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, cum, keyword_typedef_table);
+        }
+
     }
 }
 
