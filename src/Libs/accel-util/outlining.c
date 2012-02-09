@@ -986,40 +986,42 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
     sort_entities_with_dep(&lre);
     set_free(re);
     /* SG : part of this code is duplicated from inlining */
-    FOREACH(ENTITY, e, lre) {
-        if(!entity_enum_member_p(e) && /* enum member cannot be added to declarations */
-                !entity_formal_p(e) ) /* formal parameters are not considered */
-        {
-            if(!has_entity_with_same_name(e,entity_declarations(module)) &&
-                    !has_entity_with_same_name(e,entity_declarations(cu) ) )
+    if(c_module_p(get_current_module_entity())) {
+        FOREACH(ENTITY, e, lre) {
+            if(!entity_enum_member_p(e) && /* enum member cannot be added to declarations */
+                    !entity_formal_p(e) ) /* formal parameters are not considered */
             {
-                if(anonymous_type_p(e)) continue;
-                if(top_level_entity_p(e)) {
-                    if(get_bool_property("OUTLINE_ALLOW_GLOBALS")) {
-                        AddEntityToCompilationUnit(e, cu );
-                        gen_append(code_externs(entity_code(cu)),CONS(ENTITY,e,NIL));
+                if(!has_entity_with_same_name(e,entity_declarations(module)) &&
+                        !has_entity_with_same_name(e,entity_declarations(cu) ) )
+                {
+                    if(anonymous_type_p(e)) continue;
+                    if(top_level_entity_p(e)) {
+                        if(get_bool_property("OUTLINE_ALLOW_GLOBALS")) {
+                            AddEntityToCompilationUnit(e, cu );
+                            gen_append(code_externs(entity_code(cu)),CONS(ENTITY,e,NIL));
+                        }
                     }
-                }
-                else if(variable_static_p(e))
-                    pips_internal_error("unhandled case : outlining a static variable\n");
-                else if(typedef_entity_p(e)) {
-#if 0
-                    basic b = variable_basic(
-                            type_variable(
-                                entity_type(
-                                    e
+                    else if(variable_static_p(e))
+                        pips_internal_error("unhandled case : outlining a static variable\n");
+                    else if(typedef_entity_p(e)) {
+    #if 0
+                        basic b = variable_basic(
+                                type_variable(
+                                    entity_type(
+                                        e
+                                        )
                                     )
-                                )
-                            );
-                    if(basic_derived_p(b)) {
-                        entity *et = &basic_derived(b);
-                        *et = recursive_rename_types(*et,cun);
-                        if(!anonymous_type_p(*et))
-                            AddEntityToCompilationUnit(*et, cu );
+                                );
+                        if(basic_derived_p(b)) {
+                            entity *et = &basic_derived(b);
+                            *et = recursive_rename_types(*et,cun);
+                            if(!anonymous_type_p(*et))
+                                AddEntityToCompilationUnit(*et, cu );
+                        }
+    #endif
+                        e=recursive_rename_types(e,cun);
+                        AddEntityToCompilationUnit(e, cu );
                     }
-#endif
-                    e=recursive_rename_types(e,cun);
-                    AddEntityToCompilationUnit(e, cu );
                 }
             }
         }
