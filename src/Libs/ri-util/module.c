@@ -364,7 +364,7 @@ module_formal_parameters(entity func)
     pips_assert("func must be a module",entity_module_p(func));
 
     decl = code_declarations(entity_code(func));
-    MAP(ENTITY, e, 
+    FOREACH(ENTITY, e, decl)
      {
        /* Dummy parameters should have been filtered out of the
 	  declarations by the parser, but let's be careful here. As a
@@ -372,8 +372,7 @@ module_formal_parameters(entity func)
 	  thru the type. */
        if(!dummy_parameter_entity_p(e) && storage_formal_p(entity_storage(e)))
 	     formals = CONS(ENTITY, e, formals);
-     },
-	 decl);
+     }
     
     return gen_nreverse(formals);
 }

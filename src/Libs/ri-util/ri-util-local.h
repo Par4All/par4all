@@ -378,9 +378,6 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
-/* GNU Extension*/
-#define SECOND_FUNCTION_NAME            "SECOND"
-
 /* F95 */
 #define ALLOCATE_FUNCTION_NAME          "ALLOCATE"
 #define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
@@ -1118,6 +1115,7 @@
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
 #define CLOCK_FUNCTION_NAME            "clock"
+#define SECOND_FUNCTION_NAME            "SECOND" //gfortran extension
 #define CLOCK_GETTIME_FUNCTION_NAME    "clock_gettime"
 #define GETTIMEOFDAY_FUNCTION_NAME    "gettimeofday"
 

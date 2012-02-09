@@ -1036,6 +1036,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {GETTIMEOFDAY_FUNCTION_NAME,             time_effects},
   {CLOCK_GETTIME_FUNCTION_NAME,            time_effects},
   {CLOCK_FUNCTION_NAME,                    time_effects},
+  {SECOND_FUNCTION_NAME,                   time_effects}, //gfortran extension
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_effects},
@@ -1223,9 +1224,6 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
-
-  /* GNU Extension*/
-  {SECOND_FUNCTION_NAME,                   time_effects},
 
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},

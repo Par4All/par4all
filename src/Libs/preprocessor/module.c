@@ -43,6 +43,7 @@
 #include "resources.h"
 #include "phases.h"
 #include "control.h"
+#include "c_syntax.h"
 #include "preprocessor.h"
 
 
@@ -360,6 +361,19 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
     statement s = statement_undefined;
     const char* cum = module_local_name(cu);
     if( c_module_p(cu) ) {
+        if(!db_resource_required_or_available_p(DBR_PARSED_CODE,cum))
+        {
+            bool compilation_unit_parser(const char*);
+            entity tmp = get_current_module_entity();
+            statement stmt = get_current_module_statement();
+            reset_current_module_entity();
+            reset_current_module_statement();
+            compilation_unit_parser(cum);
+            if(!entity_undefined_p(tmp))
+                set_current_module_entity(tmp);
+            if(!statement_undefined_p(stmt))
+                set_current_module_statement(stmt);
+        }
         if(!db_resource_required_or_available_p(DBR_CODE,cum))
         {
             bool controlizer(const char*);
@@ -443,7 +457,13 @@ AddEntityToModuleCompilationUnit(entity e, entity module)
 {
     list tse = type_supporting_entities(NIL,entity_type(e));
     entity cu = module_entity_to_compilation_unit_entity(module);
-    FOREACH(ENTITY,se,tse) AddEntityToCompilationUnit(se,cu);
+    FOREACH(ENTITY,se,tse) {
+        const char * eln = entity_local_name(se);
+        if(strstr(eln, DUMMY_STRUCT_PREFIX) || strstr(eln, DUMMY_UNION_PREFIX) ) {
+            continue;
+        }
+        AddEntityToCompilationUnit(se,cu);
+    }
     gen_free_list(tse);
     AddEntityToCompilationUnit(e,cu);
 }
@@ -486,7 +506,7 @@ static void do_recompile_module(entity module, statement module_statement) {
 /* build a textual representation of the modified module and update db
  */
 bool
-recompile_module(char* module)
+recompile_module(const char* module)
 {
     entity modified_module = module_name_to_entity(module);
     statement modified_module_statement =

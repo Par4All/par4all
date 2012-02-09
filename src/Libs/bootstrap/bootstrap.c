@@ -5405,6 +5405,7 @@ CreateIntrinsics( set module_list )
         {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
         {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
         {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},
+        {SECOND_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0}, //GFORTRAN
 
         /*#include <wchar.h>*/
         { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
@@ -5516,9 +5517,6 @@ CreateIntrinsics( set module_list )
         {VERRX_FUNCTION_NAME,   3, 	   overloaded_to_void_type, 0, 0},
         {VWARN_FUNCTION_NAME,   2, 	   overloaded_to_void_type, 0, 0},
         {VWARNX_FUNCTION_NAME,  2, 	   overloaded_to_void_type, 0, 0},
-
-        /* GNU Extension*/
-        {SECOND_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
 
         /* F95 */
         {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},

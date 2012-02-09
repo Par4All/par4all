@@ -256,7 +256,7 @@ list make_unbounded_subscripts(int d)
    See also MakeCurrentFunction(), which is part of the Fortran
    parser.
  */
-static entity make_empty_module(const char* full_name,
+entity make_empty_module(const char* full_name,
 				type r, language l)
 {
   const char* name;
