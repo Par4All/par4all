@@ -68,8 +68,9 @@ apply PARTIAL_EVAL[${NAME}]
 # no, too efficient, helper functions are removed.
 #apply USE_DEF_ELIMINATION[${NAME}]
 # no, too efficient, do/while loops that contain helpers are removed
-setproperty SIMPLIFY_CONTROL_DO_WHILE FALSE
-apply SIMPLIFY_CONTROL[${NAME}]
+# argh! some while loop bodies are also whiped out:-(
+#setproperty SIMPLIFY_CONTROL_DO_WHILE FALSE
+#apply SIMPLIFY_CONTROL[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}
