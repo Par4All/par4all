@@ -931,8 +931,9 @@ dead_statement_rewrite(statement s)
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
 
-   stdebug(2, "dead_statement_rewrite: The current statement st at the beginning",
-	   s);
+   stdebug(2, "dead_statement_rewrite: "
+           "The current statement st at the beginning",
+           s);
 
    switch(t) {
    case is_instruction_sequence: {
@@ -947,9 +948,8 @@ dead_statement_rewrite(statement s)
       break;
    }
    case is_instruction_loop:
-     break;
    case is_instruction_forloop:
-     ;
+     break;
    case is_instruction_whileloop:
      {
      whileloop wl = instruction_whileloop(i);
