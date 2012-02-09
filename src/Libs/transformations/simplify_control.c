@@ -913,8 +913,98 @@ static void dead_recurse_unstructured(unstructured u)
 	      unstructured_consistent_p(u));
 }
 
+static bool one_iteration_while_loop_p(statement s)
+{
+  instruction i = statement_instruction(s);
+  whileloop wl = instruction_whileloop(i);
+  evaluation e = whileloop_evaluation(wl);
+  bool one_iteration_p = false;
+  statement wb = whileloop_body(wl);
+  transformer prec = load_statement_precondition(s);
+  transformer tf = load_statement_transformer(wb);
+  expression c = whileloop_condition(wl);
 
+  if(evaluation_after_p(e)) {
+    // See if the repeat until is only executed once
+    // Issue: the precondition holding before the condition is
+    // re-evaluated because it has not been stored
+    transformer tp = transformer_apply(tf, prec); // test precondition
+    transformer ct = condition_to_transformer(c, tp, true);
+    one_iteration_p = transformer_empty_p(ct);
+    free_transformer(tp), free_transformer(ct);
+  }
+  else {
+    // See if the loop condition is false when tested after the body execution
+    // Should be useless since integrated in wb's precondition
+    // transformer fct = condition_to_transformer(c, prec, true);
+    transformer bprec = load_statement_precondition(wb);
+    transformer tp = transformer_apply(tf, bprec); // test precondition
+    transformer sct = condition_to_transformer(c, tp, true);
+    one_iteration_p = transformer_empty_p(sct);
+    free_transformer(tp), free_transformer(sct);
+  }
+  return one_iteration_p;
+}
 
+/* If it can be proven that the while loop is executed only once,
+ * replace the while loop by its body in s.
+ *
+ * It is assumed that s contains a while loop.
+ */ 
+static void simplify_while_loop(statement s)
+{
+  instruction i = statement_instruction(s);
+  whileloop wl = instruction_whileloop(i);
+  evaluation e = whileloop_evaluation(wl);
+  bool one_iteration_p = one_iteration_while_loop_p(s);
+
+  if(one_iteration_p
+     && (!evaluation_after_p(e) ||
+	 // A quick fix for FREIA demonstrations
+	 get_bool_property("SIMPLIFY_CONTROL_DO_WHILE"))
+     // Same fix for while loops and the FREIA demonstration
+     && get_bool_property("SIMPLIFY_CONTROL_DO_WHILE")) {
+
+    // FI: this is buggy if the condition has a side effect
+    // An expression statement should be added before the body and
+    // another one after the body in case it is a do{}while() loop
+
+    // Easiest solution: do not simplify while loops when there
+    // conditions have side effects
+
+    statement wb = whileloop_body(wl);
+    statement_instruction(s) = statement_instruction(wb);
+    // We should try to preserve labels, comments and statement numbers...
+    statement_number(s) = statement_number(wb);
+    // An issue if we have a label for s and a label for wb...
+    ; // FI: to be seen later, wb is unlikely to have a label...
+    // Concatenate comments...
+    // FI: to be seen later... The parser seems to junk the loop comments
+    string sc = statement_comments(s);
+    string wbc = statement_comments(wb); // will be freed with wb
+    string nc;
+    if(empty_comments_p(sc)) {
+      if(empty_comments_p(wbc))
+	nc = empty_comments;
+      else
+	nc = strdup(wbc);
+    }
+    else {
+      if(empty_comments_p(wbc))
+	nc = strdup(sc);
+      else
+	nc = strdup(concatenate(sc, wbc, NULL)); // new comment
+      free(sc);
+    }
+    statement_comments(s) = empty_comments;
+    insert_comments_to_statement(s, nc);
+    // Get rid of obsolete pieces of data structures
+    whileloop_body(wl) = statement_undefined;
+    free_instruction(i);
+    statement_instruction(wb) = instruction_undefined;
+    free_statement(wb);
+  }
+}
 
 /* Essaye de faire le menage des blocs vides recursivement.
    En particulier, si les 2 branches d'un test sont vides on peut supprimer
@@ -951,58 +1041,8 @@ dead_statement_rewrite(statement s)
    case is_instruction_forloop:
      break;
    case is_instruction_whileloop:
-     {
-     whileloop wl = instruction_whileloop(i);
-     evaluation e = whileloop_evaluation(wl);
-     if(evaluation_after_p(e) &&
-        get_bool_property("SIMPLIFY_CONTROL_DO_WHILE"))
-     {
-       // See if the repeat until is only executed once
-       // Issue: the precondition holding before the condition is
-       // evaluated has not been stored
-       statement wb = whileloop_body(wl);
-       transformer prec = load_statement_precondition(s);
-       transformer tf = load_statement_transformer(wb);
-       transformer tp = transformer_apply(tf, prec); // test precondition
-       expression c = whileloop_condition(wl);
-       transformer ct = condition_to_transformer(c, tp, true);
-       if(transformer_empty_p(ct)) {
-         // The condition is never true
-         // the until loop can be replaced by its body
-         statement_instruction(s) = statement_instruction(wb);
-         // We should try to preserve labels, comments and statement numbers...
-         statement_number(s) = statement_number(wb);
-         // An issue if we have a label for s and a label for wb...
-         ; // FI: to be seen later, wb is unlikely to have a label...
-         // Concatenate comments...
-         // FI: to be seen later... The parser seems to junk the loop comments
-         string sc = statement_comments(s);
-         string wbc = statement_comments(wb); // will be freed with wb
-         string nc;
-         if(empty_comments_p(sc)) {
-           if(empty_comments_p(wbc))
-             nc = empty_comments;
-           else
-             nc = strdup(wbc);
-         }
-         else {
-           if(empty_comments_p(wbc))
-             nc = strdup(sc);
-           else
-             nc = strdup(concatenate(sc, wbc, NULL)); // new comment
-           free(sc);
-         }
-         statement_comments(s) = empty_comments;
-         insert_comments_to_statement(s, nc);
-         // Get rid of obsolete pieces of data structures
-         whileloop_body(wl) = statement_undefined;
-         free_instruction(i);
-         statement_instruction(wb) = instruction_undefined;
-         free_statement(wb);
-       }
-     }
+     simplify_while_loop(s);
      break;
-     }
    case is_instruction_test:
    {
        statement st_true, st_false;
