@@ -2160,8 +2160,14 @@ static bool any_scalar_dep(dagvtx v, set vs)
       break;
     }
   }
-  pips_debug(8, "scalar rw dep on %d: %s\n",
-             (int) dagvtx_number(v), bool_to_string(dep));
+
+  ifdebug(8) {
+    string svs = set_to_string("vs", vs, (gen_string_func_t) dagvtx_number_str);
+    pips_debug(8, "scalar rw dep on %d for (%s): %s\n",
+             (int) dagvtx_number(v), svs, bool_to_string(dep));
+    free(svs);
+  }
+
   return dep;
 }
 
@@ -2205,9 +2211,11 @@ list /* of dagvtx */ dag_computable_vertices
 {
   list computable = NIL;
   set local_currents = set_make(set_pointer);
+  set not_computed = set_make(set_pointer);
+  set not_computed_before = set_make(set_pointer);
+
   set_assign(local_currents, currents);
 
-  set not_computed = set_make(set_pointer);
   FOREACH(dagvtx, v, dag_vertices(d))
     if (!set_belong_p(computed, v))
       set_add_element(not_computed, not_computed, v);
@@ -2239,10 +2247,19 @@ list /* of dagvtx */ dag_computable_vertices
       pips_debug(8, "%d predecessors to %" _intFMT "\n",
                  (int) gen_length(preds), dagvtx_number(v));
 
+      // build subset of "not computed" which should occur before v
+      // from the initial sequence point of view
+      set_clear(not_computed_before);
+      SET_FOREACH(dagvtx, vnc, not_computed)
+      {
+        if (dagvtx_number(vnc)<dagvtx_number(v))
+          set_add_element(not_computed_before, not_computed_before, vnc);
+      }
+
       if(// no scalar dependencies in the current pipeline
         !any_scalar_dep(v, local_currents) &&
-        // or in the future!
-        !any_scalar_dep(v, not_computed) &&
+        // or in the future of the graph
+        !any_scalar_dep(v, not_computed_before) &&
         // and image dependencies are fulfilled.
         list_in_set_p(preds, maybe))
       {
@@ -2263,6 +2280,7 @@ list /* of dagvtx */ dag_computable_vertices
   // cleanup
   set_free(local_currents);
   set_free(not_computed);
+  set_free(not_computed_before);
   gen_free_list(lv);
   return computable;
 }
