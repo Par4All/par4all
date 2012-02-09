@@ -602,6 +602,8 @@
 #define ISFINITE_OPERATOR_NAME             "isfinite"
 #define ISINF_OPERATOR_NAME                "isinf"
 #define ISNAN_OPERATOR_NAME                "isnan"
+#define ISNANL_OPERATOR_NAME               "isnanl"
+#define ISNANF_OPERATOR_NAME               "isnanf"
 #define ISNORMAL_OPERATOR_NAME             "isnormal"
 #define SIGNBIT_OPERATOR_NAME              "signbit"
 #define C_ACOS_OPERATOR_NAME               "acos"

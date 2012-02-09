@@ -4938,6 +4938,8 @@ CreateIntrinsics( set module_list )
         {ISFINITE_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {ISINF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISNANL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_real_to_int, 0},
+        {ISNANF_OPERATOR_NAME, 1, real_to_integer_type, typing_function_real_to_int, 0},
         {ISNORMAL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {SIGNBIT_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
         {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double , 0},

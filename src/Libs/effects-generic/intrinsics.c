@@ -702,6 +702,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ISFINITE_OPERATOR_NAME,                 no_write_effects},
   {ISINF_OPERATOR_NAME,                    no_write_effects},
   {ISNAN_OPERATOR_NAME,                    no_write_effects},
+  {ISNANL_OPERATOR_NAME,                   no_write_effects},
+  {ISNANF_OPERATOR_NAME,                   no_write_effects},
   {ISNORMAL_OPERATOR_NAME,                 no_write_effects},
   {SIGNBIT_OPERATOR_NAME,                  no_write_effects},
   {C_ACOS_OPERATOR_NAME,                   no_write_effects},

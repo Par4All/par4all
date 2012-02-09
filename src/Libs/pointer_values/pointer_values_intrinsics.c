@@ -473,6 +473,8 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {ISFINITE_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {ISINF_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
   {ISNAN_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
+  {ISNANL_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
+  {ISNANF_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {ISNORMAL_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {SIGNBIT_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
   {C_ACOS_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
