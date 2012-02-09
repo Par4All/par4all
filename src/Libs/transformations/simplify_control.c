@@ -953,56 +953,58 @@ static bool one_iteration_while_loop_p(statement s)
  */ 
 static void simplify_while_loop(statement s)
 {
-  instruction i = statement_instruction(s);
-  whileloop wl = instruction_whileloop(i);
-  evaluation e = whileloop_evaluation(wl);
-  bool one_iteration_p = one_iteration_while_loop_p(s);
+  if (get_statement_precondition==load_statement_precondition) {
+    instruction i = statement_instruction(s);
+    whileloop wl = instruction_whileloop(i);
+    evaluation e = whileloop_evaluation(wl);
+    bool one_iteration_p = one_iteration_while_loop_p(s);
 
-  if(one_iteration_p
-     && (!evaluation_after_p(e) ||
-	 // A quick fix for FREIA demonstrations
-	 get_bool_property("SIMPLIFY_CONTROL_DO_WHILE"))
-     // Same fix for while loops and the FREIA demonstration
-     && get_bool_property("SIMPLIFY_CONTROL_DO_WHILE")) {
+    if(one_iteration_p
+       && (!evaluation_after_p(e) ||
+       // A quick fix for FREIA demonstrations
+       get_bool_property("SIMPLIFY_CONTROL_DO_WHILE"))
+       // Same fix for while loops and the FREIA demonstration
+       && get_bool_property("SIMPLIFY_CONTROL_DO_WHILE")) {
 
-    // FI: this is buggy if the condition has a side effect
-    // An expression statement should be added before the body and
-    // another one after the body in case it is a do{}while() loop
+      // FI: this is buggy if the condition has a side effect
+      // An expression statement should be added before the body and
+      // another one after the body in case it is a do{}while() loop
 
-    // Easiest solution: do not simplify while loops when there
-    // conditions have side effects
+      // Easiest solution: do not simplify while loops when there
+      // conditions have side effects
 
-    statement wb = whileloop_body(wl);
-    statement_instruction(s) = statement_instruction(wb);
-    // We should try to preserve labels, comments and statement numbers...
-    statement_number(s) = statement_number(wb);
-    // An issue if we have a label for s and a label for wb...
-    ; // FI: to be seen later, wb is unlikely to have a label...
-    // Concatenate comments...
-    // FI: to be seen later... The parser seems to junk the loop comments
-    string sc = statement_comments(s);
-    string wbc = statement_comments(wb); // will be freed with wb
-    string nc;
-    if(empty_comments_p(sc)) {
-      if(empty_comments_p(wbc))
-	nc = empty_comments;
-      else
-	nc = strdup(wbc);
+      statement wb = whileloop_body(wl);
+      statement_instruction(s) = statement_instruction(wb);
+      // We should try to preserve labels, comments and statement numbers...
+      statement_number(s) = statement_number(wb);
+      // An issue if we have a label for s and a label for wb...
+      ; // FI: to be seen later, wb is unlikely to have a label...
+      // Concatenate comments...
+      // FI: to be seen later... The parser seems to junk the loop comments
+      string sc = statement_comments(s);
+      string wbc = statement_comments(wb); // will be freed with wb
+      string nc;
+      if(empty_comments_p(sc)) {
+        if(empty_comments_p(wbc))
+      nc = empty_comments;
+        else
+      nc = strdup(wbc);
+      }
+      else {
+        if(empty_comments_p(wbc))
+      nc = strdup(sc);
+        else
+      nc = strdup(concatenate(sc, wbc, NULL)); // new comment
+        free(sc);
+      }
+      statement_comments(s) = empty_comments;
+      insert_comments_to_statement(s, nc);
+      // Get rid of obsolete pieces of data structures
+      whileloop_body(wl) = statement_undefined;
+      free_instruction(i);
+      statement_instruction(wb) = instruction_undefined;
+      free_statement(wb);
     }
-    else {
-      if(empty_comments_p(wbc))
-	nc = strdup(sc);
-      else
-	nc = strdup(concatenate(sc, wbc, NULL)); // new comment
-      free(sc);
-    }
-    statement_comments(s) = empty_comments;
-    insert_comments_to_statement(s, nc);
-    // Get rid of obsolete pieces of data structures
-    whileloop_body(wl) = statement_undefined;
-    free_instruction(i);
-    statement_instruction(wb) = instruction_undefined;
-    free_statement(wb);
   }
 }
 
