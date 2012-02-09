@@ -103,8 +103,8 @@ bool summary_rw_effects_engine(const char* module_name)
 	// dummy targets to generate effects from them
 	// but only for paths from formal arguments with pointer basic
 	// BC.
-	entity m = get_current_module_entity();
-	type m_utype = ultimate_type(entity_type(m));
+	//entity m = get_current_module_entity();
+	//type m_utype = ultimate_type(entity_type(m));
 	list l_formals = module_formal_parameters(get_current_module_entity());
 	// Types of formal parameters, not the formal parameters themselves
 	//list l_formals = functional_parameters(type_functional(m_utype));
