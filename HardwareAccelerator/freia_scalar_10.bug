@@ -1,0 +1,4 @@
+pips error in split_dag: (/home/fabien/DEV/PROJECTS/prod/pips/src/Libs/hwac/freia_spoc.c:2153) assertion failed
+
+ 'something must be computable if current is empty' not verified
+

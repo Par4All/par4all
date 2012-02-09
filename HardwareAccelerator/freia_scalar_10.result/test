@@ -1,0 +1,90 @@
+#
+# AIPO
+#
+#
+# compile generated freia_scalar_10
+#
+
+! initial function
+
+int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
+{
+   int max0, max;                                                       /*0005*/
+   freia_aipo_global_max(i, &max);                                      /*0006*/
+   max0 = max;                                                          /*0007*/
+   freia_aipo_add_const(o, i, 1);                                       /*0008*/
+   freia_aipo_global_max(o, &max);                                      /*0009*/
+   return max+max0;                                                     /*0010*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_scalar_10" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "9 max" [shape=diamond];
+  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
+  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "9 max" [label="o"];
+  "8 +_" -> "o";
+  "6 max" [shape=diamond];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
+  "i" -> "8 +_";
+  "i" -> "6 max";
+}
+// graph for dag "dag_cleaned_0" of module "freia_scalar_10" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "9 max" [shape=diamond];
+  "9 max" -> "7 ?" [arrowhead=empty,label="max"];
+  "9 max" -> "6 max" [arrowhead=empty,label="max"];
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "9 max" [label="o"];
+  "8 +_" -> "o";
+  "6 max" [shape=diamond];
+  "6 max" -> "9 max" [arrowhead=empty,label="max"];
+  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
+  "i" -> "8 +_";
+  "i" -> "6 max";
+}
+
+! updated function for
+
+int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
+{
+   int max0, max;                                                       /*0005*/
+   freia_aipo_global_max(i, &max);                                      /*0006*/
+   max0 = max;                                                          /*0007*/
+   freia_aipo_add_const(o, i, 1);                                       /*0008*/
+   freia_aipo_global_max(o, &max);                                      /*0009*/
+   return max+max0;                                                     /*0010*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
+{
+   int max0, max;                                                       /*0005*/
+   freia_aipo_global_max(i, &max);                                      /*0006*/
+   max0 = max;                                                          /*0007*/
+   freia_aipo_add_const(o, i, 1);                                       /*0008*/
+   freia_aipo_global_max(o, &max);                                      /*0009*/
+   return max+max0;                                                     /*0010*/
+}
