@@ -90,6 +90,10 @@ display_clean_up_sequences_statistics()
 
 /* Clean up sequences context */
 
+
+// beware: by construction l_ref contains references which may have indices
+// with references themselves contained in l_ref
+// these references are all program references and must not be freed
 typedef struct {
   list l_ref; // references of the outermost statement
   list l_loops; // loops of the outermost statement
@@ -111,6 +115,25 @@ store_loops(loop l, cusq_context * p_ctxt)
   return true;
 }
 
+static bool
+store_declarations_references(statement st, cusq_context * p_ctxt)
+{
+
+  if (declaration_statement_p(st))
+    {
+      FOREACH(ENTITY, decl, statement_declarations(st))
+	{
+	  value init_val = entity_initial(decl);
+	  if (! value_undefined_p(init_val))
+	    {
+	      gen_context_recurse(init_val,  p_ctxt, reference_domain, store_reference, gen_null);
+	    }
+	}
+    }
+  return true;
+}
+
+
 static void
 cusq_ctxt_init(statement s, cusq_context * p_ctxt)
 {
@@ -122,6 +145,7 @@ cusq_ctxt_init(statement s, cusq_context * p_ctxt)
   if (p_ctxt->merge_sequences_with_declarations)
     {
       gen_context_multi_recurse(s, p_ctxt,
+				statement_domain, store_declarations_references, gen_null,
 				reference_domain, store_reference, gen_null,
 				loop_domain, store_loops, gen_null,
 				NULL);
@@ -133,6 +157,15 @@ cusq_ctxt_init(statement s, cusq_context * p_ctxt)
       pips_debug(1, "outermost declarations:");
       print_entities(p_ctxt->l_decl);
       fprintf(stderr, "\n");
+
+      pips_debug(1, "references:");
+      FOREACH(REFERENCE, ref, p_ctxt->l_ref)
+	{
+	  print_words(stderr,words_any_reference(ref, NIL, (const char* (*)(struct _newgen_struct_entity_ *))entity_global_name));
+	  fprintf(stderr, " ");
+	}
+      fprintf(stderr, "\n");
+
       pips_debug(1, "%s merge sequences with declarations\n", p_ctxt->merge_sequences_with_declarations? "":"do not");
     }
 }
@@ -159,9 +192,24 @@ replace_entities_in_cusq_context(cusq_context * p_ctxt, hash_table ht)
 {
   FOREACH(REFERENCE, ref, p_ctxt->l_ref)
     {
+      ifdebug(6)
+	{
+	  pips_debug(6, "dealing with reference: ");
+	  print_words(stderr,words_any_reference(ref, NIL, (const char* (*)(struct _newgen_struct_entity_ *))entity_global_name));
+	  fprintf(stderr, "\n");
+	}
       entity new_ent = hash_get(ht, reference_variable(ref));
       if (new_ent !=  HASH_UNDEFINED_VALUE)
-	reference_variable(ref) = new_ent;
+	{
+	  pips_debug(6, "new entity found: %s \n", entity_name(new_ent));
+	  reference_variable(ref) = new_ent;
+	  ifdebug(6)
+	    {
+	      pips_debug(6, "reference is now: ");
+	      print_words(stderr,words_any_reference(ref, NIL, (const char* (*)(struct _newgen_struct_entity_ *))entity_global_name));
+	      fprintf(stderr, "\n");
+	    }
+	}
     }
 
   FOREACH(LOOP, l, p_ctxt->l_loops)
@@ -501,9 +549,17 @@ clean_up_sequences_rewrite(statement s, cusq_context * p_ctxt)
 			pips_debug(6, "new decl name: %s\n", new_name);
 
 			if (parent_decl_with_same_name || top_level_entity_with_same_name_p )
-			  new_decl = make_entity_copy_with_new_name_and_suffix(decl, new_name, true);
+			  new_decl = make_entity_copy_with_new_name_and_suffix(decl, new_name, false);
 			else
-			  new_decl = make_entity_copy_with_new_name(decl, new_name, true);
+			  new_decl = make_entity_copy_with_new_name(decl, new_name, false);
+
+			// We have to keep the original initial value, because it contains references
+			// which have been gathered in p_ctxt->l_decl and which may have to be renamed.
+			if (!value_undefined_p(entity_initial(decl)))
+			  {
+			    entity_initial(new_decl) = entity_initial(decl);
+			    entity_initial(decl) = make_value_unknown();
+			  }
 
 			pips_debug(3, "new declaration: %s\n", entity_name(new_decl));
 			hash_put(renamings, decl, new_decl); // add the correspondance in renamings table for further actual renaming
