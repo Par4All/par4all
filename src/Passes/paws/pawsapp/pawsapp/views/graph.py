@@ -1,55 +1,57 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, shutil
-import Image
 from subprocess   import Popen, PIPE
+
+import Image
 from pyps         import workspace, module
 from pyrops       import pworkspace
+
 from pyramid.view import view_config
-from .operations  import _create_file, _create_result_graphs, _delete_dir
+
+from .operations  import _create_workdir, _create_file, _get_resdir
 
 
 # Default image size
 _size = (512, 512)
 
 
-def _create_thumbnail(request, image):
-    """
-    """
-    publicdir = request.registry.settings['paws.publicdir']
-    outfile   = '%s.thumbnail.png' % os.path.splitext(image)[0]
-    try:
-        ii = Image.open(image)
-        ii.thumbnail(_size)
-        ii.save(outfile, 'PNG')
-    except IOError:
-        print 'ERROR'
-    return '/' + os.path.relpath(outfile, os.path.join(publicdir, '..'))
-
-
-def _create_zoom_image(request, image):
-    """
-    """
-    resultdir = request.registry.settings['paws.resultdir']
-    publicdir = request.registry.settings['paws.publicdir']
-
-    outfile   = _create_thumbnail(request, os.path.join(resultdir, image))
-    link      = '/' + os.path.relpath(os.path.join(resultdir, image), os.path.join(publicdir, '..'))
-
-    return dict(link=link, image=outfile)
-
-
 def _create_dot_images(request, functions):
-    workdir = request.session['workdir']
+    """
+    """
+    resdir  = _get_resdir(request)
+    workdir = os.path.basename(request.session['workdir']) # sanitized
+
     images  = []
+
     for fu in functions:
-        filename = 'files/%s/%s.png' % (workdir, fu)
-        p = Popen( ['dot', '-Tpng', '-o', filename, '%s.database/%s/%s.dot' % (workdir, fu, fu)], stdout=PIPE, stderr=PIPE)
+
+        # Full-size image
+        imgname = os.path.basename('%s.png' % fu) # sanitized
+        imgpath = os.path.join(resdir, imgname)
+        imgurl  = request.route_url('tool_results_name', tool='tool', name=imgname)
+
+        p = Popen( ['dot', '-Tpng', '-o', imgpath, '%s.database/%s/%s.dot' % (workdir, fu, fu)],
+                   stdout=PIPE, stderr=PIPE)
         p.wait()
-        _create_result_graphs(request, filename)
-        image = _create_zoom_image(request, '%s/%s.png' % (workdir, fu))
-        image['fu'] = fu
-        images.append(image)
+
+        # Thumbnail image
+        thumbname = '%s.thumbnail.png' % fu
+        thumbpath = os.path.join(resdir, thumbname)
+        thumburl  = request.route_url('tool_results_name', tool='tool', name=thumbname)
+        
+        zoom = False
+        try:
+            im = Image.open(imgpath)
+            if im.size[0] > _size[0] or im.size[1] > _size[1]:
+                zoom = True
+                im.thumbnail(_size, Image.ANTIALIAS)
+                im.save(thumbpath, 'PNG')
+        except IOError:
+            print 'ERROR'
+
+        images.append(dict(full=imgurl, thumb=thumburl, fu=fu, zoom=zoom))
+
     return images
 
 
@@ -69,12 +71,16 @@ def _get_ws_functions(ws):
 def dependence_graph(request):
     """
     """
-    source    = _create_file(request, '', request.params['code'], request.params['language'])
-    workdir   = request.session['workdir']
+    form = request.params
+    code = form.get('code')
+    lang = form.get('lang')
+
+    source    = _create_file(request, '', code, lang)
+    workdir   = request.session['workdir'] if 'workdir' in request.session else _create_workdir(request)        
     ws        = pworkspace(str(source), name=workdir, deleteOnClose=True)
     functions = _get_ws_functions(ws)
     images    = _create_dot_images(request, functions)
-    _delete_dir(source)
+    #_delete_dir(source)
     ws.close()
     return dict(images=images)
 
@@ -83,8 +89,9 @@ def dependence_graph(request):
 def dependence_graph_multi(request):
     """
     """
+    workdir   = request.session['workdir'] if 'workdir' in request.session else _create_workdir(request)        
     sources   = request.session['sources']
-    workdir   = request.session['workdir']
+
     ws        = pworkspace(*sources, name=workdir, deleteOnClose=True)
     functions = _get_ws_functions(ws)
     images    = _create_dot_images(request, functions)

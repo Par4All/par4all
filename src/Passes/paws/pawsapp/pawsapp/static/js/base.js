@@ -7,10 +7,9 @@ var directory,
     functions = '',
     nb_files = 1,
     multiple = false,
-    
     options = {
 	zoomHeight: 400,
-	zoomWIDTH: 400
+	zoomWidth: 400
     };
 
 
@@ -324,8 +323,8 @@ function create_graph(index, panel_id) {
 	} else {
 	    $.post(
 		routes['dependence_graph'], 
-		{ code:     $('#sourcecode-1').text(),
-                  language: $('#lang-1').html()
+		{ code: $('#sourcecode-1').text(),
+                  lang: $('#lang-1').html()
                 },
 		enable_dependence_graph
 	    );

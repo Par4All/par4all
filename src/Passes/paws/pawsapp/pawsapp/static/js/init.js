@@ -41,7 +41,7 @@ $(function(){
 
     // Save button
     $("#save-button").click(function() {
-	document.location.href = routes['tool_result'].replace('{tool}', operation);
+	document.location.href = routes['tool_results'].replace('{tool}', operation);
     });
 
     // Switch between basic/advanced modes

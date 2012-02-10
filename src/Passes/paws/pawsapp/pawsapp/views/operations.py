@@ -20,10 +20,19 @@ _resultDirName = '__res__'
 imports = ''
 
 
-def _create_workdir(request, force=False):
+def _create_workdir(request):
     """Create a per-session temporary working directory and return its base name.
+    Clear previous workdir files, if any.
     """
     tempdir = request.registry.settings['paws.tempdir']
+
+    # Clear previsou workdir files, if any
+    if 'workdir' in request.session:
+        workdir = os.path.basename(request.session['workdir']) # sanitized
+        path    = os.path.join(tempdir, workdir)
+        if os.path.exists(path):
+            shutil.rmtree(path)
+    # New workdir
     workdir = mkdtemp(dir = tempdir)
     os.mkdir(os.path.join(workdir, _resultDirName))
     dirname = os.path.basename(workdir)
@@ -32,43 +41,18 @@ def _create_workdir(request, force=False):
 
 def _get_resdir(request):
     tempdir = request.registry.settings['paws.tempdir']
-    workdir = os.path.basename(request.session['workdir']) # sanitize
+    workdir = os.path.basename(request.session['workdir']) # sanitized
     return os.path.join(tempdir, workdir, _resultDirName)
 
 def _create_file(request, op, code, lang):
     """Create a temp file to receive a source file, and return its full path.
     """
     tempdir = request.registry.settings['paws.tempdir']
-    workdir = os.path.basename(request.session['workdir']) # sanitize
-    fname   = os.path.basename(op + "_code" + languages[lang]['ext']) # sanitize
+    workdir = os.path.basename(request.session['workdir']) # sanitized
+    fname   = os.path.basename(op + "_code" + languages[lang]['ext']) # sanitized
     path    = os.path.join(tempdir, workdir, fname)
     file(path, 'w').write(code)
     return path
-
-def _create_result_file(request, code):
-    """
-    """
-    resdir  = _get_resdir(request)
-    path    = os.path.join(resdir, 'code')
-    file(path, 'w').write(code)
-    return path
-
-def _create_result_graphs(request, graph):
-    """
-    """
-    resdir  = _get_resdir(request)
-    workdir = os.path.basename(request.session['workdir']) # sanitize
-    graph   = os.path.basename(graph) # sanitize
-    path    = os.path.join(resdir, workdir, graph)
-    file(path, 'w').write(file(graph).read()) ##TODO!!
-    return path
-	
-def _delete_dir(filename):
-    """Delete the directory containing 'filename'.
-    """
-    dirname = os.path.dirname(filename)
-    if os.path.exists(dirname):
-        shutil.rmtree(dirname)
 
 def _import_base_module(request):
     """
@@ -119,8 +103,11 @@ def _highlight_code(request, code, lang, demo=False):
     """Apply Pygment formatting
     """
     code = code.replace('\n\n', '\n')
-    if not demo:
-        _create_result_file(request, code)
+    if not demo: ##TODO
+        resdir  = _get_resdir(request)
+        workdir = os.path.basename(request.session['workdir']) # Sanitized
+        path    = os.path.join(resdir, 'result-%s.txt' % workdir)
+        file(path, 'w').write(code)
     lexer = None
     if lang == 'C':
         lexer = CLexer()
@@ -182,7 +169,6 @@ def perform(request):
     mod     = _import_base_module(request)
     try:
         functions = mod.perform(source, op, adv, **params)
-        #_delete_dir(source)
         return _highlight_code(request, imports + '\n' + functions, lang)
     except RuntimeError, msg:
         return _catch_error(msg)

@@ -10,7 +10,6 @@ from subprocess   import Popen, PIPE
 from pyramid.view import view_config
 
 from .operations  import _create_workdir, _highlight_code
-from .graph       import _create_zoom_image
 
 
 _dependence_graph = 'apply PRINT_DOT_DEPENDENCE_GRAPH'

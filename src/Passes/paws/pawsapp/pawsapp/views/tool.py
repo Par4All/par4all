@@ -4,12 +4,16 @@
 Generic tool controller
 
 """
-import os, re
+import os, re, mimetypes
 from ConfigParser import SafeConfigParser
 from zipfile      import ZipFile
+
 from pyramid.view import view_config
 
 from .operations  import _get_resdir
+
+
+mimetypes.init()
 
 
 def get_tooldir(request, tool):
@@ -72,7 +76,7 @@ def get_info(request, tool):
 def tool(request):
     """Generic tool view (basic and advanced modes).
     """
-    tool     = os.path.basename(request.matchdict['tool']) # (sanitized)
+    tool     = os.path.basename(request.matchdict['tool']) # sanitized
     advanced = bool(request.matched_route.name.endswith('advanced'))
 
     return dict(tool     = tool,
@@ -119,15 +123,21 @@ def load_example_file(request):
     except:
         return ''
 
-@view_config(route_name='tool_result', renderer='string', permission='view')
+@view_config(route_name='tool_results',      renderer='string', permission='view')
+@view_config(route_name='tool_results_name', renderer='string', permission='view')
 def get_result_file(request):
     """Return the content of the transformed code.
     """
-    resdir = _get_resdir(request)
-    path   = os.path.join(resdir, 'code')
+    resdir  = _get_resdir(request)
+    workdir = os.path.basename(request.session['workdir']) # sanitized
+    name    = os.path.basename(request.matchdict.get('name', 'result-%s.txt' % workdir))
+    ext     = os.path.splitext(name)[1]
+    path    = os.path.join(resdir, name)
 
-    request.response.headers['Content-type']        = 'text/plain;charset=utf-8'
-    request.response.headers['Content-disposition'] = 'attachment; filename=result-%s.txt' % request.session['workdir']
+    request.response.headers['Content-type'] = mimetypes.types_map.get(ext, 'text/plain;charset=utf-8')
+
+    if ext == '.txt': # Open text file as an attachment
+        request.response.headers['Content-disposition'] = str('attachment; filename=%s' % name)
 
     return file(path).read()
 

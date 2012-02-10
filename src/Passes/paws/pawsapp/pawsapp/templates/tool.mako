@@ -197,13 +197,14 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 ## Classic examples modal
 
-${w.modal(u"Please select an example:", classic_body, "classic-examples-dialog")}
+${w.modal(u"Please select an example", classic_body, "classic-examples-dialog")}
 
 <%def name="classic_body()">
-% for ex in examples:
-<div><a href="#" id="${ex}" class="btn" style="width:90%; text-align: left">
-    ${w.icon("file")} ${ex}</a></div>
-% endfor
+<ul class="unstyled">
+  % for ex in examples:
+  <li><a href="#" id="${ex}">${w.icon("file")} ${ex}</a></li>
+  % endfor
+</ul>
 </%def>
 
 
