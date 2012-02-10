@@ -696,21 +696,23 @@ class p4a_processor(object):
         # later in... C (for OpenCL or CUDA kernel definition). :-)
 
         # go through the call graph in a top - down fashion
-        head = [ m for m in all_modules if not m.callers ]
-        while head:
-            tmp=list()
-            for m in head:
-                m.gpu_ify(GPU_USE_WRAPPER = False, 
-                            GPU_USE_KERNEL = False,                             
-                            GPU_USE_FORTRAN_WRAPPER = self.fortran,
-                            GPU_USE_LAUNCHER = True,
-                            GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
-                            annotate_loop_nests = True) # annotate for recover parallel loops later
-                tmp.extend([c for c in m.callees if c.name.find(self.get_launcher_prefix ()) !=0])
-            head=tmp
+        def gpuify_all(module):
+            module.gpu_ify(GPU_USE_WRAPPER = False, 
+                        GPU_USE_KERNEL = False,                             
+                        GPU_USE_FORTRAN_WRAPPER = self.fortran,
+                        GPU_USE_LAUNCHER = True,
+                        GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                        GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                        GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                        OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
+                        annotate_loop_nests = True) # annotate for recover parallel loops later
+            # recursive walk through
+            [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
+
+        # call gpuify_all recursively starting from the heads of the callgraph
+        [ gpuify_all(m) for m in all_modules if not m.callers ]
+
+
 
         # Select kernel launchers by using the fact that all the generated
         # functions have their names beginning with the launcher prefix:
@@ -751,11 +753,6 @@ class p4a_processor(object):
         kernel_prefix = self.get_kernel_prefix ()
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
-
-        # Unfold kernel,  ususally won't hurt code size, but less painful with
-        # callees declared in others compilation units (unsupported in CUDA and
-        # OpenCL) and can allow some opportunities for scalarization & others
-        # kernels.unfold()
 
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
@@ -812,6 +809,7 @@ class p4a_processor(object):
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
 
 
+
         # Unfortunately CUDA (at least up to 4.0) does not accept C99
         # array declarations with sizes also passed as parameters in
         # kernels. So, we degrade the quality of the generated code by
@@ -832,6 +830,10 @@ class p4a_processor(object):
 
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
+
+        # Unfold kernel, usually won't hurt code size, but less painful with
+        # static functions declared in accelerator compilation units 
+        kernels.unfold()
 
         # add sentinel around loop nests in launcher, used to replace the loop
         # nest with a call kernel in post-processing
