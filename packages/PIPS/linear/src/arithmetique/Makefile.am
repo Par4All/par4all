@@ -36,6 +36,7 @@ libarithmetique_la_SOURCES=abs.c \
 		pgcd.c \
 		ppcm.c \
 		io.c \
-		errors.c
+		errors.c \
+		value.c
 
 include $(top_srcdir)/makes/cproto.mk

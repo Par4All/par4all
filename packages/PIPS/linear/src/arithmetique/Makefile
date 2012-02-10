@@ -28,7 +28,8 @@ LIB_CFILES =	abs.c \
 		pgcd.c \
 		ppcm.c \
 		io.c \
-		errors.c
+		errors.c \
+		value.c
 
 OTHER_HEADERS =	assert.h \
 		boolean.h \
