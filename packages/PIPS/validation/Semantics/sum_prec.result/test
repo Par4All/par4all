@@ -107,31 +107,31 @@ C    I<=92, 2MS+1<=I, I<=2MS+2}
       MM = MP1/2                                                        0010
 
 C  P(I,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92, NX==42, 2<=I,
-C    I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2}
+C    I<=92, I<=2MM, 2MM<=I+1, 2MS+1<=I, I<=2MS+2}
 
 
       DO K = 2, N-1                                                     0012
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92,
-C    NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2, 2<=K,
+C    NX==42, 2<=I, I<=92, I<=2MM, 2MM<=I+1, 2MS+1<=I, I<=2MS+2, 2<=K,
 C    K+1<=N}
 
          DO J = 2, MM                                                   0013
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92,
-C    NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2, 2<=J,
+C    NX==42, 2<=I, I<=92, I<=2MM, 2MM<=I+1, 2MS+1<=I, I<=2MS+2, 2<=J,
 C    J<=MM, 2<=K, K+1<=N}
 
             JJ = J+MS                                                   0014
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, J+MS==JJ, LX==32,
-C    MX==92, NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I,
+C    MX==92, NX==42, 2<=I, I<=92, I<=2MM, 2MM<=I+1, 2MS+1<=I,
 C    I<=2MS+2, 2<=J, J<=MM, 2<=K, K+1<=N}
 
             X(J,K,1) = X(JJ,K,2)                                        0015
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, J+MS==JJ, LX==32,
-C    MX==92, NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I,
+C    MX==92, NX==42, 2<=I, I<=92, I<=2MM, 2MM<=I+1, 2MS+1<=I,
 C    I<=2MS+2, 2<=J, J<=MM, 2<=K, K+1<=N}
 
             X(JJ,K,1) = X(J,K,2)                                        0016

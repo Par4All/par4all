@@ -71,7 +71,7 @@ C  T() {}
             DATA(I+1) = TEMPI                                           0034
          ENDIF
 
-C  T(M) {NN<=2M+1, 2M<=NN}
+C  T(M) {2M<=NN, NN<=2M+1}
 
          M = NN/2                                                       0036
 
@@ -86,7 +86,7 @@ C  T(J) {J+M==J#init}
 
          J = J-M                                                        0038
 
-C  T(M) {M#init<=2M+1, 2M<=M#init}
+C  T(M) {2M<=M#init, M#init<=2M+1}
 
          M = M/2                                                        0039
          GOTO 1

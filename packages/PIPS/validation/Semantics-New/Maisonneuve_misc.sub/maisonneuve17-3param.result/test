@@ -255,7 +255,7 @@ void run(void)
                   ;
 
 //  T(x,y) {x+y#init==x#init+y, 0<=o, o+3<=s1, o+x+1<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+s2<=o+x+y, o+y+1<=s1+s2,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y+1<=s1+s2,
 //    s1<=o+x, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1}
 
             while (flip())
@@ -338,12 +338,12 @@ void run(void)
 
 //  T(x,y) {x+y#init==x#init+y, o+3<=s1, s2+2x#init<=o+s1+2x+2,
 //    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+3<=s2, x#init<=o+x, y<=o+x+1,
-//    x<=o+y+1, x#init<=x+1, x<=x#init}
+//    x<=o+y+1, x<=x#init, x#init<=x+1}
 
             if (flip())
 
 //  T(x,y) {o+x==s1-1, x==x#init-1, y==y#init-1, 0<=o, o+3<=s1,
-//    o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x,
+//    o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
 //    o+x+1<=s1+s2+y, o+y+1<=s1+s2, s1+1<=o+y, o+3<=s2, y<=o+x+1,
 //    x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y}
 
@@ -351,20 +351,20 @@ void run(void)
 
 //  T(x) {o+x==s1-1, x==x#init-1, 0<=o, o+3<=s1, o+1<=s1+s2,
 //    s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, o+y<=s1+s2+x+1, o+x+2<=s1+s2+y,
-//    o+y<=s1+s2, s1+2<=o+y, o+3<=s2, y<=o+x+2, x<=o+y, 0<=s1,
+//    o+y<=s1+s2, s1+2<=o+y, o+3<=s2, x<=o+y, y<=o+x+2, 0<=s1,
 //    y<=s1+x+1, x+1<=s1+y, 0<=s2, x+1<=s2+y}
 
                   x--;
 
 //  T(y) {o+x==s1-1, y==y#init-1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y,
+//    o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y,
 //    o+y+1<=s1+s2, s1+1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1,
 //    y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y}
 
                   y--;
 
-//  T() {o+x==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+y+1<=s1+s2,
+//  T() {o+x==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+y+1<=s1+s2,
 //    s1+1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y,
 //    0<=s2, x<=s2+y}
 
@@ -376,44 +376,44 @@ void run(void)
                }
                else
 
-//  T() {0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
-//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
+//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y, y<=s2+x+1}
 
                   while (1)
 
-//  T() {0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
-//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
+//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y, y<=s2+x+1}
 
                      ;
             else if (flip())
 
 //  T(x,y) {o+y==s1-1, x==x#init-1, y==y#init-1, 0<=o, o+3<=s1,
-//    o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x,
+//    o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
 //    o+x+1<=s1+s2+y, s1+1<=o+x, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1,
-//    y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//    y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y, y<=s2+x+1}
 
                if (x>=s1-o&&x<=s1+s2-o&&y>=s1-o&&y<=s1+s2-o&&x>=s1-o+2&&y==s1-o) {
 
 //  T(x) {o+y==s1, x==x#init-1, 0<=o, o+3<=s1, o+1<=s1+s2,
 //    o+x+1<=s1+s2, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, o+y<=s1+s2+x+1,
-//    o+x+2<=s1+s2+y, s1+1<=o+x, o+3<=s2, y<=o+x+2, x<=o+y, 0<=s1,
+//    o+x+2<=s1+s2+y, s1+1<=o+x, o+3<=s2, x<=o+y, y<=o+x+2, 0<=s1,
 //    y<=s1+x+1, x+1<=s1+y, 0<=s2, y<=s2+x+2}
 
                   x--;
 
 //  T(y) {o+y==s1-1, y==y#init-1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y,
+//    o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y,
 //    s1+1<=o+x, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y,
-//    0<=s2, y<=s2+x+1, x<=s2+y}
+//    0<=s2, x<=s2+y, y<=s2+x+1}
 
                   y--;
 
-//  T() {o+y==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y, s1+1<=o+x,
+//  T() {o+y==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, s1+1<=o+x,
 //    o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2,
-//    y<=s2+x+1, x<=s2+y}
+//    x<=s2+y, y<=s2+x+1}
 
                   if (x==0&&y==s1+s2-o)
 
@@ -423,47 +423,47 @@ void run(void)
                }
                else
 
-//  T() {0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
-//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
+//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y, y<=s2+x+1}
 
                   while (1)
 
-//  T() {0<=o, o+3<=s1, o+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
-//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, o+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
+//    0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y, y<=s2+x+1}
 
                      ;
 
 //  T(x,y) {x==x#init-1, y==y#init-1, 0<=o, o+3<=s1, s2<=o+s1+2,
-//    o+1<=s1+s2, o+x+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+x+y+1<=s1+s2, o+y+1<=s1+s2,
+//    o+1<=s1+s2, o+x+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+x+y+1<=s1+s2, o+y+1<=s1+s2,
 //    s1<=o+x+1, s1<=o+y+1, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, x<=s1,
-//    y<=s1+x, x<=s1+y, y<=s1, 0<=s2, y<=s2+x+1, x<=s2+y, 0<=x, 0<=y}
+//    y<=s1+x, x<=s1+y, y<=s1, 0<=s2, x<=s2+y, y<=s2+x+1, 0<=x, 0<=y}
 
             if (x>=s1-o&&x<=s1+s2-o&&y>=s1-o&&y<=s1+s2-o&&x-1>=0&&x-1<=s1&&y-1>=0&&y-1<=s1&&y-1<s1+s2-o-x+1) {
 
 //  T(x) {x==x#init-1, 0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2,
-//    o+x+1<=s1+s2, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, o+y<=s1+s2+x+1,
-//    o+x+2<=s1+s2+y, o+x+y<=s1+s2, o+y<=s1+s2, s1<=o+x+1, s1<=o+y,
-//    o+3<=s2, y<=o+x+2, x<=o+y, 0<=s1, x<=s1, y<=s1+x+1, x+1<=s1+y,
+//    o+x+1<=s1+s2, o+x+y<=s1+s2, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1,
+//    o+y<=s1+s2+x+1, o+x+2<=s1+s2+y, o+y<=s1+s2, s1<=o+x+1, s1<=o+y,
+//    o+3<=s2, x<=o+y, y<=o+x+2, 0<=s1, x<=s1, y<=s1+x+1, x+1<=s1+y,
 //    y<=s1+1, 0<=s2, y<=s2+x+2, x+1<=s2+y, 0<=x, 1<=y}
 
                x--;
 
 //  T(y) {y==y#init-1, 0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2,
-//    o+x+1<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x,
+//    o+x+1<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
 //    o+x+1<=s1+s2+y, o+x+y+1<=s1+s2, o+y+1<=s1+s2, s1<=o+x+1,
 //    s1<=o+y+1, o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, x<=s1, y<=s1+x,
-//    x<=s1+y, y<=s1, 0<=s2, y<=s2+x+1, x<=s2+y, 0<=x, 0<=y}
+//    x<=s1+y, y<=s1, 0<=s2, x<=s2+y, y<=s2+x+1, 0<=x, 0<=y}
 
                y--;
 
 //  T() {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2, o+x+1<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y,
+//    o+y<=s1+s2+x, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y,
 //    o+x+y+1<=s1+s2, o+y+1<=s1+s2, s1<=o+x+1, s1<=o+y+1, o+3<=s2,
 //    y<=o+x+1, x<=o+y+1, 0<=s1, x<=s1, y<=s1+x, x<=s1+y, y<=s1,
-//    0<=s2, y<=s2+x+1, x<=s2+y, 0<=x, 0<=y}
+//    0<=s2, x<=s2+y, y<=s2+x+1, 0<=x, 0<=y}
 
                if (x==0&&y==s1+s2-o)
 
@@ -473,15 +473,17 @@ void run(void)
             }
             else
 
-//  T() {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1,
-//    x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2, o+y<=s1+s2+x,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2,
+//    y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y,
+//    y<=s2+x+1}
 
                while (1)
 
-//  T() {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+3<=s2, y<=o+x+1,
-//    x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2, y<=s2+x+1, x<=s2+y}
+//  T() {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2, o+y<=s1+s2+x,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, o+x+1<=s1+s2+y, o+3<=s2,
+//    y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y, 0<=s2, x<=s2+y,
+//    y<=s2+x+1}
 
                   ;
          }
@@ -721,9 +723,9 @@ void run(void)
 
                x++;
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x<=s1+s2, s1+s2<=o+x+y+1,
-//    o+x+y<=s1+s2, o+y<=s1+s2, s1<=o+x, s1<=o+y+1, o+3<=s2, x<=s1+1,
-//    y<=s1, 1<=x, y<=x+4, x<=y+6, 0<=y}
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x<=s1+s2, o+x+y<=s1+s2,
+//    s1+s2<=o+x+y+1, o+y<=s1+s2, s1<=o+x, s1<=o+y+1, o+3<=s2,
+//    x<=s1+1, y<=s1, 1<=x, y<=x+4, x<=y+6, 0<=y}
 
                y++;
 
@@ -757,29 +759,29 @@ void run(void)
 
             while (flip())
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    o+y+2<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    y<=x+5, x<=y+5}
 
                if (flip())
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    o+y+2<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    y<=x+5, x<=y+5}
 
                   if (x>=0&&x<=s1&&y>=0&&y<=s1&&x+1>=s1-o&&x+1<=s1+s2-o&&y+1>=s1-o&&y<=s1+s2-o&&y+1>=s1+s2-o-x-1) {
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    o+y+2<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    x<=s1, y<=s1, 0<=x, y<=x+5, x<=y+5, 0<=y}
 
                      x++;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2<=o+s1+2, o+x+1<=s1+s2,
-//    s2+y<=o+s1+x+1, s2+x<=o+s1+y+3, s1+y<=o+s2+x, s1+x<=o+s2+y+2,
+//    s1+y<=o+s2+x, s2+y<=o+s1+x+1, s2+x<=o+s1+y+3, s1+x<=o+s2+y+2,
 //    s1+s2+1<=o+x+y, o+y+2<=s1+s2, s1+1<=o+x, s1<=o+y, o+3<=s2,
 //    y<=o+x, x<=o+y+2, x<=s1+1, y<=s1, 1<=x, y<=x+4, x<=y+6, 0<=y}
 
@@ -799,8 +801,8 @@ void run(void)
                   }
                   else
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    3s1+1<=o+s2+x+y, o+y+2<=s1+s2, s1<=o+x, s1+10y<=10o+11x+14,
 //    21s1+6<=10o+11x+10y, 10y<=8o+s1+10x+11, s1+2y<=3o+3x+2,
 //    5s1+2<=3o+3x+2y, 2y+1<=o+s1+2x, s1<=o+y, o+3<=s2, y<=o+x+1,
@@ -808,8 +810,8 @@ void run(void)
 
                      while (1)
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    3s1+1<=o+s2+x+y, o+y+2<=s1+s2, s1<=o+x, s1+10y<=10o+11x+14,
 //    21s1+6<=10o+11x+10y, 10y<=8o+s1+10x+11, s1+2y<=3o+3x+2,
 //    5s1+2<=3o+3x+2y, 2y+1<=o+s1+2x, s1<=o+y, o+3<=s2, y<=o+x+1,
@@ -826,16 +828,16 @@ void run(void)
                   x--;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2<=o+s1+2, o+x+3<=s1+s2,
-//    s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, s1+y<=o+s2+x+2, s1+x<=o+s2+y,
+//    s1+x<=o+s2+y, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, s1+y<=o+s2+x+2,
 //    s1+s2+1<=o+x+y, o+y+2<=s1+s2, s1<=o+x, s1+1<=o+y, o+3<=s2,
-//    y<=o+x+2, x<=o+y, y<=x+6, x<=y+4}
+//    x<=o+y, y<=o+x+2, y<=x+6, x<=y+4}
 
                   y--;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2<=o+s1+2, o+x+3<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+y+3<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2, y<=o+x+1,
-//    x<=o+y+1, y<=x+5, x<=y+5}
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+y+3<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2,
+//    y<=o+x+1, x<=o+y+1, y<=x+5, x<=y+5}
 
                   if (x==0&&y==s1+s2-o)
 
@@ -845,58 +847,58 @@ void run(void)
                }
                else
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+x+2<=s1+s2, s1+s2<=o+x+y,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
 //    o+x+y<=s1+s2+1, o+y+2<=s1+s2, s1<=o+x, s1<=o+y, o+3<=s2,
 //    y<=o+x+1, x<=o+y+1, y<=x+5, x<=y+5}
 
                   while (1)
 
-//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    s1+s2<=o+x+y, o+x+y<=s1+s2+1, s1<=o+x, s1<=o+y, o+3<=s2,
+//  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s1+s2<=o+x+y, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, o+x+y<=s1+s2+1, s1<=o+x, s1<=o+y, o+3<=s2,
 //    y<=o+x+1, x<=o+y+1, y<=x+5, x<=y+5}
 
                      ;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
 //    o+3<=s2, y<=o+x+1, x<=o+y+1, 2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5,
 //    x<=y+5}
 
             if (flip())
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
 //    o+3<=s2, y<=o+x+1, x<=o+y+1, 2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5,
 //    x<=y+5}
 
                if (x>=s1-o&&x<=s1+s2-o&&y>=s1-o&&y<=s1+s2-o&&x==s1-o&&y>=s1-o+2) {
 
 //  P(o,s1,s2,x,y) {o+x==s1, 0<=o, o+3<=s1, o+2x+4<=3s1+s2,
-//    o+x+2<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
-//    s1+x<=o+s2+y+1, s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2,
+//    o+x+2<=s1+s2, s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
+//    s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2,
 //    s1+2<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1, 2y+1<=2s1+x,
 //    2x+1<=2s1+y, y<=x+5}
 
                   x--;
 
 //  P(o,s1,s2,x,y) {o+x==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1,
-//    s1+y<=o+s2+x+2, s1+x<=o+s2+y, s1+s2<=o+x+y+1, o+y<=s1+s2+x+1,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s1+x<=o+s2+y, s2+y<=o+s1+x+3,
+//    s2+x<=o+s1+y+1, s1+y<=o+s2+x+2, s1+s2<=o+x+y+1, o+y<=s1+s2+x+1,
 //    o+x+2<=s1+s2+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1+2<=o+y,
-//    o+3<=s2, y<=o+x+2, x<=o+y, 0<=s1, 2y<=2s1+x, 2x+3<=2s1+y,
+//    o+3<=s2, x<=o+y, y<=o+x+2, 0<=s1, 2y<=2s1+x, 2x+3<=2s1+y,
 //    y<=s1+x+1, x+1<=s1+y, x+1<=s2+y, y<=x+6}
 
                   y--;
 
 //  P(o,s1,s2,x,y) {o+x==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y+2, o+y<=s1+s2+x,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y+2,
 //    o+x+1<=s1+s2+y, o+2y+6<=3s1+s2, o+y+3<=s1+s2, s1+1<=o+y,
-//    o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, 2y+2<=2s1+x, 2x+2<=2s1+y,
-//    y<=s1+x, x<=s1+y, x<=s2+y, y<=x+5}
+//    o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y,
+//    2y+2<=2s1+x, 2x+2<=2s1+y, x<=s2+y, y<=x+5}
 
                   if (x==0&&y==s1+s2-o)
 
@@ -907,16 +909,16 @@ void run(void)
                else
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
 //    4s1+y<=4o+5x+1, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5, x<=y+5}
 
                   while (1)
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
 //    4s1+y<=4o+5x+1, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5, x<=y+5}
 
@@ -924,36 +926,36 @@ void run(void)
             else if (flip())
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x, s1<=o+y,
 //    o+3<=s2, y<=o+x+1, x<=o+y+1, 2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5,
 //    x<=y+5}
 
                if (x>=s1-o&&x<=s1+s2-o&&y>=s1-o&&y<=s1+s2-o&&x>=s1-o+2&&y==s1-o) {
 
 //  P(o,s1,s2,x,y) {o+y==s1, 0<=o, o+3<=s1, o+2x+4<=3s1+s2,
-//    o+x+2<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
-//    s1+x<=o+s2+y+1, s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2,
+//    o+x+2<=s1+s2, s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
+//    s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2,
 //    s1+2<=o+x, o+3<=s2, y<=o+x+1, x<=o+y+1, 2y+1<=2s1+x,
 //    2x+1<=2s1+y, x<=y+5}
 
                   x--;
 
 //  P(o,s1,s2,x,y) {o+y==s1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1,
-//    s1+y<=o+s2+x+2, s1+x<=o+s2+y, s1+s2<=o+x+y+1, o+y<=s1+s2+x+1,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s1+x<=o+s2+y, s2+y<=o+s1+x+3,
+//    s2+x<=o+s1+y+1, s1+y<=o+s2+x+2, s1+s2<=o+x+y+1, o+y<=s1+s2+x+1,
 //    o+x+2<=s1+s2+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1+1<=o+x,
-//    o+3<=s2, y<=o+x+2, x<=o+y, 0<=s1, 2y<=2s1+x, 2x+3<=2s1+y,
+//    o+3<=s2, x<=o+y, y<=o+x+2, 0<=s1, 2y<=2s1+x, 2x+3<=2s1+y,
 //    y<=s1+x+1, x+1<=s1+y, y<=s2+x+2, x<=y+4}
 
                   y--;
 
 //  P(o,s1,s2,x,y) {o+y==s1-1, 0<=o, o+3<=s1, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2,
-//    s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y+2, o+y<=s1+s2+x,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, o+y<=s1+s2+x, s2+y<=o+s1+x+2,
+//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y+2,
 //    o+x+1<=s1+s2+y, o+2y+6<=3s1+s2, o+y+3<=s1+s2, s1+1<=o+x,
-//    o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, 2y+2<=2s1+x, 2x+2<=2s1+y,
-//    y<=s1+x, x<=s1+y, y<=s2+x+1, x<=y+5}
+//    o+3<=s2, y<=o+x+1, x<=o+y+1, 0<=s1, y<=s1+x, x<=s1+y,
+//    2y+2<=2s1+x, 2x+2<=2s1+y, y<=s2+x+1, x<=y+5}
 
                   if (x==0&&y==s1+s2-o)
 
@@ -964,16 +966,16 @@ void run(void)
                else
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
 //    4s1+x<=4o+5y+1, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5, x<=y+5}
 
                   while (1)
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, o+2x+4<=3s1+s2, o+x+2<=s1+s2,
-//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
-//    s1+s2<=o+x+y, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
+//    s1+s2<=o+x+y, s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1,
+//    s1+x<=o+s2+y+1, o+2y+4<=3s1+s2, o+y+2<=s1+s2, s1<=o+x,
 //    4s1+x<=4o+5y+1, s1<=o+y, o+3<=s2, y<=o+x+1, x<=o+y+1,
 //    2y+1<=2s1+x, 2x+1<=2s1+y, y<=x+5, x<=y+5}
 
@@ -998,24 +1000,24 @@ void run(void)
                x--;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s1+s2<=3o+x+y+1, s2+y<=o+s1+x+3,
-//    s2+x<=o+s1+y+1, s1+y<=o+s2+x+2, s1+x<=o+s2+y, s1+s2<=o+x+y+3,
-//    o+y<=s1+s2+x+1, o+x+2<=s1+s2+y, o+x+y<=s1+s2, o+2y+4<=3s1+s2,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s1+x<=o+s2+y, o+x+y<=s1+s2,
+//    s1+s2<=3o+x+y+1, s2+y<=o+s1+x+3, s2+x<=o+s1+y+1, s1+y<=o+s2+x+2,
+//    s1+s2<=o+x+y+3, o+y<=s1+s2+x+1, o+x+2<=s1+s2+y, o+2y+4<=3s1+s2,
 //    o+y+2<=s1+s2, s1<=2o+x+1, s1<=o+x+1, 2s1<=2o+x+y+1, s1<=2o+y,
-//    s1<=o+y, o+3<=s2, 2s2<=2o+x+y+3, y<=o+x+2, x<=o+y, 0<=s1, x<=s1,
+//    s1<=o+y, o+3<=s2, 2s2<=2o+x+y+3, x<=o+y, y<=o+x+2, 0<=s1, x<=s1,
 //    2y<=2s1+x, 2x+3<=2s1+y, y<=s1+x+1, x+1<=s1+y, y<=s1+1, 0<=s2,
 //    y<=s2+x+2, x+1<=s2+y, 0<=x, y<=x+6, x<=y+4, 1<=y}
 
                y--;
 
 //  P(o,s1,s2,x,y) {0<=o, o+3<=s1, s2<=o+s1+2, o+1<=s1+s2,
-//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, s1+s2<=3o+x+y+2, s2+y<=o+s1+x+2,
-//    s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1, s1+s2<=o+x+y+4,
-//    o+y<=s1+s2+x, o+x+1<=s1+s2+y, o+x+y+1<=s1+s2, o+2y+6<=3s1+s2,
+//    o+2x+6<=3s1+s2, o+x+3<=s1+s2, o+y<=s1+s2+x, s1+s2<=3o+x+y+2,
+//    s2+y<=o+s1+x+2, s2+x<=o+s1+y+2, s1+y<=o+s2+x+1, s1+x<=o+s2+y+1,
+//    s1+s2<=o+x+y+4, o+x+1<=s1+s2+y, o+x+y+1<=s1+s2, o+2y+6<=3s1+s2,
 //    o+y+3<=s1+s2, s1<=2o+x+1, s1<=o+x+1, 2s1<=2o+x+y+2, s1<=2o+y+1,
 //    s1<=o+y+1, o+3<=s2, 2s2<=2o+x+y+4, y<=o+x+1, x<=o+y+1, 0<=s1,
-//    x<=s1, 2y+2<=2s1+x, 2x+2<=2s1+y, y<=s1+x, x<=s1+y, y<=s1, 0<=s2,
-//    y<=s2+x+1, x<=s2+y, 0<=x, y<=x+5, x<=y+5, 0<=y}
+//    x<=s1, y<=s1+x, x<=s1+y, 2y+2<=2s1+x, 2x+2<=2s1+y, y<=s1, 0<=s2,
+//    x<=s2+y, y<=s2+x+1, 0<=x, y<=x+5, x<=y+5, 0<=y}
 
                if (x==0&&y==s1+s2-o)
 

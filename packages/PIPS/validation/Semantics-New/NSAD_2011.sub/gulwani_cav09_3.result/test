@@ -276,7 +276,7 @@ void ts_restructured(void)
          }
 
 //  T(i2,s,x,y) {i1+i2==x, i1+i2#init==y#init+1, s==1, s#init==2,
-//    x==y+1, 1<=i1, n<=i1+i2#init, x<=i1+i2#init+1, i1+i2#init<=x,
+//    x==y+1, 1<=i1, n<=i1+i2#init, i1+i2#init<=x, x<=i1+i2#init+1,
 //    i1<=n, x<=i1+n}
 
       if (rand_b()) {

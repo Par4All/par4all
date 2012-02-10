@@ -102,7 +102,7 @@ C           BEGIN BLOCK
 C           END BLOCK
          ENDIF
 
-C  T(M) {NN<=2M+1, 2M<=NN}
+C  T(M) {2M<=NN, NN<=2M+1}
 
 C (0,16)
          M = NN/2                                                       0034
@@ -120,7 +120,7 @@ C (1,1)
             GOTO 99999
          ENDIF
 
-C  T(J,M) {J+M#init==J#init, M#init<=2M+1, 2M<=M#init}
+C  T(J,M) {J+M#init==J#init, 2M<=M#init, M#init<=2M+1}
 
 C (2,1)
 C        BEGIN BLOCK
@@ -130,7 +130,7 @@ C  T(J) {J+M==J#init}
 C (2,2)
          J = J-M                                                        0036
 
-C  T(M) {M#init<=2M+1, 2M<=M#init}
+C  T(M) {2M<=M#init, M#init<=2M+1}
 
 C (2,3)
          M = M/2                                                        0037

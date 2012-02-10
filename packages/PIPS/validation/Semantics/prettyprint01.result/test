@@ -1,0 +1,29 @@
+--- Preconditions for
+
+C  P() {}
+
+! Check constraint sort (bug spotted in Transformations/costi)
+
+      PROGRAM PRETTYPRINT01
+
+C  P() {}
+
+
+      IF (2*NS2.LE.N.AND.4.LE.N) THEN                                   0005
+
+C  P() {4<=N, 2NS2<=N}
+
+         I = 1                                                          0006
+      ENDIF
+
+C  P(I) {}
+
+
+      IF (4.LE.N.AND.2*NS2.LE.N) THEN                                   0009
+
+C  P(I) {4<=N, 2NS2<=N}
+
+         I = 2                                                          0010
+      ENDIF
+
+      END

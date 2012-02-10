@@ -169,22 +169,22 @@ int main()
    for(i = 0; i <= 4; i += 1)
 
 // Points To:
-// a.p -> *HEAP*_l_17[0] , EXACT
-// b.p -> *HEAP*_l_17[0] , EXACT
+// a.p -> *HEAP*_l_17[0] , MAY
+// b.p -> *HEAP*_l_17[0] , MAY
 // e.champ[*].p -> *HEAP*_l_29[0] , MAY
 
       for(j = 0; j <= 9; j += 1)
 
 // Points To:
-// a.p -> *HEAP*_l_17[0] , EXACT
-// b.p -> *HEAP*_l_17[0] , EXACT
+// a.p -> *HEAP*_l_17[0] , MAY
+// b.p -> *HEAP*_l_17[0] , MAY
 // e.champ[*].p -> *HEAP*_l_29[0] , MAY
 
          ((f.champ)[i].p)[j] = i*j;
 
 // Points To:
-// a.p -> *HEAP*_l_17[0] , EXACT
-// b.p -> *HEAP*_l_17[0] , EXACT
+// a.p -> *HEAP*_l_17[0] , MAY
+// b.p -> *HEAP*_l_17[0] , MAY
 // e.champ[*].p -> *HEAP*_l_29[0] , MAY
 
 

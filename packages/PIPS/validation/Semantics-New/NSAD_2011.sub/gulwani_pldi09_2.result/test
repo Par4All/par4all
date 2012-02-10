@@ -54,7 +54,7 @@ void ts_singlestate(void)
    while (rand_b())
 
 //  T(i1,i2,v1,v2) {i1+v1==i1#init+v1#init, i1<=n, i2+v1#init<=n+v1,
-//    1<=m, v1+v2+1<=m+v1#init, 1<=n, v1#init<=v1+1, v1<=v1#init,
+//    1<=m, v1+v2+1<=m+v1#init, 1<=n, v1<=v1#init, v1#init<=v1+1,
 //    2v1+v2+1<=2v1#init+v2#init, 1<=v1#init}
 
       if (rand_b()) {
@@ -554,18 +554,18 @@ void ts_restructured(void)
 
          v1--;
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n-1, m==v2, 0<=i2, i2<=1, i2+v1+2<=m+n,
-//    i2+m+v1<=n, i2+v1+2<=2n, 1<=m, 1<=n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n-1, m==v2, 0<=i2, i2<=1, i2+m+v1<=n,
+//    i2+v1+2<=m+n, i2+v1+2<=2n, 1<=m, 1<=n, v1+1<=n, 1<=v1}
 
          i1++;
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, m==v2, 0<=i2, i2<=1, i2+v1+2<=m+n,
-//    i2+m+v1<=n, i2+v1+2<=2n, 1<=m, 1<=n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, m==v2, 0<=i2, i2<=1, i2+m+v1<=n,
+//    i2+v1+2<=m+n, i2+v1+2<=2n, 1<=m, 1<=n, v1+1<=n, 1<=v1}
 
          i2 = 0;
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, v1+2<=m+n,
-//    m+v1<=n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, m+v1<=n,
+//    v1+2<=m+n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
 
          if (!(i1<=n&&i2<=n))
 
@@ -573,8 +573,8 @@ void ts_restructured(void)
 
             checking_error();
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, v1+2<=m+n,
-//    m+v1<=n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, m+v1<=n,
+//    v1+2<=m+n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
 
          if (!(v1>0&&v2>=m))
 
@@ -582,18 +582,18 @@ void ts_restructured(void)
 
             deadlock();
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, v1+2<=m+n,
-//    m+v1<=n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, m==v2, 1<=m, m+v1<=n,
+//    v1+2<=m+n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
 
          v2 = 0;
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, v2==0, 1<=m, v1+2<=m+n,
-//    m+v1<=n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==0, v2==0, 1<=m, m+v1<=n,
+//    v1+2<=m+n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
 
          i2 += m;
 
-//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==m, v2==0, 1<=i2, v1+2<=i2+n,
-//    i2+v1<=n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
+//  P(i1,i2,m,n,v1,v2) {i1+v1==n, i2==m, v2==0, 1<=i2, i2+v1<=n,
+//    v1+2<=i2+n, 1<=n, v1+2<=2n, v1+1<=n, 1<=v1}
 
          if (!(i1<=n&&i2<=n))
 

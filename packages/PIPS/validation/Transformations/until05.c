@@ -1,6 +1,8 @@
 // Check that useless until loops are removed
 
-// Check that labels are preserved...
+// Check that effects are taken into account when available
+
+// See also until06.c
 
 #include <stdio.h>
 

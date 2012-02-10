@@ -143,6 +143,10 @@ int main(int argc, char *argv[])
    //PIPS generated variable
    register int32_t volprevious;
    //PIPS generated variable
+   freia_status ret0_0;
+   //PIPS generated variable
+   int i0_0;
+   //PIPS generated variable
    register freia_status ret_10;
    //PIPS generated variable
    register int i_16;
@@ -430,21 +434,34 @@ int main(int argc, char *argv[])
    _return4 = err_2;
 
    ret_9 = freia_aipo_global_vol(out, &volcurrent);
+   //PIPS generated variable
+   //PIPS generated variable
    volprevious = volcurrent;
-   
-   
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
-   i_16 = 1;
-   
-   
+   i0_0 = 1;
    _return12 = 0;
-   ret_10 = 0;
-   ret_10 |= freia_aipo_inf(out, out, in);
-   
-   
-   _return7 = ret_10;
+   ret0_0 = 0;
+   ret0_0 |= freia_aipo_inf(out, out, in);
+   _return7 = ret0_0;
    ret_9 |= _return7;
    ret_9 |= freia_aipo_global_vol(out, &volcurrent);
+   while (volcurrent!=volprevious) {
+      volprevious = volcurrent;
+      
+      
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
+      i_16 = 1;
+      
+      
+      _return12 = 0;
+      ret_10 = 0;
+      ret_10 |= freia_aipo_inf(out, out, in);
+      
+      
+      _return7 = ret_10;
+      ret_9 |= _return7;
+      ret_9 |= freia_aipo_global_vol(out, &volcurrent);
+   }
    
    
    _return0 = ret_9;

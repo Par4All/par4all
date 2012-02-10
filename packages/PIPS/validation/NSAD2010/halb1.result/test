@@ -99,12 +99,12 @@ int main()
          y++;
       }
 
-//  P(x,y) {x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
+//  P(x,y) {x<=102, y<=x, 2<=x+y, x+y<=202, 0<=y}
 
 
       if (x+y<=202)
 
-//  P(x,y) {x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
+//  P(x,y) {x<=102, y<=x, 2<=x+y, x+y<=202, 0<=y}
 
          printf("property verified\n");
    }

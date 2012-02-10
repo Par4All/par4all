@@ -387,8 +387,7 @@ int foo3()
 int main()
 {
    float a[5][3], ret;
-//             <    is read   >: a[0][3] a[1][3]
-//             <    is written>: a[0][3] a[1][3] ret
+//             <    is written>: ret
 
    ret = foo(a);
 //             <    is read   >: a[0][3] a[1][3]
@@ -405,12 +404,6 @@ int main()
 
 	63 --> 64 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
-		from <a[1][3]-W-EXACT> to <a[1][3]-W-EXACT>
-		from <a[0][3]-W-EXACT> to <a[0][3]-W-EXACT>
-		from <a[1][3]-W-EXACT> to <a[1][3]-R-EXACT>
-		from <a[0][3]-W-EXACT> to <a[0][3]-R-EXACT>
-		from <a[1][3]-R-EXACT> to <a[1][3]-W-EXACT>
-		from <a[0][3]-R-EXACT> to <a[0][3]-W-EXACT>
 	64 --> 65 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
 

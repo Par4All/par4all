@@ -335,7 +335,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    free(buffer);
 
 // Points To:
-// buffer -> *HEAP*_l_20[0] , EXACT
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT

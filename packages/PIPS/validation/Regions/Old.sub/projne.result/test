@@ -42,7 +42,7 @@ C    J<=N}>
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=N}>
-C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2+1, PHI2<=K,
+C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, PHI2<=K, K<=PHI2+1,
 C    1<=I, I<=N}>
 C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=N}>
 
@@ -56,7 +56,7 @@ C    J<=N}>
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
-C  <WORK(PHI1,PHI2)-R-EXACT-{PHI1==J, K<=PHI2+1, PHI2<=K, 1<=I, I<=N,
+C  <WORK(PHI1,PHI2)-R-EXACT-{PHI1==J, PHI2<=K, K<=PHI2+1, 1<=I, I<=N,
 C    1<=J, J<=N}>
 
                A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                        0022

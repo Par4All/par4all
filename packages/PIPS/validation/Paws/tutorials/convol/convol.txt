@@ -1,1 +1,0 @@
-This example presents effect of cloning, partial evaluation, loop unrolling and reduction parallelization for a Power architecture.

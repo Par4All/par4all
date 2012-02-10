@@ -98,11 +98,11 @@ int main()
          y++;
       }
 
-//  P(x,y) {x<=104, 4<=x+2y, 2y<=x, x+2y<=204, 0<=y}
+//  P(x,y) {x<=104, 2y<=x, 4<=x+2y, x+2y<=204, 0<=y}
 
       if (x+2*y<=204)
 
-//  P(x,y) {x<=104, 4<=x+2y, 2y<=x, x+2y<=204, 0<=y}
+//  P(x,y) {x<=104, 2y<=x, 4<=x+2y, x+2y<=204, 0<=y}
 
          printf("property verified\n");
    }

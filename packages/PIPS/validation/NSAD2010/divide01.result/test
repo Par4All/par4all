@@ -15,7 +15,7 @@ void divide01()
 
    while (m>1) {
 
-//  T(m) {m#init<=2m+1, 2m<=m#init, 2<=m#init}
+//  T(m) {2m<=m#init, m#init<=2m+1, 2<=m#init}
 
       m = m/2;
 
@@ -28,7 +28,7 @@ void divide01()
 
    while (m<-1) {
 
-//  T(m) {m#init<=2m+1, 2m<=m#init, m#init+2<=0}
+//  T(m) {2m<=m#init, m#init<=2m+1, m#init+2<=0}
 
       m = m/2;
 

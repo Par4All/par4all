@@ -101,7 +101,7 @@ void slope07()
 
    if (61*y<=55*x+54)
 
-//  P(k,x,y) {0<=x, x<=58, 10y<=9x+9, 9y<=8x+13, y<=x}
+//  P(k,x,y) {0<=x, x<=58, y<=x, 10y<=9x+9, 9y<=8x+13}
 
       /* x=9, y=9 is reachable */
       /* The new constraints are derived from points (0,0), (9,9),

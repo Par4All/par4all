@@ -164,12 +164,12 @@ int main()
    }
 
 //  P(k,new,old,x,y,z) {new+old==1, x==10, y+z==10, 0<=new, new<=1,
-//    y<=new+9, new<=y}
+//    new<=y, y<=new+9}
 
    if (new==1&&old==0||new==0&&old==1)
 
 //  P(k,new,old,x,y,z) {new+old==1, x==10, y+z==10, 0<=new, new<=1,
-//    y<=new+9, new<=y}
+//    new<=y, y<=new+9}
 
       printf("property  verified\n");
    else

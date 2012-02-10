@@ -1,0 +1,12 @@
+setenv WS=prettyprint01
+delete $WS
+create $WS $WS.f
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+echo --- Preconditions for $NAME
+display PRINTED_FILE[%ALL]
+close
+delete $WS
+quit

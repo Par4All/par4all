@@ -110,13 +110,13 @@ int main()
    for(i = 0; i <= N-1; i += 1)
 
 //  <A[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=99, 50i<=50PHI1+49PHI2,
-//    PHI2+i<=PHI1+99, PHI1<=PHI2+i, 49PHI1+50PHI2<=49i+4950,
+//    PHI1<=PHI2+i, PHI2+i<=PHI1+99, 49PHI1+50PHI2<=49i+4950,
 //    50i<=99PHI1, 99PHI1<=49i+4950, N==100, 0<=i, i<=99}>
 
       for(k = 0; k <= N-1; k += 1)
 
-//  <A[PHI1][PHI2]-W-MAY-{50i<=50PHI1+49PHI2, PHI2+i<=PHI1+99,
-//    PHI1<=PHI2+i, 49PHI1+50PHI2<=49i+4950, 50k<=49PHI1+50PHI2,
+//  <A[PHI1][PHI2]-W-MAY-{50i<=50PHI1+49PHI2, PHI1<=PHI2+i,
+//    PHI2+i<=PHI1+99, 49PHI1+50PHI2<=49i+4950, 50k<=49PHI1+50PHI2,
 //    PHI2<=PHI1+k, PHI1+k<=PHI2+99, 50PHI1+49PHI2<=49k+4950,
 //    50i<=99PHI1, 99PHI1<=49i+4950, 50k<=99PHI2, 99PHI2<=49k+4950,
 //    N==100, 0<=i, i<=99, 0<=k, k<=99}>

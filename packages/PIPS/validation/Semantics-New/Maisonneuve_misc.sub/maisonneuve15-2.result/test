@@ -39,8 +39,8 @@ void run(void)
 
             assert_error();
 
-//  T(x,y) {x+y#init==x#init+y, 3x#init<=7x, 9x#init<=5x+16,
-//    x<=x#init, 7x#init<=7x+4y#init, 5x#init+4y#init<=5x+16,
+//  T(x,y) {x+y#init==x#init+y, 3x#init<=7x, x<=x#init,
+//    9x#init<=5x+16, 7x#init<=7x+4y#init, 5x#init+4y#init<=5x+16,
 //    x#init+3<=3x+y#init, 2x#init+3<=3x+2y#init,
 //    5x#init+4y#init<=x+20}
 
@@ -639,7 +639,7 @@ void run(void)
          }
          else {
 
-//  T(x,y) {x+y#init==x#init+y, 2<=x, x<=4, x#init<=x+2, x<=x#init,
+//  T(x,y) {x+y#init==x#init+y, 2<=x, x<=4, x<=x#init, x#init<=x+2,
 //    x#init+2<=x+y#init, x+y#init<=x#init+4}
 
             if (flip()) {

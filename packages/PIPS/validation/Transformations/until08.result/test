@@ -1,0 +1,25 @@
+### initial code
+void until08()
+{
+   int i = 1;
+   do {
+      i++;
+   }
+   while (0);
+   printf("%d", i);
+   do {
+      i++;
+   }
+   while (0);
+   printf("%d", i);
+}
+### suppress dead code
+void until08()
+{
+   int i = 1;
+   i++;
+   printf("%d", i);
+   i++;
+   printf("%d", i);
+}
+

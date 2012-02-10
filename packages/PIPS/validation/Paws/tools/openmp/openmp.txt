@@ -1,1 +1,0 @@
-OpenMP is a de facto standard to express data and task parallelism in C and Fortran programs.

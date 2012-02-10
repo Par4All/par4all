@@ -1,72 +1,68 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace, module
-from pyrops import pworkspace
+from pyps       import workspace, module
+from pyrops     import pworkspace
 
-def import_module(operation):
-	return __import__('paws_' + operation, None, None, ['__all__'])
 
-def perform(source_path, operation, advanced=False, properties=None, analysis=None, phases=None):
-	mod = import_module(operation)
-        try:
-                ws = pworkspace(source_path, deleteOnClose=True)
-                if advanced:
-                        if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
-                        if (analysis != ""): activate(ws, analysis)
-			if (phases != ""): apply_phases(ws, phases)
-                functions = ''
-                for fu in ws.fun:
-                        functions += mod.invoke_function(fu, ws)
-                ws.close()
-                return functions
-        except:
-                ws.close()
-                raise
+def import_module(op):
+    return __import__('paws_' + op, None, None, ['__all__'])
 
-def perform_multiple(sources, operation, function_name, advanced=False, properties=None, analysis=None, phases=None):
-	mod = import_module(operation)
-        try:
-                ws = pworkspace(*sources, deleteOnClose=True)
-		if advanced:
-                        if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
-                        if (analysis != ""): activate(ws, analysis)
-			if (phases != ""): apply_phases(ws, phases)		
-                result = mod.invoke_function(ws.fun.__getattr__(function_name), ws)
-                ws.close()
-                return result
-        except:
-                ws.close()
-                raise
+def perform(source_path, op, advanced=False, **params):
+    mod = import_module(op)
+    try:
+        ws = pworkspace(str(source_path), deleteOnClose=True)
 
-def activate(ws, analyses):
-	for analysis in analyses[ : -1].split(';'):
-		ws.activate(str(analysis))
+        if advanced:
 
-def apply_phases(ws, phases):
-	for phase in phases[ : -1].split(';'):
-		if phase.split()[1] == 'true':
-			getattr(ws.all, phase.split()[0])()
+            # Set properties
+            for props in params.get('properties', {}).values():
+                for p in props:
+                    if p['checked']:
+                        val = str(p['val']) if isinstance(p['val'], unicode) else p['val'] ##TODO
+                        setattr(ws.props, p['id'], val)
 
-def set_properties(ws, properties):
-        for prop in properties:
-                pair = prop.split()
-                default = getattr(ws.props, pair[0])
-                if type(default) == int:
-                        value = int(pair[1])
-                elif type(default) == bool:
-                        if pair[1] == 'false':
-                                value = False
-                        else:
-                                value = True
-                else:
-                        value = pair[1]
-                if default != value:
-                        setattr(ws.props, pair[0], value)
+            # Activate analyses
+            for a in params.get('analyses', []):
+                if a['checked']:
+                    ws.activate(str(a['val']))
 
-def get_functions(sources):
-        ws = pworkspace(*sources, deleteOnClose=True)
-        functions = []
+            # Apply phases
+            for p in params.get('phases', []):
+                if p['checked']:
+                    getattr(ws.all, p['id'])()
+
+        functions = ''
         for fu in ws.fun:
-                functions.append(fu.name)
+            functions += mod.invoke_function(fu, ws)
+
         ws.close()
         return functions
+
+    except:
+        ws.close()
+        raise
+
+def perform_multiple(sources, op, function_name, advanced=False, **params):
+    mod = import_module(op)
+    try:
+        ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
+        if advanced:
+            if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
+            if (analysis != ""): activate(ws, analysis)
+            if (phases != ""): apply_phases(ws, phases)		
+        result = mod.invoke_function(ws.fun.__getattr__(function_name), ws)
+        ws.close()
+        return result
+    except:
+        ws.close()
+        raise
+
+def get_functions(sources):
+    ws = pworkspace(*sources, deleteOnClose=True) ##TODO: cast source file names to str
+    functions = []
+    for fu in ws.fun:
+        functions.append(fu.name)
+    ws.close()
+    return functions
 

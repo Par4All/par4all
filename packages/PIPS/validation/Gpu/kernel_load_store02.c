@@ -1,7 +1,6 @@
 /* Test kernel_load_store on a scalar modification.
 */
-
-#include <stdlib.h>
+extern void exit(int status);
 
 enum { N = 100 };
 

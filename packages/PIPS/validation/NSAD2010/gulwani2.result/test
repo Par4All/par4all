@@ -128,13 +128,11 @@ int main()
    x = 0;
    y = 50;
 
-   while (x<100) {
-      while (x<50)
-         x++;
-      while (x<100&&x>=50) {
-         x++;
-         y++;
-      }
+   while (x<50)
+      x++;
+   while (x<100&&x>=50) {
+      x++;
+      y++;
    }
 
    printf("property  verified\n");

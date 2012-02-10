@@ -44,23 +44,23 @@ float main(int argc, char *argv[])
    for(i = 0; i <= 8; i += 1)
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
       for(j = 0; j <= 8; j += 1) {
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
          imagein[i][j].re = 0.0;
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
          imagein[i][j].im = 0.0;
       }
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
    return imagein[2][1].re;
 }

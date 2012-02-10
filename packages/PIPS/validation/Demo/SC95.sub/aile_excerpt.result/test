@@ -112,8 +112,9 @@ C********************************************************
 6- Show D with regions
 
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
-C    PHI2<=KP, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, PHI2<=KP,
+C    KP<=PHI2+1, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L,
+C    L<=7}>
 
 C
       REAL FUNCTION D(J,K,JP,KP)
@@ -124,8 +125,9 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
-C    PHI2<=KP, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, PHI2<=KP,
+C    KP<=PHI2+1, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L,
+C    L<=7}>
 
 C     
       D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0010
@@ -135,8 +137,9 @@ C
 7- Show D with MUST regions 
 
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
-C    PHI2<=KP, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, PHI2<=KP,
+C    KP<=PHI2+1, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L,
+C    L<=7}>
 
 C
       REAL FUNCTION D(J,K,JP,KP)
@@ -147,8 +150,9 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
-C    PHI2<=KP, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, PHI2<=KP,
+C    KP<=PHI2+1, L<=PHI3, PHI3<=L+2, J==JP, K==KP-1, 3<=KP, 1<=L,
+C    L<=7}>
 
 C     
       D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0010

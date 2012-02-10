@@ -1,0 +1,158 @@
+
+TRANSFORMERS
+
+
+//  T() {n<=0}
+
+void cohen02(int n)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(j) {i==0, j==42}
+
+   int j = 42;
+
+//  T(j) {i==0, j#init==42, 0<=j, j<=42, 1<=n}
+
+   while (i<n) {
+
+//  T(j) {i==0, 0<=j, j<=j#init, 0<=j#init, 1<=n}
+
+      while (i<n&&j>=0)
+
+//  T(j) {i==0, j==j#init-2, 0<=j+2, 1<=n}
+
+         j -= 2;
+
+//  T() {i==0, j+1<=0, 1<=n}
+
+      while (i<n&&j<0)
+
+//  T(j) {i==0, j==0, j#init+1<=0, 1<=n}
+
+         j = 0;
+
+//  T() {i==0, j==0, 1<=n}
+
+      /* j==0 here */
+      printf("i=%d, j=%d\n", i, j);
+   }
+
+//  T() {i==0, j==42, n<=0}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void cohen02(int n)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int j = 42;
+
+//  P(i,j) {i==0, j==42}
+
+   while (i<n) {
+
+//  P(i,j) {i==0, 0<=j, j<=42, 1<=n}
+
+      while (i<n&&j>=0)
+
+//  P(i,j) {i==0, 0<=j, j<=42, 1<=n}
+
+         j -= 2;
+
+//  P(i,j) {i==0, 0<=j+2, j+1<=0, 1<=n}
+
+      while (i<n&&j<0)
+
+//  P(i,j) {i==0, 0<=j+2, j+1<=0, 1<=n}
+
+         j = 0;
+
+//  P(i,j) {i==0, j==0, 1<=n}
+
+      /* j==0 here */
+      printf("i=%d, j=%d\n", i, j);
+   }
+
+//  P(i,j) {i==0, j==42, n<=0}
+
+   printf("i=%d, j=%d\n", i, j);
+}
+
+FOR LOOP RECOVERY
+
+void cohen02(int n)
+{
+   int i = 0;
+   int j = 42;
+   //PIPS generated variable
+   int j0;
+   while (i<n) {
+      for (j0 = j;i<n&&j0>=0;j0 = j0-2) {
+         j = j0;
+         j -= 2;
+      }
+      while (i<n&&j<0)
+         j = 0;
+      /* j==0 here */
+      printf("i=%d, j=%d\n", i, j);
+   }
+   printf("i=%d, j=%d\n", i, j);
+}
+
+CONTROL SIMPLIFICATION: the second internal while loop should be
+simplified because you can prove that the loop is always entered and
+exited after only one iteration [not working, not implemented]
+
+void cohen02(int n)
+{
+   int i = 0;
+   int j = 42;
+   //PIPS generated variable
+   int j0;
+   while (i<n) {
+      for (j0 = j;i<n&&j0>=0;j0 = j0-2) {
+         j = j0;
+         j -= 2;
+      }
+      j = 0;
+      /* j==0 here */
+      printf("i=%d, j=%d\n", i, j);
+   }
+   printf("i=%d, j=%d\n", i, j);
+}
+
+PARTIAL EVALUATION: the termination condition of the recovered
+for loop should be simplified [not working/not implemented]
+
+void cohen02(int n)
+{
+   int i = 0;
+   int j = 42;
+   //PIPS generated variable
+   int j0;
+   while (i<n) {
+      for (j0 = j;0<n&&j0>=0;j0 = j0-2) {
+         j = j0;
+         j -= 2;
+      }
+      j = 0;
+      /* j==0 here */
+      printf("i=%d, j=%d\n", 0, 0);
+   }
+   printf("i=%d, j=%d\n", 0, 42);
+}

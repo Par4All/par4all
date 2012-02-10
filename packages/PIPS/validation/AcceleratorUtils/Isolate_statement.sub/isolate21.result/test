@@ -15,6 +15,6 @@ void pain(char *T)
    P4A_accel_malloc((void **) &T0, sizeof(char)*2);
 
 holy:   sain(*T0);
-   P4A_copy_from_accel_1d(sizeof(char), 2, 2, 0, T, *T0);
+   P4A_copy_from_accel_1d(sizeof(char), 2, 2, 0, &T[0], *T0);
    P4A_accel_free(T0);
 }

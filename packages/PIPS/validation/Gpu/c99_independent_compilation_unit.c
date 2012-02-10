@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+extern int atoi(const char *nptr);
 
 
 int main(int argc, char **argv) {
