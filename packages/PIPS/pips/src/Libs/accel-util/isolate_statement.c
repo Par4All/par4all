@@ -1,21 +1,21 @@
 /*
-  Copyright 1989-2010 MINES ParisTech
+   Copyright 1989-2010 MINES ParisTech
 
-  This file is part of PIPS.
+   This file is part of PIPS.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  any later version.
+   PIPS is free software: you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.
+   PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+   See the GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -26,7 +26,7 @@
  * @date 2010-05-01
  */
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 #include <ctype.h>
 
@@ -62,8 +62,8 @@
  */
 
 struct dma_pair {
-  entity new_ent;
-  enum region_to_dma_switch s;
+    entity new_ent;
+    enum region_to_dma_switch s;
 };
 
 
@@ -71,8 +71,22 @@ struct dma_pair {
 static const int dmaScalar = 0;
 static const int dma1D = 1;
 
-static size_t get_dma_dimension(entity to) {
-    size_t n = type_dereferencement_depth(entity_type(to)) - 1; /* -1 because we always have pointer to area ... in our case*/
+static size_t get_dma_dimension(region reg_from) {
+    /* It should be the number of variable phis and stop at first field*/
+    size_t n=0;
+    FOREACH(EXPRESSION,exp,reference_indices(region_any_reference(reg_from))) {
+        if(expression_reference_p(exp)) {
+            reference ref = expression_reference(exp);
+            entity var = reference_variable(ref);
+            if(variable_phi_p(var) ) {
+                    ++n;
+            }
+            else {
+                pips_assert("not a  phi means a field",entity_field_p(var));
+                break;
+            }
+        }
+    }
     return n;
 }
 
@@ -110,40 +124,65 @@ static bool region_to_dimensions(region reg, transformer tr, list *dimensions, l
 }
 
 static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, list * offsets, expression *condition) {
-  pips_assert("effects are regions\n",effect_region_p(eff));
-  if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
-    /* let's try with the definition region instead */
-    descriptor d = effect_descriptor(eff);
-    if(descriptor_convex_p(d)) {
-      sc_free(descriptor_convex(d));
-      /* create dummy empty effects */
-      effects dumbo = make_effects(NIL);
-      entity e = reference_variable(region_any_reference(eff));
-      set_live_loop_indices();
-      partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
-      reset_live_loop_indices();
-      free_effects(dumbo);
-      descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
+    pips_assert("effects are regions\n",effect_region_p(eff));
+    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
+        /* let's try with the definition region instead */
+        descriptor d = effect_descriptor(eff);
+        if(descriptor_convex_p(d)) {
+            sc_free(descriptor_convex(d));
+            /* create dummy empty effects */
+            effects dumbo = make_effects(NIL);
+            entity e = reference_variable(region_any_reference(eff));
+            set_live_loop_indices();
+            partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
+            reset_live_loop_indices();
+            free_effects(dumbo);
+            descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
+        }
+        if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
+            pips_internal_error("failed to compute dma from regions appropriately\n");
     }
-    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
-      pips_internal_error("failed to compute dma from regions appropriately\n");
-  }
 }
 
-static expression entity_to_address(entity e) {
-    size_t n = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(e)))));
-    list indices = NIL;
+static expression region_to_address(region reg) {
     bool is_fortran = fortran_module_p(get_current_module_entity());
     int indice_first = (is_fortran == true) ? 1 : 0;
-    while(n--) indices = CONS(EXPRESSION,int_to_expression(indice_first),indices);
-    reference r = make_reference(e,indices);
-    expression result = expression_undefined;
+    expression address = entity_to_expression(reference_variable(region_any_reference(reg)));
+    FOREACH(EXPRESSION,exp,reference_indices(region_any_reference(reg))) {
+        pips_assert("region indices only contain references",expression_reference_p(exp));
+        reference expr = expression_reference(exp);
+        entity var =reference_variable(expr);
+        if(variable_phi_p(var)) {
+            expression index = int_to_expression(indice_first);
+            if(expression_reference_p(address)) {
+                reference_indices(expression_reference(address))=
+                    gen_nconc(reference_indices(expression_reference(address)),
+                        make_expression_list(index));
+            }
+            else 
+            address= make_expression(
+                    make_syntax_subscript(
+                        make_subscript(address,make_expression_list(index))
+                        )
+                    ,
+                    normalized_undefined
+                    );
+        }
+        else {
+            address= MakeBinaryCall(
+                    entity_intrinsic(FIELD_OPERATOR_NAME),
+                    address,
+                    copy_expression(exp)
+                    );
+        }
+    }
+    expression result;
     if (fortran_module_p(get_current_module_entity()))
-      result = MakeUnaryCall(entity_intrinsic(C_LOC_FUNCTION_NAME),
-			     reference_to_expression(r));
+        result = MakeUnaryCall(entity_intrinsic(C_LOC_FUNCTION_NAME),
+                address);
     else
-      result = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-			     reference_to_expression(r));
+        result = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                address);
     return result;
 }
 
@@ -160,30 +199,95 @@ static expression entity_to_address(entity e) {
  * a[x][1] -> sizeof(a.x)
  */
 
-static expression get_sizeofexpression_for_reference(entity variable, list indices) {
-  expression sizeof_exp;
+static expression get_sizeofexpression_for_region(region reg) {
+    expression sizeof_exp;
+    reference rr = region_any_reference(reg);
 
-  // Never free'd but unclear when we can/should
-  reference r = make_reference(variable,indices);
+    reference r = make_reference(reference_variable(rr),NIL);
 
-  type element_type = make_type_variable(make_variable(basic_of_reference(r),
-                                                       NIL,
-                                                       NIL));
+    /* extract the constant indices of the region */
+    FOREACH(EXPRESSION,exp, reference_indices(rr)) {
+        pips_assert("region indices are only references",expression_reference_p(exp)) ;
+        reference ref = expression_reference(exp);
+        entity var = reference_variable(ref);
+        if(entity_field_p(var)) {
+            break;
+        }
+        else if(variable_phi_p(var)) {
+                reference_indices(r)=CONS(EXPRESSION,int_to_expression(0),reference_indices(r));
+        }
+        else pips_internal_error("not a field and not a phi variable ?");
+    }
+    reference_indices(r)= gen_nreverse(reference_indices(r));
 
-  /* Here we make a special case for struct because of nvcc/C++ doesn't like construct like :
-   *  sizeof(struct {data_t latitude; data_t longitude; data_t stock;})
-   * so we produce a sizeof(var); instead
-   */
-  if(type_struct_variable_p(element_type)) {
-    expression exp = region_reference_to_expression(r);
-    sizeof_exp = MakeSizeofExpression(exp);
-    free_type(element_type);
-  } else {
-    sizeof_exp = MakeSizeofType(element_type);
-  }
-  return sizeof_exp;
+    type element_type = make_type_variable(make_variable(basic_of_reference(r),
+                NIL,
+                NIL));
+
+    /* Here we make a special case for struct because of nvcc/C++ doesn't like construct like :
+     *  sizeof(struct {data_t latitude; data_t longitude; data_t stock;})
+     * so we produce a sizeof(var); instead
+     */
+    if(type_struct_variable_p(element_type)) {
+        expression exp = region_reference_to_expression(r);
+        sizeof_exp = MakeSizeofExpression(exp);
+        free_type(element_type);
+    } else {
+        sizeof_exp = MakeSizeofType(element_type);
+    }
+    return sizeof_exp;
 }
 
+list variable_to_dimensions(region reg_from) {
+    /* We may skip the size of the first dimension since it is not
+       used in address calculation. But since it depends of Fortran
+       or C in the runtime, postpone this micro-optimization... */
+    reference r =region_any_reference(reg_from);
+    entity from = reference_variable(r);
+    variable from_tv = type_variable(ultimate_type(entity_type(from)));
+    list dims = variable_dimensions(from_tv);
+    list out=NIL;
+    FOREACH(EXPRESSION,exp, reference_indices(r)) {
+        pips_assert("a region only contains references", expression_reference_p(exp));
+        reference rexp = expression_reference(exp);
+        entity var = reference_variable(rexp);
+        if(variable_phi_p(var)) {
+            /* we are in trouble, as we don't know anything about the size of the underlying array. It is the fist dimension, so not very important anyway ... except for FORTRAN :-( But there are no pointer in FORTRAN :p */
+            if(ENDP(dims) && basic_pointer_p(variable_basic(from_tv))) {
+                pips_assert("no pointer in fortran", c_module_p(get_current_module_entity()));
+                expression eupper = expression_undefined;
+                Psysteme sc_reg = sc_dup(region_system(reg_from));
+                sc_transform_eg_in_ineg(sc_reg);
+                Pcontrainte lower,upper;
+                constraints_for_bounds(var,
+                        &sc_inegalites(sc_reg), &lower, &upper);
+                if( !CONTRAINTE_UNDEFINED_P(upper))
+                {
+                    eupper = constraints_to_loop_bound(upper,var,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                }
+                else {
+                    pips_internal_error("Should not happen at this point, should it ?");
+                }
+
+                out=CONS(DIMENSION,
+                        make_dimension(
+                            int_to_expression(0), eupper
+                            ), out);
+                from_tv = type_variable(ultimate_type(basic_pointer(variable_basic(from_tv))));
+                dims = variable_dimensions(from_tv);
+            }
+            else {
+                pips_assert("some dims stacked", !ENDP(dims));
+                out=CONS(DIMENSION, copy_dimension(DIMENSION(CAR(dims))), out);
+                POP(dims);
+            }
+        }
+        else if(entity_field_p(var)) {
+            break;
+        }
+    }
+    return gen_nreverse(out);
+}
 
 /**
  * converts dimensions to a dma call from a memory @a from to another memory @a to
@@ -196,167 +300,152 @@ static expression get_sizeofexpression_for_reference(entity variable, list indic
  * @return
  */
 static
-call dimensions_to_dma(entity from,
-		  entity to,
-		  list/*of dimensions*/ ld,
-		  list/*of offsets*/    lo,
-		  enum region_to_dma_switch m)
+call dimensions_to_dma(effect reg_from,
+        entity to,
+        list/*of dimensions*/ ld,
+        list/*of offsets*/    lo,
+        enum region_to_dma_switch m)
 {
-  expression dest;
-  list args = NIL;
-  const char* function_name = get_dma_name(m,get_dma_dimension(to));
+    entity from = reference_variable(region_any_reference(reg_from));
+    expression dest;
+    list args = NIL;
+    const char* function_name = get_dma_name(m,get_dma_dimension(reg_from));
 
-  entity mcpy = module_name_to_entity(function_name);
-  if (entity_undefined_p(mcpy)) {
-      mcpy=make_empty_subroutine(function_name,copy_language(module_language(get_current_module_entity())));
-    pips_user_warning("Cannot find \"%s\" method. Are you sure you have set\n"
-		    "KERNEL_LOAD_STORE_..._FUNCTION "
-		    "to a defined entity and added the correct .c file?\n",function_name);
-  }
-  else if (!fortran_module_p(get_current_module_entity())) {
-      AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
-  } else
-    AddEntityToModule(mcpy,get_current_module_entity());
+    entity mcpy = module_name_to_entity(function_name);
+    if (entity_undefined_p(mcpy)) {
+        mcpy=make_empty_subroutine(function_name,copy_language(module_language(get_current_module_entity())));
+        pips_user_warning("Cannot find \"%s\" method. Are you sure you have set\n"
+                "KERNEL_LOAD_STORE_..._FUNCTION "
+                "to a defined entity and added the correct .c file?\n",function_name);
+    }
+    else if (!fortran_module_p(get_current_module_entity())) {
+        AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
+    } else
+        AddEntityToModule(mcpy,get_current_module_entity());
 
-  /* Scalar detection: */
-  bool scalar_entity = entity_scalar_p(from);
+    /* Scalar detection: */
+    bool scalar_entity = entity_scalar_p(from);
 
-  if (dma_allocate_p(m)) {
-      /* Need the address for the allocator to modify the pointer itself: */
-      dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),entity_to_expression(to));
-      /* Generate a "void **" type: */
-      type voidpp = make_type_variable(
-              make_variable(
-                  make_basic_pointer(
-                      make_type_variable(
-                          make_variable(
-                              make_basic_pointer(
-                                  make_type_void(NIL)
-                                  ),
-                              NIL,NIL
-                              )
-                          )
-                      ),
-                  NIL,NIL
-                  )
-              );
-      /* dest = "(void **) &to" */
-      dest = make_expression(
-              make_syntax_cast(
-                  make_cast(voidpp,dest)
-                  ),
-              normalized_undefined);
-  }
-  else if (!dma_deallocate_p(m) && !scalar_entity)
-    /* Except for the deallocation or if we have a scalar and then we have
-       already created a pointer to it, the original array is referenced
-       through pointer dereferencing: */
-    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-			 entity_to_expression(to));
-  else
-    dest=entity_to_expression(to);
+    if (dma_allocate_p(m)) {
+        /* Need the address for the allocator to modify the pointer itself: */
+        dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),entity_to_expression(to));
+        /* Generate a "void **" type: */
+        type voidpp = make_type_variable(
+                make_variable(
+                    make_basic_pointer(
+                        make_type_variable(
+                            make_variable(
+                                make_basic_pointer(
+                                    make_type_void(NIL)
+                                    ),
+                                NIL,NIL
+                                )
+                            )
+                        ),
+                    NIL,NIL
+                    )
+                );
+        /* dest = "(void **) &to" */
+        dest = make_expression(
+                make_syntax_cast(
+                    make_cast(voidpp,dest)
+                    ),
+                normalized_undefined);
+    }
+    else if (!dma_deallocate_p(m) && !scalar_entity)
+        /* Except for the deallocation or if we have a scalar and then we have
+           already created a pointer to it, the original array is referenced
+           through pointer dereferencing: */
+        dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                entity_to_expression(to));
+    else
+        dest=entity_to_expression(to);
 
 
+    switch(m) {
+        case dma_deallocate:
+            args = make_expression_list(dest);
+            break;
+        case dma_allocate:
+            {
+                expression sizeof_exp = get_sizeofexpression_for_region(reg_from);
 
-  switch(m) {
-      case dma_deallocate:
-          args = make_expression_list(dest);
-          break;
-      case dma_allocate:
-          {
-            expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
+                /* sizeof(element)*number elements of the array: */
+                expression transfer_size = SizeOfDimensions(ld);
+                transfer_size=MakeBinaryCall(
+                        entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                        sizeof_exp,
+                        transfer_size);
 
-            /* sizeof(element)*number elements of the array: */
-              expression transfer_size = SizeOfDimensions(ld);
-              transfer_size=MakeBinaryCall(
-                      entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-                      sizeof_exp,
-                      transfer_size);
+                args = make_expression_list(dest, transfer_size);
+            } break;
+        case dma_load:
+        case dma_store:
+            /* Generate communication functions: */
+            {
+                //if(!scalar_entity) {
+                /* Build the sizes of the array block to transfer: */
+                list /*of expressions*/ transfer_sizes = NIL;
+                FOREACH(DIMENSION,d,ld) {
+                    expression transfer_size=
+                        SizeOfDimension(d);
+                    transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
+                }
+                transfer_sizes=gen_nreverse(transfer_sizes);
 
-              args = make_expression_list(dest, transfer_size);
-          } break;
-      case dma_load:
-      case dma_store:
-	/* Generate communication functions: */
-	{
-	  //if(!scalar_entity) {
-	    /* Build the sizes of the array block to transfer: */
-	    list /*of expressions*/ transfer_sizes = NIL;
-	    FOREACH(DIMENSION,d,ld) {
-	      expression transfer_size= SizeOfDimension(d);
-	      transfer_sizes=CONS(EXPRESSION,transfer_size,transfer_sizes);
-	    }
-	    transfer_sizes=gen_nreverse(transfer_sizes);
+                /* Build the sizes of the array with element to transfer: */
+                list/* of expressions*/ from_dims = NIL;
+                list vardims = variable_to_dimensions(reg_from);
+                FOREACH(DIMENSION,d, vardims) {
+                    from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
+                }
+                gen_full_free_list(vardims);
+                from_dims=gen_nreverse(from_dims);
 
-	    /* Build the sizes of the array with element to transfer: */
-	    list/* of expressions*/ from_dims = NIL;
-	    /* We may skip the size of the first dimension since it is not
-	       used in adress calculation. But since it depends of Fortran
-	       or C in the runtime, postpone this micro-optimization... */
-	    type utype_from = ultimate_type(entity_type(from));
-	    FOREACH(DIMENSION,d,variable_dimensions(type_variable(utype_from))) {
-	      from_dims=CONS(EXPRESSION,SizeOfDimension(d),from_dims);
-	    }
-	    from_dims=gen_nreverse(from_dims);
+                /* Build the offsets of the array block to transfer: */
+                list/* of expressions*/ offsets = NIL;
+                FOREACH(EXPRESSION,e,lo)
+                    offsets=CONS(EXPRESSION,e,offsets);
+                offsets=gen_nreverse(offsets);
+                /* Use a special transfert function for scalars instead of reusing
+                   the 1D function. It may useful for example if it is implemented
+                   as a FIFO at the hardware level: */
+                //} else {
+                //    /* If we have a scalar variable to transfert, generate
+                //       synthetic transfer parameters: */
+                //    /* 1 element to transfert */
+                //    transfer_sizes = make_expression_list(int_to_expression(1));
+                //    /* 1 dimension */
+                //    from_dims = make_expression_list(int_to_expression(1));
+                //    /* At the begining of the « array »: */
+                //    offsets = make_expression_list(int_to_expression(0));
+                //  }
 
-	    /* Build the offsets of the array block to transfer: */
-	    list/* of expressions*/ offsets = NIL;
-	    FOREACH(EXPRESSION,e,lo)
-	      offsets=CONS(EXPRESSION,e,offsets);
-	    offsets=gen_nreverse(offsets);
-	/* Use a special transfert function for scalars instead of reusing
-	   the 1D function. It may useful for example if it is implemented
-	   as a FIFO at the hardware level: */
-	//} else {
-	//    /* If we have a scalar variable to transfert, generate
-	//       synthetic transfer parameters: */
-	//    /* 1 element to transfert */
-	//    transfer_sizes = make_expression_list(int_to_expression(1));
-	//    /* 1 dimension */
-	//    from_dims = make_expression_list(int_to_expression(1));
-	//    /* At the begining of the « array »: */
-	//    offsets = make_expression_list(int_to_expression(0));
-	//  }
-
-	    expression source;
-	    if(entity_pointer_p(from)) { // Not sure this test is bullet proof :-(
-	      // No dereferencing needed for pointers
-	      source = entity_to_expression(from);
-
-	      // Pointers don't have dimensions, hack to add a fake one here
-	      // Obviously we're only 1D compliant here
-	      if(ENDP(from_dims)) {
-	        from_dims=gen_copy_seq(transfer_sizes);
-	      }
-	    } else {
-	      source = entity_to_address(from);
-	    }
-
-	    /* Generate host and accel adresses: */
-	    args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
-	    //if(dma_load_p(m))
-	    //    args=gen_nreverse(args);
-	    /* Output parameters in an order compatible with some C99
-	       implementation of the runtime: size and block size first, so
-	       that some arguments can be defined with them: */
-	    /* Insert offset: */
-	    args = gen_append(offsets, args);
-	    /* Insert the block size to transfert: */
-	    args = gen_append(transfer_sizes, args);
-	    /* Insert the array sizes: */
-	    args = gen_append(from_dims, args);
-	    /* Insert the element size expression: */
-	    expression sizeof_exp = get_sizeofexpression_for_reference(from,lo);
-	    args = CONS(EXPRESSION,
-	                sizeof_exp,
-	                args);
-	} break;
-      default:
-          pips_internal_error("should not happen");
-  }
-  return make_call(mcpy, args);
+                expression source = region_to_address(reg_from);
+                /* Generate host and accel adresses: */
+                args = CONS(EXPRESSION,source,CONS(EXPRESSION,dest,NIL));
+                //if(dma_load_p(m))
+                //    args=gen_nreverse(args);
+                /* Output parameters in an order compatible with some C99
+                   implementation of the runtime: size and block size first, so
+                   that some arguments can be defined with them: */
+                /* Insert offset: */
+                args = gen_append(offsets, args);
+                /* Insert the block size to transfert: */
+                args = gen_append(transfer_sizes, args);
+                /* Insert the array sizes: */
+                args = gen_append(from_dims, args);
+                /* Insert the element size expression: */
+                expression sizeof_exp = get_sizeofexpression_for_region(reg_from);
+                args = CONS(EXPRESSION,
+                        sizeof_exp,
+                        args);
+            } break;
+        default:
+            pips_internal_error("should not happen");
+    }
+    return make_call(mcpy, args);
 }
-
 
 /* Compute a call to a DMA function from the effects of a statement
 
@@ -370,196 +459,261 @@ call dimensions_to_dma(entity from,
    to "" in the relevant property
 
    If this cannot be done, it throws a pips_user_error
- */
-static
+   */
+    static
 statement effects_to_dma(statement stat,
-			 enum region_to_dma_switch s,
-			 hash_table e2e, expression * condition,
-			 bool fine_grain_analysis, const char* prefix,
-			 const char* suffix)
+        enum region_to_dma_switch s,
+        hash_table e2e, expression * condition,
+        bool fine_grain_analysis, const char* prefix,
+        const char* suffix)
 {
-  /* if no dma is provided, skip the computation
-   * it is used for scalope at least */
-  if(empty_string_p(get_dma_name(s,dma1D)))
-    return statement_undefined;
+    /* if no dma is provided, skip the computation
+     * it is used for scalope at least */
+    if(empty_string_p(get_dma_name(s,dma1D)))
+        return statement_undefined;
 
-  /* work on a copy because we compute the rectangular hull in place
-     and keep only store effects: we do not care for environment effects here (BC)
-  */
-  list l_eff_tmp = effects_store_effects(load_cumulated_rw_effects_list(stat));
-  list rw_effects = gen_full_copy_list(l_eff_tmp);
-  gen_free_list(l_eff_tmp); /* free the spine, as effects are shared with the database */
-  transformer tr = transformer_range(load_statement_precondition(stat));
-
-  /* SG: to do: merge convex hulls when they refer to *all* fields of a region
-   * to do this, according to BC, I should iterate over all regions,
-   * detect fields and then iterate again over regions to find combinable regions
-   * that way I would not generate needless read effects when all fields are accessed using the same pattern
-   *
-   * some more dev I am not willing to do right now :)
-   */
-
-  /* ensure we only have a rectangular region
-   * as a side effect, strided accesses are handled by region_rectangular_hull
-   */
-  for(list iter = rw_effects;!ENDP(iter);POP(iter)) {
-      region *tmp = (region*)REFCAR(iter);
-      region new = region_rectangular_hull(*tmp,true);
-      //    free_effect(*tmp); SG: why does this lead to a segfault ?
-      //    I find no sharing in region_rectangular_hull
-      *tmp=new;
-  }
-
-  list effects = NIL;
-
-  /* filter out relevant effects depending on operation mode */
-  FOREACH(EFFECT,e,rw_effects) {
-    if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
-        && action_read_p(effect_action(e)))
-      effects=CONS(EFFECT,e,effects);
-    else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
-             && action_write_p(effect_action(e)))
-      effects=CONS(EFFECT,e,effects);
-  }
-
-  /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
-   */
-  if(!fine_grain_analysis) {
-    FOREACH(EFFECT,eff,rw_effects) {
-      if(entity_pointer_p(reference_variable(region_any_reference(eff)))
-          && ! std_file_effect_p(eff)) {
-        print_effect(eff);
-        pips_user_error("pointers wreak havoc with isolate_statement\n");
-      }
-      descriptor d = effect_descriptor(eff);
-      if(descriptor_convex_p(d)) {
-        Psysteme sc_old = descriptor_convex(d);
-        Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
-        sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
-        sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
-        sc_old=sc_normalize2(sc_old);
-        sc_new=sc_normalize2(sc_new);
-        if(!sc_equal_p(sc_old,sc_new)) {
-          sc_free(sc_old);
-          descriptor_convex(d)=sc_new;
-          effect_approximation_tag(eff)=is_approximation_may;
-        }
-      }
-    }
-  }
-
-  /* handle the may approximations here: if the approximation is may,
-   * we have to load the data, otherwise the store may store
-   * irrelevant data
-   */
-  if (dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s)) {
-      /* first step is to check for may-write effects */
-      list may_write_effects = NIL;
-      FOREACH(EFFECT,e,rw_effects) {
-          if(approximation_may_p(effect_approximation(e)) &&
-                      action_write_p(effect_action(e)) ) {
-              effect fake = copy_effect(e);
-              action_tag(effect_action(fake))=is_action_read;
-              may_write_effects=CONS(EFFECT,fake,may_write_effects);
-          }
-      }
-      /* then we will merge these effects with those
-       * that were already gathered
-       * because we are manipulating sets, it is not very efficient
-       * but there should not be that many effects anyway
+    /* work on a copy because we compute the rectangular hull in place
+       and keep only store effects: we do not care for environment effects here (BC)
        */
-      FOREACH(EFFECT,e_new,may_write_effects) {
-        bool merged = false; // if we failed to merge e_new in effects, we just add it to the list */
-        for(list iter=effects;!ENDP(iter);POP(iter)){
-          effect * e_origin = (effect*)REFCAR(iter); // get a reference to change it in place if needed
-          if(same_entity_p(
-                effect_any_entity(*e_origin),
-                effect_any_entity(e_new))) {
-            merged=true;
-            region tmp = regions_must_convex_hull(*e_origin,e_new);
-            // there should be a free there, but it fails
-            *e_origin=tmp;
-          }
-        }
-        /* no data was copy-in, add this effect */
-        if(!merged) {
-          effects=CONS(EFFECT,copy_effect(e_new),effects);
-        }
-      }
-      gen_full_free_list(may_write_effects);
-  }
+    list l_eff_tmp = effects_store_effects(load_cumulated_rw_effects_list(stat));
+    list rw_effects = gen_full_copy_list(l_eff_tmp);
+    gen_free_list(l_eff_tmp); /* free the spine, as effects are shared with the database */
+    transformer tr = transformer_range(load_statement_precondition(stat));
 
-  /* builds out transfer from gathered effects */
-  list statements = NIL;
-  FOREACH(EFFECT,eff,effects) {
-    statement the_dma = statement_undefined;
-    reference r = effect_any_reference(eff);
-    entity re = reference_variable(r);
-
-    if(entity_abstract_location_p(re)) {
-      pips_user_error("We can't handle abstract locations here. Please try to "
-          "avoid using pointer or activate some pointer analyzes.\n");
+    /* ensure we only have a rectangular region
+     * as a side effect, strided accesses are handled by region_rectangular_hull
+     */
+    for(list iter = rw_effects;!ENDP(iter);POP(iter)) {
+        region *tmp = (region*)REFCAR(iter);
+        region new = region_rectangular_hull(*tmp,true);
+        //    free_effect(*tmp); SG: why does this lead to a segfault ?
+        //    I find no sharing in region_rectangular_hull
+        *tmp=new;
     }
 
-    struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
-
-    if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
-        if( !io_effect_p(eff) && !std_file_effect_p(eff) &&
-                (!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR"))
-           ) {
-            list /*of dimensions*/ the_dims = NIL,
-                 /*of expressions*/the_offsets = NIL;
-            effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
-
-            entity eto;
-            if(val == HASH_UNDEFINED_VALUE) {
-
-              /* initialized with NULL value */
-              expression init = int_to_expression(0);
-
-              /* Replace the reference to the array re to *eto: */
-              type re_type = ultimate_array_type(entity_type(re));
-              basic re_basic = basic_undefined;
-              pips_assert("the type of the considered effect is expected to be variable",
-                          type_variable_p(re_type));
-              re_basic = variable_basic(type_variable(re_type));
-              // MA: quick hack because of pointers, all of that seems dirty anyway :(
-              if(basic_pointer_p(re_basic)) {
-                type pointed = basic_pointer(re_basic);
-                pips_assert("type variable expected", type_variable_p(pointed));
-                re_basic = variable_basic(type_variable(pointed));
-              }
-              entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(re_basic),the_dims);
-              entity declaring_module =
-                get_current_module_entity();
-              // PIER Here we need to add a P4A variable prefix to the name to help
-              // p4a postprocessing
-              string str = strdup (concatenate (prefix,entity_user_name(re), suffix, NULL));
-              eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
-              free (str);
-              AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
-              isolate_patch_entities(stat,re,eto,the_offsets);
-
-              val=malloc(sizeof(*val));
-              val->new_ent=eto;
-              val->s=s;
-              hash_put(e2e,re,val);
+    /* merge copy in and copy out for allocation
+     * this is entity-based, we could do a better job if we were reference-based 
+     */
+    if (dma_allocate_p(s) || dma_deallocate_p(s)) {
+        list out = NIL;
+        set visited_entities = set_make(set_pointer);
+        FOREACH(EFFECT,self,rw_effects) {
+            entity svar = reference_variable(region_any_reference(self));
+            if(!set_belong_p(visited_entities,svar)) {
+                set_add_element(visited_entities, visited_entities, svar);
+                FOREACH(EFFECT,other, rw_effects) {
+                    if(self!=other) {
+                        entity ovar = reference_variable(region_any_reference(other));
+                        if(same_entity_p(svar,ovar)) {
+                            effect etmp = regions_must_convex_hull(self,other);
+                            if(region_write_p(other))
+                                region_action(etmp) = copy_action(region_action(other));
+                            //free_effect(self);
+                            self=etmp;
+                        }
+                    }
+                }
+                out=CONS(EFFECT,self,out);
             }
-            else {
-                eto = val->new_ent;
-                val->s=s;/*to avoid duplicate*/
+        }
+        set_free(visited_entities);
+        gen_free_list(rw_effects);
+        rw_effects=gen_nreverse(out);
+    }
+    /* merge regions with same prefix but different suffixes (in presence of fields ...) */
+    if (dma_load_p(s) || dma_store_p(s) || dma_allocate_p(s) ) {
+        list out = NIL;
+        set r_visited_entities = set_make(set_pointer);
+        set w_visited_entities = set_make(set_pointer);
+        FOREACH(EFFECT,self, rw_effects) {
+            entity svar = reference_variable(region_any_reference(self));
+            enum action_utype sa = action_tag(region_action(self));
+            set this = is_action_read ==sa ? r_visited_entities : w_visited_entities;
+            if(!set_belong_p(this ,svar)) {
+                set_add_element(this, this, svar);
+                FOREACH(EFFECT,other,rw_effects) {
+                    if(self!=other) {
+                        entity ovar = reference_variable(region_any_reference(other));
+                        if(same_entity_p(svar,ovar) && (sa == action_tag(region_action(other))) ) {
+                            effect etmp = regions_must_convex_hull(self,other);
+                            //free_effect(self);
+                            self=etmp;
+                        }
+                    }
+                }
+                out=CONS(EFFECT,self,out);
             }
-            the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(re,eto,the_dims,the_offsets,s)));
-            statements=CONS(STATEMENT,the_dma,statements);
+        }
+        set_free(r_visited_entities);
+        set_free(w_visited_entities);
+        gen_free_list(rw_effects);
+        rw_effects=gen_nreverse(out);
+    }
+
+    /* SG: to do: merge convex hulls when they refer to *all* fields of a region
+     * to do this, according to BC, I should iterate over all regions,
+     * detect fields and then iterate again over regions to find combinable regions
+     * that way I would not generate needless read effects when all fields are accessed using the same pattern
+     *
+     * some more dev I am not willing to do right now :)
+     */
+
+
+    list effects = NIL;
+
+    /* filter out relevant effects depending on operation mode */
+    FOREACH(EFFECT,e,rw_effects) {
+        if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
+                && action_read_p(effect_action(e)))
+            effects=CONS(EFFECT,e,effects);
+        else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
+                && action_write_p(effect_action(e)))
+            effects=CONS(EFFECT,e,effects);
+    }
+    effects=gen_nreverse(effects);
+
+
+    /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
+    */
+    if(!fine_grain_analysis) {
+        FOREACH(EFFECT,eff,rw_effects) {
+            if(entity_pointer_p(reference_variable(region_any_reference(eff)))
+                    && ! std_file_effect_p(eff)) {
+                print_effect(eff);
+                pips_user_error("pointers wreak havoc with isolate_statement\n");
+            }
+            descriptor d = effect_descriptor(eff);
+            if(descriptor_convex_p(d)) {
+                Psysteme sc_old = descriptor_convex(d);
+                Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
+                sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
+                sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
+                sc_old=sc_normalize2(sc_old);
+                sc_new=sc_normalize2(sc_new);
+                if(!sc_equal_p(sc_old,sc_new)) {
+                    sc_free(sc_old);
+                    descriptor_convex(d)=sc_new;
+                    effect_approximation_tag(eff)=is_approximation_may;
+                }
+            }
         }
     }
-  }
-  gen_free_list(effects);
-  gen_full_free_list(rw_effects);
-  if (statements == NIL)
-    return statement_undefined;
-  else
-    return make_block_statement(statements);
+
+    /* handle the may approximations here: if the approximation is may,
+     * we have to load the data, otherwise the store may store
+     * irrelevant data
+     */
+    if (dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s)) {
+        /* first step is to check for may-write effects */
+        list may_write_effects = NIL;
+        FOREACH(EFFECT,e,rw_effects) {
+            if(approximation_may_p(effect_approximation(e)) &&
+                    action_write_p(effect_action(e)) ) {
+                effect fake = copy_effect(e);
+                action_tag(effect_action(fake))=is_action_read;
+                may_write_effects=CONS(EFFECT,fake,may_write_effects);
+            }
+        }
+        may_write_effects=gen_nreverse(may_write_effects);
+        /* then we will merge these effects with those
+         * that were already gathered
+         * because we are manipulating lists, it is not very efficient
+         * but there should not be that many effects anyway
+         */
+        FOREACH(EFFECT,e_new,may_write_effects) {
+            bool merged = false; // if we failed to merge e_new in effects, we just add it to the list */
+            for(list iter=effects;!ENDP(iter);POP(iter)){
+                effect * e_origin = (effect*)REFCAR(iter); // get a reference to change it in place if needed
+                if(same_entity_p(
+                            effect_any_entity(*e_origin),
+                            effect_any_entity(e_new))) {
+                    merged=true;
+                    region tmp = regions_must_convex_hull(*e_origin,e_new);
+                    // there should be a free there, but it fails
+                    *e_origin=tmp;
+                }
+            }
+            /* no data was copy-in, add this effect */
+            if(!merged) {
+                effects=CONS(EFFECT,copy_effect(e_new),effects);
+            }
+        }
+        gen_full_free_list(may_write_effects);
+        effects=gen_nreverse(effects);
+    }
+
+
+
+    /* builds out transfer from gathered effects */
+    list statements = NIL;
+    FOREACH(EFFECT,eff,effects) {
+        statement the_dma = statement_undefined;
+        reference r = effect_any_reference(eff);
+        entity re = reference_variable(r);
+
+        if(entity_abstract_location_p(re)) {
+            pips_user_error("We can't handle abstract locations here. Please try to "
+                    "avoid using pointer or activate some pointer analyzes.\n");
+        }
+
+
+        struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
+
+        if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
+            if( !io_effect_p(eff) && !std_file_effect_p(eff) &&
+                    (!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR"))
+              ) {
+                list /*of dimensions*/ the_dims = NIL,
+                     /*of expressions*/the_offsets = NIL;
+                effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
+
+                entity eto;
+                if(val == HASH_UNDEFINED_VALUE) {
+
+                    /* initialized with NULL value */
+                    expression init = int_to_expression(0);
+
+                    /* Replace the reference to the array re to *eto: */
+                    type re_type = ultimate_array_type(entity_type(re));
+                    basic re_basic = basic_undefined;
+                    pips_assert("the type of the considered effect is expected to be variable",
+                            type_variable_p(re_type));
+                    re_basic = variable_basic(type_variable(re_type));
+                    if(basic_pointer_p(re_basic)) {
+                        type pointed_type = basic_pointer(re_basic);
+                        re_basic = variable_basic(type_variable(pointed_type));
+                    }
+                    entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(re_basic),the_dims);
+                    entity declaring_module =
+                        get_current_module_entity();
+                    // PIER Here we need to add a P4A variable prefix to the name to help
+                    // p4a postprocessing
+                    string str = strdup (concatenate (prefix,entity_user_name(re), suffix, NULL));
+                    eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
+                    free (str);
+                    AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
+                    isolate_patch_entities(stat,re,eto,the_offsets);
+
+                    val=malloc(sizeof(*val));
+                    val->new_ent=eto;
+                    val->s=s;
+                    hash_put(e2e,re,val);
+                }
+                else {
+                    eto = val->new_ent;
+                    val->s=s;/*to avoid duplicate*/
+                }
+                the_dma = instruction_to_statement(make_instruction_call(dimensions_to_dma(eff,eto,the_dims,the_offsets,s)));
+                statements=CONS(STATEMENT,the_dma,statements);
+            }
+        }
+    }
+    gen_free_list(effects);
+    gen_full_free_list(rw_effects);
+    if (statements == NIL)
+        return statement_undefined;
+    else
+        return make_block_statement(statements);
 }
 
 typedef struct {
@@ -707,8 +861,8 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
                                         must?make_approximation_exact():make_approximation_may(), sc);
                                 /* add it to current region */
                                 region nreg = regions_must_convex_hull(*reg,copy);
-                                free_effect(*reg);
-                                free_effect(copy);
+                                //free_effect(*reg);
+                                //free_effect(copy);
                                 *reg=nreg;
                             }
                             else pips_internal_error("This case should have been filtered out by `do_check_isolate_statement_preconditions_on_call'");
@@ -722,7 +876,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
          * the assumption is that reading a pointer is not that important and most certainly comes from passing a pointer as parameter to a function
          * if the pointer itself is not written, it should be ok.
          * Well this indeed very optimistic ...
-        */
+         */
         list rdup = gen_copy_seq(regions);
         FOREACH(REGION,r,rdup) {
             if(region_read_p(r) ) {
@@ -733,6 +887,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
                 }
             }
         }
+        update_cumulated_rw_effects_list(s,regions);
         gen_free_list(rdup);
         gen_free_list(p.regions_to_extend);
     }
@@ -756,13 +911,13 @@ void do_isolate_statement(statement s, const char* prefix, const char* suffix) {
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
     allocates = effects_to_dma(s,dma_allocate,e2e,&condition,
-			       fine_grain_analysis,prefix,suffix);
+            fine_grain_analysis,prefix,suffix);
     loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis,prefix,
-			   suffix);
+            suffix);
     stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis,prefix,
-			    suffix);
+            suffix);
     deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL,fine_grain_analysis,
-				 prefix,suffix);
+            prefix,suffix);
     HASH_MAP(k,v,free(v),e2e);
     hash_table_free(e2e);
 
@@ -838,20 +993,20 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         }
         /* build up the replacement */
         syntax syn = 
-          make_syntax_call(
-              make_call(
-                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                CONS(EXPRESSION,entity_to_expression(p->new),NIL)
-                )
-              );
+            make_syntax_call(
+                    make_call(
+                        entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                        CONS(EXPRESSION,entity_to_expression(p->new),NIL)
+                        )
+                    );
 
         /* it is illegal to create a subscript without indices
          * quoting RK, at the airport back from SC 2010 */
         syntax snew = ENDP(indices) ?
-          syn:
-          make_syntax_subscript(
-              make_subscript(syntax_to_expression(syn),indices)
-              );
+            syn:
+            make_syntax_subscript(
+                    make_subscript(syntax_to_expression(syn),indices)
+                    );
         expression parent = (expression)gen_get_ancestor(expression_domain,r);
         expression_syntax(parent)=syntax_undefined;
         update_expression_syntax(parent,snew);
@@ -947,14 +1102,16 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
                 /* this is a constant : the dimension is 1 and the offset is the bound */
                 if(bounds_equal_p(phi,lower,upper))
                 {
+#if 1
                     expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-		    if (fortran_p) {
-		      // in fortran remove -1 to the bound since index 1 is
-		      // offset 0
-		      bound = add_integer_to_expression (bound, -1);
-		    }
+                    if (fortran_p) {
+                        // in fortran remove -1 to the bound since index 1 is
+                        // offset 0
+                        bound = add_integer_to_expression (bound, -1);
+                    }
                     *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
                     *offsets=CONS(EXPRESSION,bound,*offsets);
+#endif
                 }
                 /* this is a range : the dimension is eupper-elower +1 and the offset is elower */
                 else
@@ -965,11 +1122,11 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
                     simplify_minmax_expression(elower,tr);
                     simplify_minmax_expression(eupper,tr);
                     expression offset = copy_expression(elower);
-		    if (fortran_p) {
-		      // in fortran remove -1 to the offset since index 1 is
-		      // offset 0
-		      offset = add_integer_to_expression (offset, -1);
-		    }
+                    if (fortran_p) {
+                        // in fortran remove -1 to the offset since index 1 is
+                        // offset 0
+                        offset = add_integer_to_expression (offset, -1);
+                    }
 
                     bool compute_upperbound_p = 
                         !exact && (expression_minmax_p(elower)||expression_minmax_p(eupper));
@@ -1021,12 +1178,16 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
         }
         /* index is a field ... */
         else { /* and the last field, store it as an extra dimension */
+#if 0
             *dims=CONS(DIMENSION,
                     make_dimension(
                         int_to_expression(0),
                         int_to_expression(0)
                         ),*dims);
             *offsets=CONS(EXPRESSION,copy_expression(index),*offsets);
+#else
+            break;
+#endif
         }
     }
     *dims=gen_nreverse(*dims);
@@ -1084,13 +1245,15 @@ isolate_statement(const char* module_name)
     /* and proceed */
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
-    else {
-      const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
-      const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
-      pips_debug (5, "isolate_statement prefix : %s\n", prefix);
-      pips_debug (5, "isolate_statement suffix : %s\n", suffix);
-      do_isolate_statement(statement_to_isolate, prefix, suffix);
+    else
+    {
+        const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
+        const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
+        pips_debug (5, "isolate_statement prefix : %s\n", prefix);
+        pips_debug (5, "isolate_statement suffix : %s\n", suffix);
+        do_isolate_statement(statement_to_isolate, prefix, suffix);
     }
+
 
 
     /* validate */

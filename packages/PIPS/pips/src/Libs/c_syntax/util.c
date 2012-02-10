@@ -916,7 +916,7 @@ bool CheckExternList()
     return true;
 }
 
-void put_new_typedef(string name)
+void put_new_typedef(const char* name)
 {
   hash_put(keyword_typedef_table,strdup(name),(void *) TK_NAMED_TYPE);
   pips_debug(5,"Add typedef name %s to hash table\n",name);

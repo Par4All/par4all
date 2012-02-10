@@ -75,7 +75,7 @@ bool cast_at_call_sites(const char *mod_name) {
       }
 
 
-      *arg = make_expression(make_syntax_cast(make_cast(type_in_func_prototype,
+      *arg = make_expression(make_syntax_cast(make_cast(copy_type(type_in_func_prototype),
                                                         *arg)),
                              normalized_undefined);
       POP(args);

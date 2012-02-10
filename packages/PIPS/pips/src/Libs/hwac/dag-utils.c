@@ -250,6 +250,7 @@ dagvtx_dot_node_sb(string_buffer sb, const string prefix, const dagvtx v)
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 {
+  // collect prettyprint properties
   bool label_nodes = get_bool_property("FREIA_DAG_LABEL_NODES");
   bool show_arcs = get_bool_property("FREIA_DAG_LABEL_ARCS");
   bool filter_nodes = get_bool_property("FREIA_DAG_FILTER_NODES");
@@ -259,7 +260,17 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   if (vtxcontent_out(co)!=entity_undefined)
     vname = entity_dot_name(vtxcontent_out(co));
 
-  if (dagvtx_number(vtx)!=0)
+  if (dagvtx_number(vtx)==0)
+  {
+    // this is an input image, only image dependencies
+    FOREACH(dagvtx, succ, dagvtx_succs(vtx))
+    {
+      fprintf(out, "  \"%s\"", vname);
+      dagvtx_dot_node(out, " -> ", succ);
+      fprintf(out, ";\n");
+    }
+  }
+  else
   {
     // we are dealing with a computation...
     string attribute = what_operation_shape(vtxcontent_optype(co));
@@ -280,11 +291,24 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
     FOREACH(dagvtx, v, dag_vertices(d))
     {
       list vars = NIL;
-      if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
-                                        dagvtx_statement(v), &vars))
+      if (// another vertex
+          vtx!=v &&
+          // with dependencies
+          freia_scalar_rw_dep(dagvtx_statement(vtx),
+                              dagvtx_statement(v), &vars))
       {
-        dagvtx_dot_node_sb(sa, "  ", vtx);
-        dagvtx_dot_node_sb(sa, " -> ", v);
+        // show scalar dep in sequence order
+        if (dagvtx_number(v)>dagvtx_number(vtx))
+        {
+          dagvtx_dot_node_sb(sa, "  ", vtx);
+          dagvtx_dot_node_sb(sa, " -> ", v);
+        }
+        else
+        {
+          dagvtx_dot_node_sb(sa, "  ", v);
+          dagvtx_dot_node_sb(sa, " -> ", vtx);
+        }
+
         sb_cat(sa, " [" SCL_DEP);
 
         if (vars && show_arcs)
@@ -319,16 +343,6 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 
     // cleanup
     string_buffer_free(&sa);
-  }
-  else
-  {
-    // this is an input image.
-    FOREACH(dagvtx, succ, dagvtx_succs(vtx))
-    {
-      fprintf(out, "  \"%s\"", vname);
-      dagvtx_dot_node(out, " -> ", succ);
-      fprintf(out, ";\n");
-    }
   }
 }
 
@@ -2160,8 +2174,14 @@ static bool any_scalar_dep(dagvtx v, set vs)
       break;
     }
   }
-  pips_debug(8, "scalar rw dep on %d: %s\n",
-             (int) dagvtx_number(v), bool_to_string(dep));
+
+  ifdebug(8) {
+    string svs = set_to_string("vs", vs, (gen_string_func_t) dagvtx_number_str);
+    pips_debug(8, "scalar rw dep on %d for (%s): %s\n",
+             (int) dagvtx_number(v), svs, bool_to_string(dep));
+    free(svs);
+  }
+
   return dep;
 }
 
@@ -2205,9 +2225,11 @@ list /* of dagvtx */ dag_computable_vertices
 {
   list computable = NIL;
   set local_currents = set_make(set_pointer);
+  set not_computed = set_make(set_pointer);
+  set not_computed_before = set_make(set_pointer);
+
   set_assign(local_currents, currents);
 
-  set not_computed = set_make(set_pointer);
   FOREACH(dagvtx, v, dag_vertices(d))
     if (!set_belong_p(computed, v))
       set_add_element(not_computed, not_computed, v);
@@ -2239,10 +2261,19 @@ list /* of dagvtx */ dag_computable_vertices
       pips_debug(8, "%d predecessors to %" _intFMT "\n",
                  (int) gen_length(preds), dagvtx_number(v));
 
+      // build subset of "not computed" which should occur before v
+      // from the initial sequence point of view
+      set_clear(not_computed_before);
+      SET_FOREACH(dagvtx, vnc, not_computed)
+      {
+        if (dagvtx_number(vnc)<dagvtx_number(v))
+          set_add_element(not_computed_before, not_computed_before, vnc);
+      }
+
       if(// no scalar dependencies in the current pipeline
         !any_scalar_dep(v, local_currents) &&
-        // or in the future!
-        !any_scalar_dep(v, not_computed) &&
+        // or in the future of the graph
+        !any_scalar_dep(v, not_computed_before) &&
         // and image dependencies are fulfilled.
         list_in_set_p(preds, maybe))
       {
@@ -2263,6 +2294,7 @@ list /* of dagvtx */ dag_computable_vertices
   // cleanup
   set_free(local_currents);
   set_free(not_computed);
+  set_free(not_computed_before);
   gen_free_list(lv);
   return computable;
 }

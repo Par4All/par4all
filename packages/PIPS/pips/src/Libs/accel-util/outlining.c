@@ -689,6 +689,7 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
                     outline_module_name,
                     entity_user_name(e)
                     );
+            entity_initial(dummy_entity)=make_value_unknown();
 
             if(entity_symbolic_p(e))
                 entity_type(dummy_entity) = fortran_module_p(new_fun)?
@@ -756,84 +757,84 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
 void outliner_patch_parameters(list statements_to_outline, list referenced_entities, list effective_parameters, list formal_parameters,
 			       statement new_body, statement begin, statement end)
 {
-  list iter  = effective_parameters;
-  list riter = referenced_entities;
+    list iter  = effective_parameters;
+    list riter = referenced_entities;
 
-        FOREACH(PARAMETER,p,formal_parameters)
-        {
-            expression x = EXPRESSION(CAR(iter));
-            entity re = ENTITY(CAR(riter));
-            entity ex = entity_undefined;
-            if(expression_reference_p(x))
-                ex = reference_variable(expression_reference(x));
+    FOREACH(PARAMETER,p,formal_parameters)
+    {
+        expression x = EXPRESSION(CAR(iter));
+        entity re = ENTITY(CAR(riter));
+        entity ex = entity_undefined;
+        if(expression_reference_p(x))
+            ex = reference_variable(expression_reference(x));
 
-            entity e = dummy_identifier(parameter_dummy(p));
-            if(!entity_undefined_p(ex)&& type_variable_p(entity_type(ex)) ) {
-                variable v = type_variable(entity_type(ex));
-                bool entity_written=false;
-                FOREACH(STATEMENT,stmt,statements_to_outline) {
-                  bool write_p = find_write_effect_on_entity(stmt,ex);
-                  ifdebug(5) {
+        entity e = dummy_identifier(parameter_dummy(p));
+        if(!entity_undefined_p(ex)&& type_variable_p(entity_type(ex)) ) {
+            variable v = type_variable(entity_type(ex));
+            bool entity_written=false;
+            FOREACH(STATEMENT,stmt,statements_to_outline) {
+                bool write_p = find_write_effect_on_entity(stmt,ex);
+                ifdebug(5) {
                     if(write_p) {
-                      pips_debug(0,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
-                      print_statement(stmt);
+                        pips_debug(0,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
+                        print_statement(stmt);
                     }
-                  }
-                  entity_written|=write_p;
                 }
-
-                if( (!basic_pointer_p(variable_basic(v))) &&
-                        ENDP(variable_dimensions(v)) &&
-                        entity_written
-                  )
-                {
-                    entity fp = make_entity_copy_with_new_name(e,entity_name(e),false);
-                    variable_dimensions(type_variable(entity_type(fp)))=
-                        gen_append(variable_dimensions(type_variable(entity_type(fp))),
-                        CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),NIL)
-                        );
-
-                    parameter_type(p)=copy_type(entity_type(fp));
-                    dummy_identifier(parameter_dummy(p))=fp;
-
-                  //Change at call site (scalar=>&scalar)
-                    syntax s = expression_syntax(x); // FIXME Leak ?
-                    expression X = make_expression(s,normalized_undefined);
-                    expression_syntax(x)=make_syntax_call(make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
-
-
-                  //Create prelude && postlude
-                    expression dereferenced = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(fp));
-
-                    // FIXME : is it ok to alias dereferenced expression in 2 statements ?
-                    statement in = make_assign_statement(entity_to_expression(e),dereferenced);
-                    statement out = make_assign_statement(dereferenced,entity_to_expression(e));
-
-                    // Cheat on effects
-                    store_cumulated_rw_effects_list(in,NIL);
-                    store_cumulated_rw_effects_list(out,NIL);
-
-
-                    insert_statement(begin,in,true);
-                    insert_statement(end,out,false);
-
-                    pips_debug(4,"Add declaration for %s",entity_name(e));
-                    add_declaration_statement(new_body,e);
-
-                }
+                entity_written|=write_p;
             }
-            if(type_variable_p(entity_type(re))) {
-                variable v = type_variable(entity_type(re));
-                if( basic_pointer_p(variable_basic(v)) &&
-                        array_type_p(basic_pointer(variable_basic(v)))) {
-                    convert_pointer_to_array(e,re,x,statements_to_outline);
 
-                }
+            if( (!basic_pointer_p(variable_basic(v))) &&
+                    ENDP(variable_dimensions(v)) &&
+                    entity_written
+              )
+            {
+                entity fp = make_entity_copy_with_new_name(e,entity_name(e),false);
+                variable_dimensions(type_variable(entity_type(fp)))=
+                    gen_append(variable_dimensions(type_variable(entity_type(fp))),
+                            CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),NIL)
+                            );
+
+                parameter_type(p)=copy_type(entity_type(fp));
+                dummy_identifier(parameter_dummy(p))=fp;
+
+                //Change at call site (scalar=>&scalar)
+                syntax s = expression_syntax(x); // FIXME Leak ?
+                expression X = make_expression(s,normalized_undefined);
+                expression_syntax(x)=make_syntax_call(make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
+
+
+                //Create prelude && postlude
+                expression dereferenced = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(fp));
+
+                // FIXME : is it ok to alias dereferenced expression in 2 statements ?
+                statement in = make_assign_statement(entity_to_expression(e),dereferenced);
+                statement out = make_assign_statement(dereferenced,entity_to_expression(e));
+
+                // Cheat on effects
+                store_cumulated_rw_effects_list(in,NIL);
+                store_cumulated_rw_effects_list(out,NIL);
+
+
+                insert_statement(begin,in,true);
+                insert_statement(end,out,false);
+
+                pips_debug(4,"Add declaration for %s",entity_name(e));
+                add_declaration_statement(new_body,e);
+
             }
-            POP(iter);
-            POP(riter);
         }
-        pips_assert("no effective parameter left", ENDP(iter));
+        if(type_variable_p(entity_type(re))) {
+            variable v = type_variable(entity_type(re));
+            if( basic_pointer_p(variable_basic(v)) &&
+                    array_type_p(basic_pointer(variable_basic(v)))) {
+                convert_pointer_to_array(e,re,x,statements_to_outline);
+
+            }
+        }
+        POP(iter);
+        POP(riter);
+    }
+    pips_assert("no effective parameter left", ENDP(iter));
 }
 
 static void do_remove_entity_from_private(loop l, entity e) {
@@ -855,19 +856,25 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
           gen_nconc(code_declarations(value_code(entity_initial(new_fun))),
                     CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
     }
-    /* either use origin's compilation unit or a new one */
-    char * cu_name = string_undefined;
     // In fortran we always want to generate the outline function
     // in its own new file
+    char * cun = string_undefined;
     if(fortran_module_p(get_current_module_entity())) {
       ;
     } else if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
       // Declare in current module so that it's not undefined at call site
       AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
-    } else {
-      cu_name = compilation_unit_of_module(get_current_module_name());
+      char * the_cu = NULL,*iter;
+      if((iter=strchr(outline_module_name,FILE_SEP))) {
+          the_cu = strndup(outline_module_name,iter-outline_module_name);
+      }
+      else the_cu = strdup(outline_module_name);
+      asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
+      free(the_cu);
+    } 
+    else {
+        cun = compilation_unit_of_module(get_current_module_name());
     }
-
     /* add a return at the end of the body, in all cases */
     insert_statement(*new_body, make_return_statement(new_fun), false);
 
@@ -876,7 +883,9 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
 
-    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
+
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()),cun);
+    if(!string_undefined_p(cun)) free(cun);
     free_text(t);
 
     set_bool_property(STAT_ORDER,saved);
@@ -933,6 +942,147 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
     return new_stmt;
 }
 
+static entity recursive_rename_types(entity e, const char * cun ) {
+    char * new_name;
+    asprintf(&new_name,"%s" MODULE_SEP_STRING "%s", cun, entity_local_name(e));
+    entity ne = gen_find_tabulated(new_name, entity_domain);
+    if(entity_undefined_p(ne))
+        ne = make_entity_copy_with_new_name(e, new_name, false);
+    free(new_name);
+    return ne;
+}
+
+static bool entity_not_undefined_nor_constant_nor_intrinsic_p(entity e) {
+    return !type_undefined_p(entity_type(e)) &&
+        entity_not_constant_or_intrinsic_p(e);
+}
+
+/* skipping anonymous enum ... */
+static bool anonymous_type_p(entity e) {
+    const char * eln = entity_local_name(e);
+    return strstr(eln, DUMMY_STRUCT_PREFIX) || strstr(eln, DUMMY_UNION_PREFIX);
+}
+
+static
+void outliner_independent_recursively(entity module, const char *cun, statement s) {
+    callees c = compute_callees(s);
+    entity cu = module_name_to_entity(cun);
+    /* first step : bring all typedefs and global declarations with you */
+    set re = get_referenced_entities_filtered(s,
+            (bool (*)(void*))gen_true, entity_not_undefined_nor_constant_nor_intrinsic_p);
+    // do not forget dependent types ...
+    set tmp = set_dup(re);
+    SET_FOREACH(entity, rer, tmp) {
+        list of_entities = type_supporting_types(entity_type(rer));
+        FOREACH(ENTITY,e,of_entities) {
+            if( entity_field_p(e) ) /* special hook for struct member : consider their structure instead of the field */
+                e=entity_field_to_entity_struct_or_union(e);
+            set_add_element(re, re, e);
+        }
+        gen_free_list(of_entities);
+    }
+    set_free(tmp);
+    list lre = set_to_list(re);
+    sort_entities_with_dep(&lre);
+    set_free(re);
+    /* SG : part of this code is duplicated from inlining */
+    if(c_module_p(get_current_module_entity())) {
+        FOREACH(ENTITY, e, lre) {
+            if(!entity_enum_member_p(e) && /* enum member cannot be added to declarations */
+                    !entity_formal_p(e) ) /* formal parameters are not considered */
+            {
+                if(!has_entity_with_same_name(e,entity_declarations(module)) &&
+                        !has_entity_with_same_name(e,entity_declarations(cu) ) )
+                {
+                    if(anonymous_type_p(e)) continue;
+                    if(top_level_entity_p(e)) {
+                        if(get_bool_property("OUTLINE_ALLOW_GLOBALS")) {
+                            AddEntityToCompilationUnit(e, cu );
+                            gen_append(code_externs(entity_code(cu)),CONS(ENTITY,e,NIL));
+                        }
+                    }
+                    else if(variable_static_p(e))
+                        pips_internal_error("unhandled case : outlining a static variable\n");
+                    else if(typedef_entity_p(e)) {
+    #if 0
+                        basic b = variable_basic(
+                                type_variable(
+                                    entity_type(
+                                        e
+                                        )
+                                    )
+                                );
+                        if(basic_derived_p(b)) {
+                            entity *et = &basic_derived(b);
+                            *et = recursive_rename_types(*et,cun);
+                            if(!anonymous_type_p(*et))
+                                AddEntityToCompilationUnit(*et, cu );
+                        }
+    #endif
+                        e=recursive_rename_types(e,cun);
+                        AddEntityToCompilationUnit(e, cu );
+                    }
+                }
+            }
+        }
+    }
+    gen_free_list(lre);
+
+    /* second step : bring all callers with you */
+    FOREACH(STRING, module_name, callees_callees(c)) {
+        char* new_name;
+        entity old_fun = module_name_to_entity(module_name);
+        asprintf(&new_name, "%s" MODULE_SEP_STRING"%s%s", cun, cun, entity_user_name(old_fun) );
+        entity new_fun = make_entity(new_name,
+                copy_type(entity_type(old_fun)),
+                copy_storage(entity_storage(old_fun)),
+                copy_value(entity_initial(old_fun))
+                );
+
+        statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+
+        bool saved = get_bool_property(STAT_ORDER);
+        set_bool_property(STAT_ORDER,false);
+        text t = text_named_module(new_fun, new_fun , body);
+
+        add_new_module_from_text(entity_local_name(new_fun), t, language_fortran_p(module_language(get_current_module_entity())), cun);
+
+        /* horrible hack to prevent declaration duplication
+         * signed : Serge Guelton
+         */
+        gen_free_list(code_declarations(EntityCode(new_fun)));
+        code_declarations(EntityCode(new_fun))=NIL;
+
+        set_bool_property(STAT_ORDER,saved);
+        outliner_independent_recursively(old_fun, cun, body);
+    }
+    free_callees(c);
+}
+/** 
+ * redeclare all callees of outlined function in the same compilation unit
+ */
+static
+void outliner_independent(const char * module_name, statement body) {
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+        string cun;
+        if(fortran_module_p(get_current_module_entity()))
+            cun = strdup("");
+        else {
+            char * the_cu = NULL,*iter;
+            if((iter=strchr(module_name,FILE_SEP))) {
+                the_cu = strndup(module_name,iter-module_name);
+            }
+            else the_cu = strdup(module_name);
+            asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
+            free(the_cu);
+            if(entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun)))
+                (void)MakeCompilationUnitEntity(cun);
+        }
+        outliner_independent_recursively(module_name_to_entity(module_name), cun, body);
+        free(cun);
+    }
+}
+
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -974,7 +1124,10 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
       outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
 
     /* 5 : file */
-    outliner_file(new_fun, formal_parameters, &new_body);
+    outliner_file(new_fun, formal_parameters, &new_body );
+
+    /* 5 bis : add all callees to the same foreign compilation units */
+    outliner_independent(outline_module_name, new_body);
 
     /* 6 : call */
     statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);

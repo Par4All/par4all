@@ -256,7 +256,7 @@ list make_unbounded_subscripts(int d)
    See also MakeCurrentFunction(), which is part of the Fortran
    parser.
  */
-static entity make_empty_module(const char* full_name,
+entity make_empty_module(const char* full_name,
 				type r, language l)
 {
   const char* name;
@@ -2552,6 +2552,26 @@ entity generic_make_entity_copy_with_new_name(entity e,
     ram_offset(r) = offset;
 
     AddEntityToDeclarations(ne, m);
+  }
+  /* manage field renaming */
+  type et = ultimate_type(entity_type(ne));
+  if(type_variable_p(et)) {
+      basic b = variable_basic(type_variable(et));
+      if(basic_derived_p(b)) {
+          entity derived = basic_derived(b);
+          type derived_type = entity_type(derived);
+          if(type_struct_p(derived_type) || type_union_p(derived_type)) {
+              const char sep = type_struct_p(derived_type) ? STRUCT_PREFIX_CHAR : UNION_PREFIX_CHAR;
+              list of_entities = type_struct(derived_type);
+              for(list iter = of_entities; !ENDP(iter); POP(iter)) {
+                  entity *field = (entity*)REFCAR(iter);
+                  char *new_field_name;
+                  asprintf(&new_field_name,"%s" MODULE_SEP_STRING "%s%s", entity_module_name(ne) , 1+strchr(entity_name(derived), sep), strchr(entity_name(*field), MEMBER_SEP_CHAR));
+                  *field = make_entity_copy_with_new_name(*field,new_field_name,move_initialization_p);
+                  free(new_field_name);
+              }
+          }
+      }
   }
   return ne;
 }

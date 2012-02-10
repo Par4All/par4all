@@ -7,10 +7,9 @@ var directory,
     functions = '',
     nb_files = 1,
     multiple = false,
-    
     options = {
 	zoomHeight: 400,
-	zoomWIDTH: 400
+	zoomWidth: 400
     };
 
 
@@ -50,10 +49,7 @@ function add_choose_function_notification() {
 }
 
 function switch_enable(sel, value) {
-    if (value)
-	$(sel).removeClass("disabled");
-    else
-	$(sel).addClass("disabled");	
+    $(sel).attr('disabled', !value);
 }
 
 function switch_buttons() {
@@ -70,6 +66,11 @@ function switch_adv_mode() {
 	$('#adv-form').hide();
 	$('#basic-button').button('toggle');
     }
+    $('#adv-button').attr('disabled', advanced);
+    $('#basic-button').attr('disabled', !advanced);
+    performed = false;
+    graph_created = false;
+    switch_buttons();
 }
 
 function deactivate_graph_buttons() {
@@ -78,11 +79,6 @@ function deactivate_graph_buttons() {
 
 function activate_graph_buttons() {
     //console.debug('ACTIVATING');
-}
-
-function clear_result_tab() {
-    switch_buttons();
-    $('#resultcode').html('');
 }
 
 function clear_graph_tab() {
@@ -114,7 +110,6 @@ function clear_multiple() {
 function load_files(files) {
 
     clear_multiple();
-    clear_result_tab();
 
     nb_files = files.length;
 
@@ -141,7 +136,6 @@ function load_files(files) {
     created_graph = false;
     switch_buttons();
 }
-
 
 function load_example(name) {
 
@@ -315,6 +309,10 @@ function check_sources(index, panel_id) {
 *********************************************************************/
 
 function create_graph(index, panel_id) {
+
+    if (!loaded)
+	return;
+
     clear_graph_tab();
     if (check_sources(index, panel_id)) {
 	if (multiple) {
@@ -325,8 +323,8 @@ function create_graph(index, panel_id) {
 	} else {
 	    $.post(
 		routes['dependence_graph'], 
-		{ code:     $('#sourcecode-1').text(),
-                  language: $('#lang-1').html()
+		{ code: $('#sourcecode-1').text(),
+                  lang: $('#lang-1').html()
                 },
 		enable_dependence_graph
 	    );
@@ -459,18 +457,49 @@ function choose_function() {
     add_choose_function_notification();
 }
 
+function keyval(k, v) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(v);
+}
+
+function get_form_values(sel) {
+    var out = [];
+
+    // INPUT fields
+    var fields = $(sel + " input");
+    for (var i=0; i < fields.length; i++) {
+	var f = fields[i];
+	if ((f.type == 'checkbox' && f.checked) || f.type == 'text' || f.type == 'hidden')
+	    out.push(keyval(f.name, f.value));
+    }
+    // SELECT fields
+    var fields = $(sel + " select");
+    for (var i=0; i < fields.length; i++) {
+	var f = fields[i];
+	out.push(keyval(f.name, f.value))
+    }
+
+    return out;
+}
 
 function perform_operation(index, panel_id) {
-    clear_result_tab();
+
+    if(!loaded)
+	return false;
+
+    // Advanced mode parameters
+    var params = advanced ? get_form_values('#adv-form') : [];
+
     if (check_sources(index, panel_id)) { // all files are ok
 	if (multiple) {
 	    choose_function();
 	} else {
 	    $.post(
 		routes['perform'],
-		{ code:      $('#sourcecode-'+index).text(),
-		  language:  $('#lang-'+index).html(),
-		  operation: operation
+		{ code   :  $('#sourcecode-'+index).text(),
+		  lang   :  $('#lang-'+index).html(),
+		  op     : operation,
+		  adv    : advanced,
+		  params : params,
 		},
 		function(data) {
 		    $("#resultcode").html(data);

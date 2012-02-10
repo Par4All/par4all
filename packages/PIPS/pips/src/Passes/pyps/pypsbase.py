@@ -574,7 +574,8 @@ class workspace(object):
             # force an update of the modification time, because previous 
             # operation might have caused rounded to the second and have broken
             # makefile dependences
-            os.utime(f,None)
+            (_,_,_,_,_,_,_,atime,ftime,_) = os.stat(f) #accuracy of os.utime is not enough, so make a trip in the future
+            os.utime(f,(atime+1,ftime+1))
             
         shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
         return sorted(saved),sorted(headers+[os.path.join(rep,"pipsdef.h")])

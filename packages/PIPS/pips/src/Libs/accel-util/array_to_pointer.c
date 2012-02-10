@@ -312,7 +312,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param, par
                 make_expression(
                     make_syntax_cast(
                       make_cast(
-                        type_in_func_prototype,
+                        copy_type(type_in_func_prototype),
                         *arg
                         )
                       ),
@@ -331,7 +331,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param, par
               make_expression(
                   make_syntax_cast(
                     make_cast(
-                      type_in_func_prototype,
+                      copy_type(type_in_func_prototype),
                       MakeUnaryCall(
                         entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
                         *arg
@@ -628,6 +628,9 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
   /* final step: fix expressions if we have disturbed typing in the process */
   do_linearize_patch_expressions(s,e2t);
   hash_table_free(e2t);
+  FOREACH(PARAMETER,p,module_functional_parameters(get_current_module_entity())) {
+    pips_assert("everything went well",parameter_consistent_p(p));
+  }
 }
 
 static void do_array_to_pointer_walk_expression(expression exp) {

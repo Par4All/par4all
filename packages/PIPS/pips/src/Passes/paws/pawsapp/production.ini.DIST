@@ -13,9 +13,7 @@ pyramid.includes = pyramid_debugtoolbar
 paws.cookie_secret = (SECRET)
 paws.authn_secret  = (SECRET)
 paws.validation    = %(here)s/../validation/Paws
-paws.tempdir       = %(here)s/files
-paws.publicdir     = %(here)s/pawsapp/static
-paws.resultdir     = %(here)s/pawsapp/static/res
+paws.tempdir       = %(here)s/data/tmp
 
 
 [server:main]

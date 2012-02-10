@@ -90,12 +90,52 @@ bool summary_rw_effects_engine(const char* module_name)
 
     set_rw_effects((*db_get_rw_effects_func)(module_name));
 
-    l_loc = load_rw_effects_list(module_stat);
-    ifdebug(2){
-	pips_debug(2, "local regions, before translation to global scope:\n");
-	(*effects_prettyprint_func)(l_loc);
+    if(empty_statement_p(module_stat)) {
+      if(get_bool_property("MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS")) {
+	l_loc = make_anywhere_read_write_memory_effects();
+      }
+      else if(get_bool_property("MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS")) {
+	// Generate all possible paths from the parameters
+	// with read and write actions
+	// I guess this does not work with varargs...
+	// This may not be sufficient when there are pointers
+	// In this case, we should use points_to
+	// dummy targets to generate effects from them
+	// but only for paths from formal arguments with pointer basic
+	// BC.
+	//entity m = get_current_module_entity();
+	//type m_utype = ultimate_type(entity_type(m));
+	list l_formals = module_formal_parameters(get_current_module_entity());
+	// Types of formal parameters, not the formal parameters themselves
+	//list l_formals = functional_parameters(type_functional(m_utype));
+
+	FOREACH(ENTITY, formal, l_formals)
+	  {
+	    type formal_t = entity_basic_concrete_type(formal);
+	    list l_tmp = NIL;
+
+	    if (!ENDP(variable_dimensions(type_variable(formal_t))))
+	      {
+		effect eff = (*reference_to_effect_func)(make_reference(formal,NIL), make_action_write_memory(), true);
+		l_tmp =  generic_effect_generate_all_accessible_paths_effects(eff, formal_t, 'x');
+		// free the dummy effect
+		(*effect_free_func)(eff);
+	      }
+	    l_loc = gen_nconc(l_tmp, l_loc);
+	  }
+      }
     }
 
+    // l_loc may still be equal to NIL even if module_stat is an empty statement
+    // and if the previously tested properties are true, because
+    // the module may have no formal argument at all. BC.
+    if(ENDP(l_loc) && !empty_statement_p(module_stat)) {
+      l_loc = load_rw_effects_list(module_stat);
+      ifdebug(2){
+	pips_debug(2, "local regions, before translation to global scope:\n");
+	(*effects_prettyprint_func)(l_loc);
+      }
+    }
 
     l_dec = summary_effects_from_declaration(module_name);
     ifdebug(8) {
@@ -111,7 +151,6 @@ bool summary_rw_effects_engine(const char* module_name)
 
     // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_any_reference(e)))) ,l_loc2);
     l_glob = (*effects_local_to_global_translation_op)(l_loc2);
-
 
     ifdebug(4)
       {
@@ -892,6 +931,7 @@ bool rw_effects_engine(const char * module_name)
     /* Get the code of the module. */
     set_current_module_statement( (statement)
 		      db_get_memory_resource(DBR_CODE, module_name, true));
+    statement ms = get_current_module_statement();
 
     set_current_module_entity(module_name_to_entity(module_name));
 
@@ -906,7 +946,7 @@ bool rw_effects_engine(const char * module_name)
 
    if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
-			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true) );
+			   db_get_memory_resource(DBR_POINTS_TO, module_name, true) );
     else if (get_pointer_info_kind() == with_pointer_values)
       set_pv( db_get_simple_pv(module_name));
 
@@ -914,7 +954,7 @@ bool rw_effects_engine(const char * module_name)
     debug_on("EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
-    rw_effects_of_module_statement(get_current_module_statement());
+    rw_effects_of_module_statement(ms);
 
     pips_debug(1, "end\n");
     debug_off();

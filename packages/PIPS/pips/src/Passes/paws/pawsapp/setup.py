@@ -12,6 +12,7 @@ requires = [
     'webhelpers',
     'pyro',
     'PIL',
+    'colander',
     ]
 
 setup(name='pawsapp',

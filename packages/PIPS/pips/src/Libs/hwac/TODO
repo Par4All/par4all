@@ -87,6 +87,7 @@
 + reuse of images in some cases when nodes are reordered... SSA?
 + wrong copy extraction order in vs_core_2, and copies not really removed
 - should turn = in image copies?
+- WW scalar dependencies may result in split that could be avoided
 
 * spoc target
 + check for not implemented functions, and skip them! convolution, other?
