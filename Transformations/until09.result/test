@@ -1,14 +1,12 @@
 ### initial code
 void until09()
 {
-   // BEGIN BLOCK
    int i = 1;
    do {
       i++;
    }
    while (i++<0);
    printf("%d", i);
-   // END BLOCK
 }
 ### Preconditions
 
@@ -16,10 +14,6 @@ void until09()
 
 void until09()
 {
-
-//  P() {}
-
-   // BEGIN BLOCK
 
 //  P() {}
 
@@ -38,18 +32,15 @@ void until09()
 //  P(i) {i==3}
 
    printf("%d", i);
-   // END BLOCK
 }
 ### suppress dead code
 void until09()
 {
-   // BEGIN BLOCK
    int i = 1;
    do {
       i++;
    }
    while (i++<0);
    printf("%d", i);
-   // END BLOCK
 }
 

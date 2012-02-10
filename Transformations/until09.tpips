@@ -2,8 +2,8 @@ delete until09
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
 
 create until09 until09.c
 

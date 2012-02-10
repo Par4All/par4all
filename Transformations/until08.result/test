@@ -1,22 +1,25 @@
 ### initial code
 void until08()
 {
-   // BEGIN BLOCK
    int i = 1;
    do {
       i++;
    }
    while (0);
    printf("%d", i);
-   // END BLOCK
+   do {
+      i++;
+   }
+   while (0);
+   printf("%d", i);
 }
 ### suppress dead code
 void until08()
 {
-   // BEGIN BLOCK
    int i = 1;
    i++;
    printf("%d", i);
-   // END BLOCK
+   i++;
+   printf("%d", i);
 }
 
