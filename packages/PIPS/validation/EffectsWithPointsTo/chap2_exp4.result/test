@@ -1,0 +1,192 @@
+
+PROPER  EFFECTS 
+
+char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+//             <    is read   >: nch ncl nrh nrl
+//             <    is written>: ncol nrow
+//             <    is referenced>: nch ncl ncol nrh nrl nrow
+//             <    is declared>: i ncol nrow
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+//             <    is declared>: m
+   char **m;
+//             <    is read   >: ncol nrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: m ncol nrow size_t
+   
+   /* allocate pointers to rows */
+   m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
+//             <    is read   >: nrh nrl
+//             <    is written>: i
+//             <    is referenced>: i nrh nrl
+   for(i = nrl+1; i <= nrh; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is referenced>: i m ncol nrh nrl
+      m[i] = m[i-1]+ncol;
+//             <    is read   >: m
+//             <    is referenced>: m
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+
+// Points To: none
+
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+
+// Points To: none
+
+   char **m;
+
+// Points To:
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   /* allocate pointers to rows */
+   m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
+
+// Points To:
+// m -> *HEAP*_l_11[0] , EXACT
+
+   for(i = nrl+1; i <= nrh; i += 1)
+
+// Points To:
+// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// m -> *HEAP*_l_11[0] , EXACT
+
+      m[i] = m[i-1]+ncol;
+
+// Points To:
+// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// m -> *HEAP*_l_11[0] , EXACT
+
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+//             <    is read   >: nch ncl nrh nrl
+//             <    is written>: ncol nrow
+//             <    is referenced>: nch ncl ncol nrh nrl nrow
+//             <    is declared>: i ncol nrow
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+//             <    is declared>: m
+   char **m;
+//             <    is read   >: ncol nrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: m ncol nrow size_t
+   
+   /* allocate pointers to rows */
+   m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
+//             <    is read   >: nrh nrl
+//             <    is written>: i
+//             <    is referenced>: i nrh nrl
+   for(i = nrl+1; i <= nrh; i += 1)
+//             <    is read   >: *HEAP*_l_11[i-1] i m ncol nrh nrl
+//             <    is written>: *HEAP*_l_11[i]
+//             <    is referenced>: i m ncol nrh nrl
+      m[i] = m[i-1]+ncol;
+//             <    is read   >: m
+//             <    is referenced>: m
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 11 with conflicts
+		from <nrow-W-EXACT> to <nrow-R-EXACT>
+		from <ncol-W-EXACT> to <ncol-R-EXACT>
+		from <nrow-WE-EXACT> to <nrow-RE-EXACT>
+		from <ncol-WE-EXACT> to <ncol-RE-EXACT>
+	07 --> 12 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 13 with conflicts
+		from <ncol-W-EXACT> to <ncol-R-EXACT>
+		from <ncol-WE-EXACT> to <ncol-RE-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 11 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+	08 --> 13 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+	08 --> 15 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+	11 --> 13 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	11 --> 15 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	13 --> 13 with conflicts
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i-1]-R-EXACT>
+		from <*HEAP*_l_11[i-1]-R-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Cumulated effects with points-to
+
+//             <    is read   >: nch ncl nrh nrl 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: nch ncl nrh nrl
+char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+//             <    is read   >: nch ncl nrh nrl
+//             <    is written>: ncol nrow
+//             <    is referenced>: nch ncl ncol nrh nrl nrow
+//             <    is declared>: i ncol nrow
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+//             <    is declared>: m
+   char **m;
+//             <    is read   >: ncol nrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: m ncol nrow size_t
+   
+   /* allocate pointers to rows */
+   m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
+//             <may be read   >: *HEAP*_l_11[*] i m ncol
+//             <may be written>: *HEAP*_l_11[*]
+//             <may be referenced>: m ncol
+//             <    is read   >: nrh nrl
+//             <    is written>: i
+//             <    is referenced>: i nrh nrl
+   for(i = nrl+1; i <= nrh; i += 1)
+//             <may be read   >: *HEAP*_l_11[*]
+//             <may be written>: *HEAP*_l_11[*]
+//             <    is read   >: i m ncol nrh nrl
+//             <    is referenced>: i m ncol nrh nrl
+      m[i] = m[i-1]+ncol;
+//             <    is read   >: m
+//             <    is referenced>: m
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+Parallel code
+
+char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+   char **m;
+   
+   /* allocate pointers to rows */
+   m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
+   for(i = nrl+1; i <= nrh; i += 1)
+      m[i] = m[i-1]+ncol;
+   /* return pointer to array of pointers to rows */
+   return m;
+}

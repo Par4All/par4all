@@ -1,1 +1,0 @@
-This example was used for a presentation at the <i>Analyze to Compile Compile to Analyze Workshop</i> held in Chamonix with CGO, April 3rd, 2011. The function of interest is compute. It is optimized by removing the inductive variable k and scalizing the array t.

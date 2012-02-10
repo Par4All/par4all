@@ -1,0 +1,122 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(l,t,u,v) {}
+
+   int u, l, t, v;
+
+//  T(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+
+   u = l = t = v = 0;
+
+//  T(l,t,u,v) {l#init==0, t#init==0, u#init==0, v#init==0, 0<=l,
+//    l<=t, l+u<=t+v, v<=l, u<=60, v<=u, 0<=v}
+
+   while (1) {
+
+//  T(v) {v==0}
+
+      v = 0;
+
+//  T(l,t,u,v) {l#init+v==l, t#init+u==t, v#init==0, t#init+v<=t,
+//    0<=u, u<=59, 0<=v}
+
+      for(u = 0; u <= 59; u += 1) {
+
+//  T(l,v) {l+v#init==l#init+v, 0<=u, u<=59, v#init<=v, v<=v#init+1}
+
+         if (v<=9&&alea())
+
+//  T(l,v) {l==l#init+1, v==v#init+1, 0<=u, u<=59, v<=10}
+
+            l++, v++;
+
+//  T(t) {t==t#init+1, 0<=u, u<=59}
+
+
+         t++;
+
+//  T() {0<=u, u<=59}
+
+         if (6*l<=t+50)
+
+//  T() {6l<=t+50, 0<=u, u<=59}
+
+            printf("property verified\n");
+      }
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int u, l, t, v;
+
+//  P(l,t,u,v) {}
+
+
+   u = l = t = v = 0;
+
+//  P(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+   while (1) {
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=60, v<=u, 0<=v}
+
+      v = 0;
+
+//  P(l,t,u,v) {v==0, 0<=l, l<=t, u<=t, 0<=u, u<=60}
+
+      for(u = 0; u <= 59; u += 1) {
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=t, 0<=u, u<=59, v<=u, 0<=v}
+
+         if (v<=9&&alea())
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=t, 0<=u, u<=59, v<=u, 0<=v, v<=9}
+
+            l++, v++;
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, 0<=u, u<=59, 50v<=49u+59, v<=u+1,
+//    0<=v}
+
+
+         t++;
+
+//  P(l,t,u,v) {l+u+1<=t+v, v<=l, 0<=u, u<=59, 50v<=49u+59, v<=u+1,
+//    0<=v}
+
+         if (6*l<=t+50)
+
+//  P(l,t,u,v) {6l<=t+50, l+u+1<=t+v, v<=l, 0<=u, u<=59, 50v<=49u+59,
+//    v<=u+1, 0<=v}
+
+            printf("property verified\n");
+      }
+   }
+}
+
+AFTER DEAD CODE ELIMINATION
+

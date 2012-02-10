@@ -83,8 +83,8 @@ int main()
 
 // Points To:
 // a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
 
    return 0;
 }

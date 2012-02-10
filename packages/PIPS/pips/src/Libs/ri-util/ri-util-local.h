@@ -378,9 +378,6 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
-/* GNU Extension*/
-#define SECOND_FUNCTION_NAME            "SECOND"
-
 /* F95 */
 #define ALLOCATE_FUNCTION_NAME          "ALLOCATE"
 #define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
@@ -605,6 +602,8 @@
 #define ISFINITE_OPERATOR_NAME             "isfinite"
 #define ISINF_OPERATOR_NAME                "isinf"
 #define ISNAN_OPERATOR_NAME                "isnan"
+#define ISNANL_OPERATOR_NAME               "isnanl"
+#define ISNANF_OPERATOR_NAME               "isnanf"
 #define ISNORMAL_OPERATOR_NAME             "isnormal"
 #define SIGNBIT_OPERATOR_NAME              "signbit"
 #define C_ACOS_OPERATOR_NAME               "acos"
@@ -1118,6 +1117,7 @@
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
 #define CLOCK_FUNCTION_NAME            "clock"
+#define SECOND_FUNCTION_NAME            "SECOND" //gfortran extension
 #define CLOCK_GETTIME_FUNCTION_NAME    "clock_gettime"
 #define GETTIMEOFDAY_FUNCTION_NAME    "gettimeofday"
 

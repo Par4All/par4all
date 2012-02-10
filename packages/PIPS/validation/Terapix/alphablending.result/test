@@ -299,9 +299,9 @@ void tile_l99996(int n, int I_0, int I_1, int src0[n][n], int src1[n][n])
    int i, j;
    {
       //PIPS generated variable
-      int (*src00)[128][256] = (int (*)[128][256]) 0, (*src10)[128][256] = (int (*)[128][256]) 0;
-      P4A_accel_malloc((void **) &src10, sizeof(int)*32768);
+      int (*src10)[128][256] = (int (*)[128][256]) 0, (*src00)[128][256] = (int (*)[128][256]) 0;
       P4A_accel_malloc((void **) &src00, sizeof(int)*32768);
+      P4A_accel_malloc((void **) &src10, sizeof(int)*32768);
       P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src1[0][0], *src10);
       P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
 
@@ -311,8 +311,8 @@ l99997:
          for(j = 256*I_1; j <= 256*I_1+255; j += 1)
             (*src00)[i-128*I_0][j-256*I_1] = 40*(*src00)[i-128*I_0][j-256*I_1]+60*(*src10)[i-128*I_0][j-256*I_1];
       P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
-      P4A_accel_free(src10);
       P4A_accel_free(src00);
+      P4A_accel_free(src10);
    }
 }
 **** check ok ******
@@ -323,16 +323,16 @@ void tile_l99996(int n, int I_0, int I_1, int src0[n][n], int src1[n][n])
    int i, j;
    {
       //PIPS generated variable
-      int (*src00)[128][256] = (int (*)[128][256]) 0, (*src10)[128][256] = (int (*)[128][256]) 0;
-      P4A_accel_malloc((void **) &src10, 32768*sizeof(int));
+      int (*src10)[128][256] = (int (*)[128][256]) 0, (*src00)[128][256] = (int (*)[128][256]) 0;
       P4A_accel_malloc((void **) &src00, 32768*sizeof(int));
+      P4A_accel_malloc((void **) &src10, 32768*sizeof(int));
       P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src1[0][0], *src10);
       P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
 
 l99996:      launcher_0(255+1, *src00, *src10);
       P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
-      P4A_accel_free(src10);
       P4A_accel_free(src00);
+      P4A_accel_free(src10);
    }
 }
 

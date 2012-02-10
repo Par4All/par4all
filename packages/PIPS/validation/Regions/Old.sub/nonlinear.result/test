@@ -5,7 +5,7 @@ C  <ITAB(PHI1)-W-MAY-{0<=PHI1, PHI1<=6}>
 
       DO I = 1, 12                                                      0003
 
-C  <ITAB(PHI1)-W-MAY-{I<=2PHI1+1, 2PHI1<=I, 1<=I, I<=12}>
+C  <ITAB(PHI1)-W-MAY-{2PHI1<=I, I<=2PHI1+1, 1<=I, I<=12}>
 
          ITAB(I/2) = 1000                                               0004
 C         ITAB(I/3 +1) = 1000

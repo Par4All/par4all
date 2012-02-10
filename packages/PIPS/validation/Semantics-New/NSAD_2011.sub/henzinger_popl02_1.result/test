@@ -174,11 +174,11 @@ void ts_restructured(void)
 
    if (x<y) goto L1;
 
-//  T() {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  T() {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
 L2:   ;
 
-//  T() {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  T() {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
    if (rand_b()) goto l99999;
 
@@ -503,15 +503,15 @@ void ts_restructured(void)
 
    if (x<y) goto L1;
 
-//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
 L2:   ;
 
-//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
    if (rand_b()) goto l99999;
 
-//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
    if (!(s==1&&x!=y))
 
@@ -537,7 +537,7 @@ L2:   ;
    goto L3;
 l99999:   ;
 
-//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, y<=x, 0<=y}
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, y<=x, 1<=x+y, 0<=y}
 
    if (!(s==1&&x!=y))
 

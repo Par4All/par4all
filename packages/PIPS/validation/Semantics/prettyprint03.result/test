@@ -1,0 +1,29 @@
+--- Preconditions for
+
+C  P() {}
+
+! Check constraint sort (bug spotted in Semantics/boolean07)
+
+      PROGRAM PRETTYPRINT03
+
+C  P() {}
+
+
+      IF (J.LE.I+1.AND.I.LE.J) THEN                                     0005
+
+C  P() {I<=J, J<=I+1}
+
+         J = 1                                                          0006
+      ENDIF
+
+C  P(J) {}
+
+
+      IF (I.LE.J.AND.J.LE.I+1) THEN                                     0009
+
+C  P(J) {I<=J, J<=I+1}
+
+         J = 2                                                          0010
+      ENDIF
+
+      END

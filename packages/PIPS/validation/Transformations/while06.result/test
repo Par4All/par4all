@@ -1,0 +1,82 @@
+### initial code
+void while06()
+{
+   int old, new;
+   while (old!=new) {
+      old = new;
+      foo(&new);
+   }
+
+   foo(&old);
+
+   while (old!=new) {
+      old = new;
+      bar(&new);
+   }
+   printf("%d", old);
+}
+### Preconditions
+
+//  P() {}
+
+void while06()
+{
+
+//  P() {}
+
+   int old, new;
+
+//  P(new,old) {}
+
+   while (old!=new) {
+
+//  P(new,old) {}
+
+      old = new;
+
+//  P(new,old) {new==old}
+
+      foo(&new);
+   }
+
+//  P(new,old) {new==old}
+
+
+   foo(&old);
+
+//  P(new,old) {}
+
+
+   while (old!=new) {
+
+//  P(new,old) {}
+
+      old = new;
+
+//  P(new,old) {new==old}
+
+      bar(&new);
+   }
+
+//  P(new,old) {new==old}
+
+   printf("%d", old);
+}
+### suppress dead code
+void while06()
+{
+   int old, new;
+   while (old!=new) {
+      old = new;
+      foo(&new);
+   }
+
+   foo(&old);
+
+   while (old!=new) {
+      old = new;
+      bar(&new);
+   }
+   printf("%d", old);
+}
+

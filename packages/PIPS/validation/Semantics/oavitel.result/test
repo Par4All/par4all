@@ -19,7 +19,7 @@ C  T(JMFM1) {JFM==JMFM1+1}
 
       JMFM1 = JFM-1                                                     0011
 
-C  T(JM1O2) {JMFM1<=2JM1O2+1, 2JM1O2<=JMFM1}
+C  T(JM1O2) {2JM1O2<=JMFM1, JMFM1<=2JM1O2+1}
 
       JM1O2 = JMFM1/2                                                   0012
 

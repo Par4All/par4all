@@ -1,0 +1,85 @@
+### initial code
+void until07()
+{
+   int old, new;
+   do {
+      int i;
+      old = new;
+      foo(&i);
+   }
+   while (old!=new);
+   do {
+      int i;
+      old = new;
+      bar(&i);
+   }
+   while (old!=new);
+   printf("%d", old);
+}
+### Preconditions
+
+//  P() {}
+
+void until07()
+{
+
+//  P() {}
+
+   int old, new;
+
+//  P(new,old) {}
+
+   do {
+
+//  P(0`1`i,0`2`i,new,old) {}
+
+      int i;
+
+//  P(0`1`i,0`2`i,new,old) {}
+
+      old = new;
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+      foo(&i);
+   }
+   while (old!=new);
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+   do {
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+      int i;
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+      old = new;
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+      bar(&i);
+   }
+   while (old!=new);
+
+//  P(0`1`i,0`2`i,new,old) {new==old}
+
+   printf("%d", old);
+}
+### suppress dead code
+void until07()
+{
+   int old, new;
+   do {
+      int i;
+      old = new;
+      foo(&i);
+   }
+   while (old!=new);
+   int i;
+   old = new;
+   bar(&i);
+   printf("%d", old);
+}
+

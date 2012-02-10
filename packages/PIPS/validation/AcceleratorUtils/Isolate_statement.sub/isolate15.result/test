@@ -124,9 +124,9 @@ void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
       P4A_accel_malloc((void **) &result0, sizeof(short)*16);
       P4A_accel_malloc((void **) &src00, sizeof(short)*16);
       P4A_accel_malloc((void **) &src10, sizeof(short)*16);
+      P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &result[0][0], *result0);
       P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src0[0][0], *src00);
       P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src1[0][0], *src10);
-      P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &result[0][0], *result0);
 
 l99998:
       for(i = 1; i <= 3; i += 1)

@@ -1243,6 +1243,7 @@ static void parse_arguments(int argc, char * argv[])
  */
 int tpips_main(int argc, char * argv[])
 {
+  variable_debug_name = (char * (*)(Variable)) entity_local_name;
   debug_on("TPIPS_DEBUG_LEVEL");
   pips_log_handler = smart_log_handler;
   initialize_signal_catcher();

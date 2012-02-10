@@ -1,0 +1,336 @@
+
+PROPER  EFFECTS 
+
+void jas_image_clearfmts(int jas_image_numfmts)
+{
+   int i;
+   jas_image_fmtinfo_t *fmtinfo;
+//             <    is read   >: jas_image_numfmts
+//             <    is written>: i
+   for(i = 0; i <= jas_image_numfmts-1; i += 1) {
+//             <    is read   >: i jas_image_numfmts
+//             <    is written>: fmtinfo
+      fmtinfo = &jas_image_fmtinfos[i];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (fmtinfo->name) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+         jas_free(fmtinfo->name);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->name = 0;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (fmtinfo->ext) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+         jas_free(fmtinfo->ext);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->ext = 0;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (fmtinfo->desc) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+         jas_free(fmtinfo->desc);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->desc = 0;
+      }
+   }
+//             <    is written>: jas_image_numfmts
+   jas_image_numfmts = 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// f1 -> _f1_1[0] , EXACT
+
+
+// Points To OUT: none
+
+int jas_free(char *f1)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT:
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+void jas_image_clearfmts(int jas_image_numfmts)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   jas_image_fmtinfo_t *fmtinfo;
+
+// Points To:
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   for(i = 0; i <= jas_image_numfmts-1; i += 1) {
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , MAY
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+      fmtinfo = &jas_image_fmtinfos[i];
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , MAY
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+      if (fmtinfo->name) {
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         jas_free(fmtinfo->name);
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         fmtinfo->name = 0;
+      }
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , MAY
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+      if (fmtinfo->ext) {
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         jas_free(fmtinfo->ext);
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         fmtinfo->ext = 0;
+      }
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , MAY
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+      if (fmtinfo->desc) {
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         jas_free(fmtinfo->desc);
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , EXACT
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+         fmtinfo->desc = 0;
+      }
+   }
+
+// Points To:
+// fmtinfo -> jas_image_fmtinfos[*] , MAY
+// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+
+   jas_image_numfmts = 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int jas_free(char *f1)
+{
+}
+void jas_image_clearfmts(int jas_image_numfmts)
+{
+   int i;
+   jas_image_fmtinfo_t *fmtinfo;
+//             <    is read   >: jas_image_numfmts
+//             <    is written>: i
+   for(i = 0; i <= jas_image_numfmts-1; i += 1) {
+//             <    is read   >: i jas_image_numfmts
+//             <    is written>: fmtinfo
+      fmtinfo = &jas_image_fmtinfos[i];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               jas_image_fmtinfos[*].name
+      if (fmtinfo->name) {
+//             <may be read   >: jas_image_fmtinfos[*].name
+//             <    is read   >: fmtinfo jas_image_numfmts
+         jas_free(fmtinfo->name);
+//             <may be written>: jas_image_fmtinfos[*].name
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->name = 0;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               jas_image_fmtinfos[*].ext
+      if (fmtinfo->ext) {
+//             <may be read   >: jas_image_fmtinfos[*].ext
+//             <    is read   >: fmtinfo jas_image_numfmts
+         jas_free(fmtinfo->ext);
+//             <may be written>: jas_image_fmtinfos[*].ext
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->ext = 0;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               jas_image_fmtinfos[*].desc
+      if (fmtinfo->desc) {
+//             <may be read   >: jas_image_fmtinfos[*].desc
+//             <    is read   >: fmtinfo jas_image_numfmts
+         jas_free(fmtinfo->desc);
+//             <may be written>: jas_image_fmtinfos[*].desc
+//             <    is read   >: fmtinfo jas_image_numfmts
+         fmtinfo->desc = 0;
+      }
+   }
+//             <    is written>: jas_image_numfmts
+   jas_image_numfmts = 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	21 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	22 --> 22 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-W-EXACT>
+	22 --> 23 with conflicts
+		from <fmtinfo-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	22 --> 24 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 25 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 27 with conflicts
+		from <fmtinfo-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	22 --> 28 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 29 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 31 with conflicts
+		from <fmtinfo-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	22 --> 32 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 33 with conflicts
+		from <fmtinfo-W-EXACT> to <fmtinfo-R-EXACT>
+	22 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	23 --> 22 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <fmtinfo-W-EXACT>
+	23 --> 25 with conflicts
+		from <jas_image_fmtinfos[*].name-R-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+	23 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+	23 --> 33 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+	23 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_numfmts-W-EXACT>
+	24 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	24 --> 25 with conflicts
+		from <jas_image_fmtinfos[*].name-R-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+	24 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	25 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	25 --> 23 with conflicts
+		from <jas_image_fmtinfos[*].name-W-MAY> to <jas_image_fmtinfos[*].name-R-MAY>
+	25 --> 24 with conflicts
+		from <jas_image_fmtinfos[*].name-W-MAY> to <jas_image_fmtinfos[*].name-R-MAY>
+	25 --> 25 with conflicts
+		from <jas_image_fmtinfos[*].name-W-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+	25 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	27 --> 22 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <fmtinfo-W-EXACT>
+	27 --> 25 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+	27 --> 29 with conflicts
+		from <jas_image_fmtinfos[*].ext-R-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+	27 --> 33 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+	27 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_numfmts-W-EXACT>
+	28 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	28 --> 29 with conflicts
+		from <jas_image_fmtinfos[*].ext-R-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+	28 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	29 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	29 --> 27 with conflicts
+		from <jas_image_fmtinfos[*].ext-W-MAY> to <jas_image_fmtinfos[*].ext-R-MAY>
+	29 --> 28 with conflicts
+		from <jas_image_fmtinfos[*].ext-W-MAY> to <jas_image_fmtinfos[*].ext-R-MAY>
+	29 --> 29 with conflicts
+		from <jas_image_fmtinfos[*].ext-W-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+	29 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	31 --> 22 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <fmtinfo-W-EXACT>
+	31 --> 25 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].name-W-MAY>
+	31 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].ext-W-MAY>
+	31 --> 33 with conflicts
+		from <jas_image_fmtinfos[*].desc-R-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+	31 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <jas_image_numfmts-W-EXACT>
+	32 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	32 --> 33 with conflicts
+		from <jas_image_fmtinfos[*].desc-R-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+	32 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+	33 --> 22 with conflicts
+		from <fmtinfo-R-EXACT> to <fmtinfo-W-EXACT>
+	33 --> 31 with conflicts
+		from <jas_image_fmtinfos[*].desc-W-MAY> to <jas_image_fmtinfos[*].desc-R-MAY>
+	33 --> 32 with conflicts
+		from <jas_image_fmtinfos[*].desc-W-MAY> to <jas_image_fmtinfos[*].desc-R-MAY>
+	33 --> 33 with conflicts
+		from <jas_image_fmtinfos[*].desc-W-MAY> to <jas_image_fmtinfos[*].desc-W-MAY>
+	33 --> 36 with conflicts
+		from <jas_image_numfmts-R-EXACT> to <jas_image_numfmts-W-EXACT>
+
+****************** End of Dependence Graph ******************

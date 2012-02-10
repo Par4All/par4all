@@ -28,6 +28,14 @@ setproperty SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 2
 # source code for aipo modules is not required at this stage
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
+# Make sure that unknown functions such as synthesized AIPO and helper
+# functions are not eliminated
+#
+# Well, this creates havoc on the generated code...
+# setproperty MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS TRUE
+# Well, this should be OK and is OK for do{}while() loops, but is not OK for while(){} loops
+# setproperty MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS TRUE
+
 activate NEW_CONTROLIZER
 activate PRINT_CODE
 #make PRINTED_FILE[%ALLFUNC]
@@ -54,8 +62,20 @@ apply FORCE_REGISTER_DECLARATIONS[main]
 # simplify expressions
 apply PARTIAL_EVAL[main]
 
+# (temporary) workaround...  we need precise effects on aipo in order
+# not to over simplify but this would require providing stubs.
+# Currently the auto generated functions do not have any
+# effect, hence induce some unwanted control simplifications. See
+# comments above about MAXIMAL_EFFECTS_FOR_UNKNOWN_FUNCTIONS
+setproperty SIMPLIFY_CONTROL_DO_WHILE FALSE
 # then control
+# Necessary to debug the impact of simplify_control
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[main]
 apply SIMPLIFY_CONTROL[main]
+
+# help enlarge sequences
+apply DOWHILE_TO_WHILE[main]
 
 # then structures
 setproperty FULL_LOOP_UNROLL_EXCEPTIONS "freia_common_set_wa"

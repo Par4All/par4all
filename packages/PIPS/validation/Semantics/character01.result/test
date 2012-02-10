@@ -2,7 +2,7 @@
 Transformers for "character01"
 
 
-//  T(character01) {character01<=c+1, c<=character01}
+//  T(character01) {c<=character01, character01<=c+1}
 
 unsigned char character01(unsigned char c)
 {

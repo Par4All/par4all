@@ -300,6 +300,43 @@ static list omp_append_private_clause (loop l, list exprs) {
   return exprs;
 }
 
+static void statement_remove_omp_clauses(statement stmt) {
+    list exts = gen_copy_seq(extensions_extension(statement_extensions(stmt)));
+    FOREACH(EXTENSION, ext, exts) {
+        if(extension_pragma(ext)) {
+            pragma p = extension_pragma(ext);
+            bool remove=false;
+            if(pragma_string_p(p)) {
+                remove = (strncasecmp("omp", pragma_string(p), 3) == 0);
+            }
+            else if(pragma_expression_p(p)) {
+                list exps = pragma_expression(p);
+                FOREACH(EXPRESSION,exp, exps) {
+                    if(expression_call_p(exp)) {
+                        call c = expression_call(exp);
+                        entity op = call_function(c);
+                        const char* omp_entities[] = {
+                            OMP_OMP_FUNCTION_NAME,
+                            OMP_REDUCTION_FUNCTION_NAME,
+                            OMP_PRIVATE_FUNCTION_NAME,
+                            NULL
+                        };
+                        const char *lname = entity_local_name(op);
+                        for(const char **iter=omp_entities;*iter;++iter) {
+                            if((remove=same_string_p(lname, *iter))) {
+                                break;
+                            }
+                        }
+                    }
+                    if(remove) break;
+                }
+            }
+            if(remove)
+                gen_remove_once(&extensions_extension(statement_extensions(stmt)),ext);
+        }
+    }
+}
+
 /// @brief generate pragma for a reduction as a list of expressions
 /// @return true if a pragma has been generated
 /// @param l, the loop to analyze for omp reduction
@@ -311,6 +348,8 @@ bool omp_pragma_expr_for_reduction (loop l, statement stmt, bool strict) {
   exprs = reductions_get_omp_pragma_expr(l, stmt, strict);
   // insert the pragma (if any) as an expression to the current statement
   if (exprs != NULL) {
+    // remove any previous openmp expression to make sure we do not introduce inconsistency
+    statement_remove_omp_clauses(stmt);
     // check if a private clause is needed on top of the reduction clause
     exprs = omp_append_private_clause (l, exprs);
     add_pragma_expr_to_statement (stmt, exprs);

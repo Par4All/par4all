@@ -602,6 +602,20 @@ expression_to_proper_constant_path_effects(expression e)
     return(le);
 }
 
+bool expression_with_side_effect_p(expression e)
+{
+  list efl = expression_to_proper_constant_path_effects(e);
+  bool side_effect_p = false;
+  FOREACH(EFFECT, ef, efl) {
+    if(effect_write_p(ef)) {
+      side_effect_p = true;
+      break;
+    }
+  }
+  gen_free_list(efl);
+  return side_effect_p;
+}
+
 /** computes the proper constant path effects of the input expression
     using the points-to information of the input statement.
 

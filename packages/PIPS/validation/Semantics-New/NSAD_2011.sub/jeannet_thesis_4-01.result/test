@@ -643,7 +643,7 @@ void ts_singlestate(void)
 
          if (!(x<=9&&y<=3&&ok==1))
 
-//  P(ok,x,y) {ok==1, 20<=2x+3y, y<=x, 0<=y}
+//  P(ok,x,y) {ok==1, y<=x, 20<=2x+3y, 0<=y}
 
             deadlock();
 

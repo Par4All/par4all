@@ -1,0 +1,28 @@
+delete until07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create until07 until07.c
+
+module until07
+
+setproperty MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS TRUE
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### Preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SIMPLIFY_CONTROL
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+
+delete until07

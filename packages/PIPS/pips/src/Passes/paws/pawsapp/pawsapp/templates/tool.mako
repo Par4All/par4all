@@ -8,6 +8,10 @@
 <%namespace name="w"   file="lib/widgets.mako"/>
 <%namespace name="adv" file="lib/advanced.mako"/>
 
+<%def name="pagetitle()">
+${info["title"]}
+</%def>
+
 <%def name="css_slot()">
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
@@ -48,7 +52,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
     ${w.icon("book", True)} Classic examples</button>
 </label>
 
-<form target="upload_target" action="${request.route_url('upload_user_file')}" methode="post"
+<form target="upload_target" action="${request.route_url('upload_user_file')}" method="post"
       enctype="multipart/form-data" id="upload_form" style="margin-bottom:-18px">
   <label for="pseudobutton">or from your own test cases:</label>
   <button id="pseudobutton" style="width:100%" class="btn btn-primary">
@@ -60,14 +64,14 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 <hr/>
 
 <p>
-  <button class="btn btn-primary disabled" style="width:100%" id="run-button">
+  <button class="btn btn-primary" style="width:100%" id="run-button">
     ${w.icon("play", True)} Run</button>
 </p>
 
 <p>
-  <button class="btn disabled" style="width:100%" id="save-button">
+  <button class="btn" style="width:100%" id="save-button">
     ${w.icon("download-alt")} Save Result</button><br/>
-  <button class="btn disabled" style="width:100%" id="print-button">
+  <button class="btn" style="width:100%" id="print-button">
     ${w.icon("print")} Print Result</button>
 </p>
 
@@ -83,19 +87,22 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
       style="margin-bottom:0">
 
   <p></p>
-  % if props:
+
+  % if info["properties"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-props-modal">
     ${w.icon("list-alt", True)} Properties</button><br/>
   % else:
   <div>${w.icon("list-alt")} No properties</div>
   % endif
-  % if analyses:
+
+  % if info["analyses"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-analyses-modal">
     ${w.icon("list-alt", True)} Select Analyses</button><br/>
   % else:
   <div>${w.icon("list-alt")} No analyses</div>
   % endif
-  % if phases:
+
+  % if info["phases"]:
   <button class="btn btn-success" style="width:100%;text-align:left" data-toggle="modal" href="#adv-phases-modal">
     ${w.icon("list-alt", True)} Phases</button>
   % else:
@@ -105,42 +112,49 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   ## "Properties" modal
   ${w.modal(u"Properties", advprop_body, id="adv-props-modal", icon="list-alt")}
   <%def name="advprop_body()">
-  ${adv.properties_fields(props)}
+  ${adv.properties_fields(info["properties"])}
   </%def>
 
   ## "Select Analyses" modal
   ${w.modal(u"Select Analyses", advanl_body, id="adv-analyses-modal", icon="list-alt")}
   <%def name="advanl_body()">
-  ${adv.analyses_fields(analyses)}
+  ${adv.analyses_fields(info["analyses"])}
   </%def>
 
   ## "Phases" modal
   ${w.modal(u"Phases", advphases_body, id="adv-phases-modal", icon="list-alt")}
   <%def name="advphases_body()">
-  ${adv.phases_fields(phases)}
+  ${adv.phases_fields(info["phases"])}
   </%def>
 
 </form>
 
-
 </%def>
+
+## "No source" alert
+<%def name="no_source_warning()">
+<div class="alert alert-warning">
+  ${w.icon("warning-sign")}
+  <b>Source file(s) not found...</b> Please provide source code first.
+</div>
+</%def>
+
 
 
 ## MAIN COLUMN
 
 <%def name="main_column()">
 
-<iframe id="iframetoprint" style="height: 0px; width: 0px; position: absolute; -moz-opacity: 0; opacity: 0"></iframe>
-
-<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em" data-content="${descr}" data-original-title="${tool}">
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em"
+     data-content="${info['descr']}" data-original-title="${tool}">
   <h2>
     ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
-    ${name}
+    ${info["title"]}
   </h2>
 </div>
 
 ## Tab headers
-<ul id="op-tabs" class="nav nav-tabs">
+<ul id="op-tabs" class="nav nav-tabs noprint">
   ${w.source_tab(id="1", active=True)}
   <li id="result_tab"><a href="#result" data-toggle="tab">${tool.upper()}</a></li>
   <li id="graph_tab"><a href="#graph" data-toggle="tab">GRAPH</a></li>
@@ -154,13 +168,13 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
   <div id="result" class="tab-pane">
     <div id="multiple-functions">
     </div>
-    <div id="resultcode">
-      Placeholder for results.
+   <div id="resultcode">
+     ${self.no_source_warning()}
     </div>
   </div>
   ## Graph panel
   <div id="graph" class="tab-pane">
-    Placeholder for dependence graphs.
+     ${self.no_source_warning()}
   </div>
 </div>
 
@@ -183,13 +197,14 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 ## Classic examples modal
 
-${w.modal(u"Please select an example:", classic_body, "classic-examples-dialog")}
+${w.modal(u"Please select an example", classic_body, "classic-examples-dialog")}
 
 <%def name="classic_body()">
-% for ex in examples:
-<div><a href="#" id="${ex}" class="btn" style="width:90%; text-align: left">
-    ${w.icon("file")} ${ex}</a></div>
-% endfor
+<ul class="unstyled">
+  % for ex in examples:
+  <li><a href="#" id="${ex}">${w.icon("file")} ${ex}</a></li>
+  % endfor
+</ul>
 </%def>
 
 

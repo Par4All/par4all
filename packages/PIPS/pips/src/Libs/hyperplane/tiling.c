@@ -308,7 +308,7 @@ statement tiling( list lls)
 
     debug_on("TILING_DEBUG_LEVEL");
 
-    debug(8,"tiling","Begin with iteration domain:\n");
+    pips_debug(8, "Begin with iteration domain:\n");
 
     /* make the constraint system for the iteration space and find a good
        origin for the tiling */
@@ -318,7 +318,7 @@ statement tiling( list lls)
     to = loop_nest_to_offset(lls);
     ifdebug(8) {
 	sc_fprint(stderr, sci, (get_variable_name_t)entity_local_name);
-	debug(8,"tiling","And with origin:\n");
+	pips_debug(8,"And with origin:\n");
 	vect_fprint(stderr, to, (get_variable_name_t)entity_local_name);
     }
 

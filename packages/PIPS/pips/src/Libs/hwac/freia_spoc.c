@@ -2150,7 +2150,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
     dagvtx_spoc_priority_current = NIL;
 
     pips_assert("something must be computable if current is empty",
-		computables || !set_empty_p(current));
+                computables || !set_empty_p(current));
 
     pips_debug(4, "%d computable vertices\n", (int) gen_length(computables));
     ifdebug(5) dagvtx_nb_dump(stderr, "computables", computables);

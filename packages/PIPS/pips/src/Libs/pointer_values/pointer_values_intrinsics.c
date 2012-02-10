@@ -473,6 +473,8 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {ISFINITE_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {ISINF_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
   {ISNAN_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
+  {ISNANL_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
+  {ISNANF_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {ISNORMAL_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {SIGNBIT_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
   {C_ACOS_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
@@ -807,6 +809,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {GETTIMEOFDAY_FUNCTION_NAME,             intrinsic_to_identical_post_pv},
   {CLOCK_GETTIME_FUNCTION_NAME,            intrinsic_to_identical_post_pv},
   {CLOCK_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
+  {SECOND_FUNCTION_NAME,                   intrinsic_to_identical_post_pv}, // gfortran intrinsic
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_function_to_post_pv},
@@ -988,9 +991,6 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
-
-  /* GNU Extension*/
-  {SECOND_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
 
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 unknown_intrinsic_to_post_pv},

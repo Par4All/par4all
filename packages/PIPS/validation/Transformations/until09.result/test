@@ -1,0 +1,46 @@
+### initial code
+void until09()
+{
+   int i = 1;
+   do {
+      i++;
+   }
+   while (i++<0);
+   printf("%d", i);
+}
+### Preconditions
+
+//  P() {}
+
+void until09()
+{
+
+//  P() {}
+
+   int i = 1;
+
+//  P(i) {i==1}
+
+   do {
+
+//  P(i) {i==1}
+
+      i++;
+   }
+   while (i++<0);
+
+//  P(i) {i==3}
+
+   printf("%d", i);
+}
+### suppress dead code
+void until09()
+{
+   int i = 1;
+   do {
+      i++;
+   }
+   while (i++<0);
+   printf("%d", i);
+}
+

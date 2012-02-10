@@ -8,10 +8,7 @@ POINTS TO
 // c -> _c_3[0] , EXACT
 
 
-// Points To OUT:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
+// Points To OUT: none
 
 void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 {

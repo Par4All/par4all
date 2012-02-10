@@ -1,0 +1,35 @@
+#
+# Code after openmp for module test
+#
+int test(int bSize, int matOut[bSize][bSize])
+{
+   int out, norm;
+   out = 0.;
+   {
+      int i;
+      for(i = 0; i <= bSize-1; i += 1) {
+         norm = 0;
+         int j;
+#pragma omp parallel for reduction(+:norm)
+         for(j = 0; j <= i-1; j += 1)
+            norm += matOut[i][j]*matOut[i][j]+matOut[i][j]*matOut[i][j];
+      }
+   }
+   out += norm;
+}
+int test(int bSize, int matOut[bSize][bSize])
+{
+   int out, norm;
+   out = 0.;
+   {
+      int i;
+      for(i = 0; i <= bSize-1; i += 1) {
+         norm = 0;
+         int j;
+#pragma omp parallel for reduction(+:norm)
+         for(j = 0; j <= i-1; j += 1)
+            norm += matOut[i][j]*matOut[i][j]+matOut[i][j]*matOut[i][j];
+      }
+   }
+   out += norm;
+}
