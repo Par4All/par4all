@@ -1,0 +1,10 @@
+int main()
+{
+   int a[10];
+   int i = 0;
+   int k = 0;
+   int i_0 = 1;
+   int j = a[i_0];
+   k = j;
+   return k;
+}
