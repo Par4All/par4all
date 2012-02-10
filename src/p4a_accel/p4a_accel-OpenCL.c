@@ -460,7 +460,7 @@ struct p4a_cl_kernel p4a_kernels_list[MAX_K];
 */
 void p4a_setArguments(int i, char* varname, size_t size, void *ref_arg)
 {
-  //fprintf(stderr,"Argument %d : size = %u\n",i,size);
+  P4A_skip_debug(5,P4A_dump_message("Set argument %d : size = %zu\n",i,size));
   p4a_global_error = clSetKernelArg(p4a_kernel,i,size, ref_arg); 
   P4A_test_execution_with_message("clSetKernelArg");
 }
