@@ -419,7 +419,7 @@ C        BEGIN BLOCK
 C        END BLOCK
       ENDIF
 
-C  T(IPARNUT) {IPARNUT#init<=IPARNUT+1, IPARNUT<=IPARNUT#init}
+C  T(IPARNUT) {IPARNUT<=IPARNUT#init, IPARNUT#init<=IPARNUT+1}
 
 C (16,5)
       IF (A(IUTI).EQ.')') THEN                                          0070

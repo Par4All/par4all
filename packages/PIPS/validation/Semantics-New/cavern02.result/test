@@ -26,7 +26,7 @@ int cavern02(int i)
 
       j++, i--;
 
-//  T(r) {i+j==r#init+100, i<=1, r+100<=i+j, r<=i+400, i<=r}
+//  T(r) {i+j==r#init+100, i<=1, r+100<=i+j, i<=r, r<=i+400}
 
 
    if (j>500)
@@ -76,7 +76,7 @@ int cavern02(int i)
 
       r = i;
 
-//  P(i,j,r) {i<=1, r+100<=i+j, r<=i+400, i<=r}
+//  P(i,j,r) {i<=1, r+100<=i+j, i<=r, r<=i+400}
 
    return r;
 }

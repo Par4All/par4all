@@ -1,0 +1,39 @@
+delete chap2_exp2
+create chap2_exp2 chap2_exp2.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+#setenv POINTER_VALUES_DEBUG_LEVEL 4
+
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+#module main
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
+
+
+close
+delete chap2_exp2
+quit

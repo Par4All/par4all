@@ -1,0 +1,50 @@
+#
+# Initial code for module pain
+#
+void pain()
+{
+   global = malloc(sizeof(int)*3);
+holy:   bra(global);
+}
+#
+# Display print_code_regions for module pain
+#
+
+//  <global-R-EXACT-{}>
+//  <global-W-EXACT-{}>
+//  <global[PHI1]-W-EXACT-{PHI1==1}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+void pain()
+{
+
+//  <global-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   global = malloc(sizeof(int)*3);
+
+//  <global-R-EXACT-{}>
+//  <global[PHI1]-W-EXACT-{PHI1==1}>
+
+holy:   bra(global);
+}
+#
+# Code after isolate_statement for module pain
+#
+void pain()
+{
+   global = malloc(sizeof(int)*3);
+   {
+      //PIPS generated variable
+      int (*global0)[2] = (int (*)[2]) 0;
+      P4A_accel_malloc((void **) &global0, sizeof(int)*2);
+      P4A_copy_to_accel_1d(sizeof(int), 2, 2, 0, &global[0], *global0);
+
+holy:      bra(*global0);
+      P4A_copy_from_accel_1d(sizeof(int), 2, 2, 0, &global[0], *global0);
+      P4A_accel_free(global0);
+   }
+}
+(0, '', '') : (0, '', '')

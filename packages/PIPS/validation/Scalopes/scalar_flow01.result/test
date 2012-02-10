@@ -103,9 +103,9 @@ int main()
       P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
 
       P4A_scmp_kernel_0(&*P4A_var_a0, &*P4A_var_b0, *P4A_var_c0);
-      P4A_scmp_write(sizeof(int), &a, P4A_var_a0);
-      P4A_scmp_write(sizeof(int), &b, P4A_var_b0);
       P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
+      P4A_scmp_write(sizeof(int), &b, P4A_var_b0);
+      P4A_scmp_write(sizeof(int), &a, P4A_var_a0);
    }
    {
       //PIPS generated variable
@@ -116,8 +116,8 @@ int main()
       P4A_scmp_read(sizeof(int), &b, P4A_var_b1);
 
       P4A_scmp_kernel_1(&*P4A_var_a1, &*P4A_var_b1);
-      P4A_scmp_write(sizeof(int), &a, P4A_var_a1);
       P4A_scmp_write(sizeof(int), &b, P4A_var_b1);
+      P4A_scmp_write(sizeof(int), &a, P4A_var_a1);
    }
 
    return 0;

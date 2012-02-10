@@ -16,10 +16,10 @@ void pain()
       //PIPS generated variable
       char (*t0)[3] = (char (*)[3]) 0;
       P4A_accel_malloc((void **) &t0, sizeof(char)*3);
-      P4A_copy_to_accel_1d(sizeof(char), 3, 3, 0, t, *t0);
+      P4A_copy_to_accel_1d(sizeof(char), 3, 3, 0, &t[0], *t0);
 
 holy:      sain(*t0);
-      P4A_copy_from_accel_1d(sizeof(char), 3, 3, 0, t, *t0);
+      P4A_copy_from_accel_1d(sizeof(char), 3, 3, 0, &t[0], *t0);
       P4A_accel_free(t0);
    }
 }

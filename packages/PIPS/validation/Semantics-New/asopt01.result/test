@@ -24,15 +24,15 @@ void asopt01(int x, int y)
 
    if (x<=0) {
 
-//  T(y) {i==0, 0<=x+1, x<=0, x<=y, y<=0, 0<=y#init+1, y#init<=1}
+//  T(y) {i==0, x<=0, 0<=x+1, x<=y, y<=0, 0<=y#init+1, y#init<=1}
 
       y = x*x+x;
 
-//  T(x) {i==0, 0<=x#init+1, x#init<=0, x#init<=y, y<=0}
+//  T(x) {i==0, x#init<=0, 0<=x#init+1, x#init<=y, y<=0}
 
       scanf("%d", &x);
 
-//  T(i) {i==1, i#init==0, 0<=y+1, y<=0}
+//  T(i) {i==1, i#init==0, y<=0, 0<=y+1}
 
       i++;
    }
@@ -66,15 +66,15 @@ void asopt01(int x, int y)
 
    if (x<=0) {
 
-//  P(i) {i==0, 0<=x+1, x<=0, 0<=y+1, y<=1}
+//  P(i) {i==0, x<=0, 0<=x+1, 0<=y+1, y<=1}
 
       y = x*x+x;
 
-//  P(i,y) {i==0, 0<=x+1, x<=0, x<=y, y<=0}
+//  P(i,y) {i==0, x<=0, 0<=x+1, x<=y, y<=0}
 
       scanf("%d", &x);
 
-//  P(i,x,y) {i==0, 0<=y+1, y<=0}
+//  P(i,x,y) {i==0, y<=0, 0<=y+1}
 
       i++;
    }

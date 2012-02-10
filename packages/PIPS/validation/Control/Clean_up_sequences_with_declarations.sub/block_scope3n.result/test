@@ -1,0 +1,17 @@
+int block_scope3n()
+{
+   int x = 6;
+
+   x--;
+   int x_0;
+   x_0 = 2;
+   int x_0_0;
+   x_0_0 = 3;
+   x_0_0--;
+   if (x_0) {
+      int x;
+      x = 5;
+   }
+   x_0++;
+   return x;
+}

@@ -3,13 +3,13 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-shell rm -rf /tmp/$WKS; mkdir /tmp/$WKS
-shell cp $WKS.c include/p4a_stubs.c /tmp/$WKS
+shell rm -rf .$WKS; mkdir .$WKS
+shell cp $WKS.c include/p4a_stubs.c .$WKS
 # Instrument the source for include tracking:
-shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS/$WKS.c
-shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS/p4a_stubs.c
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' .$WKS/$WKS.c
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' .$WKS/p4a_stubs.c
 
-create $WKS /tmp/$WKS/$WKS.c /tmp/$WKS/p4a_stubs.c
+create $WKS .$WKS/$WKS.c .$WKS/p4a_stubs.c
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE

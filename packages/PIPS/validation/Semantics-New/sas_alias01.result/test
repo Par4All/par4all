@@ -15,7 +15,7 @@ void sas_alias01(int m)
 
    while (x>=0&&y>=0) {
 
-//  T(x,y) {0<=m, x#init<=x+1, x<=x#init, 0<=x#init, y#init<=y,
+//  T(x,y) {0<=m, x<=x#init, x#init<=x+1, 0<=x#init, y#init<=y,
 //    0<=y#init}
 
       if (alea()>=0.) {

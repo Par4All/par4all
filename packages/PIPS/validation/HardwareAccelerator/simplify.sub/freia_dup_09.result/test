@@ -25,7 +25,7 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
   "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
@@ -74,7 +74,7 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
   "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
@@ -202,7 +202,7 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
   "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
@@ -462,7 +462,7 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
   "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";

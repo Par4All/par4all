@@ -197,18 +197,18 @@ C           END BLOCK
          ENDIF
       ENDDO
 
-C  P(M,MS,S) {5MS<=9M, 0<=7M+MS, 3MS+4<=7M+4S, MS+1<=2M+2S,
-C    2<=M+MS+2S, 5<=M+MS+S, M<=MS+2S, MS<=3, 15<=5MS+3S, 7S<=MS+35,
-C    MS+3S<=15, 0<=S}
+C  P(M,MS,S) {5MS<=9M, 0<=7M+MS, M<=MS+2S, 3MS+4<=7M+4S, MS+1<=2M+2S,
+C    2<=M+MS+2S, 5<=M+MS+S, MS<=3, 15<=5MS+3S, 7S<=MS+35, MS+3S<=15,
+C    0<=S}
 
 C (0,13)
 
       PRINT *, MS, S, M                                                 0022
 
-C  P(M,MS,S) {0<=M, 5MS<=9M, 0<=7M+MS, MS<=3M, 3MS+4<=7M+4S,
-C    MS+1<=2M+2S, 2<=M+MS+2S, 5<=M+MS+S, M<=MS+2S, 5<=5M+S, 1<=M+4S,
-C    1<=M+S, M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 15<=5MS+3S,
-C    7S<=MS+35, MS+3S<=15, 0<=S, S<=5}
+C  P(M,MS,S) {0<=M, 5MS<=9M, 0<=7M+MS, MS<=3M, M<=MS+2S, 3MS+4<=7M+4S,
+C    MS+1<=2M+2S, 2<=M+MS+2S, 5<=M+MS+S, 5<=5M+S, 1<=M+4S, 1<=M+S,
+C    M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 15<=5MS+3S, 7S<=MS+35,
+C    MS+3S<=15, 0<=S, S<=5}
 
 C (0,14)
       READ *, S, MS                                                     0023

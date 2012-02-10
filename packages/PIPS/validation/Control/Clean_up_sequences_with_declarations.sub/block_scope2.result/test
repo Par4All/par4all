@@ -1,0 +1,16 @@
+int block_scope2()
+{
+   int x = 6;
+lab1:   x--;
+   int x_0;
+   x_0++;
+   int x_1 = -1;
+   if (x_1>0) goto lab1;
+   return x;
+}
+int main()
+{
+   int j = block_scope2();
+   printf("j=%d\n", j);
+   return 0;
+}

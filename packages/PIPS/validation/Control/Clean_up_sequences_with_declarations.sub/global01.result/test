@@ -1,0 +1,11 @@
+int main()
+{
+   int j = 0;
+   i = 5;
+   int i_0 = 3;
+   j = j+i_0;
+
+   j = j+i;
+
+   return j;
+}

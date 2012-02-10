@@ -237,7 +237,7 @@ int main()
       while (u<60)
 
 //  T(l,t,u,v) {l+v#init==l#init+v, t+u#init==t#init+u, l#init<=l,
-//    l<=l#init+10, l#init+t<=l+t#init+60, l+t#init<=l#init+t,
+//    l<=l#init+10, l+t#init<=l#init+t, l#init+t<=l+t#init+60,
 //    l#init+u#init<=t#init+v#init, l#init+5v#init<=t#init+50,
 //    v#init<=l#init, u<=60, v<=u, u#init<=59, v#init<=u#init, 0<=v,
 //    v<=10, 0<=v#init, v#init<=10}

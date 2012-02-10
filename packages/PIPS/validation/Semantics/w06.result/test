@@ -36,7 +36,7 @@ C (0,5)
 
       DO WHILE (I.LT.N)                                                 0013
 
-C  T(I,J) {I==I#init+1, J#init<=J+2, J<=J#init}
+C  T(I,J) {I==I#init+1, J<=J#init, J#init<=J+2}
 
 C (0,6)
 C        BEGIN BLOCK
@@ -46,7 +46,7 @@ C  T() {}
 C (0,7)
          PRINT *, I                                                     0014
 
-C  T(J) {J#init<=J+2, J<=J#init}
+C  T(J) {J<=J#init, J#init<=J+2}
 
 C (0,8)
          IF (T(I).GT.0.) THEN                                           0015

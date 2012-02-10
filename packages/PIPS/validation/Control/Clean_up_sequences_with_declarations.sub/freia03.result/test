@@ -1,0 +1,21 @@
+int main(void)
+{
+   freia_status end = 1;
+   _Bool contrastenhance = 1;
+   int32_t maximal_shape = 21;
+   int _return2, _return3;
+
+l99995:   ;
+   if (contrastenhance==1) {
+      int I_0;
+      I_0 = maximal_shape/2+1;
+      freia_status ret;
+
+      _return2 = ret;
+l99997:      ;
+      _return2;
+   }
+break_1:   ;
+
+   return 0;
+}

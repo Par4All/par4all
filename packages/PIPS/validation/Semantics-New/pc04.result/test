@@ -17,7 +17,7 @@ int main()
    
    while (1) {
 
-//  T(s0,s1) {s0#init<=s0+1, s0<=s0#init}
+//  T(s0,s1) {s0<=s0#init, s0#init<=s0+1}
 
       if (s0==1&&alea()) {
 
@@ -30,7 +30,7 @@ int main()
          s1 = 1;
       }
 
-//  T(s1,s2) {s1#init<=s1+1, s1<=s1#init}
+//  T(s1,s2) {s1<=s1#init, s1#init<=s1+1}
 
       if (s1==1&&alea()) {
 
@@ -43,7 +43,7 @@ int main()
          s2 = 1;
       }
 
-//  T(s0,s2) {s2#init<=s2+1, s2<=s2#init}
+//  T(s0,s2) {s2<=s2#init, s2#init<=s2+1}
 
       if (s2==1&&alea()) {
 

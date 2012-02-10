@@ -1074,6 +1074,7 @@ int anr999(void)
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
+   0;                                                                   /*0054*/
 
    i_1 = 10;                                                            /*0068*/
 
@@ -1082,7 +1083,9 @@ int anr999(void)
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
+
    I_13 = 0;                                                            /*0090*/
+   0;                                                                   /*0091*/
 
    anr999_spoc_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);          /*0038*/
    
@@ -3739,6 +3742,7 @@ int anr999(void)
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
+   0;                                                                   /*0054*/
 
    i_1 = 10;                                                            /*0068*/
 
@@ -3747,7 +3751,9 @@ int anr999(void)
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
+
    I_13 = 0;                                                            /*0090*/
+   0;                                                                   /*0091*/
 
    anr999_terapix_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);       /*0038*/
    
@@ -4383,6 +4389,7 @@ int anr999(void)
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
+   0;                                                                   /*0054*/
 
    i_1 = 10;                                                            /*0068*/
 
@@ -4391,7 +4398,9 @@ int anr999(void)
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
+
    I_13 = 0;                                                            /*0090*/
+   0;                                                                   /*0091*/
 
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/

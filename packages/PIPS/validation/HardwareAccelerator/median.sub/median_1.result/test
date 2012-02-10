@@ -1373,6 +1373,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // cleanup
+   ;                                                                    /*0038*/
    return ret;                                                          /*0039*/
 }
 #

@@ -1,0 +1,29 @@
+#
+# Initial code for module pain
+#
+int pain()
+{
+   int h[3];
+holy:   bra(h);
+   return h[1];
+}
+#
+# Display print_code_regions for module pain
+#
+
+//  <global[PHI1]-R-EXACT-{PHI1==2}>
+
+int pain()
+{
+   int h[3];
+
+//  <global[PHI1]-R-EXACT-{PHI1==2}>
+//  <h[PHI1]-W-EXACT-{PHI1==1}>
+
+holy:   bra(h);
+
+//  <h[PHI1]-R-EXACT-{PHI1==1}>
+
+   return h[1];
+}
+statement isolation failed as expected

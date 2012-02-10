@@ -430,7 +430,7 @@ void ts_singlestate(void)
 
          if (!(s==2||y<=x&&y<=-x+102))
 
-//  P(s,x,y) {s==1, 1<=x, 103<=x+y, y<=x, 0<=y}
+//  P(s,x,y) {s==1, 1<=x, y<=x, 103<=x+y, 0<=y}
 
             checking_error();
       }

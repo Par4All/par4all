@@ -529,7 +529,7 @@ void ts_singlestate(void)
 
          if (!(0<=l&&l<=t&&6*l<=t+50))
 
-//  P(l,t,u,v) {1<=l, t+51<=6l, l<=t, 6l<=t+55, u<=t, u<=60, v<=10}
+//  P(l,t,u,v) {1<=l, l<=t, t+51<=6l, 6l<=t+55, u<=t, u<=60, v<=10}
 
             checking_error();
       }
@@ -644,19 +644,19 @@ void ts_restructured(void)
 
          t++;
 
-//  P(l,t,u,v) {0<=l, l+1<=t, 6l<=t+49, 60<=59t+u, u<=t, u<=59, v<=8}
+//  P(l,t,u,v) {0<=l, l+1<=t, 6l<=t+49, u<=t, 60<=59t+u, u<=59, v<=8}
 
          l++;
 
-//  P(l,t,u,v) {1<=l, l<=t, 6l<=t+55, 60<=59t+u, u<=t, u<=59, v<=8}
+//  P(l,t,u,v) {1<=l, l<=t, 6l<=t+55, u<=t, 60<=59t+u, u<=59, v<=8}
 
          v++;
 
-//  P(l,t,u,v) {1<=l, l<=t, 6l<=t+55, 60<=59t+u, u<=t, u<=59, v<=9}
+//  P(l,t,u,v) {1<=l, l<=t, 6l<=t+55, u<=t, 60<=59t+u, u<=59, v<=9}
 
          if (!(0<=l&&l<=t&&6*l<=t+50))
 
-//  P(l,t,u,v) {1<=l, t+51<=6l, l<=t, 6l<=t+55, 60<=59t+u, u<=t,
+//  P(l,t,u,v) {1<=l, l<=t, t+51<=6l, 6l<=t+55, u<=t, 60<=59t+u,
 //    u<=59, v<=9}
 
             checking_error();
@@ -679,7 +679,7 @@ void ts_restructured(void)
 
          t++;
 
-//  P(l,t,u,v) {0<=l, l+1<=t, 6l<=t+49, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {0<=l, l+1<=t, 6l<=t+49, u<=t, 60<=59t+u, u<=59}
 
          if (!(0<=l&&l<=t&&6*l<=t+50))
 
@@ -717,7 +717,7 @@ void ts_restructured(void)
 
          if (!(0<=l&&l<=t&&6*l<=t+50))
 
-//  P(l,t,u,v) {u==60, 1<=l, t+51<=6l, l<=t, 6l<=t+55, 60<=t, v<=10}
+//  P(l,t,u,v) {u==60, 1<=l, l<=t, t+51<=6l, 6l<=t+55, 60<=t, v<=10}
 
             checking_error();
 
@@ -813,28 +813,28 @@ void ts_restructured(void)
 
          t++;
 
-//  P(l,t,u,v) {v==9, 0<=l, l+1<=t, 6l<=t+49, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==9, 0<=l, l+1<=t, 6l<=t+49, u<=t, 60<=59t+u, u<=59}
 
          l++;
 
-//  P(l,t,u,v) {v==9, 1<=l, l<=t, 6l<=t+55, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==9, 1<=l, l<=t, 6l<=t+55, u<=t, 60<=59t+u, u<=59}
 
          v++;
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+55, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+55, u<=t, 60<=59t+u, u<=59}
 
          if (!(0<=l&&l<=t&&6*l<=t+50))
 
-//  P(l,t,u,v) {v==10, 1<=l, t+51<=6l, l<=t, 6l<=t+55, 60<=59t+u,
-//    u<=t, u<=59}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, t+51<=6l, 6l<=t+55, u<=t,
+//    60<=59t+u, u<=59}
 
             checking_error();
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, u<=t, 60<=59t+u, u<=59}
 
          while (rand_b()) {
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, u<=t, 60<=59t+u, u<=59}
 
             if (!(u<=58))
 
@@ -842,7 +842,7 @@ void ts_restructured(void)
 
                deadlock();
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, 60<=59t+u, u<=t, u<=58}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, u<=t, 60<=59t+u, u<=58}
 
             u++;
 
@@ -850,7 +850,7 @@ void ts_restructured(void)
 
             t++;
 
-//  P(l,t,u,v) {v==10, 1<=l, l+1<=t, 6l<=t+49, 120<=59t+u, u<=t,
+//  P(l,t,u,v) {v==10, 1<=l, l+1<=t, 6l<=t+49, u<=t, 120<=59t+u,
 //    u<=59}
 
             if (!(0<=l&&l<=t&&6*l<=t+50))
@@ -860,11 +860,11 @@ void ts_restructured(void)
                checking_error();
          }
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, 60<=59t+u, u<=t, u<=59}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, u<=t, 60<=59t+u, u<=59}
 
          if (!(u==59))
 
-//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, 60<=59t+u, u<=t, u<=58}
+//  P(l,t,u,v) {v==10, 1<=l, l<=t, 6l<=t+50, u<=t, 60<=59t+u, u<=58}
 
             deadlock();
 

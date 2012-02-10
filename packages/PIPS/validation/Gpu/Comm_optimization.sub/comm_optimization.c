@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
+extern int atoi(const char *nptr);
 
 void init(int n, int a[n], int b[n]) {
   for(int i=0; i<n;i++) {

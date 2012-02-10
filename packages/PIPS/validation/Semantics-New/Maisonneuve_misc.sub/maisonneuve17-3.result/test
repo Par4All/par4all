@@ -332,8 +332,8 @@ void run(void)
 
                      ;
 
-//  T(x,y) {x+y#init==x#init+y, y<=x+2, x<=y+2, y#init<=y+1,
-//    y<=y#init}
+//  T(x,y) {x+y#init==x#init+y, y<=x+2, x<=y+2, y<=y#init,
+//    y#init<=y+1}
 
             if (flip())
 

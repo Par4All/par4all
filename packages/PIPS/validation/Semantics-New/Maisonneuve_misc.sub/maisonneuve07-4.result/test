@@ -24,7 +24,7 @@ void run(void)
    // b > 0 should be enough
    while (1) {
 
-//  T(x) {0<=b, x#init<=x+1, x<=x#init}
+//  T(x) {0<=b, x<=x#init, x#init<=x+1}
 
       if (rand()%2&&x>=-b)
 
@@ -79,11 +79,11 @@ void run(void)
 
          x--;
 
-//  P(b,t,x) {0<=b, 0<=b+x+1, x<=b+1, 0<=t, 0<=t+x+1, x<=t}
+//  P(b,t,x) {0<=b, 0<=b+x+1, x<=b+1, 0<=t, x<=t, 0<=t+x+1}
 
       if (rand()%2&&x<=b)
 
-//  P(b,t,x) {0<=b, 0<=b+x+1, x<=b, 0<=t, 0<=t+x+1, x<=t}
+//  P(b,t,x) {0<=b, x<=b, 0<=b+x+1, 0<=t, x<=t, 0<=t+x+1}
 
          x++;
 

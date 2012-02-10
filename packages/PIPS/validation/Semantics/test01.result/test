@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM TEST01
 
-C  T(I) {I#init<=I+1, I<=I#init}
+C  T(I) {I<=I#init, I#init<=I+1}
 
 
       IF (I.EQ.1) THEN                                                  0003
@@ -18,7 +18,7 @@ C  T() {}
 
       PRINT *, I                                                        0007
 
-C  T(I) {I#init<=I+1, I<=I#init}
+C  T(I) {I<=I#init, I#init<=I+1}
 
 
       IF (I.GE.1) THEN                                                  0009
@@ -53,7 +53,7 @@ C  T(I) {I==0}
 
       I = 0                                                             0021
 
-C  T(I) {I#init<=I+1, I<=I#init}
+C  T(I) {I<=I#init, I#init<=I+1}
 
 
       IF (I.EQ.1) THEN                                                  0023

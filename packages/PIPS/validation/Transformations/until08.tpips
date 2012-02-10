@@ -1,0 +1,20 @@
+delete until08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create until08 until08.c
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SIMPLIFY_CONTROL_DIRECTLY
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+
+delete until08

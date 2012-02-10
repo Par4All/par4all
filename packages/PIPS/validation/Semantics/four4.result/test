@@ -26,7 +26,7 @@ C  T(NN) {2N==NN}
 C (0,3)
       NN = 2*N                                                          0008
 
-C  T(M) {NN<=2M+1, 2M<=NN}
+C  T(M) {2M<=NN, NN<=2M+1}
 
 C (0,4)
       M = NN/2                                                          0009
@@ -37,7 +37,7 @@ C    M#init+1<=J#init, 2<=M, 2<=M#init}
 C (0,5)
       DO WHILE (M.GE.2.AND.J.GT.M)                                      0010
 
-C  T(J,M) {J+M#init==J#init, M#init<=2M+1, 2M<=M#init}
+C  T(J,M) {J+M#init==J#init, 2M<=M#init, M#init<=2M+1}
 
 C (0,6)
 C        BEGIN BLOCK
@@ -47,7 +47,7 @@ C  T(J) {J+M==J#init}
 C (0,7)
          J = J-M                                                        0011
 
-C  T(M) {M#init<=2M+1, 2M<=M#init}
+C  T(M) {2M<=M#init, M#init<=2M+1}
 
 C (0,8)
          M = M/2                                                        0012

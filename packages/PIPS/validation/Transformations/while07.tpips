@@ -1,0 +1,28 @@
+delete while07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+create while07 while07.c
+
+module while07
+
+setproperty MAXIMAL_PARAMETER_EFFECTS_FOR_UNKNOWN_FUNCTIONS TRUE
+
+echo ### initial code
+display PRINTED_FILE
+
+echo ### Preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo ### suppress dead code
+apply SIMPLIFY_CONTROL
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+
+delete while07

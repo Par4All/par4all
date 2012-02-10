@@ -1,0 +1,52 @@
+#
+# Initial code for module pain
+#
+void pain(int rdata[100])
+{
+   int i;
+holy:
+   for(i = 0; i <= 99; i += 1)
+      rdata[0] += rdata[i];
+}
+#
+# Display print_code_regions for module pain
+#
+
+//  <rdata[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <rdata[PHI1]-W-EXACT-{PHI1==0}>
+
+void pain(int rdata[100])
+{
+   int i;
+
+//  <rdata[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>
+//  <rdata[PHI1]-W-EXACT-{PHI1==0}>
+
+holy:
+   for(i = 0; i <= 99; i += 1)
+
+//  <rdata[PHI1]-R-MAY-{0<=PHI1, PHI1<=i, i<=99}>
+//  <rdata[PHI1]-W-EXACT-{PHI1==0, 0<=i, i<=99}>
+
+      rdata[0] += rdata[i];
+}
+#
+# Code after isolate_statement for module pain
+#
+void pain(int rdata[100])
+{
+   int i;
+   {
+      //PIPS generated variable
+      int (*rdata0)[100] = (int (*)[100]) 0;
+      P4A_accel_malloc((void **) &rdata0, sizeof(int)*100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &rdata[0], *rdata0);
+
+holy:
+      for(i = 0; i <= 99; i += 1)
+         (*rdata0)[0-0] += (*rdata0)[i-0];
+      P4A_copy_from_accel_1d(sizeof(int), 100, 1, 0, &rdata[0], *rdata0);
+      P4A_accel_free(rdata0);
+   }
+}
+(0, '4950\n', '') : (0, '4950\n', '')

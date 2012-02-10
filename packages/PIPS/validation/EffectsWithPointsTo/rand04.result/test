@@ -119,12 +119,12 @@ int main(void)
    *pp = (void *) 0;
 
 // Points To:
-// pi1 -> *NULL_POINTER* , MAY
 // pi1 -> i1 , MAY
+// pi1 -> *NULL_POINTER* , MAY
 // pi2 -> i2 , MAY
 // pi2 -> *NULL_POINTER* , MAY
-// pp -> pi2 , MAY
 // pp -> pi1 , MAY
+// pp -> pi2 , MAY
 
    printf("%p %p %p\n", pp, pi1, pi2);
 
