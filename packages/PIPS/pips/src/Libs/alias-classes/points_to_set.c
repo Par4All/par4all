@@ -70,11 +70,6 @@ entity location_entity(cell c)
   return e;
 }
 
-/* Returns a copy of the reference in cell */
-reference location_reference(cell c)
-{
-  return copy_reference(cell_to_reference(c));
-}
 
 
 /*return true if two acces_path are equals*/
@@ -92,19 +87,17 @@ int points_to_equal_p( const void * vpt1, const void*  vpt2)
   cell c2 = points_to_source(pt2);
   cell c3 = points_to_sink(pt1);
   cell c4 = points_to_sink(pt2);
-  bool cmp1 = true, cmp2 = true, cmp3 = false;
-
-  cmp1 = locations_equal_p(c1,c2);
-  cmp2 = locations_equal_p(c3,c4);
-  cmp3 = ( approximation_exact_p( points_to_approximation(pt1) )
+  bool cmp1 = locations_equal_p(c1,c2);
+  bool cmp2 = locations_equal_p(c3,c4);
+  bool cmp3 = ( approximation_exact_p( points_to_approximation(pt1) )
 	   &&
 	   approximation_exact_p( points_to_approximation(pt2) )
 	   ) || ( approximation_may_p( points_to_approximation(pt1) )
 		  &&
 		  approximation_may_p( points_to_approximation(pt2) )
 		  );
-  bool cmp =cmp1 && cmp2 && cmp3;
-  return cmp;
+
+  return cmp1 && cmp2 && cmp3;
 }
 
 
@@ -163,7 +156,7 @@ set points_to_function_projection(set pts)
   set_assign(res, pts);
 
   SET_FOREACH(points_to, pt, pts){
-    if(cell_out_of_scope_p(points_to_source(pt)) || cell_out_of_scope_p(points_to_sink(pt)))
+    if(cell_out_of_scope_p(points_to_source(pt)))
       set_del_element(res, res, (void*)pt);
   }
   return res;
@@ -174,10 +167,7 @@ bool cell_out_of_scope_p(cell c)
 {
   reference r = cell_to_reference(c);
   entity e = reference_variable(r);
-  if (!(variable_static_p(e) || formal_parameter_p(e) || top_level_entity_p(e) || entity_heap_location_p(e)))
-    return true;
-  else
-    return false;
+  return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
 }
 
 /*print a points-to for debug*/
@@ -209,11 +199,8 @@ bool source_in_set_p(cell source, set s)
 {
   bool in_p = false;
   SET_FOREACH ( points_to, pt, s ) {
-    /* if ( cell_equal_p(points_to_source(pt),source) ) */
-    /*   in_p = true; */
     if( opkill_may_vreference(source, points_to_source(pt) ))
       return true;
-
   }
   return in_p;
 }
@@ -265,6 +252,14 @@ set merge_points_to_set(set s1, set s2) {
   Merge_set = set_clear(Merge_set);
   Merge_set = set_union(Merge_set, Possible_set, Definite_set);
 
+  set_clear(Intersection_set);
+  set_clear(Union_set);
+  set_clear(Possible_set);
+  set_clear(Definite_set);
+  set_free(Definite_set);
+  set_free(Possible_set);
+  set_free(Intersection_set);
+  set_free(Union_set);
   return Merge_set;
 }
 

@@ -148,16 +148,14 @@ bool print_code_points_to(const char* module_name,
   bool res;
   debug_on("POINTS_TO_DEBUG_LEVEL");
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-  /* points_to_list summary_pts_to = (points_to_list) */
-  /*   db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true); */
-  /* list l_sum_pt_to = points_to_list_list(summary_pts_to); */
   
-  /* Load IN summary pts-to */
+  
+  /* Load IN  pts-to */
   points_to_list pts_to_in = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_IN, module_name, true);
   list l_pt_to_in = points_to_list_list(pts_to_in);
 
- /* Load OUT summary pts-to */
+ /* Load OUT  pts-to */
   points_to_list pts_to_out = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_OUT, module_name, true);
   list l_pt_to_out = points_to_list_list(pts_to_out);
@@ -168,7 +166,7 @@ bool print_code_points_to(const char* module_name,
   /*  FI: just for debugging */
   // check_abstract_locations();
   set_printed_points_to_list((statement_points_to)
-			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true));
+			     db_get_memory_resource(DBR_POINTS_TO, module_name, true));
   /* statement_points_to_consistent_p(get_printed_points_to_list()); */
   set_current_module_statement((statement)
 			       db_get_memory_resource(DBR_CODE,
@@ -199,7 +197,7 @@ bool print_code_points_to(const char* module_name,
 bool print_code_points_to_list(const char* module_name)
 {
 	return print_code_points_to(module_name,
-				    DBR_POINTS_TO_LIST,
+				    DBR_POINTS_TO,
 				    PT_TO_SUFFIX);
 }
 

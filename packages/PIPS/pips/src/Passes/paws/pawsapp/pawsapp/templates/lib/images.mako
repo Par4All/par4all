@@ -1,12 +1,13 @@
-% for im in images:
-<div class="span16">
-  <p><span class="label notice">Function '${im["fu"]}'</span></p>
-  <div>
-    <a href="${im['link']}" class="ZOOM_IMAGE"><img src="${im['image']}"/></a>
-  </div>
-  <br clear="all"/>
-  % if images.index(im) != len(images)-1:
-  <hr/>
-  % endif 
+% for img in images:
+<div style="clear:both; width: 100%">
+  <p><span class="label notice">Function '${img["fu"]}'</span></p>
+  % if img["zoom"]:
+  <a href="${img['full']}" class="ZOOM_IMAGE" title="Zoom">${h.image(img["thumb"], img["fu"])}</a>
+  % else:
+  ${h.image(img["full"], img["fu"])}
+  % endif
 </div>
+% if images.index(img) != len(images)-1:
+<hr/>
+% endif 
 % endfor

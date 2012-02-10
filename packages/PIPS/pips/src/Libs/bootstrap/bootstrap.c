@@ -4938,6 +4938,8 @@ CreateIntrinsics( set module_list )
         {ISFINITE_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {ISINF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISNANL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_real_to_int, 0},
+        {ISNANF_OPERATOR_NAME, 1, real_to_integer_type, typing_function_real_to_int, 0},
         {ISNORMAL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
         {SIGNBIT_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
         {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double , 0},
@@ -5405,6 +5407,7 @@ CreateIntrinsics( set module_list )
         {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
         {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
         {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},
+        {SECOND_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0}, //GFORTRAN
 
         /*#include <wchar.h>*/
         { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
@@ -5516,9 +5519,6 @@ CreateIntrinsics( set module_list )
         {VERRX_FUNCTION_NAME,   3, 	   overloaded_to_void_type, 0, 0},
         {VWARN_FUNCTION_NAME,   2, 	   overloaded_to_void_type, 0, 0},
         {VWARNX_FUNCTION_NAME,  2, 	   overloaded_to_void_type, 0, 0},
-
-        /* GNU Extension*/
-        {SECOND_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
 
         /* F95 */
         {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},

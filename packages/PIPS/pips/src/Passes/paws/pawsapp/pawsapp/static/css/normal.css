@@ -1,3 +1,12 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.sidebar-nav {
+    padding: 9px 0;
+}
+
 .inp-hide {
     height: 30px;
     left: -90px;
@@ -8,11 +17,10 @@
 
 /* Main column */
 
-#classic-examples-dialog a {
-    margin-bottom: 2px;
-}
-
-
 ol.linenums li span {
     color: #333;
+}
+
+.ZOOM_IMAGE img {
+    max-width: none; /* for compatibility with Bootstrap */
 }

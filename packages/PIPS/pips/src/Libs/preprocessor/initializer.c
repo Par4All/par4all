@@ -363,14 +363,12 @@ static text compilation_unit_text(entity cu, entity module)
 
    Should be checked with different module with the same name... Maybe a
    conflict in WORKSPACE_TMP_SPACE ?
-   if compilation_unit_name is set to string_undefined, a new compilation unit is generated, but not in fortran, where compilation unit do not exist!
 */
 bool
 add_new_module_from_text(const char* module_name,
 			 text code_text,
 			 bool is_fortran,
-			 const char* compilation_unit_name) {
-    pips_assert("fortran module have no compilation unit\n",!is_fortran || (is_fortran && string_undefined_p(compilation_unit_name)));
+             const char* compilation_unit_name) {
     bool success_p = true;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
@@ -399,24 +397,26 @@ add_new_module_from_text(const char* module_name,
       asprintf(&file_name,"%s" FORTRAN_FILE_SUFFIX ,module_name );
     } else {
         set_prettyprint_language_tag(is_language_c);
+        if(string_undefined_p(compilation_unit_name)) {
+            cun = compilation_unit_of_module(module_name);
+        }
+        else {
+            cun = strdup(compilation_unit_name);
+            if(entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun)))
+                cu = MakeCompilationUnitEntity(cun);
+        }
 
         // Build the corresponding compilation unit for C code
-        if( string_undefined_p(compilation_unit_name) ) {
-            // Function defined in pipsmake
-            cun = compilation_unit_of_module(module_name);
-
-            if(string_undefined_p(cun)) {
-                int count = 0;
-                asprintf(&cun,"%s" FILE_SEP_STRING, module_name);
-                while(!entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun))) {
-                    free(cun);
-                    asprintf(&cun,"%s%d" FILE_SEP_STRING, module_name, count ++);
-                }
-                cu = MakeCompilationUnitEntity(cun);
+        if(string_undefined_p(cun)) {
+            char * the_cu = NULL,*iter;
+            if((iter=strchr(module_name,FILE_SEP))) {
+                the_cu = strndup(module_name,iter-module_name);
             }
+            else the_cu = strdup(module_name);
+            asprintf(&cun, "%s" FILE_SEP_STRING, the_cu);
+            cu = MakeCompilationUnitEntity(cun);
+            free(the_cu);
         }
-        else
-            cun=strdup(compilation_unit_name);
 
         /* pips' current directory is just above the workspace
         */
@@ -453,7 +453,7 @@ add_new_module_from_text(const char* module_name,
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(full_name));
 
-    if(!is_fortran && string_undefined_p(compilation_unit_name) ) { // C is assumed
+    if( !entity_undefined_p(cu) ) { // C is assumed
       /* Add the compilation unit files */
       pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
       user_log("Registering synthesized compilation unit %s\n", file_name);
@@ -475,10 +475,13 @@ add_new_module_from_text(const char* module_name,
       DB_PUT_FILE_RESOURCE(res, cun, init_name);
       DB_PUT_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(full_name));
     }
-    else if(!is_fortran)
-        AddEntityToModuleCompilationUnit(m,module_name_to_entity(compilation_unit_name));
+    else if(!is_fortran) {
+        if(entity_undefined_p(cu)) cu = module_name_to_entity(cun);
+        AddEntityToModuleCompilationUnit(m, cu);
+    }
 
     free(file_name), free(dir_name), free(full_name), free(finit_name);
+    if(!string_undefined_p(cun)) free(cun);
     return success_p;
 }
 
@@ -504,7 +507,8 @@ add_new_module(const char* module_name,
   text code_text = text_module(module, stat);
   bool ret = add_new_module_from_text(module_name,
 				  code_text,
-				  is_fortran,string_undefined);
+				  is_fortran,
+                  string_undefined);
   free_text(code_text);
 
   return ret;
@@ -536,7 +540,8 @@ static bool missing_file_initializer(const char* module_name, bool is_fortran)
   stub = stub_text(m, is_fortran);
   bool ret = add_new_module_from_text(module_name,
 				  stub,
-				  is_fortran,string_undefined);
+				  is_fortran,
+                  string_undefined);
   free_text(stub);
   return ret;
 }

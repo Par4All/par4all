@@ -77,7 +77,6 @@
 
 static list time_effects(entity, list );
 static list no_write_effects(entity e,list args);
-static list safe_c_effects(entity e,list args);
 static list safe_c_read_only_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
@@ -703,6 +702,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ISFINITE_OPERATOR_NAME,                 no_write_effects},
   {ISINF_OPERATOR_NAME,                    no_write_effects},
   {ISNAN_OPERATOR_NAME,                    no_write_effects},
+  {ISNANL_OPERATOR_NAME,                   no_write_effects},
+  {ISNANF_OPERATOR_NAME,                   no_write_effects},
   {ISNORMAL_OPERATOR_NAME,                 no_write_effects},
   {SIGNBIT_OPERATOR_NAME,                  no_write_effects},
   {C_ACOS_OPERATOR_NAME,                   no_write_effects},
@@ -1037,6 +1038,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {GETTIMEOFDAY_FUNCTION_NAME,             time_effects},
   {CLOCK_GETTIME_FUNCTION_NAME,            time_effects},
   {CLOCK_FUNCTION_NAME,                    time_effects},
+  {SECOND_FUNCTION_NAME,                   time_effects}, //gfortran extension
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_effects},
@@ -1225,9 +1227,6 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
-  /* GNU Extension*/
-  {SECOND_FUNCTION_NAME,                   time_effects},
-
   /* F95 */
   {ALLOCATE_FUNCTION_NAME,                 any_heap_effects},
   {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},
@@ -1385,8 +1384,11 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
 
 /**
    assumes may read and write effects on the objects pointed to by actual arguments
+
+   Hopefully also used for empty functions, i.e. functions with an
+   empty statement, which, most of the time, are unknown functions.
  */
-static list
+list
 safe_c_effects(entity e __attribute__ ((__unused__)),list args)
 {
   list lw = NIL, lr = NIL;
@@ -2234,7 +2236,7 @@ static list any_heap_effects(entity e, list args)
 /* Molka Becher : To handle the effects of memmove function. Memmove acts as if it uses
    a temporary array to copy characters from one object to another. C99
    Note : CreateMemmoveAbstractState() is defined in bootstrap.c  */
-static list memmove_effects(entity e, list args)
+static list memmove_effects(entity e, list args __attribute__ ((unused)))
 {
   list le = NIL;
   entity memmove_entity = entity_undefined;
@@ -2793,7 +2795,7 @@ effects_of_implied_do(expression exp, tag act)
 
 /* Add a time effect, that is a read and a write on a particular hidden time variable */
 static
-list time_effects(entity e, list args) {
+list time_effects(entity e __attribute__ ((unused)), list args) {
 	list le = NIL;
     FOREACH(EXPRESSION,arg,args) // true for at least gettimeofday, clock and time
         le = gen_nconc(le,
@@ -2965,7 +2967,7 @@ static list search_or_sort_effects(entity e, list args)
 /**
     generate effects for strtoxxx functions
  */
-static list strtoxxx_effects(entity e, list args)
+static list strtoxxx_effects(entity e __attribute__ ((unused)), list args)
 {
   list le = NIL;
   expression nptr_exp = EXPRESSION(CAR(args));

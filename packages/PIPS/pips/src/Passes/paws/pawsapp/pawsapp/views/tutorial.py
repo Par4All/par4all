@@ -9,15 +9,8 @@ from subprocess   import Popen, PIPE
 
 from pyramid.view import view_config
 
-from .operations  import _get_directory, _highlight_code
-from .graph       import _create_zoom_image
+from .operations  import _create_workdir, _highlight_code
 
-
-tutorialName = {
-    'acca-2011'    : u'acca-2011.c',
-    'aile_excerpt' : u'aile_excerpt.f',
-    'convol'       : u'convol.f',
-    }
 
 _dependence_graph = 'apply PRINT_DOT_DEPENDENCE_GRAPH'
 _paws_marker      = '<END OF THE STEP>'
@@ -80,7 +73,7 @@ def _create_png(request, function, tutorial):
 def tutorial(request):
 
     tutorial = os.path.basename(request.matchdict['tutorial'])  # (sanitized)
-    name     = tutorialName[tutorial]
+    name     = "tutorialName[tutorial]" ##TODO
     path     = _get_path(request, tutorial)
 
     source   = os.path.join(path, name)

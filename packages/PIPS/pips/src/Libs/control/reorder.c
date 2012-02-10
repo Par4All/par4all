@@ -82,71 +82,73 @@ static int get_next_unstructured_number() {
 
    @return the statement number after the end of the given statement
 */
-static int statement_reorder(st, un, sn)
-statement st;
-int un, sn;
+static int statement_reorder(statement st, int un, int sn)
 {
-    instruction i = statement_instruction(st);
+  instruction i = statement_instruction(st);
+  pips_assert("instruction is defined", !instruction_undefined_p(i));
 
-    /* temporary, just to avoid rebooting... */
-    static int check_depth_hack = 0;
-    check_depth_hack++;
-    pips_assert("not too deep", check_depth_hack<10000);
+  // temporary, just to avoid rebooting...
+  static int check_depth_hack = 0;
+  check_depth_hack++;
+  pips_assert("not too deep", check_depth_hack<10000);
 
-    debug(5, "statement_reorder", "entering for %d : (%d,%d)\n",
-	  statement_number(st), un, sn);
+  pips_debug(5, "entering for %"_intFMT" : (%d,%d)\n",
+             statement_number(st), un, sn);
 
-    statement_ordering(st) = MAKE_ORDERING(un, sn);
+  // update ordering
+  statement_ordering(st) = MAKE_ORDERING(un, sn);
+  sn += 1;
 
-    sn += 1;
-
-    switch (instruction_tag(i)) {
-      case is_instruction_block:
-	debug(5, "statement_reorder", "block\n");
-	MAPL(sts, {
-	    sn = statement_reorder(STATEMENT(CAR(sts)), un, sn);
-	}, instruction_block(i));
-	break;
-      case is_instruction_test:
-	debug(5, "statement_reorder", "test\n");
-	sn = statement_reorder(test_true(instruction_test(i)), un, sn);
-	sn = statement_reorder(test_false(instruction_test(i)), un, sn);
-	break;
-      case is_instruction_loop:
-	debug(5, "statement_reorder", "loop\n");
-	sn = statement_reorder(loop_body(instruction_loop(i)), un, sn);
-	break;
-      case is_instruction_whileloop:
-	debug(5, "statement_reorder", "whileloop\n");
-	sn = statement_reorder(whileloop_body(instruction_whileloop(i)), un, sn);
-	break;
-      case is_instruction_forloop:
-	debug(5, "statement_reorder", "forloop\n");
-	sn = statement_reorder(forloop_body(instruction_forloop(i)), un, sn);
-	break;
-      case is_instruction_goto:
-      case is_instruction_call:
-	debug(5, "statement_reorder", "goto or call\n");
-	break;
-      case is_instruction_expression:
-	debug(5, "statement_reorder", "expression\n");
-	break;
-      case is_instruction_unstructured:
-	debug(5, "statement_reorder", "unstructured\n");
-	unstructured_reorder(instruction_unstructured(i));
-	break;
-      default:
-	pips_internal_error("Unknown tag %d", instruction_tag(i));
+  switch (instruction_tag(i))
+  {
+  case is_instruction_sequence:
+    pips_debug(5, "sequence\n");
+    FOREACH (statement, s, sequence_statements(instruction_sequence(i)))
+    {
+      sn = statement_reorder(s, un, sn);
     }
-
-    debug(5, "statement_reorder", "exiting %d\n", sn);
-
-    check_depth_hack--;
-    return sn;
+    break;
+  case is_instruction_test:
+    pips_debug(5, "test\n");
+    sn = statement_reorder(test_true(instruction_test(i)), un, sn);
+    sn = statement_reorder(test_false(instruction_test(i)), un, sn);
+    break;
+  case is_instruction_loop:
+    pips_debug(5, "loop\n");
+    sn = statement_reorder(loop_body(instruction_loop(i)), un, sn);
+    break;
+  case is_instruction_whileloop:
+    pips_debug(5, "whileloop\n");
+    sn = statement_reorder(whileloop_body(instruction_whileloop(i)), un, sn);
+    break;
+  case is_instruction_forloop:
+    pips_debug(5, "forloop\n");
+    sn = statement_reorder(forloop_body(instruction_forloop(i)), un, sn);
+    break;
+  case is_instruction_goto:
+  case is_instruction_call:
+    pips_debug(5, "goto or call\n");
+    // nothing to do, does not contain statements
+    break;
+  case is_instruction_expression:
+    pips_debug(5, "expression\n");
+    break;
+  case is_instruction_unstructured:
+    pips_debug(5, "unstructured\n");
+    unstructured_reorder(instruction_unstructured(i));
+    break;
+    // missing: is_instruction_multitest
+  default:
+    pips_internal_error("Unknown tag %d", instruction_tag(i));
+  }
+  pips_debug(5, "exiting %d\n", sn);
+  check_depth_hack--;
+  return sn;
 }
 
 
-void control_node_reorder(__attribute__((unused)) control c,__attribute__((unused))  set visited_control) {
+void control_node_reorder(__attribute__((unused)) control c,
+                          __attribute__((unused)) set visited_control) {
 }
 
 /* Reorder an unstructured

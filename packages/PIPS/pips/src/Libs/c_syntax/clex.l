@@ -392,12 +392,21 @@ void init_C_comment()
 }
 /* compatibility layer for bsd */
 static void bsd_rewrite(char ** pyytext) {
-	if(same_string_p(*pyytext,"__stdinp"))
-		*pyytext="stdin";
-	else if(same_string_p(*pyytext,"__stdoutp"))
-		*pyytext="stdout";
-	else if(same_string_p(*pyytext,"__stderrp"))
-		*pyytext="stderr";
+	char* aliases [][2] = {
+		{ "__stdinp", "stdin" },
+		{ "__stdoutp", "stdout" },
+		{ "__stderrp", "stderr" },
+		{ "__isnanl", "isnanl" },
+		{ "__isnanf", "isnanf" },
+		{ "__isnan", "isnan" },
+		{ NULL, NULL }
+	};
+	for(char *(*iter)[2] = &aliases[0] ; (*iter)[0] ; ++iter) {
+		if(same_string_p(*pyytext, (*iter)[0] )) {
+			*pyytext=(*iter)[1];
+			break;
+		}
+	}
 }
 
 %}

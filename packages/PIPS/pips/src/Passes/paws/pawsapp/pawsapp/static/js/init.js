@@ -1,5 +1,9 @@
 $(function(){
 
+    //
+    // LEFT COLUMN
+    //
+
     // A+ / A- buttons
     $('#aplus').click(function(ev) {
 	ev.preventDefault();
@@ -10,17 +14,59 @@ $(function(){
 	resize(0)
     });
 
-    // Classic examples
+    // Load classic examples button
     $('#classic-examples-dialog a').click(function(ev) {
 	ev.preventDefault();
 	load_example(ev.target.id);
     });
 
-    // File upload
+    // Upload file button
     $('#upload_input').change(function() {
 	$('#upload_form').submit();
 	$('#upload_target').load(after_upload);
     });
+
+    // Run button
+    $("#run-button").click(function(ev) {
+	ev.preventDefault();
+	activate_tab('result');
+	if (performed == false)
+	    performed = perform_operation(1, 'result');
+    });
+
+    // Print button
+    $("#print-button").click(function() {
+	window.print();
+    });
+
+    // Save button
+    $("#save-button").click(function() {
+	document.location.href = routes['tool_results'].replace('{tool}', operation);
+    });
+
+    // Switch between basic/advanced modes
+    $('#mode-buttons').click(function(ev) {
+	ev.preventDefault();
+	advanced = !advanced;
+	switch_adv_mode();
+    });
+
+    // Advanced mode form
+    $('#adv-form a').tooltip();
+    $('#adv-form .watch').change(function() {
+	performed = false;
+	created_graph = false;
+	switch_buttons();
+    });
+
+    // Initialize button states
+    switch_buttons();
+    switch_adv_mode();
+
+
+    //
+    // MAIN COLUMN
+    //
 
     // Source code input field
     $('#sourcecode-1').linedtextarea()
@@ -39,34 +85,5 @@ $(function(){
 	    created_graph = create_graph(1, 'graph');
     });
 
-    // Run button
-    $("#run-button").click(function(ev) {
-	ev.preventDefault();
-	activate_tab('result');
-	if (performed == false)
-	    performed = perform_operation(1, 'result');
-    });
-
-    // Print buttons
-    $("#print-button").click(function(ev) {
-        var content    = $('#resultcode'),
-            printFrame = $('#iframetoprint').contentWindow;
-        printFrame.document.ope();
-        printFrame.document.write(content.innerHTML);
-        printFrame.document.close();
-        printFrame.focus();
-        printFrame.print();
-    });
-
-    switch_buttons();
-
-    // Switch between modes
-
-    $('#mode-buttons').click(function(ev) {
-	ev.preventDefault();
-	advanced = !advanced;
-	switch_adv_mode();
-    });
-    switch_adv_mode();
 
 });
