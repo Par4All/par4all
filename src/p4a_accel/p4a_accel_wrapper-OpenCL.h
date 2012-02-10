@@ -84,13 +84,22 @@ short, ushort, and half will need to include the #pragma OPENCL
 EXTENSION cl_khr_byte_addressable_store : enable directive before any
 code that performs writes that may not be supported. 
 */
+#ifdef cl_khr_byte_addressable_store
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
+#endif
 
 /*
 Pragma to support double floating point precision
 * */
 
-#pragma OPENCL EXTENSION cl_khr_fp64: enable 
+#ifdef cl_khr_fp64
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+#elif defined(cl_amd_fp64)
+#pragma OPENCL EXTENSION cl_amd_fp64 : enable
+#else
+#warning "Your OpenCL device doesn't support double precision"
+#endif
+
 
 
 /**

@@ -1,8 +1,12 @@
 # Makefile for Stars-pm
-TARGET= stars-pm
+LOCAL_TARGET= stars-pm
 
 # can be overwrite on cmdline
 SIZE?=128
+
+# In the following, the _GRAPHICS_ and CPP flags allow GTK or OpenGL
+# graphics output. Note you can have both at the same time,
+# interessingly. :-)
 
 #colors
 NO_COLOR=
@@ -27,8 +31,8 @@ export P4A_GENERATED
 PGI_SOURCES=  $(BASE_SOURCES:%=pgi/%)
 PGI_OBJS=  $(BASE_SOURCES:%.c=%.o)
 MANUAL_CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
-							cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
-							cuda/4-updateforce.cu cuda/4-updatevel.cu cuda/6-updatepos.cu
+	cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
+	cuda/4-updateforce.cu cuda/4-updatevel.cu cuda/6-updatepos.cu
 
 STUBS = stubs/pips_stubs.c
 
@@ -53,6 +57,7 @@ ifeq ($(opengl),1)
   GRAPHICS_SRC+= common/glgraphics.c
   LDLIBS+= -lGL -lGLU -lglut
   CULIBS+= -lGL -lGLU -lglut
+  OPENCLLIBS+= -lGL -lGLU -lglut
   # Since the user may have defined its own P4A_OPTIONS such as
   # P4A_OPTIONS='--cuda-cc=1.3', use it and go on with it with 'overide':
   override P4A_OPTIONS+= -D_GLGRAPHICS_ --extra-obj=common/glgraphics.o
@@ -77,14 +82,6 @@ include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GR
 	rm -f include/stars-pm-generated_* *.o
 	cproto  `pkg-config --cflags-only-I gtk+-2.0` $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
 
-%_gtk:
-	$(MAKE) $* gtk=1
-
-display_%:run_%_gtk ;
-
-%_opengl: demo_opengl_message
-	$(MAKE) $* opengl=1
-
 opengl_display_%: demo_opengl_message run_%_opengl ;
 
 demo_opengl_message:
@@ -92,3 +89,26 @@ demo_opengl_message:
 	(command "make demo_opengl"), this allows the execution of the next demo\n"
 
 demo_opengl : opengl_display_seq opengl_display_openmp opengl_display_accel-openmp opengl_display_cuda opengl_display_cuda-opt opengl_display_opencl;
+
+
+# Changing between OpenGL and GTK still needs a make clean in between...
+
+# If we ask for GTK version, compile as is:
+%_gtk:
+	$(MAKE) gtk=1 $*
+
+
+# If we ask for OpenGL version, compile as is:
+%_opengl: demo_opengl_message
+	$(MAKE) opengl=1 $*
+
+default_gtk=
+ifneq ($(gtk),1)
+  ifneq ($(opengl),1)
+	# Default display use GTK version if not asked already for OpenGL
+	#nor GTK:
+	default_gtk=_gtk
+  endif
+endif
+
+display_%: run_%$(default_gtk) ;

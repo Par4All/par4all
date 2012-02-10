@@ -48,6 +48,12 @@ def add_own_options(parser):
 
     proc_group = optparse.OptionGroup(parser, "PIPS processing options")
 
+    proc_group.add_option("--no-pointer-aliasing", action = "store_true", default = False,
+        help = "Assume there is no aliasing in input program, thus enabling more optimizations. This option currently only controls PIPS internal processing and is not taken into account for back-end compilation.")
+
+    proc_group.add_option("--pointer-analysis", action = "store_true", default = False,
+        help = "Activates a pointer analysis phase on the code (experimental !).")
+
     proc_group.add_option("--accel", "-A", action = "store_true", default = False,
         help = "Parallelize for heterogeneous accelerators by using the Par4All Accel run-time that allows executing code for various hardware accelerators such as GPU or even OpenMP emulation.")
 
@@ -70,16 +76,19 @@ def add_own_options(parser):
         help = "This option is useful when generating some CUDA code from C99 sources. Indeed nvcc doesn't support the following C99 syntax : foo (int n, int a[n]), then if the --c99 option is enabled, p4a will automatically generates the CUDA code in new C89 files (with no VLA but pointers with linearized accesses instead) that will be compiled by nvcc. A simple call to each kernel will be inserted into the original file that can be compiled with your usual C99 compiler.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
+        help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit.")
 
-    proc_group.add_option("--fine", "-F", action = "store_true", default = False,
-        help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
+    proc_group.add_option("--fine-grain", "-F", action = "store_true", default = False,
+        help = "Use a fine-grain parallelization algorithm instead of a coarse-grain one.")
 
     proc_group.add_option("--atomic", action = "store_true", default = False,
         help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
 
     proc_group.add_option("--pocc", action = "store_true", default = False,
-        help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection")
+        help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection.")
+
+    proc_group.add_option("--pocc-options", action = "store", default = "",
+        help = "Options to pass to PoCC.")
 
     proc_group.add_option("--cuda-cc", action = "store", default = "2.0",
         help = "Compute capabilities of CUDA target (default is 2.0). For example if you have a message like 'P4A CUDA kernel execution failed : invalid device function' at execution time, the generated code may be incompatible with your GPU and you have to use this option to select the good architecture version.")
@@ -360,8 +369,10 @@ def main():
             options.cuda_cc=1.3
         elif options.cuda_cc == "2.0":
             options.cuda_cc=2
+        elif options.cuda_cc == "2.1":
+            options.cuda_cc=2.1
         else:
-            p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")
+            p4a_util.die("Unknown CUDA compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0 2.1)")
 
         if options.simple and (options.cuda or options.opencl or options.openmp or options.scmp):
             p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp  and/or --opencl")
@@ -537,6 +548,8 @@ def main():
             # will be serialized (pickle'd) to ease the
             # passing of parameters to the processor.
             input = p4a_processor.p4a_processor_input()
+            input.noalias = options.no_pointer_aliasing
+            input.pointer_analysis = options.pointer_analysis           
             input.c99 = options.c99
             input.project_name = project_name
             input.accel = options.accel
@@ -547,9 +560,10 @@ def main():
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.scmp = options.scmp
-            input.fine = options.fine
+            input.fine_grain = options.fine_grain
             input.atomic = options.atomic
             input.pocc = options.pocc
+            input.pocc_options = options.pocc_options
             input.select_modules = options.select_modules
             input.exclude_modules = options.exclude_modules
             input.cpp_flags = " ".join(builder.cpp_flags)

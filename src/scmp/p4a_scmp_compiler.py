@@ -45,17 +45,14 @@ class p4a_scmp_compiler(p4a_processor):
     scmp_default_stack_size = 1024
     scmp_buffers_file_name = "scmp_buffers.h"
 
-    def __init__(self, workspace = None, project_name = "",
-                 scmp_applis_dir_name = ".",
-                 cpp_flags = "",
-                 verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False,
-                 recover_includes = True, native_recover_includes = False,
-                 user_properties = {}, activates = []):
-
+    def __init__(self, files = [], project_name = "",scmp_applis_dir_name = ".",user_properties = {}, *sources, **kwargs): 
+                 
+        
         global default_scmp_properties
         self.scmp_applis_dir_name = scmp_applis_dir_name
         self.scmp_events_file_name = project_name + "_event_val.h"
+        
+        ## FIXME : what's the following ??? Stubs should be handled by a broker
         stubs_name = "p4a_stubs.c"
         self.stubs_files = os.path.join(os.environ["P4A_ACCEL_DIR"], stubs_name)
         files += [ self.stubs_files ]
@@ -63,14 +60,7 @@ class p4a_scmp_compiler(p4a_processor):
         # add scmp properties to user properties
         properties = dict(user_properties)
         properties.update(default_scmp_properties)
-        p4a_processor.__init__(self, workspace, project_name,
-                               cpp_flags,
-                               verbose, files, filter_select, filter_exclude,
-                               False, False, False, False, False, 2, False,
-                               recover_includes,
-                               native_recover_includes,
-                               True, False, False, "",
-                               properties, {}, activates)
+        p4a_processor.__init__(self, files=files, project_name=project_name, properties=properties,  *sources, **kwargs)
         self.kernel_tasks_labels = []
         self.server_tasks_labels = []
         self.generated_files = []

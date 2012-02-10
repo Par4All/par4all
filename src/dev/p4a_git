@@ -109,7 +109,7 @@ while [ "$1" ] ; do
       -g|--recursive-git-svn) recursive_git_action=1 ;;
       -f|--fetch-remote-git) fetch_remote_git=1 ;;
       -p|--pull-remote-git) pull_remote_git=1 ;;
-      -m|--aggregate-branches) aggregate_branches=1 ; merge_to_prefix_branches=$1 ; shift ; merge_remote_git_prefix="$1" ; shift ;;
+      -m|--aggregate-branches) aggregate_branches=1 ; merge_to_prefix_branches="$1" ; shift ; merge_remote_git_prefix="$2" ; shift ;;
       -a|--branch-action) branch_action_name=p4a ; branch_action="$@" ; break;;
       -b|--branch-action-name) branch_action_name="$1" ; shift; branch_action="$@" ; break;;
       --add-remotes) add_remotes=1 ;;

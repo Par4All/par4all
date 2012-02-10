@@ -1,5 +1,5 @@
-Release notes for Par4All 1.3, 2011/11/11
-=========================================
+Release notes for Par4All 1.3.1, 2012/01/30
+===========================================
 
 Par4All is an open-source environment to do source-to-source
 transformations on C and Fortran programs for parallelizing, optimizing,
@@ -18,8 +18,9 @@ This release presents new features of Par4All and PIPS that are described
 deeper in the ``changelog`` file. For all features and changes in the
 previous versions, please see the release notes archives from git.
 
-To install Par4All, you need Debian, Ubuntu or Fedora. More detailed
-information on installation can be found on the Par4All Installation
+Par4All is provided as Debian and Ubuntu Linux packages to ease
+installation but can be also compiled on Fedora Linux. More detailed
+information on installation can be found in the Par4All Installation
 guide.
 
 More documentation and information is available on http://par4all.org.

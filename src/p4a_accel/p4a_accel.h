@@ -11,14 +11,19 @@
     but it can also be used to ease heterogeneous parallel manual
     programming.
 
-    Should target Ter\@pix and SCALOPES accelerators, CUDA and OpenCL.
+    Should target Ter\@pix and SCALOPES accelerators (CEA SCMP), CUDA,
+    OpenCL and even OpenMP for emulation.
 
-    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
-    Compétitivité Images and Network) and SCALOPES (Artemis European
-    Project project)
+    This started with funding by the FREIA (French ANR), TransMedi\@
+    (French Pôle de Compétitivité Images and Network) and SCALOPES
+    (Artemis European Project project).
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
+
+    Now there are many other contributors and it is funded by the SMECY
+    ARTEMIS project, the SIMILAN System@TIC project.
+
 */
 
 /* License BSD */
@@ -34,10 +39,8 @@ extern "C" {
 /* For size_t: */
 #include <stddef.h>
 
-/** Note that in CUDA and OpenCL there is 3 dimensions max: */
+/** Note that in CUDA and OpenCL there are 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
-
-extern double P4A_accel_timer_stop_and_float_measure();
 
 /* Main debug level */
 extern int p4a_debug_level;
@@ -45,19 +48,30 @@ extern int p4a_debug_level;
 /* Flag that trigger timing of kernel execution */
 extern int p4a_timing;
 
+/* Flag that trigger the Par4All runtime initialization */
+extern int p4a_runtime_initialized;
+
+#define checkP4ARuntimeInitialized() \
+if(!p4a_runtime_initialized) { \
+  fprintf(stderr,"The Par4All was not initialized, a call to P4A_init_accel() is missing ! It might cause some issues...\n"); \
+}
+
+  /* Check we do not have conflicting targets: */
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
-#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined at the same time"
 #endif
 
-#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENCL) 
-#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENCL defined, yet"
+#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENCL)
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENCL defined at the same time"
 #endif
 
-#if defined(P4A_ACCEL_OPENCL) && defined(P4A_ACCEL_OPENMP) 
-#error "You cannot have both P4A_ACCEL_OPENCL and P4A_ACCEL_OPENMP defined, yet"
+#if defined(P4A_ACCEL_OPENCL) && defined(P4A_ACCEL_OPENMP)
+#error "You cannot have both P4A_ACCEL_OPENCL and P4A_ACCEL_OPENMP defined at the same time"
 #endif
 
 /* Some common function prototypes. */
+
+extern double P4A_accel_timer_stop_and_float_measure();
 
 /** Prototype for allocating memory on the hardware accelerator.
 
@@ -230,20 +244,23 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
     @param debug_stuff is some text that is included texto if P4A_DEBUG is
     defined
 */
-#define P4A_skip_debug(level,debug_stuff) \
-do { \
-  if(p4a_debug_level>=level) { \
-    debug_stuff; \
-  } \
-} while(0);
+#define P4A_skip_debug(level, debug_stuff) \
+  do { \
+    if(p4a_debug_level >= level) { \
+      debug_stuff; \
+    } \
+  } while(0);
 
 /*
+  This was the previous static implementation
 #ifdef P4A_DEBUG
 #define P4A_skip_debug(debug_stuff) debug_stuff
 #else
 #define P4A_skip_debug(debug_stuff)
 #endif
 */
+
+
 #include <stdio.h>
 
 /** Output a debug message à la printf */

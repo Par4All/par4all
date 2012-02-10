@@ -14,11 +14,19 @@ float p4a_timing_elapsedTime = -1;
 struct timeval p4a_time_begin, p4a_time_end;
 
 /**
- * The main debug level for p4a
+ * The main debug level for Par4All Runtime
  */
 int p4a_debug_level = 0;
 
+/* Flag that trigger the Par4All runtime initialization */
+int p4a_runtime_initialized = 0;
+
 void p4a_main_init() {
+  if(p4a_runtime_initialized) {
+    P4A_dump_message("Runtime is initialized more than one time, it probably not intended ! Please report.\n");
+  }
+
+  p4a_runtime_initialized = 1;
   checkStackSize();
 
   /* Debug level stuff */

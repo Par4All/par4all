@@ -1,8 +1,102 @@
-2011-12-06  Serge Guelton <serge.guelton@hpc-project.com>
+2012-01-24 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.3.2
+
+
+2012-01-18  Serge Guelton <serge.guelton@hpc-project.com>
 
  * Par4All 1.3.1
 
-   * Fix loop bound generation in the presence of unsigned types
+   * Check for CUDA memory allocation errors
+
+   * Restore PIPS properties after a PyPS exception
+
+   * Manage better pointers on 1D array on GPU
+
+   * Fix loop bound generation in the presence of unsigned index types
+
+   * Fix p4a --report
+
+   * Fix regressions in examples because of PIPS validation
+     compatibility.
+
+   * Stars-PM example can work in OpenCL and OpenGL
+
+   * New --no-pointer-aliasing option in p4a
+
+   * --fine option is now --fine-grain. Coarse grain is again the
+     default parallelization.
+
+   * Remove parasitic kernel launchers from GPU code with static
+     functions
+
+   * Put libraries at the end of link options since it chokes some
+     linkers.
+
+   * Fix bugs in loop fusion
+
+   * Fix bugs in PIPS linear around overflow handling
+
+   * Improve array linearization to deal with pointers on array of
+     structs, VLA, arrays with static size and others, skip local arrays...
+
+   * Fix bugs in statement isolation, accept structs, deal better
+     with partial arrays...
+
+   * Fix bugs in outliner
+
+   * Fix bugs in GPU-ify
+
+   * Describe better the versions in scripts and validation
+
+   * Update package list for recent Ubuntu
+
+   * Update installation guide
+
+   * p4a_scpp is now more user friendly
+
+   * Better linear constraints, improve normalization
+
+   * Improve redundancy reduction in Linear
+
+   * Improve ipyps portability
+
+   * Improve OpenMP reduction pragma when several reductions at the
+     same time
+
+   * Fix bug in localize_declaration
+
+   * Improve simplify control
+
+   * Improve p4a_git integration script
+
+   * Improve organization of the Par4All download server directories
+
+   * Fix typo in stub broker
+
+   * Fix P4A Accel runtime to deal with constants in OpenCL kernel
+     invocation
+
+   * Differentiate more OpenMP and GPU compilation flows
+
+   * Restructure Par4All Accel Runtime
+
+   * Avoid launching kernels with no iteration
+
+   * Accept multiple source files with same base name
+
+   * More resilient with spaces in path names
+
+   * Improve effects for structures
+
+   * Keep more comments
+
+   * More tolerant with __asm(...)
+
+   * Improve transformers
+
+   * Improve conflict testing in dependence graph
+
 
 2011-11-11  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 

@@ -51,6 +51,7 @@ void * P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
       it = memory_mapping.find(host_ptr);
       if(it == memory_mapping.end()) {
         fprintf(stderr, "Error insert failed !\n");
+        checkP4ARuntimeInitialized();
         exit(-1);
       }
 
@@ -81,7 +82,7 @@ void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
   void *accel_ptr = P4A_runtime_host_ptr_to_accel_ptr(host_ptr,size);
 
 #ifdef P4A_RUNTIME_DEBUG
-    fprintf(stderr,"P4A_RUNTIME : Copying %zd bytes of memory from host %p to accel %p !\n",__FUNCTION__,__LINE__,size, host_ptr,accel_ptr);
+    fprintf(stderr,"[%s:%d] : Copying %zd bytes of memory from host %p to accel %p !\n",__FUNCTION__,__LINE__,size, host_ptr,accel_ptr);
 #endif
 
   // Copy data
@@ -116,6 +117,7 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */) {
               __FUNCTION__,
               __LINE__,
               host_ptr);
+      checkP4ARuntimeInitialized()
       exit(-1);
     } else {
       // A mapping was found !

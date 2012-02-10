@@ -26,8 +26,8 @@
 #include <cuda.h>
 #include <p4a_stacksize_test.h>
 
-#define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
-#define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
+#define toolTestExec(error)   checkErrorInline        (error, __FILE__, __LINE__)
+#define toolTestExecMessage(error,message)	checkErrorMessageInline	(error,message, __FILE__, __LINE__)
 
 static inline void checkErrorInline(cudaError_t error,
                                     const char *currentFile,
@@ -38,14 +38,15 @@ static inline void checkErrorInline(cudaError_t error,
             currentFile,
             currentLine,
             cudaGetErrorString(error));
+    checkP4ARuntimeInitialized()
     exit(-1);
   }
 }
 
-static inline void checkErrorMessageInline(const char *errorMessage,
+static inline void checkErrorMessageInline(cudaError_t error,
+                                           const char *errorMessage,
                                            const char *currentFile,
                                            const int currentLine) {
-  cudaError_t error = cudaGetLastError();
   if(cudaSuccess != error) {
     fprintf(stderr,
             "File %s - Line %i - %s : %s\n",
@@ -53,6 +54,7 @@ static inline void checkErrorMessageInline(const char *errorMessage,
             currentLine,
             errorMessage,
             cudaGetErrorString(error));
+    checkP4ARuntimeInitialized();
     exit(-1);
   }
 
@@ -65,6 +67,7 @@ static inline void checkErrorMessageInline(const char *errorMessage,
               currentLine,
               errorMessage,
               cudaGetErrorString(error));
+      checkP4ARuntimeInitialized();
       exit(-1);
     }
   }
@@ -156,7 +159,12 @@ void p4a_init_cuda_accel();
 
 // Set of routine for timing kernel executions
 extern float p4a_timing_elapsedTime;
-#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+#define P4A_TIMING_accel_timer_start \
+{ \
+  if(p4a_timing) { \
+    P4A_accel_timer_start; \
+  } \
+}
 #define P4A_TIMING_accel_timer_stop \
 { \
   if(p4a_timing) { \
@@ -383,7 +391,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     into:
 
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
+    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage (cudaGetLastError(),"P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
 #define P4A_call_accel_kernel(kernel, grid, blocks, parameters)			\
   do {									\
@@ -396,7 +404,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 		P4A_TIMING_accel_timer_start; \
     P4A_call_accel_kernel_context(kernel,grid,blocks) \
     P4A_call_accel_kernel_parameters parameters;			\
-    toolTestExecMessage("P4A CUDA kernel execution failed");			\
+    toolTestExecMessage(cudaGetLastError(),"P4A CUDA kernel execution failed");			\
     P4A_TIMING_accel_timer_stop; \
     P4A_TIMING_display_elasped_time(kernel); \
   } while (0)

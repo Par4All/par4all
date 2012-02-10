@@ -56,6 +56,8 @@ def process(input):
                 files = input.files,
                 filter_select = input.select_modules,
                 filter_exclude = input.exclude_modules,
+                noalias = input.noalias,
+                pointer_analysis = input.pointer_analysis,
                 accel = input.accel,
                 cuda = input.cuda,
                 opencl = input.opencl,
@@ -66,6 +68,7 @@ def process(input):
                 c99 = input.c99,
                 atomic = input.atomic,
                 use_pocc = input.pocc,
+                pocc_options = input.pocc_options,
                 recover_includes = input.recover_includes,
                 native_recover_includes = input.native_recover_includes,
                 properties = input.properties,
@@ -74,12 +77,12 @@ def process(input):
             )
             if input.accel:
                 p4a_util.warn("Activating fine-grain parallelization for accelerator mode")
-                input.fine = True
-                
+                input.fine_grain = True
+
             output.database_dir = processor.get_database_directory()
 
             # First apply some generic parallelization:
-            processor.parallelize(fine = input.fine,
+            processor.parallelize(fine_grain = input.fine_grain,
                                   apply_phases_before = input.apply_phases['abp'],
                                   apply_phases_after = input.apply_phases['aap'],
                                   omp=input.openmp and not input.accel)
@@ -89,7 +92,7 @@ def process(input):
                 # have an OpenMP implementation of it if OpenMP option is set
                 # too:
                 processor.gpuify(
-                        fine = input.fine,
+                        fine_grain = input.fine_grain,
                         apply_phases_kernel = input.apply_phases['akg'],
                         apply_phases_kernel_launcher = input.apply_phases['aklg'],
                         apply_phases_wrapper = input.apply_phases['awg'],
@@ -100,7 +103,7 @@ def process(input):
                 processor.ompify(
                         apply_phases_before = input.apply_phases['abo'],
                         apply_phases_after = input.apply_phases['aao'])
-                    
+
             # Write the output files.
             output.files = processor.save(input.output_dir,
                                           input.output_prefix,

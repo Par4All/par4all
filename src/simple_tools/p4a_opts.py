@@ -208,7 +208,7 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@
             + "\n\nTranslated options:\n\n" + repr(static_options)
             + "\n\nTranslated arguments:\n\n" + args
             + "\nAttached files:\n\n" + files_desc
-            + "\nMachine: " + platform.uname() + "\n"
+            + "\nMachine: " + repr(platform.uname()) + "\n"
             + "\nUsername: " + p4a_util.whoami() + "\n"
             + "\nEnvironment:\n\n" + env
             + "\nThe full log for this session follows:\n\n" + p4a_util.read_file(current_log_file)))

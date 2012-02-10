@@ -461,7 +461,7 @@ class p4a_builder:
             for obj in extra_obj:
 				quoted_extra_obj+=[p4a_util.quote_fname(obj)]
             # Create the final binary.
-            p4a_util.run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", p4a_util.quote_fname(output_file) ] + second_pass_files + quoted_extra_obj + self.ld_libs,
+            p4a_util.run([ final_command ] + [ "-o", p4a_util.quote_fname(output_file) ] + second_pass_files + quoted_extra_obj + self.ld_flags + more_ld_flags + self.ld_libs,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
 

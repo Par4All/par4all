@@ -503,7 +503,7 @@ can create from \texttt{p4a} a new branch infrastructure named
 \verb|p4a-1.3-rc-polylib| for \Apolylib, etc., with each one starting from
 its relative \verb|p4a|-prefixed branch infrastructure. To do this, use;
 \begin{verbatim}
-p4a_git --aggregate-branches p4a-1.3-rc
+p4a_git --aggregate-branches p4a-1.3-rc p4a
 \end{verbatim}
 
 To start the \texttt{p4a-0.3-alpha} branch infrastructure from
@@ -520,7 +520,7 @@ p4a_git --aggregate-branches p4a-1.3-rc
 to update the \texttt{p4a-1.3-rc} branch infrastructure.
 
 When finished, these branches can be pushed for sharing or merged
-into the main \Apfa \texttt{p4a} with:
+into the main \Apfa \Agit repository{p4a} with:
 \begin{verbatim}
 p4a_git --branch-action-name p4a-very-personal git push origin \$branch
 \end{verbatim}
@@ -528,11 +528,11 @@ p4a_git --branch-action-name p4a-very-personal git push origin \$branch
 To pull all the different \Apfa branches that may have been
 changed by others:
 \begin{verbatim}
-p4a_git --branch-action-name p4a "git checkout \$branch; git pull origin \$branch"
+p4a_git --branch-action-name p4a "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 \end{verbatim}
-or even faster by avoiding a fetch for each \texttt{pull}:
+or in a more compact way:
 \begin{verbatim}
-p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
+p4a_git --branch-action "git checkout \$branch git pull origin \$branch"
 \end{verbatim}
 
 
