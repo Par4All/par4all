@@ -26,7 +26,7 @@ def _create_workdir(request):
     """
     tempdir = request.registry.settings['paws.tempdir']
 
-    # Clear previsou workdir files, if any
+    # Clear previous workdir files, if any
     if 'workdir' in request.session:
         workdir = os.path.basename(request.session['workdir']) # sanitized
         path    = os.path.join(tempdir, workdir)

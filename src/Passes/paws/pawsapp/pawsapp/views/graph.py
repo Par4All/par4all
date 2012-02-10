@@ -27,7 +27,7 @@ def _create_dot_images(request, functions):
     for fu in functions:
 
         # Full-size image
-        imgname = os.path.basename('%s.png' % fu) # sanitized
+        imgname = os.path.basename('%s-%s.png' % (workdir, fu)) # sanitized
         imgpath = os.path.join(resdir, imgname)
         imgurl  = request.route_url('tool_results_name', tool='tool', name=imgname)
 
@@ -36,7 +36,7 @@ def _create_dot_images(request, functions):
         p.wait()
 
         # Thumbnail image
-        thumbname = '%s.thumbnail.png' % fu
+        thumbname = os.path.basename('%s-%s.thumbnail.png' % (workdir, fu)) # sanitized
         thumbpath = os.path.join(resdir, thumbname)
         thumburl  = request.route_url('tool_results_name', tool='tool', name=thumbname)
         
