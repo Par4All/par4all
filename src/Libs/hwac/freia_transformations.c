@@ -51,12 +51,20 @@
 /********************************************************************* UTILS */
 
 // this should exists somewhere???
+// top-down so that it is in ascending order?
 // I'm not sure that it makes much sense, as
-// the statement number is expected to be the source code line number
+// the statement number is expected to be the source code line number?
 
 static bool sr_flt(statement s, int * number)
 {
-  if (statement_number(s)!=STATEMENT_NUMBER_UNDEFINED)
+  instruction i = statement_instruction(s);
+  if (instruction_sequence_p(i))
+    // it seems that sequences are expected not to have a number
+    // just in case, force the property
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+  else if (statement_number(s)!=STATEMENT_NUMBER_UNDEFINED)
+    // just add a number if none are available?
+    // otherwise, the initial number is kept
     statement_number(s) = (*number)++;
   return true;
 }
@@ -166,19 +174,15 @@ static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
   }
 }
 
-static void freia_unroll_while_for_spoc(statement s)
+static bool freia_unroll_while_for_spoc(statement s)
 {
   bool changed = false;
   gen_context_recurse(s, &changed,
                       whileloop_domain, gen_true, maybe_unroll_while_rwt);
-  if (changed)
-  {
-    stmt_renumber(s);
-    module_reorder(s);
-  }
+  return changed;
 }
 
-int freia_unroll_while(string module)
+bool freia_unroll_while(const string module)
 {
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
@@ -190,10 +194,15 @@ int freia_unroll_while(string module)
   set_current_module_entity(module_name_to_entity(module));
 
   // do the job
-  freia_unroll_while_for_spoc(mod_stat);
+  bool changed = freia_unroll_while_for_spoc(mod_stat);
 
-  // put updated code and accelerated helpers
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
+  // update if changed
+  if (changed)
+  {
+    stmt_renumber(mod_stat);
+    module_reorder(mod_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
+  }
 
   reset_current_module_statement();
   reset_current_module_entity();
