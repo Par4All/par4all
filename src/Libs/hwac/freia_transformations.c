@@ -75,6 +75,30 @@ static void stmt_renumber(statement s)
   gen_context_recurse(s, &number, statement_domain, sr_flt, gen_null);
 }
 
+/* look for a variable
+ */
+typedef struct
+{
+  bool used;
+  entity var;
+} vis_ctx;
+
+static void vis_rwt(const reference r,  vis_ctx * ctx)
+{
+  if (reference_variable(r)==ctx->var)
+  {
+    ctx->used = true;
+    gen_recurse_stop(NULL);
+  }
+}
+
+static bool variable_is_used(statement s, entity var)
+{
+  vis_ctx ctx = { false, var };
+  gen_context_recurse(s, &ctx, reference_domain, gen_true, vis_rwt);
+  return ctx.used;
+}
+
 /*********************************** UNROLL FREIA CONVERGENCE LOOPS FOR SPOC */
 
 typedef struct {
@@ -203,6 +227,170 @@ bool freia_unroll_while(const string module)
     module_reorder(mod_stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
   }
+
+  reset_current_module_statement();
+  reset_current_module_entity();
+  debug_off();
+  return true;
+}
+
+/********************** SPECIAL CASE SCALAR WW DEPENDENCY HANDLING FOR FREIA */
+/*
+  When switching do-while to while on FREIA convergence loops, the code
+  generates a scalar WW dependency within the sequence which prevents an
+  operation to be merged. Pips is designed to be intelligent about loops
+  for parallelization, whereas I really need some cleverness in sequences
+  for FREIA compilation.
+
+  The following code, where the reduction is a volume computation in our case:
+
+    reductionl(image1, &something);
+    somethingelse = something;
+    reduction(image2, &something);
+
+  should be replaced by:
+
+    reduction(image1, &somethingelse);
+    reduction(image2, &something);
+
+  I'm not sure how this transformation could be generalized, possibly
+  based on chains...
+  Moreover, I'm not really sure how much I can rely on effects
+  because of the pointers involved.
+  So this is just a quick hack for my particular case.
+*/
+
+/* return the freia reduction entity, or NULL if it does not apply
+ */
+static entity freia_reduction_variable(const statement s)
+{
+  if (freia_statement_aipo_call_p(s))
+  {
+    const call c = freia_statement_to_call(s);
+    const string called = (const string) entity_local_name(call_function(c));
+    if (same_string_p(called, AIPO "global_min") ||
+        same_string_p(called, AIPO "global_max") ||
+        same_string_p(called, AIPO "global_min_coord") ||
+        same_string_p(called, AIPO "global_max_coord") ||
+        same_string_p(called, AIPO "global_vol"))
+    {
+      const expression last = EXPRESSION(CAR(gen_last(call_arguments(c))));
+      // should be a call to "&" operator
+      if (expression_address_of_p(last))
+      {
+        const expression arg =
+          EXPRESSION(CAR(call_arguments(expression_call(last))));
+        if (syntax_reference_p(expression_syntax(arg)))
+          return expression_variable(arg);
+      }
+    }
+  }
+  // not found!
+  return NULL;
+}
+
+static list remove_register(list lq)
+{
+  FOREACH(qualifier, q, lq)
+  {
+    if (qualifier_register_p(q))
+    {
+      gen_remove_once(&lq, q);
+      // register may be there once
+      return lq;
+    }
+  }
+  return lq;
+}
+
+static void sww_seq_rwt(const sequence sq, bool * changed)
+{
+  // current status of search
+  statement previous_reduction = NULL;
+  entity previous_variable = NULL;
+  statement assignment = NULL;
+  entity assigned = NULL;
+
+  // this is a partial O(n) implementation
+  // beware that we may have VERY LONG sequences...
+  FOREACH(statement, s, sequence_statements(sq))
+  {
+    bool tocheck = true;
+    entity red = freia_reduction_variable(s);
+    if (red)
+    {
+      if (previous_reduction && assignment && red==previous_variable)
+      {
+        // matched!
+        // replace variable in first reduction
+        hash_table replacements = hash_table_make(hash_pointer, 0);
+        hash_put(replacements, previous_variable, assigned);
+        replace_entities(previous_reduction, replacements);
+        hash_table_free(replacements);
+        // and now useless remove assignment
+        free_instruction(statement_instruction(assignment));
+        statement_instruction(assignment) = make_continue_instruction();
+        // make assigned NOT a register... just in case
+        variable v = type_variable(entity_type(assigned));
+        variable_qualifiers(v) = remove_register(variable_qualifiers(v));
+        // we did something
+        *changed = true;
+      }
+
+      // restart current status with new found reduction
+      previous_reduction = s;
+      previous_variable = red;
+      assignment = NULL;
+      assigned = NULL;
+      tocheck = false;
+    }
+
+    // detect reduction variable assignment
+    if (previous_reduction && !assignment &&
+        instruction_assign_p(statement_instruction(s)))
+    {
+      list args = call_arguments(instruction_call(statement_instruction(s)));
+      expression e1 = EXPRESSION(CAR(args)), e2 = EXPRESSION(CAR(CDR(args)));
+      if (expression_reference_p(e1) && expression_reference_p(e2) &&
+          reference_variable(expression_reference(e2))==previous_variable)
+      {
+        assignment = s;
+        assigned = reference_variable(expression_reference(e1));
+        tocheck = false;
+      }
+    }
+
+    if (tocheck && previous_variable && variable_is_used(s, previous_variable))
+    {
+      // full cleanup
+      previous_reduction = NULL;
+      previous_variable = NULL;
+      assignment = NULL;
+      assigned = NULL;
+    }
+  }
+}
+
+bool freia_remove_scalar_ww_deps(const string module)
+{
+  debug_on("PIPS_HWAC_DEBUG_LEVEL");
+  pips_debug(1, "considering module %s\n", module);
+
+  // else do the stuff
+  statement mod_stat =
+    (statement) db_get_memory_resource(DBR_CODE, module, true);
+  set_current_module_statement(mod_stat);
+  set_current_module_entity(module_name_to_entity(module));
+
+  // do the job
+  bool changed = false;
+  gen_context_recurse(mod_stat, &changed,
+                      sequence_domain, gen_true, sww_seq_rwt);
+
+  // update database if changed
+  if (changed)
+    // stmt_renumber(mod_stat); module_reorder(mod_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
 
   reset_current_module_statement();
   reset_current_module_entity();
