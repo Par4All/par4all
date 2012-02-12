@@ -30,7 +30,7 @@ LIB_CFILES = \
 	freia_aipo.c \
 	dag-utils.c \
 	freia-utils.c \
-	freia_unroll_while.c
+	freia_transformations.c
 
 INC_TARGET =    $(TARGET).h
 

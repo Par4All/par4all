@@ -48,6 +48,27 @@
 #include "freia.h"
 #include "hwac.h"
 
+/********************************************************************* UTILS */
+
+// this should exists somewhere???
+// I'm not sure that it makes much sense, as
+// the statement number is expected to be the source code line number
+
+static bool sr_flt(statement s, int * number)
+{
+  if (statement_number(s)!=STATEMENT_NUMBER_UNDEFINED)
+    statement_number(s) = (*number)++;
+  return true;
+}
+
+static void stmt_renumber(statement s)
+{
+  int number=1;
+  gen_context_recurse(s, &number, statement_domain, sr_flt, gen_null);
+}
+
+/*********************************** UNROLL FREIA CONVERGENCE LOOPS FOR SPOC */
+
 typedef struct {
   int morpho;
   int comp;
@@ -143,20 +164,6 @@ static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
       *changed = true;
     }
   }
-}
-
-// this should exists somewhere???
-static bool sr_flt(statement s, int * number)
-{
-  if (statement_number(s)!=STATEMENT_NUMBER_UNDEFINED)
-    statement_number(s) = (*number)++;
-  return true;
-}
-
-static void stmt_renumber(statement s)
-{
-  int number=1;
-  gen_context_recurse(s, &number, statement_domain, sr_flt, gen_null);
 }
 
 static void freia_unroll_while_for_spoc(statement s)
