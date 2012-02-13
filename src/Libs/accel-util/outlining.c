@@ -847,13 +847,6 @@ static void do_remove_entity_from_decl(statement s, entity e) {
 
 static
 void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
-    /* prepare parameters and body*/
-    module_functional_parameters(new_fun)=formal_parameters;
-    FOREACH(PARAMETER,p,formal_parameters) {
-      code_declarations(value_code(entity_initial(new_fun))) =
-          gen_nconc(code_declarations(value_code(entity_initial(new_fun))),
-                    CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
-    }
     if(!fortran_module_p(get_current_module_entity())){
         string outline_module_name = (string)entity_user_name(new_fun);
         char * the_cu = NULL,*iter, *cun;
@@ -962,6 +955,7 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
                 copy_storage(entity_storage(old_fun)),
                 copy_value(entity_initial(old_fun))
                 );
+        AddEntityToModuleCompilationUnit(new_fun,cu);
         replace_entity(s,old_fun, new_fun);
 
 
@@ -1014,6 +1008,15 @@ void outliner_independent(const char * module_name, statement body) {
 void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
 {
     string outline_module_name = (string)entity_user_name(new_fun);
+
+    /* prepare parameters and body*/
+    module_functional_parameters(new_fun)=formal_parameters;
+    FOREACH(PARAMETER,p,formal_parameters) {
+      code_declarations(value_code(entity_initial(new_fun))) =
+          gen_nconc(code_declarations(value_code(entity_initial(new_fun))),
+                    CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
+    }
+
     /* 5-0 : create new compilation unit */
     outliner_compilation_unit(new_fun, formal_parameters);
 
@@ -1027,7 +1030,6 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
         ;
     } else if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
         // Declare in current module so that it's not undefined at call site
-        AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
         char * the_cu = NULL,*iter;
         if((iter=strchr(outline_module_name,FILE_SEP))) {
             the_cu = strndup(outline_module_name,iter-outline_module_name);

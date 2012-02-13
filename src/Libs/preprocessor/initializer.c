@@ -477,7 +477,6 @@ add_new_module_from_text(const char* module_name,
     }
     char *dir_name = db_get_current_workspace_directory(), *src_name;
     asprintf(&src_name,WORKSPACE_TMP_SPACE "/%s",file_name);
-    free(file_name);
     char *full_name;
     asprintf(&full_name,"%s/%s",dir_name,src_name);
     char *init_name =
@@ -504,6 +503,7 @@ add_new_module_from_text(const char* module_name,
      * name...  should only put a new user file, I guess?
      */
     user_log("Registering synthesized file %s\n", file_name );
+    free(file_name);
     DB_PUT_FILE_RESOURCE(res, module_name, init_name);
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, full_name);
@@ -513,7 +513,6 @@ add_new_module_from_text(const char* module_name,
     }
     else if(!is_fortran) {
         if(entity_undefined_p(cu)) cu = module_name_to_entity(cun);
-        AddEntityToModuleCompilationUnit(m, cu);
     }
 
     if(!string_undefined_p(cun)) free(cun);
