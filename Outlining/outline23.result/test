@@ -22,9 +22,9 @@ Generated files
 //
 void ding(int b[100], int i_0[1]);
 //PIPS generated variable
-static void do_assign(int b[1], int i);
-//PIPS generated variable
 static void assign(int *b, int i);
+//PIPS generated variable
+static void do_assign(int b[1], int i);
 void ding(int b[100], int i_0[1])
 {
    //PIPS generated variable
@@ -59,8 +59,6 @@ static void do_assign(int b[1], int i);
 void assign(int *b, int i);
 
 float ing(int i);
-//PIPS generated variable
-void ding(int b[100], int i_0[1]);
 static void do_assign(int b[1], int i)
 {
    b[i] = i;

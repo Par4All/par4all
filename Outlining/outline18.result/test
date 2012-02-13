@@ -104,5 +104,3 @@ typedef struct {
 
 ///@brief update particles features
 int main(void);
-//PIPS generated variable
-void kernel(int v_0[1], int i);

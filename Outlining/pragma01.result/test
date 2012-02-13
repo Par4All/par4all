@@ -30,5 +30,3 @@ int pof()
    kernel(&a);
 }
 int pof();
-//PIPS generated variable
-void kernel(int a_0[1]);
