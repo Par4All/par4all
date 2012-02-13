@@ -2518,9 +2518,9 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
         else { // pl == NIL
             /* The new declaration is inserted before sl*/
             pips_assert("The above loop was entered at most once", sl==cl);
-	    statement ssl = STATEMENT(CAR(sl));
-	    if (before_p && declaration_statement_p(ssl))
+	    if (before_p && !ENDP(sl) && declaration_statement_p(STATEMENT(CAR(sl))))
 	      {
+		statement ssl = STATEMENT(CAR(sl));
 		entity ecar = ENTITY(CAR(statement_declarations(ssl)));
 		if( comments_equal_p(statement_comments(ssl),comment) &&
                     !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
