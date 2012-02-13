@@ -845,10 +845,8 @@ static void do_remove_entity_from_decl(statement s, entity e) {
     gen_remove(&statement_declarations(s),e);
 }
 
-void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
-{
-  string outline_module_name = (string)entity_user_name(new_fun);
-
+static
+void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
     /* prepare parameters and body*/
     module_functional_parameters(new_fun)=formal_parameters;
     FOREACH(PARAMETER,p,formal_parameters) {
@@ -856,6 +854,24 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
           gen_nconc(code_declarations(value_code(entity_initial(new_fun))),
                     CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
     }
+    if(!fortran_module_p(get_current_module_entity())){
+        string outline_module_name = (string)entity_user_name(new_fun);
+        char * the_cu = NULL,*iter, *cun;
+        if((iter=strchr(outline_module_name,FILE_SEP))) {
+            the_cu = strndup(outline_module_name,iter-outline_module_name);
+        }
+        else the_cu = strdup(outline_module_name);
+        asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
+        add_new_compilation_unit(cun, fortran_module_p(get_current_module_entity()), new_fun);
+        free(cun);
+    }
+}
+
+
+void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
+{
+  string outline_module_name = (string)entity_user_name(new_fun);
+
     // In fortran we always want to generate the outline function
     // in its own new file
     char * cun = string_undefined;
@@ -1032,14 +1048,17 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
     FOREACH(STRING, module_name, callees_callees(c)) {
         char* new_name;
         entity old_fun = module_name_to_entity(module_name);
-        asprintf(&new_name, "%s" MODULE_SEP_STRING"%s%s", cun, cun, entity_user_name(old_fun) );
+        asprintf(&new_name, "%s" MODULE_SEP_STRING"%s%s%s", cun, cun, get_string_property("OUTLINE_CALLEES_PREFIX"),entity_user_name(old_fun) );
         entity new_fun = make_entity(new_name,
                 copy_type(entity_type(old_fun)),
                 copy_storage(entity_storage(old_fun)),
                 copy_value(entity_initial(old_fun))
                 );
+        replace_entity(s,old_fun, new_fun);
 
-        statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+
+        statement body = copy_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
+        outliner_independent_recursively(old_fun, cun, body);
 
         bool saved = get_bool_property(STAT_ORDER);
         set_bool_property(STAT_ORDER,false);
@@ -1054,7 +1073,7 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
         code_declarations(EntityCode(new_fun))=NIL;
 
         set_bool_property(STAT_ORDER,saved);
-        outliner_independent_recursively(old_fun, cun, body);
+        free_statement(body);
     }
     free_callees(c);
 }
@@ -1123,11 +1142,14 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
     if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
       outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
 
+    /* 5-0 : create new compilation unit */
+    outliner_compilation_unit(new_fun, formal_parameters);
+
+    /* 5-1 : add all callees to the same foreign compilation units */
+    outliner_independent(outline_module_name, new_body);
+
     /* 5 : file */
     outliner_file(new_fun, formal_parameters, &new_body );
-
-    /* 5 bis : add all callees to the same foreign compilation units */
-    outliner_independent(outline_module_name, new_body);
 
     /* 6 : call */
     statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);

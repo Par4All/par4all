@@ -7529,6 +7529,7 @@ KERNELIZE_HOST_CALL_NAME ""
 OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
 
+
 \begin{PipsPass}{group_constants}
 Gather all constants from a module and put them in a single array.
 Relevant for Terapix code generation, and maybe for other accelerators as well
@@ -10701,7 +10702,9 @@ can be set to true to outline the new module into a newly created
 compilation unit. It is named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
 All necessary types, global variables and functions\marginpar{Serge?}
 are declared into this new compilation unit\marginpar{Serge: Consistency
-  betweeen properties? Name conflicts?}.
+  betweeen properties? Name conflicts?}. All the functions brought in the
+new compilation unit through the sub-callgraph are declared static and
+prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
@@ -10727,6 +10730,9 @@ OUTLINE_INDEPENDENT_COMPILATION_UNIT FALSE
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE}
 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_CALLEES_PREFIX}
+OUTLINE_CALLEES_PREFIX ""
 \end{PipsProp}
 
 
