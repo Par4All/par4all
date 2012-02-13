@@ -866,96 +866,15 @@ void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
         free(cun);
     }
 }
-
-
-void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
-{
-  string outline_module_name = (string)entity_user_name(new_fun);
-
-    // In fortran we always want to generate the outline function
-    // in its own new file
-    char * cun = string_undefined;
-    if(fortran_module_p(get_current_module_entity())) {
-      ;
-    } else if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
-      // Declare in current module so that it's not undefined at call site
-      AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
-      char * the_cu = NULL,*iter;
-      if((iter=strchr(outline_module_name,FILE_SEP))) {
-          the_cu = strndup(outline_module_name,iter-outline_module_name);
-      }
-      else the_cu = strdup(outline_module_name);
-      asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
-      free(the_cu);
-    } 
-    else {
-        cun = compilation_unit_of_module(get_current_module_name());
-    }
-    /* add a return at the end of the body, in all cases */
-    insert_statement(*new_body, make_return_statement(new_fun), false);
-
-    /* we can now begin the outlining */
-    bool saved = get_bool_property(STAT_ORDER);
-    set_bool_property(STAT_ORDER,false);
-    text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
-
-
-    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()),cun);
-    if(!string_undefined_p(cun)) free(cun);
-    free_text(t);
-
-    set_bool_property(STAT_ORDER,saved);
-
-
-
-    /* horrible hack to prevent declaration duplication
-     * signed : Serge Guelton
-     */
-    gen_free_list(code_declarations(EntityCode(new_fun)));
-    code_declarations(EntityCode(new_fun))=NIL;
-
-    /* we need to free them now, otherwise recompilation fails */
-    FOREACH(PARAMETER,p,formal_parameters) {
-        entity e = dummy_identifier(parameter_dummy(p));
-        if(!type_undefined_p(entity_type(e)) &&
-                entity_variable_p(e)) {
-            free_type(entity_type(e));
-            entity_type(e)=type_undefined;
-        }
-    }
+static bool entity_not_undefined_nor_constant_nor_intrinsic_p(entity e) {
+    return !type_undefined_p(entity_type(e)) &&
+        entity_not_constant_or_intrinsic_p(e);
 }
 
-statement outliner_call(entity new_fun, list statements_to_outline, list effective_parameters)
-{
-
-    /* and return the replacement statement */
-    instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
-    statement new_stmt = statement_undefined;
-
-    /* perform substitution :
-     * replace the original statements by a single call
-     * and patch the remaining statement (yes it's ugly)
-     */
-    FOREACH(STATEMENT,old_statement,statements_to_outline)
-    {
-        //free_instruction(statement_instruction(old_statement));
-        if(statement_undefined_p(new_stmt))
-        {
-            statement_instruction(old_statement)=new_inst;
-            new_stmt=old_statement;
-        }
-        else
-            statement_instruction(old_statement)=make_continue_instruction();
-        gen_free_list(statement_declarations(old_statement));
-        statement_declarations(old_statement)=NIL;
-        /* trash any extensions|comments, they may not be valid now */
-        free_extensions(statement_extensions(old_statement));
-        statement_extensions(old_statement)=empty_extensions();
-        if(!string_undefined_p(statement_comments(old_statement))) free(statement_comments(old_statement));
-        statement_comments(old_statement)=empty_comments;
-
-    }
-    return new_stmt;
+/* skipping anonymous enum ... */
+static bool anonymous_type_p(entity e) {
+    const char * eln = entity_local_name(e);
+    return strstr(eln, DUMMY_STRUCT_PREFIX) || strstr(eln, DUMMY_UNION_PREFIX);
 }
 
 static entity recursive_rename_types(entity e, const char * cun ) {
@@ -966,17 +885,6 @@ static entity recursive_rename_types(entity e, const char * cun ) {
         ne = make_entity_copy_with_new_name(e, new_name, false);
     free(new_name);
     return ne;
-}
-
-static bool entity_not_undefined_nor_constant_nor_intrinsic_p(entity e) {
-    return !type_undefined_p(entity_type(e)) &&
-        entity_not_constant_or_intrinsic_p(e);
-}
-
-/* skipping anonymous enum ... */
-static bool anonymous_type_p(entity e) {
-    const char * eln = entity_local_name(e);
-    return strstr(eln, DUMMY_STRUCT_PREFIX) || strstr(eln, DUMMY_UNION_PREFIX);
 }
 
 static
@@ -1102,6 +1010,105 @@ void outliner_independent(const char * module_name, statement body) {
     }
 }
 
+
+void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
+{
+    string outline_module_name = (string)entity_user_name(new_fun);
+    /* 5-0 : create new compilation unit */
+    outliner_compilation_unit(new_fun, formal_parameters);
+
+    /* 5-1 : add all callees to the same foreign compilation units */
+    outliner_independent(outline_module_name, *new_body);
+
+    // In fortran we always want to generate the outline function
+    // in its own new file
+    char * cun = string_undefined;
+    if(fortran_module_p(get_current_module_entity())) {
+        ;
+    } else if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+        // Declare in current module so that it's not undefined at call site
+        AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
+        char * the_cu = NULL,*iter;
+        if((iter=strchr(outline_module_name,FILE_SEP))) {
+            the_cu = strndup(outline_module_name,iter-outline_module_name);
+        }
+        else the_cu = strdup(outline_module_name);
+        asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
+        free(the_cu);
+    } 
+    else {
+        cun = compilation_unit_of_module(get_current_module_name());
+    }
+    /* add a return at the end of the body, in all cases */
+    insert_statement(*new_body, make_return_statement(new_fun), false);
+
+    /* we can now begin the outlining */
+    bool saved = get_bool_property(STAT_ORDER);
+    set_bool_property(STAT_ORDER,false);
+    text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
+
+
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()),cun);
+    if(!string_undefined_p(cun)) free(cun);
+    free_text(t);
+
+    set_bool_property(STAT_ORDER,saved);
+
+
+
+    /* horrible hack to prevent declaration duplication
+     * signed : Serge Guelton
+     */
+    gen_free_list(code_declarations(EntityCode(new_fun)));
+    code_declarations(EntityCode(new_fun))=NIL;
+
+    /* we need to free them now, otherwise recompilation fails */
+    FOREACH(PARAMETER,p,formal_parameters) {
+        entity e = dummy_identifier(parameter_dummy(p));
+        if(!type_undefined_p(entity_type(e)) &&
+                entity_variable_p(e)) {
+            free_type(entity_type(e));
+            entity_type(e)=type_undefined;
+        }
+    }
+}
+
+statement outliner_call(entity new_fun, list statements_to_outline, list effective_parameters)
+{
+
+    /* and return the replacement statement */
+    instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
+    statement new_stmt = statement_undefined;
+
+    /* perform substitution :
+     * replace the original statements by a single call
+     * and patch the remaining statement (yes it's ugly)
+     */
+    FOREACH(STATEMENT,old_statement,statements_to_outline)
+    {
+        //free_instruction(statement_instruction(old_statement));
+        if(statement_undefined_p(new_stmt))
+        {
+            statement_instruction(old_statement)=new_inst;
+            new_stmt=old_statement;
+        }
+        else
+            statement_instruction(old_statement)=make_continue_instruction();
+        gen_free_list(statement_declarations(old_statement));
+        statement_declarations(old_statement)=NIL;
+        /* trash any extensions|comments, they may not be valid now */
+        free_extensions(statement_extensions(old_statement));
+        statement_extensions(old_statement)=empty_extensions();
+        if(!string_undefined_p(statement_comments(old_statement))) free(statement_comments(old_statement));
+        statement_comments(old_statement)=empty_comments;
+
+    }
+    return new_stmt;
+}
+
+
+
+
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -1142,11 +1149,6 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
     if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
       outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
 
-    /* 5-0 : create new compilation unit */
-    outliner_compilation_unit(new_fun, formal_parameters);
-
-    /* 5-1 : add all callees to the same foreign compilation units */
-    outliner_independent(outline_module_name, new_body);
 
     /* 5 : file */
     outliner_file(new_fun, formal_parameters, &new_body );
