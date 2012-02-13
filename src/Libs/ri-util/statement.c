@@ -2338,7 +2338,7 @@ static void generic_insert_statement(statement s,
           }
           else
               ls = CONS(STATEMENT,s1,ls);
-    }
+      }
       else
 	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));
       instruction_block(i) = ls;
@@ -2465,7 +2465,7 @@ string generated_variable_comment(entity e)
  * For the time being, a declaration statement is a continue
  * statement.
  */
-statement add_declaration_statement(statement s, entity e)
+static statement generic_add_declaration_statement(statement s, entity e, bool before_p)
 {
     if(statement_block_p(s)) {
         list sl = statement_block(s); //statement list
@@ -2477,16 +2477,21 @@ statement add_declaration_statement(statement s, entity e)
                 STATEMENT_NUMBER_UNDEFINED,
                 comment);
 
-        /* Look for the last declaration: it is pointed to by pl */
-        for(cl=sl; !ENDP(cl); POP(cl)) {
-            statement cs = STATEMENT(CAR(cl));
-            if(declaration_statement_p(cs)) {
+	if (before_p)
+	  cl = sl;
+	else
+	  {
+	    /* Look for the last declaration: it is pointed to by pl */
+	    for(cl=sl; !ENDP(cl); POP(cl)) {
+	      statement cs = STATEMENT(CAR(cl));
+	      if(declaration_statement_p(cs)) {
                 pl = cl;
-            }
-            else {
+	      }
+	      else {
                 break;
-            }
-        }
+	      }
+	    }
+	  }
 
         /* Do we have previous declarations to skip? */
         if(!ENDP(pl)) {
@@ -2513,7 +2518,25 @@ statement add_declaration_statement(statement s, entity e)
         else { // pl == NIL
             /* The new declaration is inserted before sl*/
             pips_assert("The above loop was entered at most once", sl==cl);
-            nsl = CONS(STATEMENT, ds, cl);
+	    statement ssl = STATEMENT(CAR(sl));
+	    if (before_p && declaration_statement_p(ssl))
+	      {
+		entity ecar = ENTITY(CAR(statement_declarations(ssl)));
+		if( comments_equal_p(statement_comments(ssl),comment) &&
+                    !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
+                    basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
+                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
+		    )
+		{
+		  free_statement(ds);
+		  statement_declarations(ssl)= CONS(ENTITY,e,statement_declarations(ssl));
+		  nsl=sl;
+		}
+		else
+		  nsl = CONS(STATEMENT, ds, sl);
+	      }
+	    else
+	      nsl = CONS(STATEMENT, ds, sl);
         }
 
         instruction_block(statement_instruction(s)) = nsl;
@@ -2530,6 +2553,17 @@ statement add_declaration_statement(statement s, entity e)
 
     return s;
 }
+
+statement add_declaration_statement(statement s, entity e)
+{
+  return generic_add_declaration_statement(s, e, false);
+}
+
+statement add_declaration_statement_at_beginning(statement s, entity e)
+{
+  return generic_add_declaration_statement(s, e, true);
+}
+
 
 /* s is assumed to be a block statement and its declarations field is
    assumed to be correct, but not necessarily the declaration
@@ -3112,12 +3146,44 @@ static bool first_reference_to_v_p(reference r)
   return result;
 }
 
+
+static bool declarations_first_reference_to_v_p(statement st)
+{
+  bool result = true;
+  if (reference_undefined_p(first_reference_to_v))
+    {
+      if (declaration_statement_p(st))
+	{
+	  FOREACH(ENTITY, decl, statement_declarations(st))
+	    {
+	      value init_val = entity_initial(decl);
+	      if (! value_undefined_p(init_val))
+		{
+		  gen_recurse(init_val,  reference_domain, first_reference_to_v_p, gen_null);
+		  if (!reference_undefined_p(first_reference_to_v))
+		    {
+		      result = false;
+		      break;
+		    }
+		}
+	    }
+	}
+    }
+  else
+    result = false;
+
+  return result;
+}
+
 reference find_reference_to_variable(statement s, entity v)
 {
   reference r = reference_undefined;
   first_reference_to_v = reference_undefined;
   variable_searched = v;
-  gen_recurse(s, reference_domain, first_reference_to_v_p, gen_null);
+  gen_multi_recurse(s,
+		    statement_domain, declarations_first_reference_to_v_p, gen_null,
+		    reference_domain, first_reference_to_v_p, gen_null,
+		    NULL);
   r = copy_reference(first_reference_to_v);
   first_reference_to_v = reference_undefined;
   variable_searched = entity_undefined;
@@ -3149,6 +3215,7 @@ int count_static_references_to_variable(statement s, entity v)
 /* Estimate count of dynamic references */
 static int    loop_depth;
 
+
 static bool count_references_to_v_p(reference r)
 {
   bool result= true;
@@ -3159,6 +3226,23 @@ static bool count_references_to_v_p(reference r)
   }
   return result;
 }
+
+static bool declarations_count_references_to_v_p(statement st)
+{
+  if (declaration_statement_p(st))
+    {
+      FOREACH(ENTITY, decl, statement_declarations(st))
+	{
+	  value init_val = entity_initial(decl);
+	  if (! value_undefined_p(init_val))
+	    {
+	      gen_recurse(init_val,  reference_domain, count_references_to_v_p, gen_null);
+	    }
+	}
+    }
+  return true;
+}
+
 
 /* This function checks reference to proper elements, not slices */
 static bool count_element_references_to_v_p(reference r)
@@ -3174,6 +3258,23 @@ static bool count_element_references_to_v_p(reference r)
     }
   }
   return result;
+}
+
+static bool declarations_count_element_references_to_v_p(statement st)
+{
+  if (declaration_statement_p(st))
+    {
+      print_statement(st);
+      FOREACH(ENTITY, decl, statement_declarations(st))
+	{
+	  value init_val = entity_initial(decl);
+	  if (! value_undefined_p(init_val))
+	    {
+	      gen_recurse(init_val,  reference_domain, count_element_references_to_v_p, gen_null);
+	    }
+	}
+    }
+  return true;
 }
 
 static bool count_loop_in(loop __attribute__ ((unused)) l)
@@ -3193,6 +3294,7 @@ int count_references_to_variable(statement s, entity v)
   loop_depth = 0;
   variable_searched = v;
   gen_multi_recurse(s, loop_domain, count_loop_in, count_loop_out,
+		    statement_domain, declarations_count_references_to_v_p, gen_null,
 		    reference_domain, count_references_to_v_p, gen_null, NULL);
   variable_searched = entity_undefined;
   return reference_count;
@@ -3202,7 +3304,8 @@ int count_references_to_variable_element(statement s, entity v)
   reference_count = 0;
   loop_depth = 0;
   variable_searched = v;
-  gen_multi_recurse(s, loop_domain, count_loop_in, count_loop_out,
+  gen_multi_recurse(s, statement_domain, declarations_count_element_references_to_v_p, gen_null,
+		    loop_domain, count_loop_in, count_loop_out,
 		    reference_domain, count_element_references_to_v_p, gen_null, NULL);
   variable_searched = entity_undefined;
   return reference_count;
