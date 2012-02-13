@@ -22,17 +22,9 @@ Generated files
 //
 void ding(int b[100], int i_0[1]);
 //PIPS generated variable
-static void assign(int *b, int i);
-//PIPS generated variable
 static void do_assign(int b[1], int i);
-static void do_assign(int b[1], int i)
-{
-   b[i] = i;
-}
-static void assign(int *b, int i)
-{
-   do_assign(b+i, i);
-}
+//PIPS generated variable
+static void assign(int *b, int i);
 void ding(int b[100], int i_0[1])
 {
    //PIPS generated variable
@@ -44,6 +36,14 @@ here:   if (1) {
          assign(b, i);
    }
    *i_0 = i;
+}
+static void assign(int *b, int i)
+{
+   do_assign(b+i, i);
+}
+static void do_assign(int b[1], int i)
+{
+   b[i] = i;
 }
 
 

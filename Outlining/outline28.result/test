@@ -19,24 +19,24 @@ Generated files
 //
 void ding(int b[100], int i);
 //PIPS generated variable
-static void assign(int *b, int i);
-//PIPS generated variable
 typedef enum {PEPSI, COCA} coca;
 //PIPS generated variable
 static void do_assign(int b[1], int i);
-static void do_assign(int b[1], int i)
+//PIPS generated variable
+static void assign(int *b, int i);
+void ding(int b[100], int i)
 {
-   b[i] = NO;
+here:   if (1)
+      assign(b, i);
 }
 static void assign(int *b, int i)
 {
    coca cola = PEPSI;
    do_assign(&cola, i);
 }
-void ding(int b[100], int i)
+static void do_assign(int b[1], int i)
 {
-here:   if (1)
-      assign(b, i);
+   b[i] = NO;
 }
 
 
