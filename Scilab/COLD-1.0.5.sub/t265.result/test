@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
       int __lv2;
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
-         register double _tmpxx0_0, _tmpxx4_0;
+         register double _tmpxx4_0, _tmpxx0_0;
          _tmpxx0_0 = (double) 1.0;
          _tmpxx1[__lv1][__lv2] = (double) 0.0;
          _u_a[__lv1][__lv2] = _tmpxx0_0;

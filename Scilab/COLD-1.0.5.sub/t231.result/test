@@ -217,7 +217,7 @@ void fdtd__d2(int _u_Ets_n0, int _u_Ets_n1, double _u_Ets[_u_Ets_n0][_u_Ets_n1])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx4_0, _tmpxx5_0;
+               register double _tmpxx5_0, _tmpxx4_0;
                _tmpxx4_0 = _tmpxx3*_u_Hxt[__lv1][__lv2][__lv3];
                _tmpxx5_0 = _u_Hx[__lv1][__lv2][__lv3]+_tmpxx4_0;
                _u_Hx[__lv1][__lv2][__lv3] = _tmpxx5_0;
@@ -250,7 +250,7 @@ void fdtd__d2(int _u_Ets_n0, int _u_Ets_n1, double _u_Ets[_u_Ets_n0][_u_Ets_n1])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx8_0, _tmpxx9_0;
+               register double _tmpxx9_0, _tmpxx8_0;
                _tmpxx8_0 = _tmpxx7*_u_Hyt[__lv1][__lv2][__lv3];
                _tmpxx9_0 = _u_Hy[__lv1][__lv2][__lv3]+_tmpxx8_0;
                _u_Hy[__lv1][__lv2][__lv3] = _tmpxx9_0;
@@ -283,7 +283,7 @@ void fdtd__d2(int _u_Ets_n0, int _u_Ets_n1, double _u_Ets[_u_Ets_n0][_u_Ets_n1])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 15; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx12_0, _tmpxx13_0;
+               register double _tmpxx13_0, _tmpxx12_0;
                _tmpxx12_0 = _tmpxx11*_u_Hzt[__lv1][__lv2][__lv3];
                _tmpxx13_0 = _u_Hz[__lv1][__lv2][__lv3]+_tmpxx12_0;
                _u_Hz[__lv1][__lv2][__lv3] = _tmpxx13_0;

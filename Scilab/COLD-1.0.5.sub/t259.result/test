@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
          int __lv3;
          for(__lv3 = 0; __lv3 <= 1; __lv3 += 1) {
             //PIPS generated variable
-            register double _tmpxx4_0;
-            //PIPS generated variable
             register double _Complex _u_c_0;
+            //PIPS generated variable
+            register double _tmpxx4_0;
             _tmpxx4_0 = (double) 1.0;
             _u_c_0 = (double _Complex) _tmpxx4_0*_tmpxx5;
             _u_logc[__lv1][__lv2][__lv3] = clog(_u_c_0);
