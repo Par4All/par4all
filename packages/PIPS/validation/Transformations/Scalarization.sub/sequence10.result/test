@@ -24,9 +24,9 @@ Code after scalarization
 
 int sequence10(int x[10], int y[10][10])
 {
-   int k;
    //PIPS generated variable
    register int x_0;
+   int k;
    x_0 = y[1][1];
    x_0 = x_0+y[1][2];
    x_0 = x_0+y[1][1];
@@ -40,11 +40,11 @@ Complexity of "sequence10" after scalarization
 //                                                                   13 (SUMMARY)
 int sequence10(int x[10], int y[10][10])
 {
-//                                                                    0 (STMT)
-   int k;
    //PIPS generated variable
 //                                                                    0 (STMT)
    register int x_0;
+//                                                                    0 (STMT)
+   int k;
 //                                                                    2 (STMT)
    x_0 = y[1][1];
 //                                                                    3 (STMT)

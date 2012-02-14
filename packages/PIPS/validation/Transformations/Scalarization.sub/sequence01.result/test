@@ -3,9 +3,9 @@ Code after scalarization
 
 int sequence01(int x[10], int y[10][10])
 {
-   int k;
    //PIPS generated variable
    register int x_0;
+   int k;
    x_0 = y[1][1];
    x_0 = x_0+y[1][2];
    x_0 = x_0+y[1][1];

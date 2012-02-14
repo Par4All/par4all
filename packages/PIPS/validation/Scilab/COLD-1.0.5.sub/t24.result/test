@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
       int __lv2;
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1) {
          //PIPS generated variable
-         register double _u_a_0, _u_b_0;
+         register double _u_b_0, _u_a_0;
          _u_a_0 = (double) 1.0;
          _u_b_0 = _u_a_0+(double) 2;
          _u_c[__lv1][__lv2] = pow(_u_b_0, 2);

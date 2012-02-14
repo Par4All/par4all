@@ -101,14 +101,10 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -122,14 +118,10 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -142,22 +134,13 @@ digraph "freia_scalar_10_spoc_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
+  "9 max" [shape=diamond];
   "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
   "i" -> "8 +_";
   "i" -> "6 max";
-}
-// graph for dag "freia_scalar_10_spoc_helper_0_1" of module "freia_scalar_10" in dot format
-digraph "freia_scalar_10_spoc_helper_0_1" {
-  // inputs
-  "o" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "9 max" [shape=diamond];
-  "o" -> "9 max";
 }
 
 ! acceleration function
@@ -169,15 +152,15 @@ digraph "freia_scalar_10_spoc_helper_0_1" {
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 // split 0: 1 cut
-// split 1: 1 cut
-// # SPOC calls: 2
+// # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_scalar_10
 freia_status freia_scalar_10_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t * po0,
-  int32_t pi1)
+  int32_t pi1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -205,11 +188,14 @@ freia_status freia_scalar_10_spoc_helper_0_0_0(
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[1][0].constant = pi1;
 
-
-  // output image o on 0
-  // o [1 alu] -> [1 output 0] 0 null
+  // o [1 alu] -> [1 measure 0] 8 add_const
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
+
+
+  // output image o on 0
+  // o [1 measure 0] -> [1 output 0] 0 null
+  // nope
 
   // fill in to the end...
   // o [1 output 0] -> [7 output 0] 0 null
@@ -247,54 +233,8 @@ freia_status freia_scalar_10_spoc_helper_0_0_0(
   // measure 6 global_max stage 0 side 0
   *po0 = (int32_t) reduc.measure[0][0].maximum;
 
-  return ret;
-}
-
-// FREIA-SPoC helper function for module freia_scalar_10
-freia_status freia_scalar_10_spoc_helper_0_1_0(
-  const freia_data2d * i0,
-  int32_t * po0)
-{
-  spoc_instr si;
-  spoc_param sp;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_op_param param;
-  freia_status ret;
-  spoc_reduction reduc;
-  freia_reduction_results redres;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // o [0 input 0] -> [0 measure 0] 0 undefined
-  si.mux[0][0].op = SPOC_MUX_IN0;
-
-
-  // no output image
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
-
-  // measure 9 global_max stage 0 side 0
-  *po0 = (int32_t) reduc.measure[0][0].maximum;
+  // measure 9 global_max stage 1 side 0
+  *po2 = (int32_t) reduc.measure[1][0].maximum;
 
   return ret;
 }
@@ -304,9 +244,7 @@ freia_status freia_scalar_10_spoc_helper_0_1_0(
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_spoc_helper_0_0_0(o, i, &max, 1);                    /*0006*/
-   max0 = max;                                                          /*0007*/
-   freia_scalar_10_spoc_helper_0_1_0(o, &max);                          /*0009*/
+   freia_scalar_10_spoc_helper_0_0_0(o, i, &max0, 1, &max);             /*0006*/
    return max+max0;                                                     /*0010*/
 }
 
@@ -315,9 +253,7 @@ int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_spoc_helper_0_0_0(o, i, &max, 1);                    /*0006*/
-   max0 = max;                                                          /*0007*/
-   freia_scalar_10_spoc_helper_0_1_0(o, &max);                          /*0009*/
+   freia_scalar_10_spoc_helper_0_0_0(o, i, &max0, 1, &max);             /*0006*/
    return max+max0;                                                     /*0010*/
 }
 #
@@ -348,14 +284,10 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -369,14 +301,10 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -389,22 +317,13 @@ digraph "freia_scalar_10_terapix_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
+  "9 max" [shape=diamond];
   "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
   "i" -> "8 +_";
   "i" -> "6 max";
-}
-// graph for dag "freia_scalar_10_terapix_helper_0_1_0" of module "freia_scalar_10" in dot format
-digraph "freia_scalar_10_terapix_helper_0_1_0" {
-  // inputs
-  "o" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "9 max" [shape=diamond];
-  "o" -> "9 max";
 }
 
 ! acceleration function
@@ -431,17 +350,18 @@ digraph "freia_scalar_10_terapix_helper_0_1_0" {
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
- * 2 image operations in dag
- * dag length is 2, dag width is 1
+ * 3 image operations in dag
+ * dag length is 3, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 6
+ * - computation: 9
  * - communication: 64
  */
 freia_status freia_scalar_10_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t * po2,
-  int32_t pi3)
+  int32_t pi3,
+  int32_t * po4)
 {
   // declarations:
   freia_microcode mcode;
@@ -466,8 +386,14 @@ freia_status freia_scalar_10_terapix_helper_0_0_0(
   int16_t p_1[1];
   const int32_t x_1 = 1;
   const int32_t y_1 = 0;
+  // operation 2_val initialization
+  int16_t p_2_val[1];
+  const int32_t x_2_val = 2;
+  const int32_t y_2_val = 0;
+  // array for reduction 2 extraction
+  int32_t red_2[1];
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][2];
+  terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
   // imagelets definitions:
@@ -479,6 +405,7 @@ freia_status freia_scalar_10_terapix_helper_0_0_0(
 
   // memory for reductions
   int reduction_0 = 1023;
+  int reduction_2 = 1022;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -577,6 +504,54 @@ freia_status freia_scalar_10_terapix_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ADD_CONST;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ADD_CONST;
+  // 2: max(1)
+  // initializing  2_val
+  p_2_val[0] = INT16_MIN;
+  gram.xoffset = x_2_val;
+  gram.yoffset = y_2_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_2_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 2_val
+  mem_init.xmin1 = reduction_2;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 1;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
+  // set measure max at reduction_2
+  mcu_macro[0][2].xmin2 = reduction_2;
+  mcu_macro[1][2].xmin2 = reduction_2;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].xmin3 = 0;
+  mcu_macro[1][2].xmin3 = 0;
+  mcu_macro[0][2].ymin3 = 0;
+  mcu_macro[1][2].ymin3 = 0;
+  mcu_macro[0][2].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
 
 
   // inputs:
@@ -612,7 +587,7 @@ freia_status freia_scalar_10_terapix_helper_0_0_0(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 2;
+  mcu_instr.nbinstr = 3;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
@@ -638,177 +613,12 @@ freia_status freia_scalar_10_terapix_helper_0_0_0(
 
   // assign reduction parameter
   *po2 = (int32_t) red_0[0];
-
-  return ret;
-}
-
-
-/* FREIA terapix helper function for module freia_scalar_10
- *
- * RAMPE    = 1024
- * NPE      = 128
- * DMA BW   = 32
- * GRAM W   = 64
- * GRAM H   = 32
- * DAG CUT  = compute
- * OVERLAP  = false
- * IMAGE H  = 0
- * MAX SIZE = 0
- *
- * 1 input image, 0 output image
- * 1 image operations in dag
- * dag length is 2, dag width is 1
- * costs in cycles per imagelet row:
- * - computation: 3
- * - communication: 32
- */
-freia_status freia_scalar_10_terapix_helper_0_1_0(
-  const freia_data2d * i0,
-  int32_t * po1)
-{
-  // declarations:
-  freia_microcode mcode;
-  freia_op_param param;
-  freia_dynamic_param dyn_param;
-  terapix_gram gram;
-  int i;
-  freia_status ret = FREIA_OK;
-  // data structures for reductions
-  terapix_mcu_macrocode mem_init;
-  freia_reduction_results redres;
-  terapix_reduction redter;
-  // overall structure which describes the computation
-  terapix_mcu_instr mcu_instr;
-  // operation 0_val initialization
-  int16_t p_0_val[1];
-  const int32_t x_0_val = 0;
-  const int32_t y_0_val = 0;
-  // array for reduction 0 extraction
-  int32_t red_0[1];
-  // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][1];
-  terapix_tile_info tile_in[2][1];
-  // imagelets definitions:
-  // - 1 computation imagelets
-  // - 1 double buffer imagelets
-  int imagelet_size = 511;
-  int imagelet_1 = 0;
-  int imagelet_2 = 511;
-
-  // memory for reductions
-  int reduction_0 = 1023;
-
-  // double buffer assignment
-  int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_2;
-
-  // body:
-  // mcode param
-  mcode.raw = (void*) terapix_ucode_array;
-  mcode.size = TERAPIX_UCODE_SIZE_T;
-  freia_mg_write_microcode(&mcode);
-
-  // dyn_param contents
-  dyn_param.raw = &gram;
-  dyn_param.size = sizeof(terapix_gram);
-
-  // redres contents
-  redres.raw = (void*) &redter;
-  redres.size = sizeof(terapix_reduction);
-
-  // 0: max(1)
-  // initializing  0_val
-  p_0_val[0] = INT16_MIN;
-  gram.xoffset = x_0_val;
-  gram.yoffset = y_0_val;
-  gram.width = 1;
-  gram.height = 1;
-  gram.params = p_0_val;
-  freia_mg_write_dynamic_param(&dyn_param);
-  // initialize memory for operation 0_val
-  mem_init.xmin1 = reduction_0;
-  mem_init.ymin1 = 0;
-  mem_init.xmin2 = 0;
-  mem_init.ymin2 = 0;
-  mem_init.xmin3 = 0;
-  mem_init.ymin3 = 0;
-  mem_init.iter1 = TERAPIX_PE_NUMBER;
-  mem_init.iter2 = 1;
-  mem_init.iter3 = 0;
-  mem_init.iter4 = 0;
-  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode); // not used?
-  param.raw = (void*) (&mem_init);
-  ret |= freia_mg_work(&param);
-  ret |= freia_mg_end_work();
-  // set measure max at reduction_0
-  mcu_macro[0][0].xmin2 = reduction_0;
-  mcu_macro[1][0].xmin2 = reduction_0;
-  mcu_macro[0][0].ymin2 = 0;
-  mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = 0;
-  mcu_macro[1][0].xmin3 = 0;
-  mcu_macro[0][0].ymin3 = 0;
-  mcu_macro[1][0].ymin3 = 0;
-  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin1 = 0;
-  mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].iter2 = imagelet_size;
-  mcu_macro[1][0].iter2 = imagelet_size;
-  mcu_macro[0][0].iter3 = 0;
-  mcu_macro[1][0].iter3 = 0;
-  mcu_macro[0][0].iter4 = 0;
-  mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
-
-  // inputs:
-  // - imagelet 1 is i0 for o
-  tile_in[0][0].x = imagelet_io_1_0;
-  tile_in[0][0].y = 0;
-  tile_in[1][0].x = imagelet_io_1_1;
-  tile_in[1][0].y = 0;
-
-  // no output
-
-  // imagelet erosion for the computation
-  mcu_instr.borderTop    = 0;
-  mcu_instr.borderBottom = 0;
-  mcu_instr.borderLeft   = 0;
-  mcu_instr.borderRight  = 0;
-  mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
-
-  // outputs
-  mcu_instr.nbout = 0;
-  mcu_instr.out0 = NULL;
-  mcu_instr.out1 = NULL;
-
-  // inputs
-  mcu_instr.nbin = 1;
-  mcu_instr.in0 = tile_in[0];
-  mcu_instr.in1 = tile_in[1];
-
-  // actual instructions
-  mcu_instr.nbinstr = 1;
-  mcu_instr.instr0   = mcu_macro[0];
-  mcu_instr.instr1   = mcu_macro[1];
-
-  // call terapix runtime
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, i0);
-
-  // extract measures
-  // get measure max result from reduction_0
-  redter.xres = reduction_0;
+  // get measure max result from reduction_2
+  redter.xres = reduction_2;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
-  redter.result = (void*) red_0;
+  redter.result = (void*) red_2;
   redter.macroid = TERAPIX_UCODE_GLOBAL_MAX;
   redter.imgwidth = i0->width;
   redter.imgheight = i0->height;
@@ -818,7 +628,7 @@ freia_status freia_scalar_10_terapix_helper_0_1_0(
   ret |= freia_cg_read_reduction_results(&redres);
 
   // assign reduction parameter
-  *po1 = (int32_t) red_0[0];
+  *po4 = (int32_t) red_2[0];
 
   return ret;
 }
@@ -829,9 +639,7 @@ freia_status freia_scalar_10_terapix_helper_0_1_0(
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_terapix_helper_0_0_0(o, i, &max, 1);                 /*0006*/
-   max0 = max;                                                          /*0007*/
-   freia_scalar_10_terapix_helper_0_1_0(o, &max);                       /*0009*/
+   freia_scalar_10_terapix_helper_0_0_0(o, i, &max0, 1, &max);          /*0006*/
    return max+max0;                                                     /*0010*/
 }
 
@@ -840,9 +648,7 @@ int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_terapix_helper_0_0_0(o, i, &max, 1);                 /*0006*/
-   max0 = max;                                                          /*0007*/
-   freia_scalar_10_terapix_helper_0_1_0(o, &max);                       /*0009*/
+   freia_scalar_10_terapix_helper_0_0_0(o, i, &max0, 1, &max);          /*0006*/
    return max+max0;                                                     /*0010*/
 }
 #
@@ -873,14 +679,10 @@ digraph "dag_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -894,14 +696,10 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "9 max" [shape=diamond];
-  "7 ?" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
   "8 +_" [shape=trapezium,orientation=270];
   "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
-  "6 max" -> "9 max" [arrowhead=empty,label="max"];
-  "6 max" -> "7 ?" [arrowhead=empty,label="max"];
   "i" -> "8 +_";
   "i" -> "6 max";
 }
@@ -914,7 +712,9 @@ digraph "freia_scalar_10_opencl_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
+  "9 max" [shape=diamond];
   "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "9 max" [label="o"];
   "8 +_" -> "o";
   "6 max" [shape=diamond];
   "i" -> "8 +_";
@@ -934,17 +734,6 @@ digraph "freia_scalar_10_opencl_helper_0_0_0" {
   "6 max" [shape=diamond];
   "i" -> "8 +_";
   "i" -> "6 max";
-}
-// graph for dag "freia_scalar_10_opencl_helper_0_1" of module "freia_scalar_10" in dot format
-digraph "freia_scalar_10_opencl_helper_0_1" {
-  // inputs
-  "o" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "9 max" [shape=diamond];
-  "o" -> "9 max";
 }
 
 ! acceleration function
@@ -1091,8 +880,7 @@ KERNEL void freia_scalar_10_opencl_helper_0_0_0(
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_opencl_helper_0_0_0(o, i, &max, 1);                  /*0006*/
-   max0 = max;                                                          /*0007*/
+   freia_scalar_10_opencl_helper_0_0_0(o, i, &max0, 1);                 /*0006*/
    freia_aipo_global_max(o, &max);                                      /*0009*/
    return max+max0;                                                     /*0010*/
 }
@@ -1102,8 +890,7 @@ int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 int freia_scalar_10(freia_data2d *o, const freia_data2d *i)
 {
    int max0, max;                                                       /*0005*/
-   freia_scalar_10_opencl_helper_0_0_0(o, i, &max, 1);                  /*0006*/
-   max0 = max;                                                          /*0007*/
+   freia_scalar_10_opencl_helper_0_0_0(o, i, &max0, 1);                 /*0006*/
    freia_aipo_global_max(o, &max);                                      /*0009*/
    return max+max0;                                                     /*0010*/
 }

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 9; __tri0 += 1) {
       //PIPS generated variable
-      register double _tmpxx0_0, _tmpxx1_0, _tmpxx2_0, _u_x_0;
+      register double _u_x_0, _tmpxx2_0, _tmpxx1_0, _tmpxx0_0;
       _tmpxx0_0 = 0.1+__tri0*0.1;
       _tmpxx1_0 = _tmpxx0_0;
       _u_x_0 = _tmpxx1_0;

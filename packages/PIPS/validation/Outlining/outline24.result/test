@@ -43,8 +43,6 @@ static void do_assign(int b[1], int i);
 void assign(intptr b, int i);
 
 float ing(int i);
-//PIPS generated variable
-void ding();
 static void do_assign(int b[1], int i)
 {
    b[i] = i;

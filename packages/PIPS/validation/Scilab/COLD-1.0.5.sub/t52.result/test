@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__tri0 = 0; __tri0 <= 20; __tri0 += 1) {
       //PIPS generated variable
-      register int _tmpxx6_0, _u_a2_0;
+      register int _u_a2_0, _tmpxx6_0;
       _tmpxx6_0 = -10+__tri0*1;
       _u_a2_0 = _tmpxx6_0;
       _u_c2[0][__tri0] = abs(_u_a2_0);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
          int __lv3;
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1) {
             //PIPS generated variable
-            register double _tmpxx7_0, _u_a3_0 = _u_a3[__lv1][__lv2][__lv3];
+            register double _u_a3_0 = _u_a3[__lv1][__lv2][__lv3], _tmpxx7_0;
             _tmpxx7_0 = _u_a3_0-0.5;
             _u_a3_0 = _tmpxx7_0;
             _u_c3[__lv1][__lv2][__lv3] = fabs(_u_a3_0);
