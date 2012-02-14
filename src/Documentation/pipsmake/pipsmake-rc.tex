@@ -6089,6 +6089,8 @@ ACCEL_STORE "SIMD_STORE"
 ACCEL_WORK "SIMD_"
 \end{PipsProp}
 
+\subsection{SIMD Atomizer}
+
 \begin{PipsPass}{simd_atomizer}
   Here is yet another atomizer, based on {\tt new\_atomizer} (see
   Section~\ref{subsubsection:limited-atomizer}), used to reduce
@@ -6232,6 +6234,8 @@ deatomizer                  > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
+\subsection{If Conversion}
+
 \begin{PipsPass}{if_conversion_init}
 This phase is the first phase of the if-conversion algorithm. The complete
 if conversion algorithm is performed by applying the three following
@@ -6307,10 +6311,11 @@ loop_nest_unswitching                  > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\subsection{Scalar Renaming}
 
 \begin{PipsPass}{scalar_renaming}
-This phase tries to minimize dependencies in the code by renaming scalars
-when legal.
+The Scalar Renaming pass tries to minimize dependencies in the code by
+renaming scalars when legal.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -6319,6 +6324,8 @@ scalar_renaming           > MODULE.code
         < MODULE.dg
         < MODULE.proper_effects
 \end{PipsMake}
+
+\subsection{Tree Matching for SIMD Code Generation}
 
 \begin{PipsPass}{simd_treematcher}
 This function initialize a treematch used by \PipsPassRef{simdizer} for simd-oriented pattern matching
