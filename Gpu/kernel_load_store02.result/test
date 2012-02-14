@@ -35,12 +35,6 @@ extern void exit(int status);
 enum {N=100};
 
 void give();
-//PIPS generated variable
-void p4a_kernel_give(int N, double array[N], int k);
-//PIPS generated variable
-void p4a_wrapper_give(int N, double array[N], int k);
-//PIPS generated variable
-void p4a_launcher_give(int N, double array[N], int k_0[1]);
 void p4a_launcher_give(int N, double array[N], int k_0[1])
 {
    //PIPS generated variable
