@@ -351,6 +351,56 @@ static text compilation_unit_text(entity cu, entity module)
     return cut;
 }
 
+void
+add_new_compilation_unit(const char* compilation_unit_name, bool is_fortran, entity module) {
+    /* Add the compilation unit files */
+    pips_assert("The compilation unit name is defined", !string_undefined_p(compilation_unit_name));
+    user_log("Registering synthesized compilation unit %s\n", compilation_unit_name);
+    entity cu = FindEntity(TOP_LEVEL_MODULE_NAME,compilation_unit_name);
+    const char* res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+    if(entity_undefined_p(cu))
+        cu = MakeCompilationUnitEntity(compilation_unit_name);
+
+    char *dir_name = db_get_current_workspace_directory();
+
+    char *file_name;
+    char* cu_real = strdup(compilation_unit_name);
+    cu_real[strlen(cu_real)-1]=0;
+    asprintf(&file_name,"%s" PP_C_ED ,cu_real);
+    free(cu_real);
+
+    char * src_name;
+    asprintf(&src_name,WORKSPACE_TMP_SPACE "/%s",file_name);
+    char *full_name;
+    asprintf(&full_name,"%s/%s",dir_name,src_name);
+    free(src_name);
+
+    char *init_name = db_build_file_resource_name(res, compilation_unit_name, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
+    char *finit_name;
+    asprintf(&finit_name,"%s/%s", dir_name, init_name);
+    free(dir_name);
+
+    /* Builds the compilation unit stub: it can be empty or include
+       module_name declaration as an extern function.
+       */
+    text stub = entity_undefined_p(module) ? make_text(NIL) : compilation_unit_text(cu, module) ;
+
+    /* Put it in the source file and link the initial file.
+    */
+    db_make_subdirectory(WORKSPACE_TMP_SPACE);
+    FILE *f = safe_fopen(finit_name, "w");
+    print_text(f, stub);
+    safe_fclose(f, finit_name);
+    free_text(stub);
+
+    if(!file_exists_p(full_name)) {
+        FILE *fake = safe_fopen(full_name,"a");
+        safe_fclose(fake, full_name);
+    }
+    DB_PUT_FILE_RESOURCE(res, compilation_unit_name, init_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, compilation_unit_name, full_name);
+}
+
 
 /* Add the new resource files associated to a module with its more-or-less
    correct code.
@@ -371,13 +421,12 @@ add_new_module_from_text(const char* module_name,
              const char* compilation_unit_name) {
     bool success_p = true;
     entity m = local_name_to_top_level_entity(module_name);
-    string file_name, dir_name, src_name, full_name, init_name, finit_name;
     /* relative to the current directory */
     FILE * f;
-    string res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+    const char *res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
 
     /* For C only: compilation unit cu and compilation unit name cun */
-    string cun = string_undefined;
+    char* cun = string_undefined;
     entity cu = entity_undefined;
 
     if(entity_undefined_p(m))
@@ -392,6 +441,7 @@ add_new_module_from_text(const char* module_name,
      * select prettyprinter
      * choose out file name
      */
+    char *file_name;
     if(is_fortran) {
       set_prettyprint_language_tag(is_language_fortran);
       asprintf(&file_name,"%s" FORTRAN_FILE_SUFFIX ,module_name );
@@ -425,12 +475,15 @@ add_new_module_from_text(const char* module_name,
         asprintf(&file_name,"%s" PP_C_ED ,cu_real);
         free(cu_real);
     }
-    dir_name = db_get_current_workspace_directory();
+    char *dir_name = db_get_current_workspace_directory(), *src_name;
     asprintf(&src_name,WORKSPACE_TMP_SPACE "/%s",file_name);
+    char *full_name;
     asprintf(&full_name,"%s/%s",dir_name,src_name);
-    init_name =
+    char *init_name =
       db_build_file_resource_name(res, entity_local_name(m), is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
+    char *finit_name;
     asprintf(&finit_name,"%s/%s" ,dir_name,init_name);
+    free(dir_name);
 
     /* Put the code text in the temporary source file */
     db_make_subdirectory(WORKSPACE_TMP_SPACE);
@@ -444,43 +497,24 @@ add_new_module_from_text(const char* module_name,
       safe_unlink(full_name);
     /* The initial file is linked to the newly generated temporary file: */
     safe_link(full_name, finit_name);
+    free(finit_name);
 
     /* Add the new generated file as a file resource with its local
      * name...  should only put a new user file, I guess?
      */
     user_log("Registering synthesized file %s\n", file_name );
-    DB_PUT_FILE_RESOURCE(res, module_name, strdup(init_name));
+    free(file_name);
+    DB_PUT_FILE_RESOURCE(res, module_name, init_name);
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(full_name));
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, full_name);
 
     if( !entity_undefined_p(cu) ) { // C is assumed
-      /* Add the compilation unit files */
-      pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
-      user_log("Registering synthesized compilation unit %s\n", file_name);
-
-      init_name = db_build_file_resource_name(res, cun, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
-      finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
-
-      /* Builds the compilation unit stub: it can be empty or include
-	 module_name declaration as an extern function.
-      */
-      text stub = compilation_unit_text(cu, m);
-
-      /* Put it in the source file and link the initial file.
-       */
-      db_make_subdirectory(WORKSPACE_TMP_SPACE);
-      f = safe_fopen(finit_name, "w");
-      print_text(f, stub);
-      safe_fclose(f, finit_name);
-      DB_PUT_FILE_RESOURCE(res, cun, init_name);
-      DB_PUT_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(full_name));
+        add_new_compilation_unit(cun, is_fortran, m);
     }
     else if(!is_fortran) {
         if(entity_undefined_p(cu)) cu = module_name_to_entity(cun);
-        AddEntityToModuleCompilationUnit(m, cu);
     }
 
-    free(file_name), free(dir_name), free(full_name), free(finit_name);
     if(!string_undefined_p(cun)) free(cun);
     return success_p;
 }
