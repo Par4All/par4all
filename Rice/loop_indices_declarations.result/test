@@ -1,0 +1,71 @@
+
+"after privatize module"
+
+int main(int argc, char **argv)
+{
+   int n = 1000;
+   if (argc>=2)
+      n = atoi(argv[1]);
+
+   n = 4*n;
+   // To be compatible with int4
+   
+   float a[n], b[n], c = 32;
+   int t;
+   
+   
+   for(t = 0; t <= 9; t += 1) {
+      int i_0;
+      for(i_0 = 0; i_0 <= n-1; i_0 += 1)
+         a[i_0] = b[i_0]*c;
+      printf("%f\n", a[0]);
+      int i;
+
+      for(i = 0; i <= n-1; i += 4) {
+         a[i] = b[i]*c;
+         a[i+1] = b[i+1]*c;
+         a[i+2] = b[i+2]*c;
+         a[i+3] = b[i+3]*c;
+      }
+   }
+
+   printf("%f\n", a[0]);
+
+   return 0;
+}
+
+"after internalize parallel code"
+
+int main(int argc, char **argv)
+{
+   int n = 1000;
+   if (argc>=2)
+      n = atoi(argv[1]);
+
+   n = 4*n;
+   // To be compatible with int4
+   
+   float a[n], b[n], c = 32;
+   int t;
+   
+   
+   for(t = 0; t <= 9; t += 1) {
+      int i_0;
+      forall(i_0 = 0; i_0 <= n-1; i_0 += 1)
+         a[i_0] = b[i_0]*c;
+      printf("%f\n", a[0]);
+      int i;
+      forall(i = 0; i <= n-1; i += 4)
+         a[i] = b[i]*c;
+      forall(i = 0; i <= n-1; i += 4)
+         a[i+1] = b[i+1]*c;
+      forall(i = 0; i <= n-1; i += 4)
+         a[i+2] = b[i+2]*c;
+      forall(i = 0; i <= n-1; i += 4)
+         a[i+3] = b[i+3]*c;
+   }
+
+   printf("%f\n", a[0]);
+
+   return 0;
+}
