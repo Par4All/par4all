@@ -11,48 +11,63 @@ Try to restructure the code for more precision:
 Check the proper effects
 int main(int argc, char **argv)
 {
+//             <    is declared>: a_d1 a_d2
    int a_d1, a_d2;
+//             <    is declared>: i j
    int i, j;
+//             <    is declared>: toto
    double *toto;
 //             <    is written>: a_d1 a_d2
+//             <    is referenced>: a_d1 a_d2
 
    a_d1 = a_d2 = 5;
 //             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: a_d1 a_d2 toto
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
 //             <    is read   >: a_d1
 //             <    is written>: i
+//             <    is referenced>: a_d1 i
 
    for(i = 0; i <= a_d1-1; i += 1)
 //             <    is read   >: a_d1 a_d2
 //             <    is written>: j
+//             <    is referenced>: a_d1 a_d2 j
       for(j = 0; j <= a_d2-1; j += 1)
 //             <    is read   >: a_d1 a_d2 i j toto
 //             <    is written>: toto[i+j*a_d1]
+//             <    is referenced>: a_d1 a_d2 i j toto
          toto[i+j*a_d1] = i+j*a_d2;
 //             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: toto
 
    free(toto);
 //             <    is written>: a_d1 a_d2
+//             <    is referenced>: a_d1 a_d2
    
    
    a_d1 = a_d2 = 10;
 //             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: a_d1 a_d2 toto
    toto = malloc(sizeof(*toto)*a_d1*a_d2);
 //             <    is read   >: a_d1
 //             <    is written>: i
+//             <    is referenced>: a_d1 i
 
    for(i = 0; i <= a_d1-1; i += 1)
 //             <    is read   >: a_d1 a_d2
 //             <    is written>: j
+//             <    is referenced>: a_d1 a_d2 j
       for(j = 0; j <= a_d2-1; j += 1)
 //             <    is read   >: a_d1 a_d2 i j toto
 //             <    is written>: toto[i+j*a_d1]
+//             <    is referenced>: a_d1 a_d2 i j toto
          toto[i+j*a_d1] = i+j*a_d2;
 //             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: toto
 
    free(toto);
    

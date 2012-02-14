@@ -40,27 +40,38 @@ Proper effects with points-to
 
 void pointer08()
 {
+//             <    is declared>: tree
    struct tree {
       struct tree *tree_list[10];
    };
+//             <    is declared>: i
    int i;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+//             <    is declared>: t
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 //             <    is written>: i
+//             <    is referenced>: i
    for(i = 0; i <= 9; i += 1)
 //             <may be written>: *HEAP*_l_8.tree_list[i]
 //             <    is read   >: i t _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: i t
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 }
 
  *********************** Use-Def Chains *********************
 
+	07 --> 09 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 10 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
 	08 --> 10 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <t-W-EXACT> to <t-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <t-WE-EXACT> to <t-RE-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	10 --> 10 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
