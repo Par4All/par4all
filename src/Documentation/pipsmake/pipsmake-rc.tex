@@ -6069,6 +6069,7 @@ NESTED_PARALLELISM_THRESHOLD 0
 \index{Atomizer}
 \index{SLP}
 \index{SSE}
+\index{Scalar Renaming}
 
 The SAC project aims at generating efficient code for processors with SIMD
 extension instruction set such as VMX, SSE4, etc. which are also
@@ -11154,9 +11155,9 @@ destroyed, even with this property set to true.
 SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
 
-Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
-when it is useless according to the OUT region, for instance when dealing
-with a library function.
+Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation
+of a copy-out statement when it is useless according to the OUT
+region, for instance when dealing with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
 \end{PipsProp}
@@ -11180,7 +11181,7 @@ because nothing can be proven when the loop is sometimes entered and
 sometimes not. Also, the memory access may be always perfectly
 legal. The default value is FALSE, going for performance before
 safety. This property is pretty hard to understand, as well as its
-impact. See sequence06, 07 and 08 in the validaiton suite of the
+impact. See sequence06, 07 and 08 in the validation suite of the
 scalarization pass.
 \begin{PipsProp}{SCALARIZATION_STRICT_MEMORY_ACCESSES}
 SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
