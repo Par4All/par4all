@@ -59,7 +59,7 @@ static string commenter(__attribute__((unused)) entity e)
 
 /* compile FREIA calls for some target.
  */
-static int freia_compiler(string module, string hardware)
+static bool freia_compiler(const string module, const string hardware)
 {
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
   pips_debug(1, "considering module %s for hardware %s\n", module, hardware);
@@ -117,22 +117,22 @@ static int freia_compiler(string module, string hardware)
   return true;
 }
 
-int freia_spoc_compiler(string module)
+bool freia_spoc_compiler(const string module)
 {
   return freia_compiler(module, "spoc");
 }
 
-int freia_terapix_compiler(string module)
+bool freia_terapix_compiler(const string module)
 {
   return freia_compiler(module, "terapix");
 }
 
-int freia_aipo_compiler(string module)
+bool freia_aipo_compiler(const string module)
 {
   return freia_compiler(module, "aipo");
 }
 
-int freia_opencl_compiler(string module)
+bool freia_opencl_compiler(const string module)
 {
   return freia_compiler(module, "opencl");
 }

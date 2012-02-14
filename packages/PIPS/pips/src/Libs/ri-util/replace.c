@@ -30,6 +30,14 @@ replace_entities_declaration_walker(statement s, hash_table ht)
 }
 
 static void
+replace_entities_call_walker(call c, hash_table ht) {
+    entity new = hash_get(ht, call_function(c));
+    if( new != HASH_UNDEFINED_VALUE) {
+        call_function(c)=new;
+    }
+}
+
+static void
 replace_entities_expression_walker(expression parent, hash_table ht)
 {
     if(expression_reference_p(parent)) {
@@ -92,6 +100,7 @@ replace_entities(void* s, hash_table ht)
       gen_context_multi_recurse(s, ht,
               expression_domain, gen_true, replace_entities_expression_walker,
               statement_domain, gen_true, replace_entities_declaration_walker,
+              call_domain, gen_true, replace_entities_call_walker,
               loop_domain, gen_true, replace_entities_loop_walker,
               NULL);
   }
