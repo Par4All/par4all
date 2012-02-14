@@ -295,7 +295,7 @@ void nb1d__d2d2d2d2d2d2(int _u_Vx_n0, int _u_Vx_n1, double _u_Vx[_u_Vx_n0][_u_Vx
 #pragma omp parallel for
          for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
             //PIPS generated variable
-            register double _tmpxx44_0, _tmpxx45_0, _tmpxx46_0, _tmpxx47_0, _u_drx_0, _u_dry_0, _u_drz_0;
+            register double _u_drz_0, _u_dry_0, _u_drx_0, _tmpxx47_0, _tmpxx46_0, _tmpxx45_0, _tmpxx44_0;
             _u_drz_0 = _u_Rz[__lv1][0]-_tmpxx43;
             _tmpxx47_0 = _u_drz_0*_u_drz_0;
             _u_dry_0 = _u_Ry[__lv1][0]-_tmpxx42;
@@ -335,7 +335,7 @@ void nb1d__d2d2d2d2d2d2(int _u_Vx_n0, int _u_Vx_n1, double _u_Vx[_u_Vx_n0][_u_Vx
 #pragma omp parallel for
          for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
             //PIPS generated variable
-            register double _tmpxx49_0, _tmpxx50_0, _tmpxx51_0, _tmpxx52_0, _tmpxx53_0, _u_f_0, _u_drz_1 = _u_drz[__lv1][0], _u_dry_1 = _u_dry[__lv1][0], _u_drx_1 = _u_drx[__lv1][0], _u_r_0 = _u_r[__lv1][0];
+            register double _u_r_0 = _u_r[__lv1][0], _u_drx_1 = _u_drx[__lv1][0], _u_dry_1 = _u_dry[__lv1][0], _u_drz_1 = _u_drz[__lv1][0], _u_f_0, _tmpxx53_0, _tmpxx52_0, _tmpxx51_0, _tmpxx50_0, _tmpxx49_0;
             _tmpxx50_0 = sqrt(_u_r_0);
             _tmpxx49_0 = _u_M[__lv1][0]/_u_r_0;
             _u_f_0 = _u_G*_tmpxx49_0;
@@ -386,7 +386,7 @@ void nb1d__d2d2d2d2d2d2(int _u_Vx_n0, int _u_Vx_n1, double _u_Vx[_u_Vx_n0][_u_Vx
 #pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
-         register double _tmpxx57_0, _u_ax_0;
+         register double _u_ax_0, _tmpxx57_0;
          _u_ax_0 = _u_Fx[__lv1][0]/_u_m[__lv1][0];
          _tmpxx57_0 = _u_ax_0*_u_dT;
          _tmpxx58[__lv1][0] = _u_Vx[__lv1][0]+_tmpxx57_0;
@@ -396,7 +396,7 @@ void nb1d__d2d2d2d2d2d2(int _u_Vx_n0, int _u_Vx_n1, double _u_Vx[_u_Vx_n0][_u_Vx
 #pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
-         register double _tmpxx59_0, _u_ay_0;
+         register double _u_ay_0, _tmpxx59_0;
          _u_ay_0 = _u_Fy[__lv1][0]/_u_m[__lv1][0];
          _tmpxx59_0 = _u_ay_0*_u_dT;
          _tmpxx60[__lv1][0] = _u_Vy[__lv1][0]+_tmpxx59_0;
@@ -406,7 +406,7 @@ void nb1d__d2d2d2d2d2d2(int _u_Vx_n0, int _u_Vx_n1, double _u_Vx[_u_Vx_n0][_u_Vx
 #pragma omp parallel for
       for(__lv1 = 0; __lv1 <= 29; __lv1 += 1) {
          //PIPS generated variable
-         register double _tmpxx61_0, _u_az_0;
+         register double _u_az_0, _tmpxx61_0;
          _u_az_0 = _u_Fz[__lv1][0]/_u_m[__lv1][0];
          _tmpxx61_0 = _u_az_0*_u_dT;
          _tmpxx62[__lv1][0] = _u_Vz[__lv1][0]+_tmpxx61_0;

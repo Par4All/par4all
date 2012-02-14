@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
       for(lv1_2 = 0; lv1_2 <= 2; lv1_2 += 1) {
          //PIPS generated variable
-         register int _u_d_1, _u_b_2 = _u_b[lv1_2][0];
+         register int _u_b_2 = _u_b[lv1_2][0], _u_d_1;
          _u_d_1 = -2147483647-1;
          _u_d_1 = _u_b_2>_u_d_1?_u_b_2:_u_d_1;
          _u_d[lv1_2][0] = _u_d_1;
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
       for(lv1_5 = 0; lv1_5 <= 2; lv1_5 += 1) {
          //PIPS generated variable
-         register int _u_d2_1, _u_b2_2 = _u_b2[lv1_5][0];
+         register int _u_b2_2 = _u_b2[lv1_5][0], _u_d2_1;
          _u_d2_1 = 2147483647;
          _u_d2_1 = _u_b2_2<_u_d2_1?_u_b2_2:_u_d2_1;
          _u_d2[lv1_5][0] = _u_d2_1;

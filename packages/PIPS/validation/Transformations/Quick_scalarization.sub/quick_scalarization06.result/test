@@ -6,9 +6,9 @@ int main()
    int b[10], i;
 
    for(i = 0; i <= 9; i += 1) {
-      int a[10];
       //PIPS generated variable
       register int a_0;
+      int a[10];
       a_0 = i;
       b[i] = a_0;
    }

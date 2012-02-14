@@ -10,7 +10,7 @@ int scalarization14(int n)
    for(i = 0; i <= 99; i += 1) {
       // BEGIN BLOCK
       //PIPS generated variable
-      register int __scalar__0, __scalar__1;
+      register int __scalar__1, __scalar__0;
       __scalar__1 = i;
       for(j = 0; j <= 99; j += 1) {
          // BEGIN BLOCK

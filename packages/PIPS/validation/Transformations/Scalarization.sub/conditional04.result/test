@@ -47,7 +47,7 @@ void conditional04(int cols, int jW[cols], int jE[cols])
    int j;
    for(j = 0; j <= cols-1; j += 1) {
       //PIPS generated variable
-      register int jE_0, jW_0;
+      register int jW_0, jE_0;
       jW_0 = j-1;
       jE_0 = j+1;
       if (j==0)
