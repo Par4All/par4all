@@ -172,7 +172,7 @@ void nb3d__d2d2(int _u_V_n0, int _u_V_n1, double _u_V[_u_V_n0][_u_V_n1], int _u_
       int __lv2;
       for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
          //PIPS generated variable
-         register double _tmpxx21_0, _tmpxx22_0;
+         register double _tmpxx22_0, _tmpxx21_0;
          _tmpxx21_0 = (double) 1.0;
          _u_ii[__lv1][__lv2] = round(_tmpxx21_0);
          _tmpxx22_0 = (double) 1.0;
@@ -197,7 +197,7 @@ void nb3d__d2d2(int _u_V_n0, int _u_V_n1, double _u_V[_u_V_n0][_u_V_n1], int _u_
 #pragma omp parallel for
    for(__tri2 = 0; __tri2 <= 29; __tri2 += 1) {
       //PIPS generated variable
-      register int _tmpxx23_0, _tmpxx24_0;
+      register int _tmpxx24_0, _tmpxx23_0;
       _tmpxx24_0 = 0+__tri2*1;
       _tmpxx23_0 = 1+__tri2*30;
       _u_kk[0][__tri2] = _tmpxx23_0+_tmpxx24_0;
@@ -300,7 +300,7 @@ void nb3d__d2d2(int _u_V_n0, int _u_V_n1, double _u_V[_u_V_n0][_u_V_n1], int _u_
          int __lv2;
          for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
             //PIPS generated variable
-            register double _tmpxx28_0, _tmpxx29_0, _u_rt_0 = _u_rt[__lv1][__lv2];
+            register double _u_rt_0 = _u_rt[__lv1][__lv2], _tmpxx29_0, _tmpxx28_0;
             _tmpxx28_0 = _u_MM[__lv1][__lv2]/_u_rt_0;
             _u_f[__lv1][__lv2] = _u_G*_tmpxx28_0;
             _tmpxx29_0 = sqrt(_u_rt_0);

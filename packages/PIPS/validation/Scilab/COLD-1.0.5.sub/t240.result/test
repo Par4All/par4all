@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
       int __lv2;
       for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
          //PIPS generated variable
-         register double _tmpxx19_0, _tmpxx20_0;
+         register double _tmpxx20_0, _tmpxx19_0;
          _tmpxx19_0 = (double) 1.0;
          _u_ii[__lv1][__lv2] = round(_tmpxx19_0);
          _tmpxx20_0 = (double) 1.0;
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__tri2 = 0; __tri2 <= 29; __tri2 += 1) {
       //PIPS generated variable
-      register int _tmpxx21_0, _tmpxx22_0;
+      register int _tmpxx22_0, _tmpxx21_0;
       _tmpxx22_0 = 0+__tri2*1;
       _tmpxx21_0 = 1+__tri2*30;
       _u_kk[0][__tri2] = _tmpxx21_0+_tmpxx22_0;
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
          int __lv2;
          for(__lv2 = 0; __lv2 <= 29; __lv2 += 1) {
             //PIPS generated variable
-            register double _tmpxx26_0, _tmpxx27_0, _u_rt_0 = _u_rt[__lv1][__lv2];
+            register double _u_rt_0 = _u_rt[__lv1][__lv2], _tmpxx27_0, _tmpxx26_0;
             _tmpxx26_0 = _u_MM[__lv1][__lv2]/_u_rt_0;
             _u_f[__lv1][__lv2] = _u_G*_tmpxx26_0;
             _tmpxx27_0 = sqrt(_u_rt_0);
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
          int __lv2;
          for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
             //PIPS generated variable
-            register double _tmpxx38_0, _tmpxx39_0, _tmpxx40_0, _tmpxx41_0, _u_V_0 = _u_V[__lv1][__lv2];
+            register double _u_V_0 = _u_V[__lv1][__lv2], _tmpxx41_0, _tmpxx40_0, _tmpxx39_0, _tmpxx38_0;
             _tmpxx38_0 = _u_a[__lv1][__lv2]*_u_dT;
             _tmpxx39_0 = _u_V_0+_tmpxx38_0;
             _u_V_0 = _tmpxx39_0;

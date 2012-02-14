@@ -10,7 +10,7 @@ int main()
    b[0] = 0;
    for(j = 0; j <= 9; j += 1) {
       //PIPS generated variable
-      register int a_0, c_0;
+      register int c_0, a_0;
       a_0 = 1;
       c_0 = a_0;
       for(k = 0; k <= 9; k += 1) {

@@ -23,6 +23,10 @@ echo ! initial function
 echo
 display PRINTED_FILE[${NAME}]
 #
+# handle some scalar deps...
+#
+apply FREIA_REMOVE_SCALAR_WW_DEPS[${NAME}]
+#
 # possibly to some unrolling, for SPoC only
 #
 ${DO_UNROLL:-#} FREIA_UNROLL_WHILE[${NAME}]

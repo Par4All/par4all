@@ -7529,6 +7529,7 @@ KERNELIZE_HOST_CALL_NAME ""
 OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
 
+
 \begin{PipsPass}{group_constants}
 Gather all constants from a module and put them in a single array.
 Relevant for Terapix code generation, and maybe for other accelerators as well
@@ -10317,11 +10318,27 @@ FREIA_IMAGE_HEIGHT 0
 FREIA_IMAGE_WIDTH 0
 \end{PipsProp}
 
+Ad-hoc transformation to remove particular scalar write-write dependencies
+in sequences. They are introduced by the do-while to while conversion
+on FREIA convergence loops. There is an underlying generic transformation
+on sequences that could be implemented with more thoughts on the subject.
+\begin{PipsMake}
+freia_remove_scalar_ww_deps > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 \subsection{FREIA SPoC}
 \label{hwac-freia-spoc}
 
 FREIA Compiler for SPoC target.
-Consider applying  \verb|freia_unroll_while| beforehand.
+
+Consider applying  \verb|freia_unroll_while| beforehand to unroll convergence
+use with the right number of iterations to make the best use of the available
+hardware. Note that the same transformation would also make sense somehow
+on sequences when the do-while to while transformation as been applied, but
+the unrolling factor is much harder to decide in the sequence case as it would
+depend on previous operations.
 
 \begin{PipsMake}
 freia_spoc_compiler   > MODULE.code
@@ -10685,7 +10702,9 @@ can be set to true to outline the new module into a newly created
 compilation unit. It is named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
 All necessary types, global variables and functions\marginpar{Serge?}
 are declared into this new compilation unit\marginpar{Serge: Consistency
-  betweeen properties? Name conflicts?}.
+  betweeen properties? Name conflicts?}. All the functions brought in the
+new compilation unit through the sub-callgraph are declared static and
+prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
@@ -10711,6 +10730,9 @@ OUTLINE_INDEPENDENT_COMPILATION_UNIT FALSE
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE}
 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_CALLEES_PREFIX}
+OUTLINE_CALLEES_PREFIX ""
 \end{PipsProp}
 
 

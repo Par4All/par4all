@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
-      register double _tmpxx0_0, _tmpxx2_0, _tmpxx4_0, _u_t1_0;
+      register double _u_t1_0, _tmpxx4_0, _tmpxx2_0, _tmpxx0_0;
       _u_t1_0 = (double) 1.0;
       _tmpxx0_0 = _u_t1_0;
       _tmp0[0][__lv2] = _tmpxx0_0;
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 3; __lv2 += 1) {
       //PIPS generated variable
-      register double _tmpxx1_0, _tmpxx3_0, _tmpxx5_0, _u_t2_0;
+      register double _u_t2_0, _tmpxx5_0, _tmpxx3_0, _tmpxx1_0;
       _u_t2_0 = (double) 0.0;
       _tmpxx1_0 = _u_t2_0;
       _tmp0[0][__lv2+4] = _tmpxx1_0;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
    for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
       //PIPS generated variable
-      register int _tmpxx6_0, _u_bt_0;
+      register int _u_bt_0, _tmpxx6_0;
       _u_bt_0 = _u_b[0][__lv2];
       _tmpxx6_0 = _u_bt_0;
       _u_d[__lv2][0] = _tmpxx6_0;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
       int __lv2;
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
-         register int _tmpxx7_0, _u_a_0 = _u_a[__lv1][__lv2];
+         register int _u_a_0 = _u_a[__lv1][__lv2], _tmpxx7_0;
          _tmpxx7_0 = _u_a_0;
          _tmpxx8[__lv1][__lv2] = _u_a_0;
          _u_d[__lv1][__lv2+1] = _tmpxx7_0;
@@ -122,9 +122,9 @@ int main(int argc, char *argv[])
       int __lv2;
       for(__lv2 = 0; __lv2 <= 1; __lv2 += 1) {
          //PIPS generated variable
-         register double _tmpxx10_0, _tmpxx12_0;
+         register int _u_a_1 = _u_a[__lv1][__lv2], _tmpxx15_0;
          //PIPS generated variable
-         register int _tmpxx15_0, _u_a_1 = _u_a[__lv1][__lv2];
+         register double _tmpxx12_0, _tmpxx10_0;
          _tmpxx10_0 = (double) 1.0;
          _tmpxx11[__lv1][__lv2] = (double) 0.0;
          _u_t3[__lv1][__lv2] = _tmpxx10_0;

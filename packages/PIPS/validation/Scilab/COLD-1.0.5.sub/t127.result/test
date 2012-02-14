@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
          int __lv3;
          for(__lv3 = 0; __lv3 <= 2; __lv3 += 1) {
             //PIPS generated variable
-            register double _u_a_0 = _u_a[__lv1][__lv2][__lv3], _u_b_0 = _u_b[__lv1][__lv2][__lv3];
+            register double _u_b_0 = _u_b[__lv1][__lv2][__lv3], _u_a_0 = _u_a[__lv1][__lv2][__lv3];
             _tmp0[__lv1][__lv2][__lv3] = (int) _u_a_0==(int) _u_c[__lv1][__lv2][__lv3];
             _tmp1[__lv1][__lv2][__lv3] = (int) _u_b_0==(int) _u_d[__lv1][__lv2][__lv3];
             _tmp2[__lv1][__lv2][__lv3] = (int) _u_a_0==(int) _u_b_0;

@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx3_0, _tmpxx4_0;
+               register double _tmpxx4_0, _tmpxx3_0;
                _tmpxx3_0 = _tmpxx2*_u_Hxt[__lv1][__lv2][__lv3];
                _tmpxx4_0 = _u_Hx[__lv1][__lv2][__lv3]+_tmpxx3_0;
                _u_Hx[__lv1][__lv2][__lv3] = _tmpxx4_0;
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 14; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx7_0, _tmpxx8_0;
+               register double _tmpxx8_0, _tmpxx7_0;
                _tmpxx7_0 = _tmpxx6*_u_Hyt[__lv1][__lv2][__lv3];
                _tmpxx8_0 = _u_Hy[__lv1][__lv2][__lv3]+_tmpxx7_0;
                _u_Hy[__lv1][__lv2][__lv3] = _tmpxx8_0;
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
             int __lv3;
             for(__lv3 = 0; __lv3 <= 15; __lv3 += 1) {
                //PIPS generated variable
-               register double _tmpxx11_0, _tmpxx12_0;
+               register double _tmpxx12_0, _tmpxx11_0;
                _tmpxx11_0 = _tmpxx10*_u_Hzt[__lv1][__lv2][__lv3];
                _tmpxx12_0 = _u_Hz[__lv1][__lv2][__lv3]+_tmpxx11_0;
                _u_Hz[__lv1][__lv2][__lv3] = _tmpxx12_0;

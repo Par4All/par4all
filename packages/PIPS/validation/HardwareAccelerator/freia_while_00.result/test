@@ -180,16 +180,12 @@ digraph "dag_0" {
 
   // computation vertices
   "8 vol" [shape=diamond];
-  "5 ?" -> "8 vol" [arrowhead=empty,label="volcurrent"];
-  "4 vol" -> "8 vol" [arrowhead=empty,label="volcurrent"];
   "7 <" [shape=trapezium,orientation=270];
   "7 <" -> "8 vol" [label="out"];
   "7 <" -> "out";
   "6 D8" [shape=box];
   "6 D8" -> "7 <" [label="out"];
   "4 vol" [shape=diamond];
-  "4 vol" -> "8 vol" [arrowhead=empty,label="volcurrent"];
-  "4 vol" -> "5 ?" [arrowhead=empty,label="volcurrent"];
   "3 E8" [shape=box];
   "3 E8" -> "6 D8" [label="out"];
   "3 E8" -> "4 vol" [label="out"];
@@ -262,16 +258,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "8 vol" [shape=diamond];
-  "5 ?" -> "8 vol" [arrowhead=empty,label="volcurrent"];
-  "4 vol" -> "8 vol" [arrowhead=empty,label="volcurrent"];
   "7 <" [shape=trapezium,orientation=270];
   "7 <" -> "8 vol" [label="out"];
   "7 <" -> "out";
   "6 D8" [shape=box];
   "6 D8" -> "7 <" [label="out"];
   "4 vol" [shape=diamond];
-  "4 vol" -> "8 vol" [arrowhead=empty,label="volcurrent"];
-  "4 vol" -> "5 ?" [arrowhead=empty,label="volcurrent"];
   "3 E8" [shape=box];
   "3 E8" -> "6 D8" [label="out"];
   "3 E8" -> "4 vol" [label="out"];
@@ -343,7 +335,9 @@ digraph "freia_while_00_spoc_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
+  "8 vol" [shape=diamond];
   "7 <" [shape=trapezium,orientation=270];
+  "7 <" -> "8 vol" [label="out"];
   "7 <" -> "out";
   "6 D8" [shape=box];
   "6 D8" -> "7 <" [label="out_1"];
@@ -355,17 +349,6 @@ digraph "freia_while_00_spoc_helper_0_0" {
   "2 D8" -> "3 E8" [label="out_3"];
   "in" -> "7 <";
   "in" -> "2 D8";
-}
-// graph for dag "freia_while_00_spoc_helper_0_1" of module "freia_while_00" in dot format
-digraph "freia_while_00_spoc_helper_0_1" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "8 vol" [shape=diamond];
-  "out" -> "8 vol";
 }
 // graph for dag "freia_while_00_spoc_helper_1_0" of module "freia_while_00" in dot format
 digraph "freia_while_00_spoc_helper_1_0" {
@@ -431,15 +414,15 @@ digraph "freia_while_00_spoc_helper_1_0" {
 
 // dag 0: 6 ops and 0 copies, optimized to 6 ops and 0+0+0 copies
 // split 0: 1 cut
-// split 1: 1 cut
-// # SPOC calls: 2
+// # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_while_00
 freia_status freia_while_00_spoc_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi0,
-  int32_t * po1)
+  int32_t * po1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -501,11 +484,14 @@ freia_status freia_while_00_spoc_helper_0_0_0(
   // alu 7 inf stage 2
   si.alu[2][0].op = SPOC_ALU_INF_IN0_IN1;
 
-
-  // output image out on 0
-  // out [2 alu] -> [2 output 0] 0 null
+  // out [2 alu] -> [2 measure 0] 7 inf
   si.mux[2][0].op = SPOC_MUX_IN1;
   si.mux[2][2].op = SPOC_MUX_IN0;
+
+
+  // output image out on 0
+  // out [2 measure 0] -> [2 output 0] 0 null
+  // nope
 
   // fill in to the end...
   // out [2 output 0] -> [7 output 0] 0 null
@@ -541,54 +527,8 @@ freia_status freia_while_00_spoc_helper_0_0_0(
   // measure 4 global_vol stage 1 side 0
   *po1 = (int32_t) reduc.measure[1][0].volume;
 
-  return ret;
-}
-
-// FREIA-SPoC helper function for module freia_while_00
-freia_status freia_while_00_spoc_helper_0_1_0(
-  const freia_data2d * i0,
-  int32_t * po0)
-{
-  spoc_instr si;
-  spoc_param sp;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_op_param param;
-  freia_status ret;
-  spoc_reduction reduc;
-  freia_reduction_results redres;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // out [0 input 0] -> [0 measure 0] 0 undefined
-  si.mux[0][0].op = SPOC_MUX_IN0;
-
-
-  // no output image
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
-
-  // measure 8 global_vol stage 0 side 0
-  *po0 = (int32_t) reduc.measure[0][0].volume;
+  // measure 8 global_vol stage 2 side 0
+  *po2 = (int32_t) reduc.measure[2][0].volume;
 
   return ret;
 }
@@ -832,9 +772,7 @@ freia_status freia_while_00_spoc_helper_1_0_0(
 int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0001*/
-   freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volcurrent);     /*0002*/
-   volprevious = volcurrent;                                            /*0005*/
-   freia_while_00_spoc_helper_0_1_0(out, &volcurrent);                  /*0008*/
+   freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);      /*0002*/
    while (volcurrent!=volprevious) {                                    /*0009*/
       volprevious = volcurrent;                                         /*0010*/
       freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);            /*0011*/
@@ -847,9 +785,7 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
 int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0001*/
-   freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volcurrent);     /*0002*/
-   volprevious = volcurrent;                                            /*0005*/
-   freia_while_00_spoc_helper_0_1_0(out, &volcurrent);                  /*0008*/
+   freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);      /*0002*/
    while (volcurrent!=volprevious) {                                    /*0009*/
       volprevious = volcurrent;                                         /*0010*/
       freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);            /*0011*/
@@ -893,16 +829,12 @@ digraph "dag_0" {
 
   // computation vertices
   "12 vol" [shape=diamond];
-  "9 ?" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out"];
   "8 vol" [shape=diamond];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "9 ?" [arrowhead=empty,label="volcurrent"];
   "7 E8" [shape=box];
   "7 E8" -> "10 D8" [label="out"];
   "7 E8" -> "8 vol" [label="out"];
@@ -940,16 +872,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "12 vol" [shape=diamond];
-  "9 ?" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out"];
   "8 vol" [shape=diamond];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "9 ?" [arrowhead=empty,label="volcurrent"];
   "7 E8" [shape=box];
   "7 E8" -> "10 D8" [label="out"];
   "7 E8" -> "8 vol" [label="out"];
@@ -986,7 +914,9 @@ digraph "freia_while_00_terapix_helper_0_0_0" {
   "out" [shape=circle];
 
   // computation vertices
+  "12 vol" [shape=diamond];
   "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out_1"];
@@ -998,17 +928,6 @@ digraph "freia_while_00_terapix_helper_0_0_0" {
   "6 D8" -> "7 E8" [label="out_3"];
   "in" -> "11 <";
   "in" -> "6 D8";
-}
-// graph for dag "freia_while_00_terapix_helper_0_1_0" of module "freia_while_00" in dot format
-digraph "freia_while_00_terapix_helper_0_1_0" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "12 vol" [shape=diamond];
-  "out" -> "12 vol";
 }
 // graph for dag "freia_while_00_terapix_helper_1_0_0" of module "freia_while_00" in dot format
 digraph "freia_while_00_terapix_helper_1_0_0" {
@@ -1054,17 +973,18 @@ digraph "freia_while_00_terapix_helper_1_0_0" {
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
- * 5 image operations in dag
- * dag length is 5, dag width is 1
+ * 6 image operations in dag
+ * dag length is 6, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 52
+ * - computation: 55
  * - communication: 64
  */
 freia_status freia_while_00_terapix_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2,
-  int32_t * po3)
+  int32_t * po3,
+  int32_t * po4)
 {
   // declarations:
   freia_microcode mcode;
@@ -1089,8 +1009,14 @@ freia_status freia_while_00_terapix_helper_0_0_0(
   const int32_t y_2_val = 0;
   // array for reduction 2 extraction
   int32_t red_2[1];
+  // operation 5_val initialization
+  int16_t p_5_val[1];
+  const int32_t x_5_val = 4;
+  const int32_t y_5_val = 0;
+  // array for reduction 5 extraction
+  int32_t red_5[1];
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][5];
+  terapix_mcu_macrocode mcu_macro[2][6];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
   // imagelets definitions:
@@ -1104,6 +1030,7 @@ freia_status freia_while_00_terapix_helper_0_0_0(
 
   // memory for reductions
   int reduction_2 = 1022;
+  int reduction_5 = 1020;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -1272,6 +1199,54 @@ freia_status freia_while_00_terapix_helper_0_0_0(
   mcu_macro[1][4].iter4 = 0;
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_INF3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_INF3;
+  // 5: vol(1)
+  // initializing  5_val
+  p_5_val[0] = 0;
+  gram.xoffset = x_5_val;
+  gram.yoffset = y_5_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_5_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 5_val
+  mem_init.xmin1 = reduction_5;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 2;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
+  // set measure vol at reduction_5
+  mcu_macro[0][5].xmin2 = reduction_5;
+  mcu_macro[1][5].xmin2 = reduction_5;
+  mcu_macro[0][5].ymin2 = 0;
+  mcu_macro[1][5].ymin2 = 0;
+  mcu_macro[0][5].xmin3 = 0;
+  mcu_macro[1][5].xmin3 = 0;
+  mcu_macro[0][5].ymin3 = 0;
+  mcu_macro[1][5].ymin3 = 0;
+  mcu_macro[0][5].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][5].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][5].ymin1 = 0;
+  mcu_macro[1][5].ymin1 = 0;
+  mcu_macro[0][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][5].iter2 = imagelet_size;
+  mcu_macro[1][5].iter2 = imagelet_size;
+  mcu_macro[0][5].iter3 = 0;
+  mcu_macro[1][5].iter3 = 0;
+  mcu_macro[0][5].iter4 = 0;
+  mcu_macro[1][5].iter4 = 0;
+  mcu_macro[0][5].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][5].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
 
 
   // inputs:
@@ -1307,7 +1282,7 @@ freia_status freia_while_00_terapix_helper_0_0_0(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 5;
+  mcu_instr.nbinstr = 6;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
@@ -1333,177 +1308,12 @@ freia_status freia_while_00_terapix_helper_0_0_0(
 
   // assign reduction parameter
   *po3 = (int32_t) red_2[0];
-
-  return ret;
-}
-
-
-/* FREIA terapix helper function for module freia_while_00
- *
- * RAMPE    = 1024
- * NPE      = 128
- * DMA BW   = 32
- * GRAM W   = 64
- * GRAM H   = 32
- * DAG CUT  = compute
- * OVERLAP  = false
- * IMAGE H  = 0
- * MAX SIZE = 0
- *
- * 1 input image, 0 output image
- * 1 image operations in dag
- * dag length is 2, dag width is 1
- * costs in cycles per imagelet row:
- * - computation: 3
- * - communication: 32
- */
-freia_status freia_while_00_terapix_helper_0_1_0(
-  const freia_data2d * i0,
-  int32_t * po1)
-{
-  // declarations:
-  freia_microcode mcode;
-  freia_op_param param;
-  freia_dynamic_param dyn_param;
-  terapix_gram gram;
-  int i;
-  freia_status ret = FREIA_OK;
-  // data structures for reductions
-  terapix_mcu_macrocode mem_init;
-  freia_reduction_results redres;
-  terapix_reduction redter;
-  // overall structure which describes the computation
-  terapix_mcu_instr mcu_instr;
-  // operation 0_val initialization
-  int16_t p_0_val[1];
-  const int32_t x_0_val = 0;
-  const int32_t y_0_val = 0;
-  // array for reduction 0 extraction
-  int32_t red_0[1];
-  // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][1];
-  terapix_tile_info tile_in[2][1];
-  // imagelets definitions:
-  // - 1 computation imagelets
-  // - 1 double buffer imagelets
-  int imagelet_size = 511;
-  int imagelet_1 = 0;
-  int imagelet_2 = 511;
-
-  // memory for reductions
-  int reduction_0 = 1022;
-
-  // double buffer assignment
-  int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_2;
-
-  // body:
-  // mcode param
-  mcode.raw = (void*) terapix_ucode_array;
-  mcode.size = TERAPIX_UCODE_SIZE_T;
-  freia_mg_write_microcode(&mcode);
-
-  // dyn_param contents
-  dyn_param.raw = &gram;
-  dyn_param.size = sizeof(terapix_gram);
-
-  // redres contents
-  redres.raw = (void*) &redter;
-  redres.size = sizeof(terapix_reduction);
-
-  // 0: vol(1)
-  // initializing  0_val
-  p_0_val[0] = 0;
-  gram.xoffset = x_0_val;
-  gram.yoffset = y_0_val;
-  gram.width = 1;
-  gram.height = 1;
-  gram.params = p_0_val;
-  freia_mg_write_dynamic_param(&dyn_param);
-  // initialize memory for operation 0_val
-  mem_init.xmin1 = reduction_0;
-  mem_init.ymin1 = 0;
-  mem_init.xmin2 = 0;
-  mem_init.ymin2 = 0;
-  mem_init.xmin3 = 0;
-  mem_init.ymin3 = 0;
-  mem_init.iter1 = TERAPIX_PE_NUMBER;
-  mem_init.iter2 = 2;
-  mem_init.iter3 = 0;
-  mem_init.iter4 = 0;
-  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode); // not used?
-  param.raw = (void*) (&mem_init);
-  ret |= freia_mg_work(&param);
-  ret |= freia_mg_end_work();
-  // set measure vol at reduction_0
-  mcu_macro[0][0].xmin2 = reduction_0;
-  mcu_macro[1][0].xmin2 = reduction_0;
-  mcu_macro[0][0].ymin2 = 0;
-  mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = 0;
-  mcu_macro[1][0].xmin3 = 0;
-  mcu_macro[0][0].ymin3 = 0;
-  mcu_macro[1][0].ymin3 = 0;
-  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin1 = 0;
-  mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].iter2 = imagelet_size;
-  mcu_macro[1][0].iter2 = imagelet_size;
-  mcu_macro[0][0].iter3 = 0;
-  mcu_macro[1][0].iter3 = 0;
-  mcu_macro[0][0].iter4 = 0;
-  mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
-
-  // inputs:
-  // - imagelet 1 is i0 for out
-  tile_in[0][0].x = imagelet_io_1_0;
-  tile_in[0][0].y = 0;
-  tile_in[1][0].x = imagelet_io_1_1;
-  tile_in[1][0].y = 0;
-
-  // no output
-
-  // imagelet erosion for the computation
-  mcu_instr.borderTop    = 0;
-  mcu_instr.borderBottom = 0;
-  mcu_instr.borderLeft   = 0;
-  mcu_instr.borderRight  = 0;
-  mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
-
-  // outputs
-  mcu_instr.nbout = 0;
-  mcu_instr.out0 = NULL;
-  mcu_instr.out1 = NULL;
-
-  // inputs
-  mcu_instr.nbin = 1;
-  mcu_instr.in0 = tile_in[0];
-  mcu_instr.in1 = tile_in[1];
-
-  // actual instructions
-  mcu_instr.nbinstr = 1;
-  mcu_instr.instr0   = mcu_macro[0];
-  mcu_instr.instr1   = mcu_macro[1];
-
-  // call terapix runtime
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, i0);
-
-  // extract measures
-  // get measure vol result from reduction_0
-  redter.xres = reduction_0;
+  // get measure vol result from reduction_5
+  redter.xres = reduction_5;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
-  redter.result = (void*) red_0;
+  redter.result = (void*) red_5;
   redter.macroid = TERAPIX_UCODE_GLOBAL_VOL;
   redter.imgwidth = i0->width;
   redter.imgheight = i0->height;
@@ -1513,7 +1323,7 @@ freia_status freia_while_00_terapix_helper_0_1_0(
   ret |= freia_cg_read_reduction_results(&redres);
 
   // assign reduction parameter
-  *po1 = (int32_t) red_0[0];
+  *po4 = (int32_t) red_5[0];
 
   return ret;
 }
@@ -1786,9 +1596,7 @@ freia_status freia_while_00_terapix_helper_1_0_0(
 int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0005*/
-   freia_while_00_terapix_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volcurrent);  /*0006*/
-   volprevious = volcurrent;                                            /*0009*/
-   freia_while_00_terapix_helper_0_1_0(out, &volcurrent);               /*0012*/
+   freia_while_00_terapix_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);   /*0006*/
    while (volcurrent!=volprevious) {                                    /*0013*/
       volprevious = volcurrent;                                         /*0014*/
       freia_while_00_terapix_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);         /*0015*/
@@ -1801,9 +1609,7 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
 int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0005*/
-   freia_while_00_terapix_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volcurrent);  /*0006*/
-   volprevious = volcurrent;                                            /*0009*/
-   freia_while_00_terapix_helper_0_1_0(out, &volcurrent);               /*0012*/
+   freia_while_00_terapix_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);   /*0006*/
    while (volcurrent!=volprevious) {                                    /*0013*/
       volprevious = volcurrent;                                         /*0014*/
       freia_while_00_terapix_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);         /*0015*/
@@ -1847,16 +1653,12 @@ digraph "dag_0" {
 
   // computation vertices
   "12 vol" [shape=diamond];
-  "9 ?" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out"];
   "8 vol" [shape=diamond];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "9 ?" [arrowhead=empty,label="volcurrent"];
   "7 E8" [shape=box];
   "7 E8" -> "10 D8" [label="out"];
   "7 E8" -> "8 vol" [label="out"];
@@ -1894,16 +1696,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "12 vol" [shape=diamond];
-  "9 ?" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out_1"];
   "8 vol" [shape=diamond];
-  "8 vol" -> "12 vol" [arrowhead=empty,label="volcurrent"];
-  "8 vol" -> "9 ?" [arrowhead=empty,label="volcurrent"];
   "7 E8" [shape=box];
   "7 E8" -> "10 D8" [label="out_2"];
   "7 E8" -> "8 vol" [label="out_2"];
@@ -1940,7 +1738,9 @@ digraph "freia_while_00_opencl_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
+  "12 vol" [shape=diamond];
   "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "12 vol" [label="out"];
   "11 <" -> "out";
   "10 D8" [shape=box];
   "10 D8" -> "11 <" [label="out_1"];
@@ -1970,17 +1770,6 @@ digraph "freia_while_00_opencl_helper_0_0_1" {
   "out_1" -> "11 <";
   "8 vol" [shape=diamond];
   "out_2" -> "8 vol";
-}
-// graph for dag "freia_while_00_opencl_helper_0_1" of module "freia_while_00" in dot format
-digraph "freia_while_00_opencl_helper_0_1" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "12 vol" [shape=diamond];
-  "out" -> "12 vol";
 }
 // graph for dag "freia_while_00_opencl_helper_1_0" of module "freia_while_00" in dot format
 digraph "freia_while_00_opencl_helper_1_0" {
@@ -2318,8 +2107,7 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
    freia_aipo_dilate_8c(out, in, freia_morpho_kernel_8c);               /*0006*/
    freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);               /*0007*/
    freia_aipo_dilate_8c(out_1, out, freia_morpho_kernel_8c);            /*0010*/
-   freia_while_00_opencl_helper_0_0_1(out, in, out_1, out, &volcurrent);               /*0011*/
-   volprevious = volcurrent;                                            /*0009*/
+   freia_while_00_opencl_helper_0_0_1(out, in, out_1, out, &volprevious);              /*0011*/
    freia_aipo_global_vol(out, &volcurrent);                             /*0012*/
    while (volcurrent!=volprevious) {                                    /*0013*/
       volprevious = volcurrent;                                         /*0014*/
@@ -2340,8 +2128,7 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
    freia_aipo_dilate_8c(out, in, freia_morpho_kernel_8c);               /*0006*/
    freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);               /*0007*/
    freia_aipo_dilate_8c(out_1, out, freia_morpho_kernel_8c);            /*0010*/
-   freia_while_00_opencl_helper_0_0_1(out, in, out_1, out, &volcurrent);               /*0011*/
-   volprevious = volcurrent;                                            /*0009*/
+   freia_while_00_opencl_helper_0_0_1(out, in, out_1, out, &volprevious);              /*0011*/
    freia_aipo_global_vol(out, &volcurrent);                             /*0012*/
    while (volcurrent!=volprevious) {                                    /*0013*/
       volprevious = volcurrent;                                         /*0014*/

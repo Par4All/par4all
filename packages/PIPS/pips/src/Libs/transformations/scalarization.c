@@ -278,13 +278,30 @@ static bool reference_substitute(reference r) {
   return result;
 }
 
+static bool declarations_reference_substitute(statement st)
+{
+  if (declaration_statement_p(st))
+    {
+      FOREACH(ENTITY, decl, statement_declarations(st))
+	{
+	  value init_val = entity_initial(decl);
+	  if (! value_undefined_p(init_val))
+	    {
+	      gen_recurse(init_val, reference_domain, reference_substitute, gen_null);
+	    }
+	}
+    }
+  return true;
+}
 
 static void statement_substitute_scalarized_array_references(statement st, reference pvr, entity s)
 {
   //TODO: create context ansd use gen_multi_recurse_with_context
   scalarized_reference = pvr;
   scalarized_replacement_variable = s;
-  gen_recurse (st, reference_domain, reference_substitute, gen_null);
+  gen_multi_recurse (st,
+		     statement_domain, declarations_reference_substitute, gen_null,
+		     reference_domain, reference_substitute, gen_null, NULL);
   scalarized_reference = reference_undefined;
   scalarized_replacement_variable = entity_undefined;
 }
@@ -527,7 +544,16 @@ static void scalarize_variable_in_statement(entity pv,
   }
   else {
     // Declare the scalar variable as local as possible
-    AddLocalEntityToDeclarations(sv, m, s);
+    // but at the beginning of the current statement if it is a block,
+    // since scalarized references may happen in declarations initializations
+    if (statement_sequence_p(s))
+      {
+	if (c_module_p(m))
+	  add_declaration_statement_at_beginning(s, sv);
+	AddLocalEntityToDeclarationsOnly(sv, m, s);
+      }
+    else
+      AddLocalEntityToDeclarations(sv, m, s);
   }
 
   pips_debug(1,"Creating variable %s for variable %s\n",
@@ -851,6 +877,23 @@ static bool reference_constant_wrt_ctxt_p(reference ref, reference_testing_ctxt 
   return continue_p;
 }
 
+
+static bool declarations_reference_constant_wrt_ctxt_p(statement st, reference_testing_ctxt *p_ctxt)
+{
+  if (declaration_statement_p(st))
+    {
+      FOREACH(ENTITY, decl, statement_declarations(st))
+	{
+	  value init_val = entity_initial(decl);
+	  if (! value_undefined_p(init_val))
+	    {
+	      gen_context_recurse(init_val, p_ctxt, reference_domain, reference_constant_wrt_ctxt_p, gen_null);
+	    }
+	}
+    }
+  return true;
+}
+
 static bool statement_entity_references_constant_in_context_p(statement s, entity e, list l_modified_variables)
 {
   int nd = type_depth(entity_type(e));
@@ -865,7 +908,10 @@ static bool statement_entity_references_constant_in_context_p(statement s, entit
     ctxt.e = e;
     ctxt.trans_args = l_modified_variables;
 
-    gen_context_recurse(s, &ctxt, reference_domain, reference_constant_wrt_ctxt_p, gen_null);
+    gen_context_multi_recurse(s, &ctxt,
+			      statement_domain, declarations_reference_constant_wrt_ctxt_p, gen_null,
+			      reference_domain, reference_constant_wrt_ctxt_p, gen_null,
+			      NULL);
     constant_p = ctxt.constant_p;
     pips_debug(2, "returning: %s\n", bool_to_string(constant_p));
   }
@@ -1557,7 +1603,7 @@ static bool scalarizable_entity_p(entity e)
    if the statement st is a loop, gather the scalarizable candidates
    in loops_scalarizable_candidates.
 
-   The candidates are the scalarizable arrayentities for which there
+   The candidates are the scalarizable array entities for which there
    are cumulated effects attached to the loop body, or which are
    declared inside the loop body.
  */
