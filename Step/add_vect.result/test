@@ -248,3 +248,12 @@ int main(int argc, char **argv)
 
    return 0;
 }
+###################### add_vect/add_vect.database/Src/main_PAR_HYBRID.cpp_processed.c ######################
+#include "main_PAR_HYBRID.cpp_processed.h"
+#include "step_api.h"
+###################### add_vect/add_vect.database/Src/main_PAR_HYBRID_FOR_HYBRID.cpp_processed.c ######################
+#include "main_PAR_HYBRID_FOR_HYBRID.cpp_processed.h"
+#include "step_api.h"
+###################### add_vect/add_vect.database/Src/main_PAR_HYBRID_FOR_HYBRID_1.cpp_processed.c ######################
+#include "main_PAR_HYBRID_FOR_HYBRID_1.cpp_processed.h"
+#include "step_api.h"
