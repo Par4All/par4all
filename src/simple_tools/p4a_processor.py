@@ -705,6 +705,7 @@ class p4a_processor(object):
                         GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                         GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                         OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
+                        OUTLINE_CALLEES_PREFIX="p4a_device_",
                         annotate_loop_nests = True) # annotate for recover parallel loops later
             # recursive walk through
             [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
@@ -831,9 +832,10 @@ class p4a_processor(object):
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
 
-        # Unfold kernel, usually won't hurt code size, but less painful with
-        # static functions declared in accelerator compilation units 
-        kernels.unfold()
+        # SG: not usefull anymore. Uncomment this if you want to try it again, this is the right place to do it
+        ## Unfold kernel, usually won't hurt code size, but less painful with
+        ## static functions declared in accelerator compilation units 
+        #kernels.unfold()
 
         # add sentinel around loop nests in launcher, used to replace the loop
         # nest with a call kernel in post-processing

@@ -286,6 +286,7 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
         while old_content != content:
             old_content=content
             content=re.sub(r"static (\w+) (\w+)(\([^)]+\)), (\w+)(\([^)]+\))",r"static \1 \2\3;\nstatic \1 \4\5", content)
+        content = re.sub(r'\nstatic (.*?) p4a_device_(.*?)\n',r'\nstatic __device__ \1 p4a_device_\2\n', content)
         #content = re.sub(r'\n(static \w+ \w+\()', r'\n__device__ \1', content)
 
     if verbose:
