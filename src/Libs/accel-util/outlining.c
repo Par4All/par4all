@@ -955,7 +955,8 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
                 copy_storage(entity_storage(old_fun)),
                 copy_value(entity_initial(old_fun))
                 );
-        AddEntityToModuleCompilationUnit(new_fun,cu);
+        if(c_module_p(get_current_module_entity()))
+                AddEntityToModuleCompilationUnit(new_fun,cu);
         replace_entity(s,old_fun, new_fun);
 
 
