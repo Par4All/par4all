@@ -39,10 +39,10 @@ gfc2pips: build
 
 # this removes all the temporary repositories
 clean-local:
-	chmod -R u+rw $(SRC.d) build
+	-chmod -R u+rw $(SRC.d) build
 	rm -rf $(SRC.d) build
 
 # this removes all the donwloaded files
 distclean-local:
-	chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
+	-chmod -R u+rw  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5) 
 	rm -rf  $(GCC_CORE_ARCHIVE) $(GCC_FORTRAN_ARCHIVE) $(GCC_MD5)
