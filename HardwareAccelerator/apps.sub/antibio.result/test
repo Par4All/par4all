@@ -6306,7 +6306,14 @@ freia_status main_terapix_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 11;
+  int image_height = i0->heightWa;
+  int max_computed_size = 182;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -6794,7 +6801,14 @@ freia_status main_terapix_helper_1_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 202;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -7048,7 +7062,14 @@ freia_status main_terapix_helper_2_0_0(
   // imagelets definitions:
   // - 1 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 511;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 511;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 511;
 
@@ -7239,7 +7260,14 @@ freia_status main_terapix_helper_3_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 202;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -7530,7 +7558,14 @@ freia_status main_terapix_helper_4_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 3 double buffer imagelets
-  int imagelet_size = 170;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 3;
+  int image_height = i0->heightWa;
+  int max_computed_size = 164;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 170;
   int imagelet_3 = 340;
@@ -8048,7 +8083,14 @@ freia_status main_terapix_helper_5_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 202;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -8332,7 +8374,14 @@ freia_status main_terapix_helper_6_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 10;
+  int image_height = i0->heightWa;
+  int max_computed_size = 184;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
