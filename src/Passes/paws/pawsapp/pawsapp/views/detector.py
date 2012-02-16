@@ -29,11 +29,9 @@ def _compile(code, language):
     return '0' if p.returncode == 0 else p.communicate()[1].replace('\n', '<br/>')
 
 
-@view_config(route_name='detect_language', renderer='string', permission='view')
-def detect(request):
-    """Heuristics to try and identify source code language.
+def detect_language(code):
+    """Detext language of given code.
     """
-    code    = request.params['code']
     analyze = {lexer.name:lexer.analyze(code) for lexer in (CDecoder, FortranDecoder)} ##TODO
     results = sorted(analyze.items(), lambda a,b: cmp(b[1], a[1]))
     lang = 'none'
@@ -48,6 +46,12 @@ def detect(request):
             lang = 'Fortran'
     return lang
 
+
+@view_config(route_name='detect_language', renderer='string', permission='view')
+def detect(request):
+    """Heuristics to try and identify source code language.
+    """
+    return detect_language(request.params['code'])
 
 @view_config(route_name='compile', renderer='string', permission='view')
 def compile(request):

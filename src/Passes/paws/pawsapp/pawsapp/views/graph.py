@@ -9,17 +9,20 @@ from pyrops       import pworkspace
 
 from pyramid.view import view_config
 
-from .operations  import _create_workdir, _create_file, _get_resdir
+from .operations  import create_workdir, get_resultdir, _create_file
 
 
 # Default image size
 _size = (512, 512)
 
 
-def _create_dot_images(request, functions):
+def create_graph_images(request, functions):
+    """Create a pair of images (full-size, thumbnail) from a dot graph.
+
+    :request:   Pyramid request
+    :functions: List of functions to graph
     """
-    """
-    resdir  = _get_resdir(request)
+    resdir  = get_resultdir(request)
     workdir = os.path.basename(request.session['workdir']) # sanitized
 
     images  = []
@@ -29,7 +32,7 @@ def _create_dot_images(request, functions):
         # Full-size image
         imgname = os.path.basename('%s-%s.png' % (workdir, fu)) # sanitized
         imgpath = os.path.join(resdir, imgname)
-        imgurl  = request.route_url('tool_results_name', tool='tool', name=imgname)
+        imgurl  = request.route_url('results_name', tool='tool', name=imgname)
 
         p = Popen( ['dot', '-Tpng', '-o', imgpath, '%s.database/%s/%s.dot' % (workdir, fu, fu)],
                    stdout=PIPE, stderr=PIPE)
@@ -38,7 +41,7 @@ def _create_dot_images(request, functions):
         # Thumbnail image
         thumbname = os.path.basename('%s-%s.thumbnail.png' % (workdir, fu)) # sanitized
         thumbpath = os.path.join(resdir, thumbname)
-        thumburl  = request.route_url('tool_results_name', tool='tool', name=thumbname)
+        thumburl  = request.route_url('results_name', tool='tool', name=thumbname)
         
         zoom = False
         try:
@@ -76,10 +79,11 @@ def dependence_graph(request):
     lang = form.get('lang')
 
     source    = _create_file(request, '', code, lang)
-    workdir   = request.session['workdir'] if 'workdir' in request.session else _create_workdir(request)        
-    ws        = pworkspace(str(source), name=workdir, deleteOnClose=True)
+    dirname   = create_workdir(request)        
+    ws        = pworkspace(str(source), name=dirname, deleteOnClose=True)
     functions = _get_ws_functions(ws)
-    images    = _create_dot_images(request, functions)
+    print "FUNCTIONS", functions
+    images    = create_graph_images(request, functions)
     #_delete_dir(source)
     ws.close()
     return dict(images=images)
@@ -89,11 +93,11 @@ def dependence_graph(request):
 def dependence_graph_multi(request):
     """
     """
-    workdir   = request.session['workdir'] if 'workdir' in request.session else _create_workdir(request)        
+    dirname   = create_workdir(request)        
     sources   = request.session['sources']
 
-    ws        = pworkspace(*sources, name=workdir, deleteOnClose=True)
+    ws        = pworkspace(*sources, name=dirname, deleteOnClose=True)
     functions = _get_ws_functions(ws)
-    images    = _create_dot_images(request, functions)
+    images    = create_graph_images(request, functions)
     ws.close()
     return dict(images=images)

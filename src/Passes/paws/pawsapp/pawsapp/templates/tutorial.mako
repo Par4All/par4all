@@ -7,14 +7,8 @@
 
 <%namespace name="w"   file="pawsapp:templates/lib/widgets.mako"/>
 
-<%def name="css_slot()">
-${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
-${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), media="all")}
-</%def>
-
 <%def name="js_slot()">
 ${h.javascript_link(request.route_url("routes.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
 <script type="text/javascript">
   operation = "demo";
 </script>
@@ -26,52 +20,60 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
 
 <%def name="content()">
 
-<div class="container">
+<div class="container-fluid">
 
   <div class="hero-unit" style="padding:.5em 1em">
     <h2>${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
-      ${name}
+      ${info["title"]}
     </h2>
   </div>
 
-  <table>
-    <tr valign="top">
-      <td>
-        <div id="demo">
-	  <br/>
-	  <label for="step" class="table_header">Current demo step:&nbsp;&nbsp; </label>
-	  <input type="text" id="step" class="ui-widget ui-widget-content slider_label"/><br/>
-	  <label for="all_steps" class="table_header">Number of all the steps:&nbsp;&nbsp; </label>
-	  <input type="text" id="all_steps" class="ui-widget ui-widget-content slider_label"/>
-	  <div id="demo_slider"></div>
-	  <br/>
-	  <table>
-	    <tr>
-	      <td>
-		<div class='table_header'>SOURCE:</div>
-	      </td>
-	      <td>
-		<div class='table_header'>SCRIPT:</div>
-	      </td>
-	    </tr>
-	    <tr>
-	      <td valign='top' align='left' width='700px'>
-		<div id="source">
-		  <textarea name="sourcecode" id="sourcecode" class="output" rows="33" cols="85"
-			    onkeydown="handle_key_down(this, event)">${source}</textarea>
-		</div>
-	      </td>
-	      <td valign='top' align='left' width='700px'>
-		<div id="sourcetpips" class="output">
-		  <p align="center">${tpips|n}</p>
-		</div>
-	      </td>
-	    </tr>
-	  </table>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div class="pagination">
+    <ul>
+      ## 'Previous' link
+      <li class="${h.css_classes([('disabled', step==0)])}">
+	${h.link_to(u"«", url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step-1)) if step > 0 else "#")}</li>
+
+      ## Overview
+      <li class="${h.css_classes([('active', step==0)])}">${h.link_to(u"Overview", url=request.route_url(request.matched_route.name, tutorial=name))}</li>
+
+      ## Steps 1..n
+      % for i in range(1, nb_steps+1):
+      <li class="${h.css_classes([('active', step==i)])}">
+	${h.link_to(i, url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=i)))}</li>
+      % endfor
+      ## 'Next' link
+      <li class="${h.css_classes([('disabled', step==nb_steps)])}">
+	${h.link_to(u"»", url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step+1)) if step < nb_steps else "#")}</li>
+    </ul>
+  </div>
+
+  <div id="demo" class="row-fluid">
+    <div class="span6">
+      <span class="label">SOURCE</span>
+      <div>
+	% if step == 0:
+	<textarea name="sourcecode" id="sourcecode" class="span12" rows=34 style="height:400px"
+		  onkeydown="handle_key_down(this, event)">${source}</textarea>
+	% else:
+	${source|n}
+	% endif
+      </div>
+      <button class="btn">${w.icon("download-alt")} Save</button>
+      <button class="btn">${w.icon("print")} Print</button>
+    </div>
+    <div class="span6">
+      <div>
+	<span class="label">SCRIPT</span>
+      </div>
+      <div id="sourcetpips" style="overflow:auto">
+	${tpips|n}
+      </div>
+      <button class="btn">${w.icon("download-alt")} Save</button>
+      <button class="btn">${w.icon("print")} Print</button>
+    </div>
+  </div>
 
 </div>
 </%def>
+

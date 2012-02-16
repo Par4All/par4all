@@ -13,14 +13,10 @@ ${info["title"]}
 </%def>
 
 <%def name="css_slot()">
-${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
-${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), media="all")}
 </%def>
 
 <%def name="js_slot()">
-${h.javascript_link(request.route_url("routes.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
 ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
 <script type="text/javascript">
   operation = "${tool}";

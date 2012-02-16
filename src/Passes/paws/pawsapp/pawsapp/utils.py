@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-PAWS utility functions
+PAWS utility functions for language handling etc.
 
 """
 import os
-from ConfigParser import SafeConfigParser
+from ConfigParser        import SafeConfigParser
+
+from pygments            import highlight
+from pygments.lexers     import CLexer, FortranLexer
+from pygments.formatters import HtmlFormatter
 
 
 # Supported languages
@@ -41,6 +45,28 @@ class FortranDecoder(object):
     @classmethod
     def analyze(cls, code):
         return len(filter(lambda t: t in code.lower(), cls.tokens)) * 100.0 / len(cls.tokens)
+
+
+# Source code highlighting
+def htmlHighlight(code, lang):
+    """Apply HTML formatting to highlight code fragment.
+
+    :code:  Source code
+    :lang:  Language of source code
+    """
+    lexer = None
+    if lang == 'C':
+        lexer = CLexer()
+    elif lang in ('Fortran77', 'Fortran95'):
+        lexer = FortranLexer()
+
+    if lexer:
+        code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
+        lines = [ '<li>%s</li>' % l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
+        return '<pre class="prettyprint linenums"><ol class="highlight linenums">%s</ol></pre>' % ''.join(lines) # absolutely NO blank spaces!
+    else:
+        return code
+
 
 #
 #
