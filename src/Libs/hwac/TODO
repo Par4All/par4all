@@ -75,6 +75,8 @@
 + cleanup declarations
 + it seems that some unused image are not removed (license_plate_copies)
 + should cleanup dead code in generated code (ret |= 0; ...)
+- there may be useless copies in the output... see antibio
+- spoc hwac calls the accelerator for copies? so it shows
 
 * validation
 + check all AIPO

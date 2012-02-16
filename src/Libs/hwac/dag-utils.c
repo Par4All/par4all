@@ -1754,11 +1754,12 @@ void freia_dag_optimize(
 
   if (get_bool_property("FREIA_MOVE_DIRECT_COPIES"))
   {
-    // A-copy->B where A is an input is removed from the dag and
-    // managed outside
+    // A-copy->B where A is an input is removed from the dag and managed outside
+    // idem A-copy->B where A is an output
 
     // if A-copy->X and A-copy->Y where A is not an input, the second copy
     // is replaced by an external X-copy->Y
+
     // ??? BUG: it should be moved after the computation
 
     // what copies are kept in the dag
@@ -1782,15 +1783,28 @@ void freia_dag_optimize(
 
         if (source==target)
         {
-          // ??? this should not happen?
+          // A->copy->A??? this should not happen?
           set_add_element(remove, remove, w);
         }
         else if (dagvtx_number(prod)==0)
         {
+          // producer is an input
           // fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
           unlink_copy_vertex(d, source, w);
           set_add_element(remove, remove, w);
-         *lbefore = CONS(statement, freia_copy_image(source, target), *lbefore);
+          *lbefore =
+            CONS(statement, freia_copy_image(source, target), *lbefore);
+        }
+        else if (gen_in_list_p(prod, dag_outputs(d)))
+        {
+          // the producer is an output, which can be copied outside...
+          // well, it may happen that the copy could be performed by the
+          // accelerator for free, eg for SPoC one output link would happen
+          // to be available... so we may really add an operation when
+          // extracting it. However, this should not be an accelerator call?
+          unlink_copy_vertex(d, source, w);
+          set_add_element(remove, remove, w);
+          *lafter = CONS(statement, freia_copy_image(source, target), *lafter);
         }
         else // source not an input, but the result of an internal computation
         {
@@ -1800,10 +1814,12 @@ void freia_dag_optimize(
             // source of the copy will be an output...
             unlink_copy_vertex(d, source, w);
             set_add_element(remove, remove, w);
-           *lafter = CONS(statement, freia_copy_image(source, target), *lafter);
+            *lafter =
+              CONS(statement, freia_copy_image(source, target), *lafter);
           }
           else if (hash_defined_p(intra_pipe_copies, source))
           {
+            // the source is already copied
             unlink_copy_vertex(d, source, w);
             set_add_element(remove, remove, w);
             *lafter = CONS(statement,
