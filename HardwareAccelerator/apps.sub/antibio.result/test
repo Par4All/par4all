@@ -880,7 +880,6 @@ int main(int argc, char *argv[])
    
    freia_aipo_global_vol(w1_1, &measure_vol);                           /*0204*/
    freia_aipo_subsat_const(w1_1, w1_1, w1_1->bpp==16?32766:254);        /*0206*/
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -4908,7 +4907,6 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -5293,7 +5291,6 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -8899,7 +8896,6 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -9127,7 +9123,6 @@ int main(int argc, char *argv[])
    
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -11164,7 +11159,6 @@ int main(int argc, char *argv[])
    main_opencl_helper_4_0_4(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);           /*0201*/
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
@@ -11425,7 +11419,6 @@ int main(int argc, char *argv[])
    main_opencl_helper_4_0_4(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);           /*0201*/
    // binarize
    
-   freia_aipo_copy(w2_0, w1_0);
    freia_aipo_copy(w3, w1_1);
    
    
