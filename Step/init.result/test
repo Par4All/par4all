@@ -70,6 +70,3 @@ int main(void)
    STEP_FINALIZE();
    return 0;
 }
-###################### init/init.database/Src/main_PARFOR_HYBRID.cpp_processed.c ######################
-#include "main_PARFOR_HYBRID.cpp_processed.h"
-#include "step_api.h"
