@@ -131,7 +131,7 @@ def tutorial(request):
         return dict(tutorial = tutname,
                     step     = step,
                     nb_steps = len(results),
-                    lang     = lang
+                    lang     = lang,
                     name     = tutname,
                     info     = info,
                     source   = file(source).read(),
