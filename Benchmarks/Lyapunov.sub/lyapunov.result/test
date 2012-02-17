@@ -400,14 +400,6 @@ void read_file(char *filename, double **pu, double **pv, size_t *xDim, size_t *y
    *pu = u;
    *pv = v;
 }
-static unsigned short __bswap_16(unsigned short __bsx)
-{
-   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
-}
-static unsigned int __bswap_32(unsigned int __bsx)
-{
-   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
-}
 double vinterp(int n1, int n2, double *w, double x, double y)
 {
    
