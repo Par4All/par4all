@@ -847,7 +847,8 @@ static void do_remove_entity_from_decl(statement s, entity e) {
 
 static
 void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
-    if(!fortran_module_p(get_current_module_entity())){
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")
+            && !fortran_module_p(get_current_module_entity())){
         string outline_module_name = (string)entity_user_name(new_fun);
         char * the_cu = NULL,*iter, *cun;
         if((iter=strchr(outline_module_name,FILE_SEP))) {
