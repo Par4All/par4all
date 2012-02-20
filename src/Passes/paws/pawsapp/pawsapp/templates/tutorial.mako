@@ -33,11 +33,20 @@ ${h.javascript_link(request.route_url("routes.js"))}
     ${info["descr"]|n}
   </div>
 
-  <div class="pagination">
+  <div class="pagination" style="text-align:center">
     <ul>
       ## 'Previous' link
       <li class="${h.css_classes([('disabled', step==0)])}">
-	${h.link_to(u"«", url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step-1)) if step > 0 else "#")}</li>
+	% if step > 1:
+	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step-1))}"
+	   data-content="${comments[step-2]}" data-original-title=" « Previous: step ${step-1}">«</a>
+	% elif step == 1:
+	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=0))}">«</a>
+	% else:
+	<a href="#" class="disabled">«</a>
+	% endif
+      </li>
+      
 
       ## Overview
       <li class="${h.css_classes([('active', step==0)])}">${h.link_to(u"Overview", url=request.route_url(request.matched_route.name, tutorial=name))}</li>
@@ -50,7 +59,13 @@ ${h.javascript_link(request.route_url("routes.js"))}
       % endfor
       ## 'Next' link
       <li class="${h.css_classes([('disabled', step==nb_steps)])}">
-	${h.link_to(u"»", url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step+1)) if step < nb_steps else "#")}</li>
+	% if step < nb_steps:
+	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step+1))}"
+	   data-content="${comments[step]}" data-original-title="Next: step ${step+1} »">»</a>
+	% else:
+	<a href="#" class="disabled">»</a>
+	% endif
+      </li>
     </ul>
   </div>
 

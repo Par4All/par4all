@@ -48,9 +48,13 @@ class FortranDecoder(object):
 
 
 # Extract first comment
-def extractFirstComment(code, lang):
+def extractFirstComment(code, lang, html=True):
     """Extract and return first comment block from code. Supported
     languages are Fortran and C.
+
+    :code: source cide
+    :lang: language of source code
+    :html: output <br/>'s instead of line breaks ?
     """
 
     # Extraction of first Fortran comment
@@ -111,7 +115,7 @@ def extractFirstComment(code, lang):
                 if match: # continuation of multi-line comment
                     out.append(match.group(1).strip())
 
-    return '\n'.join(out)
+    return ('<br/>' if html else '\n').join(out)
 
 
 # Source code highlighting
