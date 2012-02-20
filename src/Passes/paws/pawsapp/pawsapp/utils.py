@@ -4,7 +4,7 @@
 PAWS utility functions for language handling etc.
 
 """
-import os
+import os, re
 from ConfigParser        import SafeConfigParser
 
 from pygments            import highlight
@@ -45,6 +45,73 @@ class FortranDecoder(object):
     @classmethod
     def analyze(cls, code):
         return len(filter(lambda t: t in code.lower(), cls.tokens)) * 100.0 / len(cls.tokens)
+
+
+# Extract first comment
+def extractFirstComment(code, lang):
+    """Extract and return first comment block from code. Supported
+    languages are Fortran and C.
+    """
+
+    # Extraction of first Fortran comment
+    if lang in languages and lang.startswith('Fortran'):
+
+        start = False
+        end   = False
+        out   = []
+
+        for l in code.split('\n'):
+            if re.match('\s*$', l): # blank line: skip
+                continue
+            match = re.match(r'c     (.*)', l, re.I) # Fortran comment
+            if match:
+                start = True
+                if not end:
+                    out.append(match.group(1))
+            elif start:
+                end = True
+
+    # Extraction of first C comment
+    elif lang == 'C':
+
+        inside  = False
+        outside = False
+        out     = []
+
+        for l in code.split('\n'):
+
+            if re.match('\s*$', l): # blank line: skip
+                continue
+
+            match = re.match(r'/\*\s*(.*?)\s*\*/', l)
+            if match: # single-line comment /* ... */
+                return match.group(1)
+
+            match = re.match(r'//\s*(.*)', l)
+            if match: # single-line comment // ...
+                return match.group(1).strip()
+
+            if not inside: 
+                match = re.match(r'/\*\s*(.*)', l)
+                if match: # start of multi-line comment
+                    if match.group(1).strip():
+                        out.append(match.group(1).strip())
+                    inside=True
+                    continue
+
+            if inside:
+
+                match = re.match(r'(.*)\s*\*/\s*$', l)
+                if match: # end of multi-line comment
+                    if match.group(1).strip():
+                        out.append(match.group(1).strip())
+                    break
+
+                match = re.match(r'\*\s*(.*)', l)
+                if match: # continuation of multi-line comment
+                    out.append(match.group(1).strip())
+
+    return '\n'.join(out)
 
 
 # Source code highlighting

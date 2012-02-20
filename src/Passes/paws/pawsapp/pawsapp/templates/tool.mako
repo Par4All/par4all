@@ -24,7 +24,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
   advanced = true;
   % endif
   $(function () {
-  $(".hero-unit").popover({html:true, placement: "bottom"});
+  $(".lang-label").tooltip();
   });
 </script>
 ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
@@ -141,12 +141,12 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <%def name="main_column()">
 
-<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em"
-     data-content="${info['descr']}" data-original-title="${tool}">
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em">
   <h2>
     ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
     ${info["title"]}
   </h2>
+    ${info["descr"]|n}
 </div>
 
 ## Tab headers

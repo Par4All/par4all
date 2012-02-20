@@ -11,9 +11,13 @@
 ${h.javascript_link(request.route_url("routes.js"))}
 <script type="text/javascript">
   operation = "demo";
+  $(function () {
+  $(".pagination li a").popover({html:true, placement: "bottom"});
+  });
 </script>
-${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
 </%def>
+
+
 
 
 ## ONE COLUMN
@@ -26,6 +30,7 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
     <h2>${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
       ${info["title"]}
     </h2>
+    ${info["descr"]|n}
   </div>
 
   <div class="pagination">
@@ -40,7 +45,8 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
       ## Steps 1..n
       % for i in range(1, nb_steps+1):
       <li class="${h.css_classes([('active', step==i)])}">
-	${h.link_to(i, url=request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=i)))}</li>
+	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=i))}"
+	   data-content="${comments[i-1]}" data-original-title="Step ${i}">${i}</a></li>
       % endfor
       ## 'Next' link
       <li class="${h.css_classes([('disabled', step==nb_steps)])}">

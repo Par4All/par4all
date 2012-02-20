@@ -4,16 +4,17 @@
 Generic tutorial controller
 
 """
-import os, re
+import os, re, pickle
 from collections  import OrderedDict
 from ConfigParser import SafeConfigParser
 from subprocess   import Popen, PIPE
 
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
 
 from .detector    import detect_language
 from .operations  import get_workdir, get_resultdir
-from ..utils      import htmlHighlight
+from ..utils      import extractFirstComment, htmlHighlight
 
 
 _paws_marker      = '<END OF THE STEP>'
@@ -116,10 +117,13 @@ def tutorial(request):
         p.wait()
 
         # Split results along markers and save to file
-        results = p.communicate()[0].split(_paws_marker)[:-1]
+        results  = p.communicate()[0].split(_paws_marker)[:-1]
+        comments = []
         for i in range(len(results)):
             step_result = os.path.join(resdir, 'step-%d.txt' % (i+1))
             file(step_result, 'w').write(results[i])
+            comments.append(extractFirstComment(results[i], lang))
+        pickle.dump(comments, file(os.path.join(resdir, 'comments.pickle'), 'w'))
 
         for index in graphs:
             #results[index] = create_png(request, graphs[index], tutname) 
@@ -136,14 +140,21 @@ def tutorial(request):
                     info     = info,
                     source   = file(source).read(),
                     tpips    = htmlHighlight(re.sub("(echo.*\n)", "", file(tpips).read()), "C"),
+                    comments = comments,
                     )
 
     # Subsequent steps
 
     else:
 
+        # Check if environment is initialized correctly:
+        if not 'lang' in request.session: ##TODO: better checks
+            request.session.flash(u'Tutorial not initialized correctly - restarting')
+            return HTTPFound(location=request.route_url(request.matched_route.name, tutorial=tutname))
+
         step_result = os.path.join(resdir, 'step-%d.txt' % step)
         step_tpips  = os.path.join(resdir, 'step-%d.tpips' % step)
+        comments    = pickle.load(file(os.path.join(resdir, 'comments.pickle')))
         lang        = request.session['lang']
 
         return dict(tutorial = tutname,
@@ -154,6 +165,7 @@ def tutorial(request):
                     info     = info,
                     source   = htmlHighlight(file(step_result).read(), lang),
                     tpips    = htmlHighlight(re.sub("(echo.*\n)", "", file(step_tpips).read()), 'C'),
+                    comments = comments,
                     )
         
         
