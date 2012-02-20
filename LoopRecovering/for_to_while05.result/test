@@ -51,7 +51,6 @@ enum {M=64};
 void compute(int M, int a_0[1], int l_0[1], int m_0[1])
 {
    // BEGIN BLOCK
-   // BEGIN BLOCK
    //PIPS generated variable
    int a, l, m;
    m = *m_0;
@@ -59,10 +58,8 @@ void compute(int M, int a_0[1], int l_0[1], int m_0[1])
    a = *a_0;
 compute:   do {
       // BEGIN BLOCK
-      // BEGIN BLOCK
       m = 0;
       while (m<M) {
-         // BEGIN BLOCK
          // BEGIN BLOCK
          a = 0;
          l++;

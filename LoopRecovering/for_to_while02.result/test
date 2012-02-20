@@ -49,7 +49,6 @@ enum {M=64};
 // END BLOCK
 void compute()
 {
-   // BEGIN BLOCK
    /* Since this for loop is desugared in a while() with an
              initialization before, it is a sequence, thus the label which
              cannor be associated on a sequence is put on a ";" inside the
