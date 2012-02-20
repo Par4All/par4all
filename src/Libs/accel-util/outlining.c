@@ -964,8 +964,10 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
         statement body = copy_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
         outliner_independent_recursively(old_fun, cun, body);
 
-        bool saved = get_bool_property(STAT_ORDER);
+        bool saved_order = get_bool_property(STAT_ORDER),
+             saved_block = get_bool_property("PRETTYPRINT_BLOCKS");
         set_bool_property(STAT_ORDER,false);
+        set_bool_property("PRETTYPRINT_BLOCKS",false);
         text t = text_named_module(new_fun, new_fun , body);
 
         add_new_module_from_text(entity_local_name(new_fun), t, language_fortran_p(module_language(get_current_module_entity())), cun);
@@ -976,7 +978,8 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
         gen_free_list(code_declarations(EntityCode(new_fun)));
         code_declarations(EntityCode(new_fun))=NIL;
 
-        set_bool_property(STAT_ORDER,saved);
+        set_bool_property(STAT_ORDER,saved_order);
+        set_bool_property("PRETTYPRINT_BLOCKS",saved_block);
         free_statement(body);
     }
     free_callees(c);
@@ -1047,8 +1050,10 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     insert_statement(*new_body, make_return_statement(new_fun), false);
 
     /* we can now begin the outlining */
-    bool saved = get_bool_property(STAT_ORDER);
+    bool saved_order = get_bool_property(STAT_ORDER),
+         saved_block = get_bool_property("PRETTYPRINT_BLOCKS");
     set_bool_property(STAT_ORDER,false);
+    set_bool_property("PRETTYPRINT_BLOCKS",false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
 
 
@@ -1056,7 +1061,8 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     if(!string_undefined_p(cun)) free(cun);
     free_text(t);
 
-    set_bool_property(STAT_ORDER,saved);
+    set_bool_property(STAT_ORDER,saved_order);
+    set_bool_property("PRETTYPRINT_BLOCKS",saved_block);
 
 
 
