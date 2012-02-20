@@ -703,7 +703,7 @@ class p4a_processor(object):
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             annotate_loop_nests = True, # annotate for recover parallel loops later
-                            concurrent=True)
+                            concurrent=False) # not compatible with independent compilation unit 
 
         # Select kernel launchers by using the fact that all the generated
         # functions have their names beginning with the launcher prefix:
