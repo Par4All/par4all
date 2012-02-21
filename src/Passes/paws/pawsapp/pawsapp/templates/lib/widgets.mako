@@ -65,3 +65,22 @@
 	    onkeydown="handle_keydown(this, event)">Put your source code here.</textarea>
 </div>
 </%def>
+
+
+## Images
+
+<%def name="images_page(imgs)">
+% for img in imgs:
+<div style="clear:both; width: 100%">
+  <p><span class="label notice">Function '${img["fu"]}'</span></p>
+  % if img["zoom"]:
+  <a href="${img['full']}" class="ZOOM_IMAGE" title="Zoom">${h.image(img["thumb"], img["fu"])}</a>
+  % else:
+  ${h.image(img["full"], img["fu"])}
+  % endif
+</div>
+% if imgs.index(img) != len(imgs)-1:
+<hr/>
+% endif 
+% endfor
+</%def>

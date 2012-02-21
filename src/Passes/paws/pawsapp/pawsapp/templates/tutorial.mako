@@ -5,9 +5,14 @@
 
 <%inherit file="base.mako"/>
 
-<%namespace name="w"   file="pawsapp:templates/lib/widgets.mako"/>
+<%namespace name="w" file="pawsapp:templates/lib/widgets.mako"/>
+
+<%def name="css_slot()">
+${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
+</%def>
 
 <%def name="js_slot()">
+${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
 ${h.javascript_link(request.route_url("routes.js"))}
 <script type="text/javascript">
   operation = "demo";
@@ -71,17 +76,19 @@ ${h.javascript_link(request.route_url("routes.js"))}
 
   <div id="demo" class="row-fluid">
     <div class="span6">
+      % if images:
+      ${w.images_page(images)}
+      % else:
       <span class="label">SOURCE</span>
-      <div>
-	% if step == 0:
-	<textarea name="sourcecode" id="sourcecode" class="span12" rows=34 style="height:400px"
-		  onkeydown="handle_key_down(this, event)">${source}</textarea>
-	% else:
-	${source|n}
-	% endif
-      </div>
+      % if step == 0:
+      <textarea name="sourcecode" id="sourcecode" class="span12" rows=34 style="height:400px"
+		onkeydown="handle_key_down(this, event)">${source}</textarea>
+      % else:
+      ${source|n}
+      % endif
       <button class="btn">${w.icon("download-alt")} Save</button>
       <button class="btn">${w.icon("print")} Print</button>
+      % endif
     </div>
     <div class="span6">
       <div>

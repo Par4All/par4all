@@ -16,14 +16,18 @@ from .operations  import create_workdir, get_resultdir, _create_file
 _size = (512, 512)
 
 
-def create_graph_images(request, functions):
+def create_graph_images(request, functions, db=None):
     """Create a pair of images (full-size, thumbnail) from a dot graph.
 
-    :request:   Pyramid request
+    :request  : Pyramid request
     :functions: List of functions to graph
+    :db:      : PIPS database directory
     """
     resdir  = get_resultdir(request)
     workdir = os.path.basename(request.session['workdir']) # sanitized
+    
+    if db is None:
+        db = workdir + '.database'
 
     images  = []
 
@@ -32,9 +36,8 @@ def create_graph_images(request, functions):
         # Full-size image
         imgname = os.path.basename('%s-%s.png' % (workdir, fu)) # sanitized
         imgpath = os.path.join(resdir, imgname)
-        imgurl  = request.route_url('results_name', tool='tool', name=imgname)
-
-        p = Popen( ['dot', '-Tpng', '-o', imgpath, '%s.database/%s/%s.dot' % (workdir, fu, fu)],
+        imgurl  = request.route_url('results_name', tool='tool', name=imgname)        
+        p = Popen( ['dot', '-Tpng', '-o', imgpath, os.path.join(db, fu, '%s.dot' % fu)],
                    stdout=PIPE, stderr=PIPE)
         p.wait()
 
@@ -50,8 +53,8 @@ def create_graph_images(request, functions):
                 zoom = True
                 im.thumbnail(_size, Image.ANTIALIAS)
                 im.save(thumbpath, 'PNG')
-        except IOError:
-            print 'ERROR'
+        except IOError, msg:
+            print 'ERROR:', msg
 
         images.append(dict(full=imgurl, thumb=thumburl, fu=fu, zoom=zoom))
 
@@ -82,7 +85,6 @@ def dependence_graph(request):
     dirname   = create_workdir(request)        
     ws        = pworkspace(str(source), name=dirname, deleteOnClose=True)
     functions = _get_ws_functions(ws)
-    print "FUNCTIONS", functions
     images    = create_graph_images(request, functions)
     #_delete_dir(source)
     ws.close()

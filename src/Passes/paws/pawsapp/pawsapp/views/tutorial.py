@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from .detector    import detect_language
 from .operations  import get_workdir, get_resultdir
+from .graph       import create_graph_images
 from ..utils      import extractFirstComment, htmlHighlight
 
 
@@ -66,18 +67,7 @@ def parse_tpips(tpips):
     return ops, graphs
 
 
-def create_png(request, function, tutname):
-    workdir = request.session['workdir']
-    p = Popen([ 'dot', '-Tpng', '-o', workdir + '.png',
-                os.path.join(tutname+'.database', function, function+'.dot')],
-                stdout=PIPE, stderr=PIPE)
-    p.wait()
-    _create_result_graphs(workdir + '.png')
-    return _create_zoom_image(request, os.path.join(workdir, workdir+'.png'))
-
-
 @view_config(route_name='tutorial', renderer='pawsapp:templates/tutorial.mako', permission='view')
-#@view_config(route_name='tutorial', renderer='string', permission='view')
 def tutorial(request):
     """
     """
@@ -118,6 +108,7 @@ def tutorial(request):
 
         # Split results along markers and save to file
         results  = p.communicate()[0].split(_paws_marker)[:-1]
+        images   = {}
         comments = []
         for i in range(len(results)):
             step_result = os.path.join(resdir, 'step-%d.txt' % (i+1))
@@ -126,8 +117,8 @@ def tutorial(request):
         pickle.dump(comments, file(os.path.join(resdir, 'comments.pickle'), 'w'))
 
         for index in graphs:
-            #results[index] = create_png(request, graphs[index], tutname) 
-            pass
+            images[index] = create_graph_images(request, [graphs[index]], db=tutname + '.database')
+        pickle.dump(images, file(os.path.join(resdir, 'images.pickle'), 'w'))
 
         request.session['nb_steps'] = len(results)
         request.session['lang']     = lang
@@ -141,6 +132,7 @@ def tutorial(request):
                     source   = file(source).read(),
                     tpips    = htmlHighlight(re.sub("(echo.*\n)", "", file(tpips).read()), "C"),
                     comments = comments,
+                    images   = images.get(step, {}),
                     )
 
     # Subsequent steps
@@ -155,6 +147,7 @@ def tutorial(request):
         step_result = os.path.join(resdir, 'step-%d.txt' % step)
         step_tpips  = os.path.join(resdir, 'step-%d.tpips' % step)
         comments    = pickle.load(file(os.path.join(resdir, 'comments.pickle')))
+        images      = pickle.load(file(os.path.join(resdir, 'images.pickle')))
         lang        = request.session['lang']
 
         return dict(tutorial = tutname,
@@ -166,6 +159,7 @@ def tutorial(request):
                     source   = htmlHighlight(file(step_result).read(), lang),
                     tpips    = htmlHighlight(re.sub("(echo.*\n)", "", file(step_tpips).read()), 'C'),
                     comments = comments,
+                    images   = images.get(step, {}),
                     )
         
         
