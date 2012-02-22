@@ -69,8 +69,8 @@ $(function(){
     //
 
     // Source code input field
-    $('#sourcecode-1').linedtextarea()
-	.attr('spellcheck', false);
+    $('#sourcecode-1').linedtextarea().attr('spellcheck', false);
+    $(".lang-label").tooltip();
 
     // "RESULTS" tab
     $('#result_tab a').click(function(ev) {

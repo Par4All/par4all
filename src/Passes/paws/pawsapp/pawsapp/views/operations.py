@@ -32,7 +32,7 @@ def get_workdir(request, reuse=True):
     Clear previous workdir files, if any, unless reuse is OK.
 
     :request:  Pyramid request
-    :reuse:    In case workdir already exists, can we reuse it?
+    :reuse:    In case workdir already exists, can we reuse the files it contains?
     """
     tempdir = request.registry.settings['paws.tempdir']
 
@@ -148,7 +148,6 @@ def get_functions(request):
     sources = [ _create_file(request, 'functions%d' % i, form['code%d' % i],  form['lang%d' % i])
                 for i in range(int(form['number']))]
     request.session['sources'] = sources
-    print request.session['sources'][0][0]
     return '\n'.join([ submit(f, f, class_='btn small') for f in _analyze_functions(request, sources) ])
 
 

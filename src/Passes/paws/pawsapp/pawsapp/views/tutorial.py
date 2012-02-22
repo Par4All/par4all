@@ -40,8 +40,9 @@ def get_info(request, tut):
     cfg.optionxform = str # case-sensitive keys
     cfg.read(os.path.join(get_tutorialdir(request, tut), 'info.ini'))
 
-    info = { 'title' : cfg.get('info', 'title'),
-             'descr' : cfg.get('info', 'description'),
+    info = { 'title'  : cfg.get('info', 'title'),
+             'descr'  : cfg.get('info', 'description'),
+             'source' : cfg.get('info', 'source'),
              }
     return info
 
@@ -67,75 +68,94 @@ def parse_tpips(tpips):
     return ops, graphs
 
 
+@view_config(route_name='tutorial_init', renderer='pawsapp:templates/lib/tutorial_paginator.mako', permission='view')
+def tutorial_init(request):
+    """Initialize tutorial
+    """
+    tutname = os.path.basename(request.matchdict['tutorial'])  # sanitized
+    info    = get_info(request, tutname)
+    tutdir  = get_tutorialdir(request, tutname)
+    dirname = get_workdir(request, reuse=False) # return value not used
+    resdir  = get_resultdir(request)
+
+    code    = request.POST['code']
+    tpips   = os.path.join(tutdir, '%s.tpips' % tutname)
+    lang    = detect_language(code)
+
+    ops, graphs = parse_tpips(tpips)
+
+    # Source code (in result dir)
+    file(os.path.join(resdir, info['source']), 'w').write(code)
+
+    # Full tpips script, with end-of-step markers
+    full_tpips = os.path.join(resdir, 'full-markers.tpips')
+    file(full_tpips, 'w').write(('echo %s\n' % _paws_marker).join(ops.values()))
+
+    # Step-by-step tpips chunks (in result dir)
+    for k,v in ops.items():
+        step_tpips = os.path.join(resdir, 'step-%d.tpips' % k)
+        file(step_tpips, 'w').write(v)
+
+    # Execute full tpips script
+    p = Popen(['tpips', full_tpips, '1'], stdout=PIPE, stderr=PIPE)
+    p.wait()
+
+    # Split results along markers and save to file
+    results  = p.communicate()[0].split(_paws_marker)[:-1]
+    images   = {}
+    comments = []
+    for i in range(len(results)):
+        step_result = os.path.join(resdir, 'step-%d.txt' % (i+1))
+        file(step_result, 'w').write(results[i])
+        comments.append(extractFirstComment(results[i], lang))
+    pickle.dump(comments, file(os.path.join(resdir, 'comments.pickle'), 'w'))
+
+    for index in graphs:
+        images[index] = create_graph_images(request, [graphs[index]], db=tutname + '.database')
+    pickle.dump(images, file(os.path.join(resdir, 'images.pickle'), 'w'))
+
+    request.session['nb_steps'] = len(results)
+    request.session['lang']     = lang
+
+    return dict(step     = 0,
+                nb_steps = len(results),
+                lang     = lang,
+                name     = tutname,
+                comments = comments,
+                )
+
+
 @view_config(route_name='tutorial', renderer='pawsapp:templates/tutorial.mako', permission='view')
 def tutorial(request):
     """
     """
-    form    = request.params
-    step    = int(form.get('step', 0))
+    form        = request.params
+    step        = int(form.get('step', 0))
+    initialized = bool(form.get('initialized', False))
 
     tutname = os.path.basename(request.matchdict['tutorial'])  # sanitized
     info    = get_info(request, tutname)
     tutdir  = get_tutorialdir(request, tutname)
-
-    dirname = get_workdir(request, reuse=False if step==0 else True)
-    tempdir = request.registry.settings['paws.tempdir']
+    dirname = get_workdir(request, reuse= (step!=0 or initialized)) # return value not used
     resdir  = get_resultdir(request)
 
-    # Step 1 : do some scaffolding to prepare the step-by-step files
+    comments = pickle.load(file(os.path.join(resdir, 'comments.pickle'))) if initialized else []
 
     if step == 0:
 
-        source  = os.path.join(tutdir, os.path.basename(info['title']))
+        source  = os.path.join(resdir if initialized else tutdir, os.path.basename(info['title']))
         tpips   = os.path.join(tutdir, '%s.tpips' % tutname)
-
-        lang    = detect_language(file(source).read())
-
-        ops, graphs = parse_tpips(tpips)
-
-        # Full tpips script, with end-of-step markers
-        full_tpips = os.path.join(tutdir, 'full-markers.tpips')
-        file(full_tpips, 'w').write(('echo %s\n' % _paws_marker).join(ops.values()))
-
-        # Step-by-step tpips chunks (in result dir)
-        for k,v in ops.items():
-            step_tpips = os.path.join(resdir, 'step-%d.tpips' % k)
-            file(step_tpips, 'w').write(v)
-
-        # Execute full tpips script
-        p = Popen(['tpips', full_tpips, '1'], stdout=PIPE, stderr=PIPE)
-        p.wait()
-
-        # Split results along markers and save to file
-        results  = p.communicate()[0].split(_paws_marker)[:-1]
-        images   = {}
-        comments = []
-        for i in range(len(results)):
-            step_result = os.path.join(resdir, 'step-%d.txt' % (i+1))
-            file(step_result, 'w').write(results[i])
-            comments.append(extractFirstComment(results[i], lang))
-        pickle.dump(comments, file(os.path.join(resdir, 'comments.pickle'), 'w'))
-
-        for index in graphs:
-            images[index] = create_graph_images(request, [graphs[index]], db=tutname + '.database')
-        pickle.dump(images, file(os.path.join(resdir, 'images.pickle'), 'w'))
-
-        request.session['nb_steps'] = len(results)
-        request.session['lang']     = lang
-
         return dict(tutorial = tutname,
+                    initialized = initialized,
                     step     = step,
-                    nb_steps = len(results),
-                    lang     = lang,
+                    nb_steps = request.session.get('nb_steps', 0),
+                    lang     = '',
                     name     = tutname,
                     info     = info,
                     source   = file(source).read(),
                     tpips    = htmlHighlight(re.sub("(echo.*\n)", "", file(tpips).read()), "C"),
                     comments = comments,
-                    images   = images.get(step, {}),
                     )
-
-    # Subsequent steps
 
     else:
 

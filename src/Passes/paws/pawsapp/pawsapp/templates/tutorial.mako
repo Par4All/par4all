@@ -13,13 +13,13 @@ ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.
 
 <%def name="js_slot()">
 ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
-${h.javascript_link(request.route_url("routes.js"))}
 <script type="text/javascript">
-  operation = "demo";
+  operation = "${tutorial}";
   $(function () {
   $(".pagination li a").popover({html:true, placement: "bottom"});
   });
 </script>
+${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
 </%def>
 
 
@@ -38,40 +38,14 @@ ${h.javascript_link(request.route_url("routes.js"))}
     ${info["descr"]|n}
   </div>
 
-  <div class="pagination" style="text-align:center">
-    <ul>
-      ## 'Previous' link
-      <li class="${h.css_classes([('disabled', step==0)])}">
-	% if step > 1:
-	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step-1))}"
-	   data-content="${comments[step-2]}" data-original-title=" « Previous: step ${step-1}">«</a>
-	% elif step == 1:
-	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=0))}">«</a>
-	% else:
-	<a href="#" class="disabled">«</a>
-	% endif
-      </li>
-      
-
-      ## Overview
-      <li class="${h.css_classes([('active', step==0)])}">${h.link_to(u"Overview", url=request.route_url(request.matched_route.name, tutorial=name))}</li>
-
-      ## Steps 1..n
-      % for i in range(1, nb_steps+1):
-      <li class="${h.css_classes([('active', step==i)])}">
-	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=i))}"
-	   data-content="${comments[i-1]}" data-original-title="Step ${i}">${i}</a></li>
-      % endfor
-      ## 'Next' link
-      <li class="${h.css_classes([('disabled', step==nb_steps)])}">
-	% if step < nb_steps:
-	<a href="${request.route_url(request.matched_route.name, tutorial=name, _query=dict(step=step+1))}"
-	   data-content="${comments[step]}" data-original-title="Next: step ${step+1} »">»</a>
-	% else:
-	<a href="#" class="disabled">»</a>
-	% endif
-      </li>
-    </ul>
+  <div id="pagination-container">
+    % if step==0 and not initialized:
+    <div class="pagination">
+      <button class="btn btn-primary" id="run-button">${w.icon("play", True)} Start tutorial</button>
+    </div>
+    % else:
+    ${w.tutorial_paginator()}
+    % endif
   </div>
 
   <div id="demo" class="row-fluid">
@@ -79,10 +53,9 @@ ${h.javascript_link(request.route_url("routes.js"))}
       % if images:
       ${w.images_page(images)}
       % else:
-      <span class="label">SOURCE</span>
+      <span class="label label-info">SOURCE</span>
       % if step == 0:
-      <textarea name="sourcecode" id="sourcecode" class="span12" rows=34 style="height:400px"
-		onkeydown="handle_key_down(this, event)">${source}</textarea>
+      <textarea name="sourcecode" id="sourcecode" class="span12" rows="34">${source}</textarea>
       % else:
       ${source|n}
       % endif
@@ -92,7 +65,7 @@ ${h.javascript_link(request.route_url("routes.js"))}
     </div>
     <div class="span6">
       <div>
-	<span class="label">SCRIPT</span>
+	<span class="label label-info">SCRIPT</span>
       </div>
       <div id="sourcetpips" style="overflow:auto">
 	${tpips|n}

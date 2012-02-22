@@ -23,4 +23,5 @@ def routes(request):
                                         'perform_multiple',
                                         'dependence_graph',
                                         'dependence_graph_multi',
+                                        'tutorial_init',
                                         ) ])

@@ -23,11 +23,8 @@ ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pac
   % if advanced:
   advanced = true;
   % endif
-  $(function () {
-  $(".lang-label").tooltip();
-  });
 </script>
-${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
 </%def>
 
 
