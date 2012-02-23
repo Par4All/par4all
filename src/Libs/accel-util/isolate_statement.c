@@ -447,6 +447,45 @@ call dimensions_to_dma(effect reg_from,
     return make_call(mcpy, args);
 }
 
+/* perform the convex hull between r0 and r1, and merge them if they have a common prefix
+ * e.g. a[phi1].re[phi2] U_ex a[phi3].im[phi4] = a[phi1] U_may a[phi3]
+ */
+static
+region extended_regions_must_convex_hull(region r0, region r1) {
+    list i0 = reference_indices(region_any_reference(r0)),
+         i1 = reference_indices(region_any_reference(r1));
+    list n0 = NIL, n1=NIL;
+    while(!ENDP(i0)&&!ENDP(i1)) {
+        expression e0 = EXPRESSION(CAR(i0)),
+                   e1 = EXPRESSION(CAR(i1));
+        // stop there: we have found the common prefix
+        if(expression_reference_p(e0) && entity_field_p(reference_variable(expression_reference(e0))) &&
+                expression_reference_p(e1) && entity_field_p(reference_variable(expression_reference(e1))) ) {
+            n0=gen_nreverse(n0);
+            n1=gen_nreverse(n1);
+            list t0 = reference_indices(region_any_reference(r0)),
+                 t1 = reference_indices(region_any_reference(r1));
+            reference_indices(region_any_reference(r0)) = n0;
+            reference_indices(region_any_reference(r1)) = n1;
+            region out = regions_must_convex_hull(r0, r1);
+            reference_indices(region_any_reference(r0)) = t0;
+            reference_indices(region_any_reference(r1)) = t1;
+            gen_free_list(n0);
+            gen_free_list(n1);
+            return out;
+        }
+        // else keep on pushing
+        n0=CONS(EXPRESSION,e0,n0);
+        n1=CONS(EXPRESSION,e1,n1);
+        POP(i0);
+        POP(i1);
+    }
+    gen_free_list(n0);
+    gen_free_list(n1);
+    return regions_must_convex_hull(r0, r1);
+
+}
+
 /* Compute a call to a DMA function from the effects of a statement
 
    @param[in] stat is the statement we want to generate communication
@@ -505,7 +544,7 @@ statement effects_to_dma(statement stat,
                     if(self!=other) {
                         entity ovar = reference_variable(region_any_reference(other));
                         if(same_entity_p(svar,ovar)) {
-                            effect etmp = regions_must_convex_hull(self,other);
+                            effect etmp = extended_regions_must_convex_hull(self,other);
                             if(region_write_p(other))
                                 region_action(etmp) = copy_action(region_action(other));
                             //free_effect(self);
@@ -535,7 +574,7 @@ statement effects_to_dma(statement stat,
                     if(self!=other) {
                         entity ovar = reference_variable(region_any_reference(other));
                         if(same_entity_p(svar,ovar) && (sa == action_tag(region_action(other))) ) {
-                            effect etmp = regions_must_convex_hull(self,other);
+                            effect etmp = extended_regions_must_convex_hull(self,other);
                             //free_effect(self);
                             self=etmp;
                         }
@@ -628,7 +667,7 @@ statement effects_to_dma(statement stat,
                             effect_any_entity(*e_origin),
                             effect_any_entity(e_new))) {
                     merged=true;
-                    region tmp = regions_must_convex_hull(*e_origin,e_new);
+                    region tmp = extended_regions_must_convex_hull(*e_origin,e_new);
                     // there should be a free there, but it fails
                     *e_origin=tmp;
                 }
@@ -860,7 +899,7 @@ static bool do_isolate_statement_preconditions_satisified_p(statement s)
                                         copy_action(region_action(*reg)),
                                         must?make_approximation_exact():make_approximation_may(), sc);
                                 /* add it to current region */
-                                region nreg = regions_must_convex_hull(*reg,copy);
+                                region nreg = extended_regions_must_convex_hull(*reg,copy);
                                 //free_effect(*reg);
                                 //free_effect(copy);
                                 *reg=nreg;
