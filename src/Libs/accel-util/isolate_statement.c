@@ -468,6 +468,7 @@ region extended_regions_must_convex_hull(region r0, region r1) {
             reference_indices(region_any_reference(r0)) = n0;
             reference_indices(region_any_reference(r1)) = n1;
             region out = regions_must_convex_hull(r0, r1);
+            region_approximation_tag(out)=is_approximation_may; // better pessimistic than nothing.
             reference_indices(region_any_reference(r0)) = t0;
             reference_indices(region_any_reference(r1)) = t1;
             gen_free_list(n0);
