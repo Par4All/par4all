@@ -1735,7 +1735,7 @@ type intrinsic_call_to_type(call c)
   else if(type_variable_p(rt)) {
     basic rb = variable_basic(type_variable(rt));
 
-    pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
+    pips_debug(9, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	       module_local_name(f),
 	       words_to_string(words_type(rt, NIL, false)));
 
@@ -1807,7 +1807,7 @@ type intrinsic_call_to_type(call c)
 	    pips_assert("Two arguments for POINT_TO or FIELD \n",
 			gen_length(args)==2);
 
-	    ifdebug(8)
+	    ifdebug(9)
 	      {
 		pips_debug(8, "Point to case, e1 = ");
 		print_expression(e1);
@@ -1863,7 +1863,7 @@ type intrinsic_call_to_type(call c)
 		       but it's not worse than the previously existing version
 		       of expression_to_type
 		    */
-		    pips_debug(8,"same number of dimensions\n");
+		    pips_debug(9,"same number of dimensions\n");
 		    basic b = basic_maximum(cb, nb);
 		    free_type(ct);
 		    free_type(nt);
@@ -1871,7 +1871,7 @@ type intrinsic_call_to_type(call c)
 		  }
 		else
 		  {
-		    pips_debug(8,"different number of dimensions\n");
+		    pips_debug(9,"different number of dimensions\n");
 		    pips_assert("pointer arithmetic with array name, first element must be the address expression", gen_length(cd) > gen_length(nd));
 		    /* current type is still valid */
 		    free_type(nt);
@@ -1889,7 +1889,7 @@ type intrinsic_call_to_type(call c)
   else
     pips_internal_error("Unexpected return type.");
 
-  pips_debug(7, "Intrinsic call to intrinsic \"%s\" "
+  pips_debug(9, "Intrinsic call to intrinsic \"%s\" "
 	     "with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
 	     words_to_string(words_type(t, NIL, false)));
@@ -1942,12 +1942,12 @@ type call_to_type(call c)
 type reference_to_type(reference ref)
 {
   type t = type_undefined;
-  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL, false)));
+  pips_debug(9, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL, false)));
 
   type exp_type = entity_basic_concrete_type(reference_variable(ref));
 
-  pips_debug(6, "reference case \n");
-  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL, false)));
+  pips_debug(9, "reference case \n");
+  pips_debug(9, "exp_type %s\n", words_to_string(words_type(exp_type, NIL, false)));
 
   if(type_variable_p(exp_type))
     {
@@ -1957,13 +1957,13 @@ type reference_to_type(reference ref)
       list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
       list l_inds = reference_indices(ref);
 
-      pips_debug(7, "reference to a variable, "
+      pips_debug(9, "reference to a variable, "
 		 "we iterate over the indices if any \n");
 
       while (!ENDP(l_inds))
 	{
 
-	  ifdebug(7) {
+	  ifdebug(9) {
 	    pips_debug(7, "new iteration : current type : %s\n",
 		       words_to_string(words_type(ct, NIL, false)));
 	    pips_debug(7, "current list of indices: \n");
@@ -1971,13 +1971,13 @@ type reference_to_type(reference ref)
 	  }
 	  if(!ENDP(cd))
 	    {
-	      pips_debug(7, "poping one type dimension and one index\n");
+	      pips_debug(9, "poping one type dimension and one index\n");
 	      POP(cd);
 	      POP(l_inds);
 	    }
 	  else
 	    {
-	      pips_debug(7,"going through pointer dimension. \n");
+	      pips_debug(9,"going through pointer dimension. \n");
 	      pips_assert("reference has too many indices :"
 			  " pointer expected\n", basic_pointer_p(cb));
 	      ct= basic_pointer(cb);
@@ -1994,11 +1994,11 @@ type reference_to_type(reference ref)
 		    make_variable(copy_basic(cb),
 				  gen_full_copy_list(cd),
 				  NIL));
-      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL, false)));
+      pips_debug(9, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL, false)));
     }
   else if(type_functional_p(exp_type))
     {
-      pips_debug(6, "functional case \n");
+      pips_debug(9, "functional case \n");
       /* A reference to a function returns a pointer to a function
 	 of the very same time */
       t = make_type(is_type_variable,
@@ -2013,7 +2013,7 @@ type reference_to_type(reference ref)
 			  type_to_string(exp_type),
 			  entity_name(reference_variable(ref)));
     }
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
+  pips_debug(9, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
   return t;
 }
 
@@ -2035,7 +2035,7 @@ type expression_to_type(expression exp)
 
   syntax s_exp = expression_syntax(exp);
 
-  ifdebug(6){
+  ifdebug(9){
     pips_debug(6, "begins with expression :");
     print_expression(exp);
     fprintf(stderr, "\n");
@@ -2045,26 +2045,26 @@ type expression_to_type(expression exp)
     {
     case is_syntax_reference:
       {
-	pips_debug(6, "reference case \n");
+	pips_debug(9, "reference case \n");
 	t = reference_to_type(syntax_reference(s_exp));
 	break;
       }
     case is_syntax_call:
       {
-	pips_debug(6, "call case \n");
+	pips_debug(9, "call case \n");
 	t = call_to_type(syntax_call(s_exp));
 	break;
       }
     case is_syntax_range:
       {
-	pips_debug(6, "range case \n");
+	pips_debug(9, "range case \n");
 	/* Well, let's assume range are well formed... */
 	t = expression_to_type(range_lower(syntax_range(s_exp)));
 	break;
       }
     case is_syntax_cast:
       {
-	pips_debug(6, "cast case \n");
+	pips_debug(9, "cast case \n");
 	t = copy_type(cast_type(syntax_cast(s_exp)));
 	if (!type_void_p(t) && type_tag(t) != is_type_variable)
 	  pips_internal_error("Bad reference type tag %d",type_tag(t));
@@ -2074,7 +2074,7 @@ type expression_to_type(expression exp)
       {
           /*
 	sizeofexpression se = syntax_sizeofexpression(s_exp);
-	pips_debug(6, "size of case \n");
+	pips_debug(9, "size of case \n");
 	if (sizeofexpression_type_p(se))
 	  {
 	    t = copy_type(sizeofexpression_type(se));
@@ -2098,7 +2098,7 @@ type expression_to_type(expression exp)
 	list cd = variable_dimensions(type_variable(ct));
 	list l_inds = subscript_indices(syntax_subscript(s_exp));
 
-	pips_debug(6, "subscript case \n");
+	pips_debug(9, "subscript case \n");
 
 	while (!ENDP(l_inds))
 	  {
@@ -2132,13 +2132,13 @@ type expression_to_type(expression exp)
       }
     case is_syntax_application:
       {
-	pips_debug(6, "application case \n");
+	pips_debug(9, "application case \n");
 	t = expression_to_type(application_function(syntax_application(s_exp)));
 	break;
       }
     case is_syntax_va_arg:
       {
-	pips_debug(6, "va_arg case\n");
+	pips_debug(9, "va_arg case\n");
 	list vararg_list = syntax_va_arg(s_exp);
 	sizeofexpression soe = SIZEOFEXPRESSION(CAR(CDR(vararg_list)));
 
@@ -2151,7 +2151,7 @@ type expression_to_type(expression exp)
       /* Never go there... */
     }
 
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
+  pips_debug(9, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
 
   return t;
 }
