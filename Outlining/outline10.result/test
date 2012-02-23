@@ -24,3 +24,5 @@ void kernel(int i, int j, int *bar0)
 kernel:   *bar0 = i*j;
 }
 void foo(int bar[256][256]);
+//PIPS generated variable
+void kernel(int i, int j, int *bar0);

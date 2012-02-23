@@ -89,6 +89,12 @@ double a[N], b[N], c[N];
 
 int main();
 //PIPS generated variable
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i);
+//PIPS generated variable
+void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i);
+//PIPS generated variable
+void p4a_launcher_main(int N, double a[N], double b[N], double c[N]);
+//PIPS generated variable
 typedef unsigned long int size_t;
 //PIPS generated variable
 void P4A_accel_malloc(void **address, size_t size);

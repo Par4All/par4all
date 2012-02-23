@@ -36,3 +36,5 @@ struct a {
    struct b {int jedi;} the;
 };
 int foo(int c);
+//PIPS generated variable
+void kernel(struct a of);

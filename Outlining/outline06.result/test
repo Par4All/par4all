@@ -30,3 +30,5 @@ kernel:
 }
 int K = 12;
 void foo(int bar[256][256]);
+//PIPS generated variable
+void kernel(int i, int bar[256][256]);

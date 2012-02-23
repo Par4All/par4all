@@ -731,27 +731,21 @@ void p4a_kernel_launcher_get_data(float_t space[501][501])
 }
 void p4a_kernel_wrapper_compute(float_t save[501][501], float_t space[501][501], int i, int j)
 {
-   // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
    p4a_kernel_compute(save, space, i, j);
-   // END BLOCK
 }
 void p4a_kernel_wrapper_compute_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
-   // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
    p4a_kernel_compute_1(save, space, i, j);
-   // END BLOCK
 }
 void p4a_kernel_wrapper_get_data(float_t space[501][501], int i, int j)
 {
-   // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
    p4a_kernel_get_data(space, i, j);
-   // END BLOCK
 }
 void write_data(char filename[])
 {
