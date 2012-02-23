@@ -1053,7 +1053,7 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
       if (ENDP(*l_pme))
 	{
 	  pips_user_warning("dereferencing a constant address expression: "
-			    "PIPS doesn't know how to handled that precisely\n");
+			    "PIPS doesn't know how to handle that precisely\n");
 	  *l_pme = effect_to_list(make_anywhere_effect(write_p? make_action_write_memory()
 						       : make_action_read_memory()));
 	}
@@ -1124,7 +1124,73 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
   else if(ENTITY_DEREFERENCING_P(op))
     {
       pips_debug(4, "Call is a dereferencing operator \n");
-      le = generic_proper_effects_of_complex_address_dereferencing_op(args, l_pme, write_p);
+      syntax op_arg_s = expression_syntax(EXPRESSION(CAR(args)));
+      if (syntax_cast_p(op_arg_s))
+	{
+	  pips_debug(4, "Dereferencing a cast expression \n");
+	  // we cannot call generic_proper_effects_of_complex_address_dereferencing_op here
+	  // because we need to test the relationship between the type of call_exp and cast_exp.
+
+	  cast c = syntax_cast(op_arg_s);
+	  type cast_t = cast_type(c);
+	  expression cast_exp = cast_expression(c);
+
+	  // try to see if we have something like *((int (*)[]) t) where t is of type int * for instance
+	  type call_exp_t = expression_to_type(call_exp);
+	  type cast_exp_t = expression_to_type(cast_exp);
+
+	  list l_me1 = NIL;
+	  list le1 = generic_proper_effects_of_complex_address_expression(cast_exp, &l_me1, write_p);
+	  // re-use an existing function because currently it checks if types are the same
+	  // or if each array dimension corresponds to a pointer dimension
+	  if (!ENDP(l_me1) && !anywhere_effect_p(EFFECT(CAR(l_me1))))
+	    {
+	      if (types_compatible_for_effects_interprocedural_translation_p(call_exp_t,  cast_exp_t))
+		{
+		  // current result is ok;
+		  pips_debug(4, "compatible types \n");
+		  le = le1;
+		  *l_pme = l_me1;
+
+		  if (write_p && pointer_type_p(cast_exp_t))
+		    {
+		      FOREACH(EFFECT, eff, l_me1)
+			{
+			  effect read_eff = (*effect_dup_func)(eff);
+			  effect_to_read_effect(read_eff);
+			  le = CONS(EFFECT, read_eff, le);
+			}
+		    }
+
+		}
+	      else
+		{
+		  pips_debug(4, "non compatible types \n");
+		  // we generate all possible paths from the cast expression main effects
+		  FOREACH(EFFECT, eff, l_me1)
+		    {
+		      list l_tmp =  generic_effect_generate_all_accessible_paths_effects(eff, cast_t, write_p?'w':'r');
+		      effects_to_may_effects(l_tmp);
+		      *l_pme = gen_nconc(l_tmp, *l_pme);
+		    }
+		}
+	    }
+	  else
+	    {
+	      le = le1;
+	      pips_user_warning("dereferencing a constant address expression: "
+				"PIPS doesn't know how to handled that precisely\n");
+	      *l_pme = effect_to_list(make_anywhere_effect(write_p?
+							   make_action_write_memory()
+							   : make_action_read_memory()));
+	    }
+	  free_type(call_exp_t);
+	  free_type(cast_exp_t);
+	}
+      else
+	{
+	  le = generic_proper_effects_of_complex_address_dereferencing_op(args, l_pme, write_p);
+	}
     }
   else if(ENTITY_CONDITIONAL_P(op))
     {
@@ -1844,7 +1910,23 @@ list generic_proper_effects_of_c_function_call_argument(expression arg)
       list l_pme = NIL;
       /* I'm not sure it is OK for all type of arguments, in particular function calls */
       le = generic_proper_effects_of_complex_address_expression(arg, &l_pme, false);
-      gen_full_free_list(l_pme);
+
+      // when there are casts, actual types are hidden
+      if (!ENDP(l_pme))
+	{
+	  effect eff = EFFECT(CAR(l_pme));
+	  reference ref = effect_any_reference(eff);
+
+
+	  if (ENDP(reference_indices(ref))
+	      && pointer_type_p(entity_basic_concrete_type(reference_variable(ref))))
+	    {
+	      le = gen_nconc(le, l_pme);
+	    }
+	  else
+	    gen_full_free_list(l_pme);
+
+	}
     }
   else
     {
