@@ -247,6 +247,9 @@ class p4a_builder:
         if not fortran:
             fortran = "gfortran"
 
+        # We need this to make sure nvcc uses the compiler given by the user
+        nvcc_flags.append("-ccbin="+cxx)
+
         if add_optimization_flags:
             if icc:
                 c_flags += [ "-xHOST -O3 -ipo -no-prec-div" ] # Do not specify -fast with implies -static and bugs with STT_GNU_IFUNC upon linkage.
