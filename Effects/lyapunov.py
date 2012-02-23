@@ -7,4 +7,4 @@ with workspace() as w:
     w.props.UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=True
     w.props.ALIASING_ACROSS_IO_STREAMS=False
     w.props.MEMORY_EFFECTS_ONLY=False
-    w.fun.lyapunov_finish.privatize_module()
+    w.fun.lyapunov_finish.display(activate="print_code_proper_effects")
