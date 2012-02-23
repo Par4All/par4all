@@ -24,6 +24,9 @@
 #include <sys/resource.h>
 #include <p4a_stacksize_test.h>
 
+// no qualifier for devices in openmp emulation mode
+#define P4A_DEVICE 
+
 extern struct timeval p4a_time_begin, p4a_time_end;
 
 /** This is a global variable used to simulate P4A virtual processor

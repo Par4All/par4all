@@ -26,6 +26,9 @@
 #include <cuda.h>
 #include <p4a_stacksize_test.h>
 
+// turn p4a device into a cuda device
+#define P4A_DEVICE __device__
+
 #define toolTestExec(error)   checkErrorInline        (error, __FILE__, __LINE__)
 #define toolTestExecMessage(error,message)	checkErrorMessageInline	(error,message, __FILE__, __LINE__)
 

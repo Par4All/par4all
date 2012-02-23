@@ -40,6 +40,9 @@
 // Some are used when launching the kernel.
 //#include "p4a_accel_wrapper-OpenCL.h"
 
+// SG: unsure
+# define P4A_KERNEL 
+
 
 /** @addtogroup P4A_log Debug messages and errors tracking.
     
