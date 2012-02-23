@@ -26,7 +26,6 @@ Par4All processing
 '''
 
 
-
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
@@ -697,18 +696,18 @@ class p4a_processor(object):
 
         # go through the call graph in a top - down fashion
         def gpuify_all(module):
-            module.gpu_ify(GPU_USE_WRAPPER = False, 
-                        GPU_USE_KERNEL = False,                             
-                        GPU_USE_FORTRAN_WRAPPER = self.fortran,
-                        GPU_USE_LAUNCHER = True,
-                        GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                        GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                        GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                        OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
-                        OUTLINE_CALLEES_PREFIX="p4a_device_",
-                        annotate_loop_nests = True) # annotate for recover parallel loops later
-            # recursive walk through
-            [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
+                module.gpu_ify(GPU_USE_WRAPPER = False, 
+                            GPU_USE_KERNEL = False,                             
+                            GPU_USE_FORTRAN_WRAPPER = self.fortran,
+                            GPU_USE_LAUNCHER = True,
+                            GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
+                            OUTLINE_CALLEES_PREFIX="p4a_device_",
+                            annotate_loop_nests = True) # annotate for recover parallel loops later
+                # recursive walk through
+                [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
 
         # call gpuify_all recursively starting from the heads of the callgraph
         [ gpuify_all(m) for m in all_modules if not m.callers ]
@@ -820,17 +819,12 @@ class p4a_processor(object):
             skip_static_length_arrays = self.c99 and not self.opencl
             use_pointer = self.c99 or self.opencl
             kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
-            for kl in kernel_launchers:
-                callees=kl.callees
-                while callees:
-                    tmp=list()
-                    for c in callees:
-                        c.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
-                        tmp.extend(c.callees)
-                    callees=tmp
-
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
-            kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
+
+            def linearize_all(k):
+                k.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
+                [ linearize_all(c) for c in k.callees ]
+            [ linearize_all(c) for c in kernels ]
 
         # SG: not usefull anymore. Uncomment this if you want to try it again, this is the right place to do it
         ## Unfold kernel, usually won't hurt code size, but less painful with
