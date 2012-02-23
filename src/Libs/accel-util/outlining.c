@@ -1001,8 +1001,9 @@ void outliner_independent(const char * module_name, statement body) {
             else the_cu = strdup(module_name);
             asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
             free(the_cu);
-            if(entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun)))
-                (void)MakeCompilationUnitEntity(cun);
+            entity cu = FindEntity(TOP_LEVEL_MODULE_NAME,cun);
+            if(entity_undefined_p(cu))
+                cu=MakeCompilationUnitEntity(cun);
         }
         outliner_independent_recursively(module_name_to_entity(module_name), cun, body);
         free(cun);
@@ -1024,6 +1025,9 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
 
     /* 5-0 : create new compilation unit */
     outliner_compilation_unit(new_fun, formal_parameters);
+
+    if(c_module_p(get_current_module_entity()))
+        AddEntityToModuleCompilationUnit(new_fun, get_current_module_entity());
 
     /* 5-1 : add all callees to the same foreign compilation units */
     outliner_independent(outline_module_name, *new_body);
