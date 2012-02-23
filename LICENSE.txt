@@ -20,7 +20,18 @@ Copyright (c) 2008-2038 HPC Project
 
 This is known as the MIT license.
 
+
+
 Unless other licenses are specified for some files or directories (PIPS,
 PolyLib, gcc...), this license applies to the Par4All content.
 
-Real authors keep their copyright.
+More specifically, Par4All gathers some other projects as git subtrees in
+its own repository to ease distribution and integration and they have
+their own licenses, for example:
+- packages/PIPS (with linear, newgen, pips...) is GPL v3;
+- packages/pips-gfc/gcc-4.4.5 is a mix of GPL v2, GPL v3, GCC runtime
+  library exception, LGPL v2 and LGPL v3;
+- packages/polylib is GPL v3;
+- examples/Benchmarks/polybenchs is GPL v3;
+- examples/Benchmarks/rodinia is under a license from the University of
+  Virginia described in examples/Benchmarks/rodinia/LICENSE.
