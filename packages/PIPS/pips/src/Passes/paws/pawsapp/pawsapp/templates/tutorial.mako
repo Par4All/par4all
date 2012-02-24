@@ -5,73 +5,76 @@
 
 <%inherit file="base.mako"/>
 
-<%namespace name="w"   file="pawsapp:templates/lib/widgets.mako"/>
+<%namespace name="w" file="pawsapp:templates/lib/widgets.mako"/>
 
 <%def name="css_slot()">
-${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
-${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), media="all")}
+${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
 </%def>
 
 <%def name="js_slot()">
-${h.javascript_link(request.route_url("routes.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
 <script type="text/javascript">
-  operation = "demo";
+  operation = "${tutorial}";
+  $(function () {
+  $(".pagination li a").popover({html:true, placement: "bottom"});
+  });
 </script>
 ${h.javascript_link(request.static_url("pawsapp:static/js/tutorial.js"))}
 </%def>
+
+
 
 
 ## ONE COLUMN
 
 <%def name="content()">
 
-<div class="container">
+<div class="container-fluid">
 
   <div class="hero-unit" style="padding:.5em 1em">
     <h2>${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
-      ${name}
+      ${info["title"]}
     </h2>
+    ${info["descr"]|n}
   </div>
 
-  <table>
-    <tr valign="top">
-      <td>
-        <div id="demo">
-	  <br/>
-	  <label for="step" class="table_header">Current demo step:&nbsp;&nbsp; </label>
-	  <input type="text" id="step" class="ui-widget ui-widget-content slider_label"/><br/>
-	  <label for="all_steps" class="table_header">Number of all the steps:&nbsp;&nbsp; </label>
-	  <input type="text" id="all_steps" class="ui-widget ui-widget-content slider_label"/>
-	  <div id="demo_slider"></div>
-	  <br/>
-	  <table>
-	    <tr>
-	      <td>
-		<div class='table_header'>SOURCE:</div>
-	      </td>
-	      <td>
-		<div class='table_header'>SCRIPT:</div>
-	      </td>
-	    </tr>
-	    <tr>
-	      <td valign='top' align='left' width='700px'>
-		<div id="source">
-		  <textarea name="sourcecode" id="sourcecode" class="output" rows="33" cols="85"
-			    onkeydown="handle_key_down(this, event)">${source}</textarea>
-		</div>
-	      </td>
-	      <td valign='top' align='left' width='700px'>
-		<div id="sourcetpips" class="output">
-		  <p align="center">${tpips|n}</p>
-		</div>
-	      </td>
-	    </tr>
-	  </table>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div id="pagination-container">
+    % if step==0 and not initialized:
+    <div class="pagination">
+      <button class="btn btn-primary" id="run-button">${w.icon("play", True)} Start tutorial</button>
+    </div>
+    % else:
+    ${w.tutorial_paginator()}
+    % endif
+  </div>
+
+  <div id="demo" class="row-fluid">
+    <div class="span6">
+      % if images:
+      ${w.images_page(images)}
+      % else:
+      <span class="label label-info">SOURCE</span>
+      % if step == 0:
+      <textarea name="sourcecode" id="sourcecode" class="span12" rows="34">${source}</textarea>
+      % else:
+      ${source|n}
+      % endif
+      <button class="btn">${w.icon("download-alt")} Save</button>
+      <button class="btn">${w.icon("print")} Print</button>
+      % endif
+    </div>
+    <div class="span6">
+      <div>
+	<span class="label label-info">SCRIPT</span>
+      </div>
+      <div id="sourcetpips" style="overflow:auto">
+	${tpips|n}
+      </div>
+      <button class="btn">${w.icon("download-alt")} Save</button>
+      <button class="btn">${w.icon("print")} Print</button>
+    </div>
+  </div>
 
 </div>
 </%def>
+

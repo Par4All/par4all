@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-PAWS utility functions
+PAWS utility functions for language handling etc.
 
 """
-import os
-from ConfigParser import SafeConfigParser
+import os, re
+from ConfigParser        import SafeConfigParser
+
+from pygments            import highlight
+from pygments.lexers     import CLexer, FortranLexer
+from pygments.formatters import HtmlFormatter
 
 
 # Supported languages
@@ -41,6 +45,99 @@ class FortranDecoder(object):
     @classmethod
     def analyze(cls, code):
         return len(filter(lambda t: t in code.lower(), cls.tokens)) * 100.0 / len(cls.tokens)
+
+
+# Extract first comment
+def extractFirstComment(code, lang, html=True):
+    """Extract and return first comment block from code. Supported
+    languages are Fortran and C.
+
+    :code: source cide
+    :lang: language of source code
+    :html: output <br/>'s instead of line breaks ?
+    """
+
+    # Extraction of first Fortran comment
+    if lang in languages and lang.startswith('Fortran'):
+
+        start = False
+        end   = False
+        out   = []
+
+        for l in code.split('\n'):
+            if re.match('\s*$', l): # blank line: skip
+                continue
+            match = re.match(r'c     (.*)', l, re.I) # Fortran comment
+            if match:
+                start = True
+                if not end:
+                    out.append(match.group(1))
+            elif start:
+                end = True
+
+    # Extraction of first C comment
+    elif lang == 'C':
+
+        inside  = False
+        outside = False
+        out     = []
+
+        for l in code.split('\n'):
+
+            if re.match('\s*$', l): # blank line: skip
+                continue
+
+            match = re.match(r'/\*\s*(.*?)\s*\*/', l)
+            if match: # single-line comment /* ... */
+                return match.group(1)
+
+            match = re.match(r'//\s*(.*)', l)
+            if match: # single-line comment // ...
+                return match.group(1).strip()
+
+            if not inside: 
+                match = re.match(r'/\*\s*(.*)', l)
+                if match: # start of multi-line comment
+                    if match.group(1).strip():
+                        out.append(match.group(1).strip())
+                    inside=True
+                    continue
+
+            if inside:
+
+                match = re.match(r'(.*)\s*\*/\s*$', l)
+                if match: # end of multi-line comment
+                    if match.group(1).strip():
+                        out.append(match.group(1).strip())
+                    break
+
+                match = re.match(r'\*\s*(.*)', l)
+                if match: # continuation of multi-line comment
+                    out.append(match.group(1).strip())
+
+    return ('<br/>' if html else '\n').join(out)
+
+
+# Source code highlighting
+def htmlHighlight(code, lang):
+    """Apply HTML formatting to highlight code fragment.
+
+    :code:  Source code
+    :lang:  Language of source code
+    """
+    lexer = None
+    if lang == 'C':
+        lexer = CLexer()
+    elif lang in ('Fortran77', 'Fortran95'):
+        lexer = FortranLexer()
+
+    if lexer:
+        code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
+        lines = [ '<li>%s</li>' % l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
+        return '<pre class="prettyprint linenums"><ol class="highlight linenums">%s</ol></pre>' % ''.join(lines) # absolutely NO blank spaces!
+    else:
+        return code
+
 
 #
 #

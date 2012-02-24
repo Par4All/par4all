@@ -1,3 +1,5 @@
+## Tutorial paginator
+
 <%namespace name="w" file="pawsapp:templates/lib/widgets.mako"/>
 
-${w.images_page(images)}
+${w.tutorial_paginator()}

@@ -352,6 +352,37 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param, par
             MakeUnaryCall(
                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
         }
+
+#if 0 // ***SG: optional, and I don't want to valdiate it
+        /* handle call sites in the form *pointer_to_array */
+        if( param->cast_at_call_site_p && expression_call_p(*arg) && ENTITY_DEREFERENCING_P(call_function(expression_call(*arg)))) {
+            expression *dereferenced = (expression*)REFCAR(call_arguments(expression_call(*arg)));
+            type dereferenced_type = expression_to_type(*dereferenced);
+            if ( pointer_type_p(dereferenced_type)) {
+                type dereferenced_pointed_type = basic_pointer(variable_basic(type_variable(dereferenced_type)));
+                if(array_type_p(dereferenced_pointed_type)) {
+                    *dereferenced = 
+                        make_expression(
+                                make_syntax_cast(
+                                    make_cast(
+                                        make_type_variable(
+                                            make_variable(
+                                                make_basic_pointer(copy_type(type_in_func_prototype)),
+                                                NIL,
+                                                NIL
+                                                )
+                                            ),
+                                        *dereferenced
+                                        )
+                                    ),
+                                normalized_undefined
+                                );
+
+                }
+            }
+
+        }
+#endif
         free_type(type_at_call_site);
       }
       POP(args);

@@ -20,8 +20,8 @@
 
 include $(srcdir)/newgen.mk
 
-if WITH_DOC
 dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty
+if WITH_DOC
 doc_DATA=$(F_pdf)
 endif
 
