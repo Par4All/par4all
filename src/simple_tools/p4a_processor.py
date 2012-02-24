@@ -26,7 +26,6 @@ Par4All processing
 '''
 
 
-
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
@@ -694,16 +693,26 @@ class p4a_processor(object):
         # Fortran case, we want the launcher to be wrapped in an
         # independent Fortran function so that it will be prettyprinted
         # later in... C (for OpenCL or CUDA kernel definition). :-)
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
-                            GPU_USE_KERNEL = False,
+
+        # go through the call graph in a top - down fashion
+        def gpuify_all(module):
+                module.gpu_ify(GPU_USE_WRAPPER = False, 
+                            GPU_USE_KERNEL = False,                             
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
-                            annotate_loop_nests = True, # annotate for recover parallel loops later
-                            concurrent=True)
+                            OUTLINE_CALLEES_PREFIX="p4a_device_",
+                            annotate_loop_nests = True) # annotate for recover parallel loops later
+                # recursive walk through
+                [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
+
+        # call gpuify_all recursively starting from the heads of the callgraph
+        [ gpuify_all(m) for m in all_modules if not m.callers ]
+
+
 
         # Select kernel launchers by using the fact that all the generated
         # functions have their names beginning with the launcher prefix:
@@ -744,11 +753,6 @@ class p4a_processor(object):
         kernel_prefix = self.get_kernel_prefix ()
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
-
-        # Unfold kernel,  ususally won't hurt code size, but less painful with
-        # callees declared in others compilation units (unsupported in CUDA and
-        # OpenCL) and can allow some opportunities for scalarization & others
-        kernels.unfold()
 
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
@@ -804,6 +808,8 @@ class p4a_processor(object):
         f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\w+$")
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
 
+
+
         # Unfortunately CUDA (at least up to 4.0) does not accept C99
         # array declarations with sizes also passed as parameters in
         # kernels. So, we degrade the quality of the generated code by
@@ -814,7 +820,16 @@ class p4a_processor(object):
             use_pointer = self.c99 or self.opencl
             kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
             wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays)
-            kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
+
+            def linearize_all(k):
+                k.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,skip_static_length_arrays=skip_static_length_arrays, skip_local_arrays=True) # always skip locally declared arrays for kernels. Assume there is no VLA in the kernel, which woul elad to an alloca anyway
+                [ linearize_all(c) for c in k.callees ]
+            [ linearize_all(c) for c in kernels ]
+
+        # SG: not usefull anymore. Uncomment this if you want to try it again, this is the right place to do it
+        ## Unfold kernel, usually won't hurt code size, but less painful with
+        ## static functions declared in accelerator compilation units 
+        #kernels.unfold()
 
         # add sentinel around loop nests in launcher, used to replace the loop
         # nest with a call kernel in post-processing

@@ -85,6 +85,8 @@ def replace_by_opencl_own_declarations(content):
     # substituted by:
     # P4A_accel_kernel.*(.*  P4A_accel_global_address type  *var
     content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
+    #content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
+    content = re.sub("(static [^\n]*?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
 
     return content
 
@@ -280,6 +282,13 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub(r'\(void \*\) 0',
                      "NULL", content)
 
+    # flag all static functions as device functions, after splitting them
+    # P4A_DEVICE is implemented in p4a_accel headers, depending on the backend
+    old_content=""
+    while old_content != content:
+        old_content=content
+        content=re.sub(r"static (\w+) (\w+)(\([^)]+\)), (\w+)(\([^)]+\))",r"static \1 \2\3;\nstatic \1 \4\5", content)
+    content = re.sub(r'\nstatic (.*?) p4a_device_(.*?)\n',r'\nstatic P4A_DEVICE \1 p4a_device_\2\n', content)
 
     if verbose:
         print content,
