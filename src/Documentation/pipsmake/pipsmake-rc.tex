@@ -11198,21 +11198,42 @@ loop benefit.
 SCALARIZATION_THRESHOLD 2
 \end{PipsProp}
 
-Property \PipsPropRef{SCALARIZATION_STRICT_MEMORY_ACCESSES} is used to
-control the insertion of new memory accesses. A memory access may be
-moved out of a loop, which is the best case for performance, but it
-then is no longer control dependent on the loop bounds. A new access
-is thus added if the compiler cannot prove that the loop is always
-entered. However, the burden of the proof may be too much, if only
-because nothing can be proven when the loop is sometimes entered and
-sometimes not. Also, the memory access may be always perfectly
-legal. The default value is FALSE, going for performance before
-safety. This property is pretty hard to understand, as well as its
-impact. See sequence06, 07 and 08 in the validation suite of the
+Property \PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST} is used to
+control the place where new memory accesses are inserted.
+
+A memory access may be moved out of a loop, which is the best case for
+performance, but it then is no longer control dependent on the loop
+bounds. A new access is thus added if the compiler cannot prove that
+the loop is always entered. However, the burden of the proof may be
+too much, if only because nothing can be proven when the loop is
+sometimes entered and sometimes not. Also, the memory access may be
+always perfectly legal.
+
+The default value for \PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST}
+is \texttt{"exactness"}, allying safety to
+performance. It forbids scalarization when both read and written
+regions for the current piece of code are approximate regions, and, in
+addition, it applies a cheap test. This is the default option.
+
+When it is set to \texttt{"strict"}, property
+\PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST} goes for safety before
+performance, allowing candidates from approximated regions, but
+performing a strict test to check the validity of the
+transformation.
+
+When the property is set to \texttt{"cheap"},
+memory accesses are moved outside of control structures with only the
+cheapest test. Use this last value with caution, since it is unsafe in
+the general case.
+
+These properties are pretty hard to understand, as well as their
+impact. See sequence06, 07, 08 and 44 in the validation suite of the
 scalarization pass.
-\begin{PipsProp}{SCALARIZATION_STRICT_MEMORY_ACCESSES}
-SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
+
+\begin{PipsProp}{SCALARIZATION_ACROSS_CONTROL_TEST}
+SCALARIZATION_ACROSS_CONTROL_TEST "exactness"
 \end{PipsProp}
+
 
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
 Laurent Daverio and Fran\c{c}ois Irigoin.
@@ -11267,6 +11288,7 @@ quick_scalarization  > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
+Pass \PipsPassRef{quick_scalarization} was implemented by Beatrice Creusillet.
 
 \subsection{Induction Variable Substitution}
 
