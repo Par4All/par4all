@@ -80,6 +80,39 @@ typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
 
+
+
+//////////////////// Properties
+
+static int scalarization_across_control_test_level = 0;
+
+static bool scalarization_across_control_test_is_exactness_p()
+{
+  return (scalarization_across_control_test_level == 0);
+}
+
+static bool scalarization_across_control_test_is_strict_test_p()
+{
+  return (scalarization_across_control_test_level == 1);
+}
+
+static void scalarization_across_control_test_level_init()
+{
+  const char * test_s = get_string_property("SCALARIZATION_ACROSS_CONTROL_TEST");
+
+  if (strstr(test_s, "strict"))
+    scalarization_across_control_test_level = 1;
+  else if (strstr(test_s, "cheap"))
+    scalarization_across_control_test_level = 2;
+  else
+    scalarization_across_control_test_level = 0;
+}
+
+static void scalarization_across_control_test_level_reset()
+{
+  scalarization_across_control_test_level = 0;
+}
+
 ////////////////////
 
 /*
@@ -523,6 +556,13 @@ static void scalarize_variable_in_statement(entity pv,
       return;
     }
 
+
+  ifdebug(3){
+    pips_debug(3, "begin for entity %s and statement:\n",
+	       entity_name(pv));
+    print_statement(s);
+  }
+
   // Create a new variable and add
   // its declaration to the current module
   // If no default prefix is defined, use the variable name
@@ -561,6 +601,13 @@ static void scalarize_variable_in_statement(entity pv,
 
   // Substitute all references to pv with references to new variable
   statement_substitute_scalarized_array_references(s, pvr, sv);
+
+  ifdebug(3){
+    pips_debug(3, "statement after substitution by sv (%s):\n",
+	       entity_name(sv));
+    print_statement(s);
+  }
+
 
   // Take care of copy-in and copy-out code if necessary
   if (get_bool_property("SCALARIZATION_FORCE_OUT")
@@ -608,6 +655,8 @@ static void scalarize_variable_in_statement(entity pv,
  *
  * Note: the usual assumption is made, no more than two effects on pv
  * in crwl...
+ * No, the assumption is that there is no more than two effects
+ * on a memory access path. BC.
  *
  * The return effect is given a read action on memory. A read-or-write
  * action would be more meaningful.
@@ -622,43 +671,58 @@ static effect unified_rw_effect_of_variable(entity pv, list crwl)
   effect pr1 = effect_undefined;
   Psysteme sc2 = SC_UNDEFINED;
   effect pr2 = effect_undefined;
+  tag app1, app2;
 
   // action_write_p(effect_action(pr))))
   if ((pr1 = effect_write_or_read_on_variable(crwl, pv, true))
       != effect_undefined) {
     descriptor d1 = effect_descriptor(pr1);
+    app1 = effect_approximation_tag(pr1);
     if (descriptor_convex_p(d1))
       sc1 = descriptor_convex(d1);
   }
+  else
+    app1 = is_approximation_may;
 
   //!(action_write_p(effect_action(pr)))))
   /* Search Effect with the opposite action */
   if ((pr2 = effect_write_or_read_on_variable(crwl, pv, false))
       != effect_undefined) {
     descriptor d2= effect_descriptor(pr2);
+    app2 = effect_approximation_tag(pr2);
     if (descriptor_convex_p(d2))
       sc2 = descriptor_convex(d2);
   }
+  else
+    app2 = is_approximation_may;
 
-  /*  Merge Read and Write Effects constraints on pv */
-  if (!SC_UNDEFINED_P(sc1) && sc_dimension(sc1) !=0) {
-    if (!SC_UNDEFINED_P(sc2) && sc_dimension(sc2) !=0)
-      sc_union=sc_cute_convex_hull(sc2,sc1);
-    else
-      sc_union=sc_dup(sc1);
-  } else {
-    if (!SC_UNDEFINED_P(sc2) && sc_dimension(sc2) !=0)
-      sc_union=sc_dup(sc2);
-    else
+  tag app_t = approximation_or(app1, app2);
+
+  // we enforce that oneof the effect is exact to be sure that no accesses
+  // are unduely moved out of control
+  if (!scalarization_across_control_test_is_exactness_p()
+      || app_t == is_approximation_exact)
+    {
+
+      /*  Merge Read and Write Effects constraints on pv */
+      if (!SC_UNDEFINED_P(sc1) && sc_dimension(sc1) !=0) {
+	if (!SC_UNDEFINED_P(sc2) && sc_dimension(sc2) !=0)
+	  sc_union=sc_cute_convex_hull(sc2,sc1);
+	else
+	  sc_union=sc_dup(sc1);
+      } else {
+	if (!SC_UNDEFINED_P(sc2) && sc_dimension(sc2) !=0)
+	  sc_union=sc_dup(sc2);
+	else
       sc_union = SC_UNDEFINED;
-  }
-
-  if(!SC_UNDEFINED_P(sc_union)) {
-    cell c = make_cell_reference(make_reference(pv,NIL));
-    action a = make_action_read(make_action_kind_store()); // arbitrary choice
-    approximation ap = make_approximation_may(); // safe default
-    descriptor d = make_descriptor_convex(sc_union);
-    pru = make_effect(c, a, ap, d);
+      }
+      if(!SC_UNDEFINED_P(sc_union)) {
+	cell c = make_cell_reference(make_reference(pv,NIL));
+	action a = make_action_read(make_action_kind_store()); // arbitrary choice
+	approximation ap = make_approximation_may(); // safe default
+	descriptor d = make_descriptor_convex(sc_union);
+	pru = make_effect(c, a, ap, d);
+      }
   }
   return pru;
 }
@@ -735,6 +799,12 @@ static bool loop_scalarization(loop l)
       int nd = type_depth(entity_type(pv));
 
       if (!effect_undefined_p(pru)) {
+
+	ifdebug(2) {
+        pips_debug(0,"pru not undefined: ");
+        print_region(pru);
+      }
+
         // Estimate the dynamic number of *element* and *variable*
         // occurrences in the loop body
         int neo = count_references_to_variable_element(s, pv);
@@ -900,7 +970,7 @@ static bool statement_entity_references_constant_in_context_p(statement s, entit
   bool constant_p = (nd==0);
 
   if(!constant_p) {
-    pips_debug(2,"Considering entity : %s", entity_name(e));
+    pips_debug(2,"Considering entity : %s\n", entity_name(e));
 
     /* none of the modified variables appears in an index of a reference from entity e */
     reference_testing_ctxt ctxt;
@@ -973,6 +1043,13 @@ static bool statement_scalarization(statement s)
   // Each variable in effects is a candidate for scalarization
   FOREACH (EFFECT, pr, crwl) {
     // Now we determine which read/write effects are not copied out.
+
+    // I'm not sure this works for arrays of structures for instance
+    // because there may be several paths with different lengths
+    // from a same entity.
+    // All the computation is done in reference to the entity pv
+    // whereas it should be done in reference to a memory access path.
+    // BC (02/20/2012).
     entity pv  = effect_variable(pr); // Private variable
     int nd = type_depth(entity_type(pv));
 
@@ -996,8 +1073,10 @@ static bool statement_scalarization(statement s)
 	}
       vect_add_elem(&var_already_seen,pv,1);
 
+      // scalarization_across_control_test_level is checked inside
+      // if it is equal to 0 and there is not at least one exact effect
+      // then an undefined effect is returned.
       effect pru = unified_rw_effect_of_variable(pv, crwl);
-      int nd = type_depth(entity_type(pv));
 
       if (!effect_undefined_p(pru)) { // FI: this should be an assert?
 	  // Estimate the dynamic number of *element* and *variable*
@@ -1070,44 +1149,44 @@ static bool statement_scalarization(statement s)
 			   entity_undefined_p(iv),
 			   entity_undefined_p(ov));
 	      }
-	    } else {
-	      bool strict_p =
-		get_bool_property("SCALARIZATION_STRICT_MEMORY_ACCESSES");
-	      /* Check that a unique element of pv is used. Its region
-		 must be constant within the statement, i.e. wrt to the
-		 statement transformer tran.
+	    } else
+	      {
+		pips_debug(1,"Profitability criterion met \n");
+		bool strict_p = scalarization_across_control_test_is_strict_test_p();
+		/* Check that a unique element of pv is used. Its region
+		   must be constant within the statement, i.e. wrt to the
+		   statement transformer tran.
 
-		 This last criterion is not strong enough, because variables
-		 modified in the statement have already been eliminated from
-		 regions. We enforce a stronger criterion implemented by
-		 statement_entity_references_constant_in_context_p which checks
-		 that each reference from pru entity has constant indices wrt
-		 to the statement transformer tran and has no complex indices
-		 (array elements, structs). BC.
-	      */
-	      /* prec might have to be replaced by prec_r, its range. */
-	      /* It is not clear if a unique element of pv should
-		 always be used, wasting some opportunities but
-		 making sure that no non-existing reference is added,
-		 or if at most a unique element is used, which may to
-		 spurious out of bounds accesses. See scalarization30
-		 for an example and explanations. */
-	      if (//constant_region_in_context_p(pru, tran)
-		  statement_entity_references_constant_in_context_p(s, effect_entity(pru),
-								    transformer_arguments(tran))
-		  && singleton_region_in_context_p(pru, prec,
-						   loop_indices_b, strict_p)) {
-		/* The array references can be replaced a references to a
-		   scalar */
-		// FI: this must be postponed to the bottom up phase
-		//scalarize_variable_in_statement(pv, s, iv, ov);
-		local_scalarized_variables =
-		  arguments_add_entity(local_scalarized_variables, pv);
-		scalarized_variables =
-		  arguments_add_entity(scalarized_variables, pv);
-	      }
-	      reset_temporary_value_counter();
-
+		   This last criterion is not strong enough, because variables
+		   modified in the statement have already been eliminated from
+		   regions. We enforce a stronger criterion implemented by
+		   statement_entity_references_constant_in_context_p which checks
+		   that each reference from pru entity has constant indices wrt
+		   to the statement transformer tran and has no complex indices
+		   (array elements, structs). BC.
+		*/
+		/* prec might have to be replaced by prec_r, its range. */
+		/* It is not clear if a unique element of pv should
+		   always be used, wasting some opportunities but
+		   making sure that no non-existing reference is added,
+		   or if at most a unique element is used, which may to
+		   spurious out of bounds accesses. See scalarization30
+		   for an example and explanations. */
+		if (//constant_region_in_context_p(pru, tran)
+		    statement_entity_references_constant_in_context_p(s, effect_entity(pru),
+								      transformer_arguments(tran))
+		    && singleton_region_in_context_p(pru, prec,
+						     loop_indices_b, strict_p)) {
+		  /* The array references can be replaced a references to a
+		     scalar */
+		  // FI: this must be postponed to the bottom up phase
+		  //scalarize_variable_in_statement(pv, s, iv, ov);
+		  local_scalarized_variables =
+		    arguments_add_entity(local_scalarized_variables, pv);
+		  scalarized_variables =
+		    arguments_add_entity(scalarized_variables, pv);
+		}
+		reset_temporary_value_counter();
 	    }
 	  }
 	}
@@ -1275,7 +1354,10 @@ static void scalarization_statement_out(statement s)
 	  irl  = effects_store_effects(irl);
 	  orl  = effects_store_effects(orl);
 	}
-
+      ifdebug(3) {
+	pips_debug(3, "statement before replacements:\n");
+	print_statement(s);
+      }
       FOREACH(ENTITY, pv, local_scalarized_variables) {
 	entity iv  = (entity)
 	  gen_find(pv, irl, (bool (*)())gen_eq, car_effect_to_variable);
@@ -1285,7 +1367,13 @@ static void scalarization_statement_out(statement s)
 	scalarize_variable_in_statement(pv, s, iv, ov);
       }
 
-      /* Remove variables privatized in s from the list of privatized
+
+      ifdebug(3) {
+	pips_debug(3, "statement on exit:\n");
+	print_statement(s);
+      }
+
+      /* Remove variables scalarized in s from the list of scalarized
 	 variables so that
 	 successive statements do not interfere with each other. */
       scalarized_variables = arguments_difference(scalarized_variables,
@@ -1341,7 +1429,7 @@ bool scalarization (char * module_name)
 
   debug_on("SCALARIZATION_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
-
+  scalarization_across_control_test_level_init();
   if(false) {
     /* We now traverse our module's statements looking for loop statements. */
     loop_indices_b = BASE_NULLE;
@@ -1369,6 +1457,7 @@ bool scalarization (char * module_name)
     }
   }
 
+  scalarization_across_control_test_level_reset();
   pips_debug(1, "end\n");
   debug_off();
 

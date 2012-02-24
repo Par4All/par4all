@@ -6069,11 +6069,13 @@ NESTED_PARALLELISM_THRESHOLD 0
 \index{Atomizer}
 \index{SLP}
 \index{SSE}
+\index{Scalar Renaming}
 
-The SAC project aims at generating efficient code for processors with SIMD
-extension instruction set such as VMX, SSE4, etc. which are also
+The SAC project aims at generating efficient code for processors with
+SIMD extension instruction set such as VMX, SSE4, etc. which are also
 refered to as Superword Level Parallelism (SLP). For more information,
-see \url{https://info.enstb.org/projets/sac}.
+see \url{https://info.enstb.org/projets/sac}, or better, see Serge
+Guelton's PhD dissertation.
 
 Some phases use \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
 to generate DMA calls and \PipsPropRef{ACCEL_WORK}.
@@ -6087,6 +6089,8 @@ ACCEL_STORE "SIMD_STORE"
 \begin{PipsProp}{ACCEL_WORK}
 ACCEL_WORK "SIMD_"
 \end{PipsProp}
+
+\subsection{SIMD Atomizer}
 
 \begin{PipsPass}{simd_atomizer}
   Here is yet another atomizer, based on {\tt new\_atomizer} (see
@@ -6118,7 +6122,7 @@ SIMD_ATOMIZER_ATOMIZE_REFERENCE FALSE
 SIMD_ATOMIZER_ATOMIZE_LHS FALSE
 \end{PipsProp}
 
-The \PipsPropRef{SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE} property is used by the sac library to know if it must override C constant type inference.
+The \PipsPropRef{SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE} property is used by the SAC library to know if it must override C constant type inference.
 In \texttt{C}, an integer constant always as the minimum size needed to hold its value, starting from an \lstinline|int|. In sac we may want to have it converted to a smaller size, in situation like \lstinline|char b;/*...*/;char a = 2 + b;|. Otherwise the result of \lstinline|2+b| is considered as an \lstinline|int|.
 if \PipsPropRef{SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE} is set to \texttt{TRUE}, the result of \lstinline|2+b| will be a \lstinline|char|.
 
@@ -6126,6 +6130,8 @@ if \PipsPropRef{SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE} is set to \texttt{TRUE}, 
 SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE FALSE
 \end{PipsProp}
 
+\subsection{Loop Unrollling for SIMD Code Generation}
+\index{Loop Unroll}
 
 \begin{PipsPass}{simdizer_auto_unroll}
 Tries to unroll the code for making the simdizing process more efficient. It thus tries to compute
@@ -6154,6 +6160,9 @@ loop_auto_unroll        > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\subsection{Tiling for SIMD Code Generation}
+\index{Tiling}
+\index{Loop Tiling}
 
 \begin{PipsPass}{simdizer_auto_tile}
 Tries to tile the code to make the simdizing process more efficient.
@@ -6167,6 +6176,9 @@ simdizer_auto_tile        > MODULE.code
         < MODULE.cumulated_effects
         < MODULE.code
 \end{PipsMake}
+
+\subsection{Preprocessing of Reductions for SIMD Code Generation}
+\index{Reduction}
 
 \begin{PipsPass}{simd_remove_reductions}
 This phase tries to pre-process reductions, so that they can be
@@ -6197,8 +6209,12 @@ SIMD_REMOVE_REDUCTIONS_PRELUDE ""
 \begin{PipsProp}{SIMD_REMOVE_REDUCTIONS_POSTLUDE}
 SIMD_REMOVE_REDUCTIONS_POSTLUDE ""
 \end{PipsProp}
+
+\subsection{Redundant Load-Store Elimination}
+\index{Redudant Load-Store Elimination}
+
 \begin{PipsPass}{redundant_load_store_elimination}
-Remove useless load store calls (and more)
+Remove useless load store calls (and more).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -6217,6 +6233,8 @@ If \PipsPropRef{REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE} is set to false,
 REDUNDANT_LOAD_STORE_ELIMINATION_CONSERVATIVE TRUE
 \end{PipsProp}
 
+\subsection{Undo Some Atomizer Transformations (?)}
+
 \begin{PipsPass}{deatomizer}
 ...
 \end{PipsPass}
@@ -6230,6 +6248,9 @@ deatomizer                  > MODULE.code
         < MODULE.proper_effects
         < MODULE.dg
 \end{PipsMake}
+
+\subsection{If Conversion}
+\index{If Conversion}
 
 \begin{PipsPass}{if_conversion_init}
 This phase is the first phase of the if-conversion algorithm. The complete
@@ -6300,16 +6321,19 @@ if_conversion_compact                  > MODULE.code
   \PipsPassRef{simplify_control} works afterwards.
 \end{PipsPass}
 
+\subsection{Loop Unswitching}
+
 \begin{PipsMake}
 loop_nest_unswitching                  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
 
+\subsection{Scalar Renaming}
 
 \begin{PipsPass}{scalar_renaming}
-This phase tries to minimize dependencies in the code by renaming scalars
-when legal.
+The Scalar Renaming pass tries to minimize dependencies in the code by
+renaming scalars when legal.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -6318,6 +6342,8 @@ scalar_renaming           > MODULE.code
         < MODULE.dg
         < MODULE.proper_effects
 \end{PipsMake}
+
+\subsection{Tree Matching for SIMD Code Generation}
 
 \begin{PipsPass}{simd_treematcher}
 This function initialize a treematch used by \PipsPassRef{simdizer} for simd-oriented pattern matching
@@ -6465,6 +6491,7 @@ scalopragma                    > MODULE.code
 
 
 \subsubsection{Bufferization}
+
 The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generated by \PipsPassRef{kernel_load_store}. To keep flows consistent outside the module \PipsPassRef{scalopify} surround variable call with a special function too.
 A C file with stubs is needed.
 
@@ -6481,7 +6508,8 @@ scalopify                    > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{SCMP generation}
+\subsubsection{SCMP Code Generation}
+
 The goal of the following phase is to generate SCMP tasks from 'normal' modules. The tasks are linked and scheduled using the SCMP HAL.
 Sesamify take in input a module and analyze all its callees (per example the 'main' after GPU-IFY or SCALOPRAGMA application).
 Each analyzed module is transformed into a SCMP task if its name begin with P4A\_scmp\_task.
@@ -11154,9 +11182,9 @@ destroyed, even with this property set to true.
 SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
 
-Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
-when it is useless according to the OUT region, for instance when dealing
-with a library function.
+Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation
+of a copy-out statement when it is useless according to the OUT
+region, for instance when dealing with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
 \end{PipsProp}
@@ -11170,21 +11198,42 @@ loop benefit.
 SCALARIZATION_THRESHOLD 2
 \end{PipsProp}
 
-Property \PipsPropRef{SCALARIZATION_STRICT_MEMORY_ACCESSES} is used to
-control the insertion of new memory accesses. A memory access may be
-moved out of a loop, which is the best case for performance, but it
-then is no longer control dependent on the loop bounds. A new access
-is thus added if the compiler cannot prove that the loop is always
-entered. However, the burden of the proof may be too much, if only
-because nothing can be proven when the loop is sometimes entered and
-sometimes not. Also, the memory access may be always perfectly
-legal. The default value is FALSE, going for performance before
-safety. This property is pretty hard to understand, as well as its
-impact. See sequence06, 07 and 08 in the validaiton suite of the
+Property \PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST} is used to
+control the place where new memory accesses are inserted.
+
+A memory access may be moved out of a loop, which is the best case for
+performance, but it then is no longer control dependent on the loop
+bounds. A new access is thus added if the compiler cannot prove that
+the loop is always entered. However, the burden of the proof may be
+too much, if only because nothing can be proven when the loop is
+sometimes entered and sometimes not. Also, the memory access may be
+always perfectly legal.
+
+The default value for \PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST}
+is \texttt{"exactness"}, allying safety to
+performance. It forbids scalarization when both read and written
+regions for the current piece of code are approximate regions, and, in
+addition, it applies a cheap test. This is the default option.
+
+When it is set to \texttt{"strict"}, property
+\PipsPropRef{SCALARIZATION_ACROSS_CONTROL_TEST} goes for safety before
+performance, allowing candidates from approximated regions, but
+performing a strict test to check the validity of the
+transformation.
+
+When the property is set to \texttt{"cheap"},
+memory accesses are moved outside of control structures with only the
+cheapest test. Use this last value with caution, since it is unsafe in
+the general case.
+
+These properties are pretty hard to understand, as well as their
+impact. See sequence06, 07, 08 and 44 in the validation suite of the
 scalarization pass.
-\begin{PipsProp}{SCALARIZATION_STRICT_MEMORY_ACCESSES}
-SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
+
+\begin{PipsProp}{SCALARIZATION_ACROSS_CONTROL_TEST}
+SCALARIZATION_ACROSS_CONTROL_TEST "exactness"
 \end{PipsProp}
+
 
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
 Laurent Daverio and Fran\c{c}ois Irigoin.
@@ -11239,6 +11288,7 @@ quick_scalarization  > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
+Pass \PipsPassRef{quick_scalarization} was implemented by Beatrice Creusillet.
 
 \subsection{Induction Variable Substitution}
 

@@ -1,6 +1,6 @@
 TARGET	= hwac
 include_HEADERS=$(TARGET).h
-dist_noinst_HEADERS=freia_spoc.h freia.h freia_terapix.h
+dist_noinst_HEADERS=freia_spoc.h freia.h freia_terapix.h freia_opencl.h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libhwac.la

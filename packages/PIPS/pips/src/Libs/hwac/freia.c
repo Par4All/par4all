@@ -600,6 +600,85 @@ static void fsi_sort(list lls)
   hash_table_free(fsi_number), fsi_number = NULL;
 }
 
+/********************************************************** SEQUENCE CLEANUP */
+/*
+  some more cleanup added to the main sequence.
+  some existing passes could do a better job, but they would require
+  working helper effects and managing pointers. Moreover, I know that I can
+  ignore deallocations.
+*/
+
+static void collect_images(reference r, set referenced)
+{
+  entity var = reference_variable(r);
+  if (freia_image_variable_p(var) && !set_belong_p(referenced, var))
+    set_add_element(referenced, referenced, var);
+}
+
+static bool freia_cleanup_sequence_rec(statement modstat, set referenced)
+{
+  //fprintf(stderr, "[freia_cleanup_main_sequence] %p\n", modstat);
+  bool changed = false;
+  instruction i = statement_instruction(modstat);
+
+  if (instruction_sequence_p(i))
+  {
+    sequence seq = instruction_sequence(i);
+    list rstats = gen_nreverse(gen_copy_seq(sequence_statements(seq)));
+    // set of referenced images
+
+    FOREACH(statement, s, rstats)
+    {
+      // handle seqs in seqs with an explicit recursion
+      if (statement_sequence_p(s))
+        changed = freia_cleanup_sequence_rec(s, referenced);
+      else if (freia_statement_aipo_call_p(s))
+      {
+        call c = freia_statement_to_call(s);
+        const freia_api_t * api =
+          hwac_freia_api(entity_local_name(call_function(c)));
+        if (api->arg_img_out==1)
+        {
+          entity img = expression_to_entity(EXPRESSION(CAR(call_arguments(c))));
+          //fprintf(stderr, "considering %s on %s\n",
+          //        api->function_name, entity_local_name(img));
+          if (!set_belong_p(referenced, img) &&
+              // hey, we keep written parameters!
+              // ??? what about global images, if any?
+              !formal_parameter_p(img))
+          {
+            changed = true;
+            free_instruction(statement_instruction(s));
+            statement_instruction(s) = make_continue_instruction();
+          }
+        }
+      }
+      // update seen variables, but must skip deallocations!
+      // ??? what about skipping alloc as well?
+      if (!is_freia_dealloc(s))
+        gen_context_recurse(s, referenced,
+                            // could also do loop indexes, but no images
+                            reference_domain, gen_true, collect_images);
+      // also look in initializations
+      FOREACH(entity, var, statement_declarations(s))
+        gen_context_recurse(entity_initial(var), referenced,
+                            reference_domain, gen_true, collect_images);
+
+    }
+
+    gen_free_list(rstats);
+  }
+  return changed;
+}
+
+static bool freia_cleanup_main_sequence(statement modstat)
+{
+  set referenced = set_make(hash_pointer);
+  bool changed = freia_cleanup_sequence_rec(modstat, referenced);
+  set_free(referenced);
+  return changed;
+}
+
 /**************************************************************** DO THE JOB */
 
 /* freia_compile:
@@ -762,6 +841,9 @@ string freia_compile(string module, statement mod_stat, string target)
   }
 
   // some code cleanup
+  freia_cleanup_main_sequence(mod_stat);
+
+  // some more code cleanup
   if (get_bool_property("FREIA_CLEANUP_STATUS"))
     freia_cleanup_status(mod_stat, helpers);
 

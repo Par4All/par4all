@@ -1197,13 +1197,40 @@ static _int freia_terapix_call
 
   // we may optimize the row size for a target image height, if available
   int image_height = FREIA_DEFAULT_HEIGHT;
-  if (image_height!=0)
+  int vertical_border = n>s? n: s;
+  int max_computed_size = imagelet_rows-2*vertical_border;
+  // this is really a MAXIMUM available size that can be set from outside
+  int max_size = get_int_property(trpx_max_size);
+
+  if (image_height==0)
   {
-    // we adjust the imagelet size so that we avoid recomputing pixels
-    // the formula must match whatever the scheduler does!
-    int vertical_border = n>s? n: s;
+    pips_assert("at least one image is needed!", n_ins||n_outs);
+    // dynamic adjustment of the imagelet size
+    sb_cat(decl,
+      "  // dynamic optimal imagelet size computation\n"
+      "  // this formula must match what the scheduler does!\n"
+      "  int vertical_border = ", itoa(vertical_border), ";\n"
+      // use first input image for the reference size, or default to output
+      "  int image_height = ", n_ins? "i": "o", "0->heightWa;\n");
+    sb_cat(decl,
+      "  int max_computed_size = ", itoa(max_computed_size), ";\n"
+      "  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;\n"
+      "  int imagelet_size =\n"
+      "        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;\n");
+    if (max_size)
+    {
+      sb_cat(decl,
+             "  // max imagelet size requested..."
+             "  int max_size = ", itoa(max_size), ";\n"
+             "  if (imagelet_size>max_size)\n"
+             "    imagelet_size = max_size;\n");
+    }
+  }
+  else
+  {
+    // we adjust statically the imagelet size so that we avoid recomputing
+    // pixels... the formula must match whatever the scheduler does!
     // ??? hmmm... only for inner tiles
-    int max_computed_size = imagelet_rows-2*vertical_border;
     // #tiles is ceil(height/computed)
     int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
     // now we compute back the row size
@@ -1213,19 +1240,15 @@ static _int freia_terapix_call
     // now we set the value directly
     sb_cat(decl, "  // imagelet max size: ", itoa(imagelet_rows), "\n");
     imagelet_rows = optim_rows;
-  }
-  else
-    pips_user_warning("no image height hint, cannot optimize imagelet size\n");
 
-  // this is really a MAXIMUM available size
-  int max_size = get_int_property(trpx_max_size);
-  // the runtime can use imagelet_rows or less
-  sb_cat(decl, "  int imagelet_size = ",
-         itoa(max_size?
-              // max_size is defined, may use it if smaller than computed size
-              (max_size<imagelet_rows? max_size: imagelet_rows):
-              // max_size is not defined
-              imagelet_rows), ";\n");
+    // the runtime can use imagelet_rows or less
+    sb_cat(decl, "  int imagelet_size = ",
+           itoa(max_size?
+                // max_size is defined, may use it if smaller than computed size
+                (max_size<imagelet_rows? max_size: imagelet_rows):
+                // max_size is not defined
+                imagelet_rows), ";\n");
+  }
 
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)

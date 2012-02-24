@@ -9,6 +9,8 @@ VERSION_SH = $(top_srcdir)/makes/version.sh
 .PHONY:pips_version.h
 BUILT_SOURCES=pips_version.h
 nodist_include_HEADERS=pips_version.h
+EXTRA_DIST=makes/version.sh
+
 pips_version.h:
 	{ \
 	  echo "#define PIPS_REV \"`$(VERSION_SH) $(top_srcdir)`\"" ; \

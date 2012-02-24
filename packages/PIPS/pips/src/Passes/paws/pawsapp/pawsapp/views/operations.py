@@ -1,45 +1,65 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, re, traceback, shutil
+import sys, os, re, traceback, shutil, mimetypes
 from tempfile            import mkdtemp
-
-from pygments            import highlight
-from pygments.lexers     import CLexer, FortranLexer
-from pygments.formatters import HtmlFormatter
 
 from pyramid.view        import view_config
 from pyramid.renderers   import render
 
-from ..utils             import languages
+from ..utils             import languages, htmlHighlight
 from ..helpers           import submit
 from ..schema            import Params
 
+mimetypes.init()
 
 _resultDirName = '__res__'
+imports        = ''
 
-imports = ''
 
-
-def _create_workdir(request):
-    """Create a per-session temporary working directory and return its base name.
-    Clear previous workdir files, if any.
+def create_workdir(request):
+    """Create a per-session temporary working directory, update session and return its base name.
     """
     tempdir = request.registry.settings['paws.tempdir']
-
-    # Clear previous workdir files, if any
-    if 'workdir' in request.session:
-        workdir = os.path.basename(request.session['workdir']) # sanitized
-        path    = os.path.join(tempdir, workdir)
-        if os.path.exists(path):
-            shutil.rmtree(path)
-    # New workdir
     workdir = mkdtemp(dir = tempdir)
     os.mkdir(os.path.join(workdir, _resultDirName))
     dirname = os.path.basename(workdir)
     request.session['workdir'] = dirname
     return dirname
+    
 
-def _get_resdir(request):
+def get_workdir(request, reuse=True):
+    """Create a per-session temporary working directory and return its base name.
+    Clear previous workdir files, if any, unless reuse is OK.
+
+    :request:  Pyramid request
+    :reuse:    In case workdir already exists, can we reuse the files it contains?
+    """
+    tempdir = request.registry.settings['paws.tempdir']
+
+    if 'workdir' in request.session:
+        dirname = os.path.basename(request.session['workdir']) # sanitized
+        path    = os.path.join(tempdir, dirname)
+        if os.path.exists(path):
+            if not reuse:
+                shutil.rmtree(path)
+
+        if not os.path.exists(path):
+            # workdir should be here, but missing for some reason, or if was deleted just above.
+            os.mkdir(path)
+        if not os.path.exists(os.path.join(path, _resultDirName)):
+            # same as above
+            os.mkdir(os.path.join(path, _resultDirName))
+
+    else:
+        # create brand new workdir
+        dirname = create_workdir(request)
+
+    return dirname
+
+
+def get_resultdir(request):
+    """Return fullpath to temporary results directory.
+    """
     tempdir = request.registry.settings['paws.tempdir']
     workdir = os.path.basename(request.session['workdir']) # sanitized
     return os.path.join(tempdir, workdir, _resultDirName)
@@ -99,24 +119,13 @@ def perform_multiple_advanced(request):
                                     form['properties'], form['phases'], True)
 
 
-def _highlight_code(request, code, lang, demo=False):
-    """Apply Pygment formatting
+def _write_result_code(request, code):
+    """Write temporary result code file to disk.
     """
-    code = code.replace('\n\n', '\n')
-    if not demo: ##TODO
-        resdir  = _get_resdir(request)
-        workdir = os.path.basename(request.session['workdir']) # Sanitized
-        path    = os.path.join(resdir, 'result-%s.txt' % workdir)
-        file(path, 'w').write(code)
-    lexer = None
-    if lang == 'C':
-        lexer = CLexer()
-    elif lang in ('Fortran77', 'Fortran95'):
-        lexer = FortranLexer()
-    if lexer:
-        code  = highlight(code, lexer, HtmlFormatter()).replace('<pre>', '<pre>\n')
-        lines = [ '<li>%s</li>' % l for l in code.split('\n') if l[:4] != "<div" and l[:5]!="</pre" ]
-        return '<pre class="prettyprint linenums"><ol class="highlight linenums">%s</ol></pre>' % ''.join(lines) # absolutely NO blank spaces!
+    resdir  = get_resultdir(request)
+    workdir = os.path.basename(request.session['workdir']) # Sanitized
+    path    = os.path.join(resdir, 'result-%s.txt' % workdir)
+    file(path, 'w').write(code)
 
 
 #
@@ -128,7 +137,7 @@ def _highlight_code(request, code, lang, demo=False):
 def get_directory(request):
     """Create and return a per-session temporary working directory
     """
-    return _create_workdir(request)
+    return get_workdir(request, reuse=False)
 
 
 @view_config(route_name='get_functions', renderer='string', permission='view')
@@ -139,7 +148,6 @@ def get_functions(request):
     sources = [ _create_file(request, 'functions%d' % i, form['code%d' % i],  form['lang%d' % i])
                 for i in range(int(form['number']))]
     request.session['sources'] = sources
-    print request.session['sources'][0][0]
     return '\n'.join([ submit(f, f, class_='btn small') for f in _analyze_functions(request, sources) ])
 
 
@@ -164,15 +172,35 @@ def perform(request):
 
     # Perform operation
     global imports ##TODO
-    imports = '\n'.join(re.findall(r'^\s*#include.*$', code, re.M)) if lang=='C' else '' # C '#include' lines
+    imports = '\n'.join(re.findall(r'^\s*#include.*$', code, re.M)) if lang=='C' else '' # C include directives
     source  = _create_file(request, op, code, lang)
     mod     = _import_base_module(request)
     try:
-        functions = mod.perform(source, op, adv, **params)
-        return _highlight_code(request, imports + '\n' + functions, lang)
+        funcs = mod.perform(source, op, adv, **params)
+        code  = (imports + '\n' + funcs).replace('\n\n', '\n')
+        _write_result_code(request, code)
+        return htmlHighlight(code, lang)
     except RuntimeError, msg:
         return _catch_error(msg)
     except:
         return _catch_error('')
 
+
+@view_config(route_name='results',      renderer='string', permission='view')
+@view_config(route_name='results_name', renderer='string', permission='view')
+def get_result_file(request):
+    """Return the content of the transformed code.
+    """
+    resdir  = get_resultdir(request)
+    workdir = os.path.basename(request.session['workdir']) # sanitized
+    name    = os.path.basename(request.matchdict.get('name', 'result-%s.txt' % workdir))
+    ext     = os.path.splitext(name)[1]
+    path    = os.path.join(resdir, name)
+
+    request.response.headers['Content-type'] = mimetypes.types_map.get(ext, 'text/plain;charset=utf-8')
+
+    if ext == '.txt': # Open text file as an attachment
+        request.response.headers['Content-disposition'] = str('attachment; filename=%s' % name)
+
+    return file(path).read()
 
