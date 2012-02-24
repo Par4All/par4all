@@ -3,16 +3,22 @@ Proper effects for "main" after privatization
 
 int main()
 {
+//             <    is declared>: a
    float a[10];
+//             <    is declared>: i
    int i;
 //             <    is written>: i
+//             <    is referenced>: i
 
    for(i = 0; i <= 9; i += 1) {
+//             <    is declared>: z
       float z;
 //             <    is written>: z
+//             <    is referenced>: z
       z = 0.0;
 //             <    is read   >: i z
 //             <    is written>: a[i]
+//             <    is referenced>: a i z
       a[i] = z;
    }
    return 0;

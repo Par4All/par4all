@@ -3,10 +3,10 @@
 #
 int guard(int i, int n, int a[n], int b[n])
 {
-   //PIPS generated variable
-
    if (i<n) {
+      //PIPS generated variable
       register int a_0 = a[i];
+
       b[i] = a_0/2+a_0/3;
    }
 }

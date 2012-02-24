@@ -174,9 +174,9 @@ void nb3d__d2d2(int _u_V_n0, int _u_V_n1, double _u_V[_u_V_n0][_u_V_n1], int _u_
          //PIPS generated variable
          register double _tmpxx22_0, _tmpxx21_0;
          _tmpxx21_0 = (double) 1.0;
-         _u_ii[__lv1][__lv2] = round(_tmpxx21_0);
+         round(_tmpxx21_0);
          _tmpxx22_0 = (double) 1.0;
-         _u_jj[__lv1][__lv2] = round(_tmpxx22_0);
+         round(_tmpxx22_0);
       }
    }
 #pragma omp parallel for

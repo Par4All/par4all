@@ -60,3 +60,7 @@ void invariant03(int n, int ni, int nj)
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' already active
+unknown[unknown] (activate_phase) Rule `TRANSFORMERS_INTER_FULL' already active
+unknown[unknown] (activate_phase) Rule `PRECONDITIONS_INTER_FULL' already active
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning invariant03 instead

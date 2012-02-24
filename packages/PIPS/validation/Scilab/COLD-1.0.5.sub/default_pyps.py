@@ -157,6 +157,7 @@ with coldValidationWorkspace(cppflags="-I stubs/include") as w:
   w.activate("PRECONDITIONS_INTRA_FAST")
   w.activate("RICE_FAST_DEPENDENCE_GRAPH")
   w.activate("NEW_CONTROLIZER")
+  w.activate("MUST_REGIONS")
 
   filter_exclude_re = re.compile("^scilab_rt_.*")
   all_modules = w.filter(lambda module: not module.compilation_unit_p() and not filter_exclude_re.match(module.name))

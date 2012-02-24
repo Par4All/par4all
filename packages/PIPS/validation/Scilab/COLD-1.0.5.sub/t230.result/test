@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
       //PIPS generated variable
       int __lv2;
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1)
-         _u_Ets[__lv1][__lv2] = (double) 0.0;
+         (double) 0.0;
    }
    _u_Ex[0][1][1] = 1;
    _u_Ey[1][0][1] = 2;
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
          //PIPS generated variable
          int __lv3;
          for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
-            _u_Hxt[__lv1][__lv2][__lv3] = (double) 0.0;
+            (double) 0.0;
       }
    }
    double _u_Hyt[25][21][15];
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
          //PIPS generated variable
          int __lv3;
          for(__lv3 = 0; __lv3 <= 14; __lv3 += 1)
-            _u_Hyt[__lv1][__lv2][__lv3] = (double) 0.0;
+            (double) 0.0;
       }
    }
    double _u_Hzt[25][20][16];
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
          //PIPS generated variable
          int __lv3;
          for(__lv3 = 0; __lv3 <= 15; __lv3 += 1)
-            _u_Hzt[__lv1][__lv2][__lv3] = (double) 0.0;
+            (double) 0.0;
       }
    }
    (int) _u_Nx==25&&(int) (_u_Ny+1)==21&&(int) (_u_Nz+1)==16?(void) 0:__assert_fail("(int)_u_Nx == 25 && (int)(_u_Ny+1) == 21 && (int)(_u_Nz+1) == 16", ".t230.tmp/t230.c", 73, (const char *) 0);

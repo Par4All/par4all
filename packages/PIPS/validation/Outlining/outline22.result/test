@@ -52,6 +52,8 @@ static void assign(int b[100], int i)
 static void assign(int b[100], int i);
 
 float ing(int i);
+//PIPS generated variable
+void ding(int b[100], int i_0[1]);
 static void assign(int b[100], int i)
 {
    b[i] = i;
