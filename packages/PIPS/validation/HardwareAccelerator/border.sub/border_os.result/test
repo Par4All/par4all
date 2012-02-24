@@ -318,7 +318,14 @@ freia_status border_os_terapix_helper_0_0_0(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;

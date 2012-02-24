@@ -4,15 +4,20 @@ Code with cumulated effects
 int main(int argc, char **argv)
 {
 //             <    is written>: j
+//             <    is referenced>: j
+//             <    is declared>: i j
    int i, j = 100;
 //             <    is written>: i
+//             <    is referenced>: i
    for(i = 0; i <= 99; i += 1)
       ;
 //             <    is written>: i
+//             <    is referenced>: i
    for(i = 0; i <= 99; i += 1)
       ;
 //             <    is read   >: i
 //             <    is written>: j
+//             <    is referenced>: i j
    //on attends qqch différent de "inconnu"
    j = i;
    return 0;
@@ -33,9 +38,12 @@ Parallelized code seen as sequential
 int main(int argc, char **argv)
 {
 //             <    is written>: j
+//             <    is referenced>: j
+//             <    is declared>: i j
    int i, j = 100;
 //             <    is read   >: i
 //             <    is written>: j
+//             <    is referenced>: i j
    //on attends qqch différent de "inconnu"
    j = i;
    return 0;

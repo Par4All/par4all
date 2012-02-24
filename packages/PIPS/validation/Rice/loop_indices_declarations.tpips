@@ -1,0 +1,37 @@
+
+delete loop_indices_declarations
+create  loop_indices_declarations loop_indices_declarations.c
+
+module main
+activate MUST_REGIONS
+set FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+set UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+set SEMANTICS_FIX_POINT_OPERATOR "derivative"
+set UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+set ALIASING_ACROSS_IO_STREAMS FALSE
+set ABORT_ON_USER_ERROR FALSE
+set SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+set CONSTANT_PATH_EFFECTS FALSE
+set PRETTYPRINT_SEQUENTIAL_STYLE "do"
+set MEMORY_EFFECTS_ONLY FALSE
+
+# setting the next property to true solves the bug
+#set CLEAN_UP_SEQUENCES_WITH_DECLARATIONS TRUE
+
+apply PRIVATIZE_MODULE[main]
+echo
+echo "after privatize module"
+echo
+display PRINTED_FILE[main]
+
+
+set MEMORY_EFFECTS_ONLY FALSE
+set PRETTYPRINT_SEQUENTIAL_STYLE "do"
+
+echo
+echo "after internalize parallel code"
+echo
+display PARALLELPRINTED_FILE[main]
+
+quit
+# EOF

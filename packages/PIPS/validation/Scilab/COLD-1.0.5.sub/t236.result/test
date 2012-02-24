@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
       //PIPS generated variable
       int __lv2;
       for(__lv2 = 0; __lv2 <= 76; __lv2 += 1)
-         _u_SET[__lv1][__lv2] = (double) 0.0;
+         (double) 0.0;
    }
 #pragma omp parallel for
    for(_u_x = 0; _u_x <= _u_side-1; _u_x += 1) {

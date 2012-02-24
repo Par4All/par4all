@@ -1,6 +1,8 @@
 delete ${WSPACE}
 create ${WSPACE} ${FILE}
 
+activate RICE_FAST_DEPENDENCE_GRAPH
+
 display PARALLELPRINTED_FILE[%ALL]
 
 close

@@ -59,19 +59,24 @@ Proper effects with points-to
 
 void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 {
+//             <    is declared>: w
    double (*w)[N];
+//             <    is declared>: i
    int i;
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: w _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: N w
 
    w = (double (*)[N]) malloc(N*sizeof(double));
 //             <    is read   >: N
 //             <    is written>: i
+//             <    is referenced>: N i
 
    for(i = 0; i <= N-1; i += 1)
 //             <    is read   >: N _a_1[0][i] _b_2[0][i] _c_3[0][i] a 
 //                               b c i w
 //             <    is written>: *HEAP*_l_7[0][i]
+//             <    is referenced>: N a b c i w
       (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
 }
 

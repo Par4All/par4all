@@ -1,5 +1,8 @@
       program funcside3
 
+      external foo3
+      integer foo3
+
       i3 = 30
 
       i3 = foo3(i1, i2)

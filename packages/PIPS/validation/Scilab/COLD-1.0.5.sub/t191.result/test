@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
       //PIPS generated variable
       int __lv2;
       for(__lv2 = 0; __lv2 <= 9; __lv2 += 1)
-         _u_a[__lv1][__lv2] = (double) 1.0;
+         (double) 1.0;
    }
 #pragma omp parallel for
    for(_u_i = 1; _u_i <= 10; _u_i += 1) {
@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
       int lv1;
       for(lv1 = 0; lv1 <= 9; lv1 += 1) {
          //PIPS generated variable
-         register double _u_a_0 = _u_a[lv0][lv1];
-         *&_u_b = _u_a_0>*&_u_b?_u_a_0:*&_u_b;
+         register double _u_a_1 = _u_a[lv0][lv1];
+         *&_u_b = _u_a_1>*&_u_b?_u_a_1:*&_u_b;
       }
    }
    scilab_rt_display_s0d0_("b", _u_b);

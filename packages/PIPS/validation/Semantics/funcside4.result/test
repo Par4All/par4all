@@ -3,19 +3,22 @@ C  P() {}
 
       PROGRAM FUNCSIDE4
 
+      EXTERNAL FOO4
+      INTEGER FOO4
+
 C  P() {}
 
 
-      I4 = 10                                                           0003
+      I4 = 10                                                           0006
 
 C  P(I4) {I4==10}
 
 
-      I4 = FOO4(I4)                                                     0005
+      I4 = FOO4(I4)                                                     0008
 
 C  P(I4) {0<=I4, I4<=2}
 
 
-      PRINT *, I4                                                       0007
+      PRINT *, I4                                                       0010
 
       END

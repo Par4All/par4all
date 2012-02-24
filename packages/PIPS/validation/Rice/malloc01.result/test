@@ -44,14 +44,19 @@ void malloc01()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: p
+//             <    is declared>: p
    int *p = malloc(10*sizeof(int));
    //int p[10];
+//             <    is declared>: i
    int i;
 //             <    is written>: i
+//             <    is referenced>: i
 
    for(i = 0; i <= 9; i += 1)
 //             <    is read   >: i p
 //             <    is written>: p[i]
+//             <    is referenced>: i p
       p[i] = (double) i;
 }
 
@@ -63,16 +68,21 @@ void malloc01()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: p
+//             <    is declared>: p
    int *p = malloc(10*sizeof(int));
    //int p[10];
+//             <    is declared>: i
    int i;
 //             <may be written>: p[*]
 //             <    is read   >: i p
 //             <    is written>: i
+//             <    is referenced>: i p
 
    for(i = 0; i <= 9; i += 1)
 //             <may be written>: p[*]
 //             <    is read   >: i p
+//             <    is referenced>: i p
       p[i] = (double) i;
 }
 
@@ -85,23 +95,32 @@ Regions
 void malloc01()
 {
 
+//  <p-RE-EXACT-{}>
 //  <p-W-EXACT-{}>
+//  <p-WE-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
    int *p = malloc(10*sizeof(int));
    //int p[10];
+
+//  <i-WE-EXACT-{}>
+
    int i;
 
+//  <i-RE-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
+//  <p-RE-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
+//  <i-RE-EXACT-{}>
 //  <i-R-EXACT-{}>
+//  <p-RE-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 

@@ -4244,7 +4244,14 @@ freia_status license_plate_copies_terapix_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -4450,7 +4457,14 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -4707,7 +4721,14 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -4964,7 +4985,14 @@ freia_status license_plate_copies_terapix_helper_0_0_3(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -5221,7 +5249,14 @@ freia_status license_plate_copies_terapix_helper_0_0_4(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -5478,7 +5513,14 @@ freia_status license_plate_copies_terapix_helper_0_0_5(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -5735,7 +5777,14 @@ freia_status license_plate_copies_terapix_helper_0_0_6(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -5992,7 +6041,14 @@ freia_status license_plate_copies_terapix_helper_0_0_7(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -6256,7 +6312,14 @@ freia_status license_plate_copies_terapix_helper_0_0_8(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 204;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -6502,7 +6565,14 @@ freia_status license_plate_copies_terapix_helper_0_0_9(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -6678,7 +6748,14 @@ freia_status license_plate_copies_terapix_helper_0_0_10(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -6854,7 +6931,14 @@ freia_status license_plate_copies_terapix_helper_0_0_11(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -7030,7 +7114,14 @@ freia_status license_plate_copies_terapix_helper_0_0_12(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -7206,7 +7297,14 @@ freia_status license_plate_copies_terapix_helper_0_0_13(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -7382,7 +7480,14 @@ freia_status license_plate_copies_terapix_helper_0_0_14(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -7571,7 +7676,14 @@ freia_status license_plate_copies_terapix_helper_0_0_15(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 2;
+  int image_height = i0->heightWa;
+  int max_computed_size = 200;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;
@@ -7844,7 +7956,14 @@ freia_status license_plate_copies_terapix_helper_0_0_16(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8016,7 +8135,14 @@ freia_status license_plate_copies_terapix_helper_0_0_17(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8188,7 +8314,14 @@ freia_status license_plate_copies_terapix_helper_0_0_18(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8360,7 +8493,14 @@ freia_status license_plate_copies_terapix_helper_0_0_19(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8532,7 +8672,14 @@ freia_status license_plate_copies_terapix_helper_0_0_20(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8709,7 +8856,14 @@ freia_status license_plate_copies_terapix_helper_0_0_21(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -8894,7 +9048,14 @@ freia_status license_plate_copies_terapix_helper_0_0_22(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -9070,7 +9231,14 @@ freia_status license_plate_copies_terapix_helper_0_0_23(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -9246,7 +9414,14 @@ freia_status license_plate_copies_terapix_helper_0_0_24(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 0;
+  int image_height = i0->heightWa;
+  int max_computed_size = 341;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -9427,7 +9602,14 @@ freia_status license_plate_copies_terapix_helper_0_0_25(
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 341;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
   int imagelet_3 = 682;
@@ -9613,7 +9795,14 @@ freia_status license_plate_copies_terapix_helper_0_0_26(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 2;
+  int image_height = i0->heightWa;
+  int max_computed_size = 200;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;

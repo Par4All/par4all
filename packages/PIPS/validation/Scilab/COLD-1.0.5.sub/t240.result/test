@@ -148,9 +148,9 @@ int main(int argc, char *argv[])
          //PIPS generated variable
          register double _tmpxx20_0, _tmpxx19_0;
          _tmpxx19_0 = (double) 1.0;
-         _u_ii[__lv1][__lv2] = round(_tmpxx19_0);
+         round(_tmpxx19_0);
          _tmpxx20_0 = (double) 1.0;
-         _u_jj[__lv1][__lv2] = round(_tmpxx20_0);
+         round(_tmpxx20_0);
       }
    }
 #pragma omp parallel for

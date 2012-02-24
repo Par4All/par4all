@@ -19,7 +19,9 @@ display PRINTED_FILE
 echo
 echo After scalarization
 echo
+activate MUST_REGIONS
 setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
+#setproperty SCALARIZATION_ACROSS_CONTROL_TEST "strict"
 apply SCALARIZATION
 display PRINTED_FILE
 

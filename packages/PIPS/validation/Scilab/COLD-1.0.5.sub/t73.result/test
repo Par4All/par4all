@@ -13,15 +13,12 @@ int main(int argc, char *argv[])
       //PIPS generated variable
       int __lv2;
       for(__lv2 = 0; __lv2 <= 2; __lv2 += 1) {
-         //PIPS generated variable
-         register double _tmp1_0;
          _tmp0[__lv1][__lv2] = (double) 1.0;
          if (__lv1==__lv2)
-            _tmp1_0 = (double) 1.0;
+            _tmp1[__lv1][__lv2] = (double) 1.0;
          else
-            _tmp1_0 = (double) 0.0;
+            _tmp1[__lv1][__lv2] = (double) 0.0;
          _tmp2[__lv1][__lv2] = (double) 0.0;
-         _tmp1[__lv1][__lv2] = _tmp1_0;
       }
    }
    scilab_rt_display_s0d2_("ans", 3, 3, _tmp0);
