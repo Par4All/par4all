@@ -37,6 +37,9 @@ echo
 
 apply UNSPLIT
 
+#
+# THIS IS NOT PORTABLE
+#
 echo
 echo compiles pgm from fortran files and executes
 echo
