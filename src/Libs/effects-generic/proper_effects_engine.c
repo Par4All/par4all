@@ -1132,7 +1132,6 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
 	  // because we need to test the relationship between the type of call_exp and cast_exp.
 
 	  cast c = syntax_cast(op_arg_s);
-	  type cast_t = cast_type(c);
 	  expression cast_exp = cast_expression(c);
 
 	  // try to see if we have something like *((int (*)[]) t) where t is of type int * for instance
@@ -1140,7 +1139,7 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
 	  type cast_exp_t = expression_to_type(cast_exp);
 
 	  list l_me1 = NIL;
-	  list le1 = generic_proper_effects_of_complex_address_expression(cast_exp, &l_me1, write_p);
+	  le = generic_proper_effects_of_complex_address_expression(cast_exp, &l_me1, write_p);
 	  // re-use an existing function because currently it checks if types are the same
 	  // or if each array dimension corresponds to a pointer dimension
 	  if (!ENDP(l_me1) && !anywhere_effect_p(EFFECT(CAR(l_me1))))
@@ -1149,7 +1148,6 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
 		{
 		  // current result is ok;
 		  pips_debug(4, "compatible types \n");
-		  le = le1;
 		  *l_pme = l_me1;
 
 		  if (write_p && pointer_type_p(cast_exp_t))
@@ -1166,18 +1164,28 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
 	      else
 		{
 		  pips_debug(4, "non compatible types \n");
+
 		  // we generate all possible paths from the cast expression main effects
-		  FOREACH(EFFECT, eff, l_me1)
-		    {
-		      list l_tmp =  generic_effect_generate_all_accessible_paths_effects(eff, cast_t, write_p?'w':'r');
-		      effects_to_may_effects(l_tmp);
-		      *l_pme = gen_nconc(l_tmp, *l_pme);
-		    }
+		  /* No, we currently don't know how to handle that at all call sites */
+		  /* It may be more advisable to return an effect on the base adress, and check the
+		     type of the base adress. If it's not compatible, then all paths effects
+		     should be generated if it is appropriate.
+		  */
+		  /* FOREACH(EFFECT, eff, l_me1) */
+/* 		    { */
+/* 		      list l_tmp =  generic_effect_generate_all_accessible_paths_effects(eff, cast_t, write_p?'w':'r'); */
+/* 		      effects_to_may_effects(l_tmp); */
+/* 		      *l_pme = gen_nconc(l_tmp, *l_pme); */
+/* 		    } */
+
+		  pips_user_warning("PIPS currently does not know how to precisely handle "
+				    "complex cast expressions\n");
+		  *l_pme = effect_to_list(make_anywhere_effect
+					  (write_p ? make_action_write_memory() : make_action_read_memory()));
 		}
 	    }
 	  else
 	    {
-	      le = le1;
 	      pips_user_warning("dereferencing a constant address expression: "
 				"PIPS doesn't know how to handled that precisely\n");
 	      *l_pme = effect_to_list(make_anywhere_effect(write_p?
