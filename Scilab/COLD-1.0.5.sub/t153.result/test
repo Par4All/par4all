@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
       //PIPS generated variable
       int __lv2;
       for(__lv2 = 0; __lv2 <= 99; __lv2 += 1) {
-         _u_x[__lv1][__lv2] = (double) 1.0;
-         _u_y[__lv1][__lv2] = (double) 1.0;
+         (double) 1.0;
+         (double) 1.0;
       }
    }
    (int) _u_n==100&&(int) _u_n==100?(void) 0:__assert_fail("(int)_u_n == 100 && (int)_u_n == 100", ".t153.tmp/t153.c", 53, (const char *) 0);
