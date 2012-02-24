@@ -1,5 +1,8 @@
       program funcside4
 
+      external foo4
+      integer foo4
+
       i4 = 10
 
       i4 = foo4(i4)
