@@ -13,25 +13,18 @@ ${info["title"]}
 </%def>
 
 <%def name="css_slot()">
-${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
 ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery.jqzoom-min.css"), media="all")}
-${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), media="all")}
 </%def>
 
 <%def name="js_slot()">
-${h.javascript_link(request.route_url("routes.js"))}
-${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
 ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery.jqzoom-core-pack-min.js"))}
 <script type="text/javascript">
   operation = "${tool}";
   % if advanced:
   advanced = true;
   % endif
-  $(function () {
-  $(".hero-unit").popover({html:true, placement: "bottom"});
-  });
 </script>
-${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
+${h.javascript_link(request.static_url("pawsapp:static/js/tool.js"))}
 </%def>
 
 
@@ -145,12 +138,12 @@ ${h.javascript_link(request.static_url("pawsapp:static/js/init.js"))}
 
 <%def name="main_column()">
 
-<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em"
-     data-content="${info['descr']}" data-original-title="${tool}">
+<div class="hero-unit" style="padding:.5em 1em; margin-bottom:1.5em">
   <h2>
     ${h.image(request.static_url("pawsapp:static/img/favicon-trans.gif"), u"PAWS icon")}
     ${info["title"]}
   </h2>
+    ${info["descr"]|n}
 </div>
 
 ## Tab headers

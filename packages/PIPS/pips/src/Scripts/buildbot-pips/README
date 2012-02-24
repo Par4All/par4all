@@ -1,0 +1,10 @@
+This file contains a few scripts used to build a pips-aware buildbot. It is not
+fully functionnal s many things need to be setup, and the whole things relies
+on master / slaves exisiting etc, so my former config was not duplicated in a
+full reusable one. However I sahre thses files inc as of they can be usefull to
+anyone that would attempt a similar approach.
+
+Bascially:
+- autoconf.py is a generic module to enhace buildbot's GNUAutoconf [reliable]
+- pipsbuild.py implements pips-specific build steps [fairly reliable]
+- pipsvalid.py implements simple parsing of pips validation output [not used for a long time]

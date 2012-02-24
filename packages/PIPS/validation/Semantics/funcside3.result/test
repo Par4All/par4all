@@ -3,19 +3,22 @@ C  P() {}
 
       PROGRAM FUNCSIDE3
 
+      EXTERNAL FOO3
+      INTEGER FOO3
+
 C  P() {}
 
 
-      I3 = 30                                                           0003
+      I3 = 30                                                           0006
 
 C  P(I3) {I3==30}
 
 
-      I3 = FOO3(I1, I2)                                                 0005
+      I3 = FOO3(I1, I2)                                                 0008
 
 C  P(I1,I2,I3) {I1+I2==I3+3}
 
 
-      PRINT *, I3                                                       0007
+      PRINT *, I3                                                       0010
 
       END

@@ -68,16 +68,20 @@ my %d = (); # per-directory: { dir -> { status -> cnt } }
 
 my ($start, $stop);
 
+my $running_time = 0;
+
 # process input formatted as
 while (<>)
 {
   # parse: <status>: [some/]dir/case duration
   # "case" may be empty for some status about the whole directory
   # "duration" may be empty for some status and in a transition
-  if (/^($status|$others): (([-\w\.]+\/)*?[-\w\.]+)(\/[-\w]+)?( \d*)?$/)
+  # "some-status: sub/dir/case 123"
+  if (/^($status|$others): (([-\w\.]+\/)*?[-\w\.]+)(\/[-\w]+)?( \d+)?$/)
   {
-    my ($stat, $dir, $case) = ($1, $2, $4);
+    my ($stat, $dir, $case, $time) = ($1, $2, $4, $5);
     $d{$dir} = zeroed() unless exists $d{$dir};
+    $running_time+=$time if defined $time;
     if ($summary eq $ARGV) # this is the current summary
     {
       $n{$stat}++;
@@ -212,7 +216,8 @@ print
 my $rate = 100;
 $rate = $n{passed}*100.0/$count if $count;
 printf "success rate: %5.1f%%\n", $rate;
-print "elapsed time: $delay\n" if defined $delay;
+print "elapsed time: $delay\n" if defined $delay and $delay;
+print "approximated cpu running time: $running_time\n";
 print "\n";
 
 # possibly aggregate counts on the first directory

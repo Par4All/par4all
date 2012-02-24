@@ -14,30 +14,39 @@ Check the proper effects, especially for variable fp and call to fgetc()
 
 void getimage(void)
 {
+//             <    is declared>: i j
    int i, j;
+//             <    is declared>: c
    unsigned char c;
+//             <    is declared>: fp
    FILE *fp;
 //             <    is written>: fp
+//             <    is referenced>: fp
    
    /* To try to avoid fp privatization */
    fp = (void *) 0;
 //             <    is written>: i
+//             <    is referenced>: i
    
    /* This loops should not be distributed.  On 2009/05/26, if the main()
         is removed, this bug too... */
    for(i = 0; i <= 63; i += 1)
 //             <    is written>: j
+//             <    is referenced>: j
       for(j = 0; j <= 63; j += 1) {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
+//             <    is referenced>: c fp
          c = fgetc(fp);
 //             <    is read   >: c i j
 //             <    is written>: imagein_re[i][j]
+//             <    is referenced>: c i imagein_re j
          imagein_re[i][j] = c==0?0.0:1.0;
 //             <    is read   >: i j
 //             <    is written>: imagein_im[i][j]
+//             <    is referenced>: i imagein_im j
          imagein_im[i][j] = 0.0;
       }
 }

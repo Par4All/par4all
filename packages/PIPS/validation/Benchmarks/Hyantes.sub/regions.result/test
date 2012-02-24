@@ -314,9 +314,9 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <the_towns-R-EXACT-{}>
-//  <the_towns[PHI1][PHI2].lat-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
-//  <the_towns[PHI1][PHI2].lon-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
-//  <the_towns[PHI1][PHI2].pot-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-MAY-{0<=PHI1, PHI1+1<=nb}>
 //  <visu.MLat-R-EXACT-{}>
 //  <visu.MLon-R-EXACT-{}>
 //  <visu.mLat-R-EXACT-{}>

@@ -847,7 +847,8 @@ static void do_remove_entity_from_decl(statement s, entity e) {
 
 static
 void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
-    if(!fortran_module_p(get_current_module_entity())){
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")
+            && !fortran_module_p(get_current_module_entity())){
         string outline_module_name = (string)entity_user_name(new_fun);
         char * the_cu = NULL,*iter, *cun;
         if((iter=strchr(outline_module_name,FILE_SEP))) {
@@ -955,15 +956,18 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
                 copy_storage(entity_storage(old_fun)),
                 copy_value(entity_initial(old_fun))
                 );
-        AddEntityToModuleCompilationUnit(new_fun,cu);
+        if(c_module_p(get_current_module_entity()))
+                AddEntityToModuleCompilationUnit(new_fun,cu);
         replace_entity(s,old_fun, new_fun);
 
 
         statement body = copy_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
         outliner_independent_recursively(old_fun, cun, body);
 
-        bool saved = get_bool_property(STAT_ORDER);
+        bool saved_order = get_bool_property(STAT_ORDER),
+             saved_block = get_bool_property("PRETTYPRINT_BLOCKS");
         set_bool_property(STAT_ORDER,false);
+        set_bool_property("PRETTYPRINT_BLOCKS",false);
         text t = text_named_module(new_fun, new_fun , body);
 
         add_new_module_from_text(entity_local_name(new_fun), t, language_fortran_p(module_language(get_current_module_entity())), cun);
@@ -974,7 +978,8 @@ void outliner_independent_recursively(entity module, const char *cun, statement 
         gen_free_list(code_declarations(EntityCode(new_fun)));
         code_declarations(EntityCode(new_fun))=NIL;
 
-        set_bool_property(STAT_ORDER,saved);
+        set_bool_property(STAT_ORDER,saved_order);
+        set_bool_property("PRETTYPRINT_BLOCKS",saved_block);
         free_statement(body);
     }
     free_callees(c);
@@ -996,8 +1001,9 @@ void outliner_independent(const char * module_name, statement body) {
             else the_cu = strdup(module_name);
             asprintf(&cun,"%s" FILE_SEP_STRING, the_cu);
             free(the_cu);
-            if(entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun)))
-                (void)MakeCompilationUnitEntity(cun);
+            entity cu = FindEntity(TOP_LEVEL_MODULE_NAME,cun);
+            if(entity_undefined_p(cu))
+                cu=MakeCompilationUnitEntity(cun);
         }
         outliner_independent_recursively(module_name_to_entity(module_name), cun, body);
         free(cun);
@@ -1019,6 +1025,9 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
 
     /* 5-0 : create new compilation unit */
     outliner_compilation_unit(new_fun, formal_parameters);
+
+    if(c_module_p(get_current_module_entity()))
+        AddEntityToModuleCompilationUnit(new_fun, get_current_module_entity());
 
     /* 5-1 : add all callees to the same foreign compilation units */
     outliner_independent(outline_module_name, *new_body);
@@ -1045,8 +1054,10 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     insert_statement(*new_body, make_return_statement(new_fun), false);
 
     /* we can now begin the outlining */
-    bool saved = get_bool_property(STAT_ORDER);
+    bool saved_order = get_bool_property(STAT_ORDER),
+         saved_block = get_bool_property("PRETTYPRINT_BLOCKS");
     set_bool_property(STAT_ORDER,false);
+    set_bool_property("PRETTYPRINT_BLOCKS",false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
 
 
@@ -1054,7 +1065,8 @@ void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
     if(!string_undefined_p(cun)) free(cun);
     free_text(t);
 
-    set_bool_property(STAT_ORDER,saved);
+    set_bool_property(STAT_ORDER,saved_order);
+    set_bool_property("PRETTYPRINT_BLOCKS",saved_block);
 
 
 

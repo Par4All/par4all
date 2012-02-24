@@ -2464,6 +2464,8 @@ string generated_variable_comment(entity e)
  *
  * For the time being, a declaration statement is a continue
  * statement.
+ * Beware that the possible dependencies between the new declaration
+ * and existing declarations are not checked.
  */
 static statement generic_add_declaration_statement(statement s, entity e, bool before_p)
 {
@@ -3264,7 +3266,6 @@ static bool declarations_count_element_references_to_v_p(statement st)
 {
   if (declaration_statement_p(st))
     {
-      print_statement(st);
       FOREACH(ENTITY, decl, statement_declarations(st))
 	{
 	  value init_val = entity_initial(decl);

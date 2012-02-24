@@ -1022,7 +1022,14 @@ freia_status freia_while_00_terapix_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 255;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 3;
+  int image_height = i0->heightWa;
+  int max_computed_size = 249;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 255;
   int imagelet_3 = 510;
@@ -1387,7 +1394,14 @@ freia_status freia_while_00_terapix_helper_1_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 202;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;

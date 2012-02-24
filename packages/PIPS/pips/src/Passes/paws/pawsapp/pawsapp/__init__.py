@@ -55,10 +55,12 @@ def main(global_config, **settings):
 
     config.add_route('tool_basic',              '/tools/{tool}')
     config.add_route('tool_advanced',           '/tools/{tool}/advanced')
-    config.add_route('tool_results',            '/tools/{tool}/results')
-    config.add_route('tool_results_name',       '/tools/{tool}/results/{name}')
 
     config.add_route('tutorial',                '/tutorials/{tutorial}')
+    config.add_route('tutorial_init',           '/tutorials/{tutorial}/init')
+
+    config.add_route('results',                 '/results')
+    config.add_route('results_name',            '/results/{name}')
 
     config.add_route('upload_user_file',        '/files/upload')
     config.add_route('load_example_file',       '/files/{tool}/{name}')

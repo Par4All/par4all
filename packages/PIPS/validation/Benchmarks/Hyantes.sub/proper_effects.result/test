@@ -162,10 +162,8 @@ hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *
    latStep *= 3.14159265358979323846/180;
 //             <may be read   >: configuration[0].fid 
 //                               plots[0][*][*].pot stderr stderr[0] 
-//                               the_towns[0][*].lat 
-//                               the_towns[0][*].lon 
-//                               the_towns[0][*].pot 
-//                               __IO_EFFECTS:LUNS[2]
+//                               the_towns[*].lat the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
 //             <may be written>: configuration[0].status 
 //                               plots[0][*][*].pot stderr[0] 
 //                               __IO_EFFECTS:LUNS[2]

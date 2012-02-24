@@ -1,0 +1,62 @@
+TARGET= lyapunov_seq lyapunov_omp lyapunov_cuda
+
+SOURCES= lyapunov.c  lyapunov_c99.c  test_lyapunov.c
+
+LDFLAGS= -lm -lnetcdf
+
+CXX=g++-4.4
+CC=gcc-4.4
+NVCC = nvcc
+NVCCFLAGS= -ccbin=$(CXX) -arch=sm_20
+CUDAFLAGS= -I/usr/local/cuda/include/
+P4A  = p4a
+
+all: $(TARGET)
+
+lyapunov_seq: $(SOURCES:.c=.o)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+lyapunov_omp:lyapunov.o test_lyapunov.o lyapunov_c99.omp.o
+	$(CC) $(LDFLAGS) -fopenmp $^ -o $@
+
+lyapunov_cuda:lyapunov.o test_lyapunov.o lyapunov_c99.cuda.a
+	$(NVCC) $(NVCCFLAGS) $(LDFLAGS) $^ -o $@
+
+
+clean:
+	$(RM) *.o *.so *.a
+	$(RM) *.p4a.c *.omp.c 
+	$(RM) -rf *.database *.generated
+
+check: all
+	time ./lyapunov_seq mercator_in.nc > /dev/null
+	cmp lyapunov_out_ref.nc lyapunov_out.nc
+	@rm lyapunov_out.nc
+	time ./lyapunov_omp mercator_in.nc >/dev/null
+	cmp lyapunov_out_ref.nc lyapunov_out.nc
+	@rm lyapunov_out.nc
+
+
+%.omp.c:%.c
+	$(P4A) -O $<
+	mv $*.p4a.c $@
+
+%.omp.o:%.omp.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -fopenmp $< -o $@
+
+%.cuda.a:%.generated %.p4a.c
+	$(CC) -c -I$${P4A_ACCEL_DIR} -DP4A_ACCEL_CUDA $(CUDAFLAGS) $*.p4a.c
+	$(CXX) -c -I$${P4A_ACCEL_DIR} -DP4A_ACCEL_CUDA $(CUDAFLAGS) $${P4A_ACCEL_DIR}/p4a_accel.c
+	cd $< && $(NVCC) -c $(NVCCFLAGS) $(CPPFLAGS) $(CFLAGS) -I$${P4A_ACCEL_DIR} -DP4A_ACCEL_CUDA *.cu  
+	$(NVCC) $(NVCCFLAGS) --lib $</*.o $*.p4a.o p4a_accel.o -o $@
+
+
+%.generated %.p4a.c:%.c
+	$(P4A) --c99 -C $< -rp $*
+
+#%.cu:%.c
+#	p4a -C $<
+#	mv $*.p4a.c $@
+#
+#%.omp.o:%.omp.c
+#	$(CC) -c $(CFLAGS) $(CPPFLAGS) -fopenmp $< -o $@

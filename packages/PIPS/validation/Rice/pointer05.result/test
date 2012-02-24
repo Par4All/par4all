@@ -33,16 +33,21 @@ Proper effects with points-to
 
 void pointer05(int n, float p[n], float q[n])
 {
+//             <    is declared>: i
    int i;
 //             <    is read   >: n
 //             <    is written>: i
+//             <    is referenced>: i n
 
    for(i = 0; i <= n-1; i += 1) {
 //             <    is read   >: i q[i]
 //             <    is written>: x
+//             <    is referenced>: i q x
+//             <    is declared>: x
       float x = q[i];
 //             <    is read   >: i n x
 //             <    is written>: p[i]
+//             <    is referenced>: i n p x
       p[i] = x;
    }
 }

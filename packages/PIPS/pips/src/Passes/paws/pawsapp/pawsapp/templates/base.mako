@@ -67,21 +67,31 @@
     <![endif]-->
 
     ## Stylesheets
+
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/bootstrap.min.css"), media="all")}
+    ${h.stylesheet_link(request.static_url("pawsapp:static/css/pygments-min.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/prettify.css"), media="all")}
+    ${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/jquery-linedtextarea-min.css"), media="all")}
+
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/normal.css"), media="all")}
     ${h.stylesheet_link(request.static_url("pawsapp:static/css/print.css"),  media="print")}
     ##${h.stylesheet_link(request.static_url("pawsapp:static/css/jq/bootstrap.min.responsive.css"), media="all")}
+
     ${self.css_slot()}
 
     ## Fav and touch icons
     <link rel="shortcut icon" href="${request.static_url('pawsapp:static/favicon.ico')}">
 
     ## Javascript
+
+    ${h.javascript_link(request.route_url("routes.js"))}
     ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-1.7.1.min.js"))}
     ${h.javascript_link(request.static_url("pawsapp:static/jq/bootstrap.min.js"))}
     ##${h.javascript_link(request.static_url("pawsapp:static/jq/prettify.js"))}
+    ${h.javascript_link(request.static_url("pawsapp:static/jq/jquery-linedtextarea-min.js"))}
+
     ${h.javascript_link(request.static_url("pawsapp:static/js/base.js"))}
+
     ${self.js_slot()}
 
   </head>

@@ -1,0 +1,591 @@
+void lyapunov_finish(int np1, int np2, double *ly2)
+{
+   
+   //lyapunov_finish_c99 (np1,np2,*(double(*)[np1][np2])ly2);
+   
+   
+   lyapunov_finish_c99(np1, np2, *((double (*)[np1][np2]) xp_1d), *((double (*)[np1][np2]) yp_1d), dt, scale, *bbox, *((double (*)[np1][np2]) ly2));
+
+   free(u1_1d);
+   free(v1_1d);
+   free(u2_1d);
+   free(v2_1d);
+
+   free(xp_1d);
+   free(yp_1d);
+   free(xp1_1d);
+   free(yp1_1d);
+}
+void lyapunov_finish_c99(int np1, int np2, double xp[np1][np2], double yp[np1][np2], double dt, int scale, double bbox_in[4], double ly2[np1][np2])
+{
+   double a, b, c, d, e, f, g, h;
+   int i, j;
+   int il, ir;
+   // left & right indices
+   int jl, jr;
+   
+   
+   // init to DEFAULT (inutile...)
+   //for (i = 0; i < np1; i++)
+   //{
+   //	for (j = 0; j < np2; j++)
+   //	{
+   //		(*ly2)[i][j]=DEFAULT;
+   //	}
+   //}
+   
+   
+   for(i = 0; i <= np1-1; i += 1)
+      for(j = 0; j <= np2-1; j += 1) {
+         // cycle on longitude axis ( %)
+         ir = (i+1)%np1;
+         il = (i-1+np1)%np1;
+         // want it > 0
+         a = 2*(xp[ir][j]-xp[il][j])/dxl;
+         c = 2*(yp[ir][j]-yp[il][j])/dxl;
+         
+         // no cycle in latitude axis ( min, max)
+         jr = j+1<np2?j+1:np2;
+         jl = j-1>0?j-1:0;
+         b = 2*(xp[i][jr]-xp[i][jl])/dxl;
+         d = 2*(yp[i][jr]-yp[i][jl])/dxl;
+         
+         
+         e = a*a+c*c;
+         f = a*b+c*d;
+         g = b*b+d*d;
+         h = (e+g+sqrt((e+g)*(e+g)-4.0*((-f)*f+e*g)))/2.0;
+
+         ly2[i][j] = log(sqrt(h))/t;
+      }
+}
+void lyapunov_init(int xDim, int yDim, double *u3, double *v3, double dt_in, double scale_in, double *bbox_in)
+{
+   int n1 = xDim;
+   int n2 = yDim;
+
+   scale = (int) scale_in;
+   dt = dt_in;
+   bbox = (double (*)[4]) bbox_in;
+   int np1 = scale*(n1-1)+1;
+   int np2 = scale*(n2-1)+1;
+   
+   
+   // global tab allocation (linear)
+   u1_1d = malloc(n1*n2*sizeof(double));
+   u2_1d = malloc(n1*n2*sizeof(double));
+   v1_1d = malloc(n1*n2*sizeof(double));
+   v2_1d = malloc(n1*n2*sizeof(double));
+   xp_1d = malloc(np1*np2*sizeof(double));
+   yp_1d = malloc(np1*np2*sizeof(double));
+   
+   
+   
+   
+   
+   
+   
+   
+   lyapunov_init_c99(xDim, yDim, np1, np2, *((double (*)[xDim][yDim]) u1_1d), *((double (*)[xDim][yDim]) v1_1d), *((double (*)[xDim][yDim]) u2_1d), *((double (*)[xDim][yDim]) v2_1d), *((double (*)[xDim][yDim]) u3), *((double (*)[xDim][yDim]) v3), *((double (*)[np1][np2]) xp_1d), *((double (*)[np1][np2]) yp_1d), dt, scale, *bbox);
+}
+void lyapunov_init_c99(int xDim, int yDim, int np1, int np2, double u1[xDim][yDim], double v1[xDim][yDim], double u2[xDim][yDim], double v2[xDim][yDim], double u3[xDim][yDim], double v3[xDim][yDim], double xp[np1][np2], double yp[np1][np2], double dt, int scale, double bbox_in[4])
+{
+
+   int i, j, p, q;
+   
+   //int n1 = xDim;
+   //int n2 = yDim;
+   
+   printf("(C) dt=%f scale=%d\n", dt, scale);
+   printf("(C) bbox = [ %f %f %f %f ]\n", bbox_in[0], bbox_in[1], bbox_in[2], bbox_in[3]);
+
+   lat1 = bbox_in[0];
+   lon1 = bbox_in[1];
+   lat2 = bbox_in[2];
+   lon2 = bbox_in[3];
+   
+   // cast to c99 VLA
+   // 	double u1[n1][n2]=(double (*)[n1][n2])u1_1d;
+   // 	double v1[n1][n2]=(double (*)[n1][n2])v1_1d;
+   // 	double u2[n1][n2]=(double (*)[n1][n2])u2_1d;
+   // 	double v2[n1][n2]=(double (*)[n1][n2])v2_1d;
+   // 	double u3[n1][n2]=(double (*)[n1][n2])u3_1d;
+   // 	double v3[n1][n2]=(double (*)[n1][n2])v3_1d;
+   // 	double xp[np1][np2]=(double (*)[np1][np2])xp_1d;
+   // 	double yp[np1][np2]=(double (*)[np1][np2])yp_1d;
+   
+   
+   //	dt = 43200.0;	// pourquoi 12h alors que dt est 24h ? TODO: parameter
+   
+   dxl = 0.5;
+   // TODO: compute from bbox
+   
+   for(p = 0; p <= np1-1; p += 1)
+      for(q = 0; q <= np2-1; q += 1) {
+         xp[p][q] = p*dxl/((double) scale)-180.;
+         yp[p][q] = q*dxl/((double) scale)-90.;
+      }
+   
+   
+   for(i = 0; i <= xDim-1; i += 1)
+      for(j = 0; j <= yDim-1; j += 1)
+         // remove land cells
+         if (u3[i][j]!=-9999.) {
+            u1[i][j] = u3[i][j];
+            v1[i][j] = v3[i][j];
+         }
+         else {
+            u1[i][j] = 0;
+            v1[i][j] = 0;
+            u2[i][j] = 0;
+            v2[i][j] = 0;
+         }
+}
+void lyapunov_iterate(int xDim, int yDim, double *u3, double *v3)
+{
+   //lyapunov_iterate_c99( xDim, yDim, *(double(*)[xDim][yDim])u3, *(double(*)[xDim][yDim])v3 );
+   int n1 = xDim;
+   int n2 = yDim;
+   int np1 = scale*(n1-1)+1;
+   int np2 = scale*(n2-1)+1;
+   
+   
+   
+   
+   
+   lyapunov_iterate_c99(xDim, yDim, np1, np2, *((double (*)[xDim][yDim]) u1_1d), *((double (*)[xDim][yDim]) v1_1d), *((double (*)[xDim][yDim]) u2_1d), *((double (*)[xDim][yDim]) v2_1d), *((double (*)[xDim][yDim]) u3), *((double (*)[xDim][yDim]) v3), *((double (*)[np1][np2]) xp_1d), *((double (*)[np1][np2]) yp_1d), dt, scale, *bbox);
+}
+void lyapunov_iterate_c99(int xDim, int yDim, int np1, int np2, double u1[xDim][yDim], double v1[xDim][yDim], double u2[xDim][yDim], double v2[xDim][yDim], double u3[xDim][yDim], double v3[xDim][yDim], double xp[np1][np2], double yp[np1][np2], double dt, int scale, double bbox_in[4])
+{
+
+   double rat;
+   double a1, b1, a2, b2, a3, b3, a4, b4;
+   int i, j;
+   int p, q;
+   double lon, lat;
+   // int n1,n2;	
+   // n1 = xDim;
+   // n2 = yDim;
+   
+   printf("(C) iterate1 modif2 xDim=%d yDim=%d\n", xDim, yDim);
+   for(i = 0; i <= xDim-1; i += 1)
+      for(j = 0; j <= yDim-1; j += 1) {
+         //printf("i=%d j=%d\n",i,j);
+         u2[i][j] = (u1[i][j]+u3[i][j])/2.0;
+         v2[i][j] = (v1[i][j]+v3[i][j])/2.0;
+      }
+
+   rat = 3.14159265358979323846/180.0;
+
+   printf("(C) iterate2\n");
+   for(p = 0; p <= np1-1; p += 1)
+      for(q = 0; q <= np2-1; q += 1) {
+         lon = xp[p][q];
+         lat = yp[p][q];
+         
+         // compute lyapunov even if hight latitude. we must use bbox to not compute it. 
+         // if( (lat>= -80.0) && (lat <= 80.0))
+         // {
+         
+         a1 = dt*vinterp(xDim, yDim, (double *) u1, lon, lat)/earth_radius/rat/cos(lat*rat);
+
+         b1 = dt*vinterp(xDim, yDim, (double *) v1, lon, lat)/earth_radius/rat;
+         a2 = dt*vinterp(xDim, yDim, (double *) u2, lon+a1/2.0, lat+b1/2.0)/earth_radius/rat/cos((lat+b1/2.0)*rat);
+         
+         
+         b2 = dt*vinterp(xDim, yDim, (double *) v2, lon+a1/2.0, lat+b1/2.0)/earth_radius/rat;
+         a3 = dt*vinterp(xDim, yDim, (double *) u2, lon+a2/2.0, lat+b2/2.0)/earth_radius/rat/cos((lat+b2/2.0)*rat);
+         
+         
+         b3 = dt*vinterp(xDim, yDim, (double *) v2, lon+a2/2.0, lat+b2/2.0)/earth_radius/rat;
+         a4 = dt*vinterp(xDim, yDim, (double *) u3, lon+a3, lat+b3)/earth_radius/rat/cos((lat+b3)*rat);
+
+         b4 = dt*vinterp(xDim, yDim, (double *) v3, lon+a3, lat+b3)/earth_radius/rat;
+         xp[p][q] = lon+(a1+2.0*a2+2.0*a3+a4)/6.0;
+         yp[p][q] = lat+(b1+2.0*b2+2.0*b3+b4)/6.0;
+      }
+   // for q
+   
+   printf("(C) iterate3\n");
+   t += dt;
+
+   for(i = 0; i <= xDim-1; i += 1)
+      for(j = 0; j <= yDim-1; j += 1) {
+         u1[i][j] = u3[i][j];
+         v1[i][j] = v3[i][j];
+      }
+}
+int main(int argc, char **argv)
+{
+
+   double scale = 4.0;
+   // revoir les lon/lat si != 4
+   double dt = 86400.0;
+   double bbox[] = {-80.0, -180.0, 90.0, 180.0};
+   
+   
+   char *mercator_in;
+   double *u, *v, *u_slice, *v_slice;
+   size_t xDim, yDim, tDim;
+
+   if (argc!=2) {
+      printf("usage: %s mercator_in.nc\n", argv[0]);
+      printf("mercator_in.nc: ls glob/ext_u_v_0m-mercatorPsy3v1R1v_glo_mean_200711* | ncecat -O mercator_in.nc\n");
+      exit(1);
+   }
+
+   mercator_in = argv[1];
+   
+   // netcdf read
+   read_file(mercator_in, &u, &v, &xDim, &yDim, &tDim);
+   // u & v will be allocated
+   
+   
+   
+   printf("init with the first frame (no tDim)");
+   u_slice = u;
+   v_slice = v;
+   lyapunov_init(xDim, yDim, u_slice, v_slice, dt, scale, bbox);
+   
+   // loop over slices
+   int t;
+   // tDim=1; // DEBUG
+   for(t = 0; t < tDim; t += 1) {
+      printf("t: %d\n", t);
+      u_slice = &u[xDim*yDim*t];
+      v_slice = &v[xDim*yDim*t];
+      lyapunov_iterate(xDim, yDim, u_slice, v_slice);
+   }
+
+   printf("fin iterate");
+   
+   // get result
+   int subXDim = (xDim-1)*(int) scale+1;
+   int subYDim = (yDim-1)*(int) scale+1;
+   double *ly2;
+   ly2 = malloc(subXDim*subYDim*sizeof(double));
+   lyapunov_finish(subXDim, subYDim, ly2);
+   
+   // write result to file
+   char *output = "lyapunov_out.nc";
+   double *lon = malloc(subXDim*sizeof(double));
+   double *lat = malloc(subYDim*sizeof(double));
+   long int time[1];
+   time[0] = 235456;
+   int i;
+   for(i = 0; i < subXDim; i += 1)
+      lon[i] = -180+i*360./((xDim-1)*scale);
+   for(i = 0; i < subYDim; i += 1)
+      lat[i] = -80+i*170./((yDim-1)*scale);
+
+   write_file(output, ly2, subXDim, subYDim, lat, lon, time);
+
+   free(u);
+   free(v);
+   free(lon);
+   free(lat);
+   free(ly2);
+
+   exit(0);
+}
+void read_file(char *filename, double **pu, double **pv, size_t *xDim, size_t *yDim, size_t *tDim)
+{
+   
+   /* This will be the netCDF ID for the file and data variable. */
+   int ncid, varid, lat_dimid, lon_dimid, record_dimid;
+   
+   /* Loop indexes, and error handling. */
+   int x, y, retval;
+   
+   /* buffer */
+   double *buff_U;
+   double *buff_V;
+   double *u, *v;
+   
+   /* Open the file. NC_NOWRITE tells netCDF we want read-only access
+      * to the file.*/
+   if (retval = nc_open(filename, 0, &ncid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimid(ncid, "latitude", &lat_dimid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimlen(ncid, lat_dimid, yDim)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimid(ncid, "longitude", &lon_dimid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimlen(ncid, lon_dimid, xDim)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimid(ncid, "record", &record_dimid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_inq_dimlen(ncid, record_dimid, tDim)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   
+   
+   printf("read u[%d][%d][%d] ..\n", (int) *xDim, (int) *yDim, (int) *tDim);
+   long int size = (long int) (*xDim**yDim**tDim*sizeof(double));
+
+   buff_U = (double *) malloc(size);
+   /* Get the varid of the data variable, based on its name. */
+   if (retval = nc_inq_varid(ncid, "u", &varid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   /* Read the data. */
+   if (retval = nc_get_var_double(ncid, varid, buff_U)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   
+   
+   printf("read v[%d][%d][%d] ..\n", (int) *xDim, (int) *yDim, (int) *tDim);
+   buff_V = (double *) malloc(size);
+   /* Get the varid of the data variable, based on its name. */
+   if (retval = nc_inq_varid(ncid, "v", &varid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   /* Read the data. */
+   if (retval = nc_get_var_double(ncid, varid, buff_V)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   
+   /* Check the data. */
+   /* for (x = 0; x < NX; x++)
+        for (y = 0; y < NY; y++)
+        if (data_in[x][y] != x * NY + y)
+        return ERRCODE; */
+   
+   /* Close the file, freeing all resources. */
+   if (retval = nc_close(ncid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   
+   
+   // transpose data
+   int t, i, j;
+   int nt, ni, nj;
+   nt = (int) *tDim;
+   ni = (int) *xDim;
+   nj = (int) *yDim;
+   u = (double *) malloc(size);
+   v = (double *) malloc(size);
+   for(t = 0; t <= nt-1; t += 1)
+      for(i = 0; i <= ni-1; i += 1)
+         for(j = 0; j <= nj-1; j += 1)
+            if (buff_U[i+j*ni]>100.||buff_V[i+j*ni]>100.) {
+               u[ni*nj*t+i*nj+j] = 0.;
+               v[ni*nj*t+i*nj+j] = 0.;
+            }
+            else {
+               u[ni*nj*t+i*nj+j] = buff_U[ni*nj*t+j*ni+i];
+               v[ni*nj*t+i*nj+j] = buff_V[ni*nj*t+j*ni+i];
+            }
+   free(buff_U);
+   free(buff_V);
+   *pu = u;
+   *pv = v;
+}
+double vinterp(int n1, int n2, double *w, double x, double y)
+{
+   
+   //if(isnan(x)) x=y;
+   //if(isnan(y)) y=x;
+   //if( isnan(x) || isnan(y)) return NaN;
+   
+   int i, j, i1, i2, j1, j2;
+   double cy1, cy2, c1, c2;
+   double dx, dy;
+   double x1, x2, y1, y2;
+   double w1, w2;
+   double wint;
+
+   dx = 0.5;
+   dy = 0.5;
+   
+   // take care of date change line
+   if (x>=180.0)
+      x = x-360;
+   if (x<=-180.0)
+      x = x+360;
+   i = (int) ((x+180.0)/dx);
+   j = (int) ((y+90.0)/dy);
+   if (i<0||i>n1||j<0||j>n2)
+      // out of bound
+      return -9999.;
+   
+   
+   i1 = i;
+   i2 = i+1;
+   if (i2==n1)
+      i2 = 0;
+
+   j1 = j;
+   j2 = j+1;
+   if (j2==n2)
+      j2 = n2-1;
+   
+   //if (w[j2+n2*i2] == 0 || w[j1+n2*i2]  == 0 || w[j2+n2*i1] == 0 || w[j1+n2*i1] == 0)
+   //return 0;
+   
+   x1 = i*dx-180.0;
+   x2 = (i+1)*dx-180.0;
+   y1 = j*dx-90.0;
+   y2 = (j+1)*dx-90.0;
+   cy1 = (y-y1)/(y2-y1);
+   cy2 = (y-y2)/(y1-y2);
+   
+   //w1 = cy1 * w[i2][j2] + cy2 * w[i2][j1];
+   //w2 = cy1 * w[i1][j2]  + cy2 * w[i1][j1];
+   w1 = cy1*w[j2+n2*i2]+cy2*w[j1+n2*i2];
+   w2 = cy1*w[j2+n2*i1]+cy2*w[j1+n2*i1];
+   c1 = (x-x1)/(x2-x1);
+   c2 = (x-x2)/(x1-x2);
+   
+   
+   
+   wint = c1*w1+c2*w2;
+
+   return wint;
+}
+void write_file(char *filename, double *lya, int xDim, int yDim, double *lat, double *lon, long int *time)
+{
+   
+   /* This will be the netCDF ID for the file and data variable. */
+   int ncid, varid, x_dimid, y_dimid, t_dimid;
+   int dimids[2];
+   
+   /* Loop indexes, and error handling. */
+   int retval;
+   int x, y;
+
+   double *tlya;
+   // transpose of lya
+   
+   tlya = (double *) malloc(xDim*yDim*sizeof(double));
+   for(x = 0; x <= xDim-1; x += 1)
+      for(y = 0; y <= yDim-1; y += 1)
+         tlya[y*xDim+x] = lya[x*yDim+y];
+   
+   
+   printf("Ouverture\n");
+   
+   /* Create the file. The NC_CLOBBER parameter tells netCDF to
+      * overwrite this file, if it already exists.*/
+   if (retval = nc_create(filename, 0, &ncid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   printf("Dimensions\n");
+   
+   /* Define the dimensions. NetCDF will hand back an ID for each. */
+   if (retval = nc_def_dim(ncid, "lon", xDim, &x_dimid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_def_dim(ncid, "lat", yDim, &y_dimid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   //if ((retval = nc_def_dim(ncid, "time", 1, &t_dimid)))
+   //  ERR(retval);
+   
+   /* The dimids array is used to pass the IDs of the dimensions of
+      * the variable. */
+   dimids[1] = x_dimid;
+   dimids[0] = y_dimid;
+   //  dimids[0] = t_dimid;
+   
+   printf("Variable\n");
+   
+   /* Define the variables */
+   printf("Lat\n");
+   int lat_varid;
+   if (retval = nc_def_var(ncid, "lat", NC_DOUBLE, 1, &y_dimid, &lat_varid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_put_att_text(ncid, lat_varid, "units", strlen("degrees_north"), "degrees_north")) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   printf("Lon\n");
+   int lon_varid;
+   if (retval = nc_def_var(ncid, "lon", NC_DOUBLE, 1, &x_dimid, &lon_varid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_put_att_text(ncid, lon_varid, "units", strlen("degrees_east"), "degrees_east")) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   //printf("Time\n");
+   //int time_varid;
+   //if ((retval = nc_def_var(ncid, "time", NC_LONG, 1,
+   //			   &t_dimid, &time_varid)))
+   //  ERR(retval);
+   
+   printf("lyapunov exponent\n");
+   if (retval = nc_def_var(ncid, "lyapunov_exponent", NC_DOUBLE, 2, dimids, &varid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_put_att_double(ncid, varid, "_FillValue", NC_DOUBLE, 1, &defaultVal)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   
+   
+   
+   
+   /* End define mode. This tells netCDF we are done defining
+      * metadata. */
+   if (retval = nc_enddef(ncid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   printf("Data\n");
+   
+   /* Write the pretend data to the file. Although netCDF supports
+      * reading and writing subsets of data, in this case we write all
+      * the data in one operation. */
+   if (retval = nc_put_var_double(ncid, varid, &tlya[0])) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_put_var_double(ncid, lon_varid, &lon[0])) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   if (retval = nc_put_var_double(ncid, lat_varid, &lat[0])) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+   //if ((retval = nc_put_var_long(ncid, time_varid, &time[0])))
+   //  ERR(retval);
+   
+   printf("Fermeture\n");
+   
+   /* Close the file. This frees up any internal netCDF resources
+      * associated with the file, and flushes any buffers. */
+   if (retval = nc_close(ncid)) {
+      printf("Error: %s\n", nc_strerror(retval));
+      exit(2);
+   }
+
+   free(tlya);
+}
