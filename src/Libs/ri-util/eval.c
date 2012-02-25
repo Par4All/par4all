@@ -164,15 +164,52 @@ value EvalSizeofexpression(sizeofexpression soe)
   return v;
 }
 
+/* Constant c is returned as field of value v. */
 value EvalConstant(constant c)
 {
-  //return make_value(is_value_constant, copy_constant(c));
+  value v = value_undefined;
 
-    return((constant_int_p(c)) ?
-	   make_value(is_value_constant, make_constant(is_constant_int,
-						   (void*) constant_int(c))) :
-	   make_value(is_value_constant,
-		      make_constant(is_constant_litteral, NIL)));
+  if(constant_int_p(c)) {
+    v = make_value(is_value_constant,
+		   make_constant(is_constant_int,
+				 (void*) constant_int(c)));
+  }
+  else if(constant_float_p(c)) {
+    constant nc = make_constant(is_constant_float,
+				NULL);
+    constant_float(nc) = constant_float(c);
+    v = make_value(is_value_constant, nc);
+  }
+  else if(constant_call_p(c)) {
+    entity e = constant_call(c);
+    type t = entity_type(e);
+    if(type_functional_p(t)) {
+      functional f = type_functional(t);
+      t = functional_result(f);
+    }
+    if(scalar_integer_type_p(t)) {
+      long long int val;
+      sscanf(entity_local_name(e), "%lld", &val);
+      v = make_value(is_value_constant,
+		     make_constant(is_constant_int,
+				   (void*) val));
+    }
+    else if(float_type_p(t)) {
+      double val;
+      sscanf(entity_local_name(e), "%lg", &val);
+      constant nc = make_constant(is_constant_float,
+				 NULL);
+      constant_float(nc) = val;
+      v = make_value(is_value_constant, nc);
+    }
+    else
+      v = make_value(is_value_constant,
+		     make_constant(is_constant_litteral, NIL));
+  }
+  else
+    v = make_value(is_value_constant,
+		   make_constant(is_constant_litteral, NIL));
+  return v;
 }
 
 /* this function tries to evaluate a call to an intrinsic function.
@@ -275,17 +312,28 @@ value EvalUnaryOp(int t, list la)
   return(vout);
 }
 
+/* t defines the operator and la is a list to two sub-expressions. 
+ *
+ * Integer and floatint point constants are evaluated.
+*/
 value EvalBinaryOp(int t, list la)
 {
   value v;
-  int argl, argr;
+  long long int i_arg_l, i_arg_r;
+  double f_arg_l, f_arg_r;
+  bool int_p = true;
 
   pips_assert("non empty list", la != NIL);
 
   v = EvalExpression(EXPRESSION(CAR(la)));
   if (value_constant_p(v) && constant_int_p(value_constant(v))) {
-    argl = constant_int(value_constant(v));
+    i_arg_l = constant_int(value_constant(v));
+    f_arg_l = i_arg_l;
     free_value(v);
+  }
+  else if (value_constant_p(v) && constant_float_p(value_constant(v))) {
+    int_p = false;
+    f_arg_l = constant_float(value_constant(v));
   }
   else
     return(v);
@@ -296,87 +344,175 @@ value EvalBinaryOp(int t, list la)
   v = EvalExpression(EXPRESSION(CAR(la)));
 
   if (value_constant_p(v) && constant_int_p(value_constant(v))) {
-    argr = constant_int(value_constant(v));
+    i_arg_r = constant_int(value_constant(v));
+    f_arg_r = i_arg_r;
+  }
+  else if (value_constant_p(v) && constant_float_p(value_constant(v))) {
+    f_arg_r = constant_float(value_constant(v));
+    int_p = false;
   }
   else
     return(v);
 
   switch (t) {
   case MINUS:
-    constant_int(value_constant(v)) = argl-argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l-i_arg_r;
+    else
+      constant_float(value_constant(v)) = i_arg_l-i_arg_r;
     break;
   case PLUS:
-    constant_int(value_constant(v)) = argl+argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l+i_arg_r;
+    else
+      constant_float(value_constant(v)) = f_arg_l+f_arg_r;
     break;
   case STAR:
-    constant_int(value_constant(v)) = argl*argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l*i_arg_r;
+    else
+      constant_float(value_constant(v)) = f_arg_l*f_arg_r;
     break;
   case SLASH:
-    if (argr != 0)
-      constant_int(value_constant(v)) = argl/argr;
+    if(int_p) {
+      if (i_arg_r != 0)
+	constant_int(value_constant(v)) = i_arg_l/i_arg_r;
+      else {
+	pips_user_error("[EvalBinaryOp] zero divide\n");
+      }
+    }
     else {
-      fprintf(stderr, "[EvalBinaryOp] zero divide\n");
-      abort();
+      if (f_arg_r != 0)
+	constant_float(value_constant(v)) = f_arg_l/f_arg_r;
+      else {
+	pips_user_error("[EvalBinaryOp] zero divide\n");
+      }
     }
     break;
   case MOD:
-    if (argr != 0)
-      constant_int(value_constant(v)) = argl%argr;
+    if(int_p) {
+      if (i_arg_r != 0)
+	constant_int(value_constant(v)) = i_arg_l%i_arg_r;
+      else {
+	pips_user_error("[EvalBinaryOp] zero divide\n");
+      }
+    }
     else {
-      fprintf(stderr, "[EvalBinaryOp] zero divide in modulo\n");
-      abort();
+      if (f_arg_r != 0) {
+	free_value(v);
+	v = make_value(is_value_unknown, NIL);
+      }
+      else {
+	pips_user_error("[EvalBinaryOp] zero divide\n");
+      }
     }
     break;
   case POWER:
-    if (argr >= 0)
-      constant_int(value_constant(v)) = ipow(argl,argr);
+    if(int_p) {
+      if (i_arg_r >= 0)
+	constant_int(value_constant(v)) = ipow(i_arg_l,i_arg_r);
+      else {
+	free_value(v);
+	v = make_value(is_value_unknown, NIL);
+      }
+    }
     else {
+      /* FI: lazy... */
       free_value(v);
       v = make_value(is_value_unknown, NIL);
     }
     break;
+    /*
+     * Logical operators should return logical values...
+     */
   case EQ:
-    constant_int(value_constant(v)) = argl==argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l==i_arg_r;
+    else
+      constant_int(value_constant(v)) = f_arg_l==f_arg_r;
     break;
   case NE:
-    constant_int(value_constant(v)) = argl!=argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l!=i_arg_r;
+    else
+      constant_int(value_constant(v)) = f_arg_l!=f_arg_r;
     break;
   case EQV:
-    constant_int(value_constant(v)) = argl==argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l==i_arg_r;
+    else
+      constant_int(value_constant(v)) = f_arg_l==f_arg_r;
     break;
   case NEQV:
-       constant_int(value_constant(v)) = argl!=argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l!=i_arg_r;
+    else
+       constant_int(value_constant(v)) = f_arg_l!=f_arg_r;
    break;
   case GT:
-       constant_int(value_constant(v)) = argl>argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l>i_arg_r;
+    else
+       constant_int(value_constant(v)) = f_arg_l>f_arg_r;
    break;
   case LT:
-       constant_int(value_constant(v)) = argl<argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l<i_arg_r;
+    else
+       constant_int(value_constant(v)) = f_arg_l<f_arg_r;
    break;
   case GE:
-       constant_int(value_constant(v)) = argl>=argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l>=i_arg_r;
+    else
+       constant_int(value_constant(v)) = f_arg_l>=f_arg_r;
    break;
-   /* OK for Fortran Logical? */
+   /* OK for Fortran Logical? Int value or logical value? */
   case OR:
-       constant_int(value_constant(v)) = (argl!=0)||(argr!=0);
+    if(int_p)
+       constant_int(value_constant(v)) = (i_arg_l!=0)||(i_arg_r!=0);
+    else
+       constant_int(value_constant(v)) = (f_arg_l!=0)||(f_arg_r!=0);
    break;
   case AND:
-       constant_int(value_constant(v)) = (argl!=0)&&(argr!=0);
+    if(int_p)
+       constant_int(value_constant(v)) = (i_arg_l!=0)&&(i_arg_r!=0);
+    else
+       constant_int(value_constant(v)) = (f_arg_l!=0)&&(f_arg_r!=0);
    break;
   case BITWISE_OR:
-       constant_int(value_constant(v)) = argl|argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l|i_arg_r;
+    else
+      pips_user_error("Bitwise or cannot have floating point arguments\n");
    break;
   case BITWISE_AND:
-       constant_int(value_constant(v)) = argl&argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l&i_arg_r;
+    else
+      pips_user_error("Bitwise and cannot have floating point arguments\n");
    break;
   case BITWISE_XOR:
-       constant_int(value_constant(v)) = argl^argr;
+    if(int_p)
+      constant_int(value_constant(v)) = i_arg_l^i_arg_r;
+    else
+      pips_user_error("Bitwise xor cannot have floating point arguments\n");
    break;
   case LEFT_SHIFT:
-       constant_int(value_constant(v)) = argl<<argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l<<i_arg_r;
+    else {
+      free_value(v);
+      v = make_value(is_value_unknown, NIL);
+    }
    break;
    case RIGHT_SHIFT:
-       constant_int(value_constant(v)) = argl>>argr;
+    if(int_p)
+       constant_int(value_constant(v)) = i_arg_l>>i_arg_r;
+    else {
+      free_value(v);
+      v = make_value(is_value_unknown, NIL);
+    }
    break;
  default:
     free_value(v);
