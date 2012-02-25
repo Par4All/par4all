@@ -1,0 +1,20 @@
+delete trac678b
+# An error must be diagnosed
+# setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create trac678b trac678b.f
+
+echo
+echo Code
+echo
+
+display PRINTED_FILE 
+close
+
+echo
+echo Warnings
+echo
+
+shell cat trac678b.database/Warnings
+delete trac678b
+quit

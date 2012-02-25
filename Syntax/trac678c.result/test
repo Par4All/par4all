@@ -1,0 +1,50 @@
+
+Symbol table
+
+MAIN
+
+Declarations for module "MAIN" with type "() -> void"
+
+Variable list:
+
+	Declared entity "MAIN:*DYNAMIC*" with type "area" with size 8
+	Declared entity "MAIN:*HEAP*" with type "area" with size 0
+	Declared entity "MAIN:*STACK*" with type "area" with size 0
+	Declared entity "MAIN:*STATIC*" with type "area" with size 0
+	Declared entity "MAIN:ARRAY" with type "variable" "INTEGER*4"
+	Declared entity "MAIN:J" with type "functional" "() -> INTEGER*4"
+
+Layouts for commons:
+
+Layout for common /MAIN:*DYNAMIC*/ of size 8:
+	Variable MAIN:ARRAY	offset = 0	size = 8
+
+
+Layout for common /MAIN:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /MAIN:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /MAIN:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module MAIN
+
+
+Code
+
+!     Floating point sizing	
+      
+      PROGRAM MAIN
+      
+      PARAMETER (J=2.456)
+
+      INTEGER ARRAY(J)
+
+      ARRAY(1) = 2                                                      0009
+      PRINT *, ARRAY(1)                                                 0010
+
+      END
