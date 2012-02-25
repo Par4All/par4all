@@ -1,0 +1,19 @@
+delete increasing_loop01
+create increasing_loop01 increasing_loop01.c
+
+echo
+echo Parsed code for "increasing_loop01"
+echo
+
+display PARSED_PRINTED_FILE[increasing_loop01]
+
+echo
+echo Controlized code for "increasing_loop01"
+echo
+
+display PRINTED_FILE[increasing_loop01]
+
+close
+delete increasing_loop01
+quit
+
