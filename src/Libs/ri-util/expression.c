@@ -2050,6 +2050,8 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  * FI: I am not sure it is an improvement; it looks more like a change
  * of semantics (see above comments and expression_constant_p());
  * other functions exist to evaluate a constant expression...
+ *
+ * FI: Not in eval.c?
  */
 int expression_to_int(expression exp)
 {
@@ -2066,18 +2068,36 @@ int expression_to_int(expression exp)
   }
 
   if(expression_constant_p(exp)) {
-    call c = syntax_call(expression_syntax(exp));
-    switch(value_tag(entity_initial(call_function(c)))) {
-    case is_value_constant:	{
-      rv = constant_int(value_constant(entity_initial(call_function(c))));
-      break;
+    syntax s = expression_syntax(exp);
+    if(syntax_call_p(s)) { // A nullary call is assumed
+      call c = syntax_call(s);
+      switch(value_tag(entity_initial(call_function(c)))) {
+      case is_value_constant:	{
+	rv = constant_int(value_constant(entity_initial(call_function(c))));
+	break;
+      }
+      case is_value_intrinsic: {
+	rv = 0 - expression_to_int(binary_call_lhs(c));
+	break;
+      }
+      default:
+	pips_internal_error("expression %s is not an integer constant\n",
+			    expression_to_string(exp));
+      }
     }
-    case is_value_intrinsic: {
-      rv = 0 - expression_to_int(binary_call_lhs(c));
-      break;
-    }
-    default:
-      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
+    else if(syntax_sizeofexpression(s)) {
+      sizeofexpression soe = syntax_sizeofexpression(s);
+      // FI: do we want to guard this evaluation with EVAL_SIZEOF?
+      value v = EvalSizeofexpression(soe);
+      if(value_constant_p(v)) { // Should always be true... but for dependent types
+	rv = constant_int(value_constant(v));
+      }
+      else {
+	/* Could be improved checking dependent and not dependent types...*/
+	pips_internal_error("expression %s is not an integer constant\n",
+			    expression_to_string(exp));
+      }
+      free_value(v);
     }
   }
   else if(expression_call_p(exp)) {
@@ -2122,21 +2142,41 @@ float expression_to_float(expression exp)
   return(rv);
 }
 
+/* FI: this function should be located in eval.c, should it not be? */
 constant expression_constant(expression exp)
 {
-  if(syntax_call_p(expression_syntax(exp)))
-  {
-    call c = syntax_call(expression_syntax(exp));
-    value v = entity_initial(call_function(c));
-    switch(value_tag(v))
+  syntax s = expression_syntax(exp);
+  if(syntax_call_p(s))
     {
-      case is_value_constant:
-        return value_constant(v);
-      case is_value_intrinsic:
-        if(ENTITY_UNARY_MINUS_P(call_function(c))||ENTITY_UNARY_PLUS_P(call_function(c)))
-          return expression_constant(binary_call_lhs(c));
-      default:
-        ;
+      call c = syntax_call(expression_syntax(exp));
+      value v = entity_initial(call_function(c));
+      switch(value_tag(v))
+	{
+	case is_value_constant:
+	  return value_constant(v);
+	case is_value_intrinsic: {
+	  entity op = call_function(c);
+	  if(ENTITY_UNARY_MINUS_P(op)||ENTITY_UNARY_PLUS_P(op))
+	    return expression_constant(binary_call_lhs(c));
+	}
+	default:
+	  ;
+	}
+    }
+  else if(syntax_sizeofexpression_p(s)) {
+    sizeofexpression soe = syntax_sizeofexpression(s);
+    /* FI: difficult to make a decision here. We may have a constant
+       expression that cannot be evaluated as a constant statically by
+       PIPS. What is the semantics of expression_constant_p()?  */
+    if(sizeofexpression_type_p(soe) /* && get_bool_property("EVAL_SIZEOF")*/ ) {
+      /* Too bad we need a function located in eval.c ... */
+      value v = EvalSizeofexpression(soe);
+      if(value_constant_p(v)) { // Should always be true...
+	constant c = value_constant(v);
+	value_constant(v) = constant_undefined;
+	free_value(v);
+	return c;
+      }
     }
   }
   return constant_undefined;
