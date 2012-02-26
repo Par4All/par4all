@@ -2969,7 +2969,23 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
       nb = upper_p? ib-1 : ib+1;
       b = int_to_expression(nb);
     }
-    else {
+    else if(NORMALIZE_EXPRESSION(e), expression_linear_p(e)) {
+      /* May modify the source code a bit more than necessary, but
+	 avoids stupid expressions such as 64-1-1 */
+      normalized n = expression_normalized(e);
+      Pvecteur v = normalized_linear(n);
+      /* This could be generalized to any affine expression. See for
+	 instance loop_bound02.c. But the source code is likely to be
+	 disturbed if the bound expression is regenerated from v after
+	 adding or subtracting 1 from its constant term. */
+      if(vect_constant_p(v) || VECTEUR_NUL_P(v)) {
+	Value c = vect_coeff(TCST, v);
+	ib = (int) c;
+	nb = upper_p? ib-1 : ib+1;
+	b = int_to_expression(nb);
+      }
+    }
+    if(expression_undefined_p(b)) {
       expression offset = int_to_expression(1);
       entity op = entity_intrinsic(upper_p? MINUS_OPERATOR_NAME : PLUS_OPERATOR_NAME);
 

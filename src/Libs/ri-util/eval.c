@@ -943,9 +943,10 @@ bool negative_expression_p(expression e)
   return negative_p;
 }
 
-/* returns if e is normalized and linear.
+/* returns if e is already normalized and linear.
  *
- * FI: should be moved into expression.c
+ * FI: should be moved into expression.c. Treacherous because the
+ * normalization is assumed to have occured earlier.
  */
 bool expression_linear_p(expression e)
 {
@@ -1011,6 +1012,9 @@ range_count(range r, intptr_t * pcount)
  * Both functions have the same name but a slightly different behavior.
  * The Linear version returns 0 when a null vector is passed as argument.
  * Francois Irigoin, 16 April 1990
+ *
+ * See vect_constant_p() placed in
+ * linear/src/contrainte/predicats.c. Seems now OK.
  */
 static bool
 vect_const_p(Pvecteur v)
