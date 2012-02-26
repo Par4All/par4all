@@ -54,14 +54,14 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
       if (t%10!=0) {
          data = image_in[img_index]<<0|image_in[img_index+1]<<8|image_in[img_index+2]<<16|image_in[img_index+3]<<24;
          //put 4 pixels in a frame (data)
-         for(i = 0; i <= 31; i += 1) {
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1) {
             data_bit = data>>i&0x01;
             symbole_flow_user1[i] = data_bit;
          }
          
          //---- Spreading
          
-         for(i = 0; i <= 31; i += 1)
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1)
             for(j = 0; j <= 7; j += 1)
                if (symbole_flow_user1[i]==0)
                   spreading_signal1[i*8+j] = -ovsf_code_user1[j];
@@ -80,7 +80,7 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
          channel_delay4 = (int32_t) (rand()%6);
          /* pdebug_info("path 4 delay: %i\n",channel_delay4); */
          //printf("%d %d %d %d\n",channel_delay1,channel_delay2,channel_delay3,channel_delay4);		
-         for(i = 0; i <= 31; i += 1) {
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1) {
             write = pilot[i]==0?-1:1;
             for(j = 0; j <= 7; j += 1)
                spreading_signal1[i*8+j] = write;
@@ -99,7 +99,7 @@ void P4A_scmp_kernel_1(int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t
    int32_t i;
    //generate multipath
    //main path
-   for(i = 0; i <= 255; i += 1)
+   for(i = 0; i <= 8*8*sizeof(int32_t)-1; i += 1)
       spreading_signals[i] = spreading_signal1[i];
 }
 void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
@@ -112,7 +112,7 @@ void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
    
    
    //initialisation
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       channel_I[u] = 0;
 }
 void P4A_scmp_kernel_11(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -137,7 +137,7 @@ void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
    
    //convolution par la réponse impultionelle du filtre (FIR_COEFF)
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = Signal_I[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -153,7 +153,7 @@ void P4A_scmp_kernel_13(float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4])
    int32_t u;
    
    //initialisation
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       channel_Q[u] = 0;
 }
 void P4A_scmp_kernel_14(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -176,7 +176,7 @@ void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = Signal_Q[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -197,14 +197,14 @@ void P4A_scmp_kernel_16(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
    
    //---- FIR for I and Q after channel
    
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       FIR2_I_user1[u] = 0;
 }
 void P4A_scmp_kernel_17(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
 {
    //PIPS generated variable
    int32_t u;
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       FIR2_Q_user1[u] = 0;
 }
 void P4A_scmp_kernel_18(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -229,7 +229,7 @@ void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
    //convolution par la réponse impultionelle du filtre (FIR_COEFF)
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = channel_I[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -246,7 +246,7 @@ void P4A_scmp_kernel_2(int32_t spreading_signals[8*8*sizeof(int32_t)+6])
    //printf("\n");
    
    //initialisation
-   for(i = 8*8*sizeof(int32_t); i <= 261; i += 1)
+   for(i = 8*8*sizeof(int32_t); i <= 8*8*sizeof(int32_t)+6-1; i += 1)
       spreading_signals[i] = 0;
 }
 void P4A_scmp_kernel_20(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -270,7 +270,7 @@ void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = channel_Q[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -295,7 +295,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
       task = 0;
       if (t%10==0) {
          j = 0;
-         for(i = 0; i <= 523; i += 4) {
+         for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 4) {
             //It is a cosinus, so the first bit out of 4 sampled gives
             //the sign of the symbol and the amplitude of the signal.
             R_pilot[j] = (int32_t) FIR2_I_user1[i];
@@ -305,7 +305,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
       }
       else {
          j = 0;
-         for(i = 0; i <= 523; i += 4) {
+         for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 4) {
             //It is a cosinus, so the first bit out of 4 sampled gives
             //the sign of the symbol and the amplitude of the signal.
             inv_qpsk_user1[j] = (int32_t) FIR2_I_user1[i];
@@ -346,7 +346,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             flag = 0;
             
             //create matrix
-            for(c = 0; c <= 31; c += 1) {
+            for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1) {
                for(i = 0; i <= 5; i += 1)
                   finger_mat[c][i] = 0;
                //initialisation
@@ -359,7 +359,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             //calculate the channel coefficients
             for(j = 0; j <= 5; j += 1) {
                coeff2[j] = 0;
-               for(c = 0; c <= 31; c += 1)
+               for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1)
                   if (S_pilot[c]==0)
                      coeff2[j] += finger_mat[c][j]*(-1);
                   else
@@ -383,7 +383,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
                   }
                   else if (coeff2[j]>=max) {
                      coeff[j]++;
-                     for(c = 0; c <= 31; c += 1)
+                     for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1)
                         for(d = 0; d <= 7; d += 1)
                            if (S_pilot[c]==1)
                               R_pilot[c*8+d+j] -= 1;
@@ -417,7 +417,7 @@ void P4A_scmp_kernel_24(int32_t coeff[6], int32_t data_0[1], int32_t finger[6], 
       task = 0;
       if (t%10!=0) {
          data = 0;
-         for(c = 0; c <= 31; c += 1) {
+         for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1) {
             fingers = 0;
             for(i = 0; i <= 5; i += 1)
                finger[i] = 0;
@@ -490,7 +490,7 @@ void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user
    
    //------------------------------------------ SEND FRAME -----------------------------------------------
    //---- Conversion serial to parallel
-   for(i = 0; i <= 261; i += 2) {
+   for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 2) {
       I_user[j] = spreading_signals[i];
       Q_user[j] = spreading_signals[i+1];
       j++;
@@ -502,7 +502,7 @@ void P4A_scmp_kernel_8(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], float Signal_I
    //PIPS generated variable
    int32_t h, i;
    //---- Modulation QPSK on I
-   for(i = 0; i <= 130; i += 1)
+   for(i = 0; i <= 8/2*8*sizeof(int32_t)+6/2-1; i += 1)
       //Phase = Sign of I_user
       for(h = 0; h <= 3; h += 1)
          Signal_I[i*4+h] = 1.0*I_user[i]*cos(h*2*3.14159265358979323846/(4-1));
@@ -513,7 +513,7 @@ void P4A_scmp_kernel_9(int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], float Signal_Q
    int32_t h, i;
    
    //---- Modulation QPSK on Q -- we suppose that we dephase it after of PI/2
-   for(i = 0; i <= 130; i += 1)
+   for(i = 0; i <= 8*8*sizeof(int32_t)/2+6/2-1; i += 1)
       //Phase = Sign of Q_user
       for(h = 0; h <= 3; h += 1)
          Signal_Q[i*4+h] = 1.0*Q_user[i]*cos(h*2*3.14159265358979323846/(4-1));
@@ -615,30 +615,30 @@ int main()
    
    //Loop on the number of frame. The number of frame is made of "nb data frame" + "nb pilot frame". 
    //Pilot frames are added to initial frames for the channel estimation.
-   for(t = 0; t <= 145635; t += 1) {
+   for(t = 0; t <= 512*1024/sizeof(int32_t)+512*1024/sizeof(int32_t)/(10-1)+1-1; t += 1) {
       P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, image_in, img_index, ovsf_code_user1, pilot, spreading_signal1, symbole_flow_user1, t);
       P4A_scmp_kernel_1(spreading_signal1, spreading_signals);
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       P4A_scmp_kernel_2(spreading_signals);
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       P4A_scmp_kernel_3(channel_delay1, spreading_signal1, spreading_signals);
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       P4A_scmp_kernel_4(channel_delay2, spreading_signal1, spreading_signals);
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       P4A_scmp_kernel_5(channel_delay3, spreading_signal1, spreading_signals);
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       P4A_scmp_kernel_6(channel_delay4, spreading_signal1, spreading_signals);
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       j = 0;
       P4A_scmp_kernel_7(I_user, Q_user, &j, spreading_signals);
@@ -671,7 +671,7 @@ int main()
          img_index += 4;
          //for next frame, increment index by size of frame
          
-         for(d = 0; d <= 31; d += 1)
+         for(d = 0; d <= 8*sizeof(int32_t)-1; d += 1)
             ;
       }
    }
@@ -761,14 +761,14 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
       if (t%10!=0) {
          data = image_in[img_index]<<0|image_in[img_index+1]<<8|image_in[img_index+2]<<16|image_in[img_index+3]<<24;
          //put 4 pixels in a frame (data)
-         for(i = 0; i <= 31; i += 1) {
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1) {
             data_bit = data>>i&0x01;
             symbole_flow_user1[i] = data_bit;
          }
          
          //---- Spreading
          
-         for(i = 0; i <= 31; i += 1)
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1)
             for(j = 0; j <= 7; j += 1)
                if (symbole_flow_user1[i]==0)
                   spreading_signal1[i*8+j] = -ovsf_code_user1[j];
@@ -787,7 +787,7 @@ void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1],
          channel_delay4 = (int32_t) (rand()%6);
          /* pdebug_info("path 4 delay: %i\n",channel_delay4); */
          //printf("%d %d %d %d\n",channel_delay1,channel_delay2,channel_delay3,channel_delay4);		
-         for(i = 0; i <= 31; i += 1) {
+         for(i = 0; i <= 8*sizeof(int32_t)-1; i += 1) {
             write = pilot[i]==0?-1:1;
             for(j = 0; j <= 7; j += 1)
                spreading_signal1[i*8+j] = write;
@@ -806,7 +806,7 @@ void P4A_scmp_kernel_1(int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t
    int32_t i;
    //generate multipath
    //main path
-   for(i = 0; i <= 255; i += 1)
+   for(i = 0; i <= 8*8*sizeof(int32_t)-1; i += 1)
       spreading_signals[i] = spreading_signal1[i];
 }
 void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
@@ -819,7 +819,7 @@ void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
    
    
    //initialisation
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       channel_I[u] = 0;
 }
 void P4A_scmp_kernel_11(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -844,7 +844,7 @@ void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
    
    //convolution par la réponse impultionelle du filtre (FIR_COEFF)
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = Signal_I[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -860,7 +860,7 @@ void P4A_scmp_kernel_13(float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4])
    int32_t u;
    
    //initialisation
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       channel_Q[u] = 0;
 }
 void P4A_scmp_kernel_14(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -883,7 +883,7 @@ void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = Signal_Q[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -904,14 +904,14 @@ void P4A_scmp_kernel_16(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
    
    //---- FIR for I and Q after channel
    
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       FIR2_I_user1[u] = 0;
 }
 void P4A_scmp_kernel_17(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
 {
    //PIPS generated variable
    int32_t u;
-   for(u = 0; u <= 523; u += 1)
+   for(u = 0; u <= (8/2*8*sizeof(int32_t)+6/2)*4-1; u += 1)
       FIR2_Q_user1[u] = 0;
 }
 void P4A_scmp_kernel_18(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -936,7 +936,7 @@ void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
    //convolution par la réponse impultionelle du filtre (FIR_COEFF)
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = channel_I[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -953,7 +953,7 @@ void P4A_scmp_kernel_2(int32_t spreading_signals[8*8*sizeof(int32_t)+6])
    //printf("\n");
    
    //initialisation
-   for(i = 8*8*sizeof(int32_t); i <= 261; i += 1)
+   for(i = 8*8*sizeof(int32_t); i <= 8*8*sizeof(int32_t)+6-1; i += 1)
       spreading_signals[i] = 0;
 }
 void P4A_scmp_kernel_20(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
@@ -977,7 +977,7 @@ void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
    ptr_x_buffer_user1 = *ptr_x_buffer_user1_0;
-   for(i = 0; i <= 523; i += 1) {
+   for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 1) {
       x_buffer_user1[ptr_x_buffer_user1++] = channel_Q[i];
       ptr_x_buffer_user1 %= 8;
       for(n = 8-1; n >= 0; n += -1) {
@@ -1002,7 +1002,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
       task = 0;
       if (t%10==0) {
          j = 0;
-         for(i = 0; i <= 523; i += 4) {
+         for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 4) {
             //It is a cosinus, so the first bit out of 4 sampled gives
             //the sign of the symbol and the amplitude of the signal.
             R_pilot[j] = (int32_t) FIR2_I_user1[i];
@@ -1012,7 +1012,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
       }
       else {
          j = 0;
-         for(i = 0; i <= 523; i += 4) {
+         for(i = 0; i <= (8/2*8*sizeof(int32_t)+6/2)*4-1; i += 4) {
             //It is a cosinus, so the first bit out of 4 sampled gives
             //the sign of the symbol and the amplitude of the signal.
             inv_qpsk_user1[j] = (int32_t) FIR2_I_user1[i];
@@ -1053,7 +1053,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             flag = 0;
             
             //create matrix
-            for(c = 0; c <= 31; c += 1) {
+            for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1) {
                for(i = 0; i <= 5; i += 1)
                   finger_mat[c][i] = 0;
                //initialisation
@@ -1066,7 +1066,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
             //calculate the channel coefficients
             for(j = 0; j <= 5; j += 1) {
                coeff2[j] = 0;
-               for(c = 0; c <= 31; c += 1)
+               for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1)
                   if (S_pilot[c]==0)
                      coeff2[j] += finger_mat[c][j]*(-1);
                   else
@@ -1090,7 +1090,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
                   }
                   else if (coeff2[j]>=max) {
                      coeff[j]++;
-                     for(c = 0; c <= 31; c += 1)
+                     for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1)
                         for(d = 0; d <= 7; d += 1)
                            if (S_pilot[c]==1)
                               R_pilot[c*8+d+j] -= 1;
@@ -1124,7 +1124,7 @@ void P4A_scmp_kernel_24(int32_t coeff[6], int32_t data_0[1], int32_t finger[6], 
       task = 0;
       if (t%10!=0) {
          data = 0;
-         for(c = 0; c <= 31; c += 1) {
+         for(c = 0; c <= 8*sizeof(int32_t)-1; c += 1) {
             fingers = 0;
             for(i = 0; i <= 5; i += 1)
                finger[i] = 0;
@@ -1197,7 +1197,7 @@ void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user
    
    //------------------------------------------ SEND FRAME -----------------------------------------------
    //---- Conversion serial to parallel
-   for(i = 0; i <= 261; i += 2) {
+   for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 2) {
       I_user[j] = spreading_signals[i];
       Q_user[j] = spreading_signals[i+1];
       j++;
@@ -1209,7 +1209,7 @@ void P4A_scmp_kernel_8(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], float Signal_I
    //PIPS generated variable
    int32_t h, i;
    //---- Modulation QPSK on I
-   for(i = 0; i <= 130; i += 1)
+   for(i = 0; i <= 8/2*8*sizeof(int32_t)+6/2-1; i += 1)
       //Phase = Sign of I_user
       for(h = 0; h <= 3; h += 1)
          Signal_I[i*4+h] = 1.0*I_user[i]*cos(h*2*3.14159265358979323846/(4-1));
@@ -1220,7 +1220,7 @@ void P4A_scmp_kernel_9(int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], float Signal_Q
    int32_t h, i;
    
    //---- Modulation QPSK on Q -- we suppose that we dephase it after of PI/2
-   for(i = 0; i <= 130; i += 1)
+   for(i = 0; i <= 8*8*sizeof(int32_t)/2+6/2-1; i += 1)
       //Phase = Sign of Q_user
       for(h = 0; h <= 3; h += 1)
          Signal_Q[i*4+h] = 1.0*Q_user[i]*cos(h*2*3.14159265358979323846/(4-1));
@@ -1256,14 +1256,14 @@ int main()
    //Sending...	
    //generate frame
    int32_t data = 0, data_bit;
-   int32_t symbole_flow_user1[8*sizeof(int32_t)];
+   int32_t symbole_flow_user1[8*4];
    
    //spreading
    int32_t ovsf_code_user1[8] = {-1, -1, 1, 1, -1, -1, 1, 1};
    //user code
-   int32_t pilot[8*sizeof(int32_t)] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+   int32_t pilot[8*4] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
    int32_t spreading_signal1[64*4+5+1];
-   int32_t spreading_signals[262];
+   int32_t spreading_signals[64*4+5+1];
    int32_t channel_delay1 = 0, channel_delay2 = 0, channel_delay3 = 0, channel_delay4 = 0;
    
    //demux
@@ -1288,7 +1288,7 @@ int main()
    
    //inv qpsk
    int32_t *destination;
-   int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6];
+   int32_t inv_qpsk_user1[64*4+5+1];
    int32_t R_pilot[64*4+5+1];
    
    //channel estimation
@@ -1304,7 +1304,7 @@ int main()
    //rake receiver
    int32_t finger[6];
    int32_t fingers;
-   int32_t symbole_flow[8*sizeof(int32_t)];
+   int32_t symbole_flow[8*4];
 
    int32_t found_error;
    
@@ -1322,38 +1322,40 @@ int main()
    
    //Loop on the number of frame. The number of frame is made of "nb data frame" + "nb pilot frame". 
    //Pilot frames are added to initial frames for the channel estimation.
-   for(t = 0; t <= 145635; t += 1) {
+   for(t = 0; t <= 512*1024/sizeof(int32_t)+512*1024/sizeof(int32_t)/(10-1)+1-1; t += 1) {
       {
          //PIPS generated variable
-         int32_t (*P4A_var_symbole_flow_user10)[32] = (int32_t (*)[32]) 0, (*P4A_var_spreading_signal10)[256] = (int32_t (*)[256]) 0, (*P4A_var_pilot0)[32] = (int32_t (*)[32]) 0, (*P4A_var_ovsf_code_user10)[8] = (int32_t (*)[8]) 0;
+         int32_t (*P4A_var_symbole_flow_user10)[32] = (int32_t (*)[32]) 0, (*P4A_var_spreading_signal10)[262] = (int32_t (*)[262]) 0, (*P4A_var_pilot0)[32] = (int32_t (*)[32]) 0, (*P4A_var_ovsf_code_user10)[8] = (int32_t (*)[8]) 0;
          //PIPS generated variable
-         unsigned char (*P4A_var_image_in0)[img_index+3+1] = (unsigned char (*)[img_index+3+1]) 0;
-         P4A_scmp_malloc((void **) &P4A_var_image_in0, sizeof(unsigned char)*(img_index+4));
+         unsigned char (*P4A_var_image_in0)[524288] = (unsigned char (*)[524288]) 0;
+         P4A_scmp_malloc((void **) &P4A_var_image_in0, sizeof(unsigned char)*524288);
          P4A_scmp_malloc((void **) &P4A_var_ovsf_code_user10, sizeof(int)*8);
          P4A_scmp_malloc((void **) &P4A_var_pilot0, sizeof(int)*32);
-         P4A_scmp_malloc((void **) &P4A_var_spreading_signal10, sizeof(int)*256);
+         P4A_scmp_malloc((void **) &P4A_var_spreading_signal10, sizeof(int)*262);
          P4A_scmp_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*32);
-         P4A_copy_to_accel_1d(sizeof(unsigned char), 524288, img_index+4, 0, &image_in[0], *P4A_var_image_in0);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal10);
+         P4A_copy_to_accel_1d(sizeof(unsigned char), 524288, 524288, 0, &image_in[0], *P4A_var_image_in0);
          P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *P4A_var_ovsf_code_user10);
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &pilot[0], *P4A_var_pilot0);
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
 
          P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, *P4A_var_image_in0, img_index, *P4A_var_ovsf_code_user10, *P4A_var_pilot0, *P4A_var_spreading_signal10, *P4A_var_symbole_flow_user10, t);
          P4A_copy_from_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 262, 256, 0, &spreading_signal1[0], *P4A_var_spreading_signal10);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal10);
       }
       {
          //PIPS generated variable
-         int32_t (*P4A_var_spreading_signals0)[256] = (int32_t (*)[256]) 0, (*P4A_var_spreading_signal11)[256] = (int32_t (*)[256]) 0;
-         P4A_scmp_malloc((void **) &P4A_var_spreading_signal11, sizeof(int)*256);
-         P4A_scmp_malloc((void **) &P4A_var_spreading_signals0, sizeof(int)*256);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 256, 0, &spreading_signal1[0], *P4A_var_spreading_signal11);
+         int32_t (*P4A_var_spreading_signals0)[262] = (int32_t (*)[262]) 0, (*P4A_var_spreading_signal11)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &P4A_var_spreading_signal11, sizeof(int)*262);
+         P4A_scmp_malloc((void **) &P4A_var_spreading_signals0, sizeof(int)*262);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals0);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *P4A_var_spreading_signal11);
 
          P4A_scmp_kernel_1(*P4A_var_spreading_signal11, *P4A_var_spreading_signals0);
-         P4A_copy_from_accel_1d(sizeof(int), 262, 256, 0, &spreading_signals[0], *P4A_var_spreading_signals0);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals0);
       }
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       {
          //PIPS generated variable
@@ -1365,7 +1367,7 @@ int main()
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals1);
       }
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       {
          //PIPS generated variable
@@ -1379,7 +1381,7 @@ int main()
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals2);
       }
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       {
          //PIPS generated variable
@@ -1393,7 +1395,7 @@ int main()
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals3);
       }
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       {
          //PIPS generated variable
@@ -1406,7 +1408,7 @@ int main()
          P4A_scmp_kernel_5(channel_delay3, *P4A_var_spreading_signal14, *P4A_var_spreading_signals4);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals4);
       }
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       {
          //PIPS generated variable
@@ -1420,7 +1422,7 @@ int main()
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *P4A_var_spreading_signals5);
       }
 
-      for(i = 0; i <= 261; i += 1)
+      for(i = 0; i <= 8*8*sizeof(int32_t)+6-1; i += 1)
          ;
       j = 0;
       {
@@ -1444,6 +1446,7 @@ int main()
          int32_t (*P4A_var_I_user1)[131] = (int32_t (*)[131]) 0;
          P4A_scmp_malloc((void **) &P4A_var_I_user1, sizeof(int)*131);
          P4A_scmp_malloc((void **) &P4A_var_Signal_I0, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &Signal_I[0], *P4A_var_Signal_I0);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &I_user[0], *P4A_var_I_user1);
 
          P4A_scmp_kernel_8(*P4A_var_I_user1, *P4A_var_Signal_I0);
@@ -1456,6 +1459,7 @@ int main()
          int32_t (*P4A_var_Q_user1)[131] = (int32_t (*)[131]) 0;
          P4A_scmp_malloc((void **) &P4A_var_Q_user1, sizeof(int)*131);
          P4A_scmp_malloc((void **) &P4A_var_Signal_Q0, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &Signal_Q[0], *P4A_var_Signal_Q0);
          P4A_copy_to_accel_1d(sizeof(int), 131, 131, 0, &Q_user[0], *P4A_var_Q_user1);
 
          P4A_scmp_kernel_9(*P4A_var_Q_user1, *P4A_var_Signal_Q0);
@@ -1465,6 +1469,7 @@ int main()
          //PIPS generated variable
          float (*P4A_var_channel_I0)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_channel_I0, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I0);
 
          P4A_scmp_kernel_10(*P4A_var_channel_I0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_I[0], *P4A_var_channel_I0);
@@ -1497,6 +1502,7 @@ int main()
          //PIPS generated variable
          float (*P4A_var_channel_Q0)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_channel_Q0, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &channel_Q[0], *P4A_var_channel_Q0);
 
          P4A_scmp_kernel_13(*P4A_var_channel_Q0);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &channel_Q[0], *P4A_var_channel_Q0);
@@ -1529,6 +1535,7 @@ int main()
          //PIPS generated variable
          float (*P4A_var_FIR2_I_user10)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_FIR2_I_user10, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user10);
 
          P4A_scmp_kernel_16(*P4A_var_FIR2_I_user10);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user10);
@@ -1537,6 +1544,7 @@ int main()
          //PIPS generated variable
          float (*P4A_var_FIR2_Q_user10)[524] = (float (*)[524]) 0;
          P4A_scmp_malloc((void **) &P4A_var_FIR2_Q_user10, sizeof(float)*524);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user10);
 
          P4A_scmp_kernel_17(*P4A_var_FIR2_Q_user10);
          P4A_copy_from_accel_1d(sizeof(float), 524, 524, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user10);
@@ -1593,13 +1601,15 @@ int main()
          //PIPS generated variable
          int32_t (*P4A_var_inv_qpsk_user10)[262] = (int32_t (*)[262]) 0, (*P4A_var_R_pilot0)[262] = (int32_t (*)[262]) 0;
          //PIPS generated variable
-         float (*P4A_var_FIR2_Q_user12)[521] = (float (*)[521]) 0, (*P4A_var_FIR2_I_user12)[521] = (float (*)[521]) 0;
-         P4A_scmp_malloc((void **) &P4A_var_FIR2_I_user12, sizeof(float)*521);
-         P4A_scmp_malloc((void **) &P4A_var_FIR2_Q_user12, sizeof(float)*521);
+         float (*P4A_var_FIR2_Q_user12)[524] = (float (*)[524]) 0, (*P4A_var_FIR2_I_user12)[524] = (float (*)[524]) 0;
+         P4A_scmp_malloc((void **) &P4A_var_FIR2_I_user12, sizeof(float)*524);
+         P4A_scmp_malloc((void **) &P4A_var_FIR2_Q_user12, sizeof(float)*524);
          P4A_scmp_malloc((void **) &P4A_var_R_pilot0, sizeof(int)*262);
          P4A_scmp_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(float), 524, 521, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user12);
-         P4A_copy_to_accel_1d(sizeof(float), 524, 521, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user12);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &R_pilot[0], *P4A_var_R_pilot0);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &FIR2_I_user1[0], *P4A_var_FIR2_I_user12);
+         P4A_copy_to_accel_1d(sizeof(float), 524, 524, 0, &FIR2_Q_user1[0], *P4A_var_FIR2_Q_user12);
 
          P4A_scmp_kernel_22(*P4A_var_FIR2_I_user12, *P4A_var_FIR2_Q_user12, *P4A_var_R_pilot0, *P4A_var_inv_qpsk_user10, &j, t);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
@@ -1627,15 +1637,16 @@ int main()
       }
       {
          //PIPS generated variable
-         int32_t (*P4A_var_symbole_flow0)[32] = (int32_t (*)[32]) 0, (*P4A_var_ovsf_code_user11)[8] = (int32_t (*)[8]) 0, (*P4A_var_inv_qpsk_user11)[261] = (int32_t (*)[261]) 0, (*P4A_var_finger0)[6] = (int32_t (*)[6]) 0, (*P4A_var_coeff1)[6] = (int32_t (*)[6]) 0;
+         int32_t (*P4A_var_symbole_flow0)[32] = (int32_t (*)[32]) 0, (*P4A_var_ovsf_code_user11)[8] = (int32_t (*)[8]) 0, (*P4A_var_inv_qpsk_user11)[262] = (int32_t (*)[262]) 0, (*P4A_var_finger0)[6] = (int32_t (*)[6]) 0, (*P4A_var_coeff1)[6] = (int32_t (*)[6]) 0;
          P4A_scmp_malloc((void **) &P4A_var_coeff1, sizeof(int)*6);
          P4A_scmp_malloc((void **) &P4A_var_finger0, sizeof(int)*6);
-         P4A_scmp_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*261);
+         P4A_scmp_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*262);
          P4A_scmp_malloc((void **) &P4A_var_ovsf_code_user11, sizeof(int)*8);
          P4A_scmp_malloc((void **) &P4A_var_symbole_flow0, sizeof(int)*32);
+         P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow[0], *P4A_var_symbole_flow0);
          P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *P4A_var_coeff1);
          P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *P4A_var_finger0);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 261, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
          P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *P4A_var_ovsf_code_user11);
 
          P4A_scmp_kernel_24(*P4A_var_coeff1, &data, *P4A_var_finger0, *P4A_var_inv_qpsk_user11, *P4A_var_ovsf_code_user11, *P4A_var_symbole_flow0, t);
@@ -1654,7 +1665,7 @@ int main()
          img_index += 4;
          //for next frame, increment index by size of frame
          
-         for(d = 0; d <= 31; d += 1)
+         for(d = 0; d <= 8*sizeof(int32_t)-1; d += 1)
             ;
       }
    }
