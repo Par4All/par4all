@@ -2929,11 +2929,24 @@ direct_decl: /* (* ISO 6.7.5 *) */
 					     " Try to compile with \"gcc -ansi -c\"\n");
 			      }
 			      else {
+				type t = (type) stack_head(s);
+				if(type_undefined_p(t)) {
+				pips_user_warning("Symbol \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e) /* entity_name(e)*/,
+						  get_current_C_line_number(), c_lineno);
+				}
+				else if(type_functional_p(t)) {
+				  pips_user_warning("Function \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e) /* entity_name(e)*/,
+						  get_current_C_line_number(), c_lineno);
+				}
+				else {
 				pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
 						  entity_user_name(e) /* entity_name(e)*/,
 						  get_current_C_line_number(), c_lineno);
 				CParserError("Variable redefinition not compatible with ISO standard."
 					     " Try to compile with \"gcc -ansi -c\"\n");
+				}
 			      }
 			    }
 			  }
