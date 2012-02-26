@@ -40,7 +40,7 @@ void putnonintrablk(short *blk)
    run = 0;
    first = 1;
 
-   for(n = 0; n <= 63; n += 1) {
+   for(n = 0; n <= (1<<6)-1; n += 1) {
       /* use appropriate entropy scanning pattern */
       signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
 
