@@ -15,7 +15,6 @@ void increasing_loop04(int NJ)
 {
    const int T = 2;
    int tj;
-   tj = T;
-   while (tj<NJ-T)
-      tj += T;
+   for(tj = T; tj <= NJ-T-1; tj += T)
+      ;
 }
