@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
    do {
       //PIPS:SAC generated v4si vector(s)
       v4si vec00, vec10, vec20;
-      a = malloc(4*sizeof(int));
+      a = malloc(sizeof(int)*4);
       SIMD_LOAD_BROADCAST_V4SI(vec20, b);
       SIMD_LOAD_V4SI(vec10, &pdata0[0]);
       SIMD_MULD(vec00, vec10, vec20);
