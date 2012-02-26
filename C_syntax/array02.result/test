@@ -76,6 +76,6 @@ int array02()
    int b[4];
    int i;
 
-   forall(i = 0; i <= 3; i += 1)
+   forall(i = 0; i <= sizeof(int)-1; i += sizeof(char))
       a[i] = 0.;
 }
