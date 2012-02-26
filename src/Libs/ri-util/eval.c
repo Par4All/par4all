@@ -24,23 +24,31 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
+
 /*
-
-This file contains a set of functions to evaluate integer constant
-expressions. The algorithm is built on a recursive analysis of the
-expression structure. Lower level functions are called until basic atoms
-are reached. The success of basic atom evaluation depend on the atom
-type:
-
-reference: right now, the evaluation fails because we do not compute
-predicates on variables.
-
-call: a call to a user function is not evaluated. a call to an intrinsic
-function is successfully evaluated if arguments can be evaluated. a call
-to a constant function is evaluated if its basic type is integer.
-
-range: a range is not evaluated.
-*/
+ * This file contains a set of functions to evaluate store independent
+ * expressions, especially integer expressions, which are key to loop
+ * parallelization.
+ *
+ * The key functions are:
+ *
+ * value EvalExpression(expression)
+ *
+ * bool expression_integer_value(expression, intptr_t *)
+ *
+ * bool expression_negative_integer_value_p(expression)
+ *
+ * bool positive_expression_p()
+ *
+ * bool negative_expression_p()
+ *
+ * expression range_to_expression()
+ *
+ * bool range_count()
+ *
+ * A few misplaced functions are here too: expression_linear_p(),
+ * ipow(), vect_const_p(), vect_product()
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -57,6 +65,46 @@ range: a range is not evaluated.
 
 #include "operator.h"
 
+/* Evaluate statically an expression. If the expression can be
+ * evaluated regardeless of the store and regardless of the target
+ * machine, and if the expression type is integer or float, return a
+ * constant value. Else, return a value unknown.
+ *
+ * To accept dependencies on target architecture, set the property
+ * "EVAL_SIZEOF" to true.
+ *
+ * A new value is always allocated.
+ *
+ * If you are not interested in the object value, but simply to the
+ * integer value of a constant expression, see
+ * expression_integer_value().
+ *
+ * This function is not fully implemented. It does not take care of
+ * logical (apparently) and string expressions. Some intrinsic
+ * operators are not evaluated. Floating point expressions are not as
+ * well covered as integer expression.
+ *
+ * It is not clear if the evaluation of floating point expressions
+ * should be considered target dependent (e.g. for GPU code) or if the
+ * IEEE floating point standard is considered strongly enforced.
+ *
+ * If information about the store used to evaluate the expression,
+ * i.e. preconditions, use precondition_minmax_of_expression()
+ *
+ * The algorithm is built on a recursive analysis of the
+ * expression structure. Lower level functions are called until basic atoms
+ * are reached. The success of basic atom evaluation depend on the atom
+ * type:
+ *
+ * reference: right now, the evaluation fails because we do not compute
+ * predicates on variables, unless the variable type is qualified by const.
+ *
+ * call: a call to a user function is not evaluated. a call to an intrinsic
+ * function is successfully evaluated if arguments can be evaluated. a call
+ * to a constant function is evaluated if its basic type is integer.
+ *
+ * range: a range is not evaluated.
+ */
 value EvalExpression(expression e)
 {
     return EvalSyntax(expression_syntax(e));
@@ -67,7 +115,25 @@ value EvalSyntax(syntax s)
   value v;
 
   switch (syntax_tag(s)) {
-  case is_syntax_reference:
+  case is_syntax_reference: {
+    /* Is it a reference to a const variable? */
+    reference r = syntax_reference(s);
+    entity var = reference_variable(r);
+    if(const_variable_p(var)) {
+      value i = entity_initial(var);
+      if(value_constant_p(i))
+	v = copy_value(entity_initial(var));
+      else if(value_expression_p(i)) {
+	expression ie = value_expression(i);
+	v = EvalExpression(ie);
+      }
+      else
+	v = make_value_unknown();
+    }
+    else
+      v = make_value_unknown();
+    break;
+  }
   case is_syntax_range:
     v = make_value_unknown();
     break;
@@ -78,7 +144,8 @@ value EvalSyntax(syntax s)
     v = make_value_unknown();
     break;
   case is_syntax_sizeofexpression:
-    /* SG: sizeof is architecture dependant, it is better not to evaluate it */
+    /* SG: sizeof is architecture dependant, it is better not to
+       evaluate it by default */
     if(get_bool_property("EVAL_SIZEOF"))
         v = EvalSizeofexpression((syntax_sizeofexpression(s)));
     else
@@ -212,15 +279,14 @@ value EvalConstant(constant c)
   return v;
 }
 
-/* this function tries to evaluate a call to an intrinsic function.
-right now, we only try to evaluate unary and binary intrinsic functions,
-ie. fortran operators.
-
-e is the intrinsic function.
-
-la is the list of arguments.
-*/
-
+/* This function tries to evaluate a call to an intrinsic function.
+ * right now, we only try to evaluate unary and binary intrinsic
+ * functions, ie. Fortran operators.
+ *
+ * e is the intrinsic function.
+ *
+ * la is the list of arguments.
+ */
 value EvalIntrinsic(entity e, list la)
 {
   value v;
@@ -694,8 +760,11 @@ int IsNaryOperator(entity e)
 
 	return token;
 }
-
-/* FI: such a function should exist in Linear/arithmetique */
+
+/* FI: such a function should exist in Linear/arithmetique
+ *
+ * FI: should it return a long long int?
+ */
 int 
 ipow(int vg, int vd)
 {
@@ -709,13 +778,15 @@ ipow(int vg, int vd)
 	return(i);
 }
 
-
+
 /*
-  evaluates statically the value of an integer expression.
-
-  returns true if an integer value could be computed and placed in pval.
-
-  returns false otherwise.
+ * evaluates statically the value of an integer expression.
+ *
+ * returns true if an integer value could be computed and placed in pval.
+ *
+ * returns false otherwise.
+ *
+ * Based on EvalExpression()
 */
 bool
 expression_integer_value(expression e, intptr_t * pval)
@@ -871,15 +942,17 @@ bool negative_expression_p(expression e)
   }
   return negative_p;
 }
-
+
 /* returns if e is normalized and linear.
+ *
+ * FI: should be moved into expression.c
  */
 bool expression_linear_p(expression e)
 {
     normalized n = expression_normalized(e);
     return !normalized_undefined_p(n) && normalized_linear_p(n);
 }
-
+
 /**
  * computes the distance between the lower bound and the upper bound of the range
  * @param r range to analyse
@@ -932,7 +1005,7 @@ range_count(range r, intptr_t * pcount)
     return success;
 }
 
-
+
 /* returns true if v is not NULL and is constant */
 /* I make it "static" because it conflicts with a Linear library function.
  * Both functions have the same name but a slightly different behavior.
