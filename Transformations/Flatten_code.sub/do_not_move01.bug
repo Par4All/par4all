@@ -1,2 +1,0 @@
-// It is not legal to move declaration of array b outside the external loop
-// after it has been declared as parallel
