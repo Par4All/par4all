@@ -6,11 +6,14 @@ delete $WS
 # Should not be set since we are checking user error detection
 # setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+# We want to check if PIPS catches the error
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 setenv PIPS_CPP_FLAGS " -I ./$WS.inc -Wall -Werror "
 
 create $WS $WS.src/$WS.c
+
+shell echo "Database created in spite of wrong source code. Error is not detected."
 
 #display PRINTED_FILE[main]
 

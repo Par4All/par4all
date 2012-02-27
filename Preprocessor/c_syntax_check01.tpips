@@ -4,9 +4,17 @@ delete $WS
 # Should not be set since we are checking user error detection
 # setproperty ABORT_ON_USER_ERROR TRUE
 
+# FI: I do see which error should be detected... stdio.h should be
+# included but this is not a problem for PIPS since bootstrap has
+# already declared the function. The bug is not detected.
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
 
 create $WS $WS.c
+
+shell echo "The database is created successfully"
 
 #display PRINTED_FILE[main]
 

@@ -4,6 +4,8 @@
 delete forloop
 create forloop forloop.c
 
+shell echo "Database for forloop created"
+
 quit
 
 activate C_PARSER
