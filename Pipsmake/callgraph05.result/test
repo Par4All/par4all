@@ -1,0 +1,12 @@
+
+Detect the precise recursive cycle: failed!
+
+CALLGRAPH[BAR] (transitive_positions) Module FOO might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) Module CALLGRAPH05 might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) Module BAR might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) 3 module could not be given a position in the call graph, probably because of a recursive call cycle.
+CALLGRAPH[BAR] (transitive_positions) Module FOO might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) Module BAR2 might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) Module BAR might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) Module FOO2 might be part of a recursive call cycle
+CALLGRAPH[BAR] (transitive_positions) 4 module could not be given a position in the call graph, probably because of a recursive call cycle.

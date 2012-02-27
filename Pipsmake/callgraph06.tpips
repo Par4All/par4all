@@ -1,14 +1,32 @@
+# tpips is run twice. It fails the first time, but it is hard to
+# record in the output
+
 delete callgraph06
 create callgraph06 callgraph06.f
 
 make CALLERS[%ALL]
 
 close
+
+echo
+echo Failure
+echo
+
+shell cat callgraph06.database/Warnings
+
 open callgraph06
+
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 make CALLERS[%ALL]
 
+echo
+echo CALLERS made for module BAR
+echo
+
 close
+
+shell cat callgraph06.database/BAR/CALLERS
+
 delete callgraph06
 quit
