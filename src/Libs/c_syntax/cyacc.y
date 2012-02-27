@@ -738,7 +738,7 @@ globals:
 			      }
 			    }
 
-				ifdebug(1) { // the sucessive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
+				ifdebug(1) { // the successive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
 				  list dl = statements_to_declarations(dsl);
 				  /* Each variable should be declared only
 					 once. Type and initial value conflict
@@ -787,6 +787,19 @@ globals:
 			  if(!compilation_unit_p(get_current_module_name())) {
 			    list udl = statements_to_declarations($$);
 			    pips_assert("Each variable is declared once", gen_once_p(udl));
+			    entity m = get_current_module_entity();
+			    string ln = entity_local_name(m);
+			    if(strcmp(ln,"main")==0) {
+			      type mt = entity_type(m);
+			      if(type_functional_p(mt)) {
+				type rt = functional_result(type_functional(mt));
+				if(!scalar_integer_type_p(rt))
+				  pips_user_warning("The \"main\" function should return an int value\n");
+			      }
+			      else {
+				pips_internal_error("A function does not have a functional type\n");
+			      }
+			    }
 			    ResetCurrentModule();
 			  }
 			}
