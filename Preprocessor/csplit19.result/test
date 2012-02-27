@@ -14,8 +14,6 @@ Deleting workspace...
 user error in tp_parse: Could not create workspace csplit19
 user error in tp_close_the_workspace: No workspace to close. Open or create one!
 user error in tp_parse: No workspace csplit19 to open!
-user error in tp_parse: Open or create a workspace first!
-setproperty PRETTYPRINT_LANGUAGE "C"
 user error in perform: Open or create a workspace first!
 user error in tp_close_the_workspace: No workspace to close. Open or create one!
 user warning in tp_parse: csplit19: No such workspace
