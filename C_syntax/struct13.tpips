@@ -1,24 +1,13 @@
 setenv WS=struct13
 delete $WS
+
+# This piece of code is no longer OK with gcc
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create $WS $WS.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 5
-
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-activate C_PARSER
-
 display PARSED_PRINTED_FILE[$WS!]
-
-# The PIPS C parser core dumps on struct12 function
-quit
-#display PARSED_PRINTED_FILE[$WS]
-
-apply UNSPLIT
-shell pips_validation_exe.sh  -c -g $WS
 close
-
-delete $WS
-
+# The PIPS C parser core dumps on struct13 function
+shell cat $WS.database/Warnings
 quit
