@@ -163,11 +163,11 @@ with coldValidationWorkspace(cppflags="-I stubs/include") as w:
   all_modules = w.filter(lambda module: not module.compilation_unit_p() and not filter_exclude_re.match(module.name))
 
   all_modules.simplify_control_directly(concurrent=True)
+  all_modules.flatten_code(concurrent=True, unroll=False)
   all_modules.privatize_module()
   all_modules.internalize_parallel_code(concurrent=True)
   all_modules.coarse_grain_parallelization(concurrent=True)
   all_modules.simplify_control_directly(concurrent=True)
-  all_modules.flatten_code(concurrent=True, unroll=False)
   all_modules.loop_fusion(concurrent=True) # may add param : greedy=True
   all_modules.quick_scalarization()
   all_modules.scalarization()

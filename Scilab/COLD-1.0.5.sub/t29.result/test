@@ -22,13 +22,19 @@ int main(int argc, char *argv[])
       _tmpxx1_0 = 5+__tri1*1;
       _u_b[0][__tri1+1] = _tmpxx1_0;
    }
+
+   0;
    _u_b[0][7] = 25;
    scilab_rt_display_s0i2_("b", 1, 8, _u_b);
    int _u_c[1][0];
+
+   0;
    scilab_rt_display_s0i2_("c", 1, 0, _u_c);
    int _u_d[1][2];
    _u_d[0][0] = 1;
    _u_d[0][1] = 2;
+
+   0;
    scilab_rt_display_s0i2_("d", 1, 2, _u_d);
 
    scilab_rt_terminate();
