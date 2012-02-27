@@ -1,5 +1,11 @@
+/* This code is not standard conformant because struct s is
+   redeclared in the same scope */
+struct s {
+   int l;
+} d1;
+union {
+   struct s {int l;} d;
+   int i;
+} u;
 ### stderr
-user warning in c_parse: Variable "l" is redefined at line 13 (17)
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
-user warning in c_parse: Variable "l" is redefined at line 13 (17)
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+user warning in c_parse: Symbol "l" is redefined at line 13 (17)
