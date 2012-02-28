@@ -738,7 +738,7 @@ globals:
 			      }
 			    }
 
-				ifdebug(1) { // the sucessive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
+				ifdebug(1) { // the successive calls to statements_to_declarations are too costly, so I only activate the test upond debug(1)
 				  list dl = statements_to_declarations(dsl);
 				  /* Each variable should be declared only
 					 once. Type and initial value conflict
@@ -787,6 +787,18 @@ globals:
 			  if(!compilation_unit_p(get_current_module_name())) {
 			    list udl = statements_to_declarations($$);
 			    pips_assert("Each variable is declared once", gen_once_p(udl));
+			    entity m = get_current_module_entity();
+			    if(strcmp(entity_local_name(m),"main")==0) {
+			      type mt = entity_type(m);
+			      if(type_functional_p(mt)) {
+				type rt = functional_result(type_functional(mt));
+				if(!scalar_integer_type_p(rt))
+				  pips_user_warning("The \"main\" function should return an int value\n");
+			      }
+			      else {
+				pips_internal_error("A function does not have a functional type\n");
+			      }
+			    }
 			    ResetCurrentModule();
 			  }
 			}
@@ -2929,11 +2941,24 @@ direct_decl: /* (* ISO 6.7.5 *) */
 					     " Try to compile with \"gcc -ansi -c\"\n");
 			      }
 			      else {
+				type t = (type) stack_head(s);
+				if(type_undefined_p(t)) {
+				pips_user_warning("Symbol \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e) /* entity_name(e)*/,
+						  get_current_C_line_number(), c_lineno);
+				}
+				else if(type_functional_p(t)) {
+				  pips_user_warning("Function \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e) /* entity_name(e)*/,
+						  get_current_C_line_number(), c_lineno);
+				}
+				else {
 				pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
 						  entity_user_name(e) /* entity_name(e)*/,
 						  get_current_C_line_number(), c_lineno);
 				CParserError("Variable redefinition not compatible with ISO standard."
 					     " Try to compile with \"gcc -ansi -c\"\n");
+				}
 			      }
 			    }
 			  }

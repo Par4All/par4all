@@ -724,6 +724,7 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
 	  // and then add the effects due to the initialization part
 	  if(!expression_undefined_p(exp_init))
 	    {
+	      pips_debug(8, "initial value: %s\n", expression_to_string(exp_init));
 	      list l_exp_init = generic_proper_effects_of_expression(exp_init);
 	      if (contract_p)
 		l_exp_init = proper_to_summary_effects(l_exp_init);
@@ -763,6 +764,9 @@ static list r_rw_effects_of_sequence(list l_inst)
     list l_decl = NIL; /* declarations if first_statement is a declaration statement */
 
     first_statement = STATEMENT(CAR(l_inst));
+    transformer context = (*load_context_func)(first_statement);
+    effects_private_current_context_push((*load_context_func)(first_statement));
+
     remaining_block = CDR(l_inst);
 
     if (c_module_p(get_current_module_entity()) &&
@@ -792,6 +796,12 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    {
 	      pips_debug(3, "transformer of first statement:\n");
 	      fprint_transformer(stderr, t1, (get_variable_name_t) entity_local_name);
+	      //print_transformer(t1);
+	    }
+	    if (!transformer_undefined_p(context))
+	    {
+	      pips_debug(3, "precondition of first statement:\n");
+	      fprint_transformer(stderr, context, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
 	    }
 	}
@@ -840,6 +850,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	  }
     }
 
+    effects_private_current_context_pop();
 
     return(l_rw);
 }
@@ -896,6 +907,7 @@ static void rw_effects_of_statement(statement s)
 {
     store_invariant_rw_effects_list(s, NIL);
     effects_private_current_stmt_pop();
+    effects_private_current_context_pop();
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
