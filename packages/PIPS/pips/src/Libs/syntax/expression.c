@@ -49,10 +49,7 @@ char vcid_syntax_expression[] = "$Id$";
 
   x is an expression that represents the value of e. */
 
-entity 
-MakeParameter(e, x)
-entity e;
-expression x;
+entity MakeParameter(entity e, expression x)
 {
     type tp;
 
@@ -74,7 +71,23 @@ expression x;
 	}
     }
     if(value_undefined_p(entity_initial(e)) || value_unknown_p(entity_initial(e))) {
-	entity_initial(e) = MakeValueSymbolic(x);
+      value v =  MakeValueSymbolic(x);
+      symbolic s = value_symbolic(v);
+      constant c = symbolic_constant(s);
+      if(constant_int_p(c) && scalar_integer_type_p(tp))
+	entity_initial(e) = v;
+      else if(constant_float_p(c) && float_type_p(tp))
+	entity_initial(e) = v;
+      else if(constant_float_p(c) && scalar_integer_type_p(tp)) {
+	/* Take the integer part of the floating point constant */
+	double fval = constant_float(c);
+	long long int ival = (long long int) fval;
+	constant_tag(c) = is_constant_int;
+	constant_int(c) = ival;
+	entity_initial(e) = v;
+      }
+      else
+	entity_initial(e) = v;
     }
     else {
 	user_warning("MakeParameter", "Initial value for variable %s redefined\n",

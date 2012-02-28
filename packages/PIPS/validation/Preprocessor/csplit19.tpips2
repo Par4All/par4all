@@ -14,8 +14,8 @@ create csplit19 csplit19.c
 close
 open csplit19
 
-activate C_PARSER
-setproperty PRETTYPRINT_LANGUAGE "C"
+#activate C_PARSER
+#setproperty PRETTYPRINT_LANGUAGE "C"
 
 display PRINTED_FILE[csplit19]
 close

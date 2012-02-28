@@ -71,8 +71,8 @@ c
       print *, 'HPFTEST52 ENDED'
       end
       real function REDMAX1(a,l,u)
-      real a(l:u), amax
       integer l, u
+      real a(l:u), amax
       amin = a(l)
       do i=l+1, u
          if (a(i).GT.amax) amax = a(i)

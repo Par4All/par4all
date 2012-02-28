@@ -1,0 +1,18 @@
+
+Parsed code for "decreasing_loop02"
+
+void decreasing_loop02(unsigned int T, int NJ)
+{
+   int tj;
+   for (tj = NJ-1;tj>=T-1;tj -= T)
+      ;
+}
+
+Controlized code for "decreasing_loop02"
+
+void decreasing_loop02(unsigned int T, int NJ)
+{
+   int tj;
+   for(tj = NJ-1; tj > T; tj += -T)
+      ;
+}

@@ -2034,29 +2034,45 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
 
 
 /*=================================================================*/
-/* int expression_to_int(expression exp): returns the integer value of "exp".
+/* int expression_to_int(expression exp): returns the integer value of
+ * "exp" when "exp" is programming language constant or a Fortran
+ * symbolic constant.
  *
  * Note: "exp" is supposed to contain an integer value which means that the
- *       function expression_constant_p() has returned true with "exp" in
+ *       function expression_constant_p() has returned true with "exp" as
  *       argument.
+ *
  *       This implies that if "exp" is not a "value_constant", it must be
  *       a "value_intrinsic". In that case it is an unary minus operation
  *       upon an expression for which the function expression_constant_p()
- *       returns true (See the commentary given for it).
+ *       returns true (see its comment).
  *
- * SG: improvement: the integer value of a extended_integer_constant_expression_p
- *  is computed too, for instance 0+5
+ * SG: improvement: the integer value of a
+ *  extended_integer_constant_expression_p is computed too, for
+ *  instance 0+5 or 6+3.
  *
- * FI: I am not sure it is an improvement; it looks more like a change
- * of semantics (see above comments and expression_constant_p());
- * other functions exist to evaluate a constant expression...
+ * FI: I am not sure it is an improvement, at best it is an extension;
+ * it looks more like a change of semantics (see above comments and
+ * expression_constant_p()); other functions exist to evaluate a
+ * constant expression... The extension should be useless as this
+ * function should not be called unless guarded by a test with
+ * expression_constant_p()... The same is true for the extension
+ * related to symbolic constants.
+ *
+ * For an extended static expression evaluation, see
+ * EvalExpression(). See also extended_expression_constant_p() for
+ * more comments about what is called a "constant" expression.
+ *
+ * For a cleaner implementation of this function as it was originally
+ * intended, see below expression_to_float().
  */
 int expression_to_int(expression exp)
 {
   int rv = 0;
-  debug( 7, "expression_to_int", "doing\n");
+  pips_debug(7, "doing\n");
 
-  /* use the normalize field first */
+  /* use the normalize field first: this is Serge Guelton's improvement... */
+  /* Not good for user source code preservation... */
   NORMALIZE_EXPRESSION(exp);
   normalized n = expression_normalized(exp);
   if(normalized_linear_p(n)) {
@@ -2065,23 +2081,57 @@ int expression_to_int(expression exp)
           return (int)vect_coeff(TCST, pv);
   }
 
+  /* This is the initial code */
   if(expression_constant_p(exp)) {
-    call c = syntax_call(expression_syntax(exp));
-    switch(value_tag(entity_initial(call_function(c)))) {
-    case is_value_constant:	{
-      rv = constant_int(value_constant(entity_initial(call_function(c))));
-      break;
+    syntax s = expression_syntax(exp);
+    if(syntax_call_p(s)) { // A nullary call is assumed
+      call c = syntax_call(s);
+      switch(value_tag(entity_initial(call_function(c)))) {
+      case is_value_constant:	{
+	rv = constant_int(value_constant(entity_initial(call_function(c))));
+	break;
+      }
+      case is_value_intrinsic: {
+	entity op = call_function(c);
+	if(ENTITY_UNARY_MINUS_P(op))
+	  rv = 0 - expression_to_int(binary_call_lhs(c));
+	else if(ENTITY_UNARY_PLUS_P(op))
+	  rv = expression_to_int(binary_call_lhs(c));
+	else
+	  pips_internal_error("Unexpected intrinsic \"%s\"\n",
+			      entity_local_name(op));
+	break;
+      }
+      default:
+	pips_internal_error("expression %s is not an integer constant\n",
+			    expression_to_string(exp));
+      }
     }
-    case is_value_intrinsic: {
-      rv = 0 - expression_to_int(binary_call_lhs(c));
-      break;
-    }
-    default:
-      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
+    else if(false && syntax_sizeofexpression(s)) {
+      sizeofexpression soe = syntax_sizeofexpression(s);
+      // FI: do we want to guard this evaluation with EVAL_SIZEOF?
+      // This should be part of eval.c
+      value v = EvalSizeofexpression(soe);
+      if(value_constant_p(v)) { // Should always be true... but for dependent types
+	rv = constant_int(value_constant(v));
+      }
+      else {
+	/* Could be improved checking dependent and not dependent types...*/
+	pips_internal_error("expression %s is not an integer constant\n",
+			    expression_to_string(exp));
+      }
+      free_value(v);
     }
   }
+  /* This is another useless extension */
   else if(expression_call_p(exp)) {
-    /* Is it an integer parameter? */
+    /* Is it an integer "parameter" in Fortran, that is symbolic constants?
+     *
+     * Should this be generalized to C const qualified variables?
+     *
+     * I have doubt about this piece of code since the call is
+     * supposedly guarded by expression_constant_p()
+     */
     entity p = call_function(syntax_call(expression_syntax(exp)));
     value v = entity_initial(p);
 
@@ -2089,14 +2139,21 @@ int expression_to_int(expression exp)
       rv = constant_int(symbolic_constant(value_symbolic(v)));
     }
     else {
-      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
+      pips_internal_error("expression %s is not an integer constant\n",
+			  expression_to_string(exp));
     }
   }
   else
-      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
+      pips_internal_error("expression %s is not an integer constant"
+			  " in the sense of expression_constant_p()\n",
+			  expression_to_string(exp));
   return(rv);
 }
-/* same as above for floats */
+
+/* Same as above for floating point constants
+ *
+ * Its calls must be guarded by expression_constant_p()
+ */
 float expression_to_float(expression exp)
 {
   float rv = 0;
@@ -2110,33 +2167,81 @@ float expression_to_float(expression exp)
       break;
     }
     case is_value_intrinsic: {
-      rv = 0 - expression_to_float(binary_call_lhs(c));
+      entity op = call_function(c);
+      if(ENTITY_UNARY_MINUS_P(op))
+	rv = 0 - expression_to_float(binary_call_lhs(c));
+      else if(ENTITY_UNARY_PLUS_P(op))
+	rv = expression_to_float(binary_call_lhs(c));
+      else
+	pips_internal_error("Unexpected intrinsic \"%s\"\n",
+			    entity_local_name(op));
       break;
     }
     default:
-      pips_internal_error("expression is not a constant");
+      pips_internal_error("expression is not a constant"
+			  " according to expression_constant_p()");
     }
   }
   else
-    pips_internal_error("expression is not a constant");
+    pips_internal_error("expression is not a constant"
+			" according to expression_constant_p()");
   return(rv);
 }
 
+/* This function returns a "constant" object if the expression is a
+ * constant such as 10, -11 or 2.345 or "foo".
+ *
+ * Expressions such as "5+0" or "sizeof(int)" or "m", with m defined
+ * as "const int m = 2;" or "M" with M defined as PARAMETER do not
+ * qualify. However their value is constant, i.e. store independent,
+ * and can be evaluated using EvalExpression().
+ */
 constant expression_constant(expression exp)
 {
-  if(syntax_call_p(expression_syntax(exp)))
-  {
-    call c = syntax_call(expression_syntax(exp));
-    value v = entity_initial(call_function(c));
-    switch(value_tag(v))
+  syntax s = expression_syntax(exp);
+  if(syntax_call_p(s))
     {
-      case is_value_constant:
-        return value_constant(v);
-      case is_value_intrinsic:
-        if(ENTITY_UNARY_MINUS_P(call_function(c))||ENTITY_UNARY_PLUS_P(call_function(c)))
-          return expression_constant(binary_call_lhs(c));
-      default:
-        ;
+      call c = syntax_call(expression_syntax(exp));
+      value v = entity_initial(call_function(c));
+      switch(value_tag(v))
+	{
+	case is_value_constant:
+	  return value_constant(v);
+	case is_value_intrinsic: {
+	  entity op = call_function(c);
+	  if(ENTITY_UNARY_MINUS_P(op)||ENTITY_UNARY_PLUS_P(op))
+	    return expression_constant(binary_call_lhs(c));
+	}
+	default:
+	  ;
+	}
+    }
+  else if(false && syntax_sizeofexpression_p(s)) {
+    sizeofexpression soe = syntax_sizeofexpression(s);
+    /* FI: difficult to make a decision here. We may have a constant
+       expression that cannot be evaluated as a constant statically by
+       PIPS. What is the semantics of expression_constant_p()?  */
+    if(sizeofexpression_type_p(soe) /* && get_bool_property("EVAL_SIZEOF")*/ ) {
+      /* Too bad we need a function located in eval.c ... */
+      value v = EvalSizeofexpression(soe);
+      if(value_constant_p(v)) { // Should always be true...
+	constant c = value_constant(v);
+	value_constant(v) = constant_undefined;
+	free_value(v);
+	return c;
+      }
+    }
+  }
+  else if(false && syntax_reference_p(s)) {
+    /* Might be a reference to a scalar constant. */
+    reference r = syntax_reference(s);
+    entity v = reference_variable(r);
+    if(const_variable_p(v)) {
+      value val = entity_initial(v);
+      if(value_constant_p(val)) {
+	constant c = copy_constant(value_constant(val));
+	return c;
+      }
     }
   }
   return constant_undefined;
@@ -2190,10 +2295,12 @@ expression e;
 }
 /*=================================================================*/
 /* bool expression_constant_p(expression exp)
- * Returns true if "exp" contains an (integer) constant value.
+ * Returns true if "exp" is an (integer) constant value.
  *
  * Note : A negativePositive constant can be represented with a call to the unary
  *        minus/plus intrinsic function upon a positive value.
+ *
+ * See below extended_expression_constant_p() for a more general function.
  */
 bool expression_constant_p(expression exp)
 {
@@ -2211,12 +2318,12 @@ bool extended_expression_constant_p(expression exp)
   switch(syntax_tag(s)) {
   case is_syntax_reference: {
     /* The only constant references in PIPS internal representation
-       are references to functions. */
+       are references to functions and to declared constants. */
     reference r = syntax_reference(s);
     entity v = reference_variable(r);
     type t = ultimate_type(entity_type(v));
 
-    constant_p = type_functional_p(t);
+    constant_p = type_functional_p(t) || const_variable_p(v);
     break;
   }
   case is_syntax_range: {
@@ -2273,8 +2380,21 @@ bool extended_expression_constant_p(expression exp)
     constant_p = extended_expression_constant_p(sub_exp);
     break;
   }
-  case is_syntax_sizeofexpression:
+  case is_syntax_sizeofexpression: {
+    /* This should be a constant, except for dependent types. */
+    sizeofexpression soe = syntax_sizeofexpression(s);
+    type t = type_undefined;
+    if(sizeofexpression_type_p(soe))
+      t = copy_type(sizeofexpression_type(soe));
+    else {
+      expression se = sizeofexpression_expression(soe);
+      t = expression_to_type(se);
+    }
+    // constant_p = !dependent_type_p(t);
+    constant_p = !variable_length_array_type_p(t);
+    free_type(t);
     break;
+  }
   case is_syntax_subscript:
     break;
   case is_syntax_application:
@@ -2833,14 +2953,39 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
     intptr_t ib = 0;
     intptr_t nb = 0;
 
-    if(expression_integer_value(e, &ib)) {
+    /* Fi this test is too strong to preserve source code */
+    if(false && expression_integer_value(e, &ib)) {
       /* The offset might not be plus or minus one, unless we know the
 	 index is an integer? Does it depend on the step value? More
 	 thought needed than available tonight (FI) */
       nb = upper_p? ib-1 : ib+1;
       b = int_to_expression(nb);
     }
-    else {
+    else if(expression_constant_p(e)) {
+      /* The offset might not be plus or minus one, unless we know the
+	 index is an integer? Does it depend on the step value? More
+	 thought needed than available tonight (FI) */
+      ib = expression_to_int(e);
+      nb = upper_p? ib-1 : ib+1;
+      b = int_to_expression(nb);
+    }
+    else if(NORMALIZE_EXPRESSION(e), expression_linear_p(e)) {
+      /* May modify the source code a bit more than necessary, but
+	 avoids stupid expressions such as 64-1-1 */
+      normalized n = expression_normalized(e);
+      Pvecteur v = normalized_linear(n);
+      /* This could be generalized to any affine expression. See for
+	 instance loop_bound02.c. But the source code is likely to be
+	 disturbed if the bound expression is regenerated from v after
+	 adding or subtracting 1 from its constant term. */
+      if(vect_constant_p(v) || VECTEUR_NUL_P(v)) {
+	Value c = vect_coeff(TCST, v);
+	ib = (int) c;
+	nb = upper_p? ib-1 : ib+1;
+	b = int_to_expression(nb);
+      }
+    }
+    if(expression_undefined_p(b)) {
       expression offset = int_to_expression(1);
       entity op = entity_intrinsic(upper_p? MINUS_OPERATOR_NAME : PLUS_OPERATOR_NAME);
 

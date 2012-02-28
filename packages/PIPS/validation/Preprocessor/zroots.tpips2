@@ -1,4 +1,7 @@
 delete zroots
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create zroots zroots.c
 
 # quit

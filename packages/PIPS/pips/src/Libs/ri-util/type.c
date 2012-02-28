@@ -2475,6 +2475,7 @@ bool array_type_p(type t)
 {
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
+
 bool type_pointer_on_struct_variable_p(type t)
 {
         t = ultimate_type(t);
@@ -2486,6 +2487,7 @@ bool type_pointer_on_struct_variable_p(type t)
         return false;
 }
 
+/* Is this equivalent to dependent_type_p()? */
 bool variable_length_array_type_p(type t)
 {
   bool return_val = false;
@@ -2500,6 +2502,7 @@ bool variable_length_array_type_p(type t)
   }
   return return_val;
 }
+
 bool fixed_length_array_type_p(type t)
 {
     return array_type_p(t) && !variable_length_array_type_p(t);

@@ -4,5 +4,12 @@ create callgraph04 callgraph04.f
 make CALLERS[%ALL]
 
 close
-delete callgraph04
+
+echo
+echo Detect recursive cycle
+echo
+
+shell cat callgraph04.database/Warnings
+
+#delete callgraph04
 quit

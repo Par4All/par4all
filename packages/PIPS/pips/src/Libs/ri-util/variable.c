@@ -1483,6 +1483,32 @@ bool volatile_variable_p(entity v)
   return volatile_p;
 }
 
+/* The variable may turn out to be a function */
+bool qualified_variable_p(entity v, int is_qualified)
+{
+  bool qualified_p = false;
+  type t = entity_type(v);
+  if(type_variable_p(t)) {
+    // ifdebug(1) pips_assert("the entity must have type variable",
+    // type_variable_p(t));
+    // FI: no idea if volatile can he hidden in a typedef...
+    variable vt = type_variable(t);
+    list ql = variable_qualifiers(vt);
+
+    FOREACH(QUALIFIER, q, ql) {
+      if(qualifier_tag(q)==is_qualified) {
+	qualified_p = true;
+	break;
+      }
+    }
+  }
+  return qualified_p;
+}
+
+bool const_variable_p(entity v)
+{
+  return qualified_variable_p(v, is_qualifier_const);
+}
 
 /* Discard the decls_text string of the module code to make the
    prettyprinter ignoring the textual declaration and remake all from

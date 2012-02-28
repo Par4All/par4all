@@ -1,9 +1,9 @@
       SUBROUTINE TILING(A,B,SZ)
       
+      INTEGER T,SZ
       INTEGER A(1:SZ,1:SZ)
       INTEGER B(0:SZ+1,0:SZ+1)
       INTEGER kernel(0:2,0:2)
-      INTEGER T,SZ
       PARAMETER (T=10)
 
       if ( MOD(SZ,T) .NE. 0 ) RETURN

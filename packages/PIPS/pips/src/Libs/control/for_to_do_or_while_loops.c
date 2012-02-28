@@ -180,8 +180,11 @@ static bool incrementation_expression_to_increment(expression incr,
                     bool entity_plus_update_p = ENTITY_PLUS_UPDATE_P(op);
                     bool entity_minus_update_p = ENTITY_MINUS_UPDATE_P(op);
                     if ( (entity_plus_update_p||entity_minus_update_p) ) {
-                        if(extended_integer_constant_expression_p(inc_v)) {
-                            int v = expression_to_int(inc_v);
+                        if(expression_constant_p(inc_v)) {
+			    int v = expression_to_int(inc_v);
+			    // bool eval_p = expression_integer_value(inc_v);
+			    //pips_assert("The expression can be evaluated",
+			    //		eval_p);
                             if (v != 0) {
                                 int sign = entity_plus_update_p ? 1 : -1 ;
                                 * pincrement = int_to_expression(sign * v);
@@ -205,10 +208,6 @@ static bool incrementation_expression_to_increment(expression incr,
 			  bool pos_p = positive_expression_p(inc_v);
 			  bool neg_p = negative_expression_p(inc_v);
 			  if(pos_p || neg_p) {
-			    /* FI: Not safe: inc_v is assumed
-			       positive... I guess unsigned type could
-			       be exploited. See
-			       C_syntax/decreasing_loop01 */
 			    if(entity_minus_update_p) {
 			      // FI: I assume we are not dealing with pointers
 			      entity uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);

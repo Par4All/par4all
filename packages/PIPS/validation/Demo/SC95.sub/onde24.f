@@ -756,6 +756,7 @@ c
 c     calcul du min
 c
       REAL*8 FUNCTION REDMIN(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
       REAL*8 A(LO1:UP1,LO2:UP2), MINA
       INTEGER I,J
       MINA = A(LO1, LO2)
@@ -771,6 +772,7 @@ c
 c     calcul du max
 c
       REAL*8 FUNCTION REDMAX(A, LO1, UP1, LO2, UP2)
+      INTEGER LO1, UP1, LO2, UP2
       REAL*8 A(LO1:UP1,LO2:UP2), MAXA
       INTEGER I,J
       MAXA = A(LO1, LO2)

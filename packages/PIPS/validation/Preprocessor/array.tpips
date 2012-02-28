@@ -15,6 +15,12 @@ create array array.c
 display PRINTED_FILE[main]
 
 close
+
+echo
+echo Warnigs:
+echo
+
 shell cat array.database/Warnings
+
 delete array
 quit

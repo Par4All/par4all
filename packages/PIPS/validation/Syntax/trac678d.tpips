@@ -1,0 +1,15 @@
+delete trac678d
+setproperty ABORT_ON_USER_ERROR TRUE
+# setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create trac678d trac678d.f
+
+apply PARTIAL_EVAL
+
+echo
+echo Code
+echo
+
+display PRINTED_FILE 
+close
+delete trac678d
+quit

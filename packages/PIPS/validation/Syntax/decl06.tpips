@@ -1,9 +1,12 @@
 delete decl06
+# The input code is not OK with gfortran: no implicit cast to int
+# See Ticket 678 and its validation test cases, especially trac678b.f
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create decl06 decl06.f
 module DECL06
 module FOO
 display PRINTED_FILE[FOO]
 close
+shell cat decl06.database/Warnings
 delete decl06
 quit

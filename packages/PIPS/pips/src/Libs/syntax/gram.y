@@ -815,7 +815,14 @@ ldim_tableau: dim_tableau
 
 dim_tableau: expression
 	    {
-		    $$ = make_dimension(int_to_expression(1),$1);
+	      expression e = $1;
+	      type t = expression_to_type(e);
+	      if(scalar_integer_type_p(t))
+		$$ = make_dimension(int_to_expression(1), e);
+	      else // Not OK with gfortran, maybe OK with f77
+		ParserError("Syntax",
+			    "Array sized with a non-integer expression");
+	      free_type(t);
 	    }
 	| TK_STAR
 	    {
@@ -829,7 +836,16 @@ dim_tableau: expression
 	    }
 	| expression TK_COLON expression
 	    {
-		    $$ = make_dimension($1, $3);
+	      expression e1 = $1;
+	      type t1 = expression_to_type(e1);
+	      expression e2 = $3;
+	      type t2 = expression_to_type(e2);
+	      if(scalar_integer_type_p(t1) && scalar_integer_type_p(t2))
+		$$ = make_dimension(e1, e2);
+	      else // Not OK with gfortran, maybe OK with f77
+		ParserError("Syntax",
+			    "Array sized with a non-integer expression");
+	      free_type(t1), free_type(t2);
 	    }
 	;
 

@@ -1,3 +1,4 @@
+/* The data structure fcomplex is not defined in this file... */
 #include <math.h>
 #include "complex.h"
 
@@ -5,8 +6,8 @@
 #define MAXM 100
 
 void zroots(a,m,roots,polish)
-fcomplex a[],roots[];
-int m,polish;
+fcomplex a[], roots[];
+int m, polish;
 {
 	int jj,j,i;
 	fcomplex x,b,c,ad[MAXM];

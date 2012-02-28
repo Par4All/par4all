@@ -90,8 +90,8 @@ c
 c reduction
 c
       real*8 function REDMAX1(a,l,u)
-      real*8 a(l:u), amax
       integer l, u, i
+      real*8 a(l:u), amax
       amax = a(l)
       do i=l+1, u
          if (a(i).GT.amax) amax = a(i)

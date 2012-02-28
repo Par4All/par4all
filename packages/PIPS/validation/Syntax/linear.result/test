@@ -30,9 +30,9 @@ PRINTED_FILE made for RELAX.
 c------------------------------------------------------------------------------
       SUBROUTINE RELAX(MAT, D1, D2, N, F)
 c
+      INTEGER D1, D2
       REAL*8 MAT(D1, D2)
       REAL*8 F
-      INTEGER D1, D2
 c
       IF (N.LE.0) STOP 'nombre d iterations incorrect'                  0009
 c

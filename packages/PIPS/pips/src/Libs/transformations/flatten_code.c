@@ -86,11 +86,21 @@ static void rename_reference(reference r, hash_table renamings)
 }
 
 /* gen_multi_recurse callback on exiting a loop:
-   if loop index needs renaming, rename this occurrence.
+ * if loop index needs renaming, rename this occurrence.
+ *
+ * Take advantage of this opportunity to serialize the loop in order
+ * to avoid any inconsistency. Local variables moved out of the loop
+ * may require a privatization after flattening of the loop is to be
+ * kept parallel.
  */
 static void rename_loop_index(loop l, hash_table renamings)
 {
   entity var = loop_index(l);
+
+  execution ex = loop_execution(l);
+  if(execution_parallel_p(ex))
+    execution_tag(ex) = is_execution_sequential;
+
   if (hash_defined_p(renamings, var)) {
     entity nvar = (entity)hash_get(renamings, var);
     if(nvar!=var) {
@@ -563,13 +573,14 @@ static void statement_purge_declarations(statement s)
    This function is be composed of several steps:
 
    1 flatten declarations inside statement: declarations are moved as
-     high as possible in the control structure
+     high as possible in the control structure; this may serialize
+     parallel loops, but this pass was designed for sequential code.
 
-   2 clean_up_sequences: remove useless braces when they are nested
+   2 clean_up_sequences: remove useless braces when they are nested.
 
-   3 unroll looops with statically known iteration number
+   3 unroll looops with statically known iteration number.
 
-   4 clean_up_sequences: remove useless braces when they are nested
+   4 clean_up_sequences: remove useless braces when they are nested.
 
    It is assumed that the function main statement will contain at
    least one local variable. This is used to preserve the scoping
