@@ -3,6 +3,13 @@ create callgraph02 callgraph02.f
 
 make CALLERS[BAR]
 
+echo
+echo "CALLERS made for module BAR"
+echo
+
 close
+
+shell cat callgraph02.database/BAR/CALLERS
+
 delete callgraph02
 quit

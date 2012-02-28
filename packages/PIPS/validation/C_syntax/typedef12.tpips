@@ -3,7 +3,11 @@ delete typedef12
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create typedef12 typedef12.c
+
+shell echo "Database created"
+
 quit
+
 #activate C_PARSER
 
 #setproperty PRETTYPRINT_LANGUAGE "C"

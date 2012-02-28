@@ -1,0 +1,23 @@
+
+Code
+
+!     Floating point initialization of integer parameter
+
+!     Make sure partial eval is OK
+      
+      PROGRAM MAIN
+      
+      INTEGER*4 I
+      PARAMETER ( I = 100 )
+      INTEGER*4 J
+      PARAMETER ( J = I*0.1 )
+
+      INTEGER*4 ARRAY
+
+      COMMON / C1 / 
+     *     ARRAY(J)
+
+      ARRAY(1) = 20                                                     0017
+      PRINT *, ARRAY(1)                                                 0018
+
+      END

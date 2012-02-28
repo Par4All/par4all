@@ -54,10 +54,10 @@ double capr__()
       for(_u_ii_0 = 1; _u_ii_0 <= _u_na+1; _u_ii_0 += 1) {
          //PIPS generated variable
          int _u_jj_0;
-         for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
+         for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1) {
             _u_mask[_u_ii_0-1][_u_jj_0-1] = 0;
-         for(_u_jj_0 = 1; _u_jj_0 <= _u_mb+1; _u_jj_0 += 1)
             _u_f[_u_ii_0-1][_u_jj_0-1] = 1;
+         }
       }
       _u_oldcap = 0;
       //PIPS generated variable

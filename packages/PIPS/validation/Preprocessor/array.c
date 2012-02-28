@@ -1,4 +1,4 @@
-// Bug in main declaration
+/* Bug in main function declaration */
 
 void main ()
 {

@@ -7,3 +7,7 @@ void main()
    a[nga] = 1;
    b[1][2] = 2;
 }
+
+Warnigs:
+
+C_PARSER[main] (c_parse) The "main" function should return an int value

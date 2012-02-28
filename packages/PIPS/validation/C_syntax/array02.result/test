@@ -6,7 +6,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "array02!:*STATIC*" with type "area" with size 0
-	Declared entity "array02:*DYNAMIC*" with type "area" with size 36
+	Declared entity "array02:*DYNAMIC*" with type "area" with size 52
 	Declared entity "array02:*HEAP*" with type "area" with size 0
 	Declared entity "array02:*STACK*" with type "area" with size 0
 	Declared entity "array02:*STATIC*" with type "area" with size 0
@@ -34,9 +34,10 @@ Layout for memory area "array02!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "array02:*DYNAMIC*" of size 36:
-	Variable "array02:0`b"	offset = 16	size = 16
-	Variable "array02:0`i"	offset = 32	size = 4
+Layout for memory area "array02:*DYNAMIC*" of size 52:
+	Variable "array02:0`a"	offset = 16	size = 16
+	Variable "array02:0`b"	offset = 32	size = 16
+	Variable "array02:0`i"	offset = 48	size = 4
 	Variable "array02:0`__func__"	offset = 0	size = 8
 	Variable "array02:0`__FUNCTION__"	offset = 8	size = 8
 
@@ -46,7 +47,7 @@ Layout for memory area "array02:*HEAP*" of size 0:
 
 
 Layout for memory area "array02:*STACK*" of size 0:
-	Dynamic Variable "array02:0`a"	offset = UNKNOWN, 	size = DYNAMIC
+	* empty area *
 
 
 Layout for memory area "array02:*STATIC*" of size 0:

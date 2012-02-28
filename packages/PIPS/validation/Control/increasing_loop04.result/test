@@ -1,0 +1,20 @@
+
+Parsed code for "increasing_loop04"
+
+void increasing_loop04(int NJ)
+{
+   const int T = 2;
+   int tj;
+   for (tj = T;tj<NJ-T;tj += T)
+      ;
+}
+
+Controlized code for "increasing_loop04"
+
+void increasing_loop04(int NJ)
+{
+   const int T = 2;
+   int tj;
+   for(tj = T; tj <= NJ-T-1; tj += T)
+      ;
+}

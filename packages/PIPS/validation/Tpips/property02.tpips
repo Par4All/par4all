@@ -1,4 +1,4 @@
 setenv WS=400
 setenv FILES=$WS.perlbench/src/*.c
+shell echo "tpips has not core dumped!"
 quit
-

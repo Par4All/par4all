@@ -1,0 +1,11 @@
+setenv ws loop_bound01
+delete $ws
+setproperty ABORT_ON_USER_ERROR TRUE
+create $ws $ws.c
+module $ws
+
+display PRINTED_FILE
+
+close
+delete $ws
+quit

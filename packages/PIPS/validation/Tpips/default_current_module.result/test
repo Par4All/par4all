@@ -1,0 +1,24 @@
+### stderr
+user warning in tp_parse: default_current_module: No such workspace
+Registering file default_current_module.f
+Checking Fortran syntax of file "./default_current_module.f"
+Splitting file    ./default_current_module.f
+  Module         BAR
+  Module         FOO
+  Module         DEFAULT_CURRENT_MODULE
+Workspace default_current_module created and opened.
+user error in tp_parse: No current module has been defined, explicitly or implictly.
+Please specify a module name as argument or check that the current workspace "default_current_module" contains one main module or no more than one module.
+user error in tp_parse: No current module has been defined, explicitly or implictly.
+Please specify a module name as argument or check that the current workspace "default_current_module" contains one main module or no more than one module.
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module BAR.
+  Closing module DEFAULT_CURRENT_MODULE.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace default_current_module closed.
+
+Workspace default_current_module deleted.

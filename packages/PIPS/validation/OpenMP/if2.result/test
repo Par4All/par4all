@@ -5,13 +5,13 @@ int main()
    int i = 0;
    int j = 0;
 
-#pragma omp parallel for private(i) if(size>=100)
+#pragma omp parallel for private(i) if(1000>=100)
    for(j = 0; j <= size-1; j += 1)
-#pragma omp parallel for if(size>=100)
+#pragma omp parallel for if(1000>=100)
       for(i = 0; i <= size-1; i += 1)
          b[i][j] = 0;
 
-#pragma omp parallel for private(i) if(size>=100)
+#pragma omp parallel for private(i) if(1000>=100)
    for(j = 0; j <= size-1; j += 1)
 #pragma omp parallel for if(100>=100)
       for(i = 0; i <= 99; i += 1)

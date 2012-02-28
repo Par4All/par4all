@@ -10,10 +10,10 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, 1<=SZ}>
 
       SUBROUTINE TILING(A,B,SZ)
       
+      INTEGER T,SZ
       INTEGER A(1:SZ,1:SZ)
       INTEGER B(0:SZ+1,0:SZ+1)
       INTEGER KERNEL(0:2,0:2)
-      INTEGER T,SZ
       PARAMETER (T=10)
 
       IF (MOD(SZ, T).NE.0) RETURN                                       0009
@@ -139,10 +139,10 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, 1<=SZ}>
 
       SUBROUTINE TILING(A,B,SZ)
       
+      INTEGER T,SZ
       INTEGER A(1:SZ,1:SZ)
       INTEGER B(0:SZ+1,0:SZ+1)
       INTEGER KERNEL(0:2,0:2)
-      INTEGER T,SZ
       PARAMETER (T=10)
 
       IF (MOD(SZ, T).NE.0) RETURN                                       0009
@@ -233,10 +233,10 @@ C    J<=SZ}>
       END
       SUBROUTINE TILING(A,B,SZ)
       
+      INTEGER T,SZ
       INTEGER A(1:SZ,1:SZ)
       INTEGER B(0:SZ+1,0:SZ+1)
       INTEGER KERNEL(0:2,0:2)
-      INTEGER T,SZ
       PARAMETER (T=10)
 
       IF (MOD(SZ, T).NE.0) RETURN                                       0009

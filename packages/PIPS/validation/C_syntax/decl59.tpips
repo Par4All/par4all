@@ -1,7 +1,18 @@
 delete decl59
 #setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create decl59 decl59.c
+
+echo
+echo Parsed printed code for "main"
+echo
+
 display PARSED_PRINTED_FILE[main]
 close
-#delete decl59
+
+echo
+echo Warnings related to "decl59.c"
+echo
+
+shell cat decl59.database/Warnings
+delete decl59
 quit

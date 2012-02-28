@@ -1,5 +1,7 @@
+union {
+   struct s {int l;} d1;
+   struct s d2;
+   int i;
+} u;
 ### stderr
-user warning in c_parse: Variable "l" is redefined at line 12 (16)
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
-user warning in c_parse: Variable "l" is redefined at line 12 (16)
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+user warning in c_parse: Symbol "l" is redefined at line 12 (16)

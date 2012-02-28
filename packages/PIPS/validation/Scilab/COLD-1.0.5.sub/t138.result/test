@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
       _u_a2[3][j_2][0] = 10;
 #pragma omp parallel for
    for(j_2 = 0; j_2 <= 2; j_2 += 1)
-      ;
+      0+1;
 
    _u_a2[5][1][0] = 20;
    0+1;
