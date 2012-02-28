@@ -46,10 +46,10 @@ int main(int argc, char *argv[])
    for(_u_i = 1; _u_i <= _u_n; _u_i += 1) {
       //PIPS generated variable
       int _u_j;
-      for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
+      for(_u_j = 1; _u_j <= _u_n; _u_j += 1) {
          _u_x[_u_i-1][_u_j-1] = _u_i;
-      for(_u_j = 1; _u_j <= _u_n; _u_j += 1)
          _u_y[_u_i-1][_u_j-1] = _u_j;
+      }
    }
    /* tic(); */
    double _u_z[100][100];

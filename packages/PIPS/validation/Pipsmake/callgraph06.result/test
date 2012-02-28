@@ -1,0 +1,14 @@
+
+Failure
+
+CALLGRAPH[CALLGRAPH06] (callgraph) no source file for module BAR, let's try so synthesize code
+INITIALIZER[BAR] (generic_initializer) user error
+INITIALIZER[BAR] (generic_initializer) no source file for BAR (might be an ENTRY point)
+set PREPROCESSOR_MISSING_FILE_HANDLING to "query" or "generate"...
+INITIALIZER[BAR] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (db_clean_all_required_resources) module 'BAR' to be deleted, no more resources owned.
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource CALLERS for module CALLGRAPH06.
+
+CALLERS made for module BAR
+
+0 T32 ("FOO"))

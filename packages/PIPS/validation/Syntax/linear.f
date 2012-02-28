@@ -115,9 +115,9 @@ c
 c------------------------------------------------------------------------------
       subroutine relax(mat, d1, d2, n, f)
 c
+      integer d1, d2
       real*8 mat(d1, d2)
       real*8 f
-      integer d1, d2
 c
       if (n .le. 0) stop 'nombre d iterations incorrect'
 c

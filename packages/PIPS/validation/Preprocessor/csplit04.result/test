@@ -1,0 +1,20 @@
+### stderr
+user warning in tp_parse: csplit04: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
+user error in parse_properties: Unknown property "CHECK_FORTRAN_SYNTAX_BEFORE_PIPS" to update
+Registering file csplit04.src/foo1.f
+Checking Fortran syntax of file "./csplit04.src/foo1.f"
+Splitting file    ./csplit04.src/foo1.f
+  Module         FOO
+Registering file csplit04.src/foo2.f
+Checking Fortran syntax of file "./csplit04.src/foo2.f"
+Splitting file    ./csplit04.src/foo2.f
+  Module         FOO
+user warning in process_user_file: Duplicate module name "FOO/FOO.initial.f" from files "./csplit04.src/foo1.f" and "./csplit04.src/foo2.f".
+Closing all modules.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Deleting workspace...
+user error in tp_parse: Could not create workspace csplit04
+user error in tp_parse: No current workspace! create or open one!

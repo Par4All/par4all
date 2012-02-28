@@ -138,6 +138,10 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 # this is the default, but may need to be overriden
 RESULTS	= RESULTS
 
+# this macro allows to control results are displayed
+#TORESULTS = >> $(RESULTS)
+TORESULTS = | tee -a $(RESULTS)
+
 # shell environment to run validation scripts
 # this is a requirement!
 SHELL	= /bin/bash
@@ -150,18 +154,18 @@ RECWHAT	=
 # tag is not counted if there is no corresponding result.
 # f95 test cases may be kept out of the validation from here as well.
 EXCEPT =  [ "$(RECWHAT)" ] && \
-	    { echo "$(RECWHAT): $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	    { echo "$(RECWHAT): $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_BUG)" -a -f $*.bug -a -d $*.result ] && \
-	    { echo "bug: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	    { echo "bug: $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_LATER)" -a -f $*.later -a -d $*.result ] && \
-	    { echo "later: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	    { echo "later: $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
-	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	    { echo "slow: $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_DEFAULT)" -a -d $*.result -a \
 	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
-	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	    { echo "skipped: $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
-	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    { echo "keptout: $(SUBDIR)/$*" $(TORESULTS) ; exit 0 ; }
 
 
 # setup running a case
@@ -185,7 +189,7 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	[ "$(RECWHAT)" ] && recwhat=$(RECWHAT) ; \
 	$(MAKE) RECWHAT=$$recwhat RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ \
 		-C $^ $(FORWARD) || \
-	  echo "broken-directory: $(SUBDIR)/$^" >> $(RESULTS)
+	  echo "broken-directory: $(SUBDIR)/$^" $(TORESULTS)
 
 # extract validation result for summary when the case was run
 # five possible outcomes: passed, changed, failed, timeout, noref
@@ -211,7 +215,7 @@ OK	= status=$$? ; \
 	        echo "passed: $(SUBDIR)/$* $$SECONDS" ; \
 	      fi ; \
             fi ; \
-	  fi >> $(RESULTS)
+	  fi $(TORESULTS)
 
 # default target is to clean
 .PHONY: clean
@@ -363,7 +367,7 @@ ifdef DO_PYPS
 	$(PF) ; $(PYTHON) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 else # no pyps...
 %.validate: %.py
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 endif # DO_PYPS
 
 # default_tpips
@@ -441,19 +445,19 @@ ifdef DO_PYPS
 else # without pyps
 
 %.validate: %.c $(DEFPYPS)
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 
 %.validate: %.f $(DEFPYPS)
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 
 %.validate: %.F $(DEFPYPS)
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 
 %.validate: %.f90 $(DEFPYPS)
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 
 %.validate: %.f95 $(DEFPYPS)
-	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" $(TORESULTS)
 
 endif # DO_PYPS
 
@@ -472,7 +476,7 @@ skipped:
 	  then \
 	    echo "missing: $(SUBDIR)/$$base" ; \
 	  fi ; \
-	done >> $(RESULTS)
+	done $(TORESULTS)
 
 # test RESULT directory without any script...
 # this warning is reported only if the case would be executed in the
@@ -494,7 +498,7 @@ orphan:
 	       -f default_pyps.py -o \
 	       -f default_test || \
 	  echo "orphan: $(SUBDIR)/$$base" ; \
-	done >> $(RESULTS)
+	done $(TORESULTS)
 
 # test case with multiple scripts... one is randomly (?) chosen
 .PHONY: multi-script
@@ -502,7 +506,7 @@ multi-script:
 	@for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-script: $(SUBDIR)/$$base" ; \
-	done >> $(RESULTS)
+	done $(TORESULTS)
 
 # test case with multiple sources (c/f/F...)
 .PHONY: multi-source
@@ -510,7 +514,7 @@ multi-source:
 	@for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
-	done >> $(RESULTS)
+	done $(TORESULTS)
 
 # empty 'test' result file
 .PHONY: empty-test
@@ -520,7 +524,7 @@ empty-test:
           then \
             echo "empty-test: $(SUBDIR)/$$base" ; \
           fi ; \
-        done >> $(RESULTS)
+        done $(TORESULTS)
 
 # check that all tpips2 have a corresponding flt
 .PHONY: nofilter
@@ -528,7 +532,7 @@ nofilter:
 	@for f in $(F.tpips2) ; do \
 	  test -e $${f/.tpips2/.flt} || \
 	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
-	done >> $(RESULTS)
+	done $(TORESULTS)
 
 # all possible inconsistencies
 .PHONY: inconsistencies

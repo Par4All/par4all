@@ -1,0 +1,13 @@
+
+Code
+
+
+Warnings
+
+PARSER[MAIN] (Syntax) user error
+PARSER[MAIN] (Syntax) Parser error between lines 6 and 6
+Array sized with a non-integer expression
+PARSER[MAIN] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module MAIN.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

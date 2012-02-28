@@ -8,8 +8,8 @@ create dereference dereference.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty IGNORE_FUNCTION_IN_HEADER FALSE
 
@@ -34,6 +34,10 @@ make CALLEES[flgr2d_raster_slide_window_fgUINT16]
 #apply PARTIAL_EVAL[flgr2d_raster_slide_window_fgUINT16]
 #display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
 
+close
+
+# CALLEES are not very readable but they fill the test file
+shell cat dereference.database/flgr2d_raster_slide_window_fgUINT16/CALLEES
 
 quit
 

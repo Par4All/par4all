@@ -6,7 +6,7 @@
       PARAMETER (N = 5)
       INTEGER*4 M
       PARAMETER (M = 1)
-      REAL*4 Q
+      INTEGER*4 Q
       PARAMETER (Q = 10)
       include 'FOO.h'
       INTEGER J(1:M), K(1:P)
@@ -14,15 +14,15 @@
       INTEGER L(1:Q)
       COMMON /FOO3/ L
 
-      PRINT *, I1(1), J(1), L(2)                                        0013
-      CALL BLA                                                          0014
+      PRINT *, I1(1), J(1), L(2)                                        0015
+      CALL BLA                                                          0016
       END
       SUBROUTINE BLA
       INTEGER*4 N
       PARAMETER (N = 5)
-      REAL*4 P
+      INTEGER*4 P
       PARAMETER (P = 1)
-      REAL*4 QX
+      INTEGER*4 QX
       PARAMETER (QX = 10)
       include 'FOO.h'
       INTEGER J(1:M), K(1:P)
@@ -30,6 +30,6 @@
       INTEGER L(1:QX)
       COMMON /FOO3/ L
 
-      PRINT *, I1(1), K(1), L(2)                                        0013
+      PRINT *, I1(1), K(1), L(2)                                        0015
       END
 

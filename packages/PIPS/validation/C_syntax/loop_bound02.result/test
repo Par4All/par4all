@@ -1,0 +1,8 @@
+void loop_bound02()
+{
+   int i, j;
+   for(i = 0; i <= 18; i += 1)
+      for(j = 0; j <= i-1-1; j += 1)
+         ;
+   return;
+}

@@ -1,0 +1,15 @@
+### stderr
+user warning in tp_parse: zroots: No such workspace
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+Registering file zroots.c
+Preprocessing file ./zroots.c
+Splitting file    ./zroots.database/Tmp/zroots.cpp_processed.c
+user warning in splitc_error: C syntax error near "fcomplex" at preprocessed line 2585 (user line 9)
+user error in splitc_error: Syntax error
+split error while extracting ./zroots.database/.csplit_file_list from ./zroots.database/Tmp/zroots.cpp_processed.c: parser error
+Closing all modules.
+Closing program.
+Closing workspace.
+Deleting workspace...
+user error in tp_parse: Could not create workspace zroots
+user error in perform: Open or create a workspace first!

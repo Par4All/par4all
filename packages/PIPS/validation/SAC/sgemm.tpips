@@ -4,6 +4,8 @@ delete SGEMM
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty CROUGH_PRINT_UNKNOWN_INTRINSIC TRUE
 
+setenv PIPS_MORE=cat
+
 create SGEMM kernels/SGEMM/SGEMM.f include/simd.f
 
 module SGEMM

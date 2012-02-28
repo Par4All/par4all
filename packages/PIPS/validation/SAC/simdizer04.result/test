@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
    a4si pdata0 = {2, 3, 4, 5};
    //PIPS generated variable
    int __c[4];
-   __a = malloc(4*sizeof(int));
+   __a = malloc(sizeof(int)*4);
    do {
       //PIPS:SAC generated v4si vector(s)
       v4si vec00, vec10, vec20;

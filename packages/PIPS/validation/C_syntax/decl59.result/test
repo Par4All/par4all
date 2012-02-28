@@ -1,0 +1,13 @@
+
+Parsed printed code for "main"
+
+int main()
+{
+   int foo2();
+   int foo2();
+   return 0;
+}
+
+Warnings related to "decl59.c"
+
+C_PARSER[main] (c_parse) Symbol "foo2" is redefined at line 3 (4)

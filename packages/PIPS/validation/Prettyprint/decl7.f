@@ -4,9 +4,11 @@
       parameter (n=5)
       common /foo/ i1(n)
 
+      integer p
       parameter (m=1,p=2)
       common /foo2/ j(m),k(p)
       
+      integer q, qx
       parameter (q=10, qx=12)
       common /foo3/ l(q)
 
@@ -19,9 +21,11 @@
       parameter (n=5)
       common /foo/ i1(n)
 
+      integer p
       parameter (m=2,p=1)
       common /foo2/ j(m),k(p)
 
+      integer q, qx
       parameter (q=3, qx=10)
       common /foo3/ l(qx)
 

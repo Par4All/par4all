@@ -1,12 +1,7 @@
-
-      SUBROUTINE FOO(X, Y, Z, W, N, M)
-      INTEGER N, M
-      REAL X(N+1)
-      REAL Y(N+1.0)
-      REAL Z(N*1.5)
-      REAL W(N*M)
-      INTEGER I
-      DO 10 I = 1, N+1                                                  0009
-         X(I) = 1                                                       0010
-10       CONTINUE                                                       0011
-      END
+PARSER[FOO] (Syntax) user error
+PARSER[FOO] (Syntax) Parser error between lines 5 and 5
+Array sized with a non-integer expression
+PARSER[FOO] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module FOO.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE
