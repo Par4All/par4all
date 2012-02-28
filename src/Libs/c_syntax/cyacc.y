@@ -788,8 +788,7 @@ globals:
 			    list udl = statements_to_declarations($$);
 			    pips_assert("Each variable is declared once", gen_once_p(udl));
 			    entity m = get_current_module_entity();
-			    const char * ln = entity_local_name(m);
-			    if(strcmp(ln,"main")==0) {
+			    if(strcmp(entity_local_name(m),"main")==0) {
 			      type mt = entity_type(m);
 			      if(type_functional_p(mt)) {
 				type rt = functional_result(type_functional(mt));
