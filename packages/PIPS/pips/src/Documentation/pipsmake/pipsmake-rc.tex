@@ -11341,7 +11341,8 @@ strength_reduction > MODULE.code
 
 \begin{PipsPass}{flatten_code}
 The goal of this program transformation is to enlarge basic blocks as
-much as possible to increase the opportunities for optimization.
+much as possible to increase the opportunities for optimization. The
+input code is assumed serial: parallel loops are declared sequential.
 \end{PipsPass}
 
 This transformation has been developed in PIPS for heterogeneous computing
@@ -11352,11 +11353,14 @@ transformations, such as partial evaluation and dead code elimination
 (including use-def elimination) can be applied to streamline the
 resulting code further.
 
-The transformation \PipsPassRef{flatten_code} firstly moves declarations
-up in the abstract syntax tree, secondly remove useless braces and thirdly
-fully unroll loops when there iteration counts are known and the
-\verb/FLATTEN_CODE_UNROLL/ property is true. Unrolling can also be
-controlled using Property \PipsPropRef{FULL_LOOP_UNROLL_EXCEPTIONS}.
+The transformation \PipsPassRef{flatten_code} firstly moves
+declarations up in the abstract syntax tree, secondly remove useless
+braces and thirdly fully unroll loops when there iteration counts are
+known and the \verb/FLATTEN_CODE_UNROLL/ property is true. Unrolling
+can also be controlled using Property
+\PipsPropRef{FULL_LOOP_UNROLL_EXCEPTIONS}. The declarations are moved
+up: some parallel loops may become sequential. To avoid inconsistency,
+all loops are declared sequential by \PipsPassRef{flatten_code}.
 
 Inlining(s), which must be performed explicitly by the user with tpips
 or another PIPS interface, can be used first to create lots of

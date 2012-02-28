@@ -567,10 +567,10 @@ static bool actual_c_parser(const char* module_name,
 	  ; // no check yet
 	}
 	printf("\nList of callees:\n");
-	MAP(STRING,s,
+	FOREACH(STRING, s, CalledModules)
 	{
 	  printf("\t%s\n",s);
-	},CalledModules);
+	}
       }
 
     if (compilation_unit_p(module_name))
