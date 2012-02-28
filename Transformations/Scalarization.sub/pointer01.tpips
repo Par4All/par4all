@@ -1,0 +1,43 @@
+delete pointer01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create pointer01 pointer01.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_POINTER_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Points-to lists
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE
+
+echo
+echo Regions
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+echo
+echo After scalarization
+echo
+
+apply SCALARIZATION[main]
+display PRINTED_FILE[main]
+
+apply UNSPLIT
+
+close
+delete pointer01
+quit
+
