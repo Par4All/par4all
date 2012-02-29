@@ -21,22 +21,28 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 /*
-This file is used to compute points-to sets intraprocedurally.
-At first we get SUMMARY_POINTS_TO, then we use it as input set for the
-function points_to_statement().
+This file contains functions used to compute points-to sets intraprocedurally at a module level.
+
+At first we get the SUMMARY_POINTS_TO of the analyzed module, then we
+use it as input set for the function points_to_statement() applied to the module statemnt.
+
 The function points_to_statement() calls
 points_to_recursive_statement(). At the level of
-points_to_recursive_statement() we dispatch according to the
-instruction's type : if it's a test we call points_to_test(), if it's
-a sequence we call points_to_sequence() ...
-When we the instruction is  call we call points_to_call() and
-according to the nature of the call we affect the appropriate
+points_to_recursive_statement(), we dispatch the execution according
+to the instruction's kind: if it's a "test" we call points_to_test(), if
+it's a "sequence" we call points_to_sequence()...
+
+When we the instruction is a "call" we call points_to_call() and
+according to the nature of the call we apply the appropriate
 treatment.
-If the call is an intrinsics, preciselly the operator "=", we call
+
+If the "call" is is a call to an intrinsics, precisely the operator "=", we call
 points_to_assignment(). This latter dispatch the treatment according
 to the nature of the left hand side and the right hand side.
-To summarize this is a call graph simulating the points-to analysis :
+
+To summarize this, here is a call graph summary for the points-to analysis :
 
 points_to_statement
       |
@@ -92,9 +98,21 @@ points_to_statement
 
 
 
-/* storing the points to associate to a statement s, in the case of
-   loops the field store is set to false to prevent from key
-   redefenition's */
+/* Store a sorted copy of the points-to pts_to_set associated to a
+   statement s in the points-to hash-table.
+
+   In case s is a loop, do, while or for, the parameter "store" is set
+   to false to prevent key redefinitions in the underlying points-to
+   hash-table. This entry condition is not checked.
+
+   In case s is a sequence, the sorted copy pts_to_set is associated
+   to each substatement and shared by s and all its substatement.
+
+   Note: the function is called with store==true from
+   points_to_whileloop(). And the hash-table can be updated
+   (hash_update()). 
+
+ */
 void points_to_storage(set pts_to_set, statement s, bool store) {
   list pt_list = NIL, tmp_l;
   points_to_list new_pt_list = points_to_list_undefined;
@@ -108,6 +126,7 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
     new_pt_list = make_points_to_list(tmp_l);
     points_to_list_consistent_p(new_pt_list);
     store_or_update_pt_to_list(s, new_pt_list);
+
     instruction i = statement_instruction(s);
     if(instruction_sequence_p(i)) {
       sequence seq = instruction_sequence(i);
@@ -115,7 +134,7 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
 	store_or_update_pt_to_list(stm, new_pt_list);
       }
     }
-    }
+  }
   else if(set_empty_p(pts_to_set)){
     tmp_l = gen_full_copy_list(pt_list);
     new_pt_list = make_points_to_list(tmp_l);
@@ -1980,7 +1999,9 @@ set points_to_recursive_control(control c, set in, __attribute__ ((__unused__))b
   out: points_to computed in a flow-insensitive way
 */
 
-set points_to_cyclic_graph(set ctrls, set in, bool store)
+set points_to_cyclic_graph(set ctrls,
+			   set in,
+			   bool store __attribute__ ((unused)))
 {
   set out = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
