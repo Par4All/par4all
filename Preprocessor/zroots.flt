@@ -1,1 +1,1 @@
-grep fcomplex
+(fgrep fcomplex | sed 's/at preprocessed line [0-9]*//')

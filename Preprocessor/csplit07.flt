@@ -1,1 +1,3 @@
-grep 'syntax error'
+(fgrep 'syntax error' | sed 's/at preprocessed line [0-9]*//')
+# fgrep 'syntax error' | fgrep 'syntax error'
+# fgrep 'syntax error'
