@@ -1,1 +1,1 @@
-cat
+grep 'No current module'
