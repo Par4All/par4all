@@ -147,69 +147,21 @@ int main()
 
 After scalarization
 
-
-//  <stdout-R-EXACT-{}>
-//  <stdout[PHI1]-R-MAY-{PHI1==0}>
-//  <stdout[PHI1]-W-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-
 int main()
 {
-
-//  <stdout-R-EXACT-{}>
-//  <stdout[PHI1]-R-MAY-{PHI1==0}>
-//  <stdout[PHI1]-W-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-
    // BEGIN BLOCK
    int *p;
    int a[1000];
    int i;
 
-//  <a[PHI1]-R-MAY-{}>
-//  <p-R-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-
    for(i = 0; i <= 999; i += 1) {
-
-//  <a[PHI1]-R-MAY-{}>
-//  <p-R-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
       // BEGIN BLOCK
-
-//  <p-W-EXACT-{}>
-
       p = &a[i];
-
-//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=999}>
-
       a[i] = 1;
-
-//  <p-R-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
       *p = 0;
-
-//  <a[PHI1]-R-EXACT-{PHI1==i}>
-//  <a[PHI1]-W-EXACT-{PHI1==i}>
-
       a[i]++;
       // END BLOCK
    }
-
-//  <a[PHI1]-R-EXACT-{PHI1==0, i==1000}>
-//  <stdout-R-EXACT-{}>
-//  <stdout[PHI1]-R-MAY-{PHI1==0}>
-//  <stdout[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
-
 
    printf("a[0]=%d\n", a[0]);
    // END BLOCK

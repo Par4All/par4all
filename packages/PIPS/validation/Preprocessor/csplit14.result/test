@@ -1,25 +1,2 @@
 ### stderr
-user warning in tp_parse: csplit14: No such workspace
-Registering file csplit14.src-a/pretty14.c
-Checking C syntax of file "./csplit14.src-a/pretty14.c"
-Preprocessing file ./csplit14.src-a/pretty14.c
-Splitting file    ./csplit14.database/Tmp/pretty14.cpp_processed.c
-  Module         prettyprint
-  Module         pretty14!
-Registering file csplit14.src-b/pretty14.c
-Checking C syntax of file "./csplit14.src-b/pretty14.c"
-Preprocessing file ./csplit14.src-b/pretty14.c
-Splitting file    ./csplit14.database/Tmp/pretty14.cpp_processed.c
 user error in csplit_open_compilation_unit: Two source files (at least) with same name: "pretty14.c".
-Not supported yet.
-user warning in set_debug_stack_pointer: debug level stack is set to 1
-Deletion of obsolete resources:
-none destroyed.
-Closing all modules.
-  Closing module pretty14!.
-  Closing module prettyprint.
-Closing program.
-Closing workspace.
-Workspace csplit14 closed.
-
-Workspace csplit14 deleted.
