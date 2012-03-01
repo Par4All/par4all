@@ -1,2 +1,2 @@
 ### stderr
-user warning in splitc_error: C syntax error near "4" at preprocessed line 2035 (user line 7)
+user warning in splitc_error: C syntax error near "4"  (user line 7)

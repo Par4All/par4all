@@ -1,2 +1,2 @@
 ### stderr
-user warning in splitc_error: C syntax error near "fcomplex" at preprocessed line 2585 (user line 9)
+user warning in splitc_error: C syntax error near "fcomplex"  (user line 9)
