@@ -199,7 +199,8 @@ bool source_in_set_p(cell source, set s)
 {
   bool in_p = false;
   SET_FOREACH ( points_to, pt, s ) {
-    if( opkill_may_vreference(source, points_to_source(pt) ))
+    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+    if(cell_equal_p(source, points_to_source(pt)))
       return true;
   }
   return in_p;

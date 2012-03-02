@@ -885,7 +885,8 @@ set points_to_init_global(statement s, list l, set in)
                                        points_to_compare_location);
         l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
         generic_effects_reset_all_methods();
-      }
+	}
+      
 
       if(ENDP(l_eval))
         l_eval = gen_nconc(l_eval, l_cell);
@@ -1774,15 +1775,31 @@ set points_to_test(test test_stmt, set pt_in, bool store) {
 /* computing the points-to of a call, user_functions not yet implemented. */
 set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__unused__))) {
   entity e = call_function(c);
-  cons *pc = call_arguments(c);
+  cons* pc = call_arguments(c);
   tag tt;
-  /* list l_effect = NIL; */
+  list l_effect = NIL, formal_param = NIL;
   set pt_out = set_generic_make(set_private, points_to_equal_p,
                                 points_to_rank);
+
   /* set pt_in_callee = set_generic_make(set_private, points_to_equal_p, */
-  /*                            points_to_rank); */
-  /* set tmp = set_generic_make(set_private, points_to_equal_p, */
-  /*                            points_to_rank); */
+ /*  				points_to_rank); */
+ /* set pt_out_callee = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+ /*  set pts_binded = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+
+ /*  set pt_written = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+ /*  set pts_gen = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+ /* set pts_kill = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+
+ /* set pt_end = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+ /* set tmp = set_generic_make(set_private, points_to_equal_p, */
+ /*  				points_to_rank); */
+
   pt_in = points_to_init(s, pt_in);
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:{
@@ -1794,22 +1811,38 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     set_assign(pt_out, pt_in);
     
     
-    /* set_current_module_entity(module); */
-    /* const char* module_name = entity_module_name(module); */
-    /* l_effect = load_summary_effects(module); */
+    /* set_current_module_entity(e); */
+    /* const char* module_name = entity_module_name(e); */
+    /* type t = entity_type(e); */
+    /* if(type_functional_p(t)){ */
+    /*   list dl = code_declarations(value_code(entity_initial(e))); */
+    /*   FOREACH(ENTITY, fp, dl) { */
+    /* 	if(formal_parameter_p(fp)) { */
+    /* 	  reference r = make_reference(fp, NIL); */
+    /* 	  cell c = make_cell_reference(r); */
+    /* 	  formal_param = gen_nconc(CONS(CELL, c, NULL), formal_param); */
+    /* 	} */
+    /*   } */
+    /* } */
+    /* l_effect =  load_summary_effects(e); */
     /* points_to_list pts_to_in = (points_to_list) */
-    /*   db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(module), true); */
+    /*   db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(e), true); */
+    /* points_to_list pts_to_out = (points_to_list) */
+    /*   db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(e), true); */
     /* list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in)); */
     /* pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in); */
-    /* tmp = set_assign(tmp, points_to_binded(module, args, pt_in)); */
-    /* print_points_to_set("pt_caller = ",pt_in); */
-    /* print_points_to_set("binded = ",tmp); */
+    /* list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out)); */
+    /* pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out); */
     /* list effs = written_pointers(l_effect); */
-    /* list formal = formal_access_paths( pt_in_callee); */
-    /* FOREACH(reference, ref, formal) { */
-    /*   print_reference(ref); */
-    /* } */
-    
+    /* pts_binded = pt_binded(e,pc , pt_in); */
+    /* print_points_to_set("pt_binded", pts_binded); */
+    /* pts_kill = pt_kill(effs, pt_in, formal_param, pt_in_callee, pts_binded); */
+    /* print_points_to_set("pt_kill", pts_kill); */
+    /* pts_gen = pt_gen(formal_param, pt_out_callee, pt_in_callee, pts_binded); */
+    /* print_points_to_set("pt_gen", pts_gen); */
+    /* tmp = set_difference(tmp,pt_in_callee, pts_kill); */
+    /* pt_end = set_union(pt_end, tmp, pts_gen); */
+    /* print_points_to_set("pt_end =",pt_end); */
   }
     break;
   case is_value_symbolic:{
