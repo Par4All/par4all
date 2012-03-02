@@ -1218,27 +1218,51 @@ set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int l
 	  bool t_to_be_freed = false;
 	  type t = cell_reference_to_type(ref, &t_to_be_freed);
 	  if(pointer_type_p(t))
-	  pt = make_points_to(l, r, make_approximation_may(), make_descriptor_none());
+	    pt = make_points_to(l, r, make_approximation_may(), make_descriptor_none());
 	  else
 	    pt = make_points_to(l, points_to_sink(i), make_approximation_may(), make_descriptor_none());
 	  if (t_to_be_freed) free_type(t);
 	}
 	if(!points_to_undefined_p(pt)) {
 	  set_add_element(gen_may_cps, gen_may_cps, (void*) pt);
+	}
       }
-    }
     }
   }
   else {
       FOREACH(cell, r, R){
       /* Should be replaced by opgen_constant_path(l,r) */
-      pt = make_points_to(l, r, a, make_descriptor_none());
-      set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
+	reference ref = cell_any_reference(r);
+	/* if(reference_unbounded_indices_p(ref)) */
+	/*   a = make_approximation_may(); */
+	pt = make_points_to(l, r, a, make_descriptor_none());
+	set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
     }
   }
 
   return gen_may_cps;
 }
+
+/* This function should be at expression.c. It already exist
+   and is called reference_with_unbounded_indices_p() but 
+   includes two cases that should be disjoint: constant indices 
+   and unbounded ones.
+*/
+bool reference_unbounded_indices_p(reference r)
+{
+  list sel = reference_indices(r);
+  bool unbounded_p = true;
+
+  MAP(EXPRESSION, se, {
+      if(!unbounded_expression_p(se)) {
+	unbounded_p = false;
+	break;
+      }
+    }, sel);
+  return unbounded_p;
+}
+
+
 
 set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int len)
 {
@@ -1256,6 +1280,9 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
     /* if we have x = &y then we generate (x,y,a) as points to relation*/
     FOREACH(cell, r, R){
       /* Should be replaced by opgen_constant_path(l,r) */
+      reference ref = cell_any_reference(r);
+      /* if(reference_unbounded_indices_p(ref)) */
+      /* 	a = make_approximation_may(); */
       pt = make_points_to(l, r, a, make_descriptor_none());
       set_add_element(gen_must_cps, gen_must_cps, (void*)pt);
     }
@@ -1289,6 +1316,8 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	  reference ref = cell_any_reference(r);
 	  bool t_to_be_freed = false;
 	  type t = cell_reference_to_type(ref, &t_to_be_freed);
+	  /* if(reference_unbounded_indices_p(ref)) */
+	  /*   a = make_approximation_may(); */
 	  if(!pointer_type_p(t))
 	    pt = make_points_to(l, r, a, make_descriptor_none());
 	  else

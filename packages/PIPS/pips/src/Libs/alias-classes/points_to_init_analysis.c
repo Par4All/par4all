@@ -55,10 +55,11 @@ set formal_points_to_parameter(cell c)
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
 			       points_to_rank);
+ 
   r = cell_to_reference(c);
-  e = reference_variable(r);
   bool to_be_freed = false;
-  fpt = entity_basic_concrete_type(e);
+  /* fpt = entity_basic_concrete_type(e); */
+  fpt = cell_reference_to_type(r,&to_be_freed);
   if(type_variable_p(fpt)){
     /* We ignor dimensions for the being, descriptors are not
      * implemented yet...Amira Mensi*/
