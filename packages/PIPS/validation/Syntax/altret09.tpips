@@ -15,7 +15,8 @@ setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
 #shell cat altret09.src/altret09.f
 
-# this is a bad idead - FC
+# this is a very bad non portable idea -- FC
+# pips_validation_exe can handle one file, not two:-(
 
 shell ${PIPS_F77:-f77} -o altret09.exe \
 	altret09.src/altret09.f \
