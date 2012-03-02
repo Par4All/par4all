@@ -23,9 +23,6 @@ apply UNSPLIT
 
 close
 
-echo 'optimized exec'
-shell ${PIPS_F77:-f77} -o type20.out type20.database/Src/type20.f
-shell ./type20.out
-shell rm type20.out
+shell pips_validation_exe.sh --crc type20
 
 delete type20

@@ -1307,30 +1307,7 @@ C  P(I,S1,S2) {S1=='   ', S2==' ', 'bye'<='hi', 6<=I, I<=30}
 
       PRINT *, I                                                        0174
       END
-'optimized exec'
- -hi -hi -
- s1 == s2
- s1 <= s2
- s1 >= s2
- -hi -hi -
- s1 == s2
- s1 <= s2
- s1 >= s2
- -bye-hi -
- s1 != s2
- s1 <  s2
- s1 <= s2
- -hi -bye-
- s1 != s2
- s1 >  s2
- s1 >= s2
- -hi -hi -
- s1 == s2
- s1 <= s2
- s1 >= s2
- -   -   -
- s1 == s2
- s1 <= s2
- s1 >= s2
-          18
+#
+# compile run compare both type20
+#
 
