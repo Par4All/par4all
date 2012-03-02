@@ -483,8 +483,11 @@ After testing and validation, this branch can be published\footnote{But
   \texttt{gitk} because it may be cumbersome for the community to remove
   some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
-p4a_git --branch-action-name p4a git push origin \$branch
+p4a_git --branch-action-name p4a git push origin \$branch >& /dev/null
 \end{verbatim}
+The \verb|>& /dev/null| is to avoid spamming the screen with MB of commit
+messages. But you can remove it if you want.
+
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
 of steps at the beginning of this section.
