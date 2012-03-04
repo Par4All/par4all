@@ -170,63 +170,47 @@ list_of_reduced_variables(
 }
 
 /*********************************************************** CHECK PROPERS */
+/* Returns NULL if not ok */
+static reduction compatible_reduction_of_var(entity var, reductions rs) {
+  reduction rnew = make_none_reduction(var);
 
-static reduction /* NULL of not ok */
-compatible_reduction_of_var(
-    entity var,
-    reductions rs)
-{
-    reduction rnew = make_none_reduction(var);
-
-    MAP(REDUCTION, r,
-    {
-	if (!update_compatible_reduction_with(&rnew, var, r))
-	{
-	    free_reduction(rnew);
-	    return NULL;
-	}
-    },
-	reductions_list(rs));
-
-    return rnew;
+  FOREACH(REDUCTION, r,reductions_list(rs)) {
+    if (!update_compatible_reduction_with(&rnew, var, r)) {
+      free_reduction(rnew);
+      return NULL;
+    }
+  }
+  return rnew;
 }
 
 /* returns NIL on any problem */
-static list
-list_of_compatible_reductions(reductions rs)
-{
-    list lnr=NIL, le = add_reduced_variables(NIL, rs);
+static list list_of_compatible_reductions(reductions rs) {
+  list lnr=NIL, le = add_reduced_variables(NIL, rs);
 
-    MAP(ENTITY, var,
-    {
-	reduction r = compatible_reduction_of_var(var, rs);
-	if (r)
-	    lnr = CONS(REDUCTION, r, lnr);
-	else
-	{
-	    gen_free_list(le);
-	    gen_full_free_list(lnr);
-	    return NIL;
-	}
-    },
-	le);
-    gen_free_list(le);
+  FOREACH(ENTITY, var,le) {
+    reduction r = compatible_reduction_of_var(var, rs);
+    if (r) {
+      lnr = CONS(REDUCTION, r, lnr);
+    } else {
+      gen_free_list(le);
+      gen_full_free_list(lnr);
+      return NIL;
+    }
+  }
+  gen_free_list(le);
 
-    return lnr;
+  return lnr;
 }
 
-static list list_of_trusted_references(reductions rs)
-{
-    list lr = NIL;
-    MAP(REDUCTION, r,
-    {
-	MAP(PREFERENCE, p,
-	    lr = CONS(REFERENCE, preference_reference(p), lr),
-	    reduction_trusted(r));
-	lr = CONS(REFERENCE, reduction_reference(r), lr); /* ??? */
-    },
-	reductions_list(rs));
-    return lr;
+static list list_of_trusted_references(reductions rs) {
+  list lr = NIL;
+  FOREACH(REDUCTION, r,reductions_list(rs)) {
+    FOREACH(PREFERENCE, p,reduction_trusted(r)) {
+      lr = CONS(REFERENCE, preference_reference(p), lr);
+    }
+    lr = CONS(REFERENCE, reduction_reference(r), lr); /* ??? */
+  }
+  return lr;
 }
 
 /* argh... what about side effect related reductions ???
@@ -235,55 +219,54 @@ static list list_of_trusted_references(reductions rs)
  * direct side effects (that is "call foo" ones) because
  * they do not need to be checked...
  */
-static bool safe_effects_for_reductions(statement s, reductions rs)
-{
-    list /* of effect */ le = effects_effects(load_proper_references(s)),
-         /* of reference */ lr = list_of_trusted_references(rs);
+static bool safe_effects_for_reductions(statement s, reductions rs) {
+  list /* of effect */ le = effects_effects(load_proper_references(s)),
+      /* of reference */ lr = list_of_trusted_references(rs);
 
-    FOREACH(EFFECT, e,le) {
-      if ((effect_write_p(e) && store_effect_p(e) && !gen_in_list_p(effect_any_reference(e), lr)) ||
-          io_effect_entity_p(effect_variable(e)))	{
-        pips_debug(8, "effect on %s (ref %p) not trusted\n",
-                   entity_name(effect_variable(e)),
-                   effect_any_reference(e));
+  FOREACH(EFFECT, e,le) {
+    if ((effect_write_p(e) && store_effect_p(e) && !gen_in_list_p(effect_any_reference(e), lr)) ||
+        io_effect_entity_p(effect_variable(e)))	{
+      pips_debug(8, "effect on %s (ref %p) not trusted\n",
+                 entity_name(effect_variable(e)),
+                 effect_any_reference(e));
 
-        gen_free_list(lr);
-        return false;
-      }
+      gen_free_list(lr);
+      return false;
     }
+  }
 
-    gen_free_list(lr);
-    return true;
+  gen_free_list(lr);
+  return true;
 }
 
 /* must check that the found reductions are
- * (1) without side effects (no W on any other than accumulators)
+ * (1) without side effects (no W on any other than accumulators),
+ *     MA: why? If the W doesn't conflict with the accumulators it should be
+ *     safe ! safe_effects_for_reductions seems overkill to me
  * (2) compatible one with respect to the other.
  * (3) not killed by other proper effects on accumulators.
  * to avoid these checks, I can stop on expressions...
  */
-static void check_proper_reductions(statement s)
-{
-    reductions rs = load_proper_reductions(s);
-    list /* of reduction */ lr = reductions_list(rs), lnr;
+static void check_proper_reductions(statement s) {
+  reductions rs = load_proper_reductions(s);
+  list /* of reduction */ lr = reductions_list(rs), lnr;
+  if(ENDP(lr))
+    return;
 
-    if (ENDP(lr)) return;
+  /* all must be compatible, otherwise some side effect!
+   */
+  lnr = list_of_compatible_reductions(rs); /* checks (2) */
 
-    /* all must be compatible, otherwise some side effect!
-     */
-    lnr = list_of_compatible_reductions(rs); /* checks (2) */
+  /* now lnr is the new list of reductions.
+   */
+  if(lnr && !safe_effects_for_reductions(s, rs)) { /* checks (1) and (3) */
+    gen_full_free_list(lnr);
+    lnr = NIL;
+  }
 
-    /* now lnr is the new list of reductions.
-     */
-    if (lnr && !safe_effects_for_reductions(s, rs)) /* checks (1) and (3) */
-    {
-	gen_full_free_list(lnr);
-	lnr = NIL;
-    }
-
-    gen_full_free_list(lr);
-    // update the reduction list
-    reductions_list(rs) = lnr;
+  gen_full_free_list(lr);
+  // update the reduction list
+  reductions_list(rs) = lnr;
 }
 
 DEFINE_LOCAL_STACK(crt_stat, statement)
@@ -338,9 +321,16 @@ static bool pr_call_flt(call c)
     }
     else if (entity_module_p(call_function(c)))
     {
-	last_translated_module_call = c;
-	reductions_list(reds) =
+      last_translated_module_call = c;
+      reductions_list(reds) =
 	    gen_nconc(translate_reductions(c), reductions_list(reds));
+    } else {
+      ifdebug(4) {
+        pips_debug(0,"Reductions for statement are:\n");
+        FOREACH(REDUCTION, r,reductions_list(reds)) {
+          DEBUG_REDUCTION(0, "considering\n", r);
+        }
+      }
     }
 
     return true;
