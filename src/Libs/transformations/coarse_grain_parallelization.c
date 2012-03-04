@@ -284,10 +284,10 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
         }
       }
     }
-    /* If the dependence cannot be disproved, add it to the list of
-     * assumed dependences. */
-    if (!ENDP(levels) || !ENDP(levelsop))
+    /* If the dependence cannot be disproved, abort the parallelization. */
+    if (!ENDP(levels) || !ENDP(levelsop)) {
       may_conflicts_p = true;
+    }
 
     gen_free_list(levels);
     gen_free_list(levelsop);
@@ -295,6 +295,10 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
       sg_rm(gs);
     if (!SG_UNDEFINED_P(gsop))
       sg_rm(gsop);
+
+    /* the dependence was blocking the parallelization, abort here ! */
+    if(may_conflicts_p)
+      break;
   }
 
   /* Was there any conflict? */
