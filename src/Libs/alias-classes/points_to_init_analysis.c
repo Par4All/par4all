@@ -50,7 +50,6 @@ void points_to_backward_translation()
 set formal_points_to_parameter(cell c)
 {
   reference r = reference_undefined;
-  entity e = entity_undefined;
   type fpt = type_undefined;
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
