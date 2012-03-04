@@ -172,9 +172,9 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
   FOREACH(EFFECT, reg, l_reg) {
     entity e = region_entity(reg);
 
-    if (gen_chunk_undefined_p(gen_find_eq(effect_entity(reg),loop_locals(l)))
-        && region_write_p(reg)
+    if (region_write_p(reg)
         && store_effect_p(reg)
+        && gen_chunk_undefined_p(gen_find_eq(effect_entity(reg),loop_locals(l)))
         && !(thread_safe_p && thread_safe_variable_p(e))
         && !(local_use_reductions_p && set_belong_p(lreductions,e))
         ) {
@@ -199,7 +199,10 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
          * access paths. d<=d2 is a very preliminary test for memory
          * access paths.
          */
-        if (same_entity_p(e,region_entity(reg2)) && store_effect_p(reg2) && region_read_p(reg2) && d<=d2) {
+        if (d<=d2
+            && store_effect_p(reg2)
+            && region_read_p(reg2)
+            && same_entity_p(e,region_entity(reg2))) {
           /* Add a write-read conflict */
           conf = make_conflict(reg, reg2, cone_undefined);
           l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
