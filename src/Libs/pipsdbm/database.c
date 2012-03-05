@@ -757,7 +757,7 @@ string db_get_memory_resource(const char* rname, const char* oname, bool pure)
     r = get_db_resource(rname, oname);
     debug_db_resource(9, rname, oname, r);
     if (db_resource_undefined_p(r) || db_resource_required_p(r))
-      pips_internal_error("requested resource %s for %s not available\n",
+      pips_internal_error("requested resource \"%s\" for module \"%s\" not available\n",
 			  rname, oname);
     /* else we have something. */
 

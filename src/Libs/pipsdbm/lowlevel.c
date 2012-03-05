@@ -298,17 +298,29 @@ void * dbll_load_resource(const char* rname, const char* oname)
 void dbll_free_resource(const char* rname, const char* oname, void * p)
 {
     methods * m;
-    pips_debug(7, "freeing resource %s[%s] (0x%p)\n", rname, oname, p);
+    pips_debug(7, "freeing resource %s[%s] (%p)\n", rname, oname, p);
     m = get_methods(rname);
     m->free_function(p);
 }
 
+/* Internal consistency of the resource, not the global consistency
+   wrt other resources and pipsmake rules which is managed by the
+   pipsmake library at a higher level. */
 bool dbll_check_resource(const char* rname, const char* oname, void * p)
 {
     methods * m;
-    pips_debug(7, "checking resource %s[%s] (0x%p)\n", rname, oname, p);
+    /* Know right away which resource is Newgen inconsistent */
+    pips_debug(9, "checking Newgen resource consistency %s[%s] (0x%p)\n",
+	       rname, oname, p);
     m = get_methods(rname);
-    return m->check_function(p);
+    bool b = m->check_function(p);
+    /* FI: I find this message I have added myself pretty useless in
+       general as a core dump occurs in case some inconsistency is
+       found. */
+    pips_debug(9, "checking Newgen resource consistency %s[%s] (0x%p): %s\n",
+	       rname, oname, p,
+	       bool_to_string(b));
+    return b;
 }
 
 bool dbll_storable_p(const char* rname)
