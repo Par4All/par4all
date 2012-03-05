@@ -484,6 +484,27 @@ static bool coarse_fusable_loops_p(statement sloop1,
       print_region(reg2);
     }
 
+    // Patch the region to mimic the same loop index
+    entity i1 = loop_index(loop1);
+    entity i2 = loop_index(loop2);
+    if(i1!=i2) {
+      reg2=copy_effect(reg2);
+      replace_entity(reg2, loop_index(loop2), loop_index(loop1));
+      list l_reg2 = CONS(REGION, reg2, NIL);
+      convex_regions_descriptor_variable_rename(l_reg2,i2,i1);
+    }
+
+
+    /** CHEAT on the ordering !
+     *  We make that in order that the dependence test believe that statements
+     *  from the first loop comes before statements from the second loop.
+     *  It may not be the case after a loop of reordering due to previous fusion
+     */
+    intptr_t ordering1 = statement_ordering(inner_stat1);
+    statement_ordering(inner_stat1) = 1;
+    intptr_t ordering2 = statement_ordering(inner_stat2);
+    statement_ordering(inner_stat2) = 2;
+
     /* Use the function TestCoupleOfReferences from ricedg. */
     /* We only consider one loop at a time, disconnected from
      * the other enclosing and inner loops. Thus l_enclosing_loops
@@ -491,13 +512,16 @@ static bool coarse_fusable_loops_p(statement sloop1,
      * The list of loop variants is empty, because we use loop invariant
      * regions (they have been composed by the loop transformer).
      */
-    reg2=copy_effect(reg2);
-    replace_entity(reg2, loop_index(loop2), loop_index(loop1));
     levels = TestCoupleOfReferences(l_enclosing_loops1, region_system(reg1),
                                     inner_stat1, reg1, effect_any_reference(reg1),
                                     l_enclosing_loops1, region_system(reg2),
                                     inner_stat2, reg2, effect_any_reference(reg2),
                                     NIL, &gs, &levelsop, &gsop);
+
+    // Restore the ordering
+    statement_ordering(inner_stat1) = ordering1;
+    statement_ordering(inner_stat2) = ordering2;
+
 
     ifdebug(2) {
       fprintf(stderr, "result:\n");
@@ -548,13 +572,17 @@ static bool coarse_fusable_loops_p(statement sloop1,
           pips_debug(1,"Loop carried forward dependence, break parallelism ");
           if(loop_parallel_p(loop1) || loop_parallel_p(loop2)) {
             if(maximize_parallelism) {
-              pips_debug(1,"then it is fusion preventing!\n");
+              ifdebug(1) {
+                fprintf(stderr,"then it is fusion preventing!\n");
+              }
               may_conflicts_p = true;
             } else {
-              pips_debug(1," but both loops are sequential, then fuse!\n");
+              ifdebug(1) {
+                fprintf(stderr," but both loops are sequential, then fuse!\n");
+              }
             }
-          } else {
-            pips_debug(1," but fuse anyway!\n");
+          } else ifdebug(1) {
+            fprintf(stderr," but fuse anyway!\n");
           }
         } else if(l==2) {
           // This is a  loop independent dependence, seems safe to me !
@@ -675,6 +703,18 @@ static bool coarse_fusion_loops(statement sloop1,
     intptr_t ordering =statement_ordering(body_loop1); // Save ordering
     insert_statement(body_loop1,body_loop2,false);
     statement_ordering(body_loop1) = ordering;
+
+    // Merge regions list for body
+    list l_reg1 = load_invariant_rw_effects_list(body_loop1);
+    list l_reg2 = load_invariant_rw_effects_list(body_loop2);
+    gen_nconc(l_reg1,l_reg2);
+    store_invariant_rw_effects_list(body_loop1,l_reg1);
+    store_invariant_rw_effects_list(body_loop2,NIL); // No sharing
+
+    // Free the body_loop2
+    // Hum, only the sequence, not the inner statements
+    // Keep the leak for now... FIXME
+
 
     ifdebug(3) {
       pips_debug(0,"After fusion : ");
