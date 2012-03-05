@@ -548,7 +548,7 @@ static bool coarse_fusable_loops_p(statement sloop1,
           if(maximize_parallelism) {
             pips_debug(1,"Loop carried forward dependence, break "
                        "parallelism: prevents the fusion !\n");
-            may_conflicts_p = false;
+            may_conflicts_p = true;
           } else {
             pips_debug(1,"Loop carried forward dependence, break "
                        "parallelism but safe...\n");
@@ -571,7 +571,6 @@ static bool coarse_fusable_loops_p(statement sloop1,
           // breaking the parallelism
           pips_debug(1,"Loop carried backward dependence, fusion preventing !\n");
           may_conflicts_p = true;
-          may_conflicts_p = false;
         } else if(l==2) {
           // This is a  non-carried dependence backware dependence
           // Hey wait a minute, how is it possible ???
@@ -589,6 +588,10 @@ static bool coarse_fusable_loops_p(statement sloop1,
       sg_rm(gs);
     if (!SG_UNDEFINED_P(gsop))
       sg_rm(gsop);
+
+
+    if(may_conflicts_p)
+      break;
   }
 
   /* Finally, free conflicts */
@@ -661,7 +664,14 @@ static bool coarse_fusion_loops(statement sloop1,
     }
 
     // Append body
+    /* Here a lot of things are broken :
+     *  - The regions associated to both body must be merged
+     *  - The ordering is broken if a new sequence is created :-(
+     *  - ?
+     */
+    intptr_t ordering =statement_ordering(body_loop1); // Save ordering
     insert_statement(body_loop1,body_loop2,false);
+    statement_ordering(body_loop1) = ordering;
 
     ifdebug(3) {
       pips_debug(0,"After fusion : ");
