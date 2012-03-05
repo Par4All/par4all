@@ -545,13 +545,16 @@ static bool coarse_fusable_loops_p(statement sloop1,
       FOREACH(INT, l, levels) {
         if(l==1) {
           // This is a loop carried dependence, break the parallelism but safe !
-          if(maximize_parallelism) {
-            pips_debug(1,"Loop carried forward dependence, break "
-                       "parallelism: prevents the fusion !\n");
-            may_conflicts_p = true;
+          pips_debug(1,"Loop carried forward dependence, break parallelism ");
+          if(loop_parallel_p(loop1) || loop_parallel_p(loop2)) {
+            if(maximize_parallelism) {
+              pips_debug(1,"then it is fusion preventing!\n");
+              may_conflicts_p = true;
+            } else {
+              pips_debug(1," but both loops are sequential, then fuse!\n");
+            }
           } else {
-            pips_debug(1,"Loop carried forward dependence, break "
-                       "parallelism but safe...\n");
+            pips_debug(1," but fuse anyway!\n");
           }
         } else if(l==2) {
           // This is a  loop independent dependence, seems safe to me !
@@ -559,7 +562,7 @@ static bool coarse_fusable_loops_p(statement sloop1,
           may_conflicts_p = false;
         } else {
           pips_user_error("I don't know what to do with a dependence level of "
-              "%d here !\n",l);
+              "%d here!\n",l);
         }
       }
     }
