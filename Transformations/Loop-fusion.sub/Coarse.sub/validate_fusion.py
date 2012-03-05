@@ -2,10 +2,11 @@ import pyps
 
 
 def validate_fusion(self,parallelize=False, flatten=True):
+    self.workspace.activate("must_regions")
     if flatten==True:
         self.flatten_code(unroll=False)
+    self.privatize_module()
     if parallelize==True:
-        self.privatize_module()
         self.coarse_grain_parallelization()
 
 
