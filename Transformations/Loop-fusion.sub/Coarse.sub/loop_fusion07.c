@@ -2,6 +2,11 @@
 
 
 int main() {
+   // The coarse grain fusion won't fuse here because the outer loops carry
+   // only one iteration. Then the preconditions is merged into the regions
+   // and we end up with a condition PHI1==0 ; which bring a loop carried 
+   // dependence => fusion preventing.
+
    double A[1][10000];
    {
       int lv1, lv2;
