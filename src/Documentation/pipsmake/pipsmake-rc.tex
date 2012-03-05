@@ -8178,15 +8178,15 @@ array_expansion > PROGRAM.entities
   to lose parallelism when fusing outer loops from a loop nests without being
   able to fuse inner loops.
 
-  Property \PipsPropRef{LOOP_FUSION_MAX_FUSED_PER_LOOP} limit the number of fusion per loop.
-  A negative value means that no limit will be enforced.
+  Property \PipsPropRef{LOOP_FUSION_MAX_FUSED_PER_LOOP} limit the number of 
+  fusion per loop. A negative value means that no limit will be enforced.
 
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
 
   This pass is still in the experimental stage. It may have side
   effects on the source code when the fusion is attempted but not
-  performed in case loop indices are different.
+  performed in case loop index are different.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8195,6 +8195,33 @@ loop_fusion            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+
+
+
+
+\begin{PipsPass}{loop_fusion_with_regions}
+  This pass is the same is \PipsPassRef{loop_fusion} excepts that it uses 
+  regions instead of dependence graph. Properties are the same as before:
+  \PipsPropRef{LOOP_FUSION_GREEDY}, 
+  \PipsPropRef{LOOP_FUSION_MAXIMIZE_PARALLELISM},
+  \PipsPropRef{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}, and
+  \PipsPropRef{LOOP_FUSION_MAX_FUSED_PER_LOOP} control the algorithm.
+\end{PipsPass}
+
+
+
+\begin{PipsMake}
+alias Fusion 'Fusion Loops With Regions'
+loop_fusion_with_regions            > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.preconditions
+        < MODULE.inv_regions
         < MODULE.dg
 \end{PipsMake}
 
@@ -8214,7 +8241,6 @@ LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS TRUE
 \begin{PipsProp}{LOOP_FUSION_MAX_FUSED_PER_LOOP}
 LOOP_FUSION_MAX_FUSED_PER_LOOP -1
 \end{PipsProp}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
 
