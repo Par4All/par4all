@@ -434,8 +434,9 @@ static bool coarse_fusable_loops_p(statement sloop1,
 
   /* First, builds list of conflicts: */
   FOREACH(EFFECT, reg1, l_reg1) {
-
-    if (gen_chunk_undefined_p(gen_find_eq(effect_entity(reg1),loop_locals(loop1))) // Ignore private variable
+    entity e1 = effect_entity(reg1);
+    if (e1!=loop_index(loop1)
+        && gen_chunk_undefined_p(gen_find_eq(e1,loop_locals(loop1))) // Ignore private variable
         && store_effect_p(reg1) // Ignore non memory effect
         ) {
       reference r = effect_any_reference(reg1);
@@ -491,7 +492,16 @@ static bool coarse_fusable_loops_p(statement sloop1,
       reg2=copy_effect(reg2);
       replace_entity(reg2, loop_index(loop2), loop_index(loop1));
       list l_reg2 = CONS(REGION, reg2, NIL);
-      convex_regions_descriptor_variable_rename(l_reg2,i2,i1);
+
+      // First project to eliminate the index that can have been added because
+      // of the preconditions, this should be safe because it is not used in the
+      // body
+      list tmp_i = CONS(entity,i1, NIL );
+      project_regions_along_variables(l_reg2, tmp_i);
+      free(tmp_i);
+
+      // Substitue i2 with i1 in the regions associated to loop2's body
+      all_regions_variable_rename(l_reg2,i2,i1);
     }
 
 
@@ -674,9 +684,6 @@ static bool coarse_fusion_loops(statement sloop1,
                    " know how to handle this case !\n",
                    entity_name(index1));
         return false;
-      } else {
-        // FI: FIXME we should check that index2 is dead on exit of loop2
-        replace_entity((void *)body_loop2, index2, index1);
       }
     }
 
@@ -694,19 +701,29 @@ static bool coarse_fusion_loops(statement sloop1,
       print_statement(sloop2);
     }
 
-    // Append body
     /* Here a lot of things are broken :
      *  - The regions associated to both body must be merged
      *  - The ordering is broken if a new sequence is created :-(
      *  - ?
      */
     intptr_t ordering =statement_ordering(body_loop1); // Save ordering
+    // Append body 2 to body 1
     insert_statement(body_loop1,body_loop2,false);
     statement_ordering(body_loop1) = ordering;
+
+    // FIXME insert_statement() does a bad job here :-(
+    // I should fix it but I'm lazy now so use the bazooka:
+    clean_up_sequences(body_loop1);
 
     // Merge regions list for body
     list l_reg1 = load_invariant_rw_effects_list(body_loop1);
     list l_reg2 = load_invariant_rw_effects_list(body_loop2);
+    if(loop_index(loop1)!=loop_index(loop2)) {
+      // Patch the regions to be expressed with the correct loop index
+      all_regions_variable_rename(l_reg2,index2,index1);
+      // FI: FIXME we should check that index2 is dead on exit of loop2
+      replace_entity((void *)body_loop1, index2, index1);
+    }
     gen_nconc(l_reg1,l_reg2);
     store_invariant_rw_effects_list(body_loop1,l_reg1);
     store_invariant_rw_effects_list(body_loop2,NIL); // No sharing
