@@ -707,10 +707,11 @@ class p4a_processor(object):
                             OUTLINE_CALLEES_PREFIX="p4a_device_",
                             annotate_loop_nests = True) # annotate for recover parallel loops later
                 # recursive walk through
-                [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0]
+                [gpuify_all(c) for c in module.callees if c.name.find(self.get_launcher_prefix ()) !=0 and c not in all_modules]
 
         # call gpuify_all recursively starting from the heads of the callgraph
-        [ gpuify_all(m) for m in all_modules if not m.callers ]
+        # Keep in mind that all_modules can be filtered !!!
+        [ gpuify_all(m) for m in all_modules if not [val for val in all_modules if val in m.callers]]
 
 
 
