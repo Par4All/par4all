@@ -1777,7 +1777,6 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
   entity e = call_function(c);
   cons* pc = call_arguments(c);
   tag tt;
-  list l_effect = NIL, formal_param = NIL;
   set pt_out = set_generic_make(set_private, points_to_equal_p,
                                 points_to_rank);
 
