@@ -483,10 +483,13 @@ After testing and validation, this branch can be published\footnote{But
   \texttt{gitk} because it may be cumbersome for the community to remove
   some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
-p4a_git --branch-action-name p4a git push origin \$branch >& /dev/null
+p4a_git --branch-action git push origin \$branch
 \end{verbatim}
-The \verb|>& /dev/null| is to avoid spamming the screen with MB of commit
-messages. But you can remove it if you want.
+Note that this may be quite verbose, so you may be more comfortable with a
+quite:
+\begin{verbatim}
+p4a_git --branch-action git push origin \$branch >& /dev/null
+\end{verbatim}
 
 If someone else updates a branch in the meantime, the new branches
 must be merged back into the local versions by re-executing the sequence
@@ -523,7 +526,7 @@ p4a_git --aggregate-branches p4a-1.3-rc
 to update the \texttt{p4a-1.3-rc} branch infrastructure.
 
 When finished, these branches can be pushed for sharing or merged
-into the main \Apfa \Agit repository{p4a} with:
+into the main \Apfa{} \Agit repository{p4a} with:
 \begin{verbatim}
 p4a_git --branch-action-name p4a-very-personal git push origin \$branch
 \end{verbatim}
@@ -593,7 +596,7 @@ git checkout p4a
     $P4A_TOP/par4all/src/dev/p4a_git --build-new-p4a
 # For a normal developer, simply build Par4All
 $P4A_ROOT/src/dev/p4a_setup.py <your options>
-# Source the new environment. Be carefull, it override the P4A_ETC
+# Source the new environment. Be carefull, it overrides the P4A_ETC
 # variable above:
 source $P4A_ROOT/run/etc/par4all-rc.sh
 # Just try it now...
@@ -1180,7 +1183,7 @@ To facilitate validation, the \verb|p4a_validate|
 script adds the concept of validation classes to the \Apips
 validation. A class is a set of validation cases with common characteristics.
 
-%TODO: 
+TODO: 
 For example, there could be a class for \texttt{ALL} the
 validation, for cases with the same result (e.g.,
 \texttt{CHANGED}, \texttt{FAILED}, \texttt{PASS}, \verb|PREVIOUS_ALL|,
@@ -1188,7 +1191,7 @@ validation, for cases with the same result (e.g.,
 etc. Once the classes are defined, set operations can be performed to combine
 them (e.g., unions, intersections, etc.)
 
-%TODO: 
+TODO: 
 Other classes can be defined directly in the validation
 directories with \texttt{.vclass} line-oriented regexp filter lines or with
 generic Python code \texttt{.vclasspy}.
