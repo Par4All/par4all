@@ -37,6 +37,7 @@
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "effects-convex.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -54,6 +55,7 @@ typedef dg_vertex_label vertex_label;
 #include "ricedg.h"
 #include "semantics.h"
 #include "transformations.h"
+#include "transformer.h"
 #include "chains.h"
 extern bool get_bool_property(string);
 extern int get_int_property(string);
@@ -64,10 +66,25 @@ extern int get_int_property(string);
 typedef struct fusion_params {
   bool maximize_parallelism; // Prevent sequentializing loop that were parallel
   bool greedy; // Fuse as much a we can, and not only loops that have reuse
+  bool coarse; // Use a coarse grain algorithm
   unsigned int max_fused_per_loop; // Threshold to limit the number of fusion per loop
 } *fusion_params;
 struct fusion_block;
 typedef struct fusion_block **fbset;
+
+
+// Forward declaration
+static bool fusion_loops(statement sloop1,
+                         set contained_stmts_loop1,
+                         statement sloop2,
+                         set contained_stmts_loop2,
+                         bool maximize_parallelism,
+                         bool coarse_grain);
+
+
+
+
+
 /**
  * Structure to hold block used for the fusion selection algorithm.
  * It's used in a sequence of statements to keep track of the precedence
@@ -368,14 +385,373 @@ static void free_temporary_fused_statement() {
 
 }
 
+
+
+static bool coarse_fusable_loops_p(statement sloop1,
+                         statement sloop2,
+                         bool maximize_parallelism) {
+  loop loop1 = statement_loop(sloop1);
+  statement inner_stat1 = loop_body(loop1);
+  loop loop2 = statement_loop(sloop2);
+  statement inner_stat2 = loop_body(loop2);
+
+  if (statement_may_contain_exiting_intrinsic_call_p(inner_stat1)
+      || statement_may_contain_exiting_intrinsic_call_p(inner_stat2))
+    return false;
+
+  /* get the loop body preconditions */
+  transformer body_prec1 = load_statement_precondition(inner_stat1);
+  transformer body_prec2 = load_statement_precondition(inner_stat2);
+
+  /* do not declare as parallel a loop which is never executed */
+  if (transformer_empty_p(body_prec1) || transformer_empty_p(body_prec2)) {
+      pips_debug(1, "non feasible inner statement (empty precondition), abort fusion\n");
+      return false;
+  }
+
+  /* ...needed by TestCoupleOfReferences(): */
+  list l_enclosing_loops1 = CONS(STATEMENT, sloop1, NIL);
+  //list l_enclosing_loops2 = CONS(STATEMENT, sloop2, NIL);
+
+  /* Get the loop invariant regions for the loop body: */
+  list l_reg1 = load_invariant_rw_effects_list(inner_stat1);
+  list l_reg2 = load_invariant_rw_effects_list(inner_stat2);
+
+  /* To store potential conflicts to study: */
+  list l_conflicts = NIL;
+
+  /* To keep track of a current conflict disabling the parallelization: */
+  bool may_conflicts_p = false;
+
+  pips_debug(1,"begin\n");
+
+  pips_debug(1,"building conflicts\n");
+  ifdebug(2) {
+    fprintf(stderr, "original invariant regions:\n");
+    print_regions(l_reg1);
+    print_regions(l_reg2);
+  }
+
+  /* First, builds list of conflicts: */
+  FOREACH(EFFECT, reg1, l_reg1) {
+    entity e1 = effect_entity(reg1);
+    if (e1!=loop_index(loop1)
+        && gen_chunk_undefined_p(gen_find_eq(e1,loop_locals(loop1))) // Ignore private variable
+        && store_effect_p(reg1) // Ignore non memory effect
+        ) {
+      reference r = effect_any_reference(reg1);
+      int d1 = gen_length(reference_indices(r));
+      conflict conf = conflict_undefined;
+
+      /* Search for a write-read/read-write conflict */
+      FOREACH(EFFECT, reg2, l_reg2) {
+        reference r2 = effect_any_reference(reg2);
+        int d2 = gen_length(reference_indices(r2));
+        entity e1 = region_entity(reg1);
+        entity e2 = region_entity(reg2);
+
+        if (store_effect_p(reg2)
+            && ( (d1<=d2 && region_write_p(reg1) && region_read_p(reg2))
+                || (d1>=d2 && region_read_p(reg1) && region_write_p(reg2))
+                || (region_write_p(reg1) && region_write_p(reg2))
+              )
+            && same_entity_p(e1,e2) // String manipulation at the end
+            ) {
+          /* Add a write-read conflict */
+          conf = make_conflict(reg1, reg2, cone_undefined);
+          l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
+        }
+      }
+    }
+  }
+
+  /* THEN, TESTS CONFLICTS */
+  pips_debug(1,"testing conflicts\n");
+  /* We want to test for write/read and read/write dependences at the same
+   * time. */
+  Finds2s1 = true;
+  FOREACH(CONFLICT, conf, l_conflicts) {
+    effect reg1 = conflict_source(conf);
+    effect reg2 = conflict_sink(conf);
+    list levels = NIL;
+    list levelsop = NIL;
+    Ptsg gs = SG_UNDEFINED;
+    Ptsg gsop = SG_UNDEFINED;
+
+    ifdebug(2) {
+      fprintf(stderr, "testing conflict from:\n");
+      print_region(reg1);
+      fprintf(stderr, "\tto:\n");
+      print_region(reg2);
+    }
+
+    // Patch the region to mimic the same loop index
+    entity i1 = loop_index(loop1);
+    entity i2 = loop_index(loop2);
+    if(i1!=i2) {
+      reg2=copy_effect(reg2);
+      replace_entity(reg2, loop_index(loop2), loop_index(loop1));
+      list l_reg2 = CONS(REGION, reg2, NIL);
+
+      // First project to eliminate the index that can have been added because
+      // of the preconditions, this should be safe because it is not used in the
+      // body
+      list tmp_i = CONS(entity,i1, NIL );
+      project_regions_along_variables(l_reg2, tmp_i);
+      free(tmp_i);
+
+      // Substitue i2 with i1 in the regions associated to loop2's body
+      all_regions_variable_rename(l_reg2,i2,i1);
+    }
+
+
+    /** CHEAT on the ordering !
+     *  We make that in order that the dependence test believe that statements
+     *  from the first loop comes before statements from the second loop.
+     *  It may not be the case after a loop of reordering due to previous fusion
+     */
+    intptr_t ordering1 = statement_ordering(inner_stat1);
+    statement_ordering(inner_stat1) = 1;
+    intptr_t ordering2 = statement_ordering(inner_stat2);
+    statement_ordering(inner_stat2) = 2;
+
+    /* Use the function TestCoupleOfReferences from ricedg. */
+    /* We only consider one loop at a time, disconnected from
+     * the other enclosing and inner loops. Thus l_enclosing_loops
+     * only contains the current loop statement.
+     * The list of loop variants is empty, because we use loop invariant
+     * regions (they have been composed by the loop transformer).
+     */
+    levels = TestCoupleOfReferences(l_enclosing_loops1, region_system(reg1),
+                                    inner_stat1, reg1, effect_any_reference(reg1),
+                                    l_enclosing_loops1, region_system(reg2),
+                                    inner_stat2, reg2, effect_any_reference(reg2),
+                                    NIL, &gs, &levelsop, &gsop);
+
+    // Restore the ordering
+    statement_ordering(inner_stat1) = ordering1;
+    statement_ordering(inner_stat2) = ordering2;
+
+
+    ifdebug(2) {
+      fprintf(stderr, "result:\n");
+      if (ENDP(levels) && ENDP(levelsop))
+        fprintf(stderr, "\tno dependence\n");
+
+      if (!ENDP(levels)) {
+        fprintf(stderr, "\tdependence at levels: ");
+        FOREACH(INT, l, levels) {
+          fprintf(stderr, " %d", l);
+        }
+        fprintf(stderr, "\n");
+
+        if (!SG_UNDEFINED_P(gs)) {
+          Psysteme sc = SC_UNDEFINED;
+          fprintf(stderr, "\tdependence cone:\n");
+          sg_fprint_as_dense(stderr, gs, gs->base);
+          sc = sg_to_sc_chernikova(gs);
+          fprintf(stderr,"\tcorresponding linear system:\n");
+          sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
+          sc_rm(sc);
+        }
+      }
+      if (!ENDP(levelsop)) {
+        fprintf(stderr, "\topposite dependence at levels: ");
+        FOREACH(INT, l, levelsop)
+        fprintf(stderr, " %d", l);
+        fprintf(stderr, "\n");
+
+        if (!SG_UNDEFINED_P(gsop)) {
+          Psysteme sc = SC_UNDEFINED;
+          fprintf(stderr, "\tdependence cone:\n");
+          sg_fprint_as_dense(stderr, gsop, gsop->base);
+          sc = sg_to_sc_chernikova(gsop);
+          fprintf(stderr,"\tcorresponding linear system:\n");
+          sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
+          sc_rm(sc);
+        }
+      }
+    }
+
+    /* If we have a level we may be into trouble */
+    if (!ENDP(levels)) {
+      // Here are the forward dependences, carried or not...
+      FOREACH(INT, l, levels) {
+        if(l==1) {
+          // This is a loop carried dependence, break the parallelism but safe !
+          pips_debug(1,"Loop carried forward dependence, break parallelism ");
+          if(loop_parallel_p(loop1) || loop_parallel_p(loop2)) {
+            if(maximize_parallelism) {
+              ifdebug(1) {
+                fprintf(stderr,"then it is fusion preventing!\n");
+              }
+              may_conflicts_p = true;
+            } else {
+              ifdebug(1) {
+                fprintf(stderr," but both loops are sequential, then fuse!\n");
+              }
+            }
+          } else ifdebug(1) {
+            fprintf(stderr," but fuse anyway!\n");
+          }
+        } else if(l==2) {
+          // This is a  loop independent dependence, seems safe to me !
+          pips_debug(1,"Loop independent forward dependence, safe...\n");
+          may_conflicts_p = false;
+        } else {
+          pips_user_error("I don't know what to do with a dependence level of "
+              "%d here!\n",l);
+        }
+      }
+    }
+    if (!ENDP(levelsop)) {
+      // Here are the backward dependences, carried or not...
+      FOREACH(INT, l, levelsop) {
+        if(l==1) {
+          // This is a loop carried dependence, not preventing fusion but
+          // breaking the parallelism
+          pips_debug(1,"Loop carried backward dependence, fusion preventing !\n");
+          may_conflicts_p = true;
+        } else if(l==2) {
+          // This is a  non-carried dependence backware dependence
+          // Hey wait a minute, how is it possible ???
+          pips_user_error("Loop independent backward dependence... weird !\n");
+        } else {
+          pips_user_error("I don't know what to do with a dependence level of "
+              "%d here !\n",l);
+        }
+      }
+    }
+
+    gen_free_list(levels);
+    gen_free_list(levelsop);
+    if (!SG_UNDEFINED_P(gs))
+      sg_rm(gs);
+    if (!SG_UNDEFINED_P(gsop))
+      sg_rm(gsop);
+
+
+    if(may_conflicts_p)
+      break;
+  }
+
+  /* Finally, free conflicts */
+  pips_debug(1,"freeing conflicts\n");
+  FOREACH(CONFLICT, c, l_conflicts) {
+    conflict_source(c) = effect_undefined;
+    conflict_sink(c) = effect_undefined;
+    free_conflict(c);
+  }
+  gen_free_list(l_conflicts);
+
+  gen_free_list(l_enclosing_loops1);
+
+  pips_debug(1,"end\n");
+
+  return !may_conflicts_p;
+
+}
+
+
 /**
- * @brief Try to fuse the two loop. Dependences are check against the new body
+ *
+ */
+static bool coarse_fusion_loops(statement sloop1,
+                         statement sloop2,
+                         bool maximize_parallelism) {
+  loop loop1 = statement_loop(sloop1);
+  loop loop2 = statement_loop(sloop2);
+  statement body_loop1 = loop_body(loop1);
+  statement body_loop2 = loop_body(loop2);
+
+  // Check if loops have fusion compatible headers, else abort
+  if(!loops_have_same_bounds_p(loop1, loop2)) {
+    pips_debug(4,"Fusion aborted because of incompatible loop headers\n");
+    return false;
+  }
+
+  bool coarse_fusable_p = coarse_fusable_loops_p(sloop1,sloop2,maximize_parallelism);
+
+  if(coarse_fusable_p) {
+    pips_debug(2,"Fuse the loops now\n");
+    entity index1 = loop_index(loop1);
+    entity index2 = loop_index(loop2);
+    if(index1!=index2) {
+      set ref_entities = get_referenced_entities(loop2);
+      // Assert that index1 is not referenced in loop2
+      if(set_belong_p(ref_entities,index1)) {
+        pips_debug(3,"First loop index (%s) is used in the second loop, we don't"
+                   " know how to handle this case !\n",
+                   entity_name(index1));
+        return false;
+      }
+    }
+
+    // Merge loop locals
+    FOREACH(ENTITY,e,loop_locals(loop2)) {
+
+      if(e != loop_index(loop2) && !gen_in_list_p(e,loop_locals(loop1))) {
+        loop_locals(loop1) = CONS(ENTITY,e,loop_locals(loop1));
+      }
+    }
+
+    ifdebug(3) {
+      pips_debug(0,"Before fusion : ");
+      print_statement(sloop1);
+      print_statement(sloop2);
+    }
+
+    /* Here a lot of things are broken :
+     *  - The regions associated to both body must be merged
+     *  - The ordering is broken if a new sequence is created :-(
+     *  - ?
+     */
+    intptr_t ordering =statement_ordering(body_loop1); // Save ordering
+    // Append body 2 to body 1
+    insert_statement(body_loop1,body_loop2,false);
+    statement_ordering(body_loop1) = ordering;
+
+    // FIXME insert_statement() does a bad job here :-(
+    // I should fix it but I'm lazy now so use the bazooka:
+    clean_up_sequences(body_loop1);
+
+    // Merge regions list for body
+    list l_reg1 = load_invariant_rw_effects_list(body_loop1);
+    list l_reg2 = load_invariant_rw_effects_list(body_loop2);
+    if(loop_index(loop1)!=loop_index(loop2)) {
+      // Patch the regions to be expressed with the correct loop index
+      all_regions_variable_rename(l_reg2,index2,index1);
+      // FI: FIXME we should check that index2 is dead on exit of loop2
+      replace_entity((void *)body_loop1, index2, index1);
+    }
+    gen_nconc(l_reg1,l_reg2);
+    store_invariant_rw_effects_list(body_loop1,l_reg1);
+    store_invariant_rw_effects_list(body_loop2,NIL); // No sharing
+
+    // Free the body_loop2
+    // Hum, only the sequence, not the inner statements
+    // Keep the leak for now... FIXME
+
+
+    ifdebug(3) {
+      pips_debug(0,"After fusion : ");
+      print_statement(sloop1);
+    }
+  }
+
+  return coarse_fusable_p;
+}
+
+
+/**
+ * @brief Try to fuse the two liront naoop recomputing a DG !
+ * Dependences are check against the new body
  * but other constraints such as some statement between the two loops are not
  * handled and must be enforced outside.
  *
  * FIXME High leakage
  */
-static bool fusion_loops(statement sloop1,
+static bool fine_fusion_loops(statement sloop1,
                          set contained_stmts_loop1,
                          statement sloop2,
                          set contained_stmts_loop2,
@@ -396,17 +772,6 @@ static bool fusion_loops(statement sloop1,
     return false;
   }
 
-  // If requested, fuse only look of the same kind (parallel/sequential).
-  if( maximize_parallelism && ((loop_parallel_p(loop1)
-      && !loop_parallel_p(loop2)) || (!loop_parallel_p(loop1)
-      && loop_parallel_p(loop2)))) {
-    pips_debug(4,"Fusion aborted because of fuse_maximize_parallelism property"
-        ", loop_parallel_p(loop1)=>%d | loop_parallel_p(loop2)=>%d\n"
-        ,loop_parallel_p(loop1),loop_parallel_p(loop2));
-
-    // Abort to preserve parallelism
-    return false;
-  }
 
 
   entity index1 = loop_index(loop1);
@@ -658,7 +1023,7 @@ static bool fusion_loops(statement sloop1,
         gen_context_recurse(inner_loop2,stmts2,statement_domain,record_statements,gen_true);
 
         pips_debug(4,"Try to fuse inner loops !\n");
-        success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism);
+        success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism,false);
         if(success) {
           inner_success = true;
           pips_debug(4,"Inner loops fused :-)\n");
@@ -732,6 +1097,46 @@ static bool fusion_loops(statement sloop1,
   }
   return success;
 }
+
+
+
+/**
+ * @brief Try to fuse the two loop. Dependences are check against the new body
+ * but other constraints such as some statement between the two loops are not
+ * handled and must be enforced outside.
+ *
+ */
+static bool fusion_loops(statement sloop1,
+                         set contained_stmts_loop1,
+                         statement sloop2,
+                         set contained_stmts_loop2,
+                         bool maximize_parallelism,
+                         bool coarse_grain) {
+  pips_assert("Previous is a loop", statement_loop_p( sloop1 ) );
+  pips_assert("Current is a loop", statement_loop_p( sloop2 ) );
+  loop loop1 = statement_loop(sloop1);
+  loop loop2 = statement_loop(sloop2);
+
+  // If requested, fuse only look of the same kind (parallel/sequential).
+  if( maximize_parallelism && ((loop_parallel_p(loop1)
+      && !loop_parallel_p(loop2)) || (!loop_parallel_p(loop1)
+      && loop_parallel_p(loop2)))) {
+    pips_debug(4,"Fusion aborted because of fuse_maximize_parallelism property"
+        ", loop_parallel_p(loop1)=>%d | loop_parallel_p(loop2)=>%d\n"
+        ,loop_parallel_p(loop1),loop_parallel_p(loop2));
+
+    // Abort to preserve parallelism
+    return false;
+  }
+
+  if(coarse_grain) {
+    return coarse_fusion_loops(sloop1,sloop2,maximize_parallelism);
+  } else {
+    return fine_fusion_loops(sloop1,contained_stmts_loop1,sloop2,contained_stmts_loop2,
+                    maximize_parallelism);
+  }
+}
+
 
 /**
  * Create an empty block
@@ -1064,7 +1469,8 @@ static bool fusable_blocks_p( fusion_block b1, fusion_block b2, unsigned int fus
  */
 static bool fuse_block( fusion_block b1,
                         fusion_block b2,
-                        bool maximize_parallelism) {
+                        bool maximize_parallelism,
+                        bool coarse) {
   bool return_val = false; // Tell is a fusion has occured
   if(!b1->is_a_loop) {
     pips_debug(5,"B1 (%d) is a not a loop, skip !\n",b1->num);
@@ -1077,7 +1483,7 @@ static bool fuse_block( fusion_block b1,
   } else {
     // Try to fuse
     pips_debug(4,"Try to fuse %d with %d\n",b1->num, b2->num);
-    if(fusion_loops(b1->s,b1->statements, b2->s, b2->statements, maximize_parallelism)) {
+    if(fusion_loops(b1->s,b1->statements, b2->s, b2->statements, maximize_parallelism, coarse)) {
       pips_debug(2, "Loop have been fused\n");
       // Now fuse the corresponding blocks
       merge_blocks(b1, b2);
@@ -1098,14 +1504,15 @@ static bool fuse_block( fusion_block b1,
 static bool try_to_fuse_with_successors(fusion_block b,
                                         int *fuse_count,
                                         bool maximize_parallelism,
-                                        unsigned int fuse_limit) {
+                                        unsigned int fuse_limit,
+                                        bool coarse) {
   // First step is to try to fuse with each successor
   if(!b->processed && b->is_a_loop && b->num>=0 && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     FBSET_FOREACH( succ, b->successors)
     {
       pips_debug(6,"Handling successor : %d\n",succ->num);
-      if(fuse_block(b, succ, maximize_parallelism)) {
+      if(fuse_block(b, succ, maximize_parallelism,coarse)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, so we stop and let
          * the caller restart the computation
@@ -1117,7 +1524,11 @@ static bool try_to_fuse_with_successors(fusion_block b,
   }
   // Second step is recursion on successors (if any)
   FBSET_FOREACH(succ, b->successors) {
-    if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism,fuse_limit))
+    if(try_to_fuse_with_successors(succ,
+                                   fuse_count,
+                                   maximize_parallelism,
+                                   fuse_limit,
+                                   coarse))
       return true;
   }
 
@@ -1136,13 +1547,14 @@ static bool try_to_fuse_with_successors(fusion_block b,
 static void try_to_fuse_with_rr_successors(fusion_block b,
                                         int *fuse_count,
                                         bool maximize_parallelism,
-                                        unsigned int fuse_limit) {
+                                        unsigned int fuse_limit,
+                                        bool coarse) {
   if(b->is_a_loop && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with rr_successors !\n",b->num);
     FBSET_FOREACH(succ, b->rr_successors)
     {
       if(fusable_blocks_p(b,succ,fuse_limit) &&
-          fuse_block(b, succ, maximize_parallelism)) {
+          fuse_block(b, succ, maximize_parallelism,coarse)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, let's restart
          * current function at the beginning and end this one.
@@ -1152,7 +1564,11 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
          *
          */
         (*fuse_count)++;
-        try_to_fuse_with_rr_successors(b, fuse_count, maximize_parallelism, fuse_limit);
+        try_to_fuse_with_rr_successors(b,
+                                       fuse_count,
+                                       maximize_parallelism,
+                                       fuse_limit,
+                                       coarse);
         return;
       }
     }
@@ -1172,12 +1588,13 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
 static void fuse_all_possible_blocks(list blocks,
                                      int *fusion_count,
                                      bool maximize_parallelism,
-                                     unsigned int fuse_limit) {
+                                     unsigned int fuse_limit,
+                                     bool coarse) {
   FOREACH(fusion_block, b1, blocks) {
     if(b1->is_a_loop && b1->count_fusion<fuse_limit) {
       FOREACH(fusion_block, b2, blocks) {
         if(fusable_blocks_p(b1,b2,fuse_limit)) {
-          if(fuse_block(b1, b2, maximize_parallelism)) {
+          if(fuse_block(b1, b2, maximize_parallelism,coarse)) {
             (*fusion_count)++;
           }
         }
@@ -1257,7 +1674,8 @@ restart_loop: ;
         if(try_to_fuse_with_successors(block,
                                        &fuse_count,
                                        params->maximize_parallelism,
-                                       params->max_fused_per_loop)) {
+                                       params->max_fused_per_loop,
+                                       params->coarse)) {
           // We fused some blocks, let's restart the process !
           // FIXME : we shouldn't have to restart the process, but it'll require
           // hard work in try_to_fuse_with_successors, so we'll do that later...
@@ -1275,7 +1693,8 @@ restart_loop: ;
         try_to_fuse_with_rr_successors(block,
                                        &fuse_count,
                                        params->maximize_parallelism,
-                                       params->max_fused_per_loop);
+                                       params->max_fused_per_loop,
+                                       params->coarse);
       }
     }
 
@@ -1290,7 +1709,8 @@ restart_loop: ;
       fuse_all_possible_blocks(block_list,
                                &fuse_count,
                                params->maximize_parallelism,
-                               params->max_fused_per_loop);
+                               params->max_fused_per_loop,
+                               params->coarse);
     }
 
 
@@ -1397,10 +1817,11 @@ restart_generation:
 /**
  * Will try to fuse as many loops as possible in the IR subtree rooted by 's'
  */
-static void compute_fusion_on_statement(statement s) {
+static void compute_fusion_on_statement(statement s, bool coarse) {
   // Get user preferences with some properties
   struct fusion_params params;
   params.maximize_parallelism = get_bool_property("LOOP_FUSION_MAXIMIZE_PARALLELISM");
+  params.coarse = coarse;
   params.greedy = get_bool_property("LOOP_FUSION_GREEDY");
   params.max_fused_per_loop = get_int_property("LOOP_FUSION_MAX_FUSED_PER_LOOP");
 
@@ -1409,45 +1830,62 @@ static void compute_fusion_on_statement(statement s) {
 }
 
 /**
- * PIPSMake entry point for loop fusion
+ * Loop fusion main entry point
  */
-bool loop_fusion(char * module_name) {
+bool module_loop_fusion(char * module_name, bool region_based) {
   statement module_statement;
+  graph dependence_graph;
 
   /* Get the true ressource, not a copy. */
   module_statement = (statement)db_get_memory_resource(DBR_CODE,
                                                        module_name,
                                                        true);
+  set_ordering_to_statement(module_statement);
 
-  /* Get the data dependence graph (chains) : */
-  graph dependence_graph = (graph)db_get_memory_resource(DBR_DG,
-                                                         module_name,
-                                                         true);
+  set_current_module_statement(module_statement);
+  set_current_module_entity(module_name_to_entity(module_name));
 
   /* The proper effect to detect the I/O operations: */
   set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,
                                                                   module_name,
                                                                   true));
-  /*
-  set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS,
-                                                                 module_name,
-                                                                 true));
-                                                                 */
-  /* Mandatory for DG construction */
+
+  /* Mandatory for DG construction and module_to_value_mapping() */
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                                      module_name,
                                                                      true));
 
-  set_current_module_statement(module_statement);
-  set_current_module_entity(module_name_to_entity(module_name));
+  /* Get the data dependence graph */
+  dependence_graph = (graph)db_get_memory_resource(DBR_DG,
+                                                         module_name,
+                                                         true);
 
-  set_ordering_to_statement(module_statement);
   ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
+
+
+  if(region_based) {
+    /* use preconditions to check that loop bodies are not dead code
+     */
+    set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS,
+                                                                   module_name,
+                                                                   true));
+
+    /* Build mapping between variables and semantics informations: */
+    module_to_value_mappings(module_name_to_entity(module_name));
+
+    /* Get and use invariant read/write regions */
+    set_invariant_rw_effects((statement_effects) db_get_memory_resource(DBR_INV_REGIONS,
+                                                                        module_name,
+                                                                        true));
+  }
+
+
+
 
   debug_on("LOOP_FUSION_DEBUG_LEVEL");
 
   // Here we go ! Let's fuse :-)
-  compute_fusion_on_statement(module_statement);
+  compute_fusion_on_statement(module_statement,region_based);
 
   /* Reorder the module, because some statements have been deleted, and others
    * have been reordered
@@ -1463,11 +1901,15 @@ bool loop_fusion(char * module_name) {
   ordering_to_dg_mapping = NULL;
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
-  //reset_precondition_map();
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
 
+  if(region_based) {
+    reset_precondition_map();
+    reset_invariant_rw_effects();
+    free_value_mappings();
+  }
 
   pips_debug(2, "done for %s\n", module_name);
   debug_off();
@@ -1480,3 +1922,19 @@ bool loop_fusion(char * module_name) {
    */
   return true;
 }
+
+
+/**
+ * Loop fusion with DG ; PIPSMake entry point
+ */
+bool loop_fusion(char * module_name) {
+  return module_loop_fusion(module_name, false);
+}
+
+/**
+ * Loop fusion with Regions ; PIPSMake entry point
+ */
+bool loop_fusion_with_regions(char * module_name) {
+  return module_loop_fusion(module_name, true);
+}
+

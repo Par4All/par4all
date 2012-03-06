@@ -174,7 +174,6 @@ set pt_gen(list args, set pt_out, set pt_in, set pt_binded)
     reference r1 = cell_any_reference(points_to_source(pt));
     list ind1 = reference_indices(r1);
     reference r2 = cell_any_reference(points_to_sink(pt));
-    list ind2 = reference_indices(r2);
     entity e1 = reference_variable(r1);
     entity e2 = reference_variable(r2);
     bool stub_p1 = entity_stub_sink_p(e1);

@@ -256,29 +256,23 @@ merge_two_reductions(reduction first, reduction second)
 /* update *pr according to r for variable var
  * r is not touched.
  */
-bool
-update_compatible_reduction_with(
-    reduction *pr,
-    entity var,
-    reduction r)
-{
-    if (reduction_variable(r)!=var)
-	return !entities_may_conflict_p(var, reduction_variable(r));
+bool update_compatible_reduction_with(reduction *pr, entity var, reduction r) {
+  if(reduction_variable(r) != var)
+    return !entities_may_conflict_p(var, reduction_variable(r));
 
-    /* else same var and no conflict */
-    if (reduction_none_p(*pr))
-    {
-	free_reduction(*pr);
-	*pr = copy_reduction(r);
-	return true;
-    }
-    /* else are they compatible?
-     */
-    if (reduction_tag(*pr)!=reduction_tag(r))
-	return false;
-    /* ok, let us merge them
-     */
-    return merge_two_reductions(*pr, copy_reduction(r));
+  /* else same var and no conflict */
+  if(reduction_none_p(*pr)) {
+    free_reduction(*pr);
+    *pr = copy_reduction(r);
+    return true;
+  }
+  /* else are they compatible?
+   */
+  if(reduction_tag(*pr) != reduction_tag(r))
+    return false;
+  /* ok, let us merge them
+   */
+  return merge_two_reductions(*pr, copy_reduction(r));
 }
 
 /* what to do with reduction *pr for variable var
@@ -350,17 +344,17 @@ bool pure_function_p(entity f)
     value v = entity_initial(f);
 
     if (value_symbolic_p(v) || value_constant_p(v) || value_intrinsic_p(v))
-	return true;
+      return true;
     /* else */
 
     if (entity_module_p(f))
     {
       FOREACH (EFFECT, e, load_summary_effects(f)) {
         if(!store_effect_p(e)) continue;
-	if (effect_write_p(e)) /* a side effect!? */
-	  return false;
-	if (io_effect_entity_p(effect_variable(e))) /* LUNS */
-	  return false;
+        if (effect_write_p(e)) /* a side effect!? */
+          return false;
+        if (io_effect_entity_p(effect_variable(e))) /* LUNS */
+          return false;
       }
     }
 
@@ -541,12 +535,12 @@ static bool fsr_reference_flt(reference r)
 	     entity_name(reference_variable(fsr_ref)));
    if (reference_equal_p(r, fsr_ref))
     {
-	fsr_found = r;
-	/* stop the recursion if does not need to check int div
-	 */
-	if (!basic_int_p(entity_basic(reference_variable(fsr_ref))) ||
-	    (fsr_op!=is_reduction_operator_prod))
-	    gen_recurse_stop(NULL);
+     fsr_found = r;
+     /* stop the recursion if does not need to check int div
+      */
+     if (!basic_int_p(entity_basic(reference_variable(fsr_ref))) ||
+         (fsr_op!=is_reduction_operator_prod))
+       gen_recurse_stop(NULL);
     }
 
     return false; /* no candidate refs within a ref! */

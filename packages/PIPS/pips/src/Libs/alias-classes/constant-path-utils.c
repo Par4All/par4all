@@ -1230,13 +1230,13 @@ set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int l
     }
   }
   else {
-      FOREACH(cell, r, R){
+    FOREACH(cell, r, R){
       /* Should be replaced by opgen_constant_path(l,r) */
-	reference ref = cell_any_reference(r);
-	/* if(reference_unbounded_indices_p(ref)) */
-	/*   a = make_approximation_may(); */
-	pt = make_points_to(l, r, a, make_descriptor_none());
-	set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
+      //reference ref = cell_any_reference(r);
+      /* if(reference_unbounded_indices_p(ref)) */
+      /*   a = make_approximation_may(); */
+      pt = make_points_to(l, r, a, make_descriptor_none());
+      set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
     }
   }
 
@@ -1280,7 +1280,7 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
     /* if we have x = &y then we generate (x,y,a) as points to relation*/
     FOREACH(cell, r, R){
       /* Should be replaced by opgen_constant_path(l,r) */
-      reference ref = cell_any_reference(r);
+      //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
       /* 	a = make_approximation_may(); */
       pt = make_points_to(l, r, a, make_descriptor_none());

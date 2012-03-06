@@ -143,15 +143,17 @@ static set up_to_date_resources = set_undefined;
 
 void reset_make_cache(void)
 {
-    pips_assert("set is defined", !set_undefined_p(up_to_date_resources));
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_undefined;
+  pips_debug(8, "The up-to-date resource cache is reset\n");
+  pips_assert("set is defined", !set_undefined_p(up_to_date_resources));
+  set_free(up_to_date_resources);
+  up_to_date_resources = set_undefined;
 }
 
 void init_make_cache(void)
 {
-    pips_assert("not set", set_undefined_p(up_to_date_resources));
-    up_to_date_resources = set_make(set_pointer);
+  pips_debug(8, "The up-to-date resource cache is initialized to empty\n");
+  pips_assert("not set", set_undefined_p(up_to_date_resources));
+  up_to_date_resources = set_make(set_pointer);
 }
 
 void reinit_make_cache_if_necessary(void)
@@ -311,13 +313,12 @@ static list build_real_resources(const char* oname, list lvr)
 		db_get_memory_resource(DBR_CALLEES, oname, true);
 	    lcallees = gen_copy_string_list(callees_callees(called_modules));
 
-	    pips_debug(8, "Callees of %s are:\n", oname);
-	    MAP(STRING, on,
-	    {
+	    if(!ENDP(lcallees))
+	      pips_debug(8, "Callees of %s are:\n", oname);
+	    FOREACH(STRING, on, lcallees) {
 		pips_debug(8, "\t%s\n", on);
 		add_res(vrn, on);
-	    },
-		lcallees);
+	    }
 	    gen_free_string_list(lcallees);
 
 	    break;
