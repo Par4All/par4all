@@ -1,0 +1,25 @@
+
+Proper effects for "foo" with points-to information
+
+void foo(double *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   (*p)++;
+}
+
+Proper effects for "main" with points-to information
+
+int main()
+{
+//             <    is written>: x y z
+   x = 1, y = 2, z = 3;
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   double *p = (int *) malloc(sizeof(double));
+//             <    is read   >: p
+   foo(p);
+//             <    is read   >: x y z
+   return x+y+z;
+}

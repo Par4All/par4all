@@ -1,0 +1,80 @@
+# Just the second phase of pointer02.tpips. For debugging.
+
+#
+# SECOND PHASE
+#
+
+# Repeat, just in case properties are properly re-initialized by "create"
+delete pointer02b
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer02b pointer02.c
+
+#
+# Let's try again with points-to information
+#
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+# FI: I am not sure what to do with:
+# cumulated_pointer_effects_with_points_to
+# must_pointer_regions_with_points_to
+# must_regions_with_points_to
+
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo Proper effects for "foo" with points-to information
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Proper effects for "main" with points-to information
+echo
+
+# activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+quit
+echo
+echo Cumulated effects for "foo" with points-to information
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effects for "main" with points-to information
+echo
+
+# activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "foo" with points-to information
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+echo
+echo Transformers for "main" with points-to information
+echo
+
+# activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main" with points-to information
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete pointer02b
+quit

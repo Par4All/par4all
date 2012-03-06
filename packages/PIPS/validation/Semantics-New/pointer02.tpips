@@ -1,3 +1,10 @@
+# This test case is made of two parts. In the first part, points-to
+# information is not used. In the second part, it is used.
+
+#
+# FIRST PHASE: NO POINTS_TO INFORMATION
+#
+
 delete pointer02
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -36,7 +43,15 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
+
+#
+# SECOND PHASE
+#
+
 delete pointer02
+
+# Repeat, just in case properties are properly re-initialized by "create"
+setproperty ABORT_ON_USER_ERROR TRUE
 
 create pointer02 pointer02.c
 
