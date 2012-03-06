@@ -1,0 +1,43 @@
+//
+// Code before fusion
+//
+int main()
+{
+   // Same as loop_fusion07.c, but with more than one iteration in the outer 
+   // loop
+   
+   double A[2][10000];
+   //PIPS generated variable
+   int lv1_0, lv2_0, lv1_1, lv2_1, lv1_2, lv2_2;
+   for(lv1_0 = 0; lv1_0 <= 1; lv1_0 += 1)
+      for(lv2_0 = 0; lv2_0 <= 9999; lv2_0 += 1)
+         A[lv1_0][lv2_0] = (double) 1.0;
+   double B[2][10000];
+   for(lv1_1 = 0; lv1_1 <= 1; lv1_1 += 1)
+      for(lv2_1 = 0; lv2_1 <= 9999; lv2_1 += 1)
+         B[lv1_1][lv2_1] = (double) 1.0;
+   double C[2][10000];
+   for(lv1_2 = 0; lv1_2 <= 1; lv1_2 += 1)
+      for(lv2_2 = 0; lv2_2 <= 9999; lv2_2 += 1)
+         C[lv1_2][lv2_2] = A[lv1_2][lv2_2]+B[lv1_2][lv2_2];
+}
+//
+// Code after fusion
+//
+int main()
+{
+   // Same as loop_fusion07.c, but with more than one iteration in the outer 
+   // loop
+   
+   double A[2][10000];
+   //PIPS generated variable
+   int lv1_0, lv2_0, lv1_1, lv2_1, lv1_2, lv2_2;
+   double B[2][10000];
+   double C[2][10000];
+   for(lv1_1 = 0; lv1_1 <= 1; lv1_1 += 1)
+      for(lv2_0 = 0; lv2_0 <= 9999; lv2_0 += 1) {
+         A[lv1_1][lv2_0] = (double) 1.0;
+         B[lv1_1][lv2_0] = (double) 1.0;
+         C[lv1_1][lv2_0] = A[lv1_1][lv2_0]+B[lv1_1][lv2_0];
+      }
+}

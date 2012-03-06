@@ -1,0 +1,40 @@
+#
+# Code after coarse_grain_parallelization for module fusion
+#
+void fusion(int l, int m, int n, int a[l][m][n], int b[l][m][n])
+{
+   int i, j, k, p;
+#pragma omp parallel for private(j)
+   for(i = 1; i <= l-1; i += 1)
+#pragma omp parallel for private(k)
+      for(j = 2; j <= m-1; j += 1)
+#pragma omp parallel for 
+         for(k = 2; k <= n-1; k += 1)
+            a[i-1][j-1][k-1] = 0;
+#pragma omp parallel for private(j)
+   for(i = 1; i <= l-1; i += 1)
+#pragma omp parallel for private(k)
+      for(j = 2; j <= m-1; j += 1)
+#pragma omp parallel for private(p)
+         for(k = 2; k <= n-1; k += 1) {
+            p = a[i-1][j-1][k-1];
+            b[i-1][j-1][k-1] += p;
+         }
+}
+#
+# Code after loop_fusion_with_regions for module fusion
+#
+void fusion(int l, int m, int n, int a[l][m][n], int b[l][m][n])
+{
+   int i, j, k, p;
+#pragma omp parallel for private(j)
+   for(i = 1; i <= l-1; i += 1)
+#pragma omp parallel for private(k)
+      for(j = 2; j <= m-1; j += 1)
+#pragma omp parallel for private(p)
+         for(k = 2; k <= n-1; k += 1) {
+            a[i-1][j-1][k-1] = 0;
+            p = a[i-1][j-1][k-1];
+            b[i-1][j-1][k-1] += p;
+         }
+}

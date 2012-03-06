@@ -1,0 +1,136 @@
+#
+# Initial code for module conv
+#
+void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
+{
+   int n, m;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, m0, m1, m2, m3, m4;
+
+
+l99998:   LU_NUB0 = (L+M-1-M+1)/1;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      y[LU_IND0*1+M] = 0;
+      for(m0 = 0; m0 <= M-1; m0 += 1)
+         y[LU_IND0*1+M] += h[m0]*x[LU_IND0*1+M+m0];
+l99997:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      y[(LU_IND0+0)*1+M] = 0;
+      for(m4 = 0; m4 <= M-1; m4 += 1)
+         y[(LU_IND0+0)*1+M] += h[m4]*x[(LU_IND0+0)*1+M+m4];
+      y[(LU_IND0+1)*1+M] = 0;
+      for(m3 = 0; m3 <= M-1; m3 += 1)
+         y[(LU_IND0+1)*1+M] += h[m3]*x[(LU_IND0+1)*1+M+m3];
+      y[(LU_IND0+2)*1+M] = 0;
+      for(m2 = 0; m2 <= M-1; m2 += 1)
+         y[(LU_IND0+2)*1+M] += h[m2]*x[(LU_IND0+2)*1+M+m2];
+      y[(LU_IND0+3)*1+M] = 0;
+      for(m1 = 0; m1 <= M-1; m1 += 1)
+         y[(LU_IND0+3)*1+M] += h[m1]*x[(LU_IND0+3)*1+M+m1];
+l99996:      ;
+   }
+   n = M+MAX0(LU_NUB0, 0)*1;
+}
+#
+# Code after partial_eval for module conv
+#
+void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
+{
+   int n, m;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, m0, m1, m2, m3, m4;
+
+
+l99998:   LU_NUB0 = L;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      y[LU_IND0+M] = 0;
+      for(m0 = 0; m0 <= M-1; m0 += 1)
+         y[LU_IND0+M] += h[m0]*x[LU_IND0+m0+M];
+l99997:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      y[LU_IND0+M] = 0;
+      for(m4 = 0; m4 <= M-1; m4 += 1)
+         y[LU_IND0+M] += h[m4]*x[LU_IND0+m4+M];
+      y[LU_IND0+M+1] = 0;
+      for(m3 = 0; m3 <= M-1; m3 += 1)
+         y[LU_IND0+M+1] += h[m3]*x[LU_IND0+m3+M+1];
+      y[LU_IND0+M+2] = 0;
+      for(m2 = 0; m2 <= M-1; m2 += 1)
+         y[LU_IND0+M+2] += h[m2]*x[LU_IND0+m2+M+2];
+      y[LU_IND0+M+3] = 0;
+      for(m1 = 0; m1 <= M-1; m1 += 1)
+         y[LU_IND0+M+3] += h[m1]*x[LU_IND0+m1+M+3];
+l99996:      ;
+   }
+   n = M+MAX0(LU_NUB0, 0);
+}
+#
+# Code after flatten_code for module conv
+#
+void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
+{
+   int n, m;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, m0, m1, m2, m3, m4;
+
+l99998:   LU_NUB0 = L;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      y[LU_IND0+M] = 0;
+      for(m0 = 0; m0 <= M-1; m0 += 1)
+         y[LU_IND0+M] += h[m0]*x[LU_IND0+m0+M];
+l99997:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      y[LU_IND0+M] = 0;
+      for(m4 = 0; m4 <= M-1; m4 += 1)
+         y[LU_IND0+M] += h[m4]*x[LU_IND0+m4+M];
+      y[LU_IND0+M+1] = 0;
+      for(m3 = 0; m3 <= M-1; m3 += 1)
+         y[LU_IND0+M+1] += h[m3]*x[LU_IND0+m3+M+1];
+      y[LU_IND0+M+2] = 0;
+      for(m2 = 0; m2 <= M-1; m2 += 1)
+         y[LU_IND0+M+2] += h[m2]*x[LU_IND0+m2+M+2];
+      y[LU_IND0+M+3] = 0;
+      for(m1 = 0; m1 <= M-1; m1 += 1)
+         y[LU_IND0+M+3] += h[m1]*x[LU_IND0+m1+M+3];
+l99996:      ;
+   }
+   n = M+MAX0(LU_NUB0, 0);
+}
+#
+# Code after loop_fusion_with_regions for module conv
+#
+void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
+{
+   int n, m;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, m0, m1, m2, m3, m4;
+
+l99998:   LU_NUB0 = L;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      y[LU_IND0+M] = 0;
+      for(m0 = 0; m0 <= M-1; m0 += 1)
+         y[LU_IND0+M] += h[m0]*x[LU_IND0+m0+M];
+l99997:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      y[LU_IND0+M] = 0;
+      y[LU_IND0+M+1] = 0;
+      y[LU_IND0+M+2] = 0;
+      y[LU_IND0+M+3] = 0;
+      for(m4 = 0; m4 <= M-1; m4 += 1) {
+         y[LU_IND0+M] += h[m4]*x[LU_IND0+m4+M];
+         y[LU_IND0+M+1] += h[m4]*x[LU_IND0+m4+M+1];
+         y[LU_IND0+M+2] += h[m4]*x[LU_IND0+m4+M+2];
+         y[LU_IND0+M+3] += h[m4]*x[LU_IND0+m4+M+3];
+      }
+l99996:      ;
+   }
+   n = M+MAX0(LU_NUB0, 0);
+}
