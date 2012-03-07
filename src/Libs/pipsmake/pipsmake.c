@@ -1333,39 +1333,40 @@ bool check_resource_up_to_date(const char* rname, const char* oname)
    pipsdbm to access these resources efficiently... */
 void delete_named_resources(const char* rn)
 {
-  /* Firstly, clean up the up-to-date cache if it exists */
+  /*
+  // old version:
   if (false && make_cache_p()) {
-    /* In this case we are called from a Pips phase or from a bang rule
-       user_warning ("delete_named_resources",
-       "called within a phase (i.e. by activate())\n"); */
+    // In this case we are called from a Pips phase or from a bang rule
+    // user_warning ("delete_named_resources",
+    // "called within a phase (i.e. by activate())\n");
     SET_FOREACH(real_resource, res, up_to_date_resources) {
       string res_rn = real_resource_resource_name((real_resource) res);
       //string res_on = real_resource_owner_name((real_resource) res);
 
       if (same_string_p(rn, res_rn)) {
-	//pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
-	//res_rn, res_on);
-	//set_del_element (up_to_date_resources,
-	//		 up_to_date_resources,
-	//		 (char *) res);
-	remove_resource_from_make_cache(res);
+        //pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
+        //res_rn, res_on);
+        //set_del_element (up_to_date_resources,
+        //		 up_to_date_resources,
+        //		 (char *) res);
+        remove_resource_from_make_cache(res);
       }
     }
   }
+  */
 
-  /* new version of the above code */
+  // firstly, clean up the up-to-date cache if it exists
   if (make_cache_p()) {
     list rl = db_retrieve_resources(rn);
     FOREACH(STRING, r_id, rl) {
-      if(make_cache_hit_p(r_id))
-	remove_resource_from_make_cache(r_id);
+      if (make_cache_hit_p(r_id))
+        remove_resource_from_make_cache(r_id);
     }
     gen_free_list(rl);
   }
 
-  /* Then remove the resource */
-  /* GO 29/6/95: many lines ...
-     db_unput_resources_verbose (rn);*/
+  // Then remove the resource
+  // GO 29/6/95: many lines ...  db_unput_resources_verbose (rn);
   db_unput_resources(rn);
 }
 
