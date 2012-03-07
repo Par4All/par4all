@@ -48,11 +48,18 @@ list list_from_gen_array(gen_array_t);
 string string_array_join(gen_array_t array, string separator);
 
 #define GEN_ARRAY_MAP(s, code, array)			\
-  {							\
-      size_t _i, _nitems = gen_array_nitems(array);	\
-      for(_i=0; _i<_nitems; _i++)			\
-      {							\
-	  void * s = gen_array_item(array, _i);		\
-	  code;						\
-      }							\
+  {                                                 \
+    size_t _i, _nitems = gen_array_nitems(array);   \
+    for(_i=0; _i<_nitems; _i++)                     \
+    {                                               \
+      void * s = gen_array_item(array, _i);         \
+      code;                                         \
+    }                                               \
   }
+
+#define GEN_ARRAY_FOREACH(type, s, array)                  \
+  size_t s##_i=0, s##_nitems = gen_array_nitems(array);    \
+  type s;                                                  \
+  for (s = (type) gen_array_item(array, s##_i);            \
+       s##_i < s##_nitems;                                 \
+       s##_i++, s = (type) gen_array_item(array, s##_i))
