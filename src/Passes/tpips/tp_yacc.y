@@ -265,18 +265,18 @@ static bool perform(bool (*what)(const char*, const char*), res_or_rule * res)
 			db_get_current_module_name()?
 			strdup(db_get_current_module_name()): NULL;
 
-		GEN_ARRAY_MAP(mod_name,
-									{
-										if (mod_name != NULL)
-										{
-											if (!what(res->the_name, mod_name)) {
-												result = false;
-												break;
-											}
-										}
-										else
-											pips_user_warning("Select a module first!\n");
-									}, res->the_owners);
+		GEN_ARRAY_FOREACH(string, mod_name, res->the_owners)
+    {
+      if (mod_name != NULL)
+      {
+        if (!what(res->the_name, mod_name)) {
+          result = false;
+          break;
+        }
+      }
+      else
+        pips_user_warning("Select a module first!\n");
+    }
 
 		/* restore the initial current module, if there was one */
 		if(save_current_module_name!=NULL) {
@@ -422,19 +422,18 @@ static gen_array_t get_main(void)
 			try_to_parse_everything_just_in_case();
 		}
 
-		GEN_ARRAY_MAP(on,
-									{
-										entity mod = local_name_to_top_level_entity(on);
+		GEN_ARRAY_FOREACH(string, on, modules)
+    {
+      entity mod = local_name_to_top_level_entity(on);
 
-										if (!entity_undefined_p(mod) && entity_main_module_p(mod))
-										{
-											if (number_of_main)
-												pips_user_error("More than one main\n");
-											number_of_main++;
-											gen_array_dupappend(result, on);
-										}
-									},
-									modules);
+      if (!entity_undefined_p(mod) && entity_main_module_p(mod))
+      {
+        if (number_of_main)
+          pips_user_error("More than one main\n");
+        number_of_main++;
+        gen_array_dupappend(result, on);
+      }
+    }
 		gen_array_full_free(modules);
 	}
 

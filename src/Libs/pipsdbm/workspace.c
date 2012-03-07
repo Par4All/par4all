@@ -312,33 +312,34 @@ bool db_create_workspace(const char* name)
  */
 static void db_close_module(string what, string oname, bool do_free)
 {
-    /* the download order is retrieved from the methods... */
-    int nr = dbll_number_of_resources(), i;
+  // the download order is retrieved from the methods...
+  int nr = dbll_number_of_resources(), i;
 
-    if (!same_string_p(oname, "")) /* log if necessary. */
-	user_log("  %s module %s.\n", what, oname);
+  if (!same_string_p(oname, "")) /* log if necessary. */
+    user_log("  %s module %s.\n", what, oname);
 
-    for (i=0; i<nr; i++) 
-    {
-	db_save_and_free_memory_resource_if_any
+  for (i=0; i<nr; i++)
+  {
+    db_save_and_free_memory_resource_if_any
 	    (dbll_get_ith_resource_name(i), oname, do_free);
-    }
+  }
 }
 
 static void db_save_workspace(string what, bool do_free)
 {
-    gen_array_t a;
+  gen_array_t a;
 
-    user_log("%s all modules.\n", what);
-    a = db_get_module_list();
-    GEN_ARRAY_MAP(module, db_close_module(what, module, do_free), a);
-    gen_array_full_free(a);
-    
-    user_log("%s program.\n", what);
-    db_close_module(what, "", do_free); /* ENTITIES are saved here... */
+  user_log("%s all modules.\n", what);
+  a = db_get_module_list();
+  GEN_ARRAY_FOREACH(string, module, a)
+    db_close_module(what, module, do_free);
+  gen_array_full_free(a);
 
-    user_log("%s workspace.\n", what);
-    save_meta_data(do_free);
+  user_log("%s program.\n", what);
+  db_close_module(what, "", do_free); /* ENTITIES are saved here... */
+
+  user_log("%s workspace.\n", what);
+  save_meta_data(do_free);
 }
 
 void db_checkpoint_workspace(void)

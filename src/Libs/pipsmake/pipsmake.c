@@ -90,42 +90,44 @@ void set_current_phase_context(const char* rname, const char* oname)
   entity_basic_concrete_types_init();
   reset_std_static_entities();
 }
-void reset_current_phase_context()
+
+void reset_current_phase_context(void)
 {
   reset_pips_current_computation();
   entity_basic_concrete_types_reset();
   reset_std_static_entities();
 }
 
-static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
+static bool catch_user_error(bool (*f)(const char *),
+                             const char* rname, const char* oname)
 {
-    volatile bool success = false;
+  volatile bool success = false;
 
-    CATCH(any_exception_error)
-    {
-      reset_static_phase_variables();
-      success = false;
-    }
-    TRY
-    {
-      set_current_phase_context(rname, oname);
-      success = (*f)(oname);
-      UNCATCH(any_exception_error);
-    }
-    reset_current_phase_context();
-    return success;
+  CATCH(any_exception_error)
+  {
+    reset_static_phase_variables();
+    success = false;
+  }
+  TRY
+  {
+    set_current_phase_context(rname, oname);
+    success = (*f)(oname);
+    UNCATCH(any_exception_error);
+  }
+  reset_current_phase_context();
+  return success;
 }
 
 static bool (*get_builder(const char* name))(const char *)
 {
-    struct builder_map * pbm;
-    for (pbm = builder_maps; pbm->builder_name; pbm++)
-	if (same_string_p(pbm->builder_name, name))
+  struct builder_map * pbm;
+  for (pbm = builder_maps; pbm->builder_name; pbm++)
+    if (same_string_p(pbm->builder_name, name))
 	    return pbm->builder_func;
-    pips_internal_error("no builder for %s", name);
-    return NULL;
+  pips_internal_error("no builder for %s", name);
+  return NULL;
 }
-
+
 /*********************************************** UP TO DATE RESOURCES CACHE */
 
 /* FI: make is very slow when interprocedural analyzes have been selected;
@@ -233,12 +235,12 @@ bool make_cache_consistent_p()
       string res_rn = real_resource_resource_name((real_resource) res);
       string res_on = real_resource_owner_name((real_resource) res);
       if(!db_resource_p(res_rn, res_on))
-	return false;
+        return false;
     }
   }
   return true;
 }
-
+
 /* Static variables used by phases must be reset on error although
    pipsmake does not know which ones are used. */
 /* FI: let us hope this is documented in PIPS developer guide... It is
@@ -307,15 +309,17 @@ string compilation_unit_of_module(const char* module_name)
   /* Should only be called for C modules. */
   string compilation_unit_name = string_undefined;
 
-  /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
+  // The guard may not be sufficient...
+  // and this may crash in db_get_memory_resource()
   if(db_resource_p(DBR_USER_FILE, module_name)) {
     string source_file_name =
       db_get_memory_resource(DBR_USER_FILE, module_name, true);
     string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
-    /* It is not clear how robust it is going to be when file name conflicts
-       occur. */
-    asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING, simpler_file_name);
+    // It is not clear how robust it is going to be
+    // when file name conflicts occur.
+    (void) asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING,
+                    simpler_file_name);
     free(simpler_file_name);
   }
 
@@ -334,144 +338,135 @@ string compilation_unit_of_module(const char* module_name)
  */
 static list build_real_resources(const char* oname, list lvr)
 {
-    list pvr, result = NIL;
+  list pvr, result = NIL;
 
-    for (pvr = lvr; pvr != NIL; pvr = CDR(pvr))
+  for (pvr = lvr; pvr != NIL; pvr = CDR(pvr))
+  {
+    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+    string vrn = virtual_resource_name(vr);
+    tag vrt = owner_tag(virtual_resource_owner(vr));
+
+    switch (vrt)
     {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
-	string vrn = virtual_resource_name(vr);
-	tag vrt = owner_tag(virtual_resource_owner(vr));
-
-	switch (vrt)
-	{
-	    /* FI: should be is_owner_workspace, but changing Newgen decl... */
-	case is_owner_program:
-	    /* FI: for  relocation of workspaces */
+	    // FI: should be is_owner_workspace, but changing Newgen decl...
+    case is_owner_program:
+	    // FI: for  relocation of workspaces
 	    add_res(vrn, "");
 	    break;
 
-	case is_owner_module:
+    case is_owner_module:
 	    add_res(vrn, oname);
 	    break;
 
-	case is_owner_main:
-	{
+    case is_owner_main:
+    {
 	    int number_of_main = 0;
 	    gen_array_t a = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on,
+	    GEN_ARRAY_FOREACH(string, on, a)
 	    {
-		if (entity_main_module_p
-		    (local_name_to_top_level_entity(on)) == true)
-		{
-		    if (number_of_main)
-			pips_internal_error("More than one main");
+        if (entity_main_module_p(local_name_to_top_level_entity(on)))
+        {
+          if (number_of_main)
+            pips_internal_error("More than one main");
 
-		    number_of_main++;
-		    pips_debug(8, "Main is %s\n", (string) on);
-		    add_res(vrn, on);
-		}
-	    },
-		a);
+          number_of_main++;
+          pips_debug(8, "Main is %s\n", (string) on);
+          add_res(vrn, on);
+        }
+	    }
 
 	    gen_array_full_free(a);
 	    break;
-	}
-	case is_owner_callees:
-	{
+    }
+    case is_owner_callees:
+    {
 	    callees called_modules;
 	    list lcallees;
 
 	    if (!rmake(DBR_CALLEES, oname)) {
-		/* FI: probably missing source code... */
-		pips_user_error("unable to build callees for %s\n"
-				"Some source code probably is missing!\n",
-				 oname);
+        // FI: probably missing source code...
+        pips_user_error("unable to build callees for %s\n"
+                        "Some source code probably is missing!\n",
+                        oname);
 	    }
 
 	    called_modules = (callees)
-		db_get_memory_resource(DBR_CALLEES, oname, true);
+        db_get_memory_resource(DBR_CALLEES, oname, true);
 	    lcallees = gen_copy_string_list(callees_callees(called_modules));
 
 	    if(!ENDP(lcallees))
 	      pips_debug(8, "Callees of %s are:\n", oname);
 	    FOREACH(STRING, on, lcallees) {
-		pips_debug(8, "\t%s\n", on);
-		add_res(vrn, on);
+        pips_debug(8, "\t%s\n", on);
+        add_res(vrn, on);
 	    }
 	    gen_free_string_list(lcallees);
 
 	    break;
-	}
-	case is_owner_callers:
-	{
-	    /* FI: the keyword callees was badly chosen; anyway, it's just
-	       a list of strings... see ri.newgen */
+    }
+    case is_owner_callers:
+    {
+	    // FI: the keyword callees was badly chosen; anyway,
+      // it's just a list of strings... see ri.newgen
 	    callees caller_modules;
 	    list lcallers;
 
 	    if (!rmake(DBR_CALLERS, oname)) {
-		user_error ("build_real_resources",
-			    "unable to build callers for %s\n"
-			    "Any missing source code?\n",
-			    oname);
+        user_error ("build_real_resources",
+                    "unable to build callers for %s\n"
+                    "Any missing source code?\n",
+                    oname);
 	    }
 
 	    caller_modules = (callees)
-		db_get_memory_resource(DBR_CALLERS, oname, true);
+        db_get_memory_resource(DBR_CALLERS, oname, true);
 	    lcallers = gen_copy_string_list(callees_callees(caller_modules));
 
 	    pips_debug(8, "Callers of %s are:\n", oname);
 
-	    MAP(STRING, on,
-	    {
-		pips_debug(8, "\t%s\n", on);
-		add_res(vrn, on);
-	    },
-		lcallers);
+      FOREACH(string, on, lcallers)
+      {
+        pips_debug(8, "\t%s\n", on);
+        add_res(vrn, on);
+      }
 	    gen_free_string_list(lcallers);
 	    break;
-	}
+    }
 
-	case is_owner_all:
-	{
-	    /* some funny stuff here:
-	     * some modules may be added by the phases here...
-	     * then we might expect a later coredump if the new resource
-	     * is not found.
-	     */
+    case is_owner_all:
+    {
+	    // some funny stuff here:
+	    // some modules may be added by the phases here...
+	    // then we might expect a later coredump if the new resource
+	    // is not found.
 	    gen_array_t modules = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on,
-	    {
-		pips_debug(8, "\t%s\n", (string) on);
-		add_res(vrn, on);
-	    },
-		modules);
+	    GEN_ARRAY_FOREACH(string, on, modules)
+      {
+        pips_debug(8, "\t%s\n", (string) on);
+        add_res(vrn, on);
+      }
 
 	    gen_array_full_free(modules);
 	    break;
-	}
+    }
 
-	case is_owner_select:
-	{
-	    /* do nothing ... */
+    case is_owner_select:
+    {
+	    // do nothing ...
 	    break;
-	}
+    }
 
-	case is_owner_compilation_unit:
+    case is_owner_compilation_unit:
 	  {
 	    string compilation_unit_name = compilation_unit_of_module(oname);
-
 	    if(string_undefined_p(compilation_unit_name)) {
-        /* Source code for module oname is not available */
-        if(compilation_unit_p(oname)) {
-          /* The user can make typos in tpips scripts about compilation unit names */
-          /* pips_internal_error("Synthetic compilation units cannot be missing"
-                                 " because they are synthesized"
-                                 " with the corresponding file\n",
-                                 oname);
-           */
+        // Source code for module oname is not available
+        if(compilation_unit_p(oname))
+        {
+          // The user can make typos in tpips scripts
+          // about compilation unit names.
           pips_user_error("No source code for compilation unit \"%s\"\n."
                           "Compilation units cannot be synthesized.\n",
                           oname);
@@ -488,10 +483,10 @@ static list build_real_resources(const char* oname, list lvr)
 
 	default:
 	    pips_internal_error("unknown tag : %d", vrt);
-	}
     }
+  }
 
-    return gen_nreverse(result);
+  return gen_nreverse(result);
 }
 
 /* touch the resource if it exits
@@ -1038,37 +1033,42 @@ static bool concurrent_apply(
     dont_interrupt_pipsmake_asap();
     save_active_phases();
 
-    GEN_ARRAY_MAP(oname,
+    GEN_ARRAY_FOREACH(string, oname, modules)
+    {
 		  if (!make_pre_transformation(oname, ru)) {
 		    okay = false;
 		    break;
-		  },
-		  modules);
-
-    if (okay) {
-	GEN_ARRAY_MAP(oname,
-		      if (!make_required(oname, ru)) {
-			okay = false;
-			break;
-		      },
-		      modules);
+		  }
     }
 
     if (okay) {
-	GEN_ARRAY_MAP(oname,
-		      if (!apply_a_rule(oname, ru)) {
-			okay = false;
-			break;
-		      },
-		      modules);
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!make_required(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
     }
+
+    if (okay) {
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!apply_a_rule(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
+    }
+
     if(okay) {
-    GEN_ARRAY_MAP(oname,
-		  if (!make_post_transformation(oname, ru)) {
-		    okay = false;
-		    break;
-		  },
-		  modules);
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!make_post_transformation(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
     }
 
     reset_make_cache();
@@ -1372,109 +1372,106 @@ void delete_named_resources(const char* rn)
 
 void delete_all_resources(void)
 {
-    db_delete_all_resources();
-    //set_free(up_to_date_resources);
-    reset_make_cache();
-    //up_to_date_resources = set_make(set_pointer);
-    init_make_cache();
+  db_delete_all_resources();
+  //set_free(up_to_date_resources);
+  reset_make_cache();
+  //up_to_date_resources = set_make(set_pointer);
+  init_make_cache();
 }
 
 /* Should be able to handle Fortran applications, C applications and
    mixed Fortran/C applications. */
 string get_first_main_module(void)
 {
-    string dir_name = db_get_current_workspace_directory();
-    string main_name;
-    string name = string_undefined;
+  string dir_name = db_get_current_workspace_directory();
+  string main_name;
+  string name = string_undefined;
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    /* Let's look for a Fortran main */
-    main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
+  // Let's look for a Fortran main
+  main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
 
+  if (file_exists_p(main_name))
+  {
+    FILE * tmp_file = safe_fopen(main_name, "r");
+    name = safe_readline(tmp_file);
+    safe_fclose(tmp_file, main_name);
+  }
+  free(main_name);
+
+  if(string_undefined_p(name)) {
+    // Let's now look for a C main
+    main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
     if (file_exists_p(main_name))
-    {
-	FILE * tmp_file = safe_fopen(main_name, "r");
-	name = safe_readline(tmp_file);
-	safe_fclose(tmp_file, main_name);
-    }
+      name = strdup("main");
     free(main_name);
+  }
 
-    if(string_undefined_p(name)) {
-      /* Let's now look for a C main */
-      main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
-      if (file_exists_p(main_name))
-	name = strdup("main");
-      free(main_name);
-    }
-
-    free(dir_name);
-    debug_off();
-    return name;
+  free(dir_name);
+  debug_off();
+  return name;
 }
 
 /* check the usage of resources
  */
 void do_resource_usage_check(const char* oname, rule ru)
 {
-    list reals;
-    set res_read = set_undefined;
-    set res_write = set_undefined;
+  list reals;
+  set res_read = set_undefined;
+  set res_write = set_undefined;
 
-    /* Get the dbm sets */
-    get_logged_resources (&res_read, &res_write);
+  // Get the dbm sets
+  get_logged_resources (&res_read, &res_write);
 
-    /* build the real required resrouces */
-    reals = build_real_resources(oname, rule_required (ru));
+  // build the real required resrouces
+  reals = build_real_resources(oname, rule_required (ru));
 
-    /* Delete then from the set of read resources */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+  // Delete then from the set of read resources
+  FOREACH(real_resource, rr, reals)
+  {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
+    string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
 
-	if (set_belong_p (res_read, elem_name)){
-	    debug (5, "do_resource_usage_check",
-		   "resource %s.%s has been read: ok\n",
-		   rron, rrrn);
+    if (set_belong_p (res_read, elem_name)){
+	    pips_debug (5, "resource %s.%s has been read: ok\n", rron, rrrn);
 	    set_del_element(res_read, res_read, elem_name);
-	} else
-	    user_log ("resource %s.%s has not been read\n",
-		      rron, rrrn);
-    }, reals);
+    }
+    else
+	    user_log("resource %s.%s has not been read\n", rron, rrrn);
+  }
 
-    /* Try to find an illegally read resrouce ... */
-    SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
-    gen_full_free_list(reals);
+  // Try to find an illegally read resrouce ... */
+  SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
+  gen_full_free_list(reals);
 
-    /* build the real produced resources */
-    reals = build_real_resources(oname, rule_produced (ru));
+  // build the real produced resources
+  reals = build_real_resources(oname, rule_produced(ru));
 
-    /* Delete then from the set of write resources */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+  // Delete then from the set of write resources
+  FOREACH(real_resource, rr, res_write)
+  {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
+    string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
 
-	if (set_belong_p (res_write, elem_name)){
-	    debug (5, "do_resource_usage_check",
-		   "resource %s.%s has been written: ok\n",
-		   rron, rrrn);
+    if (set_belong_p (res_write, elem_name)){
+	    pips_debug (5, "resource %s.%s has been written: ok\n", rron, rrrn);
 	    set_del_element(res_write, res_write, elem_name);
-	} else
-	    user_log ("resource %s.%s has not been written\n",
-		      rron, rrrn);
-    }, reals);
+    }
+    else
+	    user_log ("resource %s.%s has not been written\n", rron, rrrn);
+  }
 
-    /* Try to find an illegally written resrouce ... */
-    SET_MAP(re,{
-	user_log ("resource %s has been written\n", re);
-    }, res_write);
+  // Try to find an illegally written resource ...
+  SET_MAP(re, user_log ("resource %s has been written\n", re), res_write);
 
-    gen_full_free_list(reals);
+  gen_full_free_list(reals);
 
-    set_clear(res_read);
-    set_clear(res_write);
+  // not free!
+  set_clear(res_read);
+  set_clear(res_write);
 }
 
 
@@ -1484,171 +1481,166 @@ static double initial_memory_size;
 
 static void logs_on(void)
 {
-    if (get_bool_property("LOG_TIMINGS"))
-	init_request_timers();
+  if (get_bool_property("LOG_TIMINGS"))
+    init_request_timers();
 
-    if (get_bool_property("LOG_MEMORY_USAGE"))
-	initial_memory_size = get_process_gross_heap_size();
+  if (get_bool_property("LOG_MEMORY_USAGE"))
+    initial_memory_size = get_process_gross_heap_size();
 }
 
 static void logs_off(void)
 {
-    if (get_bool_property("LOG_TIMINGS"))
-    {
-	string request_time, phase_time, dbm_time;
-	get_request_string_timers (&request_time, &phase_time, &dbm_time);
+  if (get_bool_property("LOG_TIMINGS"))
+  {
+    string request_time, phase_time, dbm_time;
+    get_request_string_timers (&request_time, &phase_time, &dbm_time);
 
-	user_log ("                                 stime      ");
-	user_log (request_time);
-	user_log ("                                 phase time ");
-	user_log (phase_time);
-	user_log ("                                 IO stime   ");
-	user_log (dbm_time);
-    }
+    user_log ("                                 stime      ");
+    user_log (request_time);
+    user_log ("                                 phase time ");
+    user_log (phase_time);
+    user_log ("                                 IO stime   ");
+    user_log (dbm_time);
+  }
 
-    if (get_bool_property("LOG_MEMORY_USAGE"))
-    {
-	double final_memory_size = get_process_gross_heap_size();
-	user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
-		 final_memory_size,
-		 final_memory_size-initial_memory_size);
-    }
+  if (get_bool_property("LOG_MEMORY_USAGE"))
+  {
+    double final_memory_size = get_process_gross_heap_size();
+    user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
+             final_memory_size,
+             final_memory_size-initial_memory_size);
+  }
 }
 
 static bool safe_do_something(
-    const char* name,
-    const char* module_n,
-    const char* what_it_is,
-    rule (*find_rule)(const char*),
-    bool (*doit)(const char*,const char*))
+  const char* name,
+  const char* module_n,
+  const char* what_it_is,
+  rule (*find_rule)(const char*),
+  bool (*doit)(const char*,const char*))
 {
-    bool success = false;
+  bool success = false;
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    if (find_rule(name) == rule_undefined)
-    {
-	pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
-	success = false;
-	debug_off();
-	return success;
-    }
-
-    CATCH(any_exception_error)
-    {
-	/* global variables that have to be reset after user-error */
-	reset_make_cache();
-	reset_static_phase_variables();
-	retrieve_active_phases();
-	pips_user_warning("Request aborted in pipsmake: "
-			  "build %s %s for module %s.\n",
-			  what_it_is, name, module_n);
-	db_clean_all_required_resources();
-	success = false;
-    }
-    TRY
-    {
-	user_log("Request: build %s %s for module %s.\n",
-		 what_it_is, name, module_n);
-
-	logs_on();
-	pips_malloc_debug();
-
-	/* DO IT HERE!
-	 */
-	success = doit(name, module_n);
-
-	if(success)
-	{
-	    user_log("%s made for %s.\n", name, module_n);
-	    logs_off();
-	}
-	else
-	{
-	    pips_user_warning("Request aborted under pipsmake: "
-			      "build %s %s for module %s.\n",
-			      what_it_is, name, module_n);
-	}
-	UNCATCH(any_exception_error);
-    }
+  if (find_rule(name) == rule_undefined)
+  {
+    pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
+    success = false;
     debug_off();
     return success;
+  }
+
+  CATCH(any_exception_error)
+  {
+    // global variables that have to be reset after user-error
+    reset_make_cache();
+    reset_static_phase_variables();
+    retrieve_active_phases();
+    pips_user_warning("Request aborted in pipsmake: "
+                      "build %s %s for module %s.\n",
+                      what_it_is, name, module_n);
+    db_clean_all_required_resources();
+    success = false;
+  }
+  TRY
+  {
+    user_log("Request: build %s %s for module %s.\n",
+             what_it_is, name, module_n);
+    logs_on();
+    pips_malloc_debug();
+
+    // DO IT HERE!
+    success = doit(name, module_n);
+
+    if(success)
+    {
+	    user_log("%s made for %s.\n", name, module_n);
+	    logs_off();
+    }
+    else
+    {
+	    pips_user_warning("Request aborted under pipsmake: "
+                        "build %s %s for module %s.\n",
+                        what_it_is, name, module_n);
+    }
+    UNCATCH(any_exception_error);
+  }
+  debug_off();
+  return success;
 }
 
 bool safe_make(const char* res_n, const char* module_n)
 {
-    return safe_do_something(res_n, module_n, "resource",
-			     find_rule_by_resource, make);
+  return safe_do_something(res_n, module_n, "resource",
+                           find_rule_by_resource, make);
 }
 
 bool safe_apply(const char* phase_n, const char* module_n)
 {
-    return safe_do_something(phase_n, module_n, "phase/rule",
-			     find_rule_by_phase, apply);
+  return safe_do_something(phase_n, module_n, "phase/rule",
+                           find_rule_by_phase, apply);
 }
 
 bool safe_concurrent_apply(
-    const char* phase_n,
-    gen_array_t modules)
+  const char* phase_n,
+  gen_array_t modules)
 {
-    bool ok = true;
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  bool ok = true;
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    /* Get a human being representation of the modules: */
-    string module_list = strdup(string_array_join(modules, ","));
+  // Get a human being representation of the modules:
+  string module_list = strdup(string_array_join(modules, ","));
 
-    if (find_rule_by_phase(phase_n)==rule_undefined)
+  if (find_rule_by_phase(phase_n)==rule_undefined)
+  {
+    pips_user_warning("Unknown phase \"%s\"\n", phase_n);
+    ok = false;
+  }
+  else
+  {
+    CATCH(any_exception_error)
     {
-	pips_user_warning("Unknown phase \"%s\"\n", phase_n);
-	ok = false;
+      reset_make_cache();
+      retrieve_active_phases();
+      pips_user_warning("Request aborted in pipsmake\n");
+      ok = false;
     }
-    else
+    TRY
     {
-      CATCH(any_exception_error)
-      {
-	reset_make_cache();
-	retrieve_active_phases();
-	pips_user_warning("Request aborted in pipsmake\n");
-	ok = false;
+      logs_on();
+      user_log("Request: capply %s for module [%s].\n", phase_n, module_list);
+
+      ok = concurrent_apply(phase_n, modules);
+
+      if (ok)	{
+        user_log("capply %s made for [%s].\n", phase_n, module_list);
+        logs_off();
       }
-      TRY
-      {
-	logs_on();
-
-	user_log("Request: capply %s for module [%s].\n",
-		 phase_n, module_list);
-
-	ok = concurrent_apply(phase_n, modules);
-
-	if (ok)	{
-	    user_log("capply %s made for [%s].\n", phase_n, module_list);
-	    logs_off();
-	}
-	else {
-	  pips_user_warning("Request aborted under pipsmake: "
-			    "capply %s for module [%s].\n",
-			    phase_n, module_list);
-	}
-
-	UNCATCH(any_exception_error);
+      else {
+        pips_user_warning("Request aborted under pipsmake: "
+                          "capply %s for module [%s].\n",
+                          phase_n, module_list);
       }
+      UNCATCH(any_exception_error);
     }
+  }
 
-    free(module_list);
-    debug_off();
-    return ok;
+  free(module_list);
+  debug_off();
+  return ok;
 }
 
 bool safe_set_property(const char* propname, const char* value)
 {
-    size_t len = strlen(propname) + strlen(value) + 2;
-    char* line = calloc(len, sizeof(char));
-    strcat(line, propname);
-    strcat(line, " ");
-    strcat(line, value);
-    user_log("set %s\n", line);
-    parse_properties_string(line);
-    free(line);
-    /* parse_properties_string() doesn't return whether it succeeded */
-    return true;
+  size_t len = strlen(propname) + strlen(value) + 2;
+  char* line = calloc(len, sizeof(char));
+  strcat(line, propname);
+  strcat(line, " ");
+  strcat(line, value);
+  user_log("set %s\n", line);
+  parse_properties_string(line);
+  free(line);
+  // parse_properties_string() doesn't return whether it succeeded
+  return true;
 }

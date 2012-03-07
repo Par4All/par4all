@@ -267,7 +267,8 @@ void prettyprint_dependence_graph( FILE * fd,
                sizeof(void *),
                (gen_cmp_func_t) conflicts_sort_callback);
         list conflicts_list = NIL;
-        GEN_ARRAY_MAP(s, conflicts_list = CONS(CONFLICT, s, conflicts_list), conflicts_array);
+        GEN_ARRAY_FOREACH(conflict, s, conflicts_array)
+          conflicts_list = CONS(conflict, s, conflicts_list);
         gen_array_free(conflicts_array);
         dg_arc_label_conflicts(dal)=conflicts_list;
       }
@@ -869,7 +870,8 @@ prettyprint_dependence_graph_view(FILE * fd,
                sizeof(void *),
                (gen_cmp_func_t) conflicts_sort_callback);
         list conflicts_list = NIL;
-        GEN_ARRAY_MAP(s, conflicts_list = CONS(CONFLICT, s, conflicts_list), conflicts_array);
+        GEN_ARRAY_FOREACH(conflict, s, conflicts_array)
+          conflicts_list = CONS(conflict, s, conflicts_list);
         gen_array_free(conflicts_array);
         dg_arc_label_conflicts(dal)=conflicts_list;
       }
