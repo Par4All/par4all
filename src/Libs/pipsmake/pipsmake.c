@@ -125,11 +125,11 @@ static bool (*get_builder(const char* name))(const char *)
     pips_internal_error("no builder for %s", name);
     return NULL;
 }
-
+
 /*********************************************** UP TO DATE RESOURCES CACHE */
 
 /* FI: make is very slow when interprocedural analyzes have been selected;
- * some memorization has been added; we need to distinguish betweeen an
+ * some memoization has been added; we need to distinguish betweeen an
  * external make which initializes a set of up-to-date resources and
  * an internal recursive make which updates and exploits that set.
  *
@@ -138,6 +138,9 @@ static bool (*get_builder(const char* name))(const char *)
  *
  * apply(), which calls make() many times, does not fully benefit from
  * this memoization scheme.
+ *
+ * What is cached? a resource id, i.e. a db_resource, i.e. an object
+ * hidden in pipsdbm_private...
  */
 static set up_to_date_resources = set_undefined;
 
@@ -156,14 +159,91 @@ void init_make_cache(void)
   up_to_date_resources = set_make(set_pointer);
 }
 
+/* Can the make cache be used? */
+bool make_cache_p()
+{
+  return !set_undefined_p(up_to_date_resources);
+}
+
 void reinit_make_cache_if_necessary(void)
 {
   if (!set_undefined_p(up_to_date_resources))
     reset_make_cache(), init_make_cache();
 }
 
+//bool make_cache_hit_p(real_resource rr)
+bool make_cache_hit_p(void * rr)
+{
+  return set_belong_p(up_to_date_resources, (void *) rr);
+}
+
+//void add_resource_to_make_cache(real_resource res)
+void add_resource_to_make_cache(void * res)
+{
+  /* FI: debugging messages cannot be factorized here because of
+     sibling resources, unless an extra parameter is added... */
+  //string res_rn = real_resource_resource_name((real_resource) res);
+  //string res_on = real_resource_owner_name((real_resource) res);
+  //pips_debug(5, "resource %s(%s) added to up_to_date make cache\n",
+  //	     res_rn, res_on);
+  set_add_element (up_to_date_resources,
+		   up_to_date_resources,
+		   (void *) res);
+}
+
+//void remove_resource_from_make_cache(real_resource res)
+void remove_resource_from_make_cache(void * res)
+{
+  string res_rn = real_resource_resource_name((real_resource) res);
+  string res_on = real_resource_owner_name((real_resource) res);
+  pips_debug(5, "resource %s(%s) deleted from up_to_date make cache\n",
+	     res_rn, res_on);
+  set_del_element (up_to_date_resources,
+		   up_to_date_resources,
+		   (void *) res);
+}
+
+/* Debug function, fully bugged... */
+void print_make_cache()
+{
+  if (!set_undefined_p(up_to_date_resources)) {
+    int count = 0;
+    /*
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      string res_on = real_resource_owner_name((real_resource) res);
+      printf("Up-to-date resource: \"%s.%s\"\n", res_on, res_rn);
+      count++;
+    }
+    */
+    if(count==0)
+      printf("No up-to-date resource is cached\n");
+  }
+  else
+    printf("The up-to-date resource cache is undefined\n");
+}
+
+/* Debug function: make sure that up-to-date resources do exist in the
+   resource database. If the cache does not exist, it is considered
+   consistent. */
+bool make_cache_consistent_p()
+{
+  if (!set_undefined_p(up_to_date_resources)) {
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      string res_on = real_resource_owner_name((real_resource) res);
+      if(!db_resource_p(res_rn, res_on))
+	return false;
+    }
+  }
+  return true;
+}
+
 /* Static variables used by phases must be reset on error although
    pipsmake does not know which ones are used. */
+/* FI: let us hope this is documented in PIPS developer guide... It is
+   not mentionned in the PIPS tutorial. And rightly so I believe. It
+   should be linked to the exception pips_user_error(). */
 void reset_static_phase_variables()
 {
 #define DECLARE_ERROR_HANDLER(name) extern void \
@@ -461,13 +541,15 @@ static void update_preserved_resources(const char* oname, rule ru)
       string rrrn = real_resource_resource_name(rr);
 
       /* is it up to date ? */
-      if(set_belong_p(up_to_date_resources, (char *) rr))
+      //if(set_belong_p(up_to_date_resources, (char *) rr))
+      if(make_cache_hit_p(rr))
       {
-        pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
-                   rrrn, rron);
-        set_del_element (up_to_date_resources,
-                         up_to_date_resources,
-                         (char *) rr);
+        // pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
+	//        rrrn, rron);
+        //set_del_element (up_to_date_resources,
+	//               up_to_date_resources,
+	//               (char *) rr);
+	remove_resource_from_make_cache(rr);
         /* GO 11/7/95: we need to del the resource from the data base
            for a next call of pipsmake to find it unavailable */
         db_unput_a_resource (rrrn, rron);
@@ -713,14 +795,22 @@ static bool apply_without_reseting_up_to_date_resources(
 }
 
 
-/* compute all post-transformations to apply a rule on an object
+/* compute all pre or post-transformations to apply a rule on an
+   object or activate a phase if owner is SELECT. The phase is not
+   necessarily a transformation anymore: analyses can be requested as
+   well although pipsmke may core dump as a consequences. The select
+   clauses are performed first.
  */
-static bool make_pre_post_transformation(const char* oname, rule ru, list transformations)
+static bool make_pre_post_transformation(const char* oname,
+					 rule ru,
+					 list transformations)
 {
     list reals;
     bool success_p = true;
 
-    /* we select some resources */
+    /* we activate the requested rules if any */
+    /* FI: apparently, we do not stack up the current active phase and
+       we do not restore it once the requesting phase is completed. */
     FOREACH(VIRTUAL_RESOURCE, vr, transformations)
     {
         string vrn = virtual_resource_name(vr);
@@ -731,15 +821,19 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
             pips_debug(3, "rule %s : selecting phase %s\n",
                     rule_phase(ru), vrn);
 
-            if (activate (vrn) == NULL) {
+	    if(!active_phase_p(vrn)) {
+	      /* FI: activate() is part of the pipsmake API, debug_on() is
+		 activated, pipsmake.rc is potentially parsed,...  */
+	      if (activate(vrn) == NULL) {
                 success_p = false;
                 break;
-            }
+	      }
+	    }
         }
     }
 
     if (success_p) {
-        /* we build the list of pre transformation real_resources */
+        /* we build the list of pre or post transformation real_resources */
         reals = build_real_resources(oname, transformations);
 
         /* we recursively make the resources */
@@ -752,28 +846,39 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
                     rule_phase(ru), rrpn, rron);
 
             if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-                success_p = false;
+	      success_p = false; // FI: success_p is not returned
 
             /* now we must drop the up_to_date cache.
              * maybe not that often? Or one should perform the transforms
-             * Top-down to avoid recomputations, with ALL...
+             * top-down to avoid recomputations, with ALL...
              */
             reset_make_cache();
             init_make_cache();
         }
     }
-    return true;
+    return true; // success_p
 }
 
+/* FI: guard added to simplify debugging and to call
+   make_pre_post_transformation() only when it is useful. */
 static bool make_pre_transformation(const char* oname, rule ru) {
-    return make_pre_post_transformation(oname,ru,rule_pre_transformation(ru));
+  bool success_p = true;
+  if(!ENDP(rule_pre_transformation(ru)))
+    success_p =  make_pre_post_transformation(oname,ru,
+					      rule_pre_transformation(ru));
+  return success_p;
 }
+
+/* FI: guard added to simplify debugging and to call
+   make_pre_post_transformation() only when it is useful. */
 static bool make_post_transformation(const char* oname, rule ru) {
+  bool success_p = true;
   if(!ENDP(rule_post_transformation(ru))) {
     reset_make_cache();
     init_make_cache();
+    success_p = make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
   }
-  return make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
+  return success_p;
 }
 
 static bool make(const char* rname, const char* oname)
@@ -805,15 +910,16 @@ static bool make(const char* rname, const char* oname)
 bool rmake(const char* rname, const char* oname)
 {
     rule ru;
-    char * res = NULL;
+    char * res_id = NULL;
 
-    debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
+    pips_debug(2, "%s(%s) - requested\n", rname, oname);
 
     /* is it up to date ? */
     if (db_resource_p(rname, oname))
     {
-	res = db_get_resource_id(rname, oname);
-	if(set_belong_p(up_to_date_resources, (char *) res))
+	res_id = db_get_resource_id(rname, oname);
+	//if(set_belong_p(up_to_date_resources, (char *) res_id))
+	if(make_cache_hit_p(res_id))
 	{
 	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
 		     rname, oname, db_time_of_resource(rname, oname));
@@ -822,7 +928,7 @@ bool rmake(const char* rname, const char* oname)
 	else
 	{
 	  /* this resource exists but is maybe up-to-date? */
-	  res = NULL; /* NO, IT IS NOT. */
+	  res_id = NULL; /* NO, IT IS NOT. */
 	}
     }
     else if (db_resource_is_required_p(rname, oname))
@@ -870,26 +976,25 @@ bool rmake(const char* rname, const char* oname)
       lr = build_real_resources(oname, rule_produced(ru));
 
       /* set up-to-date all the produced resources for that rule */
-      MAP(REAL_RESOURCE, rr,
-      {
+      FOREACH(REAL_RESOURCE, rr, lr) {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 
 	if (db_resource_p(rrrn, rron))
 	{
-	  res = db_get_resource_id(rrrn, rron);
+	  res_id = db_get_resource_id(rrrn, rron);
 	  pips_debug(5, "resource %s(%s) added to up_to_date "
 		     "with time stamp %d\n",
 		     rrrn, rron, db_time_of_resource(rrrn, rron));
-	  set_add_element(up_to_date_resources,
-			  up_to_date_resources, res);
+	  //set_add_element(up_to_date_resources,
+	  //		  up_to_date_resources, res_id);
+	  add_resource_to_make_cache(res_id);
 	}
 	else {
 	  pips_internal_error("resource %s[%s] just built not found!",
 			      rrrn, rron);
 	}
-      },
-	  lr);
+      }
 
       gen_full_free_list(lr);
     }
@@ -1014,10 +1119,11 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   list real_modified_resources = NIL;
   rule ru = rule_undefined;
   bool result = true;
-  void * res_id = (void *) db_get_resource_id(rname, oname);
+  void * res_id = db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
-  if(set_belong_p(up_to_date_resources, res_id))
+  // if(set_belong_p(up_to_date_resources, res_id))
+  if(make_cache_hit_p(res_id))
     return true;
 
   /* Initial resources by definition are not associated to a rule.
@@ -1113,14 +1219,16 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
 		 rname, oname, db_time_of_resource(rname, oname));
-      set_add_element(up_to_date_resources, up_to_date_resources, res_id);
+      //set_add_element(up_to_date_resources, up_to_date_resources, res_id);
+      add_resource_to_make_cache(res_id);
 
-      MAP(REAL_RESOURCE, rpr, {
+      FOREACH(REAL_RESOURCE, rpr, real_produced_resources) {
 	string srname = real_resource_resource_name(rpr);
 	string soname = real_resource_owner_name(rpr);
 	void * sres_id = (void *) db_get_resource_id(srname, soname);
+	// real_resource sres_id = db_get_resource_id(srname, soname);
 
-	if(sres_id != (real_resource) res_id) {
+	if(sres_id != res_id) {
 
 	  if(same_string_p(rname, srname)) {
 	    /* We would retrieve the same rule and the same required
@@ -1129,7 +1237,8 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
 		       "with time stamp %d\n",
 		       srname, soname, db_time_of_resource(srname, soname));
-	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	    //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	    add_resource_to_make_cache(sres_id);
 	  }
 	  else {
 	    /* Check that the sibling is currently obtained by the same
@@ -1139,19 +1248,20 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	    if(sru==ru) {
 	      /* The rule does not have to be fired again, so its produced
                  resources are up-to-date. */
-	    string soname = real_resource_owner_name(rpr);
+	      string soname = real_resource_owner_name(rpr);
 
-	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
-		       "with time stamp %d\n",
-		       srname, soname, db_time_of_resource(srname, soname));
-	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	      pips_debug(5, "sibling resource %s(%s) added to up_to_date "
+			 "with time stamp %d\n",
+			 srname, soname, db_time_of_resource(srname, soname));
+	      //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	      add_resource_to_make_cache(sres_id);
 	    }
 	  }
 	}
 	else {
 	  res_found_p = true;
 	}
-      }, real_produced_resources);
+      }
 
       pips_assert("The resources res is among the real resources produced by rule ru",
 		  res_found_p);
@@ -1178,7 +1288,9 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 int delete_obsolete_resources(void)
 {
     int ndeleted;
-    bool cache_off = set_undefined_p(up_to_date_resources);
+    bool cache_off = !make_cache_p();
+    // FI: this test breaks the consistency of init() and reset() for
+    // the make cache
     if (cache_off) init_make_cache();
     ndeleted =
 	db_delete_obsolete_resources(check_physical_resource_up_to_date);
@@ -1216,37 +1328,54 @@ bool check_resource_up_to_date(const char* rname, const char* oname)
 	check_physical_resource_up_to_date(rname, oname): false;
 }
 
-/* Delete from up_to_date all the resources of a given name */
-void delete_named_resources (const char* rn)
+/* Delete from up_to_date_resources make cache all the resources with
+   a given resource name. There is no internal data structure in
+   pipsdbm to access these resources efficiently... */
+void delete_named_resources(const char* rn)
 {
-    /* GO 29/6/95: many lines ...
-       db_unput_resources_verbose (rn);*/
-    db_unput_resources(rn);
+  /* Firstly, clean up the up-to-date cache if it exists */
+  if (false && make_cache_p()) {
+    /* In this case we are called from a Pips phase or from a bang rule
+       user_warning ("delete_named_resources",
+       "called within a phase (i.e. by activate())\n"); */
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      //string res_on = real_resource_owner_name((real_resource) res);
 
-    if (up_to_date_resources != set_undefined) {
-	/* In this case we are called from a Pips phase
-	user_warning ("delete_named_resources",
-		      "called within a phase (i.e. by activate())\n"); */
-	SET_MAP(res, {
-	    string res_rn = real_resource_resource_name((real_resource) res);
-	    string res_on = real_resource_owner_name((real_resource) res);
-
-	    if (same_string_p(rn, res_rn)) {
-		pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
-			   res_rn, res_on);
-		set_del_element (up_to_date_resources,
-				 up_to_date_resources,
-				 (char *) res);
-	    }
-	}, up_to_date_resources);
+      if (same_string_p(rn, res_rn)) {
+	//pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
+	//res_rn, res_on);
+	//set_del_element (up_to_date_resources,
+	//		 up_to_date_resources,
+	//		 (char *) res);
+	remove_resource_from_make_cache(res);
+      }
     }
+  }
+
+  /* new version of the above code */
+  if (make_cache_p()) {
+    list rl = db_retrieve_resources(rn);
+    FOREACH(STRING, r_id, rl) {
+      if(make_cache_hit_p(r_id))
+	remove_resource_from_make_cache(r_id);
+    }
+    gen_free_list(rl);
+  }
+
+  /* Then remove the resource */
+  /* GO 29/6/95: many lines ...
+     db_unput_resources_verbose (rn);*/
+  db_unput_resources(rn);
 }
 
 void delete_all_resources(void)
 {
     db_delete_all_resources();
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_make(set_pointer);
+    //set_free(up_to_date_resources);
+    reset_make_cache();
+    //up_to_date_resources = set_make(set_pointer);
+    init_make_cache();
 }
 
 /* Should be able to handle Fortran applications, C applications and

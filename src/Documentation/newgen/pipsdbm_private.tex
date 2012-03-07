@@ -27,63 +27,114 @@
 \usepackage{newgen_domain}
 \usepackage[backref,pagebackref]{hyperref}
 
-\title{Pips Database Manager \\ private data structures}
+\title{Pips Database Manager \\ Private Data Structures}
 \author{Fabien Coelho}
 
 \begin{document}
 
 \maketitle
 
-\section{New database structures}
+\section{Internal Pipsdbm Database Structures}
 \label{sec:new}
 
-New database structures for manipulation by \texttt{pipsdbm}.
-The idea is to improve \texttt{pipsdbm} performances by providing an
-underlying fast mapping-based implementation instead of the old list,
-which does not scale well with the number of modules.
+This file contains the description of new database structures used
+internally by \texttt{pipsdbm}. The idea is to improve
+\texttt{pipsdbm} performances by providing an underlying fast
+hash-table-based implementation instead of the list used externally by
+\verb/pipsdbm/ API, since lists do not scale up well with the number of
+modules.
 
-Conceptually, the database manages resources. However, resources are both
-owned by a module and have a type (from the \texttt{pipsmake} point of view),
-and the altogether forms the resource identification. After discussing it
-a while, it was decided that \texttt{pipsdbm} should know about this
-subclassification of resources, and this is finally reflected by the
-data structures.
+Conceptually, the \verb/pipsdbm/ database manages resources. However,
+resources are owned by a module and have a kind (from the
+\texttt{pipsmake} point of view), and they together form the unique
+resource identification. After discussing it for a while among PIPS
+designers, it was decided that \texttt{pipsdbm} should know about this
+subclassification of resources, and this is taken into account by
+these private \verb/pipsdbm/ data structures.
+
+All domain private to \verb/pipsdbm/ have name prefixed by \verb/db_/.
+
+\subsection{User Resources}
+
+The exact nature of a resource as defined by a user of the library is
+not known by \verb/pipsdbm/ API. So all pointers to user resources,
+e.g. \verb/CODE/ or \verb/CALLERS/, are typed as \verb/void */,
+i.e. \verb/db_void/ in Newgen declarations.
 
 \domain{external db_void}
 
-\subsection{Named objects}
+\subsection{Named Objects}
 \label{sec:named}
 
-The key for the mapping management is a string, however they are not
-managed by functions, which need a full newgen domain. Hence this small
-tabulated domain which can associate a unique object to a string.
-It can be used for both owners (modules) and type strings.
+The key for the resource descriptor management is a string. However
+they are not managed by functions, which need a full newgen
+domain. 
+% FI: I do not understand
+Hence this small tabulated domain associates a unique object
+to a string. It can be used for both owners, i.e. module names, and
+resource type, i.e. strings. For instance, all occurences of the
+string \verb/"foo"/ are reduced to one.
 
 \domain{tabulated db_symbol = name:string}
 
+% FI: since there is only one field, it looks more like a set than a
+% mapping or tabulated domain...
 
-\subsection{A resource for pips}
+% FI: I do not understand the reason why strings are not used as
+% access keys? Why do they have to be turned to unique pointers first?
+% What is gained by hashing then pointers instead of strings?
+
+\subsection{An Internal Resource Descriptor for PIPS}
 \label{sec:rs}
 
-A resource is just some pointer to the resource in memory.
-It is associated a logical time and maybe a file time, to check for
-possibly modified files. It may be loaded (the pointer actually points to
-the resource) or unloaded (the pointer may store the name of the
-resource?), or being required by pipsmake but not yet produced.
+A resource descriptor, known here as \verb/db_resource/, contains
+several fields, similar to the fields of data structure
+\verb/resource/ defined in \verb/database/. First a pointer called
+\verb/pointer /to the resource in memory.  This pointer is associated
+to a logical time, \verb/time/, and maybe a file time,
+\verb/file_time/, to check for possibly externally modified files when
+PIPS is used interactively or is coupled to other tools using the PIPS
+workspace files. Each resource has a status, called
+\verb/db_status/. It may be \verb/loaded/ and the pointer field
+\verb/db_pointer/ actually points to the resource data structure in
+memory, or unloaded, \verb/stored/ (the pointer may point to the name
+of the resource?), or being \verb/required/ by pipsmake but not yet
+produced. For optimization, a resource can also be loaded and stored
+at the same time. Note that a key information, whether the resource is
+up-to-date or not, is not stored here as it depends on the rules
+managed by \verb/pipsmake/ at a higher level.
 
 \domain{db_status = loaded:unit + stored:unit + required:unit + loaded_and_stored:unit}
 
 \domain{db_resource = pointer:db_void x db_status x time:int x file_time:int}
 
+Note the differences with the domain \verb/resource/ and
+\verb/status/. The fields \verb/name/ and \verb/owner_name/ are gone
+because they are used as access keys. The field \verb/db_status/ is
+more complex than the field \verb/status/ and it does not contain a
+pointer to the user data structure. This pointer is moved up into
+\verb/db_resource/.
 
-\subsection{Resource mappings}
+Note that objects of type \verb/db_resource/ are internal to
+\verb/pipsdbm/. However, they are used under the name \verb/res_id/ to
+manage the \verb/make_cache/ of \verb/pipsdbm/.
+
+\subsection{Resource Mappings}
 \label{sec:map}
 
-Now the pips resources are stored internally with a two level function. 
-The first one relies on the owner name, the second on the resource name.
+The PIPS resource descriptors are stored and retrieved internally with
+a two-level mapping scheme.  The first one uses the owner name,
+a.k.a. the module name, and the second one the resource kind
+name. Note that module and resource names are both managed as
+\verb/db_symbol/.
 
-\domain{db_owned_resources = db_symbol -> db_resource}
+The owner name is used to reach all resources associated to a given module:
 
 \domain{db_resources = db_symbol -> db_owned_resources}
+
+Then the different resources can be accessed thanks to their resource
+kind names: 
+
+\domain{db_owned_resources = db_symbol -> db_resource}
 
 \end{document}
