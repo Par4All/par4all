@@ -47,7 +47,7 @@ gen_array_t gen_array_from_list(list);
 list list_from_gen_array(gen_array_t);
 string string_array_join(gen_array_t array, string separator);
 
-#define GEN_ARRAY_MAP(s, code, array)			\
+#define GEN_ARRAY_MAP(s, code, array)               \
   {                                                 \
     size_t _i, _nitems = gen_array_nitems(array);   \
     for(_i=0; _i<_nitems; _i++)                     \
@@ -57,9 +57,8 @@ string string_array_join(gen_array_t array, string separator);
     }                                               \
   }
 
-#define GEN_ARRAY_FOREACH(type, s, array)                  \
-  size_t s##_i=0, s##_nitems = gen_array_nitems(array);    \
-  type s;                                                  \
-  for (s = (type) gen_array_item(array, s##_i);            \
-       s##_i < s##_nitems;                                 \
-       s##_i++, s = (type) gen_array_item(array, s##_i))
+#define GEN_ARRAY_FOREACH(type, s, array)                       \
+  size_t s##_i=0, s##_nitems = gen_array_nitems(array);         \
+  type s = s##_nitems>0? (type) gen_array_item(array, 0): NULL; \
+  for (; s##_i < s##_nitems &&                                  \
+         ((s = (type) gen_array_item(array, s##_i))); s##_i++)
