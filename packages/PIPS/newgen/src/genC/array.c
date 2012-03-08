@@ -120,36 +120,36 @@ gen_array_dupappend(gen_array_t a, void * what)
 /* Observers...
  */
 void **
-gen_array_pointer(gen_array_t a)
+gen_array_pointer(const gen_array_t a)
 {
     return a->array;
 }
 
-size_t 
-gen_array_nitems(gen_array_t a)
+size_t
+gen_array_nitems(const gen_array_t a)
 {
     return a->nitems;
 }
 
-size_t 
-gen_array_size(gen_array_t a)
+size_t
+gen_array_size(const gen_array_t a)
 {
     return a->size;
 }
 
 void *
-gen_array_item(gen_array_t a, size_t i)
+gen_array_item(const gen_array_t a, size_t i)
 {
   message_assert("valid index", /* 0<=i && */ i < a->size);
-    return a->array[i];
+  return a->array[i];
 }
 
 /* Sort: assumes that the items are the first ones.
  */
-static int 
+static int
 gen_array_cmp(const void * a1, const void * a2)
 {
-    return strcmp(* (char **) a1, * (char **) a2);
+  return strcmp(* (char **) a1, * (char **) a2);
 }
 
 void
@@ -172,14 +172,14 @@ gen_array_from_list(list /* of string */ ls)
     return a;
 }
 
-list /* of string */
+list // of string
 list_from_gen_array(gen_array_t a)
 {
-    list ls = NIL;
-    GEN_ARRAY_MAP(s, ls = CONS(STRING, strdup(s), ls), a);
-    return ls;
+  list ls = NIL;
+  GEN_ARRAY_FOREACH(string, s, a)
+    ls = CONS(string, strdup(s), ls);
+  return ls;
 }
-
 
 /* Join a string array with a string separator.
 
@@ -193,17 +193,19 @@ list_from_gen_array(gen_array_t a)
    with ["foo", "bar", "daurade"] and "," should return the string
    "foo,bar,daurade".
 */
-string string_array_join(gen_array_t array, string separator) {
+string string_array_join(gen_array_t array, string separator)
+{
   string join = "";
   bool first_iteration = true;
 
-  GEN_ARRAY_MAP(s, {
-      if (! first_iteration)
-	join = concatenate(join, separator, NULL);
-      else
-	first_iteration = false;
-      join = concatenate(join, (string) s, NULL);
-    }, array);
+  GEN_ARRAY_FOREACH(string, s, array)
+  {
+    if (! first_iteration)
+      join = concatenate(join, separator, NULL);
+    else
+      first_iteration = false;
+    join = concatenate(join, s, NULL);
+  }
 
   return join;
 }

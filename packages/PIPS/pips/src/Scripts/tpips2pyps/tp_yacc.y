@@ -137,44 +137,44 @@ bool loop_phase_p(string phase){
   return false;
 }
 
-static void perform( string action, bool res_as_action_p, res_or_rule * res) {
-  GEN_ARRAY_MAP(mod_name,
-                {
-                  if (mod_name != NULL) {
-                    string standard_fun = "";
-                    if(strncmp(mod_name,"program",strlen("program")) != 0
-                        && strncmp(mod_name,"all_functions",strlen("all_functions")) != 0
-                        && strncmp(mod_name,"main_module",strlen("main_module")) != 0
-                        && strncmp(mod_name,"current_module",strlen("current_module")) != 0) {
-                      standard_fun = "fun.";
-                    }
-                    if(res_as_action_p) {
-                      strtolower(res->the_name);
+static void perform( string action, bool res_as_action_p, res_or_rule * res)
+{
+  GEN_ARRAY_FOREACH(string, mod_name, res->the_owners)
+  {
+    if (mod_name != NULL) {
+      string standard_fun = "";
+      if(strncmp(mod_name,"program",strlen("program")) != 0
+         && strncmp(mod_name,"all_functions",strlen("all_functions")) != 0
+         && strncmp(mod_name,"main_module",strlen("main_module")) != 0
+         && strncmp(mod_name,"current_module",strlen("current_module")) != 0) {
+        standard_fun = "fun.";
+      }
+      if(res_as_action_p) {
+        strtolower(res->the_name);
 
-                      string loops_access = strdup("");
-                      if(loop_phase_p(res->the_name)) {
-                        free(loops_access);
-                        asprintf(&loops_access,"loops(\"%s\").",loop_label);
-                      }
+        string loops_access = strdup("");
+        if(loop_phase_p(res->the_name)) {
+          free(loops_access);
+          asprintf(&loops_access,"loops(\"%s\").",loop_label);
+        }
 
-                      printf("# %s %s\n"
-                           "w.%s%s.%s%s()" JUMPL,
-                           action,res->the_name, standard_fun,
-                           (string)mod_name,loops_access,res->the_name);
+        printf("# %s %s\n"
+               "w.%s%s.%s%s()" JUMPL,
+               action,res->the_name, standard_fun,
+               (string)mod_name,loops_access,res->the_name);
 
-                      free(loops_access);
-                    } else {
-                      printf("# %s %s\n"
-                           "w.%s%s.%s(\"%s\")" JUMPL,
-                           action,res->the_name, standard_fun,
-                           (string)mod_name,action,res->the_name);
-                    }
-                  }
-                  else {
-                    pips_user_warning("Select a module first!\n");
-                  }
-                }, res->the_owners);
-
+        free(loops_access);
+      } else {
+        printf("# %s %s\n"
+               "w.%s%s.%s(\"%s\")" JUMPL,
+               action,res->the_name, standard_fun,
+               (string)mod_name,action,res->the_name);
+      }
+    }
+    else {
+      pips_user_warning("Select a module first!\n");
+    }
+  }
 }
 
 static void print_putenv(string key, string value){
@@ -495,16 +495,16 @@ i_capply: TK_CAPPLY rule_id TK_ENDOFLINE
 	{
 		pips_debug(7, "reduce rule i_capply\n");
     res_or_rule * res = &$2;
-    GEN_ARRAY_MAP(mod_name,
-                  {
-                    if (mod_name != NULL) {
-                       printf("# tpips capply as a simple apply\n"
-                           "w.fun.%s.%s()" JUMPL, (string)mod_name, res->the_name);
-                    }
-                    else {
-                      pips_user_warning("Select a module first!\n");
-                    }
-                  }, res->the_owners);
+    GEN_ARRAY_FOREACH(string, mod_name, res->the_owners)
+    {
+      if (mod_name != NULL) {
+        printf("# tpips capply as a simple apply\n"
+               "w.fun.%s.%s()" JUMPL, (string)mod_name, res->the_name);
+      }
+      else {
+        pips_user_warning("Select a module first!\n");
+      }
+    }
     $$ = true;
 	}
 	;
