@@ -209,7 +209,7 @@ extern gen_chunk *gen_read GEN_PROTO(( FILE * )) ;
 extern int gen_read_tabulated GEN_PROTO(( FILE *, int )) ;
 extern int gen_read_and_check_tabulated GEN_PROTO(( FILE *, int )) ;
 extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
-extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
+extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ;
 extern char * alloc GEN_PROTO((int));
 
 /* exported type translation functions. */
@@ -220,11 +220,11 @@ extern void gen_type_translation_default GEN_PROTO((void));
 extern void gen_type_translation_read GEN_PROTO((string));
 extern void gen_type_translation_write GEN_PROTO((string));
 
-extern void gen_init_external GEN_PROTO((int, 
-					 void*(*)(FILE*, int(*)(void)), 
-					 void (*)(FILE*, void*), 
-					 void (*)(void*), 
-					 void* (*)(void*), 
+extern void gen_init_external GEN_PROTO((int,
+					 void*(*)(FILE*, int(*)(void)),
+					 void (*)(FILE*, void*),
+					 void (*)(void*),
+					 void* (*)(void*),
 					 int (*)(void*))) ;
 extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
 extern bool gen_sharing_p GEN_PROTO((gen_chunk *, gen_chunk *));
@@ -251,10 +251,10 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 extern void gen_full_recurse GEN_PROTO((void *, void *, ...));
 extern void gen_recurse(void * start, int domain_number,
                 bool (*flt)(void *),
-                void (*rwt)(void *)); 
+                void (*rwt)(void *));
 extern void gen_context_recurse(void * start, void * context, int domain_number,
                 bool (*flt)(void *, void * context),
-                void (*rwt)(void *, void * context)); 
+                void (*rwt)(void *, void * context));
 
 extern gen_chunk * gen_get_recurse_previous_visited_object(void);
 extern gen_chunk * gen_get_recurse_current_ancestor(void);
