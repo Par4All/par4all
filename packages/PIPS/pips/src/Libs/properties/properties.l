@@ -516,15 +516,17 @@ void fprint_property(FILE * fd, const char* pname)
 
 void fprint_properties(FILE * fd)
 {
-    if (pl)
-    { /* dump all sorted properties in fd. */
-	gen_array_t array = gen_array_make(0);
-	fprintf(fd, "# PIPS PROPERTIES\n");
-	HASH_MAP(name, p, gen_array_dupappend(array, name), pl);
-	gen_array_sort(array);
-	GEN_ARRAY_MAP(name, fprint_property(fd, name), array);
-	gen_array_full_free(array);
-    } else fprintf(fd, "# NO PIPS PROPERTIES...\n");
+  if (pl)
+  { // dump all sorted properties in fd.
+    gen_array_t array = gen_array_make(0);
+    fprintf(fd, "# PIPS PROPERTIES\n");
+    HASH_MAP(name, p, gen_array_dupappend(array, name), pl);
+    gen_array_sort(array);
+    GEN_ARRAY_FOREACH(string, name, array)
+      fprint_property(fd, name);
+    gen_array_full_free(array);
+  }
+  else fprintf(fd, "# NO PIPS PROPERTIES...\n");
 }
 
 /******************************************************* TOP-LEVEL INTERFACE */
