@@ -1,0 +1,55 @@
+int foo(int v)
+{
+   N = v;
+   return N;
+}
+int main()
+{
+   int a = 0;
+   int b = 0;
+   a = foo(a);
+   b = foo(b);
+   return a+b;
+}
+//             <    is alive (in)>: v
+int foo(int v)
+{
+//             <    is alive (in)>: v
+   N = v;
+//             <    is alive (in)>: N
+   return N;
+}
+//             <    is alive (in)>: N
+int main()
+{
+//             <    is alive (in)>: N
+   int a = 0;
+//             <    is alive (in)>: N a
+   int b = 0;
+//             <    is alive (in)>: N a b
+   a = foo(a);
+//             <    is alive (in)>: N a b
+   b = foo(b);
+//             <    is alive (in)>: a b
+   return a+b;
+}
+//             <may be alive (out)>: N
+int foo(int v)
+{
+//             <    is alive (out)>: N
+   N = v;
+//             <may be alive (out)>: N
+   return N;
+}
+int main()
+{
+//             <    is alive (out)>: N a
+   int a = 0;
+//             <    is alive (out)>: N a b
+   int b = 0;
+//             <    is alive (out)>: N a b
+   a = foo(a);
+//             <    is alive (out)>: a b
+   b = foo(b);
+   return a+b;
+}

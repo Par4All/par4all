@@ -1,0 +1,82 @@
+      PROGRAM DOT_PRODUCT
+
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+
+!     Some initializations
+      DO I = 1, N                                                       0008
+         A(I) = I*1.0                                                   0009
+         B(I) = I*2.0                                                   0010
+      ENDDO
+      RESULT = 0.0                                                      0012
+
+      DO I = 1, N                                                       0014
+         RESULT = RESULT+A(I)*B(I)                                      0015
+      ENDDO
+
+      PRINT *, 'Final Result= ', RESULT                                 0018
+      END
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+      PROGRAM DOT_PRODUCT
+
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+!     Some initializations
+      DO I = 1, N                                                       0008
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: I __IO_EFFECTS:LUNS(6)
+         A(I) = I*1.0                                                   0009
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: I __IO_EFFECTS:LUNS(6)
+         B(I) = I*2.0                                                   0010
+      ENDDO
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+      RESULT = 0.0                                                      0012
+C             <may be alive (in)>: A(*) B(*) RESULT
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+      DO I = 1, N                                                       0014
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: I RESULT __IO_EFFECTS:LUNS(6)
+         RESULT = RESULT+A(I)*B(I)                                      0015
+      ENDDO
+C             <    is alive (in)>: RESULT __IO_EFFECTS:LUNS(6)
+
+      PRINT *, 'Final Result= ', RESULT                                 0018
+      END
+      PROGRAM DOT_PRODUCT
+
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+C             <may be alive (out)>: A(*) B(*)
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+
+!     Some initializations
+      DO I = 1, N                                                       0008
+C             <may be alive (out)>: A(*) B(*)
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         A(I) = I*1.0                                                   0009
+C             <may be alive (out)>: A(*) B(*)
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         B(I) = I*2.0                                                   0010
+      ENDDO
+C             <may be alive (out)>: A(*) B(*) RESULT
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+      RESULT = 0.0                                                      0012
+C             <    is alive (out)>: RESULT __IO_EFFECTS:LUNS(6)
+
+      DO I = 1, N                                                       0014
+C             <may be alive (out)>: A(*) B(*) RESULT
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         RESULT = RESULT+A(I)*B(I)                                      0015
+      ENDDO
+
+      PRINT *, 'Final Result= ', RESULT                                 0018
+      END
