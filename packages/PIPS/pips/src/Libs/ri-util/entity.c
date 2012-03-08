@@ -1968,10 +1968,14 @@ bool some_main_entity_p(void)
 {
   gen_array_t modules = db_get_module_list();
   bool some_main = false;
-  GEN_ARRAY_MAP(name,
+  GEN_ARRAY_FOREACH(string, name, modules)
+  {
 		if (entity_main_module_p(local_name_to_top_level_entity(name)))
-		  some_main = true,
-		modules);
+    {
+		  some_main = true;
+      break;
+    }
+  }
   gen_array_full_free(modules);
   return some_main;
 }

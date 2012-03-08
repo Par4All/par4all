@@ -692,7 +692,7 @@ static void db_save_and_free_resource(
     }
 }
 
-/* some way to identify a resource... count be an id...
+/* some way to identify a resource... could be an id...
  */
 string db_get_resource_id(const char* rname, const char* oname)
 {
@@ -915,6 +915,36 @@ void db_unput_resources(const char* rname)
 	}
     },
 		     get_pips_database());
+}
+
+/* Retrieve all the db resources of a given resource type
+ *
+ * Scan all module hash tables to find all resources of kind rname, no
+ * matter what the owner is.
+ *
+ * Used only to clean up the make cache in pipsmake.c.
+ *
+ * Derived from db_unput_resources()
+ */
+list db_retrieve_resources(const char* rname)
+{
+  list rl = NIL;
+  db_symbol r;
+  DB_OK;
+  r = find_or_create_db_symbol(rname);
+  /* Scan all resource maps or of owners */
+  DB_RESOURCES_MAP(s, or,
+		   {
+		     /* See if it contains a resource of kind rname,
+			normalized to r */
+		     if (bound_db_owned_resources_p(or, r)) {
+		       /* */
+		       db_resource dbr = get_resource(rname, or);
+		       rl = CONS(DB_RESOURCE, dbr, rl);
+		     }
+		   },
+		   get_pips_database());
+  return rl;
 }
 
 void db_save_and_free_memory_resource_if_any

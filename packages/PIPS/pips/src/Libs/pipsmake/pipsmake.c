@@ -90,46 +90,48 @@ void set_current_phase_context(const char* rname, const char* oname)
   entity_basic_concrete_types_init();
   reset_std_static_entities();
 }
-void reset_current_phase_context()
+
+void reset_current_phase_context(void)
 {
   reset_pips_current_computation();
   entity_basic_concrete_types_reset();
   reset_std_static_entities();
 }
 
-static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
+static bool catch_user_error(bool (*f)(const char *),
+                             const char* rname, const char* oname)
 {
-    volatile bool success = false;
+  volatile bool success = false;
 
-    CATCH(any_exception_error)
-    {
-      reset_static_phase_variables();
-      success = false;
-    }
-    TRY
-    {
-      set_current_phase_context(rname, oname);
-      success = (*f)(oname);
-      UNCATCH(any_exception_error);
-    }
-    reset_current_phase_context();
-    return success;
+  CATCH(any_exception_error)
+  {
+    reset_static_phase_variables();
+    success = false;
+  }
+  TRY
+  {
+    set_current_phase_context(rname, oname);
+    success = (*f)(oname);
+    UNCATCH(any_exception_error);
+  }
+  reset_current_phase_context();
+  return success;
 }
 
 static bool (*get_builder(const char* name))(const char *)
 {
-    struct builder_map * pbm;
-    for (pbm = builder_maps; pbm->builder_name; pbm++)
-	if (same_string_p(pbm->builder_name, name))
+  struct builder_map * pbm;
+  for (pbm = builder_maps; pbm->builder_name; pbm++)
+    if (same_string_p(pbm->builder_name, name))
 	    return pbm->builder_func;
-    pips_internal_error("no builder for %s", name);
-    return NULL;
+  pips_internal_error("no builder for %s", name);
+  return NULL;
 }
 
 /*********************************************** UP TO DATE RESOURCES CACHE */
 
 /* FI: make is very slow when interprocedural analyzes have been selected;
- * some memorization has been added; we need to distinguish betweeen an
+ * some memoization has been added; we need to distinguish betweeen an
  * external make which initializes a set of up-to-date resources and
  * an internal recursive make which updates and exploits that set.
  *
@@ -138,6 +140,9 @@ static bool (*get_builder(const char* name))(const char *)
  *
  * apply(), which calls make() many times, does not fully benefit from
  * this memoization scheme.
+ *
+ * What is cached? a resource id, i.e. a db_resource, i.e. an object
+ * hidden in pipsdbm_private...
  */
 static set up_to_date_resources = set_undefined;
 
@@ -156,14 +161,91 @@ void init_make_cache(void)
   up_to_date_resources = set_make(set_pointer);
 }
 
+/* Can the make cache be used? */
+bool make_cache_p()
+{
+  return !set_undefined_p(up_to_date_resources);
+}
+
 void reinit_make_cache_if_necessary(void)
 {
   if (!set_undefined_p(up_to_date_resources))
     reset_make_cache(), init_make_cache();
 }
 
+//bool make_cache_hit_p(real_resource rr)
+bool make_cache_hit_p(void * rr)
+{
+  return set_belong_p(up_to_date_resources, (void *) rr);
+}
+
+//void add_resource_to_make_cache(real_resource res)
+void add_resource_to_make_cache(void * res)
+{
+  /* FI: debugging messages cannot be factorized here because of
+     sibling resources, unless an extra parameter is added... */
+  //string res_rn = real_resource_resource_name((real_resource) res);
+  //string res_on = real_resource_owner_name((real_resource) res);
+  //pips_debug(5, "resource %s(%s) added to up_to_date make cache\n",
+  //	     res_rn, res_on);
+  set_add_element (up_to_date_resources,
+		   up_to_date_resources,
+		   (void *) res);
+}
+
+//void remove_resource_from_make_cache(real_resource res)
+void remove_resource_from_make_cache(void * res)
+{
+  string res_rn = real_resource_resource_name((real_resource) res);
+  string res_on = real_resource_owner_name((real_resource) res);
+  pips_debug(5, "resource %s(%s) deleted from up_to_date make cache\n",
+	     res_rn, res_on);
+  set_del_element (up_to_date_resources,
+		   up_to_date_resources,
+		   (void *) res);
+}
+
+/* Debug function, fully bugged... */
+void print_make_cache()
+{
+  if (!set_undefined_p(up_to_date_resources)) {
+    int count = 0;
+    /*
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      string res_on = real_resource_owner_name((real_resource) res);
+      printf("Up-to-date resource: \"%s.%s\"\n", res_on, res_rn);
+      count++;
+    }
+    */
+    if(count==0)
+      printf("No up-to-date resource is cached\n");
+  }
+  else
+    printf("The up-to-date resource cache is undefined\n");
+}
+
+/* Debug function: make sure that up-to-date resources do exist in the
+   resource database. If the cache does not exist, it is considered
+   consistent. */
+bool make_cache_consistent_p()
+{
+  if (!set_undefined_p(up_to_date_resources)) {
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      string res_on = real_resource_owner_name((real_resource) res);
+      if(!db_resource_p(res_rn, res_on))
+        return false;
+    }
+  }
+  return true;
+}
+
 /* Static variables used by phases must be reset on error although
    pipsmake does not know which ones are used. */
+/* FI: let us hope this is documented in PIPS developer guide... It is
+   not mentionned in the PIPS tutorial. And rightly so I believe. It
+   should be linked to the exception pips_user_error(). */
 void reset_static_phase_variables()
 {
 #define DECLARE_ERROR_HANDLER(name) extern void \
@@ -227,15 +309,17 @@ string compilation_unit_of_module(const char* module_name)
   /* Should only be called for C modules. */
   string compilation_unit_name = string_undefined;
 
-  /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
+  // The guard may not be sufficient...
+  // and this may crash in db_get_memory_resource()
   if(db_resource_p(DBR_USER_FILE, module_name)) {
     string source_file_name =
       db_get_memory_resource(DBR_USER_FILE, module_name, true);
     string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
-    /* It is not clear how robust it is going to be when file name conflicts
-       occur. */
-    asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING, simpler_file_name);
+    // It is not clear how robust it is going to be
+    // when file name conflicts occur.
+    (void) asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING,
+                    simpler_file_name);
     free(simpler_file_name);
   }
 
@@ -254,144 +338,135 @@ string compilation_unit_of_module(const char* module_name)
  */
 static list build_real_resources(const char* oname, list lvr)
 {
-    list pvr, result = NIL;
+  list pvr, result = NIL;
 
-    for (pvr = lvr; pvr != NIL; pvr = CDR(pvr))
+  for (pvr = lvr; pvr != NIL; pvr = CDR(pvr))
+  {
+    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+    string vrn = virtual_resource_name(vr);
+    tag vrt = owner_tag(virtual_resource_owner(vr));
+
+    switch (vrt)
     {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
-	string vrn = virtual_resource_name(vr);
-	tag vrt = owner_tag(virtual_resource_owner(vr));
-
-	switch (vrt)
-	{
-	    /* FI: should be is_owner_workspace, but changing Newgen decl... */
-	case is_owner_program:
-	    /* FI: for  relocation of workspaces */
+	    // FI: should be is_owner_workspace, but changing Newgen decl...
+    case is_owner_program:
+	    // FI: for  relocation of workspaces
 	    add_res(vrn, "");
 	    break;
 
-	case is_owner_module:
+    case is_owner_module:
 	    add_res(vrn, oname);
 	    break;
 
-	case is_owner_main:
-	{
+    case is_owner_main:
+    {
 	    int number_of_main = 0;
 	    gen_array_t a = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on,
+	    GEN_ARRAY_FOREACH(string, on, a)
 	    {
-		if (entity_main_module_p
-		    (local_name_to_top_level_entity(on)) == true)
-		{
-		    if (number_of_main)
-			pips_internal_error("More than one main");
+        if (entity_main_module_p(local_name_to_top_level_entity(on)))
+        {
+          if (number_of_main)
+            pips_internal_error("More than one main");
 
-		    number_of_main++;
-		    pips_debug(8, "Main is %s\n", (string) on);
-		    add_res(vrn, on);
-		}
-	    },
-		a);
+          number_of_main++;
+          pips_debug(8, "Main is %s\n", (string) on);
+          add_res(vrn, on);
+        }
+	    }
 
 	    gen_array_full_free(a);
 	    break;
-	}
-	case is_owner_callees:
-	{
+    }
+    case is_owner_callees:
+    {
 	    callees called_modules;
 	    list lcallees;
 
 	    if (!rmake(DBR_CALLEES, oname)) {
-		/* FI: probably missing source code... */
-		pips_user_error("unable to build callees for %s\n"
-				"Some source code probably is missing!\n",
-				 oname);
+        // FI: probably missing source code...
+        pips_user_error("unable to build callees for %s\n"
+                        "Some source code probably is missing!\n",
+                        oname);
 	    }
 
 	    called_modules = (callees)
-		db_get_memory_resource(DBR_CALLEES, oname, true);
+        db_get_memory_resource(DBR_CALLEES, oname, true);
 	    lcallees = gen_copy_string_list(callees_callees(called_modules));
 
 	    if(!ENDP(lcallees))
 	      pips_debug(8, "Callees of %s are:\n", oname);
 	    FOREACH(STRING, on, lcallees) {
-		pips_debug(8, "\t%s\n", on);
-		add_res(vrn, on);
+        pips_debug(8, "\t%s\n", on);
+        add_res(vrn, on);
 	    }
 	    gen_free_string_list(lcallees);
 
 	    break;
-	}
-	case is_owner_callers:
-	{
-	    /* FI: the keyword callees was badly chosen; anyway, it's just
-	       a list of strings... see ri.newgen */
+    }
+    case is_owner_callers:
+    {
+	    // FI: the keyword callees was badly chosen; anyway,
+      // it's just a list of strings... see ri.newgen
 	    callees caller_modules;
 	    list lcallers;
 
 	    if (!rmake(DBR_CALLERS, oname)) {
-		user_error ("build_real_resources",
-			    "unable to build callers for %s\n"
-			    "Any missing source code?\n",
-			    oname);
+        user_error ("build_real_resources",
+                    "unable to build callers for %s\n"
+                    "Any missing source code?\n",
+                    oname);
 	    }
 
 	    caller_modules = (callees)
-		db_get_memory_resource(DBR_CALLERS, oname, true);
+        db_get_memory_resource(DBR_CALLERS, oname, true);
 	    lcallers = gen_copy_string_list(callees_callees(caller_modules));
 
 	    pips_debug(8, "Callers of %s are:\n", oname);
 
-	    MAP(STRING, on,
-	    {
-		pips_debug(8, "\t%s\n", on);
-		add_res(vrn, on);
-	    },
-		lcallers);
+      FOREACH(string, on, lcallers)
+      {
+        pips_debug(8, "\t%s\n", on);
+        add_res(vrn, on);
+      }
 	    gen_free_string_list(lcallers);
 	    break;
-	}
+    }
 
-	case is_owner_all:
-	{
-	    /* some funny stuff here:
-	     * some modules may be added by the phases here...
-	     * then we might expect a later coredump if the new resource
-	     * is not found.
-	     */
+    case is_owner_all:
+    {
+	    // some funny stuff here:
+	    // some modules may be added by the phases here...
+	    // then we might expect a later coredump if the new resource
+	    // is not found.
 	    gen_array_t modules = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on,
-	    {
-		pips_debug(8, "\t%s\n", (string) on);
-		add_res(vrn, on);
-	    },
-		modules);
+	    GEN_ARRAY_FOREACH(string, on, modules)
+      {
+        pips_debug(8, "\t%s\n", (string) on);
+        add_res(vrn, on);
+      }
 
 	    gen_array_full_free(modules);
 	    break;
-	}
+    }
 
-	case is_owner_select:
-	{
-	    /* do nothing ... */
+    case is_owner_select:
+    {
+	    // do nothing ...
 	    break;
-	}
+    }
 
-	case is_owner_compilation_unit:
+    case is_owner_compilation_unit:
 	  {
 	    string compilation_unit_name = compilation_unit_of_module(oname);
-
 	    if(string_undefined_p(compilation_unit_name)) {
-        /* Source code for module oname is not available */
-        if(compilation_unit_p(oname)) {
-          /* The user can make typos in tpips scripts about compilation unit names */
-          /* pips_internal_error("Synthetic compilation units cannot be missing"
-                                 " because they are synthesized"
-                                 " with the corresponding file\n",
-                                 oname);
-           */
+        // Source code for module oname is not available
+        if(compilation_unit_p(oname))
+        {
+          // The user can make typos in tpips scripts
+          // about compilation unit names.
           pips_user_error("No source code for compilation unit \"%s\"\n."
                           "Compilation units cannot be synthesized.\n",
                           oname);
@@ -408,10 +483,10 @@ static list build_real_resources(const char* oname, list lvr)
 
 	default:
 	    pips_internal_error("unknown tag : %d", vrt);
-	}
     }
+  }
 
-    return gen_nreverse(result);
+  return gen_nreverse(result);
 }
 
 /* touch the resource if it exits
@@ -461,13 +536,15 @@ static void update_preserved_resources(const char* oname, rule ru)
       string rrrn = real_resource_resource_name(rr);
 
       /* is it up to date ? */
-      if(set_belong_p(up_to_date_resources, (char *) rr))
+      //if(set_belong_p(up_to_date_resources, (char *) rr))
+      if(make_cache_hit_p(rr))
       {
-        pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
-                   rrrn, rron);
-        set_del_element (up_to_date_resources,
-                         up_to_date_resources,
-                         (char *) rr);
+        // pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
+	//        rrrn, rron);
+        //set_del_element (up_to_date_resources,
+	//               up_to_date_resources,
+	//               (char *) rr);
+	remove_resource_from_make_cache(rr);
         /* GO 11/7/95: we need to del the resource from the data base
            for a next call of pipsmake to find it unavailable */
         db_unput_a_resource (rrrn, rron);
@@ -713,14 +790,22 @@ static bool apply_without_reseting_up_to_date_resources(
 }
 
 
-/* compute all post-transformations to apply a rule on an object
+/* compute all pre or post-transformations to apply a rule on an
+   object or activate a phase if owner is SELECT. The phase is not
+   necessarily a transformation anymore: analyses can be requested as
+   well although pipsmke may core dump as a consequences. The select
+   clauses are performed first.
  */
-static bool make_pre_post_transformation(const char* oname, rule ru, list transformations)
+static bool make_pre_post_transformation(const char* oname,
+					 rule ru,
+					 list transformations)
 {
     list reals;
     bool success_p = true;
 
-    /* we select some resources */
+    /* we activate the requested rules if any */
+    /* FI: apparently, we do not stack up the current active phase and
+       we do not restore it once the requesting phase is completed. */
     FOREACH(VIRTUAL_RESOURCE, vr, transformations)
     {
         string vrn = virtual_resource_name(vr);
@@ -731,15 +816,19 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
             pips_debug(3, "rule %s : selecting phase %s\n",
                     rule_phase(ru), vrn);
 
-            if (activate (vrn) == NULL) {
+	    if(!active_phase_p(vrn)) {
+	      /* FI: activate() is part of the pipsmake API, debug_on() is
+		 activated, pipsmake.rc is potentially parsed,...  */
+	      if (activate(vrn) == NULL) {
                 success_p = false;
                 break;
-            }
+	      }
+	    }
         }
     }
 
     if (success_p) {
-        /* we build the list of pre transformation real_resources */
+        /* we build the list of pre or post transformation real_resources */
         reals = build_real_resources(oname, transformations);
 
         /* we recursively make the resources */
@@ -752,28 +841,39 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
                     rule_phase(ru), rrpn, rron);
 
             if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-                success_p = false;
+	      success_p = false; // FI: success_p is not returned
 
             /* now we must drop the up_to_date cache.
              * maybe not that often? Or one should perform the transforms
-             * Top-down to avoid recomputations, with ALL...
+             * top-down to avoid recomputations, with ALL...
              */
             reset_make_cache();
             init_make_cache();
         }
     }
-    return true;
+    return true; // success_p
 }
 
+/* FI: guard added to simplify debugging and to call
+   make_pre_post_transformation() only when it is useful. */
 static bool make_pre_transformation(const char* oname, rule ru) {
-    return make_pre_post_transformation(oname,ru,rule_pre_transformation(ru));
+  bool success_p = true;
+  if(!ENDP(rule_pre_transformation(ru)))
+    success_p =  make_pre_post_transformation(oname,ru,
+					      rule_pre_transformation(ru));
+  return success_p;
 }
+
+/* FI: guard added to simplify debugging and to call
+   make_pre_post_transformation() only when it is useful. */
 static bool make_post_transformation(const char* oname, rule ru) {
+  bool success_p = true;
   if(!ENDP(rule_post_transformation(ru))) {
     reset_make_cache();
     init_make_cache();
+    success_p = make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
   }
-  return make_pre_post_transformation(oname,ru,rule_post_transformation(ru));
+  return success_p;
 }
 
 static bool make(const char* rname, const char* oname)
@@ -805,15 +905,16 @@ static bool make(const char* rname, const char* oname)
 bool rmake(const char* rname, const char* oname)
 {
     rule ru;
-    char * res = NULL;
+    char * res_id = NULL;
 
-    debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
+    pips_debug(2, "%s(%s) - requested\n", rname, oname);
 
     /* is it up to date ? */
     if (db_resource_p(rname, oname))
     {
-	res = db_get_resource_id(rname, oname);
-	if(set_belong_p(up_to_date_resources, (char *) res))
+	res_id = db_get_resource_id(rname, oname);
+	//if(set_belong_p(up_to_date_resources, (char *) res_id))
+	if(make_cache_hit_p(res_id))
 	{
 	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
 		     rname, oname, db_time_of_resource(rname, oname));
@@ -822,7 +923,7 @@ bool rmake(const char* rname, const char* oname)
 	else
 	{
 	  /* this resource exists but is maybe up-to-date? */
-	  res = NULL; /* NO, IT IS NOT. */
+	  res_id = NULL; /* NO, IT IS NOT. */
 	}
     }
     else if (db_resource_is_required_p(rname, oname))
@@ -870,26 +971,25 @@ bool rmake(const char* rname, const char* oname)
       lr = build_real_resources(oname, rule_produced(ru));
 
       /* set up-to-date all the produced resources for that rule */
-      MAP(REAL_RESOURCE, rr,
-      {
+      FOREACH(REAL_RESOURCE, rr, lr) {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 
 	if (db_resource_p(rrrn, rron))
 	{
-	  res = db_get_resource_id(rrrn, rron);
+	  res_id = db_get_resource_id(rrrn, rron);
 	  pips_debug(5, "resource %s(%s) added to up_to_date "
 		     "with time stamp %d\n",
 		     rrrn, rron, db_time_of_resource(rrrn, rron));
-	  set_add_element(up_to_date_resources,
-			  up_to_date_resources, res);
+	  //set_add_element(up_to_date_resources,
+	  //		  up_to_date_resources, res_id);
+	  add_resource_to_make_cache(res_id);
 	}
 	else {
 	  pips_internal_error("resource %s[%s] just built not found!",
 			      rrrn, rron);
 	}
-      },
-	  lr);
+      }
 
       gen_full_free_list(lr);
     }
@@ -933,37 +1033,42 @@ static bool concurrent_apply(
     dont_interrupt_pipsmake_asap();
     save_active_phases();
 
-    GEN_ARRAY_MAP(oname,
+    GEN_ARRAY_FOREACH(string, oname, modules)
+    {
 		  if (!make_pre_transformation(oname, ru)) {
 		    okay = false;
 		    break;
-		  },
-		  modules);
-
-    if (okay) {
-	GEN_ARRAY_MAP(oname,
-		      if (!make_required(oname, ru)) {
-			okay = false;
-			break;
-		      },
-		      modules);
+		  }
     }
 
     if (okay) {
-	GEN_ARRAY_MAP(oname,
-		      if (!apply_a_rule(oname, ru)) {
-			okay = false;
-			break;
-		      },
-		      modules);
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!make_required(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
     }
+
+    if (okay) {
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!apply_a_rule(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
+    }
+
     if(okay) {
-    GEN_ARRAY_MAP(oname,
-		  if (!make_post_transformation(oname, ru)) {
-		    okay = false;
-		    break;
-		  },
-		  modules);
+      GEN_ARRAY_FOREACH(string, oname, modules)
+      {
+        if (!make_post_transformation(oname, ru)) {
+          okay = false;
+          break;
+        }
+      }
     }
 
     reset_make_cache();
@@ -1014,10 +1119,11 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   list real_modified_resources = NIL;
   rule ru = rule_undefined;
   bool result = true;
-  void * res_id = (void *) db_get_resource_id(rname, oname);
+  void * res_id = db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
-  if(set_belong_p(up_to_date_resources, res_id))
+  // if(set_belong_p(up_to_date_resources, res_id))
+  if(make_cache_hit_p(res_id))
     return true;
 
   /* Initial resources by definition are not associated to a rule.
@@ -1113,14 +1219,16 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
 		 rname, oname, db_time_of_resource(rname, oname));
-      set_add_element(up_to_date_resources, up_to_date_resources, res_id);
+      //set_add_element(up_to_date_resources, up_to_date_resources, res_id);
+      add_resource_to_make_cache(res_id);
 
-      MAP(REAL_RESOURCE, rpr, {
+      FOREACH(REAL_RESOURCE, rpr, real_produced_resources) {
 	string srname = real_resource_resource_name(rpr);
 	string soname = real_resource_owner_name(rpr);
 	void * sres_id = (void *) db_get_resource_id(srname, soname);
+	// real_resource sres_id = db_get_resource_id(srname, soname);
 
-	if(sres_id != (real_resource) res_id) {
+	if(sres_id != res_id) {
 
 	  if(same_string_p(rname, srname)) {
 	    /* We would retrieve the same rule and the same required
@@ -1129,7 +1237,8 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
 		       "with time stamp %d\n",
 		       srname, soname, db_time_of_resource(srname, soname));
-	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	    //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	    add_resource_to_make_cache(sres_id);
 	  }
 	  else {
 	    /* Check that the sibling is currently obtained by the same
@@ -1139,19 +1248,20 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	    if(sru==ru) {
 	      /* The rule does not have to be fired again, so its produced
                  resources are up-to-date. */
-	    string soname = real_resource_owner_name(rpr);
+	      string soname = real_resource_owner_name(rpr);
 
-	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
-		       "with time stamp %d\n",
-		       srname, soname, db_time_of_resource(srname, soname));
-	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	      pips_debug(5, "sibling resource %s(%s) added to up_to_date "
+			 "with time stamp %d\n",
+			 srname, soname, db_time_of_resource(srname, soname));
+	      //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	      add_resource_to_make_cache(sres_id);
 	    }
 	  }
 	}
 	else {
 	  res_found_p = true;
 	}
-      }, real_produced_resources);
+      }
 
       pips_assert("The resources res is among the real resources produced by rule ru",
 		  res_found_p);
@@ -1178,7 +1288,9 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 int delete_obsolete_resources(void)
 {
     int ndeleted;
-    bool cache_off = set_undefined_p(up_to_date_resources);
+    bool cache_off = !make_cache_p();
+    // FI: this test breaks the consistency of init() and reset() for
+    // the make cache
     if (cache_off) init_make_cache();
     ndeleted =
 	db_delete_obsolete_resources(check_physical_resource_up_to_date);
@@ -1216,135 +1328,150 @@ bool check_resource_up_to_date(const char* rname, const char* oname)
 	check_physical_resource_up_to_date(rname, oname): false;
 }
 
-/* Delete from up_to_date all the resources of a given name */
-void delete_named_resources (const char* rn)
+/* Delete from up_to_date_resources make cache all the resources with
+   a given resource name. There is no internal data structure in
+   pipsdbm to access these resources efficiently... */
+void delete_named_resources(const char* rn)
 {
-    /* GO 29/6/95: many lines ...
-       db_unput_resources_verbose (rn);*/
-    db_unput_resources(rn);
+  /*
+  // old version:
+  if (false && make_cache_p()) {
+    // In this case we are called from a Pips phase or from a bang rule
+    // user_warning ("delete_named_resources",
+    // "called within a phase (i.e. by activate())\n");
+    SET_FOREACH(real_resource, res, up_to_date_resources) {
+      string res_rn = real_resource_resource_name((real_resource) res);
+      //string res_on = real_resource_owner_name((real_resource) res);
 
-    if (up_to_date_resources != set_undefined) {
-	/* In this case we are called from a Pips phase
-	user_warning ("delete_named_resources",
-		      "called within a phase (i.e. by activate())\n"); */
-	SET_MAP(res, {
-	    string res_rn = real_resource_resource_name((real_resource) res);
-	    string res_on = real_resource_owner_name((real_resource) res);
-
-	    if (same_string_p(rn, res_rn)) {
-		pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
-			   res_rn, res_on);
-		set_del_element (up_to_date_resources,
-				 up_to_date_resources,
-				 (char *) res);
-	    }
-	}, up_to_date_resources);
+      if (same_string_p(rn, res_rn)) {
+        //pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
+        //res_rn, res_on);
+        //set_del_element (up_to_date_resources,
+        //		 up_to_date_resources,
+        //		 (char *) res);
+        remove_resource_from_make_cache(res);
+      }
     }
+  }
+  */
+
+  // firstly, clean up the up-to-date cache if it exists
+  if (make_cache_p()) {
+    list rl = db_retrieve_resources(rn);
+    FOREACH(STRING, r_id, rl) {
+      if (make_cache_hit_p(r_id))
+        remove_resource_from_make_cache(r_id);
+    }
+    gen_free_list(rl);
+  }
+
+  // Then remove the resource
+  // GO 29/6/95: many lines ...  db_unput_resources_verbose (rn);
+  db_unput_resources(rn);
 }
 
 void delete_all_resources(void)
 {
-    db_delete_all_resources();
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_make(set_pointer);
+  db_delete_all_resources();
+  //set_free(up_to_date_resources);
+  reset_make_cache();
+  //up_to_date_resources = set_make(set_pointer);
+  init_make_cache();
 }
 
 /* Should be able to handle Fortran applications, C applications and
    mixed Fortran/C applications. */
 string get_first_main_module(void)
 {
-    string dir_name = db_get_current_workspace_directory();
-    string main_name;
-    string name = string_undefined;
+  string dir_name = db_get_current_workspace_directory();
+  string main_name;
+  string name = string_undefined;
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    /* Let's look for a Fortran main */
-    main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
+  // Let's look for a Fortran main
+  main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
 
+  if (file_exists_p(main_name))
+  {
+    FILE * tmp_file = safe_fopen(main_name, "r");
+    name = safe_readline(tmp_file);
+    safe_fclose(tmp_file, main_name);
+  }
+  free(main_name);
+
+  if(string_undefined_p(name)) {
+    // Let's now look for a C main
+    main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
     if (file_exists_p(main_name))
-    {
-	FILE * tmp_file = safe_fopen(main_name, "r");
-	name = safe_readline(tmp_file);
-	safe_fclose(tmp_file, main_name);
-    }
+      name = strdup("main");
     free(main_name);
+  }
 
-    if(string_undefined_p(name)) {
-      /* Let's now look for a C main */
-      main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
-      if (file_exists_p(main_name))
-	name = strdup("main");
-      free(main_name);
-    }
-
-    free(dir_name);
-    debug_off();
-    return name;
+  free(dir_name);
+  debug_off();
+  return name;
 }
 
 /* check the usage of resources
  */
 void do_resource_usage_check(const char* oname, rule ru)
 {
-    list reals;
-    set res_read = set_undefined;
-    set res_write = set_undefined;
+  list reals;
+  set res_read = set_undefined;
+  set res_write = set_undefined;
 
-    /* Get the dbm sets */
-    get_logged_resources (&res_read, &res_write);
+  // Get the dbm sets
+  get_logged_resources (&res_read, &res_write);
 
-    /* build the real required resrouces */
-    reals = build_real_resources(oname, rule_required (ru));
+  // build the real required resrouces
+  reals = build_real_resources(oname, rule_required (ru));
 
-    /* Delete then from the set of read resources */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+  // Delete then from the set of read resources
+  FOREACH(real_resource, rr, reals)
+  {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
+    string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
 
-	if (set_belong_p (res_read, elem_name)){
-	    debug (5, "do_resource_usage_check",
-		   "resource %s.%s has been read: ok\n",
-		   rron, rrrn);
+    if (set_belong_p (res_read, elem_name)){
+	    pips_debug (5, "resource %s.%s has been read: ok\n", rron, rrrn);
 	    set_del_element(res_read, res_read, elem_name);
-	} else
-	    user_log ("resource %s.%s has not been read\n",
-		      rron, rrrn);
-    }, reals);
+    }
+    else
+	    user_log("resource %s.%s has not been read\n", rron, rrrn);
+  }
 
-    /* Try to find an illegally read resrouce ... */
-    SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
-    gen_full_free_list(reals);
+  // Try to find an illegally read resrouce ... */
+  SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
+  gen_full_free_list(reals);
 
-    /* build the real produced resources */
-    reals = build_real_resources(oname, rule_produced (ru));
+  // build the real produced resources
+  reals = build_real_resources(oname, rule_produced(ru));
 
-    /* Delete then from the set of write resources */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+  // Delete then from the set of write resources
+  FOREACH(real_resource, rr, res_write)
+  {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
+    string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
 
-	if (set_belong_p (res_write, elem_name)){
-	    debug (5, "do_resource_usage_check",
-		   "resource %s.%s has been written: ok\n",
-		   rron, rrrn);
+    if (set_belong_p (res_write, elem_name)){
+	    pips_debug (5, "resource %s.%s has been written: ok\n", rron, rrrn);
 	    set_del_element(res_write, res_write, elem_name);
-	} else
-	    user_log ("resource %s.%s has not been written\n",
-		      rron, rrrn);
-    }, reals);
+    }
+    else
+	    user_log ("resource %s.%s has not been written\n", rron, rrrn);
+  }
 
-    /* Try to find an illegally written resrouce ... */
-    SET_MAP(re,{
-	user_log ("resource %s has been written\n", re);
-    }, res_write);
+  // Try to find an illegally written resource ...
+  SET_MAP(re, user_log ("resource %s has been written\n", re), res_write);
 
-    gen_full_free_list(reals);
+  gen_full_free_list(reals);
 
-    set_clear(res_read);
-    set_clear(res_write);
+  // not free!
+  set_clear(res_read);
+  set_clear(res_write);
 }
 
 
@@ -1354,171 +1481,166 @@ static double initial_memory_size;
 
 static void logs_on(void)
 {
-    if (get_bool_property("LOG_TIMINGS"))
-	init_request_timers();
+  if (get_bool_property("LOG_TIMINGS"))
+    init_request_timers();
 
-    if (get_bool_property("LOG_MEMORY_USAGE"))
-	initial_memory_size = get_process_gross_heap_size();
+  if (get_bool_property("LOG_MEMORY_USAGE"))
+    initial_memory_size = get_process_gross_heap_size();
 }
 
 static void logs_off(void)
 {
-    if (get_bool_property("LOG_TIMINGS"))
-    {
-	string request_time, phase_time, dbm_time;
-	get_request_string_timers (&request_time, &phase_time, &dbm_time);
+  if (get_bool_property("LOG_TIMINGS"))
+  {
+    string request_time, phase_time, dbm_time;
+    get_request_string_timers (&request_time, &phase_time, &dbm_time);
 
-	user_log ("                                 stime      ");
-	user_log (request_time);
-	user_log ("                                 phase time ");
-	user_log (phase_time);
-	user_log ("                                 IO stime   ");
-	user_log (dbm_time);
-    }
+    user_log ("                                 stime      ");
+    user_log (request_time);
+    user_log ("                                 phase time ");
+    user_log (phase_time);
+    user_log ("                                 IO stime   ");
+    user_log (dbm_time);
+  }
 
-    if (get_bool_property("LOG_MEMORY_USAGE"))
-    {
-	double final_memory_size = get_process_gross_heap_size();
-	user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
-		 final_memory_size,
-		 final_memory_size-initial_memory_size);
-    }
+  if (get_bool_property("LOG_MEMORY_USAGE"))
+  {
+    double final_memory_size = get_process_gross_heap_size();
+    user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
+             final_memory_size,
+             final_memory_size-initial_memory_size);
+  }
 }
 
 static bool safe_do_something(
-    const char* name,
-    const char* module_n,
-    const char* what_it_is,
-    rule (*find_rule)(const char*),
-    bool (*doit)(const char*,const char*))
+  const char* name,
+  const char* module_n,
+  const char* what_it_is,
+  rule (*find_rule)(const char*),
+  bool (*doit)(const char*,const char*))
 {
-    bool success = false;
+  bool success = false;
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    if (find_rule(name) == rule_undefined)
-    {
-	pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
-	success = false;
-	debug_off();
-	return success;
-    }
-
-    CATCH(any_exception_error)
-    {
-	/* global variables that have to be reset after user-error */
-	reset_make_cache();
-	reset_static_phase_variables();
-	retrieve_active_phases();
-	pips_user_warning("Request aborted in pipsmake: "
-			  "build %s %s for module %s.\n",
-			  what_it_is, name, module_n);
-	db_clean_all_required_resources();
-	success = false;
-    }
-    TRY
-    {
-	user_log("Request: build %s %s for module %s.\n",
-		 what_it_is, name, module_n);
-
-	logs_on();
-	pips_malloc_debug();
-
-	/* DO IT HERE!
-	 */
-	success = doit(name, module_n);
-
-	if(success)
-	{
-	    user_log("%s made for %s.\n", name, module_n);
-	    logs_off();
-	}
-	else
-	{
-	    pips_user_warning("Request aborted under pipsmake: "
-			      "build %s %s for module %s.\n",
-			      what_it_is, name, module_n);
-	}
-	UNCATCH(any_exception_error);
-    }
+  if (find_rule(name) == rule_undefined)
+  {
+    pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
+    success = false;
     debug_off();
     return success;
+  }
+
+  CATCH(any_exception_error)
+  {
+    // global variables that have to be reset after user-error
+    reset_make_cache();
+    reset_static_phase_variables();
+    retrieve_active_phases();
+    pips_user_warning("Request aborted in pipsmake: "
+                      "build %s %s for module %s.\n",
+                      what_it_is, name, module_n);
+    db_clean_all_required_resources();
+    success = false;
+  }
+  TRY
+  {
+    user_log("Request: build %s %s for module %s.\n",
+             what_it_is, name, module_n);
+    logs_on();
+    pips_malloc_debug();
+
+    // DO IT HERE!
+    success = doit(name, module_n);
+
+    if(success)
+    {
+	    user_log("%s made for %s.\n", name, module_n);
+	    logs_off();
+    }
+    else
+    {
+	    pips_user_warning("Request aborted under pipsmake: "
+                        "build %s %s for module %s.\n",
+                        what_it_is, name, module_n);
+    }
+    UNCATCH(any_exception_error);
+  }
+  debug_off();
+  return success;
 }
 
 bool safe_make(const char* res_n, const char* module_n)
 {
-    return safe_do_something(res_n, module_n, "resource",
-			     find_rule_by_resource, make);
+  return safe_do_something(res_n, module_n, "resource",
+                           find_rule_by_resource, make);
 }
 
 bool safe_apply(const char* phase_n, const char* module_n)
 {
-    return safe_do_something(phase_n, module_n, "phase/rule",
-			     find_rule_by_phase, apply);
+  return safe_do_something(phase_n, module_n, "phase/rule",
+                           find_rule_by_phase, apply);
 }
 
 bool safe_concurrent_apply(
-    const char* phase_n,
-    gen_array_t modules)
+  const char* phase_n,
+  gen_array_t modules)
 {
-    bool ok = true;
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+  bool ok = true;
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    /* Get a human being representation of the modules: */
-    string module_list = strdup(string_array_join(modules, ","));
+  // Get a human being representation of the modules:
+  string module_list = strdup(string_array_join(modules, ","));
 
-    if (find_rule_by_phase(phase_n)==rule_undefined)
+  if (find_rule_by_phase(phase_n)==rule_undefined)
+  {
+    pips_user_warning("Unknown phase \"%s\"\n", phase_n);
+    ok = false;
+  }
+  else
+  {
+    CATCH(any_exception_error)
     {
-	pips_user_warning("Unknown phase \"%s\"\n", phase_n);
-	ok = false;
+      reset_make_cache();
+      retrieve_active_phases();
+      pips_user_warning("Request aborted in pipsmake\n");
+      ok = false;
     }
-    else
+    TRY
     {
-      CATCH(any_exception_error)
-      {
-	reset_make_cache();
-	retrieve_active_phases();
-	pips_user_warning("Request aborted in pipsmake\n");
-	ok = false;
+      logs_on();
+      user_log("Request: capply %s for module [%s].\n", phase_n, module_list);
+
+      ok = concurrent_apply(phase_n, modules);
+
+      if (ok)	{
+        user_log("capply %s made for [%s].\n", phase_n, module_list);
+        logs_off();
       }
-      TRY
-      {
-	logs_on();
-
-	user_log("Request: capply %s for module [%s].\n",
-		 phase_n, module_list);
-
-	ok = concurrent_apply(phase_n, modules);
-
-	if (ok)	{
-	    user_log("capply %s made for [%s].\n", phase_n, module_list);
-	    logs_off();
-	}
-	else {
-	  pips_user_warning("Request aborted under pipsmake: "
-			    "capply %s for module [%s].\n",
-			    phase_n, module_list);
-	}
-
-	UNCATCH(any_exception_error);
+      else {
+        pips_user_warning("Request aborted under pipsmake: "
+                          "capply %s for module [%s].\n",
+                          phase_n, module_list);
       }
+      UNCATCH(any_exception_error);
     }
+  }
 
-    free(module_list);
-    debug_off();
-    return ok;
+  free(module_list);
+  debug_off();
+  return ok;
 }
 
 bool safe_set_property(const char* propname, const char* value)
 {
-    size_t len = strlen(propname) + strlen(value) + 2;
-    char* line = calloc(len, sizeof(char));
-    strcat(line, propname);
-    strcat(line, " ");
-    strcat(line, value);
-    user_log("set %s\n", line);
-    parse_properties_string(line);
-    free(line);
-    /* parse_properties_string() doesn't return whether it succeeded */
-    return true;
+  size_t len = strlen(propname) + strlen(value) + 2;
+  char* line = calloc(len, sizeof(char));
+  strcat(line, propname);
+  strcat(line, " ");
+  strcat(line, value);
+  user_log("set %s\n", line);
+  parse_properties_string(line);
+  free(line);
+  // parse_properties_string() doesn't return whether it succeeded
+  return true;
 }
