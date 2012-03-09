@@ -33,7 +33,36 @@
 \begin{document}
 
 \maketitle
- 
+
+To analyze and transform code in a modular way, each PIPS pass uses
+and generates many objects related to different modules. These objects
+are called resources and different passes can, or at least should,
+only communicate with them. They are known by the name of the module
+they are related to, e.g. \verb/foo/, and by the name of their kind,
+e.g. \verb/CODE/ or \verb/PRECONDITIONS/.
+
+The passes, a.k.a. phases, are declared together with the resources in
+\verb/pipsmake-rc.tex/. Library \verb/pipsmake/ is responsible for the
+global consistency and for the pass isolation: passes do not have to
+know about the context because \verb/pipsmake/ ensures that they are
+called with all they need.
+
+The PIPS database manager provides time stamps to support the
+\verb/pipsmake/ consistency scheme and disk transfers to provide
+long-term storage. Thanks to this, the compilation process can be
+broken into several steps, which is very useful for large applications
+and for interactions with other tools or with users.
+
+The PIPS database manager, \verb/pipsdbm/, was first designed with
+resource lists. When PIPS was used to analyze interprocedurally
+hundreds of modules, the list-based data structure did not scale up
+and was replaced by a two-level hash-table scheme providing a much
+faster access to any resource using its owner name and its name.
+
+The new data structure is described in
+\verb/pipsdbm_private.pdf/. However, the old data structures and API
+are still used by the client library, \verb/pipsmake/.
+
 \section{Old Database Structures}
  
 \domain{Database = name:string x directory:string x resources:resource*}
@@ -58,7 +87,7 @@ The library which makes use of this data structure is
 consistent file naming rule were used across PIPS development.
  
 }
- 
+
 \domain{Resource = name:string x owner\_name:string x status x time:int x file\_time:int}
 { The domain {\tt resource} is used by
   pipsdbm to describe any piece of information which might be
