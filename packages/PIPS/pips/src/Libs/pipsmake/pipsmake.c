@@ -205,24 +205,22 @@ void remove_resource_from_make_cache(void * res)
 		   (void *) res);
 }
 
-/* Debug function, fully bugged... */
+/* Debug function, to be tested... */
 void print_make_cache()
 {
   if (!set_undefined_p(up_to_date_resources)) {
     int count = 0;
-    /*
-    SET_FOREACH(real_resource, res, up_to_date_resources) {
-      string res_rn = real_resource_resource_name((real_resource) res);
-      string res_on = real_resource_owner_name((real_resource) res);
+    SET_FOREACH(void *, res, up_to_date_resources) {
+      string res_rn = db_resource_name(res);
+      string res_on = db_resource_owner_name(res);
       printf("Up-to-date resource: \"%s.%s\"\n", res_on, res_rn);
       count++;
     }
-    */
     if(count==0)
       printf("No up-to-date resource is cached\n");
   }
   else
-    printf("The up-to-date resource cache is undefined\n");
+    printf("The up-to-date resource cache is currently undefined\n");
 }
 
 /* Debug function: make sure that up-to-date resources do exist in the
@@ -231,9 +229,9 @@ void print_make_cache()
 bool make_cache_consistent_p()
 {
   if (!set_undefined_p(up_to_date_resources)) {
-    SET_FOREACH(real_resource, res, up_to_date_resources) {
-      string res_rn = real_resource_resource_name((real_resource) res);
-      string res_on = real_resource_owner_name((real_resource) res);
+    SET_FOREACH(void *, res, up_to_date_resources) {
+      string res_rn = db_resource_name(res);
+      string res_on = db_resource_owner_name(res);
       if(!db_resource_p(res_rn, res_on))
         return false;
     }
@@ -335,6 +333,10 @@ string compilation_unit_of_module(const char* module_name)
  * of is_owner_all case).
  *
  * In spite of the name, no resource is actually built.
+ *
+ * FI: the result "result" seems to be always an empty list, NIL, but
+ * macro add_res does update "result". Once again, macros improve
+ * readability and maintenance.
  */
 static list build_real_resources(const char* oname, list lvr)
 {
@@ -529,22 +531,18 @@ static void update_preserved_resources(const char* oname, rule ru)
     /* we build the list of modified real_resources */
     reals = build_real_resources(oname, rule_modified(ru));
 
-    /* we delete them from the uptodate set */
+    /* we delete them from the up-to-date set */
     FOREACH(real_resource, rr, reals)
     {
       string rron = real_resource_owner_name(rr);
       string rrrn = real_resource_resource_name(rr);
 
       /* is it up to date ? */
-      //if(set_belong_p(up_to_date_resources, (char *) rr))
-      if(make_cache_hit_p(rr))
+      // FI: this piece of code must have never been tested...
+      void * rr_id = db_get_resource_id(rrrn, rron);
+      if(make_cache_hit_p(rr_id))
       {
-        // pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
-	//        rrrn, rron);
-        //set_del_element (up_to_date_resources,
-	//               up_to_date_resources,
-	//               (char *) rr);
-	remove_resource_from_make_cache(rr);
+	remove_resource_from_make_cache(rr_id);
         /* GO 11/7/95: we need to del the resource from the data base
            for a next call of pipsmake to find it unavailable */
         db_unput_a_resource (rrrn, rron);
@@ -913,7 +911,6 @@ bool rmake(const char* rname, const char* oname)
     if (db_resource_p(rname, oname))
     {
 	res_id = db_get_resource_id(rname, oname);
-	//if(set_belong_p(up_to_date_resources, (char *) res_id))
 	if(make_cache_hit_p(res_id))
 	{
 	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
@@ -981,8 +978,6 @@ bool rmake(const char* rname, const char* oname)
 	  pips_debug(5, "resource %s(%s) added to up_to_date "
 		     "with time stamp %d\n",
 		     rrrn, rron, db_time_of_resource(rrrn, rron));
-	  //set_add_element(up_to_date_resources,
-	  //		  up_to_date_resources, res_id);
 	  add_resource_to_make_cache(res_id);
 	}
 	else {
@@ -1122,7 +1117,6 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   void * res_id = db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
-  // if(set_belong_p(up_to_date_resources, res_id))
   if(make_cache_hit_p(res_id))
     return true;
 
@@ -1219,7 +1213,6 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
 		 rname, oname, db_time_of_resource(rname, oname));
-      //set_add_element(up_to_date_resources, up_to_date_resources, res_id);
       add_resource_to_make_cache(res_id);
 
       FOREACH(REAL_RESOURCE, rpr, real_produced_resources) {
@@ -1237,7 +1230,6 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
 		       "with time stamp %d\n",
 		       srname, soname, db_time_of_resource(srname, soname));
-	    //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
 	    add_resource_to_make_cache(sres_id);
 	  }
 	  else {
@@ -1253,7 +1245,6 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	      pips_debug(5, "sibling resource %s(%s) added to up_to_date "
 			 "with time stamp %d\n",
 			 srname, soname, db_time_of_resource(srname, soname));
-	      //set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
 	      add_resource_to_make_cache(sres_id);
 	    }
 	  }
@@ -1329,31 +1320,15 @@ bool check_resource_up_to_date(const char* rname, const char* oname)
 }
 
 /* Delete from up_to_date_resources make cache all the resources with
-   a given resource name. There is no internal data structure in
-   pipsdbm to access these resources efficiently... */
+ * a given resource name. There is no internal data structure in
+ * pipsdbm to access these resources efficiently... The two-level
+ * mapping of database.c must be inverted.
+ *
+ * FI: FC claims in an e-mail that this could be done more efficiently
+ * but does not explain how.
+ */
 void delete_named_resources(const char* rn)
 {
-  /*
-  // old version:
-  if (false && make_cache_p()) {
-    // In this case we are called from a Pips phase or from a bang rule
-    // user_warning ("delete_named_resources",
-    // "called within a phase (i.e. by activate())\n");
-    SET_FOREACH(real_resource, res, up_to_date_resources) {
-      string res_rn = real_resource_resource_name((real_resource) res);
-      //string res_on = real_resource_owner_name((real_resource) res);
-
-      if (same_string_p(rn, res_rn)) {
-        //pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
-        //res_rn, res_on);
-        //set_del_element (up_to_date_resources,
-        //		 up_to_date_resources,
-        //		 (char *) res);
-        remove_resource_from_make_cache(res);
-      }
-    }
-  }
-  */
 
   // firstly, clean up the up-to-date cache if it exists
   if (make_cache_p()) {
@@ -1373,9 +1348,7 @@ void delete_named_resources(const char* rn)
 void delete_all_resources(void)
 {
   db_delete_all_resources();
-  //set_free(up_to_date_resources);
   reset_make_cache();
-  //up_to_date_resources = set_make(set_pointer);
   init_make_cache();
 }
 
@@ -1442,21 +1415,21 @@ void do_resource_usage_check(const char* oname, rule ru)
 	    user_log("resource %s.%s has not been read\n", rron, rrrn);
   }
 
-  // Try to find an illegally read resrouce ... */
+  // Try to find an illegally read resource ... */
   SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
   gen_full_free_list(reals);
 
   // build the real produced resources
   reals = build_real_resources(oname, rule_produced(ru));
 
-  // Delete then from the set of write resources
-  FOREACH(real_resource, rr, res_write)
+  // Delete then from the set of written/generated resources
+  FOREACH(real_resource, rr, reals /*res_write*/)
   {
     string rron = real_resource_owner_name(rr);
     string rrrn = real_resource_resource_name(rr);
     string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
 
-    if (set_belong_p (res_write, elem_name)){
+    if (set_belong_p (res_write, (void *) elem_name)){
 	    pips_debug (5, "resource %s.%s has been written: ok\n", rron, rrrn);
 	    set_del_element(res_write, res_write, elem_name);
     }

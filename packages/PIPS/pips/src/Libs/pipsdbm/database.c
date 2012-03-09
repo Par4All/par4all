@@ -898,8 +898,10 @@ void db_invalidate_memory_resource(const char * rname, const char *oname)
     if (!db_status_undefined_p(db_resource_db_status(r)))
         db_resource_file_time(r)=0;
 }
-
+
 /** Delete all the resources of a given type
+ *
+ * Each owner map has to be checked because of two-level mapping used.
  */
 void db_unput_resources(const char* rname)
 {
@@ -917,10 +919,10 @@ void db_unput_resources(const char* rname)
 		     get_pips_database());
 }
 
-/* Retrieve all the db resources of a given resource type
+/* Retrieve all the db resources of a given resource type, "rname".
  *
- * Scan all module hash tables to find all resources of kind rname, no
- * matter what the owner is.
+ * Scan all module hash tables to find all resources of kind "rname",
+ * no matter what the owner is.
  *
  * Used only to clean up the make cache in pipsmake.c.
  *
@@ -935,6 +937,7 @@ list db_retrieve_resources(const char* rname)
   /* Scan all resource maps or of owners */
   DB_RESOURCES_MAP(s, or,
 		   {
+		     pips_debug(9, "Resources for owner \"%s\"\n",  (string) s);
 		     /* See if it contains a resource of kind rname,
 			normalized to r */
 		     if (bound_db_owned_resources_p(or, r)) {
@@ -947,6 +950,51 @@ list db_retrieve_resources(const char* rname)
   return rl;
 }
 
+/* Retrieve the resource name, a.k.a. kind or nature, or the resource
+ * owner name of db_resource "dbr" according to "owner_p".
+ *
+ * The two-level mapping must be inverted.
+ *
+ * string_undefined is returned if "dbr" is not found in the current
+ * resource database.
+ *
+ * This is used for interactive debugging and for debug messages.
+ */
+static string db_resource_name_or_owner_name(db_resource dbr, bool owner_p)
+{
+  string name = string_undefined;
+    DB_OK;
+    DB_RESOURCES_MAP(s1, or,
+    {
+      DB_OWNED_RESOURCES_MAP(s2, dbr21,
+			     {
+			       if(dbr==dbr21) {
+				 if(owner_p)
+				   name = (string) s1;
+				 else
+				   name = (string) s2;
+				 break;
+			       }
+			     },
+			     or);
+    },
+		      get_pips_database());
+     return name;
+}
+
+/* To be used for debugging */
+string db_resource_name(void * dbr)
+{
+  return db_resource_name_or_owner_name((db_resource) dbr, false);
+}
+
+/* To be used for debugging */
+string db_resource_owner_name(void * dbr)
+{
+  return db_resource_name_or_owner_name((db_resource) dbr, true);
+}
+
+
 void db_save_and_free_memory_resource_if_any
   (const char* rname, const char* oname, bool do_free)
 {
@@ -1165,7 +1213,7 @@ gen_array_t db_get_module_or_function_list(bool module_p)
 	if (!same_string_p(on, "") && (module_p || !compilation_unit_p(on)))
 	    gen_array_dupappend(a, on);
     },
-	get_pips_database());
+		     get_pips_database());
 
     gen_array_sort(a);
     return a;
