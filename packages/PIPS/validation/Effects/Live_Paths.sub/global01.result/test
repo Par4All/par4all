@@ -1,0 +1,38 @@
+int foo(void)
+{
+   return N;
+}
+int main()
+{
+   int a = 0;
+   a = foo();
+   return a;
+}
+//             <    is alive (in)>: N
+int foo(void)
+{
+//             <    is alive (in)>: N
+   return N;
+}
+//             <    is alive (in)>: N
+int main()
+{
+//             <    is alive (in)>: N
+   int a = 0;
+//             <    is alive (in)>: N
+   a = foo();
+//             <    is alive (in)>: a
+   return a;
+}
+int foo(void)
+{
+   return N;
+}
+int main()
+{
+//             <    is alive (out)>: N
+   int a = 0;
+//             <    is alive (out)>: a
+   a = foo();
+   return a;
+}
