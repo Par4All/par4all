@@ -174,13 +174,13 @@ void reinit_make_cache_if_necessary(void)
 }
 
 //bool make_cache_hit_p(real_resource rr)
-bool make_cache_hit_p(void * rr)
+bool make_cache_hit_p(void * rr_id)
 {
-  return set_belong_p(up_to_date_resources, (void *) rr);
+  return set_belong_p(up_to_date_resources, rr_id);
 }
 
 //void add_resource_to_make_cache(real_resource res)
-void add_resource_to_make_cache(void * res)
+void add_resource_to_make_cache(void * res_id)
 {
   /* FI: debugging messages cannot be factorized here because of
      sibling resources, unless an extra parameter is added... */
@@ -190,19 +190,19 @@ void add_resource_to_make_cache(void * res)
   //	     res_rn, res_on);
   set_add_element (up_to_date_resources,
 		   up_to_date_resources,
-		   (void *) res);
+		   res_id);
 }
 
 //void remove_resource_from_make_cache(real_resource res)
-void remove_resource_from_make_cache(void * res)
+void remove_resource_from_make_cache(void * res_id)
 {
-  string res_rn = real_resource_resource_name((real_resource) res);
-  string res_on = real_resource_owner_name((real_resource) res);
+  string res_rn = db_resource_name(res_id);
+  string res_on = db_resource_owner_name(res_id);
   pips_debug(5, "resource %s(%s) deleted from up_to_date make cache\n",
 	     res_rn, res_on);
   set_del_element (up_to_date_resources,
 		   up_to_date_resources,
-		   (void *) res);
+		   res_id);
 }
 
 /* Debug function, to be tested... */
@@ -210,17 +210,21 @@ void print_make_cache()
 {
   if (!set_undefined_p(up_to_date_resources)) {
     int count = 0;
-    SET_FOREACH(void *, res, up_to_date_resources) {
-      string res_rn = db_resource_name(res);
-      string res_on = db_resource_owner_name(res);
-      printf("Up-to-date resource: \"%s.%s\"\n", res_on, res_rn);
+    SET_FOREACH(void *, res_id, up_to_date_resources) {
+      string res_rn = db_resource_name(res_id);
+      string res_on = db_resource_owner_name(res_id);
+      if(string_undefined_p(res_rn) || string_undefined_p(res_on))
+	 printf("Up-to-date resources/make cache inconsistent with "
+		"pipsdbm resources\n");
+      else
+	printf("Up-to-date resource: \"%s.%s\"\n", res_on, res_rn);
       count++;
     }
     if(count==0)
-      printf("No up-to-date resource is cached\n");
+      printf("No up-to-date resource is cached in make cache\n");
   }
   else
-    printf("The up-to-date resource cache is currently undefined\n");
+    printf("The up-to-date resource make cache is currently undefined\n");
 }
 
 /* Debug function: make sure that up-to-date resources do exist in the
@@ -229,9 +233,14 @@ void print_make_cache()
 bool make_cache_consistent_p()
 {
   if (!set_undefined_p(up_to_date_resources)) {
-    SET_FOREACH(void *, res, up_to_date_resources) {
-      string res_rn = db_resource_name(res);
-      string res_on = db_resource_owner_name(res);
+    SET_FOREACH(void *, res_id, up_to_date_resources) {
+      string res_rn = db_resource_name(res_id);
+      /* FI: the first test should be enough */
+      if(string_undefined_p(res_rn))
+	return false;
+      string res_on = db_resource_owner_name(res_id);
+      if(string_undefined_p(res_on))
+	return false;
       if(!db_resource_p(res_rn, res_on))
         return false;
     }
@@ -1094,26 +1103,25 @@ static bool make_required(const char* oname, rule ru)
   reals = build_real_resources(oname, rule_required(ru));
 
   /* we recursively make required resources */
-  FOREACH(REAL_RESOURCE, rr, reals)
-    {
-      string rron = real_resource_owner_name(rr);
-      string rrrn = real_resource_resource_name(rr);
+  FOREACH(REAL_RESOURCE, rr, reals) {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
 
-      pips_debug(3, "rule %s : %s(%s) - recursive call\n",
-		 rule_phase(ru), rrrn, rron);
+    pips_debug(3, "rule %s : %s(%s) - recursive call\n",
+	       rule_phase(ru), rrrn, rron);
 
-      if (!rmake(rrrn, rron)) {
-	success_p = false;
-	/* Want to free the list ... */
-	break;
-      }
-
-      /* In french:
-	 ici nous devons  tester si un des regles modified
-	 fait partie des required. Dans ce cas on la fabrique
-	 de suite. */
-
+    if (!rmake(rrrn, rron)) {
+      success_p = false;
+      /* Want to free the list ... */
+      break;
     }
+
+    /* In french:
+       ici nous devons  tester si un des regles modified
+       fait partie des required. Dans ce cas on la fabrique
+       de suite. */
+
+  }
 
   /* Two problems may occur: ALL has changed, for instance because
    * some code has been synthesized (issue for PROGAM.PRECONDITION),
@@ -1129,20 +1137,28 @@ static bool make_required(const char* oname, rule ru)
    * synthesis.
    */
 
-  /* Check that all required resources are up-to-date. */
+  /* Check that all required resources exist and are up-to-date. */
   if(success_p && make_cache_p()) {
     FOREACH(REAL_RESOURCE, rr, reals) {
       string rron = real_resource_owner_name(rr);
       string rrrn = real_resource_resource_name(rr);
-      void * rr_id = db_get_resource_id(rrrn, rron);
-      /* file resources such as USER_FILEs, which are mostly
-	 generated by create_worspace, are not inserted as ready in
-	 the make cache... It it were requested again here, it would
-	 then be in the cache... FI: no idea why... */
-      if(!make_cache_hit_p(rr_id) && strcmp(rrrn, DBR_USER_FILE)!=0) {
-	pips_user_warning("Computed resource \"%s.%s\" is not up-to-date"
-			  " and must be recomputed\n",
-			  rron, rrrn);
+      if(db_resource_p(rrrn, rron)) {
+	void * rr_id = db_get_resource_id(rrrn, rron);
+	/* file resources such as USER_FILEs, which are mostly
+	   generated by create_worspace, are not inserted as ready in
+	   the make cache... It it were requested again here, it would
+	   then be in the cache... FI: no idea why... */
+	if(!make_cache_hit_p(rr_id) && strcmp(rrrn, DBR_USER_FILE)!=0) {
+	  pips_user_warning("Computed resource \"%s.%s\" is not up-to-date"
+			    " and must be recomputed\n",
+			    rron, rrrn);
+	  if (!rmake(rrrn, rron)) {
+	    success_p = false;
+	    break;
+	  }
+	}
+      }
+      else {
 	if (!rmake(rrrn, rron)) {
 	  success_p = false;
 	  break;
@@ -1153,6 +1169,8 @@ static bool make_required(const char* oname, rule ru)
 
   /* We re-build the list of required real_resources in case ALL
      is used and modified because some code has been synthesized. */
+  /* FI: In case ALL is updated and some bang rule is used, it would
+     be better to fix ALL first. */
   if(success_p
      && (strcmp(get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING"),
 		"generate")==0
@@ -1193,6 +1211,8 @@ static bool make_required(const char* oname, rule ru)
      pre-transformations have to converge in one step... */
 
   /* Check again that all required resources are up-to-date. */
+  /* FI: should be as bugged as the initial previou test. The resource
+     existence should be tested before its id is requested. */
   if(success_p && make_cache_p()) {
     FOREACH(REAL_RESOURCE, rr, reals) {
       string rron = real_resource_owner_name(rr);
@@ -1436,20 +1456,33 @@ bool check_resource_up_to_date(const char* rname, const char* oname)
  */
 void delete_named_resources(const char* rn)
 {
+  pips_assert("make cache is consistent before deletion",
+	      make_cache_consistent_p());
 
   // firstly, clean up the up-to-date cache if it exists
+  int count = 0;
   if (make_cache_p()) {
     list rl = db_retrieve_resources(rn);
     FOREACH(STRING, r_id, rl) {
-      if (make_cache_hit_p(r_id))
+      if (make_cache_hit_p(r_id)) {
         remove_resource_from_make_cache(r_id);
+	count++;
+      }
     }
     gen_free_list(rl);
   }
 
+  pips_debug(8, "Number of resources no longer considered up-to-date: %d\n",
+	     count);
+
   // Then remove the resource
   // GO 29/6/95: many lines ...  db_unput_resources_verbose (rn);
-  db_unput_resources(rn);
+  int count2 = db_unput_resources(rn);
+  pips_assert("The number of resources removed from the cache is smaller "
+	      "than the number of resources removed from te database\n",
+	      count<=count2);
+  pips_assert("make cache is consistent before deletion",
+	      make_cache_consistent_p());
 }
 
 void delete_all_resources(void)
