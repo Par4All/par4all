@@ -29,7 +29,11 @@ def make_safe_intermediate_file_path(input_file, build_dir, change_ext = None):
             break
     return intermediate_file
 
-cuda_dir = ""
+# By default, no specific value for CUDA_DIR defining where CUDA is
+# installed.  Note that if there is no need for CUDA or if the CUDA
+# environment is installed with standard packages on the OS (for example
+# package nvidia-cuda-toolkit on Debian), this can remain unset:
+cuda_dir = None
 def get_cuda_dir():
     global cuda_dir
     if not cuda_dir:
@@ -40,11 +44,12 @@ def get_cuda_dir():
             p4a_util.warn("CUDA_DIR environment variable undefined. Using '" +
                 cuda_dir + "' as default location for CUDA installation")
         if not os.path.isdir(cuda_dir):
-            raise p4a_util.p4a_error("CUDA directory not found or invalid (" + cuda_dir
-                + "). Please set the CUDA_DIR environment variable correctly")
+            p4a_util.warn("CUDA directory not found or invalid (" + cuda_dir
+                + "). This may work if it is already installed in a standard place already searched by the system tools. If not, please set the CUDA_DIR environment variable correctly")
     return cuda_dir
 
-amd_opencl_dir = ""
+
+amd_opencl_dir = None
 def get_amd_opencl_dir():
     global amd_opencl_dir
     if not amd_opencl_dir:
@@ -76,33 +81,43 @@ def get_opencl_cpp_flags():
         opencl_flags=["-I"+os.path.join(opencl_dir, "include")]
     else:
         opencl_dir=get_cuda_dir()
-        opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL")
-                + " -I" + os.path.join(opencl_dir, "include/CL2")
-                + " -I" +  os.path.join(opencl_dir, "include")
-                ]
+        if opencl_dir:
+            opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL")
+                          + " -I" + os.path.join(opencl_dir, "include/CL2")
+                          + " -I" +  os.path.join(opencl_dir, "include")
+                          ]
+        else:
+            opencl_flags = []
     return opencl_flags
 
+
 def get_cuda_cpp_flags():
-    return [
-        "-I" + os.path.join(get_cuda_dir(), "include")
-#        "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
-    ]
+    if get_cuda_dir():
+        return [
+            "-I" + os.path.join(get_cuda_dir(), "include")
+            # "-I" + os.path.join(get_cuda_sdk_dir(), "C/common/inc"),
+            ]
+    else:
+        return []
+
 
 def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
-    cuda_dir = get_cuda_dir()
 #    cuda_sdk_dir = get_cuda_sdk_dir()
     lib_arch_suffix = ""
     if m64:
         lib_arch_suffix = "_x86_64"
     else:
         lib_arch_suffix = "_i386"
-    flags = [
-        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(cuda_dir, "lib"),
-#        "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
-#        "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
-        "-Bdynamic", "-lcudart"
-    ]
+    flags = [ "-Bdynamic", "-lcudart" ]
+    # Insert specific directory paths if specified:
+    cuda_dir = get_cuda_dir()
+    if cuda_dir:
+        flags = [
+            "-L" + os.path.join(cuda_dir, "lib64"),
+            "-L" + os.path.join(cuda_dir, "lib"),
+            # "-L" + os.path.join(cuda_sdk_dir, "C/lib"),
+            # "-L" + os.path.join(cuda_sdk_dir, "C/common/lib/linux"),
+            ] + flags
     if cutil:
         flags += [ "-Bstatic", "-lcutil" + lib_arch_suffix ]
     if cublas:
@@ -111,9 +126,11 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
         p4a_util.die("TODO")
     return flags
 
+
 def get_opencl_ld_flags(m64 = True):
     '''To be restructured for multi-platforms OpenCL
     '''
+    lib_opencl_path = None
     opencl_dir=get_amd_opencl_dir()
     lib_arch_suffix = ""
     if opencl_dir:
@@ -124,20 +141,25 @@ def get_opencl_ld_flags(m64 = True):
             lib_arch_suffix = "x86"
     else:
         opencl_dir = get_cuda_dir()
-        lib_opencl_path=os.path.join(opencl_dir, "lib")
-        if m64:
-            lib_arch_suffix = "64"
-        else:
-            lib_arch_suffix = ""
-    flags = [
-#        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(opencl_dir, lib_opencl_path + lib_arch_suffix),
-#        "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
-        "-L" + lib_opencl_path,
-        "-L/usr/lib",
-        "-l OpenCL"
-    ]
+        if opencl_dir:
+            lib_opencl_path=os.path.join(opencl_dir, "lib")
+            if m64:
+                lib_arch_suffix = "64"
+            else:
+                lib_arch_suffix = ""
+    if lib_opencl_path:
+        flags = [
+            # "-L" + os.path.join(cuda_dir, "lib64"),
+            "-L" + os.path.join(opencl_dir, lib_opencl_path + lib_arch_suffix),
+            # "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
+            "-L" + lib_opencl_path,
+            "-L/usr/lib",
+            "-l OpenCL"
+            ]
+    else:
+        flags = []
     return flags
+
 
 class p4a_builder:
     """The p4a_builder is used for two main things.
