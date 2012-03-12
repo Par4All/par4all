@@ -69,8 +69,8 @@ unsplit
 
 compiles pgm from fortran files and executes
 
-  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity
+  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity
 
 compiles pgm from fortran and C files and executes
 
-  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity  2.40000009E+38       +Infinity       +Infinity       +Infinity       +Infinity
+  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity
