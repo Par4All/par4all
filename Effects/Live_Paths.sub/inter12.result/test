@@ -1,0 +1,60 @@
+void foo(int size, int a[size], int min, int max, int val)
+{
+   int i = 0;
+   for (i = min;i<max&&i<size;i++)
+      a[i] = val;
+}
+int main()
+{
+   int a[10];
+   int i;
+
+   foo(10, a, 3, 20, 20);
+
+   return a[5];
+}
+//             <may be alive (in)>: a[5] max min size val
+void foo(int size, int a[size], int min, int max, int val)
+{
+//             <may be alive (in)>: a[5] max min size val
+   int i = 0;
+//             <may be alive (in)>: a[5] i max min size val
+   for (i = min;i<max&&i<size;i++)
+//             <may be alive (in)>: a[5] max min size
+//             <    is alive (in)>: i val
+      a[i] = val;
+}
+int main()
+{
+   int a[10];
+//             <may be alive (in)>: a[5]
+   int i;
+//             <may be alive (in)>: a[5]
+
+   foo(10, a, 3, 20, 20);
+//             <    is alive (in)>: a[5]
+
+   return a[5];
+}
+//             <    is alive (out)>: a[5]
+void foo(int size, int a[size], int min, int max, int val)
+{
+//             <may be alive (out)>: a[5] i max min size val
+   int i = 0;
+//             <    is alive (out)>: a[5]
+   for (i = min;i<max&&i<size;i++)
+//             <may be alive (out)>: a[5] i max min size val
+      a[i] = val;
+}
+int main()
+{
+//             <may be alive (out)>: a[5]
+   int a[10];
+//             <may be alive (out)>: a[5]
+   int i;
+//             <    is alive (out)>: a[5]
+
+   foo(10, a, 3, 20, 20);
+
+   return a[5];
+}
