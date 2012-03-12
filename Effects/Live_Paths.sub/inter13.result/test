@@ -1,0 +1,111 @@
+
+      PROGRAM DOT_PRODUCT
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+
+      CALL INIT(A, B)                                                   0007
+
+      RESULT = 0.0                                                      0009
+
+      DO I = 1, N                                                       0011
+         RESULT = RESULT+A(I)*B(I)                                      0012
+      ENDDO
+
+      PRINT *, 'Final Result= ', RESULT                                 0015
+      END
+      SUBROUTINE INIT (A, B)
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N)
+!     Some initializations
+      DO I = 1, N                                                       0006
+         A(I) = I*1.0                                                   0007
+         B(I) = I*2.0                                                   0008
+      ENDDO
+      END
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+      PROGRAM DOT_PRODUCT
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+      CALL INIT(A, B)                                                   0007
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+      RESULT = 0.0                                                      0009
+C             <may be alive (in)>: A(*) B(*) RESULT
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+
+      DO I = 1, N                                                       0011
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: I RESULT __IO_EFFECTS:LUNS(6)
+         RESULT = RESULT+A(I)*B(I)                                      0012
+      ENDDO
+C             <    is alive (in)>: RESULT __IO_EFFECTS:LUNS(6)
+
+      PRINT *, 'Final Result= ', RESULT                                 0015
+      END
+C             <may be alive (in)>: A B
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+      SUBROUTINE INIT (A, B)
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N)
+C             <may be alive (in)>: A B
+C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+!     Some initializations
+      DO I = 1, N                                                       0006
+C             <may be alive (in)>: A B
+C             <    is alive (in)>: I __IO_EFFECTS:LUNS(6)
+         A(I) = I*1.0                                                   0007
+C             <may be alive (in)>: A B
+C             <    is alive (in)>: I __IO_EFFECTS:LUNS(6)
+         B(I) = I*2.0                                                   0008
+      ENDDO
+      END
+
+      PROGRAM DOT_PRODUCT
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N), RESULT
+C             <may be alive (out)>: A(*) B(*)
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+
+      CALL INIT(A, B)                                                   0007
+C             <may be alive (out)>: A(*) B(*) RESULT
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+
+      RESULT = 0.0                                                      0009
+C             <    is alive (out)>: RESULT __IO_EFFECTS:LUNS(6)
+
+      DO I = 1, N                                                       0011
+C             <may be alive (out)>: A(*) B(*) RESULT
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         RESULT = RESULT+A(I)*B(I)                                      0012
+      ENDDO
+
+      PRINT *, 'Final Result= ', RESULT                                 0015
+      END
+C             <may be alive (out)>: A B
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+      SUBROUTINE INIT (A, B)
+      INTEGER N, I
+      PARAMETER (N=100)
+      REAL A(N), B(N)
+C             <may be alive (out)>: A B
+C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+!     Some initializations
+      DO I = 1, N                                                       0006
+C             <may be alive (out)>: A B
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         A(I) = I*1.0                                                   0007
+C             <may be alive (out)>: A B
+C             <    is alive (out)>: I __IO_EFFECTS:LUNS(6)
+         B(I) = I*2.0                                                   0008
+      ENDDO
+      END
