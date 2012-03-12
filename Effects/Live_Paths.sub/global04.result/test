@@ -42,8 +42,8 @@ C             <may be alive (in)>: A(*) B(*)
 C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
 
       RESULT = 0.0                                                      0010
-C             <may be alive (in)>: A(*) B(*) RESULT
-C             <    is alive (in)>: __IO_EFFECTS:LUNS(6)
+C             <may be alive (in)>: A(*) B(*)
+C             <    is alive (in)>: RESULT __IO_EFFECTS:LUNS(6)
 
       DO I = 1, N                                                       0012
 C             <may be alive (in)>: A(*) B(*)
@@ -83,8 +83,8 @@ C             <may be alive (out)>: A(*) B(*)
 C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
 
       CALL INIT                                                         0008
-C             <may be alive (out)>: A(*) B(*) RESULT
-C             <    is alive (out)>: __IO_EFFECTS:LUNS(6)
+C             <may be alive (out)>: A(*) B(*)
+C             <    is alive (out)>: RESULT __IO_EFFECTS:LUNS(6)
 
       RESULT = 0.0                                                      0010
 C             <    is alive (out)>: RESULT __IO_EFFECTS:LUNS(6)
