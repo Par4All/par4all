@@ -2271,9 +2271,8 @@ c_simple_effects_on_actual_parameter_forward_translation (entity  callee,
 										   nb_phi_real,
 										   &n_eff_ref, &n_eff_d,
 										   &exact_translation_p);
-		    n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff_orig)),
-					exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may(),
-					n_eff_d);
+		    n_eff = make_reference_simple_effect(n_eff_ref, copy_action(effect_action(eff_orig)),
+					exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may());
 		    pips_debug_effect(5, "final eff_formal : \n", n_eff);
 
 		    pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
