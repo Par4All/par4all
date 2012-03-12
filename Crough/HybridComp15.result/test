@@ -13,7 +13,7 @@ Initial code
       CST(5) = 5.0
       DO 10 I = 1, 5
          DO J = 1, 5
-            A(I,J) = CST(I)*2.4E38
+            A(I,J) = CST(I)*2.4E5
          ENDDO
 10       CONTINUE
       PRINT *, A
@@ -57,7 +57,7 @@ toto_ (float a[5][5], float cst[5])
     {
       for (j = 1; j <= 5; j++)
 	{
-	  a[j - 1][i - 1] = (cst[i - 1] * 2.4e38);
+	  a[j - 1][i - 1] = (cst[i - 1] * 2.4e5);
 	}
       continue;
     }
@@ -69,8 +69,8 @@ unsplit
 
 compiles pgm from fortran files and executes
 
-  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity
+   240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0    
 
 compiles pgm from fortran and C files and executes
 
-  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity  2.40000009E+38        Infinity        Infinity        Infinity        Infinity
+   240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0       240000.00       480000.00       720000.00       960000.00       1200000.0    
