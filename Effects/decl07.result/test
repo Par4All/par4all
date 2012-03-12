@@ -1,0 +1,132 @@
+int guard(int i, int n, int a[n], int b[n])
+{
+//             <    is read   >: a[i] i
+//             <    is written>: a_0
+   register int a_0 = a[i];
+//             <    is read   >: i n
+
+   if (i<n)
+//             <    is read   >: a_0 i
+//             <    is written>: b[i]
+      b[i] = a_0/2+a_0/3;
+}
+int main(int argc, char **argv)
+{
+//             <    is written>: n
+   int n = 100;
+   int a[n], b[n];
+   {
+      int i;
+//             <    is read   >: n
+//             <    is written>: 0`1`i
+
+      for(i = 0; i <= n-1; i += 1)
+//             <    is read   >: 0`1`i n
+//             <    is written>: a[i]
+         a[i] = i;
+   }
+   {
+      int i;
+//             <    is read   >: n
+//             <    is written>: 0`2`i
+
+      for(i = 0; i <= n-1; i += 1)
+//             <may be read   >: a[*]
+//             <may be written>: b[*]
+//             <    is read   >: 0`2`i n
+         guard(i, n, a, b);
+   }
+   {
+      int i;
+//             <    is read   >: n
+//             <    is written>: 0`3`i
+
+      for(i = 0; i <= n-1; i += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: b[i] 0`3`i n stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%d\n", b[i]);
+   }
+}
+
+//  <a[PHI1]-R-MAY-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <b[PHI1]-W-MAY-{PHI1==i, n==100, 0<=i, i<=99}>
+
+int guard(int i, int n, int a[n], int b[n])
+{
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+   register int a_0 = a[i];
+
+//  <b[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+
+   if (i<n)
+
+//  <b[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
+      b[i] = a_0/2+a_0/3;
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+int main(int argc, char **argv)
+{
+   int n = 100;
+   int a[n], b[n];
+   {
+      int i;
+
+//  <a[PHI1]-W-MAY-{0<=PHI1, PHI1<=99, n==100}>
+
+
+      for(i = 0; i <= n-1; i += 1)
+
+//  <a[PHI1]-W-EXACT-{PHI1==0`1`i, n==100, 0<=0`1`i, 0`1`i<=99}>
+
+         a[i] = i;
+   }
+   {
+      int i;
+
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=99, n==100}>
+//  <b[PHI1]-W-MAY-{0<=PHI1, PHI1<=99, n==100}>
+
+
+      for(i = 0; i <= n-1; i += 1)
+
+//  <a[PHI1]-R-MAY-{PHI1==0`2`i, n==100, 0<=0`2`i, 0`2`i<=99}>
+//  <b[PHI1]-W-MAY-{PHI1==0`2`i, n==100, 0<=0`2`i, 0`2`i<=99}>
+
+         guard(i, n, a, b);
+   }
+   {
+      int i;
+
+//  <b[PHI1]-R-MAY-{0<=PHI1, PHI1<=99, n==100}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+
+      for(i = 0; i <= n-1; i += 1)
+
+//  <b[PHI1]-R-EXACT-{PHI1==0`3`i, n==100, 0<=0`3`i, 0`3`i<=99}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         printf("%d\n", b[i]);
+   }
+}
