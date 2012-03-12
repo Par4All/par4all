@@ -1,0 +1,322 @@
+
+PROPER  EFFECTS 
+
+int scalar_renaming02()
+{
+   int *p, a, b, c;                                                     /*0004*/
+//             <    is written>: p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a
+   a = 1;                                                               /*0006*/
+//             <    is written>: a
+   a = 2;                                                               /*0007*/
+//             <    is read   >: a
+//             <    is written>: b
+   b = a;                                                               /*0008*/
+//             <    is written>: a
+   a = 3;                                                               /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a
+//             <    is written>: c
+   c = a;                                                               /*0011*/
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a b c stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d-%d-%d", a, b, c);                                         /*0012*/
+   return 0;                                                            /*0013*/
+}
+int scalar_renaming02()
+{
+   int *p, a, b, c;                                                     /*0004*/
+//             <    is written>: p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a
+   a = 1;                                                               /*0006*/
+//             <    is written>: a
+   a = 2;                                                               /*0007*/
+//             <    is read   >: a
+//             <    is written>: b
+   b = a;                                                               /*0008*/
+//             <    is written>: a
+   a = 3;                                                               /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a
+//             <    is written>: c
+   c = a;                                                               /*0011*/
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a b c stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d-%d-%d", a, b, c);                                         /*0012*/
+   return 0;                                                            /*0013*/
+}
+int scalar_renaming02()
+{
+   int *p, a;                                                           /*0004*/
+   //PIPS generated variable
+   int a0, a1, a2, a3, b0, b1, c0, c1;
+//             <    is written>: p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a0
+   a0 = 1;                                                              /*0006*/
+//             <    is written>: a1
+   a1 = 2;                                                              /*0007*/
+//             <    is read   >: a1
+//             <    is written>: b0
+   b0 = a1;                                                             /*0008*/
+//             <    is written>: a2
+   a2 = 3;                                                              /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a3
+//             <    is written>: a2
+   a2 = a3;
+//             <    is read   >: b1
+//             <    is written>: b0
+   b0 = b1;
+//             <    is read   >: a2
+//             <    is written>: c1
+   c1 = a2;                                                             /*0011*/
+//             <    is read   >: c1
+//             <    is written>: c0
+   c0 = c1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a2 b0 c0 stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d-%d-%d", a2, b0, c0);                                      /*0012*/
+   return 0;                                                            /*0013*/
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int scalar_renaming02()
+{
+
+// Points To: none
+
+   int *p, a;                                                           /*0004*/
+   //PIPS generated variable
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int a0, a1, a2, a3, b0, b1, c0, c1;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &a;                                                              /*0005*/
+
+// Points To:
+// p -> a , EXACT
+
+   a0 = 1;                                                              /*0006*/
+
+// Points To:
+// p -> a , EXACT
+
+   a1 = 2;                                                              /*0007*/
+
+// Points To:
+// p -> a , EXACT
+
+   b0 = a1;                                                             /*0008*/
+
+// Points To:
+// p -> a , EXACT
+
+   a2 = 3;                                                              /*0009*/
+
+// Points To:
+// p -> a , EXACT
+
+   *p = 4;                                                              /*0010*/
+
+// Points To:
+// p -> a , EXACT
+
+   a2 = a3;
+
+// Points To:
+// p -> a , EXACT
+
+   b0 = b1;
+
+// Points To:
+// p -> a , EXACT
+
+   c1 = a2;                                                             /*0011*/
+
+// Points To:
+// p -> a , EXACT
+
+   c0 = c1;
+
+// Points To:
+// p -> a , EXACT
+
+   printf("%d-%d-%d", a2, b0, c0);                                      /*0012*/
+
+// Points To:
+// p -> a , EXACT
+
+   return 0;                                                            /*0013*/
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int scalar_renaming02()
+{
+   int *p, a;                                                           /*0004*/
+   //PIPS generated variable
+   int a0, a1, a2, a3, b0, b1, c0, c1;
+//             <    is written>: p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a0
+   a0 = 1;                                                              /*0006*/
+//             <    is written>: a1
+   a1 = 2;                                                              /*0007*/
+//             <    is read   >: a1
+//             <    is written>: b0
+   b0 = a1;                                                             /*0008*/
+//             <    is written>: a2
+   a2 = 3;                                                              /*0009*/
+//             <    is read   >: p
+//             <    is written>: a
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a3
+//             <    is written>: a2
+   a2 = a3;
+//             <    is read   >: b1
+//             <    is written>: b0
+   b0 = b1;
+//             <    is read   >: a2
+//             <    is written>: c1
+   c1 = a2;                                                             /*0011*/
+//             <    is read   >: c1
+//             <    is written>: c0
+   c0 = c1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a2 b0 c0 stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d-%d-%d", a2, b0, c0);                                      /*0012*/
+   return 0;                                                            /*0013*/
+}
+int scalar_renaming02()
+{
+//             <    is declared>: a p
+   int *p, a;                                                           /*0004*/
+   //PIPS generated variable
+//             <    is declared>: a0 a1 a2 a3 b0 b1 c0 c1
+   int a0, a1, a2, a3, b0, b1, c0, c1;
+//             <    is written>: p
+//             <    is referenced>: a p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a0
+//             <    is referenced>: a0
+   a0 = 1;                                                              /*0006*/
+//             <    is written>: a1
+//             <    is referenced>: a1
+   a1 = 2;                                                              /*0007*/
+//             <    is read   >: a1
+//             <    is written>: b0
+//             <    is referenced>: a1 b0
+   b0 = a1;                                                             /*0008*/
+//             <    is written>: a2
+//             <    is referenced>: a2
+   a2 = 3;                                                              /*0009*/
+//             <    is read   >: p
+//             <    is written>: a
+//             <    is referenced>: p
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a3
+//             <    is written>: a2
+//             <    is referenced>: a2 a3
+   a2 = a3;
+//             <    is read   >: b1
+//             <    is written>: b0
+//             <    is referenced>: b0 b1
+   b0 = b1;
+//             <    is read   >: a2
+//             <    is written>: c1
+//             <    is referenced>: a2 c1
+   c1 = a2;                                                             /*0011*/
+//             <    is read   >: c1
+//             <    is written>: c0
+//             <    is referenced>: c0 c1
+   c0 = c1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a2 b0 c0 stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <    is referenced>: a2 b0 c0
+   printf("%d-%d-%d", a2, b0, c0);                                      /*0012*/
+   return 0;                                                            /*0013*/
+}
+int scalar_renaming02()
+{
+//             <    is declared>: a p
+   int *p, a;                                                           /*0004*/
+   //PIPS generated variable
+//             <    is declared>: a00 a10 a20 a21 a3 b00 b01 b1 c00 
+//                               c10
+   int a3, b1, c10, c00, b00, b01, a20, a21, a10, a00;
+//             <    is written>: p
+//             <    is referenced>: a p
+   p = &a;                                                              /*0005*/
+//             <    is written>: a00
+//             <    is referenced>: a00
+   a00 = 1;                                                             /*0006*/
+//             <    is written>: a10
+//             <    is referenced>: a10
+   a10 = 2;                                                             /*0007*/
+//             <    is read   >: a10
+//             <    is written>: b00
+//             <    is referenced>: a10 b00
+   b00 = a10;                                                           /*0008*/
+//             <    is written>: a20
+//             <    is referenced>: a20
+   a20 = 3;                                                             /*0009*/
+//             <    is read   >: p
+//             <    is written>: a
+//             <    is referenced>: p
+   *p = 4;                                                              /*0010*/
+//             <    is read   >: a3
+//             <    is written>: a21
+//             <    is referenced>: a21 a3
+   a21 = a3;
+//             <    is read   >: b1
+//             <    is written>: b01
+//             <    is referenced>: b01 b1
+   b01 = b1;
+//             <    is read   >: a21
+//             <    is written>: c10
+//             <    is referenced>: a21 c10
+   c10 = a21;                                                           /*0011*/
+//             <    is read   >: c10
+//             <    is written>: c00
+//             <    is referenced>: c00 c10
+   c00 = c10;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a21 b01 c00 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <    is referenced>: a21 b01 c00
+   printf("%d-%d-%d", a21, b01, c00);                                   /*0012*/
+   return 0;                                                            /*0013*/
+}
