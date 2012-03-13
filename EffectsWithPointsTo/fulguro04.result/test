@@ -17,32 +17,40 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 POINTS-TO
 
 
-// Points To:
-// data1 -> _data1_1[0] , EXACT
-// data2 -> _data2_2[0] , EXACT
+// Points To IN:
+// data1 -> _data1_1 , EXACT
+// data2 -> _data2_2 , EXACT
+
+
+// Points To OUT:
+// _data1_1.array -> _data1_1_1 , EXACT
+// _data2_2.array -> _data2_2_2 , EXACT
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
 
 
 // Points To:
-// data1 -> _data1_1[0] , EXACT
-// data2 -> _data2_2[0] , EXACT
+// data1 -> _data1_1 , EXACT
+// data2 -> _data2_2 , EXACT
 
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
 
 // Points To:
-// data1 -> _data1_1[0] , EXACT
-// data2 -> _data2_2[0] , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// _data1_1.array -> _data1_1_1 , EXACT
+// data1 -> _data1_1 , EXACT
+// data2 -> _data2_2 , EXACT
+// psrc1 -> _data1_1_1 , EXACT
 
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
 
 // Points To:
-// data1 -> _data1_1[0] , EXACT
-// data2 -> _data2_2[0] , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// _data1_1.array -> _data1_1_1 , EXACT
+// _data2_2.array -> _data2_2_2 , EXACT
+// data1 -> _data1_1 , EXACT
+// data2 -> _data2_2 , EXACT
+// psrc1 -> _data1_1_1 , EXACT
+// psrc2 -> _data2_2_2 , EXACT
 
 
    return;
@@ -53,10 +61,10 @@ PROPER  EFFECTS WITH POINTS TO
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data1_1.array data1
 //             <    is written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data2_2.array data2
 //             <    is written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
 
@@ -65,8 +73,5 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 
  *********************** Use-Def Chains *********************
 
-	34 --> 35 with conflicts
-		from <psrc1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <psrc2-W-EXACT>
 
 ****************** End of Dependence Graph ******************
