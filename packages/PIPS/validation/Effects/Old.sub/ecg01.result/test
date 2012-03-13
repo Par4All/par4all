@@ -35,9 +35,10 @@ C             <may be written>: F(*)
 C             <    is written>: J
 
       J = 1                                                             0008
-C             <may be read   >: I J S(*)
-C             <may be written>: F(*) J
-C             <    is written>: I
+C             <may be read   >: S(*)
+C             <may be written>: F(*)
+C             <    is read   >: I J
+C             <    is written>: I J
       DO I = 1, N                                                       0009
 C             <may be read   >: S(*)
 C             <may be written>: F(*)
