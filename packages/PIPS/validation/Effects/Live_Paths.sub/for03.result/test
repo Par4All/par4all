@@ -1,0 +1,61 @@
+int main()
+{
+   int a, b;
+   int tab[10];
+
+   b = 10;
+   a = 0;
+   {
+      int i;
+      for (i = 0;i<b;tab[a] += tab[a-1])
+         i = i+1;
+   }
+   return a+tab[a];
+}
+int main()
+{
+   int a, b;
+   int tab[10];
+//             <may be alive (in)>: tab[*]
+
+   b = 10;
+//             <may be alive (in)>: b tab[*]
+   a = 0;
+   {
+//             <may be alive (in)>: b tab[*]
+//             <    is alive (in)>: a
+      int i;
+//             <may be alive (in)>: b i tab[*]
+//             <    is alive (in)>: a
+      for (i = 0;i<b;tab[a] += tab[a-1])
+//             <may be alive (in)>: a b tab[*]
+//             <    is alive (in)>: i
+         i = i+1;
+   }
+//             <may be alive (in)>: tab[*]
+//             <    is alive (in)>: a
+   return a+tab[a];
+}
+int main()
+{
+   int a, b;
+//             <may be alive (out)>: tab[*]
+   int tab[10];
+//             <may be alive (out)>: b tab[*]
+
+   b = 10;
+//             <may be alive (out)>: b tab[*]
+//             <    is alive (out)>: a
+   a = 0;
+   {
+//             <may be alive (out)>: b i tab[*]
+//             <    is alive (out)>: a
+      int i;
+//             <may be alive (out)>: tab[*]
+//             <    is alive (out)>: a
+      for (i = 0;i<b;tab[a] += tab[a-1])
+//             <may be alive (out)>: a b i tab[*]
+         i = i+1;
+   }
+   return a+tab[a];
+}

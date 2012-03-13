@@ -757,6 +757,24 @@ bool extended_integer_constant_expression_p(expression e)
   return ice_p;
 }
 
+// same as previous but also returns the integer constant in the integer
+// pointed by parameter result if the expression is an integer constant
+bool extended_integer_constant_expression_p_to_int(expression e, int * result)
+{
+  value v = EvalExpression(e);
+  bool ice_p = false;
+
+  if(value_constant_p(v)) {
+    constant c = value_constant(v);
+
+    ice_p = constant_int_p(c);
+    if (ice_p) *result = constant_int(c);
+  }
+  free_value(v);
+  return ice_p;
+}
+
+
 /* positive integer constant expression: call to a positive constant
    or to a sum of positive integer constant expressions (much too
    restrictive, but enough for the source codes submitted to PIPS up
@@ -2149,6 +2167,8 @@ int expression_to_int(expression exp)
 			  expression_to_string(exp));
   return(rv);
 }
+
+
 
 /* Same as above for floating point constants
  *

@@ -1,0 +1,96 @@
+void foo(int a[SIZE], int min, int max, int val)
+{
+   int i = 0;
+   for (i = min;i<max&&i<SIZE;i++)
+      a[i] += val;
+}
+void init(int a[SIZE], int val)
+{
+   int i = 0;
+   for(i = 0; i <= SIZE-1; i += 1)
+      a[i] = val;
+}
+int main()
+{
+   int a[10];
+
+   init(a, 0);
+   foo(a, 3, 20, 20);
+
+   return a[5];
+}
+//             <may be alive (in)>: SIZE a[*] max min val
+void foo(int a[SIZE], int min, int max, int val)
+{
+//             <may be alive (in)>: SIZE a[*] max min val
+   int i = 0;
+//             <may be alive (in)>: SIZE a[*] i max min val
+   for (i = min;i<max&&i<SIZE;i++)
+//             <may be alive (in)>: SIZE a[*] max min
+//             <    is alive (in)>: i val
+      a[i] += val;
+}
+//             <may be alive (in)>: a[*] val
+//             <    is alive (in)>: SIZE
+void init(int a[SIZE], int val)
+{
+//             <may be alive (in)>: a[*] val
+//             <    is alive (in)>: SIZE
+   int i = 0;
+//             <may be alive (in)>: a[*] val
+//             <    is alive (in)>: SIZE
+   for(i = 0; i <= SIZE-1; i += 1)
+//             <may be alive (in)>: a[*]
+//             <    is alive (in)>: SIZE i val
+      a[i] = val;
+}
+//             <    is alive (in)>: SIZE
+int main()
+{
+//             <    is alive (in)>: SIZE
+   int a[10];
+//             <may be alive (in)>: a[*]
+//             <    is alive (in)>: SIZE
+
+   init(a, 0);
+//             <may be alive (in)>: SIZE a[*]
+   foo(a, 3, 20, 20);
+//             <    is alive (in)>: a[5]
+
+   return a[5];
+}
+//             <    is alive (out)>: a[5]
+void foo(int a[SIZE], int min, int max, int val)
+{
+//             <may be alive (out)>: SIZE a[*] i max min val
+   int i = 0;
+//             <    is alive (out)>: a[5]
+   for (i = min;i<max&&i<SIZE;i++)
+//             <may be alive (out)>: SIZE a[*] i max min val
+      a[i] += val;
+}
+//             <may be alive (out)>: SIZE a[*]
+void init(int a[SIZE], int val)
+{
+//             <may be alive (out)>: a[*] val
+//             <    is alive (out)>: SIZE
+   int i = 0;
+//             <may be alive (out)>: SIZE a[*]
+   for(i = 0; i <= SIZE-1; i += 1)
+//             <may be alive (out)>: a[*] val
+//             <    is alive (out)>: SIZE i
+      a[i] = val;
+}
+int main()
+{
+//             <may be alive (out)>: a[*]
+//             <    is alive (out)>: SIZE
+   int a[10];
+//             <may be alive (out)>: SIZE a[*]
+
+   init(a, 0);
+//             <    is alive (out)>: a[5]
+   foo(a, 3, 20, 20);
+
+   return a[5];
+}

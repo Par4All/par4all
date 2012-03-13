@@ -899,13 +899,16 @@ void db_invalidate_memory_resource(const char * rname, const char *oname)
         db_resource_file_time(r)=0;
 }
 
-/** Delete all the resources of a given type
+/** Delete all the resources of a given type "rname"
+ *
+ * Return the number of deleted resources
  *
  * Each owner map has to be checked because of two-level mapping used.
  */
-void db_unput_resources(const char* rname)
+int db_unput_resources(const char* rname)
 {
     db_symbol r;
+    int count = 0;
     DB_OK;
     r = find_or_create_db_symbol(rname);
     DB_RESOURCES_MAP(s, or,
@@ -914,9 +917,11 @@ void db_unput_resources(const char* rname)
 	if (bound_db_owned_resources_p(or, r)) {
 	    db_delete_resource(rname, db_symbol_name(s));
 	    dbll_unlink_resource_file(rname, db_symbol_name(s), false);
+	    count ++;
 	}
     },
 		     get_pips_database());
+    return count;
 }
 
 /* Retrieve all the db resources of a given resource type, "rname".
@@ -966,13 +971,15 @@ static string db_resource_name_or_owner_name(db_resource dbr, bool owner_p)
     DB_OK;
     DB_RESOURCES_MAP(s1, or,
     {
+      pips_debug(9, "Resources for module \"%s\":\n", db_symbol_name(s1));
       DB_OWNED_RESOURCES_MAP(s2, dbr21,
 			     {
+			       pips_debug(9, "\t\"%s\":\n", db_symbol_name(s2));
 			       if(dbr==dbr21) {
 				 if(owner_p)
-				   name = (string) s1;
+				   name =  db_symbol_name(s1);
 				 else
-				   name = (string) s2;
+				   name =  db_symbol_name(s2);
 				 break;
 			       }
 			     },
@@ -1018,7 +1025,7 @@ void db_delete_all_resources(void)
     int nr = dbll_number_of_resources(), i;
     DB_OK;
     for (i=0; i<nr; i++)
-      db_unput_resources(dbll_get_ith_resource_name(i));
+      (void) db_unput_resources(dbll_get_ith_resource_name(i));
 }
 
 /******************************************************************* MODULES */

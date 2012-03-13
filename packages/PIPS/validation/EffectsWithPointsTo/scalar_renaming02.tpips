@@ -1,0 +1,61 @@
+delete scalar_renaming02
+create scalar_renaming02 scalar_renaming02.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty TPIPS_IS_A_SHELL=TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty MEMORY_EFFECTS_ONLY  TRUE
+
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[scalar_renaming02]
+
+display PRINTED_FILE
+apply SCALAR_RENAMING
+display PRINTED_FILE[scalar_renaming02]
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[scalar_renaming02]
+#shell dot -Tpng scalar_renaming02.database/scalar_renaming02/scalar_renaming02.dot >scalar_renaming02_dg_01.png
+#shell gqview scalar_renaming02_dg_01.png
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+setproperty MEMORY_EFFECTS_ONLY  FALSE
+display PRINTED_FILE
+apply SCALAR_RENAMING
+display PRINTED_FILE[scalar_renaming02]
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[scalar_renaming02]
+#shell dot -Tpng scalar_renaming02.database/scalar_renaming02/scalar_renaming02.dot >scalar_renaming02_dg02.png
+#shell gqview scalar_renaming02_dg02.png
+
+apply UNSPLIT
+close
+
+#shell sed -i -e '2,/main(/ d' $WS.database/Src/$WS.c
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+#shell ( test "`./$WS.database/Tmp/ref`" = "`./$WS.database/Tmp/out`" && echo ok ) || echo ko
+
+delete scalar_renaming02
+quit
+
