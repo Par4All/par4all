@@ -41,11 +41,11 @@
   ---\\
   HPC Project}
 
-\author{Amaury \textsc{Darsch} \and Serge \textsc{Guelton} \and Ronan
-  \textsc{Keryell} \and Grégoire \textsc{Péan} \and Claire \textsc{Seguin}
-  \and Mickaël \textsc{Thievent} \and Pierre \textsc{Villalon}
-  \and Mehdi \textsc{Amini} \and Janice \textsc{Onanian-McMahon}
-  \and Onil \textsc{Goubier}}
+\author{Mehdi \textsc{Amini} \and Amaury \textsc{Darsch} \and Onil
+  \textsc{Goubier} \and Serge \textsc{Guelton} \and Ronan \textsc{Keryell}
+  \and Janice \textsc{Onanian-McMahon} \and Grégoire \textsc{Péan} \and
+  Claire \textsc{Seguin} \and Mickaël \textsc{Thievent} \and Pierre
+  \textsc{Villalon}}
 
 \maketitle
 
@@ -1448,8 +1448,76 @@ The wrong work is still connected to the branch
 of information.
 
 
+\subsection{Using \protect\Agit to push some branch on a test machine to
+  try a \protect\Apfa version}
+\label{sec:using-agit-push}
+
+Developing and testing \Apfa on multiple platforms at the same time may be
+cumbersome but hopefully \Agit can help here too with the concept of
+distributed repositories.
+
+For example if you develop on your local machine and want to test \Apfa on
+a test machine named \texttt{ridee.enstb.org} you can connect to, you can
+begin with creating some \Agit clone of \Apfa if not already there.
+
+Then you can create a new remote in your local \Agit copy where you
+develop to the remote \Agit, with say:
+\begin{verbatim}
+git remote add ridee ridee.enstb.org:some_dir/par4all
+\end{verbatim}
+Pushing on a non-bare \Agit repository is not a normal practice because it
+desynchronize the index with the working directory if the branch you push
+on is the checked-out one.
+
+So you have to allow this before on the target machine with a:
+\begin{verbatim}
+git config receive.denyCurrentBranch warn
+\end{verbatim}
+
+Guess you work on the branch \texttt{p4a} on \texttt{ridee}, you can begin
+with a clean state in the working tree with a
+\begin{verbatim}
+git reset --hard
+\end{verbatim}
+
+Then you can push for example with a
+\begin{verbatim}
+git push ridee p4a-own
+\end{verbatim}
+
+Then you can merge on \texttt{ridee} \texttt{p4a-own} into \texttt{p4a}
+for real test:
+\begin{verbatim}
+# Just in case we were not in the right branch:
+git checkout p4a
+git merge p4a-own
+\end{verbatim}
+and compile.
+
+You could also merge locally \texttt{p4a} and push \texttt{p4a} instead,
+but if you roll back \texttt{p4a-own}, you have also to roll-back
+\texttt{p4a}.
+
+If you have done some roll-back in the branch locally or done some work
+remotely on the main branch, the history is no longer
+synchronized. Normally that means merging the different history. But if it
+is just for some throwable testing on the remote, you can remotely
+\texttt{git reset} the \texttt{p4a} history or use the \texttt{+} in:
+\begin{verbatim}
+git push ridee +p4a-own
+\end{verbatim}
+that will move the \texttt{p4a-own} branch unconditionally without a
+merge.
+
+Note that since \Agit keep a record of the branch history it-self, you may
+still recover the history if it was a mistake by inspecting the output of:
+\begin{verbatim}
+git reflog show
+\end{verbatim}
+
+
 \subsection{The history has been rewritten on the server or how to resolve
-  an uchrony with git}
+  an uchrony with \protect\Agit}
 \label{sec:history-has-been}
 
 \Apfa is complex with many branches and sometimes some commits that should
