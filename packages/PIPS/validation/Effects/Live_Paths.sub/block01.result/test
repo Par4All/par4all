@@ -1,0 +1,54 @@
+int main()
+{
+   int result = 0;
+   {
+      int k = 0;
+      result += k;
+   }
+   result++;
+   {
+      int k = 1;
+      result += k;
+   }
+   return result;
+}
+int main()
+{
+   int result = 0;
+   {
+//             <    is alive (in)>: result
+      int k = 0;
+//             <    is alive (in)>: 0`1`k result
+      result += k;
+   }
+//             <    is alive (in)>: result
+   result++;
+   {
+//             <    is alive (in)>: result
+      int k = 1;
+//             <    is alive (in)>: 0`2`k result
+      result += k;
+   }
+//             <    is alive (in)>: result
+   return result;
+}
+int main()
+{
+//             <    is alive (out)>: result
+   int result = 0;
+   {
+//             <    is alive (out)>: 0`1`k result
+      int k = 0;
+//             <    is alive (out)>: result
+      result += k;
+   }
+//             <    is alive (out)>: result
+   result++;
+   {
+//             <    is alive (out)>: 0`2`k result
+      int k = 1;
+//             <    is alive (out)>: result
+      result += k;
+   }
+   return result;
+}

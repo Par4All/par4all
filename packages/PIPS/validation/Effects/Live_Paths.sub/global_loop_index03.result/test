@@ -1,0 +1,97 @@
+void bar()
+{
+   printf("i=%d\n", i);
+}
+void foo()
+{
+   int j, a[10];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+
+   for(j = 0; j <= 9; j += 1)
+      printf("a[%d] = %d\n", j, a[j]);
+}
+int main()
+{
+   foo();
+   bar();
+   return 0;
+}
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+void bar()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+   printf("i=%d\n", i);
+}
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+void foo()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   int j, a[10];
+//             <may be alive (in)>: a[*] stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be alive (in)>: a[*] stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+      a[i] = i;
+//             <may be alive (in)>: a[*] stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+
+   for(j = 0; j <= 9; j += 1)
+//             <may be alive (in)>: a[*] stdout[0]
+//             <    is alive (in)>: i j stdout __IO_EFFECTS:LUNS[1]
+      printf("a[%d] = %d\n", j, a[j]);
+}
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   foo();
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: i stdout __IO_EFFECTS:LUNS[1]
+   bar();
+   return 0;
+}
+void bar()
+{
+   printf("i=%d\n", i);
+}
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+void foo()
+{
+//             <may be alive (out)>: a[*] stdout[0]
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1]
+   int j, a[10];
+//             <may be alive (out)>: a[*] stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be alive (out)>: a[*] stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+      a[i] = i;
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+
+   for(j = 0; j <= 9; j += 1)
+//             <may be alive (out)>: a[*] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is alive (out)>: i j stdout
+      printf("a[%d] = %d\n", j, a[j]);
+}
+int main()
+{
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: i stdout __IO_EFFECTS:LUNS[1]
+   foo();
+   bar();
+   return 0;
+}
