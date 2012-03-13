@@ -29,39 +29,35 @@ int main()
    do {
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == p (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &*HEAP*_l_7[0] (exact);
+// q == &p[*] (may);
 
       *q = i;
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == p (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &*HEAP*_l_7[0] (exact);
+// q == &p[*] (may);
 
       q++;
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &p[1] (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &*HEAP*_l_7[0] (exact);
+// q == &p[*] (may);
 
       i++;
    }
    while (i<5);
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == p (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &*HEAP*_l_7[0] (exact);
+// q == &p[*] (may);
 
 
    free(p);
 
 // Pointer values:
 // p == *ANY_MODULE*:*UNDEFINED* (exact);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// q == *ANY_MODULE*:*UNDEFINED* (may);
 
    return 0;
 }

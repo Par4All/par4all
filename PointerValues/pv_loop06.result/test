@@ -41,14 +41,14 @@ int main()
    for(i = 0; i <= 9; i += 1)
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[*] (may);
+// q == &b[*] (may);
 
       *p++ = 2**q++;
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[*] (may);
+// q == &b[*] (may);
 
    return 0;
 }
