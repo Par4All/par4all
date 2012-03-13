@@ -897,17 +897,16 @@ list statement_to_loop_statement_list(statement s)
 bool range_contains_at_least_one_point_p( range r )
 {
   bool return_val = false;
-  expression low = range_lower(r);
-  expression up = range_upper(r);
-  expression inc = range_increment(r);
-  if(expression_constant_p(low) && expression_constant_p(up)
-      && expression_constant_p(inc) ) {
-    if(expression_to_int(inc)>0
-        && expression_to_int(up) > expression_to_int(low)) {
+  expression low = range_lower(r); int i_low;
+  expression up = range_upper(r); int i_up;
+  expression inc = range_increment(r); int i_inc;
+  if(extended_integer_constant_expression_p_to_int(low, &i_low)
+     && extended_integer_constant_expression_p_to_int(up, &i_up)
+     && extended_integer_constant_expression_p_to_int(inc, &i_inc) ) {
+    if(i_inc >0 && i_up > i_low) {
       // Increasing case
       return_val = true;
-    } else if(expression_to_int(inc) < 0
-        && expression_to_int(up) < expression_to_int(low)) {
+    } else if(i_inc < 0 && i_up < i_low) {
       // Decreasing case
       return_val = true;
     }
