@@ -371,10 +371,9 @@ class ValidationClass:
         return self
 
 
-    def show_diff_files(self):
-        """Display the differences associated to the elements from the
-        result in the *.result directories (diff between the .out and the
-        .test)"""
+    def apply_on_diff_files(self, function):
+        """Apply a function on all the couples of (test, out) that is the
+        reference file and the output file in each selected .result directory"""
 
         for n in self.ordered_list():
             if verbose:
@@ -390,10 +389,33 @@ class ValidationClass:
                 print(out, 'not found')
                 continue
 
+            function(ref, out)
+
+
+    def show_diff_files(self):
+        """Display the differences associated to the elements from the
+        result in the *.result directories (diff between the .out and the
+        .test)"""
+
+        def print_difference_of_result_couple(ref, out):
             print("Differences between", ref, "and", out)
             # To avoid messing with previous print(), flush the output:
             sys.stdout.flush()
             subprocess.call(["diff", ref, out])
+
+        self.apply_on_diff_files(print_difference_of_result_couple)
+
+
+    def apply_diff_tool_on_files(self, diff_tool):
+        """Run a diff tool on all the result couples of the validation class"""
+
+        def apply_tool_on_result_couple(ref, out):
+            # To avoid messing with previous print(), flush the output:
+            sys.stdout.flush()
+            # Notice the closure on diff_tool...
+            subprocess.call([diff_tool, ref, out])
+
+        self.apply_on_diff_files(apply_tool_on_result_couple)
 
 
     def show_diff_results(self):
@@ -505,8 +527,8 @@ def main():
                               help = 'filter the current validation class by keeping only the elements with the expected status;')
 
     vc_filtering.add_argument("--remove-status", dest = "remove_status",
-                            metavar = ValidationElement.METAVAR,
-                            help = 'filter the current validation class by removing the elements with the given status;')
+                              metavar = ValidationElement.METAVAR,
+                              help = 'filter the current validation class by removing the elements with the given status;')
 
     vc_filtering.add_argument("-f",  "--filter", dest="filter",
                               help = "filter the current class by keeping all the validation items with a name matching a regular expression;",
@@ -526,6 +548,20 @@ def main():
     vc_display.add_argument("-s",  "--show-diff-files", action = "store_true",
                             dest = "show_diff_files", default = False,
                             help = "show the output differences for the current class by looking into the *.results directories;")
+
+    vc_display.add_argument("-d",  "--diff-tool", nargs = '?',
+                            dest = "diff_tool", default = False,
+                            # Use diff if this option is without argument
+                            const = "diff",
+                            help = """Use a diff tool to display the output differences for the current class by
+                            looking iteratively into the *.results
+                            directories. If you can write in the 'test'
+                            file with the tool, it is a way to accept a
+                            validation test case. Examples of diff tools
+                            suggested by git :araxis, bc3, diffuse,
+                            ecmerge, emerge, gvimdiff, kdiff3, meld,
+                            opendiff, p4merge, tkdiff, tortoisemerge,
+                            vimdiff and xxdiff;""")
 
     vc_display.add_argument("--show-diff-results", action = "store_true",
                             dest = "show_diff_results", default = False,
@@ -600,6 +636,11 @@ def main():
         # Show the diff in the .results directories for the validation
         # class elements:
         vc.show_diff_files()
+
+    if options.diff_tool:
+        # Show the diff in the .results directories for the validation
+        # class elements:
+        vc.apply_diff_tool_on_files(options.diff_tool)
 
     if options.show_diff_results:
         # Show the diff recorded in RESULTS for the validation class elements:
