@@ -12,7 +12,7 @@ Introduce the concept of validation class, not that far from CfEngine one.
 Ronan.Keryell@hpc-project.com
 """
 
-import re, optparse, pickle, os, shutil, subprocess, functools, sys, string
+import re, argparse, pickle, os, shutil, subprocess, functools, sys, string
 
 verbose = False
 
@@ -478,90 +478,80 @@ def main():
 
     global verbose
 
-    parser = optparse.OptionParser(usage = """usage: %prog [options] [<files>]
+    parser = argparse.ArgumentParser(description = """Parse and deal with
+    PIPS validation format in a Par4All use
+
     The following options are processed in this very order, so that you
     can pipe actions:""")
 
-    vc_file = optparse.OptionGroup(parser,
-                                   "Validation class construction from files")
+    vc_file = parser.add_argument_group("Validation class construction from files")
 
-    vc_file.add_option("--file", dest = "simple_file_name",
-                       help = "initialize a validation class from a plain line-oriented file of validation case names;",
-                       metavar = "FILE")
+    vc_file.add_argument("--file", dest = "simple_file_name",
+                         help = "initialize a validation class from a plain line-oriented file of validation case names such as a validation output or e-mail;",
+                         metavar = "FILE")
 
-    vc_file.add_option("--old-diff-file", dest = "old_diff_file_name",
-                       help = "add to a validation class the items from the old differences found in a validation diff output file;",
-                       metavar = "FILE")
+    vc_file.add_argument("--old-diff-file", dest = "old_diff_file_name",
+                         help = "add to a validation class the items from the old differences found in a validation 'diff' output file. That is things after '< ';",
+                         metavar = "FILE")
 
-    vc_file.add_option("--new-diff-file", dest = "new_diff_file_name",
-                       help = "add to a validation class the items from the new differences found in a validation diff output file;",
-                       metavar = "FILE")
+    vc_file.add_argument("--new-diff-file", dest = "new_diff_file_name",
+                         help = "add to a validation class the items from the new differences found in a validation diff output file. That is things after '> ';",
+                         metavar = "FILE")
 
-    parser.add_option_group(vc_file)
+    vc_filtering = parser.add_argument_group("Validation class filtering")
 
-    vc_filtering = optparse.OptionGroup(parser,
-                                        "Validation class filtering")
+    vc_filtering.add_argument("--keep-status", dest = "keep_status",
+                              metavar = ValidationElement.METAVAR,
+                              help = 'filter the current validation class by keeping only the elements with the expected status;')
 
-    vc_filtering.add_option("--keep-status", dest = "keep_status",
-                            metavar = ValidationElement.METAVAR,
-                            help = 'filter the current validation class by keeping only the elements with the expected status;')
-
-    vc_filtering.add_option("--remove-status", dest = "remove_status",
+    vc_filtering.add_argument("--remove-status", dest = "remove_status",
                             metavar = ValidationElement.METAVAR,
                             help = 'filter the current validation class by removing the elements with the given status;')
 
-    vc_filtering.add_option("-f",  "--filter", dest="filter",
-                            help = "filter the current class by keeping all the validation items with a name matching a regular expression;",
-                            metavar = "REGULAR-EXPRESSION")
+    vc_filtering.add_argument("-f",  "--filter", dest="filter",
+                              help = "filter the current class by keeping all the validation items with a name matching a regular expression;",
+                              metavar = "REGULAR-EXPRESSION")
 
-    vc_filtering.add_option("--filter-out", dest = "filter_out",
-                            help = "filter out the current class by removing all the validation items with a name matching a regular expression;",
-                            metavar = "REGULAR-EXPRESSION")
+    vc_filtering.add_argument("--filter-out", dest = "filter_out",
+                              help = "filter out the current class by removing all the validation items with a name matching a regular expression;",
+                              metavar = "REGULAR-EXPRESSION")
 
-    parser.add_option_group(vc_filtering)
+    vc_display = parser.add_argument_group("Validation class display")
 
-    vc_display = optparse.OptionGroup(parser, "Validation class display")
+    vc_display.add_argument("-l", "--list",
+                            action = "store_true", dest = "list_elements",
+                            default = False,
+                            help = "list the elements of the validation class;")
 
-    vc_display.add_option("-l", "--list",
-                          action = "store_true", dest = "list_elements",
-                          default = False,
-                          help = "list the elements of the validation class;")
+    vc_display.add_argument("-s",  "--show-diff-files", action = "store_true",
+                            dest = "show_diff_files", default = False,
+                            help = "show the output differences for the current class by looking into the *.results directories;")
 
-    vc_display.add_option("-s",  "--show-diff-files", action = "store_true",
-                          dest = "show_diff_files", default = False,
-                          help = "show the output differences for the current class by looking into the *.results directories;")
+    vc_display.add_argument("--show-diff-results", action = "store_true",
+                            dest = "show_diff_results", default = False,
+                            help = "show the output differences for the current class from the RESULTS directory;")
 
-    vc_display.add_option("--show-diff-results", action = "store_true",
-                          dest = "show_diff_results", default = False,
-                          help = "show the output differences for the current class from the RESULTS directory;")
+    vc_accept = parser.add_argument_group("Accept the validation from a validation class")
 
-    parser.add_option_group(vc_display)
+    vc_accept.add_argument("-a",  "--accept",
+                           action = "store_true", dest = "accept", default = False,
+                           help = "accept for the current validation class and add them with git;")
 
-    vc_accept = optparse.OptionGroup(parser, "Accept the validation from a validation class")
+    vc_accept.add_argument("-c",  "--commit", dest = "message",
+                           help = "commit in git the accepted modifications with the given message;",
+                           metavar = "MESSAGE")
 
-    vc_accept.add_option("-a",  "--accept",
-                         action = "store_true", dest = "accept", default = False,
-                         help = "accept for the current validation class and add them with git;")
+    group = parser.add_argument_group("Debug options")
 
-    vc_accept.add_option("-c",  "--commit", dest = "message",
-                      help = "commit in git the accepted modifications with the given message;",
-                      metavar = "MESSAGE")
+    group.add_argument("-v",  "--verbose",
+                       action = "store_true", dest = "verbose", default = False,
+                       help = "run in verbose mode;")
 
-    parser.add_option_group(vc_accept)
+    group.add_argument("-q",  "--quiet",
+                       action = "store_false", dest = "verbose",
+                       help = "run in quiet mode [default];")
 
-    group = optparse.OptionGroup(parser, "Debug options")
-
-    group.add_option("-v",  "--verbose",
-                     action = "store_true", dest = "verbose", default = False,
-                     help = "run in verbose mode;")
-
-    group.add_option("-q",  "--quiet",
-                     action = "store_false", dest = "verbose",
-                     help = "run in quiet mode [default];")
-
-    parser.add_option_group(group)
-
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
     verbose = options.verbose
 
