@@ -8,7 +8,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 module main
 activate PRINT_CODE_SIMPLE_POINTER_VALUES
-display PRINTED_FILE
+display PRINTED_FILE[%ALLFUNC]
 
 close
 delete $WSPACE
