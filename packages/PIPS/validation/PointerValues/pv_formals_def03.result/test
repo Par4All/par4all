@@ -1,0 +1,67 @@
+int foo(int *a[10])
+{
+
+// Pointer values:
+// a[*] == &_a_1[*][0] (may);
+
+   int failed = 0;
+   {
+
+// Pointer values:
+// a[*] == &_a_1[*][0] (may);
+
+      int i;
+
+// Pointer values:
+// a[*] == &_a_1[*][0] (may);
+
+      for(i = 0; i <= 9; i += 1) {
+
+// Pointer values:
+// a[*] == &*HEAP*_l_8[0] (may);
+// a[*] == &_a_1[*][0] (may);
+
+         a[i] = (int *) malloc(5*sizeof(int));
+
+// Pointer values:
+// a[*] == &*HEAP*_l_8[0] (may);
+// a[*] == &_a_1[*][0] (may);
+
+         if (a[i]==(void *) 0)
+
+// Pointer values:
+// a[*] == &*HEAP*_l_8[0] (may);
+// a[*] == &_a_1[*][0] (may);
+
+            failed++;
+      }
+   }
+
+// Pointer values:
+// a[*] == &*HEAP*_l_8[0] (may);
+// a[*] == &_a_1[*][0] (may);
+
+   return failed;
+}
+int main()
+{
+
+// Pointer values: none
+
+   int failed;
+
+// Pointer values: none
+
+   int *a[10];
+
+// Pointer values:
+// a[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   failed = foo(a);
+
+// Pointer values:
+// a[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   return failed;
+}
