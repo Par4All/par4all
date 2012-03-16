@@ -233,3 +233,76 @@ bool pv_cells_syntactically_equal_p(cell_relation pv1, cell_relation pv2)
   return false;
 }
 
+/*
+  @brief tests the syntactic equality of the corresponding cells of two pointer_value relations
+  @param pv1 is a pointer_value
+  @param pv2 is another pointer value
+  @return true if the input pointer values are syntactically equal.
+
+  if both pvs are value_of pvs, they are considered equal if their first cells are equal
+  and second cells are equal but also if the first cell of the first pv is equal to
+  the second cell of the second pv and conversely.
+ */
+bool pv_cells_mergeable_p(cell_relation pv1, cell_relation pv2)
+{
+
+
+  bool value_of_1_p = cell_relation_second_value_of_p(pv1);
+  bool value_of_2_p = cell_relation_second_value_of_p(pv1);
+
+  if ( (value_of_1_p && !value_of_2_p) || (value_of_2_p && !value_of_1_p))
+    return false;
+
+  cell c_first_1 = cell_relation_first_cell(pv1);
+  cell c_second_1 = cell_relation_second_cell(pv1);
+
+  cell c_first_2 = cell_relation_first_cell(pv2);
+  cell c_second_2 = cell_relation_second_cell(pv2);
+
+  int n_first_first = cell_compare(&c_first_1, &c_first_2);
+
+  if (n_first_first == 0)
+    {
+      int n_second_second = cell_compare(&c_second_1, &c_second_2);
+      
+      if (n_second_second != 0)
+	{
+	  if (cell_entity(c_second_1) != cell_entity(c_second_2)
+	      || (gen_length(reference_indices(cell_any_reference(c_second_1)))
+		  != gen_length(reference_indices(cell_any_reference(c_second_2)))))
+	    return false;
+	}
+    }
+  else
+    {
+      if (!value_of_1_p)
+	return false;
+      else /* value_of pvs, try to see if their cells are inverted */
+	{
+	  int n_first_second = cell_compare(&c_first_1, &c_second_2);
+	  if (n_first_second == 0)
+	    {
+	      int n_second_first = cell_compare(&c_second_1, &c_first_2);
+	      
+	      if (n_second_first != 0)
+		return false;
+	    }	
+	  else
+	    return false;
+	  
+	}
+    }
+  
+  descriptor d1 = cell_relation_descriptor(pv1);
+  descriptor d2 = cell_relation_descriptor(pv1);
+
+  if (descriptor_none_p(d1) && descriptor_none_p(d2))
+    {
+      return true;
+    }
+  else
+    pips_internal_error("Convex pointer_values not implemented yet");
+  
+  return false;
+}
+

@@ -1422,15 +1422,48 @@ list simple_pv_must_union(cell_relation pv1, cell_relation pv2)
   else
     {
       pips_debug(5, "general case\n");
-      tag t1 = cell_relation_approximation_tag(pv1);
-      tag t2 = cell_relation_approximation_tag(pv2);
-      tag t;
+      if ((cell_compare(&c_first_1, &c_first_2) == 0
+	   && cell_compare(&c_second_1, &c_second_2) == 0)
+	  || (cell_compare(&c_first_1, &c_second_2) == 0
+	      && cell_compare(&c_second_1, &c_first_2) == 0)
+	  )
+	{
 
-      if (t1 == t2) t = t1;
-      else t = is_approximation_exact;
+	  tag t1 = cell_relation_approximation_tag(pv1);
+	  tag t2 = cell_relation_approximation_tag(pv2);
+	  tag t;
 
-      pv = copy_cell_relation(pv1);
-      cell_relation_approximation_tag(pv) = t;
+	  if (t1 == t2) t = t1;
+	  else t = is_approximation_exact;
+
+	  pv = copy_cell_relation(pv1);
+	  cell_relation_approximation_tag(pv) = t;
+	}
+     else
+       {
+
+	  // first cells are equal, but not second cells indices
+	  // generate a pv with an unbounded dimension wherever dimensions
+	  // are not equal
+	  pv = copy_cell_relation(pv1);
+	  cell_relation_approximation_tag(pv) = is_approximation_may;
+
+	  cell c_second_pv = cell_relation_second_cell(pv);
+	  list l_ind_c_second_pv = reference_indices(cell_any_reference(c_second_pv));
+	  list l_ind_c_second_2 = reference_indices(cell_any_reference(c_second_2));
+
+	  for(; !ENDP(l_ind_c_second_pv); POP(l_ind_c_second_pv), POP(l_ind_c_second_2))
+	    {
+	      expression ind_pv = EXPRESSION(CAR(l_ind_c_second_pv));
+	      expression ind_2 = EXPRESSION(CAR(l_ind_c_second_2));
+
+	      if (!expression_equal_p(ind_pv, ind_2))
+		{
+		  EXPRESSION_(CAR(l_ind_c_second_pv)) = make_unbounded_expression();
+		}
+	    }
+
+       }
     }
   pips_debug_pv(5, "pv =\n", pv);
   list l_res = CONS(CELL_RELATION, pv, NIL);
@@ -1465,15 +1498,47 @@ list simple_pv_may_union(cell_relation pv1, cell_relation pv2)
     }
   else
     {
-      tag t1 = cell_relation_approximation_tag(pv1);
-      tag t2 = cell_relation_approximation_tag(pv2);
-      tag t;
+      if ((cell_compare(&c_first_1, &c_first_2) == 0
+	   && cell_compare(&c_second_1, &c_second_2) == 0)
+	  || (cell_compare(&c_first_1, &c_second_2) == 0
+	      && cell_compare(&c_second_1, &c_first_2) == 0)
+	  )
+	{
 
-      if (t1 == t2) t = t1;
-      else t = is_approximation_may;
+	  tag t1 = cell_relation_approximation_tag(pv1);
+	  tag t2 = cell_relation_approximation_tag(pv2);
+	  tag t;
 
-      pv = copy_cell_relation(pv1);
-      cell_relation_approximation_tag(pv) = t;
+	  if (t1 == t2) t = t1;
+	  else t = is_approximation_may;
+
+	  pv = copy_cell_relation(pv1);
+	  cell_relation_approximation_tag(pv) = t;
+	}
+      else
+	{
+	  // first cells are equal, but not second cells indices
+	  // generate a pv with an unbounded dimension wherever dimensions
+	  // are not equal
+	  pv = copy_cell_relation(pv1);
+	  cell_relation_approximation_tag(pv) = is_approximation_may;
+
+	  cell c_second_pv = cell_relation_second_cell(pv);
+	  list l_ind_c_second_pv = reference_indices(cell_any_reference(c_second_pv));
+	  list l_ind_c_second_2 = reference_indices(cell_any_reference(c_second_2));
+	  
+	  for(; !ENDP(l_ind_c_second_pv); POP(l_ind_c_second_pv), POP(l_ind_c_second_2))
+	    {
+	      expression ind_pv = EXPRESSION(CAR(l_ind_c_second_pv));
+	      expression ind_2 = EXPRESSION(CAR(l_ind_c_second_2));
+
+	      if (!expression_equal_p(ind_pv, ind_2))
+		{
+		  EXPRESSION_(CAR(l_ind_c_second_pv)) = make_unbounded_expression();
+		}
+	    }
+
+	}
     }
   list l_res = CONS(CELL_RELATION, pv, NIL);
   pips_debug_pvs(5, "returning:\n", l_res);
@@ -1488,7 +1553,7 @@ bool pvs_union_combinable_p(cell_relation pv1, cell_relation pv2)
   pips_assert("error: there should be no undefined cell_relations in lists\n", !(undef1 && undef2));
 
   if (undef1 || undef2) return true;
-  if (pv_cells_syntactically_equal_p(pv1, pv2)) return true;
+  if (pv_cells_mergeable_p(pv1, pv2)) return true;
 
 
   cell c_first_1 = cell_relation_first_cell(pv1);
