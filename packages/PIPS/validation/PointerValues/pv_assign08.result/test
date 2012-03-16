@@ -1,3 +1,10 @@
+int * foo()
+{
+
+// Pointer values: none
+
+   return (int *) malloc(sizeof(int));
+}
 int main()
 {
 

@@ -47,22 +47,22 @@ int main()
    do {
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[*] (may);
+// q == &b[*] (may);
 
       *p++ = 2**q++;
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[*] (may);
+// q == &b[*] (may);
 
       i++;
    }
    while (i<10);
 
 // Pointer values:
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[*] (may);
+// q == &b[*] (may);
 
    return 0;
 }

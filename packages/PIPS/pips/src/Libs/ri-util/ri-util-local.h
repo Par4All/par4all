@@ -98,6 +98,8 @@
 #define HEAP_AREA_LOCAL_NAME             "*HEAP*"
 #define STACK_AREA_LOCAL_NAME            "*STACK*"
 #define ALLOCATABLE_AREA_LOCAL_NAME      "*ALLOCATABLE*"
+#define POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME "*POINTER_DUMMY_TARGETS*"
+
 /* The set of all memory areas. FI: this macro is now obsolete and
    should be removed when a new version of alias-classes is
    introduced. Too bad ri-util/effects.c is going to depend on
@@ -2196,6 +2198,7 @@ enum {
     ENTITY_HEAP_AREA = 8,
     ENTITY_DYNAMIC_AREA = 16,
     ENTITY_STATIC_AREA = 32,
+    ENTITY_POINTER_DUMMY_TARGETS_AREA = 64,
 };
 
 #define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)

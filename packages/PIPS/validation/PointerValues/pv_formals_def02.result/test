@@ -1,0 +1,79 @@
+int foo(int **a)
+{
+
+// Pointer values:
+// a == &_a_1[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   *a = (int *) malloc(sizeof(int));
+
+// Pointer values:
+// _a_1[0] == &*HEAP*_l_3[0] (exact);
+// a == &_a_1[0] (exact);
+// a[0] == &*HEAP*_l_3[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   **a = 1;
+
+// Pointer values:
+// _a_1[0] == &*HEAP*_l_3[0] (exact);
+// a == &_a_1[0] (exact);
+// a[0] == &*HEAP*_l_3[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   *a = (int *) malloc(sizeof(int)*2);
+
+// Pointer values:
+// _a_1[0] == &*HEAP*_l_5[0] (exact);
+// a == &_a_1[0] (exact);
+// a[0] == &*HEAP*_l_5[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   (*a)[0] = 0;
+
+// Pointer values:
+// _a_1[0] == &*HEAP*_l_5[0] (exact);
+// a == &_a_1[0] (exact);
+// a[0] == &*HEAP*_l_5[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   (*a)[1] = 1;
+
+// Pointer values:
+// _a_1[0] == &*HEAP*_l_5[0] (exact);
+// a == &_a_1[0] (exact);
+// a[0] == &*HEAP*_l_5[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   return **a;
+}
+int main()
+{
+
+// Pointer values: none
+
+   int res;
+
+// Pointer values: none
+
+   int p;
+
+// Pointer values: none
+
+   int *q;
+
+// Pointer values:
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = &p;
+
+// Pointer values:
+// q == &p (exact);
+
+   res = foo(&q);
+
+// Pointer values:
+// q == &p (exact);
+
+   return res;
+}

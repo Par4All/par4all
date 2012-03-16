@@ -261,7 +261,7 @@ entity make_empty_module(const char* full_name,
 {
   const char* name;
   entity e = gen_find_tabulated(full_name, entity_domain);
-  entity DynamicArea, StaticArea, StackArea, HeapArea;
+  entity DynamicArea, StaticArea, StackArea, HeapArea, PointerArea;
 
   /* FC: added to allow reintrance in HPFC */
   if (e!=entity_undefined)
@@ -309,6 +309,13 @@ entity make_empty_module(const char* full_name,
   entity_initial(HeapArea) = make_value_unknown();
   entity_kind(HeapArea) = ABSTRACT_LOCATION | ENTITY_HEAP_AREA ;
   AddEntityToDeclarations(HeapArea, e);
+
+  PointerArea = FindOrCreateEntity(name, POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
+  entity_type(PointerArea) = make_type_area(make_area(0, NIL));
+  entity_storage(PointerArea) = make_storage_rom();
+  entity_initial(PointerArea) = make_value_unknown();
+  entity_kind(PointerArea) = ABSTRACT_LOCATION | ENTITY_POINTER_DUMMY_TARGETS_AREA ;
+  AddEntityToDeclarations(PointerArea, e);
 
   return(e);
 }

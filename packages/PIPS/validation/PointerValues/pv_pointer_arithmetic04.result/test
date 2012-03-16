@@ -1,0 +1,45 @@
+int main()
+{
+
+// Pointer values: none
+
+   int n = 10;
+
+// Pointer values: none
+
+   int *vect = (int *) malloc(n*sizeof(int));
+   {
+
+// Pointer values:
+// vect == &*HEAP*_l_4[0] (exact);
+
+      int i;
+
+// Pointer values:
+// vect == &*HEAP*_l_4[0] (exact);
+
+
+      for(i = 0; i <= n-1; i += 1) {
+
+// Pointer values:
+// vect == &*HEAP*_l_4[*] (may);
+
+         *vect = i;
+
+// Pointer values:
+// vect == &*HEAP*_l_4[*] (may);
+
+         vect++;
+      }
+   }
+
+// Pointer values:
+// vect == &*HEAP*_l_4[*] (may);
+
+   vect -= n;
+
+// Pointer values:
+// vect == &*HEAP*_l_4[*] (may);
+
+   free(vect);
+}

@@ -1400,6 +1400,140 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   return;
 }
 
+static list module_initial_parameter_pv()
+{
+  list pv_out = NIL;
+  entity module = get_current_module_entity();
+  list l_formals = module_formal_parameters(module);
+  const char* mod_name = get_current_module_name();
+  entity pointer_dummy_area = FindOrCreateEntity(mod_name, POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
+  storage pointer_dummy_storage = make_storage_ram(make_ram(module, pointer_dummy_area, UNKNOWN_RAM_OFFSET, NIL));
+
+  FOREACH(ENTITY, formal_ent, l_formals)
+    {
+      effect formal_eff = make_reference_simple_effect(make_reference(formal_ent, NIL),
+						       make_action_write_memory(),
+						       make_approximation_exact());
+      type formal_t = entity_basic_concrete_type(formal_ent);
+
+      // generate all possible effects from the formal parameter
+      list lw = generic_effect_generate_all_accessible_paths_effects_with_level(formal_eff,
+										formal_t,
+										'w',
+										true,
+										10, /* to avoid too long paths until GAPS are handled */
+										false);
+      const char * formal_name = entity_user_name(formal_ent);
+      int nb = 1;
+
+      FOREACH(EFFECT, eff, lw)
+	{
+	  // this should be at least partly be embedded in a representation dependent wrapper
+	  pips_debug_effect(3, "current effect: \n", eff);
+	  bool to_be_freed = false;
+	  type eff_t = cell_to_type(effect_cell(eff), &to_be_freed);
+	  if (type_variable_p(eff_t) && basic_pointer_p(variable_basic(type_variable(eff_t))))
+	    {
+
+	      // we generate an address_of pv, the source of which is the effect cell
+	      // and the sink of which is the first element of a new entity, whose type
+	      // is a one dimensional array of the pointed type.
+
+	      // first generate the new entity name
+	      entity new_ent = entity_undefined;
+	      string new_name = NULL;
+	      new_name = strdup(concatenate(mod_name, MODULE_SEP_STRING, "_", formal_name,"_", i2a(nb), NULL));
+	      nb ++;
+
+	      // then take care of the type and target path indices
+	      type pointed_type = basic_pointer(variable_basic(type_variable(eff_t)));
+	      type new_type = type_undefined;
+	      list new_dims = NIL; // array dimensions of new type
+
+	      // if the effect path contains multiple paths (a[*] or p.end[*].begin for instance)
+	      // then there are several targets;
+	      // the indices of the new_path must have an additional dimension
+	      // and also the new type
+	      bool single_path = true;
+	      list new_inds = NIL; // indices of the target path
+
+	      // Not generic
+	      // for simple cells, isn't it sufficient to test the approximation of the effect ?
+	      FOREACH(EXPRESSION, eff_ind_exp, reference_indices(effect_any_reference(eff)))
+		{
+		  if (unbounded_expression_p(eff_ind_exp))
+		    {
+		      single_path = false;
+		      break;
+		    }
+		}
+	      if (!single_path)
+		{
+		  new_inds = CONS(EXPRESSION, make_unbounded_expression(), NIL);
+		  new_dims = CONS(DIMENSION,
+				      make_dimension(int_to_expression(0),
+						     make_unbounded_expression()), NIL);
+		  // the approximation will be ok because, as the path is not unique
+		  // the effect approximation is may by construction
+		}
+
+	      if (type_variable_p(pointed_type))
+		{
+
+		  pips_debug(5, "variable case\n");
+		  variable pointed_type_v = type_variable(pointed_type);
+		  basic new_basic = copy_basic(variable_basic(pointed_type_v));
+		  if (ENDP(variable_dimensions(pointed_type_v)))
+		    {
+		      pips_debug(5, "with 0 dimension\n");
+		      new_dims = gen_nconc(new_dims, CONS(DIMENSION,
+				      make_dimension(int_to_expression(0),
+						     make_unbounded_expression()), NIL));
+		      new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
+		    }
+		  else
+		    {
+		      new_dims = gen_full_copy_list(variable_dimensions(pointed_type_v));
+		      pips_debug(5, "with %d dimension\n", (int) gen_length(new_dims));
+		      FOREACH(DIMENSION, dim, new_dims)
+			{
+			  new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
+			}
+		    }
+		  new_type = make_type_variable(make_variable(new_basic, new_dims, NIL));
+		  pips_debug(5, "new_type is: %s (%s)\n", words_to_string(words_type(new_type, NIL, false)),
+			     type_to_string(new_type));
+		  new_ent = make_entity(new_name,
+					   new_type,
+					   copy_storage(pointer_dummy_storage),
+					   make_value_unknown());
+		}
+	      else
+		{
+		  pips_debug(5, "non-variable formal parameter target type -> anywhere\n");
+		  new_ent = entity_all_locations();
+		  gen_full_free_list(new_inds);
+		  new_inds = NIL;
+		}
+
+
+	      cell new_cell = make_cell_reference(make_reference(new_ent, new_inds));
+	      // then make the new pv
+	      cell_relation new_pv = make_address_of_pointer_value(copy_cell(effect_cell(eff)),
+					    new_cell,
+					    effect_approximation_tag(eff),
+					    make_descriptor_none());
+	      pips_debug_pv(3, "generated pv: \n", new_pv);
+	      // and add it to the return list of pvs
+	      pv_out = CONS(CELL_RELATION, new_pv, pv_out);
+	    }
+	  if (to_be_freed) free_type(eff_t);
+	}
+        gen_full_free_list(lw);
+    }
+  free_storage(pointer_dummy_storage);
+  return pv_out;
+}
 
 /**
    @brief generic interface to compute the pointer values of a given module
@@ -1423,7 +1557,10 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  (void)statement_to_post_pv(get_current_module_statement(), NIL, ctxt);
+
+  list l_init = module_initial_parameter_pv();
+
+  (void)statement_to_post_pv(get_current_module_statement(), l_init, ctxt);
 
   (*ctxt->db_put_pv_func)(module_name, get_pv());
   //(*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());

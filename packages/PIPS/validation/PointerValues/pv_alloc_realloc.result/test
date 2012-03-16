@@ -1,0 +1,144 @@
+int main()
+{
+
+// Pointer values: none
+
+   int n = 3;
+
+// Pointer values: none
+
+   unsigned char **p1;
+
+// Pointer values:
+// p1 == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   unsigned char **p2;
+
+// Pointer values:
+// p1 == *ANY_MODULE*:*UNDEFINED* (exact);
+// p2 == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p1 = (unsigned char **) malloc(sizeof(unsigned char *));
+
+// Pointer values:
+// p1 == &*HEAP*_l_9[0] (exact);
+// p2 == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   p2 = (unsigned char **) malloc(sizeof(unsigned char *));
+
+
+// Pointer values:
+// p1 == &*HEAP*_l_9[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+
+   int inc_size = 0;
+
+// Pointer values:
+// p1 == &*HEAP*_l_9[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+
+   inc_size += 10;
+
+// Pointer values:
+// p1 == &*HEAP*_l_9[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+
+   *p1 = (unsigned char *) malloc(inc_size*sizeof(unsigned char));
+
+// Pointer values:
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (exact);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+
+   *p2 = (unsigned char *) malloc(inc_size*sizeof(unsigned char));
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (exact);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (exact);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (exact);
+
+   inc_size += 10;
+   {
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (exact);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (exact);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (exact);
+
+      int i;
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (exact);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (exact);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (exact);
+
+
+      for(i = 1; i <= n-1; i += 1) {
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (may);
+// *HEAP*_l_10[0] == &*HEAP*_l_22[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_21[0] (may);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (may);
+// p1[0] == &*HEAP*_l_21[0] (may);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (may);
+// p2[0] == &*HEAP*_l_22[0] (may);
+
+         inc_size += 10;
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (may);
+// *HEAP*_l_10[0] == &*HEAP*_l_22[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_21[0] (may);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (may);
+// p1[0] == &*HEAP*_l_21[0] (may);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (may);
+// p2[0] == &*HEAP*_l_22[0] (may);
+
+         *p1 = (unsigned char *) realloc(*p1, inc_size*sizeof(unsigned char));
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (may);
+// *HEAP*_l_10[0] == &*HEAP*_l_22[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_21[0] (exact);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_21[0] (exact);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (may);
+// p2[0] == &*HEAP*_l_22[0] (may);
+
+         *p2 = (unsigned char *) realloc(*p2, inc_size*sizeof(unsigned char));
+      }
+   }
+
+// Pointer values:
+// *HEAP*_l_10[0] == &*HEAP*_l_15[0] (may);
+// *HEAP*_l_10[0] == &*HEAP*_l_22[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_14[0] (may);
+// *HEAP*_l_9[0] == &*HEAP*_l_21[0] (may);
+// p1 == &*HEAP*_l_9[0] (exact);
+// p1[0] == &*HEAP*_l_14[0] (may);
+// p1[0] == &*HEAP*_l_21[0] (may);
+// p2 == &*HEAP*_l_10[0] (exact);
+// p2[0] == &*HEAP*_l_15[0] (may);
+// p2[0] == &*HEAP*_l_22[0] (may);
+
+   return 0;
+}
