@@ -683,7 +683,7 @@ static sentence sentence_area(entity e, entity module, bool pp_dimensions, list 
     bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     /* FI: POINTER declarations should be generated for the heap area */
-    if (dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e)) /* shouldn't get in? */
+    if (dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e) || pointer_dummy_targets_area_p(e)) /* shouldn't get in? */
 	return sentence_undefined;
 
     assert(type_area_p(te));
@@ -1691,7 +1691,7 @@ static text text_entity_declaration(entity module,
       before = CONS(SENTENCE, sentence_basic_declaration(e), before);
       before = CONS(SENTENCE, sentence_external(e), before);
     } else if (area_p && !dynamic_area_p(e) && !heap_area_p(e)
-        && !stack_area_p(e) && !empty_static_area_p(e)) {
+	       && !stack_area_p(e) && !pointer_dummy_targets_area_p(e) && !empty_static_area_p(e) ) {
       /*            AREAS: COMMONS and SAVEs
        */
       pips_debug(7, "considered as a regular common\n");

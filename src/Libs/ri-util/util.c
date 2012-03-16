@@ -463,7 +463,7 @@ bool entity_area_p(entity e)
 bool entity_special_area_p(entity e)
 {
   return entity_area_p(e) &&
-      ( static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e) );
+    ( static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e) || pointer_dummy_targets_area_p(e));
 }
 
 /* Test if a string can be a Fortran 77 comment: */
