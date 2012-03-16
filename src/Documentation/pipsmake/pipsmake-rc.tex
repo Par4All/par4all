@@ -6514,7 +6514,7 @@ scalopify                    > MODULE.code
 
 The goal of the following phase is to generate SCMP tasks from 'normal' modules. The tasks are linked and scheduled using the SCMP HAL.
 Sesamify take in input a module and analyze all its callees (per example the 'main' after GPU-IFY or SCALOPRAGMA application).
-Each analyzed module is transformed into a SCMP task if its name begin with P4A\_scmp\_task.
+Each analyzed module is transformed into a SCMP task if its name begin with \texttt{P4A\_scmp\_task}.
 To generate final files for SCMP the pass output need to be transform with a special python parser.
 
 \begin{PipsMake}
@@ -7489,13 +7489,13 @@ KERNEL_LOAD_STORE_STORE_FUNCTION_6D "P4A_copy_from_accel_6d"
 
 As a side effect of kernel load store pass, some new variables are declared
 into the function. A prefix can be used for the names of those variables
-using the property KERNEL\_LOAD\_STORE\_VAR\_PREFIX. It is also possible to
-insert a suffix using the property KERNEL\_LOAD\_STORE\_VAR\_PREFIX.
+using the property \PipsPropRef{KERNEL_LOAD_STORE_VAR_PREFIX}. It is also possible to
+insert a suffix using the property \PipsPropRef{KERNEL_LOAD_STORE_VAR_PREFIX}.
 The suffix will be inserted between the original variable name
 and the instance number of the copy.
 
 \begin{PipsProp}{KERNEL_LOAD_STORE_VAR_PREFIX}
-KERNEL_LOAD_STORE_VAR_PREFIX "P4A_var_"
+KERNEL_LOAD_STORE_VAR_PREFIX "p4a_var_"
 \end{PipsProp}
 
 \begin{PipsProp}{KERNEL_LOAD_STORE_VAR_SUFFIX}
