@@ -526,7 +526,8 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
   pips_assert("no effect on entity fields\n",!entity_field_p(v));
   transformer context;
 
-  if (effects_private_current_context_empty_p())
+  if ( !effects_private_current_context_stack_initialized_p()
+       || effects_private_current_context_empty_p())
     context = transformer_undefined;
   else {
     context = effects_private_current_context_head();
@@ -1481,7 +1482,8 @@ list generic_proper_effects_of_complex_memory_access_expression(expression addex
 	}
     }
   transformer context = transformer_undefined;
-  if( !effects_private_current_context_empty_p())
+  if( effects_private_current_context_stack_initialized_p()
+      && !effects_private_current_context_empty_p())
     context = effects_private_current_context_head();
   if (!transformer_undefined_p(context))
     (*effects_precondition_composition_op)(*lpme, context);
@@ -1527,7 +1529,8 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	      {
 		transformer context = transformer_undefined;
 
-		if( !effects_private_current_context_empty_p())
+		if( effects_private_current_context_stack_initialized_p()
+		    && !effects_private_current_context_empty_p())
 		  context = effects_private_current_context_head();
 
 		type addexp_t = expression_to_type(addexp);
@@ -1626,7 +1629,8 @@ generic_proper_effects_of_subscript(subscript s)
     list le = NIL;
     transformer context;
 
-    if (effects_private_current_context_empty_p())
+    if (!effects_private_current_context_stack_initialized_p()
+	|| effects_private_current_context_empty_p())
 	context = transformer_undefined;
     else
       {

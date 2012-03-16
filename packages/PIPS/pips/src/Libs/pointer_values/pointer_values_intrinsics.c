@@ -1272,7 +1272,8 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
 	      new_dim = int_to_expression(-1);
 	    }
 	  else
-	    pips_internal_error("unexpected update operator on pointers");
+	    //pips_internal_error("unexpected update operator on pointers");
+	    new_dim = make_unbounded_expression();
 
 	  (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
 	  /*l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
