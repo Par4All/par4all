@@ -31,32 +31,27 @@ int main()
       p = &a[1];
 
 // Pointer values:
-// p == &a[0] (may);
-// p == &a[1] (may);
+// p == &a[*] (may);
 
    p = p+1;
 
 // Pointer values:
-// p == &a[1] (may);
-// p == &a[2] (may);
+// p == &a[*] (may);
 
    p = p+3;
 
 // Pointer values:
-// p == &a[4] (may);
-// p == &a[5] (may);
+// p == &a[*] (may);
 
    p = p-1;
 
 // Pointer values:
-// p == &a[3] (may);
-// p == &a[4] (may);
+// p == &a[*] (may);
 
    p = p-2;
 
 // Pointer values:
-// p == &a[1] (may);
-// p == &a[2] (may);
+// p == &a[*] (may);
 
    return 0;
 }

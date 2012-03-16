@@ -1,0 +1,23 @@
+int foo(int *a)
+{
+
+// Pointer values:
+// a == &_a_1[0] (exact);
+
+   return *a;
+}
+int main()
+{
+
+// Pointer values: none
+
+   int i;
+
+// Pointer values: none
+
+   foo(&i);
+
+// Pointer values: none
+
+   return i;
+}

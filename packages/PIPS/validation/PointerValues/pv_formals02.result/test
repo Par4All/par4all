@@ -1,0 +1,39 @@
+int foo(int **a)
+{
+
+// Pointer values:
+// a == &_a_1[0] (exact);
+// a[*] == &_a_2[*][0] (may);
+
+   return **a;
+}
+int main()
+{
+
+// Pointer values: none
+
+   int res;
+
+// Pointer values: none
+
+   int p;
+
+// Pointer values: none
+
+   int *q;
+
+// Pointer values:
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = &p;
+
+// Pointer values:
+// q == &p (exact);
+
+   res = foo(&q);
+
+// Pointer values:
+// q == &p (exact);
+
+   return res;
+}

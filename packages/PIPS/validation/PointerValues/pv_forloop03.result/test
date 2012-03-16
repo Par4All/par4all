@@ -32,24 +32,27 @@ int main()
    while (i<10) {
 
 // Pointer values:
-// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// a == &*HEAP*_l_8[0] (exact);
 // p == a (may);
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[1] (may);
+// p == &a[*] (may);
 
       *p = 1.0;
 
 // Pointer values:
-// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// a == &*HEAP*_l_8[0] (exact);
 // p == a (may);
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[1] (may);
+// p == &a[*] (may);
 
       p++;
    }
 
 // Pointer values:
-// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// a == &*HEAP*_l_8[0] (exact);
 // p == a (may);
-// p == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a[1] (may);
+// p == &a[*] (may);
 
    return 0;
 }
