@@ -68,7 +68,7 @@ my %d = (); # per-directory: { dir -> { status -> cnt } }
 
 my ($start, $stop);
 
-my $running_time = 0;
+my $elapsed_time = 0;
 
 # process input formatted as
 while (<>)
@@ -81,7 +81,7 @@ while (<>)
   {
     my ($stat, $dir, $case, $time) = ($1, $2, $4, $5);
     $d{$dir} = zeroed() unless exists $d{$dir};
-    $running_time+=$time if defined $time;
+    $elapsed_time+=$time if defined $time;
     if ($summary eq $ARGV) # this is the current summary
     {
       $n{$stat}++;
@@ -216,8 +216,8 @@ print
 my $rate = 100;
 $rate = $n{passed}*100.0/$count if $count;
 printf "success rate: %5.1f%%\n", $rate;
-print "elapsed time: $delay\n" if defined $delay and $delay;
-print "approximated cpu running time: $running_time\n";
+print "overall elapsed time: $delay\n" if defined $delay and $delay;
+print "cumulated elapsed time: $elapsed_time\n";
 print "\n";
 
 # possibly aggregate counts on the first directory
