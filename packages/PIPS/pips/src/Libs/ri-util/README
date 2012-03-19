@@ -42,7 +42,8 @@ used for C nd Fortran
 entity.c: functions dealing with the Newgen object entity; there all
 kinds of entities in PIPS; see also: constant.c for entities
 representing constants, variable.c for entities representing program
-variables (i.e. not related to the Newgen object called "variables")
+variables (i.e. not related to the Newgen object called "variable",
+which is part of the type description)
 
 eval.c: static evaluation of expressions; fails if the expression's
 value is not statically known
@@ -85,7 +86,7 @@ section about statements.
 pragma.c: functions dealing with pragmas; they are embedded in
 "extension"; see ri.pdf and extension.c
 
-prettyprint.c: prettyprint many parts of the itnernal representation
+prettyprint.c: prettyprint many parts of the internal representation
 either in Fortran or in C
 
 replace.c: fucntions to substitute a variable o by a variable n in all
@@ -105,7 +106,8 @@ variables must be reset at each phase/pass termination
 
 type.c: functions dealing with the "type" Newgen object.
 
-unstructured.c: functions dealing with the "unstructured" Newgen object
+unstructured.c: functions dealing with the "unstructured" Newgen
+object (see ri.pdf)
 
 util.c: functions dealing with the names of entities; a lot of
 information is stored in an entity name; see ri.pdf, the section about

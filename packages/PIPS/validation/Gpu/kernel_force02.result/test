@@ -5,17 +5,17 @@ int main()
    int b[100] = {1};
    {
       //PIPS generated variable
-      int (*P4A_var_a0)[100] = (int (*)[100]) 0, (*P4A_var_b0)[100] = (int (*)[100]) 0;
-      P4A_accel_malloc((void **) &P4A_var_b0, sizeof(int)*100);
-      P4A_accel_malloc((void **) &P4A_var_a0, sizeof(int)*100);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *P4A_var_b0);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A_var_a0);
+      int (*p4a_var_a0)[100] = (int (*)[100]) 0, (*p4a_var_b0)[100] = (int (*)[100]) 0;
+      P4A_accel_malloc((void **) &p4a_var_b0, sizeof(int)*100);
+      P4A_accel_malloc((void **) &p4a_var_a0, sizeof(int)*100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *p4a_var_b0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *p4a_var_a0);
 
 
-      myKernel(*P4A_var_a0, *P4A_var_b0);
-      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &b[0], *P4A_var_b0);
-      P4A_accel_free(P4A_var_b0);
-      P4A_accel_free(P4A_var_a0);
+      myKernel(*p4a_var_a0, *p4a_var_b0);
+      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &b[0], *p4a_var_b0);
+      P4A_accel_free(p4a_var_b0);
+      P4A_accel_free(p4a_var_a0);
    }
 
    return 0;

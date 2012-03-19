@@ -119,31 +119,31 @@ void do_one_iteration(int m, int n, IMAGE_RGB x[m][n], RGB ui[m][n], RGB uj[m][n
       int i;
       {
          //PIPS generated variable
-         FLOAT (*P4A_var_kInv0)[3][3] = (FLOAT (*)[3][3]) 0;
+         FLOAT (*p4a_var_kInv0)[3][3] = (FLOAT (*)[3][3]) 0;
          //PIPS generated variable
-         float (*P4A_var_ui0)[m][n][3] = (float (*)[m][n][3]) 0, (*P4A_var_uj0)[m][n][3] = (float (*)[m][n][3]) 0;
+         float (*p4a_var_ui0)[m][n][3] = (float (*)[m][n][3]) 0, (*p4a_var_uj0)[m][n][3] = (float (*)[m][n][3]) 0;
          //PIPS generated variable
-         FLOAT (*P4A_var_weights0)[q][q] = (FLOAT (*)[q][q]) 0;
+         FLOAT (*p4a_var_weights0)[q][q] = (FLOAT (*)[q][q]) 0;
          //PIPS generated variable
-         unsigned char (*P4A_var_x0)[m][n][3] = (unsigned char (*)[m][n][3]) 0;
+         unsigned char (*p4a_var_x0)[m][n][3] = (unsigned char (*)[m][n][3]) 0;
          if (m-1>0&&n-1>0&&m-1>0&&n-1>0&&q-1>0&&q-1>0&&m-1>0&&n-1>0) {
-            P4A_accel_malloc((void **) &P4A_var_x0, sizeof(unsigned char)*m*n*3);
-            P4A_accel_malloc((void **) &P4A_var_weights0, sizeof(float)*q*q);
-            P4A_accel_malloc((void **) &P4A_var_uj0, sizeof(float)*m*n*3);
-            P4A_accel_malloc((void **) &P4A_var_ui0, sizeof(float)*m*n*3);
-            P4A_accel_malloc((void **) &P4A_var_kInv0, sizeof(float)*9);
-            P4A_copy_to_accel_3d(sizeof(unsigned char), m, n, 3, m, n, 3, 0, 0, 0, &x[0][0][0], *P4A_var_x0);
-            P4A_copy_to_accel_2d(sizeof(float), q, q, q, q, 0, 0, &weights[0][0], *P4A_var_weights0);
-            P4A_copy_to_accel_3d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &ui[0][0][0], *P4A_var_ui0);
-            P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kInv[0][0], *P4A_var_kInv0);
+            P4A_accel_malloc((void **) &p4a_var_x0, sizeof(unsigned char)*m*n*3);
+            P4A_accel_malloc((void **) &p4a_var_weights0, sizeof(float)*q*q);
+            P4A_accel_malloc((void **) &p4a_var_uj0, sizeof(float)*m*n*3);
+            P4A_accel_malloc((void **) &p4a_var_ui0, sizeof(float)*m*n*3);
+            P4A_accel_malloc((void **) &p4a_var_kInv0, sizeof(float)*9);
+            P4A_copy_to_accel_3d(sizeof(unsigned char), m, n, 3, m, n, 3, 0, 0, 0, &x[0][0][0], *p4a_var_x0);
+            P4A_copy_to_accel_2d(sizeof(float), q, q, q, q, 0, 0, &weights[0][0], *p4a_var_weights0);
+            P4A_copy_to_accel_3d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &ui[0][0][0], *p4a_var_ui0);
+            P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kInv[0][0], *p4a_var_kInv0);
 
-            p4a_launcher_do_one_iteration(m, n, q, qofs, alpha, *P4A_var_kInv0, *P4A_var_ui0, *P4A_var_uj0, *P4A_var_weights0, *P4A_var_x0);
-            P4A_copy_from_accel_3d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &uj[0][0][0], *P4A_var_uj0);
-            P4A_accel_free(P4A_var_x0);
-            P4A_accel_free(P4A_var_weights0);
-            P4A_accel_free(P4A_var_uj0);
-            P4A_accel_free(P4A_var_ui0);
-            P4A_accel_free(P4A_var_kInv0);
+            p4a_launcher_do_one_iteration(m, n, q, qofs, alpha, *p4a_var_kInv0, *p4a_var_ui0, *p4a_var_uj0, *p4a_var_weights0, *p4a_var_x0);
+            P4A_copy_from_accel_3d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &uj[0][0][0], *p4a_var_uj0);
+            P4A_accel_free(p4a_var_x0);
+            P4A_accel_free(p4a_var_weights0);
+            P4A_accel_free(p4a_var_uj0);
+            P4A_accel_free(p4a_var_ui0);
+            P4A_accel_free(p4a_var_kInv0);
          }
       }
    }
