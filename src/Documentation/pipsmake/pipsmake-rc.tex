@@ -6512,10 +6512,21 @@ scalopify                    > MODULE.code
 
 \subsubsection{SCMP Code Generation}
 
-The goal of the following phase is to generate SCMP tasks from 'normal' modules. The tasks are linked and scheduled using the SCMP HAL.
-Sesamify take in input a module and analyze all its callees (per example the 'main' after GPU-IFY or SCALOPRAGMA application).
-Each analyzed module is transformed into a SCMP task if its name begin with \texttt{P4A\_scmp\_task}.
-To generate final files for SCMP the pass output need to be transform with a special python parser.
+The SCMP architecture, an asymmetric multiprocessor system-on-chip for
+dynamic applications, is described in~\cite{Ventroux2010}. This
+\PipsPassRef{sesamify} is described in a HPC Project technical report
+written by Beatrice Creusillet.
+
+The goal of the following phase is to generate SCMP tasks from C
+functions. The tasks are linked and scheduled using the SCMP Hardware
+Adaptation Layer (HAL). Pass \PipsPassRef{sesamify} takes as input a
+module and analyzes all its callees. For instance, the 'main' module
+can be submitted to sesamify after the \PipsPassRef{gpu_ify} or
+\PipsPassRef{scalopragma} pass have been applied. Each analyzed module
+is transformed into a SCMP task if its name begins with
+\texttt{P4A\_scmp\_task}. To generate the final files for the SCMP
+simulator, the pass output must be transformed by a specific python
+parser.
 
 \begin{PipsMake}
 sesamify                    > MODULE.code
@@ -7898,7 +7909,7 @@ gpu_promote_sequential	> MODULE.code
 \end{PipsMake}
 
 
-\subsection{Task generation for SCALOPES project}
+\subsection{Task Generation for the SCALOPES Project}
 \label{subsubsection-scalopes-project}
 
 The goal of the following phase is to generate several tasks from one
