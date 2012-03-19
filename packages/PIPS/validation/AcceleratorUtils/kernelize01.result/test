@@ -154,18 +154,18 @@ int foo(int seed[100])
    }
    {
       //PIPS generated variable
-      int (*P4A_var_c0)[100] = (int (*)[100]) 0, (*P4A_var_b0)[100] = (int (*)[100]) 0, (*P4A_var_a0)[100] = (int (*)[100]) 0;
-      P4A_accel_malloc((void **) &P4A_var_a0, sizeof(int)*100);
-      P4A_accel_malloc((void **) &P4A_var_b0, sizeof(int)*100);
-      P4A_accel_malloc((void **) &P4A_var_c0, sizeof(int)*100);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A_var_a0);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *P4A_var_b0);
+      int (*p4a_var_c0)[100] = (int (*)[100]) 0, (*p4a_var_b0)[100] = (int (*)[100]) 0, (*p4a_var_a0)[100] = (int (*)[100]) 0;
+      P4A_accel_malloc((void **) &p4a_var_a0, sizeof(int)*100);
+      P4A_accel_malloc((void **) &p4a_var_b0, sizeof(int)*100);
+      P4A_accel_malloc((void **) &p4a_var_c0, sizeof(int)*100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *p4a_var_a0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *p4a_var_b0);
 
-kernel:      run_kernel(*P4A_var_a0, *P4A_var_b0, *P4A_var_c0);
-      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *P4A_var_c0);
-      P4A_accel_free(P4A_var_a0);
-      P4A_accel_free(P4A_var_b0);
-      P4A_accel_free(P4A_var_c0);
+kernel:      run_kernel(*p4a_var_a0, *p4a_var_b0, *p4a_var_c0);
+      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *p4a_var_c0);
+      P4A_accel_free(p4a_var_a0);
+      P4A_accel_free(p4a_var_b0);
+      P4A_accel_free(p4a_var_c0);
    }
    /* print result */
    for(i = 0; i <= 99; i += 1)
@@ -189,17 +189,17 @@ int foo(int seed[100])
    }
    {
       //PIPS generated variable
-      int (*P4A_var_c0)[100] = (int (*)[100]) 0, (*P4A_var_b0)[100] = (int (*)[100]) 0, (*P4A_var_a0)[100] = (int (*)[100]) 0;
-      P4A_accel_malloc((void **) &P4A_var_a0, sizeof(int)*100);
-      P4A_accel_malloc((void **) &P4A_var_b0, sizeof(int)*100);
-      P4A_accel_malloc((void **) &P4A_var_c0, sizeof(int)*100);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A_var_a0);
-      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *P4A_var_b0);
-      run_kernel(*P4A_var_a0, *P4A_var_b0, *P4A_var_c0);
-      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *P4A_var_c0);
-      P4A_accel_free(P4A_var_a0);
-      P4A_accel_free(P4A_var_b0);
-      P4A_accel_free(P4A_var_c0);
+      int (*p4a_var_c0)[100] = (int (*)[100]) 0, (*p4a_var_b0)[100] = (int (*)[100]) 0, (*p4a_var_a0)[100] = (int (*)[100]) 0;
+      P4A_accel_malloc((void **) &p4a_var_a0, sizeof(int)*100);
+      P4A_accel_malloc((void **) &p4a_var_b0, sizeof(int)*100);
+      P4A_accel_malloc((void **) &p4a_var_c0, sizeof(int)*100);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *p4a_var_a0);
+      P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &b[0], *p4a_var_b0);
+      run_kernel(*p4a_var_a0, *p4a_var_b0, *p4a_var_c0);
+      P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &c[0], *p4a_var_c0);
+      P4A_accel_free(p4a_var_a0);
+      P4A_accel_free(p4a_var_b0);
+      P4A_accel_free(p4a_var_c0);
    }
    /* print result */
    for(i = 0; i <= 99; i += 1)

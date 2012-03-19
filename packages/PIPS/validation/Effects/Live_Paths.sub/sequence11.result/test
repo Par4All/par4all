@@ -1,0 +1,77 @@
+int main()
+{
+   int i;
+   int *p;
+   int **q;
+
+   p = malloc(5*sizeof(int));
+   q = malloc(5*sizeof(int *));
+
+   for(i = 0; i <= 4; i += 1) {
+      p[i] = i;
+      q[i] = &p[i];
+   }
+
+   return q[2][1];
+}
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int i;
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int *p;
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int **q;
+//             <may be alive (in)>: q[2]
+//             <    is alive (in)>: q[2][1] _MALLOC_EFFECTS:_MALLOC_
+
+   p = malloc(5*sizeof(int));
+//             <may be alive (in)>: q[2]
+//             <    is alive (in)>: p q[2][1] _MALLOC_EFFECTS:_MALLOC_
+   q = malloc(5*sizeof(int *));
+//             <may be alive (in)>: q[2]
+//             <    is alive (in)>: p q q[2][1]
+
+   for(i = 0; i <= 4; i += 1) {
+//             <may be alive (in)>: q[2]
+//             <    is alive (in)>: i p q q[2][1]
+      p[i] = i;
+//             <may be alive (in)>: p q[2]
+//             <    is alive (in)>: i q q[2][1]
+      q[i] = &p[i];
+   }
+//             <    is alive (in)>: q q[2] q[2][1]
+
+   return q[2][1];
+}
+int main()
+{
+//             <    is alive (out)>: _MALLOC_EFFECTS:_MALLOC_
+   int i;
+//             <    is alive (out)>: _MALLOC_EFFECTS:_MALLOC_
+   int *p;
+//             <may be alive (out)>: q[2]
+//             <    is alive (out)>: q[2][1] _MALLOC_EFFECTS:_MALLOC_
+   int **q;
+//             <may be alive (out)>: q[2]
+//             <    is alive (out)>: p q[2][1] 
+//                               _MALLOC_EFFECTS:_MALLOC_
+
+   p = malloc(5*sizeof(int));
+//             <may be alive (out)>: q[2]
+//             <    is alive (out)>: p q q[2][1]
+   q = malloc(5*sizeof(int *));
+//             <    is alive (out)>: q q[2] q[2][1]
+
+   for(i = 0; i <= 4; i += 1) {
+//             <may be alive (out)>: p q[2]
+//             <    is alive (out)>: i q q[2][1]
+      p[i] = i;
+//             <may be alive (out)>: p q[2]
+//             <    is alive (out)>: i q q[2][1]
+      q[i] = &p[i];
+   }
+
+   return q[2][1];
+}

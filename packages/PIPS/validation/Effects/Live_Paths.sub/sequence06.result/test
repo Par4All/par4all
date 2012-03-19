@@ -1,0 +1,42 @@
+int main()
+{
+   int a[5];
+   int i = 0;
+
+   for(i = i; i <= 4; i += 1)
+      a[i] = i;
+
+   return a[1];
+}
+int main()
+{
+   int a[5];
+//             <may be alive (in)>: a[1]
+   int i = 0;
+//             <may be alive (in)>: a[1]
+//             <    is alive (in)>: i
+
+   for(i = i; i <= 4; i += 1)
+//             <may be alive (in)>: a[1]
+//             <    is alive (in)>: i i
+      a[i] = i;
+//             <    is alive (in)>: a[1]
+
+   return a[1];
+}
+int main()
+{
+//             <may be alive (out)>: a[1]
+   int a[5];
+//             <may be alive (out)>: a[1]
+//             <    is alive (out)>: i
+   int i = 0;
+//             <    is alive (out)>: a[1]
+
+   for(i = i; i <= 4; i += 1)
+//             <may be alive (out)>: a[1]
+//             <    is alive (out)>: i i
+      a[i] = i;
+
+   return a[1];
+}

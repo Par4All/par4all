@@ -1,0 +1,68 @@
+int main()
+{
+   int i;
+   int *p;
+   int *q;
+
+   p = malloc(5*sizeof(int));
+   q = &p[2];
+
+   for(i = 0; i <= 4; i += 1)
+      p[i] = i;
+
+   return p[1]+q[1];
+}
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int i;
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int *p;
+//             <may be alive (in)>: p[1]
+//             <    is alive (in)>: _MALLOC_EFFECTS:_MALLOC_
+   int *q;
+//             <may be alive (in)>: p[1]
+//             <    is alive (in)>: q[1] _MALLOC_EFFECTS:_MALLOC_
+
+   p = malloc(5*sizeof(int));
+//             <may be alive (in)>: p[1]
+//             <    is alive (in)>: p q[1]
+   q = &p[2];
+//             <may be alive (in)>: p[1]
+//             <    is alive (in)>: p q q[1]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (in)>: p[1]
+//             <    is alive (in)>: i p q q[1]
+      p[i] = i;
+//             <    is alive (in)>: p p[1] q q[1]
+
+   return p[1]+q[1];
+}
+int main()
+{
+//             <    is alive (out)>: _MALLOC_EFFECTS:_MALLOC_
+   int i;
+//             <may be alive (out)>: p[1]
+//             <    is alive (out)>: _MALLOC_EFFECTS:_MALLOC_
+   int *p;
+//             <may be alive (out)>: p[1]
+//             <    is alive (out)>: q[1] _MALLOC_EFFECTS:_MALLOC_
+   int *q;
+//             <may be alive (out)>: p[1]
+//             <    is alive (out)>: p q[1]
+
+   p = malloc(5*sizeof(int));
+//             <may be alive (out)>: p[1]
+//             <    is alive (out)>: p q q[1]
+   q = &p[2];
+//             <    is alive (out)>: p p[1] q q[1]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (out)>: p[1]
+//             <    is alive (out)>: i p q q[1]
+      p[i] = i;
+
+   return p[1]+q[1];
+}

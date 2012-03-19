@@ -14,14 +14,14 @@ int main(int argc, char **argv)
    int offset = argc;
    {
       //PIPS generated variable
-      int (*P4A_var_a0)[offset+1] = (int (*)[offset+1]) 0;
+      int (*p4a_var_a0)[offset+1] = (int (*)[offset+1]) 0;
       if (offset>0) {
-         P4A_accel_malloc((void **) &P4A_var_a0, sizeof(int)*(offset+1));
-         P4A_copy_to_accel_1d(sizeof(int), 1000, offset+1, 0, &a[0], *P4A_var_a0);
+         P4A_accel_malloc((void **) &p4a_var_a0, sizeof(int)*(offset+1));
+         P4A_copy_to_accel_1d(sizeof(int), 1000, offset+1, 0, &a[0], *p4a_var_a0);
 
-         kernel(offset, *P4A_var_a0);
-         P4A_copy_from_accel_1d(sizeof(int), 1000, offset+1, 0, &a[0], *P4A_var_a0);
-         P4A_accel_free(P4A_var_a0);
+         kernel(offset, *p4a_var_a0);
+         P4A_copy_from_accel_1d(sizeof(int), 1000, offset+1, 0, &a[0], *p4a_var_a0);
+         P4A_accel_free(p4a_var_a0);
       }
    }
 }

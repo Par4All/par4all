@@ -154,19 +154,19 @@ estimation:      ;
       p4a_launcher_main();
       {
          //PIPS generated variable
-         int (*P4A_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*P4A_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref0, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*1040);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat0, sizeof(int)*1024);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref0);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         int (*p4a_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*p4a_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*p4a_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref0, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user10, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat0, sizeof(int)*1024);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref0);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
 
-         p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
-         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
-         P4A_accel_free(P4A_var_ovsf_code_ref0);
-         P4A_accel_free(P4A_var_inv_qpsk_user10);
-         P4A_accel_free(P4A_var_finger_mat0);
+         p4a_launcher_main_1(*p4a_var_finger_mat0, *p4a_var_inv_qpsk_user10, *p4a_var_ovsf_code_ref0);
+         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
+         P4A_accel_free(p4a_var_ovsf_code_ref0);
+         P4A_accel_free(p4a_var_inv_qpsk_user10);
+         P4A_accel_free(p4a_var_finger_mat0);
       }
 
       for(c = 0; c <= 63; c += 1)
@@ -178,19 +178,19 @@ estimation:      ;
          }
       {
          //PIPS generated variable
-         int (*P4A_var_coeff20)[16] = (int (*)[16]) 0, (*P4A_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*P4A_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat1, sizeof(int)*1024);
-         P4A_accel_malloc((void **) &P4A_var_coeff20, sizeof(int)*16);
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat1);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
+         int (*p4a_var_coeff20)[16] = (int (*)[16]) 0, (*p4a_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*p4a_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user10, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat1, sizeof(int)*1024);
+         P4A_accel_malloc((void **) &p4a_var_coeff20, sizeof(int)*16);
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat1);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
 
-         p4a_launcher_main_2(*P4A_var_coeff20, *P4A_var_finger_mat1, *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
-         P4A_accel_free(P4A_var_symbole_flow_user10);
-         P4A_accel_free(P4A_var_finger_mat1);
-         P4A_accel_free(P4A_var_coeff20);
+         p4a_launcher_main_2(*p4a_var_coeff20, *p4a_var_finger_mat1, *p4a_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
+         P4A_accel_free(p4a_var_symbole_flow_user10);
+         P4A_accel_free(p4a_var_finger_mat1);
+         P4A_accel_free(p4a_var_coeff20);
       }
       p4a_launcher_main_3();
       
@@ -219,19 +219,19 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         int (*p4a_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*p4a_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*p4a_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user11, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref1, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user11, sizeof(int)*(j+1024));
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref1);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
 
-         p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
-         P4A_accel_free(P4A_var_symbole_flow_user11);
-         P4A_accel_free(P4A_var_ovsf_code_ref1);
-         P4A_accel_free(P4A_var_inv_qpsk_user11);
+         p4a_launcher_main_4(*p4a_var_inv_qpsk_user11, j, *p4a_var_ovsf_code_ref1, *p4a_var_symbole_flow_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
+         P4A_accel_free(p4a_var_symbole_flow_user11);
+         P4A_accel_free(p4a_var_ovsf_code_ref1);
+         P4A_accel_free(p4a_var_inv_qpsk_user11);
       }
 
       retro_loop_count++;
@@ -294,19 +294,19 @@ estimation:      ;
       p4a_launcher_main();
       {
          //PIPS generated variable
-         int (*P4A_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*P4A_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref0, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*1040);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat0, sizeof(int)*1024);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref0);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         int (*p4a_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*p4a_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*p4a_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref0, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user10, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat0, sizeof(int)*1024);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref0);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
 
-         p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
-         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
-         P4A_accel_free(P4A_var_ovsf_code_ref0);
-         P4A_accel_free(P4A_var_inv_qpsk_user10);
-         P4A_accel_free(P4A_var_finger_mat0);
+         p4a_launcher_main_1(*p4a_var_finger_mat0, *p4a_var_inv_qpsk_user10, *p4a_var_ovsf_code_ref0);
+         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
+         P4A_accel_free(p4a_var_ovsf_code_ref0);
+         P4A_accel_free(p4a_var_inv_qpsk_user10);
+         P4A_accel_free(p4a_var_finger_mat0);
       }
 
       for(c = 0; c <= 63; c += 1)
@@ -318,19 +318,19 @@ estimation:      ;
          }
       {
          //PIPS generated variable
-         int (*P4A_var_coeff20)[16] = (int (*)[16]) 0, (*P4A_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*P4A_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat1, sizeof(int)*1024);
-         P4A_accel_malloc((void **) &P4A_var_coeff20, sizeof(int)*16);
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat1);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
+         int (*p4a_var_coeff20)[16] = (int (*)[16]) 0, (*p4a_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*p4a_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user10, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat1, sizeof(int)*1024);
+         P4A_accel_malloc((void **) &p4a_var_coeff20, sizeof(int)*16);
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat1);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
 
-         p4a_launcher_main_2(*P4A_var_coeff20, *P4A_var_finger_mat1, *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
-         P4A_accel_free(P4A_var_symbole_flow_user10);
-         P4A_accel_free(P4A_var_finger_mat1);
-         P4A_accel_free(P4A_var_coeff20);
+         p4a_launcher_main_2(*p4a_var_coeff20, *p4a_var_finger_mat1, *p4a_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
+         P4A_accel_free(p4a_var_symbole_flow_user10);
+         P4A_accel_free(p4a_var_finger_mat1);
+         P4A_accel_free(p4a_var_coeff20);
       }
       p4a_launcher_main_3();
       
@@ -359,19 +359,19 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         int (*p4a_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*p4a_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*p4a_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user11, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref1, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user11, sizeof(int)*(j+1024));
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref1);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
 
-         p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
-         P4A_accel_free(P4A_var_symbole_flow_user11);
-         P4A_accel_free(P4A_var_ovsf_code_ref1);
-         P4A_accel_free(P4A_var_inv_qpsk_user11);
+         p4a_launcher_main_4(*p4a_var_inv_qpsk_user11, j, *p4a_var_ovsf_code_ref1, *p4a_var_symbole_flow_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
+         P4A_accel_free(p4a_var_symbole_flow_user11);
+         P4A_accel_free(p4a_var_ovsf_code_ref1);
+         P4A_accel_free(p4a_var_inv_qpsk_user11);
       }
 
       retro_loop_count++;
@@ -434,19 +434,19 @@ estimation:      ;
       p4a_launcher_main();
       {
          //PIPS generated variable
-         int (*P4A_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*P4A_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref0, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*1040);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat0, sizeof(int)*1024);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref0);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         int (*p4a_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*p4a_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*p4a_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref0, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user10, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat0, sizeof(int)*1024);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref0);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
 
-         p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
-         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
-         P4A_accel_free(P4A_var_ovsf_code_ref0);
-         P4A_accel_free(P4A_var_inv_qpsk_user10);
-         P4A_accel_free(P4A_var_finger_mat0);
+         p4a_launcher_main_1(*p4a_var_finger_mat0, *p4a_var_inv_qpsk_user10, *p4a_var_ovsf_code_ref0);
+         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
+         P4A_accel_free(p4a_var_ovsf_code_ref0);
+         P4A_accel_free(p4a_var_inv_qpsk_user10);
+         P4A_accel_free(p4a_var_finger_mat0);
       }
 
       for(c = 0; c <= 63; c += 1)
@@ -458,19 +458,19 @@ estimation:      ;
          }
       {
          //PIPS generated variable
-         int (*P4A_var_coeff20)[16] = (int (*)[16]) 0, (*P4A_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*P4A_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat1, sizeof(int)*1024);
-         P4A_accel_malloc((void **) &P4A_var_coeff20, sizeof(int)*16);
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat1);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
+         int (*p4a_var_coeff20)[16] = (int (*)[16]) 0, (*p4a_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*p4a_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user10, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat1, sizeof(int)*1024);
+         P4A_accel_malloc((void **) &p4a_var_coeff20, sizeof(int)*16);
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat1);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
 
-         p4a_launcher_main_2(*P4A_var_coeff20, *P4A_var_finger_mat1, *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
-         P4A_accel_free(P4A_var_symbole_flow_user10);
-         P4A_accel_free(P4A_var_finger_mat1);
-         P4A_accel_free(P4A_var_coeff20);
+         p4a_launcher_main_2(*p4a_var_coeff20, *p4a_var_finger_mat1, *p4a_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
+         P4A_accel_free(p4a_var_symbole_flow_user10);
+         P4A_accel_free(p4a_var_finger_mat1);
+         P4A_accel_free(p4a_var_coeff20);
       }
       p4a_launcher_main_3();
       
@@ -499,19 +499,19 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         int (*p4a_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*p4a_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*p4a_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user11, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref1, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user11, sizeof(int)*(j+1024));
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref1);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
 
-         p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
-         P4A_accel_free(P4A_var_symbole_flow_user11);
-         P4A_accel_free(P4A_var_ovsf_code_ref1);
-         P4A_accel_free(P4A_var_inv_qpsk_user11);
+         p4a_launcher_main_4(*p4a_var_inv_qpsk_user11, j, *p4a_var_ovsf_code_ref1, *p4a_var_symbole_flow_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
+         P4A_accel_free(p4a_var_symbole_flow_user11);
+         P4A_accel_free(p4a_var_ovsf_code_ref1);
+         P4A_accel_free(p4a_var_inv_qpsk_user11);
       }
 
       retro_loop_count++;
@@ -574,19 +574,19 @@ estimation:      ;
       p4a_launcher_main();
       {
          //PIPS generated variable
-         int (*P4A_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*P4A_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref0, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*1040);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat0, sizeof(int)*1024);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref0);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         int (*p4a_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*p4a_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*p4a_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref0, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user10, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat0, sizeof(int)*1024);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref0);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
 
-         p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
-         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
-         P4A_accel_free(P4A_var_ovsf_code_ref0);
-         P4A_accel_free(P4A_var_inv_qpsk_user10);
-         P4A_accel_free(P4A_var_finger_mat0);
+         p4a_launcher_main_1(*p4a_var_finger_mat0, *p4a_var_inv_qpsk_user10, *p4a_var_ovsf_code_ref0);
+         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
+         P4A_accel_free(p4a_var_ovsf_code_ref0);
+         P4A_accel_free(p4a_var_inv_qpsk_user10);
+         P4A_accel_free(p4a_var_finger_mat0);
       }
 
       for(c = 0; c <= 63; c += 1)
@@ -598,19 +598,19 @@ estimation:      ;
          }
       {
          //PIPS generated variable
-         int (*P4A_var_coeff20)[16] = (int (*)[16]) 0, (*P4A_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*P4A_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat1, sizeof(int)*1024);
-         P4A_accel_malloc((void **) &P4A_var_coeff20, sizeof(int)*16);
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat1);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
+         int (*p4a_var_coeff20)[16] = (int (*)[16]) 0, (*p4a_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*p4a_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user10, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat1, sizeof(int)*1024);
+         P4A_accel_malloc((void **) &p4a_var_coeff20, sizeof(int)*16);
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat1);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
 
-         p4a_launcher_main_2(*P4A_var_coeff20, *P4A_var_finger_mat1, *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
-         P4A_accel_free(P4A_var_symbole_flow_user10);
-         P4A_accel_free(P4A_var_finger_mat1);
-         P4A_accel_free(P4A_var_coeff20);
+         p4a_launcher_main_2(*p4a_var_coeff20, *p4a_var_finger_mat1, *p4a_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
+         P4A_accel_free(p4a_var_symbole_flow_user10);
+         P4A_accel_free(p4a_var_finger_mat1);
+         P4A_accel_free(p4a_var_coeff20);
       }
       p4a_launcher_main_3();
       
@@ -639,19 +639,19 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         int (*p4a_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*p4a_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*p4a_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user11, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref1, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user11, sizeof(int)*(j+1024));
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref1);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
 
-         p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
-         P4A_accel_free(P4A_var_symbole_flow_user11);
-         P4A_accel_free(P4A_var_ovsf_code_ref1);
-         P4A_accel_free(P4A_var_inv_qpsk_user11);
+         p4a_launcher_main_4(*p4a_var_inv_qpsk_user11, j, *p4a_var_ovsf_code_ref1, *p4a_var_symbole_flow_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
+         P4A_accel_free(p4a_var_symbole_flow_user11);
+         P4A_accel_free(p4a_var_ovsf_code_ref1);
+         P4A_accel_free(p4a_var_inv_qpsk_user11);
       }
 
       retro_loop_count++;
@@ -714,19 +714,19 @@ estimation:      ;
       p4a_launcher_main();
       {
          //PIPS generated variable
-         int (*P4A_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*P4A_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*P4A_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref0, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user10, sizeof(int)*1040);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat0, sizeof(int)*1024);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref0);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
+         int (*p4a_var_finger_mat0)[64][16] = (int (*)[64][16]) 0, (*p4a_var_inv_qpsk_user10)[1040] = (int (*)[1040]) 0, (*p4a_var_ovsf_code_ref0)[16] = (int (*)[16]) 0;
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref0, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user10, sizeof(int)*1040);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat0, sizeof(int)*1024);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref0);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, 1040, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
 
-         p4a_launcher_main_1(*P4A_var_finger_mat0, *P4A_var_inv_qpsk_user10, *P4A_var_ovsf_code_ref0);
-         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat0);
-         P4A_accel_free(P4A_var_ovsf_code_ref0);
-         P4A_accel_free(P4A_var_inv_qpsk_user10);
-         P4A_accel_free(P4A_var_finger_mat0);
+         p4a_launcher_main_1(*p4a_var_finger_mat0, *p4a_var_inv_qpsk_user10, *p4a_var_ovsf_code_ref0);
+         P4A_copy_from_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat0);
+         P4A_accel_free(p4a_var_ovsf_code_ref0);
+         P4A_accel_free(p4a_var_inv_qpsk_user10);
+         P4A_accel_free(p4a_var_finger_mat0);
       }
 
       for(c = 0; c <= 63; c += 1)
@@ -738,19 +738,19 @@ estimation:      ;
          }
       {
          //PIPS generated variable
-         int (*P4A_var_coeff20)[16] = (int (*)[16]) 0, (*P4A_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*P4A_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user10, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_finger_mat1, sizeof(int)*1024);
-         P4A_accel_malloc((void **) &P4A_var_coeff20, sizeof(int)*16);
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user10);
-         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *P4A_var_finger_mat1);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
+         int (*p4a_var_coeff20)[16] = (int (*)[16]) 0, (*p4a_var_finger_mat1)[64][16] = (int (*)[64][16]) 0, (*p4a_var_symbole_flow_user10)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user10, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_finger_mat1, sizeof(int)*1024);
+         P4A_accel_malloc((void **) &p4a_var_coeff20, sizeof(int)*16);
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user10);
+         P4A_copy_to_accel_2d(sizeof(int), 64, 16, 64, 16, 0, 0, &finger_mat[0][0], *p4a_var_finger_mat1);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
 
-         p4a_launcher_main_2(*P4A_var_coeff20, *P4A_var_finger_mat1, *P4A_var_symbole_flow_user10);
-         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *P4A_var_coeff20);
-         P4A_accel_free(P4A_var_symbole_flow_user10);
-         P4A_accel_free(P4A_var_finger_mat1);
-         P4A_accel_free(P4A_var_coeff20);
+         p4a_launcher_main_2(*p4a_var_coeff20, *p4a_var_finger_mat1, *p4a_var_symbole_flow_user10);
+         P4A_copy_from_accel_1d(sizeof(int), 16, 16, 0, &coeff2[0], *p4a_var_coeff20);
+         P4A_accel_free(p4a_var_symbole_flow_user10);
+         P4A_accel_free(p4a_var_finger_mat1);
+         P4A_accel_free(p4a_var_coeff20);
       }
       p4a_launcher_main_3();
       
@@ -779,19 +779,19 @@ l99998:      ;
       coeff[j]++;
       {
          //PIPS generated variable
-         int (*P4A_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*P4A_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*P4A_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
-         P4A_accel_malloc((void **) &P4A_var_symbole_flow_user11, sizeof(int)*64);
-         P4A_accel_malloc((void **) &P4A_var_ovsf_code_ref1, sizeof(int)*16);
-         P4A_accel_malloc((void **) &P4A_var_inv_qpsk_user11, sizeof(int)*(j+1024));
-         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *P4A_var_symbole_flow_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *P4A_var_ovsf_code_ref1);
-         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
+         int (*p4a_var_inv_qpsk_user11)[j+1023+1] = (int (*)[j+1023+1]) 0, (*p4a_var_ovsf_code_ref1)[16] = (int (*)[16]) 0, (*p4a_var_symbole_flow_user11)[64] = (int (*)[64]) 0;
+         P4A_accel_malloc((void **) &p4a_var_symbole_flow_user11, sizeof(int)*64);
+         P4A_accel_malloc((void **) &p4a_var_ovsf_code_ref1, sizeof(int)*16);
+         P4A_accel_malloc((void **) &p4a_var_inv_qpsk_user11, sizeof(int)*(j+1024));
+         P4A_copy_to_accel_1d(sizeof(int), 64, 64, 0, &symbole_flow_user1[0], *p4a_var_symbole_flow_user11);
+         P4A_copy_to_accel_1d(sizeof(int), 16, 16, 0, &ovsf_code_ref[0], *p4a_var_ovsf_code_ref1);
+         P4A_copy_to_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
 
-         p4a_launcher_main_4(*P4A_var_inv_qpsk_user11, j, *P4A_var_ovsf_code_ref1, *P4A_var_symbole_flow_user11);
-         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *P4A_var_inv_qpsk_user11);
-         P4A_accel_free(P4A_var_symbole_flow_user11);
-         P4A_accel_free(P4A_var_ovsf_code_ref1);
-         P4A_accel_free(P4A_var_inv_qpsk_user11);
+         p4a_launcher_main_4(*p4a_var_inv_qpsk_user11, j, *p4a_var_ovsf_code_ref1, *p4a_var_symbole_flow_user11);
+         P4A_copy_from_accel_1d(sizeof(int), 1040, j+1024, 0, &inv_qpsk_user1[0], *p4a_var_inv_qpsk_user11);
+         P4A_accel_free(p4a_var_symbole_flow_user11);
+         P4A_accel_free(p4a_var_ovsf_code_ref1);
+         P4A_accel_free(p4a_var_inv_qpsk_user11);
       }
 
       retro_loop_count++;
