@@ -1,0 +1,49 @@
+int main()
+{
+   int a[5];
+   int i;
+   int *p;
+   p = (void *) 0;
+
+   for(i = 0; i <= 4; i += 1)
+      a[i] = i;
+   p = &a[2];
+
+   return *p;
+}
+int main()
+{
+   int a[5];
+   int i;
+   int *p;
+//             <    is alive (in)>: p[0]
+   p = (void *) 0;
+//             <    is alive (in)>: p[0]
+
+   for(i = 0; i <= 4; i += 1)
+//             <    is alive (in)>: i p[0]
+      a[i] = i;
+//             <    is alive (in)>: p[0]
+   p = &a[2];
+//             <    is alive (in)>: p p[0]
+
+   return *p;
+}
+int main()
+{
+   int a[5];
+   int i;
+//             <    is alive (out)>: p[0]
+   int *p;
+//             <    is alive (out)>: p[0]
+   p = (void *) 0;
+//             <    is alive (out)>: p[0]
+
+   for(i = 0; i <= 4; i += 1)
+//             <    is alive (out)>: i p[0]
+      a[i] = i;
+//             <    is alive (out)>: p p[0]
+   p = &a[2];
+
+   return *p;
+}
