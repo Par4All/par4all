@@ -1,0 +1,42 @@
+int main()
+{
+   int a[5], b[5];
+   int i;
+
+   for(i = 0; i <= 4; i += 1)
+      a[i] = b[i] = i;
+
+   return a[b[2]];
+}
+int main()
+{
+   int a[5], b[5];
+//             <may be alive (in)>: a[*] b[2]
+   int i;
+//             <may be alive (in)>: a[*] b[2]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (in)>: a[*] b[2]
+//             <    is alive (in)>: i
+      a[i] = b[i] = i;
+//             <may be alive (in)>: a[*]
+//             <    is alive (in)>: b[2]
+
+   return a[b[2]];
+}
+int main()
+{
+//             <may be alive (out)>: a[*] b[2]
+   int a[5], b[5];
+//             <may be alive (out)>: a[*] b[2]
+   int i;
+//             <may be alive (out)>: a[*]
+//             <    is alive (out)>: b[2]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (out)>: a[*] b[2]
+//             <    is alive (out)>: i
+      a[i] = b[i] = i;
+
+   return a[b[2]];
+}

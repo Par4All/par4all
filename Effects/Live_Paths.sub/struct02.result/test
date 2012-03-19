@@ -1,0 +1,45 @@
+int main()
+{
+   my_struct c;
+   int i;
+
+   for(i = 0; i <= 4; i += 1)
+      (c.a)[i] = i;
+   c.b = 10.0;
+
+   return (c.a)[2];
+}
+int main()
+{
+   my_struct c;
+//             <may be alive (in)>: c.a[2]
+   int i;
+//             <may be alive (in)>: c.a[2]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (in)>: c.a[2]
+//             <    is alive (in)>: i
+      (c.a)[i] = i;
+//             <    is alive (in)>: c.a[2]
+   c.b = 10.0;
+//             <    is alive (in)>: c.a[2]
+
+   return (c.a)[2];
+}
+int main()
+{
+//             <may be alive (out)>: c.a[2]
+   my_struct c;
+//             <may be alive (out)>: c.a[2]
+   int i;
+//             <    is alive (out)>: c.a[2]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (out)>: c.a[2]
+//             <    is alive (out)>: i
+      (c.a)[i] = i;
+//             <    is alive (out)>: c.a[2]
+   c.b = 10.0;
+
+   return (c.a)[2];
+}
