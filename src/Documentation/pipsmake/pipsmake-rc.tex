@@ -137,6 +137,9 @@
 
 \newenvironment{PipsPass}[1]{\label{pass:#1}}{}
 
+% To keep track of all titles down to subsubsections
+\setcounter{tocdepth}{4}
+
 
 \title{PIPS High-Level Software Interface \\
     Pipsmake configuration}
@@ -7709,7 +7712,7 @@ wrap_kernel_argument > CALLERS.code
 \end{PipsMake}
 
 
-\subsection{Code distribution on GPU}
+\subsection{Code Distribution on GPU}
 \label{sec:code-distr-gpu}
 
 \begin{PipsPass}{gpu_ify}
@@ -15790,7 +15793,7 @@ used in \EPIPS, followed by the icon to use.
 
 Use a blank line to insert a menu separator.
 
-\section{View menu}
+\section{View Menu}
 \label{sec:view_menu}
 
 The view menu is displayed according to the following layout and
@@ -15818,7 +15821,7 @@ methods (\WPIPS{} method, \EPIPS{} method, icon name for the frame):
 \end{PipsMenu}
 
 
-\section{Transformation menu}
+\section{Transformation Menu}
 \label{sec:transformation_menu}
 
 The transformation menu is displayed as here:
@@ -15883,7 +15886,7 @@ transformation (s)he wants...
 
 \chapter{Conclusion}
 
-New functionalities can easily be added to \Pips{}. The new function names
+New functionalities can easily be added to \Pips{}. The new pass names
 must be declared somewhere in this file as well as the resources required
 and produced. Then, {\tt make} must be run in the {\tt Documentation}
 directory and the \Pipsmake{} library must be recompiled and \Pips{}
