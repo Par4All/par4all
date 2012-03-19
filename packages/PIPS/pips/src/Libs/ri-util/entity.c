@@ -98,21 +98,21 @@ void set_internal_static_entities()
   if (!internal_static_entities_initialized_p)
     {
       rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
-					 RAND_GEN_EFFECTS_NAME);
+                                         RAND_GEN_EFFECTS_NAME);
       malloc_effect_ent  = FindOrCreateEntity(MALLOC_EFFECTS_PACKAGE_NAME,
-				       MALLOC_EFFECTS_NAME);
+                                       MALLOC_EFFECTS_NAME);
       memmove_effect_ent  = FindOrCreateEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
-					MEMMOVE_EFFECTS_NAME);
+                                        MEMMOVE_EFFECTS_NAME);
       time_effect_ent  = FindOrCreateEntity(TIME_EFFECTS_PACKAGE_NAME,
-					TIME_EFFECTS_VARIABLE_NAME);
+                                        TIME_EFFECTS_VARIABLE_NAME);
       luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
-				     IO_EFFECTS_ARRAY_NAME);
+                                     IO_EFFECTS_ARRAY_NAME);
       io_ptr_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
-				       IO_EFFECTS_PTR_NAME);
+                                       IO_EFFECTS_PTR_NAME);
       io_eof_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
-				       IO_EOF_ARRAY_NAME);
+                                       IO_EOF_ARRAY_NAME);
       io_error_luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
-					      IO_ERROR_ARRAY_NAME);
+                                              IO_ERROR_ARRAY_NAME);
 
       continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
 
@@ -202,7 +202,7 @@ void print_entity_variable(entity e)
     (void) fprintf(stderr,"name: %s\n",entity_name(e));
 
     if (!type_variable_p(entity_type(e)))
-	return;
+        return;
 
     v = type_variable(entity_type(e));
 
@@ -217,7 +217,7 @@ bool unbounded_expression_p(expression e)
     {
       const char* n = entity_local_name(call_function(syntax_call(s)));
       if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
-	return true;
+        return true;
     }
   return false;
 }
@@ -257,7 +257,7 @@ list make_unbounded_subscripts(int d)
    parser.
  */
 entity make_empty_module(const char* full_name,
-				type r, language l)
+                                type r, language l)
 {
   const char* name;
   entity e = gen_find_tabulated(full_name, entity_domain);
@@ -275,11 +275,11 @@ entity make_empty_module(const char* full_name,
   e = make_entity
     (strdup(full_name),
      make_type_functional(
-	       make_functional(NIL, r)),
+               make_functional(NIL, r)),
      make_storage_rom(),
      make_value_code(
-		make_code(NIL, strdup(""), make_sequence(NIL),NIL,
-			  l)));
+                make_code(NIL, strdup(""), make_sequence(NIL),NIL,
+                          l)));
 
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
@@ -323,14 +323,14 @@ entity make_empty_module(const char* full_name,
 entity make_empty_program(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
-				 MODULE_SEP_STRING  MAIN_PREFIX, name, NULL);
+                                 MODULE_SEP_STRING  MAIN_PREFIX, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
 entity make_empty_subroutine(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
-				 MODULE_SEP_STRING, name, NULL);
+                                 MODULE_SEP_STRING, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
@@ -345,14 +345,14 @@ entity make_empty_f95module(const char* name,language l)
 entity make_empty_function(const char* name, type r, language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
-				 MODULE_SEP_STRING, name, NULL);
+                                 MODULE_SEP_STRING, name, NULL);
   return make_empty_module(full_name, r,l);
 }
 
 entity make_empty_blockdata(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING
-				 BLOCKDATA_PREFIX, name, NULL);
+                                 BLOCKDATA_PREFIX, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
@@ -430,7 +430,7 @@ entity make_new_label(entity module)
 }
 
 entity make_loop_label(int __attribute__ ((unused)) desired_number,
-		entity module)
+                entity module)
 {
   entity e = make_new_label(module);
   return e;
@@ -518,7 +518,7 @@ entity_local_name(entity e)
   const char* null_name = "null";
   pips_assert("entity is defined", !entity_undefined_p(e));
   pips_assert("constant term or entity",
-	      e==NULL || entity_domain_number(e)==entity_domain);
+              e==NULL || entity_domain_number(e)==entity_domain);
   return e==NULL ? null_name : local_name(entity_name(e));
 }
 
@@ -583,14 +583,14 @@ bool string_block_scope_p(string s)
   if(strspn(s, valid) == strlen(s)) {
     for(cs=s; *cs!='\0'; cs++) {
       if(is_number && isdigit(*cs))
-	;
+        ;
       else if(is_number && *cs==BLOCK_SEP_CHAR)
-	is_number = false;
+        is_number = false;
       else if(!is_number && isdigit(*cs))
-	is_number = true;
+        is_number = true;
       else if(!is_number && *cs==BLOCK_SEP_CHAR) {
-	is_block_scope = false;
-	break;
+        is_block_scope = false;
+        break;
       }
     }
     is_block_scope = !is_number;
@@ -615,7 +615,7 @@ string entity_name_without_scope(entity e)
     enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
 
   pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
-	     en, enws);
+             en, enws);
 
   return enws;
 }
@@ -633,7 +633,7 @@ string local_name_to_scope(const char* ln)
     s = strndup(ln, ns-ln+1);
 
   pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
-	     ln, s);
+             ln, s);
 
   return s;
 }
@@ -675,7 +675,7 @@ bool label_name_conflict_with_labels(const char* n, list ll)
   if(!empty_label_p(n)) {
     FOREACH(ENTITY, l, ll) {
       if(strcmp(label_local_name(l), n) == 0)
-	conflict_p = true;
+        conflict_p = true;
     }
   }
   return conflict_p;
@@ -707,7 +707,7 @@ entity e;
     pips_assert("entity_relative_name", !entity_undefined_p(m));
 
     s = (strcmp(module_local_name(m), entity_module_name(m)) == 0) ?
-	entity_local_name(e) : entity_name(e) ;
+        entity_local_name(e) : entity_name(e) ;
 
     return s;
 }
@@ -720,7 +720,7 @@ const char* entity_and_common_name(entity e)
   pips_assert("some current entity", !entity_undefined_p(m));
 
   name = concatenate(entity_local_name(ram_section(storage_ram(entity_storage(e)))),
-		     MODULE_SEP_STRING,entity_name(e),NIL);
+                     MODULE_SEP_STRING,entity_name(e),NIL);
 
   return name +sizeof(COMMON_PREFIX) -1;
 }
@@ -763,7 +763,7 @@ bool entity_main_module_p(entity e)
 {
   return entity_module_p(e)
     && (strspn(entity_local_name(e), MAIN_PREFIX)==1
-	|| same_string_p(entity_local_name(e), "main"));
+        || same_string_p(entity_local_name(e), "main"));
 }
 
 bool entity_f95module_p(entity e) {
@@ -788,12 +788,12 @@ bool entity_function_p(entity e)
   type
     t_ent = entity_type(e),
     t = (type_functional_p(t_ent) ?
-	 functional_result(type_functional(t_ent)) :
-	 type_undefined);
+         functional_result(type_functional(t_ent)) :
+         type_undefined);
 
   return(entity_module_p(e) &&
-	 !type_undefined_p(t) &&
-	 !type_void_p(t));
+         !type_undefined_p(t) &&
+         !type_void_p(t));
 }
 
 bool entity_subroutine_p(entity e)
@@ -843,7 +843,7 @@ void set_register_qualifier(entity v)
     if(type_variable_p(vt)) {
       list *ql = &variable_qualifiers(type_variable(vt));
       qualifier q = make_qualifier_register();
-      *ql =	gen_nconc(*ql, CONS(QUALIFIER, q , NIL));
+      *ql =     gen_nconc(*ql, CONS(QUALIFIER, q , NIL));
     }
     else
       pips_internal_error("Improper argument\n");
@@ -873,12 +873,12 @@ bool assumed_size_array_p(entity e)
       variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
-	{
-	  int length = gen_length(l_dims);
-	  dimension last_dim =  find_ith_dimension(l_dims,length);
-	  if (unbounded_dimension_p(last_dim))
-	    return true;
-	}
+        {
+          int length = gen_length(l_dims);
+          dimension last_dim =  find_ith_dimension(l_dims,length);
+          if (unbounded_dimension_p(last_dim))
+            return true;
+        }
     }
   return false;
 }
@@ -892,13 +892,13 @@ bool pointer_type_array_p(entity e)
       variable v = type_variable(entity_type(e));
       list l_dims = variable_dimensions(v);
       if (l_dims != NIL)
-	{
-	  int length = gen_length(l_dims);
-	  dimension last_dim =  find_ith_dimension(l_dims,length);
-	  expression exp = dimension_upper(last_dim);
-	  if (expression_equal_integer_p(exp,1))
-	    return true;
-	}
+        {
+          int length = gen_length(l_dims);
+          dimension last_dim =  find_ith_dimension(l_dims,length);
+          expression exp = dimension_upper(last_dim);
+          if (expression_equal_integer_p(exp,1))
+            return true;
+        }
     }
   return false;
 }
@@ -1012,14 +1012,14 @@ int entity_field_rank(entity f)
     pips_internal_error("Unexpected type tag %d", type_tag(st));
 
   pips_assert("st is a struct or union type",
-	      type_struct_p(st) || type_union_p(st));
+              type_struct_p(st) || type_union_p(st));
 
   /* FI: positions are counted from 1 on; do we want to subtract 1? */
   rank = gen_position((void *) f, fl);
 
   if(rank==0) {
     pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"",
-			entity_name(f), type_struct_p(st)?"structure":"union" , entity_name(su));
+                        entity_name(f), type_struct_p(st)?"structure":"union" , entity_name(su));
   }
 
   return rank;
@@ -1107,11 +1107,11 @@ bool local_entity_of_module_p(entity e, entity module)
 {
   bool
     result = same_string_p(entity_module_name(e),
-			   module_local_name(module));
+                           module_local_name(module));
 
   debug(6, "local_entity_of_module_p",
-	"%s %s %s\n",
-	entity_name(e), result ? "in" : "not in", entity_name(module));
+        "%s %s %s\n",
+        entity_name(e), result ? "in" : "not in", entity_name(module));
 
   return(result);
 }
@@ -1121,7 +1121,7 @@ bool entity_in_common_p(entity e)
   storage s = entity_storage(e);
 
   return(storage_ram_p(s) &&
-	 !entity_special_area_p(ram_section(storage_ram(s))));
+         !entity_special_area_p(ram_section(storage_ram(s))));
 }
 
 /* See comments about module_name(). Its result is transient and must
@@ -1150,9 +1150,9 @@ entity entity_empty_label(void)
   entity empty;
 
   empty = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-					 MODULE_SEP_STRING,
-					 EMPTY_LABEL_NAME,
-					 NULL), entity_domain);
+                                         MODULE_SEP_STRING,
+                                         EMPTY_LABEL_NAME,
+                                         NULL), entity_domain);
   pips_assert("entity_empty_label", empty != entity_undefined );
 
   return empty;
@@ -1177,7 +1177,7 @@ bool io_entity_p(entity e)
 {
   set_internal_static_entities();
   return (same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
-	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
+          || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
 }
 
 bool io_luns_entity_p(entity e)
@@ -1270,8 +1270,8 @@ bool std_file_entity_p(entity e)
 {
   set_std_static_entities();
   return(same_entity_p(e, stdin_ent)
-	 || same_entity_p(e, stdout_ent)
-	 || same_entity_p(e, stderr_ent));
+         || same_entity_p(e, stdout_ent)
+         || same_entity_p(e, stderr_ent));
 }
 
 
@@ -1300,13 +1300,13 @@ bool intrinsic_name_p(const char *local_name) {
 entity entity_intrinsic(const char* name)
 {
   entity e = (entity) gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-						     MODULE_SEP_STRING,
-						     name,
-						     NULL),
-					 entity_domain);
+                                                     MODULE_SEP_STRING,
+                                                     name,
+                                                     NULL),
+                                         entity_domain);
 
   pips_assert("entity_intrinsic", e != entity_undefined
-	      && intrinsic_entity_p(e));
+              && intrinsic_entity_p(e));
   return(e);
 }
 
@@ -1422,14 +1422,14 @@ bool entity_list_p(list el)
 
   FOREACH(ENTITY, e, el)
       {
-	static entity le = entity_undefined;
-	pips_debug(10, "Entity e in list is \"%s\"\n", safe_entity_name(e));
-	if(entity_domain_number(e)!=entity_domain) {
-	  pips_debug(8, "Last entity le in list is \"%s\"\n", safe_entity_name(le));
-	  pure = false;
-	  break;
-	}
-	le = e;
+        static entity le = entity_undefined;
+        pips_debug(10, "Entity e in list is \"%s\"\n", safe_entity_name(e));
+        if(entity_domain_number(e)!=entity_domain) {
+          pips_debug(8, "Last entity le in list is \"%s\"\n", safe_entity_name(le));
+          pure = false;
+          break;
+        }
+        le = e;
       }
   return pure;
 }
@@ -1473,8 +1473,8 @@ entity local_name_to_top_level_entity(const char *n)
     {
       for(int i=0; i<PREFIXES_SIZE && entity_undefined_p(module); i++)
         module = gen_find_tabulated(concatenate
-				    (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
-				    entity_domain);
+                                    (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
+                                    entity_domain);
     }
 
   return module;
@@ -1520,16 +1520,16 @@ entity FindEntityFromUserName( const char* package, const char* name ) {
   entity e = FindEntity(package, name);
   if ( entity_undefined_p(e) ) {
     e = gen_find_tabulated( concatenate( package,
-					 MODULE_SEP_STRING "0" BLOCK_SEP_STRING,
-					 name,
-					 NULL ),
+                                         MODULE_SEP_STRING "0" BLOCK_SEP_STRING,
+                                         name,
+                                         NULL ),
             entity_domain );
   }
   if ( entity_undefined_p(e) ) {
     e = gen_find_tabulated( concatenate( package,
-					 MODULE_SEP_STRING ,
-					 name,
-					 NULL ),
+                                         MODULE_SEP_STRING ,
+                                         name,
+                                         NULL ),
             entity_domain );
   }
   return e;
@@ -1583,7 +1583,7 @@ entity CreateEntity(const char *package_name, const char * local_name)
    See SafeFindOrCreateEntity().
 */
 entity FindOrCreateEntity(const char* package /* package name */,
-			  const char* local_name /* entity name */)
+                          const char* local_name /* entity name */)
 {
   entity e;
   if(entity_undefined_p(e=FindEntity(package, local_name))) {
@@ -1611,7 +1611,7 @@ entity FindOrCreateTopLevelEntity(const char* name)
 string name;
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
-				   MODULE_SEP_STRING, name, NULL);
+                                   MODULE_SEP_STRING, name, NULL);
     entity e = gen_find_tabulated(full_name, entity_domain);
 
     return(e);
@@ -1626,9 +1626,9 @@ expression entity_ith_bounds(entity e, int i)
 {
   dimension d = entity_ith_dimension(e, i);
   syntax s = make_syntax(is_syntax_range,
-			 make_range(copy_expression(dimension_lower(d)),
-				    copy_expression(dimension_upper(d)),
-				    int_to_expression(1)));
+                         make_range(copy_expression(dimension_lower(d)),
+                                    copy_expression(dimension_upper(d)),
+                                    int_to_expression(1)));
   return(make_expression(s, normalized_undefined));
 }
 
@@ -1640,11 +1640,11 @@ expression entity_ith_bounds(entity e, int i)
       bool found = false;
 
       while ((pid->name != NULL) && (!found)) {
-	if (strcmp(pid->name, s) == 0)
-	  {
-	    found = true;
-	    return true;
-	  }
+        if (strcmp(pid->name, s) == 0)
+          {
+            found = true;
+            return true;
+          }
       }
       return false;
 }*/
@@ -1656,35 +1656,35 @@ bool io_intrinsic_p(entity e)
   if (set_undefined_p(io_functions_set)) {
     io_functions_set = set_make(set_pointer);
     set_add_elements(io_functions_set, io_functions_set, entity_intrinsic(SCANF_FUNCTION_NAME),
-		     entity_intrinsic(PRINTF_FUNCTION_NAME),
-		     entity_intrinsic(SCANF_FUNCTION_NAME),
-		     entity_intrinsic(ISOC99_SCANF_FUNCTION_NAME),
-		     entity_intrinsic(FPRINTF_FUNCTION_NAME),
-		     entity_intrinsic(ISOC99_SCANF_USER_FUNCTION_NAME),
-		     entity_intrinsic(PUTS_FUNCTION_NAME),
-		     entity_intrinsic(GETS_FUNCTION_NAME),
-		     entity_intrinsic(FOPEN_FUNCTION_NAME),
-		     entity_intrinsic(FCLOSE_FUNCTION_NAME),
-		     entity_intrinsic(SNPRINTF_FUNCTION_NAME),
-		     entity_intrinsic(SSCANF_FUNCTION_NAME),
-		     entity_intrinsic(ISOC99_SSCANF_FUNCTION_NAME),
-		     entity_intrinsic(ISOC99_SSCANF_USER_FUNCTION_NAME),
-		     entity_intrinsic(VFPRINTF_FUNCTION_NAME),
-		     entity_intrinsic(VFSCANF_FUNCTION_NAME),
+                     entity_intrinsic(PRINTF_FUNCTION_NAME),
+                     entity_intrinsic(SCANF_FUNCTION_NAME),
+                     entity_intrinsic(ISOC99_SCANF_FUNCTION_NAME),
+                     entity_intrinsic(FPRINTF_FUNCTION_NAME),
+                     entity_intrinsic(ISOC99_SCANF_USER_FUNCTION_NAME),
+                     entity_intrinsic(PUTS_FUNCTION_NAME),
+                     entity_intrinsic(GETS_FUNCTION_NAME),
+                     entity_intrinsic(FOPEN_FUNCTION_NAME),
+                     entity_intrinsic(FCLOSE_FUNCTION_NAME),
+                     entity_intrinsic(SNPRINTF_FUNCTION_NAME),
+                     entity_intrinsic(SSCANF_FUNCTION_NAME),
+                     entity_intrinsic(ISOC99_SSCANF_FUNCTION_NAME),
+                     entity_intrinsic(ISOC99_SSCANF_USER_FUNCTION_NAME),
+                     entity_intrinsic(VFPRINTF_FUNCTION_NAME),
+                     entity_intrinsic(VFSCANF_FUNCTION_NAME),
 
-		     /*Fortran*/
-		     entity_intrinsic(WRITE_FUNCTION_NAME),
-		     //entity_intrinsic(PRINT_FUNCTION_NAME),
-		     entity_intrinsic(REWIND_FUNCTION_NAME),
-		     entity_intrinsic(OPEN_FUNCTION_NAME),
-		     entity_intrinsic(CLOSE_FUNCTION_NAME),
-		     entity_intrinsic(INQUIRE_FUNCTION_NAME),
-		     entity_intrinsic(BACKSPACE_FUNCTION_NAME),
-		     entity_intrinsic(READ_FUNCTION_NAME),
-		     entity_intrinsic(BUFFERIN_FUNCTION_NAME),
-		     entity_intrinsic(ENDFILE_FUNCTION_NAME),
-		     entity_intrinsic(FORMAT_FUNCTION_NAME),
-		     NULL);
+                     /*Fortran*/
+                     entity_intrinsic(WRITE_FUNCTION_NAME),
+                     //entity_intrinsic(PRINT_FUNCTION_NAME),
+                     entity_intrinsic(REWIND_FUNCTION_NAME),
+                     entity_intrinsic(OPEN_FUNCTION_NAME),
+                     entity_intrinsic(CLOSE_FUNCTION_NAME),
+                     entity_intrinsic(INQUIRE_FUNCTION_NAME),
+                     entity_intrinsic(BACKSPACE_FUNCTION_NAME),
+                     entity_intrinsic(READ_FUNCTION_NAME),
+                     entity_intrinsic(BUFFERIN_FUNCTION_NAME),
+                     entity_intrinsic(ENDFILE_FUNCTION_NAME),
+                     entity_intrinsic(FORMAT_FUNCTION_NAME),
+                     NULL);
   }
   if(set_belong_p(io_functions_set, e))
     return true;
@@ -1703,15 +1703,15 @@ bool arithmetic_intrinsic_p(entity e)
   if (set_undefined_p(arithmetic_functions_set)) {
     arithmetic_functions_set = set_make(set_pointer);
     set_add_elements(arithmetic_functions_set, arithmetic_functions_set,
-		     entity_intrinsic(PLUS_OPERATOR_NAME),
-		     entity_intrinsic(PLUS_C_OPERATOR_NAME),
-		     entity_intrinsic(MINUS_OPERATOR_NAME),
-		     entity_intrinsic(MINUS_C_OPERATOR_NAME),
-		     entity_intrinsic(UNARY_PLUS_OPERATOR_NAME),
-		     entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
-		     entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-		     entity_intrinsic(DIVIDE_OPERATOR_NAME),
-		     NULL);
+                     entity_intrinsic(PLUS_OPERATOR_NAME),
+                     entity_intrinsic(PLUS_C_OPERATOR_NAME),
+                     entity_intrinsic(MINUS_OPERATOR_NAME),
+                     entity_intrinsic(MINUS_C_OPERATOR_NAME),
+                     entity_intrinsic(UNARY_PLUS_OPERATOR_NAME),
+                     entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+                     entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                     entity_intrinsic(DIVIDE_OPERATOR_NAME),
+                     NULL);
   }
   if(set_belong_p(arithmetic_functions_set, e))
     return true;
@@ -1738,8 +1738,8 @@ bool entity_continue_p(entity f)
 /* returns the list of entity to appear in the common declaration.
  */
 list /* of entity */ common_members_of_module(entity common,
-					      entity module,
-					      bool only_primary /* not the equivalenced... */)
+                                              entity module,
+                                              bool only_primary /* not the equivalenced... */)
 {
   list result = NIL;
   int cumulated_offset = 0;
@@ -1756,29 +1756,29 @@ list /* of entity */ common_members_of_module(entity common,
       pips_assert("storage ram", storage_ram_p(s));
       r = storage_ram(s);
       if (ram_function(r)==module)
-	{
-	  int offset = ram_offset(r);
-	  int size = 0;
+        {
+          int offset = ram_offset(r);
+          int size = 0;
 
-	  if(heap_area_p(ram_section(r))) {
-	    size = 0;
-	  }
-	  else if(stack_area_p(ram_section(r))) {
-	    size = 0;
-	  }
-	  else {
-	    if(!SizeOfArray(v, &size)) {
-	      pips_internal_error("Varying size array \"%s\"", entity_name(v));
-	    }
-	  }
+          if(heap_area_p(ram_section(r))) {
+            size = 0;
+          }
+          else if(stack_area_p(ram_section(r))) {
+            size = 0;
+          }
+          else {
+            if(!SizeOfArray(v, &size)) {
+              pips_internal_error("Varying size array \"%s\"", entity_name(v));
+            }
+          }
 
-	  if (cumulated_offset==offset || !only_primary)
-	    result = CONS(ENTITY, v, result);
-	  else
-	    break; /* drop equivalenced that come hereafter... */
+          if (cumulated_offset==offset || !only_primary)
+            result = CONS(ENTITY, v, result);
+          else
+            break; /* drop equivalenced that come hereafter... */
 
-	  cumulated_offset+=size;
-	}
+          cumulated_offset+=size;
+        }
     }
 
   return gen_nreverse(result);
@@ -1796,11 +1796,11 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
   const char* nv = entity_local_name(v);
   MAP(ENTITY, e,
       {
-	if (same_string_p(entity_local_name(e),nv))
-	  {
-	    ref = e;
-	    break;
-	  }
+        if (same_string_p(entity_local_name(e),nv))
+          {
+            ref = e;
+            break;
+          }
       },
       l);
 
@@ -1812,7 +1812,7 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
   /* same OFFSET?
    */
   if (ok) ok = so = (ram_offset(storage_ram(entity_storage(v))) ==
-		     ram_offset(storage_ram(entity_storage(ref))));
+                     ram_offset(storage_ram(entity_storage(ref))));
 
   /* same TYPE?
    */
@@ -1829,16 +1829,16 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
   }
 
   pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
-	     entity_undefined_p(ref)? "<undef>": entity_name(ref),
-	     ok, sn, so, st);
+             entity_undefined_p(ref)? "<undef>": entity_name(ref),
+             ok, sn, so, st);
 
   /* temporary for CA
    */
   if (!ok) {
     pips_debug(1, "common /%s/: %s != %s (n=%d,o=%d,t=%d)\n",
-	       entity_name(common), entity_name(v),
-	       entity_undefined_p(ref)? "<undef>": entity_name(ref),
-	       sn, so, st);
+               entity_name(common), entity_name(v),
+               entity_undefined_p(ref)? "<undef>": entity_name(ref),
+               sn, so, st);
   }
 
   return ok;
@@ -1866,7 +1866,7 @@ bool check_common_inclusion(entity common)
     {
       entity v = ENTITY(CAR(lv));
       if (ram_function(storage_ram(entity_storage(v)))!=ref)
-	ok = comparable_entity_in_list_p(common, v, lref);
+        ok = comparable_entity_in_list_p(common, v, lref);
       POP(lv);
     }
 
@@ -1895,24 +1895,24 @@ bool check_common_inclusion(entity common)
 entity make_new_common(string name, entity mod)
 {
   string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
-						 MODULE_SEP_STRING
-						 COMMON_PREFIX,name,NULL));
+                                                 MODULE_SEP_STRING
+                                                 COMMON_PREFIX,name,NULL));
   type common_type = make_type(is_type_area, make_area(8, NIL));
   entity StaticArea =
     FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
   storage common_storage = make_storage(is_storage_ram,
-					(make_ram(mod,StaticArea, 0, NIL)));
+                                        (make_ram(mod,StaticArea, 0, NIL)));
   value common_value =
     make_value_code(make_code(NIL,
-			      string_undefined,
-			      make_sequence(NIL),
-			      NIL,
-			      make_language_fortran()));
+                              string_undefined,
+                              make_sequence(NIL),
+                              NIL,
+                              make_language_fortran()));
 
   return make_entity(common_global_name,
-		     common_type,
-		     common_storage,
-		     common_value);
+                     common_type,
+                     common_storage,
+                     common_value);
 }
 
 /* This function creates a common variable in a given common in a given module.
@@ -1959,11 +1959,11 @@ entity find_ith_formal_parameter(entity the_fnct, int rank)
       current = ENTITY(CAR(ldecl));
       ldecl = CDR(ldecl);
       if (declaration_formal_p(current) && (entity_to_offset(current)==rank))
-	return current;
+        return current;
     }
 
   pips_internal_error("cannot find the %d dummy argument of %s",
-		      rank, entity_name(the_fnct));
+                      rank, entity_name(the_fnct));
 
   return entity_undefined;
 }
@@ -1977,9 +1977,9 @@ bool some_main_entity_p(void)
   bool some_main = false;
   GEN_ARRAY_FOREACH(string, name, modules)
   {
-		if (entity_main_module_p(local_name_to_top_level_entity(name)))
+                if (entity_main_module_p(local_name_to_top_level_entity(name)))
     {
-		  some_main = true;
+                  some_main = true;
       break;
     }
   }
@@ -2107,17 +2107,17 @@ bool extern_entity_p(entity module, entity e)
     //}
     //else
       {
-	//return(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL);
+        //return(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL);
       //}
    //}
   //else
     //return(static_module_name_p(e));
   */
   /* return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
-	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
+          ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
   */
     return ((compilation_unit_entity_p(module) && gen_in_list_p(e,code_externs(value_code(entity_initial(module)))))
-	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
+          ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
 
 }
 
@@ -2132,7 +2132,7 @@ bool explicit_extern_entity_p(entity module, entity e)
        global scope: this is not an explicit extern declaration.
   */
     return compilation_unit_entity_p(module)
-	     && gen_in_list_p(e,code_externs(value_code(entity_initial(module))));
+             && gen_in_list_p(e,code_externs(value_code(entity_initial(module))));
 }
 
 string storage_to_string(storage s)
@@ -2187,7 +2187,7 @@ void update_dummy_parameter(parameter p, entity ep)
     dummy d = parameter_dummy(p);
 
     pips_debug(8, "Dummy identifier changed from \"\%s\" to \"\%s\"\n",
-	       entity_name(dummy_identifier(d)), entity_name(ep));
+               entity_name(dummy_identifier(d)), entity_name(ep));
     /* Note that free_entity(dummy_identifier(d)) should be performed... */
     dummy_identifier(d) = ep;
   }
@@ -2373,7 +2373,7 @@ bool entity_used_in_declarations_p(entity e, list ldecl)
 
     if(gen_in_list_p(e, sel)) {
       pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
-		 entity_name(e), entity_name(d));
+                 entity_name(e), entity_name(d));
       found_p = true;
       gen_free_list(sel);
       break;
@@ -2407,14 +2407,14 @@ bool type_used_in_type_declarations_p(entity e, list ldecl)
       list stl = type_supporting_types(dt);
 
       if(gen_in_list_p(e, stl)) {
-	pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
-		   entity_name(e), entity_name(d));
-	found_p = true;
-	gen_free_list(stl);
-	break;
+        pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
+                   entity_name(e), entity_name(d));
+        found_p = true;
+        gen_free_list(stl);
+        break;
       }
       else {
-	gen_free_list(stl);
+        gen_free_list(stl);
       }
     }
   }
@@ -2448,7 +2448,7 @@ entity make_entity_copy(entity e)
   do {
     if (variable_name != NULL)
       /* Free the already allocated name in the previous iteration that
-	 was conflicting: */
+         was conflicting: */
       free(variable_name);
     asprintf(&variable_name, "%s_%d", entity_name(e), number++);
   }
@@ -2456,9 +2456,9 @@ entity make_entity_copy(entity e)
     != entity_undefined);
 
   ne = make_entity(variable_name,
-		   copy_type(entity_type(e)),
-		   copy_storage(entity_storage(e)),
-		   copy_value(entity_initial(e)));
+                   copy_type(entity_type(e)),
+                   copy_storage(entity_storage(e)),
+                   copy_value(entity_initial(e)));
 
   if(storage_ram_p(entity_storage(ne))) {
     /* We are in trouble. Up to now, we have created a static alias of
@@ -2498,9 +2498,9 @@ entity make_entity_copy(entity e)
    @return the new entity.
 */
 entity generic_make_entity_copy_with_new_name(entity e,
-					      string global_new_name,
-					      bool systematically_add_suffix,
-					      bool move_initialization_p)
+                                              string global_new_name,
+                                              bool systematically_add_suffix,
+                                              bool move_initialization_p)
 {
   entity ne = entity_undefined;
   char * variable_name = strdup(global_new_name);
@@ -2515,7 +2515,7 @@ entity generic_make_entity_copy_with_new_name(entity e,
   {
     if (variable_name != NULL)
       /* Free the already allocated name in the previous iteration that
-	 was conflicting: */
+         was conflicting: */
       free(variable_name);
     asprintf(&variable_name, "%s_%d", global_new_name, number++);
   }
@@ -2523,11 +2523,11 @@ entity generic_make_entity_copy_with_new_name(entity e,
   //extended_integer_constant_expression_p(e)
 
   ne = make_entity(variable_name,
-		   copy_type(entity_type(e)),
-		   copy_storage(entity_storage(e)),
-		   move_initialization_p? copy_value(entity_initial(e)) :
-		   make_value_unknown()
-		   );
+                   copy_type(entity_type(e)),
+                   copy_storage(entity_storage(e)),
+                   move_initialization_p? copy_value(entity_initial(e)) :
+                   make_value_unknown()
+                   );
 
   if(storage_ram_p(entity_storage(ne))) {
     /* We are in trouble. Up to now, we have created a static alias of
@@ -2552,12 +2552,12 @@ entity generic_make_entity_copy_with_new_name(entity e,
       offset = UNKNOWN_RAM_OFFSET;
     else
       {
-	if (c_module_p(module_name_to_entity(module_name)))
-	  offset = (basic_tag(b)!=is_basic_overloaded)?
-	    (add_C_variable_to_area(a, ne)):(0);
-	else
-	  offset = (basic_tag(b)!=is_basic_overloaded)?
-	    (add_variable_to_area(a, ne)):(0);
+        if (c_module_p(module_name_to_entity(module_name)))
+          offset = (basic_tag(b)!=is_basic_overloaded)?
+            (add_C_variable_to_area(a, ne)):(0);
+        else
+          offset = (basic_tag(b)!=is_basic_overloaded)?
+            (add_variable_to_area(a, ne)):(0);
       }
 
     ram_offset(r) = offset;
@@ -2589,23 +2589,23 @@ entity generic_make_entity_copy_with_new_name(entity e,
 
 
 entity make_entity_copy_with_new_name(entity e,
-				      string global_new_name,
-				      bool move_initialization_p)
+                                      string global_new_name,
+                                      bool move_initialization_p)
 {
   return generic_make_entity_copy_with_new_name(e,
-						global_new_name,
-						false,
-						move_initialization_p);
+                                                global_new_name,
+                                                false,
+                                                move_initialization_p);
 }
 
 entity make_entity_copy_with_new_name_and_suffix(entity e,
-				      string global_new_name,
-				      bool move_initialization_p)
+                                      string global_new_name,
+                                      bool move_initialization_p)
 {
   return generic_make_entity_copy_with_new_name(e,
-						global_new_name,
-						true,
-						move_initialization_p);
+                                                global_new_name,
+                                                true,
+                                                move_initialization_p);
 }
 
 
@@ -2794,9 +2794,16 @@ commutative_call_p(call c)
 
 
 /**
- * @brief build a list of expression from a list of entities
+ * @brief build a list of expressions from a list of entities
  * @return the list of expression
  * @param l_ent, the list of entities
+ *
+ * FI: should have been placed in expression.c
+ *
+ * FI: no check on arguments, robustness is doubtful; see entity_to_expression()
+ *
+ * FI: somebody complaining about the PIPS code structuration in files
+ * and libraries might have added to the confusion?
  **/
 list entities_to_expressions(list l_ent) {
   list l_exp = NIL;
@@ -2842,18 +2849,18 @@ entity find_enum_of_member(entity m)
       pips_debug(8, "Checking enum \"\%s\"\n", entity_name(e));
 
       if(gen_in_list_p((void *) m, ml)) {
-	ee = e;
-	break;
+        ee = e;
+        break;
       }
       ifdebug(8) {
-	if(entity_undefined_p(ee)) {
-	  pips_debug(8, "Member \"\%s\" not found in enum \"\%s\"\n",
-		     entity_name(m), entity_name(e));
-	}
-	else {
-	  pips_debug(8, "Member \"\%s\" found in enum \"\%s\"\n",
-		     entity_name(m), entity_name(e));
-	}
+        if(entity_undefined_p(ee)) {
+          pips_debug(8, "Member \"\%s\" not found in enum \"\%s\"\n",
+                     entity_name(m), entity_name(e));
+        }
+        else {
+          pips_debug(8, "Member \"\%s\" found in enum \"\%s\"\n",
+                     entity_name(m), entity_name(e));
+        }
       }
     }
   }
@@ -2865,7 +2872,13 @@ entity find_enum_of_member(entity m)
 }
 
 
-/** Test if a module is in C */
+/** Test if a module "m" is written in C
+ *
+ * value_code_p(m) is not checked: is this code robust? Why not an
+ * if/else if/ else and a unique return statement?
+ *
+ * All intrinsics, including Fortran intrinsics, are considered written in C.
+ */
 bool c_module_p(entity m)
 {
   bool c_p = false;
@@ -2915,9 +2928,9 @@ static void make_uniq_reference_list(reference r, deux_listes * l)
 {
   entity e = reference_variable(r);
   if (! (storage_rom_p(entity_storage(e)) &&
-	 !(value_undefined_p(entity_initial(e))) &&
-	 value_symbolic_p(entity_initial(e)) &&
-	 type_functional_p(entity_type(e)))) {
+         !(value_undefined_p(entity_initial(e))) &&
+         value_symbolic_p(entity_initial(e)) &&
+         type_functional_p(entity_type(e)))) {
 
     /* Add reference r only once */
     if (l->le ==NIL || !gen_in_list_p(e, l->le)) {
@@ -2961,9 +2974,9 @@ list l;
     Pbase result = BASE_NULLE;
     FOREACH(ENTITY, e, l2)
     {
-	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
-	new->succ = result;
-	result = new;
+        Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
+        new->succ = result;
+        result = new;
     }
 
     gen_free_list(l2);
@@ -3164,7 +3177,15 @@ set get_referenced_entities(void* elem)
 
 }
 /**
- * Check if a variable is local to a module
+ * Check if a variable "var" is local to a module "module".
+ *
+ * A variable is local to a module:
+ *
+ * - if it has been allocated in one of the module areas such as
+ * *STATIC*, *DYNAMIC*,...
+ *
+ * - if it is a formal parameter passed by value, that is a C scalar
+ * formal parameter; note that a scalar can be a structure or a union.
  */
 bool entity_local_variable_p(entity var, entity module) {
   bool local = false;
