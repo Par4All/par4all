@@ -6,12 +6,12 @@ int main(int argc, char **argv)
    init_array();
    {
       //PIPS generated variable
-      double (*P4A_var_y0)[80] = (double (*)[80]) 0;
-      P4A_accel_malloc((void **) &P4A_var_y0, sizeof(double)*80);
+      double (*p4a_var_y0)[80] = (double (*)[80]) 0;
+      P4A_accel_malloc((void **) &p4a_var_y0, sizeof(double)*80);
 
-      p4a_launcher_main(*P4A_var_y0);
-      P4A_copy_from_accel_1d(sizeof(double), 80, 80, 0, &y[0], *P4A_var_y0);
-      P4A_accel_free(P4A_var_y0);
+      p4a_launcher_main(*p4a_var_y0);
+      P4A_copy_from_accel_1d(sizeof(double), 80, 80, 0, &y[0], *p4a_var_y0);
+      P4A_accel_free(p4a_var_y0);
    }
    p4a_launcher_main_1(tmp);
    p4a_launcher_main_2(A, tmp, x);

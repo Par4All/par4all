@@ -1,0 +1,31 @@
+int main()
+{
+   my_struct c;
+
+   c.a = 10;
+   c.b = 10.0;
+
+   return c.a;
+}
+int main()
+{
+   my_struct c;
+
+   c.a = 10;
+//             <    is alive (in)>: c.a
+   c.b = 10.0;
+//             <    is alive (in)>: c.a
+
+   return c.a;
+}
+int main()
+{
+   my_struct c;
+//             <    is alive (out)>: c.a
+
+   c.a = 10;
+//             <    is alive (out)>: c.a
+   c.b = 10.0;
+
+   return c.a;
+}

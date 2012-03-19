@@ -3,10 +3,6 @@
 !!
       PROGRAM SCALAR02
       INTEGER X,Y,A,B
-      EXTERNAL ir_isnan,id_isnan
-      LOGICAL*4 ir_isnan,id_isnan
-      STOP 'Variable SCALAR02:Y is used before set'
-      STOP 'Variable SCALAR02:B is used before set'
       X = Y
       A = B
       PRINT *, X, A

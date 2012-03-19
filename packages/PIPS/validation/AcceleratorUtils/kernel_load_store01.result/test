@@ -38,20 +38,20 @@ void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n]
 l99998:
    for(i = 0; i <= n-1; i += 1) {
       //PIPS generated variable
-      short (*P4A_var_result0)[n][n] = (short (*)[n][n]) 0, (*P4A_var_src00)[n][n] = (short (*)[n][n]) 0, (*P4A_var_src10)[n][n] = (short (*)[n][n]) 0;
+      short (*p4a_var_result0)[n][n] = (short (*)[n][n]) 0, (*p4a_var_src00)[n][n] = (short (*)[n][n]) 0, (*p4a_var_src10)[n][n] = (short (*)[n][n]) 0;
       if (n-1>0&&n-1>0&&n-1>0&&n-1>0&&n-1>0&&n-1>0) {
-         P4A_accel_malloc((void **) &P4A_var_src10, sizeof(short)*n*n);
-         P4A_accel_malloc((void **) &P4A_var_src00, sizeof(short)*n*n);
-         P4A_accel_malloc((void **) &P4A_var_result0, sizeof(short)*n*n);
-         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *P4A_var_result0);
-         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src1[0][0], *P4A_var_src10);
-         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src0[0][0], *P4A_var_src00);
+         P4A_accel_malloc((void **) &p4a_var_src10, sizeof(short)*n*n);
+         P4A_accel_malloc((void **) &p4a_var_src00, sizeof(short)*n*n);
+         P4A_accel_malloc((void **) &p4a_var_result0, sizeof(short)*n*n);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *p4a_var_result0);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src1[0][0], *p4a_var_src10);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src0[0][0], *p4a_var_src00);
 
-l99999:         parteeeeeez(n, i, *P4A_var_result0, *P4A_var_src00, *P4A_var_src10);
-         P4A_copy_from_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *P4A_var_result0);
-         P4A_accel_free(P4A_var_src10);
-         P4A_accel_free(P4A_var_src00);
-         P4A_accel_free(P4A_var_result0);
+l99999:         parteeeeeez(n, i, *p4a_var_result0, *p4a_var_src00, *p4a_var_src10);
+         P4A_copy_from_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *p4a_var_result0);
+         P4A_accel_free(p4a_var_src10);
+         P4A_accel_free(p4a_var_src00);
+         P4A_accel_free(p4a_var_result0);
       }
    }
 }

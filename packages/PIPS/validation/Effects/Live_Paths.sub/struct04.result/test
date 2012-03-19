@@ -1,0 +1,71 @@
+void foo(my_struct *p)
+{
+   int i;
+
+   for(i = 0; i <= 4; i += 1)
+      (p->a)[i] = i;
+}
+int main()
+{
+   my_struct c;
+
+   foo(&c);
+
+   c.b = 10.0;
+
+   return (c.a)[2];
+}
+//             <may be alive (in)>: p[0].a[2]
+//             <    is alive (in)>: p
+void foo(my_struct *p)
+{
+//             <may be alive (in)>: p[0].a[2]
+//             <    is alive (in)>: p
+   int i;
+//             <may be alive (in)>: p[0].a[2]
+//             <    is alive (in)>: p
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (in)>: p[0].a[2]
+//             <    is alive (in)>: i p
+      (p->a)[i] = i;
+}
+int main()
+{
+   my_struct c;
+//             <may be alive (in)>: c.a[2]
+
+   foo(&c);
+//             <    is alive (in)>: c.a[2]
+
+   c.b = 10.0;
+//             <    is alive (in)>: c.a[2]
+
+   return (c.a)[2];
+}
+//             <    is alive (out)>: p[0].a[2]
+void foo(my_struct *p)
+{
+//             <may be alive (out)>: p[0].a[2]
+//             <    is alive (out)>: p
+   int i;
+//             <    is alive (out)>: p[0].a[2]
+
+   for(i = 0; i <= 4; i += 1)
+//             <may be alive (out)>: p p[0].a[2]
+//             <    is alive (out)>: i
+      (p->a)[i] = i;
+}
+int main()
+{
+//             <may be alive (out)>: c.a[2]
+   my_struct c;
+//             <    is alive (out)>: c.a[2]
+
+   foo(&c);
+//             <    is alive (out)>: c.a[2]
+
+   c.b = 10.0;
+
+   return (c.a)[2];
+}
