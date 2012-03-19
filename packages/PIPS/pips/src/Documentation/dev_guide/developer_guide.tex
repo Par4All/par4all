@@ -265,14 +265,14 @@ know by a PIPS programmer as modules and submodules.
 Eclipse is a multi-language software development environment comprising an 
 integrated development environment (IDE) and an extensible plug-in system. 
 
-You have to use an eclipse installation with CDT plugin 
-(have a look at http://www.eclipse.org/cdt/) to be able to use eclipse for C/C++
+You have to use an eclipse installation with CDT plugin
+(have a look at \url{http://www.eclipse.org/cdt}) to be able to use eclipse for C/C++
 development.
 
 
 \subsubsection{Workspace/Project creation}
 
-In eclipse you have workspace and project concept. The latter is like a 
+In Eclipse you have workspace and project concept. The latter is like a
 repository, or a subtree of a source location. In PIPS it can be a pass, whole
 pips or linear or newgen, or all of them in one shot !
 
@@ -295,7 +295,7 @@ have PIPS sources somewhere on you hard drive.
 
 First use menu \textit{File} $=>$ \textit{New} $=>$ \textit{Project} or 
 right-click and contextual menu as shown on 
-the screenshot, then five a project name, uncheck the checkbox to enable browsing
+the screenshot, then give a project name, uncheck the checkbox to enable browsing
 an existing location, and find your PIPS source directory. Click finish and you
 have now a fresh new PIPS project in Eclipse. It may overload your computer for 
 a little while indexing the whole project, you can see the progression in the
@@ -320,14 +320,15 @@ We are missing Newgen and Linear includes, we have only default Eclipse includes
 
 \begin{center}
 \noindent
-`\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes-2.png}
+\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes-2.png}
 \end{center}
 
-Select project root and push \textit{alt+enter} or right click on it and select properties 
-item in the contextual menu. Then go to C/C++ General submenu and select Paths 
-and Symbols. In the Includes tab select language GNU C in the left part and click
-add. Then choose \textit{Workspace...} and find you pips/include/ dir. Repeat 
-the same operation for including Newgen and Linear include dirs.
+Select project root and push \textit{alt+enter} or right click on it and
+select properties item in the contextual menu. Then go to C/C++ General
+submenu and select Paths and Symbols. In the Includes tab select language
+GNU C in the left part and click add. Then choose \textit{Workspace...}
+and find you \texttt{pips/include/} dir. Repeat the same operation for
+including Newgen and Linear include dirs.
 
 \begin{center}
 \noindent
@@ -335,7 +336,7 @@ the same operation for including Newgen and Linear include dirs.
 \end{center}
 
 Validate two times and accept to rebuild the index when Eclipse ask. After index
-rebuilding you can observe that the code is no longer underlined :-)
+rebuilding you can observe that the code is no longer underlined. :-)
 
 \subsubsection{Benefits from Eclipse power}
 
@@ -2198,7 +2199,7 @@ When a validation default \texttt{tpips} script is used:
   ...
 \end{verbatim}
 
-When the PyPS Python pass manager is used: 
+When the PyPS Python pass manager is used:
 \begin{verbatim}
 gdb --arg python my.py to debug pips parts
 \end{verbatim}

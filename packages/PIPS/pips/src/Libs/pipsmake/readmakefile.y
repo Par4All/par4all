@@ -358,6 +358,7 @@ void add_rule(rule r)
 	}
     }
 
+    /* FI: no check of rule name unicity; e.g. double declaration of sesamify */
     makefile_rules(pipsmakefile) = gen_nconc(makefile_rules(pipsmakefile),
 					     CONS(RULE, r, NIL));
 }
