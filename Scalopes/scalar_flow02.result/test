@@ -94,12 +94,12 @@ int main()
    b = 0;
    {
       //PIPS generated variable
-      int (*P4A_var_c0)[10] = (int (*)[10]) 0;
-      P4A_scmp_malloc((void **) &P4A_var_c0, sizeof(int)*10);
-      P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
+      int (*p4a_var_c0)[10] = (int (*)[10]) 0;
+      P4A_scmp_malloc((void **) &p4a_var_c0, sizeof(int)*10);
+      P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *p4a_var_c0);
 
-      P4A_scmp_kernel_0(&a, &b, *P4A_var_c0);
-      P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *P4A_var_c0);
+      P4A_scmp_kernel_0(&a, &b, *p4a_var_c0);
+      P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *p4a_var_c0);
    }
    P4A_scmp_kernel_1(&a, &b);
 

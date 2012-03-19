@@ -89,13 +89,13 @@ void get_data(char filename[])
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1) {
       //PIPS generated variable
-      float_t (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      float_t (*p4a_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &p4a_var_space0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space0);
 
-      p4a_launcher_get_data(*P4A_var_space0, i, &j);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
-      P4A_accel_free(P4A_var_space0);
+      p4a_launcher_get_data(*p4a_var_space0, i, &j);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space0);
+      P4A_accel_free(p4a_var_space0);
    }
    
    /* Read the pixel grey value: */
@@ -114,29 +114,29 @@ void iteration(float_t space[501][501], float_t save[501][501])
    int i, j;
    {
       //PIPS generated variable
-      float_t (*P4A_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &P4A_var_save0, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      float_t (*p4a_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*p4a_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &p4a_var_space0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &p4a_var_save0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save0);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space0);
 
-      p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
-      P4A_accel_free(P4A_var_space0);
-      P4A_accel_free(P4A_var_save0);
+      p4a_launcher_iteration(*p4a_var_save0, *p4a_var_space0);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save0);
+      P4A_accel_free(p4a_var_space0);
+      P4A_accel_free(p4a_var_save0);
    }
    {
       //PIPS generated variable
-      float_t (*P4A_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &P4A_var_space1, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
+      float_t (*p4a_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*p4a_var_space1)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &p4a_var_space1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &p4a_var_save1, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space1);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save1);
 
-      p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-      P4A_accel_free(P4A_var_space1);
-      P4A_accel_free(P4A_var_save1);
+      p4a_launcher_iteration_1(*p4a_var_save1, *p4a_var_space1);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space1);
+      P4A_accel_free(p4a_var_space1);
+      P4A_accel_free(p4a_var_save1);
    }
 }
 void iteration(float_t space[501][501], float_t save[501][501])
@@ -144,28 +144,28 @@ void iteration(float_t space[501][501], float_t save[501][501])
    int i, j;
    {
       //PIPS generated variable
-      float_t (*P4A_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &P4A_var_save0, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      float_t (*p4a_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*p4a_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &p4a_var_space0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &p4a_var_save0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save0);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space0);
 
-      p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
-      P4A_accel_free(P4A_var_space0);
-      P4A_accel_free(P4A_var_save0);
+      p4a_launcher_iteration(*p4a_var_save0, *p4a_var_space0);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save0);
+      P4A_accel_free(p4a_var_space0);
+      P4A_accel_free(p4a_var_save0);
    }
    {
       //PIPS generated variable
-      float_t (*P4A_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &P4A_var_space1, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
+      float_t (*p4a_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*p4a_var_space1)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &p4a_var_space1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &p4a_var_save1, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space1);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *p4a_var_save1);
 
-      p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
-      P4A_accel_free(P4A_var_space1);
-      P4A_accel_free(P4A_var_save1);
+      p4a_launcher_iteration_1(*p4a_var_save1, *p4a_var_space1);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *p4a_var_space1);
+      P4A_accel_free(p4a_var_space1);
+      P4A_accel_free(p4a_var_save1);
    }
 }
