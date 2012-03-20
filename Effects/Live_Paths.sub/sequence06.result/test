@@ -18,7 +18,7 @@ int main()
 
    for(i = i; i <= 4; i += 1)
 //             <may be alive (in)>: a[1]
-//             <    is alive (in)>: i i
+//             <    is alive (in)>: i
       a[i] = i;
 //             <    is alive (in)>: a[1]
 
@@ -35,7 +35,7 @@ int main()
 
    for(i = i; i <= 4; i += 1)
 //             <may be alive (out)>: a[1]
-//             <    is alive (out)>: i i
+//             <    is alive (out)>: i
       a[i] = i;
 
    return a[1];
