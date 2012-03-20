@@ -1819,7 +1819,7 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
 	  free_pv_results_paths(&pv_res_arg);
 	  if (pv_res_arg.l_out != l_in_cur)
 	    {
-	      gen_full_free_list(l_in_cur);
+	      //gen_full_free_list(l_in_cur);
 	      l_in_cur = pv_res_arg.l_out;
 	    }
 	  /* well this is not safe in case of arguments with external function calls

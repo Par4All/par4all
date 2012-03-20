@@ -2514,6 +2514,35 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+// tests if a type is FILE *
+// beware: costly because it contains a string operation
+bool FILE_star_type_p(type t)
+{
+  bool res = false;
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (basic_pointer_p(b))
+	{
+	  t = basic_pointer(b);
+	  if (type_variable_p(t))
+	    {
+	      basic b = variable_basic(type_variable(t));
+	      if (basic_derived_p(b))
+		{
+		  entity te = basic_derived(b);
+		  if (strstr(entity_name(te), "_IO_FILE") != NULL)
+		    {
+		      res = true;
+		    }
+		}
+	    }
+	}
+    }
+  return res;
+}
+
+
 list type_fields(type t)
 {
   list l_res = NIL;

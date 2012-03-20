@@ -680,7 +680,15 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 	act = 'r';
     }
 
-  if (anywhere_effect_p(eff))
+
+  if (FILE_star_type_p(eff_type))
+    {
+      /* there is no other accessible path */
+      pips_debug(6, "FILE star path -> returning NIL or the path itself \n");
+      if (add_eff)
+	l_res = effect_to_list(eff);
+    }
+  else if (anywhere_effect_p(eff))
     {
       /* there is no other accessible path */
       pips_debug(6, "anywhere effect -> returning NIL \n");
