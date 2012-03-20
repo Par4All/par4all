@@ -138,7 +138,7 @@
 \newenvironment{PipsPass}[1]{\label{pass:#1}}{}
 
 % To keep track of all titles down to subsubsections
-\setcounter{tocdepth}{4}
+\setcounter{tocdepth}{3}
 
 
 \title{PIPS High-Level Software Interface \\
@@ -370,7 +370,7 @@ instance to prettyprint, but some are linked to {\tt PIPS}
 infrastructure and are presented in
 Chapter~\ref{chapter-global-options}.
 
-\section{Informal syntax}
+\section{Informal Pipsmake Syntax}
 \label{sec:informal-syntax}
 
 To understand and to be able to write new rules for {\tt pipsmake}, a
@@ -606,7 +606,7 @@ SYSTEM_NOT_FEASIBLE "{0==-1}"
 \end{PipsProp}
 are prettyprinted by {\tt PIPS}.
 
-\subsection{PipsMake}
+\subsection{PipsMake Library}
 \index{Pipsmake}
 \index{checkpoint}
 
@@ -640,7 +640,7 @@ workspaces. The frequency may be adapted in a script, rarely at the
 beginning to more often latter.
 
 
-\subsection{PipsDBM}
+\subsection{PipsDBM Library}
 \index{Pipsdbm}
 \index{PIPSDBM\_NO\_FREE\_ON\_QUIT}
 
@@ -650,18 +650,18 @@ to check object consistency when they are stored in the database, and to
 an intermediate phase has corrupted some data structure unwillingly).
 
 You can control what is done when a workspace is closed and resources are
-save. The
+saved. The
 \begin{PipsProp}{PIPSDBM_RESOURCES_TO_DELETE}
 PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \end{PipsProp}
 property can be set to to "obsolete" or to "all".
 
-Note that it is not managed from {\tt pipsdbm} but from {\tt pipsmake}
+Note that it is not managed from {\tt pipsdbm} but from {\tt pipsmake},
 which knows what is obsolete or not.
 
 
 
-\subsection{Top Level Control}
+\subsection{Top Level Library}
 \index{Top Level}
 \index{Logging}
 \index{Abort}
@@ -734,35 +734,10 @@ ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE
 \end{verbatim}
 They still are used for the old non-regression tests.
 
-\subsection{Tpips Command Line Interface}
-\index{Tpips}
-\index{TPIPS\_IS\_A\_SHELL}
-
-\Tpips{} is one of PIPS user interfaces.
-
-% no longer used {
-% \begin{PipsProp}{TPIPS_NO_EXECUTION_MODE}
-% TPIPS_NO_EXECUTION_MODE FALSE
-% \end{PipsProp}
-% controls whether we shall execute the instructions of just check the syntax:
-% }
-
-\begin{PipsProp}{TPIPS_IS_A_SHELL}
-TPIPS_IS_A_SHELL FALSE
-\end{PipsProp}
-controls whether \Tpips{} should behave as an extended shell and
-consider any input command that is not a \Tpips{} command a Shell
-command.
-
-This property is automatically set to TRUE when pyps is running.
-\begin{PipsProp}{PYPS}
-PYPS FALSE
-\end{PipsProp}
 
 
 
-
-\subsection{Warning Control}
+\subsection{Warning Management}
 \index{Warning}
 \index{NO\_USER\_WARNING}
 \index{WARNING\_ON\_STAT\_ERROR}
@@ -784,6 +759,7 @@ been written and hence its temporal consistency.
 WARNING_ON_STAT_ERROR TRUE
 \end{PipsProp}
 
+Error messages are also copied in the Warnings file.
 
 \subsection{Option for C Code Generation}
 
@@ -803,6 +779,35 @@ There is no guarantee that each code generation phase is going to
 comply with this property. It is up to each developper to decide if
 this global property is to be used or not in his/her local phase.
 
+\section{User and Programming Interfaces}
+
+\subsection{Tpips Command Line Interface}
+\index{Tpips}
+\index{TPIPS\_IS\_A\_SHELL}
+
+\Tpips{} is one of PIPS user interfaces.
+
+% no longer used {
+% \begin{PipsProp}{TPIPS_NO_EXECUTION_MODE}
+% TPIPS_NO_EXECUTION_MODE FALSE
+% \end{PipsProp}
+% controls whether we shall execute the instructions of just check the syntax:
+% }
+
+\begin{PipsProp}{TPIPS_IS_A_SHELL}
+TPIPS_IS_A_SHELL FALSE
+\end{PipsProp}
+controls whether \Tpips{} should behave as an extended shell and
+consider any input command that is not a \Tpips{} command a Shell
+command.
+
+\subsection{Pyps API}
+
+This property is automatically set to TRUE when pyps is running.
+\begin{PipsProp}{PYPS}
+PYPS FALSE
+\end{PipsProp}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INPUT FILES
@@ -815,7 +820,7 @@ this global property is to be used or not in his/her local phase.
 \label{subsection-user-file}
 \index{User File}
 
-An input program is a set of user Fortran~77 or C source files and a name,
+An input program is a set of user Fortran~77, Fortran~90 or C source files and a name,
 called a {\em workspace}. The files are looked for in the current
 directory, then by using the colon-separated \verb|PIPS_SRCPATH| variable
 for other directories where they might be found. The first occurrence of
@@ -878,14 +883,14 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \index{Hollerith}
 \index{Missing file}
 
-\subsection{Fortran case of preprocessing and splitting}
+\subsection{Fortran 77 Preprocessing and Splitting}
 \label{sec:fortran-case}
 
 
-The Fortran files specified as input to \Pips{} by the user are
+The Fortran 77 files specified as input to \Pips{} by the user are
 preprocessed in various ways.
 
-\subsubsection{Fortran Syntactic Verification}
+\subsubsection{Fortran 77 Syntactic Verification}
 \label{sec:fortr-synt-verif}
 
 If the \verb|PIPS_CHECK_FORTRAN| shell environment variable is defined
@@ -953,7 +958,7 @@ STUB_IO_BARRIER FALSE
 \end{PipsProp}
 
 
-\subsubsection{Fortran file preprocessing}
+\subsubsection{Fortran 77 File Preprocessing}
 \label{sec:fortr-file-prepr}
 
 If the file suffix is \verb|.F| then the file is preprocessed. By default
@@ -965,7 +970,7 @@ Moreover the default preprocessing options are %
 with the \verb|PIPS_FPP_FLAGS| environment variable.
 
 
-\subsubsection{Fortran Split}
+\subsubsection{Fortran 77 Split}
 \label{sec:fortran-split}
 
 The file is then split into one file per module using a PIPS specialized
@@ -1067,6 +1072,13 @@ recommended to set this property to \verb|TRUE|.
 Note: the C and Fortran syntactic verifications could be controlled by
 a unique property.
 
+\subsection{Fortran 90 Preprocessing and Splitting}
+\label{sec:fortran-90-preprocessing-and-splitting}
+
+The Fortran 90 parser is a separate program, derived from gcc Fortran
+parser. It is activated directly when the workspace is created, and
+not by pipsmake.
+
 \subsection{Source File Hierarchy}
 \label{sec:source-file-hierarchy}
 
@@ -1080,7 +1092,7 @@ PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING FALSE
 \end{PipsProp}
 
 
-\section{Source File}
+\section{Source Files}
 \label{subsection-source-file}
 \index{Source File}
 \index{Missing Code}
@@ -1220,7 +1232,10 @@ unsplit                         > PROGRAM.user_file
                 < ALL.printed_file
 \end{PipsMake}
 
-\chapter{Abstract Syntax Tree}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \chapter{Abstract Syntax Tree}
+\chapter{Building the Internal Representation}
 \label{section-abstract-syntax-tree}
 \index{AST}
 \index{IR}
@@ -1275,21 +1290,23 @@ called \verb+parsed_code+ and a list of called module names,
 \verb+callees+.
 
 
-\subsection{Fortran}
+\subsection{Fortran 77}
 \label{sec:fortran}
 
 
-Source code is assumed to be fully Fortran-77
-compliant. On the first encountered error, the parser may be able to
+Source code is assumed to be fully Fortran-77 compliant. The syntax
+should be checked by a standard Fortran compiler, e.g. \verb/fort77/
+or at least \verb/gfortran/, before the PIPS Fortran 77 parser is
+activated. On the first encountered error, the parser may be able to
 emit a useful message or the non-analyzed part of the source code is
 printed out.
 
 \Pips{} input language is standard Fortran~77 with few extensions and some
 restrictions. The input character set includes underscore, \verb/_/, and
 varying length variable names, i.e. they are not restricted to 6
-characters.
+characters are supported as well as dependent types for arrays.
 
-\subsubsection{Fortran restrictions}
+\subsubsection{Fortran 77 Restrictions}
 
 \begin{enumerate}
 
@@ -1345,7 +1362,7 @@ benchmarks are handled without manual editing, but for ENTRY statements
 which are obsoleted by the current Fortran standard.
 
 
-\subsubsection{Some additional remarks}
+\subsubsection{Some Additional Remarks}
 
 \begin{itemize}
 \item The PIPS preprocessing stage included in \texttt{fsplit()} is going
@@ -1357,7 +1374,7 @@ which are obsoleted by the current Fortran standard.
 
 \end{itemize}
 
-\subsubsection{Some unfriendly features}
+\subsubsection{Some Unfriendly Features}
 
 \begin{enumerate}
 
@@ -1393,7 +1410,7 @@ generated for lines ending after column 72.
 \end{enumerate}
 
 
-\subsubsection{Declaration of the standard parser}
+\subsubsection{Declaration of the Standard Fortran 77 Parser}
 \label{subsubsection:declaration-of-the-standard-parser}
 \index{PARSER\_WARN\_FOR\_COLUMNS\_73\_80}
 \index{Symbol table}
@@ -1453,7 +1470,7 @@ PARSER_ACCEPT_ANSI_EXTENSIONS TRUE
 Currently, this property is not used often enough in PIPS parser which let
 go many mistakes... as expected by real users!
 
-\subsubsection*{Array range extension}
+\subsubsection*{Array Range Extension}
 \index{PARSER\_ACCEPT\_ARRAY\_RANGE\_EXTENSION}
 \index{Fortran 90}
 
@@ -1695,7 +1712,7 @@ PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
 \end{PipsProp}
 
 
-\subsection{Declaration of HPFC parser}
+\subsection{Declaration of HPFC Parser}
 
 \begin{PipsPass}{hpfc_parser}
 This parser takes a different Fortran file but applies the same
@@ -1717,7 +1734,7 @@ hpfc_parser                     > MODULE.parsed_code
 \end{PipsMake}
 
 
-\subsection{Declaration of the C parsers}
+\subsection{Declaration of the C Parsers}
 \label{subsection:declaration-of-the-C-parsers}
 
 A C file is seen in PIPS as a compilation unit, that contains all the
@@ -1921,6 +1938,12 @@ choke some parts of \PIPS{}...) like:
 This representation is not yet implemented.
 
 
+\subsection{Fortran 90}
+
+The Fortran 90 parser is not integrated in pipsmake. It is activated
+earlier when the workspace is created.
+
+
 \section{Controlized Code (Hierarchical Control Flow Graph)}
 \label{subsection-controlized-code}
 \index{Controlizer}
@@ -2071,7 +2094,9 @@ GATHER_FORMATS_AT_END FALSE
 \end{PipsProp}
 
 
-\subsubsection*{Clean Up Sequences}
+\subsection{Properties for Clean Up Sequences}
+
+% FI: should be moved next to the declaration of the pass
 
 \index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 To display the statistics about cleaning-up sequences and removing
@@ -2097,7 +2122,14 @@ CLEAN_UP_SEQUENCES_WITH_DECLARATIONS FALSE
 \end{PipsProp}
 
 
+\section{Parallel Code}
+\label{subsection-parallel-code}
 
+The internal representation includes special field to declare parallel
+constructs such as parallel loops. A parallel code internal
+representation does not differ fundamentally from a sequential code.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% FI-> ??: why is it located here?
 
@@ -2254,7 +2286,7 @@ REMOVE_USELESS_LABEL_KEEP_LOOP_LABEL FALSE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
-\chapter{Analyses}
+\chapter{Static Analyses}
 \label{section-analyses}
 \index{Analysis}
 
@@ -3495,10 +3527,10 @@ detected by the effect analysis\dots{} which was required by flinter.
 Resource \texttt{CALLEES.code} is not explicitly required but it produces the
 global symbols which function \PipsPassRef{flinter} needs to check parameter lists.
 
-\section{Loop statistics}
+\section{Loop Statistics}
 
 Computes statistics about loops in module. It computes the number of
-perfectly and imperfectly  nested loops and gives their depths. And it gives
+perfectly and imperfectly nested loops and gives their depths. And it gives
 the number of nested loops which we can treat with our algorithm.
 
 \begin{PipsMake}
@@ -3506,6 +3538,10 @@ loop_statistics > MODULE.stats_file
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+Note: it does not seem to behave like a standard analysis, associating
+information to the internal representation. Instead, an ASCII file
+seems to be created.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SEMANTICS
 
@@ -3724,7 +3760,7 @@ refine_transformers         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{PipsMake}
 
-\subsection{Summary Transformer}
+\subsubsection{Summary Transformer}
 \label{subsubsection-summary-transformer}
 \index{Transformer (Summary)}
 \index{Summary Transformer}
@@ -3747,7 +3783,42 @@ summary_transformer             > MODULE.summary_transformer
         < MODULE.summary_effects
 \end{PipsMake}
 
-\subsection{Initial Precondition}
+\subsection{Preconditions}
+\label{subsubsection-preconditions}
+\index{Precondition}
+
+\begin{PipsPass}{preconditions}
+A precondition for a statement $s$ in a module $m$ is a predicate true
+for every state reachable from the initial state of $m$, in which $s$
+is executed. A precondition is of NewGen type "transformer" (see
+\Pri{}) and preconditions is of type \verb+statement_mapping+.
+
+Option \PipsPassRef{preconditions_intra} associates a precondition to each
+statement, assuming that no information is available at the module entry
+point.
+
+Inter-procedural preconditions may be computed with {\em
+  intra}-procedural transformers but the benefit is not
+clear. Intra-procedural preconditions may be computed with {\em
+  inter}-procedural transformers. This is faster that a full
+interprocedural analysis because there is no need for a top-down
+propagation of summary preconditions. This is compatible with code
+transformations like \PipsPassRef{partial_eval},
+\PipsPassRef{simplify_control} and
+\PipsPassRef{dead_code_elimination}.
+
+Since these two options for transformer and precondition computations are
+independent and that \PipsPassRef{transformers_inter_full} and
+\PipsPassRef{preconditions_inter_full} must be both (independently) selected
+to obtain the best possible results. These two options are recommended.
+
+% Known bug: the postcondition of a loop, computed with the {\em full}
+% option for transformers and preconditions is wrong because the last
+% increment of the index is not performed. Besides the exit condition is
+% not added (yet).
+\end{PipsPass}
+
+\subsubsection{Initial Precondition or Program Precondition}
 \label{subsubsection-initial-precs}
 \index{Precondition (Initial)}
 \index{Initial Precondition}
@@ -3785,7 +3856,7 @@ main procedure. Although it appears below for all interprocedural analyses
 and it always is computed, it only is used when a main procedure is
 available.
 
-\subsection{Intraprocedural Summary Precondition}
+\subsubsection{Intraprocedural Summary Precondition}
 \index{Intraprocedural Summary Precondition}
 \index{Precondition (Summary)}
 
@@ -3811,40 +3882,61 @@ precondition resource at the right place in \verb/pipsmake.rc/.
 No menu is declared to select either intra- or interprocedural summary
 preconditions.
 
-\subsection{Preconditions}
-\label{subsubsection-preconditions}
-\index{Precondition}
+\subsubsection{Interprocedural Summary Precondition}
+\index{Summary Precondition}
+\index{Precondition (Summary)}
 
-\begin{PipsPass}{preconditions}
-A precondition for a statement $s$ in a module $m$ is a predicate true
-for every state reachable from the initial state of $m$, in which $s$
-is executed. A precondition is of NewGen type "transformer" (see
-\Pri{}) and preconditions is of type \verb+statement_mapping+.
+By default, summary preconditions are computed intraprocedurally. The
+interprocedural option must be explicitly activated.
 
-Option \PipsPassRef{preconditions_intra} associates a precondition to each
-statement, assuming that no information is available at the module entry
-point.
-
-Inter-procedural preconditions may be computed with {\em
-  intra}-procedural transformers but the benefit is not
-clear. Intra-procedural preconditions may be computed with {\em
-  inter}-procedural transformers. This is faster that a full
-interprocedural analysis because there is no need for a top-down
-propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval},
-\PipsPassRef{simplify_control} and
-\PipsPassRef{dead_code_elimination}.
-
-Since these two options for transformer and precondition computations are
-independent and that \PipsPassRef{transformers_inter_full} and
-\PipsPassRef{preconditions_inter_full} must be both (independently) selected
-to obtain the best possible results. These two options are recommended.
-
-% Known bug: the postcondition of a loop, computed with the {\em full}
-% option for transformers and preconditions is wrong because the last
-% increment of the index is not performed. Besides the exit condition is
-% not added (yet).
+\begin{PipsPass}{interprocedural_summary_precondition}
+An interprocedural summary precondition for a module is derived from all
+its call sites. Of course, preconditions must be known for all its
+callers' statements.  The summary precondition is the convex hull of all
+call sites preconditions, translated into a proper environment which is
+{\em not} necessarily the module's frame. Because of {\em invisible}
+global and static variables and aliasing, it is difficult for a caller to
+know which variables might be used by the caller to represent a given
+memory location. To avoid the problem, the current summary precondition is
+always translated into the {\em caller}'s frame. So each module must first
+translate its summary precondition, when receiving it from the resource
+manager ({\em pipsdbm}) before using it.
 \end{PipsPass}
+
+Note: the previous algorithm was based on a on-the-fly reduction by
+convex hull. Each time a call site was encountered while computing a
+module preconditions, the callee's summary precondition was updated. This
+old scheme was more efficient but not compatible with program
+transformations because it was impossible to know when the summary
+preconditions of the modules had to be reset to the infeasible
+(a.k.a. empty) precondition.
+
+An infeasible precondition means that the module is never called although
+a main is present in the workspace. If no main module is available, a TRUE
+precondition is generated. Note that, in both cases, the impact of static
+initializations propagated by link edition is taken into account although
+this is prohibited by the Fortran Standard which requires a BLOCKDATA
+construct for such initializations. In other words, a module which is
+never called has an impact on the program execution and its declarations
+should not be destroyed.
+
+\begin{PipsMake}
+interprocedural_summary_precondition            > MODULE.summary_precondition
+        < PROGRAM.entities
+        < PROGRAM.program_precondition
+        < CALLERS.preconditions
+        < MODULE.callers
+\end{PipsMake}
+
+The following rule is obsolete. It is context sensitive and its results
+depends on the history of commands performed on the workspace.
+
+\begin{PipsMake}
+summary_precondition            > MODULE.summary_precondition
+        < PROGRAM.entities
+        < CALLERS.preconditions
+        < MODULE.callers
+\end{PipsMake}
 
 \subsubsection{Menu for Preconditions}
 
@@ -3934,62 +4026,6 @@ preconditions_inter_full        > MODULE.preconditions
         < CALLEES.summary_transformer
         < MODULE.summary_transformer
 
-\end{PipsMake}
-
-\subsection{Interprocedural Summary Precondition}
-\index{Summary Precondition}
-\index{Precondition (Summary)}
-
-By default, summary preconditions are computed intraprocedurally. The
-interprocedural option must be explicitly activated.
-
-\begin{PipsPass}{interprocedural_summary_precondition}
-An interprocedural summary precondition for a module is derived from all
-its call sites. Of course, preconditions must be known for all its
-callers' statements.  The summary precondition is the convex hull of all
-call sites preconditions, translated into a proper environment which is
-{\em not} necessarily the module's frame. Because of {\em invisible}
-global and static variables and aliasing, it is difficult for a caller to
-know which variables might be used by the caller to represent a given
-memory location. To avoid the problem, the current summary precondition is
-always translated into the {\em caller}'s frame. So each module must first
-translate its summary precondition, when receiving it from the resource
-manager ({\em pipsdbm}) before using it.
-\end{PipsPass}
-
-Note: the previous algorithm was based on a on-the-fly reduction by
-convex hull. Each time a call site was encountered while computing a
-module preconditions, the callee's summary precondition was updated. This
-old scheme was more efficient but not compatible with program
-transformations because it was impossible to know when the summary
-preconditions of the modules had to be reset to the infeasible
-(a.k.a. empty) precondition.
-
-An infeasible precondition means that the module is never called although
-a main is present in the workspace. If no main module is available, a TRUE
-precondition is generated. Note that, in both cases, the impact of static
-initializations propagated by link edition is taken into account although
-this is prohibited by the Fortran Standard which requires a BLOCKDATA
-construct for such initializations. In other words, a module which is
-never called has an impact on the program execution and its declarations
-should not be destroyed.
-
-\begin{PipsMake}
-interprocedural_summary_precondition            > MODULE.summary_precondition
-        < PROGRAM.entities
-        < PROGRAM.program_precondition
-        < CALLERS.preconditions
-        < MODULE.callers
-\end{PipsMake}
-
-The following rule is obsolete. It is context sensitive and its results
-depends on the history of commands performed on the workspace.
-
-\begin{PipsMake}
-summary_precondition            > MODULE.summary_precondition
-        < PROGRAM.entities
-        < CALLERS.preconditions
-        < MODULE.callers
 \end{PipsMake}
 
 \subsection{Total Preconditions}
@@ -4103,7 +4139,7 @@ total_preconditions_inter        > MODULE.total_preconditions
 
 The program postcondition is only used for the main module.
 
-\subsection{Summary Total Precondition}
+\subsubsection{Summary Total Precondition}
 \index{Summary Total Precondition}
 \index{Total Precondition (Summary)}
 
@@ -4119,7 +4155,7 @@ summary_total_precondition            > MODULE.summary_total_precondition
         < CALLERS.total_preconditions
 \end{PipsMake}
 
-\subsection{Summary Total Postcondition}
+\subsubsection{Summary Total Postcondition}
 \index{Summary Total Postcondition}
 \index{Total Postcondition (Summary)}
 
@@ -4144,7 +4180,7 @@ summary_total_postcondition            > MODULE.summary_total_postcondition
         < MODULE.callers
 \end{PipsMake}
 
-\subsection{Final Postcondition}
+\subsubsection{Final Postcondition}
 \label{subsubsection-final-postcondition}
 \index{Postcondition (Final)}
 \index{Final Postcondition}
@@ -5702,9 +5738,345 @@ summary_complementary_sections > MODULE.summary_compsec
         < MODULE.compsec
 \end{PipsMake}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Dynamic Analyses (Instrumentation)}
+
+Dynamic analyses are performed at run-time. At compile-time, the
+property than can be proved or disproved are exploited, but in doubt a
+run-time is added to the source code. The current dynamic analyses
+implemented in \Pips are array bound checking, Fortran alias and
+used-before-set analyses.
 
 
-\chapter{Parallelization and Distribution}
+\section{Array Bound Checking}
+\label{subsection-array-bound-checking}
+\index{Buffer overflow}
+\index{Array access}
+
+Array bound checking refers to determining whether all array references
+are within their declared range in all of their uses in a program. These
+array  bound checks may be analysed intraprocedurally or
+interprocedurally, depending on the need for accuracy.
+
+There are two versions of intraprocedural array bounds checking: array
+bound check bottom up, array bound check top down. The first approach
+relies on checking every array access and on the elimination of
+redundant tests by advanced dead code elimination based on
+preconditions. The second approach is based on exact convex array
+regions. They are used to prove that all accessed in a compound
+statement are correct.
+
+These two dynamic analyses are implemented for Fortran. They are
+described in Nga Nguyen's PhD (see~\cite{Ngu02}). They
+may work for C code, but this has not been validated.
+
+
+\subsection{Elimination of Redundant Tests: Bottom-Up Approach}
+\label{subsection-array-bound-check_bottom_up}
+
+\begin{PipsPass}{array_bound_check_bottom_up}
+This transformation takes as input the current module, adds array range
+checks (lower and upper bound checks) to every statement that has one or
+more array accesses. The output is the module with those added tests.
+
+If one test is trivial or exists already for the same statement, it is
+no need to be generated in order to reduce the
+number of tests.  As Fortran language permits an assumed-size array
+declarator with the unbounded upper bound of the last dimension, no range check is generated for this case also.
+
+Associated with each test is a bound violation error message and in case
+of real access violation, a STOP statement will be put before the current
+statement.
+
+This phase should always be followed by the
+\PipsPassRef{partial_redundancy_elimination} for logical expression in
+order to reduce the number of bound checks.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias array_bound_check_bottom_up 'Elimination of Redundant Tests'
+array_bound_check_bottom_up            > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
+\subsection{Insertion of Unavoidable Tests}
+\label{subsection-array-bound-check_top_down}
+
+\begin{PipsPass}{array_bound_check_top_down}
+This second implementation is based on the array region analyses phase which benefits some interesting proven properties:
+
+\begin{enumerate}
+
+\item If a MAY region correspond to one node in the control flow graph
+  that represents a block of code of program is included in the
+  declared dimensions of the array, no bound check is needed for this
+  block of code.
+
+\item If a MUST region correspond to one node in the control
+  flow graph that represents a block of code of program contains elements
+  which are outside the declared dimensions of the  array, there is
+  certainly bound violation in this block of code. An error can be
+  detected just in compilation time.
+
+\end{enumerate}
+
+If none of these two properties are satisfied, we consider the
+approximation of region. In case of MUST region, if the exact bound checks
+can be generated, they will be inserted before the block of code. If not,
+like in case of MAY region, we continue to go down to the children nodes
+in the control flow graph.
+
+ The main advantage
+of this algorithm is that it permits to detect the sure bound violations
+or to tell that there is certainly no bound violation as soon as
+possible, thanks to the context given by preconditions and the top-down
+analyses.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias array_bound_check_top_down 'Insertion of Unavoidable Tests'
+array_bound_check_top_down   > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+\end{PipsMake}
+
+
+\subsection{Interprocedural Array Bound Checking}
+\label{subsection-array-bound-check_interprocedural}
+
+\begin{PipsPass}{array_bound_check_interprocedural}
+This phase checks for out of bound errors when passing arrays or array
+elements as arguments in procedure call. It ensures that there is no bound
+violation in every array access in the callee procedure, with respect to
+the array declarations in the caller procedure.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias array_bound_check_interprocedural 'Interprocedural Array Bound Checking'
+array_bound_check_interprocedural             > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.preconditions
+\end{PipsMake}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY BOUND CHECK
+
+\subsection{Array Bound Checking Instrumentation}
+\label{subsection-array-bound-check_instrumentation}
+
+\begin{PipsPass}{array_bound_check_instrumentation}
+
+We provide here a tool to calculate the number of dynamic bound checks
+from both initial and PIPS generated code.
+
+These transformations are implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
+\end{PipsPass}
+
+\begin{PipsMake}
+alias array_bound_check_instrumentation 'Array Bound Checking Instrumentation'
+array_bound_check_instrumentation > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
+
+Array bounds checking refers to determining whether all array reference
+are within their declared range in all of its uses in a program. Here are
+array bounds checking options for code instrumentation, in order to
+compute the number of bound checks added. We can use only one property for
+these two case, but the meaning is not clear. To be changed ?
+
+\begin{PipsProp}{INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
+INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
+\end{PipsProp}
+\begin{PipsProp}{PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
+PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
+\end{PipsProp}
+
+In practice, bound violations may often occur with arrays in a common block. The
+standard is violated, but programmers think that they are not dangerous
+because the allocated size of the common is not reached.
+The following property deals with this kind of bad programming practice. If the
+array is a common variable, it checks if the reference goes beyond the
+size of the common block or not.
+
+\begin{PipsProp}{ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE}
+ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE FALSE
+\end{PipsProp}
+
+The following property tells the verification phases (array bound
+checking, alias checking or uninitialized variables checking) to instrument
+codes with the STOP or the PRINT message. Logically, if a standard violation
+is detected, the program will stop immediately. Furthermore, the STOP message gives the
+partial redundancy elimination phase more information to remove
+redundant tests occurred after this STOP. However, for the debugging
+purposes, one may need to display all possible violations such as
+out-of-bound or used-before-set errors, but not
+to stop the program. In this case, a PRINT message is chosen. By default,
+we use the STOP message.
+
+\begin{PipsProp}{PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE}
+PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
+\end{PipsProp}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ALIAS
+
+\section{Alias Verification}
+\label{subsection-alias-verification}
+
+\subsection{Alias Propagation}
+\label{subsubsection-alias-propagation}
+\index{Alias Propagation}
+
+\begin{PipsPass}{alias_propagation}
+
+\textit {Aliasing} occurs when two or more variables refer to the same
+storage location at the same program point. Alias analysis is critical for
+performing most optimizations correctly because we must know for certain
+that we have to take into account
+all the ways a location, or the value of a variable, may (or must)
+be used or changed. Compile-time alias information is also important for
+program verification, debugging and understanding.
+
+In Fortran 77, parameters are passed by address in such
+a way that, as long as the actual argument is associated with a named
+storage location, the called subprogram can change the value of the actual
+argument by assigning a value to the corresponding formal parameter. So
+new aliases can be created between formal parameters if the
+same actual argument is passed to two or more formal parameters, or between formal
+parameters and global parameters if an actual
+argument is an object in common storage which is also visible in the
+called subprogram or other subprograms in the call chain below it.
+
+Both \textit{intraprocedural} and \textit{interprocedural} alias
+determinations are important for program analysis. Intraprocedural aliases
+occur due to pointers in languages like LISP, C, C++ or Fortran 90,
+union construct in C or \verb+EQUIVALENCE+ in Fortran. Interprocedural aliases
+are generally created by parameter passing and by access to global
+variables, which propagates intraprocedural aliases  across procedures and
+introduces new aliases.
+
+The basic idea for computing interprocedural aliases is to follow all the
+possible chains of argument-parameters and nonlocal variable-parameter
+bindings at all call sites. We introduce a \textit{naming memory
+  locations} technique which guarantees the correctness and enhances the
+precision of data-flow analysis. The technique associates sections,
+offsets of actual parameters to formal parameters following a certain call
+path. Precise alias information are computed for both scalar and array
+variables. The analysis is called alias propagation.
+
+This analysis is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
+\end{PipsPass}
+
+\begin{PipsMake}
+
+alias_propagation           > MODULE.alias_associations
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.alias_associations
+        < CALLERS.code
+
+\end{PipsMake}
+
+\subsection{Alias Checking}
+\label{subsubsection-alias-check}
+\index{Alias Checking}
+
+\begin{PipsPass}{alias_check}
+
+With the call-by-reference mechanism in Fortran 77, new aliases can be
+created between formal parameters if the
+same actual argument is passed to two or more formal parameters, or between formal
+parameters and global parameters if an actual
+argument is an object in common storage which is also visible in the
+called subprogram or other subprograms in the call chain below it.
+
+Restrictions on association of entities in Fortran 77 (Section 15.9.3.6
+\cite{ANSI83}) say that neither aliased formal parameters nor the variable in the
+common block may become defined during execution
+of the called subprogram or the others subprograms in the call chain.
+
+This phase uses information from the \PipsPassRef{alias_propagation}
+analysis and computes the definition
+informations of variables in a program, and then to verify
+statically if the program violates the standard restriction on alias or
+not. If these informations are not known at compile-time, we instrument
+the code with tests that check the violation dynamically during
+execution of program.
+
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
+\end{PipsPass}
+
+% Attention : will we use the preconditions, regions, effects ?
+% They are may be wrong
+
+\begin{PipsMake}
+alias alias_check 'Alias Check'
+alias_check   > MODULE.code
+        < PROGRAM.entities
+        < MODULE.alias_associations
+        < MODULE.cumulated_effects
+        < ALL.code
+\end{PipsMake}
+
+This is a property to control whether the alias propagation and alias checking
+phases use information from MAIN program or not. If the current
+module is never called by the main program, we do no alias propagation
+and alias checking for this module if the property is on. However, we
+can do nothing with modules that have no callers at all, because this
+is a top-down approach.
+
+\begin{PipsProp}{ALIAS_CHECKING_USING_MAIN_PROGRAM}
+ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
+\end{PipsProp}
+
+\section{Used Before Set}
+\label{subsection-used-before_set}
+
+\begin{PipsPass}{used_before_set}
+This analysis checks if the program uses a variable or an array element
+which has not been assigned a value. In this case, anything may happen:
+the program may appear to run normally, or may
+crash, or may behave unpredictably. We use IN regions
+that give a set of read variables not previously written. Depending on the
+nature of the variable: local, formal or global, we have different
+cases. In principle, it
+works as follows: if we have a MUST IN region at the module statement, the
+corresponding variable must be used before
+being defined, a STOP is inserted. Else, we insert an initialization
+function and go down, insert a verification function before each MUST IN
+at each sub-statements.
+
+This is a top-down analysis that process a procedure before all its
+callees. Information given by callers is used to verify if we have to
+check for the formal parameters in the current module or not. In addition,
+we produce information in the resource MODULE.ubs to tell if the formal
+parameters of the called procedures have to be checked or not.
+
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
+\end{PipsPass}
+
+\begin{PipsMake}
+alias used_before_set 'Used Before Set'
+used_before_set   > MODULE.ubs
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.in_regions
+        < CALLERS.ubs
+\end{PipsMake}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Parallelization, Distribution and Code Generation}
 \label{section-program-transformations-parallelization-distribution}
 %% \index{Transformation}
 %% \index{Program Transformation}
@@ -8750,13 +9122,13 @@ partial_redundancy_elimination             > MODULE.code
 %-----------End of Redundancy Elimination -------------------------
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL FLOW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL FLOW TRANSFORMATIONS
 
 \section{Control-Flow Optimizations}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEAD CODE ELIMINATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL SIMPLIFICATION
 
-\subsection{Dead Code Elimination}
+\subsection{Control Simplification (a.k.a. Dead Code Elimination)}
 \label{sec:dead-code-elimination}
 \index{Dead Code Elimination}
 \index{Unreachable Code Elimination}
@@ -8865,8 +9237,8 @@ suppress_dead_code          > MODULE.code
 SIMPLIFY_CONTROL_DIRECTLY_PRIVATE_LOOP_INDICES FALSE
 \end{PipsProp}
 
-Whether to try to simplify do/while loops (property provided
-as a special lworkaround for FREIA).
+Whether to try to simplify do/while loops (property introduced
+as a special workaround for FREIA).
 \begin{PipsProp}{SIMPLIFY_CONTROL_DO_WHILE}
 SIMPLIFY_CONTROL_DO_WHILE TRUE
 \end{PipsProp}
@@ -8882,7 +9254,7 @@ simplify_control_directly    > MODULE.code
         < MODULE.summary_effects
 \end{PipsMake}
 
-\subsubsection{Dead Code Elimination properties}
+\subsubsection{Properties for Control Simplification}
 \index{Dead Code}
 \index{DEAD\_CODE\_DISPLAY\_STATISTICS}
 
@@ -8893,6 +9265,7 @@ statistics display:
 DEAD_CODE_DISPLAY_STATISTICS TRUE
 \end{PipsProp}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEAD CODE ELIMINATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% USE-DEF ELIMINATION
 
 \subsection{Dead Code Elimination (a.k.a. Use-Def Elimination)}
@@ -9094,12 +9467,15 @@ restructure_control          > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{For-loop recovering}
+\subsubsection{DO Loop Recovery}
 \label{sec:loop-recovering}
 
 \begin{PipsPass}{recover_for_loop}
-This control-flow transformation try to recover for-loops from
-while-loops. Useful to be run after transformations
+This control-flow transformation transforms while loops into DO loops
+by recovering an index variable, an initial value, a final value and
+an increment.
+
+Useful to be run after transformations ?!?
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9118,7 +9494,7 @@ recover_for_loop          > MODULE.code
 This phase cannot be called from inside the control restructurer since it
 needs many higher-level analysis. This is why it is in a separate phase.
 
-\subsubsection{For-loop to do-loop transformation}
+\subsubsection{For Loop to DO Loop Conversion}
 \label{sec:loop-do-loop}
 
 \begin{PipsPass}{for_loop_to_do_loop}
@@ -9155,13 +9531,13 @@ for_loop_to_do_loop          > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{For-loop to while-loop transformation}
+\subsubsection{For Loop to While Loop Conversion}
 \label{sec:loop-while-loop}
 
 \begin{PipsPass}{for_loop_to_while_loop}
 Since in PIPS some transformations and analysis may not be implemented for
-C for-loop but may be implemented for while-loop, it is interesting to
-have this for-loop to while-loop desugaring transformation.
+C for loops but may be implemented for while loops, it is interesting to
+have this for loop to while loop conversion.
 \end{PipsPass}
 
 This transformation transforms a
@@ -9195,7 +9571,7 @@ for_loop_to_while_loop          > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{Do-while to while-loop transformation}
+\subsubsection{Do While to While Loop Conversion}
 \label{sec:do-while to while-loop}
 
 Some transformations only work on while loops, thus it is useful to have
@@ -9215,7 +9591,7 @@ while (cond) {
 }
 \end{lstlisting}
 
-It is a transformation useful before while-loop to for-loop recovering for
+It is a transformation useful before while loop to for loop recovery for
 example (see \S~\ref{sec:loop-recovering}).
 
 \begin{PipsMake}
@@ -9321,10 +9697,12 @@ full_spaghettify          > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Control Structure Normalisation (STF)}
+\subsection{Control Flow Normalisation (STF)}
 \label{subsection-control-structure-normalization-stf}
 \index{STF}
 \index{Control Restructurer}
+
+This pass is now obsolete. Use \PipsPassRef{restucture_control} instead.
 
 \begin{PipsPass}{stf}
 Transformation \PipsPassRef{stf} is a C interface to a Shell script used to
@@ -9336,11 +9714,11 @@ runtime libraries to run STF if is has not been statically compiled...
 
 Known bug/feature: \PipsPassRef{stf} does not change resource \texttt{code} like
 other transformations, but the \texttt{source} file. Transformations
-applied before \PipsPassRef{stf} are lost. This should be changed in the near
-future.
+applied before \PipsPassRef{stf} are lost.
+% This should be changed in the near future.
 
 This transformation is now assumed redundant with respect to the native
-PIPS control restructurers that deal with other languages too.
+PIPS control restructurers, which deal with other languages too.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9353,11 +9731,13 @@ stf                      > MODULE.source_file
 \label{subsection-trivial-test-elimination}
 \index{Trivial Test Elimination}
 
+% FI->RK: what do you use this for?
+
 \begin{PipsPass}{suppress_trivial_test}
-Function \PipsPassRef{suppress_trivial_test} is used to delete the branch TRUE of
+Function \PipsPassRef{suppress_trivial_test} is used to delete the TRUE branch of
 trivial test instruction. After apply \PipsPassRef{suppress_trivial_test}, the condition of the
-new test instruction is the condition correspondent to the branch FALSE of
-the test initial.
+new test instruction is the condition correspondent to the FALSE branch of
+the initial test.
 
 This function was designed and implemented by Trinh Quoc \textsc{Anh}.
 \end{PipsPass}
@@ -9494,7 +9874,7 @@ fsm_merge_states    > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{FSM properties}
+\subsubsection{FSM Properties}
 \index{FSM Generation}
 \index{FSMIZE\_WITH\_GLOBAL\_VARIABLE}
 
@@ -9641,7 +10021,7 @@ An atomizer is also used by WP65 (see
 Section~\ref{subsubsection-shared-memory-emulation})
 
 
-\subsubsection{Atomizer properties}
+\subsubsection{Atomizer Properties}
 \index{Atomization}
 \index{Three Address Code}
 \index{ATOMIZE\_INDIRECT\_REF\_ONLY}
@@ -9913,7 +10293,8 @@ instruction to be matched).
 EXPRESSION_SUBSTITUTION_PATTERN ""
 \end{PipsProp}
 
-\subsection{Rename operator}
+\subsection{Rename Operators}
+
 \begin{PipsPass}{rename_operator}
 This transformation replaces all language operators by function calls.
 \end{PipsPass}
@@ -9924,7 +10305,11 @@ rename_operator > MODULE.code
                 < PROGRAM.entities
 \end{PipsMake}
 
-Function name is deduced from operator name, operator arguments type and a common prefix. Each function name is built using the pattern [PREFIX][OP~NAME][SUFFIX] (eg: \emph{int} + \emph{int} will lead to \emph{op\_addi}). The replacement function must have been declared, otherwise a warning is asserted and the operator is ignored.
+The function name is derived from the operator name, the operator
+arguments type(s) and a common prefix. Each function name is built using
+the pattern [PREFIX][OP~NAME][SUFFIX] (eg: \emph{int} + \emph{int}
+will lead to \emph{op\_addi}). The replacement function must have been
+declared, otherwise a warning is emited and the operator is ignored.
 
 \vspace{5pt}
 \begin{minipage}{\textwidth}
@@ -9939,7 +10324,7 @@ float foo(float a, float b)
 
 \vspace{5pt}
 \begin{minipage}{\textwidth}
-would become using the default configuration:
+becomes, using the default configuration:
 \begin{lstlisting}
 float foo(float a, float b)
 {
@@ -9949,7 +10334,7 @@ float foo(float a, float b)
 \end{minipage}
 
 
-\emph{OP~NAME} is given by the following table:
+\emph{OP~NAME} is defined by the following table:
 \begin{center}
 \begin{tabular}{r l}
 post++ & post\_inc \\
@@ -9986,7 +10371,10 @@ $>$  & gt \\
 \end{tabular}
 \end{center}
 
-Using the property \PipsPropRef{RENAME_OPERATOR_OPS}, it is possible to give a restrictive list of operator name on which operator renaming should be applied. Every operator not listed in this list will be ignored.
+Using the property \PipsPropRef{RENAME_OPERATOR_OPS}, it is possible
+to give a restrictive list of operator names on which operator
+renaming should be applied. Operator that are not in this list are
+ignored.
 
 \begin{PipsProp}{RENAME_OPERATOR_OPS}
 RENAME_OPERATOR_OPS "plus minus mul div mod un_plus un_minus assign mul_up div_up mod_up plus_up minus_up"
@@ -10053,12 +10441,16 @@ float a, b;
 op_add_upf(&a, b);
 \end{lstlisting}
 
-\subsection{Array to pointer conversion}
+\subsection{Array to Pointer Conversion}
+
+% FI: this should be in Section ``Declaration Transformations''... but
+% it can be argued that the address expression is potentially
+% simplified
 
 \begin{PipsPass}{linearize_array}
 This transformation replaces all arrays in the module by equivalent linearized
 arrays.
-Eventually using array/ pointer equivalence.
+Eventually using array/pointer equivalence.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10124,17 +10516,19 @@ LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS FALSE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE
 
-\subsection{Expression Optimizations}
-\label{subsection-expression-optimizations}
-\index{Common subexpression elimination}
-\index{CSE}
-\index{Invariant code motion}
-\index{Optimization}
-\index{EOLE}
-\index{EOLE\_FLAGS}
-\index{EOLE\_OPTIONS}
+% FI: this subsection seems to have been emptied, but the indexes have not been moved too.
 
-\subsubsection{Expression optimization using algebraic properties}
+%\subsection{Expression Optimizations}
+%\label{subsection-expression-optimizations}
+%\index{Common subexpression elimination}
+%\index{CSE}
+%\index{Invariant code motion}
+%\index{Optimization}
+%\index{EOLE}
+%\index{EOLE\_FLAGS}
+%\index{EOLE\_OPTIONS}
+
+\subsection{Expression Optimization Using Algebraic Properties}
 \label{sec:expr-optim-using}
 
 \begin{PipsPass}{optimize_expressions}
@@ -10211,11 +10605,12 @@ EOLE_OPTIMIZATION_STRATEGY "P2SC"
 \end{PipsProp}
 
 
-\subsubsection{Common subexpression elimination}
+\subsection{Common Subexpression Elimination}
 \label{sec:comm-subexpr-elim-1}
-\index{common subexpression elimination}
+\index{Common subexpression elimination}
+\index{CSE}
 
-Here are described 2 interesting cases of the one in
+Here are described two interesting cases of the one in
 \S~\ref{sec:expr-optim-using}.
 
 \begin{PipsPass}{common_subexpression_elimination}
@@ -10226,7 +10621,7 @@ One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} t
 \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
 
 The heuristic used for common subexpression elimination is described
-in Chapter 15 of Julien Zory's PhD dissertation~\cite{Zor99}.
+in Chapter~15 of Julien Zory's PhD dissertation~\cite{Zor99}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10912,7 +11307,7 @@ CLONE_NAME ""
 
 \section{Declaration Transformations}
 
-\subsection{Declarations cleaning}
+\subsection{Declarations Cleaning}
 
 Clean the declarations of unused variables and commons and so.
 It is also a code transformation, since not only the module entity are
@@ -11060,7 +11455,7 @@ array_resizing_statistic   > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-\subsubsection{Array Resizing properties}
+\subsubsection{Array Resizing Properties}
 
 This phase is firstly designed to infer automatically new array
 declarations for assumed-size (A(*)) and one (A(1) or also called ugly
@@ -11449,8 +11844,10 @@ FLATTEN_CODE_UNROLL TRUE
   etc. into their expanded form such as \verb/a = a + b/.
 \end{PipsPass}
 
-Note that if you have side effects in the destination, since the
-destination is evaluated twice, it is not equivalent in the general case.
+Note that if the left hand side expression implies side effects, the
+transformed code is not equivalent since they will be evaluated
+twice. The left hand side is not checked for side effects. The
+legality of the transformation is not guaranteed.
 
 \begin{PipsMake}
 split_update_operator > MODULE.code
@@ -11459,7 +11856,7 @@ split_update_operator > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Split Initializations (C code)}
+\subsection{Split Initializations (C Code)}
 
 \begin{PipsPass}{split_initializations}
 The purpose of this transformation is to separate the initialization
@@ -11474,7 +11871,7 @@ are modified by eliminating the initial value, and a new assignment
 statement with the initial value is added to the source code.
 
 This transformation can be used, for instance, to improve reduction
-detection (see TRAC ticket 181).
+detection (see TRAC Ticket 181).
 
 Note that C array and structure initializations, which use braces,
 cannot be converted into assignments. In such cases, the initial
@@ -11505,14 +11902,14 @@ must exist in the symbol table.
 This transformation loops over the symbols in the symbol table, and
 for each of them which is a typedef, compare the local name to the
 property \PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This
-approach is unsafe because there can be differents typedef with the
+approach is unsafe because there can be different typedef with the
 same name in different compilation units, resulting in differents
 entries in the symbol table for a same local name. The return type can
 also be incoherent with the return statement, thus it is not safe to
-run it on a non void function.
+run it on a non-void function.
 
-However this pass has been created for special need in par4all, and considering
-previously described restrictions, it does the job.
+However this pass has been created for special need in par4all, and
+considering restrictions described above, it does the job.
 
 \begin{PipsProp}{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}
 SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "P4A_accel_kernel_wrapper"
@@ -11529,8 +11926,8 @@ set_return_type_as_typedef > MODULE.code
 \subsection{Cast at Call Sites}
 
 \begin{PipsPass}{cast_at_call_sites}
-The purpose of this transformation is to force parameters at call sites to be
-casted as expected according to the prototype of the functions.
+The purpose of this transformation is to cast parameters at call sites
+according to the prototype of the called functions.
 \end{PipsPass}
 
 
@@ -11544,407 +11941,6 @@ cast_at_call_sites > CALLERS.code
         < CALLERS.code
 \end{PipsMake}
 
-
-
-%-----------End of Declaration Transformations -------------------------
-
-\section{Array Bound Checking}
-\label{subsection-array-bound-checking}
-\index{Buffer overflow}
-\index{Array access}
-
-Array bound checking refers to determining whether all array references
-are within their declared range in all of their uses in a program. These
-array  bound checks may be analysed intraprocedurally or
-interprocedurally, depending on the need for accuracy.
-
-There are two versions of intraprocedural array bounds checking: array
-bound check bottom up, array bound check top down. The first approach
-relies on checking every array access and on the elimination of
-redundant tests by advanced dead code elimination based on
-preconditions. The second approach is based on exact convex array
-regions. They are used to prove that all accessed in a compound
-statement are correct.
-
-These two dynamic analyses are implemented for Fortran. They are
-described in Nga Nguyen's PhD (see~\cite{Ngu02}). They
-may work for C code, but this has not been validated.
-
-
-\subsection{Elimination of Redundant Tests: Bottom-Up Approach}
-\label{subsection-array-bound-check_bottom_up}
-
-\begin{PipsPass}{array_bound_check_bottom_up}
-This transformation takes as input the current module, adds array range
-checks (lower and upper bound checks) to every statement that has one or
-more array accesses. The output is the module with those added tests.
-
-If one test is trivial or exists already for the same statement, it is
-no need to be generated in order to reduce the
-number of tests.  As Fortran language permits an assumed-size array
-declarator with the unbounded upper bound of the last dimension, no range check is generated for this case also.
-
-Associated with each test is a bound violation error message and in case
-of real access violation, a STOP statement will be put before the current
-statement.
-
-This phase should always be followed by the
-\PipsPassRef{partial_redundancy_elimination} for logical expression in
-order to reduce the number of bound checks.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias array_bound_check_bottom_up 'Elimination of Redundant Tests'
-array_bound_check_bottom_up            > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{PipsMake}
-
-
-\subsection{Insertion of Unavoidable Tests}
-\label{subsection-array-bound-check_top_down}
-
-\begin{PipsPass}{array_bound_check_top_down}
-This second implementation is based on the array region analyses phase which benefits some interesting proven properties:
-
-\begin{enumerate}
-
-\item If a MAY region correspond to one node in the control flow graph
-  that represents a block of code of program is included in the
-  declared dimensions of the array, no bound check is needed for this
-  block of code.
-
-\item If a MUST region correspond to one node in the control
-  flow graph that represents a block of code of program contains elements
-  which are outside the declared dimensions of the  array, there is
-  certainly bound violation in this block of code. An error can be
-  detected just in compilation time.
-
-\end{enumerate}
-
-If none of these two properties are satisfied, we consider the
-approximation of region. In case of MUST region, if the exact bound checks
-can be generated, they will be inserted before the block of code. If not,
-like in case of MAY region, we continue to go down to the children nodes
-in the control flow graph.
-
- The main advantage
-of this algorithm is that it permits to detect the sure bound violations
-or to tell that there is certainly no bound violation as soon as
-possible, thanks to the context given by preconditions and the top-down
-analyses.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias array_bound_check_top_down 'Insertion of Unavoidable Tests'
-array_bound_check_top_down   > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.regions
-\end{PipsMake}
-
-
-\subsection{Interprocedural Array Bound Checking}
-\label{subsection-array-bound-check_interprocedural}
-
-\begin{PipsPass}{array_bound_check_interprocedural}
-This phase checks for out of bound errors when passing arrays or array
-elements as arguments in procedure call. It ensures that there is no bound
-violation in every array access in the callee procedure, with respect to
-the array declarations in the caller procedure.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias array_bound_check_interprocedural 'Interprocedural Array Bound Checking'
-array_bound_check_interprocedural             > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.preconditions
-\end{PipsMake}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY BOUND CHECK
-
-\subsection{Array Bound Checking Instrumentation}
-\label{subsection-array-bound-check_instrumentation}
-
-\begin{PipsPass}{array_bound_check_instrumentation}
-
-We provide here a tool to calculate the number of dynamic bound checks
-from both initial and PIPS generated code.
-
-These transformations are implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
-\end{PipsPass}
-
-\begin{PipsMake}
-alias array_bound_check_instrumentation 'Array Bound Checking Instrumentation'
-array_bound_check_instrumentation > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{PipsMake}
-
-
-
-Array bounds checking refers to determining whether all array reference
-are within their declared range in all of its uses in a program. Here are
-array bounds checking options for code instrumentation, in order to
-compute the number of bound checks added. We can use only one property for
-these two case, but the meaning is not clear. To be changed ?
-
-\begin{PipsProp}{INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
-INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
-\end{PipsProp}
-\begin{PipsProp}{PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION}
-PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
-\end{PipsProp}
-
-In practice, bound violations may often occur with arrays in a common block. The
-standard is violated, but programmers think that they are not dangerous
-because the allocated size of the common is not reached.
-The following property deals with this kind of bad programming practice. If the
-array is a common variable, it checks if the reference goes beyond the
-size of the common block or not.
-
-\begin{PipsProp}{ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE}
-ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE FALSE
-\end{PipsProp}
-
-The following property tells the verification phases (array bound
-checking, alias checking or uninitialized variables checking) to instrument
-codes with the STOP or the PRINT message. Logically, if a standard violation
-is detected, the program will stop immediately. Furthermore, the STOP message gives the
-partial redundancy elimination phase more information to remove
-redundant tests occurred after this STOP. However, for the debugging
-purposes, one may need to display all possible violations such as
-out-of-bound or used-before-set errors, but not
-to stop the program. In this case, a PRINT message is chosen. By default,
-we use the STOP message.
-
-\begin{PipsProp}{PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE}
-PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
-\end{PipsProp}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ALIAS
-
-\section{Alias Verification}
-\label{subsection-alias-verification}
-
-\subsection{Alias Propagation}
-\label{subsubsection-alias-propagation}
-\index{Alias Propagation}
-
-\begin{PipsPass}{alias_propagation}
-
-\textit {Aliasing} occurs when two or more variables refer to the same
-storage location at the same program point. Alias analysis is critical for
-performing most optimizations correctly because we must know for certain
-that we have to take into account
-all the ways a location, or the value of a variable, may (or must)
-be used or changed. Compile-time alias information is also important for
-program verification, debugging and understanding.
-
-In Fortran 77, parameters are passed by address in such
-a way that, as long as the actual argument is associated with a named
-storage location, the called subprogram can change the value of the actual
-argument by assigning a value to the corresponding formal parameter. So
-new aliases can be created between formal parameters if the
-same actual argument is passed to two or more formal parameters, or between formal
-parameters and global parameters if an actual
-argument is an object in common storage which is also visible in the
-called subprogram or other subprograms in the call chain below it.
-
-Both \textit{intraprocedural} and \textit{interprocedural} alias
-determinations are important for program analysis. Intraprocedural aliases
-occur due to pointers in languages like LISP, C, C++ or Fortran 90,
-union construct in C or \verb+EQUIVALENCE+ in Fortran. Interprocedural aliases
-are generally created by parameter passing and by access to global
-variables, which propagates intraprocedural aliases  across procedures and
-introduces new aliases.
-
-The basic idea for computing interprocedural aliases is to follow all the
-possible chains of argument-parameters and nonlocal variable-parameter
-bindings at all call sites. We introduce a \textit{naming memory
-  locations} technique which guarantees the correctness and enhances the
-precision of data-flow analysis. The technique associates sections,
-offsets of actual parameters to formal parameters following a certain call
-path. Precise alias information are computed for both scalar and array
-variables. The analysis is called alias propagation.
-
-This analysis is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
-\end{PipsPass}
-
-\begin{PipsMake}
-
-alias_propagation           > MODULE.alias_associations
-        < PROGRAM.entities
-        < MODULE.code
-        < CALLERS.alias_associations
-        < CALLERS.code
-
-\end{PipsMake}
-
-\subsection{Alias Checking}
-\label{subsubsection-alias-check}
-\index{Alias Checking}
-
-\begin{PipsPass}{alias_check}
-
-With the call-by-reference mechanism in Fortran 77, new aliases can be
-created between formal parameters if the
-same actual argument is passed to two or more formal parameters, or between formal
-parameters and global parameters if an actual
-argument is an object in common storage which is also visible in the
-called subprogram or other subprograms in the call chain below it.
-
-Restrictions on association of entities in Fortran 77 (Section 15.9.3.6
-\cite{ANSI83}) say that neither aliased formal parameters nor the variable in the
-common block may become defined during execution
-of the called subprogram or the others subprograms in the call chain.
-
-This phase uses information from the \PipsPassRef{alias_propagation}
-analysis and computes the definition
-informations of variables in a program, and then to verify
-statically if the program violates the standard restriction on alias or
-not. If these informations are not known at compile-time, we instrument
-the code with tests that check the violation dynamically during
-execution of program.
-
-This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
-\end{PipsPass}
-
-% Attention : will we use the preconditions, regions, effects ?
-% They are may be wrong
-
-\begin{PipsMake}
-alias alias_check 'Alias Check'
-alias_check   > MODULE.code
-        < PROGRAM.entities
-        < MODULE.alias_associations
-        < MODULE.cumulated_effects
-        < ALL.code
-\end{PipsMake}
-
-This is a property to control whether the alias propagation and alias checking
-phases use information from MAIN program or not. If the current
-module is never called by the main program, we do no alias propagation
-and alias checking for this module if the property is on. However, we
-can do nothing with modules that have no callers at all, because this
-is a top-down approach.
-
-\begin{PipsProp}{ALIAS_CHECKING_USING_MAIN_PROGRAM}
-ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
-\end{PipsProp}
-
-\section{Used Before Set}
-\label{subsection-used-before_set}
-
-\begin{PipsPass}{used_before_set}
-This analysis checks if the program uses a variable or an array element
-which has not been assigned a value. In this case, anything may happen:
-the program may appear to run normally, or may
-crash, or may behave unpredictably. We use IN regions
-that give a set of read variables not previously written. Depending on the
-nature of the variable: local, formal or global, we have different
-cases. In principle, it
-works as follows: if we have a MUST IN region at the module statement, the
-corresponding variable must be used before
-being defined, a STOP is inserted. Else, we insert an initialization
-function and go down, insert a verification function before each MUST IN
-at each sub-statements.
-
-This is a top-down analysis that process a procedure before all its
-callees. Information given by callers is used to verify if we have to
-check for the formal parameters in the current module or not. In addition,
-we produce information in the resource MODULE.ubs to tell if the formal
-parameters of the called procedures have to be checked or not.
-
-This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
-\end{PipsPass}
-
-\begin{PipsMake}
-alias used_before_set 'Used Before Set'
-used_before_set   > MODULE.ubs
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.in_regions
-        < CALLERS.ubs
-\end{PipsMake}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MISC
-
-\section{Miscellaneous transformations}
-
-The following warning paragraphs should not be located here, but the
-whole introduction has to be updated to take into account the merger
-with properties-rc.tex, the new content (the transformation section
-has been exploded) and the new passes such as gpips. No time right
-now. FI.
-
-All PIPS transformations assume that the initial code is legal
-according to the language standard. In other words, its semantics is
-well defined. Otherwise, it is impossible to maintain a constant
-semantics through program transformations. So uninitialized variables,
-for instance, can lead to codes that seem wrong, because they are
-likely to give different outputs than the initial code. But this does
-not matter as the initial code output is undefined and could well be
-the new output,
-
-Also, remember that dead code does not impact the semantics in an
-observable way. Hence dead code can be transformed in apparently weird
-ways. For instance, all loops that are part of a dead code section can
-be found parallel, although they are obviously sequential, because all
-the references will carry an unfeasible predicate. In fact, reference
-A(I), placed in a dead code section, does not reference the memory and
-does not have to be part of the dependence graph.
-
-Dead code can crop out in many modules when a whole application linked
-with a library is analyzed. All unused library modules are dead for
-PIPS.
-
-On the other hand, missing source modules synthesized by PIPS may also
-lead to weird results because they are integrated in the application
-with empty definitions. Their call sites have no impact on the
-application semantics.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TYPE CHECK
-
-\subsection{Type Checker}
-\label{subsection-type-checker}
-\index{TypeChecker}
-
-Typecheck code according to Fortran standard + double-complex.
-Typechecking is performed interprocedurally for user-defined functions.
-Insert type conversions where implicitly needed.
-Use typed intrinsics instead of generic ones.
-Precompute constant conversions if appropriate (e.g. 16 to 16.0E0).
-Add comments about type errors detected in the code.
-Report back how much was done.
-
-\begin{PipsMake}
-type_checker            > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < CALLEES.code
-\end{PipsMake}
-
-Here are type checker options. Whether to deal with double complex or to
-refuse them. Whether to add a summary of errors, conversions and
-simplifications as a comment to the routine. Whether to always show complex
-constructors.
-
-\begin{PipsProp}{TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION}
-TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
-\end{PipsProp}
-\begin{PipsProp}{TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION}
-TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION FALSE
-\end{PipsProp}
-\begin{PipsProp}{TYPE_CHECKER_ADD_SUMMARY}
-TYPE_CHECKER_ADD_SUMMARY FALSE
-\end{PipsProp}
-\begin{PipsProp}{TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS}
-TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
-\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% S&A PRIVATIZATION
 
@@ -11995,9 +11991,13 @@ privatize_module                    > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Declaration Localization
+
+\subsubsection{Declaration Localization}
+
 \begin{PipsPass}{localize_declaration}
-Use informations from \PipsPassRef{privatize_module} to change \texttt{C}
-variable declarations.
+Use informations from \PipsPassRef{privatize_module} to move \texttt{C}
+variable declarations as close as possible to their uses.
 For instance
 \begin{lstlisting}
 int i,j;
@@ -12214,6 +12214,84 @@ freeze_variables                   > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+
+%-----------End of Declaration Transformations -------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MISC
+
+\section{Miscellaneous transformations}
+
+The following warning paragraphs should not be located here, but the
+whole introduction has to be updated to take into account the merger
+with properties-rc.tex, the new content (the transformation section
+has been exploded) and the new passes such as gpips. No time right
+now. FI.
+
+All PIPS transformations assume that the initial code is legal
+according to the language standard. In other words, its semantics is
+well defined. Otherwise, it is impossible to maintain a constant
+semantics through program transformations. So uninitialized variables,
+for instance, can lead to codes that seem wrong, because they are
+likely to give different outputs than the initial code. But this does
+not matter as the initial code output is undefined and could well be
+the new output,
+
+Also, remember that dead code does not impact the semantics in an
+observable way. Hence dead code can be transformed in apparently weird
+ways. For instance, all loops that are part of a dead code section can
+be found parallel, although they are obviously sequential, because all
+the references will carry an unfeasible predicate. In fact, reference
+A(I), placed in a dead code section, does not reference the memory and
+does not have to be part of the dependence graph.
+
+Dead code can crop out in many modules when a whole application linked
+with a library is analyzed. All unused library modules are dead for
+PIPS.
+
+On the other hand, missing source modules synthesized by PIPS may also
+lead to weird results because they are integrated in the application
+with empty definitions. Their call sites have no impact on the
+application semantics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TYPE CHECK
+
+\subsection{Type Checker}
+\label{subsection-type-checker}
+\index{TypeChecker}
+
+Typecheck code according to Fortran standard + double-complex.
+Typechecking is performed interprocedurally for user-defined functions.
+Insert type conversions where implicitly needed.
+Use typed intrinsics instead of generic ones.
+Precompute constant conversions if appropriate (e.g. 16 to 16.0E0).
+Add comments about type errors detected in the code.
+Report back how much was done.
+
+\begin{PipsMake}
+type_checker            > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.code
+\end{PipsMake}
+
+Here are type checker options. Whether to deal with double complex or to
+refuse them. Whether to add a summary of errors, conversions and
+simplifications as a comment to the routine. Whether to always show complex
+constructors.
+
+\begin{PipsProp}{TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION}
+TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
+\end{PipsProp}
+\begin{PipsProp}{TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION}
+TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION FALSE
+\end{PipsProp}
+\begin{PipsProp}{TYPE_CHECKER_ADD_SUMMARY}
+TYPE_CHECKER_ADD_SUMMARY FALSE
+\end{PipsProp}
+\begin{PipsProp}{TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS}
+TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
+\end{PipsProp}
 
 \subsection{Manual Editing}
 
@@ -13227,7 +13305,7 @@ print_code_simple_gen_kill_pointer_values      > MODULE.printed_file
 
 \end{PipsMake}
 
-\subsection{Prettyprint properties}
+\subsection{Prettyprint Properties}
 
 \index{Prettyprinter (Code)}
 \index{Code Prettyprinter}
@@ -13930,7 +14008,7 @@ print_code_as_a_graph_cumulated_effects    > MODULE.graph_printed_file
         < MODULE.summary_effects
 \end{PipsMake}
 
-\subsection{ICFG properties}
+\subsection{ICFG Properties}
 
 \label{subsection-interprocedural-control-flow-graph}
 \index{ICFG}
@@ -14014,7 +14092,7 @@ filtering criterion.
 RW_FILTERED_EFFECTS 0
 \end{PipsProp}
 
-\subsection{Graph properties}
+\subsection{Graph Properties}
 
 
 \subsubsection{Interface to Graphics Prettyprinters}
