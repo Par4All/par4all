@@ -3171,7 +3171,7 @@ for instance, \textsc{Kennedy}'s algorithm requires dependence levels (which
 loop actually creates the dependence) while algorithms originated from
 CSRD prefer DDVs (relations between loop indices when the dependence
 occurs). Dependence cones introduced in~\cite{Iri87,IT87a,IT87b,IT88}
-are even more precise~\cite{AIY94}.
+are even more precise~\cite{YAI94}.
 
 The computations of dependence level and dependence cone~\cite{Yan93} are
 both implemented in \Pips{}. DDV's are not computed. Currently, only
@@ -5769,7 +5769,7 @@ regions. They are used to prove that all accessed in a compound
 statement are correct.
 
 These two dynamic analyses are implemented for Fortran. They are
-described in Nga Nguyen's PhD (see~\cite{Ngu02}). They
+described in Nga Nguyen's PhD (see~\cite{Ngu02}) and in~\cite{NI05}. They
 may work for C code, but this has not been validated.
 
 
@@ -6000,7 +6000,7 @@ argument is an object in common storage which is also visible in the
 called subprogram or other subprograms in the call chain below it.
 
 Restrictions on association of entities in Fortran 77 (Section 15.9.3.6
-\cite{ANSI83}) say that neither aliased formal parameters nor the variable in the
+\cite{ANSI78}) say that neither aliased formal parameters nor the variable in the
 common block may become defined during execution
 of the called subprogram or the others subprograms in the call chain.
 
@@ -8643,7 +8643,7 @@ LOOP_FUSION_MAX_FUSED_PER_LOOP -1
 \label{subsection-index-set-splitting}
 \index{Index Set Splitting}
 \begin{PipsPass}{index_set_splitting}
-Index Set Splitting~\cite{GFL00}  splits the loop referenced by
+Index Set Splitting~\cite{GFL99}  splits the loop referenced by
 property \PipsPropRef{LOOP_LABEL} into two loops.  The
 first loop ends at an iteration designated by property
 \PipsPropRef{INDEX_SET_SPLITTING_BOUND} and the second start thereafter.  It
@@ -11379,7 +11379,7 @@ One problem of Fortran code is the unnormalized array bound
 declarations. In many program, the programmer put an asterisk
 (assumed-size array declarator), even 1 for every
 upper bound of last dimension of array declaration. This feature affects
-code quality and prevents others analyses such as array bound checking,
+code quality and prevents others analyses such as array bound checking or
 alias analysis. We developed in PIPS two new methods to find out
 automatically the proper upper bound for the unnormalized and assumed-size
 array declarations, a process we call {\em array resizing}. Both
@@ -11513,6 +11513,8 @@ the option to compute new declarations for instrumented array
 \begin{PipsProp}{ARRAY_RESIZING_BOTTOM_UP_OPTION}
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{PipsProp}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCALARIZATION
 
 \subsection{Scalarization}
 
@@ -11697,7 +11699,7 @@ constant_array_scalarization > MODULE.code
 \end{PipsMake}
 
 This pass may be useful to make C source code more palatable to C to VHDL
-converter that prefer dealing with scalars than arrays. It is also useful
+converters that handle scalars better than arrays. It is also useful
 to propagate constants contained in an array since the semantics passes
 only analyze scalar variables.
 
@@ -11709,9 +11711,9 @@ array regions analyses and uses them to check its legality
 criteria. The next phase alleviates these drawbacks.
 
 \begin{PipsPass}{quick_scalarization}
-  This Pass solely relies on proper and cumulated effets, and as such
+  This pass solely relies on proper and cumulated effets, and as such
   may fail to scalarize some accesses. However, it is expected to give
-  good results in current cases, especially after
+  good results in usual cases, especially after
   \PipsPassRef{loop_fusion}.
 
   It basically uses the same algorithm as scalar privatization, but
@@ -11820,8 +11822,8 @@ The code externalization and adaptation for a given hardware
 accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
-Initially developed in August 2009 by Laurent \textsc{Daverio}, with help from
-Fabien \textsc{Coelho} and Fran�ois \textsc{Irigoin}.
+Initially developed in August 2009 by Laurent \textsc{Daverio}, with
+help from Fabien \textsc{Coelho} and Francois \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -11837,23 +11839,28 @@ FLATTEN_CODE_UNROLL TRUE
 \end{PipsProp}
 
 
-\subsection{Split Update Operator}
+\subsection{Split Update Operators}
 
 \begin{PipsPass}{split_update_operator}
   Split C operators such as \verb/a += b/, \verb/a *= b/, \verb/a >>= b/,
   etc. into their expanded form such as \verb/a = a + b/.
 \end{PipsPass}
 
-Note that if the left hand side expression implies side effects, the
-transformed code is not equivalent since they will be evaluated
-twice. The left hand side is not checked for side effects. The
-legality of the transformation is not guaranteed.
+Note that if the left hand side expression lhs implies side effects,
+the transformed code is not equivalent since lhs be evaluated twice in
+the transformed code. The left hand side is not checked for side
+effects. The legality of the transformation is not guaranteed.
 
 \begin{PipsMake}
 split_update_operator > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+Two improvements could be used. Check the side effects with a function
+such as \verb/expression_to_proper_constant_path_effects()/ and/or use a
+pointer to evaluate lhs \verb/a/ once to obtain
+\verb/p = &a; *p = *p +b;/.
 
 
 \subsection{Split Initializations (C Code)}
@@ -11908,6 +11915,8 @@ entries in the symbol table for a same local name. The return type can
 also be incoherent with the return statement, thus it is not safe to
 run it on a non-void function.
 
+% FI: the motivation could be explicited...
+
 However this pass has been created for special need in par4all, and
 considering restrictions described above, it does the job.
 
@@ -11923,17 +11932,17 @@ set_return_type_as_typedef > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Cast at Call Sites}
+\subsection{Cast Actual Parameters at Call Sites}
 
 \begin{PipsPass}{cast_at_call_sites}
 The purpose of this transformation is to cast parameters at call sites
-according to the prototype of the called functions.
+according to the prototype, a.k.a. the signature, of the called functions.
 \end{PipsPass}
 
-
+% FI: any motivation? example?
 
 \begin{PipsMake}
-alias cast_at_call_sites 'Call parameters at call sites'
+alias cast_at_call_sites 'Cast parameters at call sites'
 cast_at_call_sites > CALLERS.code
         < PROGRAM.entities
         < MODULE.code
@@ -11991,7 +12000,7 @@ privatize_module                    > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Declaration Localization
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DECLARATION LOCALIZATION
 
 \subsubsection{Declaration Localization}
 
@@ -12027,6 +12036,8 @@ localize_declaration > MODULE.code
 \begin{PipsProp}{LOCALIZE_DECLARATION_SKIP_LOOP_INDICES}
 LOCALIZE_DECLARATION_SKIP_LOOP_INDICES FALSE
 \end{PipsProp}
+
+% FI: we could also restitute initializations, "int p; p = 0;" -> "int p = 0;"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY PRIVATIZATION
 
@@ -16007,7 +16018,9 @@ caller.
 
 %% BIBLIOGRAPHY
 
-\bibliography{../pips.bib}
+% \bibliographystyle{latex8}
+\bibliographystyle{acm}
+\bibliography{../pips}
 
 \newpage
 
