@@ -26,3 +26,4 @@
 #define SEQUENTIAL_POINTS_TO_SETS_SUFFIX ".pt"
 #define USER_POINTS_TO_SETS_SUFFIX ".upt"
 
+typedef set pt_map;
