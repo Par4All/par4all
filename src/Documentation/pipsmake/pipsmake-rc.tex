@@ -7976,7 +7976,13 @@ and the set of data that have to be copied back from the GPU after the execution
 of each statement.
 
 Then according to this information, the copy-in and copy-out transfers are
-generated using same properties as \PipsPassRef{KERNEL_LOAD_STORE}:
+generated using same set of properties as \PipsPassRef{KERNEL_LOAD_STORE}.
+
+This work has been described in~\cite{AIK11,ACIK11}, however the implementation
+is more complex than the published equations because of PIPS' HCFG and because
+of a heuristic to keep transfers as high as possible in the HCFG.
+
+
 
 \end{PipsPass}
 \begin{PipsMake}
