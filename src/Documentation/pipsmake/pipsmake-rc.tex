@@ -1924,7 +1924,7 @@ some declaration splitting, we can generate a more representative version:
 if \PipsPropRef{C_PARSER_GENERATE_COMPACT_C99_FOR_LOOP_DECLARATION} property
 set to \texttt{FALSE}.
 
-\begin{PipsProp}{C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION}
+\begin{PipsProp}{C_PARSER_GENERATE_COMPACT_C99_FOR_LOOP_DECLARATION}
 C_PARSER_GENERATE_COMPACT_C99_FOR_LOOP_DECLARATION FALSE
 \end{PipsProp}
 
@@ -2589,19 +2589,19 @@ out_effects > MODULE.out_effects
 \end{PipsMake}
 
 \subsection{Proper and Cumulated References}
-\label{subsubsection-cumulated-effects}
-\index{Cumulated Effects}
-\index{Effects (Cumulated)}
+%\label{subsubsection-cumulated-effects}
+%\index{Cumulated Effects}
+%\index{Effects (Cumulated)}
 
 The concept of {\em proper references} is not yet clearly defined. The
-original idea is to keep track of the actual objects of newgen domain
+original idea is to keep track of the actual objects of Newgen domain
 {\tt reference} used in the program representation of the current
 statement, while retaining if they correspond to a read or a write of
 the corresponding memory locations. Proper references are
 represented as effects.
 
 For C programs, where memory accesses are not necessarily represented
-by objects of newgen domain {\tt reference}, the semantics of this
+by objects of Newgen domain {\tt reference}, the semantics of this
 analysis is unclear.
 
 Cumulated references gather proper references over the program
@@ -5104,7 +5104,7 @@ must_regions                    > MODULE.proper_regions
         < CALLEES.summary_regions
 \end{PipsMake}
 
-\begin{PipsPass}{must_regions}
+\begin{PipsPass}{must_regions_with_points_to}
 This function computes the \verb|MUST| regions in a module.
 \end{PipsPass}
 \begin{PipsMake}
@@ -5388,6 +5388,7 @@ alias_classes > MODULE.alias_classes
 
 \subsection{Init  Points to Analysis}
 
+\begin{PipsPass}{init_points_to_analysis}
 This phase generates synthetic points-to relations for formal
 parameters. It creates synthetic sinks, i.e. stubs, for formal
 parameters and provides an initial set of points-to to the
@@ -5399,6 +5400,7 @@ parameters. Two properties should control this behavior,
 \PipsPropRef{ALIASING_ACROSS_FORMAL_PARAMETERS} and
 \PipsPropRef{ALIASING_ACROSS_TYPES}. The first one supersedes the
 property \PipsPropRef{ALIASING_INSIDE_DATA_STRUCTURE}.
+\end{PipsPass}
 \begin{PipsMake}
 alias init_points_to_analysis  'Init Points To Analysis'
 
@@ -5409,22 +5411,26 @@ init_points_to_analysis > MODULE.init_points_to_list
 
 \subsection{Intraprocedural Points to Analysis}
 \label{subsection-intraprocedural-points-to-analysis}
-\index{Intraprocedural Points to Analysis}
+\label{subsection-points-to-analysis}
+\index{Intraprocedural Points-to Analysis}
 
-This function is being implemented by Amira \textsc{Mensi}.
-The \PipsPassRef{intraprocedural_points_to_analysis} is implemented in order to
-compute points-to relations, based on Emami algorithm. \textsc{Emami} algorithm
-is a top-down analysis which calcules the points-to relations by
-applying specific rules to each assignement pattern identified.
-This phase requires another resource which
-is \PipsPassRef{init_points_to_analysis}.
-Ressources points\_to\_in and points\_to\_out will be used to compute
-the transfer function later. They represent points-to relation at the beginning of functions
-where sources are formal parameters or global variables. Points\_to\_out are points-to relations
-at the end of function's body, it contains return value and it's sink, formal parameters, gloabl 
-variables and heap allocated variables which can be visible beyond function's scope.
-And using effects to compute calls impact
-on points-to analysis.
+\begin{PipsPass}{intraprocedural_points_to_analysis}
+This function is being implemented by Amira \textsc{Mensi}.  The
+\PipsPassRef{intraprocedural_points_to_analysis} is implemented in
+order to compute points-to relations, based on Emami
+algorithm. \textsc{Emami} algorithm is a top-down analysis which
+calcules the points-to relations by applying specific rules to each
+assignement pattern identified.  This phase requires another resource
+which is \PipsPassRef{init_points_to_analysis}.  Ressources
+points\_to\_in and points\_to\_out will be used to compute the
+transfer function later. They represent points-to relation at the
+beginning of functions where sources are formal parameters or global
+variables. Points\_to\_out are points-to relations at the end of
+function's body, it contains return value and it's sink, formal
+parameters, gloabl variables and heap allocated variables which can be
+visible beyond function's scope.  And using effects to compute calls
+impact on points-to analysis.
+\end{PipsPass}
 \begin{PipsMake}
 alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 
@@ -5449,10 +5455,12 @@ expression and subexpression by the points-to analysis.
 \label{subsection-interprocedural-points-to-analysis}
 \index{Interprocedural Points to Analysis}
 
+\begin{PipsPass}{interprocedural_points_to_analysis}
 This pass is being implemented by Amira \textsc{Mensi}.
 The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
 compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. 
 This phase requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+\end{PipsPass}
 
 \begin{PipsMake}
 alias interprocedural_points_to_analysis  'Interprocedural Points To Analysis'
@@ -6323,7 +6331,7 @@ loop.
 This algorithm still is in the development stage. It can be tried to
 check that loops are interchanged when locality can be
 improved\marginpar{Internship!}. An alternative for static control
-section, is to use the interface with PoCC (see Section~\ref{}).
+section, is to use the interface with PoCC (see Section~\ref{subsection-prettyprinter-pocc}).
 
 \end{PipsPass}
 
@@ -6339,8 +6347,8 @@ nest_parallelization                    > MODULE.parallelized_code
 
 \begin{PipsPass}{internalize_parallel_code}
 To simplify the user interface and to display with one click a
-parallelized program, programs in PIPS are ({\em parallelized code})
-instead of standard ({\em code}.\marginpar{PV:not clear} As a consequence, parallelized
+parallelized program, programs in PIPS are {\em parallelized code}
+instead of standard {\em code}.\marginpar{PV:not clear} As a consequence, parallelized
 programs cannot be further analyzed and transformed because sequential
 code and parallelized code do not have the same resource type. Most
 pipsmake rules apply to {\em code} but not to {\em parallelized
@@ -7523,7 +7531,7 @@ COMENGINE_SIZE_OF_FIFO 128
 \subsubsection{Isolate Statement}
 \begin{PipsPass}{isolate_statement}
 Isolate the statement given in \PipsPropRef{ISOLATE_STATEMENT_LABEL} in a separated memory.
-Data transfer are generated using the same DMA as \PipsPassRef{KERNEL_LOAD_STORE}.
+Data transfer are generated using the same DMA as \PipsPassRef{kernel_load_store}.
 \end{PipsPass}
 
 The algorithm is based on Read and write regions (no in / out yet) to compute
@@ -7966,7 +7974,7 @@ Use this property for accuracy of divide to multiply conversion.
 TERAPIX_REMOVE_DIVIDE_ACCURACY 4
 \end{PipsProp}
 
-\subsubsection{Generating communications}
+\subsubsection{Communication Generation}
 
 
 \begin{PipsPass}{kernel_data_mapping}
@@ -7976,11 +7984,11 @@ and the set of data that have to be copied back from the GPU after the execution
 of each statement.
 
 Then according to this information, the copy-in and copy-out transfers are
-generated using same set of properties as \PipsPassRef{KERNEL_LOAD_STORE}.
+generated using same set of properties as \PipsPassRef{kernel_load_store}.
 
-This work has been described in~\cite{AIK11,ACIK11}, however the implementation
+This work has been described in~\cite{AIK11}\cite{ACIK11}. However, the implementation
 is more complex than the published equations because of PIPS' HCFG and because
-of a heuristic to keep transfers as high as possible in the HCFG.
+of a heuristic to generate transfers as high as possible in the HCFG.
 
 
 
@@ -8035,7 +8043,7 @@ wrap_kernel_argument > CALLERS.code
 \begin{PipsPass}{gpu_ify}
 This phase generate GPU kernels from perfect parallel loop nests.
 \PipsPropRef{GPU_IFY_ANNOTATE_LOOP_NESTS} property triggers automatically the 
-annotation of the loop nest (see \PipsPassRef{GPU_LOOP_NEST_ANNOTATE}).
+annotation of the loop nest (see \PipsPassRef{gpu_loop_nest_annotate}).
 \end{PipsPass}
 
 \begin{PipsProp}{GPU_IFY_ANNOTATE_LOOP_NESTS}
@@ -9143,9 +9151,11 @@ partial_redundancy_elimination             > MODULE.code
 \index{Simplify Control}
 \index{Control Simplification}
 
-\begin{PipsPass}{suppress_dead_code}
-Alias for \PipsPassRef{simplify_control}.
-\end{PipsPass}
+% FI: duplicate definition?
+
+%\begin{PipsPass}{simplify_control}
+%Alias for \PipsPassRef{simplify_control}.
+%\end{PipsPass}
 
 \begin{PipsPass}{simplify_control}
 
@@ -9306,7 +9316,7 @@ are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
 \verb/FALSE/ because we need that the DG includes arcs for declarations as these
 latter are separate statements now.
 
-\PipsPassRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why
+\PipsPassRef{clean_declarations} is automatically done at the end, this is why
 cumulated effects are needed.
 
 Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} p. 595,
@@ -9708,7 +9718,7 @@ full_spaghettify          > MODULE.code
 \index{STF}
 \index{Control Restructurer}
 
-This pass is now obsolete. Use \PipsPassRef{restucture_control} instead.
+This pass is now obsolete. Use \PipsPassRef{restructure_control} instead.
 
 \begin{PipsPass}{stf}
 Transformation \PipsPassRef{stf} is a C interface to a Shell script used to
@@ -10990,12 +11000,12 @@ Use following property to control whether inlining should ignore stubs:
 INLINING_IGNORE_STUBS TRUE
 \end{PipsProp}
 
-Use following property to control whether inlining should ignore stubs:
-\begin{PipsProp}{INLINING_IGNORE_STUBS}
-INLINING_IGNORE_STUBS TRUE
-\end{PipsProp}
+%Use following property to control whether inlining should ignore stubs:
+%\begin{PipsProp}{INLINING_IGNORE_STUBS}
+%INLINING_IGNORE_STUBS TRUE
+%\end{PipsProp}
 
-Set following property to TRUE to add comments on inlinied statements to
+Set the following property to TRUE to add comments on inlined statements to
 keep track of their origin.
 \begin{PipsProp}{INLINING_COMMENT_ORIGIN}
 INLINING_COMMENT_ORIGIN FALSE
@@ -12939,7 +12949,7 @@ print_code_continuation_conditions   > MODULE.printed_file
 \subsection{Sequential View with Convex Array Regions}
 
 \subsubsection{Sequential View with Plain Pointer Regions}
-\label{sec:plain-regions}
+\label{sec:plain-pointer-regions}
 
 \begin{PipsPass}{print_code_pointer_regions}
 Display the code decorated with the pointer regions.
@@ -12976,7 +12986,7 @@ print_code_proper_pointer_regions          > MODULE.printed_file
 
 \subsubsection{Sequential View with Invariant Pointer Regions}
 
-\begin{PipsPass}{print_code_inv_regions}
+\begin{PipsPass}{print_code_inv_pointer_regions}
 Display the code decorated with the invariant read/write pointer regions.
 \end{PipsPass}
 
@@ -15532,7 +15542,7 @@ there were a set of limiting rules to apply for PoCC, but user calls
 are the only current issue\footnote{The PLUTO compiler does not
   support intrinsics calls either, althoug it is part of the PoCC
   collection.} So the property is called
-\PipsPassRef{STATIC_CONTROLIZE_ACROSS_USER_CALLS} and its default
+\PipsPropRef{STATIC_CONTROLIZE_ACROSS_USER_CALLS} and its default
 value is TRUE.
 \begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
 STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
