@@ -1,6 +1,6 @@
 /*
 
-  $Id: points_to_analysis_general_algorithm.c 21101 2012-03-04 20:38:17Z amini $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 
@@ -97,9 +97,13 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
     break;
   }
   case is_syntax_subscript: {
+    // FI: another expression should be exploited
     subscript sub = syntax_subscript(s);
+    expression a = subscript_array(sub)
     list sel = subscript_indices(sub);
-    pt_out = expressions_to_points_to(sel, pt_in);
+    pt_map pt_int = expression_to_points_to(a, pt_in)
+    pt_out = expressions_to_points_to(sel, pt_int);
+    free_set(pt_int);
     break;
   }
   case is_syntax_application: {
@@ -158,23 +162,37 @@ pt_map range_to_points_to(range r, pt_map pt_in)
   return pt_out;
 }
 
-/* Three different kinds of calls are distinguished: calls to
-   constants, e.g. NULL, calls to intrinsics, e.g. ++ or malloc(), and
-   calls to a user function. */
+/* Three different kinds of calls are distinguished:
+ *
+ * - calls to constants, e.g. NULL,
+ *
+ * - calls to intrinsics, e.g. ++ or malloc(),
+ *
+ * - and calls to a user function.
+ */
 pt_map call_to_points_to(call c, pt_map pt_in)
 {
   pt_map pt_out;
   entity f = call_function(c);
+  list al = call_arguments(c);
+
+  /* points-to updates due to arguments */
+  pt_map pt_int = expressions_to_points_to(al, pt_in)
+
+  /* points-to updates due to the function itself */
   if(entity_constant_p(f))
-    pt_out = constant_call_to_points_to(c, pt_in);
+    pt_out = constant_call_to_points_to(c, pt_int);
   else if(intrinsic_entity_p(f))
-    pt_out = intrinsic_call_to_points_to(c, pt_in);
+    pt_out = intrinsic_call_to_points_to(c, pt_int);
   else // must be a user-defined function
-    pt_out = user_call_to_points_to(c, pt_in);
+    pt_out = user_call_to_points_to(c, pt_int);
+
+  free_set(pt_int);
+
   return pt_out;
 }
 
-/* FI: this shold not generate any points-to update
+/* FI: this should not generate any points-to update
  *
  * it would be better not to go down here to avoid an allocate and a
  * free.
@@ -194,6 +212,10 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   pt_map pt_out;
   entity f = call_function(c);
 
+  // FI: Where should we check that the update is linked to a pointer?
+  // Should we go down because a pointer assignment may be hidden anywhere...
+  // Or have we already taken care of this in call_to_points_to()
+
   if(ENTITY_ASSIGN_P(f)) {
     list al = call_arguments(c);
     expression lhs = EXPRESSION(CAR(al));
@@ -201,8 +223,12 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     pt_out = assignment_to_points_to(lhs, rhs, pt_in);
   }
   else if(ENTITY_PLUS_UPDATE_P(f))
+    /* Many update operators */
+    pips_internal_error("Not implemented yet\n");
     ;
   else if(ENTITY_POST_INCREMENT_P(f))
+    /* Four increment related operators */
+    pips_internal_error("Not implemented yet\n");
     ;
   else
     pt_out = copy_set(pt_in);
@@ -217,6 +243,9 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
 
   // FI: intraprocedural, use effects
   // FI: interprocedural, check alias compatibility, generate gen and kill sets,...
+
+  // FI: we need a global variable here to make the decision without
+  // propagating an extra parameter everywhere
 
   pips_internal_error("Not implemented yet\n");
 
@@ -248,6 +277,7 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
 pt_map pointer_assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
 
   return pt_out;
 }
@@ -255,6 +285,7 @@ pt_map pointer_assignment_to_points_to(expression lhs, expression rhs, pt_map pt
 pt_map struct_assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
 
   return pt_out;
 }

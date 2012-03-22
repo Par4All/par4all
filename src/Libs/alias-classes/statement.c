@@ -1,6 +1,6 @@
 /*
 
-  $Id: points_to_analysis_general_algorithm.c 21101 2012-03-04 20:38:17Z amini $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 
@@ -77,6 +77,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
 pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
@@ -144,30 +145,35 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
 pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
 pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
 pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
 
@@ -181,5 +187,6 @@ pt_map multitest_to_points_to(multitest mt, pt_map pt_in)
 pt_map forloop_to_points_to(forloop fl, pt_map pt_in)
 {
   pt_map pt_out;
+  pips_internal_error("Not implemented yet\n");
   return pt_out;
 }
