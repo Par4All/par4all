@@ -451,14 +451,11 @@ bool entity_all_dynamic_locations_p(entity e)
 bool entity_stub_sink_p(entity e)
 {
   bool stub_sink_p = false;
-  bool dummy_target_p = false;
   const char * en = entity_local_name(e);
   storage s = entity_storage(e);
-  if(storage_ram_p(s))
-    dummy_target_p = pointer_dummy_targets_area_p(ram_section(storage_ram(s)));
   char first = en[0];
   char penultimate = en[strlen(en) - 2];
-  if(dummy_target_p && first == '_' && penultimate == '_')
+  if(storage_rom_p(s) && first == '_' && penultimate == '_')
     stub_sink_p = true;
 
   return stub_sink_p;
