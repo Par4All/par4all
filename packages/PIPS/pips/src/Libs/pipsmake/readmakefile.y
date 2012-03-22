@@ -293,16 +293,20 @@ parse_makefile(void)
 /* this function returns the rule that defines builder pname */
 rule find_rule_by_phase(const char* pname)
 {
-    makefile m = parse_makefile();
+  rule fr = rule_undefined;
+  makefile m = parse_makefile();
 
-    pips_debug(9, "searching rule for phase %s\n", pname);
+  pips_debug(9, "searching rule for phase %s\n", pname);
 
-    /* walking thru rules */
-    MAP(RULE, r, 
-	if (same_string_p(rule_phase(r), pname)) return r, 
-	makefile_rules(m));
+  /* walking thru rules */
+  FOREACH(RULE, r, makefile_rules(m)) {
+    if (same_string_p(rule_phase(r), pname)) {
+      fr = r;
+      break;
+    }
+  }
 
-    return rule_undefined;
+  return fr;
 }
 
 void add_rule(rule r)
@@ -359,8 +363,13 @@ void add_rule(rule r)
     }
 
     /* FI: no check of rule name unicity; e.g. double declaration of sesamify */
-    makefile_rules(pipsmakefile) = gen_nconc(makefile_rules(pipsmakefile),
-					     CONS(RULE, r, NIL));
+    rule or = find_rule_by_phase(rule_phase(r));
+    if(rule_undefined_p(or))
+      makefile_rules(pipsmakefile) = gen_nconc(makefile_rules(pipsmakefile),
+					       CONS(RULE, r, NIL));
+    else
+      pips_internal_error("Double declaration of phase \"%s\"\n"
+			  "Check pipsmake-rc.tex or pipsmake.rc\n", rule_phase(r));
 }
 
 makefile open_makefile(const char* name)

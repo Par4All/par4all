@@ -190,10 +190,16 @@ static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 POINTS TO
 
 
-// Points To:
+// Points To IN:
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
+
+
+// Points To OUT:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
@@ -213,647 +219,166 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
 
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    fgINT32 *pdest = (fgINT32 *) datdest->array;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    fgINT32 v1;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    fgINT32 v2;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    fgINT32 result;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    int spp = datdest->spp;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    int length = datdest->length*spp;
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    for(j = 0; j <= length-1; j += 1) {
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
       result = flgr_defop_add_fgINT32(v1, v2);
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
 
 // Points To:
+// _data1_2[0].array -> _data1_2_2[0] , EXACT
+// _data2_3[0].array -> _data2_3_3[0] , EXACT
+// _datdest_1[0].array -> _datdest_1_1[0] , EXACT
 // data1 -> _data1_2[0] , EXACT
 // data2 -> _data2_3[0] , EXACT
 // datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pdest -> _datdest_1_1[0] , EXACT
+// psrc1 -> _data1_2_2[0] , EXACT
+// psrc2 -> _data2_3_3[0] , EXACT
 
    return;
-}
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
-{
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   FLGR_Ret ret;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_NULL_OBJECT;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return ret;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK)
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return ret;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-
-   if (datdest->type==FLGR_BIT) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgBIT(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_UINT8) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgUINT8(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_UINT16) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgUINT16(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_UINT32) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgUINT32(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_INT8) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgINT8(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_INT16) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgINT16(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_INT32) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgINT32(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_FLOAT32) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   if (datdest->type==FLGR_FLOAT64) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-      return FLGR_RET_OK;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   return FLGR_RET_TYPE_UNKNOWN;
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgBIT(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
-{
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-
-   FLGR_Data1D **pdest = datdest->row;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   FLGR_Data1D **p1 = data1->row;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   FLGR_Data1D **p2 = data2->row;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   int i;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   i = 0;
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   while (i<data1->size_y) {
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-      i++, pdest++, p1++, p2++;
-   }
-
-// Points To:
-// data1 -> _data1_2[0] , EXACT
-// data2 -> _data2_3[0] , EXACT
-// datdest -> _datdest_1[0] , EXACT
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// pdest -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-
-   return;
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgUINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgUINT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-// f3 -> _f3_3[0] , EXACT
-
-int flgr2d_arith_add_fgUINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
-{
-}
-
-// Points To:
-// f1 -> _f1_1[0] , EXACT
-// f2 -> _f2_2[0] , EXACT
-
-int flgr2d_is_data_same_attributes(FLGR_Data2D *f1, FLGR_Data2D *f2)
-{
-}
-
-// Points To: none
-
-int flgr_get_type_string(enum FLGR_TYPE f1)
-{
-}
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
-{
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-   return flgr_get_array_fgINT32(array, pos);
-}
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
-{
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-   flgr_set_array_fgINT32(array, pos, value);
-}
-
-// Points To: none
-
-static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
-{
-
-// Points To: none
-
-   return a+b;
-}
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
-{
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-   return array[pos];
-}
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
-{
-
-// Points To:
-// array -> _array_1[0] , EXACT
-
-   array[pos] = value;
 }

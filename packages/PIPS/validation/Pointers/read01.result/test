@@ -8,7 +8,6 @@ int main()
    ssize_t bytes_read;
    int fd;
 //             <    is written>: nbytes
-
    nbytes = sizeof(buf);
 //             <may be written>: buf[*]
 //             <    is read   >: fd nbytes __IO_EFFECTS:LUNS[fd]
@@ -19,7 +18,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -41,7 +43,6 @@ int main()
    int fd;
 
 // Points To: none
-
 
    nbytes = sizeof(buf);
 

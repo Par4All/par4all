@@ -2330,6 +2330,10 @@ basic_to_generic_conversion(basic b)
 
     return result;
 }
+
+/*
+ * A set of predicates to distinguish between types
+ */
 
 bool signed_type_p(type t)
 {
@@ -2514,6 +2518,35 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+// tests if a type is FILE *
+// beware: costly because it contains a string operation
+bool FILE_star_type_p(type t)
+{
+  bool res = false;
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (basic_pointer_p(b))
+	{
+	  t = basic_pointer(b);
+	  if (type_variable_p(t))
+	    {
+	      basic b = variable_basic(type_variable(t));
+	      if (basic_derived_p(b))
+		{
+		  entity te = basic_derived(b);
+		  if (strstr(entity_name(te), "_IO_FILE") != NULL)
+		    {
+		      res = true;
+		    }
+		}
+	    }
+	}
+    }
+  return res;
+}
+
+
 list type_fields(type t)
 {
   list l_res = NIL;
@@ -2536,19 +2569,33 @@ list type_fields(type t)
 
 }
 
-
-
 /* Returns true if t is of type struct, union or enum. Need to
-   distinguish with the case struct/union/enum in type in RI, these
-   are the definitions of the struct/union/enum themselve, not a
-   variable of this type.
-
-   Example : struct foo var;*/
-
+ * distinguish with the case struct/union/enum in type in RI, these
+ * are the definitions of the struct/union/enum themselve, not a
+ * variable of this type.
+ *
+ * Example : struct foo var;
+ */
 bool derived_type_p(type t)
 {
   return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns true if t is of type derived and if the derived type is a struct.
+ *
+ * Example : struct foo var;
+ */
+bool struct_type_p(type t)
+{
+  bool struct_p = false;
+  if(derived_type_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    struct_p = type_struct_p(dt);
+  }
+  return struct_p;
 }
 
 /* Returns true if t is a typedefED type.

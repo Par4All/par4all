@@ -24,7 +24,10 @@ int struct06()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int struct06()
 {

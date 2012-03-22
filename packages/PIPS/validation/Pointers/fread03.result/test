@@ -89,12 +89,15 @@ void ReadPGMrow(FILE *file, int width, byte *line)
 POINTS TO
 
 
-// Points To:
+// Points To IN:
 // filename -> _filename_1[0] , EXACT
 // nch -> _nch_5[0] , EXACT
 // ncl -> _ncl_4[0] , EXACT
 // nrh -> _nrh_3[0] , EXACT
 // nrl -> _nrl_2[0] , EXACT
+
+
+// Points To OUT: none
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
@@ -342,7 +345,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    free(buffer);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
@@ -355,9 +358,12 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    return m;
 }
 
-// Points To:
+// Points To IN:
 // file -> _file_1[0] , EXACT
 // line -> _line_3[0] , EXACT
+
+
+// Points To OUT: none
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
@@ -369,14 +375,20 @@ void ReadPGMrow(FILE *file, int width, byte *line)
    fread(&line[0], sizeof(byte), width, file);
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int bmatrix(int f1, int f2, int f3, int f4)
 {
 }
 
-// Points To:
+// Points To IN:
 // f1 -> _f1_1[0] , EXACT
+
+
+// Points To OUT: none
 
 int nrerror(char *f1)
 {

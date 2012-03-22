@@ -30,7 +30,11 @@ int main()
 POINTS TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> p , EXACT
 
 int main()
 {
@@ -48,8 +52,8 @@ int main()
    *p = &i;
 
 // Points To:
-// _p_22770512 -> i , EXACT
-// p -> _p_22770512 , EXACT
+// p -> i , EXACT
+// p -> p , EXACT
 
 
    return 0;

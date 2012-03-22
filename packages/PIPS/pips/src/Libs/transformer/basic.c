@@ -71,6 +71,22 @@ void transformer_free(transformer t)
     free_transformer(t);
 }
 
+void free_transformers(transformer t, ...) {
+  va_list args;
+
+  /* Analyze in args the variadic arguments that may be after t: */
+  va_start(args, t);
+  /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  do {
+    free_transformer(t);
+    /* Get the next argument: */
+    t = va_arg(args, transformer);
+  } while(t!=NULL);
+  /* Release the variadic analyzis: */
+  va_end(args);
+}
+
 void old_transformer_free(transformer t)
 {
     /* I should use gen_free directly but Psysteme is not yet properly
