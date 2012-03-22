@@ -18,7 +18,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -29,13 +32,11 @@ int main()
       int *first;
    } x;
 
-// Points To:
-// x.first -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: none
 
    int y[10];
 
-// Points To:
-// x.first -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: none
 
 
    x.first = &y[5];

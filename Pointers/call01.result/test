@@ -1,23 +1,6 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS
 
-void call01(int *pi, tf_t *q)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pi
-   *pi = 1;
-//             <    is read   >: pi
-//             <    is written>: pi
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
-   pi++;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   q->one = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   (q->two)[4] = 2;
-}
 int main()
 {
    int i;
@@ -27,55 +10,13 @@ int main()
    call01(&i, &s);
 }
 
-PROPER POINTER EFFECTS
-
-int main()
-{
-   int i;
-   tf_t s;
-//             <    is written>: i s.one s.two[4]
-
-   call01(&i, &s);
-}
-
-POINTS TO
+POINTS-TO
 
 
-// Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
+// Points To IN: none
 
-void call01(int *pi, tf_t *q)
-{
 
-// Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
-
-   *pi = 1;
-
-// Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
-
-   /* pi is passed by value: pi++ does not generate a summary effect
-        for call01 */
-   pi++;
-
-// Points To:
-// pi -> _pi_1[*] , EXACT
-// q -> _q_2[0] , EXACT
-
-   q->one = 1;
-
-// Points To:
-// pi -> _pi_1[*] , EXACT
-// q -> _q_2[0] , EXACT
-
-   (q->two)[4] = 2;
-}
-
-// Points To: none
+// Points To OUT: none
 
 int main()
 {

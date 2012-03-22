@@ -13,7 +13,10 @@ char * conditional01(int i)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 char * conditional01(int i)
 {

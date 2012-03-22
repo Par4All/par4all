@@ -17,6 +17,11 @@ int main()
    s = &l;
 //             <    is read   >: q s
 //             <    is written>: b p r
+   /* printf("address of p=%p\n ",p); */
+   /*   printf("address of r=%p\n",r); */
+   /*   printf("address of q=%p\n",q); */
+   /*   printf("address of s=%p\n",s); */
+   
    b = (p = q)&&(r = s);
 //             <    is read   >: q s
 //             <    is written>: p r
@@ -24,10 +29,15 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: p
       *p++;
-   else if ((p = q)||(r = s))
+   else
+//             <    is read   >: q s
+//             <    is written>: p r
+      /*  printf("address of p=%p\n",p); */
+      /*   printf("address of r=%p\n",r); */
+      if ((p = q)||(r = s))
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: r
-      *r++;
+         *r++;
 
    return 0;
 }
@@ -35,7 +45,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -95,6 +108,11 @@ int main()
 // s -> l , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
+   /* printf("address of p=%p\n ",p); */
+   /*   printf("address of r=%p\n",r); */
+   /*   printf("address of q=%p\n",q); */
+   /*   printf("address of s=%p\n",s); */
+   
    b = (p = q)&&(r = s);
 
 // Points To:
@@ -114,7 +132,7 @@ int main()
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       *p++;
-   else if ((p = q)||(r = s))
+   else
 
 // Points To:
 // p -> j , EXACT
@@ -123,7 +141,18 @@ int main()
 // s -> l , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-      *r++;
+      /*  printf("address of p=%p\n",p); */
+      /*   printf("address of r=%p\n",r); */
+      if ((p = q)||(r = s))
+
+// Points To:
+// p -> j , EXACT
+// q -> j , EXACT
+// r -> l , EXACT
+// s -> l , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+         *r++;
 
 // Points To:
 // p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY

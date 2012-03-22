@@ -71,7 +71,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -91,26 +94,22 @@ int main()
    int *tab2[10];
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int tab3[10][10];
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int **tab4;
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int y;
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -119,49 +118,42 @@ int main()
    foo(x);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(tab);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(tab2[4]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(tab3[5]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(tab4[6]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(&y);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    foo(&tab[1]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -169,49 +161,42 @@ int main()
    printf("%d\n", *x);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", tab[0]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", tab2[4][0]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", tab3[5][0]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", tab4[6][0]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", y);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    printf("%d\n", tab[1]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
