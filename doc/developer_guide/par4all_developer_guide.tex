@@ -105,7 +105,7 @@ To compile \Apfa directly from source packages that are not
 inside the \Apfa directory hierarchy, see \S~\ref{sec:direct-organ}. In
 this case, \texttt{-{}-\emph{PACKAGE}-src=...} specifies the
 location of the sources of \texttt{\emph{package}}, (e.g.,
-\verb|-pips-src=...| or \verb|--polylib-src=...|). If all these options are
+\verb|--pips-src=...| or \verb|--polylib-src=...|). If all these options are
 set (e.g., if the source locations point to working copies of the
 \Apips{} \Asvn), then the \texttt{p4a-own} branch can be used for
 compilation. For the \Apips
@@ -776,7 +776,7 @@ decoration by using the \verb/--plain/ is also useful when debugging.
 
 The preferred method for debugging \texttt{p4a} from \texttt{gdb} is
 to launch first
-\texttt{gdb python} and then run \texttt{p4a} with:
+\texttt{gdb python} or with Emacs \texttt{}and then run \texttt{p4a} with:
 \begin{verbatim}
 run /usr/local/par4all/bin/p4a --plain --no-spawn
     -o hyantes-static-99_openmp hyantes-static-99.c -lm
