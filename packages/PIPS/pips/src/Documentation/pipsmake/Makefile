@@ -114,6 +114,7 @@ phases.h: pipsmake.rc
 	#
 	# building $@
 	#
+	# The -u option for sort hides redeclared phases
 	sed '/^[a-z]/!d;s/ .*//g;' $< | tr '[a-z]' '[A-Z]' | sort -u | \
 	sed 's/.*/#define BUILDER_& "&"/' > $@
 
