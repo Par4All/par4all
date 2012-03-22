@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS
 
 int global01()
 {
@@ -11,22 +11,15 @@ int global01()
    return 0;
 }
 
-PROPER POINTER EFFECTS
-
-int global01()
-{
-//             <    is written>: i
-   i = &k;
-//             <    is read   >: i
-//             <    is written>: j
-   j = i;
-   return 0;
-}
-
-POINTS TO
+POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT:
+// i -> k , EXACT
+// j -> k , EXACT
 
 int global01()
 {

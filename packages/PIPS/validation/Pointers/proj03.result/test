@@ -11,8 +11,9 @@ int main(void)
    int **pp = &pi;
 //             <    is written>: j
    int j = 2;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -49,7 +50,10 @@ int main(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -76,7 +80,6 @@ int main(void)
 // Points To:
 // pi -> i , EXACT
 // pp -> pi , EXACT
-
 
    srand(time((void *) 0));
 

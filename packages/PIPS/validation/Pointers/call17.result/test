@@ -15,8 +15,11 @@ void call17(int *x)
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // x -> _x_1[0] , EXACT
+
+
+// Points To OUT: none
 
 void call17(int *x)
 {

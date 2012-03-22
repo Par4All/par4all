@@ -7,8 +7,9 @@ int main(void)
    int i = 0, j = 0;
 //             <    is written>: pp
    int **pp = (void *) 0;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -46,7 +47,10 @@ int main(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -61,7 +65,6 @@ int main(void)
 
 // Points To:
 // pp -> *NULL_POINTER* , EXACT
-
 
    srand(time((void *) 0));
 

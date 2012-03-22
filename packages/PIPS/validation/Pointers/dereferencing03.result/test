@@ -7,7 +7,6 @@ void dereferencing03()
    int i;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-
    *(p+1) = 0.;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i p
@@ -17,7 +16,10 @@ void dereferencing03()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void dereferencing03()
 {
@@ -33,7 +35,6 @@ void dereferencing03()
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
 
    *(p+1) = 0.;
 
