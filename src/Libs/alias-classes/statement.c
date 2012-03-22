@@ -58,33 +58,48 @@ This file contains functions used to compute points-to sets at statement level.
 #include "points_to_private.h"
 #include "alias-classes.h"
 
-/* See points_to_statement() */
+/* See points_to_statement()
+ *
+ *
+ */
 pt_map statement_to_points_to(statement s, pt_map pt_in)
 {
-  pt_map pt_out;
+  pt_map pt_out = new_pt_map();
+  assign_pt_map(pt_out, pt_in);
 
   if(declaration_statement_p(s))
-    pt_out = declaration_statement_to_points_to(s, pt_in);
+    pt_out = declaration_statement_to_points_to(s, pt_out);
   else {
     instruction i = statement_instruction(s);
-    pt_out = instruction_to_points_to(i, pt_in);
+    pt_out = instruction_to_points_to(i, pt_out);
   }
 
+  /* Either pt_in or pt_out should be stored in the hash_table 
+   *
+   * But it might be smarter (or not) to require or not the storage.
+   */
+
   return pt_out;
 }
 
-/* See points_to_init() */
+/* See points_to_init()
+ *
+ * pt_in is modified by side-effects and returned
+ */
 pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for declaration statement %p\n", s);
   return pt_out;
 }
 
-/* See points_to_statement() */
+/* See points_to_statement()
+ *
+ * pt_in is modified by side-effects and returned
+ */
 pt_map instruction_to_points_to(instruction i, pt_map pt_in)
 {
-  pt_map pt_out;
+  pt_map pt_out = pt_in;
   tag it = instruction_tag(i);
   switch(it) {
   case is_instruction_sequence: {
@@ -144,49 +159,49 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
 
 pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for sequence %p\n", seq);
   return pt_out;
 }
 
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for test %p\n", t);
   return pt_out;
 }
 
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for loop %p\n", l);
   return pt_out;
 }
 
 pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for while loop %pd\n", wl);
   return pt_out;
 }
 
 pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for usntructured %p\n", u);
   return pt_out;
 }
 
 pt_map multitest_to_points_to(multitest mt, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for multitest %p\n", mt);
   return pt_out;
 }
 
 pt_map forloop_to_points_to(forloop fl, pt_map pt_in)
 {
-  pt_map pt_out;
-  pips_internal_error("Not implemented yet\n");
+  pt_map pt_out = pt_in;
+  pips_internal_error("Not implemented yet for for loop %p\n", fl);
   return pt_out;
 }

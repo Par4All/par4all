@@ -27,3 +27,6 @@
 #define USER_POINTS_TO_SETS_SUFFIX ".upt"
 
 typedef set pt_map;
+#define pt_map_undefined set_undefined
+#define new_pt_map() set_generic_make(set_private, points_to_equal_p, points_to_rank)
+#define assign_pt_map(x,y) set_assign(x, y)
