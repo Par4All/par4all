@@ -138,7 +138,7 @@ points_to create_stub_points_to(cell c, type t,
   entity formal_parameter = gen_find_entity(formal_name);
   bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
 
-  if(type_variable_p(t))
+  if(type_variable_p(t)){
     bb = variable_basic(type_variable(t));
   basic base = copy_basic(bb);
   if(type_strict_p)
@@ -149,14 +149,20 @@ points_to create_stub_points_to(cell c, type t,
 					  NIL));
   else
     pt = copy_type(t);
+  } 
+  else if (type_void_p(t)){
+    pt = make_type_void(NIL);
+  }
  
-  if(entity_undefined_p(formal_parameter)) 
+  if(entity_undefined_p(formal_parameter)) {
+    entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
+    entity_kind(DummyTarget)=ENTITY_POINTER_DUMMY_TARGETS_AREA;
     formal_parameter = make_entity(formal_name,
 				   pt,
-				   make_storage_rom(),
+				   make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
 				   make_value_unknown());
   
-
+  }
   if(type_strict_p)
     sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
   else

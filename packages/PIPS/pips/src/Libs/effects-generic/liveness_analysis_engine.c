@@ -818,7 +818,7 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
   list l_index = CONS(EFFECT,
 		      (*reference_to_effect_func)(make_reference(index, NIL), make_action_read_memory(), false),
 		      NIL);
-  l_live_in_header = gen_nconc(l_index, l_live_in_header);
+  l_live_in_header = (*effects_union_op)(l_index, l_live_in_header, effects_same_action_p);
 
   pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
 
