@@ -432,21 +432,42 @@ transformer repeatloop_to_transformer(whileloop wl,
 				      transformer pre,
 				      list wlel) /* effects of whileloop wl */
 {
-  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  /* t_body_star =  t_init ; t_enter ; (t_body ; t_next)+
+   *
+   * t_once = t_body; t_exit
+   *
+   * t_repeat = t_body_star + t_once
+   */
   transformer t_body_star = transformer_undefined;
   statement body_s = whileloop_body(wl);
+  transformer t_body = transformer_undefined; // load_statement_transformer(body_s);
   transformer t_init = transformer_identity();
   expression cond_e = whileloop_condition(wl);
   transformer t_enter = transformer_identity();
   /* An effort could be made to compute the precondition for t_continue,
      especially if the precondition to t_inc is available. */
   transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  /* FI: it should be computed with the postcondition of the body */
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   //transformer t_inc = transformer_identity();
   transformer t_next = t_continue;
 
+  /* The loop is executed at least twice; FI: I'm note sure the twice is captured */
+  /* FI: example dowhile02 seems to show this is wrong with t_next
+     empty, in spite of the star */
   t_body_star = any_loop_to_transformer(t_init, t_enter, t_next, body_s, wlel, pre);
 
-  return t_body_star;
+  /* The loop is executed only once */
+  // any_loop_to_transformer() has computed the body transformer
+  t_body = load_statement_transformer(body_s);
+  transformer t_once = transformer_combine(copy_transformer(t_body), t_exit);
+
+  /* global transformer */
+  transformer t_repeat = transformer_convex_hull(t_once, t_body_star);
+
+  // free_transformer(t_once), free_transformer(t_body_star), free_transformer(t_next), free_transformer(t_exit), free_transformer(t_enter);
+
+  return t_repeat;
 }
 
 #define IS_LOWER_BOUND 0
@@ -2577,6 +2598,7 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
 
   statement body_s = whileloop_body(wl);
   transformer t_body = load_statement_transformer(body_s);
+  transformer t_body_c = complete_statement_transformer(t_body, pre, body_s);
   transformer t_init = transformer_identity();
   transformer post_init = copy_transformer(pre);
   expression cond_e = whileloop_condition(wl);
@@ -2601,7 +2623,7 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
 				   t_enter,
 				   t_skip,
 				   t_body_star,
-				   t_body,
+				   t_body_c,
 				   t_continue, //since t_inc is ineffective
 				   t_inc,
 				   t_exit,
@@ -2612,20 +2634,20 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
    * t_enter,... are meaningless. Instead of dealing with zero or at
    * least one iteration, we have to deal with one or at least two.
    *
-   * post = (t_body ; t_exit)(pre) +
-   *        (t_body ; t_continue ; t_body_star ; t_body ; t_exit)(pre)
+   * post = (t_body_c ; t_exit)(pre) +
+   *        (t_body_c ; t_continue ; t_body_star ; t_body_c ; t_exit)(pre)
    *
    * where we assume that t_body_star includes the continuation condition. 
    */
 
   free_transformer(post);
 
-  post_1 = transformer_apply(t_body, pre);
+  post_1 = transformer_apply(t_body_c, pre);
   post_2 = transformer_apply(t_exit, post_1);
 
   post_3 = transformer_apply(t_continue, post_1);
   post_4 = transformer_apply(t_body_star, post_3);
-  post_5 = transformer_apply(t_body, post_4);
+  post_5 = transformer_apply(t_body_c, post_4);
   post_6 = transformer_apply(t_exit, post_5);
 
   post = transformer_convex_hull(post_2, post_6);
@@ -2639,6 +2661,7 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
   free_transformer(t_continue);
   free_transformer(t_exit);
   free_transformer(t_inc);
+  free_transformer(t_body_c);
 
   free_transformer(post_1);
   free_transformer(post_2);
