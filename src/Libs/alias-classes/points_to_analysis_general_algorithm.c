@@ -117,7 +117,7 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
   list pt_list = NIL, tmp_l;
   points_to_list new_pt_list = points_to_list_undefined;
   
-  if ( !set_empty_p(pts_to_set) && store == true ) {
+  if ( /* !set_empty_p(pts_to_set) && */ store == true ) {
     
     pt_list = set_to_sorted_list(pts_to_set,
                                  (int(*)(const void*, const void*))
@@ -143,225 +143,8 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
   gen_free_list(pt_list);
 }
 
-/* From input points-to pts_to_set, compute and return pt_out after
-   the assignment "m.a = n.a;" where a is of type pointer.
 
-   Parameter pts_to_set is modified by side effect and returned.
 
-   m.a and n.a are assumed simple enough not to generate multiple
-   write effects.
-
-   FI: I do not understand why the input is not as simple as "m = n;".
- */
-set struct_double_pointer(set pts_to_set, expression lhs, expression rhs) {
-  set gen_pts_to = set_generic_make(set_private, points_to_equal_p,
-                                    points_to_rank);
-  set written_pts_to = set_generic_make(set_private, points_to_equal_p,
-                                        points_to_rank);
-  effect e1 = effect_undefined, e2 = effect_undefined;
-  reference r1 = reference_undefined;
-  reference r2 = reference_undefined;
-  set s = set_generic_make(set_private, points_to_equal_p,
-                           points_to_rank);
-
-  /* Make sure the input meets the function precondition. Note that it
-     is not fully checked: the check below is "m = n;" */
-  pips_assert("lhs and rhs are references",
-              expression_reference_p(lhs) && expression_reference_p(rhs));
-
-  /* init the effect's engine. */
-  set_methods_for_proper_simple_effects();
-  /* Compute the lhs location in effect e1 */
-  list l_ef = NIL;
-  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
-                                                                 &l_ef, true);
-  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  /* Compute the rhs location in effect e2 */
-  l_ef = NIL;
-  list l2 = generic_proper_effects_of_complex_address_expression(rhs,
-                                                                 &l_ef, false);
-  e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  effects_free(l1);
-  effects_free(l2);
-  generic_effects_reset_all_methods();
-
-  /* Build the cells needed for points-to information */
-  r1 = effect_any_reference(e1);
-  cell source = make_cell_reference(r1);
-  r2 = effect_any_reference(e2);
-  cell sink = make_cell_reference(r2);
-    
-  /* FI: I am lost. I do not understand how pt_in is used to interpret
-     source and sink... */
-  SET_FOREACH(points_to, i, pts_to_set){
-    if(locations_equal_p(points_to_source(i), sink))
-      s = set_add_element(s, s, (void*)i);
-  }
-    
-  /* Compute the gen set */
-  SET_FOREACH(points_to, j, s){
-    cell new_sink = copy_cell(points_to_sink(j));
-    approximation rel = points_to_approximation(j);
-    points_to pt_to = make_points_to(source,
-                                     new_sink,
-                                     rel,
-                                     make_descriptor_none());
-    gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-                                 (void*) pt_to );
-  }
-    
-  /* Compute the kill set */
-  SET_FOREACH(points_to, k, pts_to_set){
-    if(locations_equal_p(points_to_source(k), source))
-      written_pts_to = set_add_element(written_pts_to,
-                                       written_pts_to, (void *)k);
-  }
-
-  /* Apply the dataflow equation: out = (in - kill) U gen */
-  pts_to_set = set_difference(pts_to_set, pts_to_set, written_pts_to);
-  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
-
-  ifdebug(1)
-    print_points_to_set("Points to for the case x is a double pointer to struct\n",
-                        pts_to_set);
-
-  set_clear(s);
-  set_clear(gen_pts_to);
-  set_clear(written_pts_to);
-  set_free(s);
-  set_free(gen_pts_to);
-  set_free(written_pts_to);
-
-  return pts_to_set;
-}
-
-/*  compute m.a = n.a where a is of pointer type
- *
- * FI: same comment as for previous function
- *
- * Code seems almost cut-and-pasted from previous function (or vice-versa)
- */
-set struct_pointer(set pts_to_set, expression lhs, expression rhs) {
-  set gen_pts_to = set_generic_make(set_private, points_to_equal_p,
-                                    points_to_rank);
-  set written_pts_to = set_generic_make(set_private, points_to_equal_p,
-                                        points_to_rank);
-  effect e1 = effect_undefined, e2 = effect_undefined;
-  reference r1 = reference_undefined;
-  reference r2 = reference_undefined;
-  list l_ef = NIL;
-
-  /* init the effect's engine.*/
-  set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(lhs, &l_ef,
-                                                                 true);
-  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-  l_ef = NIL;
-  list l2 = generic_proper_effects_of_complex_address_expression(rhs, &l_ef,
-                                                                 false);
-  e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  effects_free(l1);
-  effects_free(l2);
-  generic_effects_reset_all_methods();
-  r1 = effect_any_reference(e1);
-  cell source = make_cell_reference(r1);
-  // add the points_to relation to the set generated
-  // by this assignement
-  r2 = effect_any_reference(e2);
-  cell sink = make_cell_reference(r2);
-  set s = set_generic_make(set_private, points_to_equal_p, points_to_rank);
-
-  SET_FOREACH(points_to, i, pts_to_set){
-      if(locations_equal_p(points_to_source(i), sink))
-        s = set_add_element(s, s, (void*)i);
-    }
-  
-  SET_FOREACH(points_to, j, s){
-      cell new_sink = copy_cell(points_to_sink(j));
-      approximation rel = points_to_approximation(j);
-      points_to pt_to = make_points_to(source,
-                                       new_sink,
-                                       rel,
-                                       make_descriptor_none());
-
-      gen_pts_to = set_add_element(gen_pts_to,gen_pts_to,
-                                   (void*) pt_to );
-    }
-
-  SET_FOREACH(points_to, k, pts_to_set) {
-    if(locations_equal_p(points_to_source(k), source))
-      written_pts_to = set_add_element(written_pts_to,
-                                       written_pts_to, (void *)k);
-  }
-
-  pts_to_set = set_difference(pts_to_set, pts_to_set, written_pts_to);
-  pts_to_set = set_union(pts_to_set, gen_pts_to, pts_to_set);
-  ifdebug(1)
-    print_points_to_set("Points to for the case <x = y>\n",
-                        pts_to_set);
-  set_clear(s);
-  set_clear(gen_pts_to);
-  set_clear(written_pts_to);
-  set_free(s);
-  set_free(gen_pts_to);
-  set_free(written_pts_to);
-  return pts_to_set;
-}
-
-/* Assuming in==pt_in, compute pt_out after the assignment "m = n;"
- * where both m and n have type struct.
- *
- * The result should be equivalent to the assignment of each pointer
- * field, "m.field1 = n.field1;..." A.M
- */
-set struct_decomposition(expression lhs, expression rhs, set pt_in) {
-  set pt_out = set_generic_make(set_private, points_to_equal_p,
-                                points_to_rank);
-  entity e1 = expression_to_entity(lhs);
-  entity e2 = expression_to_entity(rhs);
-  type t1 = entity_type(e1);
-  type t2 = entity_type(e2);
-  variable v1 = type_variable(t1);
-  variable v2 = type_variable(t2);
-  basic b1 = variable_basic(v1);
-  basic b2 = variable_basic(v2);
-  entity ent1 = basic_derived(b1);
-  entity ent2 = basic_derived(b2);
-  type tt1 = entity_type(ent1);
-  type tt2 = entity_type(ent2);
-  list l1 = type_struct(tt1);
-  list l2 = type_struct(tt2);
-
-  /* FI: Should not we assert that tt1==tt2 and hence l1==l2? */
-
-  FOREACH(ENTITY, i, l1) {
-    if( expression_pointer_p(entity_to_expression(i)) ) { // memory leak
-      ent2 = ENTITY (CAR(l2));
-      expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                      lhs,
-                                      entity_to_expression(i));
-      expression ex2 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                      rhs,
-                                      entity_to_expression(ent2));
-      expression_consistent_p(ex1);
-      expression_consistent_p(ex1);
-      pt_out = set_union(pt_out, pt_out,
-                         struct_pointer(pt_in,
-                                        ex1,
-                                        ex2));
-    }
-    l2 = CDR(l2);
-  }
-
-  return pt_out;
-}
 
 
 /* Using points-to "in", compute the new points-to set "out" for any
@@ -418,15 +201,6 @@ set points_to_assignment(statement current,
   list L = NIL, R = NIL, args = NIL;
   bool address_of_p = false;
    
-  /* FI: this seems a contradiction wrt the function name... */
-  if (instruction_expression_p(statement_instruction(current))) {
-    //expression e = instruction_expression(statement_instruction(current));
-    // could be "p++;"
-    // could hide *any* call... e.g. "m=n;"
-    // Why not use points_to_expression() as just below?
-    ;
-  }
-
   /* Take into account the possible points-to side effects of
      expressions "rhs" and "lhs". E.g. "p = q = r;" */
   cur = points_to_expression(rhs, in, true);
@@ -1075,6 +849,7 @@ set points_to_intrinsic(statement s,
         type t = entity_type(e);
         if(entity_variable_p(e))
           {
+	    /*AM: should test if e is a struct*/
             basic b = variable_basic(type_variable(t));
             if(basic_typedef_p(b))
               {
@@ -1175,29 +950,14 @@ set points_to_intrinsic(statement s,
     set_assign(pt_out, pt_cur);
   } 
   /* FI: These operators could be merged in one class. */
-  else if(ENTITY_AND_P(e)) {
+  else if(ENTITY_AND_P(e) ||ENTITY_OR_P(e) || ENTITY_COMMA_P(e) ) {
     FOREACH(EXPRESSION, exp, pc) {
       pt_out = points_to_expression(exp,
                                     pt_cur,
                                     true);
     }
-  } else if(ENTITY_OR_P(e)) {
-    FOREACH(EXPRESSION, exp, pc) {
-      pt_out = points_to_expression(exp,
-                                    pt_cur,
-                                    true);
-    }
-  } else if (ENTITY_COMMA_P(e)) {
-    FOREACH(EXPRESSION, exp, pc) {
-      pt_out = points_to_expression(exp,
-                                    pt_cur,
-                                    true);
-    }
-  } else if(ENTITY_CONTINUE_P(e)) {
-    pt_out = set_assign(pt_out, pt_cur);
-
-  } 
-  /* Memory allocation: FI I have not seen malloc() */
+  }
+    /* Memory allocation: FI I have not seen malloc() */
   else if( ENTITY_FREE_SYSTEM_P(e)) {
     expression ex = EXPRESSION (CAR(pc));
     pt_out = points_to_free(s, ex, pt_cur);
@@ -1548,7 +1308,7 @@ set points_to_forloop(forloop fl,
     set_clear(pt_out);
     pt_out = points_to_recursive_statement(for_body,
                                            cur,
-                                           false);
+                                           true);
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
       reference sr = cell_any_reference(sc);
@@ -1623,7 +1383,7 @@ set points_to_loop(loop fl, set pt_in, bool store __attribute__ ((__unused__))) 
     set_clear(pt_out);
     pt_out = points_to_recursive_statement(loop_body,
                                                      cur,
-                                                     false);
+                                                     true);
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
       reference sr = cell_any_reference(sc);
@@ -1686,14 +1446,14 @@ set points_to_do_whileloop(whileloop fl, set pt_in, bool store __attribute__ ((_
   int k = get_int_property("POINTS_TO_K_LIMITING");
   expression cond = whileloop_condition(fl);
   set_assign(pt_in, points_to_recursive_statement(dowhile_body,
-                                                   pt_in, false));
+                                                   pt_in, true));
   for(i = 0; i< k; i++){
     set_clear(cur);
     cur = set_assign(cur, pt_in);
     set_clear(pt_out);
     pt_out = points_to_recursive_statement(dowhile_body,
                                                      cur,
-                                           false);
+                                           true);
     SET_FOREACH(points_to, pt, pt_out){
       cell sc = points_to_source(pt);
       reference sr = cell_any_reference(sc);
@@ -1780,26 +1540,23 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
   set pt_out = set_generic_make(set_private, points_to_equal_p,
                                 points_to_rank);
 
-  /* set pt_in_callee = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
- /* set pt_out_callee = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
- /*  set pts_binded = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
+  set pt_in_callee = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
+ set pt_out_callee = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
+  set pts_binded = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
 
- /*  set pt_written = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
- /*  set pts_gen = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
- /* set pts_kill = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
+  set pt_written = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
+  set pts_kill = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
 
- /* set pt_end = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
- /* set tmp = set_generic_make(set_private, points_to_equal_p, */
- /*  				points_to_rank); */
-
-  pt_in = points_to_init(s, pt_in);
+  set pt_end = set_generic_make(set_private, points_to_equal_p,
+  				points_to_rank);
+  list formal_param = NIL, l_effect = NIL;
+  if (declaration_statement_p(s))
+    pt_in = points_to_init(s, pt_in);
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:{
     
@@ -1837,10 +1594,7 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     /* print_points_to_set("pt_binded", pts_binded); */
     /* pts_kill = pt_kill(effs, pt_in, formal_param, pt_in_callee, pts_binded); */
     /* print_points_to_set("pt_kill", pts_kill); */
-    /* pts_gen = pt_gen(formal_param, pt_out_callee, pt_in_callee, pts_binded); */
-    /* print_points_to_set("pt_gen", pts_gen); */
-    /* tmp = set_difference(tmp,pt_in_callee, pts_kill); */
-    /* pt_end = set_union(pt_end, tmp, pts_gen); */
+    /* pt_end = set_difference(pt_end,pt_in, pts_kill); */
     /* print_points_to_set("pt_end =",pt_end); */
   }
     break;
@@ -1927,33 +1681,63 @@ set points_to_expression(expression e, set pt_in, bool store)
     break;
   }
   case is_syntax_reference: {
-    /* FI: lots of things can be hidden in the index expression... */
     set_assign(pt_out, pt_in);
+    /* FI: lots of things can be hidden in the index expression... */
+    FOREACH(expression, s, reference_indices(syntax_reference(s))) {
+      pt_out = points_to_expression(s, pt_out, store);
+    }
+   
     break;
   }
 
   case is_syntax_range: {
-    // FI: just in case, go down into the subexpressions in case a
-    // comma or an assignment operator is hidden?
     set_assign(pt_out, pt_in);
+    range r = syntax_range(s);
+    expression l = range_lower(r);
+    pt_out = points_to_expression(l, pt_out, store);
+    expression u = range_upper(r);
+    pt_out = points_to_expression(u, pt_out, store);
+    expression inc = range_increment(r);
+    pt_out = points_to_expression(inc, pt_out, store); 
+    
     break;
   }
   case is_syntax_sizeofexpression: {
      set_assign(pt_out, pt_in);
+     sizeofexpression sof = syntax_sizeofexpression(s);
+     if(sizeofexpression_expression_p(sof)) {
+       expression sof_e = sizeofexpression_expression(sof);
+       pt_out = points_to_expression(sof_e, pt_out, store);
+     }
+     
     break;
   }
   case is_syntax_subscript: {
     set_assign(pt_out, pt_in);
+    expression ar = subscript_array(syntax_subscript(s));
+    pt_out = points_to_expression(ar, pt_out, store); 
+    FOREACH(expression, i, subscript_indices(syntax_subscript(s))) {
+	pt_out = points_to_expression(i, pt_out, store);
+      }
     break;
   }
   case is_syntax_application: {
-    /* FI: a warning about ignoring a function call and the evaluation
-       of the effective parameters? */
     set_assign(pt_out, pt_in);
+    expression f = application_function(syntax_application(s));
+    pt_out = points_to_expression(f, pt_out, store);
+    FOREACH(expression, arg, application_arguments(syntax_application(s))) {
+	pt_out = points_to_expression(arg, pt_out, store);
+      }
     break;
   }
   case is_syntax_va_arg: {
     set_assign(pt_out, pt_in);
+    FOREACH(sizeofexpression, sofx, syntax_va_arg(s)) {
+      if(sizeofexpression_expression_p(sofx)) {
+	expression sof_e = sizeofexpression_expression(sofx);
+	pt_out = points_to_expression(sof_e, pt_out, store);
+     }
+    }
     break;
   }
 
@@ -2323,22 +2107,16 @@ set points_to_recursive_statement(statement current,
 }
 
 
-/* FI: This function seems to have become useless 
- *
- * FI: The allocation of pts_to_out seems to be a memory leak
- *
- * FI: obsolete comment? Entry point: intialize the entry points-to
- * set; intraprocedurally, it's an empty set.
+/* AM: This function is useless 
+ * points_to_recursive_statement() should be renamed points_to_statement()
  */
 set points_to_statement(statement current, set pt_in) {
-  set pts_to_out = set_generic_make(set_private, points_to_equal_p,
-                                points_to_rank);
-  pts_to_out = points_to_recursive_statement(current, pt_in, true);
+  set pts_to_out = points_to_recursive_statement(current, pt_in, true);
   return pts_to_out;
 }
 
 
-/* FI: Process a declaration statement.
+/* Process a declaration statement.
  *
  * Likely memory leaks: exp_init, lhs, l_cl.
  *
@@ -2355,243 +2133,99 @@ set points_to_init(statement s, set pt_in)
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   set_assign(pt_out, pt_in);
+  list l_decls = statement_declarations(s);
 
-  /* test if the statement is a declaration. */
-  if (c_module_p(get_current_module_entity()) &&
-      (declaration_statement_p(s))) {
-    list l_decls = statement_declarations(s);
-    pips_debug(1, "declaration statement \n");
-
-    FOREACH(ENTITY, e, l_decls){
-      if(type_variable_p(entity_type(e))){
-        if( !storage_rom_p(entity_storage(e)) ) {
-          value v_init = entity_initial(e);
-          /* generate points-to due to the initialisation */
-          if(value_expression_p(v_init)){
-            expression exp_init = value_expression(v_init);
-            expression lhs = entity_to_expression(e);
-            if(expression_pointer_p(lhs))
-              pt_out = points_to_assignment(s,
-                                            lhs,
-                                            exp_init,
-                                            pt_out);
-          }
-          else {
-            l = points_to_init_variable(e);
-            FOREACH(CELL, cl, l) {
-              list l_cl = CONS(CELL, cl, NIL);
-              if(type_sensitive_p)
-                set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
-              else
-                set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
-            }
-          }
-        }
+  pips_debug(1, "declaration statement \n");
+  
+  FOREACH(ENTITY, e, l_decls){
+    if(pointer_type_p(ultimate_type(entity_type(e)))) 
+      {
+	if( !storage_rom_p(entity_storage(e)) ) {
+	  value v_init = entity_initial(e);
+	  /* generate points-to due to the initialisation */
+	  if(value_expression_p(v_init)){
+	    expression exp_init = value_expression(v_init);
+	    expression lhs = entity_to_expression(e);
+	    pt_out = points_to_assignment(s,
+					  lhs,
+					  exp_init,
+					  pt_out);
+	    /* AM: abnormal sharing (lhs) */
+	    /* free_expression(lhs); */
+	  }
+	  else {
+	    l = points_to_init_variable(e);
+	    FOREACH(CELL, cl, l) {
+	      list l_cl = CONS(CELL, cl, NIL);
+	      if(type_sensitive_p)
+		set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
+	      else
+		set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
+	    }
+	  }
+	}
       }
-    }
   }
-
+  
   return pt_out;
 }
 
 
-/* FI: */
+/* When the declaration of "e" does not contain an initial value, find
+   all allocated pointers in entity e. We distinguish between scalar
+   pointers, array of pointers and struct containing pointers and
+   struct. Return a list of cells each containing a reference to
+   pointer. These cells are used later to build a points-to data
+   structure.  */
 list points_to_init_variable(entity e)
 {
   list l = NIL;
-  expression ex = entity_to_expression(e);
+  
+  if (entity_variable_p(e)) 
+    {
+      /*AM: missing recursive descent on variable_dimensions. int a[*(q=p)]*/
 
-  if(entity_variable_p(e)){
-    basic b = variable_basic(type_variable(entity_type(e)));
-    if(expression_pointer_p(ex)){
-      reference r = make_reference(e, NIL);
-      cell c = make_cell_reference(r);
-      l = CONS(CELL, c, NIL);
-    }else if(entity_array_p(e)){
-      if(basic_pointer_p(b)){
-        expression ind = make_unbounded_expression();
-        reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
-        cell c = make_cell_reference(r);
-         l = CONS(CELL, c, NIL);
-      }
-    }else if(basic_derived_p(b)){
-      entity ee = basic_derived(b);
-      type t = entity_type(ee);
-      if(type_struct_p(t)){
-        l = points_to_init_struct(e, ee);
-      }
-    }else if(basic_typedef_p(b)){
-      l = points_to_init_typedef(e);
-    }
-  }
-  return l;
-}
-
-/* FI: */
-list points_to_init_pointer_to_typedef(entity e)
-{
-  list l = NIL;
-  type t1 = ultimate_type(entity_type(e));
- 
-  if(type_variable_p(t1)){
-    basic b = variable_basic(type_variable(entity_type(e)));
-    if(basic_pointer_p(b)){
-      type t2 = basic_pointer(variable_basic(type_variable(t1)));
-      if(typedef_type_p(t2)){
-        basic b1 = variable_basic(type_variable(t2));
-          if(basic_typedef_p(b1)){
-            entity e2  = basic_typedef(b1);
-            if(entity_variable_p(e2)){
-              basic b2 = variable_basic(type_variable(entity_type(e2)));
-              if(basic_derived_p(b2)){
-                entity e3 = basic_derived(b2);
-                l = points_to_init_pointer_to_derived(e, e3);
-              }
-            }
-          }
-        }
-      else if(derived_type_p(t2)){
-        entity e3 = basic_derived(variable_basic(type_variable(t2)));
-        l = points_to_init_pointer_to_derived(e, e3);
+      if(pointer_type_p(ultimate_type(entity_type(e)))) 
+	{
+	  if (entity_array_p(e)) 
+	    {
+	      expression ind = make_unbounded_expression();
+	      reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
+	      cell c = make_cell_reference(r);
+	      l = CONS(CELL, c, NIL);
+	    }
+	  else {
+	    reference r = make_reference(e, NIL);
+	    cell c = make_cell_reference(r);
+	    l = CONS(CELL, c, NIL);
+	  } 
+	}
+      else {
+	basic b = variable_basic(type_variable(ultimate_type(entity_type(e))));
+	if (basic_derived_p(b)) 
+	  {
+	    entity ee = basic_derived(b);
+	    type t = entity_type(ee);
+	    if (type_struct_p(t)) 
+	      {
+		l = points_to_init_struct(e, ee);
+	      }
+	  }
       }
     }
-  }
+  /* 	else if (basic_typedef_p(b))  */
+  /* 	  { */
+  /* 	    l = points_to_init_typedef(e); */
+  /* 	  } */
+  /* } */
 
   return l;
 }
 
-/* FI: */
-list points_to_init_pointer_to_derived(entity e, entity ee){
-  list l = NIL;
-  type tt = entity_type(ee);
-
-  if(type_struct_p(tt))
-   l = points_to_init_pointer_to_struct(e, ee);
-  else if(type_union_p(tt))
-    pips_user_warning("union case not handled yet \n");
-  else if(type_enum_p(tt))  // FI: something to be done for enum?
-    pips_user_warning("enum case not handled yet \n");
-  return l;
-}
 
 
-/* FI: */
-list  points_to_init_pointer_to_struct(entity e, entity ee)
-{
-  list l = NIL;
-  bool  eval = true;
-  type tt = entity_type(ee);
-  expression ex = entity_to_expression(e);
-
-  if(  type_struct_p(tt) ) {
-    list l1 = type_struct(tt);
-    if(  !array_argument_p(ex) ) {
-      FOREACH( ENTITY, i, l1 ) {
-        expression ef = entity_to_expression(i);
-        if( expression_pointer_p(ef) ) {
-          expression ex1 =
-            MakeBinaryCall(entity_intrinsic(POINT_TO_OPERATOR_NAME),
-                           ex,
-                           ef);
-          cell c = get_memory_path(ex1, &eval);
-          l = gen_nconc(CONS(CELL, c, NIL),l);
-        }
-      }
-    }
-    else
-      l = points_to_init_array_of_struct(e, ee);
-  }
-
-  return l;
-}
-
-/* FI: */
-list points_to_init_typedef(entity e)
-{
-  list l = NIL;
-  type t1 = entity_type(e);
-    
-  if(type_variable_p(t1)) { // FI: real test or assert?
-    basic b = variable_basic(type_variable(entity_type(e)));
-    tag tt = basic_tag(b);
-    switch(tt){
-    case is_basic_int:;
-      break;
-    case is_basic_float:;
-      break;
-    case is_basic_logical:;
-      break;
-    case is_basic_overloaded:;
-      break;
-    case is_basic_complex:;
-      break;
-    case is_basic_string:;
-      break;
-    case is_basic_bit:;
-      break;
-    case is_basic_pointer:;
-      break;
-    case is_basic_derived:
-      {
-      bool  eval = true;
-      type t = entity_type(e);
-      expression ex = entity_to_expression(e);
-        if( type_struct_p(t) )
-          {
-        list l1 = type_struct(t);
-            FOREACH( ENTITY, i, l1 ) {
-          expression ef = entity_to_expression(i);
-              if( expression_pointer_p(ef) )
-                {
-            expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                            ex,
-                                            ef);
-            cell c = get_memory_path(ex1, &eval);
-            l = gen_nconc(CONS(CELL, c, NIL),l);
-        }
-        }
-          }
-        else if( type_enum_p(t) )
-        pips_user_warning("enum case not handled yet \n");
-        else if( type_union_p(t) )
-        pips_user_warning("union cas not handled yet \nx");
-    }
-      break;
-    case is_basic_typedef:
-      {
-        entity e1  = basic_typedef(b);
-        type t1 = entity_type(e1);
-        if( entity_variable_p(e1) )
-          {
-          basic b2 =  variable_basic(type_variable(t1));
-          if( basic_derived_p(b2) )
-            {
-            entity e2  = basic_derived(b2);
-            l = points_to_init_derived(e, e2);
-          }
-        }
-      }
-      break;
-    default: pips_internal_error("unexpected tag %d\n", tt);
-      break;
-    }
-  }
-  return l;
-}
-
-
-/* */
-list points_to_init_derived(entity e, entity ee){
-  list l = NIL;
-  type tt = entity_type(ee);
-
-  if( type_struct_p(tt) )
-   l = points_to_init_struct(e, ee);
-  return l;
-}
-
-
-/* FI: what are "e" and "ee"? What is returned? What is done> */
+/* return list of cells for pointers declared directlyor indirecltl in
+   variable "e" of type struct defined by entity "ee" */
 list  points_to_init_struct(entity e, entity ee)
 {
   list l = NIL;
@@ -2602,6 +2236,7 @@ list  points_to_init_struct(entity e, entity ee)
   pips_assert("entity ee has type struct", type_struct_p(tt));
 
   list l1 = type_struct(tt);
+  /* AM: Do not build expressions ef and ex */
   if( !array_argument_p(ex) ) {
     FOREACH( ENTITY, i, l1 ){
       expression ef = entity_to_expression(i);
@@ -2666,10 +2301,12 @@ list points_to_init_array_of_struct(entity e, entity field)
           reference  r = reference_undefined;
 
           /*init the effect's engine*/
-          set_methods_for_proper_simple_effects();
           list l_ef = NIL;
+          set_methods_for_proper_simple_effects();
           list l1 = generic_proper_effects_of_complex_address_expression(ex, &l_ef,
                                                                          true);
+          
+	  generic_effects_reset_all_methods();
           ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
           /* gen_free_list(l_ef); */ /* free the spine */
           effect_add_dereferencing_dimension(ef);
@@ -2678,7 +2315,6 @@ list points_to_init_array_of_struct(entity e, entity field)
           EXPRESSION_(CAR(l_inds)) = make_unbounded_expression();
           ex = reference_to_expression(r);
           effects_free(l1);
-          generic_effects_reset_all_methods();
         }
       expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
                                       ex,
