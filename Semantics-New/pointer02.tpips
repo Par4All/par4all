@@ -115,5 +115,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-delete pointer02
+#delete pointer02
 quit

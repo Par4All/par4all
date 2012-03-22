@@ -1,4 +1,6 @@
-int main()
+/* TRAC Ticket 692 */
+
+int dowhile01()
 {
   int i, a[10], b[10];
 
