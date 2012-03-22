@@ -65,7 +65,10 @@ s_t make_s(int i, float x)
 POINTS TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void assign02()
 {
@@ -97,7 +100,10 @@ void assign02()
    j = make_s(1, 2.).entier;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 s_t make_s(int i, float x)
 {

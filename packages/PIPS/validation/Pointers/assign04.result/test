@@ -37,7 +37,10 @@ void foo()
 POINTS TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void assign04()
 {
@@ -96,7 +99,10 @@ void assign04()
    ***p = 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void foo()
 {

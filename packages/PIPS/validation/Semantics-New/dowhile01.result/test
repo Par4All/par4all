@@ -1,0 +1,92 @@
+
+TRANSFORMERS
+
+
+//  T(dowhile01) {dowhile01==0}
+
+int dowhile01()
+{
+
+//  T(i) {}
+
+   int i, a[10], b[10];
+
+//  T(i) {}
+
+   do {
+
+//  T(i) {0<=i, i<=9}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  T() {0<=i, i<=9}
+
+         a[i] = i;
+   }
+   while (0);
+
+//  T(i) {i#init==10, 0<=i, i<=10}
+
+   do {
+
+//  T(i) {i#init==10, 0<=i, i<=9}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  T() {0<=i, i<=9}
+
+         b[i] = a[i];
+   }
+   while (0);
+
+//  T(dowhile01) {dowhile01==0, i==10}
+
+
+   return 0;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int dowhile01()
+{
+
+//  P() {}
+
+   int i, a[10], b[10];
+
+//  P(i) {}
+
+   do {
+
+//  P(i) {}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  P(i) {0<=i, i<=9}
+
+         a[i] = i;
+   }
+   while (0);
+
+//  P(i) {i==10}
+
+   do {
+
+//  P(i) {i==10}
+
+      for(i = 0; i <= 9; i += 1)
+
+//  P(i) {0<=i, i<=9}
+
+         b[i] = a[i];
+   }
+   while (0);
+
+//  P(i) {i==10}
+
+
+   return 0;
+}

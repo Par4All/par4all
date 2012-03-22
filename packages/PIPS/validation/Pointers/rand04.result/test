@@ -9,7 +9,9 @@ int main(void)
 //             <    is written>: pi2
    int *pi2 = &i2;
    int **pp;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -38,7 +40,10 @@ int main(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -100,8 +105,8 @@ int main(void)
    *pp = (void *) 0;
 
 // Points To:
-// pi1 -> *NULL_POINTER* , MAY
 // pi1 -> i1 , MAY
+// pi1 -> *NULL_POINTER* , MAY
 // pi2 -> i2 , MAY
 // pi2 -> *NULL_POINTER* , MAY
 // pp -> pi2 , MAY
@@ -114,8 +119,8 @@ int main(void)
 // pi1 -> *NULL_POINTER* , MAY
 // pi2 -> i2 , MAY
 // pi2 -> *NULL_POINTER* , MAY
-// pp -> pi1 , MAY
 // pp -> pi2 , MAY
+// pp -> pi1 , MAY
 
    return 0;
 }

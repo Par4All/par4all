@@ -57,7 +57,10 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {

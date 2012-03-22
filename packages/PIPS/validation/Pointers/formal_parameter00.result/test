@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS
 
 void formal_parameter00(int *pi)
 {
@@ -16,28 +16,14 @@ void formal_parameter00(int *pi)
    return 0;
 }
 
-PROPER POINTER EFFECTS
-
-void formal_parameter00(int *pi)
-{
-   int *q;
-   int i;
-//             <    is written>: i
-
-   i = 0;
-//             <    is read   >: pi
-//             <    is written>: q
-   q = pi;
-//             <    is written>: pi
-   pi = &i;
-   return 0;
-}
-
-POINTS TO
+POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // pi -> _pi_1[0] , EXACT
+
+
+// Points To OUT: none
 
 void formal_parameter00(int *pi)
 {
