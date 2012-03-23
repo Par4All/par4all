@@ -330,31 +330,3 @@ set pt_gen(list args, set pt_out, set pt_in, set pt_binded)
 /*   return pt_out; */
 /* } */
 
-
-
-bool interprocedural_points_to_analysis(char * module_name)
-{
-  /* list pt_list = NIL; */
-  /* set pts_to_set = set_generic_make(set_private, */
-  /* 				    points_to_equal_p,points_to_rank); */
-
-  set_current_module_entity(module_name_to_entity(module_name));
-  //entity module = get_current_module_entity();
-
-  //type t = entity_type(module);
-
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-
-  pips_debug(1, "considering module %s\n", module_name);
-
-  
-
-  /* DB_PUT_MEMORY_RESOURCE */
-  /*   (DBR_INIT_POINTS_TO_LIST, module_name, init_pts_to_list); */
-
-  reset_current_module_entity();
-  debug_off();
-
-  bool good_result_p = true;
-  return (good_result_p);
-}

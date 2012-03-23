@@ -171,18 +171,28 @@ pt_map range_to_points_to(range r, pt_map pt_in)
  */
 pt_map call_to_points_to(call c, pt_map pt_in)
 {
+  // FI: see functio points_to_call()
   pt_map pt_out = pt_in;
   entity f = call_function(c);
   list al = call_arguments(c);
+  value fv = entity_initial(f);
 
   /* points-to updates due to arguments */
   pt_out = expressions_to_points_to(al, pt_in);
 
   /* points-to updates due to the function itself */
-  if(entity_constant_p(f))
-    pt_out = constant_call_to_points_to(c, pt_out);
+  if(entity_constant_p(f)) {
+    // pt_out = constant_call_to_points_to(c, pt_out);
+    pt_out = pt_in;
+  }
   else if(intrinsic_entity_p(f))
     pt_out = intrinsic_call_to_points_to(c, pt_out);
+  else if(symbolic_entity_p(f))
+    pt_out = pt_in; // FI?
+  else if(value_unknown_p(fv)) {
+    pips_internal_error("function %s has an unknown value\n",
+                        entity_name(f));
+  }
   else {
     // must be a user-defined function
     pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
@@ -207,13 +217,23 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
   entity f = call_function(c);
+  list al = call_arguments(c);
+
+  set_methods_for_proper_simple_effects();
+  list el = call_to_proper_effects(c);
+  generic_effects_reset_all_methods();
+
+  pips_debug(5, "intrinsic function \"%s\"\n", entity_name(f));
+  pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el);
+
+  // FI: short term version
+  return pt_out;
 
   // FI: Where should we check that the update is linked to a pointer?
   // Should we go down because a pointer assignment may be hidden anywhere...
   // Or have we already taken care of this in call_to_points_to()
 
   if(ENTITY_ASSIGN_P(f)) {
-    list al = call_arguments(c);
     expression lhs = EXPRESSION(CAR(al));
     expression rhs = EXPRESSION(CAR(CDR(al)));
     pt_out = assignment_to_points_to(lhs, rhs, pt_in);
@@ -248,7 +268,12 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
   // FI: we need a global variable here to make the decision without
   // propagating an extra parameter everywhere
 
-  pips_internal_error("Not implemented yet for function \"%s\"\n", entity_user_name(f));
+  // pips_internal_error("Not implemented yet for function \"%s\"\n", entity_user_name(f));
+
+  pips_user_warning("The function call to \"%s\" is still ignored\n"
+		    "On going implementation...\n", entity_user_name(f));
+  //set_assign(pt_out, pt_in);
+  pt_out = pt_in;
 
   return pt_out;
 }
@@ -276,10 +301,29 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   return pt_out;
 }
 
-pt_map pointer_assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
+/* Any abstract location of the lhs in L is going to point to any sink of
+ * any abstract location of the rhs in R.
+ *
+ * New points-to information must be added when a formal parameter
+ * is dereferenced.
+ *
+ * FI: Side effects of lhs and rhs have been taken care of at a higher
+ * level? I do not think so in general...
+ */
+pt_map pointer_assignment_to_points_to(expression lhs,
+				       expression rhs,
+				       pt_map pt_in)
 {
   pt_map pt_out = pt_in;
   pips_internal_error("Not implemented yet for lhs %p and rhs %p\n", lhs, rhs);
+
+  /* Take side effects into account */
+  pt_out = expression_to_points_to(lhs, pt_out);
+  pt_out = expression_to_points_to(rhs, pt_out);
+
+  /*Change the "lhs" into a contant memory path using current
+    points-to information pt_out */
+  list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
 
   return pt_out;
 }

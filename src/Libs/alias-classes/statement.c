@@ -66,11 +66,15 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out = new_pt_map();
   assign_pt_map(pt_out, pt_in);
+  instruction i = statement_instruction(s);
 
-  if(declaration_statement_p(s))
+  if(declaration_statement_p(s)) {
+    /* Process the declarations */
     pt_out = declaration_statement_to_points_to(s, pt_out);
+    /* Go down recursively */
+    pt_out = instruction_to_points_to(i, pt_out);
+  }
   else {
-    instruction i = statement_instruction(s);
     pt_out = instruction_to_points_to(i, pt_out);
   }
 
@@ -78,6 +82,14 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
    *
    * But it might be smarter (or not) to require or not the storage.
    */
+  // FI: currently, this is going to be redundant most of the time
+  points_to_storage(pt_in, s, true);
+
+    /* Eliminate local information if you exit a block */
+  if(statement_sequence_p(s)) {
+    list dl = statement_declarations(s);
+    pt_out = points_to_block_projection(pt_out, dl);
+  }
 
   return pt_out;
 }
@@ -89,7 +101,48 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
 pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for declaration statement %p\n", s);
+  //set pt_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
+  list l = NIL;
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+
+  list l_decls = statement_declarations(s);
+
+  pips_debug(1, "declaration statement \n");
+  
+  FOREACH(ENTITY, e, l_decls) {
+    if(pointer_type_p(ultimate_type(entity_type(e)))) {
+      if( !storage_rom_p(entity_storage(e)) ) {
+	// FI: could be simplified with variable_initial_expression()
+	value v_init = entity_initial(e);
+	/* generate points-to due to the initialisation */
+	if(value_expression_p(v_init)){
+	  expression exp_init = value_expression(v_init);
+	  expression lhs = entity_to_expression(e);
+	  pt_out = assignment_to_points_to(lhs,
+					   exp_init,
+					   pt_out);
+	  /* AM/FI: abnormal sharing (lhs); the reference may be
+	     reused in the cel... */
+	  /* free_expression(lhs); */
+	}
+	else {
+	  /* Generate nowhere sinks */
+	  /* FI: goes back into Amira's code */
+	  l = points_to_init_variable(e);
+	  FOREACH(CELL, cl, l) {
+	    list l_cl = CONS(CELL, cl, NIL);
+	    // FI: memory leak because of the calls to points_to_nowherexxx
+	    if(type_sensitive_p)
+	      set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
+	    else
+	      set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
+	    //FI: free l_cl?
+	  }
+	}
+      }
+    }
+  }
+  
   return pt_out;
 }
 
@@ -148,11 +201,13 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_expression: {
     expression e = instruction_expression(i);
-    pt_out = expression_to_points_to(e, pt_in);
+    pt_out = new_pt_map();
+    set_assign(pt_out, pt_in);
+    pt_out = expression_to_points_to(e, pt_out);
     break;
   }
   default:
-    ;
+    pips_internal_error("Unexpected instruction tag %d\n", it);
   }
   return pt_out;
 }
@@ -160,35 +215,87 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
 pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for sequence %p\n", seq);
+  //bool store = true; // FI: management and use of store_p? Could be useful? How is it used?
+  // pt_out = points_to_sequence(seq, pt_in, store);
+  FOREACH(statement, st, sequence_statements(seq)) {
+    pt_out = statement_to_points_to(st, pt_out);
+  }
+
   return pt_out;
 }
 
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for test %p\n", t);
+
+  bool store = true;
+  pt_out = points_to_test(t, pt_in, store);
+
+  // FI: I do not understand with the necessary projections are not
+  // performed recursively at a lower level
+
+  // FI: I do not understand how the merge stuff works twice
+
+  statement true_stmt = test_true(t);
+  list tdl = statement_declarations(true_stmt);
+  if(declaration_statement_p(true_stmt) && !ENDP(tdl)){
+      pt_out = points_to_block_projection(pt_out, tdl);
+      pt_out = merge_points_to_set(pt_out, pt_in);
+    }
+
+  statement false_stmt = test_false(t);
+  list fdl = statement_declarations(false_stmt);
+  if(declaration_statement_p(false_stmt) && !ENDP(fdl)) {
+    pt_out = points_to_block_projection(pt_out, fdl);
+    pt_out = merge_points_to_set(pt_out, pt_in);
+  }
+
   return pt_out;
 }
 
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for loop %p\n", l);
+  bool store = false;
+  pt_out = points_to_loop(l, pt_in, store);
+
+  /* This sequence has been factored out in statement_to_points_to() */
+  /*
+  statement ls = loop_body(l);
+  list dl = statement_declarations(ls);
+  if(declaration_statement_p(ls) && !ENDP(dl))
+    pt_out = points_to_block_projection(pt_out, dl);
+  */
+
   return pt_out;
 }
 
 pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for while loop %pd\n", wl);
+  bool store = false;
+  if (evaluation_before_p(whileloop_evaluation(wl)))
+    pt_out = points_to_whileloop(wl, pt_in, store);
+  else
+    pt_out = points_to_do_whileloop(wl, pt_in, store);
+
+  statement ws = whileloop_body(wl);
+  list dl = statement_declarations(ws);
+  // FI: to be improved
+  if(declaration_statement_p(ws) && !ENDP(dl))
+    pt_out = points_to_block_projection(pt_out, dl);
+
   return pt_out;
 }
 
 pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for usntructured %p\n", u);
+
+  pt_out = points_to_unstructured(u, pt_in, true);
+
+  // FI: The storage should be performed at a higher level?
+  // points_to_storage(pt_out,current,true);
   return pt_out;
 }
 
@@ -202,6 +309,13 @@ pt_map multitest_to_points_to(multitest mt, pt_map pt_in)
 pt_map forloop_to_points_to(forloop fl, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for for loop %p\n", fl);
+  bool store = false;
+  pt_out = points_to_forloop(fl, pt_in, store);
+  /*
+    statement ls = forloop_body(fl);
+    list dl =statement_declarations(ls);
+    if(declaration_statement_p(ls) && !ENDP(dl))
+    pt_out = points_to_block_projection(pt_out, dl);
+  */
   return pt_out;
 }

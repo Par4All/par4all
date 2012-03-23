@@ -1,0 +1,26 @@
+Organization of the libray
+
+  passes.c   	pass definitions, interface with pipsmake and pipsdbm
+  statement.c	statement analysis
+  expression.c	expression analysis
+
+alias_classes.c
+alias_lists.c
+alias_pairs.c
+assignment.c	analysis of assignment (statement or expression?)
+constant-path-utils.c
+points_to_analysis_general_algorithm.c
+points_to_init_analysis.c
+points_to_interprocedural_analysis.c
+points_to_prettyprint.c
+points_to_set.c
+prettyprint.c
+sav_alias_classes.c
+sav_alias_lists.c
+
+  emami.c: functions developed to implement Emami's algorithm
+
+Validation of the library
+
+  Pointers
+  EffectsWithPointsTo
