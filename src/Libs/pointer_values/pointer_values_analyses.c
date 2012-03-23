@@ -199,8 +199,17 @@ void print_pv_results(pv_results pv_res)
     fprintf(stderr, "result_path is undefined\n");
 }
 
+/******************** SOME UTILITIES (to move elsewhere?) */
 
-
+list make_anywhere_anywhere_pvs()
+{
+  cell anywhere_c = make_cell_reference(make_reference(entity_all_locations(), NIL));
+  cell_relation pv = make_address_of_pointer_value(anywhere_c,
+						   copy_cell(anywhere_c),
+						   is_approximation_may,
+						   make_descriptor_none());
+  return (CONS(CELL_RELATION, pv, NIL));
+}
 
 /******************** LOCAL FUNCTIONS DECLARATIONS */
 
@@ -771,15 +780,36 @@ list forloop_to_post_pv(forloop l, list l_in, pv_context *ctxt)
 
 
 static
-list unstructured_to_post_pv(unstructured __attribute__ ((unused))u, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused)) *ctxt)
+list unstructured_to_post_pv(unstructured unstr, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
-  pips_internal_error("not yet implemented");
-   pips_debug_pvs(2, "returning: ", l_out);
- pips_debug(1, "end\n");
+  control entry_ctrl = unstructured_entry( unstr );
+  statement entry_node = control_statement(entry_ctrl);
+
+  if(control_predecessors(entry_ctrl) == NIL && control_successors(entry_ctrl) == NIL)
+    {
+      /* there is only one statement in u; */
+      pips_debug(6, "unique node\n");
+      l_out = statement_to_post_pv(entry_node, l_in, ctxt);
+    }
+  else
+    {
+      pips_user_warning("Pointer analysis for unstructured part of code not yet fully implemented:\n"
+			"Consider restructuring your code\n");
+      list l_in_anywhere = make_anywhere_anywhere_pvs();
+      list blocs = NIL ;
+      CONTROL_MAP(c, {
+	  list l_out = statement_to_post_pv(control_statement(c), gen_full_copy_list(l_in_anywhere), ctxt);
+	  gen_full_free_list(l_out);
+	},
+	unstructured_exit( unstr ), blocs) ;
+      gen_free_list(blocs);
+      l_out = make_anywhere_anywhere_pvs();
+    }
+  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug(1, "end\n");
   return (l_out);
 }
-
 
 void range_to_post_pv(range r, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
