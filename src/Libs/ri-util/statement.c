@@ -205,6 +205,8 @@ bool forloop_statement_p(statement s) {
 
    For the time being a declaration statement is a call to continue
    with non-empty declarations.
+
+   FI: This could be fixed by adding + declaration in the instruction domainn
 */
 bool declaration_statement_p(statement s) {
   bool declaration_p = false;
