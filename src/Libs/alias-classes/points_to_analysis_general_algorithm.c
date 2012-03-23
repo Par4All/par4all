@@ -1540,21 +1540,21 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
   set pt_out = set_generic_make(set_private, points_to_equal_p,
                                 points_to_rank);
 
-  set pt_in_callee = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
- set pt_out_callee = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
-  set pts_binded = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
+  /*set pt_in_callee = set_generic_make(set_private, points_to_equal_p,
+    points_to_rank);*/
+  /*set pt_out_callee = set_generic_make(set_private, points_to_equal_p,
+    points_to_rank);*/
+ /*set pts_binded = set_generic_make(set_private, points_to_equal_p,
+   points_to_rank);*/
 
-  set pt_written = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
-  set pts_kill = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
+  /*set pt_written = set_generic_make(set_private, points_to_equal_p,
+    points_to_rank);*/
+  /*set pts_kill = set_generic_make(set_private, points_to_equal_p,
+    points_to_rank); */
 
-  set pt_end = set_generic_make(set_private, points_to_equal_p,
-  				points_to_rank);
-  list formal_param = NIL, l_effect = NIL;
+  /*set pt_end = set_generic_make(set_private, points_to_equal_p,
+    points_to_rank); */
+  /*list formal_param = NIL, l_effect = NIL */;
   if (declaration_statement_p(s))
     pt_in = points_to_init(s, pt_in);
   switch (tt = value_tag(entity_initial(e))) {
