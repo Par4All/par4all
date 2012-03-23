@@ -3128,6 +3128,10 @@ void check_user_call_site(entity func, list args)
 }
 
 /* just returns the entity of an expression, or entity_undefined
+ *
+ * The entity returned is either the function called or the variable
+ * referenced
+ *
  * SG: moved here from hpfc
  */
 entity expression_to_entity(expression e)
