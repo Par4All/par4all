@@ -1,0 +1,3 @@
+/* Missing array of pointers initialization 
+   int *tab2[10] should generate tab2[*] -> *nowhere*_b0, MAY
+*/
