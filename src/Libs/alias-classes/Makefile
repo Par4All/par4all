@@ -33,7 +33,8 @@ LIB_CFILES = 	alias_pairs.c \
 		prettyprint.c \
 		statement.c \
 		expression.c \
-		passes.c
+		passes.c \
+	        sinks.c
 
 
 INC_TARGET =	$(TARGET).h

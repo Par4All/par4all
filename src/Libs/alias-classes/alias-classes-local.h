@@ -30,3 +30,10 @@ typedef set pt_map;
 #define pt_map_undefined set_undefined
 #define new_pt_map() set_generic_make(set_private, points_to_equal_p, points_to_rank)
 #define assign_pt_map(x,y) set_assign(x, y)
+#define pt_map_clear set_clear
+#define pt_map_free set_free
+#define pt_map_union set_union
+
+// FI: Not so sure we do not need a new name
+#define source_in_pt_map_p source_in_set_p
+

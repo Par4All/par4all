@@ -23,10 +23,11 @@
 */
 
 /*
- * This file contains functions used to compute points-to sets at expression level.
+ * This file contains functions used to compute points-to sets at
+ * expression level.
  *
  * The argument pt_in is always modified by side-effects and returned.
-*/
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
