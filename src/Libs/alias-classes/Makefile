@@ -32,7 +32,8 @@ LIB_CFILES = 	alias_pairs.c \
                 constant-path-utils.c \
 		prettyprint.c \
 		statement.c \
-		expression.c
+		expression.c \
+		passes.c
 
 
 INC_TARGET =	$(TARGET).h
