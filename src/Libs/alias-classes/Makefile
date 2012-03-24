@@ -31,9 +31,8 @@ LIB_CFILES = 	alias_pairs.c \
 		points_to_interprocedural_analysis.c \
                 constant-path-utils.c \
 		prettyprint.c \
-	        statement.c \
-                expression.c \
-		passes.c
+		statement.c \
+		expression.c
 
 
 INC_TARGET =	$(TARGET).h
