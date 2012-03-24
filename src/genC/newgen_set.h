@@ -101,8 +101,9 @@ extern set set_generic_make(set_type, hash_equals_t, hash_rank_t);
 extern set set_make(set_type);
 extern set set_singleton(set_type, const void *);
 extern set set_dup(const set);
-// DESTRUCTOR
+// DESTRUCTORA
 extern void set_free(set);
+extern void sets_free(set,...);
 // OBSERVERS
 extern int set_size(const set);
 extern int set_own_allocated_memory(const set);

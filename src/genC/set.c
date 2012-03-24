@@ -324,6 +324,25 @@ void set_free(set s)
   gen_free_area((void**) s, sizeof(struct _set_chunk));
 }
 
+/* Free several sets in one call. Useful when many sets are used
+   simultaneously. */
+void sets_free(set s,...)
+{
+  va_list args;
+
+  /* Analyze in args the variadic arguments that may be after t: */
+  va_start(args, s);
+  /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  do {
+    set_free(s);
+    /* Get the next argument */
+    s = va_arg(args, set);
+  } while(s!=NULL);
+  /* Release the variadic analysis */
+  va_end(args);
+}
+
 /* returns the number of items in s.
  */
 int set_size(const set s)
