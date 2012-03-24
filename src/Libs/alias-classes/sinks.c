@@ -137,10 +137,13 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
     break;
   case 1:
     sinks = unary_intrinsic_call_to_points_to_sinks(c, in);
+    break;
   case 2:
     sinks = binary_intrinsic_call_to_points_to_sinks(c, in);
+    break;
   case 3:
     sinks = ternary_intrinsic_call_to_points_to_sinks(c, in);
+    break;
   default:
     sinks = nary_intrinsic_call_to_points_to_sinks(c, in);
     break;
@@ -154,17 +157,37 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
+  expression a = EXPRESSION(CAR(al));
   list sinks = NIL;
-  pips_internal_error("Not implemented for %p and %p\n", c, in);
+  pips_assert("One argument", gen_length(al)==1);
+  // pips_internal_error("Not implemented for %p and %p\n", c, in);
   if (ENTITY_MALLOC_SYSTEM_P(f) ||
       ENTITY_CALLOC_SYSTEM_P(f)) {
-    expression a = EXPRESSION(CAR(al));
     sinks = malloc_to_points_to_sinks(a, in);
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
+    sinks = expression_to_constant_paths(statement_undefined, a, in);
+   }
+  else if(ENTITY_PRE_INCREMENT_P(f)) {
+    pips_internal_error("Not implemented yet.\n");
      ;
    }
+  else if(ENTITY_PRE_DECREMENT_P(f)) {
+    pips_internal_error("Not implemented yet.\n");
+     ;
+   }
+  else if(ENTITY_POST_INCREMENT_P(f)) {
+    pips_internal_error("Not implemented yet.\n");
+     ;
+   }
+  else if(ENTITY_POST_DECREMENT_P(f)) {
+    pips_internal_error("Not implemented yet.\n");
+     ;
+   }
+  else {
   // FI: to be continued
+    pips_internal_error("Unexpected unary pointer operator\n");
+  }
 
   return sinks;
 }
@@ -174,11 +197,15 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 {
   entity f = call_function(c);
+  list al = call_arguments(c);
+  expression a1 = EXPRESSION(CAR(al));
+  expression a2 = EXPRESSION(CAR(CDR(al)));
   list sinks = NIL;
-  pips_internal_error("Not implemented for %p and %p\n", c, in);
+  pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
 
   if(ENTITY_ASSIGN_P(f)) {
-    ;
+    // FI: you need to dereference this according to in...
+    sinks = expression_to_points_to_sinks(a1, in);
   }
   else if(ENTITY_POINT_TO_P(f)) {
     ;
@@ -240,9 +267,43 @@ list points_to_null_sinks()
 }
 */
 
+ /* Debug: print a cell list for points-to. Parameter f is not useful
+    in a debugging context. */
+void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
+{
+  reference r = cell_any_reference(c);
+  print_reference(r);
+}
+
+/* Debug: use stderr */
+void print_points_to_cell(cell c)
+{
+  fprint_points_to_cell(stderr, c);
+}
+
+/* Debug */
+void print_points_to_cells(list cl)
+{
+  if(ENDP(cl))
+    fprintf(stderr, "Empty cell list\n");
+  FOREACH(CELL, c, cl) {
+    print_points_to_cell(c);
+    if(!ENDP(CDR(cl)))
+      fprintf(stderr, ", ");
+  }
+  fprintf(stderr, "\n");
+}
+
+
+ /* Returns a list of memory cells */
 list reference_to_points_to_sinks(reference r, pt_map in)
 {
   list sinks = NIL;
+
+  ifdebug(8) {
+    pips_debug(8, "Reference r = ");
+    print_reference(r);
+  }
 
   // FI: to be checked otherwise?
   expression rhs = expression_undefined;
@@ -259,9 +320,10 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	if (!source_in_pt_map_p(nc, in)) {
 	  pt_map tmp = formal_points_to_parameter(nc);
 	  // FI: lots of trouble here
-	  in = pt_map_union(in, in, tmp);
-	  pt_map_clear(tmp);
-	  pt_map_free(tmp);
+	  in = union_of_pt_maps(in, in, tmp);
+	  // FI: Amira says that the free is shallow...
+	  clear_pt_map(tmp);
+	  free_pt_map(tmp);
 	}
       }
       /* FI/FC : I dropped the current statement from many signature,
@@ -272,6 +334,11 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	 with Amira and Fabien. */
       sinks = expression_to_constant_paths(statement_undefined, rhs, in);
     }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "Resulting cells: ");
+    print_points_to_cells(sinks);
   }
 
   return sinks;

@@ -353,9 +353,13 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 /* } */
 
 /*
-  Change dereferenced pointers and filed access into a constant paths
-  When no constant path is found the expression is uninitialized pointer
-*/
+ * Change dereferenced pointers and field access into a constant paths.
+ *
+ * When no constant path is found, the expression is considered
+ * equivalent to an uninitialized pointer. 
+ *
+ * FI: to be reviewed, obvious memory leaks
+ */
 list expression_to_constant_paths(statement s, expression e, set in)
 {
   set cur = set_generic_make(set_private, points_to_equal_p,
@@ -365,8 +369,14 @@ list expression_to_constant_paths(statement s, expression e, set in)
   list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL;
   bool exact_p = false, *nowhere_p = false, changed = true;
   bool eval_p = true;
+
+  // FI: it looks very complicated when e is a simple reference, but
+  // it may be a general approach
+
   c = get_memory_path(e, &eval_p);
+
   c = simple_cell_to_store_independent_cell(c, &changed);
+
   reference cr = cell_any_reference(c);
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   /* Take into account global variables which are initialized in demand*/
@@ -375,6 +385,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
   l_cell = CONS(CELL, c, NIL);
   in = set_assign(cur, points_to_init_global(s, l_cell, in));
   if( eval_p ) {
+    // FI: memory leak for l_cell
     l_cell = CONS(CELL, c, NIL);
     set_methods_for_proper_simple_effects();
     l_in = set_to_sorted_list(in,
@@ -383,11 +394,13 @@ list expression_to_constant_paths(statement s, expression e, set in)
     l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
     generic_effects_reset_all_methods();
     /* in = points_to_init_global(s, l_cell, in); */
+    // FI: memory leak for l_cell
     l_cell = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
 
     in =  set_assign(in, points_to_init_global(s, l_cell, in));
     }
   else {
+    // FI: memory leak for l_cell
     l_cell = CONS(CELL, c, NIL);
     in =  set_assign(cur, points_to_init_global(s, l_cell, in));
   }
@@ -467,6 +480,7 @@ cell get_memory_path(expression e, bool * eval_p)
       else
 	anywhere =  entity_all_xxx_locations(ANYWHERE_LOCATION);
       reference r = make_reference(anywhere,NIL);
+      /* FI: Should not it be a preference? */
       c = make_cell_reference(r);
     }
     else {
@@ -1131,34 +1145,44 @@ bool expression_null_locations_p(expression e)
 }
 
 /*
-create a set of points-to relations of the form:
-element_L -> & element_R, MAY
+ * create a set of points-to relations of the form:
+ *
+ * element_L -> & element_R, MAY
+ *
+ * FI: it would be nice to have the equation or a formula
+ * I do not understand why gen_may1 is built from in_may
 */
 set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 {
- set gen_may1 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- set gen_may2 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- int len = (int) gen_length(L);
+  set gen_may1 = set_generic_make(set_private, points_to_equal_p,
+				  points_to_rank);
+  set gen_may2 = set_generic_make(set_private, points_to_equal_p,
+				  points_to_rank);
+  int len = (int) gen_length(L);
 
- if(len > 1){
+  if(len > 1) {
+    /* If the source is not precisely known */
     FOREACH(cell, l, L){
       SET_FOREACH(points_to, pt, in_may){
 	if(points_to_compare_cell(points_to_source(pt),l)){
-	  points_to npt = make_points_to(l, points_to_sink(pt),make_approximation_may(), make_descriptor_none());
+	  points_to npt = make_points_to(l, points_to_sink(pt),
+					 make_approximation_may(),
+					 make_descriptor_none());
 	  set_add_element(gen_may1, gen_may1, (void*)npt);
 	}
       }
     }
- }
+  }
 
- FOREACH(cell, l, L){
-   set_union(gen_may2, gen_may2, gen_may_constant_paths(l, R, in_may, address_of_p, len));
- }
- set_union(gen_may2, gen_may2,gen_may1);
+  FOREACH(cell, l, L){
+    // FI: memory leak due to call to call to gen_may_constant_paths()
+    set_union(gen_may2, gen_may2,
+	      gen_may_constant_paths(l, R, in_may, address_of_p, len));
+  }
 
- return gen_may2;
+  set_union(gen_may2, gen_may2, gen_may1);
+
+  return gen_may2;
 }
 
 

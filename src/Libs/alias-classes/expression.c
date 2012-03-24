@@ -221,14 +221,14 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   list al = call_arguments(c);
 
   set_methods_for_proper_simple_effects();
-  list el = call_to_proper_effects(c);
+  //list el = call_to_proper_effects(c);
   generic_effects_reset_all_methods();
 
   pips_debug(5, "intrinsic function \"%s\"\n", entity_name(f));
-  pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el);
 
   // FI: short term version
-  return pt_out;
+  // pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el);
+  // return pt_out;
 
   // FI: Where should we check that the update is linked to a pointer?
   // Should we go down because a pointer assignment may be hidden anywhere...
@@ -251,7 +251,8 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   }
   else {
     // Not safe till all previous tests are defined
-    pips_internal_error("Not implemented yet\n");
+    // It is assumed that other intrinsics do not generate points-to arcs...
+    // pips_internal_error("Not implemented yet\n");
     pt_out = pt_in;
   }
 
@@ -316,15 +317,62 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 				       pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for lhs %p and rhs %p\n", lhs, rhs);
+  // pips_internal_error("Not implemented yet for lhs %p and rhs %p\n", lhs, rhs);
 
   /* Take side effects into account */
   pt_out = expression_to_points_to(lhs, pt_out);
-  pt_out = expression_to_points_to(rhs, pt_out);
+  pt_out = expression_to_points_to(rhs, pt_out); // FI: used to be "incur"
 
-  /*Change the "lhs" into a contant memory path using current
-    points-to information pt_out */
+  /* Change the "lhs" into a constant memory path using current
+   * points-to information pt_out.
+   *
+   * FI:  Necessary nodes and arcs in the calling context should be added
+   * on-demand. I have no idea if this function does it or not...
+   */
   list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+
+  // FI: more work needed here, shut up gcc
+  // pips_internal_error("Not implemented yet %p", L);
+
+  /* Retrieve the memory locations that might be reached by the rhs
+   *
+   */
+  list R = expression_to_points_to_sinks(rhs,pt_out);
+
+  /* Compute the data-flow equation for the may and the must edges...
+   *
+   * out = (in - kill) U gen ?
+   */
+
+ /* Extract MAY/MUST points to relations from the input set "incur",
+  * now the current pt_out... */
+  pt_map in_may = points_to_may_filter(pt_out);
+  pt_map in_must = points_to_must_filter(pt_out);
+  pt_map kill_may = kill_may_set(L, in_may);
+  pt_map kill_must = kill_must_set(L, pt_out);
+  // FI: I am lost with &address_of_p
+  bool address_of_p = false;
+  pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
+  pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
+  pt_map kill = new_pt_map();
+  set_union(kill, kill_may, kill_must);
+  pt_map gen = new_pt_map();
+  set_union(gen, gen_may, gen_must);
+  if( set_empty_p(gen) ) {
+    bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+    if(type_sensitive_p)
+      gen = points_to_anywhere_typed(L, pt_out);
+    else
+      gen = points_to_anywhere(L, pt_out); 
+  }
+  set_difference(pt_out, pt_out, kill);
+  set_union(pt_out, pt_out, gen);
+
+  free_pt_maps(in_may, in_must,
+	       kill_may, kill_must,
+	       gen_may, gen_must,
+	       gen, kill, NULL);
+  // clear_pt_map(pt_out); // FI: why not free?
 
   return pt_out;
 }

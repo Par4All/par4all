@@ -185,11 +185,14 @@ void print_points_to(const points_to pt)
   fprintf(stderr," (%d)\n", approximation_tag(app));
 }
 
-/*print a points-to set for debug*/
+/* Print a set of points-to for debug */
 void print_points_to_set(string what,  set s)
 {
   fprintf(stderr,"points-to set %s:\n", what);
-  SET_MAP(elt, print_points_to((points_to) elt), s);
+  if(set_size(s)==0)
+    fprintf(stderr, "empty set\n");
+  else
+    SET_MAP(elt, print_points_to((points_to) elt), s);
   fprintf(stderr, "\n");
 }
 

@@ -1139,7 +1139,7 @@ set points_to_post_increment(statement s,
 /* computing the points-to set of a while loop by iterating over its
  * body until reaching a fixed-point.
  *
- * The fiex-point is forced by k-limiting.
+ * The fixed-point is forced by k-limiting and by using the top of the lattice.
  *
  * For the time being the condition's side effect are not taken into
  * account.
