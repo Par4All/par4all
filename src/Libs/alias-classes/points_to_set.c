@@ -189,7 +189,9 @@ void print_points_to(const points_to pt)
 void print_points_to_set(string what,  set s)
 {
   fprintf(stderr,"points-to set %s:\n", what);
-  if(set_size(s)==0)
+  if(set_undefined_p(s))
+    fprintf(stderr, "undefined set\n");
+  else if(set_size(s)==0)
     fprintf(stderr, "empty set\n");
   else
     SET_MAP(elt, print_points_to((points_to) elt), s);
@@ -207,6 +209,27 @@ bool source_in_set_p(cell source, set s)
       return true;
   }
   return in_p;
+}
+
+/* Return a list of cells that are sink for some edge whose source is
+ *  "source" in set "s"
+ *
+ * Function added by FI. Only one use. In that case, it would be
+ * better to copy the cells before putting them in the new list.
+ */
+list source_to_sinks(cell source, set s)
+{
+  list sinkl = NIL;
+  SET_FOREACH ( points_to, pt, s ) {
+    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+    if(cell_equal_p(source, points_to_source(pt))) {
+      cell sc = points_to_sink(pt);
+      sinkl = CONS(CELL, sc, sinkl);
+    }
+  }
+  // FI: use gen_nreverse() to simplify debbugging? Not meaningful
+  // with SET_FOREACH
+  return sinkl;
 }
 
 /* test if a cell appear as a sink in a set of points-to */

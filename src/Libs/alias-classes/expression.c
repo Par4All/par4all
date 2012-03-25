@@ -351,7 +351,9 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   pt_map kill_may = kill_may_set(L, in_may);
   pt_map kill_must = kill_must_set(L, pt_out);
   // FI: I am lost with &address_of_p
-  bool address_of_p = false;
+  // FI: I assumed the conversion performed earlier in sinks, AM performs it in
+  // gen_must_constant_paths() which may or not be better;
+  bool address_of_p = true;
   pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
   pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
   pt_map kill = new_pt_map();

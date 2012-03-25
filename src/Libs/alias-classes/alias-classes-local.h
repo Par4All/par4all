@@ -35,6 +35,7 @@ typedef set pt_map;
 #define assign_pt_map(x,y) set_assign(x, y)
 #define clear_pt_map(pt) set_clear(pt)
 #define free_pt_map(pt) set_free(pt)
+#define print_pt_map(pt) print_points_to_set("",pt);
 // FI: varargs; probably OK with gcc preprocessor
 #define free_pt_maps sets_free
 #define union_of_pt_maps(pt1, pt2, pt3) set_union(pt1, pt2, pt3)

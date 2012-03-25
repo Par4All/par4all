@@ -285,11 +285,13 @@ void print_points_to_cell(cell c)
 void print_points_to_cells(list cl)
 {
   if(ENDP(cl))
-    fprintf(stderr, "Empty cell list\n");
-  FOREACH(CELL, c, cl) {
-    print_points_to_cell(c);
-    if(!ENDP(CDR(cl)))
-      fprintf(stderr, ", ");
+    fprintf(stderr, "Empty cell list");
+  else {
+    FOREACH(CELL, c, cl) {
+      print_points_to_cell(c);
+      if(!ENDP(CDR(cl)))
+	fprintf(stderr, ", ");
+    }
   }
   fprintf(stderr, "\n");
 }
@@ -299,6 +301,8 @@ void print_points_to_cells(list cl)
 list reference_to_points_to_sinks(reference r, pt_map in)
 {
   list sinks = NIL;
+  entity e = reference_variable(r);
+  list sl = reference_indices(r);
 
   ifdebug(8) {
     pips_debug(8, "Reference r = ");
@@ -307,17 +311,28 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 
   // FI: to be checked otherwise?
   expression rhs = expression_undefined;
-  if (array_argument_p(rhs)) {
+  if (!ENDP(sl)) {
+    // FI: to be seen with AM
+    pips_internal_error("Not implemented yet.\n");
     sinks = array_to_constant_paths(rhs, in);
   }
   else {
-    entity e = reference_variable(r);
     /* scalar case, rhs is already a lvalue */
-    /* add points-to relations in demand for global pointers */
+    /* add points-to relations on demand for global pointers and
+       top-level entities */
     if( pointer_type_p(ultimate_type(entity_type(e)) )) {
       if( top_level_entity_p(e) || formal_parameter_p(e) ) {
-	cell nc = make_cell_reference(r);
+
+	// FI: the piece of code below checks if e is at least the
+	// source of one arcs in pt_map in. If not, a new arc is
+	// created in another pt_map and the union of both is returned.
+	// FI: this could be a function and this could be simplified
+
+	// FI->AM: either it's a persistant reference or reference r
+	// must be copied. I chose the copy option
+	cell nc = make_cell_reference(copy_reference(r));
 	if (!source_in_pt_map_p(nc, in)) {
+	  // FI->AM: in spite of the name, seems to handle globals as well
 	  pt_map tmp = formal_points_to_parameter(nc);
 	  // FI: lots of trouble here
 	  in = union_of_pt_maps(in, in, tmp);
@@ -325,14 +340,31 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	  clear_pt_map(tmp);
 	  free_pt_map(tmp);
 	}
+	else {
+	  // FI->AM: you have to free the cell without freeing the reference...
+	  // cell_reference(nc) = reference_undefined;
+	  free_cell(nc);
+	}
       }
+
       /* FI/FC : I dropped the current statement from many signature,
 	 assuming it is not necessary to exploit in because we are
 	 dealing only for the current statement and because we do no
 	 need an involved statement. However, this may not be
 	 compatible with the current data structure... To be checked
 	 with Amira and Fabien. */
-      sinks = expression_to_constant_paths(statement_undefined, rhs, in);
+      // sinks = expression_to_constant_paths(statement_undefined, rhs, in);
+      cell nc = make_cell_reference(copy_reference(r));
+      // Could be made simpler if source_to_sinks() fully allocated a new list
+      list sl = source_to_sinks(nc, in);
+      free_cell(nc);
+      sinks = gen_full_copy_list(sl);
+      gen_free_list(sl);
+    }
+    else {
+      pips_internal_error("Pointer assignment from something "
+			  "that is not a pointer.\n Could be a "
+			  "function assigned to a functional pointer.\n");
     }
   }
 

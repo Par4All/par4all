@@ -11,16 +11,22 @@ Organization of the library
 
   expression.c	recursive expression analysis
 
-  sinks.c	given a points-to in, compute the state of memory locations
-                associated with a lhs expression
+  sinks.c	given a points-to in, compute the set of memory locations
+                possibly associated with a lhs expression
 
 alias_classes.c
 alias_lists.c
 alias_pairs.c
 
-constant-path-utils.c
+  constant-path-utils.c: to be reengineered/checked/read... Assumes
+  that sets of arcs are used as representation of the points-to graph
 
-  points_to_analysis_general_algorithm.c : initial algorithm, build incrementaly so as to have results quickly and to explore the problems
+  points_to_analysis_general_algorithm.c : initial algorithm, build
+  incrementaly so as to have results quickly and to explore the
+  problems; it is re-used by copy to build the new version so as to
+  keep two possible versions; the function names are changed from
+  points_to_xxxx to xxx_points_to_yyy in order to avoid all conflict
+  names
 
   points_to_init_analysis.c
 

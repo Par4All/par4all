@@ -355,10 +355,14 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 /*
  * Change dereferenced pointers and field access into a constant paths.
  *
+ * FI: For instance, *p becomes p[0], s.a becomes s[a] and p->a
+ * becomes p[a] (to be checked with AM).
+ *
  * When no constant path is found, the expression is considered
  * equivalent to an uninitialized pointer. 
  *
- * FI: to be reviewed, obvious memory leaks
+ * FI: to be reviewed with AM, obvious memory leaks
+ * FI: what is the meaning of eval_p? set by get_memory_path()?
  */
 list expression_to_constant_paths(statement s, expression e, set in)
 {
@@ -379,11 +383,15 @@ list expression_to_constant_paths(statement s, expression e, set in)
 
   reference cr = cell_any_reference(c);
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  /* Take into account global variables which are initialized in demand*/
+
+  /* Take into account global variables which are initialized on demand*/
   /* entity ce = reference_variable(cr); */
   /* cell cc = make_cell_reference(cr); */
   l_cell = CONS(CELL, c, NIL);
-  in = set_assign(cur, points_to_init_global(s, l_cell, in));
+  set g_set = points_to_init_global(s, l_cell, in);
+  in = set_assign(cur, g_set);
+  // FI: free_set(g_set);
+
   if( eval_p ) {
     // FI: memory leak for l_cell
     l_cell = CONS(CELL, c, NIL);
@@ -395,7 +403,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
     generic_effects_reset_all_methods();
     /* in = points_to_init_global(s, l_cell, in); */
     // FI: memory leak for l_cell
-    l_cell = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
+    l_cell = gen_nconc(l, possible_constant_paths(l_eval,c,nowhere_p));
 
     in =  set_assign(in, points_to_init_global(s, l_cell, in));
     }
@@ -407,8 +415,11 @@ list expression_to_constant_paths(statement s, expression e, set in)
   
 
   /* if c is an anywhere or a reference we don't evaluate it*/
-  if (eval_p && !(set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
-		 || entity_nowhere_locations_p(reference_variable(cr))) && 
+  if (eval_p
+      && !(set_empty_p(in)
+	   || entity_null_locations_p(reference_variable(cr))
+	   || entity_nowhere_locations_p(reference_variable(cr)))
+      && 
       !get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
     {
       set_methods_for_proper_simple_effects();
@@ -418,7 +429,6 @@ list expression_to_constant_paths(statement s, expression e, set in)
       l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
       generic_effects_reset_all_methods();
       l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
-    
     }
   else if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
       pips_user_warning("Uninitialized pointer");
@@ -437,8 +447,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
       if (to_be_freed) free_type(c_type);
     }
   else if(eval_p)
-    pips_user_error("Uninitialized pointer\n");
-  
+    pips_user_error("Uninitialized pointer dereferencing\n");
   else
     l = CONS(CELL, c, NIL);
 
@@ -467,7 +476,7 @@ cell get_memory_path(expression e, bool * eval_p)
   bool exact_p = false;
   /* we assume that we don't need to cover all expression type's, we
      are only intereseted in user function call, reference or pointer
-     dereferening*/
+     dereferencing */
 
   if (expression_call_p(e)) {
     if (user_function_call_p(e)) {
@@ -1187,35 +1196,43 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 
 
 /*
-create a set of points-to relations of the form:
-element_L -> & element_R, EXACT
-*/
+ * create a set of points-to relations of the form:
+ * element_L -> & element_R, EXACT
+ *
+ * FI: address_of_p does not seem to be updated in this function. Why
+ * pass a pointer? My analysis is wrong if gen_must_constant_paths() updates it
+ */
 set gen_must_set(list L, list R, set in_must, bool *address_of_p)
 {
- set gen_must1 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- set gen_must2 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- int len = (int) gen_length(L);
+  set gen_must1 = set_generic_make(set_private, points_to_equal_p,
+				   points_to_rank);
+  set gen_must2 = set_generic_make(set_private, points_to_equal_p,
+				   points_to_rank);
+  int len = (int) gen_length(L);
 
- /* if len > 1 we must iterate over in_must and change all points-to relations having L as lhs into may relations */
- if(len > 1){
+  /* if len > 1 we must iterate over in_must and change all points-to
+     relations having L as lhs into may relations */
+  if(len > 1){
     FOREACH(cell, l, L){
       SET_FOREACH(points_to, pt, in_must){
 	if(points_to_compare_cell(points_to_source(pt),l)){
-	  points_to npt = make_points_to(l, points_to_sink(pt),make_approximation_may(), make_descriptor_none());
+	  points_to npt = make_points_to(l, points_to_sink(pt),
+					 make_approximation_may(),
+					 make_descriptor_none());
 	  set_add_element(gen_must1, gen_must1, (void*)npt);
 	}
       }
     }
- }
+  }
 
- FOREACH(cell, l, L){
-   set_union(gen_must2, gen_must2, gen_must_constant_paths(l, R, in_must, address_of_p, len));
- }
- set_union(gen_must2, gen_must2,gen_must1);
+  FOREACH(cell, l, L){
+    set must_l = gen_must_constant_paths(l, R, in_must, address_of_p, len);
+    set_union(gen_must2, gen_must2, must_l);
+    // FI: shouldn't must_l be freed?
+  }
+  set_union(gen_must2, gen_must2,gen_must1);
 
- return gen_must2;
+  return gen_must2;
 }
 
 set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int len)
@@ -1287,11 +1304,24 @@ bool reference_unbounded_indices_p(reference r)
 }
 
 
-
-set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int len)
+/* Build a set of arcs from cell l towards cells in list R if
+ * *address_p is true, or towards cells pointed by cells in list R if
+ * not.
+ *
+ * Approximation is must if len==1. len is the cardinal of L, a set
+ * containing l.
+ *
+ * FI: since *address_of_p is not modified, I do not understand why a
+ * pointer is passed.
+ */
+set gen_must_constant_paths(cell l,
+			    list R,
+			    set in_must,
+			    bool* address_of_p,
+			    int len)
 {
   set gen_must_cps = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
+				      points_to_rank);
   points_to pt = points_to_undefined;
   approximation a = approximation_undefined;
   bool changed = false;
@@ -1336,27 +1366,27 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	  /* if(!points_to_undefined_p(pt)) */
 	  /*   set_add_element(gen_must_cps, gen_must_cps, (void*) pt); */
 
-	if(array_entity_p(reference_variable(cell_any_reference(r)))){
-	  reference ref = cell_any_reference(r);
-	  bool t_to_be_freed = false;
-	  type t = cell_reference_to_type(ref, &t_to_be_freed);
-	  /* if(reference_unbounded_indices_p(ref)) */
-	  /*   a = make_approximation_may(); */
-	  if(!pointer_type_p(t))
-	    pt = make_points_to(l, r, a, make_descriptor_none());
-	  else
-	    pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
+	  if(array_entity_p(reference_variable(cell_any_reference(r)))){
+	    reference ref = cell_any_reference(r);
+	    bool t_to_be_freed = false;
+	    type t = cell_reference_to_type(ref, &t_to_be_freed);
+	    /* if(reference_unbounded_indices_p(ref)) */
+	    /*   a = make_approximation_may(); */
+	    if(!pointer_type_p(t))
+	      pt = make_points_to(l, r, a, make_descriptor_none());
+	    else
+	      pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
 
-	  if (t_to_be_freed) free_type(t);
+	    if (t_to_be_freed) free_type(t);
+	  }
+	  if(!points_to_undefined_p(pt))
+	    set_add_element(gen_must_cps, gen_must_cps, (void*) pt);
 	}
-	if(!points_to_undefined_p(pt))
-	  set_add_element(gen_must_cps, gen_must_cps, (void*) pt);
       }
     }
   }
-  }
   
- return gen_must_cps;
+  return gen_must_cps;
 }
 
 points_to opgen_may_constant_path(cell l __attribute__ ((__unused__)), cell r __attribute__ ((__unused__)))
