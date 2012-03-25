@@ -172,7 +172,7 @@ pt_map range_to_points_to(range r, pt_map pt_in)
  */
 pt_map call_to_points_to(call c, pt_map pt_in)
 {
-  // FI: see functio points_to_call()
+  // FI: see Amira's function points_to_call()
   pt_map pt_out = pt_in;
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -181,24 +181,33 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   /* points-to updates due to arguments */
   pt_out = expressions_to_points_to(al, pt_in);
 
-  /* points-to updates due to the function itself */
-  if(entity_constant_p(f)) {
-    // pt_out = constant_call_to_points_to(c, pt_out);
-    pt_out = pt_in;
-  }
-  else if(intrinsic_entity_p(f))
-    pt_out = intrinsic_call_to_points_to(c, pt_out);
-  else if(symbolic_entity_p(f))
-    pt_out = pt_in; // FI?
-  else if(value_unknown_p(fv)) {
-    pips_internal_error("function %s has an unknown value\n",
-                        entity_name(f));
+  // FI: I wanted to use the return type but it is too foten
+  // overloaded with intrinsics
+  type ct = call_to_type(c);
+  if(pointer_type_p(ct)) {
+    /* points-to updates due to the function itself */
+    if(entity_constant_p(f)) {
+      // pt_out = constant_call_to_points_to(c, pt_out);
+      pt_out = pt_in;
+    }
+    else if(intrinsic_entity_p(f))
+      pt_out = intrinsic_call_to_points_to(c, pt_out);
+    else if(symbolic_entity_p(f))
+      pt_out = pt_in; // FI?
+    else if(value_unknown_p(fv)) {
+      pips_internal_error("function %s has an unknown value\n",
+			  entity_name(f));
+    }
+    else {
+      // must be a user-defined function
+      pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
+      pt_out = user_call_to_points_to(c, pt_out);
+    }
   }
   else {
-    // must be a user-defined function
-    pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
-    pt_out = user_call_to_points_to(c, pt_out);
+    ; //nothing to do
   }
+  free_type(ct);
 
   return pt_out;
 }
@@ -218,46 +227,146 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
   entity f = call_function(c);
-  list al = call_arguments(c);
 
-  set_methods_for_proper_simple_effects();
-  //list el = call_to_proper_effects(c);
-  generic_effects_reset_all_methods();
-
-  pips_debug(5, "intrinsic function \"%s\"\n", entity_name(f));
-
-  // FI: short term version
-  // pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el);
-  // return pt_out;
-
-  // FI: Where should we check that the update is linked to a pointer?
-  // Should we go down because a pointer assignment may be hidden anywhere...
-  // Or have we already taken care of this in call_to_points_to()
-
-  if(ENTITY_ASSIGN_P(f)) {
-    expression lhs = EXPRESSION(CAR(al));
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    pt_out = assignment_to_points_to(lhs, rhs, pt_in);
-  }
-  else if(ENTITY_PLUS_UPDATE_P(f)) {
-    /* Many update operators */
-    pips_internal_error("Not implemented yet\n");
-    ;
-  }
-  else if(ENTITY_POST_INCREMENT_P(f)) {
-    /* Four increment related operators */
-    pips_internal_error("Not implemented yet\n");
-    ;
+  if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
+     || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
+    clear_pt_map(pt_out);
   }
   else {
-    // Not safe till all previous tests are defined
-    // It is assumed that other intrinsics do not generate points-to arcs...
-    // pips_internal_error("Not implemented yet\n");
-    pt_out = pt_in;
-  }
+    list al = call_arguments(c);
 
+    set_methods_for_proper_simple_effects();
+    //list el = call_to_proper_effects(c);
+    generic_effects_reset_all_methods();
+
+    pips_debug(5, "intrinsic function \"%s\"\n", entity_name(f));
+
+    // FI: short term version
+    // pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el);
+    // return pt_out;
+
+    // FI: Where should we check that the update is linked to a pointer?
+    // Should we go down because a pointer assignment may be hidden anywhere...
+    // Or have we already taken care of this in call_to_points_to()
+
+    if(ENTITY_ASSIGN_P(f)) {
+      expression lhs = EXPRESSION(CAR(al));
+      expression rhs = EXPRESSION(CAR(CDR(al)));
+      pt_out = assignment_to_points_to(lhs, rhs, pt_out);
+    }
+    // According to C standard, pointer arithmetics does not change
+    // the targeted object.
+    else if(ENTITY_PLUS_UPDATE_P(f)) {
+      expression lhs = EXPRESSION(CAR(al));
+      expression delta = EXPRESSION(CAR(CDR(al)));
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+    }
+    else if(ENTITY_MINUS_UPDATE_P(f)) {
+      expression lhs = EXPRESSION(CAR(al));
+      expression rhs = EXPRESSION(CAR(CDR(al)));
+      entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
+      expression delta = MakeUnaryCall(um, copy_expression(rhs));
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_PRE_INCREMENT_P(f)) {
+      expression lhs = EXPRESSION(CAR(al));
+      expression delta = int_to_expression(1);
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    else if(ENTITY_POST_DECREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) {
+      expression lhs = EXPRESSION(CAR(al));
+      expression delta = int_to_expression(-1);
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    else {
+      // Not safe till all previous tests are defined
+      // It is assumed that other intrinsics do not generate points-to arcs...
+      // pips_internal_error("Not implemented yet\n");
+      pt_out = pt_in;
+    }
+  }
   return pt_out;
 }
+
+/* Update the sink locations associated to the source "lhs" under
+ * points-to information pt_map by "delta".
+ *
+ * C standard guarantees that the sink objects is unchanged by pointer
+ * arithmetic.
+ *
+ * Property POINTS_TO_STRICT_POINTER_TYPES is used to be more or less
+ * flexible about formal parameters and local variables such as "int *
+ * p"
+ */
+pt_map pointer_arithmetic_to_points_to(expression lhs,
+				       expression delta __attribute__ ((unused)),
+				       pt_map pt_in)
+{
+  pt_map pt_out = pt_in;
+  list sources = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+  FOREACH(CELL, source, sources) {
+    list sinks = source_to_sinks(source, pt_in);
+    /* Update the sinks by side-effect, taking advantage of the
+       shallow copy performed in source_to_sinks(). */
+    FOREACH(CELL, sink, sinks) {
+      /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
+	 "delta" can be statically evaluated */
+      reference r = cell_any_reference(sink);
+      entity v = reference_variable(r);
+      if(entity_array_p(v)
+	 || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+	value v = EvalExpression(delta);
+	list sl = reference_indices(r);
+	if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+	  int dv =  constant_int(value_constant(v));
+	  if(ENDP(sl)) {
+	    // FI: oops, we are in trouble; assume 0...
+	    expression se = int_to_expression(dv);
+	    reference_indices(r) = CONS(EXPRESSION, se, NIL);
+	  }
+	  else {
+	    expression lse = EXPRESSION(CAR(gen_last(sl)));
+	    value vlse = EvalExpression(lse);
+	    if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
+	      int ov =  constant_int(value_constant(vlse));
+	      expression nse = int_to_expression(dv+ov);
+	      ; // for the time being, do nothing as * is going to be used anyway
+	      EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      free_expression(lse);
+	    }
+	    else {
+	      // FI: assume * is used... UNBOUNDED_DIMENSION
+	      expression nse = make_unbounded_expression();
+	      EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      free_expression(lse);
+	    }
+	  }
+	}
+	else {
+	  if(ENDP(sl)) {
+	    expression nse = make_unbounded_expression();
+	    reference_indices(r) = CONS(EXPRESSION, nse, NIL);
+	  }
+	  else {
+	    expression ose = EXPRESSION(CAR(gen_last(sl)));
+	    expression nse = make_unbounded_expression();
+	    EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    free_expression(ose);
+	  }
+	}
+      }
+      else {
+	pips_user_error("Use of pointer arithmetic on %s is not "
+			"standard-compliant.\n", entity_user_name(v));
+      }
+    }
+  }
+  return pt_out;
+}
+
 
 pt_map user_call_to_points_to(call c, pt_map pt_in)
 {

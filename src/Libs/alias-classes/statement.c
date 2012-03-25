@@ -83,7 +83,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
    * But it might be smarter (or not) to require or not the storage.
    */
   // FI: currently, this is going to be redundant most of the time
-  points_to_storage(pt_in, s, true);
+  fi_points_to_storage(pt_in, s, true);
 
     /* Eliminate local information if you exit a block */
   if(statement_sequence_p(s)) {

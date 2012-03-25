@@ -170,7 +170,7 @@ bool cell_out_of_scope_p(cell c)
   return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
 }
 
-/*print a points-to for debug*/
+/*print a points-to arc for debug*/
 void print_points_to(const points_to pt)
 {
   cell source = points_to_source(pt);
@@ -182,7 +182,7 @@ void print_points_to(const points_to pt)
   print_reference(r1);
   fprintf(stderr,"->");
   print_reference(r2);
-  fprintf(stderr," (%d)\n", approximation_tag(app));
+  fprintf(stderr," (%s)\n", approximation_to_string(app));
 }
 
 /* Print a set of points-to for debug */

@@ -361,6 +361,22 @@ list reference_to_points_to_sinks(reference r, pt_map in)
       sinks = gen_full_copy_list(sl);
       gen_free_list(sl);
     }
+    else if(array_type_p(entity_type(e))) { // FI: not OK with typedef
+      /* An array name can be used as pointer constant */
+      /* We should add null indices accordinng to its number of dimensions */
+      int n = NumberOfDimension(e);
+      int rd = (int) gen_length(reference_indices(r));
+      int i;
+      reference nr = copy_reference(r);
+      // FI: not efficient
+      for(i=rd; i<n; i++) {
+	reference_indices(nr) =
+	  gen_nconc(reference_indices(nr),
+		    CONS(EXPRESSION, int_to_expression(0), NIL));
+      }
+      cell nc = make_cell_reference(nr);
+      sinks = CONS(CELL, nc, NIL);
+    }
     else {
       pips_internal_error("Pointer assignment from something "
 			  "that is not a pointer.\n Could be a "

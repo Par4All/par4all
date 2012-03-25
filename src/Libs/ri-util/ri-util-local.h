@@ -37,8 +37,9 @@
   *
   * Idem for type Psysteme (FI 3 November 1990)
   *
-  * New function call need to be defined to handle omp pragma as a standard
-  * pips expression. To be easily reconized all the deine values start by OMP_
+  * New function call need to be defined to handle omp pragma as a
+  * standard PIPS expression. To be easily recognized, all the defined
+  * values are prefixed by "OMP_".
   */
 
 /*
