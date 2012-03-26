@@ -29,9 +29,16 @@
    It is up to the user to know what to do (e.g., freeing some temporary
    memory storage) before S1 is assigned a new value.
 
+   Shallow copies are used. If set A is assigned to set B, side
+   effects on elements of A are visible in B.
+
    Formal parameters are modified in functions which makes the stack
    misleading when debugging with gdb.
-*/
+
+   The sets are implemented with hash-tables. Each element is stored
+   as key and value.
+
+  */
 #ifdef HAVE_CONFIG_H
     #include "config.h"
 #endif
