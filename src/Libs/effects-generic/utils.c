@@ -688,7 +688,8 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
       if (add_eff)
 	l_res = effect_to_list(eff);
     }
-  else if (anywhere_effect_p(eff))
+  else if (anywhere_effect_p(eff) || entity_null_locations_p(effect_entity(eff))
+	   || abstract_pointer_value_cell_p(effect_cell(eff)))
     {
       /* there is no other accessible path */
       pips_debug(6, "anywhere effect -> returning NIL \n");
