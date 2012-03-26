@@ -1,0 +1,26 @@
+void foo(int a)
+{
+
+// Pointer values: none
+
+   printf("%d\n", a);
+}
+int main()
+{
+
+// Pointer values: none
+
+   int a = 1;
+
+// Pointer values: none
+
+   foo(2);
+
+// Pointer values: none
+
+   foo(a);
+
+// Pointer values: none
+
+   return 0;
+}

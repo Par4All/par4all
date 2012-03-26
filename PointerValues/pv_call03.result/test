@@ -1,0 +1,30 @@
+void foo(int *q)
+{
+
+// Pointer values:
+// q == &_q_1[0] (exact);
+
+   printf("%d\n", *q);
+}
+int main()
+{
+
+// Pointer values: none
+
+   int a = 1, *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   p = &a;
+
+// Pointer values:
+// p == &a (exact);
+
+   foo(p);
+
+// Pointer values:
+// p == &a (exact);
+
+   return 0;
+}
