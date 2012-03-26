@@ -1197,7 +1197,21 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 	  FOREACH(EFFECT, eff, l_eff_pointer)
 	    {
 	      effect new_eff = copy_effect(eff);
-	      (*effect_add_expression_dimension_func)(new_eff, new_arg);
+	      reference new_ref = effect_any_reference(new_eff);
+	      list l_inds = reference_indices(new_ref);
+	      if (ENDP(l_inds))
+		{
+		  (*effect_add_expression_dimension_func)(new_eff, new_arg);
+		}
+	      else
+		{
+		  expression last_exp = EXPRESSION(CAR(gen_last(l_inds)));
+		  entity binary_plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+										   PLUS_C_OPERATOR_NAME),
+							      entity_domain);
+		  new_arg = MakeBinaryCall(binary_plus_ent, copy_expression(last_exp), new_arg);
+		  (*effect_change_ith_dimension_expression_func)(new_eff, new_arg, (int) gen_length(l_inds));
+		}
 	      l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
 	      l_new_eff_kind = CONS(CELL_INTERPRETATION,
 				    make_cell_interpretation_address_of(), NIL);
@@ -1791,7 +1805,8 @@ static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_
      of the argument evaluation on pointer values
      eliminate local variables, retrieve the value of the returned pointer if any...
   */
-  expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+  if (!ENDP(func_args))
+    expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
 }
 
 static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
