@@ -28,6 +28,8 @@
 
 // FI: just in case another data structure would be more suitable or
 // more efficient
+// For instance, set of points-to could be a type declared in
+// points_to_private.tex
 typedef set pt_map;
 #define pt_map_undefined set_undefined
 #define pt_map_undefined_p(pt) ((pt)=set_undefined)
@@ -39,7 +41,7 @@ typedef set pt_map;
 // FI: varargs; probably OK with gcc preprocessor
 #define free_pt_maps sets_free
 #define union_of_pt_maps(pt1, pt2, pt3) set_union(pt1, pt2, pt3)
-
+#define consistent_pt_map(s) consistent_points_to_set(s)
 // FI: Not so sure we do not need a new name
 #define source_in_pt_map_p(cell,set) source_in_set_p(cell,set)
 

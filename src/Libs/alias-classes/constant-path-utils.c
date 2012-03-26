@@ -106,7 +106,7 @@ set points_to_nowhere_typed(list lhs_list, set input)
 */
 set points_to_nowhere(list lhs_list, set input)
 {
-  set kill= set_generic_make(set_private, points_to_equal_p,
+  set kill = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
   set gen = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
@@ -130,12 +130,13 @@ set points_to_nowhere(list lhs_list, set input)
 
   /* Computing the gen set */
   FOREACH(cell, c, lhs_list) {
-    entity e =entity_all_xxx_locations(NOWHERE_LOCATION);
+    entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
     reference r = make_reference(e, NIL);
     cell sink = make_cell_reference(r);
-    points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
+    points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
     set_add_element(gen, gen, (void*)pt_to);
   }
+  free_approximation(a);
   set_union(res, gen, input_kill_diff);
 
   return res;
@@ -1174,10 +1175,12 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
     FOREACH(cell, l, L){
       SET_FOREACH(points_to, pt, in_may){
 	if(points_to_compare_cell(points_to_source(pt),l)){
+	  // FI: it would be much easier/efficient to modify the approximation of pt
 	  points_to npt = make_points_to(l, points_to_sink(pt),
 					 make_approximation_may(),
 					 make_descriptor_none());
 	  set_add_element(gen_may1, gen_may1, (void*)npt);
+	  set_del_element(gen_may1, gen_may1, (void*)pt);
 	}
       }
     }
@@ -1185,8 +1188,11 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 
   FOREACH(cell, l, L){
     // FI: memory leak due to call to call to gen_may_constant_paths()
-    set_union(gen_may2, gen_may2,
-	      gen_may_constant_paths(l, R, in_may, address_of_p, len));
+    set gen_l = gen_may_constant_paths(l, R, in_may, address_of_p, len);
+    // FI: be careful, the union does not preserve consistency because
+    // the same arc may appear with different approximations
+    set_union(gen_may2, gen_may2, gen_l);
+    // free_set(gen_l);
   }
 
   set_union(gen_may2, gen_may2, gen_may1);
@@ -1308,28 +1314,34 @@ bool reference_unbounded_indices_p(reference r)
  * *address_p is true, or towards cells pointed by cells in list R if
  * not.
  *
- * Approximation is must if len==1. len is the cardinal of L, a set
+ * Approximation is must if Lc==1. Lc is the cardinal of L, a set
  * containing l.
+ *
+ * FI->AM: I do not understand why the cardinal of R is not used too
+ * when deciding if the approximation is may or must. I decide to
+ * change the semantics of this function although it is used by the
+ * initial analysis.
  *
  * FI: since *address_of_p is not modified, I do not understand why a
  * pointer is passed.
+ *
+ * FI->AM: sharing of a... A new approximation must be generated for
+ * each new arc
  */
 set gen_must_constant_paths(cell l,
 			    list R,
 			    set in_must,
 			    bool* address_of_p,
-			    int len)
+			    int Lc)
 {
   set gen_must_cps = set_generic_make(set_private, points_to_equal_p,
 				      points_to_rank);
   points_to pt = points_to_undefined;
   approximation a = approximation_undefined;
   bool changed = false;
+  int Rc = (int) gen_length(R);
 
-  if(len > 1)
-    a = make_approximation_may();
-  else
-    a = make_approximation_exact();
+  // Rc = 0;
   if(*address_of_p){
     /* if we have x = &y then we generate (x,y,a) as points to relation*/
     FOREACH(cell, r, R){
@@ -1337,11 +1349,13 @@ set gen_must_constant_paths(cell l,
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
       /* 	a = make_approximation_may(); */
+      approximation a = (Lc+Rc>2)?
+	make_approximation_may(): make_approximation_exact();
       pt = make_points_to(l, r, a, make_descriptor_none());
       set_add_element(gen_must_cps, gen_must_cps, (void*)pt);
     }
   }
-  else{
+  else {
     /* here we have x = y, then we generate (x,y1,a)|(y,y1,a) as
        points to relation */
     FOREACH(cell, r, R){
@@ -1350,6 +1364,8 @@ set gen_must_constant_paths(cell l,
 	  set_methods_for_proper_simple_effects();
 	  l = simple_cell_to_store_independent_cell(l, &changed);
 	  generic_effects_reset_all_methods();
+	  approximation a = (Lc+Rc>2)?
+	    make_approximation_may() : make_approximation_exact();
 	  pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
 
 

@@ -174,40 +174,47 @@ pt_map call_to_points_to(call c, pt_map pt_in)
 {
   // FI: see Amira's function points_to_call()
   pt_map pt_out = pt_in;
+
   entity f = call_function(c);
-  list al = call_arguments(c);
-  value fv = entity_initial(f);
+  type ft = entity_type(f);
+  functional ff = type_functional(ft);
+  type rt = functional_result(ff);
 
-  /* points-to updates due to arguments */
-  pt_out = expressions_to_points_to(al, pt_in);
+  if(!type_void_p(rt)) {
+    list al = call_arguments(c);
+    value fv = entity_initial(f);
 
-  // FI: I wanted to use the return type but it is too foten
-  // overloaded with intrinsics
-  type ct = call_to_type(c);
-  if(pointer_type_p(ct)) {
-    /* points-to updates due to the function itself */
-    if(entity_constant_p(f)) {
-      // pt_out = constant_call_to_points_to(c, pt_out);
-      pt_out = pt_in;
-    }
-    else if(intrinsic_entity_p(f))
-      pt_out = intrinsic_call_to_points_to(c, pt_out);
-    else if(symbolic_entity_p(f))
-      pt_out = pt_in; // FI?
-    else if(value_unknown_p(fv)) {
-      pips_internal_error("function %s has an unknown value\n",
-			  entity_name(f));
+    /* points-to updates due to arguments */
+    pt_out = expressions_to_points_to(al, pt_in);
+
+    // FI: I wanted to use the return type but it is too often
+    // overloaded with intrinsics
+    type ct = call_to_type(c);
+    if(pointer_type_p(ct)) {
+      /* points-to updates due to the function itself */
+      if(entity_constant_p(f)) {
+	// pt_out = constant_call_to_points_to(c, pt_out);
+	pt_out = pt_in;
+      }
+      else if(intrinsic_entity_p(f))
+	pt_out = intrinsic_call_to_points_to(c, pt_out);
+      else if(symbolic_entity_p(f))
+	pt_out = pt_in; // FI?
+      else if(value_unknown_p(fv)) {
+	pips_internal_error("function %s has an unknown value\n",
+			    entity_name(f));
+      }
+      else {
+	// must be a user-defined function
+	pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
+	pt_out = user_call_to_points_to(c, pt_out);
+      }
     }
     else {
-      // must be a user-defined function
-      pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
-      pt_out = user_call_to_points_to(c, pt_out);
+      ; //nothing to do
     }
+    free_type(ct);
   }
-  else {
-    ; //nothing to do
-  }
-  free_type(ct);
 
   return pt_out;
 }
@@ -466,6 +473,10 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
   pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
   pt_map kill = new_pt_map();
+  // FI->AM: do we really want to keep the same arc with two different
+  // approximations? The whole business of may/must does not seem
+  // right. What are the equations? Where are they documented in your
+  // dissertation?
   set_union(kill, kill_may, kill_must);
   pt_map gen = new_pt_map();
   set_union(gen, gen_may, gen_must);
@@ -476,6 +487,7 @@ pt_map pointer_assignment_to_points_to(expression lhs,
     else
       gen = points_to_anywhere(L, pt_out); 
   }
+  // FI->AM: shouldn't it be a kill_must here?
   set_difference(pt_out, pt_out, kill);
   set_union(pt_out, pt_out, gen);
 

@@ -125,34 +125,46 @@ list call_to_points_to_sinks(call c, pt_map in)
 list intrinsic_call_to_points_to_sinks(call c, pt_map in)
 {
   list sinks = NIL;
-  //entity f = call_function(c);
+  entity f = call_function(c);
   list al = call_arguments(c);
   int nary = (int) gen_length(al);
 
-  // Switch on number of arguments to avoid long switch on character
-  // string or memoizing of intrinsics
-  switch(nary) {
-  case 0:
-    pips_internal_error("Probably a constant or a symbolic. Not handled here\n");
-    break;
-  case 1:
-    sinks = unary_intrinsic_call_to_points_to_sinks(c, in);
-    break;
-  case 2:
-    sinks = binary_intrinsic_call_to_points_to_sinks(c, in);
-    break;
-  case 3:
-    sinks = ternary_intrinsic_call_to_points_to_sinks(c, in);
-    break;
-  default:
-    sinks = nary_intrinsic_call_to_points_to_sinks(c, in);
-    break;
+  // You do not know the number of arguments for the comma operator
+  if(ENTITY_COMMA_P(f)) {
+    expression e = EXPRESSION(CAR(gen_last(al)));
+    sinks = expression_to_points_to_sinks(e, in);
+  }
+  else {
+    // Switch on number of arguments to avoid long switch on character
+    // string or memoizing of intrinsics
+    switch(nary) {
+    case 0:
+      pips_internal_error("Probably a constant or a symbolic. Not handled here\n");
+      break;
+    case 1:
+      sinks = unary_intrinsic_call_to_points_to_sinks(c, in);
+      break;
+    case 2:
+      sinks = binary_intrinsic_call_to_points_to_sinks(c, in);
+      break;
+    case 3:
+      sinks = ternary_intrinsic_call_to_points_to_sinks(c, in);
+      break;
+    default:
+      sinks = nary_intrinsic_call_to_points_to_sinks(c, in);
+      break;
+    }
   }
 
   return sinks;
 }
 
-// malloc, &p, p++, p--, ++p, --p
+/*
+ * malloc, &p, *p, p++, p--, ++p, --p,
+ *
+ * Do not create any sharing between elements of in and elements part
+ * of the returned list, sinks.
+ */
 list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 {
   entity f = call_function(c);
@@ -167,6 +179,26 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
     sinks = expression_to_constant_paths(statement_undefined, a, in);
+   }
+  else if(ENTITY_DEREFERENCING_P(f)) {
+    /* Locate the pointer */
+    list cl = expression_to_points_to_sinks(a, in);
+    /* Finds what it is pointing to */
+    FOREACH(CELL, c, cl) {
+      /* Do not create sharing between elements of "in" and elements of
+	 "sinks". */
+      list pointed = gen_full_copy_list(source_to_sinks(c, in));
+      if(ENDP(pointed)) {
+	reference r = cell_any_reference(c);
+	entity v = reference_variable(r);
+	string words_to_string(list);
+	pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			    entity_user_name(v),
+			    words_to_string(words_reference(r, NIL)));
+      }
+      else
+	sinks = gen_nconc(sinks, pointed);
+    }
    }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
     pips_internal_error("Not implemented yet.\n");
@@ -201,28 +233,33 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   expression a1 = EXPRESSION(CAR(al));
   expression a2 = EXPRESSION(CAR(CDR(al)));
   list sinks = NIL;
-  pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
 
   if(ENTITY_ASSIGN_P(f)) {
     // FI: you need to dereference this according to in...
     sinks = expression_to_points_to_sinks(a1, in);
   }
   else if(ENTITY_POINT_TO_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ;
   }
   else if(ENTITY_FIELD_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ;
   }
   else if(ENTITY_PLUS_C_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ; 
   }
   else if(ENTITY_MINUS_C_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ; 
   }
   else if(ENTITY_PLUS_UPDATE_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ; 
   }
   else if(ENTITY_MINUS_UPDATE_P(f)) {
+    pips_internal_error("Not implemented for %p and %p and %p\n", c, in, a2);
     ;
   }
   else {
@@ -235,11 +272,20 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 {
   entity f = call_function(c);
+  list al = call_arguments(c);
   list sinks = NIL;
-  pips_internal_error("Not implemented for %p and %p\n", c, in);
+
+  pips_assert("in is consistent", consistent_pt_map(in));
+
   if(ENTITY_CONDITIONAL_P(f)) {
-    ;
+    expression e1 = EXPRESSION(CAR(CDR(al)));
+    expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
+    list sinks1 = expression_to_points_to_sinks(e1, in);
+    list sinks2 = expression_to_points_to_sinks(e2, in);
+    sinks = gen_nconc(sinks1, sinks2);
   }
+  // FI: any other ternary intrinsics?
+
   return sinks;
 }
 
@@ -297,7 +343,8 @@ void print_points_to_cells(list cl)
 }
 
 
- /* Returns a list of memory cells */
+ /* Returns a list of memory cells possibly accessed by the evaluation
+    of reference r */
 list reference_to_points_to_sinks(reference r, pt_map in)
 {
   list sinks = NIL;
@@ -310,11 +357,38 @@ list reference_to_points_to_sinks(reference r, pt_map in)
   }
 
   // FI: to be checked otherwise?
-  expression rhs = expression_undefined;
-  if (!ENDP(sl)) {
+  //expression rhs = expression_undefined;
+  if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
     // FI: to be seen with AM
-    pips_internal_error("Not implemented yet.\n");
-    sinks = array_to_constant_paths(rhs, in);
+    //pips_internal_error("Not implemented yet.\n");
+    //sinks = array_to_constant_paths(rhs, in);
+    /* Two possibilities: an array of pointers fully subscribed or any
+       other kind of array partially subscribed */
+      int nd = NumberOfDimension(e);
+      int rd = (int) gen_length(sl);
+      if(nd>rd) {
+	/* No matter what, the target is obtained by adding a 0 subscript */
+	reference nr = copy_reference(r);
+	cell nc = make_cell_reference(nr);
+	expression ze = int_to_expression(0);
+	reference_indices(nr) = gen_nconc(reference_indices(nr),
+					  CONS(EXPRESSION, ze, NIL));
+	sinks = CONS(CELL, nc, NIL);
+      }
+      else if(nd==rd) {
+	if( pointer_type_p(ultimate_type(entity_type(e)) )) {
+	  cell nc = make_cell_reference(copy_reference(r));
+	  sinks = source_to_sinks(nc, in);
+	  free_cell(nc);
+	}
+	else {
+	  pips_user_error("Illegal value for a pointer. Should be a lhs.\n");
+	}
+      }
+      else { // rd is too big
+	pips_user_error("Too many subscript expressions for array \"%s\".\n",
+			entity_user_name(e));
+      }
   }
   else {
     /* scalar case, rhs is already a lvalue */

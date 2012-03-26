@@ -58,6 +58,27 @@ This file contains functions used to compute points-to sets at statement level.
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: short term attempt at providing a deep copy to avoid sharing
+ * between sets. If elements are shared, it quickly becomes impossible
+ * to deep free any set.
+ */
+pt_map full_copy_pt_map(pt_map m)
+{
+  pt_map out = new_pt_map();
+  /*
+  HASH_MAP(k, v, {
+      points_to pt = (points_to) k;
+      points_to npt = copy_points_to(pt);
+	hash_put( out->table, (void *) npt, (void *) npt );
+    }, m->table);
+  */
+  SET_FOREACH(points_to, pt, m) {
+    points_to npt = copy_points_to(pt);
+    set_add_element(out, out, (void *) npt);
+  }
+return out;
+}
+
 /* See points_to_statement()
  *
  *
@@ -65,7 +86,8 @@ This file contains functions used to compute points-to sets at statement level.
 pt_map statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out = new_pt_map();
-  assign_pt_map(pt_out, pt_in);
+  //assign_pt_map(pt_out, pt_in);
+  pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
 
   if(declaration_statement_p(s)) {
