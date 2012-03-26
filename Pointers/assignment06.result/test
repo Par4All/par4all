@@ -1,0 +1,71 @@
+
+PROPER  EFFECTS
+
+void assignment06(int a[10])
+{
+   // int * q = a;
+   int *q;
+   int i;
+//             <    is written>: q
+
+   q = a;
+//             <    is written>: i
+   i = 0;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void assignment06(int a[10])
+{
+   // int * q = a;
+
+// Points To: none
+
+   int *q;
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i;
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   q = a;
+
+// Points To:
+// q -> a[0] , EXACT
+
+   i = 0;
+
+// Points To:
+// q -> a[0] , EXACT
+
+   q++;
+
+// Points To:
+// q -> a[1] , EXACT
+
+   q++;
+
+// Points To:
+// q -> a[2] , EXACT
+
+
+   return;
+}
