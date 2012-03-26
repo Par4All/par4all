@@ -50,7 +50,7 @@ int main()
 
 // Pointer values:
 // a[*] == *ANY_MODULE*:*UNDEFINED* (may);
-// a[*] == &*HEAP*_l_12[0] (may);
+// a[*] == &*ANY_MODULE*:*ANYWHERE* (may);
 
    return res;
 }
