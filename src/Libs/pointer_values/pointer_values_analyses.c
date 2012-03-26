@@ -936,6 +936,103 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
   return;
 }
 
+
+
+static void
+external_call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
+{
+  entity func = call_function(c);
+  list func_args = call_arguments(c);
+  pips_debug(1, "begin for %s\n", entity_local_name(func));
+
+  /* the expression that denotes the called function and the arguments
+     are evaluated; then there is a sequence point, and the function is called
+  */
+
+  /* Arguments evaluation: we don't use expressions_to_post_pv because
+     we want to accumulate the results paths
+  */
+
+  list l_cur = l_in;
+  pv_results pv_res_exp_eval = make_pv_results();
+  FOREACH(EXPRESSION, arg, func_args)
+    {
+      pv_results pv_res_cur = make_pv_results();
+      expression_to_post_pv(arg, l_cur, &pv_res_cur, ctxt);
+      l_cur = pv_res_cur.l_out;
+      pv_res_exp_eval.result_paths = gen_nconc(pv_res_exp_eval.result_paths, pv_res_cur.result_paths);
+      pv_res_exp_eval.result_paths_interpretations = gen_nconc(pv_res_exp_eval.result_paths_interpretations,
+						      pv_res_cur.result_paths_interpretations);
+    }
+
+  /* Function call: we generate abstract_location targets for all
+     possible effects from arguments. We should also do the same for
+     all global variables in the current compilation unit...
+  */
+  list l_ci = pv_res_exp_eval.result_paths_interpretations;
+  FOREACH(EFFECT, real_arg_eff, pv_res_exp_eval.result_paths)
+    {
+      pips_debug_effect(3, "considering effect:\n", real_arg_eff);
+      cell_interpretation ci = CELL_INTERPRETATION(CAR(l_ci));
+      bool add_eff = cell_interpretation_address_of_p(ci);
+      bool to_be_freed = false;
+      type t = cell_to_type(effect_cell(real_arg_eff), &to_be_freed);
+
+      // generate all possible effects on pointers from the actual parameter
+      list lw = generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
+										t,
+										'w',
+										add_eff,
+										10, /* to avoid too long paths until GAPS are handled */
+										true); /* only pointers */
+      if (to_be_freed) free_type(t);
+      pips_debug_effects(3, "effects to be killed:\n", lw);
+
+      if (!ENDP(lw))
+	{
+	  // potentially kill these paths and generate abstract location targets (currently anywhere)
+	  effects_to_may_effects(lw);
+	  list l_abstract_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
+	  list l_ci_abstract_eff = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+	  FOREACH(EFFECT, eff, lw)
+	    {
+	      single_pointer_assignment_to_post_pv(eff, l_abstract_eff, l_ci_abstract_eff,
+						   false, l_cur,
+						   pv_res, ctxt);
+	      l_cur = pv_res->l_out;
+	    }
+
+	  gen_full_free_list(lw);
+	}
+      POP(l_ci);
+    }
+  pv_res->l_out = l_cur;
+
+  /* Return value: test the type of the result path : if it's a
+     pointer type, generate an abstract location target of the pointed
+     type, else it's an empty set/list.
+  */
+  type func_res_t = compute_basic_concrete_type(functional_result(type_functional(entity_type(func))));
+  if (pointer_type_p(func_res_t))
+    {
+      pv_res->result_paths = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
+				  NIL);
+      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+						  make_cell_interpretation_address_of(),
+						  NIL);
+    }
+  else
+    {
+      pv_res->result_paths = NIL;
+      pv_res->result_paths_interpretations = NIL;
+    }
+  free_type(func_res_t);
+
+  pips_debug_pvs(2, "returning pv_res->l_out:", pv_res->l_out);
+  pips_debug(1, "end\n");
+  return;
+}
+
 static
 void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 {
@@ -952,18 +1049,7 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
       switch (t)
 	{
 	case is_value_code:
-	  pips_debug(5, "external function \n");
-	  /* the expression that denotes the called function and the arguments
-	     are evaluated; then there is a sequence point, and the function is called
-	  */
-	  pips_user_warning("external call, not handled yet, returning all locations effect "
-			    "and assuming no effects on pointer_values \n");
-	  pv_res->l_out = l_in;
-	  pv_res->result_paths = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
-				      NIL);
-	  pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-						      make_cell_interpretation_address_of(),
-						      NIL);
+	  external_call_to_post_pv(c, l_in, pv_res, ctxt);
 	  break;
 
 	case is_value_intrinsic:
