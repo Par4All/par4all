@@ -111,6 +111,28 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
   gen_free_list(pt_list);
 }
 
+void fi_points_to_storage(set pts_to_set, statement s, bool store) {
+  list pt_list = NIL, tmp_l;
+  points_to_list new_pt_list = points_to_list_undefined;
+  
+  if ( !set_empty_p(pts_to_set) && store == true ) {
+    
+    pt_list = set_to_sorted_list(pts_to_set,
+                                 (int(*)(const void*, const void*))
+                                 points_to_compare_cells);
+    tmp_l = gen_full_copy_list(pt_list);
+    new_pt_list = make_points_to_list(tmp_l);
+    points_to_list_consistent_p(new_pt_list);
+    store_or_update_pt_to_list(s, new_pt_list);
+  }
+  else if(set_empty_p(pts_to_set)){
+    tmp_l = gen_full_copy_list(pt_list);
+    new_pt_list = make_points_to_list(tmp_l);
+    store_or_update_pt_to_list(s, new_pt_list);
+  }
+  gen_free_list(pt_list);
+}
+
 
 /* Pass INTRAPROCEDURAL_POINTS_TO_ANALYSIS
  *

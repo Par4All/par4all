@@ -1241,17 +1241,15 @@ set gen_must_set(list L, list R, set in_must, bool *address_of_p)
   return gen_must2;
 }
 
-set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int len)
+set gen_may_constant_paths(cell l,
+			   list R,
+			   set in_may,
+			   bool* address_of_p,
+			   int Lc)
 {
   set gen_may_cps = set_generic_make(set_private, points_to_equal_p,
 				     points_to_rank);
   points_to pt = points_to_undefined;
-  approximation a = approximation_undefined;
-
-  if(len > 1)
-    a = make_approximation_may();
-  else
-    a = make_approximation_exact();
   if(!(*address_of_p)){
     /* here we have x = y, then we generate (x,y1,a)|(y,y1,a) as
        points to relation */
@@ -1277,7 +1275,10 @@ set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int l
     }
   }
   else {
+    int Rc = (int) gen_length(R);
     FOREACH(cell, r, R){
+      approximation a = (Lc+Rc>2) ?
+	make_approximation_may() : make_approximation_exact();
       /* Should be replaced by opgen_constant_path(l,r) */
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
