@@ -1201,16 +1201,23 @@ set r;
 */
 void print_statement(statement s)
 {
-  debug_on("TEXT_DEBUG_LEVEL");
-  set_alternate_return_set();
-  reset_label_counter();
-  push_current_module_statement(s);
-  text txt = text_statement(entity_undefined, 0, s, NIL);
-  print_text(stderr, txt);
-  free_text(txt);
-  pop_current_module_statement();
-  reset_alternate_return_set();
-  debug_off();
+  int dn = statement_domain_number(s);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==statement_domain) {
+    debug_on("TEXT_DEBUG_LEVEL");
+    set_alternate_return_set();
+    reset_label_counter();
+    push_current_module_statement(s);
+    text txt = text_statement(entity_undefined, 0, s, NIL);
+    print_text(stderr, txt);
+    free_text(txt);
+    pop_current_module_statement();
+    reset_alternate_return_set();
+    debug_off();
+  }
+  else
+    (void) fprintf(stderr,"Arg. \"s\"is not a statement.\n");
 }
 
 

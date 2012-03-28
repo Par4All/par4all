@@ -1210,6 +1210,10 @@ void fprint_expression(FILE * f, expression e)
 
 void print_expression(expression e)
 {
+  int dn = expression_domain_number(e);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==expression_domain) {
     normalized n;
 
     if(e==expression_undefined)
@@ -1223,6 +1227,9 @@ void print_expression(expression e)
 	else
 	    (void) fprintf(stderr,"NORMALIZED UNDEFINED\n");
     }
+  }
+  else
+    (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
 }
 
 string expression_to_string(expression e) {

@@ -2753,6 +2753,17 @@ bool scalar_integer_type_p(type t)
   return long_p;
 }
 
+bool integer_type_p(type t)
+{
+  bool int_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    int_p = basic_int_p(b);
+  }
+  return int_p;
+}
+
 type make_standard_long_integer_type(type t)
 {
   if (t == type_undefined)
