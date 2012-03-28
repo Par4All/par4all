@@ -90,15 +90,20 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
 
+  init_heap_model(s);
+
   if(declaration_statement_p(s)) {
     /* Process the declarations */
     pt_out = declaration_statement_to_points_to(s, pt_out);
-    /* Go down recursively */
+    /* Go down recursively, although it is currently useless sinc a
+       declaration statement is a call to CONTINUE */
     pt_out = instruction_to_points_to(i, pt_out);
   }
   else {
     pt_out = instruction_to_points_to(i, pt_out);
   }
+
+  reset_heap_model();
 
   /* Either pt_in or pt_out should be stored in the hash_table 
    *
@@ -107,7 +112,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   // FI: currently, this is going to be redundant most of the time
   fi_points_to_storage(pt_in, s, true);
 
-    /* Eliminate local information if you exit a block */
+  /* Eliminate local information if you exit a block */
   if(statement_sequence_p(s)) {
     list dl = statement_declarations(s);
     pt_out = points_to_block_projection(pt_out, dl);
@@ -204,7 +209,11 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_call: {
     call c = instruction_call(i);
-    pt_out = call_to_points_to(c, pt_in);
+    // list al = call_arguments(c);
+    /* Take care of side effects: no they are processed recursively */
+    // pt_out = expressions_to_points_to(al, pt_in);
+    /* Take care of the direct effects */
+    pt_out = call_to_points_to(c, pt_out);
     break;
   }
   case is_instruction_unstructured: {
@@ -223,9 +232,19 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_expression: {
     expression e = instruction_expression(i);
-    pt_out = new_pt_map();
-    set_assign(pt_out, pt_in);
-    pt_out = expression_to_points_to(e, pt_out);
+    /* Do not bother with side-effects. They will be taken care of
+       recursively */
+    /*
+    if(expression_call_p(e)) {
+      call c = syntax_call(expression_syntax(e));
+      list al = call_arguments(c);
+      // Take care of side effects
+      pt_out = expressions_to_points_to(al, pt_in);
+    }
+    else
+      pt_out = pt_in;
+    */
+    pt_out = expression_to_points_to(e, pt_in);
     break;
   }
   default:
@@ -448,8 +467,8 @@ pt_map any_loop_to_points_to(statement b,
 
 pt_map k_limit_points_to(pt_map pt_out, int k)
 {
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  entity anywhere = entity_undefined;
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  //entity anywhere = entity_undefined;
 
   SET_FOREACH(points_to, pt, pt_out){
     cell sc = points_to_source(pt);
@@ -463,28 +482,14 @@ pt_map k_limit_points_to(pt_map pt_out, int k)
     if((int)gen_length(sl)>k){
       bool to_be_freed = false;
       type sc_type = cell_to_type(sc, &to_be_freed);
-      if(type_sensitive_p)
-	anywhere = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-						 sc_type);
-      else
-	anywhere = entity_all_xxx_locations(ANYWHERE_LOCATION);
-
-      reference r = make_reference(anywhere,NIL);
-      sc = make_cell_reference(r);
+      sc = make_anywhere_cell(sc_type);
       if(to_be_freed) free_type(sc_type);
     }
 
     if((int)gen_length(kl)>k){
       bool to_be_freed = false;
       type kc_type = cell_to_type(kc, &to_be_freed);
-      if(type_sensitive_p)
-	anywhere = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-						  kc_type);
-      else
-	anywhere = entity_all_xxx_locations(ANYWHERE_LOCATION);
-
-      reference r = make_reference(anywhere, NIL);
-      kc = make_cell_reference(r);
+      kc = make_anywhere_cell(kc_type);
       if(to_be_freed) free_type(kc_type);
     }
 
@@ -501,6 +506,21 @@ pt_map k_limit_points_to(pt_map pt_out, int k)
     }
   }
   return pt_out;
+}
+
+/* This function should be located somewhere in effect-util in or near
+   abstract locations */
+cell make_anywhere_cell(type t)
+{
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  entity anywhere = type_sensitive_p?
+    entity_all_xxx_locations_typed(ANYWHERE_LOCATION, t)
+    :
+    entity_all_xxx_locations(ANYWHERE_LOCATION);
+
+  reference r = make_reference(anywhere,NIL);
+  cell sc = make_cell_reference(r);
+  return sc;
 }
 
 

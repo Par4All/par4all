@@ -227,25 +227,27 @@ bool source_in_set_p(cell source, set s)
   return in_p;
 }
 
-/* Return a list of cells that are sink for some edge whose source is
- *  "source" in set "s"
+/* Return a list of cells, "sinks", that are sink for some edge whose
+ *  source is "source" in set "s". If "fresh_p" is set to true, no
+ *  sharing is created between list "sinks" and reference "source" or
+ *  points-to set "s". Else, the cells in list "sinks" are the cells
+ *  in arcs of the points-to set.
  *
- * Function added by FI. Only one use. In that case, it would be
- * better to copy the cells before putting them in the new list.
+ * Function added by FI.
  */
-list source_to_sinks(cell source, set s)
+list source_to_sinks(cell source, set s, bool fresh_p)
 {
-  list sinkl = NIL;
+  list sinks = NIL;
   SET_FOREACH ( points_to, pt, s ) {
     /* if( opkill_may_vreference(source, points_to_source(pt) )) */
     if(cell_equal_p(source, points_to_source(pt))) {
-      cell sc = points_to_sink(pt);
-      sinkl = CONS(CELL, sc, sinkl);
+      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+      sinks = CONS(CELL, sc, sinks);
     }
   }
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
-  return sinkl;
+  return sinks;
 }
 
 /* test if a cell appear as a sink in a set of points-to */
