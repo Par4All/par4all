@@ -1,0 +1,48 @@
+
+PROPER  EFFECTS
+
+void arithmetic08(int a[10])
+{
+//             <    is written>: q
+   int *q = a;
+   int *p;
+//             <    is read   >: q
+//             <    is written>: p q
+
+   p = q += 1;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void arithmetic08(int a[10])
+{
+
+// Points To: none
+
+   int *q = a;
+
+// Points To:
+// q -> a[0] , EXACT
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> a[0] , EXACT
+
+
+   p = q += 1;
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> a[1] , EXACT
+
+   return;
+}
