@@ -327,7 +327,7 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 {
   pt_map pt_out = pt_in;
   // list sources = expression_to_constant_paths(statement_undefined, lhs, pt_out);
-  list sources = expression_to_points_to_sinks(lhs, pt_out);
+  list sources = expression_to_points_to_sinks(lhs, pt_out, false);
   FOREACH(CELL, source, sources) {
     // You want sharing for side effects
     list sinks = source_to_sinks(source, pt_out, false);
@@ -523,7 +523,7 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   /* Retrieve the memory locations that might be reached by the rhs
    *
    */
-  list R = expression_to_points_to_sinks(rhs,pt_out);
+  list R = expression_to_points_to_sinks(rhs,pt_out, true);
 
   /* Compute the data-flow equation for the may and the must edges...
    *
@@ -550,7 +550,7 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   set_union(kill, kill_may, kill_must);
   pt_map gen = new_pt_map();
   set_union(gen, gen_may, gen_must);
-  if( set_empty_p(gen) ) {
+  if(set_empty_p(gen)) {
     bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
     if(type_sensitive_p)
       gen = points_to_anywhere_typed(L, pt_out);

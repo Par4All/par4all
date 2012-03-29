@@ -24,9 +24,11 @@
 
 /*
  * This file contains functions used to compute points-to sets at
- * expression level.
+ * the expression level.
  *
- * Most important function: list expression_to_points_to_sinks(expression lhs, pt_map in)
+ * Most important function:
+ *
+ * list expression_to_points_to_sinks(expression lhs, pt_map in, bool eval_p)
  *
  * The purpose of this function and the functions in this C file is to
  * return a list of memory cells addressed when evaluated in the
@@ -143,7 +145,7 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
   // You do not know the number of arguments for the comma operator
   if(ENTITY_COMMA_P(f)) {
     expression e = EXPRESSION(CAR(gen_last(al)));
-    sinks = expression_to_points_to_sinks(e, in);
+    sinks = expression_to_points_to_sinks(e, in, true);
   }
   else {
     // Switch on number of arguments to avoid long switch on character
@@ -190,11 +192,11 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
     // sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
+    sinks = expression_to_points_to_sinks(a, in, false);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
     /* Locate the pointer */
-    list cl = expression_to_points_to_sinks(a, in);
+    list cl = expression_to_points_to_sinks(a, in, true);
     /* Finds what it is pointing to */
     FOREACH(CELL, c, cl) {
       /* Do not create sharing between elements of "in" and elements of
@@ -214,7 +216,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
+    sinks = expression_to_points_to_sinks(a, in, false);
     // FI: this has already been done when the side effects are exploited
     //expression one = int_to_expression(1);
     //offset_cells(sinks, one);
@@ -222,14 +224,14 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
+    sinks = expression_to_points_to_sinks(a, in, false);
     //expression m_one = int_to_expression(-1);
     //offset_cells(sinks, m_one);
     //free_expression(m_one);
    }
   else if(ENTITY_POST_INCREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
+    sinks = expression_to_points_to_sinks(a, in, false); // assignment06
     /* We have to undo the impact of side effects */
     expression m_one = int_to_expression(-1);
     offset_cells(sinks, m_one);
@@ -237,7 +239,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_POST_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
+    sinks = expression_to_points_to_sinks(a, in, false);
     /* We have to undo the impact of side effects */
     expression one = int_to_expression(1);
     offset_cells(sinks, one);
@@ -263,11 +265,12 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 
   if(ENTITY_ASSIGN_P(f)) {
     // FI: you need to dereference this according to in...
-    sinks = expression_to_points_to_sinks(a1, in);
+    // See assignment01.c
+    sinks = expression_to_points_to_sinks(a1, in, true);
   }
   else if(ENTITY_POINT_TO_P(f)) { // p->a
     // FI: allocation of a fully fresh list? Theroretically...
-    list L = expression_to_points_to_sinks(a1, in);
+    list L = expression_to_points_to_sinks(a1, in, true);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
@@ -288,7 +291,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
     // FI: subset of previous case, no need for dereferencing
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, false);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, sinks) {
@@ -306,11 +309,11 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     free_expression(ma2);
   }
   else if(ENTITY_PLUS_UPDATE_P(f)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     // offset_cells(sinks, a2);
   }
   else if(ENTITY_MINUS_UPDATE_P(f)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     /// Already performed elsewhere. The value returned by expression
     // "p -= e" is simply "p", here "a1"
     //entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
@@ -330,7 +333,7 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   type t1 = expression_to_type(a1);
   type t2 = expression_to_type(a2);
   if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     offset_cells(sinks, a2);
   }
   else
@@ -350,10 +353,11 @@ list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   pips_assert("in is consistent", consistent_pt_map(in));
 
   if(ENTITY_CONDITIONAL_P(f)) {
+    bool eval_p = true;
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    list sinks1 = expression_to_points_to_sinks(e1, in);
-    list sinks2 = expression_to_points_to_sinks(e2, in);
+    list sinks1 = expression_to_points_to_sinks(e1, in, eval_p);
+    list sinks2 = expression_to_points_to_sinks(e2, in, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
   }
   // FI: any other ternary intrinsics?
@@ -419,12 +423,14 @@ void print_points_to_cells(list cl)
   * of reference "r". No sharing between the returned list "sinks" and
   * the reference "r" or the points-to set "in".
   *
-  * Example: x, t[1], t[1][2],...
+  * Examples: x->x, t[1]->t[1], t[1][2]->t[1][2], p->p...
+  *
+  * The dereferencing, if necessary is performed at a higher level
   *
   * FI: I do not trust this function. It is already too long. And I am
   * not confident the case disjunction is correct/well chosen.
   */
-list reference_to_points_to_sinks(reference r, pt_map in)
+list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity e = reference_variable(r);
@@ -533,10 +539,16 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	 compatible with the current data structure... To be checked
 	 with Amira and Fabien. */
       // sinks = expression_to_constant_paths(statement_undefined, rhs, in);
-      cell nc = make_cell_reference(copy_reference(r));
-      // sinks = source_to_sinks(nc, in, true);
-      // free_cell(nc);
-      sinks = CONS(CELL, nc, NIL);
+	cell nc = make_cell_reference(copy_reference(r));
+      if(eval_p) {
+	// FI: we have a pointer. It denotes another location.
+	sinks = source_to_sinks(nc, in, true);
+	free_cell(nc);
+      }
+      else {
+      // FI: without dereferencing
+	sinks = CONS(CELL, nc, NIL);
+      }
     }
     else if(array_type_p(ultimate_type(entity_type(e)))) { // FI: not OK with typedef
       /* An array name can be used as pointer constant */
@@ -569,6 +581,7 @@ list reference_to_points_to_sinks(reference r, pt_map in)
   return sinks;
 }
 
+// FI: I assume we do not need the eval_p parameter here
 list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
 {
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
@@ -586,15 +599,17 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
   return sinks;
 }
 
+// FI: do we need eval_p?
 list cast_to_points_to_sinks(cast c, pt_map in)
 {
   expression e = cast_expression(c);
   // FI: should we pass down the expected type? It would be useful for
   // heap modelling
-  list sinks = expression_to_points_to_sinks(e, in);
+  list sinks = expression_to_points_to_sinks(e, in, true);
   return sinks;
 }
 
+// FI: do we need eval_p?
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
@@ -602,7 +617,7 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
   pips_internal_error("Not implemented yet");
   if( sizeofexpression_expression_p(soe) ){
     expression ne = sizeofexpression_expression(soe);
-    sinks = expression_to_points_to_sinks(ne, in);
+    sinks = expression_to_points_to_sinks(ne, in, true);
   }
   return sinks;
 }
@@ -752,7 +767,7 @@ list range_to_points_to_sinks(range r, pt_map in)
  * The list returned should be fully allocated with no sharing between
  * it and the in points-to set. Hopefully...
  */
-list expression_to_points_to_sinks(expression e, pt_map in)
+ list expression_to_points_to_sinks(expression e, pt_map in, bool eval_p)
 {
   /*reference + range + call + cast + sizeofexpression + subscript + application*/
   tag tt ;
@@ -761,7 +776,7 @@ list expression_to_points_to_sinks(expression e, pt_map in)
   switch (tt = syntax_tag(s)) {
   case is_syntax_reference: {
     reference r = syntax_reference(s);
-    sinks = reference_to_points_to_sinks(r, in);
+    sinks = reference_to_points_to_sinks(r, in, eval_p);
     break;
   }
   case is_syntax_range: {

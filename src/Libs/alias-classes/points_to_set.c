@@ -227,7 +227,7 @@ bool source_in_set_p(cell source, set s)
   return in_p;
 }
 
-/* Return a list of cells, "sinks", that are sink for some edge whose
+/* Return a list of cells, "sinks", that are sink for some arc whose
  * source is "source" in set "s". If "fresh_p" is set to true, no
  * sharing is created between list "sinks" and reference "source" or
  * points-to set "s". Else, the cells in list "sinks" are the cells in
@@ -238,16 +238,47 @@ bool source_in_set_p(cell source, set s)
  *
  * Function added by FI.
  */
-list source_to_sinks(cell source, set s, bool fresh_p)
+list source_to_sinks(cell source, set pts, bool fresh_p)
 {
   list sinks = NIL;
-  SET_FOREACH ( points_to, pt, s ) {
-    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+  SET_FOREACH ( points_to, pt, pts) {
     if(cell_equal_p(source, points_to_source(pt))) {
       cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
       sinks = CONS(CELL, sc, sinks);
     }
   }
+
+  // FI: you must generate sinks for formal parameters, global
+  // variables and stubs if nothing has been found
+  if(ENDP(sinks)) {
+    reference r = cell_any_reference(source);
+    entity v = reference_variable(r);
+    if(formal_parameter_p(v)
+       || /* global_variable_p(v)*/
+       /* FI: wrong test anywhere might have been top-level? */
+       /* FI: wrong, how about static global variables? */
+       /* FI: see for instance global07.c */
+       top_level_entity_p(v)) {
+      // Find stub type
+      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+      // FI: the type retrieval must be improved for arrays & Co
+      points_to pt = create_stub_points_to(source, st, basic_undefined);
+      pts = add_arc_to_pt_map(pt, pts);
+      sinks = source_to_sinks(source, pts, false);
+    }
+    else if(false) {
+      /* cell nc = add_virtual_sink_to_source(source);
+       * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+       * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+       */
+      ;
+    }
+    if(ENDP(sinks))
+      pips_internal_error("Sink missing for a source based on \"%s\".\n",
+			  entity_user_name(v));
+
+  }
+
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
   return sinks;
