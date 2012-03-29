@@ -7,8 +7,10 @@ create pointer02 pointer02.c
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
 activate PROPER_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_EFFECTS
+# Commented out to find a bug
+# activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 activate PRINT_CHAINS_GRAPH

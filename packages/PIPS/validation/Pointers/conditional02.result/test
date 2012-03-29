@@ -1,0 +1,38 @@
+
+PROPER  EFFECTS
+
+void conditional02()
+{
+   int i, j, *p;
+//             <    is read   >: i j
+//             <    is written>: p
+   p = i>j?&i:&j;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void conditional02()
+{
+
+// Points To: none
+
+   int i, j, *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = i>j?&i:&j;
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+
+   return;
+}

@@ -1,0 +1,74 @@
+
+PROPER  EFFECTS
+
+int test02()
+{
+   int i, j;
+//             <    is written>: p
+   int *p = &i;
+//             <    is written>: q
+   int *q = &j;
+//             <    is read   >: p q
+
+   if (p==q)
+//             <    is written>: i
+      i = 1;
+   else
+//             <    is written>: i
+      i = 2;
+//             <    is read   >: i
+
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int test02()
+{
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   int *p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   int *q = &j;
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+
+   if (p==q)
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+      i = 1;
+   else
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+      i = 2;
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+
+   return i;
+}

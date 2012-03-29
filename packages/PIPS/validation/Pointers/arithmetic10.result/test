@@ -1,0 +1,91 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int a[10];
+//             <    is written>: q
+   int *q = &a[0];
+//             <    is written>: p
+   int *p = &a[0];
+   int i;
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+
+   *q++;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("p=%p, q=%p, *q=%d\n", p, q, *q);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *q = &a[0];
+
+// Points To:
+// q -> a[0] , EXACT
+
+   int *p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[0] , EXACT
+
+   int i;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[0] , EXACT
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[0] , EXACT
+
+      a[i] = i;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[0] , EXACT
+
+
+   *q++;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[1] , EXACT
+
+   printf("p=%p, q=%p, *q=%d\n", p, q, *q);
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a[1] , EXACT
+
+   return 0;
+}

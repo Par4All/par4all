@@ -18,7 +18,8 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    double *p = (int *) malloc(sizeof(double));
-//             <    is read   >: p
+//             <    is read   >: p foo:_p_1
+//             <    is written>: foo:_p_1
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;

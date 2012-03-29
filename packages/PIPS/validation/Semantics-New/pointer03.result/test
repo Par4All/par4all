@@ -141,11 +141,13 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = (int *) malloc(sizeof(int));
-//             <    is read   >: p
+//             <    is read   >: p foo:_p_1[0]
+//             <    is written>: foo:_p_1[0]
    foo(p);
 //             <    is written>: p
    p = &x;
-//             <    is read   >: p
+//             <    is read   >: p foo:_p_1[0]
+//             <    is written>: foo:_p_1[0]
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
@@ -153,7 +155,8 @@ int main()
 
 Cumulated effects for "foo" with points-to information
 
-//             <    is read   >: p
+//             <    is read   >: _p_1[0] p
+//             <    is written>: _p_1[0]
 void foo(int *p)
 {
 //             <    is read   >: _p_1[0] p
@@ -163,8 +166,10 @@ void foo(int *p)
 
 Cumulated effects for "main" with points-to information
 
-//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_ 
+//                               foo:_p_1[0]
+//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_ 
+//                               foo:_p_1[0]
 int main()
 {
 //             <    is written>: x y z
@@ -173,11 +178,13 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    int *p = (int *) malloc(sizeof(int));
-//             <    is read   >: p
+//             <    is read   >: p foo:_p_1[0]
+//             <    is written>: foo:_p_1[0]
    foo(p);
 //             <    is written>: p
    p = &x;
-//             <    is read   >: p
+//             <    is read   >: p foo:_p_1[0]
+//             <    is written>: foo:_p_1[0]
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
