@@ -590,8 +590,8 @@ ExpressionToInt(expression e)
     return(i);
 }
 
-int NumberOfDimension(e)
-entity e;
+// FI: should be at least NumberOfDimensions, with an s
+int NumberOfDimension(entity e)
 {
     type t = entity_type(e);
     int nd;

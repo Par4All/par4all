@@ -58,6 +58,27 @@ This file contains functions used to compute points-to sets at statement level.
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: short term attempt at providing a deep copy to avoid sharing
+ * between sets. If elements are shared, it quickly becomes impossible
+ * to deep free any set.
+ */
+pt_map full_copy_pt_map(pt_map m)
+{
+  pt_map out = new_pt_map();
+  /*
+  HASH_MAP(k, v, {
+      points_to pt = (points_to) k;
+      points_to npt = copy_points_to(pt);
+	hash_put( out->table, (void *) npt, (void *) npt );
+    }, m->table);
+  */
+  SET_FOREACH(points_to, pt, m) {
+    points_to npt = copy_points_to(pt);
+    set_add_element(out, out, (void *) npt);
+  }
+return out;
+}
+
 /* See points_to_statement()
  *
  *
@@ -65,19 +86,37 @@ This file contains functions used to compute points-to sets at statement level.
 pt_map statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out = new_pt_map();
-  assign_pt_map(pt_out, pt_in);
+  //assign_pt_map(pt_out, pt_in);
+  pt_out = full_copy_pt_map(pt_in);
+  instruction i = statement_instruction(s);
 
-  if(declaration_statement_p(s))
+  init_heap_model(s);
+
+  if(declaration_statement_p(s)) {
+    /* Process the declarations */
     pt_out = declaration_statement_to_points_to(s, pt_out);
-  else {
-    instruction i = statement_instruction(s);
+    /* Go down recursively, although it is currently useless sinc a
+       declaration statement is a call to CONTINUE */
     pt_out = instruction_to_points_to(i, pt_out);
   }
+  else {
+    pt_out = instruction_to_points_to(i, pt_out);
+  }
+
+  reset_heap_model();
 
   /* Either pt_in or pt_out should be stored in the hash_table 
    *
    * But it might be smarter (or not) to require or not the storage.
    */
+  // FI: currently, this is going to be redundant most of the time
+  fi_points_to_storage(pt_in, s, true);
+
+  /* Eliminate local information if you exit a block */
+  if(statement_sequence_p(s)) {
+    list dl = statement_declarations(s);
+    pt_out = points_to_block_projection(pt_out, dl);
+  }
 
   return pt_out;
 }
@@ -89,7 +128,48 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
 pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for declaration statement %p\n", s);
+  //set pt_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
+  list l = NIL;
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+
+  list l_decls = statement_declarations(s);
+
+  pips_debug(1, "declaration statement \n");
+  
+  FOREACH(ENTITY, e, l_decls) {
+    if(pointer_type_p(ultimate_type(entity_type(e)))) {
+      if( !storage_rom_p(entity_storage(e)) ) {
+	// FI: could be simplified with variable_initial_expression()
+	value v_init = entity_initial(e);
+	/* generate points-to due to the initialisation */
+	if(value_expression_p(v_init)){
+	  expression exp_init = value_expression(v_init);
+	  expression lhs = entity_to_expression(e);
+	  pt_out = assignment_to_points_to(lhs,
+					   exp_init,
+					   pt_out);
+	  /* AM/FI: abnormal sharing (lhs); the reference may be
+	     reused in the cel... */
+	  /* free_expression(lhs); */
+	}
+	else {
+	  /* Generate nowhere sinks */
+	  /* FI: goes back into Amira's code */
+	  l = points_to_init_variable(e);
+	  FOREACH(CELL, cl, l) {
+	    list l_cl = CONS(CELL, cl, NIL);
+	    // FI: memory leak because of the calls to points_to_nowherexxx
+	    if(type_sensitive_p)
+	      set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
+	    else
+	      set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
+	    //FI: free l_cl?
+	  }
+	}
+      }
+    }
+  }
+  
   return pt_out;
 }
 
@@ -129,7 +209,11 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_call: {
     call c = instruction_call(i);
-    pt_out = call_to_points_to(c, pt_in);
+    // list al = call_arguments(c);
+    /* Take care of side effects: no they are processed recursively */
+    // pt_out = expressions_to_points_to(al, pt_in);
+    /* Take care of the direct effects */
+    pt_out = call_to_points_to(c, pt_out);
     break;
   }
   case is_instruction_unstructured: {
@@ -148,11 +232,23 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_expression: {
     expression e = instruction_expression(i);
+    /* Do not bother with side-effects. They will be taken care of
+       recursively */
+    /*
+    if(expression_call_p(e)) {
+      call c = syntax_call(expression_syntax(e));
+      list al = call_arguments(c);
+      // Take care of side effects
+      pt_out = expressions_to_points_to(al, pt_in);
+    }
+    else
+      pt_out = pt_in;
+    */
     pt_out = expression_to_points_to(e, pt_in);
     break;
   }
   default:
-    ;
+    pips_internal_error("Unexpected instruction tag %d\n", it);
   }
   return pt_out;
 }
@@ -160,35 +256,282 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
 pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for sequence %p\n", seq);
+  //bool store = true; // FI: management and use of store_p? Could be useful? How is it used?
+  // pt_out = points_to_sequence(seq, pt_in, store);
+  FOREACH(statement, st, sequence_statements(seq)) {
+    pt_out = statement_to_points_to(st, pt_out);
+  }
+
   return pt_out;
 }
 
+/* Computing the points-to information after a test.
+ *
+ * All the relationships are of type MAY, even if the same arc is
+ * defined, e.g. "if(c) p = &i; else p=&i;".
+ *
+ * Might be refined later by using preconditions.
+ */
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for test %p\n", t);
+
+  //bool store = true;
+  // pt_out = points_to_test(t, pt_in, store);
+  // Translation of points_to_test
+  statement ts = test_true(t);
+  statement fs = test_false(t);
+  pt_map pt_t = new_pt_map();
+  pt_map pt_f = new_pt_map();
+  
+  /* condition's side effect and information are taked into account, e.g.:
+   *
+   * "if(p=q)" or "if(*p++)" or "if(p)" which implies p->NULL in the
+   * else branch. FI: to be checked with test cases */
+  expression c = test_condition(t);
+  // FI: we need something specific for conditions to handle NULL tests
+  // something like comdition_to_points_to(c, in, true_p)
+  pt_out = expression_to_points_to(c, pt_in);
+
+  // FI: we need a copy of this current pt_out for the analysis of the
+  // false branch
+  pt_map pt_in_f = new_pt_map();
+  assign_pt_map(pt_in_f, pt_out);
+  
+  pt_t = statement_to_points_to(ts, pt_out);
+
+  if(empty_statement_p(fs)) // FI Micro optimization...
+    pt_f = set_assign(pt_f, pt_out);
+  else
+    pt_f = statement_to_points_to(fs, pt_in_f);
+  
+  // FI: oops, what happens to objects in memory?
+  // Should we free the old pt_out/pt_in?
+  // pt_map_free(pt_out)
+  free_pt_map(pt_in_f);
+  pt_out = merge_points_to_set(pt_t, pt_f);
+  // pt_map_free(pt_t), pt_map_free(pt_f);
+
+  // FI: I do not understand with the necessary projections are not
+  // performed recursively at a lower level (in fact, they are...
+
+  // FI: I do not understand how the merge stuff works twice
+
+  /*
+  list tdl = statement_declarations(ts);
+  if(declaration_statement_p(ts) && !ENDP(tdl)){
+    // pt_out = points_to_block_projection(pt_out, tdl);
+    pt_out = merge_points_to_set(pt_out, pt_in);
+  }
+
+  list fdl = statement_declarations(fs);
+  if(declaration_statement_p(fs) && !ENDP(fdl)) {
+    // pt_out = points_to_block_projection(pt_out, fdl);
+    pt_out = merge_points_to_set(pt_out, pt_in);
+  }
+  */
+
   return pt_out;
 }
 
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for loop %p\n", l);
+  bool store = false;
+  pt_out = points_to_loop(l, pt_in, store);
+
+  /* This sequence has been factored out in statement_to_points_to() */
+  /*
+  statement ls = loop_body(l);
+  list dl = statement_declarations(ls);
+  if(declaration_statement_p(ls) && !ENDP(dl))
+    pt_out = points_to_block_projection(pt_out, dl);
+  */
+
   return pt_out;
 }
 
 pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for while loop %pd\n", wl);
+  statement b = whileloop_body(wl);
+  expression c = whileloop_condition(wl);
+    
+  //bool store = false;
+  if (evaluation_before_p(whileloop_evaluation(wl))) {
+    //pt_out = points_to_whileloop(wl, pt_in, store);
+    pt_out = any_loop_to_points_to(b,
+				   expression_undefined,
+				   c,
+				   expression_undefined,
+				   pt_in);
+  }
+  else {
+    // pt_out = points_to_do_whileloop(wl, pt_in, store);
+    /* Execute the first iteration */
+    pt_out = statement_to_points_to(b, pt_out);
+    pt_out = any_loop_to_points_to(b,
+				   expression_undefined,
+				   c,
+				   expression_undefined,
+				   pt_in);
+  }
+
+  //statement ws = whileloop_body(wl);
+  //list dl = statement_declarations(ws);
+  // FI: to be improved
+  //if(declaration_statement_p(ws) && !ENDP(dl))
+  //  pt_out = points_to_block_projection(pt_out, dl);
+
   return pt_out;
 }
 
+/* Perform the same k-limiting scheme for all kinds of loops 
+ *
+ * The do while loop mus use an external special treatment for the
+ * first iteration.
+ *
+ * Derived from points_to_forloop().
+ */
+pt_map any_loop_to_points_to(statement b,
+			     expression init, // can be undefined
+			     expression c,
+			     expression inc, // ca be undefined
+			     pt_map pt_in)
+{
+  pt_map pt_out = pt_in;
+
+  //  set pt_out = set_generic_make(set_private, points_to_equal_p,
+  //                              points_to_rank);
+  // pt_map cur = new_pt_map();
+  int i = 0;
+  int k = get_int_property("POINTS_TO_K_LIMITING");
+
+  /* First, enter the loop: initialization + condition check */
+  if(!expression_undefined_p(init))
+    pt_out = expression_to_points_to(init, pt_out);
+  pt_out = expression_to_points_to(c, pt_out);
+  // pt_in = points_to_expression(exp_inc, pt_in, true);
+
+  /* pt_out(i) = f(pt_out(i-1)) U pt_out(i-1)
+   *
+   * prev = pt_out(i-1)
+   */
+  pt_map prev = new_pt_map();
+  for(i = 0; i< k; i++){
+    /* prev receives the current points-to information, pt_out */
+    set_clear(prev);
+    prev = set_assign(prev, pt_out);
+    set_clear(pt_out);
+
+    /* Depending on the kind of loops, execute the body and then
+       possibly the incrementation and the condition */
+    // FI: here, storage_p would be useful to avoid unnecessary
+    // storage and update for each substatement at each iteration k
+    pt_out = statement_to_points_to(b, prev);
+    if(!expression_undefined_p(inc))
+      pt_out = expression_to_points_to(inc, pt_out);
+    // FI: should be condition_to_points_to() for conditions such as
+    // while(p!=q);
+    // The condition is always defined
+    pt_out = expression_to_points_to(c, pt_out);
+
+    /* Perform the k-limiting on the latest points to information */
+    int k = get_int_property("POINTS_TO_K_LIMITING");
+    pt_out = k_limit_points_to(pt_out, k);
+
+    // set_clear(pt_in); is pt_in useful?
+
+    /* Merge the previous resut and the current result. */
+    // FI: move to pt_map
+    pt_out = merge_points_to_set(prev, pt_out);
+
+    /* Check convergence */
+    if(set_equal_p(prev, pt_out))
+      break;
+  }
+
+  /* Propagate stable points-to information in the loop body */
+  // FI: this is wrong since only one points-to information is copied
+  // for each statement in the loop
+  points_to_storage(pt_in, b , true);
+  // FI: I would expect something like
+  // pt_tmp = statement_to_points_to(b, pt_out);
+
+  /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
+     information is changed accordingly. */
+  pt_out = points_to_independent_store(pt_out);
+
+  return pt_out;
+}
+
+pt_map k_limit_points_to(pt_map pt_out, int k)
+{
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  //entity anywhere = entity_undefined;
+
+  SET_FOREACH(points_to, pt, pt_out){
+    cell sc = points_to_source(pt);
+    reference sr = cell_any_reference(sc);
+    list sl = reference_indices(sr);
+
+    cell kc = points_to_sink(pt);
+    reference kr = cell_any_reference(kc);
+    list kl = reference_indices(kr);
+
+    if((int)gen_length(sl)>k){
+      bool to_be_freed = false;
+      type sc_type = cell_to_type(sc, &to_be_freed);
+      sc = make_anywhere_cell(sc_type);
+      if(to_be_freed) free_type(sc_type);
+    }
+
+    if((int)gen_length(kl)>k){
+      bool to_be_freed = false;
+      type kc_type = cell_to_type(kc, &to_be_freed);
+      kc = make_anywhere_cell(kc_type);
+      if(to_be_freed) free_type(kc_type);
+    }
+
+    points_to npt = make_points_to(sc, kc, points_to_approximation(pt),
+				   make_descriptor_none());
+    if(!points_to_equal_p(npt,pt)){
+      // FI: should be moved to pt_map type...
+      pt_out = set_del_element(pt_out, pt_out, (void*)pt);
+      pt_out = set_add_element(pt_out, pt_out, (void*)npt);
+    }
+    else {
+      // FI: memory leak
+      // free_points_to(npt);
+    }
+  }
+  return pt_out;
+}
+
+/* This function should be located somewhere in effect-util in or near
+   abstract locations */
+cell make_anywhere_cell(type t)
+{
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  entity anywhere = type_sensitive_p?
+    entity_all_xxx_locations_typed(ANYWHERE_LOCATION, t)
+    :
+    entity_all_xxx_locations(ANYWHERE_LOCATION);
+
+  reference r = make_reference(anywhere,NIL);
+  cell sc = make_cell_reference(r);
+  return sc;
+}
+
+
 pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for usntructured %p\n", u);
+
+  pt_out = points_to_unstructured(u, pt_in, true);
+
+  // FI: The storage should be performed at a higher level?
+  // points_to_storage(pt_out,current,true);
   return pt_out;
 }
 
@@ -202,6 +545,19 @@ pt_map multitest_to_points_to(multitest mt, pt_map pt_in)
 pt_map forloop_to_points_to(forloop fl, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  pips_internal_error("Not implemented yet for for loop %p\n", fl);
+  statement b = forloop_body(fl);
+  expression init = forloop_initialization(fl);
+  expression c = forloop_condition(fl);
+  expression inc = forloop_increment(fl);
+  //bool store = false;
+  // pt_out = points_to_forloop(fl, pt_in, store);
+
+  pt_out = any_loop_to_points_to(b, init, c, inc, pt_in);
+  /*
+    statement ls = forloop_body(fl);
+    list dl =statement_declarations(ls);
+    if(declaration_statement_p(ls) && !ENDP(dl))
+    pt_out = points_to_block_projection(pt_out, dl);
+  */
   return pt_out;
 }

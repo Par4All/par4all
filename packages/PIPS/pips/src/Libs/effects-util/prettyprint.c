@@ -191,7 +191,7 @@ pips_region_user_name(entity ent)
 
 
 
-/********** POINT_TO *************/
+/********** POINTS_TO *************/
 
 
 
@@ -422,6 +422,20 @@ list words_pointer_value(cell_relation pv)
   w= gen_nconc(w, effect_words_reference(second_r));
   w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
   return (w);
+}
+
+string approximation_to_string(approximation a)
+{
+  string as = string_undefined;
+  if(approximation_may_p(a))
+    as = "may";
+  else if(approximation_must_p(a))
+    as = "must"; // could be "exact"
+  else if(approximation_exact_p(a))
+    as = "exact";
+  else
+    pips_internal_error("Unknown approximation tag.\n");
+  return as;
 }
 
 #define append(s) add_to_current_line(line_buffer, s, str_prefix, tpv)

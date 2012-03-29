@@ -1149,3 +1149,56 @@ bool vect_contains_phi_p(Pvecteur v)
 
     return(false);
 }
+
+
+/* Functions about cells - There is no cell.c file */
+
+/* add a field to a cell if it is meaningful
+ */
+cell cell_add_field_dimension(cell c, entity f)
+{
+  if(cell_reference_p(c)) {
+    reference r = cell_reference(c);
+    cell_reference(c) = reference_add_field_dimension(r, f);
+  }
+  else if(cell_preference_p(c)) {
+    preference pr = cell_preference(c);
+    reference r = preference_reference(pr);
+    preference_reference(pr) = reference_add_field_dimension(r, f);
+  }
+  else if(cell_gap_p(c))
+    pips_internal_error("Not applicable on gaps.\n");
+  else
+    pips_internal_error("Unknown kind of cell.\n");
+  return c;
+}
+
+/* add a field f as a subscript to a reference r if it is
+ * meaningful. Leave r unchanged if not.
+ *
+ * This function cannot be located in ri-util because it might need to
+ * know about abstract locations.
+ */
+reference reference_add_field_dimension(reference r, entity f)
+{
+  entity v = reference_variable(r);
+  type t = ultimate_type(entity_type(v));
+  if(struct_type_p(t)) {
+    entity ste = basic_derived(variable_basic(type_variable(t)));
+    type st = entity_type(ste);
+    pips_assert("st is a struct type", type_struct_p(st));
+    list fl = type_struct(st);
+    if(entity_is_argument_p(f,fl)) {
+      expression s = entity_to_expression(f);
+      reference_indices(r) = gen_nconc(reference_indices(r),
+				       CONS(EXPRESSION, s, NIL));
+    }
+    else {
+      pips_internal_error("No field \"%s\" for struct \"%s\"\n",
+			  entity_user_name(f), entity_user_name(v));
+    }
+  }
+  else {
+  }
+  return r;
+}
