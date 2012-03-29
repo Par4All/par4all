@@ -1,0 +1,62 @@
+
+PROPER  EFFECTS
+
+void arithmetic04(int a[10])
+{
+//             <    is written>: q
+   int *q = a;
+   int i;
+//             <    is read   >: q
+//             <    is written>: q
+   // FI: to separate the previous and next statements
+   q++;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void arithmetic04(int a[10])
+{
+
+// Points To: none
+
+   int *q = a;
+
+// Points To:
+// q -> a[0] , EXACT
+
+   int i;
+
+// Points To:
+// q -> a[0] , EXACT
+
+   // FI: to separate the previous and next statements
+   q++;
+
+// Points To:
+// q -> a[1] , EXACT
+
+   q++;
+
+// Points To:
+// q -> a[2] , EXACT
+
+   q++;
+
+// Points To:
+// q -> a[3] , EXACT
+
+   return;
+}

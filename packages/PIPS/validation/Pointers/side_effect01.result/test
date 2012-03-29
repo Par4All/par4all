@@ -1,0 +1,40 @@
+
+PROPER  EFFECTS
+
+void side_effect01(int a[10])
+{
+//             <    is written>: q
+   int *q = a;
+//             <    is read   >: q
+//             <    is written>: q
+
+   foo(q++);
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void side_effect01(int a[10])
+{
+
+// Points To: none
+
+   int *q = a;
+
+// Points To:
+// q -> a[0] , EXACT
+
+
+   foo(q++);
+
+// Points To:
+// q -> a[1] , EXACT
+
+   return;
+}

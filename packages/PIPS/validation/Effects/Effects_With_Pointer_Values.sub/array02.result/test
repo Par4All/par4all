@@ -1,0 +1,84 @@
+int main()
+{
+
+// Pointer values: none
+
+   int a[2], b, *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   a[0] = 0;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   a[1] = 1;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   if (a[0]>a[1]) {
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      p = a;
+
+// Pointer values:
+// p == a (exact);
+
+      b = 0;
+   }
+   else {
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      p = a+1;
+
+// Pointer values:
+// p == &a[1] (exact);
+
+      b = 1;
+   }
+
+// Pointer values:
+// p == a (may);
+// p == &a[1] (may);
+
+   b = p[0];
+
+// Pointer values:
+// p == a (may);
+// p == &a[1] (may);
+
+   return b;
+}
+int main()
+{
+   int a[2], b, *p;
+//             <    is written>: a[0]
+   a[0] = 0;
+//             <    is written>: a[1]
+   a[1] = 1;
+//             <    is read   >: a[0] a[1]
+   if (a[0]>a[1]) {
+//             <    is written>: p
+      p = a;
+//             <    is written>: b
+      b = 0;
+   }
+   else {
+//             <    is written>: p
+      p = a+1;
+//             <    is written>: b
+      b = 1;
+   }
+//             <may be read   >: a[0] a[1]
+//             <    is read   >: p
+//             <    is written>: b
+   b = p[0];
+//             <    is read   >: b
+   return b;
+}

@@ -1,0 +1,61 @@
+
+PROPER  EFFECTS
+
+int test03()
+{
+   int i, j;
+   int *p;
+//             <    is read   >: i j
+
+   if (i==j)
+//             <    is written>: p
+      p = &i;
+   else
+//             <    is written>: p
+      p = &i;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int test03()
+{
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   if (i==j)
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      p = &i;
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return 0;
+}

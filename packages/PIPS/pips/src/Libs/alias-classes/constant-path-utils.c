@@ -106,7 +106,7 @@ set points_to_nowhere_typed(list lhs_list, set input)
 */
 set points_to_nowhere(list lhs_list, set input)
 {
-  set kill= set_generic_make(set_private, points_to_equal_p,
+  set kill = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
   set gen = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
@@ -130,12 +130,13 @@ set points_to_nowhere(list lhs_list, set input)
 
   /* Computing the gen set */
   FOREACH(cell, c, lhs_list) {
-    entity e =entity_all_xxx_locations(NOWHERE_LOCATION);
+    entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
     reference r = make_reference(e, NIL);
     cell sink = make_cell_reference(r);
-    points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
+    points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
     set_add_element(gen, gen, (void*)pt_to);
   }
+  free_approximation(a);
   set_union(res, gen, input_kill_diff);
 
   return res;
@@ -353,9 +354,17 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 /* } */
 
 /*
-  Change dereferenced pointers and filed access into a constant paths
-  When no constant path is found the expression is uninitialized pointer
-*/
+ * Change dereferenced pointers and field access into a constant paths.
+ *
+ * FI: For instance, *p becomes p[0], s.a becomes s[a] and p->a
+ * becomes p[a] (to be checked with AM).
+ *
+ * When no constant path is found, the expression is considered
+ * equivalent to an uninitialized pointer. 
+ *
+ * FI: to be reviewed with AM, obvious memory leaks
+ * FI: what is the meaning of eval_p? set by get_memory_path()?
+ */
 list expression_to_constant_paths(statement s, expression e, set in)
 {
   set cur = set_generic_make(set_private, points_to_equal_p,
@@ -365,16 +374,27 @@ list expression_to_constant_paths(statement s, expression e, set in)
   list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL;
   bool exact_p = false, *nowhere_p = false, changed = true;
   bool eval_p = true;
+
+  // FI: it looks very complicated when e is a simple reference, but
+  // it may be a general approach
+
   c = get_memory_path(e, &eval_p);
+
   c = simple_cell_to_store_independent_cell(c, &changed);
+
   reference cr = cell_any_reference(c);
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  /* Take into account global variables which are initialized in demand*/
+
+  /* Take into account global variables which are initialized on demand*/
   /* entity ce = reference_variable(cr); */
   /* cell cc = make_cell_reference(cr); */
   l_cell = CONS(CELL, c, NIL);
-  in = set_assign(cur, points_to_init_global(s, l_cell, in));
+  set g_set = points_to_init_global(s, l_cell, in);
+  in = set_assign(cur, g_set);
+  // FI: free_set(g_set);
+
   if( eval_p ) {
+    // FI: memory leak for l_cell
     l_cell = CONS(CELL, c, NIL);
     set_methods_for_proper_simple_effects();
     l_in = set_to_sorted_list(in,
@@ -383,19 +403,24 @@ list expression_to_constant_paths(statement s, expression e, set in)
     l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
     generic_effects_reset_all_methods();
     /* in = points_to_init_global(s, l_cell, in); */
-    l_cell = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
+    // FI: memory leak for l_cell
+    l_cell = gen_nconc(l, possible_constant_paths(l_eval,c,nowhere_p));
 
     in =  set_assign(in, points_to_init_global(s, l_cell, in));
     }
   else {
+    // FI: memory leak for l_cell
     l_cell = CONS(CELL, c, NIL);
     in =  set_assign(cur, points_to_init_global(s, l_cell, in));
   }
   
 
   /* if c is an anywhere or a reference we don't evaluate it*/
-  if (eval_p && !(set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
-		 || entity_nowhere_locations_p(reference_variable(cr))) && 
+  if (eval_p
+      && !(set_empty_p(in)
+	   || entity_null_locations_p(reference_variable(cr))
+	   || entity_nowhere_locations_p(reference_variable(cr)))
+      && 
       !get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
     {
       set_methods_for_proper_simple_effects();
@@ -405,7 +430,6 @@ list expression_to_constant_paths(statement s, expression e, set in)
       l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
       generic_effects_reset_all_methods();
       l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
-    
     }
   else if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
       pips_user_warning("Uninitialized pointer");
@@ -424,8 +448,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
       if (to_be_freed) free_type(c_type);
     }
   else if(eval_p)
-    pips_user_error("Uninitialized pointer\n");
-  
+    pips_user_error("Uninitialized pointer dereferencing\n");
   else
     l = CONS(CELL, c, NIL);
 
@@ -454,7 +477,7 @@ cell get_memory_path(expression e, bool * eval_p)
   bool exact_p = false;
   /* we assume that we don't need to cover all expression type's, we
      are only intereseted in user function call, reference or pointer
-     dereferening*/
+     dereferencing */
 
   if (expression_call_p(e)) {
     if (user_function_call_p(e)) {
@@ -467,6 +490,7 @@ cell get_memory_path(expression e, bool * eval_p)
       else
 	anywhere =  entity_all_xxx_locations(ANYWHERE_LOCATION);
       reference r = make_reference(anywhere,NIL);
+      /* FI: Should not it be a preference? */
       c = make_cell_reference(r);
     }
     else {
@@ -1131,80 +1155,101 @@ bool expression_null_locations_p(expression e)
 }
 
 /*
-create a set of points-to relations of the form:
-element_L -> & element_R, MAY
+ * create a set of points-to relations of the form:
+ *
+ * element_L -> & element_R, MAY
+ *
+ * FI: it would be nice to have the equation or a formula
+ * I do not understand why gen_may1 is built from in_may
 */
 set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 {
- set gen_may1 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- set gen_may2 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- int len = (int) gen_length(L);
+  set gen_may1 = set_generic_make(set_private, points_to_equal_p,
+				  points_to_rank);
+  set gen_may2 = set_generic_make(set_private, points_to_equal_p,
+				  points_to_rank);
+  int len = (int) gen_length(L);
 
- if(len > 1){
+  if(len > 1) {
+    /* If the source is not precisely known */
     FOREACH(cell, l, L){
       SET_FOREACH(points_to, pt, in_may){
 	if(points_to_compare_cell(points_to_source(pt),l)){
-	  points_to npt = make_points_to(l, points_to_sink(pt),make_approximation_may(), make_descriptor_none());
+	  // FI: it would be much easier/efficient to modify the approximation of pt
+	  points_to npt = make_points_to(l, points_to_sink(pt),
+					 make_approximation_may(),
+					 make_descriptor_none());
 	  set_add_element(gen_may1, gen_may1, (void*)npt);
+	  set_del_element(gen_may1, gen_may1, (void*)pt);
 	}
       }
     }
- }
+  }
 
- FOREACH(cell, l, L){
-   set_union(gen_may2, gen_may2, gen_may_constant_paths(l, R, in_may, address_of_p, len));
- }
- set_union(gen_may2, gen_may2,gen_may1);
+  FOREACH(cell, l, L){
+    // FI: memory leak due to call to call to gen_may_constant_paths()
+    set gen_l = gen_may_constant_paths(l, R, in_may, address_of_p, len);
+    // FI: be careful, the union does not preserve consistency because
+    // the same arc may appear with different approximations
+    set_union(gen_may2, gen_may2, gen_l);
+    // free_set(gen_l);
+  }
 
- return gen_may2;
+  set_union(gen_may2, gen_may2, gen_may1);
+
+  return gen_may2;
 }
 
 
 /*
-create a set of points-to relations of the form:
-element_L -> & element_R, EXACT
-*/
+ * create a set of points-to relations of the form:
+ * element_L -> & element_R, EXACT
+ *
+ * FI: address_of_p does not seem to be updated in this function. Why
+ * pass a pointer? My analysis is wrong if gen_must_constant_paths() updates it
+ */
 set gen_must_set(list L, list R, set in_must, bool *address_of_p)
 {
- set gen_must1 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- set gen_must2 = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
- int len = (int) gen_length(L);
+  set gen_must1 = set_generic_make(set_private, points_to_equal_p,
+				   points_to_rank);
+  set gen_must2 = set_generic_make(set_private, points_to_equal_p,
+				   points_to_rank);
+  int len = (int) gen_length(L);
 
- /* if len > 1 we must iterate over in_must and change all points-to relations having L as lhs into may relations */
- if(len > 1){
+  /* if len > 1 we must iterate over in_must and change all points-to
+     relations having L as lhs into may relations */
+  if(len > 1){
     FOREACH(cell, l, L){
       SET_FOREACH(points_to, pt, in_must){
 	if(points_to_compare_cell(points_to_source(pt),l)){
-	  points_to npt = make_points_to(l, points_to_sink(pt),make_approximation_may(), make_descriptor_none());
+	  points_to npt = make_points_to(l, points_to_sink(pt),
+					 make_approximation_may(),
+					 make_descriptor_none());
 	  set_add_element(gen_must1, gen_must1, (void*)npt);
 	}
       }
     }
- }
+  }
 
- FOREACH(cell, l, L){
-   set_union(gen_must2, gen_must2, gen_must_constant_paths(l, R, in_must, address_of_p, len));
- }
- set_union(gen_must2, gen_must2,gen_must1);
+  FOREACH(cell, l, L){
+    set must_l = gen_must_constant_paths(l, R, in_must, address_of_p, len);
+    set_union(gen_must2, gen_must2, must_l);
+    // FI: shouldn't must_l be freed?
+  }
+  set_union(gen_must2, gen_must2,gen_must1);
 
- return gen_must2;
+  return gen_must2;
 }
 
-set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int len)
+set gen_may_constant_paths(cell l,
+			   list R,
+			   set in_may,
+			   bool* address_of_p,
+			   int Lc)
 {
   set gen_may_cps = set_generic_make(set_private, points_to_equal_p,
 				     points_to_rank);
   points_to pt = points_to_undefined;
-  approximation a = approximation_undefined;
-
-  if(len > 1)
-    a = make_approximation_may();
-  else
-    a = make_approximation_exact();
   if(!(*address_of_p)){
     /* here we have x = y, then we generate (x,y1,a)|(y,y1,a) as
        points to relation */
@@ -1230,7 +1275,10 @@ set gen_may_constant_paths(cell l, list R, set in_may, bool* address_of_p, int l
     }
   }
   else {
+    int Rc = (int) gen_length(R);
     FOREACH(cell, r, R){
+      approximation a = (Lc+Rc>2) ?
+	make_approximation_may() : make_approximation_exact();
       /* Should be replaced by opgen_constant_path(l,r) */
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
@@ -1263,19 +1311,38 @@ bool reference_unbounded_indices_p(reference r)
 }
 
 
-
-set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int len)
+/* Build a set of arcs from cell l towards cells in list R if
+ * *address_p is true, or towards cells pointed by cells in list R if
+ * not.
+ *
+ * Approximation is must if Lc==1. Lc is the cardinal of L, a set
+ * containing l.
+ *
+ * FI->AM: I do not understand why the cardinal of R is not used too
+ * when deciding if the approximation is may or must. I decide to
+ * change the semantics of this function although it is used by the
+ * initial analysis.
+ *
+ * FI: since *address_of_p is not modified, I do not understand why a
+ * pointer is passed.
+ *
+ * FI->AM: sharing of a... A new approximation must be generated for
+ * each new arc
+ */
+set gen_must_constant_paths(cell l,
+			    list R,
+			    set in_must,
+			    bool* address_of_p,
+			    int Lc)
 {
   set gen_must_cps = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
+				      points_to_rank);
   points_to pt = points_to_undefined;
   approximation a = approximation_undefined;
   bool changed = false;
+  int Rc = (int) gen_length(R);
 
-  if(len > 1)
-    a = make_approximation_may();
-  else
-    a = make_approximation_exact();
+  // Rc = 0;
   if(*address_of_p){
     /* if we have x = &y then we generate (x,y,a) as points to relation*/
     FOREACH(cell, r, R){
@@ -1283,11 +1350,13 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
       /* 	a = make_approximation_may(); */
+      approximation a = (Lc+Rc>2)?
+	make_approximation_may(): make_approximation_exact();
       pt = make_points_to(l, r, a, make_descriptor_none());
       set_add_element(gen_must_cps, gen_must_cps, (void*)pt);
     }
   }
-  else{
+  else {
     /* here we have x = y, then we generate (x,y1,a)|(y,y1,a) as
        points to relation */
     FOREACH(cell, r, R){
@@ -1296,6 +1365,8 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	  set_methods_for_proper_simple_effects();
 	  l = simple_cell_to_store_independent_cell(l, &changed);
 	  generic_effects_reset_all_methods();
+	  approximation a = (Lc+Rc>2)?
+	    make_approximation_may() : make_approximation_exact();
 	  pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
 
 
@@ -1312,27 +1383,27 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	  /* if(!points_to_undefined_p(pt)) */
 	  /*   set_add_element(gen_must_cps, gen_must_cps, (void*) pt); */
 
-	if(array_entity_p(reference_variable(cell_any_reference(r)))){
-	  reference ref = cell_any_reference(r);
-	  bool t_to_be_freed = false;
-	  type t = cell_reference_to_type(ref, &t_to_be_freed);
-	  /* if(reference_unbounded_indices_p(ref)) */
-	  /*   a = make_approximation_may(); */
-	  if(!pointer_type_p(t))
-	    pt = make_points_to(l, r, a, make_descriptor_none());
-	  else
-	    pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
+	  if(array_entity_p(reference_variable(cell_any_reference(r)))){
+	    reference ref = cell_any_reference(r);
+	    bool t_to_be_freed = false;
+	    type t = cell_reference_to_type(ref, &t_to_be_freed);
+	    /* if(reference_unbounded_indices_p(ref)) */
+	    /*   a = make_approximation_may(); */
+	    if(!pointer_type_p(t))
+	      pt = make_points_to(l, r, a, make_descriptor_none());
+	    else
+	      pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
 
-	  if (t_to_be_freed) free_type(t);
+	    if (t_to_be_freed) free_type(t);
+	  }
+	  if(!points_to_undefined_p(pt))
+	    set_add_element(gen_must_cps, gen_must_cps, (void*) pt);
 	}
-	if(!points_to_undefined_p(pt))
-	  set_add_element(gen_must_cps, gen_must_cps, (void*) pt);
       }
     }
   }
-  }
   
- return gen_must_cps;
+  return gen_must_cps;
 }
 
 points_to opgen_may_constant_path(cell l __attribute__ ((__unused__)), cell r __attribute__ ((__unused__)))

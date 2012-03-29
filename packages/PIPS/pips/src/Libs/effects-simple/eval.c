@@ -181,9 +181,8 @@ list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused))
 }
 
 
-list simple_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
+list simple_effect_to_constant_path_effects_with_pointer_values(effect eff)
 {
-  pips_internal_error("not yet implemented\n");
   list le = NIL;
   bool exact_p;
   reference ref = effect_any_reference(eff);
@@ -192,18 +191,24 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect __attribu
     {
       pips_debug(8, "dereferencing case \n");
       bool exact_p = false;
+      list l_pv = cell_relations_list( load_pv(effects_private_current_stmt_head()) );
+      pv_context ctxt = make_simple_pv_context();
+      list l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_pv, &ctxt);
+      reset_pv_context(&ctxt);
 
-      if (effect_reference_dereferencing_p(ref, &exact_p))
+      FOREACH(EFFECT, eff_alias, l_aliased)
 	{
-	  pips_debug(8, "dereferencing case \n");
-	  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	  if (!effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
+	    le = CONS(EFFECT, eff_alias, le); /* it should be a union here.
+						 However, we expect the caller
+						 to perform the contraction afterwards. */
+	  else
+	    free_effect(eff_alias);
 	}
-      else
-	le = CONS(EFFECT, (*effect_dup_func)(eff), le);
-
+      gen_free_list(l_aliased);
     }
   else
-    le = CONS(EFFECT, copy_effect(eff), le);
+    le = CONS(EFFECT, (*effect_dup_func)(eff), le);
  return le;
 }
 

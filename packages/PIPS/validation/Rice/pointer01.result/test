@@ -51,7 +51,8 @@ void pointer01(int n, float *p, float *q)
 
 Cumulated effects with points-to
 
-//             <may be read   >: p q
+//             <may be read   >: _q_3[*] p q
+//             <may be written>: _p_2[*]
 //             <may be referenced>: p q
 //             <    is read   >: n
 //             <    is referenced>: n

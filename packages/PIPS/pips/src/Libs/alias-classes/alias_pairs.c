@@ -272,7 +272,7 @@ statement s;
  *    ENDFOR
  */
 static void
-add_parameter_aliases_for_this_call_site(call call_site,
+add_parameter_aliases_for_this_call_site(call call_site __attribute__ ((unused)),
 					 transformer context,
 					 list real_args)
 {

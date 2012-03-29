@@ -33,7 +33,7 @@ int main()
    res = foo(&q);
 
 // Pointer values:
-// q == &p (exact);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
 
    return res;
 }

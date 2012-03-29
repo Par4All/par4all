@@ -78,26 +78,42 @@ bool locations_equal_p(cell acc1, cell acc2)
   return cell_equal_p(acc1, acc2);
 }
 
-/* returns true if two relations are equals. (maybe added to ri-util later)*/
+/* returns true if two points-to arcs "vpt1" and "vpt2" are equal.
+ *
+ * Used to build sets of points-to using the set library of Newgen
+ */
 int points_to_equal_p( const void * vpt1, const void*  vpt2)
 {
   points_to pt1 = (points_to) vpt1;
   points_to pt2 = (points_to) vpt2;
+
+ //same source
   cell c1 = points_to_source(pt1);
   cell c2 = points_to_source(pt2);
+  bool cmp1 = locations_equal_p(c1,c2);
+
+ // same sink
   cell c3 = points_to_sink(pt1);
   cell c4 = points_to_sink(pt2);
-  bool cmp1 = locations_equal_p(c1,c2);
   bool cmp2 = locations_equal_p(c3,c4);
-  bool cmp3 = ( approximation_exact_p( points_to_approximation(pt1) )
-	   &&
-	   approximation_exact_p( points_to_approximation(pt2) )
-	   ) || ( approximation_may_p( points_to_approximation(pt1) )
-		  &&
-		  approximation_may_p( points_to_approximation(pt2) )
-		  );
 
-  return cmp1 && cmp2 && cmp3;
+ // same approximation
+  approximation a1 = points_to_approximation(pt1);
+  approximation a2 = points_to_approximation(pt2);
+  // FI: must is forgotten...
+  //bool cmp3 = (approximation_exact_p(a1) && approximation_exact_p(a2))
+  //  || ( approximation_may_p(a1) && approximation_may_p(a2));
+  // FI: should we identify "exact" and "must"?
+  bool cmp3 = (approximation_tag(a1)==approximation_tag(a2));
+  bool cmp = cmp1 && cmp2 && cmp3;
+
+  ifdebug(8) {
+    printf("%s for pt1=%p and pt2=%p\n", bool_to_string(cmp), pt1, pt2);
+    print_points_to(pt1);
+    print_points_to(pt2);
+  }
+
+  return cmp;
 }
 
 
@@ -155,7 +171,7 @@ set points_to_function_projection(set pts)
 			     points_to_rank);
   set_assign(res, pts);
 
-  SET_FOREACH(points_to, pt, pts){
+  SET_FOREACH(points_to, pt, pts) {
     if(cell_out_of_scope_p(points_to_source(pt)))
       set_del_element(res, res, (void*)pt);
   }
@@ -170,7 +186,7 @@ bool cell_out_of_scope_p(cell c)
   return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
 }
 
-/*print a points-to for debug*/
+/*print a points-to arc for debug*/
 void print_points_to(const points_to pt)
 {
   cell source = points_to_source(pt);
@@ -182,14 +198,19 @@ void print_points_to(const points_to pt)
   print_reference(r1);
   fprintf(stderr,"->");
   print_reference(r2);
-  fprintf(stderr," (%d)\n", approximation_tag(app));
+  fprintf(stderr," (%s)\n", approximation_to_string(app));
 }
 
-/*print a points-to set for debug*/
+/* Print a set of points-to for debug */
 void print_points_to_set(string what,  set s)
 {
   fprintf(stderr,"points-to set %s:\n", what);
-  SET_MAP(elt, print_points_to((points_to) elt), s);
+  if(set_undefined_p(s))
+    fprintf(stderr, "undefined set\n");
+  else if(set_size(s)==0)
+    fprintf(stderr, "empty set\n");
+  else
+    SET_MAP(elt, print_points_to((points_to) elt), s);
   fprintf(stderr, "\n");
 }
 
@@ -204,6 +225,29 @@ bool source_in_set_p(cell source, set s)
       return true;
   }
   return in_p;
+}
+
+/* Return a list of cells, "sinks", that are sink for some edge whose
+ *  source is "source" in set "s". If "fresh_p" is set to true, no
+ *  sharing is created between list "sinks" and reference "source" or
+ *  points-to set "s". Else, the cells in list "sinks" are the cells
+ *  in arcs of the points-to set.
+ *
+ * Function added by FI.
+ */
+list source_to_sinks(cell source, set s, bool fresh_p)
+{
+  list sinks = NIL;
+  SET_FOREACH ( points_to, pt, s ) {
+    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+    if(cell_equal_p(source, points_to_source(pt))) {
+      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+      sinks = CONS(CELL, sc, sinks);
+    }
+  }
+  // FI: use gen_nreverse() to simplify debbugging? Not meaningful
+  // with SET_FOREACH
+  return sinks;
 }
 
 /* test if a cell appear as a sink in a set of points-to */
@@ -401,4 +445,49 @@ int points_to_compare_location(void * vpt1, void * vpt2) {
     }
   }
   return i;
+}
+
+/* make sure that set "s" does not contain redundant or contradictory
+   elements */
+bool consistent_points_to_set(set s)
+{
+  bool consistent_p = true;
+
+  SET_FOREACH(points_to, pt1, s) {
+    SET_FOREACH(points_to, pt2, s) {
+      if(pt1!=pt2) {
+	//same source
+	cell c1 = points_to_source(pt1);
+	cell c2 = points_to_source(pt2);
+	bool cmp1 = locations_equal_p(c1,c2);
+
+	// same sink
+	cell c3 = points_to_sink(pt1);
+	cell c4 = points_to_sink(pt2);
+	bool cmp2 = locations_equal_p(c3,c4);
+	if(cmp1&&cmp2) {
+	  // same approximation
+	  approximation a1 = points_to_approximation(pt1);
+	  approximation a2 = points_to_approximation(pt2);
+	  // FI: must is forgotten...
+	  //bool cmp3 = (approximation_exact_p(a1) && approximation_exact_p(a2))
+	  //  || ( approximation_may_p(a1) && approximation_may_p(a2));
+	  // FI: should we identify "exact" and "must"?
+	  bool cmp3 = (approximation_tag(a1)==approximation_tag(a2));
+	  if(cmp3) {
+	    fprintf(stderr, "Redundant points-to arc:\n");
+	    print_points_to(pt1);
+	    consistent_p = false;
+	  }
+	  else {
+	    fprintf(stderr, "Contradictory points-to arcs: incompatible approximation\n");
+	    print_points_to(pt1);
+	    print_points_to(pt2);
+	    consistent_p = false;
+	  }
+	}
+      }
+    }
+  }
+  return consistent_p;
 }

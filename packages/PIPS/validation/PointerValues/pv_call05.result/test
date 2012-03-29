@@ -1,0 +1,51 @@
+void foo(cmplx_t *p, int n)
+{
+
+// Pointer values:
+// p == &_p_1[0] (exact);
+// p[*].im == &_p_3[*][0] (may);
+// p[*].re == &_p_2[*][0] (may);
+
+   p->re = (float *) malloc(n*sizeof(float));
+
+// Pointer values:
+// _p_1[0].re == &*HEAP*_l_8[0] (exact);
+// p == &_p_1[0] (exact);
+// p[0].re == &*HEAP*_l_8[0] (exact);
+// p[*].im == &_p_3[*][0] (may);
+// p[*].re == &_p_2[*][0] (may);
+
+   p->im = (float *) malloc(n*sizeof(float));
+
+// Pointer values:
+// _p_1[0].im == &*HEAP*_l_9[0] (exact);
+// _p_1[0].re == &*HEAP*_l_8[0] (exact);
+// p == &_p_1[0] (exact);
+// p[0].im == &*HEAP*_l_9[0] (exact);
+// p[0].re == &*HEAP*_l_8[0] (exact);
+// p[*].im == &_p_3[*][0] (may);
+// p[*].re == &_p_2[*][0] (may);
+
+   return;
+}
+int main()
+{
+
+// Pointer values: none
+
+   cmplx_t cmplxs;
+
+// Pointer values:
+// cmplxs.im == *ANY_MODULE*:*UNDEFINED* (exact);
+// cmplxs.re == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   foo(&cmplxs, 10);
+
+// Pointer values:
+// cmplxs.im == *ANY_MODULE*:*UNDEFINED* (may);
+// cmplxs.im == &*ANY_MODULE*:*ANYWHERE* (may);
+// cmplxs.re == *ANY_MODULE*:*UNDEFINED* (may);
+// cmplxs.re == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}

@@ -1,0 +1,32 @@
+
+PROPER  EFFECTS
+
+int decl07(int a[10])
+{
+//             <    is written>: p
+   int *p = &a[9];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int decl07(int a[10])
+{
+
+// Points To: none
+
+   int *p = &a[9];
+
+// Points To:
+// p -> a[9] , EXACT
+
+
+   return 0;
+}

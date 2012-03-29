@@ -1129,10 +1129,17 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 
   type t1 = expression_to_type(arg1);
   bool pointer_t1 = pointer_type_p(t1);
-  free_type(t1);
+  bool array_t1 = array_type_p(t1);
+  pips_debug(5, "type t1 is: %s (%s)\n", words_to_string(words_type(t1, NIL, false)),
+			     type_to_string(t1));
+
   type t2 = expression_to_type(arg2);
   bool pointer_t2 = pointer_type_p(t2);
-  free_type(t2);
+  bool array_t2 = array_type_p(t2);
+  pips_debug(5, "type t2 is: %s (%s)\n", words_to_string(words_type(t2, NIL, false)),
+			     type_to_string(t2));
+
+  int nb_dims = 0;
 
   const char* func_name = entity_local_name(func);
 
@@ -1161,19 +1168,23 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
   list l_eff_pointer = NIL;
   expression other_arg = expression_undefined;
 
-  if (pointer_t1 && !pointer_t2 )
+  if ((pointer_t1 || array_t1) && !(pointer_t2 || array_t2))
     /* pointer arithmetic, the pointer is in the first expression */
     {
       pointer_arithmetic = true;
       l_eff_pointer = l_eff1;
       other_arg = arg2;
+      nb_dims = pointer_t1 ? 1 : gen_length(variable_dimensions(type_variable(t1)));
     }
-  else if (pointer_t2 && !pointer_t1)
+  else if ((pointer_t2 || array_t2) && !(pointer_t1 || array_t1))
     {
       pointer_arithmetic = true;
       l_eff_pointer = l_eff2;
       other_arg = arg1;
+      nb_dims = pointer_t2 ? 1 : gen_length(variable_dimensions(type_variable(t2)));
     }
+  free_type(t1);
+  free_type(t2);
 
   if (pointer_arithmetic)
     {
@@ -1183,30 +1194,69 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 	  /* build new effects */
 	  list l_new_eff = NIL;
 	  list l_new_eff_kind = NIL;
-	  expression new_arg = copy_expression(other_arg);
 
-	  if (same_string_p(func_name, MINUS_C_OPERATOR_NAME))
+	  if (nb_dims == 1)
 	    {
-	      entity unary_minus_ent =
-		gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							UNARY_MINUS_OPERATOR_NAME),
-				   entity_domain);
-	      new_arg = MakeUnaryCall(unary_minus_ent, new_arg);
+
+	      pips_debug(3, "one dimension case\n");
+	      expression new_arg = copy_expression(other_arg);
+
+	      if (same_string_p(func_name, MINUS_C_OPERATOR_NAME))
+		{
+		  entity unary_minus_ent =
+		    gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							    UNARY_MINUS_OPERATOR_NAME),
+				       entity_domain);
+		  new_arg = MakeUnaryCall(unary_minus_ent, new_arg);
+		}
+
+	      FOREACH(EFFECT, eff, l_eff_pointer)
+		{
+		  effect new_eff = copy_effect(eff);
+		  reference new_ref = effect_any_reference(new_eff);
+		  list l_inds = reference_indices(new_ref);
+		  if (ENDP(l_inds))
+		    {
+		      (*effect_add_expression_dimension_func)(new_eff, new_arg);
+		    }
+		  else
+		    {
+		      expression last_exp = EXPRESSION(CAR(gen_last(l_inds)));
+		      entity binary_plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+										       PLUS_C_OPERATOR_NAME),
+								  entity_domain);
+		      new_arg = MakeBinaryCall(binary_plus_ent, copy_expression(last_exp), new_arg);
+		      (*effect_change_ith_dimension_expression_func)(new_eff, new_arg, (int) gen_length(l_inds));
+		    }
+		  l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
+		  l_new_eff_kind = CONS(CELL_INTERPRETATION,
+					make_cell_interpretation_address_of(), NIL);
+		}
+	      free_expression(new_arg);
+
 	    }
-
-	  FOREACH(EFFECT, eff, l_eff_pointer)
+	  else
 	    {
-	      effect new_eff = copy_effect(eff);
-	      (*effect_add_expression_dimension_func)(new_eff, new_arg);
-	      l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
-	      l_new_eff_kind = CONS(CELL_INTERPRETATION,
-				    make_cell_interpretation_address_of(), NIL);
+	      pips_debug(3, "several dimensions (%d) case\n", nb_dims);
+	      
+	      // we could do more work to be more precise
+	      expression new_ind = make_unbounded_expression();
+	      FOREACH(EFFECT, eff, l_eff_pointer)
+		{
+		  effect new_eff = copy_effect(eff);
+
+		  for(int i = 1; i <= nb_dims; i++)
+		    (*effect_add_expression_dimension_func)(new_eff, copy_expression(new_ind));
+		  l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
+		  l_new_eff_kind = CONS(CELL_INTERPRETATION,
+					make_cell_interpretation_address_of(), NIL);
+		}
+	      free_expression(new_ind);
 	    }
 	  gen_nreverse(l_new_eff);
 	  gen_nreverse(l_new_eff_kind);
 	  pv_res->result_paths = l_new_eff;
 	  pv_res->result_paths_interpretations = l_new_eff_kind;
-	  free_expression(new_arg);
 	}
     }
   pv_res->l_out = pv_res2.l_out;
@@ -1791,7 +1841,8 @@ static void c_return_to_post_pv(entity __attribute__ ((unused)) func, list func_
      of the argument evaluation on pointer values
      eliminate local variables, retrieve the value of the returned pointer if any...
   */
-  expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
+  if (!ENDP(func_args))
+    expression_to_post_pv(EXPRESSION(CAR(func_args)), l_in, pv_res, ctxt);
 }
 
 static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,

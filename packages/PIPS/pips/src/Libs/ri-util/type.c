@@ -2585,6 +2585,8 @@ bool derived_type_p(type t)
 /* Returns true if t is of type derived and if the derived type is a struct.
  *
  * Example : struct foo var;
+ *
+ * Note: different trom type_struct_p
  */
 bool struct_type_p(type t)
 {
@@ -2596,6 +2598,45 @@ bool struct_type_p(type t)
     struct_p = type_struct_p(dt);
   }
   return struct_p;
+}
+
+/* Returns true if t is of type derived and if the derived type is a union.
+ *
+ * Example : union foo var;
+ *
+ * Note: different trom type_union_p
+ */
+bool union_type_p(type t)
+{
+  bool union_p = false;
+  if(derived_type_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    union_p = type_union_p(dt);
+  }
+  return union_p;
+}
+
+/* Returns true if t is of type derived and if the derived type is a enum.
+ *
+ * Example : enum foo var;
+ *
+ * FI: Could be unified with the prevous two functions,
+ * struct_type_p() and union_type_p()
+ *
+ * Note: different from type_enum_p
+ */
+bool enum_type_p(type t)
+{
+  bool enum_p = false;
+  if(derived_type_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    enum_p = type_enum_p(dt);
+  }
+  return enum_p;
 }
 
 /* Returns true if t is a typedefED type.
@@ -2710,6 +2751,17 @@ bool scalar_integer_type_p(type t)
     }
   }
   return long_p;
+}
+
+bool integer_type_p(type t)
+{
+  bool int_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    int_p = basic_int_p(b);
+  }
+  return int_p;
 }
 
 type make_standard_long_integer_type(type t)

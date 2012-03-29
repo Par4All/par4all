@@ -2433,7 +2433,7 @@ proper_effects_with_points_to > MODULE.proper_effects
 proper_effects_with_pointer_values > MODULE.proper_effects
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.pointer_values
+        < MODULE.simple_pointer_values
         < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -2489,7 +2489,7 @@ cumulated_pointer_effects_with_pointer_values > MODULE.cumulated_pointer_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_pointer_effects
-        < MODULE.points_to
+        < MODULE.simple_pointer_values
 \end{PipsMake}
 
 \begin{PipsMake}

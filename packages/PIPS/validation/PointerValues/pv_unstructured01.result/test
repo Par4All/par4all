@@ -1,0 +1,69 @@
+int main()
+{
+
+// Pointer values: none
+
+   int a[10], *pa, b[10], *pb, res;
+
+// Pointer values:
+// pa == *ANY_MODULE*:*UNDEFINED* (exact);
+// pb == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   pa = &a[0];
+
+// Pointer values:
+// pa == &a[0] (exact);
+// pb == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   pb = &b[0];
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+begin:   if (*pb+*pa>0) goto end;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+middle1:   pa++;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   if (*pb+*pa>0) goto end;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+middle2:   pb++;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   if (*pb+*pa>0) {
+   }
+   else {
+      goto begin;
+   }
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+end:   ;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   res = *pa+*pb;
+
+// Pointer values:
+// *ANY_MODULE*:*ANYWHERE* == &*ANY_MODULE*:*ANYWHERE* (may);
+
+
+   return res;
+}

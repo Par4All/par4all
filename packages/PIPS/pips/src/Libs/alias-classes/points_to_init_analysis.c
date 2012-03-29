@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 /* For strdup: */
-#define _GNU_SOURCE
+// Already defined elsewhere
+//#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"
@@ -535,70 +536,4 @@ set array_formal_parameter_to_stub_points_to(type t,cell c)
 
   return pt_in;
 
-}
-
-
-bool init_points_to_analysis(char * module_name)
-{
-  entity module;
-  type t;
-  list pt_list = NIL, dl = NIL;
-  set pts_to_set = set_generic_make(set_private,
-				    points_to_equal_p,points_to_rank);
-  set formal_set = set_generic_make(set_private,
-				    points_to_equal_p,points_to_rank);
-  set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
-
-  t = entity_type(module);
-
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-
-  pips_debug(1, "considering module %s\n", module_name);
-
-  /* Properties */
-  if(get_bool_property("ALIASING_ACROSS_FORMAL_PARAMETERS"))
-    pips_user_warning("Property ALIASING_ACROSS_FORMAL_PARAMETERS"
-		      " is ignored\n");
-  if(get_bool_property("ALIASING_ACROSS_TYPES"))
-    pips_user_warning("Property ALIASING_ACROSS_TYPES"
-		      " is ignored\n");
-  if(get_bool_property("ALIASING_INSIDE_DATA_STRUCTURE"))
-    pips_user_warning("Property ALIASING_INSIDE_DATA_STRUCTURE"
-		      " is ignored\n");
-
-  if(type_functional_p(t)){
-    dl = code_declarations(value_code(entity_initial(module)));
-
-    FOREACH(ENTITY, fp, dl) {
-      if(formal_parameter_p(fp)) {
-	reference r = make_reference(fp, NIL);
-	cell c = make_cell_reference(r);
-	formal_set = formal_points_to_parameter(c);
-	pts_to_set = set_union(pts_to_set, pts_to_set,
-			       formal_set);
-      }
-    }
-    
-  }
-  else
-    pips_user_error("The module %s is not a function.\n", module_name);
-
-  pt_list = set_to_sorted_list(pts_to_set,
-			       (int(*)
-				(const void*,const void*))
-			       points_to_compare_cells);
-  points_to_list init_pts_to_list = make_points_to_list(pt_list);
-  points_to_list_consistent_p(init_pts_to_list);
-  DB_PUT_MEMORY_RESOURCE
-    (DBR_INIT_POINTS_TO_LIST, module_name, init_pts_to_list);
-  reset_current_module_entity();
-  set_clear(pts_to_set);
-  set_clear(pts_to_set);
-  set_free(pts_to_set);
-  set_free(formal_set);
-  debug_off();
-
-  bool good_result_p = true;
-  return (good_result_p);
 }
