@@ -29,9 +29,16 @@
    It is up to the user to know what to do (e.g., freeing some temporary
    memory storage) before S1 is assigned a new value.
 
+   Shallow copies are used. If set A is assigned to set B, side
+   effects on elements of A are visible in B.
+
    Formal parameters are modified in functions which makes the stack
    misleading when debugging with gdb.
-*/
+
+   The sets are implemented with hash-tables. Each element is stored
+   as key and value.
+
+  */
 #ifdef HAVE_CONFIG_H
     #include "config.h"
 #endif
@@ -322,6 +329,25 @@ void set_free(set s)
 {
   hash_table_free(s->table);
   gen_free_area((void**) s, sizeof(struct _set_chunk));
+}
+
+/* Free several sets in one call. Useful when many sets are used
+   simultaneously. */
+void sets_free(set s,...)
+{
+  va_list args;
+
+  /* Analyze in args the variadic arguments that may be after t: */
+  va_start(args, s);
+  /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  do {
+    set_free(s);
+    /* Get the next argument */
+    s = va_arg(args, set);
+  } while(s!=NULL);
+  /* Release the variadic analysis */
+  va_end(args);
 }
 
 /* returns the number of items in s.
