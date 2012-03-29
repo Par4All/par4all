@@ -1210,6 +1210,10 @@ void fprint_expression(FILE * f, expression e)
 
 void print_expression(expression e)
 {
+  int dn = expression_domain_number(e);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==expression_domain) {
     normalized n;
 
     if(e==expression_undefined)
@@ -1223,6 +1227,9 @@ void print_expression(expression e)
 	else
 	    (void) fprintf(stderr,"NORMALIZED UNDEFINED\n");
     }
+  }
+  else
+    (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
 }
 
 string expression_to_string(expression e) {
@@ -3128,6 +3135,10 @@ void check_user_call_site(entity func, list args)
 }
 
 /* just returns the entity of an expression, or entity_undefined
+ *
+ * The entity returned is either the function called or the variable
+ * referenced
+ *
  * SG: moved here from hpfc
  */
 entity expression_to_entity(expression e)
