@@ -40,5 +40,11 @@ echo
 display PARALLELPRINTED_FILE
 
 close
-delete pointer01
+
+# FI: I need to check the logfile to see how it is impacted by the
+# bang rule for intraprocedural_points_to_analysis
+#
+# We seem to have tons of useless recomputations due to the bang rule
+
+#delete pointer01
 quit

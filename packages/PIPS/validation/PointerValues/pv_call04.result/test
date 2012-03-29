@@ -1,0 +1,43 @@
+void foo(int **q, int *p)
+{
+
+// Pointer values:
+// p == &_p_1[0] (exact);
+// q == &_q_1[0] (exact);
+// q[*] == &_q_2[*][0] (may);
+
+   *q = p;
+}
+int main()
+{
+
+// Pointer values: none
+
+   int a = 1, *p, **q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   p = &a;
+
+// Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q = (int **) malloc(sizeof(int *));
+
+// Pointer values:
+// p == &a (exact);
+// q == &*HEAP*_l_13[0] (exact);
+
+   foo(q, p);
+
+// Pointer values:
+// *HEAP*_l_13[*] == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == &a (exact);
+// q == &*HEAP*_l_13[0] (exact);
+// q[*] == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}

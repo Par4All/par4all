@@ -1,0 +1,45 @@
+
+PROPER  EFFECTS
+
+void assignment02()
+{
+   int i;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void assignment02()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return;
+}
