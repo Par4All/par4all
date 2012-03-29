@@ -2480,6 +2480,11 @@ bool array_type_p(type t)
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
 
+bool scalar_type_p(type t)
+{
+  return (type_variable_p(t) && (variable_dimensions(type_variable(t)) == NIL));
+}
+
 bool type_pointer_on_struct_variable_p(type t)
 {
         t = ultimate_type(t);

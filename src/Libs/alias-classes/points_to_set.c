@@ -228,10 +228,13 @@ bool source_in_set_p(cell source, set s)
 }
 
 /* Return a list of cells, "sinks", that are sink for some edge whose
- *  source is "source" in set "s". If "fresh_p" is set to true, no
- *  sharing is created between list "sinks" and reference "source" or
- *  points-to set "s". Else, the cells in list "sinks" are the cells
- *  in arcs of the points-to set.
+ * source is "source" in set "s". If "fresh_p" is set to true, no
+ * sharing is created between list "sinks" and reference "source" or
+ * points-to set "s". Else, the cells in list "sinks" are the cells in
+ * arcs of the points-to set.
+ *
+ * Additional functionality: add new arcs in s when global, formal or
+ * virtual variables are reached.
  *
  * Function added by FI.
  */

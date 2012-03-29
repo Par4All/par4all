@@ -26,7 +26,18 @@
  * This file contains functions used to compute points-to sets at
  * expression level.
  *
- * The argument pt_in is always modified by side-effects and returned.
+ * Most important function: list expression_to_points_to_sinks(expression lhs, pt_map in)
+ *
+ * The purpose of this function and the functions in this C file is to
+ * return a list of memory cells addressed when evaluated in the
+ * memory context "in".
+ *
+ * The memory context "in" may be modified by side-effects if new
+ * memory locations have to be added, for instance when formal or
+ * global pointers are dereferenced.
+ *
+ * The similar functions in Amira's implementation are located in
+ * constant-path-utils.c.
  */
 
 #include <stdlib.h>
@@ -404,8 +415,15 @@ void print_points_to_cells(list cl)
 }
 
 
- /* Returns a list of memory cells possibly accessed by the evaluation
-    of reference r. No sharing between the returned list "sinks" and the reference "r" or the points-to set "in". */
+ /* Returns a list of memory cells "sinks" possibly accessed by the evaluation
+  * of reference "r". No sharing between the returned list "sinks" and
+  * the reference "r" or the points-to set "in".
+  *
+  * Example: x, t[1], t[1][2],...
+  *
+  * FI: I do not trust this function. It is already too long. And I am
+  * not confident the case disjunction is correct/well chosen.
+  */
 list reference_to_points_to_sinks(reference r, pt_map in)
 {
   list sinks = NIL;
@@ -432,12 +450,24 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	/* No matter what, the target is obtained by adding a 0 subscript */
 	reference nr = copy_reference(r);
 	cell nc = make_cell_reference(nr);
-	expression ze = int_to_expression(0);
-	reference_indices(nr) = gen_nconc(reference_indices(nr),
-					  CONS(EXPRESSION, ze, NIL));
+	for(int i=rd; i<nd; i++) { // FI: not efficient
+	  expression ze = int_to_expression(0);
+	  reference_indices(nr) = gen_nconc(reference_indices(nr),
+					    CONS(EXPRESSION, ze, NIL));
+	}
 	sinks = CONS(CELL, nc, NIL);
       }
       else if(nd==rd) {
+	cell nc = make_cell_reference(copy_reference(r));
+	sinks = CONS(CELL, nc, NIL);
+
+	// FI: no indirection here
+	// sinks = source_to_sinks(nc, in, true);
+	// free_cell(nc);
+
+	// FI: the decision about the legality of the assignment
+	// cannot be made down here. Anything can be a sink.
+	/*
 	type et = ultimate_type(entity_type(e));
 	if( pointer_type_p(et)) {
 	  cell nc = make_cell_reference(copy_reference(r));
@@ -452,6 +482,7 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	else {
 	  pips_user_error("Illegal value for a pointer. Should be a lhs.\n");
 	}
+	*/
       }
       else { // rd is too big
 	pips_user_error("Too many subscript expressions for array \"%s\".\n",
@@ -460,6 +491,11 @@ list reference_to_points_to_sinks(reference r, pt_map in)
   }
   else {
     /* scalar case, rhs is already a lvalue */
+    if(scalar_type_p(ultimate_type(entity_type(e)))) {
+    // FI: I do not think this is the right place at all.
+    // FI: The sink of a reference does not depend (much) on in
+    // FI: counter-example a[p-q]...
+#if 0
     /* add points-to relations on demand for global pointers and
        top-level entities */
     if( pointer_type_p(ultimate_type(entity_type(e)) )) {
@@ -488,6 +524,7 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	  free_cell(nc);
 	}
       }
+#endif
 
       /* FI/FC : I dropped the current statement from many signature,
 	 assuming it is not necessary to exploit in because we are
@@ -497,10 +534,11 @@ list reference_to_points_to_sinks(reference r, pt_map in)
 	 with Amira and Fabien. */
       // sinks = expression_to_constant_paths(statement_undefined, rhs, in);
       cell nc = make_cell_reference(copy_reference(r));
-      sinks = source_to_sinks(nc, in, true);
-      free_cell(nc);
+      // sinks = source_to_sinks(nc, in, true);
+      // free_cell(nc);
+      sinks = CONS(CELL, nc, NIL);
     }
-    else if(array_type_p(entity_type(e))) { // FI: not OK with typedef
+    else if(array_type_p(ultimate_type(entity_type(e)))) { // FI: not OK with typedef
       /* An array name can be used as pointer constant */
       /* We should add null indices accordinng to its number of dimensions */
       int n = NumberOfDimension(e);

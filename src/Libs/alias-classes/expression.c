@@ -326,12 +326,52 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 				       pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  list sources = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+  // list sources = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+  list sources = expression_to_points_to_sinks(lhs, pt_out);
   FOREACH(CELL, source, sources) {
     // You want sharing for side effects
-    list sinks = source_to_sinks(source, pt_in, false);
+    list sinks = source_to_sinks(source, pt_out, false);
     /* Update the sinks by side-effect, taking advantage of the
        shallow copy performed in source_to_sinks(). */
+    // FI: this should be hidden in source_to_sinks()...
+    if(ENDP(sinks)) {
+      /* Three possibilities: the referenced variable is a formal
+	 parameter, or the referenced variable is a global variable or
+	 an internal error has been encountered. And a fourth
+	 possibility if we really operate on demand: a virtual entity
+	 of the calling context */
+      reference r = cell_any_reference(source);
+      entity v = reference_variable(r);
+      if(formal_parameter_p(v)
+	 || /* global_variable_p(v)*/
+	 /* FI: wrong test anywhere might have been top-level? */
+	 /* FI: wrong, how about static global variables? */
+	 top_level_entity_p(v)) {
+	// FI: No idea if I should copy source to avoid some sharing...
+	// FI: this function is much too general since it goes down
+	// recursively in potentially recursive data structures...
+	// FI: this is not on-demand...
+	// FI: located in points_to_init_analysis.c
+	// pt_map new = formal_points_to_parameter(source);
+	// pt_out = union_of_pt_maps(pt_out, pt_out, new);
+	// Find stub type
+	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+	// FI: the type retrieval must be improved for arrays & Co
+	points_to pt = create_stub_points_to(source, st, basic_undefined);
+	pt_out = add_arc_to_pt_map(pt, pt_out);
+	sinks = source_to_sinks(source, pt_out, false);
+      }
+      else if(false) {
+	/* cell nc = add_virtual_sink_to_source(source);
+	 * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+	 * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+	 */
+	;
+      }
+      if(ENDP(sinks))
+	pips_internal_error("Sink missing for a source based on \"%s\".\n",
+			    entity_user_name(v));
+    }
     offset_cells(sinks, delta);
   }
   // FI: should we free the sources list? Fully free it?
@@ -395,6 +435,7 @@ void offset_cell(cell sink, expression delta)
       }
     }
   }
+  // FI to be extended to pointers and points-to stubs
   else {
     pips_user_error("Use of pointer arithmetic on %s is not "
 		    "standard-compliant.\n", entity_user_name(v));
