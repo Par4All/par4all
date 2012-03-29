@@ -194,6 +194,8 @@ pt_map call_to_points_to(call c, pt_map pt_in)
       // again when going down? See arithmetic08 and 09?
       // This is necessary but cannot be placed here because of the
       // recursive calls
+      // FI: we are in trouble for post increment and post decrement...
+      // We should update the target a second time in sinks.c!
       pt_out = expressions_to_points_to(al, pt_in);
 
       // FI: I wanted to use the return type but it is too often

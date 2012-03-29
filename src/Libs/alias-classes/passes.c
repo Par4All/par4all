@@ -137,7 +137,7 @@ void fi_points_to_storage(set pts_to_set, statement s, bool store) {
 /* Pass INTRAPROCEDURAL_POINTS_TO_ANALYSIS
  *
  */
-bool intraprocedural_points_to_analysis(char * module_name) {
+static bool generic_points_to_analysis(char * module_name) {
   entity module;
   statement module_stat;
   set pt_in = set_generic_make(set_private, points_to_equal_p, points_to_rank);
@@ -268,30 +268,21 @@ bool init_points_to_analysis(char * module_name)
   return (good_result_p);
 }
 
+static bool interprocedural_points_to_p = true;
+
+bool interprocedural_points_to_analysis_p()
+{
+  return interprocedural_points_to_p;
+}
+
+bool intraprocedural_points_to_analysis(char * module_name)
+{
+  interprocedural_points_to_p = false;
+  return generic_points_to_analysis(module_name);
+}
 
 bool interprocedural_points_to_analysis(char * module_name)
 {
-  /* list pt_list = NIL; */
-  /* set pts_to_set = set_generic_make(set_private, */
-  /* 				    points_to_equal_p,points_to_rank); */
-
-  set_current_module_entity(module_name_to_entity(module_name));
-  //entity module = get_current_module_entity();
-
-  //type t = entity_type(module);
-
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-
-  pips_debug(1, "considering module %s\n", module_name);
-
-  
-
-  /* DB_PUT_MEMORY_RESOURCE */
-  /*   (DBR_INIT_POINTS_TO_LIST, module_name, init_pts_to_list); */
-
-  reset_current_module_entity();
-  debug_off();
-
-  bool good_result_p = true;
-  return (good_result_p);
+  interprocedural_points_to_p = true;
+  return generic_points_to_analysis(module_name);
 }

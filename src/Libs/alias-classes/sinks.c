@@ -178,7 +178,8 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     sinks = malloc_to_points_to_sinks(a, in);
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+    // sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
     /* Locate the pointer */
@@ -201,19 +202,35 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     }
    }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
-    expression one = int_to_expression(1);
-    offset_cells(sinks, one);
-    free_expression(one);
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in);
+    // FI: this has already been done when the side effects are exploited
+    //expression one = int_to_expression(1);
+    //offset_cells(sinks, one);
+    //free_expression(one);
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in);
+    //expression m_one = int_to_expression(-1);
+    //offset_cells(sinks, m_one);
+    //free_expression(m_one);
+   }
+  else if(ENTITY_POST_INCREMENT_P(f)) {
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in);
+    /* We have to undo the impact of side effects */
     expression m_one = int_to_expression(-1);
     offset_cells(sinks, m_one);
     free_expression(m_one);
    }
-  else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+  else if(ENTITY_POST_DECREMENT_P(f)) {
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in);
+    /* We have to undo the impact of side effects */
+    expression one = int_to_expression(1);
+    offset_cells(sinks, one);
+    free_expression(one);
    }
   else {
   // FI: to be continued
