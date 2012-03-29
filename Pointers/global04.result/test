@@ -34,7 +34,8 @@ POINTS TO
 
 
 // Points To OUT:
-// p -> p , EXACT
+// _p_0 -> i , EXACT
+// p -> _p_0 , EXACT
 
 int main()
 {
@@ -52,8 +53,8 @@ int main()
    *p = &i;
 
 // Points To:
-// p -> i , EXACT
-// p -> p , EXACT
+// _p_0 -> i , EXACT
+// p -> _p_0 , EXACT
 
 
    return 0;
