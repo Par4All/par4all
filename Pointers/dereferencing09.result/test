@@ -68,14 +68,14 @@ int main()
 
 // Points To:
 // b -> a , EXACT
-// bb -> a , EXACT
+// bb -> b , EXACT
 // c -> b , EXACT
 
    aa = **c;
 
 // Points To:
 // b -> a , EXACT
-// bb -> a , EXACT
+// bb -> b , EXACT
 // c -> b , EXACT
 
    return 0;

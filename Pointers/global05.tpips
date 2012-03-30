@@ -1,10 +1,13 @@
 delete global05
 create global05 global05.c
-setproperty ABORT_ON_USER_ERROR TRUE
+
+# Detection of a user error due to property POINTS_TO_STRICT_POINTER_TYPES
+#setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
+
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 ##TODO: explain
@@ -31,5 +34,6 @@ display PRINTED_FILE[global05]
 
 
 close
+shell cat global05.database/Warnings
 delete global05
 quit

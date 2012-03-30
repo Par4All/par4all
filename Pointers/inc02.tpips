@@ -1,12 +1,11 @@
-delete global02
-create global02 global02.c
+delete inc02
+create inc02 inc02.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
-
-# Assume pointers points to array by default and generate indexing
+# A pointer int * is incremented, this property must be reset
 setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
 ##TODO: explain
@@ -16,22 +15,22 @@ echo PROPER EFFECTS
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 echo 
 echo PROPER POINTER EFFECTS
 echo
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
+display PRINTED_FILE[main]
 
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 close
-delete global02
+delete inc02
 quit

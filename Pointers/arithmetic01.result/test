@@ -54,7 +54,7 @@ int main()
    i++;
 
 // Points To:
-// i -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// i -> j[1] , EXACT
 
 
    return 0;
