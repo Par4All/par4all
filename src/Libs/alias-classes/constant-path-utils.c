@@ -1338,7 +1338,7 @@ set gen_must_constant_paths(cell l,
   set gen_must_cps = set_generic_make(set_private, points_to_equal_p,
 				      points_to_rank);
   points_to pt = points_to_undefined;
-  approximation a = approximation_undefined;
+  //approximation a = approximation_undefined;
   bool changed = false;
   int Rc = (int) gen_length(R);
 
