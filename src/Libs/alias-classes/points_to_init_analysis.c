@@ -116,8 +116,8 @@ entity create_stub_entity(entity e, type t)
   string s = string_undefined;
   string en = (string) entity_user_name(e);
 
-  // FI: guarantee about name uniqueness?
-  if( formal_parameter_p(e) ) {
+  // FI: guarantee about *local* new name uniqueness?
+  if(formal_parameter_p(e)) {
     // Naming for sinks of formal parameters: use their offsets
     formal f = storage_formal( entity_storage(e) );
     int off = formal_offset(f);
@@ -125,6 +125,11 @@ entity create_stub_entity(entity e, type t)
   }
   else if(top_level_entity_p(e)){ // FI: global_variable_p()
     // Naming for sinks of global variable: use their offsets
+    int off = ram_offset(storage_ram(entity_storage(e)));
+    s = strdup(concatenate("_", en,"_", i2a(off), NULL));
+  }
+  else if(static_global_variable_p(e)){ // "static int i;"
+    // Naming for sinks of static global variable: use their offsets
     int off = ram_offset(storage_ram(entity_storage(e)));
     s = strdup(concatenate("_", en,"_", i2a(off), NULL));
   }

@@ -195,8 +195,8 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     sinks = expression_to_points_to_sinks(a, in, false);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
-    /* Locate the pointer */
-    list cl = expression_to_points_to_sinks(a, in, true);
+    /* Locate the pointer, no dereferencing yet */
+    list cl = expression_to_points_to_sinks(a, in, false);
     /* Finds what it is pointing to */
     FOREACH(CELL, c, cl) {
       /* Do not create sharing between elements of "in" and elements of
@@ -216,7 +216,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in, false);
+    sinks = expression_to_points_to_sinks(a, in, true);
     // FI: this has already been done when the side effects are exploited
     //expression one = int_to_expression(1);
     //offset_cells(sinks, one);
@@ -224,14 +224,15 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in, false);
+    sinks = expression_to_points_to_sinks(a, in, true);
     //expression m_one = int_to_expression(-1);
     //offset_cells(sinks, m_one);
     //free_expression(m_one);
    }
   else if(ENTITY_POST_INCREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in, false); // assignment06
+    // arithmetic05: "q=p++;" p++ must be evaluated
+    sinks = expression_to_points_to_sinks(a, in, true);
     /* We have to undo the impact of side effects */
     expression m_one = int_to_expression(-1);
     offset_cells(sinks, m_one);
@@ -239,7 +240,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
    }
   else if(ENTITY_POST_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in, false);
+    sinks = expression_to_points_to_sinks(a, in, true);
     /* We have to undo the impact of side effects */
     expression one = int_to_expression(1);
     offset_cells(sinks, one);
@@ -320,6 +321,10 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     //expression ma2 = MakeUnaryCall(um, copy_expression(a2));
     //offset_cells(sinks, ma2);
     //free_expression(ma2);
+  }
+  else if (ENTITY_CALLOC_SYSTEM_P(f)) { // CALLOC has two arguments
+    // FI: we need a calloc_to_points_to_sinks() to exploit both arguments...
+    sinks = malloc_to_points_to_sinks(a1, in);
   }
   else {
     ; // Nothing to do

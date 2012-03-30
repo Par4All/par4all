@@ -266,7 +266,12 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       pts = add_arc_to_pt_map(pt, pts);
       sinks = source_to_sinks(source, pts, false);
     }
-    else if(false) {
+    else if(static_global_variable_p(v)) {
+      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+      // FI: the type retrieval must be improved for arrays & Co
+      points_to pt = create_stub_points_to(source, st, basic_undefined);
+      pts = add_arc_to_pt_map(pt, pts);
+      sinks = source_to_sinks(source, pts, false);
       /* cell nc = add_virtual_sink_to_source(source);
        * points_to npt = make_points_to(copy_cell(source), nc, may/must)
        * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()

@@ -438,7 +438,10 @@ void offset_cell(cell sink, expression delta)
   // FI to be extended to pointers and points-to stubs
   else {
     pips_user_error("Use of pointer arithmetic on %s is not "
-		    "standard-compliant.\n", entity_user_name(v));
+		    "standard-compliant.\n"
+		    "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
+		    " for usual non-standard compliant C code.\n",
+		    entity_user_name(v));
   }
 }
 
