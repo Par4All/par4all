@@ -202,7 +202,7 @@ AX_ARG_ENABLE([fortran95],
 )
 
 # set the optionnal passes dirs there
-AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_fortran95 $ax_enable_paws"])
+AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_phpips $ax_enable_fortran95 $ax_enable_paws"])
 
 
 

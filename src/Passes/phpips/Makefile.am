@@ -9,9 +9,11 @@ pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar
 
 dist_pkgPHP_PHP = phpipsbase.php
+PHPdir=phpips
 dist_PHP_DATA = pips.pth
 
 nodist_pkgPHP_PHP=phpips.php
+pkgphpexecdir = phpips
 pkgphpexec_LTLIBRARIES = _phpips.la
 _phpips_la_SOURCES = phpips_aux.c
 nodist__phpips_la_SOURCES =phpips_wrap.c
