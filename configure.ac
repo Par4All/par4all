@@ -133,6 +133,16 @@ AX_ARG_ENABLE([tpips],
 			]
 )
 
+# phpips
+AX_ARG_ENABLE([phpips],
+			[enable PHP interface],
+			[no],
+			[
+			 AC_PROG_SWIG
+			 AX_CHECK_PROG([php])
+			]
+)
+
 # pyps
 AX_ARG_ENABLE([pyps],
 			[enable python interface],
@@ -315,6 +325,7 @@ AC_CONFIG_FILES([pips_config.h
          src/Passes/pyps/drivers/ir_navigator/Makefile
 				 src/Passes/tpips/Makefile
 
+				 src/Passes/phpips/Makefile
 				 src/Runtimes/Makefile
 
 				 src/Scripts/Makefile
