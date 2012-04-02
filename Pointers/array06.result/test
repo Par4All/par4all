@@ -37,7 +37,7 @@ int main()
    pu = t[1][2];
 
 // Points To:
-// pu -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
 
    return 0;
 }

@@ -93,14 +93,14 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// q -> i[1] , EXACT
 
    // The loaded value is not used
    printf("i=%d, p=%p, q=%p\n", i, p, q);
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// q -> i[1] , EXACT
 
    return 0;
 }

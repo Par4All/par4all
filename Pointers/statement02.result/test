@@ -18,6 +18,11 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: x
    x = *y;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("*x=%d\n", *x);
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: x y
    *y = x;
@@ -81,6 +86,13 @@ int main()
 // y1 -> y2 , EXACT
 
    x = *y;
+
+// Points To:
+// x -> y2 , EXACT
+// y -> y1 , EXACT
+// y1 -> y2 , EXACT
+
+   printf("*x=%d\n", *x);
 
 // Points To:
 // x -> y2 , EXACT

@@ -13,11 +13,19 @@ int main()
    c = &b;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: bb
-
+   
+   // Here c->b->a
+   
    bb = *c;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: aa
+   
+   // bb has the value of b, hence bb->a
+   
    aa = **c;
+   
+   // aa is a copy of a
+   
    return 0;
 }
 
@@ -63,20 +71,28 @@ int main()
 // bb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // c -> b , EXACT
 
-
+   
+   // Here c->b->a
+   
    bb = *c;
 
 // Points To:
 // b -> a , EXACT
-// bb -> b , EXACT
+// bb -> a , EXACT
 // c -> b , EXACT
 
+   
+   // bb has the value of b, hence bb->a
+   
    aa = **c;
 
 // Points To:
 // b -> a , EXACT
-// bb -> b , EXACT
+// bb -> a , EXACT
 // c -> b , EXACT
 
+   
+   // aa is a copy of a
+   
    return 0;
 }

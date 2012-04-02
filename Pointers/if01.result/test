@@ -65,15 +65,15 @@ int main()
       x = &x2;
 
 // Points To:
-// x -> x2 , MAY
 // x -> x1 , MAY
+// x -> x2 , MAY
 
 
    y = *x;
 
 // Points To:
-// x -> x2 , MAY
 // x -> x1 , MAY
+// x -> x2 , MAY
 
    return 0;
 }
