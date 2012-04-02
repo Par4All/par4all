@@ -94,7 +94,7 @@ list points_to_null_sinks()
   return entity_to_sinks(ne);
 }
 
-list call_to_points_to_sinks(call c, pt_map in)
+list call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity f = call_function(c);
@@ -119,7 +119,7 @@ list call_to_points_to_sinks(call c, pt_map in)
     break;
   case is_value_intrinsic: 
     // FI: here is the action, &p, *p, p->q, p.q, etc...
-    sinks = intrinsic_call_to_points_to_sinks(c, in);
+    sinks = intrinsic_call_to_points_to_sinks(c, in, eval_p);
     break;
   default:
     pips_internal_error("unknown value tag %d\n", tt);
@@ -135,7 +135,7 @@ list call_to_points_to_sinks(call c, pt_map in)
  *
  * "(cast) p" is not an expression.
  */
-list intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity f = call_function(c);
@@ -155,13 +155,13 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
       pips_internal_error("Probably a constant or a symbolic. Not handled here\n");
       break;
     case 1:
-      sinks = unary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = unary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     case 2:
-      sinks = binary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = binary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     case 3:
-      sinks = ternary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = ternary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     default:
       sinks = nary_intrinsic_call_to_points_to_sinks(c, in);
@@ -178,7 +178,7 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
  * Do not create any sharing between elements of in and elements part
  * of the returned list, sinks.
  */
-list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -195,9 +195,11 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     sinks = expression_to_points_to_sinks(a, in, false);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
+    // FI: this piece of code must be restructured using a function
+    // for computing an approximation of memory(p)
     /* Locate the pointer, no dereferencing yet */
     list cl = expression_to_points_to_sinks(a, in, false);
-    /* Finds what it is pointing to */
+    /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
       /* Do not create sharing between elements of "in" and elements of
 	 "sinks". */
@@ -210,10 +212,29 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 			    entity_user_name(v),
 			    words_to_string(words_reference(r, NIL)));
       }
-      else
-	sinks = gen_nconc(sinks, pointed);
+      else {
+	if(eval_p) {
+	  /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
+	  FOREACH(CELL, sc, pointed) {
+	    /* Do not create sharing between elements of "in" and elements of
+	       "sinks". */
+	    list starpointed = source_to_sinks(sc, in, true);
+	    if(ENDP(starpointed)) {
+	      reference sr = cell_any_reference(sc);
+	      entity sv = reference_variable(sr);
+	      string words_to_string(list);
+	      pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+				  entity_user_name(sv),
+				  words_to_string(words_reference(sr, NIL)));
+	    }
+	    sinks = gen_nconc(sinks, starpointed);
+	  }
+	}
+	else
+	  sinks = gen_nconc(sinks, pointed);
+      }
     }
-   }
+  }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
     sinks = expression_to_points_to_sinks(a, in, true);
@@ -256,7 +277,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 
 // p=q, p.x, p->y, p+e, p-e, p+=e, p-=e
 // What other binary operator could be part of a lhs expression?
-list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -278,16 +299,20 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
       // FI: side effect or allocation of a new cell?
       (void) cell_add_field_dimension(pc, f);
       // FI: does this call allocate a full new list?
-      list dL = source_to_sinks(pc, in, true);
-      if(ENDP(dL))
-	pips_internal_error("Dereferencing error.\n");
-      else {
-	FOREACH(CELL, ec, dL) {
-	  // (void) cell_add_field_dimension(ec, f);
-	  // FI: should we allocate new cells? Done
-	  sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+      if(eval_p) {
+	list dL = source_to_sinks(pc, in, true);
+	if(ENDP(dL))
+	  pips_internal_error("Dereferencing error.\n");
+	else {
+	  FOREACH(CELL, ec, dL) {
+	    // (void) cell_add_field_dimension(ec, f);
+	    // FI: should we allocate new cells? Done
+	    sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+	  }
 	}
       }
+      else
+	sinks = gen_nconc(sinks, CONS(CELL, pc, NIL));
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
@@ -349,7 +374,7 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
 }
 
 // c?p:q
-list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -791,7 +816,7 @@ list range_to_points_to_sinks(range r, pt_map in)
   }
   case  is_syntax_call: {
     call c = syntax_call(s);
-    sinks = call_to_points_to_sinks(c, in);
+    sinks = call_to_points_to_sinks(c, in, eval_p);
     break;
   }
   case  is_syntax_cast: {

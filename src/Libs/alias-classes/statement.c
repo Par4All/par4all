@@ -110,7 +110,18 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
    * But it might be smarter (or not) to require or not the storage.
    */
   // FI: currently, this is going to be redundant most of the time
-  fi_points_to_storage(pt_in, s, true);
+  pt_map pt_merged;
+  if(bound_pt_to_list_p(s)) {
+    points_to_list ptl_prev = load_pt_to_list(s);
+    list ptl_prev_l = gen_full_copy_list(points_to_list_list(ptl_prev));
+    pt_map pt_prev = new_pt_map();
+    pt_prev = set_assign_list(pt_prev, ptl_prev_l);
+    gen_free_list(ptl_prev_l);
+    pt_merged = merge_points_to_set(pt_in, pt_prev);
+  }
+  else
+    pt_merged = pt_in;
+  fi_points_to_storage(pt_merged, s, true);
 
   /* Eliminate local information if you exit a block */
   if(statement_sequence_p(s)) {
@@ -374,7 +385,7 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 				   expression_undefined,
 				   c,
 				   expression_undefined,
-				   pt_in);
+				   pt_out);
   }
 
   //statement ws = whileloop_body(wl);

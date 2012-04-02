@@ -270,8 +270,16 @@ list word_points_to(points_to pt)
   return rlt1;
 }
 
-/* must return -1, 0 or 1. Should avoid 0 because we want a total
-   order to avoid validation problems. */
+/* Comparison of two points-to arcs based on their source and sink nodes.
+ *
+ * This comparison function is used to sort a list of points-to before
+ * storage and print-out.
+ *
+ * It must return -1, 0 or 1 like strcmp(). It should avoid 0 because
+ * we want a total order to avoid validation problems. Hence the
+ * exploitation of the references, number of indices, etc. if the
+ * entity names are not sufficient to disambiguate the references.
+ */
 int points_to_compare_cells(const void * vpt1, const void * vpt2)
 {
   int i = 0;
@@ -302,48 +310,51 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
 
   i = strcmp(entity_minimal_user_name(v1so), entity_minimal_user_name(v2so));
   if(i==0) {
-    sl1 = reference_indices(r1so);
-    sl2 = reference_indices(r2so);
-    int i1 = gen_length(sl1);
-    int i2 = gen_length(sl2);
-
-    i = i2>i1? 1 : (i2<i1? -1 : 0);
-
+    i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
     if(i==0) {
-      sli1 = reference_indices(r1si);
-      sli2 = reference_indices(r2si);
-      int i1 = gen_length(sli1);
-      int i2 = gen_length(sli2);
+      sl1 = reference_indices(r1so);
+      sl2 = reference_indices(r2so);
+      int i1 = gen_length(sl1);
+      int i2 = gen_length(sl2);
 
       i = i2>i1? 1 : (i2<i1? -1 : 0);
-      //	if(i==0) {
-      for(;i==0 && !ENDP(sl1); POP(sl1), POP(sl2)){
-	expression se1 = EXPRESSION(CAR(sl1));
-	expression se2 = EXPRESSION(CAR(sl2));
-	if(expression_constant_p(se1) && expression_constant_p(se2)){
-	  int i1 = expression_to_int(se1);
-	  int i2 = expression_to_int(se2);
-	  i = i2>i1? 1 : (i2<i1? -1 : 0);
-	  if(i==0){
-	    i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
-	    for(;i==0 && !ENDP(sli1); POP(sli1), POP(sli2)){
-	      expression sei1 = EXPRESSION(CAR(sli1));
-	      expression sei2 = EXPRESSION(CAR(sli2));
-	      if(expression_constant_p(sei1) && expression_constant_p(sei2)){
-		int i1 = expression_to_int(sei1);
-		int i2 = expression_to_int(sei2);
-		i = i2>i1? 1 : (i2<i1? -1 : 0);
-	      }else{
-		string s1 = words_to_string(words_expression(se1, NIL));
-		string s2 = words_to_string(words_expression(se2, NIL));
-		i = strcmp(s1, s2);
+
+      if(i==0) {
+	sli1 = reference_indices(r1si);
+	sli2 = reference_indices(r2si);
+	int i1 = gen_length(sli1);
+	int i2 = gen_length(sli2);
+
+	i = i2>i1? 1 : (i2<i1? -1 : 0);
+	//	if(i==0) {
+	for(;i==0 && !ENDP(sl1); POP(sl1), POP(sl2)){
+	  expression se1 = EXPRESSION(CAR(sl1));
+	  expression se2 = EXPRESSION(CAR(sl2));
+	  if(expression_constant_p(se1) && expression_constant_p(se2)){
+	    int i1 = expression_to_int(se1);
+	    int i2 = expression_to_int(se2);
+	    i = i2>i1? 1 : (i2<i1? -1 : 0);
+	    if(i==0){
+	      i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
+	      for(;i==0 && !ENDP(sli1); POP(sli1), POP(sli2)){
+		expression sei1 = EXPRESSION(CAR(sli1));
+		expression sei2 = EXPRESSION(CAR(sli2));
+		if(expression_constant_p(sei1) && expression_constant_p(sei2)){
+		  int i1 = expression_to_int(sei1);
+		  int i2 = expression_to_int(sei2);
+		  i = i2>i1? 1 : (i2<i1? -1 : 0);
+		}else{
+		  string s1 = words_to_string(words_expression(se1, NIL));
+		  string s2 = words_to_string(words_expression(se2, NIL));
+		  i = strcmp(s1, s2);
+		}
 	      }
 	    }
+	  } else {
+	    string s1 = words_to_string(words_expression(se1, NIL));
+	    string s2 = words_to_string(words_expression(se2, NIL));
+	    i = strcmp(s1, s2);
 	  }
-	}else{
-	  string s1 = words_to_string(words_expression(se1, NIL));
-	  string s2 = words_to_string(words_expression(se2, NIL));
-	  i = strcmp(s1, s2);
 	}
       }
     }

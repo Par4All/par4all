@@ -172,7 +172,7 @@ static bool generic_points_to_analysis(char * module_name) {
   // FI: old version
   pts_to_out = points_to_statement(module_stat, pt_in);
   // FI: new version
-  // pts_to_out = statement_to_points_to(module_stat, pt_in);
+  //pts_to_out = statement_to_points_to(module_stat, pt_in);
   /* Store the points-to relations */
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO, module_name, get_pt_to_list());
 
@@ -209,7 +209,7 @@ bool init_points_to_analysis(char * module_name)
   type t;
   list pt_list = NIL, dl = NIL;
   set pts_to_set = set_generic_make(set_private,
-				    points_to_equal_p,points_to_rank);
+			 	    points_to_equal_p,points_to_rank);
   set formal_set = set_generic_make(set_private,
 				    points_to_equal_p,points_to_rank);
   set_current_module_entity(module_name_to_entity(module_name));

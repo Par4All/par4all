@@ -301,8 +301,11 @@ bool sink_in_set_p(cell sink, set s)
 }
 
 
-/* merge two points-to sets; required to compute
-   the points-to set of the if control statements. */
+/* merge two points-to sets;
+ *
+ * required to compute
+ * the points-to set of the if control statements.
+ */
 set merge_points_to_set(set s1, set s2) {
   set Definite_set = set_generic_make(set_private, points_to_equal_p,
 				      points_to_rank);
