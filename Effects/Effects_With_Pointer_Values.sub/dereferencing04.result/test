@@ -1,0 +1,50 @@
+void dereferencing04()
+{
+
+// Pointer values: none
+
+   double *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   double *q;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   double *r;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+
+// Pointer values: none
+
+   dereferencing04();
+
+// Pointer values: none
+
+   return 1;
+}
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p q r
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+   dereferencing04();
+   return 1;
+}
