@@ -1,0 +1,50 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: a b y
+   int a = 2, b = 1, **x, *y = &a;
+//             <    is written>: x
+   x = &y;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: x
+   *x = &b;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a = 2, b = 1, **x, *y = &a;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> a , EXACT
+
+   x = &y;
+
+// Points To:
+// x -> y , EXACT
+// y -> a , EXACT
+
+   *x = &b;
+
+// Points To:
+// x -> y , EXACT
+// y -> b , EXACT
+
+
+   return 0;
+}
