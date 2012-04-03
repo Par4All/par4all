@@ -61,7 +61,8 @@ int main()
    failed = foo(a);
 
 // Pointer values:
-// a[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// a[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// a[*] == &*ANY_MODULE*:*ANYWHERE* (may);
 
    return failed;
 }
