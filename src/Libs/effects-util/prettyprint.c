@@ -317,13 +317,13 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
   // FI: memory leak? generation of a new string?
   extern const char* entity_minimal_user_name(entity);
   string n1so =   entity_abstract_location_p(v1so)?
-    entity_local_name(v1so) : entity_minimal_user_name(v1so);
+    (string) entity_local_name(v1so) :  (string) entity_minimal_user_name(v1so);
   string n2so =   entity_abstract_location_p(v2so)?
-    entity_local_name(v2so) : entity_minimal_user_name(v2so);
+    (string) entity_local_name(v2so) : (string) entity_minimal_user_name(v2so);
   string n1si =   entity_abstract_location_p(v1si)?
-    entity_local_name(v1si) : entity_minimal_user_name(v1si);
+   (string)  entity_local_name(v1si) : (string) entity_minimal_user_name(v1si);
   string n2si =   entity_abstract_location_p(v2si)?
-    entity_local_name(v2si) : entity_minimal_user_name(v2si);
+    (string) entity_local_name(v2si) : (string) entity_minimal_user_name(v2si);
 
   i = strcmp(n1so, n2so);
   if(i==0) {
