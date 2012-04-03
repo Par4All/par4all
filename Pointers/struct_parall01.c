@@ -1,12 +1,14 @@
+
 #include<stdlib.h>
 
 typedef struct{
   int *p;
-}s_with_pointer;
+} s_with_pointer;
 
 typedef struct{
   s_with_pointer champ[5];
-}s_with_array_of_struct_with_pointer;
+} s_with_array_of_struct_with_pointer;
+
 int main()
 {
   s_with_pointer a, b;
@@ -14,7 +16,7 @@ int main()
   int i, j;
 
 /* definition of a */
-  a.p = (int*)malloc(10*sizeof(int));
+  a.p = (int*) malloc(10*sizeof(int));
   for(i = 0; i<10; i++)
     a.p[i] = i;
 

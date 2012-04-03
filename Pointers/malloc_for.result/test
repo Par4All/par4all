@@ -58,16 +58,16 @@ int main(int argc, char *argv[])
 
 // Points To:
 // argv[*] -> _argv_2[0] , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // p -> *HEAP*_l_11 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
 
       p = (int *) malloc(sizeof(int));
 
 // Points To:
 // argv[*] -> _argv_2[0] , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // p -> *HEAP*_l_11 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    
    
