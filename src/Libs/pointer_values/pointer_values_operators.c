@@ -1059,7 +1059,9 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
   pips_debug_effect(5, "begin with eff:", eff);
   pips_debug_pvs(5, "and l_pv:", l_pv);
 
-  if (anywhere_effect_p(eff)) /* should be turned into entity_abstract_location_p */
+  if (anywhere_effect_p(eff)
+      || null_pointer_value_cell_p(effect_cell(eff))
+      || undefined_pointer_value_cell_p(effect_cell(eff))) /* should be turned into entity_abstract_location_p */
     {
       pips_debug(5, "anywhere case\n");
       return (NIL);
@@ -1105,17 +1107,22 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 	      pips_debug_pv(5, "translating eff using pv: \n", pv_equiv);
 
 	      if (undefined_pointer_value_cell_p(c1)
-		  || undefined_pointer_value_cell_p(c2)
-		  || null_pointer_value_cell_p(c1)
-		  || null_pointer_value_cell_p(c2))
+		  || undefined_pointer_value_cell_p(c2))
 		{
-		  if (cell_relation_exact_p(pv_equiv))
-		    pips_user_error("\n\tdereferencing an undefined or null pointer (%s)\n",
-				    words_to_string(effect_words_reference(effect_any_reference(eff))));
-		  else
-		    {
-		      pips_debug(5,"potential dereferencement of an undefined or null pointer\n");
-		    }
+		  pips_debug(5,"potential dereferencement of an undefined pointer -> returning undefined\n");
+		  l_res = effect_to_list(make_undefined_pointer_value_effect(copy_action(effect_action(eff))));
+		  if (cell_relation_may_p(pv_equiv))
+		    effects_to_may_effects(l_res);
+		  anywhere_p = true;
+		}
+	      else if (null_pointer_value_cell_p(c1)
+		       || null_pointer_value_cell_p(c2))
+		{
+		      pips_debug(5,"potential dereferencement of a null pointer -> returning null\n");
+		      l_res = effect_to_list(make_null_pointer_value_effect(copy_action(effect_action(eff))));
+		      if (cell_relation_may_p(pv_equiv))
+			effects_to_may_effects(l_res);
+		      anywhere_p = true;
 		}
 	      else
 		{

@@ -194,11 +194,24 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect eff)
       list l_pv = cell_relations_list( load_pv(effects_private_current_stmt_head()) );
       pv_context ctxt = make_simple_pv_context();
       list l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_pv, &ctxt);
+      pips_debug_effects(8, "aliased effects\n", l_aliased);
       reset_pv_context(&ctxt);
 
       FOREACH(EFFECT, eff_alias, l_aliased)
 	{
-	  if (!effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
+	  entity ent_alias = effect_entity(eff_alias);
+	  if (undefined_pointer_value_entity_p(ent_alias)
+	      || null_pointer_value_entity_p(ent_alias))
+	    {
+	      // currently interpret them as anywhere effects since these values
+	      // are not yet well integrated in abstract locations lattice
+	      // and in effects computations
+	      // to be FIXED later.
+	      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
+	      free_effect(eff_alias);
+	    }
+	  else if (entity_abstract_location_p(effect_entity(eff_alias))
+	      || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
 	    le = CONS(EFFECT, eff_alias, le); /* it should be a union here.
 						 However, we expect the caller
 						 to perform the contraction afterwards. */

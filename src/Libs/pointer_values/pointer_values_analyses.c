@@ -1193,6 +1193,33 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
 	      anywhere_lhs_p = true;
 	      l_kill = l_aliased;
 	    }
+	  else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
+		   && (null_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
+	    {
+	      // dereferencing a null pointer is considered as undefined by the standard
+	      // with gcc (without any option) the compiler does not complain, but the execution aborts
+	      // I make the choice here that if the pointer value is exactly NULL, then
+	      // the program abort; hence there is no pointer anymore and the pointer values list is empty.
+	      pips_user_warning("null pointer is dereferenced on lhs(%s)\n",
+				effect_to_string(lhs_eff));
+	      gen_full_free_list(l_in);
+	      l_in = NIL;
+	      l_kill = NIL;
+	    }
+	  else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
+		   && (undefined_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
+		{
+		  // dereferencing a non-initialized pointer is considered as undefined by the standard
+		  // However, with gcc (without any option), the compiler does not complain,
+		  // and the execution is sometimes correct.
+		  // I make the choice here that if the pointer value is (exactly) undefined
+		  // then the program does not necessarily abort;
+		  // as I can keep dereferencements in pointer values (I'm not limited
+		  // to constant paths), I still generate a kill and a gen. BC.
+		  pips_user_warning("undefined pointer is dereferenced on lhs(%s)\n",
+				    effect_to_string(lhs_eff));
+		  l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+		}
 	  else
 	    {
 	      /* if lhs_eff is a may-be-killed, then all aliased effects are also
@@ -1261,18 +1288,23 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
   else
     {
       /* generate for all alias p in l_kill p == rhs_eff */
+      /* except for p==undefined or p==null (should other abstract values/locations be ignored here?) */
       FOREACH(EFFECT, eff_alias, l_kill)
 	{
-	  list l_rhs_kind_tmp = l_rhs_kind;
-	  FOREACH(EFFECT, rhs_eff, l_rhs_eff)
+	  if (!null_pointer_value_effect_p(eff_alias)
+	      && ! undefined_pointer_value_effect_p(eff_alias))
 	    {
-	      cell_interpretation rhs_kind =
-		CELL_INTERPRETATION(CAR(l_rhs_kind_tmp));
-	      //bool exact_preceding_p = true;
-	      list l_gen_pv = (* ctxt->make_pv_from_effects_func)
-		(eff_alias, rhs_eff, rhs_kind, l_in);
-	      l_gen = gen_nconc(l_gen_pv, l_gen);
-	      POP(l_rhs_kind_tmp);
+	      list l_rhs_kind_tmp = l_rhs_kind;
+	      FOREACH(EFFECT, rhs_eff, l_rhs_eff)
+		{
+		  cell_interpretation rhs_kind =
+		    CELL_INTERPRETATION(CAR(l_rhs_kind_tmp));
+		  //bool exact_preceding_p = true;
+		  list l_gen_pv = (* ctxt->make_pv_from_effects_func)
+		    (eff_alias, rhs_eff, rhs_kind, l_in);
+		  l_gen = gen_nconc(l_gen_pv, l_gen);
+		  POP(l_rhs_kind_tmp);
+		}
 	    }
 	}
       if (declaration_p)
