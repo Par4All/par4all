@@ -277,8 +277,17 @@ list word_points_to(points_to pt)
  *
  * It must return -1, 0 or 1 like strcmp(). It should avoid 0 because
  * we want a total order to avoid validation problems. Hence the
- * exploitation of the references, number of indices, etc. if the
- * entity names are not sufficient to disambiguate the references.
+ * exploitation of the references, number of indices, subscript
+ * expressions, etc. if the entity names are not sufficient to
+ * disambiguate the references.
+ *
+ * When subscript expressions are used, fields are replaced by the
+ * corresponding field number. So the sort is based on the field ranks
+ * in the data structure and not on the the field names.
+ *
+ * For abstract locations, the local name is used for the sort and the
+ * global names is sometimes used in the prettyprint. Hence, the
+ * alphabetical order is not obvious in the print-out.
  */
 int points_to_compare_cells(const void * vpt1, const void * vpt2)
 {
@@ -307,10 +316,18 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
   list sl1 = NIL, sl2 = NIL, sli1 = NIL, sli2 = NIL ;
   // FI: memory leak? generation of a new string?
   extern const char* entity_minimal_user_name(entity);
+  string n1so =   entity_abstract_location_p(v1so)?
+    entity_local_name(v1so) : entity_minimal_user_name(v1so);
+  string n2so =   entity_abstract_location_p(v2so)?
+    entity_local_name(v2so) : entity_minimal_user_name(v2so);
+  string n1si =   entity_abstract_location_p(v1si)?
+    entity_local_name(v1si) : entity_minimal_user_name(v1si);
+  string n2si =   entity_abstract_location_p(v2si)?
+    entity_local_name(v2si) : entity_minimal_user_name(v2si);
 
-  i = strcmp(entity_minimal_user_name(v1so), entity_minimal_user_name(v2so));
+  i = strcmp(n1so, n2so);
   if(i==0) {
-    i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
+    i = strcmp(n1si, n2si);
     if(i==0) {
       sl1 = reference_indices(r1so);
       sl2 = reference_indices(r2so);

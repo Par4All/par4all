@@ -130,9 +130,7 @@ set points_to_nowhere(list lhs_list, set input)
 
   /* Computing the gen set */
   FOREACH(cell, c, lhs_list) {
-    entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
-    reference r = make_reference(e, NIL);
-    cell sink = make_cell_reference(r);
+    cell sink = make_nowhere_cell();
     points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
     set_add_element(gen, gen, (void*)pt_to);
   }
@@ -140,6 +138,14 @@ set points_to_nowhere(list lhs_list, set input)
   set_union(res, gen, input_kill_diff);
 
   return res;
+}
+
+cell make_nowhere_cell()
+{
+  entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
+  reference r = make_reference(e, NIL);
+  cell sink = make_cell_reference(r);
+  return sink;
 }
 
 

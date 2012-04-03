@@ -186,9 +186,12 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   list sinks = NIL;
   pips_assert("One argument", gen_length(al)==1);
   // pips_internal_error("Not implemented for %p and %p\n", c, in);
-  if (ENTITY_MALLOC_SYSTEM_P(f) ||
-      ENTITY_CALLOC_SYSTEM_P(f)) {
+  if (ENTITY_MALLOC_SYSTEM_P(f)) {
     sinks = malloc_to_points_to_sinks(a, in);
+  }
+  else if (ENTITY_FREE_SYSTEM_P(f)) {
+    // FI: should be useless because free() returns void
+    sinks = CONS(CELL, make_nowhere_cell(), NIL);
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
     // sinks = expression_to_constant_paths(statement_undefined, a, in);
@@ -350,6 +353,13 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   else if (ENTITY_CALLOC_SYSTEM_P(f)) { // CALLOC has two arguments
     // FI: we need a calloc_to_points_to_sinks() to exploit both arguments...
     sinks = malloc_to_points_to_sinks(a1, in);
+  }
+  else if(ENTITY_FOPEN_P(f)) {
+    /* Should be handled like a malloc, using the line number for malloc() */
+    pips_user_warning("Fopen() not precisely implemented.\n");
+    type rt = functional_result(type_functional(entity_type(f)));
+    type ct = type_to_pointed_type(rt);
+    sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
   }
   else {
     ; // Nothing to do

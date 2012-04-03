@@ -1978,11 +1978,46 @@ type reference_to_type(reference ref)
 	  else
 	    {
 	      pips_debug(9,"going through pointer dimension. \n");
+	      // FI: struct are only possible for constant memory path
+	      // the usual internal representation does not use fields
+	      // as indices
 	      pips_assert("reference has too many indices :"
-			  " pointer expected\n", basic_pointer_p(cb));
-	      ct= basic_pointer(cb);
-	      cb = variable_basic(type_variable(ct));
-	      cd = variable_dimensions(type_variable(ct));
+			  " pointer or struct expected\n",
+			  basic_pointer_p(cb) || basic_derived_p(cb));
+	      if(basic_pointer_p(cb)) {
+		ct = basic_pointer(cb);
+		cb = variable_basic(type_variable(ct));
+		cd = variable_dimensions(type_variable(ct));
+	      }
+	      else if(basic_derived_p(cb)) { // must be a struct, see assert
+		entity de = basic_derived(cb);
+		type st = entity_type(de);
+		list fl = type_struct(st);
+		// FI: I am not sure about the internal representation...
+		// Do we find an integer or a field reference as
+		// subscript expression?
+		expression ind = EXPRESSION(CAR(l_inds));
+		value ind_v = EvalExpression(ind);
+		if(value_constant_p(ind_v)) {
+		  int n = constant_int(value_constant(ind_v));
+		  entity f = ENTITY(gen_nth(n, fl));
+		  type ft = entity_type(f);
+		  ct = ft;
+		  cb = variable_basic(type_variable(ct));
+		  cd = variable_dimensions(type_variable(ct));
+		}
+		else { // FI: assume a reference to a field
+		  // pips_internal_error("Unexpected internal representation.\n");
+		  pips_assert("The subscript expression is a reference",
+			      expression_reference_p(ind));
+		  entity f =
+		    reference_variable(syntax_reference(expression_syntax(ind)));
+		  type ft = entity_type(f);
+		  ct = ft;
+		  cb = variable_basic(type_variable(ct));
+		  cd = variable_dimensions(type_variable(ct));
+		}
+	      }
 	      POP(l_inds);
 	    }
 	}
