@@ -15,17 +15,17 @@ int main()
   s_with_array_of_struct_with_pointer e, f;
   int i, j;
 
-/* definition of a */
+  /* definition of a */
   a.p = (int*) malloc(10*sizeof(int));
   for(i = 0; i<10; i++)
     a.p[i] = i;
 
-/* definition of b */
+  /* definition of b */
   b = a;
   for(i = 0; i<10; i++)
     b.p[i] = i*10;
 
-/* definition of e */
+  /* definition of e */
   for(i = 0; i<5; i++)
     {
       e.champ[i].p = malloc(10*sizeof(int));

@@ -1,0 +1,116 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int t[10][10][10];
+
+//             <    is written>: p1
+   int *p1 = t[10][10];
+   //int **p2 = t[10];
+//             <    is written>: p2
+   int (*p2)[10] = t[10];
+   //int ***p3 = t;
+//             <    is written>: p3
+   int (*p3)[10][10] = t;
+   
+   //int ***q = &t;
+//             <    is written>: q
+   int (*q)[10][10][10] = &t;
+
+//             <    is written>: r1
+   int *r1 = &t[10][10][0];
+   //int **r2 = &t[10][0];
+//             <    is written>: r2
+   int (*r2)[10] = &t[10][0];
+   //int ***r3 = &t[0];
+//             <    is written>: r3
+   int (*r3)[10][10] = &t[0];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int t[10][10][10];
+
+
+// Points To: none
+
+   int *p1 = t[10][10];
+   //int **p2 = t[10];
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+
+   int (*p2)[10] = t[10];
+   //int ***p3 = t;
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+
+   int (*p3)[10][10] = t;
+   
+   //int ***q = &t;
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+// p3 -> t[0] , EXACT
+
+   int (*q)[10][10][10] = &t;
+
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+// p3 -> t[0] , EXACT
+// q -> t , EXACT
+
+   int *r1 = &t[10][10][0];
+   //int **r2 = &t[10][0];
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+// p3 -> t[0] , EXACT
+// q -> t , EXACT
+// r1 -> t[10][10][0] , EXACT
+
+   int (*r2)[10] = &t[10][0];
+   //int ***r3 = &t[0];
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+// p3 -> t[0] , EXACT
+// q -> t , EXACT
+// r1 -> t[10][10][0] , EXACT
+// r2 -> t[10][0] , EXACT
+
+   int (*r3)[10][10] = &t[0];
+
+// Points To:
+// p1 -> t[10][10][0] , EXACT
+// p2 -> t[10][0] , EXACT
+// p3 -> t[0] , EXACT
+// q -> t , EXACT
+// r1 -> t[10][10][0] , EXACT
+// r2 -> t[10][0] , EXACT
+// r3 -> t[0] , EXACT
+
+
+   return 0;
+}

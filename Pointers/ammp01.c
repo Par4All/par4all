@@ -1,5 +1,7 @@
 /* Effect bug in ammp: call site to a_m_serial seems to lack argument(s) */
 
+/* Points-to bug: unitialized pointer dereferencing... */
+
 typedef struct atom {
   int serial;
   int active;
@@ -13,25 +15,25 @@ ATOM * first;
 ATOM *a_m_serial( serial )
 int serial;
 {
-     static ATOM *ap = ((void *)0);
- static ATOM *lastmatched = ((void *)0);
- int i , n, a_number();
- if( atomUPDATE) n= a_number();
- else n = atomNUMBER;
+  static ATOM *ap = ((void *)0);
+  static ATOM *lastmatched = ((void *)0);
+  int i , n, a_number();
+  if( atomUPDATE) n= a_number();
+  else n = atomNUMBER;
 
- ap = first; /* static pointer is hook for more efficient search */
-     if( ap == ((void *)0)) return ((void *)0);
- if( lastmatched == ((void *)0) ) lastmatched = first;
+  ap = first; /* static pointer is hook for more efficient search */
+  if( ap == ((void *)0)) return ((void *)0);
+  if( lastmatched == ((void *)0) ) lastmatched = first;
 
- if( serial == lastmatched->serial) return lastmatched;
- if( serial > lastmatched->serial) ap = lastmatched;
- for( i=0; i< n; i++ )
-     {
+  if( serial == lastmatched->serial) return lastmatched;
+  if( serial > lastmatched->serial) ap = lastmatched;
+  for( i=0; i< n; i++ )
+    {
       if( ap-> serial == serial) {lastmatched = ap;return ap;}
       if( ap == ap->next)ap = first ;
       else ap = ap->next;
-     }
-     return ((void *)0);
+    }
+  return ((void *)0);
 }
 
 int a_number()

@@ -1,0 +1,69 @@
+
+PROPER  EFFECTS
+
+int assignment08(int a[10])
+{
+   struct foo {
+      int *a;
+      int *b;
+   } x, y;
+   int i, j;
+//             <    is written>: x.a
+
+   x.a = &i;
+//             <    is written>: x.b
+   x.b = &j;
+//             <    is read   >: x.a x.b
+//             <    is written>: y.a y.b
+   y = x;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int assignment08(int a[10])
+{
+
+// Points To: none
+
+   struct foo {
+      int *a;
+      int *b;
+   } x, y;
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+
+   x.a = &i;
+
+// Points To:
+// x.a -> i , EXACT
+
+   x.b = &j;
+
+// Points To:
+// x.a -> i , EXACT
+// x.b -> j , EXACT
+
+   y = x;
+
+// Points To:
+// x.a -> i , EXACT
+// x.b -> j , EXACT
+// y.a -> i , EXACT
+// y.b -> j , EXACT
+
+
+   return 0;
+}

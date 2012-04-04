@@ -1,0 +1,52 @@
+
+PROPER EFFECTS
+
+int formal_parameter02(int ***ppp)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+   int *q = **ppp;
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int formal_parameter02(int ***ppp)
+{
+//             <    is read   >: ppp ppp[0] ppp[0][0]
+//             <    is written>: q
+   int *q = **ppp;
+   return 0;
+}
+
+POINTS TO
+
+
+// Points To IN:
+// _ppp_1[0] -> _ppp_1_1[0] , EXACT
+// _ppp_1_1[0] -> _ppp_1_1_1[0] , EXACT
+// ppp -> _ppp_1[0] , EXACT
+
+
+// Points To OUT:
+// _ppp_1[0] -> _ppp_1_1[0] , EXACT
+// _ppp_1_1[0] -> _ppp_1_1_1[0] , EXACT
+
+int formal_parameter02(int ***ppp)
+{
+
+// Points To:
+// _ppp_1[0] -> _ppp_1_1[0] , EXACT
+// _ppp_1_1[0] -> _ppp_1_1_1[0] , EXACT
+// ppp -> _ppp_1[0] , EXACT
+
+   int *q = **ppp;
+
+// Points To:
+// _ppp_1[0] -> _ppp_1_1[0] , EXACT
+// _ppp_1_1[0] -> _ppp_1_1_1[0] , EXACT
+// ppp -> _ppp_1[0] , EXACT
+// q -> _ppp_1_1_1[0] , EXACT
+
+   return 0;
+}
