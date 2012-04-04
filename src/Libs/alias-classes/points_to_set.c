@@ -278,6 +278,21 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
        */
       ;
     }
+    else if(entity_stub_sink_p(v)) {
+      //type ost = ultimate_type(entity_type(v));
+      bool to_be_freed;
+      type rt = cell_to_type(source, &to_be_freed); // reference type
+      if(pointer_type_p(rt)) {
+	type nst = type_to_pointed_type(rt);
+	points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	pts = add_arc_to_pt_map(pt, pts);
+	sinks = source_to_sinks(source, pts, false);
+      }
+      else if(array_type_p(rt)) {
+	printf("Entity \"%s\"\n", entity_local_name(v));
+	pips_internal_error("Not implemented yet.\n");
+      }
+    }
     if(ENDP(sinks))
       pips_internal_error("Sink missing for a source based on \"%s\".\n",
 			  entity_user_name(v));

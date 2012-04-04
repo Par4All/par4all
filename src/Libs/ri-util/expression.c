@@ -1271,7 +1271,18 @@ void print_syntax(syntax s)
 
 void print_reference(reference r)
 {
-  print_words(stderr,words_reference(r, NIL));
+    int dn = reference_domain_number(r);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==reference_domain) {
+    if(reference_undefined_p(r))
+      fprintf(stderr, "reference undefined\n");
+    else {
+      print_words(stderr,words_reference(r, NIL));
+    }
+  }
+  else
+    fprintf(stderr, "Not a Newgen \"reference\" object\n");
 }
 
 void print_reference_list(list lr)

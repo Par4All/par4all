@@ -93,6 +93,16 @@ list points_to_null_sinks()
   entity ne = entity_null_locations();
   return entity_to_sinks(ne);
 }
+
+list points_to_anywhere_sinks(type t)
+{
+  entity ne;
+  if(type_undefined_p(t))
+    ne = entity_all_locations();
+  else
+    ne = entity_typed_anywhere_locations(t);
+  return entity_to_sinks(ne);
+}
 
 list call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
@@ -111,6 +121,22 @@ list call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     constant zero = value_constant(v);
     if(constant_int_p(zero) && constant_int(zero)==0)
       sinks = points_to_null_sinks();
+    else {
+      type t = type_to_returned_type(entity_type(f));
+      if(string_type_p(t)) {
+	// FI: we could generate a special location for each string
+	// FI: we could reuse the constant function
+	// FI: we could use the static area of the current module
+	// FI: we can always use anywhere...
+	// FI: does not depend oneval_p... involution...
+	reference r = make_reference(f, NIL);
+	cell c = make_cell_reference(r);
+	sinks = CONS(CELL, c, NIL);
+    }
+    else {
+      sinks = points_to_anywhere_sinks(t);
+    }
+    }
   }
     break;
   case is_value_unknown:
@@ -384,7 +410,9 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
 }
 
 // c?p:q
-list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
+list ternary_intrinsic_call_to_points_to_sinks(call c,
+					       pt_map in,
+					       bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -393,7 +421,7 @@ list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   pips_assert("in is consistent", consistent_pt_map(in));
 
   if(ENTITY_CONDITIONAL_P(f)) {
-    bool eval_p = true;
+    //bool eval_p = true;
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     list sinks1 = expression_to_points_to_sinks(e1, in, eval_p);
@@ -433,8 +461,19 @@ list points_to_null_sinks()
     in a debugging context. */
 void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
 {
-  reference r = cell_any_reference(c);
-  print_reference(r);
+  int dn = cell_domain_number(c);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==cell_domain) {
+    if(cell_undefined_p(c))
+      fprintf(stderr, "cell undefined\n");
+    else {
+      reference r = cell_any_reference(c);
+      print_reference(r);
+    }
+  }
+  else
+    fprintf(stderr, "Not a Newgen cell object\n");
 }
 
 /* Debug: use stderr */
@@ -463,9 +502,22 @@ void print_points_to_cells(list cl)
   * of reference "r". No sharing between the returned list "sinks" and
   * the reference "r" or the points-to set "in".
   *
-  * Examples: x->x, t[1]->t[1], t[1][2]->t[1][2], p->p...
+  * Examples if eval_p==false: x->x, t[1]->t[1], t[1][2]->t[1][2], p->p...
   *
-  * The dereferencing, if necessary is performed at a higher level
+  * Examples if eval_p==true: x->error, t[1]->t[1][0],
+  * t[1][2]->t[1][2][0], p->p[0]...
+  *
+  * Issue: let's assume "t" to be an array "int t[10][10[10];". The C
+  * language is (too) flexible. If "p" is an "int ***p;", the impact
+  * of assignment "p=t;" leads to "p points-to t" or "p points-to
+  * t[0]" or "p points-to t[0][0][0]". Two different criteria can be
+  * used: the compatibiliy of the pointer type and the pointed cell
+  * type, or the equality of the pointer value and of the pointed cell
+  * address. 
+  *
+  * In the first case, t->t[0]->t[0][0]->t[0][0][0].
+  *
+  * In the second case, t->t[0][0][0], t[0]->t[0][0][0], t[0][0]->t[0][0][0].
   *
   * FI: I do not trust this function. It is already too long. And I am
   * not confident the case disjunction is correct/well chosen.
@@ -484,102 +536,55 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
   // FI: to be checked otherwise?
   //expression rhs = expression_undefined;
   if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
-    // FI: to be seen with AM
-    //pips_internal_error("Not implemented yet.\n");
-    //sinks = array_to_constant_paths(rhs, in);
     /* Two proper possibilities: an array of pointers fully subscribed
        or any other kind of array partially subscribed. And an
        unsuitable one: an integer value... */
-      int nd = NumberOfDimension(e);
-      int rd = (int) gen_length(sl);
-      if(nd>rd) {
-	/* No matter what, the target is obtained by adding a 0 subscript */
+    int nd = NumberOfDimension(e);
+    int rd = (int) gen_length(sl);
+    if(nd>rd) {
+      /* No matter what, the target is obtained by adding a 0 subscript */
+      reference nr = copy_reference(r);
+      cell nc = make_cell_reference(nr);
+      for(int i=rd; eval_p && i<nd; i++) { // FI: not efficient
+	expression ze = int_to_expression(0);
+	reference_indices(nr) = gen_nconc(reference_indices(nr),
+					  CONS(EXPRESSION, ze, NIL));
+	i = nd; // to be type compatible
+      }
+      sinks = CONS(CELL, nc, NIL);
+    }
+    else if(nd==rd) {
+      // FI: eval_p is not used here...
+      cell nc = make_cell_reference(copy_reference(r));
+      sinks = CONS(CELL, nc, NIL);
+    }
+    else { // rd is too big
+      // Could be a structure with field accesses expressed as indices
+      type et = ultimate_type(entity_type(e));
+      if(struct_type_p(et)) {
 	reference nr = copy_reference(r);
 	cell nc = make_cell_reference(nr);
-	for(int i=rd; i<nd; i++) { // FI: not efficient
+	if(eval_p) {
+	  sinks = source_to_sinks(nc, in, true);
+	  /*
 	  expression ze = int_to_expression(0);
 	  reference_indices(nr) = gen_nconc(reference_indices(nr),
 					    CONS(EXPRESSION, ze, NIL));
+	  */
 	}
-	sinks = CONS(CELL, nc, NIL);
-      }
-      else if(nd==rd) {
-	cell nc = make_cell_reference(copy_reference(r));
-	sinks = CONS(CELL, nc, NIL);
-
-	// FI: no indirection here
-	// sinks = source_to_sinks(nc, in, true);
-	// free_cell(nc);
-
-	// FI: the decision about the legality of the assignment
-	// cannot be made down here. Anything can be a sink.
-	/*
-	type et = ultimate_type(entity_type(e));
-	if( pointer_type_p(et)) {
-	  cell nc = make_cell_reference(copy_reference(r));
-	  sinks = source_to_sinks(nc, in, true);
-	  free_cell(nc);
-	}
-	else if(integer_type_p(et)) {
-	  pips_user_warning("Pointer made from integer without a cast\n");
-	  cell nc = make_anywhere_cell(et);
+	else
 	  sinks = CONS(CELL, nc, NIL);
-	}
-	else {
-	  pips_user_error("Illegal value for a pointer. Should be a lhs.\n");
-	}
-	*/
       }
-      else { // rd is too big
+      else {
 	pips_user_error("Too many subscript expressions for array \"%s\".\n",
 			entity_user_name(e));
       }
+    }
   }
   else {
     /* scalar case, rhs is already a lvalue */
     if(scalar_type_p(ultimate_type(entity_type(e)))) {
-    // FI: I do not think this is the right place at all.
-    // FI: The sink of a reference does not depend (much) on in
-    // FI: counter-example a[p-q]...
-#if 0
-    /* add points-to relations on demand for global pointers and
-       top-level entities */
-    if( pointer_type_p(ultimate_type(entity_type(e)) )) {
-      if( top_level_entity_p(e) || formal_parameter_p(e) ) {
-
-	// FI: the piece of code below checks if e is at least the
-	// source of one arcs in pt_map in. If not, a new arc is
-	// created in another pt_map and the union of both is returned.
-	// FI: this could be a function and this could be simplified
-
-	// FI->AM: either it's a persistant reference or reference r
-	// must be copied. I chose the copy option
-	cell nc = make_cell_reference(copy_reference(r));
-	if (!source_in_pt_map_p(nc, in)) {
-	  // FI->AM: in spite of the name, seems to handle globals as well
-	  pt_map tmp = formal_points_to_parameter(nc);
-	  // FI: lots of trouble here
-	  in = union_of_pt_maps(in, in, tmp);
-	  // FI: Amira says that the free is shallow...
-	  clear_pt_map(tmp);
-	  free_pt_map(tmp);
-	}
-	else {
-	  // FI->AM: you have to free the cell without freeing the reference...
-	  // cell_reference(nc) = reference_undefined;
-	  free_cell(nc);
-	}
-      }
-#endif
-
-      /* FI/FC : I dropped the current statement from many signature,
-	 assuming it is not necessary to exploit in because we are
-	 dealing only for the current statement and because we do no
-	 need an involved statement. However, this may not be
-	 compatible with the current data structure... To be checked
-	 with Amira and Fabien. */
-      // sinks = expression_to_constant_paths(statement_undefined, rhs, in);
-	cell nc = make_cell_reference(copy_reference(r));
+      cell nc = make_cell_reference(copy_reference(r));
       if(eval_p) {
 	// FI: we have a pointer. It denotes another location.
 	sinks = source_to_sinks(nc, in, true);
@@ -592,16 +597,17 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     }
     else if(array_type_p(ultimate_type(entity_type(e)))) { // FI: not OK with typedef
       /* An array name can be used as pointer constant */
-      /* We should add null indices accordinng to its number of dimensions */
+      /* We should add null indices according to its number of dimensions */
       int n = NumberOfDimension(e);
       int rd = (int) gen_length(reference_indices(r));
       int i;
       reference nr = copy_reference(r);
       // FI: not efficient
-      for(i=rd; i<n; i++) {
+      for(i=rd; eval_p && i<n; i++) {
 	reference_indices(nr) =
 	  gen_nconc(reference_indices(nr),
 		    CONS(EXPRESSION, int_to_expression(0), NIL));
+	i = n; // to be type compatible
       }
       cell nc = make_cell_reference(nr);
       sinks = CONS(CELL, nc, NIL);

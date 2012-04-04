@@ -520,15 +520,19 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   /* Change the "lhs" into a constant memory path using current
    * points-to information pt_out.
    */
-  list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+  //list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
+  list L = expression_to_points_to_sinks(lhs, pt_out, false);
 
   /* Retrieve the memory locations that might be reached by the rhs
    *
    * Update the calling context by adding new stubs linked directly or
    * indirectly to the formal parameters and global variables if
-   * necessary
+   * necessary.
    */
   list R = expression_to_points_to_sinks(rhs,pt_out, true);
+
+  pips_assert("Left hand side reference list is not empty.\n", !ENDP(L));
+  pips_assert("Right hand side reference list is not empty.\n", !ENDP(R));
 
   pt_out = list_assignment_to_points_to(L, R, pt_out);
 
@@ -628,31 +632,74 @@ pt_map struct_assignment_to_points_to(expression lhs,
   FOREACH(CELL, lc, L) {
     bool l_to_be_freed;
     type lt = cell_to_type(lc, &l_to_be_freed);
+    entity le = reference_variable(cell_any_reference(lc));
     FOREACH(CELL, rc, R) {
       bool r_to_be_freed;
       type rt = cell_to_type(rc, &r_to_be_freed);
-      pips_assert("Both types are struct",
-		  struct_type_p(lt) && struct_type_p(rt));
-      pips_assert("Both type are equal", type_equal_p(lt, rt));
-      entity ste = basic_derived(variable_basic(type_variable(lt)));
-      type st = entity_type(ste); // structure type
-      list fl = type_struct(st); // field list
-      FOREACH(ENTITY, f, fl) {
-	type ft = entity_type(f); // field type
-	if(pointer_type_p(ft) || struct_type_p(ft)) {
-	  reference lr = copy_reference(cell_any_reference(lc));
-	  reference rr = copy_reference(cell_any_reference(rc));
-	  reference_add_field_dimension(lr, f);
-	  reference_add_field_dimension(rr, f);
-	  expression nlhs = reference_to_expression(lr);
-	  expression nrhs = reference_to_expression(rr);
-	  pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-	  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
-	  // free a list of objects of type xxx with one call
-	  free_expression(lhs), free_expression(rhs);
+      entity re = reference_variable(cell_any_reference(rc));
+      if(entity_abstract_location_p(le)) {
+	if(entity_abstract_location_p(re)) {
+	  pips_internal_error("Not implemented yet.");
 	}
 	else {
-	  ; // Do nothing
+	  pips_internal_error("Not implemented yet.");
+	}
+      }
+      else {
+	if(entity_abstract_location_p(re)) {
+	  // All fields are going to point to this abstract
+	  // location... or to the elements pointed by this abstract
+	  // location
+	  pips_assert("Left type is struct",
+		      struct_type_p(lt));
+	  entity ste = basic_derived(variable_basic(type_variable(lt)));
+	  type st = entity_type(ste); // structure type
+	  list fl = type_struct(st); // field list
+	  FOREACH(ENTITY, f, fl) {
+	    type ft = entity_type(f); // field type
+	    if(pointer_type_p(ft) || struct_type_p(ft)) {
+	      reference lr = copy_reference(cell_any_reference(lc));
+	      reference rr = copy_reference(cell_any_reference(rc));
+	      reference_add_field_dimension(lr, f);
+	      reference_add_field_dimension(rr, f);
+	      expression nlhs = reference_to_expression(lr);
+	      expression nrhs = reference_to_expression(rr);
+	      pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+	      // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+	      // free a list of objects of type xxx with one call
+	      free_expression(lhs), free_expression(rhs);
+	    }
+	    else {
+	      ; // Do nothing
+	    }
+	  }
+	}
+	else {
+	  pips_assert("Both types are struct",
+		      struct_type_p(lt) && struct_type_p(rt));
+	  pips_assert("Both type are equal", type_equal_p(lt, rt));
+	  entity ste = basic_derived(variable_basic(type_variable(lt)));
+	  type st = entity_type(ste); // structure type
+	  list fl = type_struct(st); // field list
+	  FOREACH(ENTITY, f, fl) {
+	    type ft = entity_type(f); // field type
+	    if(pointer_type_p(ft) || struct_type_p(ft)) {
+	      reference lr = copy_reference(cell_any_reference(lc));
+	      reference rr = copy_reference(cell_any_reference(rc));
+	      reference_add_field_dimension(lr, f);
+	      reference_add_field_dimension(rr, f);
+	      expression nlhs = reference_to_expression(lr);
+	      expression nrhs = reference_to_expression(rr);
+	      pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+	      // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+	      // free a list of objects of type xxx with one call
+	      // The references within the expressions are now part of pt_out
+	      // free_expression(lhs), free_expression(rhs);
+	    }
+	    else {
+	      ; // Do nothing
+	    }
+	  }
 	}
       }
     }

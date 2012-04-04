@@ -493,7 +493,10 @@ bool effects_reference_sharing_p(list el, bool persistant_p) {
  persistant pointer. (re-used from original non-generic function
  anywhere_effect.)
 
-   Action a is integrated in the new effect (aliasing).
+ Action a is integrated in the new effect (aliasing).
+ 
+ FI: the type should always be passed and ignored according to
+ ALIAS_ACROSS_TYPES
  */
 effect make_anywhere_effect(action act)
 {

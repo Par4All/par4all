@@ -4622,6 +4622,26 @@ type type_to_pointed_type(type t)
   return upt;
 }
 
+/* returns t if t is not a functoional type, and the returned type if t is
+   a functional type. Type definitions are replaced. If t is undefined,
+   returns a type_undefined. */
+type type_to_returned_type(type t)
+{
+  type urt = type_undefined;
+
+  if(!type_undefined_p(t)) {
+    type ut = ultimate_type(t);
+    type rt = ut;
+
+    if(type_functional_p(ut))
+      rt = functional_result(type_functional(ut));
+
+    if(!type_undefined_p(rt))
+      urt = ultimate_type(rt);
+  }
+  return urt;
+}
+
 /* returns t if t is not a pointer type, and the first indirectly
    pointed type that is not a pointer if t is
    a pointer type. Type definitions are replaced. */

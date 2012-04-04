@@ -190,6 +190,9 @@ entity create_stub_entity(entity e, type t)
  * POINTS_TO_MODULE_NAME.
  *
  * FI: Is it sufficient to generate stubs for foo(int *p) and bar(double *p)?
+ *
+ * FI: no, it is useless, since they are created on demand; but this
+ * function is reused on demand.
  */
 points_to create_stub_points_to(cell c, type t,
 				__attribute__ ((__unused__)) basic b)
@@ -208,8 +211,8 @@ points_to create_stub_points_to(cell c, type t,
 
   entity formal_parameter = create_stub_entity(e, t);
 
-  bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-  if(type_strict_p)
+  bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(!type_strict_p)
     sink_ref = make_reference(formal_parameter,
 			      CONS(EXPRESSION, int_to_expression(0), NIL));
   else

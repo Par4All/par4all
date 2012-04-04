@@ -148,7 +148,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   pips_debug(1, "declaration statement \n");
   
   FOREACH(ENTITY, e, l_decls) {
-    if(pointer_type_p(ultimate_type(entity_type(e)))) {
+    type et = ultimate_type(entity_type(e));
+    if(pointer_type_p(et) || struct_type_p(et)) {
       if( !storage_rom_p(entity_storage(e)) ) {
 	// FI: could be simplified with variable_initial_expression()
 	value v_init = entity_initial(e);

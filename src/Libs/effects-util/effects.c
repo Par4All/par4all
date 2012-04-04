@@ -278,6 +278,7 @@ bool anywhere_effect_p(effect e)
   return anywhere_p;
 }
 
+
 effect heap_effect(entity m, action ac)
 {
   entity heap = FindEntity(entity_local_name(m), HEAP_AREA_LOCAL_NAME );
