@@ -1,6 +1,20 @@
 Here are given small examples showing how to use p4a, tpips and PyPS to
 parallelize some code.
 
+If you do not have write access to this directory, YOU SHOULD NOT RUN
+Par4All AS ROOT with sudo or whatever, since it may create a security
+issue.
+
+Instead, copy its content (with cp -a for example) in some place where you
+can write into and try the examples from this new location.
+
+For example, starting from a standard installation, if you want a copy of
+the examples in your home directory and work with them, you can try:
+
+  cp -a /usr/local/par4all/examples ~
+  cd ~/examples
+
+
 People only interested in quick results should look only at examples/P4A
 using p4a.
 
