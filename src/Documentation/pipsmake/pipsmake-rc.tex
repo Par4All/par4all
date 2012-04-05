@@ -5105,7 +5105,8 @@ must_regions                    > MODULE.proper_regions
 \end{PipsMake}
 
 \begin{PipsPass}{must_regions_with_points_to}
-This function computes the \verb|MUST| regions in a module.
+This function computes the \verb|MUST| regions in a module using
+  information on pointer targets given by points-to.
 \end{PipsPass}
 \begin{PipsMake}
 must_regions_with_points_to     > MODULE.proper_regions
@@ -5114,10 +5115,30 @@ must_regions_with_points_to     > MODULE.proper_regions
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
+        < MODULE.points_to
         < MODULE.transformers
         < MODULE.preconditions
         < CALLEES.summary_regions
 \end{PipsMake}
+
+\begin{PipsPass}{must_regions_with_pointer_values}
+  This function computes the \verb|MUST| regions in a module using
+  information on pointer targets given by pointer values.
+\end{PipsPass}
+\begin{PipsMake}
+must_regions_with_pointer_values > MODULE.proper_regions
+                                > MODULE.regions
+                                > MODULE.inv_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.simple_pointer_values
+        < MODULE.transformers
+        < MODULE.preconditions
+        < CALLEES.summary_regions
+\end{PipsMake}
+
+
 
 \subsection{Summary READ/WRITE Convex Array Regions}
 \label{subsubsection-summary-regions}
