@@ -1,0 +1,88 @@
+
+PROPER  EFFECTS
+
+int main(void)
+{
+   list l;
+//             <    is read   >: nil
+//             <    is written>: l
+   l = nil;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nil _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   l = list_cons(1.0, nil);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   l = list_cons(2.0, l);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   l = list_cons(3.0, l);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+   int n = list_len(l);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+   list_free(l);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// nil -> _nil_0[0] , EXACT
+
+int main(void)
+{
+
+// Points To: none
+
+   list l;
+
+// Points To:
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   l = nil;
+
+// Points To:
+// l -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   l = list_cons(1.0, nil);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   l = list_cons(2.0, l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   l = list_cons(3.0, l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   int n = list_len(l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   list_free(l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   return 0;
+}

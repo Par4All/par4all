@@ -1,0 +1,73 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   FILE *s;
+   char *fmt;
+   char *ch;
+   int tab[5];
+   int r;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   r = varargs03(s, fmt, ch, tab);
+//             <    is read   >: r
+   return r;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   FILE *s;
+
+// Points To:
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   char *fmt;
+
+// Points To:
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   char *ch;
+
+// Points To:
+// ch -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int tab[5];
+
+// Points To:
+// ch -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int r;
+
+// Points To:
+// ch -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   r = varargs03(s, fmt, ch, tab);
+
+// Points To:
+// ch -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return r;
+}

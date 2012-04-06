@@ -1,0 +1,102 @@
+
+PROPER  EFFECTS
+
+int main(void)
+{
+//             <    is read   >: nil
+//             <    is written>: l
+   list l = nil;
+   int n;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   fscanf(stdin, "%d", &n);
+//             <    is read   >: n
+   if (n>0)
+//             <    is read   >: n
+//             <    is written>: n
+      while (n--)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l n _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+         l = list_cons((double) n, l);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+   n = list_len(l);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: n stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   fprintf(stdout, "n=%d", n);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// nil -> _nil_0[0] , EXACT
+
+int main(void)
+{
+
+// Points To: none
+
+   list l = nil;
+
+// Points To:
+// l -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   int n;
+
+// Points To:
+// l -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   fscanf(stdin, "%d", &n);
+
+// Points To:
+// l -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+   if (n>0)
+
+// Points To:
+// l -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+      while (n--)
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// l -> _nil_0[0] , MAY
+// nil -> _nil_0[0] , EXACT
+
+         l = list_cons((double) n, l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// l -> _nil_0[0] , MAY
+// nil -> _nil_0[0] , EXACT
+
+   n = list_len(l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// l -> _nil_0[0] , MAY
+// nil -> _nil_0[0] , EXACT
+
+   fprintf(stdout, "n=%d", n);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// l -> _nil_0[0] , MAY
+// nil -> _nil_0[0] , EXACT
+
+   return 0;
+}

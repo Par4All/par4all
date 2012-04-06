@@ -1,0 +1,34 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
+
+// Points To: none
+
+   return 0;
+}

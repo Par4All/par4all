@@ -1,0 +1,80 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i;
+   int *p;
+   int a[10];
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int a[10];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+// q -> a[*] , MAY
+
+      int *q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+// q -> a[*] , MAY
+
+      q = &a[i];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+// q -> a[*] , MAY
+
+      p = q;
+   }
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+
+   return 0;
+}

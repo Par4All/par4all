@@ -1,0 +1,37 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *a;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+   a = foo();
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *a;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a = foo();
+
+// Points To:
+// a -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   return 0;
+}

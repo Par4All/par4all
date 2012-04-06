@@ -1,0 +1,66 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p[10];
+   int a[10];
+//             <    is read   >: i
+   do {
+//             <    is read   >: i
+//             <    is written>: p[i]
+      p[i] = &a[i];
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<10);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *p[10];
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   do {
+
+// Points To:
+// p[*] -> a[*] , EXACT
+
+      p[i] = &a[i];
+
+// Points To:
+// p[*] -> a[*] , EXACT
+
+      i++;
+   }
+   while (i<10);
+
+// Points To:
+// p[*] -> a[*] , EXACT
+
+   return 0;
+}
