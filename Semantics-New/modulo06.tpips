@@ -8,10 +8,14 @@ echo
 echo Source code with transformers
 echo
 
+# This not enough because we need interprocedural information
 # setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[modulo06]
+
+# To capture the impact of the modulo operator
+apply REFINE_TRANSFORMERS[modulo06]
 
 echo
 echo Source code with preconditions
