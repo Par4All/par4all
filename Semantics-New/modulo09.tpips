@@ -15,7 +15,7 @@ echo
 echo Source code with transformers
 echo
 
-# setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[modulo09]
