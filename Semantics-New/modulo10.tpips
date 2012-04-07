@@ -1,0 +1,48 @@
+delete modulo10
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create modulo10 modulo10.c
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
+echo
+echo Source code unrolled
+echo
+setproperty LOOP_LABEL "unroll"
+setproperty UNROLL_RATE 4
+apply UNROLL[kernel]
+
+
+
+
+echo
+echo Source code with transformers
+echo
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[kernel]
+
+echo
+echo Source code with preconditions
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[kernel]
+
+
+echo
+echo Source code with preconditions after inlining !
+echo
+apply INLINING[kernel]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+
+close
+#delete modulo05
+quit
