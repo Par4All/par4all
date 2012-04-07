@@ -1,0 +1,32 @@
+delete modulo09
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create modulo09 modulo09.c
+
+echo
+echo Source code unrolled
+echo
+setproperty LOOP_LABEL "unroll"
+setproperty UNROLL_RATE 4
+apply UNROLL[modulo09]
+
+echo
+echo Source code with transformers
+echo
+
+# setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[modulo09]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[modulo09]
+
+close
+#delete modulo05
+quit
