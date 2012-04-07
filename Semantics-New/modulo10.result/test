@@ -1,0 +1,437 @@
+
+Source code unrolled
+
+
+Source code with transformers
+
+
+//  T() {}
+
+void kernel(unsigned int ni, unsigned int nj, unsigned int nk, unsigned int nl, float alpha, float beta, float A[ni][nk], float B[nk][nj], float D[ni][nl])
+{
+   //PIPS generated variable
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T() {}
+
+   register float D_0;
+   //PIPS generated variable
+
+//  T(LU_IB0,LU_IND0,LU_NUB0) {}
+
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+//  T(LU_IB0,LU_IND0,LU_NUB0,i,j) {0<=i, i+1<=ni}
+
+   for(i = 0; i < ni; i += 1)
+
+//  T(LU_IB0,LU_IND0,LU_NUB0,j) {0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+      for(j = 0; j < nj; j += 1) {
+
+//  T(k) {0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+         int k;
+
+//  T(LU_IB0,LU_IND0,LU_NUB0,k) {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3,
+//    LU_IB0<=LU_IND0, LU_NUB0<=LU_IND0, LU_NUB0<=k, 0<=i, i+1<=ni,
+//    0<=j, j+1<=nj, 0<=k}
+
+         if (i<=ni-1&&j<=nj-1) {
+
+//  T() {0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+            D_0 = 0;
+
+//  T(LU_NUB0) {LU_NUB0==nk, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+unroll:            LU_NUB0 = (nk-1-0+1)/1;
+
+//  T(LU_IB0) {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, 0<=i, i+1<=ni,
+//    0<=j, j+1<=nj}
+
+            LU_IB0 = MOD(LU_NUB0, 4);
+
+//  T(LU_IND0) {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3,
+//    LU_IND0+1<=LU_IB0, 0<=LU_IND0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+            for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IND0+1<=LU_IB0,
+//    0<=LU_IND0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+               D_0 += alpha*A[i][LU_IND0*1+0]*B[LU_IND0*1+0][j];
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IND0+1<=LU_IB0,
+//    0<=LU_IND0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+l99999:               ;
+            }
+
+//  T(LU_IND0) {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IB0<=LU_IND0#init, 2LU_IND0#init<=LU_IB0+3,
+//    LU_IND0+1<=LU_NUB0, 0<=LU_IND0#init, 0<=i, i+1<=ni, 0<=j,
+//    j+1<=nj}
+
+            for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IND0+1<=LU_NUB0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+               D_0 += alpha*A[i][(LU_IND0+0)*1+0]*B[(LU_IND0+0)*1+0][j];
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IND0+1<=LU_NUB0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+               D_0 += alpha*A[i][(LU_IND0+1)*1+0]*B[(LU_IND0+1)*1+0][j];
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IND0+1<=LU_NUB0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+               D_0 += alpha*A[i][(LU_IND0+2)*1+0]*B[(LU_IND0+2)*1+0][j];
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IND0+1<=LU_NUB0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+               D_0 += alpha*A[i][(LU_IND0+3)*1+0]*B[(LU_IND0+3)*1+0][j];
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_IND0+1<=LU_NUB0, 0<=i, i+1<=ni, 0<=j, j+1<=nj}
+
+l99998:               ;
+            }
+
+//  T(k) {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_NUB0<=LU_IND0, LU_NUB0<=k, 0<=i, i+1<=ni, 0<=j, j+1<=nj,
+//    0<=k}
+
+            k = 0+MAX0(LU_NUB0, 0)*1;
+         }
+
+//  T() {LU_NUB0==nk, 0<=LU_IB0+3, LU_IB0<=3, LU_IB0<=LU_IND0,
+//    LU_NUB0<=LU_IND0, LU_NUB0<=k, 0<=i, i+1<=ni, 0<=j, j+1<=nj,
+//    0<=k}
+
+         D[i][j] = D_0;
+      }
+}
+
+Source code with preconditions
+
+
+//  P() {ni==1024, nj==1024, nk==1024, nl==1024}
+
+void kernel(unsigned int ni, unsigned int nj, unsigned int nk, unsigned int nl, float alpha, float beta, float A[ni][nk], float B[nk][nj], float D[ni][nl])
+{
+   //PIPS generated variable
+
+//  P() {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   int i, j;
+
+//  P(i,j) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   register float D_0;
+   //PIPS generated variable
+
+//  P(i,j) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j) {ni==1024, nj==1024, nk==1024,
+//    nl==1024}
+
+   for(i = 0; i < ni; i += 1)
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j) {ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=i, i<=1023}
+
+      for(j = 0; j < nj; j += 1) {
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j) {ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=i, i<=1023, 0<=j, j<=1023}
+
+         int k;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=i, i<=1023, 0<=j, j<=1023}
+
+         if (i<=ni-1&&j<=nj-1) {
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=i, i<=1023, 0<=j, j<=1023}
+
+            D_0 = 0;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=i, i<=1023, 0<=j, j<=1023}
+
+unroll:            LU_NUB0 = (nk-1-0+1)/1;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_NUB0==1024, ni==1024,
+//    nj==1024, nk==1024, nl==1024, 0<=i, i<=1023, 0<=j, j<=1023}
+
+            LU_IB0 = MOD(LU_NUB0, 4);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=i, i<=1023, 0<=j,
+//    j<=1023}
+
+            for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+//  P() {0==-1}
+
+               D_0 += alpha*A[i][LU_IND0*1+0]*B[LU_IND0*1+0][j];
+
+//  P() {0==-1}
+
+l99999:               ;
+            }
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_IND0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=i,
+//    i<=1023, 0<=j, j<=1023}
+
+            for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=LU_IND0,
+//    LU_IND0<=1023, 0<=i, i<=1023, 0<=j, j<=1023}
+
+               D_0 += alpha*A[i][(LU_IND0+0)*1+0]*B[(LU_IND0+0)*1+0][j];
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=LU_IND0,
+//    LU_IND0<=1023, 0<=i, i<=1023, 0<=j, j<=1023}
+
+               D_0 += alpha*A[i][(LU_IND0+1)*1+0]*B[(LU_IND0+1)*1+0][j];
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=LU_IND0,
+//    LU_IND0<=1023, 0<=i, i<=1023, 0<=j, j<=1023}
+
+               D_0 += alpha*A[i][(LU_IND0+2)*1+0]*B[(LU_IND0+2)*1+0][j];
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=LU_IND0,
+//    LU_IND0<=1023, 0<=i, i<=1023, 0<=j, j<=1023}
+
+               D_0 += alpha*A[i][(LU_IND0+3)*1+0]*B[(LU_IND0+3)*1+0][j];
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=LU_IND0,
+//    LU_IND0<=1023, 0<=i, i<=1023, 0<=j, j<=1023}
+
+l99998:               ;
+            }
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 1024<=LU_IND0,
+//    LU_IND0<=1027, 0<=i, i<=1023, 0<=j, j<=1023}
+
+            k = 0+MAX0(LU_NUB0, 0)*1;
+         }
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,j,k) {LU_IB0==0, LU_NUB0==1024,
+//    k==1024, ni==1024, nj==1024, nk==1024, nl==1024, 1024<=LU_IND0,
+//    LU_IND0<=1027, 0<=i, i<=1023, 0<=j, j<=1023}
+
+         D[i][j] = D_0;
+      }
+}
+
+Source code with preconditions after inlining !
+
+
+//  P() {}
+
+int main(int argc, char **argv)
+{
+
+//  P() {}
+
+   int ni = 1024;
+
+//  P(ni) {ni==1024}
+
+   int nj = 1024;
+
+//  P(ni,nj) {ni==1024, nj==1024}
+
+   int nk = 1024;
+
+//  P(ni,nj,nk) {ni==1024, nj==1024, nk==1024}
+
+   int nl = 1024;
+
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   float alpha;
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   float beta;
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   float A[ni][nk];
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   float B[nk][nj];
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   float D[ni][nl];
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   
+   /* Initialize array(s). */
+   
+   
+   
+   init_array(ni, nj, nk, nl, &alpha, &beta, A, B, D);
+   {
+      
+      
+      /* Run kernel. */
+      
+      
+      
+      
+      //PIPS generated variable
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+      int i, j;
+
+//  P(0`1`i,j,ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+      register float D_0;
+      //PIPS generated variable
+
+//  P(0`1`i,j,ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+      int LU_NUB0, LU_IB0, LU_IND0;
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,ni,nj,nk,nl) {ni==1024, nj==1024,
+//    nk==1024, nl==1024}
+
+      for(i = 0; i <= ni-1; i += 1)
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,ni,nj,nk,nl) {ni==1024, nj==1024,
+//    nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023}
+
+         for(j = 0; j <= nj-1; j += 1) {
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,ni,nj,nk,nl) {ni==1024, nj==1024,
+//    nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023, 0<=j, j<=1023}
+
+            int k;
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {ni==1024,
+//    nj==1024, nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023, 0<=j,
+//    j<=1023}
+
+            if (i<=ni-1&&j<=nj-1) {
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {ni==1024,
+//    nj==1024, nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023, 0<=j,
+//    j<=1023}
+
+               D_0 = 0;
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {ni==1024,
+//    nj==1024, nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023, 0<=j,
+//    j<=1023}
+
+               LU_NUB0 = (nk-1-0+1)/1;
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_NUB0==1024,
+//    ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i, 0`1`i<=1023,
+//    0<=j, j<=1023}
+
+               LU_IB0 = MOD(LU_NUB0, 4);
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 0<=j, j<=1023}
+
+               for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
+
+//  P() {0==-1}
+
+                  D_0 += alpha*A[i][LU_IND0*1+0]*B[LU_IND0*1+0][j];
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_IND0==0, LU_NUB0==1024, ni==1024, nj==1024, nk==1024,
+//    nl==1024, 0<=0`1`i, 0`1`i<=1023, 0<=j, j<=1023}
+
+               for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 0<=LU_IND0, LU_IND0<=1023, 0<=j, j<=1023}
+
+                  D_0 += alpha*A[i][(LU_IND0+0)*1+0]*B[(LU_IND0+0)*1+0][j];
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 0<=LU_IND0, LU_IND0<=1023, 0<=j, j<=1023}
+
+                  D_0 += alpha*A[i][(LU_IND0+1)*1+0]*B[(LU_IND0+1)*1+0][j];
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 0<=LU_IND0, LU_IND0<=1023, 0<=j, j<=1023}
+
+                  D_0 += alpha*A[i][(LU_IND0+2)*1+0]*B[(LU_IND0+2)*1+0][j];
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 0<=LU_IND0, LU_IND0<=1023, 0<=j, j<=1023}
+
+                  D_0 += alpha*A[i][(LU_IND0+3)*1+0]*B[(LU_IND0+3)*1+0][j];
+               }
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, ni==1024, nj==1024, nk==1024, nl==1024, 0<=0`1`i,
+//    0`1`i<=1023, 1024<=LU_IND0, LU_IND0<=1027, 0<=j, j<=1023}
+
+               k = 0+MAX0(LU_NUB0, 0)*1;
+            }
+
+//  P(0`1`i,LU_IB0,LU_IND0,LU_NUB0,j,k,ni,nj,nk,nl) {LU_IB0==0,
+//    LU_NUB0==1024, k==1024, ni==1024, nj==1024, nk==1024, nl==1024,
+//    0<=0`1`i, 0`1`i<=1023, 1024<=LU_IND0, LU_IND0<=1027, 0<=j,
+//    j<=1023}
+
+            D[i][j] = D_0;
+         }
+   }
+   {
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+      int i;
+
+//  P(0`6`i,ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+
+      for(i = 0; i <= 9; i += 1)
+
+//  P(0`6`i,ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024,
+//    0<=0`6`i, 0`6`i<=9}
+
+         printf("%f\n", D[i][i]);
+   }
+
+//  P(ni,nj,nk,nl) {ni==1024, nj==1024, nk==1024, nl==1024}
+
+   return 0;
+}

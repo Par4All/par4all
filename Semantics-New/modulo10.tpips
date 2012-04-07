@@ -1,3 +1,14 @@
+# Issue: if REFINE_TRANSFORMERS is not applied before getting the
+# preconditions, the preconditions are more precise after inlining
+
+# This is logical because the inlining implies a recomputation of the
+# transformers and because the interprocedural preconditions are then
+# available and because the transformers must be computed in context,
+# i.e. using whatever precondition is available.
+
+# FI: I have to think more about the in context option and the
+# availability of the preconditions.
+
 delete modulo10
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -31,6 +42,7 @@ display PRINTED_FILE[kernel]
 echo
 echo Source code with preconditions
 echo
+apply REFINE_TRANSFORMERS[%ALLFUNC]
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[kernel]
 
