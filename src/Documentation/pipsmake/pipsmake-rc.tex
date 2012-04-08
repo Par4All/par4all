@@ -4244,7 +4244,7 @@ SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES FALSE
 SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
 \end{PipsProp}
 
-\subsubsection{Array declarations and accesses}
+\subsubsection{Array Declarations and Accesses}
 \label{subsubsection:array-declarations-and-accesses}
 \index{SEMANTICS\_TRUST\_ARRAY\_DECLARATIONS}
 \index{SEMANTICS\_TRUST\_ARRAY\_REFERENCES}
@@ -4271,6 +4271,22 @@ quite a lot without adding any useful information.
 
 \begin{PipsProp}{SEMANTICS_TRUST_ARRAY_REFERENCES}
 SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
+\end{PipsProp}
+
+\subsubsection{Type Information}
+\label{subsubsection:type-information}
+\index{SEMANTICS\_USE\_TYPE\_INFORMATION}
+
+Type range information is difficult to turn into useful
+information. It implies some handling of wrap-around behavior. It is
+likely to cause lots of overflows. This is experimental. By default
+this property is not set.
+
+This property is turned off by default because it might slow down PIPS
+quite a lot without adding any useful information.
+
+\begin{PipsProp}{SEMANTICS_USE_TYPE_INFORMATION}
+SEMANTICS_USE_TYPE_INFORMATION FALSE
 \end{PipsProp}
 
 \subsubsection{Flow Sensitivity}
@@ -5407,7 +5423,7 @@ alias_classes > MODULE.alias_classes
         < MODULE.alias_lists
 \end{PipsMake}
 
-\subsection{Init  Points to Analysis}
+\subsection{Init Points-to Analysis}
 
 \begin{PipsPass}{init_points_to_analysis}
 This phase generates synthetic points-to relations for formal
