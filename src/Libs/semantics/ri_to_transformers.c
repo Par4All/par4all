@@ -2291,6 +2291,13 @@ transformer statement_to_transformer(
       transformer ipre = transformer_range(post);
       transformer it = transformer_undefined;
 
+      // FI: this should not be duplicated. Temporary fix for modulo07.c
+      /* add type information */
+      if(get_bool_property("SEMANTICS_USE_TYPE_INFORMATION")) {
+	transformer_add_type_information(nt);
+	/* nt = transformer_normalize(nt, 0); */
+      }
+
       ifdebug(8) {
 	pips_debug(8, "Statement local preconditions due to declarations:");
 	print_transformer(ipre);
