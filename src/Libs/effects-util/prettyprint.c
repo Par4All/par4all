@@ -350,26 +350,26 @@ int points_to_compare_cells(const void * vpt1, const void * vpt2)
 	  if(expression_constant_p(se1) && expression_constant_p(se2)){
 	    int i1 = expression_to_int(se1);
 	    int i2 = expression_to_int(se2);
-	    i = i2>i1? 1 : (i2<i1? -1 : 0);
-	    if(i==0){
-	      i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
-	      for(;i==0 && !ENDP(sli1); POP(sli1), POP(sli2)){
-		expression sei1 = EXPRESSION(CAR(sli1));
-		expression sei2 = EXPRESSION(CAR(sli2));
-		if(expression_constant_p(sei1) && expression_constant_p(sei2)){
-		  int i1 = expression_to_int(sei1);
-		  int i2 = expression_to_int(sei2);
-		  i = i2>i1? 1 : (i2<i1? -1 : 0);
-		}else{
-		  string s1 = words_to_string(words_expression(se1, NIL));
-		  string s2 = words_to_string(words_expression(se2, NIL));
-		  i = strcmp(s1, s2);
-		}
-	      }
-	    }
+	    i = i2>i1? -11 : (i2<i1? 1 : 0);
 	  } else {
 	    string s1 = words_to_string(words_expression(se1, NIL));
 	    string s2 = words_to_string(words_expression(se2, NIL));
+	    i = strcmp(s1, s2);
+	  }
+	}
+	// if(i==0) {
+	// i = strcmp(entity_minimal_user_name(v1si), entity_minimal_user_name(v2si));
+	for(;i==0 && !ENDP(sli1); POP(sli1), POP(sli2)){
+	  expression sei1 = EXPRESSION(CAR(sli1));
+	  expression sei2 = EXPRESSION(CAR(sli2));
+	  if(expression_constant_p(sei1) && expression_constant_p(sei2)){
+	    int i1 = expression_to_int(sei1);
+	    int i2 = expression_to_int(sei2);
+	    i = i2>i1? -1 : (i2<i1? 1 : 0);
+	  } else {
+	    // FI: memory leak?
+	    string s1 = words_to_string(words_expression(sei1, NIL));
+	    string s2 = words_to_string(words_expression(sei2, NIL));
 	    i = strcmp(s1, s2);
 	  }
 	}

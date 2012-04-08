@@ -1493,7 +1493,7 @@ bool volatile_variable_p(entity v)
 }
 
 /* The variable may turn out to be a function */
-bool qualified_variable_p(entity v, int is_qualified)
+bool qualified_variable_p(entity v, unsigned int is_qualified)
 {
   bool qualified_p = false;
   type t = entity_type(v);

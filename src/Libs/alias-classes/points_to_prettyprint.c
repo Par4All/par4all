@@ -260,7 +260,7 @@ text text_points_to_relation(points_to pt_to)
 				NIL));
 	}
       else
-	pips_user_warning("unexpected points to relation undefined\n");
+	pips_user_warning("unexpected points-to relation undefined\n");
     }
   else
     tpt_to = make_text(NIL);

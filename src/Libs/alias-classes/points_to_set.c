@@ -189,16 +189,23 @@ bool cell_out_of_scope_p(cell c)
 /*print a points-to arc for debug*/
 void print_points_to(const points_to pt)
 {
-  cell source = points_to_source(pt);
-  cell sink = points_to_sink(pt);
-  approximation app = points_to_approximation(pt);
-  reference r1 = cell_to_reference(source);
-  reference r2 = cell_to_reference(sink);
+  if(points_to_undefined_p(pt))
+    (void) fprintf(stderr,"POINTS_TO UNDEFINED\n");
+  // For debugging with gdb, dynamic type checking
+  else if(points_to_domain_number(pt)!=points_to_domain)
+    (void) fprintf(stderr,"Arg. \"pt\"is not a points_to.\n");
+  else {
+    cell source = points_to_source(pt);
+    cell sink = points_to_sink(pt);
+    approximation app = points_to_approximation(pt);
+    reference r1 = cell_to_reference(source);
+    reference r2 = cell_to_reference(sink);
 
-  print_reference(r1);
-  fprintf(stderr,"->");
-  print_reference(r2);
-  fprintf(stderr," (%s)\n", approximation_to_string(app));
+    print_reference(r1);
+    fprintf(stderr,"->");
+    print_reference(r2);
+    fprintf(stderr," (%s)\n", approximation_to_string(app));
+  }
 }
 
 /* Print a set of points-to for debug */
@@ -264,6 +271,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       // FI: the type retrieval must be improved for arrays & Co
       points_to pt = create_stub_points_to(source, st, basic_undefined);
       pts = add_arc_to_pt_map(pt, pts);
+      add_arc_to_points_to_context(copy_points_to(pt));
       sinks = source_to_sinks(source, pts, false);
     }
     else if(static_global_variable_p(v)) {
@@ -271,6 +279,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       // FI: the type retrieval must be improved for arrays & Co
       points_to pt = create_stub_points_to(source, st, basic_undefined);
       pts = add_arc_to_pt_map(pt, pts);
+      add_arc_to_points_to_context(copy_points_to(pt));
       sinks = source_to_sinks(source, pts, false);
       /* cell nc = add_virtual_sink_to_source(source);
        * points_to npt = make_points_to(copy_cell(source), nc, may/must)
@@ -280,12 +289,13 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
     }
     else if(entity_stub_sink_p(v)) {
       //type ost = ultimate_type(entity_type(v));
-      bool to_be_freed;
+      bool to_be_freed; // FI: memory leak for the time being
       type rt = cell_to_type(source, &to_be_freed); // reference type
       if(pointer_type_p(rt)) {
 	type nst = type_to_pointed_type(rt);
 	points_to pt = create_stub_points_to(source, nst, basic_undefined);
 	pts = add_arc_to_pt_map(pt, pts);
+	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
       }
       else if(array_type_p(rt)) {

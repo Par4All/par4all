@@ -1210,13 +1210,11 @@ void fprint_expression(FILE * f, expression e)
 
 void print_expression(expression e)
 {
-  int dn = expression_domain_number(e);
-
-  // For debugging with gdb, dynamic type checking
-  if(dn!=expression_domain)
-    (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
-  else if(e==expression_undefined)
+  if(e==expression_undefined)
     (void) fprintf(stderr,"EXPRESSION UNDEFINED\n");
+  // For debugging with gdb, dynamic type checking
+  else if(expression_domain_number(e)!=expression_domain)
+    (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
   else {
     normalized n;
     (void) fprintf(stderr,"syntax = ");
@@ -1268,18 +1266,14 @@ void print_syntax(syntax s)
 
 void print_reference(reference r)
 {
-    int dn = reference_domain_number(r);
-
+  if(reference_undefined_p(r))
+    fprintf(stderr, "reference undefined\n");
   // For debugging with gdb, dynamic type checking
-  if(dn==reference_domain) {
-    if(reference_undefined_p(r))
-      fprintf(stderr, "reference undefined\n");
-    else {
-      print_words(stderr,words_reference(r, NIL));
-    }
-  }
-  else
+  else if(reference_domain_number(r)!=reference_domain)
     fprintf(stderr, "Not a Newgen \"reference\" object\n");
+  else {
+    print_words(stderr,words_reference(r, NIL));
+  }
 }
 
 void print_reference_list(list lr)
