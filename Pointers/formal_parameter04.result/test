@@ -48,7 +48,11 @@ int formal_parameter04(my_struct *p)
 POINTS TO
 
 
-// Points To IN: none
+// Points To IN:
+// _p_1.two -> _p_1_1 , EXACT
+// _p_1_1.two -> _p_1_1_1 , EXACT
+// _p_1_1_1.two -> _p_1_1_1_1 , EXACT
+// p -> _p_1 , EXACT
 
 
 // Points To OUT:

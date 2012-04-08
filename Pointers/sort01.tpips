@@ -1,12 +1,8 @@
-# Several problems, including for parsing of a_m_serial() and a_next()
-
-setenv WSPACE=ammp01
+setenv WSPACE=sort01
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
-# The purpose is to detect a user error...
-# setproperty ABORT_ON_USER_ERROR TRUE
-
+setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
@@ -21,7 +17,7 @@ echo
 echo PROPER  EFFECTS
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE
 
 
 
@@ -29,9 +25,8 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE
 
 close
-shell cat $WSPACE.database/Warnings
 delete $WSPACE
 quit

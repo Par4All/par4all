@@ -38,23 +38,36 @@ int assignment08(int a[10])
       int *b;
    } x, y;
 
-// Points To: none
+// Points To:
+// x.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int i, j;
 
-// Points To: none
+// Points To:
+// x.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    x.a = &i;
 
 // Points To:
+// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // x.a -> i , EXACT
+// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    x.b = &j;
 
 // Points To:
 // x.a -> i , EXACT
 // x.b -> j , EXACT
+// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    y = x;
 
