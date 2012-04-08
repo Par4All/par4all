@@ -55,3 +55,21 @@ cell make_anywhere_points_to_cell(type t __attribute__ ((unused)))
   cell c = make_cell_reference(r);
   return c;
 }
+
+bool formal_parameter_points_to_cell_p(cell c)
+{
+  bool formal_p = true;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  formal_p = formal_parameter_p(v);
+  return formal_p;
+}
+
+bool stub_points_to_cell_p(cell c)
+{
+  bool formal_p = true;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  formal_p = entity_stub_sink_p(v); // FI: can be a source too
+  return formal_p;
+}
