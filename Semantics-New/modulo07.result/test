@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T(modulo07) {0<=modulo07, modulo07<=3}
+
+int modulo07(int argc, char **argv)
+{
+
+//  T(n) {0<=n#init}
+
+   unsigned int n = atoi(argv[1]);
+
+//  T(j) {0<=j, j<=3, 0<=n}
+
+   int j = n%4;
+
+//  T(modulo07) {j==modulo07, 0<=j, j<=3, 0<=n}
+
+   
+   // n is unsigned, j cannot be < 0
+   return j;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int modulo07(int argc, char **argv)
+{
+
+//  P() {}
+
+   unsigned int n = atoi(argv[1]);
+
+//  P() {0<=n}
+
+   int j = n%4;
+
+//  P(j) {0<=j, j<=3, 0<=n}
+
+   
+   // n is unsigned, j cannot be < 0
+   return j;
+}

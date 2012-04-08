@@ -1,8 +1,8 @@
-delete unsigned04
-create unsigned04 unsigned04.c
+delete unsigned07
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unsigned07 unsigned07.c
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
@@ -10,6 +10,7 @@ activate PRECONDITIONS_INTER_FULL
 
 setproperty CONSTANT_PATH_EFFECTS FALSE
 
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_USE_TYPE_INFORMATION TRUE
 
 display PARSED_PRINTED_FILE[main]
@@ -53,5 +54,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-delete unsigned04
+delete unsigned07
 quit

@@ -1,5 +1,5 @@
-delete unsigned04
-create unsigned04 unsigned04.c
+delete unsigned06
+create unsigned06 unsigned06.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
@@ -53,5 +53,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
-delete unsigned04
+delete unsigned06
 quit

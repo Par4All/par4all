@@ -8,7 +8,11 @@ echo
 echo Source code with transformers
 echo
 
-# setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+# To process the modulo operator
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+# To gather the information about the sign of "n"
+setproperty SEMANTICS_USE_TYPE_INFORMATION TRUE
+
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[modulo07]
