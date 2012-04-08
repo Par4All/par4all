@@ -1213,23 +1213,20 @@ void print_expression(expression e)
   int dn = expression_domain_number(e);
 
   // For debugging with gdb, dynamic type checking
-  if(dn==expression_domain) {
-    normalized n;
-
-    if(e==expression_undefined)
-	(void) fprintf(stderr,"EXPRESSION UNDEFINED\n");
-    else {
-	(void) fprintf(stderr,"syntax = ");
-	print_syntax(expression_syntax(e));
-	(void) fprintf(stderr,"\nnormalized = ");
-	if((n=expression_normalized(e))!=normalized_undefined)
-	    print_normalized(n);
-	else
-	    (void) fprintf(stderr,"NORMALIZED UNDEFINED\n");
-    }
-  }
-  else
+  if(dn!=expression_domain)
     (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
+  else if(e==expression_undefined)
+    (void) fprintf(stderr,"EXPRESSION UNDEFINED\n");
+  else {
+    normalized n;
+    (void) fprintf(stderr,"syntax = ");
+    print_syntax(expression_syntax(e));
+    (void) fprintf(stderr,"\nnormalized = ");
+    if((n=expression_normalized(e))!=normalized_undefined)
+      print_normalized(n);
+    else
+      (void) fprintf(stderr,"NORMALIZED UNDEFINED\n");
+  }
 }
 
 string expression_to_string(expression e) {
