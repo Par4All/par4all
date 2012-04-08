@@ -2345,6 +2345,12 @@ transformer statement_to_transformer(
       /* nt = transformer_normalize(nt, 0); */
     }
 
+    /* add type information */
+    if(get_bool_property("SEMANTICS_USE_TYPE_INFORMATION")) {
+      transformer_add_type_information(nt);
+      /* nt = transformer_normalize(nt, 0); */
+    }
+
     /* When we leave a block the local stack allocated variables
        disappear */
     if(statement_block_p(s) && !ENDP(dl=statement_declarations(s))) {

@@ -701,6 +701,119 @@ void transformer_add_reference_information(transformer tf, statement s)
   add_reference_information(tf, s, true);
 }
 
+// FI: these constants are not (yet) defined in ri-util-local.h
+#define unsigned_char          11
+#define unsigned_short_int     12
+#define unsigned_int           14
+#define unsigned_long_int      16
+#define unsigned_long_long_int 18
+
+/* Add some of the constraints linked to the type of a variable */
+static void add_type_information(transformer tf)
+{
+  Psysteme ps = predicate_system(transformer_relation(tf));
+  Pbase b = vect_copy(sc_base(ps)); // FI: the basis may evolve when
+                                    // new constraints are added
+  Pbase cb = BASE_NULLE;
+
+  for(cb=b; !BASE_NULLE_P(cb); cb = vecteur_succ(cb)) {
+    Variable v = vecteur_var(cb);
+    entity ev = (entity) v;
+    if(v!=TCST && !local_old_value_entity_p(v)) { // FI: TCST check should be useless in a basis
+      entity e = value_to_variable(v);
+      type t = ultimate_type(entity_type(e));
+      if(unsigned_type_p(t)) {
+	basic tb = variable_basic(type_variable(t));
+	int s = basic_int(tb);
+	// FI: the lower bound, lb, could also be defined, e.g. for "char"
+	long long int ub = -1/*, lb = 0*/;
+	long long int period = 0;
+	switch(s) {
+	case unsigned_char:
+	  ub = 256-1, period = 256;
+	  break;
+	case unsigned_short_int:
+	  ub = 256*256-1, period = 256*256;
+	  break;
+	case unsigned_int:
+	  // We go straight to the overflows!
+	  // ub = 256L*256L*256L*256L-1;
+	  ub = 0, period = 256L*256L*256L*256L;
+	  break;
+	case unsigned_long_int:
+	  // We go straight to the overflows!
+	  // ub = 256L*256L*256L*256L-1;
+	  ub = 0, period = 256L*256L*256L*256L;
+	  break;
+	case unsigned_long_long_int:
+	  // We go straight to the overflows!
+	  //ub = 256*256*256*256*256*256*256*256-1;
+	  //ub = 0; // FI: too dangerous
+	  break;
+	default:
+	  ub=-1; // do nothing
+	  break;
+	}
+	if(ub>=0) { 
+	  /* We assume exists lambda s.t. e = ep + period*lambda */
+	  entity ep = make_local_temporary_value_entity(t);
+	  entity lambda = make_local_temporary_integer_value_entity();
+	  tf = transformer_add_inequality_with_integer_constraint(tf, ep, 0, false);
+	  if(ub>0) {
+	    // Without this dangerous upperbound, we lose information
+	    // but avoid giving wrong results.
+	    // FI: The upperbound is dangerous because linear does not
+	    // expect such large constants, especially my bounded normalization
+	    // that should be itself bounded! See
+	    // check_coefficient_reduction() and the stack allocation
+	    // of arrays a, b and c!
+	    tf = transformer_add_inequality_with_integer_constraint(tf, ep, ub, true);
+	  }
+	  Pvecteur eq =
+	    vect_make(vect_new(e, VALUE_MONE),
+		      ep, VALUE_ONE,
+		      lambda, (Value) period, TCST, VALUE_ZERO, NULL);
+	  tf = transformer_equality_add(tf, eq);
+	  /* Compute the value of lambda */
+	  Value pmin, pmax;
+	  if(precondition_minmax_of_value(lambda, tf, &pmin, &pmax)) {
+	    if(pmin==pmax) 
+	      tf = transformer_add_equality_with_integer_constant(tf, lambda, pmin);
+	  }
+	  /* Now we must get rid of lambda and e and possibly e's old value */
+	  list p =
+	    CONS(ENTITY, e, CONS(ENTITY, lambda, NIL));
+	  pips_assert("ep is in tf basis",
+		      base_contains_variable_p(sc_base(ps), ep));
+	  pips_assert("lambda is in tf basis",
+		      base_contains_variable_p(sc_base(ps), lambda));
+	  if(entity_is_argument_p(e, transformer_arguments(tf))) {
+	    entity old_e = entity_to_old_value(e);
+	    p = CONS(ENTITY, old_e, p);
+	    pips_assert("old_e is in tf basis",
+			base_contains_variable_p(sc_base(ps), ep));
+	  }
+	  tf = safe_transformer_projection(tf, p);
+	  gen_free_list(p);
+	  /* Now we must substitute ep by e */
+	  tf = transformer_value_substitute(tf, ep, e);
+	}
+      }
+    }
+  }
+  vect_rm(b);
+}
+
+void precondition_add_type_information(transformer pre)
+{
+  add_type_information(pre);
+}
+
+void transformer_add_type_information(transformer tf)
+{
+  add_type_information(tf);
+}
+
 /* Refine the precondition pre of s using side effects and compute its
    postcondition post. Postcondition post is returned. */
 transformer statement_to_postcondition(
@@ -779,6 +892,11 @@ transformer statement_to_postcondition(
 	/* add array references information */
 	if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
 	    precondition_add_reference_information(pre, s);
+	}
+
+	/* add type information */
+	if(get_bool_property("SEMANTICS_USE_TYPE_INFORMATION")) {
+	  transformer_add_type_information(pre);
 	}
 
 	/* Add information from declarations when useful */
