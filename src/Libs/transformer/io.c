@@ -44,11 +44,12 @@
 
 #include "transformer.h"
 
-/* print_transformer(tf): not a macro because of dbx */
+/* print_transformer(tf): not a macro because of dbx and gdb */
 transformer print_transformer(transformer tf)
 {
-    return fprint_transformer(stderr, tf,
-			      (get_variable_name_t) external_value_name);
+  (void) fprint_transformer(stderr, tf,
+			    (get_variable_name_t) external_value_name);
+  return tf;
 }
 
 /* For debugging without problem from temporary values */
@@ -75,7 +76,15 @@ fprint_transformer(FILE * fd,
        so a call to print_transformer passed as an argument to debug
        is ALWAYS effective */
 
-    if (tf!=transformer_undefined) {
+  int dn = transformer_domain_number(tf);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn!=transformer_domain) {
+    (void) fprintf(stderr,"Arg. \"e\"is not an expression.\n");
+  }
+  else if(tf==transformer_undefined)
+    (void) fprintf(stderr,"TRANSFORMER UNDEFINED\n");
+  else {
 	cons * args = transformer_arguments(tf);
 	Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
 
@@ -91,8 +100,7 @@ fprint_transformer(FILE * fd,
 		  sc,
 		  value_name);
     }
-    else
-	(void) fprintf(fd, "TRANSFORMER_UNDEFINED\n");
+
     return tf;
 }
 
