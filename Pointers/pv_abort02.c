@@ -1,4 +1,7 @@
 // dereferencing a null pointer yields a user error
+
+#include <stdio.h>
+
 int main()
 {
   int **a;

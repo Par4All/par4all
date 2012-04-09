@@ -1,3 +1,136 @@
 
 PROPER  EFFECTS
 
+int bar(int *p)
+{
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: a[*p++] p
+   a[*p++] = 2.;
+   return 0;
+}
+int foo(int *p)
+{
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: a[*p+1]
+   a[*p+1] = 2.;
+   return 0;
+}
+int toto(int *p)
+{
+   int *q;
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: a[*(q = p++)] p q
+   a[*(q = p++)] = 2.;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// p -> _p_1[0] , EXACT
+
+
+// Points To OUT: none
+
+int bar(int *p)
+{
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   int b[100];
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+
+   a[*p++] = 2.;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   return 0;
+}
+
+// Points To IN:
+// p -> _p_1[0] , EXACT
+
+
+// Points To OUT: none
+
+int foo(int *p)
+{
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   int b[100];
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+
+   a[*p+1] = 2.;
+
+// Points To:
+// p -> b[0] , EXACT
+
+   return 0;
+}
+
+// Points To IN:
+// p -> _p_1[0] , EXACT
+
+
+// Points To OUT: none
+
+int toto(int *p)
+{
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   int *q;
+
+// Points To:
+// p -> _p_1[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int b[100];
+
+// Points To:
+// p -> _p_1[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a[*(q = p++)] = 2.;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   return 0;
+}
