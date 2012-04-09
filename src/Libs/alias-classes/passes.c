@@ -214,7 +214,8 @@ static bool generic_points_to_analysis(char * module_name) {
     Get the init_points_to_list resource.
     This list contains formal paramters and their stub sinks
   */
-#if !FRANCOIS
+  // #if !FRANCOIS: to simplify interface with effects_with_points_to
+#if 1
   list pts_to_list = NIL;
   points_to_list init_pts_to_list = 
     (points_to_list) db_get_memory_resource(DBR_INIT_POINTS_TO_LIST,
@@ -223,7 +224,7 @@ static bool generic_points_to_analysis(char * module_name) {
   pts_to_list = gen_full_copy_list(points_to_list_list(init_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
   // FI: this should be useless as stubs are built on demand
-  pt_in = set_assign_list(pt_in, NIL);
+  // pt_in = set_assign_list(pt_in, NIL);
   gen_free_list(pts_to_list);
 #else
   pt_in = set_assign_list(pt_in, NIL);
