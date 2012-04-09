@@ -293,27 +293,26 @@ static bool sc_totally_functional_graph_p( Psysteme g, // function graph
 static Pbase loop_indices_b = BASE_NULLE;
 
 // These are needed for callback function reference_substitute
-// FI: I am sure somebody is going to complain about a context not
-// being used; but remember you do not know when, why or how this piece of
-// code was written
-static reference scalarized_reference = reference_undefined;
-static entity scalarized_replacement_variable = entity_undefined;
+struct subst_ref_ctx {
+  reference scalarized_reference;
+  entity scalarized_replacement_variable;
+};
 
 // gen_recurse callback function for
 // statement_substitute_scalarized_array_references
-static bool reference_substitute(reference r) {
+static bool reference_substitute(reference r, struct subst_ref_ctx *ctx) {
   bool result = true;
   entity v = reference_variable(r);
-  entity scalarized_v = reference_variable(scalarized_reference);
+  entity scalarized_v = reference_variable(ctx->scalarized_reference);
   // This test proved to strong by conditional04 because the region
   // computation does too good a job...
-  // if(reference_equal_p(r,scalarized_reference)) {
+  // if(reference_equal_p(r,ctx->scalarized_reference)) {
   if(v==scalarized_v) {
     // Scalarize only if r refers to an array element and not to a slice
     list inds = reference_indices(r);
     size_t d = type_depth(ultimate_type(entity_type(v)));
     if (gen_length(inds) == d) {
-      reference_variable(r) = scalarized_replacement_variable;
+      reference_variable(r) = ctx->scalarized_replacement_variable;
       reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))
       result = false; /* do not recurse in reference indices which are discarded */
     }
@@ -337,14 +336,13 @@ static void statement_substitute_scalarized_array_references(statement st,
                                                              reference pvr,
                                                              entity s) {
   //TODO: create context ansd use gen_multi_recurse_with_context
-  scalarized_reference = pvr;
-  scalarized_replacement_variable = s;
-  gen_multi_recurse (st,
+  struct subst_ref_ctx ctx;
+  ctx.scalarized_reference = pvr;
+  ctx.scalarized_replacement_variable = s;
+  gen_context_multi_recurse(st,&ctx,
          statement_domain, declarations_reference_substitute, gen_null,
          reference_domain, reference_substitute, gen_null,
          NULL);
-  scalarized_reference = reference_undefined;
-  scalarized_replacement_variable = entity_undefined;
 }
 
 
@@ -733,14 +731,16 @@ static effect unified_rw_effect_of_variable(entity pv, list crwl) {
 }
 
 
-// To keep track of already scalarized variables
-static list scalarized_variables = list_undefined;
+struct scalarization_ctx {
+  // To keep track of already scalarized variables
+  list scalarized_variables;
 
-// To associate a list of privatized variables to each statement
-static hash_table statement_scalarized_variables = hash_table_undefined;
+  // To associate a list of privatized variables to each statement
+  hash_table statement_scalarized_variables;
+};
 
 /* This function has been replaced by statement_scalarization() */
-static bool loop_scalarization(loop l)
+static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
 {
   entity i    = loop_index(l);
   statement s = loop_body(l);
@@ -803,7 +803,7 @@ static bool loop_scalarization(loop l)
 
     descriptor d = effect_descriptor(pr);
     if (descriptor_convex_p(d) &&
-        !entity_is_argument_p(pv, scalarized_variables)
+        !entity_is_argument_p(pv, ctx->scalarized_variables)
         && !vect_coeff(pv,var_already_seen)) {
       ifdebug(2) {
         pips_debug(0,"Considering regions : ");
@@ -898,7 +898,7 @@ static bool loop_scalarization(loop l)
               /* The array references can be replaced by references to a
                  scalar */
               scalarize_variable_in_statement(pv, s, iv, ov);
-              scalarized_variables = arguments_add_entity(scalarized_variables,
+              ctx->scalarized_variables = arguments_add_entity(ctx->scalarized_variables,
                                                           pv);
             }
             // Clean-up
@@ -1006,8 +1006,8 @@ static bool statement_entity_references_constant_in_context_p(statement s,
  *
  * The first cut is a cut-and-paste of loop_scalarization()
  */
-static bool statement_scalarization(statement s)
-{
+static bool statement_scalarization(statement s,
+                                    struct scalarization_ctx *ctx) {
   ifdebug(1) {
     pips_debug(1, "Statement:\n");
     print_statement(s);
@@ -1066,7 +1066,7 @@ static bool statement_scalarization(statement s)
     entity pv  = effect_variable(pr); // Private variable
     int nd = type_depth(entity_type(pv));
 
-    if(!entity_is_argument_p(pv, scalarized_variables) // sclarized at
+    if(!entity_is_argument_p(pv, ctx->scalarized_variables) // sclarized at
                    // a higher level?
        && !vect_coeff(pv,var_already_seen) // Each variable may appear
              // several times in the
@@ -1206,8 +1206,8 @@ static bool statement_scalarization(statement s)
                 //scalarize_variable_in_statement(pv, s, iv, ov);
                 local_scalarized_variables =
                   arguments_add_entity(local_scalarized_variables, pv);
-                scalarized_variables =
-                    arguments_add_entity(scalarized_variables, pv);
+                ctx->scalarized_variables =
+                    arguments_add_entity(ctx->scalarized_variables, pv);
               }
               reset_temporary_value_counter();
             }
@@ -1221,7 +1221,7 @@ static bool statement_scalarization(statement s)
   vect_rm(var_already_seen);
 
   /* Associate the current list of privatized variables to statement s */
-  hash_put(statement_scalarized_variables,
+  hash_put(ctx->statement_scalarized_variables,
            (void *) s,
            (void *) local_scalarized_variables);
 
@@ -1241,7 +1241,8 @@ static bool statement_scalarization(statement s)
  * process it. Stack the loop index to build the iteration
  * space. Perform loop scalarization.
  */
-static bool scalarization_loop_statement_in(statement ls) {
+static bool scalarization_loop_statement_in(statement ls,
+                                            struct scalarization_ctx *ctx) {
   bool result_p = true;
 
   if (statement_loop_p(ls)) {
@@ -1252,12 +1253,13 @@ static bool scalarization_loop_statement_in(statement ls) {
        loop.
     */
     entity i = loop_index(l);
-    scalarized_variables = arguments_add_entity(scalarized_variables, i);
+    ctx->scalarized_variables = arguments_add_entity(ctx->scalarized_variables,
+                                                     i);
 
     // Accumulate new index in "domain" basis
     loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
 
-    result_p = loop_scalarization(l);
+    result_p = loop_scalarization(l,ctx);
   }
 
   return result_p;
@@ -1268,7 +1270,8 @@ static bool scalarization_loop_statement_in(statement ls) {
  * unstack all variables related to loops internal wrt the current
  * loop to restore the current iteration space.
  */
-static void scalarization_loop_statement_out(statement s) {
+static void scalarization_loop_statement_out(statement s,
+                                             struct scalarization_ctx *ctx) {
   if (statement_loop_p(s)) {
     loop l   = statement_loop(s);
     entity i = loop_index(l);
@@ -1280,7 +1283,7 @@ static void scalarization_loop_statement_out(statement s) {
     /* Remove variables privatized in the current loop, so that
        successive loops do not interfere with each other.
     */
-    for (list el=scalarized_variables; !ENDP(el); POP(el)) {
+    for (list el=ctx->scalarized_variables; !ENDP(el); POP(el)) {
       entity e = ENTITY(CAR(el));
       if (e == i) {
         break;
@@ -1288,8 +1291,8 @@ static void scalarization_loop_statement_out(statement s) {
         nl = CONS(ENTITY, e, nl);
       }
     }
-    gen_free_list(scalarized_variables);
-    scalarized_variables = gen_nreverse(nl);
+    gen_free_list(ctx->scalarized_variables);
+    ctx->scalarized_variables = gen_nreverse(nl);
 
     loop_indices_b = base_remove_variable(loop_indices_b, (Variable) i);
   }
@@ -1300,7 +1303,8 @@ static void scalarization_loop_statement_out(statement s) {
  * declaration statement process it: keep track of scalarized
  * variables.
  */
-static bool scalarization_statement_in(statement s) {
+static bool scalarization_statement_in(statement s,
+                                       struct scalarization_ctx *ctx) {
   bool result_p = true;
 
   // In fact, only sequences and loops are good candidates... although
@@ -1312,7 +1316,7 @@ static bool scalarization_statement_in(statement s) {
   //
   // This test must be exactly replicated in scalaration_statement_out
   if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
-    result_p = statement_scalarization(s);
+    result_p = statement_scalarization(s,ctx);
 
     if (statement_loop_p(s)) {
       loop l   = statement_loop(s);
@@ -1331,8 +1335,8 @@ static bool scalarization_statement_in(statement s) {
 
 /* gen_recurse callback on exiting a statement. Privatize the
    variables collected during the top-down phase */
-static void scalarization_statement_out(statement s)
-{
+static void scalarization_statement_out(statement s,
+                                        struct scalarization_ctx *ctx) {
   // This test must be exactly replicated in scalaration_statement_in
   if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
 
@@ -1353,7 +1357,7 @@ static void scalarization_statement_out(statement s)
 
     /* Retrieve the variables to privatize for statement s */
     list local_scalarized_variables =
-      (list) hash_get(statement_scalarized_variables, (void *) s);
+      (list) hash_get(ctx->statement_scalarized_variables, (void *) s);
 
     if(!ENDP(local_scalarized_variables)) {
       /* The ENDP test is not necessary but it saves time, especially
@@ -1394,8 +1398,9 @@ static void scalarization_statement_out(statement s)
       /* Remove variables scalarized in s from the list of scalarized
          variables so that
          successive statements do not interfere with each other. */
-      scalarized_variables = arguments_difference(scalarized_variables,
-                                                  local_scalarized_variables);
+      ctx->scalarized_variables =
+          arguments_difference(ctx->scalarized_variables,
+                               local_scalarized_variables);
 
       /* This list is no longer useful. It is still accessible via the
          hashtable statement_scalarized_variables but s should not be
@@ -1414,7 +1419,7 @@ static void scalarization_statement_out(statement s)
 }
 
 
-bool scalarization (char * module_name) {
+bool scalarization(char * module_name) {
   entity module;
   statement module_stat;
 
@@ -1449,29 +1454,37 @@ bool scalarization (char * module_name) {
 
   debug_on("SCALARIZATION_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
+
   scalarization_across_control_test_level_init();
   if(false) {
     /* We now traverse our module's statements looking for loop statements. */
     loop_indices_b = BASE_NULLE;
-    scalarized_variables = NIL;
-    gen_recurse(module_stat, statement_domain, scalarization_loop_statement_in,
-    scalarization_loop_statement_out);
-    scalarized_variables = list_undefined;
+    struct scalarization_ctx ctx;
+    ctx.scalarized_variables = NIL;
+    gen_context_recurse(module_stat,
+                        &ctx,
+                        statement_domain,
+                        scalarization_loop_statement_in,
+                        scalarization_loop_statement_out);
   } else {
   /* We now traverse our module's statements looking for all
      statements. We look for constant array references to scalarize
      on the way down. The effective scalarization is performed during
      the bottom-up phase. */
     loop_indices_b = BASE_NULLE;
-    scalarized_variables = NIL;
-    statement_scalarized_variables = hash_table_make(hash_pointer, 0);
-    gen_recurse(module_stat, statement_domain, scalarization_statement_in,
-    scalarization_statement_out);
+    struct scalarization_ctx ctx;
+    ctx.scalarized_variables = NIL;
+    ctx.statement_scalarized_variables = hash_table_make(hash_pointer, 0);
+    gen_context_recurse(module_stat,
+                        &ctx,
+                        statement_domain,
+                        scalarization_statement_in,
+                        scalarization_statement_out);
     /* Not enough the lists should be freed too... but they are freed
        on the way by scalarization_statement_out() */
-    hash_table_free(statement_scalarized_variables);
+    hash_table_free(ctx.statement_scalarized_variables);
     ifdebug(1) {
-      pips_assert("scalarized_variables is empty", ENDP(scalarized_variables));
+      pips_assert("scalarized_variables is empty", ENDP(ctx.scalarized_variables));
       pips_assert("loop_indices_b is empty", BASE_NULLE_P(loop_indices_b));
     }
   }
