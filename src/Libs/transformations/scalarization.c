@@ -320,12 +320,17 @@ static bool reference_substitute(reference r, struct subst_ref_ctx *ctx) {
   return result;
 }
 
-static bool declarations_reference_substitute(statement st) {
+static bool declarations_reference_substitute(statement st,
+                                              struct subst_ref_ctx *ctx) {
   if (declaration_statement_p(st)) {
     FOREACH(ENTITY, decl, statement_declarations(st)) {
       value init_val = entity_initial(decl);
       if (! value_undefined_p(init_val)) {
-        gen_recurse(init_val, reference_domain, reference_substitute, gen_null);
+        gen_context_recurse(init_val,
+                            ctx,
+                            reference_domain,
+                            reference_substitute,
+                            gen_null);
       }
     }
   }
@@ -737,7 +742,30 @@ struct scalarization_ctx {
 
   // To associate a list of privatized variables to each statement
   hash_table statement_scalarized_variables;
+
+  // Flag that indicate if we should keep perfect parallel loop nest
+  bool keep_perfect_parallel;
+
+  // Loops that should not be scalarized (according to previous property)
+  set blacklisted_loops;
 };
+
+
+static void blacklist_perfectly_nested_parallel_loop(statement s,
+                                                     set blacklisted_loops) {
+  if(statement_loop(s)) {
+    int depth = depth_of_parallel_perfect_loop_nest(s);
+    for(int d=2;d<=depth;d++) {
+     s=get_first_inner_perfectly_nested_loop(loop_body(statement_loop(s)));
+     pips_assert("Perfectly nested loops coherency !",
+                 !statement_undefined_p(s));
+     set_add_element(blacklisted_loops,blacklisted_loops,s);
+    }
+  }
+}
+
+
+
 
 /* This function has been replaced by statement_scalarization() */
 static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
@@ -1315,7 +1343,14 @@ static bool scalarization_statement_in(statement s,
   // criterion... but this has been fixed with a profitability threshold
   //
   // This test must be exactly replicated in scalaration_statement_out
-  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
+  SET_FOREACH(statement,bl_st,ctx->blacklisted_loops) {
+    pips_debug(0,"BLACKLISTED :\n");
+    print_statement(bl_st);
+  }
+
+  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/
+      && !set_belong_p(ctx->blacklisted_loops,s)) {
+
     result_p = statement_scalarization(s,ctx);
 
     if (statement_loop_p(s)) {
@@ -1326,6 +1361,11 @@ static bool scalarization_statement_in(statement s,
                  entity_name(i), base_dimension(loop_indices_b));
 
       loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
+
+      if(ctx->keep_perfect_parallel) {
+        blacklist_perfectly_nested_parallel_loop(s,ctx->blacklisted_loops);
+      }
+
     }
   }
 
@@ -1338,7 +1378,8 @@ static bool scalarization_statement_in(statement s,
 static void scalarization_statement_out(statement s,
                                         struct scalarization_ctx *ctx) {
   // This test must be exactly replicated in scalaration_statement_in
-  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
+  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/
+      && !set_belong_p(ctx->blacklisted_loops,s)) {
 
     /* If statement s is a loop, remove its loop index from basis
        loop_indices_b which keep track of loop nesting. Do it before
@@ -1455,11 +1496,18 @@ bool scalarization(char * module_name) {
   debug_on("SCALARIZATION_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
+  // Context for gen_context_recurse
+  struct scalarization_ctx ctx;
+  ctx.blacklisted_loops = set_make(set_pointer);
+  if(get_bool_property("SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
+  } else {
+    ctx.keep_perfect_parallel = false;
+  }
+
   scalarization_across_control_test_level_init();
   if(false) {
     /* We now traverse our module's statements looking for loop statements. */
     loop_indices_b = BASE_NULLE;
-    struct scalarization_ctx ctx;
     ctx.scalarized_variables = NIL;
     gen_context_recurse(module_stat,
                         &ctx,
@@ -1472,7 +1520,6 @@ bool scalarization(char * module_name) {
      on the way down. The effective scalarization is performed during
      the bottom-up phase. */
     loop_indices_b = BASE_NULLE;
-    struct scalarization_ctx ctx;
     ctx.scalarized_variables = NIL;
     ctx.statement_scalarized_variables = hash_table_make(hash_pointer, 0);
     gen_context_recurse(module_stat,
@@ -1488,6 +1535,8 @@ bool scalarization(char * module_name) {
       pips_assert("loop_indices_b is empty", BASE_NULLE_P(loop_indices_b));
     }
   }
+
+  set_free(ctx.blacklisted_loops); // No leak
 
   scalarization_across_control_test_level_reset();
   pips_debug(1, "end\n");

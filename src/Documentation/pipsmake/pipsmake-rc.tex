@@ -11630,7 +11630,10 @@ the code generation slightly differs because local declarations are
 possible with C. However, this may destroy perfect loop nests required
 by other passes. Property
 \PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} can be used to
-preserve C perfect loop nests.
+preserve C perfect loop nests, this property is currently not completely 
+implemented.
+\PipsPropRef{SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS} can be used to
+preserve C perfect parallel loop nests.
 
 
 Pass \PipsPassRef{scalarization} uses the read and written convex
@@ -11682,6 +11685,11 @@ destroyed, even with this property set to true.
 \begin{PipsProp}{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST}
 SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
+
+\begin{PipsProp}{SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}
+SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS FALSE
+\end{PipsProp}
+
 
 Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation
 of a copy-out statement when it is useless according to the OUT
