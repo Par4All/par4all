@@ -718,7 +718,7 @@ static void add_type_information(transformer tf)
 
   for(cb=b; !BASE_NULLE_P(cb); cb = vecteur_succ(cb)) {
     Variable v = vecteur_var(cb);
-    entity ev = (entity) v;
+    //entity ev = (entity) v;
     if(v!=TCST && !local_old_value_entity_p(v)) { // FI: TCST check should be useless in a basis
       entity e = value_to_variable(v);
       type t = ultimate_type(entity_type(e));
@@ -776,7 +776,7 @@ static void add_type_information(transformer tf)
 	  tf = transformer_equality_add(tf, eq);
 	  /* Compute the value of lambda */
 	  Value pmin, pmax;
-	  if(precondition_minmax_of_value(lambda, tf, &pmin, &pmax)) {
+	  if(precondition_minmax_of_value(lambda, tf, (intptr_t*) &pmin, (intptr_t*) &pmax)) {
 	    if(pmin==pmax) 
 	      tf = transformer_add_equality_with_integer_constant(tf, lambda, pmin);
 	  }
