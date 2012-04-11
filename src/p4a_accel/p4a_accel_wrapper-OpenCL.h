@@ -100,6 +100,10 @@ Pragma to support double floating point precision
 #warning "Your OpenCL device doesn't support double precision"
 #endif
 
+// Required for loop unrolling
+#define MOD(x,n) ((x)%(n))
+#define MAX0(x,n) max(x,n)
+
 
 
 /**

@@ -35,6 +35,10 @@
 extern "C" {
 #endif
 
+// Required for loop unrolling
+#define MOD(x,n) ((x)%(n))
+#define MAX0(x,n) max(x,n)
+
 
 /* For size_t: */
 #include <stddef.h>
