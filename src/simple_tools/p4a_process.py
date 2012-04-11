@@ -67,6 +67,7 @@ def process(input):
                 fftw3 = input.fftw3,
                 c99 = input.c99,
                 atomic = input.atomic,
+                kernel_unroll = input.kernel_unroll,
                 use_pocc = input.pocc,
                 pocc_options = input.pocc_options,
                 recover_includes = input.recover_includes,
