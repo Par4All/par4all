@@ -1,6 +1,90 @@
-2012-01-24 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2012-03-06 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.4
+
+    * Outline kernel callees with a prefix to avoid conflicts
+
+    * New kernel generation algorithm for p4a: no longer inline callees in
+      kernels but call device functions instead
+
+    * Apply some callees unfolding after array linearization for non-C99
+      VLA devices
+
+    * nvcc compilation chain can use C++ compiler specified by user
+
+    * Deal with OpenCL pointer in kernel callees
+
+    * Add another loop fusion algorithm based on array regions
+
+    * Fix --select-module and other module filtering to cope new kernel
+      generation algorithm
+
+
+2012-02-09 Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.3.2
+
+   * Improved redundancy elimination in Linear
+
+   * Add some missing intrinsics for Fortran
+
+   * Do not generate loops for degenerated iteration domains
+
+   * Fix effects computation
+
+   * Improve for- to do-loop translation
+
+   * Do not privatize global variable in simple privatization
+
+   * New experiment -pointer-analysis option to take into account pointer
+     analysis
+
+   * Fix interface with PoCC
+
+   * Add a --pocc-options to p4a
+
+   * Improve transformers computation
+
+   * Improve semantics analysis in the case of unsigned loop index
+
+   * Fix bug in timing method in Accel runtime
+
+   * Check for Accel runtime non-initialization
+
+   * Test if a CUDA device is available in CUDA mode for Accel runtime
+
+   * Add a lot of information in CUDA mode for Accel runtime
+
+   * Improve documentation
+
+   * Control simplification deals with do-while loops
+
+   * Fix bugs in loop-fusion
+
+   * Now clean_up_sequence can deal more gracefully with variable scoping
+
+   * Improve sorting in Linear to have more repetitive behaviour
+
+   * Add detection of 1-trip while-loops
+
+   * Fix bugs in isolate_statement
+
+   * Improve outliner in the case of a new compilation unit
+
+   * Add isnan C intrinsic
+
+   * Manage by overloading already existing OpenMP-pragma with the new
+     generated ones
+
+   * Fix sharing in the case of cast in a function call
+
+   * --cuda-cc now accepts 2.1 version
+
+   * Add support for AMD fp64 OpenCL extension in Accel runtime, if available
+
+   * Add debug kernel call information in OpenCL Accel runtime
+
+   * p4a can accept now Fortran files with .F extension
 
 
 2012-01-18  Serge Guelton <serge.guelton@hpc-project.com>
