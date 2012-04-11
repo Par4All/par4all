@@ -1343,11 +1343,6 @@ static bool scalarization_statement_in(statement s,
   // criterion... but this has been fixed with a profitability threshold
   //
   // This test must be exactly replicated in scalaration_statement_out
-  SET_FOREACH(statement,bl_st,ctx->blacklisted_loops) {
-    pips_debug(0,"BLACKLISTED :\n");
-    print_statement(bl_st);
-  }
-
   if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/
       && !set_belong_p(ctx->blacklisted_loops,s)) {
 
