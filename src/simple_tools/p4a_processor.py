@@ -711,7 +711,8 @@ class p4a_processor(object):
 
         # call gpuify_all recursively starting from the heads of the callgraph
         # Keep in mind that all_modules can be filtered !!!
-        [ gpuify_all(m) for m in all_modules if not [val for val in all_modules if val in m.callers]]
+        # this is broken if m=>n=>p and n is filtered :-(
+        [ gpuify_all(m) for m in all_modules if not [val for val in all_modules if val.name in [ n.name for n in m.callers]]]
 
 
 
