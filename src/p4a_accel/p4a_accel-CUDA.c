@@ -9,7 +9,7 @@ struct cudacc {
 };
 
 static int computeCoresForDevice(struct cudacc cc, int multiproc) {
-  if(cc.minor==1) {
+  if(cc.major==1) {
     return 8*multiproc;
   } else if (cc.major==2 and cc.minor==0) {
     return 32*multiproc;
