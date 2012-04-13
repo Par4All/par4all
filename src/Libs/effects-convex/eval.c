@@ -207,6 +207,19 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
   free_effect(reg);
 }
 
+void simple_cell_to_convex_cell_conversion(cell input_cell, cell * output_cell, descriptor * output_desc)
+{
+
+  reference input_ref = cell_any_reference(input_cell);
+  reference output_ref = reference_undefined;
+
+  simple_reference_to_convex_reference_conversion(input_ref, &output_ref, output_desc);
+  *output_cell = make_cell_reference(output_ref);
+}
+
+
+
+
 /*
   @param c is a the convex cell for which we look an equivalent constant path
   @param ptl is the list of points-to in which we search for constant paths

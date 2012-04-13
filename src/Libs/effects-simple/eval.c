@@ -114,6 +114,20 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
   return res;
 }
 
+
+bool simple_cell_preceding_p(cell c1, descriptor d1,
+			     cell c2, descriptor d2,
+			     transformer current_precondition,
+		             bool strict_p,
+			     bool * exact_p)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+
+  return simple_cell_reference_preceding_p(r1, d1, r2, d2, current_precondition,
+					   strict_p, exact_p);
+}
+
 bool path_preceding_p(effect eff1, effect eff2,
 		      transformer current_precondition,
 		      bool strict_p,
@@ -133,6 +147,14 @@ void simple_reference_to_simple_reference_conversion(reference ref,
 						     descriptor * output_desc)
 {
   *output_ref = ref;
+  *output_desc = make_descriptor(is_descriptor_none,UU);
+}
+
+void simple_cell_to_simple_cell_conversion(cell input_cell,
+					   cell * output_cell,
+					   descriptor * output_desc)
+{
+  *output_cell = input_cell;
   *output_desc = make_descriptor(is_descriptor_none,UU);
 }
 

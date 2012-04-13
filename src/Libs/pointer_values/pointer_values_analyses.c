@@ -103,6 +103,7 @@ pv_context make_simple_pv_context()
 /*   ctxt.db_get_kill_pv_func = db_get_simple_kill_pv; */
 /*   ctxt.db_put_kill_pv_func = db_put_simple_kill_pv; */
   ctxt.make_pv_from_effects_func = make_simple_pv_from_simple_effects;
+  ctxt.cell_preceding_p_func = simple_cell_preceding_p;
   ctxt.cell_reference_with_value_of_cell_reference_translation_func =
     simple_cell_reference_with_value_of_cell_reference_translation;
   ctxt.cell_reference_with_address_of_cell_reference_translation_func =
@@ -114,6 +115,7 @@ pv_context make_simple_pv_context()
   ctxt.stmt_stack = stack_make(statement_domain, 0, 0);
   return ctxt;
 }
+
 
 #define UNDEF abort
 
@@ -1734,7 +1736,7 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
 bool simple_pointer_values(char * module_name)
 {
   pv_context ctxt = make_simple_pv_context();
-  set_methods_for_simple_pointer_effects();
+  set_methods_for_simple_effects();
   generic_module_pointer_values(module_name, &ctxt);
   reset_pv_context(&ctxt);
   generic_effects_reset_all_methods();
