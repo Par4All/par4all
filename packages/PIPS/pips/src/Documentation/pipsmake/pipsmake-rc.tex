@@ -4244,7 +4244,7 @@ SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES FALSE
 SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
 \end{PipsProp}
 
-\subsubsection{Array declarations and accesses}
+\subsubsection{Array Declarations and Accesses}
 \label{subsubsection:array-declarations-and-accesses}
 \index{SEMANTICS\_TRUST\_ARRAY\_DECLARATIONS}
 \index{SEMANTICS\_TRUST\_ARRAY\_REFERENCES}
@@ -4271,6 +4271,22 @@ quite a lot without adding any useful information.
 
 \begin{PipsProp}{SEMANTICS_TRUST_ARRAY_REFERENCES}
 SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
+\end{PipsProp}
+
+\subsubsection{Type Information}
+\label{subsubsection:type-information}
+\index{SEMANTICS\_USE\_TYPE\_INFORMATION}
+
+Type range information is difficult to turn into useful
+information. It implies some handling of wrap-around behavior. It is
+likely to cause lots of overflows. This is experimental. By default
+this property is not set.
+
+This property is turned off by default because it might slow down PIPS
+quite a lot without adding any useful information.
+
+\begin{PipsProp}{SEMANTICS_USE_TYPE_INFORMATION}
+SEMANTICS_USE_TYPE_INFORMATION FALSE
 \end{PipsProp}
 
 \subsubsection{Flow Sensitivity}
@@ -5105,7 +5121,8 @@ must_regions                    > MODULE.proper_regions
 \end{PipsMake}
 
 \begin{PipsPass}{must_regions_with_points_to}
-This function computes the \verb|MUST| regions in a module.
+This function computes the \verb|MUST| regions in a module using
+  information on pointer targets given by points-to.
 \end{PipsPass}
 \begin{PipsMake}
 must_regions_with_points_to     > MODULE.proper_regions
@@ -5114,10 +5131,30 @@ must_regions_with_points_to     > MODULE.proper_regions
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
+        < MODULE.points_to
         < MODULE.transformers
         < MODULE.preconditions
         < CALLEES.summary_regions
 \end{PipsMake}
+
+\begin{PipsPass}{must_regions_with_pointer_values}
+  This function computes the \verb|MUST| regions in a module using
+  information on pointer targets given by pointer values.
+\end{PipsPass}
+\begin{PipsMake}
+must_regions_with_pointer_values > MODULE.proper_regions
+                                > MODULE.regions
+                                > MODULE.inv_regions
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.simple_pointer_values
+        < MODULE.transformers
+        < MODULE.preconditions
+        < CALLEES.summary_regions
+\end{PipsMake}
+
+
 
 \subsection{Summary READ/WRITE Convex Array Regions}
 \label{subsubsection-summary-regions}
@@ -5386,7 +5423,7 @@ alias_classes > MODULE.alias_classes
         < MODULE.alias_lists
 \end{PipsMake}
 
-\subsection{Init  Points to Analysis}
+\subsection{Init Points-to Analysis}
 
 \begin{PipsPass}{init_points_to_analysis}
 This phase generates synthetic points-to relations for formal
@@ -11593,7 +11630,10 @@ the code generation slightly differs because local declarations are
 possible with C. However, this may destroy perfect loop nests required
 by other passes. Property
 \PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} can be used to
-preserve C perfect loop nests.
+preserve C perfect loop nests, this property is currently not completely 
+implemented.
+\PipsPropRef{SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS} can be used to
+preserve C perfect parallel loop nests.
 
 
 Pass \PipsPassRef{scalarization} uses the read and written convex
@@ -11645,6 +11685,11 @@ destroyed, even with this property set to true.
 \begin{PipsProp}{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST}
 SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
+
+\begin{PipsProp}{SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}
+SCALARIZATION_KEEP_PERFECT_PARALLEL_LOOP_NESTS FALSE
+\end{PipsProp}
+
 
 Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation
 of a copy-out statement when it is useless according to the OUT

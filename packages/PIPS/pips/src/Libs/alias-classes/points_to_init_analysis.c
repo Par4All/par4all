@@ -61,7 +61,7 @@ set formal_points_to_parameter(cell c)
   /* fpt = entity_basic_concrete_type(e); */
   fpt = cell_reference_to_type(r,&to_be_freed);
   if(type_variable_p(fpt)){
-    /* We ignor dimensions for the being, descriptors are not
+    /* We ignor dimensions for the time being, descriptors are not
      * implemented yet...Amira Mensi*/
     basic fpb = variable_basic(type_variable(fpt));
     if(array_type_p(fpt)) {
@@ -105,67 +105,116 @@ set formal_points_to_parameter(cell c)
 
 }
 
-
-/* To create the points-to stub associated to the formal parameter,
- * the sink name is a concatenation of the formal parameter and the
- * POINTS_TO_MODULE_NAME.
+/* Allocate a new stub entity for entity "e" and with type "t".
  *
- * FI: Is it sufficient to generate stubs for foo(int *p) and bar(double *p)?
+ * Type "t" could be derived from "e" since it should be the pointed
+ * type of "e"'s type
  */
-points_to create_stub_points_to(cell c, type t,
-				__attribute__ ((__unused__)) basic b)
+entity create_stub_entity(entity e, type t)
 {
-  points_to pt_to = points_to_undefined;
-  basic bb = basic_undefined;
-  type pt = type_undefined;
-  expression ex = make_unbounded_expression();
-  reference sink_ref = reference_undefined;
-  cell source_cell = copy_cell(c);
-  reference r = cell_any_reference(source_cell);
-  entity e = reference_variable(r);
-  const char * en = entity_user_name(e); 
-  string s = NULL;
-  if( formal_parameter_p(e) ) {
+  // local name for the stub
+  string s = string_undefined;
+  string en = (string) entity_user_name(e);
+
+  // FI: guarantee about *local* new name uniqueness?
+  if(formal_parameter_p(e)) {
+    // Naming for sinks of formal parameters: use their offsets
     formal f = storage_formal( entity_storage(e) );
     int off = formal_offset(f);
     s = strdup(concatenate("_", en,"_", i2a(off), NULL));
   }
-  else {
+  else if(top_level_entity_p(e)){ // FI: global_variable_p()
+    // Naming for sinks of global variable: use their offsets
+    int off = ram_offset(storage_ram(entity_storage(e)));
+    s = strdup(concatenate("_", en,"_", i2a(off), NULL));
+  }
+  else if(static_global_variable_p(e)){ // "static int i;"
+    // Naming for sinks of static global variable: use their offsets
+    int off = ram_offset(storage_ram(entity_storage(e)));
+    s = strdup(concatenate("_", en,"_", i2a(off), NULL));
+  }
+  else if(entity_stub_sink_p(e)) {
+    // Naming for sinks of stubs: repeat their last suffix
     char *suffix = strrchr(en,'_');
     s = strdup(concatenate( en, suffix, NULL )); 
   }
   
-  string formal_name = strdup(concatenate(get_current_module_name() ,MODULE_SEP_STRING, s, NULL));
-  entity formal_parameter = gen_find_entity(formal_name);
-  bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  // FI: the stub entity already exists?
+  string formal_name = strdup(concatenate(get_current_module_name(),
+					  MODULE_SEP_STRING, s, NULL));
+  entity stub = gen_find_entity(formal_name);
+  // FI: I expect here a pips_assert("The stub cannot exist",
+  // entity_undefined_p(stub));
 
+  // Compute the pointed type
+  type pt = type_undefined;
   if(type_variable_p(t)){
-    bb = variable_basic(type_variable(t));
-  basic base = copy_basic(bb);
-  if(type_strict_p)
-    pt = make_type_variable(
-			    make_variable(base,
-					  CONS(DIMENSION,
-					       make_dimension(int_to_expression(0),ex),NIL),
-					  NIL));
-  else
-    pt = copy_type(t);
+    basic bb = variable_basic(type_variable(t));
+    basic base = copy_basic(bb);
+    bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+    if(type_strict_p) {
+      expression ex = make_unbounded_expression();
+      dimension d = make_dimension(int_to_expression(0),ex);
+      variable v = make_variable(base,
+				 CONS(DIMENSION, d ,NIL),
+				 NIL);
+      pt = make_type_variable(v);
+    }
+    else
+      pt = copy_type(t);
   } 
   else if (type_void_p(t)){
     pt = make_type_void(NIL);
   }
  
-  if(entity_undefined_p(formal_parameter)) {
+  // If entity "stub" does not already exist, create it.
+  if(entity_undefined_p(stub)) {
     entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
     entity_kind(DummyTarget)=ENTITY_POINTER_DUMMY_TARGETS_AREA;
-    formal_parameter = make_entity(formal_name,
-				   pt,
-				   make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
-				   make_value_unknown());
+    stub = make_entity(formal_name,
+		       pt,
+		       make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
+		       make_value_unknown());
   
   }
-  if(type_strict_p)
-    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+
+  return stub;
+}
+
+
+/* To create the points-to between a formal parameter or a global
+ * variable or a snother stub on one hand, and another new stub on the
+ * other.
+ *
+ * the sink name is a concatenation of the formal parameter and the
+ * POINTS_TO_MODULE_NAME.
+ *
+ * FI: Is it sufficient to generate stubs for foo(int *p) and bar(double *p)?
+ *
+ * FI: no, it is useless, since they are created on demand; but this
+ * function is reused on demand.
+ */
+points_to create_stub_points_to(cell c, type t,
+				__attribute__ ((__unused__)) basic b)
+{
+  points_to pt_to = points_to_undefined;
+  //basic bb = basic_undefined;
+  //type pt = type_undefined;
+  //expression ex = make_unbounded_expression();
+  reference sink_ref = reference_undefined;
+  cell source_cell = copy_cell(c);
+  reference r = cell_any_reference(source_cell);
+  entity e = reference_variable(r);
+
+  //const char * en = entity_user_name(e); 
+  //string s = NULL;
+
+  entity formal_parameter = create_stub_entity(e, t);
+
+  bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(!type_strict_p)
+    sink_ref = make_reference(formal_parameter,
+			      CONS(EXPRESSION, int_to_expression(0), NIL));
   else
     sink_ref = make_reference(formal_parameter,  NIL);
 
@@ -178,8 +227,10 @@ points_to create_stub_points_to(cell c, type t,
   return pt_to;
 }
 
-/* To create the points-to stub assiciated to the formal parameter,
- * the sink name is a concatenation of the formal parmater and the POINTS_TO_MODULE_NAME */
+/* To create the points-to stub associated to the formal parameter,
+ * the sink name is a concatenation of the formal parmater and the
+ * POINTS_TO_MODULE_NAME.
+ */
 points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basic b)
 { 
   list l_ind = NIL;

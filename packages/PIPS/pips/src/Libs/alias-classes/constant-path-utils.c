@@ -130,9 +130,7 @@ set points_to_nowhere(list lhs_list, set input)
 
   /* Computing the gen set */
   FOREACH(cell, c, lhs_list) {
-    entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
-    reference r = make_reference(e, NIL);
-    cell sink = make_cell_reference(r);
+    cell sink = make_nowhere_cell();
     points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
     set_add_element(gen, gen, (void*)pt_to);
   }
@@ -140,6 +138,14 @@ set points_to_nowhere(list lhs_list, set input)
   set_union(res, gen, input_kill_diff);
 
   return res;
+}
+
+cell make_nowhere_cell()
+{
+  entity e = entity_all_xxx_locations(NOWHERE_LOCATION);
+  reference r = make_reference(e, NIL);
+  cell sink = make_cell_reference(r);
+  return sink;
 }
 
 
@@ -1186,13 +1192,46 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
     }
   }
 
+  // Possibly generate an error for dereferencing an undefined pointer
+  bool error_p =
+    get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  int lc = (int) gen_length(L);
   FOREACH(cell, l, L){
+    reference lr = cell_any_reference(l);
+    entity lv = reference_variable(lr);
+    bool null_p = entity_null_locations_p(lv);
+    bool nowhere_p = entity_typed_nowhere_locations_p(lv)
+      || entity_nowhere_locations_p(lv);
+    string bug = null_p? "a null" : "";
+    bug = nowhere_p? "an undefined" : "";
+    // Can the lhs be accessed?
+    if(null_p || nowhere_p) {
+      // No: two options; either a user_error() for dereferencing an
+      // unitialized pointer or a conversion to anywhere, typed or not
+      // FI: why be tolerant of NULL pointer dereferencing? For may information
+      if(lc==1) {
+	if(error_p)
+	  pips_user_error("Dereferencing of %s pointer.\n", bug);
+	else {
+	  pips_user_warning("Dereferencing of %s pointer.\n", bug);
+	}
+      }
+      else {
+	pips_user_warning("Possible dereferencing of %s pointer.\n", bug);
+      }
+      type t = entity_type(lv);
+      cell nl = make_anywhere_points_to_cell(t);
+      set gen_l = gen_may_constant_paths(nl, R, in_may, address_of_p, len);
+      set_union(gen_may2, gen_may2, gen_l);
+    }
+    else {
     // FI: memory leak due to call to call to gen_may_constant_paths()
     set gen_l = gen_may_constant_paths(l, R, in_may, address_of_p, len);
     // FI: be careful, the union does not preserve consistency because
     // the same arc may appear with different approximations
     set_union(gen_may2, gen_may2, gen_l);
     // free_set(gen_l);
+    }
   }
 
   set_union(gen_may2, gen_may2, gen_may1);
@@ -1207,6 +1246,9 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
  *
  * FI: address_of_p does not seem to be updated in this function. Why
  * pass a pointer? My analysis is wrong if gen_must_constant_paths() updates it
+ *
+ * FI: lots of common points between gen_must_set() and
+ * gen_may_set()... Possible unification?
  */
 set gen_must_set(list L, list R, set in_must, bool *address_of_p)
 {
@@ -1231,10 +1273,40 @@ set gen_must_set(list L, list R, set in_must, bool *address_of_p)
     }
   }
 
+  bool error_p = false; // generate an error for dereferencing an undefined pointer
+  int lc = (int) gen_length(L);
   FOREACH(cell, l, L){
+    // Can the lhs be accessed?
+    reference lr = cell_any_reference(l);
+    entity lv = reference_variable(lr);
+    bool null_p = entity_null_locations_p(lv);
+    bool nowhere_p = entity_typed_nowhere_locations_p(lv)
+      || entity_nowhere_locations_p(lv);
+    string bug = null_p? "a null" : "";
+    bug = nowhere_p? "an undefined" : "";
+    if(null_p || nowhere_p) {
+      // No: two options; either a user_error() for dereferencing an
+      // unitialized pointer or a conversion to anywhere, typed or not
+      if(lc==1) {
+	if(error_p)
+	  pips_user_error("Dereferencing of %s pointer.\n", bug);
+	else {
+	  pips_user_warning("Dereferencing of %s pointer.\n", bug);
+	}
+      }
+      else {
+	pips_user_warning("Possible dereferencing of %s pointer.\n", bug);
+      }
+      type t = entity_type(lv);
+      cell nl = make_anywhere_points_to_cell(t);
+      set must_l = gen_must_constant_paths(nl, R, in_must, address_of_p, len);
+      set_union(gen_must2, gen_must2, must_l);
+    }
+    else {
     set must_l = gen_must_constant_paths(l, R, in_must, address_of_p, len);
     set_union(gen_must2, gen_must2, must_l);
     // FI: shouldn't must_l be freed?
+    }
   }
   set_union(gen_must2, gen_must2,gen_must1);
 
@@ -1338,7 +1410,7 @@ set gen_must_constant_paths(cell l,
   set gen_must_cps = set_generic_make(set_private, points_to_equal_p,
 				      points_to_rank);
   points_to pt = points_to_undefined;
-  approximation a = approximation_undefined;
+  //approximation a = approximation_undefined;
   bool changed = false;
   int Rc = (int) gen_length(R);
 

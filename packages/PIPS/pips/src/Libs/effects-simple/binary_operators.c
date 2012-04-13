@@ -519,3 +519,150 @@ effect proper_to_summary_simple_effect(effect eff)
   }
   return(eff);
 }
+
+
+bool simple_cells_intersection_p(cell c1, descriptor __attribute__ ((__unused__)) d1,
+				 cell c2, descriptor __attribute__ ((__unused__)) d2,
+				 bool * exact_p)
+{
+  bool res = true; /* default safe result */
+  bool concrete_locations_p = true;
+
+  if (cells_combinable_p(c1, c2))
+    {
+      bool c1_abstract_location_p = cell_abstract_location_p(c1);
+      bool c2_abstract_location_p = cell_abstract_location_p(c2);
+
+      if (c1_abstract_location_p || c2_abstract_location_p)
+	{
+	  entity e1 = cell_entity(c1);
+	  entity e2 = cell_entity(c2);
+	  bool heap1_context_sensitive_p = c1_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e1);
+	  bool heap2_context_sensitive_p = c2_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e2);
+
+	  if (heap1_context_sensitive_p && heap2_context_sensitive_p)
+	    {
+	      concrete_locations_p = true;
+	    }
+	  else
+	    {
+	      concrete_locations_p = false;
+
+	      res = true;
+	      *exact_p = true;
+	    }
+	}
+
+      if (concrete_locations_p)
+	{
+	  /* we have combinable concrete locations or assimilated (context sensitive heap locations) */
+	  list l1 = cell_indices(c1);
+	  list l2 = cell_indices(c2);
+
+	  /* they intersect if their corresponding indices are unbounded or equal */
+	  res = true; *exact_p = true;
+	  while(res && !ENDP(l1))
+	    {
+	      expression exp1 = EXPRESSION(CAR(l1));
+	      expression exp2 = EXPRESSION(CAR(l2));
+
+	      if (unbounded_expression_p(exp1) || unbounded_expression_p(exp2))
+		*exact_p = false;
+	      else if (!expression_equal_p(exp1, exp2))
+		{
+		  res = false;
+		  *exact_p = true;
+		}
+	      POP(l1);
+	      POP(l2);
+	    }
+	}
+    }
+  else
+    {
+      res = false;
+      *exact_p = true;
+    }
+  return res;
+}
+
+/* Inclusion test :
+ */
+
+/**
+   returns true if c1 is included into c2, false otherwise.
+   returns false if c1 may only be included into c2.
+
+   @param exact_p target is set to true if the result is exact, false otherwise.
+
+   In fact, this parameter would be useful only if there are overflows during
+   the systems inclusion test. But it is not currently used.
+ */
+bool simple_cells_inclusion_p(cell c1, __attribute__ ((__unused__)) descriptor d1,
+			      cell c2, __attribute__ ((__unused__)) descriptor d2,
+			      bool * exact_p)
+{
+  bool res = true; /* default result */
+  *exact_p = true;
+
+  bool concrete_locations_p = true;
+
+  if (cells_combinable_p(c1, c2))
+    {
+      bool c1_abstract_location_p = cell_abstract_location_p(c1);
+      bool c2_abstract_location_p = cell_abstract_location_p(c2);
+
+      if (c1_abstract_location_p || c2_abstract_location_p)
+	{
+	  entity e1 = cell_entity(c1);
+	  entity e2 = cell_entity(c2);
+	  bool heap1_context_sensitive_p = c1_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e1);
+	  bool heap2_context_sensitive_p = c2_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e2);
+
+	  if (heap1_context_sensitive_p && heap2_context_sensitive_p)
+	    {
+	      concrete_locations_p = true;
+	    }
+	  else
+	    {
+	      entity al_max = abstract_locations_max(e1, e2);
+	      res = same_entity_p(e2, al_max);
+	      concrete_locations_p = false;
+	    }
+	}
+
+      if (concrete_locations_p)
+	{
+	  /* we have combinable concrete locations or assimilated (context sensitive heap locations) */
+	  list inds1 = cell_indices(c1);
+	  list inds2 = cell_indices(c2);
+
+
+	  for(;!ENDP(inds1) && res == true; POP(inds1), POP(inds2))
+	    {
+	      expression exp1 = EXPRESSION(CAR(inds1));
+	      expression exp2 = EXPRESSION(CAR(inds2));
+
+	      if (unbounded_expression_p(exp1))
+		{
+		  pips_debug(8, "case 4.1\n");
+		  if (!unbounded_expression_p(exp2))
+		    {
+		      pips_debug(8, "case 4.2\n");
+		      res = false;
+		    }
+		}
+	      else if (!unbounded_expression_p(exp2) && !expression_equal_p(exp1, exp2) )
+		{
+		  pips_debug(8, "case 4.3\n");
+		  res = false;
+		}
+	    }
+	}
+    }
+  else
+    {
+      res = false;
+    }
+  return res;
+}

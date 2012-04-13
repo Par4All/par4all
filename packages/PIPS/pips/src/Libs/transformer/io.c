@@ -44,11 +44,12 @@
 
 #include "transformer.h"
 
-/* print_transformer(tf): not a macro because of dbx */
+/* print_transformer(tf): not a macro because of dbx and gdb */
 transformer print_transformer(transformer tf)
 {
-    return fprint_transformer(stderr, tf,
-			      (get_variable_name_t) external_value_name);
+  (void) fprint_transformer(stderr, tf,
+			    (get_variable_name_t) external_value_name);
+  return tf;
 }
 
 /* For debugging without problem from temporary values */
@@ -69,31 +70,36 @@ fprint_transformer(FILE * fd,
 		   transformer tf,
 		   get_variable_name_t value_name)
 {
-    /* print_transformer returns an int to be compatible with the debug()
-       function; however, debug being a function and not a macro, its
-       arguments are ALWAYS evaluated regardless of the debug level;
-       so a call to print_transformer passed as an argument to debug
-       is ALWAYS effective */
+  /* print_transformer returns an int to be compatible with the debug()
+     function; however, debug being a function and not a macro, its
+     arguments are ALWAYS evaluated regardless of the debug level;
+     so a call to print_transformer passed as an argument to debug
+     is ALWAYS effective */
 
-    if (tf!=transformer_undefined) {
-	cons * args = transformer_arguments(tf);
-	Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
+  if(tf==transformer_undefined)
+    (void) fprintf(stderr,"TRANSFORMER UNDEFINED\n");
+  // For debugging with gdb, dynamic type checking
+  else if((transformer_domain_number(tf))!=transformer_domain) {
+    (void) fprintf(stderr,"Arg. \"tf\"is not a transformer.\n");
+  }
+  else {
+    cons * args = transformer_arguments(tf);
+    Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
 
-	/* print argument list */
-	(void) fprintf(fd,"arguments:");
-	print_homogeneous_arguments(args, (const char* (*) (entity))value_name);
+    /* print argument list */
+    (void) fprintf(fd,"arguments:");
+    print_homogeneous_arguments(args, (const char* (*) (entity))value_name);
 
-	/* print relation */
-	if(SC_UNDEFINED_P(sc))
-	    pips_internal_error("undefined relation");
-	(void) fprintf(fd,"relation:");
-	sc_fprint(fd,
-		  sc,
-		  value_name);
-    }
-    else
-	(void) fprintf(fd, "TRANSFORMER_UNDEFINED\n");
-    return tf;
+    /* print relation */
+    if(SC_UNDEFINED_P(sc))
+      pips_internal_error("undefined relation");
+    (void) fprintf(fd,"relation:");
+    sc_fprint(fd,
+	      sc,
+	      value_name);
+  }
+
+  return tf;
 }
 
 list fprint_transformers(FILE * fd,

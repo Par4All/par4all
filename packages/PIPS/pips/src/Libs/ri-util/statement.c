@@ -1201,10 +1201,12 @@ set r;
 */
 void print_statement(statement s)
 {
-  int dn = statement_domain_number(s);
-
+  if(statement_undefined_p(s))
+    fprintf(stderr, "Undefined statement\n");
   // For debugging with gdb, dynamic type checking
-  if(dn==statement_domain) {
+  else if(statement_domain_number(s)!=statement_domain)
+    (void) fprintf(stderr,"Arg. \"s\"is not a statement.\n");
+  else {
     debug_on("TEXT_DEBUG_LEVEL");
     set_alternate_return_set();
     reset_label_counter();
@@ -1216,8 +1218,6 @@ void print_statement(statement s)
     reset_alternate_return_set();
     debug_off();
   }
-  else
-    (void) fprintf(stderr,"Arg. \"s\"is not a statement.\n");
 }
 
 

@@ -2572,3 +2572,41 @@ void convex_cell_reference_with_value_of_cell_reference_translation
   *output_desc = make_descriptor_convex(output_sc);
   sc_rm(input_sc2);
 }
+
+void convex_cell_with_address_of_cell_translation
+(cell input_cell, descriptor input_desc,
+ cell address_of_cell, descriptor address_of_desc,
+ int nb_common_indices,
+ cell *output_cell, descriptor * output_desc,
+ bool *exact_p)
+{
+  reference input_ref = cell_any_reference(input_cell);
+  reference address_of_ref = cell_any_reference(address_of_cell);
+  reference output_ref;
+  convex_cell_reference_with_address_of_cell_reference_translation(input_ref, input_desc,
+								   address_of_ref, address_of_desc,
+								   nb_common_indices, &output_ref,
+								   output_desc,
+								   exact_p);
+
+  *output_cell = make_cell_reference(output_ref);
+}
+
+void convex_cell_with_value_of_cell_translation
+(cell input_cell, descriptor input_desc,
+ cell value_of_cell, descriptor  value_of_desc,
+ int nb_common_indices,
+ cell *output_cell, descriptor * output_desc,
+ bool *exact_p)
+{
+  reference input_ref = cell_any_reference(input_cell);
+  reference value_of_ref = cell_any_reference(value_of_cell);
+  reference output_ref;
+  convex_cell_reference_with_value_of_cell_reference_translation(input_ref, input_desc,
+								 value_of_ref, value_of_desc,
+								 nb_common_indices, &output_ref,
+								 output_desc,
+								 exact_p);
+
+  *output_cell = make_cell_reference(output_ref);
+}

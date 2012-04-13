@@ -189,16 +189,23 @@ bool cell_out_of_scope_p(cell c)
 /*print a points-to arc for debug*/
 void print_points_to(const points_to pt)
 {
-  cell source = points_to_source(pt);
-  cell sink = points_to_sink(pt);
-  approximation app = points_to_approximation(pt);
-  reference r1 = cell_to_reference(source);
-  reference r2 = cell_to_reference(sink);
+  if(points_to_undefined_p(pt))
+    (void) fprintf(stderr,"POINTS_TO UNDEFINED\n");
+  // For debugging with gdb, dynamic type checking
+  else if(points_to_domain_number(pt)!=points_to_domain)
+    (void) fprintf(stderr,"Arg. \"pt\"is not a points_to.\n");
+  else {
+    cell source = points_to_source(pt);
+    cell sink = points_to_sink(pt);
+    approximation app = points_to_approximation(pt);
+    reference r1 = cell_to_reference(source);
+    reference r2 = cell_to_reference(sink);
 
-  print_reference(r1);
-  fprintf(stderr,"->");
-  print_reference(r2);
-  fprintf(stderr," (%s)\n", approximation_to_string(app));
+    print_reference(r1);
+    fprintf(stderr,"->");
+    print_reference(r2);
+    fprintf(stderr," (%s)\n", approximation_to_string(app));
+  }
 }
 
 /* Print a set of points-to for debug */
@@ -227,24 +234,81 @@ bool source_in_set_p(cell source, set s)
   return in_p;
 }
 
-/* Return a list of cells, "sinks", that are sink for some edge whose
- *  source is "source" in set "s". If "fresh_p" is set to true, no
- *  sharing is created between list "sinks" and reference "source" or
- *  points-to set "s". Else, the cells in list "sinks" are the cells
- *  in arcs of the points-to set.
+/* Return a list of cells, "sinks", that are sink for some arc whose
+ * source is "source" in set "s". If "fresh_p" is set to true, no
+ * sharing is created between list "sinks" and reference "source" or
+ * points-to set "s". Else, the cells in list "sinks" are the cells in
+ * arcs of the points-to set.
+ *
+ * Additional functionality: add new arcs in s when global, formal or
+ * virtual variables are reached.
  *
  * Function added by FI.
  */
-list source_to_sinks(cell source, set s, bool fresh_p)
+list source_to_sinks(cell source, set pts, bool fresh_p)
 {
   list sinks = NIL;
-  SET_FOREACH ( points_to, pt, s ) {
-    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+  SET_FOREACH ( points_to, pt, pts) {
     if(cell_equal_p(source, points_to_source(pt))) {
       cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
       sinks = CONS(CELL, sc, sinks);
     }
   }
+
+  // FI: you must generate sinks for formal parameters, global
+  // variables and stubs if nothing has been found
+  if(ENDP(sinks)) {
+    reference r = cell_any_reference(source);
+    entity v = reference_variable(r);
+    if(formal_parameter_p(v)
+       || /* global_variable_p(v)*/
+       /* FI: wrong test anywhere might have been top-level? */
+       /* FI: wrong, how about static global variables? */
+       /* FI: see for instance global07.c */
+       top_level_entity_p(v)) {
+      // Find stub type
+      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+      // FI: the type retrieval must be improved for arrays & Co
+      points_to pt = create_stub_points_to(source, st, basic_undefined);
+      pts = add_arc_to_pt_map(pt, pts);
+      add_arc_to_points_to_context(copy_points_to(pt));
+      sinks = source_to_sinks(source, pts, false);
+    }
+    else if(static_global_variable_p(v)) {
+      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+      // FI: the type retrieval must be improved for arrays & Co
+      points_to pt = create_stub_points_to(source, st, basic_undefined);
+      pts = add_arc_to_pt_map(pt, pts);
+      add_arc_to_points_to_context(copy_points_to(pt));
+      sinks = source_to_sinks(source, pts, false);
+      /* cell nc = add_virtual_sink_to_source(source);
+       * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+       * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+       */
+      ;
+    }
+    else if(entity_stub_sink_p(v)) {
+      //type ost = ultimate_type(entity_type(v));
+      bool to_be_freed; // FI: memory leak for the time being
+      type rt = cell_to_type(source, &to_be_freed); // reference type
+      if(pointer_type_p(rt)) {
+	type nst = type_to_pointed_type(rt);
+	points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	pts = add_arc_to_pt_map(pt, pts);
+	add_arc_to_points_to_context(copy_points_to(pt));
+	sinks = source_to_sinks(source, pts, false);
+      }
+      else if(array_type_p(rt)) {
+	printf("Entity \"%s\"\n", entity_local_name(v));
+	pips_internal_error("Not implemented yet.\n");
+      }
+    }
+    if(ENDP(sinks))
+      pips_internal_error("Sink missing for a source based on \"%s\".\n",
+			  entity_user_name(v));
+
+  }
+
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
   return sinks;
@@ -262,8 +326,11 @@ bool sink_in_set_p(cell sink, set s)
 }
 
 
-/* merge two points-to sets; required to compute
-   the points-to set of the if control statements. */
+/* merge two points-to sets;
+ *
+ * required to compute
+ * the points-to set of the if control statements.
+ */
 set merge_points_to_set(set s1, set s2) {
   set Definite_set = set_generic_make(set_private, points_to_equal_p,
 				      points_to_rank);

@@ -38,6 +38,11 @@ typedef struct {
 
   list (*make_pv_from_effects_func)(effect, effect, cell_interpretation, list);
 
+  /* COMPARISON OPERATORS */
+  bool (*cell_preceding_p_func)(cell, descriptor,
+				cell, descriptor ,
+				transformer, bool, bool *);
+
   /* TRANSLATION OPERATORS */
   void (*cell_reference_with_value_of_cell_reference_translation_func)
   (reference , descriptor, reference , descriptor, int, reference *, descriptor *, bool *);

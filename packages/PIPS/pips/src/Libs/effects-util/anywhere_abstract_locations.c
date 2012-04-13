@@ -55,20 +55,38 @@ resulting abstract location is *ANYWHERE*:*ANYWHERE*.
 
 */
 
-/*return *ANY_MODULE*:*ANYWHERE* (the top of the lattice)*/
+// FI: redundance between all_locations and anywhere
+
+/*return *ANY_MODULE*:*ANYWHERE* (the top of the lattice)
+ *
+ * FI->aM: it was first decided to make this entity an area, but areas
+ * cannot be typed. So the internal representation must be changed to
+ * carry a type usable according to ALIAS_ACROSS_TYPES. The top of the
+ * location lattice should use overloaded as type, that is the top of
+ * the type lattice.
+ */
 entity entity_all_locations()
 {
   entity anywhere = entity_undefined;
-  static const char any_name[] = ANY_MODULE_NAME MODULE_SEP_STRING  ANYWHERE_LOCATION;
+  static const char any_name[] =
+    ANY_MODULE_NAME MODULE_SEP_STRING  ANYWHERE_LOCATION;
   anywhere = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
-    anywhere = make_entity(strdup(any_name), t, make_storage_rom(), make_value_unknown());
+    anywhere = make_entity(strdup(any_name),
+			   t,
+			   make_storage_rom(),
+			   make_value_unknown());
     entity_kind(anywhere)=ABSTRACT_LOCATION;
   }
 
   return anywhere;
+}
+
+entity entity_anywhere_locations()
+{
+  return entity_all_locations();
 }
 
 /* test if an entity is the top of the lattice*/
@@ -81,6 +99,25 @@ bool entity_all_locations_p(entity e)
     && same_string_p(entity_module_name(e), ANY_MODULE_NAME);
 
   return anywhere_p;
+}
+
+entity entity_typed_anywhere_locations(type t)
+{
+  return entity_all_xxx_locations_typed(ANYWHERE_LOCATION, t);
+}
+
+/* test if an entity is the bottom of the lattice*/
+bool entity_anywhere_locations_p(entity e)
+{
+    return same_entity_p(e, entity_all_locations());
+}
+
+/* test if an entity is the bottom of the lattice*/
+bool entity_typed_anywhere_locations_p(entity e)
+{
+  string ln = (string) entity_local_name(e);
+  string p = strstr(ln, ANYWHERE_LOCATION);
+  return p!=NULL;
 }
 
 /* return *ANY_MODULE*:*NOWHERE* */
@@ -102,12 +139,23 @@ entity entity_nowhere_locations()
    return nowhere;
 }
 
-
+entity entity_typed_nowhere_locations(type t)
+{
+  return entity_all_xxx_locations_typed(NOWHERE_LOCATION, t);
+}
 
 /* test if an entity is the bottom of the lattice*/
 bool entity_nowhere_locations_p(entity e)
 {
     return same_entity_p(e,entity_nowhere_locations());
+}
+
+/* test if an entity is the bottom of the lattice*/
+bool entity_typed_nowhere_locations_p(entity e)
+{
+  string ln = (string) entity_local_name(e);
+  string p = strstr(ln, NOWHERE_LOCATION);
+  return p!=NULL;
 }
 
 
