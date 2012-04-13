@@ -1,0 +1,62 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   mystruct s1, s2, s3;
+//             <    is written>: b c
+   int b = 1, c = 2, d;
+//             <    is written>: s2.a
+
+   s2.a = &b;
+//             <    is written>: s3.a
+   s3.a = &c;
+//             <may be read   >: s2.a s2.b[*] s2.c s3.a s3.b[*] s3.c
+//             <may be written>: s1.b[*]
+//             <    is read   >: c d
+//             <    is written>: s1.a s1.c
+   s1 = c==d?s2:s3;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   mystruct s1, s2, s3;
+
+// Points To: none
+
+   int b = 1, c = 2, d;
+
+// Points To: none
+
+
+   s2.a = &b;
+
+// Points To:
+// s2.a -> b , EXACT
+
+   s3.a = &c;
+
+// Points To:
+// s2.a -> b , EXACT
+// s3.a -> c , EXACT
+
+   s1 = c==d?s2:s3;
+
+// Points To:
+// s2.a -> b , EXACT
+// s3.a -> c , EXACT
+
+   return 0;
+}

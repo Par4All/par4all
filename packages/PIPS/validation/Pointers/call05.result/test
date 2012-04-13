@@ -1,0 +1,93 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: d1
+   int d1 = 4;
+//             <    is written>: d2
+   int d2 = 4;
+   int y[d1][d2];
+   int i, j;
+//             <    is read   >: d1
+//             <    is written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: d1 d2 i
+      call05(i, d2, y[i]);
+//             <    is read   >: d1
+//             <    is written>: i
+
+   for(i = 0; i <= d1-1; i += 1) {
+//             <    is read   >: d1 d2
+//             <    is written>: j
+      for(j = 0; j <= d2-1; j += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: d1 d2 i j stdout y[i][j] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: d1 stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int d1 = 4;
+
+// Points To: none
+
+   int d2 = 4;
+
+// Points To: none
+
+   int y[d1][d2];
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1)
+
+// Points To: none
+
+      call05(i, d2, y[i]);
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1) {
+
+// Points To: none
+
+      for(j = 0; j <= d2-1; j += 1)
+
+// Points To: none
+
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+
+// Points To: none
+
+      printf("\n");
+   }
+}

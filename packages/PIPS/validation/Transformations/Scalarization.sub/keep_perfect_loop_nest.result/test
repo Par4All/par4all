@@ -1,0 +1,42 @@
+#
+# Code after scalarization for module main
+#
+int main()
+{
+   int i, j;
+   int N = 100;
+   int A[N][N];
+   int u1[N];
+   int u2[N];
+
+#pragma omp parallel for 
+l99998:
+   for(i = 0; i <= N-1; i += 1)
+#pragma omp parallel for 
+l99999:
+      for(j = 0; j <= N-1; j += 1)
+         A[i][j] = A[i][j]+u1[i]+u2[i];
+}
+#
+# Code after scalarization for module main
+#
+int main()
+{
+   int i, j;
+   int N = 100;
+   int A[N][N];
+   int u1[N];
+   int u2[N];
+
+#pragma omp parallel for 
+l99998:
+   for(i = 0; i <= N-1; i += 1) {
+      //PIPS generated variable
+      register int u2_0 = u2[i], u1_0 = u1[i];
+
+#pragma omp parallel for 
+l99999:
+      for(j = 0; j <= N-1; j += 1)
+         A[i][j] = A[i][j]+u1_0+u2_0;
+   }
+}

@@ -1,0 +1,125 @@
+
+PROPER  EFFECTS
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//             <    is read   >: c
+   if (c=='\n'||c=='\r')
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: col
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         (*nbout)++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         (*col)++;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      (*col)++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   (*nbout)++;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+
+// Points To OUT: none
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+   if (c=='\n'||c=='\r')
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+         my_fputc(' ', _stream);
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+         (*nbout)++;
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+         (*col)++;
+      }
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+      (*col)++;
+   }
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+
+// Points To:
+// _stream -> __stream_2[0] , EXACT
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
+
+   (*nbout)++;
+}

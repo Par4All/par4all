@@ -1,0 +1,106 @@
+
+PROPER EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: q
+   int *q = &i;
+//             <    is written>: p
+   int *p = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   // Increment i
+   (*q)++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+   // increment q
+   *q++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i p q stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // The loaded value is not used
+   printf("i=%d, p=%p, q=%p\n", i, p, q);
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: q
+   int *q = &i;
+//             <    is written>: p
+   int *p = &i;
+//             <    is read   >: q q[0]
+//             <    is written>: q[0]
+   // Increment i
+   (*q)++;
+//             <    is read   >: q q[0]
+//             <    is written>: q
+   // increment q
+   *q++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i p q stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // The loaded value is not used
+   printf("i=%d, p=%p, q=%p\n", i, p, q);
+   return 0;
+}
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *q = &i;
+
+// Points To:
+// q -> i , EXACT
+
+   int *p = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+
+   // Increment i
+   (*q)++;
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+
+   // increment q
+   *q++;
+
+// Points To:
+// p -> i , EXACT
+// q -> i[1] , EXACT
+
+   // The loaded value is not used
+   printf("i=%d, p=%p, q=%p\n", i, p, q);
+
+// Points To:
+// p -> i , EXACT
+// q -> i[1] , EXACT
+
+   return 0;
+}

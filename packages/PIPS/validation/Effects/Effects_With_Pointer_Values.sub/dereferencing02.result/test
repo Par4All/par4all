@@ -1,0 +1,121 @@
+void dereferencing02()
+{
+
+// Pointer values: none
+
+   double x = 1.;
+
+// Pointer values: none
+
+   double *p = &x;
+
+// Pointer values:
+// p == &x (exact);
+
+   double **q = &p;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+
+   double **w;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i = 1;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   **q = 2.;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   **(q+(i = 0)) = 3.;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   **(w+(i = 2)) = 4.;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   x = **q;
+
+// Pointer values:
+// p == &x (exact);
+// q == &p (exact);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   q++;
+
+// Pointer values:
+// p == &x (exact);
+// q == &*ANY_MODULE*:*ANYWHERE* (may);
+// w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   *q++;
+}
+int main()
+{
+
+// Pointer values: none
+
+   dereferencing02();
+
+// Pointer values: none
+
+   return 1;
+}
+void dereferencing02()
+{
+//             <    is written>: x
+   double x = 1.;
+//             <    is written>: p
+   double *p = &x;
+//             <    is written>: q
+   double **q = &p;
+   double **w;
+//             <    is written>: i
+   int i = 1;
+//             <    is read   >: p q
+//             <    is written>: x
+   
+   
+   **q = 2.;
+//             <    is read   >: p q
+//             <    is written>: i x
+   **(q+(i = 0)) = 3.;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   **(w+(i = 2)) = 4.;
+//             <    is read   >: p q x
+//             <    is written>: x
+   x = **q;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+   *q++;
+}
+int main()
+{
+   dereferencing02();
+   return 1;
+}

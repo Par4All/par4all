@@ -245,6 +245,36 @@ must_regions_with_points_to(const char* module_name)
     return res1 && res2;
 }
 
+/* bool must_regions(const char* module_name)
+ * input    : the name of the current module
+ * output   : nothing.
+ * modifies : computes the local regions of a module.
+ * comment  : local regions can contain local variables.
+ */
+bool
+must_regions_with_pointer_values(const char* module_name)
+{
+    bool res1, res2;
+
+    set_bool_property("MUST_REGIONS", true);
+
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_pointer_values);
+    set_methods_for_convex_rw_effects();
+    res1 = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_pointer_values);
+    set_methods_for_convex_rw_effects();
+    res2 = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+
+    return res1 && res2;
+}
+
+
+
 /******************************************************** CONVEX IN REGIONS */
 
 

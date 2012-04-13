@@ -59,6 +59,17 @@ entity cell_entity(cell c)
   else return(reference_variable(cell_any_reference(c)));
 }
 
+list cell_indices(cell c)
+{
+  list l_res = NIL;
+  if (cell_gap_p(c))
+    pips_internal_error("GAPs not implemented yet\n");
+  else
+    l_res = reference_indices(cell_any_reference(c));
+  return l_res;
+}
+
+
 /* API for reference */
 
 reference cell_any_reference(cell c)
@@ -278,6 +289,21 @@ bool anywhere_effect_p(effect e)
   return anywhere_p;
 }
 
+/* Is it an anywhere effect? */
+bool anywhere_cell_p(cell c)
+{
+  bool anywhere_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  anywhere_p =  entity_all_locations_p(v);
+
+  return anywhere_p;
+}
+
+
+
+
 effect heap_effect(entity m, action ac)
 {
   entity heap = FindEntity(entity_local_name(m), HEAP_AREA_LOCAL_NAME );

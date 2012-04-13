@@ -1,0 +1,58 @@
+void dereferencing04()
+{
+
+// Pointer values: none
+
+   double *p = (double *) malloc(10*sizeof(double));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+
+   double *q = (double *) malloc(10*sizeof(double));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == &*HEAP*_l_8[0] (exact);
+
+   double *r = (double *) malloc(10*sizeof(double));
+
+// Pointer values:
+// p == &*HEAP*_l_7[0] (exact);
+// q == &*HEAP*_l_8[0] (exact);
+// r == &*HEAP*_l_9[0] (exact);
+
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+
+// Pointer values: none
+
+   dereferencing04();
+
+// Pointer values: none
+
+   return 1;
+}
+void dereferencing04()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   double *p = (double *) malloc(10*sizeof(double));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+   double *q = (double *) malloc(10*sizeof(double));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: r _MALLOC_EFFECTS:_MALLOC_
+   double *r = (double *) malloc(10*sizeof(double));
+//             <    is read   >: p q r
+//             <    is written>: *HEAP*_l_7[q-r]
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dereferencing04();
+   return 1;
+}

@@ -1,0 +1,81 @@
+
+PROPER  EFFECTS
+
+void bar(int **pp, int **qq)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *pp = *qq;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("pointers exchanged");
+}
+void foo()
+{
+//             <    is written>: i j p pp q qq
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   bar(pp, qq);
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _pp_1[0] -> _pp_1_1[0] , EXACT
+// _qq_2[0] -> _qq_2_2[0] , EXACT
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
+
+
+// Points To OUT:
+// _pp_1[0] -> _qq_2_2[0] , EXACT
+// _qq_2[0] -> _qq_2_2[0] , EXACT
+
+void bar(int **pp, int **qq)
+{
+
+// Points To:
+// _pp_1[0] -> _pp_1_1[0] , EXACT
+// _qq_2[0] -> _qq_2_2[0] , EXACT
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
+
+   *pp = *qq;
+
+// Points To:
+// _pp_1[0] -> _qq_2_2[0] , EXACT
+// _qq_2[0] -> _qq_2_2[0] , EXACT
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
+
+   printf("pointers exchanged");
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void foo()
+{
+
+// Points To: none
+
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+
+   bar(pp, qq);
+}

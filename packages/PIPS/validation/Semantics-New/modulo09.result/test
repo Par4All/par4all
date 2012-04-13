@@ -1,0 +1,156 @@
+
+Source code unrolled
+
+
+Source code with transformers
+
+
+//  T() {}
+
+void modulo09()
+{
+
+//  T(n) {n==1024}
+
+   int n = 1024;
+
+//  T(i) {n==1024}
+
+   int i;
+   //PIPS generated variable
+
+//  T(LU_IB0,LU_IND0,LU_NUB0) {n==1024}
+
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+//  T(LU_NUB0) {LU_NUB0==1024, n==1024}
+
+unroll:   LU_NUB0 = (n-1-0+1)/1;
+
+//  T(LU_IB0) {LU_IB0==0, LU_NUB0==1024, n==1024}
+
+   LU_IB0 = MOD(LU_NUB0, 4);
+
+//  T() {0==-1}
+
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+//  T() {0==-1}
+
+      printf("%d", LU_IND0*1+0);
+
+//  T() {0==-1}
+
+l99999:      ;
+   }
+
+//  T(LU_IND0) {LU_IB0==0, LU_IND0#init==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+
+//  T() {LU_IB0==0, LU_NUB0==1024, n==1024, 0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+0)*1+0);
+
+//  T() {LU_IB0==0, LU_NUB0==1024, n==1024, 0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+1)*1+0);
+
+//  T() {LU_IB0==0, LU_NUB0==1024, n==1024, 0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+2)*1+0);
+
+//  T() {LU_IB0==0, LU_NUB0==1024, n==1024, 0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+3)*1+0);
+
+//  T() {LU_IB0==0, LU_NUB0==1024, n==1024, 0<=LU_IND0, LU_IND0<=1023}
+
+l99998:      ;
+   }
+
+//  T(i) {LU_IB0==0, LU_NUB0==1024, i==1024, n==1024, 1024<=LU_IND0,
+//    LU_IND0<=1027}
+
+   i = 0+MAX0(LU_NUB0, 0)*1;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+void modulo09()
+{
+
+//  P() {}
+
+   int n = 1024;
+
+//  P(n) {n==1024}
+
+   int i;
+   //PIPS generated variable
+
+//  P(i,n) {n==1024}
+
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {n==1024}
+
+unroll:   LU_NUB0 = (n-1-0+1)/1;
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_NUB0==1024, n==1024}
+
+   LU_IB0 = MOD(LU_NUB0, 4);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024}
+
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+//  P() {0==-1}
+
+      printf("%d", LU_IND0*1+0);
+
+//  P() {0==-1}
+
+l99999:      ;
+   }
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_IND0==0,
+//    LU_NUB0==1024, n==1024}
+
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+0)*1+0);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+1)*1+0);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+2)*1+0);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+      printf("%d", (LU_IND0+3)*1+0);
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    0<=LU_IND0, LU_IND0<=1023}
+
+l99998:      ;
+   }
+
+//  P(LU_IB0,LU_IND0,LU_NUB0,i,n) {LU_IB0==0, LU_NUB0==1024, n==1024,
+//    1024<=LU_IND0, LU_IND0<=1027}
+
+   i = 0+MAX0(LU_NUB0, 0)*1;
+}

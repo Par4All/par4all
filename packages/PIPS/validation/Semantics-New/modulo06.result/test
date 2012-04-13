@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+void modulo06(unsigned int n, int i, unsigned int a[n])
+{
+
+//  T(i) {0<=i+3, i<=3}
+
+   i = n%4;
+
+//  T(j) {0<=j+3, j<=3}
+
+   int j = n%4;
+
+//  T() {}
+
+   
+   // Here i and j in the precondition should be the same
+   printf("%d", a[i]);
+}
+
+Source code with preconditions
+
+
+//  P() {i==0, n==10}
+
+void modulo06(unsigned int n, int i, unsigned int a[n])
+{
+
+//  P() {i==0, n==10}
+
+   i = n%4;
+
+//  P(i) {i==2, n==10}
+
+   int j = n%4;
+
+//  P(i,j) {i==2, j==2, n==10}
+
+   
+   // Here i and j in the precondition should be the same
+   printf("%d", a[i]);
+}

@@ -66,39 +66,39 @@ int main()
    for(i = 1; i <= 4; i += 1) {
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
       c = 5;
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
       a = b;
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
       b = &d;
    }
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
 
    return 0;

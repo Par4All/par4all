@@ -1,4 +1,12 @@
-#include <stdio.h>
+// Check fix point for do while
+
+// Check the resulting points-to information after the loop: a cannot
+// point to nowhere
+
+// Check sorting before print-out...
+
+// #include <stdio.h>
+
 int main() {
   int *a, *b, c, d, i;
    c = 0;
@@ -6,11 +14,11 @@ int main() {
    i = 2;
    b = &c;
  
-   do{
-     i = i+1;
-     a= b;
+   do {
+     a = b;
      b = &d;
-   }while(i<5); 
+     i = i+1;
+   } while(i<5); 
 
   return 0;
 }

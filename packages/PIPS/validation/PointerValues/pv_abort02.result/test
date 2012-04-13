@@ -1,8 +1,26 @@
 int main()
 {
+
+// Pointer values: none
+
    int **a;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
    int b;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
    a = (int **) 0;
+
+// Pointer values:
+// a == *NULL_POINTER* (exact);
+
    a[0] = &b;
+
+// Pointer values: none
+
    return 0;
 }

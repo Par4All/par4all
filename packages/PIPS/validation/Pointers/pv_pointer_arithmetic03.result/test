@@ -1,0 +1,93 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int a[10];
+   int *p;
+   int i, j;
+//             <    is written>: i
+   i = 3;
+//             <    is written>: j
+   j = 2;
+//             <    is written>: p
+   p = &a[0];
+//             <    is read   >: i p
+//             <    is written>: p
+   p = p+i;
+//             <    is read   >: j p
+//             <    is written>: p
+   p = p+j;
+//             <    is read   >: i p
+//             <    is written>: p
+   p = p-i;
+//             <    is read   >: j p
+//             <    is written>: p
+   p = p-j;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i, j;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   i = 3;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   j = 2;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+
+   p = p+i;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   p = p+j;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   p = p-i;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   p = p-j;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   return 0;
+}

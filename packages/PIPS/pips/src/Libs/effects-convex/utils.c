@@ -1568,6 +1568,34 @@ void convex_region_change_ith_dimension_expression(effect reg, expression exp,
   return;
 }
 
+/**
+ eliminate phi_i from the region Psystem.
+
+ @param reg a convex region
+ @param exp the new expresion for the region ith dimension
+ @param i is the rank of the dimension to change.
+
+ */
+void convex_region_descriptor_remove_ith_dimension(effect reg, int i)
+{
+  list l_phi_i = CONS(ENTITY,make_phi_entity(i),NIL);
+
+  /* first eliminate PHI_i variable from the system */
+  region_exact_projection_along_parameters(reg, l_phi_i);
+  gen_free_list(l_phi_i);
+
+  ifdebug(8)
+    {
+      pips_debug(8, "end with region :\n");
+      print_region(reg);
+      pips_assert("the region is consistent", effect_consistent_p(reg));
+    }
+
+  return;
+}
+
+
+
 
 /**
    @brief copies the input_effect and converts all it's reference indices that refer to

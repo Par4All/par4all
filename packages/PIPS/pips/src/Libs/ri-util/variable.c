@@ -1366,6 +1366,15 @@ bool formal_parameter_p(entity v)
     return formal_p;
 }
 
+/* Is v a global variable declared local to a C file such "static int i;" */
+bool static_global_variable_p(entity v)
+{
+  // static global variables are decared in a compilation unit
+  bool static_global_variable_p = compilation_unit_p(entity_module_name(v));
+
+  return static_global_variable_p;
+}
+
 
 /* True if a variable is the pseudo-variable used to store value
    returned by a function: */
@@ -1484,7 +1493,7 @@ bool volatile_variable_p(entity v)
 }
 
 /* The variable may turn out to be a function */
-bool qualified_variable_p(entity v, int is_qualified)
+bool qualified_variable_p(entity v, unsigned int is_qualified)
 {
   bool qualified_p = false;
   type t = entity_type(v);

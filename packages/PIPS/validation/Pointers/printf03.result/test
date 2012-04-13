@@ -53,13 +53,13 @@ int main()
    char *fmt = "i=%d, %d, %f\n";
 
 // Points To:
-// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fmt -> "i=%d, %d, %f\n" , EXACT
 
 
    y[0] = 0.;
 
 // Points To:
-// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fmt -> "i=%d, %d, %f\n" , EXACT
 
    printf(fmt, i, i+j, x);
 }

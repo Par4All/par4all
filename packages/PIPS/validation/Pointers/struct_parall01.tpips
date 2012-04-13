@@ -9,11 +9,11 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 module main
 
 
-echo 
-echo PROPER POINTER EFFECTS
-echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
+#echo 
+#echo PROPER POINTER EFFECTS
+#echo
+#activate PRINT_CODE_PROPER_POINTER_EFFECTS
+#display PRINTED_FILE
 
 
 

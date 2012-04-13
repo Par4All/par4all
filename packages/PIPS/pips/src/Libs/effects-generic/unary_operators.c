@@ -734,3 +734,130 @@ list filter_effects_with_declaration(list l_eff, entity decl)
     }
   return l_res;
 }
+
+/***********************************************************************/
+/*                                               */
+/***********************************************************************/
+
+/**
+  @input eff is an input effect describing a memory path
+  @return a list of effects corresponding to effects on eff cell prefix pointer paths
+*/
+list effect_intermediary_pointer_paths_effect(effect eff)
+{
+  pips_debug_effect(5, "input effect :", eff);
+  list l_res = NIL;
+  reference ref = effect_any_reference(eff);
+  entity e = reference_variable(ref);
+  descriptor d = effect_descriptor(eff);
+  list ref_inds = reference_indices(ref);
+  int nb_phi_init = (int) gen_length(ref_inds);
+  reference tmp_ref = make_reference(e, NIL);
+  type t = entity_basic_concrete_type(e);
+  bool finished = false;
+
+  if (entity_abstract_location_p(e))
+    {
+      if (anywhere_effect_p(eff)
+	  || null_pointer_value_cell_p(effect_cell(eff))
+	  || undefined_pointer_value_cell_p(effect_cell(eff)))
+	return CONS(EFFECT, copy_effect(eff), NIL);
+    }
+
+  while (!finished && !ENDP(ref_inds))
+    {
+      switch (type_tag(t))
+	{
+
+	case is_type_variable:
+	  {
+	    pips_debug(5," variable case\n");
+	    basic b = variable_basic(type_variable(t));
+	    size_t nb_dim = gen_length(variable_dimensions(type_variable(t)));
+
+	    /* add to tmp_ref as many indices from ref as nb_dim */
+	    for(size_t i = 0; i< nb_dim; i++, POP(ref_inds))
+	      {
+		reference_indices(tmp_ref) =
+		  gen_nconc(reference_indices(tmp_ref),
+			    CONS(EXPRESSION,
+				 copy_expression(EXPRESSION(CAR(ref_inds))),
+				 NIL));
+	      }
+
+	    if (basic_pointer_p(b))
+	      {
+		pips_debug(5," pointer basic\n");
+		if (!ENDP(ref_inds))
+		  {
+		    pips_debug(5,"and ref_inds is not empty\n");
+		    effect tmp_eff =
+		      make_effect(make_cell_reference(copy_reference(tmp_ref)),
+				  copy_action(effect_action(eff)),
+				  copy_approximation(effect_approximation(eff)),
+				  copy_descriptor(d));
+		    if (descriptor_convex_p(d))
+		      {
+			int nb_phi_tmp_eff = (int) gen_length(reference_indices(tmp_ref));
+			for(int nphi = nb_phi_tmp_eff; nphi <= nb_phi_init; nphi++)
+			  {
+			    extern void convex_region_descriptor_remove_ith_dimension(effect, int);
+			    convex_region_descriptor_remove_ith_dimension(tmp_eff, nphi);
+			  }
+		      }
+		    else if (!descriptor_none_p(d))
+		      {
+			pips_internal_error("invalid effect descriptor kind\n");
+		      }
+		    l_res = CONS(EFFECT, tmp_eff, l_res);
+		    reference_indices(tmp_ref) =
+		      gen_nconc(reference_indices(tmp_ref),
+				CONS(EXPRESSION,
+				     copy_expression(EXPRESSION(CAR(ref_inds))),
+				     NIL));
+		    POP(ref_inds);
+
+		    type new_t = copy_type(basic_pointer(b));
+		    /* free_type(t);*/
+		    t = new_t;
+		  }
+		else
+		  finished = true;
+	      }
+	    else if (basic_derived_p(b))
+	      {
+		pips_debug(5,"derived basic\n");
+		type new_t = entity_basic_concrete_type(basic_derived(b));
+		t = new_t;
+	      }
+	    else
+	      finished = true;
+	  }
+	  break;
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  {
+	    pips_debug(5,"struct union or enum type\n");
+
+	    /* add next index */
+	    expression field_exp = EXPRESSION(CAR(ref_inds));
+	    reference_indices(tmp_ref) =
+	      gen_nconc(reference_indices(tmp_ref),
+			CONS(EXPRESSION,
+			     copy_expression(field_exp),
+			     NIL));
+	    POP(ref_inds);
+	    entity field_ent = expression_to_entity(field_exp);
+	    pips_assert("expression is a field entity\n", !entity_undefined_p(field_ent));
+	    type new_t = entity_basic_concrete_type(field_ent);
+	    t = new_t;
+	  }
+	  break;
+	default:
+	    pips_internal_error("unexpected type tag");
+
+	}
+    }
+  return l_res;
+}

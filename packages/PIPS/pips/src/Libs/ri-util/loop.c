@@ -434,11 +434,20 @@ int depth_of_parallel_perfect_loop_nest(statement s) {
     statement prev = s;
     for(list iter=statement_block(s);!ENDP(iter);POP(iter)) {
       statement st = STATEMENT(CAR(iter));
-      if(declaration_statement_p(st))//ok, skip this
+      // We can ignore declarations... until there is an initialization !
+      if(declaration_statement_p(st)) {
+        FOREACH(entity,e,statement_declarations(st)) {
+          if(!value_undefined_p(entity_initial(e))
+              && !value_unknown_p(entity_initial(e))) {
+            return 0;
+          }
+        }
         continue;
-      else if(gen_length(iter)!=1) return 0;
-      else
+      } else if(gen_length(iter)!=1) {
+        return 0;
+      } else {
         s = st;
+      }
     }
     if(s == prev) return 0;
   }

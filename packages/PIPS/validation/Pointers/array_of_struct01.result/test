@@ -1,0 +1,36 @@
+
+PROPER  EFFECTS
+
+int array_of_struct01()
+{
+   struct two {
+      int *first;
+      int second;
+   } x[10];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int array_of_struct01()
+{
+
+// Points To: none
+
+   struct two {
+      int *first;
+      int second;
+   } x[10];
+
+// Points To: none
+
+
+   return 0;
+}

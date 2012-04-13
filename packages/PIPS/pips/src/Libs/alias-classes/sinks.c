@@ -24,9 +24,22 @@
 
 /*
  * This file contains functions used to compute points-to sets at
- * expression level.
+ * the expression level.
  *
- * The argument pt_in is always modified by side-effects and returned.
+ * Most important function:
+ *
+ * list expression_to_points_to_sinks(expression lhs, pt_map in, bool eval_p)
+ *
+ * The purpose of this function and the functions in this C file is to
+ * return a list of memory cells addressed when evaluated in the
+ * memory context "in".
+ *
+ * The memory context "in" may be modified by side-effects if new
+ * memory locations have to be added, for instance when formal or
+ * global pointers are dereferenced.
+ *
+ * The similar functions in Amira's implementation are located in
+ * constant-path-utils.c.
  */
 
 #include <stdlib.h>
@@ -80,8 +93,18 @@ list points_to_null_sinks()
   entity ne = entity_null_locations();
   return entity_to_sinks(ne);
 }
+
+list points_to_anywhere_sinks(type t)
+{
+  entity ne;
+  if(type_undefined_p(t))
+    ne = entity_all_locations();
+  else
+    ne = entity_typed_anywhere_locations(t);
+  return entity_to_sinks(ne);
+}
 
-list call_to_points_to_sinks(call c, pt_map in)
+list call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity f = call_function(c);
@@ -98,6 +121,22 @@ list call_to_points_to_sinks(call c, pt_map in)
     constant zero = value_constant(v);
     if(constant_int_p(zero) && constant_int(zero)==0)
       sinks = points_to_null_sinks();
+    else {
+      type t = type_to_returned_type(entity_type(f));
+      if(string_type_p(t)) {
+	// FI: we could generate a special location for each string
+	// FI: we could reuse the constant function
+	// FI: we could use the static area of the current module
+	// FI: we can always use anywhere...
+	// FI: does not depend oneval_p... involution...
+	reference r = make_reference(f, NIL);
+	cell c = make_cell_reference(r);
+	sinks = CONS(CELL, c, NIL);
+    }
+    else {
+      sinks = points_to_anywhere_sinks(t);
+    }
+    }
   }
     break;
   case is_value_unknown:
@@ -106,7 +145,7 @@ list call_to_points_to_sinks(call c, pt_map in)
     break;
   case is_value_intrinsic: 
     // FI: here is the action, &p, *p, p->q, p.q, etc...
-    sinks = intrinsic_call_to_points_to_sinks(c, in);
+    sinks = intrinsic_call_to_points_to_sinks(c, in, eval_p);
     break;
   default:
     pips_internal_error("unknown value tag %d\n", tt);
@@ -122,7 +161,7 @@ list call_to_points_to_sinks(call c, pt_map in)
  *
  * "(cast) p" is not an expression.
  */
-list intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity f = call_function(c);
@@ -132,7 +171,7 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
   // You do not know the number of arguments for the comma operator
   if(ENTITY_COMMA_P(f)) {
     expression e = EXPRESSION(CAR(gen_last(al)));
-    sinks = expression_to_points_to_sinks(e, in);
+    sinks = expression_to_points_to_sinks(e, in, true);
   }
   else {
     // Switch on number of arguments to avoid long switch on character
@@ -142,13 +181,13 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
       pips_internal_error("Probably a constant or a symbolic. Not handled here\n");
       break;
     case 1:
-      sinks = unary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = unary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     case 2:
-      sinks = binary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = binary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     case 3:
-      sinks = ternary_intrinsic_call_to_points_to_sinks(c, in);
+      sinks = ternary_intrinsic_call_to_points_to_sinks(c, in, eval_p);
       break;
     default:
       sinks = nary_intrinsic_call_to_points_to_sinks(c, in);
@@ -165,7 +204,7 @@ list intrinsic_call_to_points_to_sinks(call c, pt_map in)
  * Do not create any sharing between elements of in and elements part
  * of the returned list, sinks.
  */
-list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -173,17 +212,23 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   list sinks = NIL;
   pips_assert("One argument", gen_length(al)==1);
   // pips_internal_error("Not implemented for %p and %p\n", c, in);
-  if (ENTITY_MALLOC_SYSTEM_P(f) ||
-      ENTITY_CALLOC_SYSTEM_P(f)) {
+  if (ENTITY_MALLOC_SYSTEM_P(f)) {
     sinks = malloc_to_points_to_sinks(a, in);
   }
+  else if (ENTITY_FREE_SYSTEM_P(f)) {
+    // FI: should be useless because free() returns void
+    sinks = CONS(CELL, make_nowhere_cell(), NIL);
+  }
   else if(ENTITY_ADDRESS_OF_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+    // sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in, false);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
-    /* Locate the pointer */
-    list cl = expression_to_points_to_sinks(a, in);
-    /* Finds what it is pointing to */
+    // FI: this piece of code must be restructured using a function
+    // for computing an approximation of memory(p)
+    /* Locate the pointer, no dereferencing yet */
+    list cl = expression_to_points_to_sinks(a, in, false);
+    /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
       /* Do not create sharing between elements of "in" and elements of
 	 "sinks". */
@@ -196,24 +241,60 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 			    entity_user_name(v),
 			    words_to_string(words_reference(r, NIL)));
       }
-      else
-	sinks = gen_nconc(sinks, pointed);
+      else {
+	if(eval_p) {
+	  /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
+	  FOREACH(CELL, sc, pointed) {
+	    /* Do not create sharing between elements of "in" and elements of
+	       "sinks". */
+	    list starpointed = source_to_sinks(sc, in, true);
+	    if(ENDP(starpointed)) {
+	      reference sr = cell_any_reference(sc);
+	      entity sv = reference_variable(sr);
+	      string words_to_string(list);
+	      pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+				  entity_user_name(sv),
+				  words_to_string(words_reference(sr, NIL)));
+	    }
+	    sinks = gen_nconc(sinks, starpointed);
+	  }
+	}
+	else
+	  sinks = gen_nconc(sinks, pointed);
+      }
     }
-   }
+  }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
-    expression one = int_to_expression(1);
-    offset_cells(sinks, one);
-    free_expression(one);
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in, true);
+    // FI: this has already been done when the side effects are exploited
+    //expression one = int_to_expression(1);
+    //offset_cells(sinks, one);
+    //free_expression(one);
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in, true);
+    //expression m_one = int_to_expression(-1);
+    //offset_cells(sinks, m_one);
+    //free_expression(m_one);
+   }
+  else if(ENTITY_POST_INCREMENT_P(f)) {
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    // arithmetic05: "q=p++;" p++ must be evaluated
+    sinks = expression_to_points_to_sinks(a, in, true);
+    /* We have to undo the impact of side effects */
     expression m_one = int_to_expression(-1);
     offset_cells(sinks, m_one);
     free_expression(m_one);
    }
-  else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)) {
-    sinks = expression_to_constant_paths(statement_undefined, a, in);
+  else if(ENTITY_POST_DECREMENT_P(f)) {
+    //sinks = expression_to_constant_paths(statement_undefined, a, in);
+    sinks = expression_to_points_to_sinks(a, in, true);
+    /* We have to undo the impact of side effects */
+    expression one = int_to_expression(1);
+    offset_cells(sinks, one);
+    free_expression(one);
    }
   else {
   // FI: to be continued
@@ -225,7 +306,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 
 // p=q, p.x, p->y, p+e, p-e, p+=e, p-=e
 // What other binary operator could be part of a lhs expression?
-list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -235,32 +316,37 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
 
   if(ENTITY_ASSIGN_P(f)) {
     // FI: you need to dereference this according to in...
-    sinks = expression_to_points_to_sinks(a1, in);
+    // See assignment01.c
+    sinks = expression_to_points_to_sinks(a1, in, true);
   }
   else if(ENTITY_POINT_TO_P(f)) { // p->a
     // FI: allocation of a fully fresh list? Theroretically...
-    list L = expression_to_points_to_sinks(a1, in);
+    list L = expression_to_points_to_sinks(a1, in, true);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
       // FI: side effect or allocation of a new cell?
       (void) cell_add_field_dimension(pc, f);
       // FI: does this call allocate a full new list?
-      list dL = source_to_sinks(pc, in, true);
-      if(ENDP(dL))
-	pips_internal_error("Dereferencing error.\n");
-      else {
-	FOREACH(CELL, ec, dL) {
-	  // (void) cell_add_field_dimension(ec, f);
-	  // FI: should we allocate new cells? Done
-	  sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+      if(eval_p) {
+	list dL = source_to_sinks(pc, in, true);
+	if(ENDP(dL))
+	  pips_internal_error("Dereferencing error.\n");
+	else {
+	  FOREACH(CELL, ec, dL) {
+	    // (void) cell_add_field_dimension(ec, f);
+	    // FI: should we allocate new cells? Done
+	    sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+	  }
 	}
       }
+      else
+	sinks = gen_nconc(sinks, CONS(CELL, pc, NIL));
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
     // FI: subset of previous case, no need for dereferencing
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, false);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, sinks) {
@@ -278,17 +364,28 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
     free_expression(ma2);
   }
   else if(ENTITY_PLUS_UPDATE_P(f)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     // offset_cells(sinks, a2);
   }
   else if(ENTITY_MINUS_UPDATE_P(f)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     /// Already performed elsewhere. The value returned by expression
     // "p -= e" is simply "p", here "a1"
     //entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
     //expression ma2 = MakeUnaryCall(um, copy_expression(a2));
     //offset_cells(sinks, ma2);
     //free_expression(ma2);
+  }
+  else if (ENTITY_CALLOC_SYSTEM_P(f)) { // CALLOC has two arguments
+    // FI: we need a calloc_to_points_to_sinks() to exploit both arguments...
+    sinks = malloc_to_points_to_sinks(a1, in);
+  }
+  else if(ENTITY_FOPEN_P(f)) {
+    /* Should be handled like a malloc, using the line number for malloc() */
+    pips_user_warning("Fopen() not precisely implemented.\n");
+    type rt = functional_result(type_functional(entity_type(f)));
+    type ct = type_to_pointed_type(rt);
+    sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
   }
   else {
     ; // Nothing to do
@@ -302,7 +399,7 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   type t1 = expression_to_type(a1);
   type t2 = expression_to_type(a2);
   if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    sinks = expression_to_points_to_sinks(a1, in, true);
     offset_cells(sinks, a2);
   }
   else
@@ -313,7 +410,9 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
 }
 
 // c?p:q
-list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
+list ternary_intrinsic_call_to_points_to_sinks(call c,
+					       pt_map in,
+					       bool eval_p)
 {
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -322,10 +421,11 @@ list ternary_intrinsic_call_to_points_to_sinks(call c, pt_map in)
   pips_assert("in is consistent", consistent_pt_map(in));
 
   if(ENTITY_CONDITIONAL_P(f)) {
+    //bool eval_p = true;
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    list sinks1 = expression_to_points_to_sinks(e1, in);
-    list sinks2 = expression_to_points_to_sinks(e2, in);
+    list sinks1 = expression_to_points_to_sinks(e1, in, eval_p);
+    list sinks2 = expression_to_points_to_sinks(e2, in, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
   }
   // FI: any other ternary intrinsics?
@@ -361,8 +461,19 @@ list points_to_null_sinks()
     in a debugging context. */
 void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
 {
-  reference r = cell_any_reference(c);
-  print_reference(r);
+  int dn = cell_domain_number(c);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==cell_domain) {
+    if(cell_undefined_p(c))
+      fprintf(stderr, "cell undefined\n");
+    else {
+      reference r = cell_any_reference(c);
+      print_reference(r);
+    }
+  }
+  else
+    fprintf(stderr, "Not a Newgen cell object\n");
 }
 
 /* Debug: use stderr */
@@ -387,9 +498,31 @@ void print_points_to_cells(list cl)
 }
 
 
- /* Returns a list of memory cells possibly accessed by the evaluation
-    of reference r. No sharing between the returned list "sinks" and the reference "r" or the points-to set "in". */
-list reference_to_points_to_sinks(reference r, pt_map in)
+ /* Returns a list of memory cells "sinks" possibly accessed by the evaluation
+  * of reference "r". No sharing between the returned list "sinks" and
+  * the reference "r" or the points-to set "in".
+  *
+  * Examples if eval_p==false: x->x, t[1]->t[1], t[1][2]->t[1][2], p->p...
+  *
+  * Examples if eval_p==true: x->error, t[1]->t[1][0],
+  * t[1][2]->t[1][2][0], p->p[0]...
+  *
+  * Issue: let's assume "t" to be an array "int t[10][10[10];". The C
+  * language is (too) flexible. If "p" is an "int ***p;", the impact
+  * of assignment "p=t;" leads to "p points-to t" or "p points-to
+  * t[0]" or "p points-to t[0][0][0]". Two different criteria can be
+  * used: the compatibiliy of the pointer type and the pointed cell
+  * type, or the equality of the pointer value and of the pointed cell
+  * address. 
+  *
+  * In the first case, t->t[0]->t[0][0]->t[0][0][0].
+  *
+  * In the second case, t->t[0][0][0], t[0]->t[0][0][0], t[0][0]->t[0][0][0].
+  *
+  * FI: I do not trust this function. It is already too long. And I am
+  * not confident the case disjunction is correct/well chosen.
+  */
+list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity e = reference_variable(r);
@@ -403,98 +536,78 @@ list reference_to_points_to_sinks(reference r, pt_map in)
   // FI: to be checked otherwise?
   //expression rhs = expression_undefined;
   if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
-    // FI: to be seen with AM
-    //pips_internal_error("Not implemented yet.\n");
-    //sinks = array_to_constant_paths(rhs, in);
     /* Two proper possibilities: an array of pointers fully subscribed
        or any other kind of array partially subscribed. And an
        unsuitable one: an integer value... */
-      int nd = NumberOfDimension(e);
-      int rd = (int) gen_length(sl);
-      if(nd>rd) {
-	/* No matter what, the target is obtained by adding a 0 subscript */
-	reference nr = copy_reference(r);
-	cell nc = make_cell_reference(nr);
+    int nd = NumberOfDimension(e);
+    int rd = (int) gen_length(sl);
+    if(nd>rd) {
+      /* No matter what, the target is obtained by adding a 0 subscript */
+      reference nr = copy_reference(r);
+      cell nc = make_cell_reference(nr);
+      for(int i=rd; eval_p && i<nd; i++) { // FI: not efficient
 	expression ze = int_to_expression(0);
 	reference_indices(nr) = gen_nconc(reference_indices(nr),
 					  CONS(EXPRESSION, ze, NIL));
-	sinks = CONS(CELL, nc, NIL);
+	i = nd; // to be type compatible
       }
-      else if(nd==rd) {
-	type et = ultimate_type(entity_type(e));
-	if( pointer_type_p(et)) {
-	  cell nc = make_cell_reference(copy_reference(r));
+      sinks = CONS(CELL, nc, NIL);
+    }
+    else if(nd==rd) {
+      // FI: eval_p is not used here...
+      cell nc = make_cell_reference(copy_reference(r));
+      sinks = CONS(CELL, nc, NIL);
+    }
+    else { // rd is too big
+      // Could be a structure with field accesses expressed as indices
+      type et = ultimate_type(entity_type(e));
+      if(struct_type_p(et)) {
+	reference nr = copy_reference(r);
+	cell nc = make_cell_reference(nr);
+	if(eval_p) {
 	  sinks = source_to_sinks(nc, in, true);
-	  free_cell(nc);
+	  /*
+	  expression ze = int_to_expression(0);
+	  reference_indices(nr) = gen_nconc(reference_indices(nr),
+					    CONS(EXPRESSION, ze, NIL));
+	  */
 	}
-	else if(integer_type_p(et)) {
-	  pips_user_warning("Pointer made from integer without a cast\n");
-	  cell nc = make_anywhere_cell(et);
+	else
 	  sinks = CONS(CELL, nc, NIL);
-	}
-	else {
-	  pips_user_error("Illegal value for a pointer. Should be a lhs.\n");
-	}
       }
-      else { // rd is too big
+      else {
 	pips_user_error("Too many subscript expressions for array \"%s\".\n",
 			entity_user_name(e));
       }
+    }
   }
   else {
     /* scalar case, rhs is already a lvalue */
-    /* add points-to relations on demand for global pointers and
-       top-level entities */
-    if( pointer_type_p(ultimate_type(entity_type(e)) )) {
-      if( top_level_entity_p(e) || formal_parameter_p(e) ) {
-
-	// FI: the piece of code below checks if e is at least the
-	// source of one arcs in pt_map in. If not, a new arc is
-	// created in another pt_map and the union of both is returned.
-	// FI: this could be a function and this could be simplified
-
-	// FI->AM: either it's a persistant reference or reference r
-	// must be copied. I chose the copy option
-	cell nc = make_cell_reference(copy_reference(r));
-	if (!source_in_pt_map_p(nc, in)) {
-	  // FI->AM: in spite of the name, seems to handle globals as well
-	  pt_map tmp = formal_points_to_parameter(nc);
-	  // FI: lots of trouble here
-	  in = union_of_pt_maps(in, in, tmp);
-	  // FI: Amira says that the free is shallow...
-	  clear_pt_map(tmp);
-	  free_pt_map(tmp);
-	}
-	else {
-	  // FI->AM: you have to free the cell without freeing the reference...
-	  // cell_reference(nc) = reference_undefined;
-	  free_cell(nc);
-	}
-      }
-
-      /* FI/FC : I dropped the current statement from many signature,
-	 assuming it is not necessary to exploit in because we are
-	 dealing only for the current statement and because we do no
-	 need an involved statement. However, this may not be
-	 compatible with the current data structure... To be checked
-	 with Amira and Fabien. */
-      // sinks = expression_to_constant_paths(statement_undefined, rhs, in);
+    if(scalar_type_p(ultimate_type(entity_type(e)))) {
       cell nc = make_cell_reference(copy_reference(r));
-      sinks = source_to_sinks(nc, in, true);
-      free_cell(nc);
+      if(eval_p) {
+	// FI: we have a pointer. It denotes another location.
+	sinks = source_to_sinks(nc, in, true);
+	free_cell(nc);
+      }
+      else {
+      // FI: without dereferencing
+	sinks = CONS(CELL, nc, NIL);
+      }
     }
-    else if(array_type_p(entity_type(e))) { // FI: not OK with typedef
+    else if(array_type_p(ultimate_type(entity_type(e)))) { // FI: not OK with typedef
       /* An array name can be used as pointer constant */
-      /* We should add null indices accordinng to its number of dimensions */
+      /* We should add null indices according to its number of dimensions */
       int n = NumberOfDimension(e);
       int rd = (int) gen_length(reference_indices(r));
       int i;
       reference nr = copy_reference(r);
       // FI: not efficient
-      for(i=rd; i<n; i++) {
+      for(i=rd; eval_p && i<n; i++) {
 	reference_indices(nr) =
 	  gen_nconc(reference_indices(nr),
 		    CONS(EXPRESSION, int_to_expression(0), NIL));
+	i = n; // to be type compatible
       }
       cell nc = make_cell_reference(nr);
       sinks = CONS(CELL, nc, NIL);
@@ -514,6 +627,7 @@ list reference_to_points_to_sinks(reference r, pt_map in)
   return sinks;
 }
 
+// FI: I assume we do not need the eval_p parameter here
 list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
 {
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
@@ -531,15 +645,17 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
   return sinks;
 }
 
+// FI: do we need eval_p?
 list cast_to_points_to_sinks(cast c, pt_map in)
 {
   expression e = cast_expression(c);
   // FI: should we pass down the expected type? It would be useful for
   // heap modelling
-  list sinks = expression_to_points_to_sinks(e, in);
+  list sinks = expression_to_points_to_sinks(e, in, true);
   return sinks;
 }
 
+// FI: do we need eval_p?
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
@@ -547,7 +663,7 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
   pips_internal_error("Not implemented yet");
   if( sizeofexpression_expression_p(soe) ){
     expression ne = sizeofexpression_expression(soe);
-    sinks = expression_to_points_to_sinks(ne, in);
+    sinks = expression_to_points_to_sinks(ne, in, true);
   }
   return sinks;
 }
@@ -697,7 +813,7 @@ list range_to_points_to_sinks(range r, pt_map in)
  * The list returned should be fully allocated with no sharing between
  * it and the in points-to set. Hopefully...
  */
-list expression_to_points_to_sinks(expression e, pt_map in)
+ list expression_to_points_to_sinks(expression e, pt_map in, bool eval_p)
 {
   /*reference + range + call + cast + sizeofexpression + subscript + application*/
   tag tt ;
@@ -706,7 +822,7 @@ list expression_to_points_to_sinks(expression e, pt_map in)
   switch (tt = syntax_tag(s)) {
   case is_syntax_reference: {
     reference r = syntax_reference(s);
-    sinks = reference_to_points_to_sinks(r, in);
+    sinks = reference_to_points_to_sinks(r, in, eval_p);
     break;
   }
   case is_syntax_range: {
@@ -716,7 +832,7 @@ list expression_to_points_to_sinks(expression e, pt_map in)
   }
   case  is_syntax_call: {
     call c = syntax_call(s);
-    sinks = call_to_points_to_sinks(c, in);
+    sinks = call_to_points_to_sinks(c, in, eval_p);
     break;
   }
   case  is_syntax_cast: {

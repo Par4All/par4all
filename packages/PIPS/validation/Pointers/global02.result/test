@@ -44,7 +44,8 @@ POINTS TO
 
 
 // Points To OUT:
-// p -> p[0] , EXACT
+// _p_0[0] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> _p_0[0] , EXACT
 
 int main()
 {
@@ -61,25 +62,24 @@ int main()
    q = p;
 
 // Points To:
-// p[0] -> p[0] , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
+// p -> _p_0[0] , EXACT
+// q -> _p_0[0] , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    *q = &i;
 
 // Points To:
-// p[0] -> i , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
+// _p_0[0] -> i , EXACT
+// p -> _p_0[0] , EXACT
+// q -> _p_0[0] , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = &**q;
 
 // Points To:
-// p[0] -> i , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
+// _p_0[0] -> i , EXACT
+// p -> _p_0[0] , EXACT
+// q -> _p_0[0] , EXACT
 // r -> i , EXACT
 
 

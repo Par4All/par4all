@@ -424,7 +424,7 @@ transformer transformer_add_equality(transformer tf, entity v1, entity v2)
 }
 
 /* Add an equality between a value and an integer constant: v==cst */
-transformer transformer_add_equality_with_integer_constant(transformer tf, entity v, int cst)
+transformer transformer_add_equality_with_integer_constant(transformer tf, entity v, long long int cst)
 {
   Pvecteur eq = vect_new((Variable) v, VALUE_MONE);
 
@@ -451,7 +451,7 @@ transformer transformer_add_inequality(transformer tf, entity v1, entity v2, boo
 }
 
 /* Add the inequality v <= cst or v >= cst */
-transformer transformer_add_inequality_with_integer_constraint(transformer tf, entity v, int cst, bool less_than_p)
+transformer transformer_add_inequality_with_integer_constraint(transformer tf, entity v, long long int cst, bool less_than_p)
 {
   Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
 

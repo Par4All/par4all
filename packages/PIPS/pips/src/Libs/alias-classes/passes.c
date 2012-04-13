@@ -132,19 +132,73 @@ void fi_points_to_storage(set pts_to_set, statement s, bool store) {
   }
   gen_free_list(pt_list);
 }
+
+/* Return the subset of "in" that is related to formal parameters and stubs
+ * 
+ * More care should be taken about formal parameter
+ * modifications. Dummy initial variables should be allocated to
+ * preserve the values of formal parameters on entry.
+ */
+pt_map points_to_to_context_points_to(pt_map in)
+{
+  pt_map out = new_pt_map();
+
+  SET_FOREACH(points_to, pt, in) {
+    cell source = points_to_source(pt);
+    if(formal_parameter_points_to_cell_p(source)
+       || stub_points_to_cell_p(source)) {
+      cell sink = points_to_sink(pt);
+      if(stub_points_to_cell_p(sink)) {
+	points_to npt = copy_points_to(pt);
+	add_arc_to_pt_map(npt, out);
+      }
+    }
+  }
+
+  return out;
+}
 
 
+static pt_map points_to_context = pt_map_undefined;
+
+void init_points_to_context()
+{
+  pips_assert("points_to_context is undefined",
+	      pt_map_undefined_p(points_to_context));
+  points_to_context = new_pt_map();
+}
+
+void reset_points_to_context()
+{
+  pips_assert("points_to_context is defined",
+	      !pt_map_undefined_p(points_to_context));
+  free_pt_map(points_to_context); // Shallow
+  points_to_context = pt_map_undefined;
+}
+
+void add_arc_to_points_to_context(points_to pt)
+{
+  (void) add_arc_to_pt_map(pt, points_to_context);
+}
+
+pt_map get_points_to_context()
+{
+  return points_to_context;
+}
+
+#define FRANCOIS 0
+
 /* Pass INTRAPROCEDURAL_POINTS_TO_ANALYSIS
  *
  */
-bool intraprocedural_points_to_analysis(char * module_name) {
+static bool generic_points_to_analysis(char * module_name) {
   entity module;
   statement module_stat;
   set pt_in = set_generic_make(set_private, points_to_equal_p, points_to_rank);
-  list pts_to_list = NIL;
   set pts_to_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
   
   init_pt_to_list();
+  init_points_to_context();
   module = module_name_to_entity(module_name);
   set_current_module_entity(module);
   make_effects_private_current_context_stack();
@@ -160,19 +214,30 @@ bool intraprocedural_points_to_analysis(char * module_name) {
     Get the init_points_to_list resource.
     This list contains formal paramters and their stub sinks
   */
+  // #if !FRANCOIS: to simplify interface with effects_with_points_to
+#if 1
+  list pts_to_list = NIL;
   points_to_list init_pts_to_list = 
     (points_to_list) db_get_memory_resource(DBR_INIT_POINTS_TO_LIST,
                                             module_name, true);
   /* Transform the list of init_pts_to_list in set of points-to.*/
   pts_to_list = gen_full_copy_list(points_to_list_list(init_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
+  // FI: this should be useless as stubs are built on demand
+  // pt_in = set_assign_list(pt_in, NIL);
   gen_free_list(pts_to_list);
+#else
+  pt_in = set_assign_list(pt_in, NIL);
+#endif
 
   /* Compute the points-to relations using the pt_in as input.*/
+#if !FRANCOIS
   // FI: old version
   pts_to_out = points_to_statement(module_stat, pt_in);
-  // FI: new version
-  // pts_to_out = statement_to_points_to(module_stat, pt_in);
+
+#else  // FI: new version
+  pts_to_out = statement_to_points_to(module_stat, pt_in);
+#endif
   /* Store the points-to relations */
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO, module_name, get_pt_to_list());
 
@@ -180,8 +245,17 @@ bool intraprocedural_points_to_analysis(char * module_name) {
   pts_to_out = points_to_function_projection(pts_to_out);
     
   /* Save IN points-to relations */
+#if !FRANCOIS
   list  l_in = set_to_list(pt_in);
   points_to_list in_list = make_points_to_list(l_in); // SG: baaaaaaad copy, let us hope AM will fix her code :p
+#else
+  // pt_map context = points_to_to_context_points_to(pts_to_out);
+  pt_map context = get_points_to_context();
+  list  l_in = set_to_list(context);
+  points_to_list in_list = make_points_to_list(l_in); // SG: baaaaaaad copy, let us hope AM will fix her code :p
+  // FI: I suppose context should be emptied because of the sharing
+  // with l_in and then freed
+#endif
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_IN, module_name, in_list);
 
     /* Save OUT points-to relations */
@@ -191,6 +265,7 @@ bool intraprocedural_points_to_analysis(char * module_name) {
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_OUT, module_name, out_list);
 
   reset_pt_to_list();
+  reset_points_to_context();
   set_free(pts_to_out);
   set_free(pt_in);
   reset_current_module_entity();
@@ -209,7 +284,7 @@ bool init_points_to_analysis(char * module_name)
   type t;
   list pt_list = NIL, dl = NIL;
   set pts_to_set = set_generic_make(set_private,
-				    points_to_equal_p,points_to_rank);
+			 	    points_to_equal_p,points_to_rank);
   set formal_set = set_generic_make(set_private,
 				    points_to_equal_p,points_to_rank);
   set_current_module_entity(module_name_to_entity(module_name));
@@ -268,30 +343,21 @@ bool init_points_to_analysis(char * module_name)
   return (good_result_p);
 }
 
+static bool interprocedural_points_to_p = true;
+
+bool interprocedural_points_to_analysis_p()
+{
+  return interprocedural_points_to_p;
+}
+
+bool intraprocedural_points_to_analysis(char * module_name)
+{
+  interprocedural_points_to_p = false;
+  return generic_points_to_analysis(module_name);
+}
 
 bool interprocedural_points_to_analysis(char * module_name)
 {
-  /* list pt_list = NIL; */
-  /* set pts_to_set = set_generic_make(set_private, */
-  /* 				    points_to_equal_p,points_to_rank); */
-
-  set_current_module_entity(module_name_to_entity(module_name));
-  //entity module = get_current_module_entity();
-
-  //type t = entity_type(module);
-
-  debug_on("POINTS_TO_DEBUG_LEVEL");
-
-  pips_debug(1, "considering module %s\n", module_name);
-
-  
-
-  /* DB_PUT_MEMORY_RESOURCE */
-  /*   (DBR_INIT_POINTS_TO_LIST, module_name, init_pts_to_list); */
-
-  reset_current_module_entity();
-  debug_off();
-
-  bool good_result_p = true;
-  return (good_result_p);
+  interprocedural_points_to_p = true;
+  return generic_points_to_analysis(module_name);
 }

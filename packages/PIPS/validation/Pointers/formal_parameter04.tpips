@@ -1,0 +1,40 @@
+delete formal_parameter04
+create formal_parameter04 formal_parameter04.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+# To pass a pointer to a struct and not an implicit pointer to an
+# array of structs (but PIPS should work even if this property is set
+# to FALSE)
+
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+##TODO: explain
+
+echo 
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER POINTER EFFECTS
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+delete formal_parameter04
+quit

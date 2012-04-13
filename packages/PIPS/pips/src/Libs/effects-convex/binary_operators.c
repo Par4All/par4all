@@ -979,8 +979,88 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
   return cute_convex_union(ps1, ps2);
 }
 
+/* Inclusion test :
+ */
 
-/* 2- Intersection :
+/**
+   returns true if c1 is included into c2, false otherwise.
+   returns false if c1 may only be included into c2.
+
+   @param exact_p target is set to true if the result is exact, false otherwise.
+
+   In fact, this parameter would be useful only if there are overflows during
+   the systems inclusion test. But it is not currently used.
+ */
+bool convex_cells_inclusion_p(cell c1, descriptor d1,
+			      cell c2, descriptor d2,
+			      bool * exact_p)
+{
+  bool res = true; /* default result */
+  *exact_p = true;
+
+  bool concrete_locations_p = true;
+
+  if (cells_combinable_p(c1, c2))
+    {
+      bool c1_abstract_location_p = cell_abstract_location_p(c1);
+      bool c2_abstract_location_p = cell_abstract_location_p(c2);
+
+      if (c1_abstract_location_p || c2_abstract_location_p)
+	{
+	  entity e1 = cell_entity(c1);
+	  entity e2 = cell_entity(c2);
+	  bool heap1_context_sensitive_p = c1_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e1);
+	  bool heap2_context_sensitive_p = c2_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e2);
+
+	  if (heap1_context_sensitive_p && heap2_context_sensitive_p)
+	    {
+	      concrete_locations_p = true;
+	    }
+	  else
+	    {
+	      entity al_max = abstract_locations_max(e1, e2);
+	      res = same_entity_p(e2, al_max);
+	      concrete_locations_p = false;
+	    }
+	}
+
+      if (concrete_locations_p)
+	{
+	  /* we have combinable concrete locations or assimilated (context sensitive heap locations) */
+	  /* they intersect if their descriptors intersection is not empty */
+
+	  Psysteme sc1 = descriptor_convex(d1);
+	  Psysteme sc2 = descriptor_convex(d2);
+
+	  /* if one of the systems is unfeasible, the result is false and exact */
+	  if (sc_empty_p(sc1) || sc_empty_p(sc2))
+	    {
+	      res = false;
+	    }
+	  /* if one of the systems is not constrained, the result is true and exact */
+	  else if (sc_rn_p(sc2))
+	    {
+	      res = true;
+	    }
+	  else if (sc_rn_p(sc1))
+	    {
+	      res = true;
+	    }
+	  else
+	    {
+	      res = sc_inclusion_p(sc1, sc2);
+	    }
+	}
+    }
+  else
+    {
+      res = false;
+    }
+  return res;
+}
+
+
+/* Intersection :
  */
 
 /* list region_intersection(region reg1, reg2)
@@ -1088,6 +1168,92 @@ region_intersection(region reg1, region reg2)
     return(l_res);
 }
 
+
+bool convex_cells_intersection_p(cell c1, descriptor d1,
+				 cell c2, descriptor d2,
+				 bool * exact_p)
+{
+  bool res = true;
+
+ /* default safe result */
+  bool concrete_locations_p = true;
+
+  if (cells_combinable_p(c1, c2))
+    {
+      bool c1_abstract_location_p = cell_abstract_location_p(c1);
+      bool c2_abstract_location_p = cell_abstract_location_p(c2);
+
+      if (c1_abstract_location_p || c2_abstract_location_p)
+	{
+	  entity e1 = cell_entity(c1);
+	  entity e2 = cell_entity(c2);
+	  bool heap1_context_sensitive_p = c1_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e1);
+	  bool heap2_context_sensitive_p = c2_abstract_location_p && entity_flow_or_context_sentitive_heap_location_p(e2);
+
+	  if (heap1_context_sensitive_p && heap2_context_sensitive_p)
+	    {
+	      concrete_locations_p = true;
+	    }
+	  else
+	    {
+	      concrete_locations_p = false;
+	      res = true;
+	      *exact_p = false; /* can it be true if we have two null locations ?*/
+	    }
+	}
+
+      if (concrete_locations_p)
+	{
+	  /* we have combinable concrete locations or assimilated (context sensitive heap locations) */
+	  /* they intersect if their descriptors intersection is not empty */
+
+	  Psysteme sc1 = descriptor_convex(d1);
+	  Psysteme sc2 = descriptor_convex(d2);
+
+
+	  /* if one of the systems is unfeasible, the result is false and exact */
+	  if (sc_empty_p(sc1) || sc_empty_p(sc2))
+	    {
+	      pips_debug(8, "d1 or d2 sc_empty");
+	      res = false;
+	      *exact_p = true;
+	    }
+
+	  /* if one of the systems is not constrained, the result is true and exact */
+	  else if (sc_rn_p(sc1) || sc_rn_p(sc2))
+	    {
+	      pips_debug(8, "d1 or d2 sc_rn");
+	      res = true;
+	      *exact_p = true;
+	    }
+	  else
+	    {
+	      /* else test the feasibility of the systems intersection */
+	      Psysteme sc = cell_system_sc_append_and_normalize(sc_dup(sc1),sc2,2); /* could be some other level? */
+
+	      CATCH(overflow_error)
+	      {
+		pips_debug(3, "overflow error \n");
+		res = true;
+		*exact_p = false;
+	      }
+	      TRY
+		{
+		  res = sc_integer_feasibility_ofl_ctrl(sc, FWD_OFL_CTRL, true);
+		  *exact_p = true;
+		  UNCATCH(overflow_error);
+		  sc_rm(sc);
+		}
+	    }
+	}
+    }
+  else
+    {
+      res = false;
+      *exact_p = true;
+    }
+  return res;
+}
 
 /* list region_entities_intersection(region reg1, reg2)
  * input    : two regions

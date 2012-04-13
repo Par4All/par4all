@@ -1,0 +1,49 @@
+void dereferencing03()
+{
+
+// Pointer values: none
+
+   double *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   *(p+1) = 0.;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   *(p+i) = 0.;
+}
+int main()
+{
+
+// Pointer values: none
+
+   dereferencing03();
+
+// Pointer values: none
+
+   return 1;
+}
+void dereferencing03()
+{
+   double *p;
+   int i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *(p+1) = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i p
+   *(p+i) = 0.;
+}
+int main()
+{
+   dereferencing03();
+   return 1;
+}

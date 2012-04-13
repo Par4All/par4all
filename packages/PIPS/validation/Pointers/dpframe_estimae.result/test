@@ -1,0 +1,180 @@
+
+PROPER  EFFECTS 
+
+void dpframe_estimae(unsigned char *ref, unsigned char *mb, int i, int j, int iminf[2][2], int jminf[2][2], int *iminp, int *jminp, int *imindmvp, int *jmindmvp, int *dmcp, int *vmcp)
+{
+   int pref, ppred, delta_x, delta_y;
+
+   int is, js, it, jt, ib, jb, it0, jt0, ib0, jb0;
+   int imins, jmins, imint, jmint, iminb, jminb, imindmv, jmindmv;
+   int vmc, local_dist;
+   int topfirst, height, width;
+//             <    is written>: vmc
+   /* Calculate Dual Prime distortions for 9 delta candidates
+      * for each of the four minimum field vectors
+      * Note: only for P pictures!
+      */
+   
+   /* initialize minimum dual prime distortion to large value */
+   vmc = 1<<30;
+//             <    is read   >: is
+//             <    is written>: is
+   is = is>=0?(is+1)/3:-(((-is)+1)/3);
+//             <    is written>: vmc
+   vmc = 1<<30;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+
+// Points To OUT: none
+
+void dpframe_estimae(unsigned char *ref, unsigned char *mb, int i, int j, int iminf[2][2], int jminf[2][2], int *iminp, int *jminp, int *imindmvp, int *jmindmvp, int *dmcp, int *vmcp)
+{
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   int pref, ppred, delta_x, delta_y;
+
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   int is, js, it, jt, ib, jb, it0, jt0, ib0, jb0;
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   int imins, jmins, imint, jmint, iminb, jminb, imindmv, jmindmv;
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   int vmc, local_dist;
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   int topfirst, height, width;
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   /* Calculate Dual Prime distortions for 9 delta candidates
+      * for each of the four minimum field vectors
+      * Note: only for P pictures!
+      */
+   
+   /* initialize minimum dual prime distortion to large value */
+   vmc = 1<<30;
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   is = is>=0?(is+1)/3:-(((-is)+1)/3);
+
+// Points To:
+// dmcp -> _dmcp_11[0] , EXACT
+// imindmvp -> _imindmvp_9[0] , EXACT
+// iminp -> _iminp_7[0] , EXACT
+// jmindmvp -> _jmindmvp_10[0] , EXACT
+// jminp -> _jminp_8[0] , EXACT
+// mb -> _mb_2[0] , EXACT
+// ref -> _ref_1[0] , EXACT
+// vmcp -> _vmcp_12[0] , EXACT
+
+   vmc = 1<<30;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void dpframe_estimae(unsigned char *ref, unsigned char *mb, int i, int j, int iminf[2][2], int jminf[2][2], int *iminp, int *jminp, int *imindmvp, int *jmindmvp, int *dmcp, int *vmcp)
+{
+   int pref, ppred, delta_x, delta_y;
+
+   int is, js, it, jt, ib, jb, it0, jt0, ib0, jb0;
+   int imins, jmins, imint, jmint, iminb, jminb, imindmv, jmindmv;
+   int vmc, local_dist;
+   int topfirst, height, width;
+//             <    is written>: vmc
+   /* Calculate Dual Prime distortions for 9 delta candidates
+      * for each of the four minimum field vectors
+      * Note: only for P pictures!
+      */
+   
+   /* initialize minimum dual prime distortion to large value */
+   vmc = 1<<30;
+//             <    is read   >: is
+//             <    is written>: is
+   is = is>=0?(is+1)/3:-(((-is)+1)/3);
+//             <    is written>: vmc
+   vmc = 1<<30;
+}
+
+ *********************** Use-Def Chains *********************
+
+	22 --> 25 with conflicts
+		from <vmc-W-EXACT> to <vmc-W-EXACT>
+
+****************** End of Dependence Graph ******************

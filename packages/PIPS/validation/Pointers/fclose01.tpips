@@ -1,0 +1,41 @@
+delete fclose01
+create fclose01 fclose01.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+# You must play with the property below whose possible values are
+# flow-sensitive, context-sensitive, insensitive, unique (default
+#  value),...
+
+# setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
+
+##TODO: explain
+
+echo 
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER POINTER EFFECTS
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+delete fclose01
+quit
