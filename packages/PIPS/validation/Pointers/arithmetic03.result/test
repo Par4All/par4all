@@ -52,7 +52,7 @@ void arithmetic03(int *p)
 
 // Points To:
 // p -> _p_1[0] , EXACT
-// q -> _p_1[*] , EXACT
+// q -> _p_1[1] , EXACT
 
    return;
 }

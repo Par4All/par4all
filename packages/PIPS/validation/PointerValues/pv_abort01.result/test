@@ -1,7 +1,29 @@
 int main()
 {
+
+// Pointer values: none
+
    int **a;
-   int b;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int b = 1;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+
    a[0] = &b;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+// a[0] == &b (exact);
+
+   printf("\nb= %d, a[0] = %d\n", b, a[0][0]);
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+// a[0] == &b (exact);
+
    return 0;
 }

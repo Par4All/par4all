@@ -1,0 +1,60 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: ap[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a b sp
+
+   call02(a, b, x, ap, sp);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int b;
+
+// Points To: none
+
+   int x[10];
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To: none
+
+   tf_t s;
+
+// Points To: none
+
+   tf_t *sp = &s;
+
+// Points To:
+// sp -> s , EXACT
+
+
+   call02(a, b, x, ap, sp);
+}

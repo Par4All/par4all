@@ -1,0 +1,110 @@
+int main(void)
+{
+   unsigned char ui;
+   ui = -1;
+   printf("%d\n", (int) ui);
+   return (int) ui;
+}
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T() {0<=ui, ui<=255}
+
+   unsigned char ui;
+
+//  T() {ui==255}
+
+   ui = -1;
+
+//  T() {}
+
+   printf("%d\n", (int) ui);
+
+//  T(main) {}
+
+   return (int) ui;
+}
+
+Transformers for "foo"
+
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   unsigned char ui;
+
+//  P() {0<=ui, ui<=255}
+
+   ui = -1;
+
+//  P() {ui==255}
+
+   printf("%d\n", (int) ui);
+
+//  P() {ui==255}
+
+   return (int) ui;
+}
+
+Transformers for "main" after transformer refining
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T() {0<=ui, ui<=255}
+
+   unsigned char ui;
+
+//  T() {ui==255}
+
+   ui = -1;
+
+//  T() {ui==255}
+
+   printf("%d\n", (int) ui);
+
+//  T(main) {ui==255}
+
+   return (int) ui;
+}
+
+Preconditions for "main" after transformer refining
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   unsigned char ui;
+
+//  P() {0<=ui, ui<=255}
+
+   ui = -1;
+
+//  P() {ui==255}
+
+   printf("%d\n", (int) ui);
+
+//  P() {ui==255}
+
+   return (int) ui;
+}

@@ -155,10 +155,10 @@ int main()
          *r++;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> j[1] , MAY
 // p -> j , MAY
 // q -> j , EXACT
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// r -> l[1] , MAY
 // r -> l , MAY
 // s -> l , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT

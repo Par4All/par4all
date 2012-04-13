@@ -1,0 +1,62 @@
+void dereferencing03()
+{
+
+// Pointer values: none
+
+   double *p;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i = 5;
+
+// Pointer values:
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = (double *) malloc(10*sizeof(double));
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+
+   *(p+1) = 0.;
+
+// Pointer values:
+// p == &*HEAP*_l_8[0] (exact);
+
+   *(p+i) = 0.;
+}
+int main()
+{
+
+// Pointer values: none
+
+   dereferencing03();
+
+// Pointer values: none
+
+   return 1;
+}
+void dereferencing03()
+{
+   double *p;
+//             <    is written>: i
+   int i = 5;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+   p = (double *) malloc(10*sizeof(double));
+//             <    is read   >: p
+//             <    is written>: *HEAP*_l_8[1]
+   *(p+1) = 0.;
+//             <    is read   >: i p
+//             <    is written>: *HEAP*_l_8[i]
+   *(p+i) = 0.;
+}
+int main()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dereferencing03();
+   return 1;
+}

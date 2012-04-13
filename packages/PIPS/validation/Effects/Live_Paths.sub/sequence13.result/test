@@ -1,0 +1,112 @@
+int main()
+{
+   int a = 0;
+
+   int *p, *q;
+
+   p = &a;
+   q = p;
+
+   printf("%d", *q);
+}
+
+Without any pointer analysis, but with constant path effects
+
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   int a = 0;
+
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   int *p, *q;
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+
+   p = &a;
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   q = p;
+//             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+
+   printf("%d", *q);
+}
+int main()
+{
+//             <may be alive (out)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1]
+   int a = 0;
+
+//             <may be alive (out)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1]
+   int *p, *q;
+//             <may be alive (out)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1]
+
+   p = &a;
+//             <may be alive (out)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is alive (out)>: stdout __IO_EFFECTS:LUNS[1]
+   q = p;
+
+   printf("%d", *q);
+}
+int main()
+{
+   int a = 0;
+
+   int *p, *q;
+
+   p = &a;
+   q = p;
+
+   printf("%d", *q);
+}
+
+With pointer values to compute constant path effects
+
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
+   int a = 0;
+
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: a stdout __IO_EFFECTS:LUNS[1]
+   int *p, *q;
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: a stdout __IO_EFFECTS:LUNS[1]
+
+   p = &a;
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: a p stdout __IO_EFFECTS:LUNS[1]
+   q = p;
+//             <may be alive (in)>: stdout[0]
+//             <    is alive (in)>: a q stdout __IO_EFFECTS:LUNS[1]
+
+   printf("%d", *q);
+}
+int main()
+{
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: a stdout __IO_EFFECTS:LUNS[1]
+   int a = 0;
+
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: a stdout __IO_EFFECTS:LUNS[1]
+   int *p, *q;
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: a p stdout __IO_EFFECTS:LUNS[1]
+
+   p = &a;
+//             <may be alive (out)>: stdout[0]
+//             <    is alive (out)>: a q stdout __IO_EFFECTS:LUNS[1]
+   q = p;
+
+   printf("%d", *q);
+}

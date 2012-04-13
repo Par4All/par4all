@@ -1,5 +1,5 @@
 
-PROPER  EFFECTS
+PROPER EFFECTS
 
 int main(void)
 {
@@ -105,22 +105,26 @@ int main(void)
    *pp = (void *) 0;
 
 // Points To:
-// pi1 -> i1 , MAY
 // pi1 -> *NULL_POINTER* , MAY
-// pi2 -> i2 , MAY
+// pi1 -> i1 , MAY
 // pi2 -> *NULL_POINTER* , MAY
-// pp -> pi2 , MAY
+// pi2 -> i2 , MAY
 // pp -> pi1 , MAY
+// pp -> pi2 , MAY
 
    printf("%p %p %p\n", pp, pi1, pi2);
 
 // Points To:
-// pi1 -> i1 , MAY
 // pi1 -> *NULL_POINTER* , MAY
-// pi2 -> i2 , MAY
+// pi1 -> i1 , MAY
 // pi2 -> *NULL_POINTER* , MAY
-// pp -> pi2 , MAY
+// pi2 -> i2 , MAY
 // pp -> pi1 , MAY
+// pp -> pi2 , MAY
 
    return 0;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pi1 
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pi2 
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pp 
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pp 

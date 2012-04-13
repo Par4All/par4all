@@ -1,0 +1,34 @@
+
+PROPER  EFFECTS
+
+int foo(int *p, int *q)
+{
+   int b[*(q = p)];
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// p -> _p_1[0] , EXACT
+// q -> _q_2[0] , EXACT
+
+
+// Points To OUT: none
+
+int foo(int *p, int *q)
+{
+
+// Points To:
+// p -> _p_1[0] , EXACT
+// q -> _q_2[0] , EXACT
+
+   int b[*(q = p)];
+
+// Points To:
+// p -> _p_1[0] , EXACT
+// q -> _q_2[0] , EXACT
+
+   return 0;
+}

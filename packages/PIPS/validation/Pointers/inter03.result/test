@@ -1,0 +1,230 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int tab5[15];
+
+   int i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   foo(tab);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(tab);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: tab2[4]
+   
+   
+   foo(tab2[4]);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(tab3[5]);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(tab4[6]);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(&tab[0]);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   foo(&tab5[3]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%s:\n", "tab2[4]");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(tab2[4]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab3[5]");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(tab3[5]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab4[6]");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(tab4[6]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(&tab[0]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab5");
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(&tab5[3]);
+   return 1;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int tab[10];
+
+// Points To: none
+
+   int *tab2[10];
+
+// Points To: none
+
+   int tab3[10][10];
+
+// Points To: none
+
+   int **tab4;
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int tab5[15];
+
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i;
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   foo(tab);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   printf("%s\n", "tab");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(tab);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   foo(tab2[4]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   foo(tab3[5]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   foo(tab4[6]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   foo(&tab[0]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   foo(&tab5[3]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   printf("%s:\n", "tab2[4]");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(tab2[4]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   printf("%s\n", "tab3[5]");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(tab3[5]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   printf("%s\n", "tab4[6]");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(tab4[6]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   printf("%s\n", "tab");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(&tab[0]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   printf("%s\n", "tab5");
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   myprint(&tab5[3]);
+
+// Points To:
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return 1;
+}

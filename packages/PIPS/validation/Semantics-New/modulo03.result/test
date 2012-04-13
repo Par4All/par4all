@@ -1,0 +1,164 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+void check_modulo(int a)
+{
+
+//  T(b,r) {}
+
+   int b, r;
+
+//  T(a) {a==4}
+
+
+   a = 4;
+
+//  T(r) {a==4, 0<=r}
+
+
+   if (b>3&&b<10) {
+
+//  T(r) {a==4, 4<=b, b<=9, 0<=r, r<=4}
+
+      r = a%b;
+
+//  T() {a==4, 4<=b, b<=9, 0<=r, r<=4}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (-10<b&&b<-3) {
+
+//  T(r) {a==4, 0<=b+9, b+4<=0, 0<=r, r<=4}
+
+      r = a%b;
+
+//  T() {a==4, 0<=b+9, b+4<=0, 0<=r, r<=4}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (-10<b&&b<10) {
+
+//  T(r) {a==4, 0<=b+9, b<=9, 0<=r}
+
+      r = a%b;
+
+//  T() {a==4, 0<=b+9, b<=9, 0<=r}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (b>5) {
+
+//  T(r) {a==4, r==4, 6<=b}
+
+      r = a%b;
+
+//  T() {a==4, r==4, 6<=b}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (b<-5) {
+
+//  T(r) {a==4, r==4, b+6<=0}
+
+      r = a%b;
+
+//  T() {a==4, r==4, b+6<=0}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else {
+
+//  T(r) {a==4, 0<=b+5, b<=5, 0<=r}
+
+      r = a%b;
+
+//  T() {a==4, 0<=b+5, b<=5, 0<=r}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+}
+
+Source code with preconditions
+
+
+//  P() {a==4}
+
+void check_modulo(int a)
+{
+
+//  P() {a==4}
+
+   int b, r;
+
+//  P(b,r) {a==4}
+
+
+   a = 4;
+
+//  P(a,b,r) {a==4}
+
+
+   if (b>3&&b<10) {
+
+//  P(a,b,r) {a==4, 4<=b, b<=9}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, 4<=b, b<=9, 0<=r, r<=4}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (-10<b&&b<-3) {
+
+//  P(a,b,r) {a==4, 0<=b+9, b+4<=0}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, 0<=b+9, b+4<=0, 0<=r, r<=4}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (-10<b&&b<10) {
+
+//  P(a,b,r) {a==4, 0<=b+9, b<=9}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, 0<=b+9, b<=9, 0<=r}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (b>5) {
+
+//  P(a,b,r) {a==4, 6<=b}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, r==4, 6<=b}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else if (b<-5) {
+
+//  P(a,b,r) {a==4, b+6<=0}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, r==4, b+6<=0}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+   else {
+
+//  P(a,b,r) {a==4, 0<=b+5, b<=5}
+
+      r = a%b;
+
+//  P(a,b,r) {a==4, 0<=b+5, b<=5, 0<=r}
+
+      printf("a=%d, b=%d, r=%d\n", a, b, r);
+   }
+}

@@ -1,0 +1,33 @@
+delete formal_parameter03
+create formal_parameter03 formal_parameter03.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+##TODO: explain
+
+echo 
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER POINTER EFFECTS
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+delete formal_parameter03
+quit

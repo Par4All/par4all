@@ -1,0 +1,1 @@
+../../EffectsWithPointsTo/dereferencing02.c

@@ -1,0 +1,60 @@
+
+PROPER EFFECTS
+
+int formal_parameter03(int ppp[10][10][10])
+{
+//             <    is written>: q
+   int *q = ppp[0][0];
+//             <    is written>: qq
+   int **qq = ppp[0];
+//             <    is written>: qqq
+   int ***qqq = ppp;
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int formal_parameter03(int ppp[10][10][10])
+{
+//             <    is written>: q
+   int *q = ppp[0][0];
+//             <    is written>: qq
+   int **qq = ppp[0];
+//             <    is written>: qqq
+   int ***qqq = ppp;
+   return 0;
+}
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int formal_parameter03(int ppp[10][10][10])
+{
+
+// Points To: none
+
+   int *q = ppp[0][0];
+
+// Points To:
+// q -> ppp[0][0] , EXACT
+
+   int **qq = ppp[0];
+
+// Points To:
+// q -> ppp[0][0] , EXACT
+// qq -> ppp[0] , EXACT
+
+   int ***qqq = ppp;
+
+// Points To:
+// q -> ppp[0][0] , EXACT
+// qq -> ppp[0] , EXACT
+// qqq -> ppp , EXACT
+
+   return 0;
+}

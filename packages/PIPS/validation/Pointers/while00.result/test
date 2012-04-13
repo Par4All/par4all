@@ -67,38 +67,37 @@ int main()
    while (c>0) {
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
       a = b;
 
 // Points To:
-// a -> d , MAY
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
       b = &d;
    }
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , MAY
+// a -> d , MAY
 // b -> c , MAY
+// b -> d , MAY
 
 
    b = &c;
 
 // Points To:
-// a -> d , MAY
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
+// a -> d , MAY
 // b -> c , EXACT
 
 

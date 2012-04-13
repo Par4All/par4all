@@ -1,0 +1,76 @@
+int main(void)
+{
+   unsigned char ui = -1;
+   return (int) ui;
+}
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T() {ui==255}
+
+   unsigned char ui = -1;
+
+//  T(main) {}
+
+   return (int) ui;
+}
+
+Transformers for "foo"
+
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   unsigned char ui = -1;
+
+//  P() {ui==255}
+
+   return (int) ui;
+}
+
+Transformers for "main" after transformer refining
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T() {ui==255}
+
+   unsigned char ui = -1;
+
+//  T(main) {ui==255}
+
+   return (int) ui;
+}
+
+Preconditions for "main" after transformer refining
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   unsigned char ui = -1;
+
+//  P() {ui==255}
+
+   return (int) ui;
+}

@@ -177,7 +177,7 @@ int main()
 
 // Points To:
 // p -> t[1][2] , EXACT
-// pu -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -210,7 +210,7 @@ int main()
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
-// qu -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // ru -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -243,7 +243,7 @@ int main()
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
 // r -> t , EXACT
-// ru -> t , EXACT
+// ru -> t[0] , EXACT
 
    ru = &t[0];
 

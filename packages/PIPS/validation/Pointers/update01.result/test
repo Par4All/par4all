@@ -46,7 +46,7 @@ void update01()
    p++;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> i[1] , EXACT
 
    i = 2;
 }

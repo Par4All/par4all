@@ -1,5 +1,7 @@
 /* example from Serge Guelton */
+
 #include<stdio.h>
+
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
    int *zaza = (int *) fifi+(3-1-0+1)*1;
@@ -26,6 +28,7 @@ int main()
    for (i = 0;i<size;i++)
       for (j = 0;j<6;j++)
          loulou[0][i][j] = k++;
-   printf("%d\n", duck(riri, fifi, size, loulou));
+   printf("%d\n", duck1(riri, fifi, size, loulou));
+   printf("%d\n", duck2(riri, fifi, size, loulou));
    return 0;
 }
