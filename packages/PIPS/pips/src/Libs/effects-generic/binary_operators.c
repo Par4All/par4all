@@ -1180,7 +1180,7 @@ bool cells_combinable_p(cell c1, cell c2)
 	  bool heap2_p = al2_p && entity_heap_location_p(e2);
 	  bool heap1_context_sensitive_p = heap1_p && entity_flow_or_context_sentitive_heap_location_p(e1);
 	  bool heap2_context_sensitive_p = heap2_p && entity_flow_or_context_sentitive_heap_location_p(e2);
-	  
+
 	  /* if one of them is an abstract location, they may be combinable */
 	  if ( al1_p || al2_p)
 	    {
@@ -1203,12 +1203,16 @@ bool cells_combinable_p(cell c1, cell c2)
 			     "and eff1 is a malloc or io effect\n");
 		  combinable_p = false;
 		}
-	      else
-		/* special easy case, and most frequent one */
-		if ((al1_p && entity_all_locations_p(e1)) || (al2_p && entity_all_locations_p(e2)))
+	      else if ((al1_p && entity_all_locations_p(e1))
+		    || (al2_p && entity_all_locations_p(e2)))
 		  combinable_p = true;
-		else
-		  if ( (al1_p && al2_p)
+	      else if ((al1_p && undefined_pointer_value_entity_p(e1))
+		      || (al2_p && undefined_pointer_value_entity_p(e2)))
+		combinable_p = false;
+	      else if ((al1_p && entity_null_locations_p(e1))
+		      || (al2_p && entity_null_locations_p(e2)))
+		combinable_p = false;
+	      else if ( (al1_p && al2_p)
 		       || (al1_p && ENDP(reference_indices(r2)))
 		       || (al2_p && ENDP(reference_indices(r1))))
 		    /*two abstract locations or one abstract location and a scalar */
@@ -1241,16 +1245,20 @@ bool cells_combinable_p(cell c1, cell c2)
 			      else
 				{
 				  /* here it is more difficult, to be handled later */
-				  pips_internal_error("case not handled yet\n");
+				  pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
+						      effect_reference_to_string(r1),
+						      effect_reference_to_string(r2));
 				}
 			    }
 			}
 		      else
 			{
-		    /* here we should consider the type of the non abstract location reference,
-		       whether there is a dereferencement or not to guess the memory area, ... */
-		    pips_internal_error("case not handled yet\n");
-	    }
+			  /* here we should consider the type of the non abstract location reference,
+			     whether there is a dereferencement or not to guess the memory area, ... */
+			  pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
+					      effect_reference_to_string(r1),
+					      effect_reference_to_string(r2));
+			}
 		    }
 	    }
 

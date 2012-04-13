@@ -42,3 +42,34 @@
 /* Function storing points to information attached to a statement
  */
 GENERIC_GLOBAL_FUNCTION(pt_to_list, statement_points_to)
+
+/* Functions specific to points-to analysis
+*/
+
+/* */
+cell make_anywhere_points_to_cell(type t __attribute__ ((unused)))
+{
+  // entity n = entity_all_locations();
+  entity n = entity_all_xxx_locations_typed(ANYWHERE_LOCATION, t);
+  reference r = make_reference(n, NIL);
+  cell c = make_cell_reference(r);
+  return c;
+}
+
+bool formal_parameter_points_to_cell_p(cell c)
+{
+  bool formal_p = true;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  formal_p = formal_parameter_p(v);
+  return formal_p;
+}
+
+bool stub_points_to_cell_p(cell c)
+{
+  bool formal_p = true;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  formal_p = entity_stub_sink_p(v); // FI: can be a source too
+  return formal_p;
+}

@@ -44,4 +44,5 @@ typedef set pt_map;
 #define consistent_pt_map(s) consistent_points_to_set(s)
 // FI: Not so sure we do not need a new name
 #define source_in_pt_map_p(cell,set) source_in_set_p(cell,set)
+#define add_arc_to_pt_map(a, s) set_add_element((set) s, (set) s, (void *) a)
 

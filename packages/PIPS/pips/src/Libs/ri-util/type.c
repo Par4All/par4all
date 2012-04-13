@@ -1844,42 +1844,84 @@ type intrinsic_call_to_type(call c)
 	  }
 	else
 	  {
-	    /* current type of expression is type of first argument */
-	    type ct = expression_to_type(EXPRESSION(CAR(args)));
+	    bool minus_c_pointer_arithmetic = false;
 
-	    MAP(EXPRESSION, arg, {
-		type nt = expression_to_type(arg);
-		basic nb = variable_basic(type_variable(nt));
-		list  nd = variable_dimensions(type_variable(nt));
+	    // special case for minus operator when first argument is a pointer type
+	    if (ENTITY_MINUS_C_P(f) )
+	      {
+		expression exp1 = EXPRESSION(CAR(args));
+		expression exp2 = EXPRESSION(CAR(CDR(args)));
+		type t1 = expression_to_type(exp1);
+		type t2 = expression_to_type(exp2);
 
-		basic cb = variable_basic(type_variable(ct));
-		list  cd = variable_dimensions(type_variable(ct));
-
-		/* we need to check the variable dimensions */
-		if (gen_length(nd) == gen_length(cd))
+		if (pointer_type_p(t1))
 		  {
-		    /* re-use an existing function. we do not take into
-		       account variable dimensions here. It may not be correct.
-		       but it's not worse than the previously existing version
-		       of expression_to_type
-		    */
-		    pips_debug(9,"same number of dimensions\n");
-		    basic b = basic_maximum(cb, nb);
-		    free_type(ct);
-		    free_type(nt);
-		    ct = make_type(is_type_variable, make_variable(b, gen_full_copy_list(nd), NIL));
-		  }
-		else
-		  {
-		    pips_debug(9,"different number of dimensions\n");
-		    pips_assert("pointer arithmetic with array name, first element must be the address expression", gen_length(cd) > gen_length(nd));
-		    /* current type is still valid */
-		    free_type(nt);
-		  }
+		    if (pointer_type_p(t2))
+		      {
+			type pt1 = pointed_type(t1);
+			type pt2 = pointed_type(t2);
+			if (!type_equal_p(pt1, pt2))
+			  {
+			    // user application should not pass compilation by a standard compiler
+			    // should we also trigger an error here?
+			    pips_user_warning("Non matching pointed types in pointer arithmetic expression %s - %s\n",
+					      expression_to_string(exp1), expression_to_string(exp2));
+			  }
+			// result is of type ptrdiff_t (ISO/IEC 9899:TC3)
+			t = make_type(is_type_variable, make_variable(make_basic_int(DEFAULT_POINTER_TYPE_SIZE),
+								      NIL,NIL));
 
 
-	      }, CDR(args));
-	    t = ct;
+		      }
+		    else
+		      {
+			t = copy_type(t1);
+		      }
+		    minus_c_pointer_arithmetic = true;
+		    free_type(t1); free_type(t2);
+		  }
+	      }
+
+	    if (! minus_c_pointer_arithmetic )
+	      {
+		/* current type of expression is type of first argument */
+		type ct = expression_to_type(EXPRESSION(CAR(args)));
+
+		MAP(EXPRESSION, arg, {
+		    type nt = expression_to_type(arg);
+		    basic nb = variable_basic(type_variable(nt));
+		    list  nd = variable_dimensions(type_variable(nt));
+
+		    basic cb = variable_basic(type_variable(ct));
+		    list  cd = variable_dimensions(type_variable(ct));
+
+		    /* we need to check the variable dimensions */
+		    if (gen_length(nd) == gen_length(cd))
+		      {
+			/* re-use an existing function. we do not take into
+			   account variable dimensions here. It may not be correct.
+			   but it's not worse than the previously existing version
+			   of expression_to_type
+			*/
+			pips_debug(9,"same number of dimensions\n");
+			basic b = basic_maximum(cb, nb);
+			free_type(ct);
+			free_type(nt);
+			ct = make_type(is_type_variable, make_variable(b, gen_full_copy_list(nd), NIL));
+		      }
+		    else
+		      {
+			pips_debug(9,"different number of dimensions\n");
+			pips_assert("pointer arithmetic with array name, first element must be the address expression",
+				    gen_length(cd) > gen_length(nd));
+			/* current type is still valid */
+			free_type(nt);
+		      }
+
+
+		  }, CDR(args));
+		t = ct;
+	      }
 	  }
       }
     else {
@@ -1978,11 +2020,46 @@ type reference_to_type(reference ref)
 	  else
 	    {
 	      pips_debug(9,"going through pointer dimension. \n");
+	      // FI: struct are only possible for constant memory path
+	      // the usual internal representation does not use fields
+	      // as indices
 	      pips_assert("reference has too many indices :"
-			  " pointer expected\n", basic_pointer_p(cb));
-	      ct= basic_pointer(cb);
-	      cb = variable_basic(type_variable(ct));
-	      cd = variable_dimensions(type_variable(ct));
+			  " pointer or struct expected\n",
+			  basic_pointer_p(cb) || basic_derived_p(cb));
+	      if(basic_pointer_p(cb)) {
+		ct = basic_pointer(cb);
+		cb = variable_basic(type_variable(ct));
+		cd = variable_dimensions(type_variable(ct));
+	      }
+	      else if(basic_derived_p(cb)) { // must be a struct, see assert
+		entity de = basic_derived(cb);
+		type st = entity_type(de);
+		list fl = type_struct(st);
+		// FI: I am not sure about the internal representation...
+		// Do we find an integer or a field reference as
+		// subscript expression?
+		expression ind = EXPRESSION(CAR(l_inds));
+		value ind_v = EvalExpression(ind);
+		if(value_constant_p(ind_v)) {
+		  int n = constant_int(value_constant(ind_v));
+		  entity f = ENTITY(gen_nth(n, fl));
+		  type ft = entity_type(f);
+		  ct = ft;
+		  cb = variable_basic(type_variable(ct));
+		  cd = variable_dimensions(type_variable(ct));
+		}
+		else { // FI: assume a reference to a field
+		  // pips_internal_error("Unexpected internal representation.\n");
+		  pips_assert("The subscript expression is a reference",
+			      expression_reference_p(ind));
+		  entity f =
+		    reference_variable(syntax_reference(expression_syntax(ind)));
+		  type ft = entity_type(f);
+		  ct = ft;
+		  cb = variable_basic(type_variable(ct));
+		  cd = variable_dimensions(type_variable(ct));
+		}
+	      }
 	      POP(l_inds);
 	    }
 	}
@@ -2480,6 +2557,11 @@ bool array_type_p(type t)
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
 
+bool scalar_type_p(type t)
+{
+  return (type_variable_p(t) && (variable_dimensions(type_variable(t)) == NIL));
+}
+
 bool type_pointer_on_struct_variable_p(type t)
 {
         t = ultimate_type(t);
@@ -2516,6 +2598,19 @@ bool pointer_type_p(type t)
 {
   return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+
+/**
+   returns the type pointed by the input type if it is a pointer or an array of pointers
+ */
+type pointed_type(type t)
+{
+  type res = type_undefined;
+
+  if (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t))))
+    res = basic_pointer(variable_basic(type_variable(t)));
+  return res;
 }
 
 // tests if a type is FILE *
@@ -4525,6 +4620,26 @@ type type_to_pointed_type(type t)
       upt = ultimate_type(pt);
   }
   return upt;
+}
+
+/* returns t if t is not a functoional type, and the returned type if t is
+   a functional type. Type definitions are replaced. If t is undefined,
+   returns a type_undefined. */
+type type_to_returned_type(type t)
+{
+  type urt = type_undefined;
+
+  if(!type_undefined_p(t)) {
+    type ut = ultimate_type(t);
+    type rt = ut;
+
+    if(type_functional_p(ut))
+      rt = functional_result(type_functional(ut));
+
+    if(!type_undefined_p(rt))
+      urt = ultimate_type(rt);
+  }
+  return urt;
 }
 
 /* returns t if t is not a pointer type, and the first indirectly

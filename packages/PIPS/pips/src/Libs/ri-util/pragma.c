@@ -411,7 +411,7 @@ list pragma_omp_merge_expr (list outer_extensions, list l_pragma) {
  *  @param p, the pragma to be closed
  *
  */
-string close_pragma(pragma p) {
+string close_pragma(pragma p __attribute__ ((unused))) {
   string result = string_undefined;
   if(prettyprint_language_is_fortran_p()) {
     /* STEP -> les pragma ne sont pas toujours fermés par des "omp end parallel do"
