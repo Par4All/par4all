@@ -220,7 +220,8 @@ class p4a_builder:
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
                  openmp = False, accel_openmp = False, icc = False,
-                 cuda = False, opencl = False, atomic=False,com_optimization=False,cuda_cc=2,fftw3=False,
+                 cuda = False, opencl = False, atomic=False,kernel_unroll=0,
+                 com_optimization=False,cuda_cc=2,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  add_openmp_flag = False, no_default_flags = False,
                  build = False

@@ -84,6 +84,9 @@ def add_own_options(parser):
     proc_group.add_option("--atomic", action = "store_true", default = False,
         help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
 
+    proc_group.add_option("--kernel-unroll", action = "store", default = 0,
+        help = "Unroll factor for loops inside kernels.")
+
     proc_group.add_option("--pocc", action = "store_true", default = False,
         help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection.")
 
@@ -514,6 +517,7 @@ def main():
             cuda = options.cuda,
             opencl=options.opencl,
             atomic = options.atomic,
+            kernel_unroll = options.kernel_unroll,
             com_optimization = options.com_optimization,
             cuda_cc = options.cuda_cc,
             fftw3 = options.fftw3,
@@ -562,6 +566,7 @@ def main():
             input.scmp = options.scmp
             input.fine_grain = options.fine_grain
             input.atomic = options.atomic
+            input.kernel_unroll = options.kernel_unroll
             input.pocc = options.pocc
             input.pocc_options = options.pocc_options
             input.select_modules = options.select_modules
@@ -616,7 +621,7 @@ def main():
                 prop_dict[k] = v
 
             input.properties = prop_dict
-
+    
             # This will hold the output (p4a_processor_output instance)
             # when the processor has been called and its output has been
             # deserialized (unpickle'd) (unless --no-spawn is specified in

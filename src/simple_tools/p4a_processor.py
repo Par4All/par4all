@@ -210,7 +210,8 @@ class p4a_processor(object):
                  accel = False, cuda = False, opencl = False, openmp = False, 
                  com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False, pocc_options = "", atomic = False, brokers="",
+                 c99 = False, use_pocc = False, pocc_options = "", 
+                 atomic = False, kernel_unroll=0, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
         self.noalias = noalias
@@ -228,6 +229,7 @@ class p4a_processor(object):
         self.pocc = use_pocc
         self.pocc_options = pocc_options
         self.atomic = atomic
+        self.kernel_unroll = kernel_unroll
         self.apply_phases = apply_phases
 
         if workspace:
@@ -671,7 +673,8 @@ class p4a_processor(object):
         #all_modules.loop_fusion(concurrent=True)
         # Have to debug (see polybench/2mm.c)
         #all_modules.localize_declaration(concurrent=True)
-        #all_modules.scalarization(concurrent=True)
+        all_modules.scalarization(concurrent=True,keep_perfect_parallel_loop_nests=True)
+        #all_modules.gpu_promote_sequential()
 
         # We handle atomic operations here
         if self.atomic:
@@ -711,7 +714,8 @@ class p4a_processor(object):
 
         # call gpuify_all recursively starting from the heads of the callgraph
         # Keep in mind that all_modules can be filtered !!!
-        [ gpuify_all(m) for m in all_modules if not [val for val in all_modules if val in m.callers]]
+        # this is broken if m=>n=>p and n is filtered :-(
+        [ gpuify_all(m) for m in all_modules if not [val for val in all_modules if val.name in [ n.name for n in m.callers]]]
 
 
 
@@ -757,7 +761,12 @@ class p4a_processor(object):
 
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
-        kernels.scalarization(concurrent=True)
+        #kernels.scalarization(concurrent=True)
+        if int(self.kernel_unroll) > 0:
+            for k in kernels:
+                for l in k.loops():
+                    l.unroll(rate=int(self.kernel_unroll),
+                             loop_unroll_with_prologue=False)
 
 		# Apply requested phases to kernel:
         apply_user_requested_phases(kernels, apply_phases_kernel)
@@ -779,6 +788,10 @@ class p4a_processor(object):
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
             # issue:
+            #kernel_launchers.display("print_code_regions")
+            #kernels.display("print_code_regions")
+            #kernels.display("print_code_preconditions")
+            self.workspace.save("save")
             kernel_launchers.kernel_load_store(concurrent=True,
                                                ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
                                                )

@@ -9,7 +9,7 @@ struct cudacc {
 };
 
 static int computeCoresForDevice(struct cudacc cc, int multiproc) {
-  if(cc.minor==1) {
+  if(cc.major==1) {
     return 8*multiproc;
   } else if (cc.major==2 and cc.minor==0) {
     return 32*multiproc;
@@ -35,11 +35,11 @@ static void displayCudaDevices(int nDevices)
     P4A_dump_message("Name:                          %s\n",  devProp.name);
     P4A_dump_message("Number of multiprocessors:     %d\n",  devProp.multiProcessorCount);
     P4A_dump_message("Number of cores:               %d\n",  computeCoresForDevice((struct cudacc){devProp.major,devProp.minor},devProp.multiProcessorCount));
-    P4A_dump_message("Total global memory:           %u\n",  devProp.totalGlobalMem);
-    P4A_dump_message("Total shared memory per block: %u\n",  devProp.sharedMemPerBlock);
+    P4A_dump_message("Total global memory:           %zu\n", devProp.totalGlobalMem);
+    P4A_dump_message("Total shared memory per block: %zu\n", devProp.sharedMemPerBlock);
     P4A_dump_message("Total registers per block:     %d\n",  devProp.regsPerBlock);
     P4A_dump_message("Warp size:                     %d\n",  devProp.warpSize);
-    P4A_dump_message("Maximum memory pitch:          %lu\n",  devProp.memPitch);
+    P4A_dump_message("Maximum memory pitch:          %lu\n", devProp.memPitch);
     P4A_dump_message("Maximum threads per block:     %d\n",  devProp.maxThreadsPerBlock);
     for (int i = 0; i < 3; ++i)
       P4A_dump_message("Maximum dimension %d of block:  %d\n", i, devProp.maxThreadsDim[i]);

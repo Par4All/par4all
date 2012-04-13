@@ -570,6 +570,22 @@ void p4a_load_kernel(const char *kernel,...)
 					  &p4a_global_error);
     P4A_test_execution_with_message("clCreateProgramWithSource");
     p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
+
+    if(p4a_global_error!=CL_SUCCESS || p4a_debug_level>0) {
+      // Display output on build error or if debug level is set
+      size_t ret_val_size;
+      clGetProgramBuildInfo(p4a_program, p4a_device_id, CL_PROGRAM_BUILD_LOG,
+                            0, NULL, &ret_val_size);
+      if(ret_val_size<5) { // Just some spaces or \n ; skip
+        char build_log[ret_val_size+1];
+        clGetProgramBuildInfo(p4a_program, p4a_device_id, CL_PROGRAM_BUILD_LOG,
+                              ret_val_size, build_log, NULL);
+        // to be carefully, terminate with \0
+        // there's no information in the reference whether the string is 0 terminated or not
+        build_log[ret_val_size] = '\0';
+        P4A_dump_message("Build Log : %s\n",build_log);
+      }
+    }
     P4A_test_execution_with_message("clBuildProgram");
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
     k->kernel = p4a_kernel;
