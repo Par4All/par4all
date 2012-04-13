@@ -8,7 +8,7 @@ int main()
    printf("%d", *p);
 }
 
-without any pointer analysis, but with constant path effects
+Without any pointer analysis, but with constant path effects
 
 //             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
@@ -50,7 +50,7 @@ int main()
    printf("%d", *p);
 }
 
-with pointer values to compute constant path effects
+With pointer values to compute constant path effects
 
 //             <may be alive (in)>: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is alive (in)>: stdout __IO_EFFECTS:LUNS[1]
