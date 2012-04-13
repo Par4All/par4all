@@ -16,7 +16,7 @@ int main()
    a = (int **) 0;
 
 // Pointer values:
-// a == *ANY_MODULE*:*NULL* (exact);
+// a == *NULL_POINTER* (exact);
 
    a[0] = &b;
 

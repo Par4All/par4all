@@ -59,7 +59,7 @@ int main()
 // Pointer values:
 // p == &b (exact);
 // q == &a (exact);
-// r == *ANY_MODULE*:*NULL* (exact);
+// r == *NULL_POINTER* (exact);
 
 
    return 0;
