@@ -28,7 +28,7 @@ int main()
    char *s = "sortie de puts";
 
 // Points To:
-// s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// s -> "sortie de puts" , EXACT
 
    puts(s);
 }

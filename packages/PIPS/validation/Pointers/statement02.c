@@ -1,4 +1,6 @@
+
 #include <stdio.h>
+
 int main() {
   int *x, x1, **y, *y1, y2;
   
@@ -8,6 +10,7 @@ int main() {
   y1 = &y2;
   y = &y1;
   x = *y;
+  printf("*x=%d\n", *x);
   *y = x;
   return 0;
 }

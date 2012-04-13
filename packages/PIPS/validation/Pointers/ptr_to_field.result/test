@@ -40,10 +40,10 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_12.p -> j , EXACT
-// *HEAP*_l_12.q -> i , EXACT
-// *HEAP*_l_13.p -> i , EXACT
-// *HEAP*_l_13.q -> j , EXACT
+// *HEAP*_l_13.p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// *HEAP*_l_13.q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// *HEAP*_l_14.p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// *HEAP*_l_14.q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 int ptr_to_field()
 {
@@ -73,48 +73,48 @@ int ptr_to_field()
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> *HEAP*_l_12 , EXACT
+// m -> *HEAP*_l_13 , EXACT
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    n = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> *HEAP*_l_12 , EXACT
-// n -> *HEAP*_l_13 , EXACT
+// m -> *HEAP*_l_13 , EXACT
+// n -> *HEAP*_l_14 , EXACT
 
    m->q = &i;
 
 // Points To:
-// *HEAP*_l_12.q -> i , EXACT
-// m -> *HEAP*_l_12 , EXACT
-// n -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_13.q -> i , EXACT
+// m -> *HEAP*_l_13 , EXACT
+// n -> *HEAP*_l_14 , EXACT
 
    m->p = &j;
 
 // Points To:
-// *HEAP*_l_12.p -> j , EXACT
-// *HEAP*_l_12.q -> i , EXACT
-// m -> *HEAP*_l_12 , EXACT
-// n -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_13.q -> i , EXACT
+// *HEAP*_l_13.p -> j , EXACT
+// m -> *HEAP*_l_13 , EXACT
+// n -> *HEAP*_l_14 , EXACT
 
    n->q = m->p;
 
 // Points To:
-// *HEAP*_l_12.p -> j , EXACT
-// *HEAP*_l_12.q -> i , EXACT
-// *HEAP*_l_13.q -> j , EXACT
-// m -> *HEAP*_l_12 , EXACT
-// n -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_13.q -> i , EXACT
+// *HEAP*_l_13.p -> j , EXACT
+// *HEAP*_l_14.q -> j , EXACT
+// m -> *HEAP*_l_13 , EXACT
+// n -> *HEAP*_l_14 , EXACT
 
    n->p = m->q;
 
 // Points To:
-// *HEAP*_l_12.p -> j , EXACT
-// *HEAP*_l_12.q -> i , EXACT
-// *HEAP*_l_13.p -> i , EXACT
-// *HEAP*_l_13.q -> j , EXACT
-// m -> *HEAP*_l_12 , EXACT
-// n -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_13.q -> i , EXACT
+// *HEAP*_l_13.p -> j , EXACT
+// *HEAP*_l_14.p -> i , EXACT
+// *HEAP*_l_14.q -> j , EXACT
+// m -> *HEAP*_l_13 , EXACT
+// n -> *HEAP*_l_14 , EXACT
 
 
    return 0;

@@ -1,0 +1,76 @@
+
+Proper effects for "main"
+
+int main()
+{
+//             <    is written>: i j
+   int *p, i = 1, j = 2;                                                /*0003*/
+//             <    is read   >: i
+
+   if (i>0)                                                             /*0005*/
+//             <    is written>: p
+      p = &i;                                                           /*0006*/
+   else
+//             <    is written>: p
+      p = &j;                                                           /*0009*/
+
+   return 0;                                                            /*0011*/
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p, i = 1, j = 2;                                                /*0003*/
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   if (i>0)                                                             /*0005*/
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &i;                                                           /*0006*/
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &j;                                                           /*0009*/
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+
+
+   return 0;                                                            /*0011*/
+}
+
+Proper effects using points_to
+
+int main()
+{
+//             <    is written>: i j
+   int *p, i = 1, j = 2;                                                /*0003*/
+//             <    is read   >: i
+
+   if (i>0)                                                             /*0005*/
+//             <    is written>: p
+      p = &i;                                                           /*0006*/
+   else
+//             <    is written>: p
+      p = &j;                                                           /*0009*/
+
+   return 0;                                                            /*0011*/
+}

@@ -1,0 +1,28 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *a[10];
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *a[10];
+
+// Points To: none
+
+   return 0;
+}

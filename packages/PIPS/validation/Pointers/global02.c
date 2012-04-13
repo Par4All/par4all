@@ -1,5 +1,9 @@
-/* Building points-to in demand for global vraibles */
-#include<stdio.h>
+/* Building points-to in demand for global variables
+ *
+ * The indexing of the stub depends on the property setproperty
+ * POINTS_TO_STRICT_POINTER_TYPES.
+ */
+
 int **p;
 
 int main()

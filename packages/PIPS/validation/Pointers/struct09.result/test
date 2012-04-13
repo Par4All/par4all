@@ -1,0 +1,442 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array c, d;
+   s_with_array_of_struct_with_pointer e, f;
+   s_with_array_of_struct_with_array g, h;
+
+   int i, j;
+   
+   // just to create a block for prettyprinting
+   if (1) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a.p _MALLOC_EFFECTS:_MALLOC_
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+//             <    is written>: i
+      for(i = 0; i <= 9; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a.p i
+         (a.p)[i] = i;
+//             <    is read   >: a.p
+//             <    is written>: b.p
+      
+      // definition of b, also modifies a
+      b = a;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with pointer copy : \n");
+//             <    is written>: i
+      for(i = 0; i <= 9; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b.p i
+         (b.p)[i] = i*10;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+//             <    is written>: i
+      
+      // definition of c
+      for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: c.array[i]
+         (c.array)[i] = i;
+//             <may be read   >: c.array[*]
+//             <may be written>: d.array[*]
+      
+      // definition of d, does not modify c
+      d = c;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array copy : \n");
+//             <    is written>: i
+      for(i = 0; i <= 9; i += 1) {
+//             <    is read   >: i
+//             <    is written>: d.array[i]
+         (d.array)[i] = i*10;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: c.array[i] d.array[i] i stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+//             <    is written>: i
+      
+      // definition of e
+      for(i = 0; i <= 4; i += 1) {
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: e.champ[i].p _MALLOC_EFFECTS:_MALLOC_
+         (e.champ)[i].p = malloc(10*sizeof(int));
+//             <    is written>: j
+         for(j = 0; j <= 9; j += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: e.champ[i].p i j
+            ((e.champ)[i].p)[j] = i+j;
+      }
+//             <may be read   >: e.champ[*].p
+//             <may be written>: f.champ[*].p
+      
+      // definition of f, also modifies e
+      f = e;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with pointer copy : \n");
+//             <    is written>: i
+      for(i = 0; i <= 4; i += 1)
+//             <    is written>: j
+         for(j = 0; j <= 9; j += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: f.champ[i].p i j
+            ((f.champ)[i].p)[j] = i*j;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+//             <    is written>: i
+      
+      // definition of g
+      for(i = 0; i <= 4; i += 1)
+//             <    is written>: j
+         for(j = 0; j <= 9; j += 1)
+//             <    is read   >: i j
+//             <    is written>: g.champ[i].array[j]
+            ((g.champ)[i].array)[j] = i+j;
+//             <may be read   >: g.champ[*].array[*]
+//             <may be written>: h.champ[*].array[*]
+      
+      // definition of h, does not modify g
+      h = g;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\nstruct with array of structs with array copy : \n");
+//             <    is written>: i
+      for(i = 0; i <= 4; i += 1)
+//             <    is written>: j
+         for(j = 0; j <= 9; j += 1) {
+//             <    is read   >: i j
+//             <    is written>: h.champ[i].array[j]
+            ((h.champ)[i].array)[j] = i*j;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: g.champ[i].array[j] 
+//                               h.champ[i].array[j] i j stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   s_with_pointer a, b;
+
+// Points To: none
+
+   s_with_array c, d;
+
+// Points To: none
+
+   s_with_array_of_struct_with_pointer e, f;
+
+// Points To: none
+
+   s_with_array_of_struct_with_array g, h;
+
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   
+   // just to create a block for prettyprinting
+   if (1) {
+
+// Points To: none
+
+      
+      // definition of a
+      a.p = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+
+      for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+
+         (a.p)[i] = i;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+
+      
+      // definition of b, also modifies a
+      b = a;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      printf("\nstruct with pointer copy : \n");
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      for(i = 0; i <= 9; i += 1) {
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+         (b.p)[i] = i*10;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+         printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
+      }
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      
+      // definition of c
+      for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+         (c.array)[i] = i;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      
+      // definition of d, does not modify c
+      d = c;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      printf("\nstruct with array copy : \n");
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      for(i = 0; i <= 9; i += 1) {
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+         (d.array)[i] = i*10;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+
+         printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
+      }
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+
+      
+      // definition of e
+      for(i = 0; i <= 4; i += 1) {
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+         (e.champ)[i].p = malloc(10*sizeof(int));
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+         for(j = 0; j <= 9; j += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , EXACT
+
+            ((e.champ)[i].p)[j] = i+j;
+      }
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      
+      // definition of f, also modifies e
+      f = e;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      printf("\nstruct with array of structs with pointer copy : \n");
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , EXACT
+// b.p -> *HEAP*_l_36[0] , EXACT
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      for(i = 0; i <= 4; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+         for(j = 0; j <= 9; j += 1) {
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+            ((f.champ)[i].p)[j] = i*j;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+            
+            
+            printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
+         }
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      
+      // definition of g
+      for(i = 0; i <= 4; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+         for(j = 0; j <= 9; j += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+            ((g.champ)[i].array)[j] = i+j;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      
+      // definition of h, does not modify g
+      h = g;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      printf("\nstruct with array of structs with array copy : \n");
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+      for(i = 0; i <= 4; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+         for(j = 0; j <= 9; j += 1) {
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+            ((h.champ)[i].array)[j] = i*j;
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+            
+            
+            printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
+         }
+   }
+
+// Points To:
+// a.p -> *HEAP*_l_36[0] , MAY
+// b.p -> *HEAP*_l_36[0] , MAY
+// e.champ[*].p -> *HEAP*_l_66[0] , MAY
+
+   return 0;
+}

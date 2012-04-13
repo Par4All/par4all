@@ -1,0 +1,94 @@
+
+PROPER  EFFECTS
+
+int main(int argc, char *argv[])
+{
+//             <    is read   >: argc
+   if (argc!=8)
+      return 1;
+   {
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      towns t = read_towns(argv[1]);
+      
+      
+      
+      
+      
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: range step xmax xmin ymax ymin
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// argv[*] -> _argv_2[0] , EXACT
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+   if (argc!=8)
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      return 1;
+   {
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      towns t = read_towns(argv[1]);
+      
+      
+      
+      
+      
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
+
+// Points To:
+// argv[*] -> _argv_2[0] , EXACT
+
+   return 0;
+}

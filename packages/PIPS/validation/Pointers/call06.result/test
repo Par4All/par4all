@@ -1,0 +1,61 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: d1
+   int d1 = 4;
+//             <    is written>: d2
+   int d2 = 4;
+   int y[d1][d2];
+   int i, j;
+//             <    is read   >: d1
+//             <    is written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: d1 d2 i
+      call06(i, d2, &y[i][0]);
+   exit(0);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int d1 = 4;
+
+// Points To: none
+
+   int d2 = 4;
+
+// Points To: none
+
+   int y[d1][d2];
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1)
+
+// Points To: none
+
+      call06(i, d2, &y[i][0]);
+
+// Points To: none
+
+   exit(0);
+}

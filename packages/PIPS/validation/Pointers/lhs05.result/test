@@ -1,0 +1,29 @@
+
+PROPER  EFFECTS
+
+void lhs05()
+{
+   int x;
+//             <    is written>: x
+   *&x = 1;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void lhs05()
+{
+
+// Points To: none
+
+   int x;
+
+// Points To: none
+
+   *&x = 1;
+}

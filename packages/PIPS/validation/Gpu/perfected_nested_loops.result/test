@@ -1,0 +1,50 @@
+int main()
+{
+   int i, j;
+   int Y = 100;
+   int X = 100;
+   int A[X][Y];
+   int u1[X];
+   int u2[X];
+   int v1[Y];
+   int v2[Y];
+
+#pragma omp parallel for 
+l99998:
+   for(i = 0; i <= Y-1; i += 1) {
+      register int u1_0 = v1[i];
+      register int u2_0 = v2[i];
+#pragma omp parallel for 
+l99999:
+      for(j = 0; j <= Y-1; j += 1)
+         A[i][j] = A[i][j]+u1_0*v1[j]+u2_0*v2[j];
+   }
+}
+int main()
+{
+   int i, j;
+   int Y = 100;
+   int X = 100;
+   int A[X][Y];
+   int u1[X];
+   int u2[X];
+   int v1[Y];
+   int v2[Y];
+l99998:   p4a_launcher_main(X, Y, A, v1, v2);
+}
+void p4a_launcher_main(int X, int Y, int A[X][Y], int v1[Y], int v2[Y])
+{
+   //PIPS generated variable
+   int i, j;
+   // Loop nest P4A begin,1D(Y)
+l99998:
+   for(i = 0; i <= Y-1; i += 1)
+      // Loop nest P4A end
+      if (i<=Y-1) {
+         register int u1_0 = v1[i];
+         register int u2_0 = v2[i];
+l99999:
+         for(j = 0; j <= Y-1; j += 1)
+            A[i][j] = A[i][j]+u1_0*v1[j]+u2_0*v2[j];
+      }
+}

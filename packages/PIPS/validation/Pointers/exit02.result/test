@@ -1,0 +1,87 @@
+
+PROPER  EFFECTS
+
+void exit02()
+{
+   int i;
+   int *j;
+//             <    is written>: i
+   i = 1;
+//             <    is read   >: i
+   if (i) {
+//             <    is written>: j
+      j = &i;
+      exit(0);
+   }
+   else {
+      static int *p;
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(i*sizeof(int));
+   }
+//             <    is written>: i
+
+   i = 2;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> *HEAP*_l_14[0] , MAY
+
+void exit02()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *j;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   i = 1;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (i) {
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      j = &i;
+
+// Points To:
+// j -> i , EXACT
+
+      exit(0);
+   }
+   else {
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      static int *p;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      p = malloc(i*sizeof(int));
+   }
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> *HEAP*_l_14[0] , MAY
+
+
+   i = 2;
+}

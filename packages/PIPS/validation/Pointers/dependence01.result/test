@@ -1,0 +1,81 @@
+
+Proper effects for "dependence01"
+
+int dependence01()
+{
+   int a;                                                               /*0006*/
+   int *b;                                                              /*0007*/
+//             <    is written>: b
+
+   b = &a;                                                              /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b
+   // b points_to a
+   
+   *b = 2;                                                              /*0011*/
+//             <    is read   >: a
+   // this statement is useful
+   
+   return a;                                                            /*0013*/
+}
+
+POINTS TO for "dependence01"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int dependence01()
+{
+
+// Points To: none
+
+   int a;                                                               /*0006*/
+
+// Points To: none
+
+   int *b;                                                              /*0007*/
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   b = &a;                                                              /*0009*/
+
+// Points To:
+// b -> a , EXACT
+
+   // b points_to a
+   
+   *b = 2;                                                              /*0011*/
+
+// Points To:
+// b -> a , EXACT
+
+   // this statement is useful
+   
+   return a;                                                            /*0013*/
+}
+
+Proper effects using points_to
+
+int dependence01()
+{
+   int a;                                                               /*0006*/
+   int *b;                                                              /*0007*/
+//             <    is written>: b
+
+   b = &a;                                                              /*0009*/
+//             <    is read   >: b
+//             <    is written>: a
+   // b points_to a
+   
+   *b = 2;                                                              /*0011*/
+//             <    is read   >: a
+   // this statement is useful
+   
+   return a;                                                            /*0013*/
+}
+

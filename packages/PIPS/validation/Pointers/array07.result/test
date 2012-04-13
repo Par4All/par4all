@@ -41,14 +41,14 @@ int main()
    for(i = 0; i <= 2; i += 1)
 
 // Points To:
-// p -> t[*] , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> t[*] , MAY
 
       p = t[i];
 
 // Points To:
-// p -> t[*] , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> t[*] , MAY
 
 
    return 0;

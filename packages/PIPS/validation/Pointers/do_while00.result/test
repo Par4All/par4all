@@ -14,14 +14,14 @@ int main()
    b = &c;
 //             <    is read   >: i
    do {
-//             <    is read   >: i
-//             <    is written>: i
-      i = i+1;
 //             <    is read   >: b
 //             <    is written>: a
       a = b;
 //             <    is written>: b
       b = &d;
+//             <    is read   >: i
+//             <    is written>: i
+      i = i+1;
    }
    while (i<5);
 
@@ -74,31 +74,34 @@ int main()
    do {
 
 // Points To:
-// a -> d , MAY
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
-// b -> d , EXACT
-
-      i = i+1;
-
-// Points To:
 // a -> d , MAY
-// a -> c , MAY
-// b -> d , EXACT
+// b -> c , MAY
+// b -> d , MAY
 
       a = b;
 
 // Points To:
-// a -> d , MAY
 // a -> c , MAY
-// b -> d , EXACT
+// a -> d , MAY
+// b -> c , MAY
+// b -> d , MAY
 
       b = &d;
+
+// Points To:
+// a -> c , MAY
+// a -> d , MAY
+// b -> d , EXACT
+
+      i = i+1;
    }
    while (i<5);
 
 // Points To:
-// a -> d , MAY
 // a -> c , MAY
+// a -> d , MAY
 // b -> d , EXACT
 
 

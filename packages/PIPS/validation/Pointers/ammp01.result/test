@@ -1,3 +1,194 @@
 
 PROPER  EFFECTS
 
+ATOM * a_m_serial(int serial)
+{
+   static ATOM *ap = (void *) 0;
+   static ATOM *lastmatched = (void *) 0;
+   int i, n, a_number();
+//             <    is read   >: atomUPDATE
+   if (atomUPDATE)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is written>: n
+      n = a_number();
+   else
+//             <    is read   >: atomNUMBER
+//             <    is written>: n
+      n = atomNUMBER;
+//             <    is read   >: first
+//             <    is written>: ap
+
+   ap = first;
+//             <    is read   >: ap
+   /* static pointer is hook for more efficient search */
+   if (ap==(void *) 0)
+      return (void *) 0;
+//             <    is read   >: lastmatched
+   if (lastmatched==(void *) 0)
+//             <    is read   >: first
+//             <    is written>: lastmatched
+      lastmatched = first;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   if (serial==lastmatched->serial)
+//             <    is read   >: lastmatched
+      return lastmatched;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (serial>lastmatched->serial)
+//             <    is read   >: lastmatched
+//             <    is written>: ap
+      ap = lastmatched;
+//             <    is read   >: n
+//             <    is written>: i
+   for(i = 0; i <= n-1; i += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (ap->serial==serial) {
+//             <    is read   >: ap n
+//             <    is written>: lastmatched
+         lastmatched = ap;
+//             <    is read   >: ap n
+         return ap;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (ap==ap->next)
+//             <    is read   >: first n
+//             <    is written>: ap
+         ap = first;
+      else
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ap
+         ap = ap->next;
+   }
+   return (void *) 0;
+}
+ATOM * a_next(int flag)
+{
+   static ATOM *ap = (void *) 0;
+//             <    is read   >: ap
+   if (ap==(void *) 0)
+//             <    is read   >: first
+//             <    is written>: ap
+      ap = first;
+//             <    is read   >: ap
+   if (ap==(void *) 0)
+      return (void *) 0;
+//             <    is read   >: flag
+   if (flag<=0) {
+//             <    is read   >: first
+//             <    is written>: ap
+      ap = first;
+//             <    is read   >: ap
+      return ap;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (ap==ap->next)
+      return (void *) 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ap
+   ap = ap->next;
+//             <    is read   >: ap
+   return ap;
+}
+int a_number()
+{
+   ATOM *ap;
+//             <    is read   >: atomUPDATE
+   if (atomUPDATE) {
+//             <    is written>: atomUPDATE
+      atomUPDATE = 0;
+//             <    is written>: atomNUMBER
+      atomNUMBER = 0;
+//             <    is read   >: first
+      if (first==(void *) 0)
+         return 0;
+//             <    is read   >: first
+//             <    is written>: ap
+      ap = first;
+l99999:      ;
+      if (!1) goto _break_1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (ap->next==(void *) 0) goto _break_1;
+//             <    is read   >: atomNUMBER
+//             <    is written>: atomNUMBER
+      atomNUMBER++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (ap->next==ap) goto _break_1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ap
+      ap = ap->next;
+      goto l99999;
+_break_1:      ;
+   }
+//             <    is read   >: atomNUMBER
+   return atomNUMBER;
+}
+int activate(int i1, int i2)
+{
+   int upper, lower;
+   ATOM *ap, *a_m_serial(int), *a_next(int);
+   int i, numatm, a_number();
+//             <    is read   >: i2
+
+   if (i2==0) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: atomNUMBER atomUPDATE 
+//                               a_m_serial:0`lastmatched
+//             <    is written>: ap a_m_serial:0`ap
+      ap = a_m_serial(i1);
+//             <    is read   >: ap
+      if (ap!=(void *) 0)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ap
+         ap->active = 1;
+      return 0;
+   }
+//             <    is read   >: i2
+//             <    is written>: upper
+
+   upper = i2;
+//             <    is read   >: i1
+//             <    is written>: lower
+   lower = i1;
+//             <    is read   >: i1 i2
+   if (i2<i1) {
+//             <    is read   >: i2
+//             <    is written>: lower
+      lower = i2;
+//             <    is read   >: i1
+//             <    is written>: upper
+      upper = i1;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is written>: numatm
+
+   numatm = a_number();
+//             <    is read   >: numatm
+//             <    is written>: i
+   for(i = 0; i <= numatm-1; i += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ap a_next:0`ap
+      ap = a_next(i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (ap->serial>=lower&&ap->serial<=upper)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ap numatm
+         ap->active = 1;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+C_PARSER[a_m_serial] (CreateReturnEntity) Type of "a_m_serial" is undefined. Return value cannot be created.
+C_PARSER[a_next] (CreateReturnEntity) Type of "a_next" is undefined. Return value cannot be created.
+C_PARSER[activate] (check_C_function_type) Type updated for function "a_m_serial"
+C_PARSER[activate] (check_C_function_type) Type updated for function "a_next"
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (possible_constant_paths) Uninitialized pointer 
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (expression_to_constant_paths) user error
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (expression_to_constant_paths) Uninitialized pointer dereferencing
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module a_m_serial.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

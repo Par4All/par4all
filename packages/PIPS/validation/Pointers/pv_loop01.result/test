@@ -1,0 +1,48 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i;
+   int a[10];
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To: none
+
+      a[i] = i;
+
+// Points To: none
+
+   return 0;
+}

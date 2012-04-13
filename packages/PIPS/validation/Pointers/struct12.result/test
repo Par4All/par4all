@@ -1,0 +1,46 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int struct12()
+{
+
+// Points To: none
+
+   struct foo s1;
+
+// Points To: none
+
+   my_struct s2;
+
+// Points To: none
+
+   my_struct s3;
+
+// Points To: none
+
+   my_struct *p = &s1;
+
+// Points To:
+// p -> s1 , EXACT
+
+   s1.two = &s3;
+
+// Points To:
+// p -> s1 , EXACT
+// s1.two -> s3 , EXACT
+
+   s2 = *p;
+
+// Points To:
+// p -> s1 , EXACT
+// s1.two -> s3 , EXACT
+
+
+   return 0;
+}
