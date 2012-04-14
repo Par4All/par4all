@@ -338,7 +338,8 @@ bool heap_cell_p(cell c)
   reference r = cell_any_reference(c);
   entity v = reference_variable(r);
 
-  heap_p = same_string_p(entity_local_name(v), HEAP_AREA_LOCAL_NAME);
+  heap_p = (strstr(entity_local_name(v), HEAP_AREA_LOCAL_NAME)
+	    ==entity_local_name(v));
 
   return heap_p;
 }
@@ -1177,11 +1178,11 @@ bool vect_contains_phi_p(Pvecteur v)
 }
 
 
-/* Functions about cells - There is no cell.c file */
+/* Functions about points-to cells - There is no cell.c file */
 
 /* add a field to a cell if it is meaningful
  */
-cell cell_add_field_dimension(cell c, entity f)
+cell points_to_cell_add_field_dimension(cell c, entity f)
 {
   if(cell_reference_p(c)) {
     reference r = cell_reference(c);
@@ -1204,6 +1205,10 @@ cell cell_add_field_dimension(cell c, entity f)
  *
  * This function cannot be located in ri-util because it might need to
  * know about abstract locations.
+ *
+ * This does not build a standard reference, but a reference used
+ * within effects computation. Field accesses are replaced by
+ * subscripts.
  */
 reference reference_add_field_dimension(reference r, entity f)
 {

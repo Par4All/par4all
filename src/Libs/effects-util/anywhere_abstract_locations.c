@@ -89,7 +89,14 @@ entity entity_anywhere_locations()
   return entity_all_locations();
 }
 
-/* test if an entity is the top of the lattice*/
+/* test if an entity is the top of the lattice 
+ *
+ * This test does not take typed anywhere into account. This is
+ * consistent with the function name, but may be not with its uses.
+ *
+ * It is not consistent with hiding the impact of
+ * ALIASING_ACROSS_TYPES from callers.
+ */
 bool entity_all_locations_p(entity e)
 {
 
