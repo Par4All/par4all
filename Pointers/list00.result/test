@@ -1,6 +1,110 @@
 
 PROPER  EFFECTS
 
+void list_clean(list *p)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+   list_free(*p);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nil p
+   *p = nil;
+}
+list list_cons(double v, list l)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
+   list n = (list) malloc(sizeof(struct cons_t ));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: n v
+   n->value = v;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l n
+   n->next = l;
+//             <    is read   >: n
+   return n;
+}
+void list_free(list l)
+{
+//             <    is read   >: l
+//             <    is written>: n p
+   list n = l, p = l;
+//             <    is read   >: n nil
+   while (n!=nil) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+      n = n->next;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: n
+//             <    is written>: p
+      p = n;
+   }
+}
+int list_len(list l)
+{
+//             <    is written>: n
+   int n = 0;
+//             <    is read   >: l
+//             <    is written>: c
+   list c = l;
+//             <    is read   >: c nil
+   while (c!=nil) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: c
+      // we know that c!=nil...
+      c = list_next(c);
+//             <    is read   >: n
+//             <    is written>: n
+      n++;
+   }
+//             <    is read   >: n
+   return n;
+}
+list list_next(list l)
+{
+//             <    is read   >: l nil
+   if (l==nil)
+//             <    is read   >: nil
+      return nil;
+   else
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      return l->next;
+}
+list list_set_next(list l, list n)
+{
+//             <    is read   >: l nil
+   if (l!=nil)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l n
+      l->next = n;
+   else
+//             <    is read   >: n
+//             <    is written>: l
+      l = n;
+//             <    is read   >: l
+   return l;
+}
+list list_set_value(list l, double v)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l v
+   // could fail?!
+   l->value = v;
+//             <    is read   >: l
+   return l;
+}
+double list_value(list l)
+{
+//             <    is read   >: l nil
+   if (l==nil)
+      return 0.0;
+   else
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      return l->value;
+}
 int main(void)
 {
    list l;
@@ -32,7 +136,263 @@ int main(void)
 POINTS-TO
 
 
+// Points To IN:
+// nil -> _nil_0[0] , EXACT
+
+
+// Points To OUT:
+// _p_1[0] -> _nil_0[0] , EXACT
+// nil -> _nil_0[0] , EXACT
+
+void list_clean(list *p)
+{
+
+// Points To:
+// _p_1[0] -> _p_1_1[0] , EXACT
+// p -> _p_1[0] , EXACT
+
+   list_free(*p);
+
+// Points To:
+// _p_1[0] -> _p_1_1[0] , EXACT
+// p -> _p_1[0] , EXACT
+
+   *p = nil;
+}
+
 // Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_15.next -> _l_2[0] , EXACT
+
+list list_cons(double v, list l)
+{
+
+// Points To:
+// l -> _l_2[0] , EXACT
+
+   list n = (list) malloc(sizeof(struct cons_t ));
+
+// Points To:
+// l -> _l_2[0] , EXACT
+// n -> *HEAP*_l_15 , EXACT
+
+   n->value = v;
+
+// Points To:
+// l -> _l_2[0] , EXACT
+// n -> *HEAP*_l_15 , EXACT
+
+   n->next = l;
+
+// Points To:
+// *HEAP*_l_15.next -> _l_2[0] , EXACT
+// l -> _l_2[0] , EXACT
+// n -> *HEAP*_l_15 , EXACT
+
+   return n;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void list_free(list l)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   list n = l, p = l;
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _l_1[0] , EXACT
+// p -> _l_1[0] , EXACT
+
+   while (n!=nil) {
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _l_1[0] , EXACT
+// p -> _l_1[0] , EXACT
+
+      n = n->next;
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _l_1[0] , EXACT
+// p -> _l_1[0] , EXACT
+
+      free(p);
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _l_1[0] , EXACT
+// p -> _l_1[0] , EXACT
+
+      p = n;
+   }
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int list_len(list l)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   int n = 0;
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   list c = l;
+
+// Points To:
+// c -> _l_1[0] , EXACT
+// l -> _l_1[0] , EXACT
+
+   while (c!=nil) {
+
+// Points To:
+// c -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// c -> _l_1[0] , MAY
+// l -> _l_1[0] , EXACT
+
+      // we know that c!=nil...
+      c = list_next(c);
+
+// Points To:
+// c -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// l -> _l_1[0] , EXACT
+
+      n++;
+   }
+
+// Points To:
+// c -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// c -> _l_1[0] , MAY
+// l -> _l_1[0] , EXACT
+
+   return n;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+list list_next(list l)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   if (l==nil)
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+      return nil;
+   else
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+      return l->next;
+}
+
+// Points To IN: none
+
+
+// Points To OUT:
+// _l_1[0] -> _n_2[0] , MAY
+
+list list_set_next(list l, list n)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _n_2[0] , EXACT
+
+   if (l!=nil)
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _n_2[0] , EXACT
+
+      l->next = n;
+   else
+
+// Points To:
+// l -> _l_1[0] , EXACT
+// n -> _n_2[0] , EXACT
+
+      l = n;
+
+// Points To:
+// _l_1[0] -> _n_2[0] , MAY
+// l -> _l_1[0] , MAY
+// l -> _n_2[0] , MAY
+// n -> _n_2[0] , EXACT
+
+   return l;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+list list_set_value(list l, double v)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   // could fail?!
+   l->value = v;
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   return l;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+double list_value(list l)
+{
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+   if (l==nil)
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+      return 0.0;
+   else
+
+// Points To:
+// l -> _l_1[0] , EXACT
+
+      return l->value;
+}
+
+// Points To IN:
+// nil -> _nil_0[0] , EXACT
 
 
 // Points To OUT:
@@ -57,31 +417,31 @@ int main(void)
    l = list_cons(1.0, nil);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 // nil -> _nil_0[0] , EXACT
 
    l = list_cons(2.0, l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 // nil -> _nil_0[0] , EXACT
 
    l = list_cons(3.0, l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 // nil -> _nil_0[0] , EXACT
 
    int n = list_len(l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 // nil -> _nil_0[0] , EXACT
 
    list_free(l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 // nil -> _nil_0[0] , EXACT
 
    return 0;
