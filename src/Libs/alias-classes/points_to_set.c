@@ -139,29 +139,61 @@ _uint points_to_rank( const void *  vpt, size_t size)
   return hash_string_rank(key,size);
 }
 
-/* Used to remove local variables and keep static one from blocks */
+/* Remove from "pts" arcs based on at least one local entity in list
+ * "l" and preserve those based on static and global entities. This
+ * function is called when exiting a statement block.
+ *
+ * Detection of dangling pointers.
+ *
+ * Detection of memory leaks. Could be skipped when dealing with the
+ * "main" module, but the information would have to be passed down
+ * thru an extra parameter.
+ *
+ * Side-effects on argument "pts".
+ */
 set points_to_block_projection(set pts, list  l)
 {
-  set res = set_generic_make(set_private, points_to_equal_p,
-				      points_to_rank);
-  set_assign(res, pts);
+  list pls = NIL; // Possibly lost sinks
   FOREACH(ENTITY, e, l) {
     SET_FOREACH(points_to, pt, pts){
       cell source = points_to_source(pt);
       cell sink = points_to_sink(pt);
       entity e_sr = reference_variable(cell_to_reference(source));
       entity e_sk = reference_variable(cell_to_reference(sink));
-      if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source))))
-	set_del_element(res, res, (void*)pt);
-      
-      else if(e == e_sk && (!(variable_static_p(e_sk) || top_level_entity_p(e_sk) || heap_cell_p(sink)))){
-	pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
-	list lhs = CONS(CELL, source, NIL);
-	res = points_to_nowhere_typed(lhs, res);
+
+      if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
+	set_del_element(pts, pts, (void*)pt);
+	if(heap_cell_p(sink)) {
+	  /* Check for memory leaks */
+	  pls = CONS(CELL, sink, pls);
+	}
+      }
+      else if(e == e_sk
+	      && (!(variable_static_p(e_sk)
+		    || top_level_entity_p(e_sk)
+		    || heap_cell_p(sink)))) {
+	if(gen_in_list_p(e_sr, l)) {
+	  /* Both the sink and the source disappear: the arc is removed */
+	  set_del_element(pts, pts, (void*)pt);
+	}
+	else {
+	  pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
+	  list lhs = CONS(CELL, source, NIL);
+	  pts = points_to_nowhere_typed(lhs, pts);
+	}
       }
     }
   }
-  return res;
+  /* Any memory leak? */
+  FOREACH(CELL, c, pls) {
+    if(!sink_in_set_p(c, pts)) {
+      reference r = cell_any_reference(c);
+      entity b = reference_variable(r);
+      pips_user_warning("Memory leak for bucket \"%s\".\n",
+			entity_name(b));
+    }
+  }
+  return pts;
 }
 
 
@@ -292,6 +324,14 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       bool to_be_freed; // FI: memory leak for the time being
       type rt = cell_to_type(source, &to_be_freed); // reference type
       if(pointer_type_p(rt)) {
+	type nst = type_to_pointed_type(rt);
+	points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	pts = add_arc_to_pt_map(pt, pts);
+	add_arc_to_points_to_context(copy_points_to(pt));
+	sinks = source_to_sinks(source, pts, false);
+      }
+      if(struct_type_p(rt)) {
+	// FI FI FI - to be really programmed with the field type
 	type nst = type_to_pointed_type(rt);
 	points_to pt = create_stub_points_to(source, nst, basic_undefined);
 	pts = add_arc_to_pt_map(pt, pts);

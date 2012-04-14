@@ -47,7 +47,14 @@ void points_to_backward_translation()
 /* We want a recursive descent on the type of the formal parameter,
  * once we found a pointer type we beguin a recursive descent until
  * founding a basic case. Then we beguin the ascent and the creation
- * gradually of the points_to_stub by calling pointer_formal_parameter_to_stub_points_to() */
+ * gradually of the points_to_stub by calling
+ * pointer_formal_parameter_to_stub_points_to().
+ *
+ * FI->AM: as I would rather work on-demand, this function should be
+ * useless. I fixed it nevertheless because it seems better for
+ * EffectsWithPointsTo, which does not seem to allocate the new
+ * points-to stubs it needs.
+ */
 set formal_points_to_parameter(cell c)
 {
   reference r = reference_undefined;
@@ -151,8 +158,19 @@ entity create_stub_entity(entity e, type t)
   if(type_variable_p(t)){
     basic bb = variable_basic(type_variable(t));
     basic base = copy_basic(bb);
-    bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-    if(type_strict_p) {
+    bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+    // FI: we have a probleme here when type_strict_p is set to false
+    //
+    // We want pointers to element to be promoted to pointers to
+    // arrays, for instance, "int * p;" is compatible with "p++;" in
+    // spite of the standard.
+    //
+    // However, we cannot do that with struct and union because the
+    // fields are replaced by subscript.
+    //
+    // To sum up, things are better if the typing is
+    // strict... although most C programs are not strictly typed.
+    if(!type_strict_p && !struct_type_p(t)) {
       expression ex = make_unbounded_expression();
       dimension d = make_dimension(int_to_expression(0),ex);
       variable v = make_variable(base,
@@ -169,8 +187,9 @@ entity create_stub_entity(entity e, type t)
  
   // If entity "stub" does not already exist, create it.
   if(entity_undefined_p(stub)) {
-    entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
-    entity_kind(DummyTarget)=ENTITY_POINTER_DUMMY_TARGETS_AREA;
+    entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,
+					    POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
+    entity_kind(DummyTarget) = ENTITY_POINTER_DUMMY_TARGETS_AREA;
     stub = make_entity(formal_name,
 		       pt,
 		       make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
@@ -183,7 +202,7 @@ entity create_stub_entity(entity e, type t)
 
 
 /* To create the points-to between a formal parameter or a global
- * variable or a snother stub on one hand, and another new stub on the
+ * variable or another stub on one hand, and another new stub on the
  * other.
  *
  * the sink name is a concatenation of the formal parameter and the
@@ -212,7 +231,7 @@ points_to create_stub_points_to(cell c, type t,
   entity formal_parameter = create_stub_entity(e, t);
 
   bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-  if(!type_strict_p)
+  if(!type_strict_p && !derived_type_p(t))
     sink_ref = make_reference(formal_parameter,
 			      CONS(EXPRESSION, int_to_expression(0), NIL));
   else
@@ -303,11 +322,11 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
 
 
 /* Input : a formal parameter which is a pointer and its type.
-
-   Output : a set of points-to where sinks are stub points-to.
-   we descent recursively until reaching a basic type, then we call
-   create_stub_points_to()to generate the adequate points-to.
-*/
+ *
+ * Output : a set of points-to where sinks are stub points-to.
+ * we descent recursively until reaching a basic type, then we call
+ *  create_stub_points_to()to generate the adequate points-to.
+ */
 set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 {
   points_to pt_to = points_to_undefined;
