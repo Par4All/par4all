@@ -66,9 +66,9 @@ int main(int argc, char *argv[])
 // Points To:
 // argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE* , EXACT
-// qi -> *HEAP*_l_10 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_10".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_10".
