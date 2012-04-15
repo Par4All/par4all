@@ -558,33 +558,108 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  *
  * New points-to information must be added when a formal parameter
  * is dereferenced.
+ *
+ * Equations for "free(e);":
+ *
+ * Let L = expression_to_sources(e,in) and R = expression_to_sinks(e,in)
+ *
+ * Any location l corresponding to e can now point to nowhere/undefined:
+ *
+ * Gen_1 = {pts=(l,nowhere,a) | l in L}
+ *
+ * Any location source that pointed to a location pointed to by l can
+ * now point to nowehere/undefined.
+ *
+ * Gen_2 = {pts=(source,nowhere,a) | exists r in R
+ *                                   && r in Heap
+ *                                   && exists pts'=(source,r,a') in in}
+ *
+ * If e corresponds to a unique (non-abstract?) location l, any arc
+ * starting from l can be removed:
+ *
+ * Kill_1 = {pts=(l,r,a) in in | l in L && |L|=1}
+ *
+ * If the freed location r is precisely known, any war pointing
+ * towards it can be removed:
+ *
+ * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1}
+ *
+ * out = (in - Kill_1 - Kill_2) U Gen_1 U Gen_2
+ *
+ * Warnings for dangling pointers:
+ *
+ * DP = {r|exists pts=(r,l,a) in Gen_2} // To be checked
+ *
+ * Memory leaks: the freed bucket may be the only bucket containing
+ * pointers towards another bucket:
+ *
+ * ML = {} // Still to be done
  */
 pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
 
-  /* Change the "lhs" into a constant memory path using current
-   * points-to information pt_out.
-   */
-  // list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
   list L = expression_to_points_to_sources(lhs, pt_out);
+  list R = expression_to_points_to_sinks(lhs, pt_out);
 
   /* Build a nowhere cell
    *
    * FI->AM: typed nowhere?
    */
-  list R = CONS(CELL, make_nowhere_cell(), NIL);
+  list N = CONS(CELL, make_nowhere_cell(), NIL);
 
+  pips_assert("L is not empty", !ENDP(L));
+  pips_assert("R is not empty", !ENDP(R));
+
+  /* Remove Kill_1 if it is not empty by definition */
+  if(gen_length(L)==1) {
+    SET_FOREACH(points_to, pts, pt_out) {
+      cell l = points_to_source(pts);
+      if(points_to_cell_in_list_p(l, L)) {
+	// FI: assuming you can perform the removal inside the loop...
+	remove_arc_from_pt_map(pts, pt_out);
+      }
+    }
+  }
+
+  /* Remove Kill_2 if it is not empty by definition */
+  if(gen_length(R)==1) {
+    SET_FOREACH(points_to, pts, pt_out) {
+      cell r = points_to_sink(pts);
+      if(points_to_cell_in_list_p(r, R)) {
+	/* FI: should be easier and more efficient to substitute the sink...*/
+	cell source = copy_cell(points_to_source(pts));
+	cell sink = make_nowhere_cell();
+	approximation a = copy_approximation(points_to_approximation(pts));
+	points_to npts = make_points_to(source, sink, a, make_descriptor_none());
+	add_arc_to_pt_map(npts, pt_out);
+	// FI: assuming you can perform the removal inside the loop...
+	remove_arc_from_pt_map(pts, pt_out);
+      }
+    }
+  }
+
+  /* Add Gen_1 */
+  pt_out = list_assignment_to_points_to(L, N, pt_out);
+
+  /* Add Gen_2: useless, already performed by Kill_2 */
+  SET_FOREACH(points_to, pts, pt_out) {
+    cell r = points_to_sink(pts);
+    if(points_to_cell_in_list_p(r, R)) {
+      cell source = copy_cell(points_to_source(pts));
+      cell sink = make_nowhere_cell();
+      approximation a = copy_approximation(points_to_approximation(pts));
+      points_to npts = make_points_to(source, sink, a, make_descriptor_none());
+      add_arc_to_pt_map(npts, pt_out);
+    }
+  }
 
   /*
    * Other pointers may or must now be dangling because their target
    * has been freed.
    */
-  list S = expression_to_points_to_sinks(lhs, pt_out);
 
-  pt_out = list_assignment_to_points_to(L, R, pt_out);
-
-  FOREACH(CELL, c, S) {
+  FOREACH(CELL, c, R) {
     if(!sink_in_set_p(c, pt_out)) {
       if(heap_cell_p(c)) {
 	entity b = reference_variable(cell_any_reference(c));
@@ -596,8 +671,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
   // FI: memory leak(s) in this function?
   gen_free_list(L);
-  gen_free_list(R);
-  gen_full_free_list(S);
+  gen_free_list(N);
+  gen_full_free_list(R);
 
   return pt_out;
 }
@@ -606,6 +681,9 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 /* Update pt_out when any element of L can be assigned any element of R
  *
  * FI->AM: Potential and sure memory leaks are not (yet) detected.
+ *
+ * FI->AM: the distinction between may and must sets used in the
+ * implementation seem useless.
  *
  * KILL_MAY = kill_may_set()
  * KILL_MUST= kill_must_set()
@@ -616,6 +694,27 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
  * KILL = KILL_MAY U KILL_MUST
  * GEN = GEN_MAY U GEN_MUST
  * PT_OUT = (PT_OUT - KILL) U GEN
+ *
+ * This function is used to model a C pointer assignment "e1 = e2;"
+ *
+ * Let L = expression_to_sources(e1) and R = expression_to_sinks(e2).
+ *
+ * Let in be the points-to relation before executing the assignment.
+ *
+ * Gen(L,R) = {pts| exist l in L exists r in R s.t. pts=(l,r,|L|=1)
+ *
+ * Kill(L,in) = {pts=(l,sink,must)| l in L}
+ *
+ * Let K=Kill(L,in) and out = (in-K) U gen(L,R)
+ *
+ * For memory leaks, let
+ *
+ *  ML(K,out) = {c in Heap | exists pts=(l,c,a) in K
+ *                           && !(exists pts'=(l',c,a') in out)}
+ *
+ * This function is described in Amira Mensi's dissertation.
+ *
+ * Test cases designed to check the behavior of this function: ?!?
  */
 pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 {
@@ -713,7 +812,8 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		// FI: too bad this cannot be reused because of an assert in normalize_reference()....
 		// pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
 		points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
-
+		// FI: pt is allocated but not used...
+		add_arc_to_pt_map(pt, pt_out); // FI: I guess...
 		// FI->FC: it would be nice to have a Newgen free_xxxxs() to
 		// free a list of objects of type xxx with one call
 		free_expression(lhs), free_expression(rhs);

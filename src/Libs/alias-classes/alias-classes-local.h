@@ -46,3 +46,4 @@ typedef set pt_map;
 // FI: Not so sure we do not need a new name
 #define source_in_pt_map_p(cell,set) source_in_set_p(cell,set)
 #define add_arc_to_pt_map(a, s) set_add_element((set) s, (set) s, (void *) a)
+#define remove_arc_from_pt_map(a, s) set_del_element((set) s, (set) s, (void *) a)

@@ -73,3 +73,15 @@ bool stub_points_to_cell_p(cell c)
   formal_p = entity_stub_sink_p(v); // FI: can be a source too
   return formal_p;
 }
+
+bool points_to_cell_in_list_p(cell c, list L)
+{
+  bool found_p = false;
+  FOREACH(CELL, lc, L) {
+    if(cell_equal_p(c,lc)) {
+      found_p =true;
+      break;
+    }
+  }
+  return found_p;
+}
