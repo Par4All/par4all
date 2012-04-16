@@ -11,7 +11,7 @@ struct rec_st {
 };
 
 // construction d'une liste
-recursive foo(int i, recursive p)
+recursive cons(int i, recursive p)
 {
   recursive q;
   q = (recursive) malloc(sizeof(struct rec_st));
@@ -20,8 +20,8 @@ recursive foo(int i, recursive p)
   return q;
 }
 
-// copie d'une liste
-recursive copy(recursive p)
+// copie inverse d'une liste
+recursive revcopy(recursive p)
 {
   recursive q, r;
   r = NULL;
@@ -37,20 +37,59 @@ recursive copy(recursive p)
   return r;
 }
 
+// inversion d'une liste (?)
+recursive reverse(recursive p)
+{
+  recursive r = p;
+  recursive previous = NULL;
+  while (r != NULL)
+  {
+    recursive next = r->n;
+    r->n = previous;
+    previous = r;
+    r = next;
+  } 
+  r = previous;
+  return r;
+}
+
 int main(void)
 {
   recursive p, q;
   p = NULL;
-  p = foo(1, p);
-  p = foo(2, p);
-  p = foo(3, p);
+  p = cons(1, p);
+  p = cons(2, p);
+  p = cons(3, p);
 
-  // copie de la liste
-  q = copy(p);
+  fprintf(stdout,
+          "# p 3 items\n"
+          "p->i: %d\n"
+          "p->n->i: %d\n"
+          "p->n->n->i: %d\n"
+          "p->n->n->n: %p\n",
+          p->i, p->n->i, p->n->n->i, p->n->n->n);
 
-  fprintf(stdout, "q->i: %d\n", q->i);
-  fprintf(stdout, "q->n->i: %d\n", q->n->i);
-  fprintf(stdout, "q->n->n->i: %d\n", q->n->n->i);
-  fprintf(stdout, "q->n->n->n: %p\n", q->n->n->n);
+  // copie inverse de la liste
+  q = revcopy(p);
+
+  fprintf(stdout,
+          "# q=revcopy(p)\n"
+          "q->i: %d\n"
+          "q->n->i: %d\n"
+          "q->n->n->i: %d\n"
+          "q->n->n->n: %p\n",
+          q->i, q->n->i, q->n->n->i, q->n->n->n);
+
+  // inverse de la liste
+  q = reverse(q);
+
+  fprintf(stdout, 
+          "# q=reverse(q)\n"
+          "q->i: %d\n"
+          "q->n->i: %d\n"
+          "q->n->n->i: %d\n"
+          "q->n->n->n: %p\n",
+          q->i, q->n->i, q->n->n->i, q->n->n->n);
+
   return 0;
 }
