@@ -12061,6 +12061,33 @@ privatize_module                    > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
+
+\begin{PipsPass}{privatize_module_even_globals}
+  This pass is similar to \PipsPassRef{privatize_module}, but it also
+  privatizes global scalar variables, using information from
+  \PipsPassRef{live_paths} analyses to avoid privatizing global
+  variables which are the values of which are used afterwards, and
+  callees \PipsPassRef{summary_effects} to ensure that global
+  variables are not used in callees. This last property is necessary
+  to keep the transformation as local as possible. If it were not
+  true, it would require to clone the sub call-trees.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias privatize_module_even_globals 'Privatize Local and Global Scalars'
+privatize_module_even_globals       > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.chains
+        < MODULE.live_out_paths
+        < MODULE.live_in_paths
+        < CALLEES.summary_effects
+\end{PipsMake}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DECLARATION LOCALIZATION
 
 \subsubsection{Declaration Localization}

@@ -71,6 +71,7 @@ typedef dg_vertex_label vertex_label;
 typedef struct {
   entity e;
   bool loop_index_p;
+  bool used_through_external_calls;
 } privatizable_ctxt;
 
 static bool loop_in(loop l, privatizable_ctxt *ctxt)
@@ -80,11 +81,47 @@ static bool loop_in(loop l, privatizable_ctxt *ctxt)
   return ctxt->loop_index_p;
 }
 
+static bool call_in(call c, privatizable_ctxt *ctxt)
+{
+  entity func = call_function(c);
+  const char* func_name = module_local_name(func);
+  type uet = ultimate_type(entity_type(func));
+
+  pips_debug(4, "begin for %s\n", entity_local_name(func));
+
+  if(type_functional_p(uet))
+    {
+      if (value_code_p(entity_initial(func)))
+	{
+	  pips_debug(4, "external function\n");
+	  /* Get the summary effects of "func". */
+	  list func_eff = (*db_get_summary_rw_effects_func)(func_name);
+	  /* tests if the function may refer to the global variable */
+	  list l_conflicts = effects_entities_which_may_conflict_with_scalar_entity(func_eff, ctxt->e);
+	  if (!ENDP(l_conflicts))
+	    {
+	      ctxt->used_through_external_calls = true;
+	      gen_free_list(l_conflicts);
+	    }
+	}
+      // else
+      // nothing to do
+    }
+  else if(type_variable_p(uet))
+    {
+      pips_debug(4, "function called through pointer -> assume worst case\n");
+      ctxt->used_through_external_calls = true;
+    }
+
+  return (!ctxt->used_through_external_calls);
+}
+
 /* privatizable() checks whether the entity e is privatizable in statement s. */
-bool entity_privatizable_in_loop_p(entity e, loop l)
+bool entity_privatizable_in_loop_statement_p(entity e, statement stmt, bool even_globals)
 {
     storage s = entity_storage( e ) ;
-    bool result = true;
+    bool result = entity_scalar_p(e);
+    loop l = statement_loop(stmt);
 
     /* For C, it should be checked that e has no initial value because
        there is no dependence arc between the initialization in t he
@@ -104,20 +141,49 @@ bool entity_privatizable_in_loop_p(entity e, loop l)
        inner loop indices are privatizable to allow correct
        parallelization of outer loops
     */
-    if (c_module_p(get_current_module_entity())
+    if (result && even_globals
+	&& storage_ram_p( s ) && static_area_p( ram_section( storage_ram( s )))
+	&& top_level_entity_p(e) )
+      {
+	pips_debug(3, "global variable\n");
+
+	/* check that the value of e is not re-used outside the loop */
+	list l_live_out = load_live_out_paths_list(stmt);
+	list l_conflicts_out = effects_entities_which_may_conflict_with_scalar_entity(l_live_out, e);
+	list l_live_in = load_live_in_paths_list(stmt);
+	list l_conflicts_in = effects_entities_which_may_conflict_with_scalar_entity(l_live_in, e);
+
+	if (ENDP(l_conflicts_out) && ENDP(l_conflicts_in))
+	  {
+	    privatizable_ctxt ctxt = {e, false, false};
+	    /* check that e is not used through called functions */
+	    /* It may be passed to a function as a parameter,
+	       but it must not be used as a global variable */
+	    gen_context_recurse(loop_body(l), &ctxt, call_domain, call_in, gen_null);
+	    result = !ctxt.used_through_external_calls;
+	  }
+	else
+	  {
+	    gen_free_list(l_conflicts_out);
+	    gen_free_list(l_conflicts_in);
+	    result = true;
+	  }
+      }
+
+    /* Here is the old behavior, to be removed when the
+       previous if branch has been sufficiently tested */
+    else if (result && !even_globals && c_module_p(get_current_module_entity())
 	&& storage_ram_p( s ) && static_area_p( ram_section( storage_ram( s )))
 	&& top_level_entity_p( e) /* this test may be removed since we check that e is used as a loop index */)
       {
-	pips_debug(3, "global variable\n");
-	privatizable_ctxt ctxt = {e, false};
+	privatizable_ctxt ctxt = {e, false, false};
 	/* check if e is an internal loop index */
 	gen_context_recurse(loop_body(l), &ctxt, loop_domain, loop_in, gen_null);
 	result = ctxt.loop_index_p;
       }
-
     else
       {
-	result = entity_scalar_p( e ) &&
+	result = result &&
 	  ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )||
 	   (storage_ram_p( s ) && dynamic_area_p( ram_section( storage_ram( s ))))) ;
       }
@@ -129,9 +195,9 @@ bool entity_privatizable_in_loop_p(entity e, loop l)
    Moreover, the locals of loops are initialized to all possible
    private entities. */
 
-static void scan_unstructured(unstructured u, list loops) ;
+static void scan_unstructured(unstructured u, list loops, bool even_globals) ;
 
-static void scan_statement(statement s, list loops)
+static void scan_statement(statement s, list loops, bool even_globals)
 {
     instruction i = statement_instruction(s);
 
@@ -142,7 +208,7 @@ static void scan_statement(statement s, list loops)
 
     switch(instruction_tag(i)) {
     case is_instruction_block:
-        MAPL(ps, {scan_statement(STATEMENT(CAR(ps)), loops);},
+        MAPL(ps, {scan_statement(STATEMENT(CAR(ps)), loops, even_globals);},
              instruction_block(i));
         break ;
     case is_instruction_loop: {
@@ -157,7 +223,7 @@ static void scan_statement(statement s, list loops)
 
             if(!anywhere_effect_p(f)
                && action_write_p( effect_action( f ))
-               &&  entity_privatizable_in_loop_p( e, l )
+               &&  entity_privatizable_in_loop_statement_p( e, s, even_globals)
                &&  gen_find_eq( e, locals ) == entity_undefined ) {
                 locals = CONS( ENTITY, e, locals ) ;
             }
@@ -175,7 +241,7 @@ static void scan_statement(statement s, list loops)
         loop_locals(l) = gen_nconc(loop_locals(l),
                                    gen_copy_seq(statement_declarations(b)));
 
-        scan_statement( b, new_loops ) ;
+        scan_statement( b, new_loops, even_globals ) ;
         hash_del(get_enclosing_loops_map(), (char *) s) ;
         store_statement_enclosing_loops(s, new_loops);
         break;
@@ -183,24 +249,24 @@ static void scan_statement(statement s, list loops)
     case is_instruction_test: {
         test t = instruction_test( i ) ;
 
-        scan_statement( test_true( t ), loops ) ;
-        scan_statement( test_false( t ), loops ) ;
+        scan_statement( test_true( t ), loops, even_globals ) ;
+        scan_statement( test_false( t ), loops, even_globals ) ;
         break ;
     }
     case is_instruction_whileloop: {
         whileloop l = instruction_whileloop(i);
         statement b = whileloop_body(l);
-        scan_statement(b, loops ) ;
+        scan_statement(b, loops, even_globals ) ;
         break;
     }
     case is_instruction_forloop: {
         forloop l = instruction_forloop(i);
         statement b = forloop_body(l);
-        scan_statement(b, loops ) ;
+        scan_statement(b, loops, even_globals ) ;
         break;
     }
    case is_instruction_unstructured:
-        scan_unstructured( instruction_unstructured( i ), loops ) ;
+        scan_unstructured( instruction_unstructured( i ), loops, even_globals ) ;
         break ;
     case is_instruction_call:
     case is_instruction_expression:
@@ -211,11 +277,11 @@ static void scan_statement(statement s, list loops)
     }
 }
 
-static void scan_unstructured(unstructured u, list loops)
+static void scan_unstructured(unstructured u, list loops, bool even_globals)
 {
     list blocs = NIL ;
 
-    CONTROL_MAP( c, {scan_statement( control_statement( c ), loops );},
+    CONTROL_MAP( c, {scan_statement( control_statement( c ), loops, even_globals );},
                  unstructured_control( u ), blocs ) ;
     gen_free_list( blocs ) ;
 }
@@ -493,7 +559,7 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 /* PRIVATIZE_DG looks for definition of entities that are locals to the loops
    in the dependency graph G for the control graph U. */
 
-bool privatize_module(char *mod_name)
+bool generic_privatize_module(char *mod_name, bool even_globals)
 {
     entity module;
     statement mod_stat;
@@ -511,6 +577,16 @@ bool privatize_module(char *mod_name)
 
     set_cumulated_rw_effects((statement_effects)
         db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true) );
+
+    if (even_globals)
+      {
+	set_constant_paths_p(true);
+	set_pointer_info_kind(with_no_pointer_info);
+	set_methods_for_simple_effects();
+	set_methods_for_live_paths(mod_name);
+	set_live_out_paths((*db_get_live_out_paths_func)(mod_name));
+  	set_live_in_paths((*db_get_live_in_paths_func)(mod_name));
+    }
 
     mod_graph = (graph)
         db_get_memory_resource(DBR_CHAINS, mod_name, true);
@@ -530,7 +606,7 @@ bool privatize_module(char *mod_name)
 
     /* Build maximal lists of private variables in loop locals */
     /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
-    scan_statement(mod_stat, NIL);
+    scan_statement(mod_stat, NIL, even_globals);
 
     /* remove non private variables from locals */
     FOREACH(VERTEX, v, graph_vertices( mod_graph )) {
@@ -566,11 +642,29 @@ bool privatize_module(char *mod_name)
     reset_current_module_statement();
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
-        reset_ordering_to_statement();
+    if (even_globals)
+      {
+	reset_live_out_paths();
+	reset_live_in_paths();
+      }
+
+    reset_ordering_to_statement();
     clean_enclosing_loops();
 
     return true;
 }
+
+bool privatize_module(char *mod_name)
+{
+  return generic_privatize_module(mod_name, false);
+}
+
+bool privatize_module_even_globals(char *mod_name)
+{
+  return generic_privatize_module(mod_name, true);
+}
+
+
 
 /**
  * @name localize declaration
