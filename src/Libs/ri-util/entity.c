@@ -1987,6 +1987,33 @@ bool some_main_entity_p(void)
   return some_main;
 }
 
+
+entity
+get_main_entity(void)
+{
+    entity m;
+    gen_array_t modules = db_get_module_list();
+    int nmodules = gen_array_nitems(modules), i;
+    pips_assert("some modules in the program", nmodules>0);
+
+    for (i=0; i<nmodules; i++)
+    {
+	m = module_name_to_entity(gen_array_item(modules, i));
+	if (entity_main_module_p(m)) {
+	    gen_array_full_free(modules);
+	    return m;
+	}
+    }
+
+    /* ??? some default if there is no main... */
+    pips_user_warning("no main found, returning %s instead\n",
+		      gen_array_item(modules,0));
+    m = module_name_to_entity(gen_array_item(modules, 0));
+    gen_array_full_free(modules);
+    return m;
+}
+
+
 /* @return the list of entities in module the name of which is given
  * warning: the entity is created if it does not exist!
  * @param module the name of the module for the entities
