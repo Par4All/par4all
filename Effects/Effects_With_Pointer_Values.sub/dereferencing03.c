@@ -1,1 +1,0 @@
-../../EffectsWithPointsTo/dereferencing03.c
