@@ -2748,8 +2748,11 @@ reconstruct the \texttt{pipsrc.*sh} files.
   the \texttt{wpips} interface.
 
   For instance, for a phase \emph{myphase} which reads a resource
-  \emph{res1} and produces a resource \emph{res2} for the current module,
-  the rule and its alias are:
+  \emph{res1} and produces a resource \emph{res2} for the current
+  module, the rule and its alias are\footnote{Beware not to add any
+    space before the new phase name (here \emph{myphase}). This
+    results in an error message from function \texttt{get\_builder}
+    (\texttt{no builder for myphase}).}:
 \begin{verbatim}
 \begin{PipsMake}
 alias myphase 'My Phase'
