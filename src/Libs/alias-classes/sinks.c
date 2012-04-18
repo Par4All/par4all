@@ -597,9 +597,14 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 	/* What is the value of the subscript expression? */
 	expression sub = EXPRESSION(CAR(reference_indices(r)));
 	// FI: should we try to evaluate the subscript statically?
-	reference nr = copy_reference(r);
+	// If the expression is not zero, the target is unchanged but
+	// * must be used as subscript in sinks
+
+	entity v = reference_variable(r);
+	reference nr = make_reference(v, NIL);
 	cell nc = make_cell_reference(nr);
 	if(eval_p) {
+	  // FI: two rounds of source_to_sinks() I guess
 	  pips_internal_error("Not implemented yet.\n");
 	}
 	else {
@@ -611,8 +616,18 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 	;
       }
       else {
-	pips_user_error("Too many subscript expressions for array \"%s\".\n",
-			entity_user_name(e));
+	// FI: you may have an array of struct to begin with, and of
+	// structs including other structs
+	// Handle it just like a struct
+	//pips_user_error("Too many subscript expressions for array \"%s\".\n",
+	//		entity_user_name(e));
+	reference nr = copy_reference(r);
+	cell nc = make_cell_reference(nr);
+	if(eval_p) {
+	  sinks = source_to_sinks(nc, in, true);
+	}
+	else
+	  sinks = CONS(CELL, nc, NIL);
       }
     }
   }
@@ -685,7 +700,14 @@ list cast_to_points_to_sinks(cast c, pt_map in)
 {
   expression e = cast_expression(c);
   // FI: should we pass down the expected type? It would be useful for
-  // heap modelling
+  // heap modelling. No, we might ass well fix the type in the list of
+  // sinks returned, especially for malloced buckets.
+  /* FI: we need here to return a list of points-to objects so as to
+   * warn the user in case the types are not compatible with the
+   * property ALIAS_ACROSS_TYPES or to fix the cells allocated in
+   * heap. However, this business if more likely to be performed in
+   * sinks.c
+   */
   list sinks = expression_to_points_to_sinks(e, in);
   return sinks;
 }
@@ -817,10 +839,25 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 }
 */
 
+ /* Generate the corresponding points-to reference(s). All access
+  * operators such as ., ->, * are replaced by subscripts.
+  *
+  */
 list subscript_to_points_to_sinks(subscript s, pt_map in)
 {
-  list sinks = NIL;
-  pips_user_warning("Not implemented yet for %p and %p\n", s, in);
+  expression a = subscript_array(s);
+  list sinks = expression_to_points_to_sources(a, in);
+  list sl = subscript_indices(s);
+  list csl = subscript_expressions_to_constant_subscript_expressions(sl);
+
+  FOREACH(CELL, c, sinks) {
+    list ncsl = gen_full_copy_list(csl);
+    reference r = cell_any_reference(c);
+    reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+  }
+
+  gen_full_free_list(csl);
+
   return sinks;
 }
 

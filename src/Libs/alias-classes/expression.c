@@ -544,13 +544,17 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   pips_assert("Left hand side reference list is not empty.\n", !ENDP(L));
   pips_assert("Right hand side reference list is not empty.\n", !ENDP(R));
 
+  // FI: where do we want to check for dereferencement of
+  // nowhere/undefined and NULL? Here? Or within
+  // list_assignment_to_points_to?
+
   pt_out = list_assignment_to_points_to(L, R, pt_out);
 
   // FI: memory leak(s)?
 
   return pt_out;
 }
-
+
 /* Any abstract location of the lhs in L is going to point to nowhere.
  *
  * Any source in pt_in pointing towards any location in lhs may or
@@ -594,6 +598,21 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  * pointers towards another bucket:
  *
  * ML = {} // Still to be done
+ *
+ * Note: for DP and ML, we could compute may and must sets. We only
+ * compute must sets to avoid swamping the log file with false alarms.
+ *
+ * FI->FC: it might be better to split the problem according to
+ * |R|. If |R|=1, you know which bucket is destroyed, unless it is an
+ * abstract bucket... which we do not really know even at the
+ * intraprocedural level.  In that case, you could remove all edges
+ * starting from r and then substitute r by nowhere/undefined.
+ *
+ * If |R| is greater than 1, then a new node nowhere/undefined must be
+ * added and any arc ending up in R must be duplicated with a similar
+ * arc ending up in the new node.
+ *
+ * The cardinal of |L| does not seem to have an impact...
  */
 pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 {
@@ -622,7 +641,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     }
   }
 
-  /* Remove Kill_2 if it is not empty by definition */
+  /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
   if(gen_length(R)==1) {
     SET_FOREACH(points_to, pts, pt_out) {
       cell r = points_to_sink(pts);
@@ -639,7 +658,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     }
   }
 
-  /* Add Gen_1 */
+  /* Add Gen_1 - Not too late since pt_out has aready been modified? */
   pt_out = list_assignment_to_points_to(L, N, pt_out);
 
   /* Add Gen_2: useless, already performed by Kill_2 */
@@ -712,12 +731,33 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
  *  ML(K,out) = {c in Heap | exists pts=(l,c,a) in K
  *                           && !(exists pts'=(l',c,a') in out)}
  *
+ * For error dereferencing, such as nowhere/undefined and NULL, check
+ * the content of L.
+ *
  * This function is described in Amira Mensi's dissertation.
  *
  * Test cases designed to check the behavior of this function: ?!?
  */
 pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 {
+  /* Check dereferencing errors */
+  bool singleton_p = (gen_length(L)==1);
+  FOREACH(CELL, c, L) {
+    if(nowhere_cell_p(c))
+      if(singleton_p)
+	// Not necessarily a user error if the code is dead
+	// Should be controlled by an extra property...
+	pips_user_warning("Dereferencing of an undefined pointer.\n");
+      else
+	pips_user_warning("Dereferencing of an undefined pointer.\n");
+    else if(null_cell_p(c))
+      if(singleton_p)
+	// Not necessarily a user error if the code is dead
+	// Should be controlled by an extra property...
+	pips_user_warning("Dereferencing of a null pointer.\n");
+      else
+	pips_user_warning("Dereferencing of a null pointer.\n");
+  }
 
   /* Compute the data-flow equation for the may and the must edges...
    *

@@ -246,6 +246,8 @@ void print_points_to_set(string what,  set s)
   fprintf(stderr,"points-to set %s:\n", what);
   if(set_undefined_p(s))
     fprintf(stderr, "undefined set\n");
+  else if(s==NULL)
+    fprintf(stderr, "uninitialized set\n");
   else if(set_size(s)==0)
     fprintf(stderr, "empty set\n");
   else
