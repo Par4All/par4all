@@ -282,13 +282,28 @@ bool source_in_set_p(cell source, set s)
 list source_to_sinks(cell source, set pts, bool fresh_p)
 {
   list sinks = NIL;
-  SET_FOREACH ( points_to, pt, pts) {
+
+  /* 1. Try to find the source in the points-to information */
+  SET_FOREACH( points_to, pt, pts) {
     if(cell_equal_p(source, points_to_source(pt))) {
       cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
       sinks = CONS(CELL, sc, sinks);
     }
   }
 
+  /* 2. Much harder... See if source is contained in one of the many
+     abstract sources. Step 1 is subsumed by Step 2... but much faster.  */
+  if(ENDP(sinks)) {
+    SET_FOREACH(points_to, pt, pts) {
+      if(cell_included_p(source, points_to_source(pt))) {
+	cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+	sinks = CONS(CELL, sc, sinks);
+      }
+    }
+  }
+
+  /* 3. If the previous steps have failed, build a new sink if the
+     source is a formal parameter. */
   // FI: you must generate sinks for formal parameters, global
   // variables and stubs if nothing has been found
   if(ENDP(sinks)) {
@@ -345,14 +360,27 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	pips_internal_error("Not implemented yet.\n");
       }
     }
-    if(ENDP(sinks))
+    if(ENDP(sinks)) {
+      reference r = cell_any_reference(source);
+      print_reference(r);
       pips_internal_error("Sink missing for a source based on \"%s\".\n",
 			  entity_user_name(v));
-
+    }
   }
 
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
+  return sinks;
+}
+
+/* Same as source_to_sinks, but for a list of cells. */
+list sources_to_sinks(list sources, set pts, bool fresh_p)
+{
+  list sinks = NIL;
+  FOREACH(CELL, c, sources) {
+    list cl =  source_to_sinks(c, pts, fresh_p);
+    sinks = gen_nconc(sinks, cl);
+  }
   return sinks;
 }
 

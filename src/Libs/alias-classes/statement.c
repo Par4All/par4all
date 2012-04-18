@@ -141,7 +141,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   pt_map pt_out = pt_in;
   //set pt_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
   list l = NIL;
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   list l_decls = statement_declarations(s);
 
@@ -149,7 +149,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   
   FOREACH(ENTITY, e, l_decls) {
     type et = ultimate_type(entity_type(e));
-    if(pointer_type_p(et) || struct_type_p(et)) {
+    if(pointer_type_p(et) || struct_type_p(et) || array_of_struct_type_p(et)) {
       if( !storage_rom_p(entity_storage(e)) ) {
 	// FI: could be simplified with variable_initial_expression()
 	value v_init = entity_initial(e);
@@ -165,17 +165,13 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  /* free_expression(lhs); */
 	}
 	else {
-	  /* Generate nowhere sinks */
-	  /* FI: goes back into Amira's code */
-	  l = points_to_init_variable(e);
-	  FOREACH(CELL, cl, l) {
-	    list l_cl = CONS(CELL, cl, NIL);
-	    // FI: memory leak because of the calls to points_to_nowherexxx
-	    if(type_sensitive_p)
-	      set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
-	    else
-	      set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
-	    //FI: free l_cl?
+	  l = variable_to_pointer_locations(e);
+	  FOREACH(CELL, source, l) {
+	    cell sink = cell_to_nowhere_sink(source); 
+	    points_to pt = make_points_to(source, sink,
+					  make_approximation_must(),
+					  make_descriptor_none());
+	    add_arc_to_pt_map(pt, pt_out);
 	  }
 	}
       }

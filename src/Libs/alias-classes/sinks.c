@@ -349,14 +349,21 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
-    // FI: subset of previous case, no need for dereferencing
-    sinks = expression_to_points_to_sources(a1, in);
+    list L = expression_to_points_to_sources(a1, in);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
-    FOREACH(CELL, pc, sinks) {
-      // FI: side effect or allocation of a new cell?
+    FOREACH(CELL, pc, L) {
       (void) points_to_cell_add_field_dimension(pc, f);
     }
+    if(eval_p) {
+      FOREACH(CELL, pc, L) {
+	list LL = source_to_sinks(pc, in, true);
+	sinks = gen_nconc(sinks, LL);
+      }
+      gen_full_free_list(L);
+    }
+    else
+      sinks = L;
   }
   else if(ENTITY_PLUS_C_P(f)) { // p+1
     sinks = expression_to_points_to_sinks_with_offset(a1, a2, in);
@@ -595,7 +602,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
       else if(pointer_type_p(et)) {
 	pips_assert("One subscript", rd==1 && nd==0);
 	/* What is the value of the subscript expression? */
-	expression sub = EXPRESSION(CAR(reference_indices(r)));
+	//expression sub = EXPRESSION(CAR(reference_indices(r)));
 	// FI: should we try to evaluate the subscript statically?
 	// If the expression is not zero, the target is unchanged but
 	// * must be used as subscript in sinks
@@ -843,20 +850,26 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
   * operators such as ., ->, * are replaced by subscripts.
   *
   */
-list subscript_to_points_to_sinks(subscript s, pt_map in)
+list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 {
   expression a = subscript_array(s);
-  list sinks = expression_to_points_to_sources(a, in);
+  list sources = expression_to_points_to_sources(a, in);
   list sl = subscript_indices(s);
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
+  list sinks = NIL;
 
-  FOREACH(CELL, c, sinks) {
+  FOREACH(CELL, c, sources) {
     list ncsl = gen_full_copy_list(csl);
     reference r = cell_any_reference(c);
     reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
   }
 
   gen_full_free_list(csl);
+
+  if(eval_p)
+    sinks = sources_to_sinks(sources, in, true);
+  else
+    sinks = sources;
 
   return sinks;
 }
@@ -919,7 +932,7 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   }
   case  is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
-    sinks = subscript_to_points_to_sinks(sub, in);
+    sinks = subscript_to_points_to_sinks(sub, in, true);
     break;
   }
   case  is_syntax_application: {

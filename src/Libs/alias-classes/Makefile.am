@@ -13,7 +13,12 @@ libalias_classes_la_SOURCES=alias_pairs.c \
 		points_to_interprocedural_analysis.c \
 		constant-path-utils.c \
 	 	prettyprint.c \
-		passes.c
+		statement.c \
+		expression.c \
+		passes.c \
+	        sinks.c \
+		unstructured.c \
+		variable.c
 
 include $(srcdir)/../pipslibs_includes.mk
 include $(top_srcdir)/makes/cproto.mk

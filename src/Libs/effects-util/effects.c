@@ -1074,7 +1074,8 @@ tag approximation_or(tag t1, tag t2)
 
 
 /** CELLS */
-/* test if two cells are equal, celles are supposed to be references.*/
+/* test if two cells are equal, celles are supposed to be
+   references. */
 
 bool cell_equal_p(cell c1, cell c2)
 {
@@ -1082,6 +1083,51 @@ bool cell_equal_p(cell c1, cell c2)
   reference r1 = cell_to_reference(c1);
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
+}
+
+/* FI->FC/AM: some elements of the lattice must be exploited here... */
+bool points_to_reference_included_p(reference r1, reference r2)
+{
+  bool included_p = true;
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+
+  list dims1 = reference_indices(r1);
+  list dims2 = reference_indices(r2);
+  list cdims2 = dims2;
+
+  if(v1 == v2) {
+    if(gen_length(dims1)==gen_length(dims2)) {
+      FOREACH(EXPRESSION, s1, dims1) {
+	expression s2 = EXPRESSION(CAR(cdims2));
+	if(!expression_equal_p(s1,s2)) {
+	  if(!unbounded_expression_p(s2)) {
+	    included_p = false;
+	    break;
+	  }
+	}
+	cdims2 = CDR(cdims2);
+      }
+    }
+    else
+      included_p = false;
+  }
+  else {
+    // pips_internal_error("Abstract location lattice not implemented here.\n");
+    // FI->AM/FC: you should check the inclusion of abstract_location(v1) and
+    // abstract_location(v2)...
+    included_p = false;
+  }
+  return included_p;
+}
+
+/* Check that all memory locations denoted by cell1 are included in cell2 */
+bool cell_included_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return points_to_reference_included_p(r1, r2);
 }
 
 

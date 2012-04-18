@@ -2600,6 +2600,12 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+bool array_of_pointers_type_p(type t)
+{
+  return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) != NIL));
+}
+
 
 /**
    returns the type pointed by the input type if it is a pointer or an array of pointers
@@ -2670,11 +2676,18 @@ list type_fields(type t)
  * variable of this type.
  *
  * Example : struct foo var;
+ *
+ * Note: arrays of struct are not considered derived types
  */
 bool derived_type_p(type t)
 {
   return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+bool array_of_derived_type_p(type t)
+{
+  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) != NIL));
 }
 
 /* Returns true if t is of type derived and if the derived type is a struct.
@@ -2687,6 +2700,18 @@ bool struct_type_p(type t)
 {
   bool struct_p = false;
   if(derived_type_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    struct_p = type_struct_p(dt);
+  }
+  return struct_p;
+}
+
+bool array_of_struct_type_p(type t)
+{
+  bool struct_p = false;
+  if(array_of_derived_type_p(t)) {
     basic b = variable_basic(type_variable(t));
     entity dte = basic_derived(b);
     type dt = entity_type(dte);
