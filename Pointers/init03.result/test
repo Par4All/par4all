@@ -1,0 +1,28 @@
+
+PROPER  EFFECTS
+
+void init03x()
+{
+   struct cons_t a;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void init03x()
+{
+
+// Points To: none
+
+   struct cons_t a;
+
+// Points To: none
+
+   return;
+}
