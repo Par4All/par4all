@@ -344,6 +344,28 @@ bool heap_cell_p(cell c)
   return heap_p;
 }
 
+bool nowhere_cell_p(cell c)
+{
+  bool nowhere_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  nowhere_p = entity_typed_nowhere_locations_p(v);
+
+  return nowhere_p;
+}
+
+bool null_cell_p(cell c)
+{
+  bool null_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  null_p = entity_null_locations_p(v);
+
+  return null_p;
+}
+
 
 bool malloc_effect_p(effect e)
 {
@@ -1212,8 +1234,9 @@ cell points_to_cell_add_field_dimension(cell c, entity f)
  */
 reference reference_add_field_dimension(reference r, entity f)
 {
-  entity v = reference_variable(r);
-  type t = ultimate_type(entity_type(v));
+  type t = reference_to_type(r);
+  //type t = ultimate_type(entity_type(v));
+
   if(struct_type_p(t)) {
     entity ste = basic_derived(variable_basic(type_variable(t)));
     type st = entity_type(ste);
@@ -1225,11 +1248,13 @@ reference reference_add_field_dimension(reference r, entity f)
 				       CONS(EXPRESSION, s, NIL));
     }
     else {
+      entity v = reference_variable(r);
       pips_internal_error("No field \"%s\" for struct \"%s\"\n",
 			  entity_user_name(f), entity_user_name(v));
     }
   }
   else {
+    ; // FI: could be useful for unions as well
   }
   return r;
 }

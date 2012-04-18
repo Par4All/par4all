@@ -151,7 +151,10 @@ entity entity_typed_nowhere_locations(type t)
   return entity_all_xxx_locations_typed(NOWHERE_LOCATION, t);
 }
 
-/* test if an entity is the bottom of the lattice*/
+/* test if an entity is the bottom of the lattice 
+ *
+ * Should we care for the typed nowhere too?
+*/
 bool entity_nowhere_locations_p(entity e)
 {
     return same_entity_p(e,entity_nowhere_locations());
