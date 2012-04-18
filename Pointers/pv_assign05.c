@@ -1,5 +1,11 @@
 // assignment with subscripted and field expressions 
-typedef struct {int *a; int *b[10]; int (*c)[10];} mystruct;
+
+typedef struct {
+  int *a;
+  int *b[10];
+  int (*c)[10];
+} mystruct;
+
 int main()
 {
   mystruct s1, s2;
