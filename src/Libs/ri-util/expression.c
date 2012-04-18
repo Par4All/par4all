@@ -4032,3 +4032,26 @@ expression dereference_expression(expression e)
   return MakeUnaryCall(CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
                        copy_expression(e));
 }
+
+/* make a full copy of the subscript expression list, preserve
+   constant subscripts, replace non-constant subscript by the star
+   subscript expression. */
+list subscript_expressions_to_constant_subscript_expressions(list sl)
+{
+  list nsl = NIL;
+
+  FOREACH(EXPRESSION, s, sl){
+    expression ni = expression_undefined;
+    value v = EvalExpression(s);
+    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+      int i = constant_int(value_constant(v));
+      ni = int_to_expression(i);
+    }
+    else {
+      ni = make_unbounded_expression();
+    }
+    nsl = CONS(EXPRESSION, ni, nsl);
+  }
+  nsl = gen_nreverse(nsl);
+  return nsl;
+}
