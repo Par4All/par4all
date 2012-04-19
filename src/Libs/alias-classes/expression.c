@@ -743,20 +743,22 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   /* Check dereferencing errors */
   bool singleton_p = (gen_length(L)==1);
   FOREACH(CELL, c, L) {
-    if(nowhere_cell_p(c))
+    if(nowhere_cell_p(c)){
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
 	pips_user_warning("Dereferencing of an undefined pointer.\n");
       else
 	pips_user_warning("Dereferencing of an undefined pointer.\n");
-    else if(null_cell_p(c))
+    }
+    else if(null_cell_p(c)) {
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
 	pips_user_warning("Dereferencing of a null pointer.\n");
       else
 	pips_user_warning("Dereferencing of a null pointer.\n");
+    }
   }
 
   /* Compute the data-flow equation for the may and the must edges...
