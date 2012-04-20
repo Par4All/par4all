@@ -958,6 +958,9 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
 
 list expression_to_points_to_sinks(expression e, pt_map in)
 {
+  // FI: question, do we have to propagate eval_p downards or could we
+  // simply perform the sinks_to_sources() here after a call to
+  // expression_to_points_to_sources()
   return expression_to_points_to_cells(e, in, true);
 }
 

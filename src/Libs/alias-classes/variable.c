@@ -28,6 +28,10 @@
  * structures and for arrays of structures or pointeurs and much
  * easier for scalar pointers.
  *
+ * Several pieces of code have been cut-and-pasted. Either more
+ * functions should have been defined or array of structs are not
+ * handled in a graceful way or both problems occur.
+ *
  * The similar functions in Amira's implementation are located in
  * points_to_analysis_general_algorithm.c.
  */
@@ -94,6 +98,8 @@ list variable_to_pointer_locations(entity e)
  * variable "e" of type struct defined by entity "ee" and its type.
  *
  * Typedefs have already been taken care of by the caller (?).
+ *
+ * Signature with e and ee inherited from Amira Mensi.
  */
 list struct_variable_to_pointer_locations(entity e, entity ee)
 {
@@ -102,6 +108,15 @@ list struct_variable_to_pointer_locations(entity e, entity ee)
   type tt = entity_type(ee);
   pips_assert("entity ee has type struct", type_struct_p(tt));
   list fl = type_struct(tt); // list of fields, or field list
+
+  list sl = NIL;
+  if(array_entity_p(e)) {
+    int i;
+    for(i=0; i< variable_entity_dimension(e); i++) {
+      expression se = make_unbounded_expression();
+      sl = CONS(EXPRESSION, se, sl);
+    }
+  }
 
   FOREACH(ENTITY, f, fl) {
     type ft = ultimate_type(entity_type(f));
@@ -116,7 +131,10 @@ list struct_variable_to_pointer_locations(entity e, entity ee)
 	l2 = CONS(EXPRESSION, s2, NIL);
       }
       expression s = entity_to_expression(f);
-      reference r = make_reference(e, CONS(EXPRESSION, s, l2));
+      list fsl = CONS(EXPRESSION, s, l2); // field list
+      list nsl = gen_full_copy_list(sl); // subscript list
+      list fl = gen_nconc(nsl,fsl); // full list
+      reference r = make_reference(e, fl);
       cell c = make_cell_reference(r);
       l = gen_nconc(l, CONS(CELL, c, NIL));
     }
@@ -129,7 +147,10 @@ list struct_variable_to_pointer_locations(entity e, entity ee)
 	l2 = CONS(EXPRESSION, s2, gen_full_copy_list(l2));
       }
       expression s = entity_to_expression(f);
-      reference r = make_reference(e, CONS(EXPRESSION, s, l2));
+      list fsl = CONS(EXPRESSION, s, l2); // field list
+      list nsl = gen_full_copy_list(sl); // subscript list
+      list fl = gen_nconc(nsl,fsl); // full list
+      reference r = make_reference(e, fl);
       cell c = make_cell_reference(r);
 
       /* Find pointers downwards and build a list of cells. */
@@ -141,51 +162,7 @@ list struct_variable_to_pointer_locations(entity e, entity ee)
       //l = array_of_struct_to_pointer_location(e, ee);
     }
   }
-
-#if 0
-  /* AM: Do not build expressions ef and ex */
-  if( !array_argument_p(ex) ) {
-    FOREACH( ENTITY, i, l1 ){
-      expression ef = entity_to_expression(i);
-      if( expression_pointer_p(ef) ) 
-        {
-          expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                          ex,
-                                          ef);
-          cell c = get_memory_path(ex1, &eval);
-          l = gen_nconc(CONS(CELL, c, NIL),l);
-        }
-      else if( array_argument_p(ef) ) 
-        {
-          basic b = variable_basic(type_variable(entity_type(i)));
-          /* arrays of pointers are changed into independent store arrays
-             and initialized to nowhere_b0 */
-          if( basic_pointer_p(b) )
-            {
-              effect eff = effect_undefined;
-              expression ind = make_unbounded_expression();
-              expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                              ex,
-                                              ef);
-              set_methods_for_proper_simple_effects();
-              list l_ef = NIL;
-              list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
-                                                                             true);
-              eff = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-              gen_free_list(l_ef);
-              reference r2 = effect_any_reference(eff);
-              effects_free(l1);
-              generic_effects_reset_all_methods();
-              reference_indices(r2)= gen_nconc(reference_indices(r2), CONS(EXPRESSION, ind, NIL));
-              cell c = make_cell_reference(r2);
-              l = gen_nconc(CONS(CELL, c, NIL),l);
-            }
-        }
-    }
-  }
-  else
-    l = array_of_struct_to_pointer_location(e, ee);
-#endif  
+  gen_full_free_list(sl);
   return l;
 }
 
@@ -196,16 +173,34 @@ list struct_variable_to_pointer_subscripts(cell c, entity f)
 {
   list sl = NIL;
   type ft = ultimate_type(entity_type(f));
-  pips_assert("We are dealing with a struct", struct_type_p(ft));
+  pips_assert("We are dealing with a struct", struct_type_p(ft)
+	      || array_of_struct_type_p(ft));
   basic fb = variable_basic(type_variable(ft));
   type st = entity_type(basic_derived(fb));
   list sfl = type_struct(st);
 
+  /* In case we are dealing with an array of structs, add subscript
+     expressions in mc, a modified copy of parameter c */
+  cell mc = copy_cell(c); // modified cell c
+  /*
+  if(array_type_p(ft)) {
+    list ssl = NIL;
+    int i;
+    for(i=0; i< variable_dimension_number(type_variable(ft)); i++) {
+      expression se = make_unbounded_expression();
+      ssl = CONS(EXPRESSION, se, ssl);
+    }
+    reference r = cell_any_reference(mc);
+    reference_indices(r) = gen_nconc(reference_indices(r), ssl);
+  }
+  */
+
+  /* Take care of each field in the structure. */
   FOREACH(ENTITY, sf, sfl) {
     type sft = ultimate_type(entity_type(sf));
     if(pointer_type_p(sft) || array_of_pointers_type_p(sft)) {
       /* copy cell c and add a subscript for f */
-      cell nc = copy_cell(c);
+      cell nc = copy_cell(mc);
       reference r = cell_any_reference(nc);
       expression se = entity_to_expression(sf);
       reference_indices(r) = gen_nconc(reference_indices(r),
@@ -235,49 +230,7 @@ list struct_variable_to_pointer_subscripts(cell c, entity f)
     }
   }
 
+  free_cell(mc);
+
   return sl;
-}
-/* FI: to be revisited with Amira. Many objects seems to be allocated
-   but never freed. Cut-and-paste used to handle effects. */
-list array_of_struct_to_pointer_location(entity e, entity field)
-{
-  list l = NIL;
-  bool eval = true;
-  type tt = entity_type(field);
-
-  pips_assert("argument \"field\" is a struct", type_struct_p(tt));
-  list l1 = type_struct(tt);
-  FOREACH( ENTITY, i, l1 ) {
-    expression ee = entity_to_expression(i);
-    if( expression_pointer_p(ee)){
-      expression ex = entity_to_expression(e);
-      if( array_argument_p(ex) ) {
-          effect ef = effect_undefined;
-          reference  r = reference_undefined;
-
-          /*init the effect's engine*/
-          list l_ef = NIL;
-          set_methods_for_proper_simple_effects();
-          list l1 = generic_proper_effects_of_complex_address_expression(ex, &l_ef,
-                                                                         true);
-          
-	  generic_effects_reset_all_methods();
-          ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-          /* gen_free_list(l_ef); */ /* free the spine */
-          effect_add_dereferencing_dimension(ef);
-          r = effect_any_reference(ef);
-          list l_inds = reference_indices(r);
-          EXPRESSION_(CAR(l_inds)) = make_unbounded_expression();
-          ex = reference_to_expression(r);
-          effects_free(l1);
-        }
-      expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
-                                      ex,
-                                      ee);
-      cell c = get_memory_path(ex1, &eval);
-      l = gen_nconc(CONS(CELL, c, NIL), l);
-    }
-  }
-      
-  return l;
 }

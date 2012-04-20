@@ -183,8 +183,25 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   entity f = call_function(c);
   list al = call_arguments(c);
   type ft = entity_type(f);
-  functional ff = type_functional(ft);
-  type rt = functional_result(ff);
+  type rt = type_undefined;
+  if(type_functional_p(ft)) {
+    functional ff = type_functional(ft);
+    rt = functional_result(ff);
+  }
+  else if(type_variable_p(ft)) {
+    /* Must be a pointer to a function */
+    if(pointer_type_p(ft)) {
+      /* I do not know if nft must be freed later */
+      type nft = type_to_pointed_type(ft);
+      pips_assert("Must be a function", type_functional_p(nft));
+      functional nff = type_functional(nft);
+      rt = functional_result(nff);
+    }
+    else
+      pips_internal_error("Unexpected type.\n");
+  }
+  else
+    pips_internal_error("Unexpected type.\n");
 
   if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {

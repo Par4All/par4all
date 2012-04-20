@@ -267,6 +267,42 @@ bool source_in_set_p(cell source, set s)
   }
   return in_p;
 }
+
+/* source is assumed to be either nowhere/undefined or anywhere, it
+   may be typed or not. */
+list anywhere_to_sinks(cell source)
+{
+  list sinks = NIL;
+  reference r = cell_any_reference(source);
+  entity v = reference_variable(r);
+  // FI: it would be better to print the reference... words_reference()...
+  // FI: sinks==NIL would be interpreted as a bug...
+  // If we dereference a nowhere/undefined, we should end up
+  // anywhere to please gcc and Fabien Coelho
+  type vt = ultimate_type(entity_type(v));
+  if(type_variable_p(vt)) {
+    if(pointer_type_p(vt)) {
+      // FI: should nt be freed?
+      type nt = type_to_pointed_type(vt);
+      cell c = make_anywhere_points_to_cell(nt);
+      sinks = CONS(CELL, c, NIL);
+    }
+    else
+      pips_internal_error("Unexpected dereferenced type.\n");
+  }
+  else if(type_area_p(vt)) {
+    // FI: this should be removed using type_overloaded for the
+    // "untyped" anywhere
+    entity e = entity_anywhere_locations();
+    reference r = make_reference(e, NIL);
+    cell c = make_cell_reference(r);
+    sinks = CONS(CELL, c, NIL);
+  }
+  else {
+    pips_internal_error("Unexpected dereferenced type.\n");
+  }
+  return sinks;
+}
 
 /* Return a list of cells, "sinks", that are sink for some arc whose
  * source is "source" in set "s". If "fresh_p" is set to true, no
@@ -283,91 +319,114 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 {
   list sinks = NIL;
 
-  /* 1. Try to find the source in the points-to information */
-  SET_FOREACH( points_to, pt, pts) {
-    if(cell_equal_p(source, points_to_source(pt))) {
-      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
-      sinks = CONS(CELL, sc, sinks);
-    }
+  /* Can we expect a sink? */
+  if(nowhere_cell_p(source)) {
+    reference r = cell_any_reference(source);
+    entity v = reference_variable(r);
+    pips_user_warning("Possibly undefined pointer \"%s\" is dereferenced.\n",
+		      entity_local_name(v));
+    sinks = anywhere_to_sinks(source);
   }
-
-  /* 2. Much harder... See if source is contained in one of the many
-     abstract sources. Step 1 is subsumed by Step 2... but much faster.  */
-  if(ENDP(sinks)) {
-    SET_FOREACH(points_to, pt, pts) {
-      if(cell_included_p(source, points_to_source(pt))) {
+  else if(anywhere_cell_p(source)) {
+    /* FI: we should return an anywhere cell with the proper type */
+    sinks = anywhere_to_sinks(source);
+  }
+  // FI: the null pointer should also be checked here!
+  else if(null_pointer_value_cell_p(source)) {
+    reference r = cell_any_reference(source);
+    entity v = reference_variable(r);
+    pips_user_warning("Possibly undefined pointer \"%s\" is dereferenced.\n",
+		      entity_local_name(v));
+    // FI: it might be better to return an empty list rather than anywhere...
+    // FI: should null be returned?!?
+    sinks = anywhere_to_sinks(source);
+  }
+  else {
+    /* 1. Try to find the source in the points-to information */
+    SET_FOREACH( points_to, pt, pts) {
+      if(cell_equal_p(source, points_to_source(pt))) {
 	cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
 	sinks = CONS(CELL, sc, sinks);
       }
     }
-  }
 
-  /* 3. If the previous steps have failed, build a new sink if the
-     source is a formal parameter. */
-  // FI: you must generate sinks for formal parameters, global
-  // variables and stubs if nothing has been found
-  if(ENDP(sinks)) {
-    reference r = cell_any_reference(source);
-    entity v = reference_variable(r);
-    if(formal_parameter_p(v)
-       || /* global_variable_p(v)*/
-       /* FI: wrong test anywhere might have been top-level? */
-       /* FI: wrong, how about static global variables? */
-       /* FI: see for instance global07.c */
-       top_level_entity_p(v)) {
-      // Find stub type
-      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
-      // FI: the type retrieval must be improved for arrays & Co
-      points_to pt = create_stub_points_to(source, st, basic_undefined);
-      pts = add_arc_to_pt_map(pt, pts);
-      add_arc_to_points_to_context(copy_points_to(pt));
-      sinks = source_to_sinks(source, pts, false);
-    }
-    else if(static_global_variable_p(v)) {
-      type st = type_to_pointed_type(ultimate_type(entity_type(v)));
-      // FI: the type retrieval must be improved for arrays & Co
-      points_to pt = create_stub_points_to(source, st, basic_undefined);
-      pts = add_arc_to_pt_map(pt, pts);
-      add_arc_to_points_to_context(copy_points_to(pt));
-      sinks = source_to_sinks(source, pts, false);
-      /* cell nc = add_virtual_sink_to_source(source);
-       * points_to npt = make_points_to(copy_cell(source), nc, may/must)
-       * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
-       */
-      ;
-    }
-    else if(entity_stub_sink_p(v)) {
-      //type ost = ultimate_type(entity_type(v));
-      bool to_be_freed; // FI: memory leak for the time being
-      type rt = cell_to_type(source, &to_be_freed); // reference type
-      if(pointer_type_p(rt)) {
-	type nst = type_to_pointed_type(rt);
-	points_to pt = create_stub_points_to(source, nst, basic_undefined);
-	pts = add_arc_to_pt_map(pt, pts);
-	add_arc_to_points_to_context(copy_points_to(pt));
-	sinks = source_to_sinks(source, pts, false);
-      }
-      if(struct_type_p(rt)) {
-	// FI FI FI - to be really programmed with the field type
-	type nst = type_to_pointed_type(rt);
-	points_to pt = create_stub_points_to(source, nst, basic_undefined);
-	pts = add_arc_to_pt_map(pt, pts);
-	add_arc_to_points_to_context(copy_points_to(pt));
-	sinks = source_to_sinks(source, pts, false);
-      }
-      else if(array_type_p(rt)) {
-	printf("Entity \"%s\"\n", entity_local_name(v));
-	pips_internal_error("Not implemented yet.\n");
+    /* 2. Much harder... See if source is contained in one of the many
+       abstract sources. Step 1 is subsumed by Step 2... but much faster.  */
+    if(ENDP(sinks)) {
+      SET_FOREACH(points_to, pt, pts) {
+	if(cell_included_p(source, points_to_source(pt))) {
+	  cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+	  sinks = CONS(CELL, sc, sinks);
+	}
       }
     }
+
+    /* 3. If the previous steps have failed, build a new sink if the
+       source is a formal parameter. */
+    // FI: you must generate sinks for formal parameters, global
+    // variables and stubs if nothing has been found
     if(ENDP(sinks)) {
       reference r = cell_any_reference(source);
-      print_reference(r);
-      pips_internal_error("Sink missing for a source based on \"%s\".\n",
-			  entity_user_name(v));
+      entity v = reference_variable(r);
+      if(formal_parameter_p(v)
+	 || /* global_variable_p(v)*/
+	 /* FI: wrong test anywhere might have been top-level? */
+	 /* FI: wrong, how about static global variables? */
+	 /* FI: see for instance global07.c */
+	 top_level_entity_p(v)) {
+	// Find stub type
+	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+	// FI: the type retrieval must be improved for arrays & Co
+	points_to pt = create_stub_points_to(source, st, basic_undefined);
+	pts = add_arc_to_pt_map(pt, pts);
+	add_arc_to_points_to_context(copy_points_to(pt));
+	sinks = source_to_sinks(source, pts, false);
+      }
+      else if(static_global_variable_p(v)) {
+	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+	// FI: the type retrieval must be improved for arrays & Co
+	points_to pt = create_stub_points_to(source, st, basic_undefined);
+	pts = add_arc_to_pt_map(pt, pts);
+	add_arc_to_points_to_context(copy_points_to(pt));
+	sinks = source_to_sinks(source, pts, false);
+	/* cell nc = add_virtual_sink_to_source(source);
+	 * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+	 * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+	 */
+	;
+      }
+      else if(entity_stub_sink_p(v)) {
+	//type ost = ultimate_type(entity_type(v));
+	bool to_be_freed; // FI: memory leak for the time being
+	type rt = cell_to_type(source, &to_be_freed); // reference type
+	if(pointer_type_p(rt)) {
+	  type nst = type_to_pointed_type(rt);
+	  points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  pts = add_arc_to_pt_map(pt, pts);
+	  add_arc_to_points_to_context(copy_points_to(pt));
+	  sinks = source_to_sinks(source, pts, false);
+	}
+	if(struct_type_p(rt)) {
+	  // FI FI FI - to be really programmed with the field type
+	  type nst = type_to_pointed_type(rt);
+	  points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  pts = add_arc_to_pt_map(pt, pts);
+	  add_arc_to_points_to_context(copy_points_to(pt));
+	  sinks = source_to_sinks(source, pts, false);
+	}
+	else if(array_type_p(rt)) {
+	  printf("Entity \"%s\"\n", entity_local_name(v));
+	  pips_internal_error("Not implemented yet.\n");
+	}
+      }
+      if(ENDP(sinks)) {
+	reference r = cell_any_reference(source);
+	print_reference(r);
+	pips_internal_error("Sink missing for a source based on \"%s\".\n",
+			    entity_user_name(v));
+      }
     }
   }
-
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
   return sinks;
