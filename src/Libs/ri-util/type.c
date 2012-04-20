@@ -4407,10 +4407,18 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
+  if(t==NULL)
+    fprintf(stderr, "type is NULL.\n");
+  else if(type_undefined_p(t))
+    fprintf(stderr, "type is undefined.\n");
+  else if(type_domain_number(t)!=type_domain)
+    fprintf(stderr, "The argument is not a type.\n");
+  else {
   // Might be better to pass true, or even more information, to see
   // what happens with the unknown type
   list wl = words_type(t, NIL, false);
   dump_words(wl);
+  }
 }
 
 static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
@@ -4912,6 +4920,16 @@ dimension find_ith_dimension(list dims, int n)
   if(i==n && !ENDP(dims))
     return DIMENSION(CAR(dims));
   return dimension_undefined;
+}
+
+int variable_dimension_number(variable v)
+{
+  int d = 0;
+
+  FOREACH(DIMENSION, cd, variable_dimensions(v))
+    d++;
+
+  return d;
 }
 
 /*
