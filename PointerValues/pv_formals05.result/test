@@ -1,3 +1,11 @@
+
+// IN Pointer values:
+// p == &_p_1[0] (exact);
+
+
+// OUT Pointer values:
+// p == &_p_1[0] (exact);
+
 int foo(my_struct *p)
 {
 
@@ -6,6 +14,12 @@ int foo(my_struct *p)
 
    return p->a;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 

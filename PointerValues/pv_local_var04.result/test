@@ -1,60 +1,102 @@
+
+// IN Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+// OUT Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
+
 int main()
 {
 
-// Pointer values: none
+// Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    if (a>1) {
 
-// Pointer values: none
+// Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       static int *p = &a;
 
 // Pointer values:
-// p == &a (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       static int *q;
 
 // Pointer values:
-// p == &a (may);
-// q == *ANY_MODULE*:*UNDEFINED* (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       q = &b;
 
 // Pointer values:
-// p == &a (may);
+// p == &a (exact);
 // q == &b (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       a = a-1;
    }
    else {
 
-// Pointer values: none
+// Pointer values:
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       static int *r = &a;
 
 // Pointer values:
-// r == &a (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       static int *s;
 
 // Pointer values:
-// r == &a (may);
-// s == *ANY_MODULE*:*UNDEFINED* (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (exact);
 
       s = &b;
 
 // Pointer values:
-// r == &a (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (exact);
+// r == &a (exact);
 // s == &b (exact);
 
       a = a+2;
    }
 
 // Pointer values:
-// p == &a (may);
+// p == &a (exact);
+// q == *ANY_MODULE*:*UNDEFINED* (may);
 // q == &b (may);
-// r == &a (may);
+// r == &a (exact);
+// s == *ANY_MODULE*:*UNDEFINED* (may);
 // s == &b (may);
 
    return 0;

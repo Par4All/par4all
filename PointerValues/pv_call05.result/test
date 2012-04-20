@@ -1,3 +1,15 @@
+
+// IN Pointer values:
+// p == &_p_1[0] (exact);
+// p[*].im == &_p_3[*][0] (may);
+// p[*].re == &_p_2[*][0] (may);
+
+
+// OUT Pointer values:
+// p == &_p_1[0] (exact);
+// p[*].im == &_p_3[*][0] (may);
+// p[*].re == &_p_2[*][0] (may);
+
 void foo(cmplx_t *p, int n)
 {
 
@@ -28,6 +40,12 @@ void foo(cmplx_t *p, int n)
 
    return;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
