@@ -4033,6 +4033,30 @@ expression dereference_expression(expression e)
                        copy_expression(e));
 }
 
+/* generate a newly allocated expression for &(e)
+ */
+expression make_address_of_expression(expression e)
+{
+  if (expression_call_p(e))
+  {
+    call c = expression_call(e);
+    if (ENTITY_DEREFERENCING_P(call_function(c))) // e is "*x"
+    {
+      pips_assert("one arg to address operator (&)",
+                  gen_length(call_arguments(c))==1);
+
+      // result is simply "x"
+      return copy_expression(EXPRESSION(CAR(call_arguments(c))));
+    }
+  }
+
+  // result is "*e"
+  return MakeUnaryCall(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),
+                       copy_expression(e));
+}
+
+
+
 /* make a full copy of the subscript expression list, preserve
    constant subscripts, replace non-constant subscript by the star
    subscript expression. */

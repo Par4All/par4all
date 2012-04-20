@@ -1222,7 +1222,7 @@ bool convex_cells_intersection_p(cell c1, descriptor d1,
 	  /* if one of the systems is not constrained, the result is true and exact */
 	  else if (sc_rn_p(sc1) || sc_rn_p(sc2))
 	    {
-	      pips_debug(8, "d1 or d2 sc_rn");
+	      pips_debug(8, "d1 or d2 sc_rn\n");
 	      res = true;
 	      *exact_p = true;
 	    }

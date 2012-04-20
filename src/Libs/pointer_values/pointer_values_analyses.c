@@ -118,6 +118,8 @@ pv_context make_simple_pv_context()
 {
   pv_context ctxt;
 
+  ctxt.initial_pointer_values_p = false;
+
   ctxt.db_get_pv_func = db_get_simple_pv;
   ctxt.db_put_pv_func = db_put_simple_pv;
   ctxt.db_get_in_pv_func = db_get_in_simple_pv;
@@ -405,26 +407,37 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   type e_type = entity_basic_concrete_type(e);
-  bool static_p =  entity_static_variable_p(e);
 
-  pips_debug(1, "begin for entity %s with basic concrete type %s\n",
-	     entity_name(e), type_to_string(e_type));
-
-  if (!type_functional_p(e_type))
+  if (type_variable_p(e_type) && !typedef_entity_p(e)
+      && !type_fundamental_basic_p(e_type)
+      && basic_concrete_type_leads_to_pointer_p(e_type))
     {
+      pips_debug(1, "begin\n");
+      pips_debug(1, "entity %s basic concrete type %s %s\n",
+	     entity_name(e), type_to_string(e_type), string_of_type(e_type));
       expression lhs_exp = entity_to_expression(e);
       expression rhs_exp = expression_undefined;
       bool free_rhs_exp = false; /* turned to true if rhs_exp is built and
 				    must be freed */
 
       value v_init = entity_initial(e);
+      bool static_p = (!ctxt->initial_pointer_values_p) && entity_static_variable_p(e);
+
+      /* in case of a local static variable, and when not dealing with the initial analysis,
+	 we should generate a stub sink */
+
       if (v_init == value_undefined)
 	{
 	  pips_debug(2, "undefined inital value\n");
 
-	  if (static_p
-	      && !type_fundamental_basic_p(e_type)
-	      && basic_concrete_type_leads_to_pointer_p(e_type))
+	  if (std_file_entity_p(e))
+	    {
+	      pips_debug(2, "standard file\n");
+	      expression tmp_exp = entity_to_expression(std_file_entity_to_pointed_file_entity(e));
+	      rhs_exp = make_address_of_expression(tmp_exp);
+	      free_expression(tmp_exp);
+	    }
+	  else if (static_p)
 	    /* when no initialization is provided for pointer static variables,
 	       or aggregate variables which recursively have pointer fields,
 	       then all pointers are initialized to NULL previous to program
@@ -433,6 +446,14 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 	    rhs_exp = entity_to_expression(null_pointer_value_entity());
 	  else
 	    rhs_exp = entity_to_expression(undefined_pointer_value_entity());
+	  free_rhs_exp = true;
+	}
+      else if (std_file_entity_p(e))
+	{
+	  pips_debug(2, "standard file\n");
+	  expression tmp_exp = entity_to_expression(std_file_entity_to_pointed_file_entity(e));
+	  rhs_exp = make_address_of_expression(tmp_exp);
+	  free_expression(tmp_exp);
 	  free_rhs_exp = true;
 	}
       else
@@ -462,9 +483,11 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 
       free_expression(lhs_exp);
       if (free_rhs_exp) free_expression(rhs_exp);
+      pips_debug_pvs(2, "returning:", l_out);
+      pips_debug(1, "end\n");
     }
-  pips_debug_pvs(2, "returning:", l_out);
-  pips_debug(1, "end\n");
+  else
+    l_out = l_in;
   return (l_out);
 }
 
@@ -1514,8 +1537,8 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   list l_in_cur = NIL;
   effect lhs_eff = effect_undefined;
 
-  pips_debug(1, "begin\n");
-
+  pips_debug(1, "begin with may_lhs_p = %s and declaration_p = %s\n", bool_to_string(may_lhs_p), bool_to_string(declaration_p));
+  pips_debug_pvs(2, "input pointer values:\n", l_in);
   type lhs_type = expression_to_type(lhs);
 
   /* first convert the rhs and lhs into memory paths, rhs is evaluated first */
@@ -1737,8 +1760,11 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-
   list l_init = module_initial_parameter_pv();
+  if(entity_main_module_p(get_current_module_entity()))
+    {
+      l_init = (*ctxt->pvs_must_union_func)(l_init, gen_full_copy_list( (*ctxt->db_get_program_pv_func)() ));
+    }
 
   list l_out = statement_to_post_pv(get_current_module_statement(), gen_full_copy_list(l_init), ctxt);
 
@@ -1850,6 +1876,7 @@ bool simple_pointer_values(char * module_name)
 bool initial_simple_pointer_values(char * module_name)
 {
   pv_context ctxt = make_simple_pv_context();
+  ctxt.initial_pointer_values_p = true;
   set_methods_for_simple_effects();
   generic_module_initial_pointer_values(module_name, &ctxt);
   reset_pv_context(&ctxt);

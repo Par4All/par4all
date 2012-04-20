@@ -54,19 +54,23 @@ bool generic_print_code_pv(char * module_name, pv_context * ctxt)
   bool success;
 
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, true));  
+				db_get_memory_resource(DBR_CODE, module_name, true));
   set_current_module_entity(module_name_to_entity(module_name));
 
   set_pv((*ctxt->db_get_pv_func)(module_name));
 
+  list l_in = (*ctxt->db_get_in_pv_func)(module_name);
+  list l_out = (*ctxt->db_get_in_pv_func)(module_name);
 
   init_prettyprint(text_pv);
   text t = make_text(NIL);
-  MERGE_TEXTS(t, text_module(get_current_module_entity(), 
+  MERGE_TEXTS(t, text_pointer_values(l_in, "IN Pointer values:"));
+  MERGE_TEXTS(t, text_pointer_values(l_out, "OUT Pointer values:"));
+  MERGE_TEXTS(t, text_module(get_current_module_entity(),
 			     get_current_module_statement()));
   success = make_text_resource_and_free(module_name, DBR_PRINTED_FILE, ".pv", t);
   close_prettyprint();
-  
+
   reset_current_module_entity();
   reset_current_module_statement();
   reset_pv();

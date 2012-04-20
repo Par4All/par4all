@@ -689,7 +689,7 @@ list generic_effect_find_aliases_with_simple_pointer_values(
 
 		      // we should maybe free converted stuff here
 		    }
-		  exact_translation_p = exact_translation_p && cell_relation_exact_p(pv_equiv);
+		  exact_translation_p = effect_exact_p(eff_intermediary) && exact_translation_p && cell_relation_exact_p(pv_equiv);
 
 		  effect eff_alias = make_effect(c,
 						 copy_action(effect_action(eff_intermediary)),
