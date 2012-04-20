@@ -1271,7 +1271,7 @@ cell points_to_cell_add_field_dimension(cell c, entity f)
 /* add a field f as a subscript to a reference r if it is
  * meaningful. Leave r unchanged if not.
  *
- * This function cannot be located in ri-util because it might need to
+ * This function cannot be located in ri-util because it does need to
  * know about abstract locations.
  *
  * This does not build a standard reference, but a reference used
@@ -1280,27 +1280,36 @@ cell points_to_cell_add_field_dimension(cell c, entity f)
  */
 reference reference_add_field_dimension(reference r, entity f)
 {
-  type t = reference_to_type(r);
-  //type t = ultimate_type(entity_type(v));
+  entity v = reference_variable(r);
 
-  if(struct_type_p(t)) {
-    entity ste = basic_derived(variable_basic(type_variable(t)));
-    type st = entity_type(ste);
-    pips_assert("st is a struct type", type_struct_p(st));
-    list fl = type_struct(st);
-    if(entity_is_argument_p(f,fl)) {
-      expression s = entity_to_expression(f);
-      reference_indices(r) = gen_nconc(reference_indices(r),
-				       CONS(EXPRESSION, s, NIL));
+  /* No fields can be added to some special abstract locations. */
+  if(!(entity_anywhere_locations_p(v)
+       || entity_typed_anywhere_locations_p(v)
+       || entity_nowhere_locations_p(v)
+       || entity_typed_nowhere_locations_p(v)
+       )) {
+    type t = reference_to_type(r);
+    //type t = ultimate_type(entity_type(v));
+
+    if(struct_type_p(t)) {
+      entity ste = basic_derived(variable_basic(type_variable(t)));
+      type st = entity_type(ste);
+      pips_assert("st is a struct type", type_struct_p(st));
+      list fl = type_struct(st);
+      if(entity_is_argument_p(f,fl)) {
+	expression s = entity_to_expression(f);
+	reference_indices(r) = gen_nconc(reference_indices(r),
+					 CONS(EXPRESSION, s, NIL));
+      }
+      else {
+	entity v = reference_variable(r);
+	pips_internal_error("No field \"%s\" for struct \"%s\"\n",
+			    entity_user_name(f), entity_user_name(v));
+      }
     }
     else {
-      entity v = reference_variable(r);
-      pips_internal_error("No field \"%s\" for struct \"%s\"\n",
-			  entity_user_name(f), entity_user_name(v));
+      ; // FI: could be useful for unions as well
     }
-  }
-  else {
-    ; // FI: could be useful for unions as well
   }
   return r;
 }
