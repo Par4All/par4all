@@ -10,9 +10,8 @@ int foo(int *p, int *q)
 POINTS-TO
 
 
-// Points To IN:
-// p -> _p_1[0] , EXACT
-// q -> _q_2[0] , EXACT
+
+// Points To IN: none
 
 
 // Points To OUT: none
