@@ -186,7 +186,7 @@ pt_map get_points_to_context()
   return points_to_context;
 }
 
-#define FRANCOIS 1
+#define FRANCOIS 0
 
 /* Pass INTRAPROCEDURAL_POINTS_TO_ANALYSIS
  *
