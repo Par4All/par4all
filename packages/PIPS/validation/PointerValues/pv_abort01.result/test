@@ -1,29 +1,63 @@
+
+// IN Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+// OUT Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
 int main()
 {
 
-// Pointer values: none
+// Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    int **a;
 
 // Pointer values:
 // a == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    int b = 1;
 
 // Pointer values:
 // a == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    a[0] = &b;
 
 // Pointer values:
 // a == *ANY_MODULE*:*UNDEFINED* (exact);
 // a[0] == &b (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    printf("\nb= %d, a[0] = %d\n", b, a[0][0]);
 
 // Pointer values:
 // a == *ANY_MODULE*:*UNDEFINED* (exact);
 // a[0] == &b (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
 }

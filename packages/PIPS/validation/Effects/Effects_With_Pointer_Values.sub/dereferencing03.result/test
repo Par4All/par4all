@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 void dereferencing03()
 {
 
@@ -20,6 +26,12 @@ void dereferencing03()
 
    *(p+i) = 0.;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -40,6 +52,48 @@ void dereferencing03()
    *(p+1) = 0.;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i p
+   *(p+i) = 0.;
+}
+int main()
+{
+   dereferencing03();
+   return 1;
+}
+void dereferencing03()
+{
+   double *p;
+   int i;
+
+//  <p-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   *(p+1) = 0.;
+
+//  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   *(p+i) = 0.;
+}
+int main()
+{
+   dereferencing03();
+   return 1;
+}
+void dereferencing03()
+{
+   double *p;
+   int i;
+
+//  <p-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   *(p+1) = 0.;
+
+//  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
    *(p+i) = 0.;
 }
 int main()

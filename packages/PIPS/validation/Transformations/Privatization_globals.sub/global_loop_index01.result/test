@@ -1,0 +1,17 @@
+#
+# Code after privatize_module_even_globals for module main
+#
+int main()
+{
+   int j, a[10];
+
+#pragma omp for private(i)
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+
+#pragma omp for private(j)
+   for(j = 0; j <= 9; j += 1)
+      printf("a[%d] = %d\n", j, a[j]);
+
+   return 0;
+}

@@ -1,0 +1,38 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+
+
+   if (p++)
+
+// Points To:
+// p -> a[1] , EXACT
+
+      *p = 1;
+
+// Points To:
+// p -> a[1] , EXACT
+
+
+   return 0;
+}
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

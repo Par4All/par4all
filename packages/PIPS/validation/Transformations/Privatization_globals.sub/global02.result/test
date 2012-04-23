@@ -1,0 +1,67 @@
+#
+# Code after privatize_module_even_globals for module bar
+#
+void bar(int a[25][25][25][25], int dim0, int dim1, int dim2)
+{
+   int l = 0;
+#pragma omp for private(l)
+   for(l = 0; l <= my_global-1; l += 1)
+      a[dim0][dim1][dim2][l] = 0;
+
+   return;
+}
+#
+# Code after privatize_module_even_globals for module foo
+#
+void foo(int size, int a[size][size][size][size], int dim0, int dim1, int dim2)
+{
+   int l = 0;
+#pragma omp for private(l)
+   for(l = 0; l <= size-1; l += 1)
+      a[dim0][dim1][dim2][l] = 0;
+
+   return;
+}
+#
+# Code after privatize_module_even_globals for module main
+#
+int main(int argc, char **argv)
+{
+   int size = 25;
+   int my_local = 10;
+   int tab[size][size][size][size];
+   int i = 0, j = 0, k = 0;
+
+#pragma omp for private(i,j,k,my_local)
+   for(i = 0; i <= size-1; i += 1)
+#pragma omp for private(j,k,my_local)
+      for(j = 0; j <= size-1; j += 1)
+#pragma omp for private(k,my_local)
+         for(k = 0; k <= size-1; k += 1) {
+            my_local = 25;
+            foo(my_local, tab, i, j, k);
+         }
+
+#pragma omp for private(my_global,i,j,k)
+   for(i = 0; i <= size-1; i += 1)
+#pragma omp for private(my_global,j,k)
+      for(j = 0; j <= size-1; j += 1)
+#pragma omp for private(my_global,k)
+         for(k = 0; k <= size-1; k += 1) {
+            my_global = 25;
+            foo(my_global, tab, i, j, k);
+         }
+
+#pragma omp for private(i,j,k)
+   for(i = 0; i <= size-1; i += 1)
+#pragma omp for private(j,k)
+      for(j = 0; j <= size-1; j += 1)
+#pragma omp for private(k)
+         for(k = 0; k <= size-1; k += 1) {
+            my_global = 25;
+            bar(tab, i, j, k);
+         }
+   
+   
+   return 0;
+}

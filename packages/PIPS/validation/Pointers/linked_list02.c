@@ -22,7 +22,9 @@ int  count(list *p)
   list *q = p;
   int i = 0;
    while( q != NULL){
-     q = q->next, i++;
+     q = q->next;
+     // Separate statement to observe the points-to information
+     i++;
    }
   return i;
 }

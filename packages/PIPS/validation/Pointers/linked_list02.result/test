@@ -1,0 +1,77 @@
+
+Proper effects for "count"
+
+int count(list *p)
+{
+//             <    is read   >: p
+//             <    is written>: q
+   list *q = p;
+//             <    is written>: i
+   int i = 0;
+//             <    is read   >: q
+   while (q!=(void *) 0) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+      q = q->next;
+//             <    is read   >: i
+//             <    is written>: i
+      // Separate statement to observe the points-to information
+      i++;
+   }
+//             <    is read   >: i
+   return i;
+}
+
+POINTS TO for "count"
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+int count(list *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   list *q = p;
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> _p_1 , EXACT
+
+   int i = 0;
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> _p_1 , EXACT
+
+   while (q!=(void *) 0) {
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> _p_1 , MAY
+
+      q = q->next;
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> _p_1 , MAY
+
+      // Separate statement to observe the points-to information
+      i++;
+   }
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> _p_1 , MAY
+
+   return i;
+}
+

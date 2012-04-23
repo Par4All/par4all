@@ -628,8 +628,8 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
 //  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
-//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
-//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
 
          /* only process if it is relevant */
          if (pot>0) {
@@ -941,8 +941,8 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
 //  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
-//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
-//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
 
          /* only process if it is relevant */
          if (pot>0) {
@@ -1254,8 +1254,8 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
 //  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
-//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
-//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
 
          /* only process if it is relevant */
          if (pot>0) {
@@ -1567,8 +1567,8 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
 //  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
-//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
-//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
 
          /* only process if it is relevant */
          if (pot>0) {
@@ -1880,8 +1880,8 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
 //  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
 //    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
-//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
-//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb}>
 
          /* only process if it is relevant */
          if (pot>0) {

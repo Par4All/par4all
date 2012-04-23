@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -51,5 +57,69 @@ int main()
 //             <    is written>: b
    b = p[1];
 //             <    is read   >: b
+   return b;
+}
+int main()
+{
+   int a[2], b, *p;
+
+//  <a[PHI1]-W-EXACT-{PHI1==0}>
+
+   a[0] = 0;
+
+//  <a[PHI1]-W-EXACT-{PHI1==1}>
+
+   a[1] = 1;
+
+//  <p-W-EXACT-{}>
+
+   p = a;
+
+//  <a[PHI1]-R-EXACT-{PHI1==0}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = p[0];
+
+//  <a[PHI1]-R-EXACT-{PHI1==1}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = p[1];
+
+//  <b-R-EXACT-{}>
+
+   return b;
+}
+int main()
+{
+   int a[2], b, *p;
+
+//  <a[PHI1]-W-EXACT-{PHI1==0}>
+
+   a[0] = 0;
+
+//  <a[PHI1]-W-EXACT-{PHI1==1}>
+
+   a[1] = 1;
+
+//  <p-W-EXACT-{}>
+
+   p = a;
+
+//  <a[PHI1]-R-EXACT-{PHI1==0}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = p[0];
+
+//  <a[PHI1]-R-EXACT-{PHI1==1}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = p[1];
+
+//  <b-R-EXACT-{}>
+
    return b;
 }

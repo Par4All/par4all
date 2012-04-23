@@ -1,0 +1,44 @@
+
+PROPER  EFFECTS
+
+void init01()
+{
+   int *p;
+   list q;
+   struct cons_t r;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void init01()
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   list q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   struct cons_t r;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   return;
+}

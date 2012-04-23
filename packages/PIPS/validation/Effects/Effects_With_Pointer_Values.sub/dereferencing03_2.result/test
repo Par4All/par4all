@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 void dereferencing03()
 {
 
@@ -26,6 +32,12 @@ void dereferencing03()
 
    *(p+i) = 0.;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -57,6 +69,84 @@ int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dereferencing03();
+   return 1;
+}
+void dereferencing03()
+{
+   double *p;
+
+//  <i-W-EXACT-{}>
+
+   int i = 5;
+
+//  <p-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   p = (double *) malloc(10*sizeof(double));
+
+//  <*HEAP*_l_8[PHI1]-W-EXACT-{PHI1==1, i==5}>
+//  <p-R-EXACT-{}>
+
+   *(p+1) = 0.;
+
+//  <*HEAP*_l_8[PHI1]-W-EXACT-{PHI1==5, i==5}>
+//  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   *(p+i) = 0.;
+}
+int main()
+{
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   dereferencing03();
+   return 1;
+}
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+void dereferencing03()
+{
+   double *p;
+
+//  <i-W-EXACT-{}>
+
+   int i = 5;
+
+//  <p-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   p = (double *) malloc(10*sizeof(double));
+
+//  <*HEAP*_l_8[PHI1]-W-EXACT-{PHI1==1, i==5}>
+//  <p-R-EXACT-{}>
+
+   *(p+1) = 0.;
+
+//  <*HEAP*_l_8[PHI1]-W-EXACT-{PHI1==5, i==5}>
+//  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   *(p+i) = 0.;
+}
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+int main()
+{
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
    dereferencing03();
    return 1;
 }

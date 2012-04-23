@@ -1,5 +1,7 @@
 // It is not legal to move declaration of array b outside the external loop
-// after it has been declared as parallel 
+// after it has been declared as parallel
+// Hence array b must either be kept local, or the surrounding loop be declared
+// as sequential (current status of flatten code (2012-04-19))
 #include <stdio.h>
 int main()
 {

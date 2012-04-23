@@ -1,3 +1,5 @@
+// FI: the memory leak cause by the loop is not detected
+
 #include <malloc.h>
 #include <stdio.h>
 int main(int argc, char *argv[])

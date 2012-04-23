@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 void dereferencing04()
 {
 
@@ -23,6 +29,12 @@ void dereferencing04()
 
    *(p+(q-r)) = 0.;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -41,6 +53,42 @@ void dereferencing04()
    double *r;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+   dereferencing04();
+   return 1;
+}
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <r-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+   dereferencing04();
+   return 1;
+}
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <r-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
    *(p+(q-r)) = 0.;
 }
 int main()
