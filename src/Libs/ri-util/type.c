@@ -829,6 +829,18 @@ string safe_type_to_string(type t)
     return type_to_string(t);
 }
 
+/* Provide a full ASCII description of type "t"
+ *
+ * FI: I am not sure about the language used.
+ */
+string type_to_full_string_definition(type t)
+{
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  string s = words_to_string(words_type(t, NIL, false));
+  debug_off();
+  return s;
+}
+
 /* SG: I don't understand the previous functions */
 string string_of_type(const type t)
 {

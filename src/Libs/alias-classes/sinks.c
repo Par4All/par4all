@@ -441,7 +441,7 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
   list al = call_arguments(c);
   list sinks = NIL;
 
-  pips_assert("in is consistent", consistent_pt_map(in));
+  pips_assert("in is consistent", consistent_pt_map_p(in));
 
   if(ENTITY_CONDITIONAL_P(f)) {
     //bool eval_p = true;
@@ -967,4 +967,18 @@ list expression_to_points_to_sinks(expression e, pt_map in)
 list expression_to_points_to_sources(expression e, pt_map in)
 {
   return expression_to_points_to_cells(e, in, false);
+}
+
+bool reference_must_points_to_null_p(reference r, pt_map in)
+{
+  list sinks = reference_to_sinks(r, in, false);
+  bool must_p = false;
+
+  if(gen_length(sinks)==1) {
+    // It is a must arc
+    cell c = CELL(CAR(sinks));
+    must_p = null_cell_p(c);
+  }
+  gen_free_list(sinks);
+  return must_p;
 }

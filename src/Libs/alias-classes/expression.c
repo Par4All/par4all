@@ -663,12 +663,14 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     SET_FOREACH(points_to, pts, pt_out) {
       cell r = points_to_sink(pts);
       if(points_to_cell_in_list_p(r, R)) {
-	/* FI: should be easier and more efficient to substitute the sink...*/
-	cell source = copy_cell(points_to_source(pts));
-	cell sink = make_nowhere_cell();
-	approximation a = copy_approximation(points_to_approximation(pts));
-	points_to npts = make_points_to(source, sink, a, make_descriptor_none());
-	add_arc_to_pt_map(npts, pt_out);
+	if(!null_cell_p(r) && !anywhere_cell_p(r) && nowhere_cell_p(r)) {
+	  /* FI: should be easier and more efficient to substitute the sink...*/
+	  cell source = copy_cell(points_to_source(pts));
+	  cell sink = make_nowhere_cell();
+	  approximation a = copy_approximation(points_to_approximation(pts));
+	  points_to npts = make_points_to(source, sink, a, make_descriptor_none());
+	  add_arc_to_pt_map(npts, pt_out);
+	}
 	// FI: assuming you can perform the removal inside the loop...
 	remove_arc_from_pt_map(pts, pt_out);
       }
@@ -679,9 +681,10 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   pt_out = list_assignment_to_points_to(L, N, pt_out);
 
   /* Add Gen_2: useless, already performed by Kill_2 */
+  /*
   SET_FOREACH(points_to, pts, pt_out) {
     cell r = points_to_sink(pts);
-    if(points_to_cell_in_list_p(r, R)) {
+    if(!null_cell_p(r) && points_to_cell_in_list_p(r, R)) {
       cell source = copy_cell(points_to_source(pts));
       cell sink = make_nowhere_cell();
       approximation a = copy_approximation(points_to_approximation(pts));
@@ -689,6 +692,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
       add_arc_to_pt_map(npts, pt_out);
     }
   }
+  */
 
   /*
    * Other pointers may or must now be dangling because their target
@@ -938,4 +942,186 @@ pt_map application_to_points_to(application a, pt_map pt_in)
   pips_internal_error("Not implemented yet for application\n");
 
   return pt_out;
+}
+
+/* Update points-to set "in" according to the content of the
+ * expression using side effects. Use "true_p" to know if the
+ * condition must be met or not.
+ */
+pt_map condition_to_points_to(expression c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  syntax cs = expression_syntax(c);
+
+  if(syntax_reference_p(cs)) {
+    /* For instance, C short cut "if(p)" for "if(p!=NULL)" */
+    out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
+  }
+  else if(syntax_call_p(cs)) {
+    out = call_condition_to_points_to(syntax_call(cs), in, true_p);
+  }
+  else {
+    pips_internal_error("Not implemented yet.\n");
+  }
+  return out;
+}
+
+/* Handle conditions such as "if(p)" */
+pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity v = reference_variable(r);
+  type vt = ultimate_type(entity_type(v));
+  list sl = reference_indices(r);
+
+  /* Take care of side effects in references */
+  out = expressions_to_points_to(sl, out);
+
+  /* are we dealing with a pointer? */
+  if(pointer_type_p(vt)) {
+    if(true_p) {
+      /* if p points to NULL, the condition is not feasible. If not,
+	 remove any arc from p to NULL */
+      if(reference_must_points_to_null_p(r, in)) {
+	// FI: memory leak with clear_pt?
+	pips_user_warning("Dead code detected.\n");
+	clear_pt_map(out);
+      }
+      else {
+	/* Make a points-to NULL and remove the arc from the current out */
+	cell source = make_cell_reference(copy_reference(r));
+	cell sink = make_null_pointer_value_cell();
+	points_to a = make_points_to(source, sink, make_approximation_may(),
+				     make_descriptor_none());
+	remove_arc_from_pt_map(a, in);
+	free_points_to(a);
+      }
+    }
+    else {
+      /* remove any arc from v to anything and add an arc from p to NULL */
+      points_to_source_projection(in, v);
+      /* Make a points-to NULL and remove the arc from the current out */
+      cell source = make_cell_reference(copy_reference(r));
+      cell sink = make_null_pointer_value_cell();
+      points_to a = make_points_to(source, sink, make_approximation_must(),
+				   make_descriptor_none());
+      add_arc_to_pt_map(a, in);
+    }
+  }
+
+  return out;
+}
+
+/* Handle any condition that is a call such as "if(p!=q)", "if(*p)",
+ * "if(foo(p=q))"... */
+pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity f = call_function(c);
+  value fv = entity_initial(f);
+  if(value_intrinsic_p(fv))
+    out = intrinsic_call_condition_to_points_to(c, in, true_p);
+  else if(value_code_p(fv))
+    out = user_call_condition_to_points_to(c, in, true_p);
+  else
+    // FI: you might have an apply on a functional pointer?
+    pips_internal_error("Not implemented yet.\n");
+  return out;
+}
+
+/* We can break down the intrinsics according to their arity or
+ * according to their kinds... or according to both conditions...
+ */
+pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity f = call_function(c);
+
+  if(ENTITY_RELATIONAL_OPERATOR_P(f))
+    out = relational_intrinsic_call_condition_to_points_to(c, in, true_p);
+  else if(ENTITY_LOGICAL_OPERATOR_P(f))
+    out = boolean_intrinsic_call_condition_to_points_to(c, in, true_p);
+  else {
+    // Take care of side effects as in "if(*p++)"
+    out = intrinsic_call_to_points_to(c, in);
+    //pips_internal_error("Not implemented yet.\n");
+  }
+  return out;
+}
+
+pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  // FI: a call site to handle like any other user call site...
+  pips_internal_error("Not implemented yet %p %p %p.\n", c, in , true_p);
+  return out;
+}
+
+/* Deal with "!", "&&", "||" etc. */
+pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  entity f = call_function(c);
+  list al = call_arguments(c);
+  pt_map out = in;
+  if(ENTITY_NOT_P(f)) {
+    expression nc = EXPRESSION(CAR(al));
+    out = condition_to_points_to(nc, in, !true_p);
+  }
+  else if(ENTITY_AND_P(f)) {
+    if(true_p) {
+      /* Combine the conditions */
+      expression nc1 = EXPRESSION(CAR(al));
+      out = condition_to_points_to(nc1, in, true_p);
+      expression nc2 = EXPRESSION(CAR(CDR(al)));
+      out = condition_to_points_to(nc2, out, true_p);
+    }
+    else {
+      /* Merge the results of the different conditions... */
+      pt_map in2 = full_copy_pt_map(in);
+      expression nc1 = EXPRESSION(CAR(al));
+      pt_map out1 = condition_to_points_to(nc1, in, true_p);
+      expression nc2 = EXPRESSION(CAR(CDR(al)));
+      pt_map out2 = condition_to_points_to(nc2, in2, true_p);
+      // FI: memory leak? Does merge_points_to_set() allocated a new set?
+      out = merge_points_to_set(out1, out2);
+      free_pt_map(out2);
+      // pips_internal_error("Not implemented yet.\n");
+    }
+  }
+  else if(ENTITY_OR_P(f)) {
+    if(true_p) {
+      /* Merge the results of the different conditions... */
+      pips_internal_error("Not implemented yet.\n");
+    }
+    else {
+      /* Combine the conditions */
+      expression nc1 = EXPRESSION(CAR(al));
+      out = condition_to_points_to(nc1, in, true_p);
+      expression nc2 = EXPRESSION(CAR(CDR(al)));
+      out = condition_to_points_to(nc2, out, true_p);
+    }
+  }
+  else
+    pips_internal_error("Not implemented yet for boolean operator \"%s\".\n",
+			entity_local_name(f));
+  return out;
+}
+
+pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity f = call_function(c);
+  if((ENTITY_EQUAL_P(f) && true_p)
+     || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
+    ; //FI FI FI
+  }
+  else if((ENTITY_EQUAL_P(f) && !true_p)
+     || (ENTITY_NON_EQUAL_P(f) && true_p)) {
+    ;//FI FI FI
+  }
+  else {
+    // Do nothing for other relational operators such as ">"
+    ; // pips_internal_error("Not implemented yet.\n");
+  }
+  return out;
 }

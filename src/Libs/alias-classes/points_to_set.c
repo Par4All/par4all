@@ -196,6 +196,38 @@ set points_to_block_projection(set pts, list  l)
   return pts;
 }
 
+/* Remove all arcs starting from e because e has been assigned a new value */
+set points_to_source_projection(set pts, entity e)
+{
+  list pls = NIL; // Possibly lost sinks
+
+  SET_FOREACH(points_to, pt, pts) {
+    cell source = points_to_source(pt);
+    cell sink = points_to_sink(pt);
+    entity e_sr = reference_variable(cell_to_reference(source));
+    //entity e_sk = reference_variable(cell_to_reference(sink));
+
+    if(e == e_sr) {
+      set_del_element(pts, pts, (void*)pt);
+      if(heap_cell_p(sink)) {
+	/* Check for memory leaks */
+	pls = CONS(CELL, sink, pls);
+      }
+    }
+  }
+
+  /* Any memory leak? */
+  FOREACH(CELL, c, pls) {
+    if(!sink_in_set_p(c, pts)) {
+      reference r = cell_any_reference(c);
+      entity b = reference_variable(r);
+      pips_user_warning("Memory leak for bucket \"%s\".\n",
+			entity_name(b));
+    }
+  }
+  return pts;
+}
+
 
 set points_to_function_projection(set pts)
 {
@@ -303,7 +335,292 @@ list anywhere_to_sinks(cell source)
   }
   return sinks;
 }
+
+/* For debugging */
+void print_points_to_path(list p)
+{
+  if(ENDP(p))
+    fprintf(stderr, "p is empty.\n");
+  else {
+    FOREACH(CELL, c, p) {
+      if(c!=CELL(CAR(p)))
+	fprintf(stderr, "->");
+      print_points_to_cell(c);
+    }
+    fprintf(stderr, "\n");
+  }
+}
+
+/* A type "t" is compatible with a cell "c" if any of the enclosing
+ * cell "c'" of "c", including "c", is of type "t".
+ *
+ * For instance, "a.next" is included in "a". It is compatible with
+ * both the type of "a" and the type of "a.next".
+ */
+bool type_compatible_with_points_to_cell_p(type t, cell c)
+{
+  cell nc = copy_cell(c);
+  reference nr = cell_any_reference(nc);
+  //list sl = reference_indices(nr);
+  bool compatible_p = false;
 
+  do {
+    bool to_be_freed;
+    type nct = cell_to_type(nc, &to_be_freed);
+    if(type_equal_p(t, nct)) {
+      compatible_p = true;
+      if(to_be_freed) free_type(nct);
+      break;
+    }
+    else if(ENDP(reference_indices(nr))) {
+      if(to_be_freed) free_type(nct);
+      break;
+    }
+    else {
+      if(to_be_freed) free_type(nct);
+      /* Remove the last subscript */
+      expression l = EXPRESSION(CAR(gen_last(reference_indices(nr))));
+      gen_remove(&reference_indices(nr), l);
+    }
+  } while(true);
+
+  ifdebug(8) {
+    bool to_be_freed;
+    type ct = cell_to_type(nc, &to_be_freed);
+    pips_debug(8, "Cell of type \"%s\" is %s included in cell of type \"%s\"\n",
+	       type_to_full_string_definition(t),
+	       type_to_full_string_definition(ct),
+	       compatible_p? "":"not");
+      if(to_be_freed) free_type(ct);
+  }
+
+  free_cell(nc);
+
+  return compatible_p;
+}
+
+/* See if a super-cell of "c" exists witf type "t". A supercell is a
+ * cell "nc" equals to cell "c" but with a shorter subscript list.
+ *
+ * This function is almost identical to the previous one.
+ *
+ * A new cell is allocated and returned.
+ */
+cell type_compatible_super_cell(type t, cell c)
+{
+  cell nc = copy_cell(c);
+  reference nr = cell_any_reference(nc);
+  //list sl = reference_indices(nr);
+  bool compatible_p = false;
+
+  do {
+    bool to_be_freed;
+    type nct = cell_to_type(nc, &to_be_freed);
+    if(type_equal_p(t, nct)) {
+      compatible_p = true;
+      if(to_be_freed) free_type(nct);
+      break;
+    }
+    else if(ENDP(reference_indices(nr))) {
+      if(to_be_freed) free_type(nct);
+      break;
+    }
+    else {
+      if(to_be_freed) free_type(nct);
+      /* Remove the last subscript */
+      expression l = EXPRESSION(CAR(gen_last(reference_indices(nr))));
+      gen_remove(&reference_indices(nr), l);
+    }
+  } while(true);
+
+  ifdebug(8) {
+    bool to_be_freed;
+    type ct = cell_to_type(nc, &to_be_freed);
+    pips_debug(8, "Cell of type \"%s\" is %s included in cell of type \"%s\"\n",
+	       type_to_full_string_definition(t),
+	       type_to_full_string_definition(ct),
+	       compatible_p? "":"not");
+    if(to_be_freed) free_type(ct);
+    if(compatible_p) {
+      pips_debug(8, "Type compatible cell \"");
+      print_points_to_cell(nc);
+      fprintf(stderr, "\"\n.");
+    }
+  }
+
+  return nc;
+}
+
+
+/* Find the "k"-th node of type "t" in list "p". Beware of cycles? No
+ * reason since "p" is bounded... The problem must be addressed when
+ * "p" is built.
+ *
+ * An issue with "t": the nodes are references and they carry multiple
+ * types, one for each number of subscripts or fields they have. So
+ * for instance, s1 and s1.next denote the same location.
+ */
+cell find_kth_points_to_node_in_points_to_path(list p, type t, int k)
+{
+  int count = 0;
+  cell kc = cell_undefined;
+  FOREACH(CELL, c, p) {
+    // bool to_be_freed;
+    // type ct = cell_to_type(c, &to_be_freed);
+    // if(type_equal_p(t, ct)) {
+    if(type_compatible_with_points_to_cell_p(t, c)) {
+      count++;
+      if(count==k) {
+	kc = type_compatible_super_cell(t,c);
+	break;
+      }
+    }
+  }
+  ifdebug(8) {
+    pips_debug(8, "Could not find %d nodes of type \"%s\" in path \"", k,
+	       type_to_full_string_definition(t));
+    print_points_to_path(p);
+    fprintf(stderr, "\"\n");
+  }
+  return kc;
+}
+
+bool node_in_points_to_path_p(cell n, list p)
+{
+  bool in_path_p = false;
+  FOREACH(CELL, c, p) {
+    if(cell_equal_p(c, n)) {
+      in_path_p = true;
+      break;
+    }
+  }
+  return in_path_p;
+}
+
+/* "p" is a points-to path ending with a cell that points towards a
+ * new cell ot type "t". To avoid creating infinite/unbounded path, no
+ * more than k nodes of type "t" can be present in path "p". If k are
+ * found, a cycle is created to represent longer paths. The
+ * corresponding arc is returned. If the creation condition is not
+ * met, do not create a new arc.
+ */
+points_to points_to_path_to_k_limited_points_to_path(list p,
+						     int k,
+						     type t,
+						     pt_map in)
+{
+  pips_assert("p contains at least one element", !ENDP(p));
+
+  points_to pt = points_to_undefined;
+  cell c = CELL(CAR(p));
+  list sources = sink_to_sources(c, in, false); // No duplication of cells
+
+  if(ENDP(sources)) {
+    /* The current path cannot be made any longer */
+
+    /* Find the k-th node of type "t" if it exists */
+    cell kc = find_kth_points_to_node_in_points_to_path(p, t, k);
+    if(!cell_undefined_p(kc)) {
+      // cell nkc = copy_cell(kc);
+      // The above function should return a freshly allocated cell or
+      // a cell_undefined
+      cell nkc = kc;
+      cell source = copy_cell(CELL(CAR(gen_last(p))));
+      pt = make_points_to(source, nkc, make_approximation_may(),
+			  make_descriptor_none());
+    }
+  }
+  else {
+    FOREACH(CELL, source, sources) {
+      /* Skip sources that are already in the path "p" so as to avoid
+	 infinite path due to cycles in points-to graph "in". */
+      if(node_in_points_to_path_p(source, p)) {
+	; // Could be useful for debugging
+      }
+      else {
+	list np = CONS(CELL, source, p); // make the path longer
+	// And recurse
+	pt = points_to_path_to_k_limited_points_to_path(np, k, t, in);
+	// And restore p
+	CDR(np) = NIL;
+	gen_free_list(np);
+	if(!points_to_undefined_p(pt)) // Stop as soon as an arc has been created
+	  break;
+      }
+    }
+  }
+  return pt;
+}
+
+
+/* Create a new node "sink" of type "t" and a new arc "pt" starting
+ * from node "source", if no path starting from any node and ending in
+ * "source", built with arcs in the points-to set "in", contains more
+ * than k nodes of type "t" (the type of the sink). If k nodes of type
+ * "t" are already in the path, create a new arc "pt" between the
+ * "source" and the k-th node in the path.
+ *
+ * Parameter k is defined by a property.
+ *
+ * FI: not to clear about what is going to happen when "source" is the
+ * final node of several paths.
+ *
+ * Also, beware of circular paths.
+ *
+ * Efficiency is not yet a goal...
+ */
+points_to create_k_limited_stub_points_to(cell source, type t, pt_map in)
+{
+  int k = get_int_property("POINTS_TO_K_LIMITING");
+  pips_assert("k is greater than one", k>=1);
+  points_to pt = points_to_undefined;
+  list p = CONS(CELL, source, NIL); // points-to path...
+
+  // FI: not to sure about he possible memory leaks...
+  pt = points_to_path_to_k_limited_points_to_path(p, k, t, in);
+
+  /* No cycle could be created, the paths can safely be made longer. */
+  if(points_to_undefined_p(pt))
+    // FI: I do not know how to use the third argument...
+    pt = create_stub_points_to(source, t, basic_undefined);
+
+  gen_free_list(p);
+
+  return pt;
+}
+
+/* Build a list of possible cell sources for cell "sink" in points-to
+ * graph "pts". If fresh_p is set, allocate new cells, if not just
+ * build the spine of the list.
+ */
+list sink_to_sources(cell sink, set pts, bool fresh_p)
+{
+  list sources = NIL;
+
+  // FI: This is a short-term short cut
+  // The & operator can be applied to anything
+  // We should start with all subscripts and then get rid of subscript
+  // one by one and each time add a new source
+
+  /* Get rid of the constant subscripts since they are not direclty
+     part of the points-to scheme on the sink side */
+  entity v = reference_variable(cell_any_reference(sink));
+  reference nr = make_reference(v, NIL);
+  cell nsink = make_cell_reference(nr);
+
+  /* 1. Try to find the source in the points-to information */
+  SET_FOREACH(points_to, pt, pts) {
+    if(cell_equal_p(nsink, points_to_sink(pt))) {
+      cell sc = fresh_p? copy_cell(points_to_source(pt))
+	: points_to_source(pt);
+      sources = CONS(CELL, sc, sources);
+    }
+  }
+  free_cell(nsink);
+  return sources;
+}
+
+
 /* Return a list of cells, "sinks", that are sink for some arc whose
  * source is "source" in set "s". If "fresh_p" is set to true, no
  * sharing is created between list "sinks" and reference "source" or
@@ -377,15 +694,25 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	// Find stub type
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
-	points_to pt = create_stub_points_to(source, st, basic_undefined);
+	points_to pt = create_k_limited_stub_points_to(source, st, pts);
 	pts = add_arc_to_pt_map(pt, pts);
 	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
+	  /* The pointer may be NULL */
+	  cell nsource = copy_cell(source);
+	  cell nsink = make_null_pointer_value_cell();
+	  points_to npt = make_points_to(nsource, nsink,
+					 make_approximation_may(),
+					 make_descriptor_none());
+	  pts = add_arc_to_pt_map(npt, pts);
+	  add_arc_to_points_to_context(copy_points_to(npt));
+	  sinks = CONS(CELL, copy_cell(nsink), sinks);
       }
       else if(static_global_variable_p(v)) {
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
-	points_to pt = create_stub_points_to(source, st, basic_undefined);
+	//points_to pt = create_stub_points_to(source, st, basic_undefined);
+	points_to pt = create_k_limited_stub_points_to(source, st, pts);
 	pts = add_arc_to_pt_map(pt, pts);
 	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
@@ -394,22 +721,44 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	 * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
 	 */
 	;
+	  /* The pointer may be NULL */
+	  cell nsource = copy_cell(source);
+	  cell nsink = make_null_pointer_value_cell();
+	  points_to npt = make_points_to(nsource, nsink,
+					 make_approximation_may(),
+					 make_descriptor_none());
+	  pts = add_arc_to_pt_map(npt, pts);
+	  add_arc_to_points_to_context(copy_points_to(npt));
+	  sinks = CONS(CELL, copy_cell(nsink), sinks);
       }
       else if(entity_stub_sink_p(v)) {
 	//type ost = ultimate_type(entity_type(v));
 	bool to_be_freed; // FI: memory leak for the time being
 	type rt = cell_to_type(source, &to_be_freed); // reference type
 	if(pointer_type_p(rt)) {
+	  /* FI: Some kind of k-limiting must be implemented here */
 	  type nst = type_to_pointed_type(rt);
-	  points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  //points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  points_to pt = create_k_limited_stub_points_to(source, nst, pts);
 	  pts = add_arc_to_pt_map(pt, pts);
 	  add_arc_to_points_to_context(copy_points_to(pt));
 	  sinks = source_to_sinks(source, pts, false);
+	  /* The pointer may be NULL */
+	  cell nsource = copy_cell(source);
+	  cell nsink = make_null_pointer_value_cell();
+	  points_to npt = make_points_to(nsource, nsink,
+					 make_approximation_may(),
+					 make_descriptor_none());
+	  pts = add_arc_to_pt_map(npt, pts);
+	  add_arc_to_points_to_context(copy_points_to(npt));
+	  sinks = CONS(CELL, copy_cell(nsink), sinks);
 	}
 	if(struct_type_p(rt)) {
 	  // FI FI FI - to be really programmed with the field type
 	  type nst = type_to_pointed_type(rt);
-	  points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  /* FI: some kind of k-limiting here */
+	  //points_to pt = create_stub_points_to(source, nst, basic_undefined);
+	  points_to pt = create_k_limited_stub_points_to(source, nst, pts);
 	  pts = add_arc_to_pt_map(pt, pts);
 	  add_arc_to_points_to_context(copy_points_to(pt));
 	  sinks = source_to_sinks(source, pts, false);
@@ -443,6 +792,14 @@ list sources_to_sinks(list sources, set pts, bool fresh_p)
   return sinks;
 }
 
+list reference_to_sinks(reference r, pt_map in, bool fresh_p)
+{
+  cell source = make_cell_reference(copy_reference(r));
+  list sinks = source_to_sinks(source, in, fresh_p);
+  free_cell(source);
+  return sinks;
+}
+
 /* test if a cell appear as a sink in a set of points-to */
 bool sink_in_set_p(cell sink, set s)
 {
@@ -455,52 +812,60 @@ bool sink_in_set_p(cell sink, set s)
 }
 
 
-/* merge two points-to sets;
+/* Merge two points-to sets
  *
- * required to compute
- * the points-to set of the if control statements.
+ * This function is required to compute the points-to set resulting of
+ * an if control statements.
+ *
+ * A new set is allocated but it reuses the elements of "s1" and "s2".
  */
 set merge_points_to_set(set s1, set s2) {
-  set Definite_set = set_generic_make(set_private, points_to_equal_p,
-				      points_to_rank);
-  set Possible_set = set_generic_make(set_private, points_to_equal_p,
-				      points_to_rank);
-  set Intersection_set = set_generic_make(set_private, points_to_equal_p,
-					  points_to_rank);
-  set Union_set = set_generic_make(set_private, points_to_equal_p,
-				   points_to_rank);
   set Merge_set = set_generic_make(set_private, points_to_equal_p,
 				   points_to_rank);
+  if(set_empty_p(s1))
+    set_assign(Merge_set, s2);
+  else if(set_empty_p(s2)) 
+    set_assign(Merge_set, s1);
+  else {
+    set Definite_set = set_generic_make(set_private, points_to_equal_p,
+					points_to_rank);
+    set Possible_set = set_generic_make(set_private, points_to_equal_p,
+					points_to_rank);
+    set Intersection_set = set_generic_make(set_private, points_to_equal_p,
+					    points_to_rank);
+    set Union_set = set_generic_make(set_private, points_to_equal_p,
+				     points_to_rank);
 
-  Intersection_set = set_intersection(Intersection_set, s1, s2);
-  Union_set = set_union(Union_set, s1, s2);
+    Intersection_set = set_intersection(Intersection_set, s1, s2);
+    Union_set = set_union(Union_set, s1, s2);
 
-  SET_FOREACH ( points_to, i, Intersection_set ) {
-    if ( approximation_tag(points_to_approximation(i)) == 2 )
-      Definite_set = set_add_element(Definite_set,Definite_set,
-				     (void*) i );
-  }
-
-  SET_FOREACH ( points_to, j, Union_set ) {
-    if ( ! set_belong_p(Definite_set, (void*)j) ) {
-      points_to pt = make_points_to(points_to_source(j), points_to_sink(j),
-				    make_approximation_may(),
-				    make_descriptor_none());
-      Possible_set = set_add_element(Possible_set, Possible_set,(void*) pt);
+    SET_FOREACH ( points_to, i, Intersection_set ) {
+      if ( approximation_tag(points_to_approximation(i)) == 2 )
+	Definite_set = set_add_element(Definite_set,Definite_set,
+				       (void*) i );
     }
+
+    SET_FOREACH ( points_to, j, Union_set ) {
+      if ( ! set_belong_p(Definite_set, (void*)j) ) {
+	points_to pt = make_points_to(points_to_source(j), points_to_sink(j),
+				      make_approximation_may(),
+				      make_descriptor_none());
+	Possible_set = set_add_element(Possible_set, Possible_set,(void*) pt);
+      }
+    }
+
+    Merge_set = set_clear(Merge_set);
+    Merge_set = set_union(Merge_set, Possible_set, Definite_set);
+
+    set_clear(Intersection_set);
+    set_clear(Union_set);
+    set_clear(Possible_set);
+    set_clear(Definite_set);
+    set_free(Definite_set);
+    set_free(Possible_set);
+    set_free(Intersection_set);
+    set_free(Union_set);
   }
-
-  Merge_set = set_clear(Merge_set);
-  Merge_set = set_union(Merge_set, Possible_set, Definite_set);
-
-  set_clear(Intersection_set);
-  set_clear(Union_set);
-  set_clear(Possible_set);
-  set_clear(Definite_set);
-  set_free(Definite_set);
-  set_free(Possible_set);
-  set_free(Intersection_set);
-  set_free(Union_set);
   return Merge_set;
 }
 

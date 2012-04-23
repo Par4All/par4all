@@ -1287,6 +1287,7 @@ reference reference_add_field_dimension(reference r, entity f)
        || entity_typed_anywhere_locations_p(v)
        || entity_nowhere_locations_p(v)
        || entity_typed_nowhere_locations_p(v)
+       || entity_null_locations_p(v)
        )) {
     type t = reference_to_type(r);
     //type t = ultimate_type(entity_type(v));

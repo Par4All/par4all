@@ -238,7 +238,20 @@ points_to create_stub_points_to(cell c, type t,
     sink_ref = make_reference(formal_parameter,  NIL);
 
   cell sink_cell = make_cell_reference(sink_ref);
-  approximation rel = make_approximation_exact();
+
+  /* FI: if we single out the NULL pointer value, this has to be a may
+   * points-to. Another discussion about stubs is based on the fact
+   * that they may represent several cells at the call site, although
+   * they are only one cell at run-time and for any specific execution
+   * of the called function.
+   *
+   * Singling out the NULL pointers is useful to exploit conditions in
+   * tests and while loops. It may also lead to more precise
+   * fix-points for the points-to graph.
+  */
+  // approximation rel = make_approximation_exact();
+  approximation rel = make_approximation_may();
+
   pt_to = make_points_to(source_cell, sink_cell, rel,
 			 make_descriptor_none());
   pointer_index ++;
@@ -326,8 +339,14 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
  * Output : a set of points-to where sinks are stub points-to.
  * we descent recursively until reaching a basic type, then we call
  *  create_stub_points_to()to generate the adequate points-to.
+ *
+ * FI: I do not know if I want to keep using this function because
+ * stubs are not created on demand and because some are certainly not
+ * useful for the points-to analysis. But they may be useful for
+ * client analysis... However, client analyses will have to create
+ * more such stubs...
  */
-set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
+set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 {
   points_to pt_to = points_to_undefined;
   set pt_in = set_generic_make(set_private,
@@ -336,6 +355,15 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
   /* maybe should be removed if we have already called ultimate type
    * in formal_points_to_parameter() */
 
+  /* The pointer may be NULL or undefined. We neglect undefined/nowhere */
+  cell nc = copy_cell(c);
+  cell null_c = make_null_pointer_value_cell();
+  points_to npt = make_points_to(nc, null_c,
+				 make_approximation_may(),
+				 make_descriptor_none());
+  pt_in = add_arc_to_pt_map(npt, pt_in);
+
+  /* The pointer may points towards another object (or set of object) */
   type upt = type_to_pointed_type(pt);
   if( type_variable_p(upt) ){
     basic fpb = variable_basic(type_variable(upt));
@@ -413,6 +441,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
     }
   }
   else if(type_functional_p(upt))
+    // FI: we probably should change this
     ;/*we don't know how to handle pointers to functions: nothing to
        be done for points-to analysis. */
   else if(type_void_p(upt)) {
