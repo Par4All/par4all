@@ -1,0 +1,143 @@
+void foo(int size, int out[size], int in[size])
+{
+   int j;
+//             <    is read   >: size
+//             <    is written>: j
+   for(j = 0; j <= size-1; j += 1)
+//             <    is read   >: in[j] j size
+//             <    is written>: out[j]
+      out[j] = abs(in[j]);
+}
+int main(int argc, char **argv)
+{
+//             <    is written>: size
+   int size = 5;
+   int in1[size][size][size];
+   int out1[size][size][size];
+   int in2[size][size][size];
+   int out2[size][size][size];
+//             <    is written>: i j k l
+   int i = 0, j = 0, k = 0, l = 0;
+//             <    is read   >: size
+//             <    is written>: i
+   for(i = 0; i <= size-1; i += 1)
+//             <    is read   >: size
+//             <    is written>: j
+      for(j = 0; j <= size-1; j += 1)
+//             <    is read   >: size
+//             <    is written>: k
+         for(k = 0; k <= size-1; k += 1) {
+//             <    is read   >: i j k size
+//             <    is written>: in1[i][j][k]
+            in1[i][j][k] = i-j-k;
+//             <    is read   >: i j k size
+//             <    is written>: in2[i][j][k]
+            in2[i][j][k] = i-j-k;
+         }
+//             <    is read   >: size
+//             <    is written>: i
+
+   for(i = 0; i <= size-1; i += 1)
+//             <    is read   >: size
+//             <    is written>: j
+      for(j = 0; j <= size-1; j += 1)
+//             <    is read   >: size
+//             <    is written>: k
+         for(k = 0; k <= size-1; k += 1)
+//             <may be read   >: in1[i][j][*]
+//             <may be written>: out1[i][j][*]
+//             <    is read   >: i j k size
+            foo(1, (int *) &out1[i][j][k], (int *) &in1[i][j][k]);
+
+   return 0;
+}
+
+//  <in[PHI1]-R-EXACT-{PHI1==0, size==1}>
+//  <out[PHI1]-W-EXACT-{PHI1==0, size==1}>
+
+void foo(int size, int out[size], int in[size])
+{
+   int j;
+
+//  <in[PHI1]-R-EXACT-{PHI1==0, size==1}>
+//  <out[PHI1]-W-EXACT-{PHI1==0, size==1}>
+
+   for(j = 0; j <= size-1; j += 1)
+
+//  <in[PHI1]-R-EXACT-{PHI1==0, j==0, size==1}>
+//  <out[PHI1]-W-EXACT-{PHI1==0, j==0, size==1}>
+
+      out[j] = abs(in[j]);
+}
+int main(int argc, char **argv)
+{
+   int size = 5;
+   int in1[size][size][size];
+   int out1[size][size][size];
+   int in2[size][size][size];
+   int out2[size][size][size];
+   int i = 0, j = 0, k = 0, l = 0;
+
+//  <in1[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=4, 0<=PHI2,
+//    PHI2<=4, 0<=PHI3, PHI3<=4, l==0, size==5}>
+//  <in2[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=4, 0<=PHI2,
+//    PHI2<=4, 0<=PHI3, PHI3<=4, l==0, size==5}>
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  <in1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=4,
+//    0<=PHI3, PHI3<=4, l==0, size==5, 0<=i, i<=4}>
+//  <in2[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=4,
+//    0<=PHI3, PHI3<=4, l==0, size==5, 0<=i, i<=4}>
+
+      for(j = 0; j <= size-1; j += 1)
+
+//  <in1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=4, l==0, size==5, 0<=i, i<=4, 0<=j, j<=4}>
+//  <in2[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=4, l==0, size==5, 0<=i, i<=4, 0<=j, j<=4}>
+
+         for(k = 0; k <= size-1; k += 1) {
+
+//  <in1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k, l==0,
+//    size==5, 0<=i, i<=4, 0<=j, j<=4, 0<=k, k<=4}>
+
+            in1[i][j][k] = i-j-k;
+
+//  <in2[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k, l==0,
+//    size==5, 0<=i, i<=4, 0<=j, j<=4, 0<=k, k<=4}>
+
+            in2[i][j][k] = i-j-k;
+         }
+
+//  <in1[PHI1][PHI2][PHI3]-R-EXACT-{0<=PHI1, PHI1<=4, 0<=PHI2,
+//    PHI2<=4, 0<=PHI3, PHI3<=4, l==0, size==5}>
+//  <out1[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=4, 0<=PHI2,
+//    PHI2<=4, 0<=PHI3, PHI3<=4, l==0, size==5}>
+
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  <in1[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=4,
+//    0<=PHI3, PHI3<=4, l==0, size==5, 0<=i, i<=4}>
+//  <out1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=4,
+//    0<=PHI3, PHI3<=4, l==0, size==5, 0<=i, i<=4}>
+
+      for(j = 0; j <= size-1; j += 1)
+
+//  <in1[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=4, l==0, size==5, 0<=i, i<=4, 0<=j, j<=4}>
+//  <out1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=4, l==0, size==5, 0<=i, i<=4, 0<=j, j<=4}>
+
+         for(k = 0; k <= size-1; k += 1)
+
+//  <in1[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI2==j, PHI3==k, l==0,
+//    size==5, 0<=i, i<=4, 0<=j, j<=4, 0<=k, k<=4}>
+//  <out1[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==j, PHI3==k, l==0,
+//    size==5, 0<=i, i<=4, 0<=j, j<=4, 0<=k, k<=4}>
+
+            foo(1, (int *) &out1[i][j][k], (int *) &in1[i][j][k]);
+
+   return 0;
+}

@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 void dereferencing02()
 {
 
@@ -71,6 +77,12 @@ void dereferencing02()
 
    *q++;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -112,6 +124,130 @@ void dereferencing02()
    q++;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: q
+   *q++;
+}
+int main()
+{
+   dereferencing02();
+   return 1;
+}
+void dereferencing02()
+{
+
+//  <x-W-EXACT-{}>
+
+   double x = 1.;
+
+//  <p-W-EXACT-{}>
+
+   double *p = &x;
+
+//  <q-W-EXACT-{}>
+
+   double **q = &p;
+   double **w;
+
+//  <i-W-EXACT-{}>
+
+   int i = 1;
+
+//  <p-R-EXACT-{i==1}>
+//  <q-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   
+   
+   **q = 2.;
+
+//  <i-W-EXACT-{}>
+//  <p-R-EXACT-{i==1}>
+//  <q-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   **(q+(i = 0)) = 3.;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   **(w+(i = 2)) = 4.;
+
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x = **q;
+
+//  <q-R-EXACT-{}>
+//  <q-W-EXACT-{}>
+
+   q++;
+
+//  <q-W-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+   *q++;
+}
+int main()
+{
+   dereferencing02();
+   return 1;
+}
+void dereferencing02()
+{
+
+//  <x-W-EXACT-{}>
+
+   double x = 1.;
+
+//  <p-W-EXACT-{}>
+
+   double *p = &x;
+
+//  <q-W-EXACT-{}>
+
+   double **q = &p;
+   double **w;
+
+//  <i-W-EXACT-{}>
+
+   int i = 1;
+
+//  <p-R-EXACT-{i==1}>
+//  <q-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   
+   
+   **q = 2.;
+
+//  <i-W-EXACT-{}>
+//  <p-R-EXACT-{i==1}>
+//  <q-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   **(q+(i = 0)) = 3.;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   **(w+(i = 2)) = 4.;
+
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x = **q;
+
+//  <q-R-EXACT-{}>
+//  <q-W-EXACT-{}>
+
+   q++;
+
+//  <q-W-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
    *q++;
 }
 int main()

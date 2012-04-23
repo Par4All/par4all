@@ -1,3 +1,5 @@
+// Check pointers to functions
+
 void fpointer01(char         c,
 		void       * _stream,
 		void      (* my_fputc)(const char c,void * _stream),

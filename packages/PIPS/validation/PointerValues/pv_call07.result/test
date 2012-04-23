@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int * foo(int n)
 {
 
@@ -15,6 +21,12 @@ int * foo(int n)
 
    return res;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 

@@ -1,28 +1,62 @@
+
+// IN Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+// OUT Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
 int main()
 {
 
-// Pointer values: none
+// Pointer values:
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    FILE *fp;
 
 // Pointer values:
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    size_t n, nr;
 
 // Pointer values:
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    char buf1[200];
 
 // Pointer values:
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    char *buf2 = malloc(200*sizeof(char));
 
 // Pointer values:
 // buf2 == &*HEAP*_l_10[0] (exact);
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    char *fmt;
 
@@ -30,6 +64,10 @@ int main()
 // buf2 == &*HEAP*_l_10[0] (exact);
 // fmt == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    char *i_name;
 
@@ -38,6 +76,10 @@ int main()
 // fmt == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    int i, r, c, max;
 
@@ -46,6 +88,10 @@ int main()
 // fmt == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    fpos_t *fp_pos, pos;
 
@@ -55,6 +101,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    long int fp_pos_indic;
 
@@ -64,6 +114,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    va_list vl;
 
@@ -73,6 +127,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    // formatted IO functions
@@ -84,6 +142,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    max = 100;
 
@@ -93,6 +155,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    n = 200;
 
@@ -102,6 +168,10 @@ int main()
 // fp == *ANY_MODULE*:*UNDEFINED* (exact);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    fp = fopen("file.txt", "rb");
 
@@ -111,6 +181,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    
@@ -122,6 +196,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fscanf(fp, fmt, i_name, &i);
 
@@ -131,6 +209,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fprintf(fp, "%s%d", i_name, i);
 
@@ -140,6 +222,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    
@@ -151,6 +237,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) printf(fmt, i_name, i);
 
@@ -160,6 +250,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    
@@ -171,6 +265,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) sprintf(buf2, fmt, i_name, i);
 
@@ -180,6 +278,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) snprintf(buf2, 100, fmt, i_name, i);
 
@@ -189,6 +291,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    
@@ -202,6 +308,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fgets(buf1, max, fp);
 
@@ -211,6 +321,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fputc(c, fp);
 
@@ -220,6 +334,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fputs(buf1, fp);
 
@@ -229,6 +347,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    c = _IO_getc(fp);
@@ -239,6 +361,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) _IO_putc(c, fp);
 
@@ -248,6 +374,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) ungetc(c, fp);
 
@@ -257,6 +387,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    c = getchar();
@@ -267,6 +401,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) putchar(c);
 
@@ -276,6 +414,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    (void) gets(buf1);
@@ -286,6 +428,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) puts(buf1);
 
@@ -295,6 +441,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    // direct IO functions
@@ -307,6 +457,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    nr = fwrite(buf2, sizeof(char), n, fp);
 
@@ -316,6 +470,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == *ANY_MODULE*:*UNDEFINED* (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    // file positionning functions
@@ -327,6 +485,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fgetpos(fp, fp_pos);
 
@@ -336,6 +498,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    (void) fgetpos(fp, &pos);
 
@@ -345,6 +511,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    (void) fseek(fp, 0L, 0);
@@ -355,6 +525,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    (void) fsetpos(fp, fp_pos);
@@ -365,6 +539,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    fp_pos_indic = ftell(fp);
@@ -375,6 +553,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    rewind(fp);
 
@@ -384,6 +566,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
    // error handling functions
@@ -396,6 +582,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    r = feof(fp);
 
@@ -405,6 +595,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    r = ferror(fp);
 
@@ -414,6 +608,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    perror(buf1);
 
@@ -423,6 +621,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    fclose(fp);
@@ -433,6 +635,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    fprintf(stderr, "The END\n");
@@ -443,6 +649,10 @@ int main()
 // fp == &*ANY_MODULE*:*ANYWHERE* (may);
 // fp_pos == &pos (exact);
 // i_name == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
 }

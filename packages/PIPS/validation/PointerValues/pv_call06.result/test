@@ -1,3 +1,11 @@
+
+// IN Pointer values:
+// q == &_q_1[0] (exact);
+
+
+// OUT Pointer values:
+// q == &_q_1[0] (exact);
+
 int * foo(int *q)
 {
 
@@ -6,6 +14,12 @@ int * foo(int *q)
 
    return q;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 

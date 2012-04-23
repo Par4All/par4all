@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 void dereferencing04()
 {
 
@@ -23,6 +29,12 @@ void dereferencing04()
 
    *(p+(q-r)) = 0.;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -53,6 +65,88 @@ int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dereferencing04();
+   return 1;
+}
+void dereferencing04()
+{
+
+//  <p-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *p = (double *) malloc(10*sizeof(double));
+
+//  <q-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *q = (double *) malloc(10*sizeof(double));
+
+//  <r-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *r = (double *) malloc(10*sizeof(double));
+
+//  <*HEAP*_l_7[PHI1]-W-MAY-{}>
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <r-R-EXACT-{}>
+
+   *(p+(q-r)) = 0.;
+}
+int main()
+{
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   dereferencing04();
+   return 1;
+}
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+void dereferencing04()
+{
+
+//  <p-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *p = (double *) malloc(10*sizeof(double));
+
+//  <q-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *q = (double *) malloc(10*sizeof(double));
+
+//  <r-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double *r = (double *) malloc(10*sizeof(double));
+
+//  <*HEAP*_l_7[PHI1]-W-MAY-{}>
+//  <p-R-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <r-R-EXACT-{}>
+
+   *(p+(q-r)) = 0.;
+}
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+int main()
+{
+
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
    dereferencing04();
    return 1;
 }
