@@ -1157,126 +1157,140 @@ effect make_reference_region(reference ref, action tac)
   effect reg;
   bool linear_p = true;
   Psysteme sc;
-  type bct = entity_basic_concrete_type(e);
-  int d = effect_type_depth(bct), dim;
-  bool pointer_p = pointer_type_p(bct);
-  list reg_ref_inds = NIL;
 
-  /* first make the predicate according to ref */
-
-  ifdebug(3)
+  if (entity_abstract_location_p(e) && ENDP(reference_indices(ref)))
     {
       pips_debug(3, "Reference : \"%s\"",
 		 words_to_string(words_reference(ref, NIL)));
-      fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
-      pips_debug(3,"effect type depth is %d\n", d);
+      reg = make_region(make_reference(e, NIL),
+			copy_action(tac),
+			make_approximation_may(),
+			sc_new());
     }
-
-  if (dummy_parameter_entity_p(e))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)",
-			entity_name(e));
-
-  /* FI: If t is a pointer type, then d should depend on the type_depth
-     of the pointed type... */
-  if (d>0 || pointer_p)
+  else
     {
-      int idim;
-      list ind = reference_indices(ref);
-      int n_ind = gen_length(ind);
-      int max_phi = 0;
-      /* imported from preprocessor.h */
 
-      pips_debug(8, "pointer or array case \n");
+      type bct = entity_basic_concrete_type(e);
+      int d = effect_type_depth(bct), dim;
+      bool pointer_p = pointer_type_p(bct);
+      list reg_ref_inds = NIL;
 
-      pips_assert("The number of indices is less or equal to the possible "
-		  "effect type depth, unless we are dealing with a pointer.\n",
-		  (int) gen_length(ind) <= d || pointer_p);
+      /* first make the predicate according to ref */
 
-      if (fortran_module_p(get_current_module_entity())
-	  && n_ind < d)
+      ifdebug(3)
 	{
-	  /* dealing with whole array references as in TAB = 1.0 */
-	  sc = entity_declaration_sc(e);
-	  max_phi = d;
-	}
-      else
-	{
-	  sc = sc_new();
-	  max_phi = n_ind;
+	  pips_debug(3, "Reference : \"%s\"",
+		     words_to_string(words_reference(ref, NIL)));
+	  fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
+	  pips_debug(3,"effect type depth is %d\n", d);
 	}
 
-      for (dim = 1; dim <= max_phi; dim++)
-	reg_ref_inds = gen_nconc(reg_ref_inds,
-				 CONS(EXPRESSION,
-				      make_phi_expression(dim),
-				      NIL));
+      if (dummy_parameter_entity_p(e))
+	pips_internal_error("the input reference entity is a dummy parameter (%s)",
+			    entity_name(e));
 
-      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
-
-      /* we add the constraints corresponding to the reference indices */
-      for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
+      /* FI: If t is a pointer type, then d should depend on the type_depth
+	 of the pointed type... */
+      if (d>0 || pointer_p)
 	{
-	  /* For equalities. */
-	  expression exp_ind = EXPRESSION(CAR(ind));
-	  bool dim_linear_p;
-	  bool unbounded_p =  unbounded_expression_p(exp_ind);
+	  int idim;
+	  list ind = reference_indices(ref);
+	  int n_ind = gen_length(ind);
+	  int max_phi = 0;
+	  /* imported from preprocessor.h */
 
-	  ifdebug(3)
-	    {
-	      if (unbounded_p)
-		pips_debug(3, "unbounded dimension PHI%d\n",idim);
-	      else
-		pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
-			   idim, words_to_string(words_expression(exp_ind, NIL)));
-	    }
+	  pips_debug(8, "pointer or array case \n");
 
-	  if (unbounded_p)
+	  pips_assert("The number of indices is less or equal to the possible "
+		      "effect type depth, unless we are dealing with a pointer.\n",
+		      (int) gen_length(ind) <= d || pointer_p);
+
+	  if (fortran_module_p(get_current_module_entity())
+	      && n_ind < d)
 	    {
-	      /* we must add PHI_idim in the Psystem base */
-	      entity phi = make_phi_entity(idim);
-	      sc_base_add_variable(sc, (Variable) phi);
-	      dim_linear_p = false;
+	      /* dealing with whole array references as in TAB = 1.0 */
+	      sc = entity_declaration_sc(e);
+	      max_phi = d;
 	    }
 	  else
 	    {
-	      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
-	      dim_linear_p =
-		sc_add_phi_equation(&sc, exp_ind, idim, IS_EG, PHI_FIRST);
-
-	      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
-	      pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
+	      sc = sc_new();
+	      max_phi = n_ind;
 	    }
-	  linear_p = linear_p && dim_linear_p;
-	} /* for */
+
+	  for (dim = 1; dim <= max_phi; dim++)
+	    reg_ref_inds = gen_nconc(reg_ref_inds,
+				     CONS(EXPRESSION,
+					  make_phi_expression(dim),
+					  NIL));
+
+	  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+
+	  /* we add the constraints corresponding to the reference indices */
+	  for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
+	    {
+	      /* For equalities. */
+	      expression exp_ind = EXPRESSION(CAR(ind));
+	      bool dim_linear_p;
+	      bool unbounded_p =  unbounded_expression_p(exp_ind);
+
+	      ifdebug(3)
+		{
+		  if (unbounded_p)
+		    pips_debug(3, "unbounded dimension PHI%d\n",idim);
+		  else
+		    pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
+			       idim, words_to_string(words_expression(exp_ind, NIL)));
+		}
+
+	      if (unbounded_p)
+		{
+		  /* we must add PHI_idim in the Psystem base */
+		  entity phi = make_phi_entity(idim);
+		  sc_base_add_variable(sc, (Variable) phi);
+		  dim_linear_p = false;
+		}
+	      else
+		{
+		  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+		  dim_linear_p =
+		    sc_add_phi_equation(&sc, exp_ind, idim, IS_EG, PHI_FIRST);
+
+		  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+		  pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
+		}
+	      linear_p = linear_p && dim_linear_p;
+	    } /* for */
+
+	  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+
+	  /* add array bounds if asked for */
+	  if (array_bounds_p()) {
+	    sc = sc_safe_append(sc,
+				sc_safe_normalize(entity_declaration_sc(e)));
+	    pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+	  }
+
+	} /* if (d>0 || pointer_p) */
+
+      else
+	{
+	  pips_debug(8, "non-pointer scalar type\n");
+	  sc = sc_new();
+	}/* if else */
 
       pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
 
-      /* add array bounds if asked for */
-      if (array_bounds_p()) {
-	sc = sc_safe_append(sc,
-			    sc_safe_normalize(entity_declaration_sc(e)));
-	pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
-      }
-
-    } /* if (d>0 || pointer_p) */
-
-  else
-    {
-      pips_debug(8, "non-pointer scalar type\n");
-      sc = sc_new();
-    }/* if else */
-
-  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
-
-  /* There was a preference originally : let's try a reference since a new
-     reference is built for each region. BC */
-  reg = make_region(
-		    make_reference(reference_variable(ref), reg_ref_inds),
-		    copy_action(tac),
-		    make_approximation
-		    (linear_p? is_approximation_exact : is_approximation_may,
-		     UU),
-		    sc);
+      /* There was a preference originally : let's try a reference since a new
+	 reference is built for each region. BC */
+      reg = make_region(
+			make_reference(reference_variable(ref), reg_ref_inds),
+			copy_action(tac),
+			make_approximation
+			(linear_p? is_approximation_exact : is_approximation_may,
+			 UU),
+			sc);
+    }
   debug_region_consistency(reg);
 
   ifdebug(3)

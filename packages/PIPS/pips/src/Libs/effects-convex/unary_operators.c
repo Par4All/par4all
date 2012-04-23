@@ -161,7 +161,7 @@ vector_to_convex_descriptor(Pvecteur v)
 void convex_effects_descriptor_normalize(list l_eff)
 {
   FOREACH(REGION, eff, l_eff) {
-    if(store_effect_p(eff))
+    if(store_effect_p(eff) && !ENDP(cell_indices(effect_cell(eff))))
       region_system_(eff) =
 	newgen_Psysteme(region_sc_normalize(region_system(eff),1));
   }

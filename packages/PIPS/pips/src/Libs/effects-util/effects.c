@@ -338,9 +338,32 @@ bool heap_cell_p(cell c)
   reference r = cell_any_reference(c);
   entity v = reference_variable(r);
 
-  heap_p = same_string_p(entity_local_name(v), HEAP_AREA_LOCAL_NAME);
+  heap_p = (strstr(entity_local_name(v), HEAP_AREA_LOCAL_NAME)
+	    ==entity_local_name(v));
 
   return heap_p;
+}
+
+bool nowhere_cell_p(cell c)
+{
+  bool nowhere_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  nowhere_p = entity_typed_nowhere_locations_p(v);
+
+  return nowhere_p;
+}
+
+bool null_cell_p(cell c)
+{
+  bool null_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  null_p = entity_null_locations_p(v);
+
+  return null_p;
 }
 
 
@@ -1051,7 +1074,8 @@ tag approximation_or(tag t1, tag t2)
 
 
 /** CELLS */
-/* test if two cells are equal, celles are supposed to be references.*/
+/* test if two cells are equal, celles are supposed to be
+   references. */
 
 bool cell_equal_p(cell c1, cell c2)
 {
@@ -1059,6 +1083,51 @@ bool cell_equal_p(cell c1, cell c2)
   reference r1 = cell_to_reference(c1);
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
+}
+
+/* FI->FC/AM: some elements of the lattice must be exploited here... */
+bool points_to_reference_included_p(reference r1, reference r2)
+{
+  bool included_p = true;
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+
+  list dims1 = reference_indices(r1);
+  list dims2 = reference_indices(r2);
+  list cdims2 = dims2;
+
+  if(v1 == v2) {
+    if(gen_length(dims1)==gen_length(dims2)) {
+      FOREACH(EXPRESSION, s1, dims1) {
+	expression s2 = EXPRESSION(CAR(cdims2));
+	if(!expression_equal_p(s1,s2)) {
+	  if(!unbounded_expression_p(s2)) {
+	    included_p = false;
+	    break;
+	  }
+	}
+	cdims2 = CDR(cdims2);
+      }
+    }
+    else
+      included_p = false;
+  }
+  else {
+    // pips_internal_error("Abstract location lattice not implemented here.\n");
+    // FI->AM/FC: you should check the inclusion of abstract_location(v1) and
+    // abstract_location(v2)...
+    included_p = false;
+  }
+  return included_p;
+}
+
+/* Check that all memory locations denoted by cell1 are included in cell2 */
+bool cell_included_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return points_to_reference_included_p(r1, r2);
 }
 
 
@@ -1177,11 +1246,11 @@ bool vect_contains_phi_p(Pvecteur v)
 }
 
 
-/* Functions about cells - There is no cell.c file */
+/* Functions about points-to cells - There is no cell.c file */
 
 /* add a field to a cell if it is meaningful
  */
-cell cell_add_field_dimension(cell c, entity f)
+cell points_to_cell_add_field_dimension(cell c, entity f)
 {
   if(cell_reference_p(c)) {
     reference r = cell_reference(c);
@@ -1202,29 +1271,46 @@ cell cell_add_field_dimension(cell c, entity f)
 /* add a field f as a subscript to a reference r if it is
  * meaningful. Leave r unchanged if not.
  *
- * This function cannot be located in ri-util because it might need to
+ * This function cannot be located in ri-util because it does need to
  * know about abstract locations.
+ *
+ * This does not build a standard reference, but a reference used
+ * within effects computation. Field accesses are replaced by
+ * subscripts.
  */
 reference reference_add_field_dimension(reference r, entity f)
 {
   entity v = reference_variable(r);
-  type t = ultimate_type(entity_type(v));
-  if(struct_type_p(t)) {
-    entity ste = basic_derived(variable_basic(type_variable(t)));
-    type st = entity_type(ste);
-    pips_assert("st is a struct type", type_struct_p(st));
-    list fl = type_struct(st);
-    if(entity_is_argument_p(f,fl)) {
-      expression s = entity_to_expression(f);
-      reference_indices(r) = gen_nconc(reference_indices(r),
-				       CONS(EXPRESSION, s, NIL));
+
+  /* No fields can be added to some special abstract locations. */
+  if(!(entity_anywhere_locations_p(v)
+       || entity_typed_anywhere_locations_p(v)
+       || entity_nowhere_locations_p(v)
+       || entity_typed_nowhere_locations_p(v)
+       || entity_null_locations_p(v)
+       )) {
+    type t = reference_to_type(r);
+    //type t = ultimate_type(entity_type(v));
+
+    if(struct_type_p(t)) {
+      entity ste = basic_derived(variable_basic(type_variable(t)));
+      type st = entity_type(ste);
+      pips_assert("st is a struct type", type_struct_p(st));
+      list fl = type_struct(st);
+      if(entity_is_argument_p(f,fl)) {
+	expression s = entity_to_expression(f);
+	reference_indices(r) = gen_nconc(reference_indices(r),
+					 CONS(EXPRESSION, s, NIL));
+      }
+      else {
+	entity v = reference_variable(r);
+	pips_internal_error("No field \"%s\" for struct \"%s\"\n",
+			    entity_user_name(f), entity_user_name(v));
+      }
     }
     else {
-      pips_internal_error("No field \"%s\" for struct \"%s\"\n",
-			  entity_user_name(f), entity_user_name(v));
+      ; // FI: could be useful for unions as well
     }
-  }
-  else {
   }
   return r;
 }

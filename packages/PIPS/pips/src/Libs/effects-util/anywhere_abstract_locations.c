@@ -89,7 +89,14 @@ entity entity_anywhere_locations()
   return entity_all_locations();
 }
 
-/* test if an entity is the top of the lattice*/
+/* test if an entity is the top of the lattice 
+ *
+ * This test does not take typed anywhere into account. This is
+ * consistent with the function name, but may be not with its uses.
+ *
+ * It is not consistent with hiding the impact of
+ * ALIASING_ACROSS_TYPES from callers.
+ */
 bool entity_all_locations_p(entity e)
 {
 
@@ -144,7 +151,10 @@ entity entity_typed_nowhere_locations(type t)
   return entity_all_xxx_locations_typed(NOWHERE_LOCATION, t);
 }
 
-/* test if an entity is the bottom of the lattice*/
+/* test if an entity is the bottom of the lattice 
+ *
+ * Should we care for the typed nowhere too?
+*/
 bool entity_nowhere_locations_p(entity e)
 {
     return same_entity_p(e,entity_nowhere_locations());
