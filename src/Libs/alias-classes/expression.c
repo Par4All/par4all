@@ -312,28 +312,44 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   // the targeted object.
   else if(ENTITY_PLUS_UPDATE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    expression delta = EXPRESSION(CAR(CDR(al)));
-    pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+    type lhst = expression_to_type(lhs);
+    if(pointer_type_p(lhst)) {
+      expression delta = EXPRESSION(CAR(CDR(al)));
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+    }
+    free_type(lhst);
   }
   else if(ENTITY_MINUS_UPDATE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
-    expression delta = MakeUnaryCall(um, copy_expression(rhs));
-    pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
-    free_expression(delta);
+    type lhst = expression_to_type(lhs);
+    if(pointer_type_p(lhst)) {
+      expression rhs = EXPRESSION(CAR(CDR(al)));
+      entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
+      expression delta = MakeUnaryCall(um, copy_expression(rhs));
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    free_type(lhst);
   }
   else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_PRE_INCREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    expression delta = int_to_expression(1);
-    pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
-    free_expression(delta);
+    type lhst = expression_to_type(lhs);
+    if(pointer_type_p(lhst)) {
+      expression delta = int_to_expression(1);
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    free_type(lhst);
   }
   else if(ENTITY_POST_DECREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    expression delta = int_to_expression(-1);
-    pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
-    free_expression(delta);
+    type lhst = expression_to_type(lhs);
+    if(pointer_type_p(lhst)) {
+      expression delta = int_to_expression(-1);
+      pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
+      free_expression(delta);
+    }
+    free_type(lhst);
   }
   else {
     // FI: fopen(), fclose() should be dealt with
@@ -1023,6 +1039,10 @@ pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
     out = intrinsic_call_condition_to_points_to(c, in, true_p);
   else if(value_code_p(fv))
     out = user_call_condition_to_points_to(c, in, true_p);
+  else if(value_constant_p(fv)) {
+    // For instance "if(1)"
+    ; // do nothing
+  }
   else
     // FI: you might have an apply on a functional pointer?
     pips_internal_error("Not implemented yet.\n");
@@ -1053,7 +1073,9 @@ pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
 {
   pt_map out = in;
   // FI: a call site to handle like any other user call site...
-  pips_internal_error("Not implemented yet %p %p %p.\n", c, in , true_p);
+  pips_user_warning("Interprocedural points-to not implemented yet. "
+		    "Call site ignored. %p %p %p.\n",
+		    c, in , true_p);
   return out;
 }
 
@@ -1067,39 +1089,23 @@ pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool tru
     expression nc = EXPRESSION(CAR(al));
     out = condition_to_points_to(nc, in, !true_p);
   }
-  else if(ENTITY_AND_P(f)) {
-    if(true_p) {
-      /* Combine the conditions */
-      expression nc1 = EXPRESSION(CAR(al));
-      out = condition_to_points_to(nc1, in, true_p);
-      expression nc2 = EXPRESSION(CAR(CDR(al)));
-      out = condition_to_points_to(nc2, out, true_p);
-    }
-    else {
-      /* Merge the results of the different conditions... */
-      pt_map in2 = full_copy_pt_map(in);
-      expression nc1 = EXPRESSION(CAR(al));
-      pt_map out1 = condition_to_points_to(nc1, in, true_p);
-      expression nc2 = EXPRESSION(CAR(CDR(al)));
-      pt_map out2 = condition_to_points_to(nc2, in2, true_p);
-      // FI: memory leak? Does merge_points_to_set() allocated a new set?
-      out = merge_points_to_set(out1, out2);
-      free_pt_map(out2);
-      // pips_internal_error("Not implemented yet.\n");
-    }
+  else if((ENTITY_AND_P(f) && true_p) || (ENTITY_OR_P(f) && !true_p)) {
+    /* Combine the conditions */
+    expression nc1 = EXPRESSION(CAR(al));
+    out = condition_to_points_to(nc1, in, true_p);
+    expression nc2 = EXPRESSION(CAR(CDR(al)));
+    out = condition_to_points_to(nc2, out, true_p);
   }
-  else if(ENTITY_OR_P(f)) {
-    if(true_p) {
-      /* Merge the results of the different conditions... */
-      pips_internal_error("Not implemented yet.\n");
-    }
-    else {
-      /* Combine the conditions */
-      expression nc1 = EXPRESSION(CAR(al));
-      out = condition_to_points_to(nc1, in, true_p);
-      expression nc2 = EXPRESSION(CAR(CDR(al)));
-      out = condition_to_points_to(nc2, out, true_p);
-    }
+  else if((ENTITY_AND_P(f) && !true_p) || (ENTITY_OR_P(f) && true_p)) {
+    /* Merge the results of the different conditions... */
+    pt_map in2 = full_copy_pt_map(in);
+    expression nc1 = EXPRESSION(CAR(al));
+    pt_map out1 = condition_to_points_to(nc1, in, true_p);
+    expression nc2 = EXPRESSION(CAR(CDR(al)));
+    pt_map out2 = condition_to_points_to(nc2, in2, true_p);
+    // FI: memory leak? Does merge_points_to_set() allocated a new set?
+    out = merge_points_to_set(out1, out2);
+    free_pt_map(out2);
   }
   else
     pips_internal_error("Not implemented yet for boolean operator \"%s\".\n",

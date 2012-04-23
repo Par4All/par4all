@@ -286,15 +286,15 @@ pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
  */
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
-  pt_map pt_out = points_to_undefined;
+  pt_map pt_out = pt_map_undefined;
 
   //bool store = true;
   // pt_out = points_to_test(t, pt_in, store);
   // Translation of points_to_test
   statement ts = test_true(t);
   statement fs = test_false(t);
-  pt_map pt_t =  points_to_undefined;
-  pt_map pt_f = points_to_undefined;
+  pt_map pt_t =  pt_map_undefined;
+  pt_map pt_f = pt_map_undefined;
 
   pt_map pt_in_t = full_copy_pt_map(pt_in);
   pt_map pt_in_f = full_copy_pt_map(pt_in);
@@ -323,19 +323,22 @@ pt_map test_to_points_to(test t, pt_map pt_in)
   return pt_out;
 }
 
+/* FI: I assume that pointers and pointer arithmetic cannot appear in
+ * a do loop, "do p=q, r, 1" is possible with "p", "q" and "r"
+ * pointing towards the same array... Let's hope the do loop
+ * conversion does not catch such cases.
+ */
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  bool store = false;
-  pt_out = points_to_loop(l, pt_in, store);
-
-  /* This sequence has been factored out in statement_to_points_to() */
-  /*
-  statement ls = loop_body(l);
-  list dl = statement_declarations(ls);
-  if(declaration_statement_p(ls) && !ENDP(dl))
-    pt_out = points_to_block_projection(pt_out, dl);
-  */
+  statement b = loop_body(l);
+  //bool store = false;
+  //pt_out = points_to_loop(l, pt_in, store);
+  pt_out = any_loop_to_points_to(b,
+				 expression_undefined,
+				 expression_undefined,
+				 expression_undefined,
+				 pt_in);
 
   return pt_out;
 }
@@ -384,7 +387,7 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
  */
 pt_map any_loop_to_points_to(statement b,
 			     expression init, // can be undefined
-			     expression c,
+			     expression c, // can be undefined
 			     expression inc, // ca be undefined
 			     pt_map pt_in)
 {
@@ -396,12 +399,13 @@ pt_map any_loop_to_points_to(statement b,
   int i = 0;
   // FI: k is linked to the cycles in points-to graph, and should not
   // be linked to the number of convergence iterations
-  // int k = get_int_property("POINTS_TO_K_LIMITING")+10;
+  int k = get_int_property("POINTS_TO_K_LIMITING")+10;
 
   /* First, enter the loop: initialization + condition check */
   if(!expression_undefined_p(init))
     pt_out = expression_to_points_to(init, pt_out);
-  pt_out = condition_to_points_to(c, pt_out, true);
+  if(!expression_undefined_p(c))
+    pt_out = condition_to_points_to(c, pt_out, true);
   // pt_in = points_to_expression(exp_inc, pt_in, true);
 
   /* pt_out(i) = f(pt_out(i-1)) U pt_out(i-1)
@@ -411,7 +415,7 @@ pt_map any_loop_to_points_to(statement b,
   pt_map prev = new_pt_map();
   // FI: it should be a while loop to reach convergence
   // FI: I keep it a forloop for safety
-  for(i = 0; i<100 ; i++){
+  for(i = 0; i<k+2 ; i++){
     /* prev receives the current points-to information, pt_out */
     set_clear(prev);
     prev = set_assign(prev, pt_out);
@@ -426,8 +430,9 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = expression_to_points_to(inc, pt_out);
     // FI: should be condition_to_points_to() for conditions such as
     // while(p!=q);
-    // The condition is always defined
-    pt_out = condition_to_points_to(c, pt_out, true);
+    // The condition is not always defined (do loops)
+    if(!expression_undefined_p(c))
+      pt_out = condition_to_points_to(c, pt_out, true);
 
     /* Perform the k-limiting on the latest points to information */
     //int k = get_int_property("POINTS_TO_K_LIMITING");
@@ -455,7 +460,8 @@ pt_map any_loop_to_points_to(statement b,
      information is changed accordingly. */
   pt_out = points_to_independent_store(pt_out);
   /* The condition must be false when exiting the loop */
-  pt_out = condition_to_points_to(c, pt_out, false);
+  if(!expression_undefined_p(inc))
+    pt_out = condition_to_points_to(c, pt_out, false);
 
   return pt_out;
 }

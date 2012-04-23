@@ -612,7 +612,11 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 	cell nc = make_cell_reference(nr);
 	if(eval_p) {
 	  // FI: two rounds of source_to_sinks() I guess
-	  pips_internal_error("Not implemented yet.\n");
+	  list sinks_1 = source_to_sinks(nc, in, true);
+	  FOREACH(CELL, c, sinks_1) {
+	    list sinks_2 = source_to_sinks(c, in, true);
+	    sinks = gen_nconc(sinks, sinks_2);
+	  }
 	}
 	else {
 	  // FI: what's going to happen with subscript expressions?
