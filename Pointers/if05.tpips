@@ -1,0 +1,14 @@
+delete if05
+create if05 if05.c
+
+
+echo
+echo POINTS TO for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+close
+shell cat if05.database/Warnings
+delete if05
+quit
