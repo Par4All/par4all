@@ -445,11 +445,21 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
 
   if(ENTITY_CONDITIONAL_P(f)) {
     //bool eval_p = true;
+    expression c = EXPRESSION(CAR(al));
+    pt_map in_t = full_copy_pt_map(in);
+    pt_map in_f = full_copy_pt_map(in);
+    in_t = condition_to_points_to(c, in_t, true);
+    in_f = condition_to_points_to(c, in_f, true);
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    list sinks1 = expression_to_points_to_cells(e1, in, eval_p);
-    list sinks2 = expression_to_points_to_cells(e2, in, eval_p);
+    list sinks1 = NIL;
+    if(!empty_pt_map_p(in_t))
+      sinks1 = expression_to_points_to_cells(e1, in_t, eval_p);
+    list sinks2 = NIL;
+    if(!empty_pt_map_p(in_f))
+      sinks2 = expression_to_points_to_cells(e2, in_f, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
+    free_pt_map(in_t), free_pt_map(in_f);
   }
   // FI: any other ternary intrinsics?
 

@@ -129,7 +129,11 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
 }
 
 /* Compute the points-to information pt_out that results from the
- * evaluation of a possibly empty list of expression. A new data structure is allocated.
+ * evaluation of a possibly empty list of expression. A new data
+ * structure is allocated.
+ *
+ * The result is correct only if you are sure that all expressions in
+ * "el" are always evaluated.
  */
 pt_map expressions_to_points_to(list el, pt_map pt_in)
 {
@@ -214,6 +218,31 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_FREE_SYSTEM_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     pt_out = freed_pointer_to_points_to(lhs, pt_out);
+  }
+  else if(ENTITY_CONDITIONAL_P(f)) {
+    // FI: I needs this piece of code for assert();
+    expression c = EXPRESSION(CAR(al));
+    pt_map in_t = full_copy_pt_map(pt_out);
+    pt_map in_f = full_copy_pt_map(pt_out);
+    in_t = condition_to_points_to(c, in_t, true);
+    in_f = condition_to_points_to(c, in_f, true);
+    expression e1 = EXPRESSION(CAR(CDR(al)));
+    expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
+    pt_map out_t = pt_map_undefined;
+    if(!empty_pt_map_p(in_t))
+      out_t = expression_to_points_to(e1, in_t);
+    pt_map out_f = pt_map_undefined;
+    // FI: should be factored out in a more general merge function...
+    if(!empty_pt_map_p(in_f))
+      out_f = expression_to_points_to(e2, in_f);
+    if(empty_pt_map_p(in_t))
+      pt_out = out_f;
+    else if(empty_pt_map_p(in_f))
+      pt_out = out_t;
+    else
+      pt_out = merge_points_to_set(out_t, out_f);
+    // FI: this destroys pt_out for test case pointer02
+    //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
   else {
     if(!type_void_p(rt)) {
@@ -1117,12 +1146,78 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 {
   pt_map out = in;
   entity f = call_function(c);
+  list al = call_arguments(c);
   if((ENTITY_EQUAL_P(f) && true_p)
      || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
+    expression lhs = EXPRESSION(CAR(al));
+    type lhst = expression_to_type(lhs);
+    expression rhs = EXPRESSION(CAR(CDR(al)));
+    type rhst = expression_to_type(rhs);
+    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sources(lhs, in);
+      list R = expression_to_points_to_sources(rhs, in);
+      if(gen_length(L)==1 && gen_length(R)==1) {
+	cell l = CELL(CAR(L));
+	cell r = CELL(CAR(R));
+	cell source = cell_undefined, sink = cell_undefined;
+	if(null_cell_p(l)) {
+	  source = r;
+	  sink = l;
+	}
+	else if(null_cell_p(r)) {
+	  source = l;
+	  sink = r;
+	}
+	if(!cell_undefined_p(source)) {
+	  entity v = reference_variable(cell_any_reference(source));
+	  out = points_to_source_projection(out, v);
+	  points_to a = make_points_to(source, sink, make_approximation_exact(),
+				     make_descriptor_none());
+	  add_arc_to_pt_map(a, out);
+	}
+      }
+    }
+    free_type(lhst), free_type(rhst);
     ; //FI FI FI
   }
   else if((ENTITY_EQUAL_P(f) && !true_p)
      || (ENTITY_NON_EQUAL_P(f) && true_p)) {
+    // FI: this code is almost identical to the code above
+    // It should be shared with a more general test first and then a
+    // precise test to decide if you add or remove arcs
+    expression lhs = EXPRESSION(CAR(al));
+    type lhst = expression_to_type(lhs);
+    expression rhs = EXPRESSION(CAR(CDR(al)));
+    type rhst = expression_to_type(rhs);
+    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sources(lhs, in);
+      list R = expression_to_points_to_sources(rhs, in);
+      if(gen_length(L)==1 && gen_length(R)==1) {
+	cell l = CELL(CAR(L));
+	cell r = CELL(CAR(R));
+	cell source = cell_undefined, sink = cell_undefined;
+	if(null_cell_p(l)) {
+	  source = r;
+	  sink = l;
+	}
+	else if(null_cell_p(r)) {
+	  source = l;
+	  sink = r;
+	}
+	if(!cell_undefined_p(source)) {
+	  // FI: we should be able to remove an arc regardless of its
+	  // approximation...
+	  points_to a = make_points_to(source, sink, make_approximation_exact(),
+				     make_descriptor_none());
+	  remove_arc_from_pt_map(a, out);
+	  free(points_to_approximation(a));
+	  points_to_approximation(a) = make_approximation_may();
+	  remove_arc_from_pt_map(a, out);
+	  free_points_to(a);
+	}
+      }
+    }
+    free_type(lhst), free_type(rhst);
     ;//FI FI FI
   }
   else {

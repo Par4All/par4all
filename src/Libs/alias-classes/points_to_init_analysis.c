@@ -461,8 +461,11 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 
 
 /* Input : a formal parameter which has a derived type (FI, I guess).
-   output : a set of points-to where sinks are stub points-to.
-*/
+ *  output : a set of points-to where sinks are stub points-to.
+ *
+ * FI: a lot of rewrite needed to simplify. Also, do not forget that
+ * NULL maybe the received value. 
+ */
 set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 {
   reference r = reference_undefined;
@@ -480,7 +483,7 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 
   if(type_variable_p(upt)){
     if(array_entity_p(e)){
-      /* We ignor dimensions for the being, descriptors are not
+      /* We ignore dimensions for the time being, descriptors are not
        * implemented yet...Amira Mensi*/
       ;
       /* ultimate_type() returns a wrong type for arrays. For
@@ -489,7 +492,7 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
     else {
       basic fpb = variable_basic(type_variable(upt));
       if( basic_derived_p(fpb)) {
-	type t = entity_type(e);
+	type t = ultimate_type(entity_type(e));
 	expression ex = entity_to_expression(e);
 	if(type_variable_p(t)){
 	  basic vb = variable_basic(type_variable(t));

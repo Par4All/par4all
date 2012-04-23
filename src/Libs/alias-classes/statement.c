@@ -384,6 +384,8 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
  * first iteration.
  *
  * Derived from points_to_forloop().
+ *
+ * pt_in is modified by side effects.
  */
 pt_map any_loop_to_points_to(statement b,
 			     expression init, // can be undefined
@@ -414,7 +416,8 @@ pt_map any_loop_to_points_to(statement b,
    */
   pt_map prev = new_pt_map();
   // FI: it should be a while loop to reach convergence
-  // FI: I keep it a forloop for safety
+  // FI: I keep it a for loop for safety
+  bool fix_point_p = false;
   for(i = 0; i<k+2 ; i++){
     /* prev receives the current points-to information, pt_out */
     set_clear(prev);
@@ -445,14 +448,19 @@ pt_map any_loop_to_points_to(statement b,
     pt_out = merge_points_to_set(prev, pt_out);
 
     /* Check convergence */
-    if(set_equal_p(prev, pt_out))
+    if(set_equal_p(prev, pt_out)) {
+      fix_point_p = true;
       break;
+    }
   }
 
-  /* Propagate stable points-to information in the loop body */
-  // FI: this is wrong since only one points-to information is copied
-  // for each statement in the loop
-  points_to_storage(pt_in, b , true);
+  if(!fix_point_p)
+    pips_internal_error("Loop convergence not reached.\n");
+
+  // FI: this should be useless because the propagation has already
+  // happened within the convergence loop...
+  //pt_map pt_b = full_copy_pt_map(pt_out);
+  //points_to_storage(pt_b, b , true);
   // FI: I would expect something like
   // pt_tmp = statement_to_points_to(b, pt_out);
 
@@ -531,8 +539,6 @@ pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 
   pt_out = new_points_to_unstructured(u, pt_in, true);
 
-  // FI: The storage should be performed at a higher level?
-  // points_to_storage(pt_out,current,true);
   return pt_out;
 }
 
@@ -550,15 +556,7 @@ pt_map forloop_to_points_to(forloop fl, pt_map pt_in)
   expression init = forloop_initialization(fl);
   expression c = forloop_condition(fl);
   expression inc = forloop_increment(fl);
-  //bool store = false;
-  // pt_out = points_to_forloop(fl, pt_in, store);
 
   pt_out = any_loop_to_points_to(b, init, c, inc, pt_in);
-  /*
-    statement ls = forloop_body(fl);
-    list dl =statement_declarations(ls);
-    if(declaration_statement_p(ls) && !ENDP(dl))
-    pt_out = points_to_block_projection(pt_out, dl);
-  */
   return pt_out;
 }
