@@ -4032,3 +4032,50 @@ expression dereference_expression(expression e)
   return MakeUnaryCall(CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
                        copy_expression(e));
 }
+
+/* generate a newly allocated expression for &(e)
+ */
+expression make_address_of_expression(expression e)
+{
+  if (expression_call_p(e))
+  {
+    call c = expression_call(e);
+    if (ENTITY_DEREFERENCING_P(call_function(c))) // e is "*x"
+    {
+      pips_assert("one arg to address operator (&)",
+                  gen_length(call_arguments(c))==1);
+
+      // result is simply "x"
+      return copy_expression(EXPRESSION(CAR(call_arguments(c))));
+    }
+  }
+
+  // result is "*e"
+  return MakeUnaryCall(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),
+                       copy_expression(e));
+}
+
+
+
+/* make a full copy of the subscript expression list, preserve
+   constant subscripts, replace non-constant subscript by the star
+   subscript expression. */
+list subscript_expressions_to_constant_subscript_expressions(list sl)
+{
+  list nsl = NIL;
+
+  FOREACH(EXPRESSION, s, sl){
+    expression ni = expression_undefined;
+    value v = EvalExpression(s);
+    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+      int i = constant_int(value_constant(v));
+      ni = int_to_expression(i);
+    }
+    else {
+      ni = make_unbounded_expression();
+    }
+    nsl = CONS(EXPRESSION, ni, nsl);
+  }
+  nsl = gen_nreverse(nsl);
+  return nsl;
+}

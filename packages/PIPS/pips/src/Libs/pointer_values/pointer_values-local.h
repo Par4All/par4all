@@ -27,9 +27,20 @@
    pointer values analyses */
 typedef struct {
 
+  /* ANALYSIS CONTROL */
+  bool initial_pointer_values_p; /* set to true for an initial module analysis */
+
   /* PIPSDEBM INTERFACES */
   statement_cell_relations (*db_get_pv_func)(const char *);
   void (*db_put_pv_func)(const char * , statement_cell_relations);
+  list (*db_get_in_pv_func)(const char *);
+  void (*db_put_in_pv_func)(const char * , list);
+  list (*db_get_out_pv_func)(const char *);
+  void (*db_put_out_pv_func)(const char * , list);
+  list (*db_get_initial_pv_func)(const char *);
+  void (*db_put_initial_pv_func)(const char * , list);
+  list (*db_get_program_pv_func)();
+  void (*db_put_program_pv_func)(list);
 
 /*   statement_cell_relations (*db_get_gen_pv_func)(char *); */
 /*   void (*db_put_gen_pv_func)(char * , statement_cell_relations); */

@@ -85,7 +85,15 @@ int main()
 
 // Points To:
 // p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
+// p -> t[4] , MAY
+// p -> t[5] , MAY
+// p -> t[6] , MAY
+// p -> t[7] , MAY
+// p -> t[8] , MAY
+// p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[10-1] , EXACT
 
@@ -93,7 +101,15 @@ int main()
 
 // Points To:
 // p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
+// p -> t[4] , MAY
+// p -> t[5] , MAY
+// p -> t[6] , MAY
+// p -> t[7] , MAY
+// p -> t[8] , MAY
+// p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[10-1] , EXACT
 
@@ -101,7 +117,15 @@ int main()
 
 // Points To:
 // p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
+// p -> t[4] , MAY
+// p -> t[5] , MAY
+// p -> t[6] , MAY
+// p -> t[7] , MAY
+// p -> t[8] , MAY
+// p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[10-1] , EXACT
 
@@ -110,7 +134,16 @@ int main()
 
 // Points To:
 // p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
+// p -> t[4] , MAY
+// p -> t[5] , MAY
+// p -> t[6] , MAY
+// p -> t[7] , MAY
+// p -> t[8] , MAY
+// p -> t[9] , MAY
+// p -> t[10] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[10-1] , EXACT
 
@@ -118,7 +151,16 @@ int main()
 
 // Points To:
 // p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
+// p -> t[4] , MAY
+// p -> t[5] , MAY
+// p -> t[6] , MAY
+// p -> t[7] , MAY
+// p -> t[8] , MAY
+// p -> t[9] , MAY
+// p -> t[10] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[10-1] , EXACT
 

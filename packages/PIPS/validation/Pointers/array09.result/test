@@ -27,8 +27,7 @@ int toto(int *p)
 POINTS-TO
 
 
-// Points To IN:
-// p -> _p_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -42,13 +41,12 @@ int bar(int *p)
    a[*p++] = 2.;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> _p_1[1] , EXACT
 
    return 0;
 }
 
-// Points To IN:
-// p -> _p_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -67,8 +65,7 @@ int foo(int *p)
    return 0;
 }
 
-// Points To IN:
-// p -> _p_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -88,8 +85,8 @@ int toto(int *p)
    a[*(q = p++)] = 2.;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> _p_1[1] , EXACT
+// q -> _p_1[0] , EXACT
 
    return 0;
 }

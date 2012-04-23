@@ -1,3 +1,11 @@
+
+// IN Pointer values:
+// a[*] == &_a_1[*][0] (may);
+
+
+// OUT Pointer values:
+// a[*] == &_a_1[*][0] (may);
+
 int foo(int *a[10])
 {
 
@@ -43,6 +51,12 @@ int foo(int *a[10])
 
    return failed;
 }
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 

@@ -40,6 +40,7 @@
 #include "text-util.h"
 #include "newgen_set.h"
 #include "points_to_private.h"
+#include "pointer_values.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
@@ -178,6 +179,21 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
   return res;
 }
 
+
+bool convex_cell_preceding_p(cell c1, descriptor d1,
+			     cell c2, descriptor d2,
+			     transformer current_precondition,
+		             bool strict_p,
+			     bool * exact_p)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+
+  return convex_cell_reference_preceding_p(r1, d1, r2, d2, current_precondition,
+					   strict_p, exact_p);
+}
+
+
 void simple_reference_to_convex_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
 {
 
@@ -299,8 +315,66 @@ list convex_effect_to_constant_path_effects_with_points_to(effect eff)
 
 }
 
+
+list convex_effect_find_aliased_paths_with_pointer_values(effect eff, statement s)
+{
+  bool exact_p;
+  list l_pv = cell_relations_list( load_pv(s));
+  pv_context ctxt = make_simple_pv_context();
+  list l_aliased = generic_effect_find_aliases_with_simple_pointer_values(eff, l_pv, &exact_p, transformer_undefined,
+								convex_cell_preceding_p,
+								convex_cell_with_address_of_cell_translation,
+								convex_cell_with_value_of_cell_translation,
+								convex_cells_intersection_p,
+								convex_cells_inclusion_p,
+								simple_cell_to_convex_cell_conversion);
+
+  reset_pv_context(&ctxt);
+  return l_aliased;
+}
+
+
+
+
 list convex_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
 {
-  pips_internal_error("not yet implemented\n");
-  return NIL;
+
+  list le = NIL;
+  bool exact_p;
+  reference ref = effect_any_reference(eff);
+
+  if (effect_reference_dereferencing_p(ref, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+      bool exact_p = false;
+      list l_aliased = convex_effect_find_aliased_paths_with_pointer_values(eff, effects_private_current_stmt_head());
+      pips_debug_effects(8, "aliased effects\n", l_aliased);
+
+      FOREACH(EFFECT, eff_alias, l_aliased)
+	{
+	  entity ent_alias = effect_entity(eff_alias);
+	  if (undefined_pointer_value_entity_p(ent_alias)
+	      || null_pointer_value_entity_p(ent_alias))
+	    {
+	      // currently interpret them as anywhere effects since these values
+	      // are not yet well integrated in abstract locations lattice
+	      // and in effects computations
+	      // to be FIXED later.
+	      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
+	      free_effect(eff_alias);
+	    }
+	  else if (entity_abstract_location_p(effect_entity(eff_alias))
+		   || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
+	    le = CONS(EFFECT, eff_alias, le); /* it should be a union here.
+						 However, we expect the caller
+						 to perform the contraction afterwards. */
+	  else
+	    free_effect(eff_alias);
+	}
+      gen_free_list(l_aliased);
+    }
+  else
+    le = CONS(EFFECT, (*effect_dup_func)(eff), le);
+  return le;
+
 }

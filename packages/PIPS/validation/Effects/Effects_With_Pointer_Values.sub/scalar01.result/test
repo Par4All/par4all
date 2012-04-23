@@ -1,3 +1,9 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
 int main()
 {
 
@@ -36,5 +42,49 @@ int main()
 //             <    is written>: b
    b = *p;
 //             <    is read   >: b
+   return b;
+}
+int main()
+{
+   int a, b, *p;
+
+//  <a-W-EXACT-{}>
+
+   a = 0;
+
+//  <p-W-EXACT-{}>
+
+   p = &a;
+
+//  <a-R-EXACT-{}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = *p;
+
+//  <b-R-EXACT-{}>
+
+   return b;
+}
+int main()
+{
+   int a, b, *p;
+
+//  <a-W-EXACT-{}>
+
+   a = 0;
+
+//  <p-W-EXACT-{}>
+
+   p = &a;
+
+//  <a-R-EXACT-{}>
+//  <b-W-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   b = *p;
+
+//  <b-R-EXACT-{}>
+
    return b;
 }

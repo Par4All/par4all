@@ -19,8 +19,7 @@ void assignment05(int *p)
 POINTS-TO
 
 
-// Points To IN:
-// p -> _p_1 , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none

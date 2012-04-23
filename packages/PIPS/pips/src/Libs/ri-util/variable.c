@@ -1174,7 +1174,11 @@ bool array_with_numerical_bounds_p(entity a)
 
 
 /* variable_entity_dimension(entity v): returns the dimension of variable v;
- * scalar have dimension 0
+ * scalar have dimension 0.
+ *
+ * This is not necessarily the dimensions because of typedefs. Another
+ * function is able to collect dimensions hidden in typedefs, but also
+ * via fields: see type_depth().
  */
 int variable_entity_dimension(entity v)
 {
@@ -1182,10 +1186,8 @@ int variable_entity_dimension(entity v)
 
   pips_assert("variable_entity_dimension", type_variable_p(entity_type(v)));
 
-  MAPL(cd, {
+  FOREACH(DIMENSION, cd, variable_dimensions(type_variable(entity_type(v))))
     d++;
-  },
-       variable_dimensions(type_variable(entity_type(v))));
 
   return d;
 }

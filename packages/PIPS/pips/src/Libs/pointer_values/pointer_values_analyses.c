@@ -68,25 +68,47 @@ void db_put_simple_pv(const char * module_name, statement_cell_relations scr)
    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_POINTER_VALUES, module_name, (char*) scr);
 }
 
-/* static statement_cell_relations db_get_simple_gen_pv(char * module_name) */
-/* { */
-/*   return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, true); */
-/* } */
+list db_get_in_simple_pv(const char * module_name)
+{
+  return (list) cell_relations_list((cell_relations) db_get_memory_resource(DBR_IN_SIMPLE_POINTER_VALUES, module_name, true));
+}
 
-/* static void db_put_simple_gen_pv(char * module_name, statement_cell_relations scr) */
-/* { */
-/*    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, (char*) scr); */
-/* } */
+void db_put_in_simple_pv(const char * module_name, list l_pv)
+{
+  DB_PUT_MEMORY_RESOURCE(DBR_IN_SIMPLE_POINTER_VALUES, module_name, (char*) make_cell_relations(l_pv));
+}
 
-/* static statement_effects db_get_simple_kill_pv(char * module_name) */
-/* { */
-/*   return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, true); */
-/* } */
+list db_get_out_simple_pv(const char * module_name)
+{
+  return cell_relations_list((cell_relations) db_get_memory_resource(DBR_OUT_SIMPLE_POINTER_VALUES, module_name, true));
+}
 
-/* static void db_put_simple_kill_pv(char * module_name, statement_effects se) */
-/* { */
-/*    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, (char*) se); */
-/* } */
+void db_put_out_simple_pv(const char * module_name, list l_pv)
+{
+  DB_PUT_MEMORY_RESOURCE(DBR_OUT_SIMPLE_POINTER_VALUES, module_name, (char*) make_cell_relations(l_pv));
+}
+
+list db_get_initial_simple_pv(const char * module_name)
+{
+  return cell_relations_list((cell_relations) db_get_memory_resource(DBR_INITIAL_SIMPLE_POINTER_VALUES, module_name, true));
+}
+
+void db_put_initial_simple_pv(const char * module_name, list l_pv)
+{
+  DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_SIMPLE_POINTER_VALUES, module_name, (char*) make_cell_relations(l_pv));
+}
+
+list db_get_program_simple_pv()
+{
+  return cell_relations_list((cell_relations) db_get_memory_resource(DBR_PROGRAM_SIMPLE_POINTER_VALUES, "", true));
+}
+
+void db_put_program_simple_pv(list l_pv)
+{
+  DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_SIMPLE_POINTER_VALUES, "", (char*) make_cell_relations(l_pv));
+}
+
+
 
 
 /******************** ANALYSIS CONTEXT */
@@ -96,12 +118,19 @@ pv_context make_simple_pv_context()
 {
   pv_context ctxt;
 
+  ctxt.initial_pointer_values_p = false;
+
   ctxt.db_get_pv_func = db_get_simple_pv;
   ctxt.db_put_pv_func = db_put_simple_pv;
-/*   ctxt.db_get_gen_pv_func = db_get_simple_gen_pv; */
-/*   ctxt.db_put_gen_pv_func = db_put_simple_gen_pv; */
-/*   ctxt.db_get_kill_pv_func = db_get_simple_kill_pv; */
-/*   ctxt.db_put_kill_pv_func = db_put_simple_kill_pv; */
+  ctxt.db_get_in_pv_func = db_get_in_simple_pv;
+  ctxt.db_put_in_pv_func = db_put_in_simple_pv;
+  ctxt.db_get_out_pv_func = db_get_out_simple_pv;
+  ctxt.db_put_out_pv_func = db_put_out_simple_pv;
+  ctxt.db_get_initial_pv_func = db_get_initial_simple_pv;
+  ctxt.db_put_initial_pv_func = db_put_initial_simple_pv;
+  ctxt.db_get_program_pv_func = db_get_program_simple_pv;
+  ctxt.db_put_program_pv_func = db_put_program_simple_pv;
+
   ctxt.make_pv_from_effects_func = make_simple_pv_from_simple_effects;
   ctxt.cell_preceding_p_func = simple_cell_preceding_p;
   ctxt.cell_reference_with_value_of_cell_reference_translation_func =
@@ -279,9 +308,11 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
 	      type e_type = entity_basic_concrete_type(e);
+	      storage e_storage = entity_storage(e);
 	      /* beware don't push static variables and non pointer variables. */
-	      if (! static_area_p(ram_section(storage_ram(entity_storage(e))))
-		  &&!type_fundamental_basic_p(e_type)
+	      if (storage_ram_p(e_storage)
+		  && ! static_area_p(ram_section(storage_ram(e_storage)))
+		  && ! type_fundamental_basic_p(e_type)
 		  && basic_concrete_type_leads_to_pointer_p(e_type))
 		l_locals = CONS(ENTITY, e, l_locals);
 	      l_cur = declaration_to_post_pv(e, l_cur, ctxt);
@@ -376,63 +407,87 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
   type e_type = entity_basic_concrete_type(e);
-  bool static_p = static_area_p(ram_section(storage_ram(entity_storage(e))));
 
-  pips_debug(1, "begin\n");
-
-  expression lhs_exp = entity_to_expression(e);
-  expression rhs_exp = expression_undefined;
-  bool free_rhs_exp = false; /* turned to true if rhs_exp is built and
-				must be freed */
-
-  value v_init = entity_initial(e);
-  if (v_init == value_undefined)
+  if (type_variable_p(e_type) && !typedef_entity_p(e)
+      && !type_fundamental_basic_p(e_type)
+      && basic_concrete_type_leads_to_pointer_p(e_type))
     {
-      pips_debug(2, "undefined inital value\n");
+      pips_debug(1, "begin\n");
+      pips_debug(1, "entity %s basic concrete type %s %s\n",
+	     entity_name(e), type_to_string(e_type), string_of_type(e_type));
+      expression lhs_exp = entity_to_expression(e);
+      expression rhs_exp = expression_undefined;
+      bool free_rhs_exp = false; /* turned to true if rhs_exp is built and
+				    must be freed */
 
-      if (static_p
-	  && !type_fundamental_basic_p(e_type)
-	  && basic_concrete_type_leads_to_pointer_p(e_type))
-	/* when no initialization is provided for pointer static variables,
-	   or aggregate variables which recursively have pointer fields,
-	   then all pointers are initialized to NULL previous to program
-	   execution.
-	*/
-	rhs_exp = entity_to_expression(null_pointer_value_entity());
+      value v_init = entity_initial(e);
+      bool static_p = (!ctxt->initial_pointer_values_p) && entity_static_variable_p(e);
+
+      /* in case of a local static variable, and when not dealing with the initial analysis,
+	 we should generate a stub sink */
+
+      if (v_init == value_undefined)
+	{
+	  pips_debug(2, "undefined inital value\n");
+
+	  if (std_file_entity_p(e))
+	    {
+	      pips_debug(2, "standard file\n");
+	      expression tmp_exp = entity_to_expression(std_file_entity_to_pointed_file_entity(e));
+	      rhs_exp = make_address_of_expression(tmp_exp);
+	      free_expression(tmp_exp);
+	    }
+	  else if (static_p)
+	    /* when no initialization is provided for pointer static variables,
+	       or aggregate variables which recursively have pointer fields,
+	       then all pointers are initialized to NULL previous to program
+	       execution.
+	    */
+	    rhs_exp = entity_to_expression(null_pointer_value_entity());
+	  else
+	    rhs_exp = entity_to_expression(undefined_pointer_value_entity());
+	  free_rhs_exp = true;
+	}
+      else if (std_file_entity_p(e))
+	{
+	  pips_debug(2, "standard file\n");
+	  expression tmp_exp = entity_to_expression(std_file_entity_to_pointed_file_entity(e));
+	  rhs_exp = make_address_of_expression(tmp_exp);
+	  free_expression(tmp_exp);
+	  free_rhs_exp = true;
+	}
       else
-	rhs_exp = entity_to_expression(undefined_pointer_value_entity());
-      free_rhs_exp = true;
+	{
+	  switch (value_tag(v_init))
+	    {
+	    case is_value_expression:
+	      rhs_exp = value_expression(v_init);
+	      break;
+	    case is_value_unknown:
+	      pips_debug(2, "unknown inital value\n");
+	      rhs_exp = expression_undefined;
+	      break;
+	    case is_value_code:
+	    case is_value_symbolic:
+	    case is_value_constant:
+	    case is_value_intrinsic:
+	    default:
+	      pips_internal_error("unexpected tag");
+	    }
+	}
+
+      pv_results pv_res = make_pv_results();
+      assignment_to_post_pv(lhs_exp, static_p, rhs_exp, true, l_in, &pv_res, ctxt);
+      l_out = pv_res.l_out;
+      free_pv_results_paths(&pv_res);
+
+      free_expression(lhs_exp);
+      if (free_rhs_exp) free_expression(rhs_exp);
+      pips_debug_pvs(2, "returning:", l_out);
+      pips_debug(1, "end\n");
     }
   else
-    {
-      switch (value_tag(v_init))
-	{
-	case is_value_expression:
-	  rhs_exp = value_expression(v_init);
-	  break;
-	case is_value_unknown:
-	  pips_debug(2, "unknown inital value\n");
-	  rhs_exp = expression_undefined;
-	  break;
-	case is_value_code:
-	case is_value_symbolic:
-	case is_value_constant:
-	case is_value_intrinsic:
-	default:
-	  pips_internal_error("unexpected tag");
-	}
-    }
-
-  pv_results pv_res = make_pv_results();
-  assignment_to_post_pv(lhs_exp, static_p, rhs_exp, true, l_in, &pv_res, ctxt);
-  l_out = pv_res.l_out;
-  free_pv_results_paths(&pv_res);
-
-  free_expression(lhs_exp);
-  if (free_rhs_exp) free_expression(rhs_exp);
-
-  pips_debug_pvs(2, "returning:", l_out);
-  pips_debug(1, "end\n");
+    l_out = l_in;
   return (l_out);
 }
 
@@ -1482,8 +1537,8 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   list l_in_cur = NIL;
   effect lhs_eff = effect_undefined;
 
-  pips_debug(1, "begin\n");
-
+  pips_debug(1, "begin with may_lhs_p = %s and declaration_p = %s\n", bool_to_string(may_lhs_p), bool_to_string(declaration_p));
+  pips_debug_pvs(2, "input pointer values:\n", l_in);
   type lhs_type = expression_to_type(lhs);
 
   /* first convert the rhs and lhs into memory paths, rhs is evaluated first */
@@ -1701,20 +1756,21 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
 				db_get_memory_resource(DBR_CODE, module_name, true));
   set_current_module_entity(module_name_to_entity(module_name));
   init_pv();
-  //  init_gen_pv();
-  //  init_kill_pv();
 
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-
   list l_init = module_initial_parameter_pv();
+  if(entity_main_module_p(get_current_module_entity()))
+    {
+      l_init = (*ctxt->pvs_must_union_func)(l_init, gen_full_copy_list( (*ctxt->db_get_program_pv_func)() ));
+    }
 
-  (void)statement_to_post_pv(get_current_module_statement(), l_init, ctxt);
+  list l_out = statement_to_post_pv(get_current_module_statement(), gen_full_copy_list(l_init), ctxt);
 
   (*ctxt->db_put_pv_func)(module_name, get_pv());
-  //(*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());
-  //(*ctxt->db_put_kill_pv_func)(module_name, get_kill_pv());
+  (*ctxt->db_put_in_pv_func)(module_name, l_init);
+  (*ctxt->db_put_out_pv_func)(module_name, l_out);
 
   pips_debug(1, "end\n");
   debug_off();
@@ -1722,9 +1778,83 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   reset_current_module_statement();
 
   reset_pv();
-  //  reset_gen_pv();
-  //  reset_kill_pv();
 
+  return;
+}
+
+
+static void generic_module_initial_pointer_values(char * module_name, pv_context *ctxt)
+{
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, true));
+  set_current_module_entity(module_name_to_entity(module_name));
+  init_pv();
+
+  debug_on("POINTER_VALUES_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+  list l_decl = module_to_all_declarations(get_current_module_entity());
+
+  list l_in = NIL;
+  list l_cur = l_in;
+  FOREACH(ENTITY, decl, l_decl)
+    {
+      if(variable_static_p(decl))
+	{
+	  l_cur = declaration_to_post_pv(decl, l_cur, ctxt);
+	}
+    }
+  list l_out = l_cur;
+
+  pips_debug_pvs(1, "Resulting pointer values:\n", l_out);
+
+  (*ctxt->db_put_initial_pv_func)(module_name, l_out);
+
+  pips_debug(1, "end\n");
+  debug_off();
+  reset_current_module_entity();
+  reset_current_module_statement();
+
+  reset_pv();
+
+  return;
+}
+
+static void generic_program_pointer_values(char * prog_name, pv_context *ctxt)
+{
+  entity the_main = get_main_entity();
+  list l_out = NIL;
+  pips_assert("main was found", the_main!=entity_undefined);
+
+  debug_on("POINTER_VALUES_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+  pips_debug(1, "considering program \"%s\" with main \"%s\"\n", prog_name,
+	       module_local_name(the_main));
+  /* Unavoidable pitfall: initializations in uncalled modules may be
+   * taken into account. It all depends on the "create" command.
+     */
+  gen_array_t modules = db_get_module_list();
+  int nmodules = gen_array_nitems(modules);
+  pips_assert("some modules in the program", nmodules>0);
+
+  for(int i=0; i<nmodules; i++)
+    {
+      string module_name = gen_array_item(modules, i);
+      pips_debug(1, "considering module %s\n", module_name);
+
+      set_current_module_entity(module_name_to_entity(module_name));
+      list l_cur = (ctxt->db_get_initial_pv_func)(module_name);
+      pips_debug_pvs(2, "module initial pvs: \n", l_cur);
+      reset_current_module_entity();
+      l_out = gen_nconc(gen_full_copy_list(l_cur), l_out);
+  }
+
+  set_current_module_entity(the_main);
+  pips_debug_pvs(2, "storing program pvs: \n", l_out);
+  reset_current_module_entity();
+
+  (*ctxt->db_put_program_pv_func)(l_out);
+  pips_debug(1, "end\n");
+  debug_off();
   return;
 }
 
@@ -1738,6 +1868,27 @@ bool simple_pointer_values(char * module_name)
   pv_context ctxt = make_simple_pv_context();
   set_methods_for_simple_effects();
   generic_module_pointer_values(module_name, &ctxt);
+  reset_pv_context(&ctxt);
+  generic_effects_reset_all_methods();
+  return(true);
+}
+
+bool initial_simple_pointer_values(char * module_name)
+{
+  pv_context ctxt = make_simple_pv_context();
+  ctxt.initial_pointer_values_p = true;
+  set_methods_for_simple_effects();
+  generic_module_initial_pointer_values(module_name, &ctxt);
+  reset_pv_context(&ctxt);
+  generic_effects_reset_all_methods();
+  return(true);
+}
+
+bool program_simple_pointer_values(char * prog_name)
+{
+  pv_context ctxt = make_simple_pv_context();
+  set_methods_for_simple_effects();
+  generic_program_pointer_values(prog_name, &ctxt);
   reset_pv_context(&ctxt);
   generic_effects_reset_all_methods();
   return(true);

@@ -1778,7 +1778,7 @@ set points_to_unstructured(unstructured uns, set pt_in, bool __attribute__ ((__u
       if(!control_in_set_p(n, Processed))
         Processed = set_add_element(Processed,Processed, (void*)n );
       rtbp_tmp = set_del_element(rtbp_tmp,rtbp_tmp,(void*)n);
-      rtbp_tmp = set_union(rtbp_tmp,rtbp_tmp,ready_to_be_precessed_set(n, Processed, Reachable));
+      rtbp_tmp = set_union(rtbp_tmp,rtbp_tmp,ready_to_be_processed_set(n, Processed, Reachable));
       set_clear(rtbp);
       rtbp = set_assign(rtbp,rtbp_tmp);
     }
@@ -1802,76 +1802,6 @@ set points_to_unstructured(unstructured uns, set pt_in, bool __attribute__ ((__u
 
 
 
-static bool statement_equal_p(statement s1, statement s2)
-{
-    return (statement_ordering(s1) == statement_ordering(s2));
-}
-
-/* test if a control belong to a set */
-bool control_in_set_p(control c, set s)
-{
-bool  in_p = false;
- SET_FOREACH(control, n, s) {
-   if(statement_equal_p(control_statement(c), control_statement(n)))
-     in_p = true;
-  }
- return in_p;
-}
- 
-bool control_equal_p(const void* vc1, const void* vc2)
-{
-  control c1 = (control)vc1;
-  control c2 = (control)vc2;
-  statement s1 = control_statement(c1);
-  statement s2 = control_statement(c2);
-  
-  return statement_ordering(s1) == statement_ordering(s2);
-
-}
-
-/* create a key which is the statement number */
-_uint control_rank( const void *  vc, size_t size)
-{
-  control c = (control)vc;
-  statement s = control_statement(c);
-  string key = strdup(i2a(statement_ordering(s)));
-  return hash_string_rank(key,size);
-}
-
-
-/* A node is ready to be processed if its predecessors are not reachable or processed */
-bool Ready_p(control c, set Processed, set Reachable)
-{ 
-  set Pred =  set_make(set_pointer);
-  list Pred_l = control_predecessors(c);
-  FOREACH(control, ctr, Pred_l) {
-    Pred = set_add_element(Pred, Pred, (void*)ctr);
-  }
-  /* Pred = set_assign_list(Pred,gen_full_copy_list( Pred_l)); */
-  bool ready_p = false;
-  SET_FOREACH(control, p , Pred) {
-    ready_p = set_belong_p(Processed,(void*) p) || !set_belong_p(Reachable,(void*) p); 
-  }
-  return ready_p;
-}
-
-
-/* A set containing all the successors of n that are ready to be processed */
-set ready_to_be_precessed_set(control n, set Processed, set Reachable)
-{
-   set Succ =  set_make(set_pointer);
-   set rtbp =  set_make(set_pointer);
-   list Succ_l = control_successors(n);
-   FOREACH(control, ctr, Succ_l) {
-    Succ = set_add_element(Succ, Succ, (void*)ctr);
-  }
-   /* Succ = set_assign_list(Succ, gen_full_copy_list(Succ_l)); */
-   SET_FOREACH(control, p , Succ){
-     if(Ready_p(p, Processed, Reachable))
-       set_add_element(rtbp, rtbp, (void*)p);
-   }
-   return rtbp;
-}
 
 
 set points_to_recursive_control(control c, set in, __attribute__ ((__unused__))bool store)
@@ -2113,47 +2043,40 @@ set points_to_init(statement s, set pt_in)
 
 
 /* When the declaration of "e" does not contain an initial value, find
-   all allocated pointers in entity e. We distinguish between scalar
-   pointers, array of pointers and struct containing pointers and
-   struct. Return a list of cells each containing a reference to
-   pointer. These cells are used later to build a points-to data
-   structure.  */
+ * all allocated pointers in entity e. We distinguish between scalar
+ * pointers, array of pointers and struct containing pointers and
+ * struct. Return a list of cells each containing a reference to aa
+ * pointer. These cells are used later as sources to build a points-to
+ * data structure pointing to nowhere/undefined.
+ */
 list points_to_init_variable(entity e)
 {
   list l = NIL;
   
-  if (entity_variable_p(e)) 
-    {
-      /*AM: missing recursive descent on variable_dimensions. int a[*(q=p)]*/
+  if (entity_variable_p(e)) {
+    /*AM: missing recursive descent on variable_dimensions. int a[*(q=p)]*/
 
-      if(pointer_type_p(ultimate_type(entity_type(e)))) 
-	{
-	  if (entity_array_p(e)) 
-	    {
-	      expression ind = make_unbounded_expression();
-	      reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
-	      cell c = make_cell_reference(r);
-	      l = CONS(CELL, c, NIL);
-	    }
-	  else {
-	    reference r = make_reference(e, NIL);
-	    cell c = make_cell_reference(r);
-	    l = CONS(CELL, c, NIL);
-	  } 
-	}
-      else {
-	basic b = variable_basic(type_variable(ultimate_type(entity_type(e))));
-	if (basic_derived_p(b)) 
-	  {
-	    entity ee = basic_derived(b);
-	    type t = entity_type(ee);
-	    if (type_struct_p(t)) 
-	      {
-		l = points_to_init_struct(e, ee);
-	      }
-	  }
+    type ut = ultimate_type(entity_type(e));
+    if(pointer_type_p(ut)) {
+      if (entity_array_p(e)) {
+	expression ind = make_unbounded_expression();
+	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
+	cell c = make_cell_reference(r);
+	l = CONS(CELL, c, NIL);
       }
+      else {
+	reference r = make_reference(e, NIL);
+	cell c = make_cell_reference(r);
+	l = CONS(CELL, c, NIL);
+      } 
     }
+    else if(struct_type_p(ut)) {
+      basic b = variable_basic(type_variable(ut));
+      entity ee = basic_derived(b);
+      l = points_to_init_struct(e, ee);
+    }
+  }
+
   /* 	else if (basic_typedef_p(b))  */
   /* 	  { */
   /* 	    l = points_to_init_typedef(e); */
@@ -2165,7 +2088,7 @@ list points_to_init_variable(entity e)
 
 
 
-/* return list of cells for pointers declared directlyor indirecltl in
+/* return list of cells for pointers declared directly or indirecltly in
    variable "e" of type struct defined by entity "ee" */
 list  points_to_init_struct(entity e, entity ee)
 {
@@ -2267,7 +2190,7 @@ list points_to_init_array_of_struct(entity e, entity field)
       
   return l;
 }
-
+
 /* Call to memory allocation intrinsic "free"
  *
  * Compute new points-to nowhere and kill old relations.

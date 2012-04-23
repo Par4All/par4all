@@ -1,4 +1,7 @@
+// FI: goal?
+
 #include <stdio.h>
+
 int main() {
   int *i,j,k;
   k=0;

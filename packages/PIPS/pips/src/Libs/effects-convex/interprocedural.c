@@ -857,12 +857,27 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       } /* case is_syntax_call */
     case is_syntax_cast :
       {
-	/* let us at least generate effects on all memory locations reachable from
-	   the cast expression
+	pips_debug(5, "cast case\n");
+	expression cast_exp = cast_expression(syntax_cast(real_s));
+	type cast_t = expression_to_type(cast_exp);
+	/* we should test here the compatibility of the casted expression type with
+	   the formal entity type. It is not available here, however, I think it's
+	   equivalent to test the compatibility with the real arg expression type
+	   since the current function is called after testing the compatilibty between
+	   the real expression type and the formal parameter type.
 	*/
-	if (!ENDP(l_sum_eff))
+	if (types_compatible_for_effects_interprocedural_translation_p(cast_t, real_arg_t))
 	  {
-	    cast c = syntax_cast(real_s);
+	    l_eff = gen_nconc
+		  (l_eff,
+		   c_convex_effects_on_formal_parameter_backward_translation
+		   (l_sum_eff, cast_exp, context));
+	  }
+	else if (!ENDP(l_sum_eff))
+	  {
+	    /* let us at least generate effects on all memory locations reachable from
+	       the cast expression
+	    */
 	    bool read_p = false, write_p = false;
 	    FOREACH(EFFECT, eff, l_sum_eff)
 	      {
@@ -872,7 +887,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    tag t = write_p ? (read_p ? 'x' : 'w') : 'r';
 	    l_eff = gen_nconc
 	      (l_eff,
-	       c_actual_argument_to_may_summary_effects(cast_expression(c), t));
+	       c_actual_argument_to_may_summary_effects(cast_exp, t));
 	  }
 
 	break;

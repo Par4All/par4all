@@ -11,8 +11,9 @@ Organization of the library
 
   expression.c	recursive expression analysis
 
-  sinks.c	given a points-to in, compute the set of memory locations
-                possibly associated with a lhs expression
+  sinks.c       given a points-to in, compute the set of memory locations
+                possibly associated with a lhs expression either
+                directly or via a memory dereferencing
 
 alias_classes.c
 alias_lists.c
@@ -40,6 +41,14 @@ alias_pairs.c
 
 sav_alias_classes.c
 sav_alias_lists.c
+
+  unstructured.c: to deal with unstructured statements (called from statement.c)
+
+  variable.c: to build the list of pointer locations contained in a
+  variable; there may be many when the variables is an array of
+  structs containing structs and so on...
+
+Temporary or historical files
 
   emami.c: functions developed to implement Emami's algorithm
   assignment.c	analysis of assignment (statement or expression?)
