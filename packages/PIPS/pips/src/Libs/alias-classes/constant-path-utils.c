@@ -148,6 +148,33 @@ cell make_nowhere_cell()
   return sink;
 }
 
+cell make_typed_nowhere_cell(type t)
+{
+  entity e = entity_all_xxx_locations_typed(NOWHERE_LOCATION, t);
+  reference r = make_reference(e, NIL);
+  cell sink = make_cell_reference(r);
+  return sink;
+}
+
+/* assuming source is a reference to a pointer, build the
+ * corresponding sink when the pointer is not initialized, i.e. is
+ * undefined.
+ */
+cell cell_to_nowhere_sink(cell source)
+{
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  cell sink = cell_undefined;
+  if(type_sensitive_p) {
+    // FI: let's hope we create neither sharing nor memory leak
+    bool to_be_freed_p = true;
+    type t = type_to_pointed_type(cell_to_type(source, &to_be_freed_p));
+    sink = make_typed_nowhere_cell(copy_type(t));
+    if(to_be_freed_p) free_type(t);
+  }
+  else
+    sink = make_nowhere_cell();
+  return sink;
+}
 
 /* Already exists in points_to_general_algorithm.c, to be removed later...
    iterate over the lhs_set, if it contains more than an element

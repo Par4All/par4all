@@ -829,6 +829,18 @@ string safe_type_to_string(type t)
     return type_to_string(t);
 }
 
+/* Provide a full ASCII description of type "t"
+ *
+ * FI: I am not sure about the language used.
+ */
+string type_to_full_string_definition(type t)
+{
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  string s = words_to_string(words_type(t, NIL, false));
+  debug_off();
+  return s;
+}
+
 /* SG: I don't understand the previous functions */
 string string_of_type(const type t)
 {
@@ -2600,6 +2612,12 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+bool array_of_pointers_type_p(type t)
+{
+  return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) != NIL));
+}
+
 
 /**
    returns the type pointed by the input type if it is a pointer or an array of pointers
@@ -2670,11 +2688,18 @@ list type_fields(type t)
  * variable of this type.
  *
  * Example : struct foo var;
+ *
+ * Note: arrays of struct are not considered derived types
  */
 bool derived_type_p(type t)
 {
   return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+bool array_of_derived_type_p(type t)
+{
+  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) != NIL));
 }
 
 /* Returns true if t is of type derived and if the derived type is a struct.
@@ -2687,6 +2712,18 @@ bool struct_type_p(type t)
 {
   bool struct_p = false;
   if(derived_type_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    struct_p = type_struct_p(dt);
+  }
+  return struct_p;
+}
+
+bool array_of_struct_type_p(type t)
+{
+  bool struct_p = false;
+  if(array_of_derived_type_p(t)) {
     basic b = variable_basic(type_variable(t));
     entity dte = basic_derived(b);
     type dt = entity_type(dte);
@@ -4382,10 +4419,18 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
+  if(t==NULL)
+    fprintf(stderr, "type is NULL.\n");
+  else if(type_undefined_p(t))
+    fprintf(stderr, "type is undefined.\n");
+  else if(type_domain_number(t)!=type_domain)
+    fprintf(stderr, "The argument is not a type.\n");
+  else {
   // Might be better to pass true, or even more information, to see
   // what happens with the unknown type
   list wl = words_type(t, NIL, false);
   dump_words(wl);
+  }
 }
 
 static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
@@ -4887,6 +4932,16 @@ dimension find_ith_dimension(list dims, int n)
   if(i==n && !ENDP(dims))
     return DIMENSION(CAR(dims));
   return dimension_undefined;
+}
+
+int variable_dimension_number(variable v)
+{
+  int d = 0;
+
+  FOREACH(DIMENSION, cd, variable_dimensions(v))
+    d++;
+
+  return d;
 }
 
 /*

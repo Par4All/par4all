@@ -95,7 +95,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   if(declaration_statement_p(s)) {
     /* Process the declarations */
     pt_out = declaration_statement_to_points_to(s, pt_out);
-    /* Go down recursively, although it is currently useless sinc a
+    /* Go down recursively, although it is currently useless since a
        declaration statement is a call to CONTINUE */
     pt_out = instruction_to_points_to(i, pt_out);
   }
@@ -129,6 +129,20 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     pt_out = points_to_block_projection(pt_out, dl);
   }
 
+  /* Really dangerous here: if pt_map "in" is empty, then pt_map "out"
+   * must be empty to...
+   *
+   * FI: we have a problem to denote unreachable statement. To
+   * associate an empty set to them woud be a way to avoid problems
+   * when merging points-to along different control paths. But you
+   * might also wish to start with an empty set... And anyway, you can
+   * find declarations in dead code...
+   */
+  // FI: a temporary fix to the problem, to run experiments...
+  if(empty_pt_map_p(pt_in) && !declaration_statement_p(s))
+    clear_pt_map(pt_out); // FI: memory leak?
+    
+
   return pt_out;
 }
 
@@ -141,7 +155,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   pt_map pt_out = pt_in;
   //set pt_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
   list l = NIL;
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   list l_decls = statement_declarations(s);
 
@@ -149,7 +163,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   
   FOREACH(ENTITY, e, l_decls) {
     type et = ultimate_type(entity_type(e));
-    if(pointer_type_p(et) || struct_type_p(et)) {
+    if(pointer_type_p(et) || struct_type_p(et) || array_of_struct_type_p(et)) {
       if( !storage_rom_p(entity_storage(e)) ) {
 	// FI: could be simplified with variable_initial_expression()
 	value v_init = entity_initial(e);
@@ -165,17 +179,13 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  /* free_expression(lhs); */
 	}
 	else {
-	  /* Generate nowhere sinks */
-	  /* FI: goes back into Amira's code */
-	  l = points_to_init_variable(e);
-	  FOREACH(CELL, cl, l) {
-	    list l_cl = CONS(CELL, cl, NIL);
-	    // FI: memory leak because of the calls to points_to_nowherexxx
-	    if(type_sensitive_p)
-	      set_union(pt_out, pt_out, points_to_nowhere_typed(l_cl, pt_out));
-	    else
-	      set_union(pt_out, pt_out, points_to_nowhere(l_cl, pt_out));
-	    //FI: free l_cl?
+	  l = variable_to_pointer_locations(e);
+	  FOREACH(CELL, source, l) {
+	    cell sink = cell_to_nowhere_sink(source); 
+	    points_to pt = make_points_to(source, sink,
+					  make_approximation_must(),
+					  make_descriptor_none());
+	    add_arc_to_pt_map(pt, pt_out);
 	  }
 	}
       }
@@ -221,11 +231,10 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_call: {
     call c = instruction_call(i);
-    // list al = call_arguments(c);
-    /* Take care of side effects: no they are processed recursively */
-    // pt_out = expressions_to_points_to(al, pt_in);
-    /* Take care of the direct effects */
-    pt_out = call_to_points_to(c, pt_out);
+    if(empty_pt_map_p(pt_in))
+      pt_out = pt_in;
+    else
+      pt_out = call_to_points_to(c, pt_out);
     break;
   }
   case is_instruction_unstructured: {
@@ -244,19 +253,10 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_expression: {
     expression e = instruction_expression(i);
-    /* Do not bother with side-effects. They will be taken care of
-       recursively */
-    /*
-    if(expression_call_p(e)) {
-      call c = syntax_call(expression_syntax(e));
-      list al = call_arguments(c);
-      // Take care of side effects
-      pt_out = expressions_to_points_to(al, pt_in);
-    }
-    else
+    if(empty_pt_map_p(pt_in))
       pt_out = pt_in;
-    */
-    pt_out = expression_to_points_to(e, pt_in);
+    else
+      pt_out = expression_to_points_to(e, pt_in);
     break;
   }
   default:
@@ -286,79 +286,59 @@ pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
  */
 pt_map test_to_points_to(test t, pt_map pt_in)
 {
-  pt_map pt_out = pt_in;
+  pt_map pt_out = pt_map_undefined;
 
   //bool store = true;
   // pt_out = points_to_test(t, pt_in, store);
   // Translation of points_to_test
   statement ts = test_true(t);
   statement fs = test_false(t);
-  pt_map pt_t = new_pt_map();
-  pt_map pt_f = new_pt_map();
+  pt_map pt_t =  pt_map_undefined;
+  pt_map pt_f = pt_map_undefined;
+
+  pt_map pt_in_t = full_copy_pt_map(pt_in);
+  pt_map pt_in_f = full_copy_pt_map(pt_in);
+
   
   /* condition's side effect and information are taked into account, e.g.:
    *
    * "if(p=q)" or "if(*p++)" or "if(p)" which implies p->NULL in the
    * else branch. FI: to be checked with test cases */
   expression c = test_condition(t);
-  // FI: we need something specific for conditions to handle NULL tests
-  // something like comdition_to_points_to(c, in, true_p)
-  pt_out = expression_to_points_to(c, pt_in);
+  if(!empty_pt_map_p(pt_in_t)) // FI: we are in dead code
+    pt_in_t = condition_to_points_to(c, pt_in_t, true);
+  pt_t = statement_to_points_to(ts, pt_in_t);
 
-  // FI: we need a copy of this current pt_out for the analysis of the
-  // false branch
-  pt_map pt_in_f = new_pt_map();
-  assign_pt_map(pt_in_f, pt_out);
+  if(!empty_pt_map_p(pt_in_f)) // FI: we are in dead code
+    pt_in_f = condition_to_points_to(c, pt_in_f, false);
+  pt_f = statement_to_points_to(fs, pt_in_f);
   
-  pt_t = statement_to_points_to(ts, pt_out);
-
-  if(empty_statement_p(fs)) // FI Micro optimization...
-    pt_f = set_assign(pt_f, pt_out);
-  else
-    pt_f = statement_to_points_to(fs, pt_in_f);
-  
-  // FI: oops, what happens to objects in memory?
-  // Should we free the old pt_out/pt_in?
-  // pt_map_free(pt_out)
-  free_pt_map(pt_in_f);
   pt_out = merge_points_to_set(pt_t, pt_f);
-  // pt_map_free(pt_t), pt_map_free(pt_f);
 
-  // FI: I do not understand with the necessary projections are not
-  // performed recursively at a lower level (in fact, they are...
+  // FI: we should take care of pt_t and pt_f to avoid memory leaks
+  // In that specific case, clear_pt_map() and free_pt_map() should be ok
 
-  // FI: I do not understand how the merge stuff works twice
-
-  /*
-  list tdl = statement_declarations(ts);
-  if(declaration_statement_p(ts) && !ENDP(tdl)){
-    // pt_out = points_to_block_projection(pt_out, tdl);
-    pt_out = merge_points_to_set(pt_out, pt_in);
-  }
-
-  list fdl = statement_declarations(fs);
-  if(declaration_statement_p(fs) && !ENDP(fdl)) {
-    // pt_out = points_to_block_projection(pt_out, fdl);
-    pt_out = merge_points_to_set(pt_out, pt_in);
-  }
-  */
+  free_pt_map(pt_t), free_pt_map(pt_f);
 
   return pt_out;
 }
 
+/* FI: I assume that pointers and pointer arithmetic cannot appear in
+ * a do loop, "do p=q, r, 1" is possible with "p", "q" and "r"
+ * pointing towards the same array... Let's hope the do loop
+ * conversion does not catch such cases.
+ */
 pt_map loop_to_points_to(loop l, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  bool store = false;
-  pt_out = points_to_loop(l, pt_in, store);
-
-  /* This sequence has been factored out in statement_to_points_to() */
-  /*
-  statement ls = loop_body(l);
-  list dl = statement_declarations(ls);
-  if(declaration_statement_p(ls) && !ENDP(dl))
-    pt_out = points_to_block_projection(pt_out, dl);
-  */
+  statement b = loop_body(l);
+  //bool store = false;
+  //pt_out = points_to_loop(l, pt_in, store);
+  pt_out = any_loop_to_points_to(b,
+				 expression_undefined,
+				 expression_undefined,
+				 expression_undefined,
+				 pt_in);
 
   return pt_out;
 }
@@ -407,7 +387,7 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
  */
 pt_map any_loop_to_points_to(statement b,
 			     expression init, // can be undefined
-			     expression c,
+			     expression c, // can be undefined
 			     expression inc, // ca be undefined
 			     pt_map pt_in)
 {
@@ -417,12 +397,15 @@ pt_map any_loop_to_points_to(statement b,
   //                              points_to_rank);
   // pt_map cur = new_pt_map();
   int i = 0;
-  int k = get_int_property("POINTS_TO_K_LIMITING");
+  // FI: k is linked to the cycles in points-to graph, and should not
+  // be linked to the number of convergence iterations
+  int k = get_int_property("POINTS_TO_K_LIMITING")+10;
 
   /* First, enter the loop: initialization + condition check */
   if(!expression_undefined_p(init))
     pt_out = expression_to_points_to(init, pt_out);
-  pt_out = expression_to_points_to(c, pt_out);
+  if(!expression_undefined_p(c))
+    pt_out = condition_to_points_to(c, pt_out, true);
   // pt_in = points_to_expression(exp_inc, pt_in, true);
 
   /* pt_out(i) = f(pt_out(i-1)) U pt_out(i-1)
@@ -430,7 +413,9 @@ pt_map any_loop_to_points_to(statement b,
    * prev = pt_out(i-1)
    */
   pt_map prev = new_pt_map();
-  for(i = 0; i< k; i++){
+  // FI: it should be a while loop to reach convergence
+  // FI: I keep it a forloop for safety
+  for(i = 0; i<k+2 ; i++){
     /* prev receives the current points-to information, pt_out */
     set_clear(prev);
     prev = set_assign(prev, pt_out);
@@ -445,12 +430,13 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = expression_to_points_to(inc, pt_out);
     // FI: should be condition_to_points_to() for conditions such as
     // while(p!=q);
-    // The condition is always defined
-    pt_out = expression_to_points_to(c, pt_out);
+    // The condition is not always defined (do loops)
+    if(!expression_undefined_p(c))
+      pt_out = condition_to_points_to(c, pt_out, true);
 
     /* Perform the k-limiting on the latest points to information */
-    int k = get_int_property("POINTS_TO_K_LIMITING");
-    pt_out = k_limit_points_to(pt_out, k);
+    //int k = get_int_property("POINTS_TO_K_LIMITING");
+    //pt_out = k_limit_points_to(pt_out, k);
 
     // set_clear(pt_in); is pt_in useful?
 
@@ -473,6 +459,9 @@ pt_map any_loop_to_points_to(statement b,
   /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
      information is changed accordingly. */
   pt_out = points_to_independent_store(pt_out);
+  /* The condition must be false when exiting the loop */
+  if(!expression_undefined_p(inc))
+    pt_out = condition_to_points_to(c, pt_out, false);
 
   return pt_out;
 }
@@ -540,7 +529,7 @@ pt_map unstructured_to_points_to(unstructured u, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
 
-  pt_out = points_to_unstructured(u, pt_in, true);
+  pt_out = new_points_to_unstructured(u, pt_in, true);
 
   // FI: The storage should be performed at a higher level?
   // points_to_storage(pt_out,current,true);

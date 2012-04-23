@@ -791,24 +791,45 @@ list effect_intermediary_pointer_paths_effect(effect eff)
 		if (!ENDP(ref_inds))
 		  {
 		    pips_debug(5,"and ref_inds is not empty\n");
-		    effect tmp_eff =
-		      make_effect(make_cell_reference(copy_reference(tmp_ref)),
-				  copy_action(effect_action(eff)),
-				  copy_approximation(effect_approximation(eff)),
-				  copy_descriptor(d));
+		    int nb_phi_tmp_eff = (int) gen_length(reference_indices(tmp_ref));
+		    effect tmp_eff = effect_undefined;
 		    if (descriptor_convex_p(d))
 		      {
-			int nb_phi_tmp_eff = (int) gen_length(reference_indices(tmp_ref));
-			for(int nphi = nb_phi_tmp_eff; nphi <= nb_phi_init; nphi++)
+			if (nb_phi_tmp_eff == 0)
 			  {
-			    extern void convex_region_descriptor_remove_ith_dimension(effect, int);
-			    convex_region_descriptor_remove_ith_dimension(tmp_eff, nphi);
+			    tmp_eff =
+			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
+					  copy_action(effect_action(eff)),
+					  copy_approximation(effect_approximation(eff)),
+					  make_descriptor_convex(sc_new()));
+			  }
+			else
+			  {
+			    tmp_eff =
+			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
+					  copy_action(effect_action(eff)),
+					  copy_approximation(effect_approximation(eff)),
+					  copy_descriptor(d));
+			    for(int nphi = nb_phi_tmp_eff; nphi <= nb_phi_init; nphi++)
+			      {
+				extern void convex_region_descriptor_remove_ith_dimension(effect, int);
+				convex_region_descriptor_remove_ith_dimension(tmp_eff, nphi);
+			      }
 			  }
 		      }
 		    else if (!descriptor_none_p(d))
 		      {
 			pips_internal_error("invalid effect descriptor kind\n");
 		      }
+		    else
+		      {
+			tmp_eff =
+			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
+					  copy_action(effect_action(eff)),
+					  copy_approximation(effect_approximation(eff)),
+					  make_descriptor_none());
+		      }
+
 		    l_res = CONS(EFFECT, tmp_eff, l_res);
 		    reference_indices(tmp_ref) =
 		      gen_nconc(reference_indices(tmp_ref),

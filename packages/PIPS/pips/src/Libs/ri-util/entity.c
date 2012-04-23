@@ -1274,8 +1274,37 @@ bool std_file_entity_p(entity e)
          || same_entity_p(e, stderr_ent));
 }
 
+/* Dummy standard files targets */
 
 
+entity std_file_entity_to_pointed_file_entity(entity e)
+{
+  string std_file_name;
+  static string std_file_target_suffix = "";
+  if (stdin_entity_p(e)) std_file_name = "stdin";
+  else if (stdout_entity_p(e)) std_file_name = "stdout";
+  else std_file_name = "stderr";
+
+  string target_name;
+  asprintf(&target_name,"__%s__%s", std_file_name, std_file_target_suffix);
+
+  entity target = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				     target_name);
+
+  if (type_undefined_p(entity_type(target)))
+    {
+      type t = entity_type(e);
+      entity_type(target) = basic_pointer(variable_basic(type_variable(t)));
+      entity_storage(target) = make_storage(is_storage_ram,
+				       make_ram(FindOrCreateTopLevelEntity(IO_EFFECTS_PACKAGE_NAME),
+						FindEntity(IO_EFFECTS_PACKAGE_NAME,
+							   STATIC_AREA_LOCAL_NAME),
+						0, NIL));
+      entity_kind(target) =  EFFECTS_PACKAGE;
+    }
+
+  return target;
+}
 
 bool intrinsic_entity_p(entity e)
 {
@@ -1986,6 +2015,33 @@ bool some_main_entity_p(void)
   gen_array_full_free(modules);
   return some_main;
 }
+
+
+entity
+get_main_entity(void)
+{
+    entity m;
+    gen_array_t modules = db_get_module_list();
+    int nmodules = gen_array_nitems(modules), i;
+    pips_assert("some modules in the program", nmodules>0);
+
+    for (i=0; i<nmodules; i++)
+    {
+	m = module_name_to_entity(gen_array_item(modules, i));
+	if (entity_main_module_p(m)) {
+	    gen_array_full_free(modules);
+	    return m;
+	}
+    }
+
+    /* ??? some default if there is no main... */
+    pips_user_warning("no main found, returning %s instead\n",
+		      gen_array_item(modules,0));
+    m = module_name_to_entity(gen_array_item(modules, 0));
+    gen_array_full_free(modules);
+    return m;
+}
+
 
 /* @return the list of entities in module the name of which is given
  * warning: the entity is created if it does not exist!
