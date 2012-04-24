@@ -231,19 +231,25 @@ set points_to_source_projection(set pts, entity e)
   return pts;
 }
 
-
+/* FI: side-effects to be used in this function */
 set points_to_function_projection(set pts)
 {
   set res = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
   set_assign(res, pts);
+  /* Do we have a useful return value? */
+  type ft = ultimate_type(entity_type(get_current_module_entity()));
+  type rt = ultimate_type(functional_result(type_functional(ft)));
+  entity rv = entity_undefined;
+  if(pointer_type_p(rt))
+    rv = function_to_return_value(get_current_module_entity());
 
   SET_FOREACH(points_to, pt, pts) {
     if(cell_out_of_scope_p(points_to_source(pt))) {
       /* Preserve the return value */
       reference r = cell_any_reference(points_to_source(pt));
       entity v = reference_variable(r);
-      if(function_to_return_value(get_current_module_entity())!=v)
+      if(rv!=v)
 	set_del_element(res, res, (void*)pt);
     }
   }

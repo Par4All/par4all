@@ -530,6 +530,29 @@ void print_points_to_cells(list cl)
   fprintf(stderr, "\n");
 }
 
+/* Points-to cannot used any kind of reference, just constant references */
+reference simplified_reference(reference r)
+{
+  list sl = reference_indices(r);
+  list nsl = NIL;
+
+  FOREACH(EXPRESSION, s, sl) {
+    value v = EvalExpression(s);
+    expression ns = expression_undefined;
+    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+      int cs = constant_int(value_constant(v));
+      ns = int_to_expression(cs);
+    }
+    else {
+      ns = make_unbounded_expression();
+    }
+    nsl = gen_nconc(nsl, CONS(EXPRESSION, ns, NIL));
+  }
+
+  entity var = reference_variable(r);
+  reference nr = make_reference(var, nsl);
+  return nr;
+}
 
  /* Returns a list of memory cells "sinks" possibly accessed by the evaluation
   * of reference "r". No sharing between the returned list "sinks" and
@@ -588,7 +611,8 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     }
     else if(nd==rd) {
       // FI: eval_p is not used here...
-      cell nc = make_cell_reference(copy_reference(r));
+      reference nr = simplified_reference(r);
+      cell nc = make_cell_reference(nr);
       sinks = CONS(CELL, nc, NIL);
     }
     else { // rd is too big

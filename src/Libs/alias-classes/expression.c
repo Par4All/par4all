@@ -44,8 +44,8 @@
 //#include "parser_private.h"
 //#include "syntax.h"
 //#include "top-level.h"
-//#include "text-util.h"
-//#include "text.h"
+#include "text-util.h"
+#include "text.h"
 #include "properties.h"
 //#include "pipsmake.h"
 //#include "semantics.h"
@@ -1166,7 +1166,71 @@ pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool tru
 			entity_local_name(f));
   return out;
 }
-
+
+/* See if you can decide that the addresses linked to c1 are smaller
+ * than the addresses linked to c2.
+ *
+ * True is returned when a decision can be made.
+ *
+ * False is returned when no decision can be made.
+ */
+bool cell_is_less_or_equal_p(cell c1, cell c2)
+{
+  bool less_or_equal_p = true;
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+  if(v1!=v2) {
+    less_or_equal_p = false; // FI: useless, but the pips_user_error() may be removed
+    pips_user_error("Incomparable pointers to \"%s\" and \"%s\" are compared.\n",
+		    words_to_string(words_reference(r1, NIL)),
+		    words_to_string(words_reference(r2, NIL)));
+  }
+  else {
+    /* You must compare the subscript expressions lexicographically */
+    list sl1 = reference_indices(r1), sl1c = sl1;
+    list sl2 = reference_indices(r2), sl2c = sl2;
+    for(sl1c = sl1;
+	!ENDP(sl1c) && !ENDP(sl2c) && less_or_equal_p;
+	sl1c = CDR(sl1c), sl2c = CDR(sl2c)) {
+      expression s1 = EXPRESSION(CAR(sl1c));
+      expression s2 = EXPRESSION(CAR(sl2c));
+      if(unbounded_expression_p(s1) || unbounded_expression_p(s2))
+	less_or_equal_p = false;
+      else {
+	value v1 = EvalExpression(s1);
+	value v2 = EvalExpression(s2);
+	if(!value_constant_p(v1) || !value_constant_p(v2)) {
+	  // FI: this should be a pips_internal_error due to
+	  // constraints on points_to sets
+	  less_or_equal_p = false;
+	  pips_internal_error("Unexpected subscripts in points-to.\n");
+	}
+	else {
+	  constant c1 = value_constant(v1);
+	  constant c2 = value_constant(v2);
+	  if(!constant_int_p(c1) || !constant_int_p(c2)) {
+	    less_or_equal_p = false;
+	    pips_internal_error("Unexpected subscripts in points-to.\n");
+	  }
+	  else {
+	    int i1 = constant_int(c1);
+	    int i2 = constant_int(c2);
+	    // FI: you should break when i1<i2
+	    less_or_equal_p = (i1<=i2);
+	  }
+	}
+      }
+    }
+    // FI: Not good for a lexicographic order, might need equal_p as
+    // well, but sufficient for arithmetic02
+    //if(less_or_equal_p && !ENDP(sl1c))
+    //  less_or_equal_p = false;
+  }
+  return less_or_equal_p;
+}
+
 pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
 {
   pt_map out = in;
@@ -1244,6 +1308,51 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
     }
     free_type(lhst), free_type(rhst);
     ;//FI FI FI
+  }
+  if((ENTITY_LESS_OR_EQUAL_P(f) && true_p)
+     || (ENTITY_GREATER_THAN_P(f) && !true_p)) {
+    expression lhs = EXPRESSION(CAR(al));
+    type lhst = expression_to_type(lhs);
+    expression rhs = EXPRESSION(CAR(CDR(al)));
+    type rhst = expression_to_type(rhs);
+    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sinks(lhs, in);
+      if(gen_length(L)==1) { // FI: one fixed bound
+	cell lc = CELL(CAR(L));
+	list RR = expression_to_points_to_sources(rhs, in);
+	SET_FOREACH(points_to, pt, out) {
+	  cell source = points_to_source(pt);
+	  if(cell_in_list_p(source, RR)) {
+	    cell sink = points_to_sink(pt);
+	    if(!cell_is_less_or_equal_p(lc, sink)) {
+	      // FI: Oops in middle of the iterator...
+	      remove_arc_from_pt_map(pt, out);
+	    }
+	  }
+	}
+      }
+      else {
+	list R = expression_to_points_to_sinks(rhs, in);
+	if(gen_length(R)==1) { // FI: one fixed bound
+	  cell rc = CELL(CAR(R));
+	  list LL = expression_to_points_to_sources(lhs, in);
+	  SET_FOREACH(points_to, pt, out) {
+	    cell source = points_to_source(pt);
+	    if(cell_in_list_p(source, LL)) {
+	      cell sink = points_to_sink(pt);
+	      // FI: this test is wrong because the negation cannot be
+	      // used when false means "unknown"
+	      if(!cell_is_less_or_equal_p(sink, rc)) {
+		// FI: Oops in middle of the iterator...
+		remove_arc_from_pt_map(pt, out);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    free_type(lhst), free_type(rhst);
+    ; //FI FI FI
   }
   else {
     // Do nothing for other relational operators such as ">"
