@@ -175,7 +175,8 @@ static void vec_imul(vec_p* pvec, qval_t coeff) {
 		vec_clear(pvec);
 	}
 	else {
-		for (vec_p vec = *pvec; vec != VEC_NULL; vec = vec->succ) {
+		vec_p vec;
+		for (vec = *pvec; vec != VEC_NULL; vec = vec->succ) {
 			qval_mul(vec->coeff, vec->coeff, coeff);
 		}
 	}
@@ -357,7 +358,8 @@ typedef table_s table_t[1];
 static void table_init(table_p tbl, int nbconstrs) {
 	constr_init(tbl->obj);
 	tbl->constrs = safe_malloc(nbconstrs * sizeof(constr_t));
-	for (int i = 0; i < nbconstrs; i++) {
+	int i;
+	for (i = 0; i < nbconstrs; i++) {
 		constr_init(tbl->constrs[i]);
 	}
 	tbl->nbvars = 0;
@@ -366,7 +368,8 @@ static void table_init(table_p tbl, int nbconstrs) {
 
 static void table_clear(table_p tbl) {
 	constr_clear(tbl->obj);
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_clear(tbl->constrs[i]);
 	}
 	free(tbl->constrs);
@@ -377,7 +380,8 @@ static void table_clear(table_p tbl) {
 #define table_get_nbconstrs(tbl) ((tbl)->nbconstrs)
 
 static void table_makepos(table_p tbl) {
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_makepos(tbl->constrs[i]);
 	}
 }
@@ -385,10 +389,11 @@ static void table_makepos(table_p tbl) {
 static void table_addsignvars(table_p tbl) {
 	// first, we try to determine the sign of variables
 	static int vars_info[VAR_MAXNB]; // -1 negative or null, +1 positive or null, 0 unknown
-	for (int i = 0; i < VAR_MAXNB; i++) {
+	int i;
+	for (i = 0; i < VAR_MAXNB; i++) {
 		vars_info[i] = 0;
 	}
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
 		vec_p vec = constr->vec;
 		if (vec != VEC_NULL && vec->succ == VEC_NULL) {
@@ -409,9 +414,10 @@ static void table_addsignvars(table_p tbl) {
 		}
 	}
 	// negative variables are inverted
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
-		for (vec_p vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
+		vec_p vec;
+		for (vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
 			var_t var = vec->var;
 			if (vars_info[var] < 0) {
 				qval_neg(vec->coeff, vec->coeff);
@@ -419,7 +425,8 @@ static void table_addsignvars(table_p tbl) {
 		}
 	}
 	// unknown sign variables are split
-	for (var_t var = tbl->nbvars - 1; var >= 0; var--) {
+	var_t var;
+	for (var = tbl->nbvars - 1; var >= 0; var--) {
 		if (vars_info[var] == 0) {
 			vars_info[var] = tbl->nbvars;
 			tbl->nbvars++;
@@ -431,9 +438,10 @@ static void table_addsignvars(table_p tbl) {
 	// and then, injected into constraints
 	qval_t coeff;
 	qval_init(coeff);
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
-		for (vec_p vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
+		vec_p vec;
+		for (vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
 			var_t var = vec->var;
 			if (vars_info[var] != VAR_NULL) {
 				qval_neg(coeff, vec->coeff);
@@ -447,7 +455,8 @@ static void table_addsignvars(table_p tbl) {
 static void table_addofsvars(table_p tbl) {
 	qval_t one;
 	qval_init(one); qval_set_i(one, 1, 1);
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
 		if (constr->rel == CONSTR_LE) {
 			vec_append_atfirst(&constr->vec, tbl->nbvars, one);
@@ -484,7 +493,8 @@ static void table_canonicalize(table_p tbl) {
 
 static void table_set_obj(table_p tbl) {
 	constr_p obj = tbl->obj;
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
 		constr_iadd(obj, constr);
 	}
@@ -493,7 +503,8 @@ static void table_set_obj(table_p tbl) {
 static void table_addobjvars(table_p tbl) {
 	qval_t one;
 	qval_init(one); qval_set_i(one, 1, 1);
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_p constr = tbl->constrs[i];
 		assert(qval_cmp_i(constr->cst, 0, 1) >= 0);
 		if (!qval_equal_i(constr->cst, 0, 1)) {
@@ -520,7 +531,8 @@ static var_t table_get_pivotvar(table_p tbl) {
 	// Bland's rule: find the lowest-numbered variable with negative value in the
 	// objective
 	var_t var = VAR_NULL;
-	for (vec_p vec = tbl->obj->vec; vec != VEC_NULL; vec = vec->succ) {
+	vec_p vec;
+	for (vec = tbl->obj->vec; vec != VEC_NULL; vec = vec->succ) {
 		if (qval_cmp_i(vec->coeff, 0, 1) > 0) {
 			var = vec->var;
 		}
@@ -533,11 +545,13 @@ static var_t table_get_assocvar(table_p tbl, int row) {
 		qval_t tmp;
 		qval_init(tmp);
 		constr_p constr = tbl->constrs[row];
-		for (vec_p vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
+		vec_p vec;
+		for (vec = constr->vec; vec != VEC_NULL; vec = vec->succ) {
 			if (qval_equal_i(vec->coeff, 1, 1)) {
 				var_t var = vec->var;
 				bool unitcol = true;
-				for (int i = 0; i < tbl->nbconstrs; i++) {
+				int i;
+				for (i = 0; i < tbl->nbconstrs; i++) {
 					if (i != row) {
 						constr_get_coeff(tmp, tbl->constrs[i], var);
 						if (!qval_equal_i(tmp, 0, 1)) {
@@ -564,7 +578,8 @@ static int table_get_pivotrow(table_p tbl, var_t var) {
 		var_t pivot_assoc = VAR_NULL;
 		qval_t pivot_ratio, ratio;
 		qval_init(pivot_ratio); qval_init(ratio);
-		for (int i = 0; i < tbl->nbconstrs; i++) {
+		int i;
+		for (i = 0; i < tbl->nbconstrs; i++) {
 			constr_p constr = tbl->constrs[i];
 			constr_get_coeff(ratio, constr, var);
 			if (qval_cmp_i(ratio, 0, 1) > 0) {
@@ -606,7 +621,8 @@ static void table_apply_pivot(table_p tbl, var_t var, int row) {
 	qval_clear(coeff);
 	// then is substracted from other constraints s.t. the coefficient on var is 0
 	constr_apply_pivot(tbl->obj, var, constr);
-	for (int i = 0; i < tbl->nbconstrs; i++) {
+	int i;
+	for (i = 0; i < tbl->nbconstrs; i++) {
 		if (i != row) {
 			constr_apply_pivot(tbl->constrs[i], var, constr);
 		}
@@ -649,7 +665,8 @@ static bool table_get_feasibility(table_p tbl) {
 static int NOWUNUSED table_fprint(FILE* stream, table_p tbl) {
 	int c = constr_fprint(stream, tbl->obj);
 	c += fprintf(stream, "\n");
-	for (int i = 0; i < 40; i++) {
+	int i;
+	for (i = 0; i < 40; i++) {
 		c += fprintf(stream, "-");
 	}
 	c += fprintf(stream, "\n");
@@ -657,7 +674,7 @@ static int NOWUNUSED table_fprint(FILE* stream, table_p tbl) {
 		c += fprintf(stream, "true\n");
 	}
 	else {
-		for (int i = 0; i < tbl->nbconstrs; i++) {
+		for (i = 0; i < tbl->nbconstrs; i++) {
 			c += fprintf(stream, "(%2d: ", i);
 			c += var_fprint(stream, table_get_assocvar(tbl, i));
 			c += fprintf(stream, ") ");
@@ -665,7 +682,7 @@ static int NOWUNUSED table_fprint(FILE* stream, table_p tbl) {
 			c += fprintf(stream, "\n");
 		}
 	}
-	for (int i = 0; i < 40; i++) {
+	for (i = 0; i < 40; i++) {
 		c += fprintf(stream, "-");
 	}
 	c += fprintf(stream, "\n");
@@ -690,7 +707,8 @@ static void vartbl_init(vartbl_p vartbl) {
 #define vartbl_clear(vartbl)
 
 static var_t vartbl_find(vartbl_p vartbl, Variable name) {
-	for (int i = 0; i < vartbl->nbvars; i++) {
+	int i;
+	for (i = 0; i < vartbl->nbvars; i++) {
 		if (vartbl->names[i] == name) {
 			return i;
 		}
@@ -716,7 +734,8 @@ static void vec_set_vecteur(vartbl_t vartbl, vec_p* pvec, Pvecteur vec) {
 static void constr_set_contrainte(vartbl_t vartbl, constr_p constr1, Pcontrainte constr2, bool is_ineq) {
 	vec_set_vecteur(vartbl, &constr1->vec, constr2->vecteur);
 	constr1->rel = is_ineq ? CONSTR_LE : CONSTR_EQ;
-	for (Pvecteur vec = constr2->vecteur; vec != NULL; vec = vec->succ) {
+	Pvecteur vec;
+	for (vec = constr2->vecteur; vec != NULL; vec = vec->succ) {
 		if (vec->var == TCST) {
 			qval_set_i(constr1->cst, -vec->val, 1);
 			break;
@@ -729,11 +748,12 @@ static void table_init_set_systeme(table_p tbl, Psysteme sys) {
 	vartbl_init(vartbl);
 	table_init(tbl, sys->nb_eq + sys->nb_ineq);
 	int i = 0;
-	for (Pcontrainte constr = sys->egalites; constr != NULL; constr = constr->succ) {
+	Pcontrainte constr;
+	for (constr = sys->egalites; constr != NULL; constr = constr->succ) {
 		constr_set_contrainte(vartbl, tbl->constrs[i], constr, false);
 		i++;
 	}
-	for (Pcontrainte constr = sys->inegalites; constr != NULL; constr = constr->succ) {
+	for (constr = sys->inegalites; constr != NULL; constr = constr->succ) {
 		constr_set_contrainte(vartbl, tbl->constrs[i], constr, true);
 		i++;
 	}

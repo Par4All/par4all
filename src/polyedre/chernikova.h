@@ -134,14 +134,16 @@ static void catch_alarm_sc_convex_hull(int sig NOWUNUSED) {
 
 static zval_t* zvec_alloc(unsigned nbvals) {
 	zval_t* zvec = safe_malloc(nbvals * sizeof(zval_t));
-	for (int i = 0; i < (int) nbvals; i++) {
+	int i;
+	for (i = 0; i < (int) nbvals; i++) {
 		zval_init(zvec[i]);
 	}
 	return zvec;
 }
 
 static void zvec_free(zval_t* zvec, unsigned nbvals) {
-	for (int i = 0; i < (int) nbvals; i++) {
+	int i;
+	for (i = 0; i < (int) nbvals; i++) {
 		zval_clear(zvec[i]);
 	}
 	free(zvec);
@@ -156,7 +158,8 @@ static void NOWUNUSED zvec_safe_free(zval_t* zvec, unsigned nbvals) {
 static void zvec_swap(zval_t* zvec1, zval_t* zvec2, unsigned nbvals) {
 	zval_t tmp;
 	zval_init(tmp);
-	for (unsigned i = 0; i < nbvals; i++) {
+	unsigned i;
+	for (i = 0; i < nbvals; i++) {
 		zval_set(tmp, zvec1[i]);
 		zval_set(zvec1[i], zvec2[i]);
 		zval_set(zvec2[i], tmp);
@@ -165,7 +168,8 @@ static void zvec_swap(zval_t* zvec1, zval_t* zvec2, unsigned nbvals) {
 }
 
 static void zvec_set_i(zval_t* zvec, long val, unsigned nbvals) {
-	for (unsigned i = 0; i < nbvals; i++) {
+	unsigned i;
+	for (i = 0; i < nbvals; i++) {
 		zval_set_i(zvec[i], val);
 	}
 }
@@ -174,7 +178,8 @@ static void zvec_copy(zval_t* zvec1, zval_t* zvec2, unsigned nbvals) {
 	zval_t* cv1, * cv2;
 	cv1 = zvec1;
 	cv2 = zvec2;
-	for (unsigned i = 0; i < nbvals; i++)  {
+	unsigned i;
+	for (i = 0; i < nbvals; i++)  {
 		zval_set(*cv2++,*cv1++);
 	}
 }
@@ -184,7 +189,8 @@ static void zvec_combine(zval_t* zvec1, zval_t* zvec2, zval_t* zvec3,
 		zval_t lambda, zval_t mu, unsigned nbvals) {
 	zval_t tmp;
 	zval_init(tmp);
-	for (unsigned i = 0; i < nbvals; i++) {
+	unsigned i;
+	for (i = 0; i < nbvals; i++) {
 		zval_mul(tmp, lambda, zvec1[i]);
 		zval_addmul(tmp, mu, zvec2[i]);
 		zval_set(zvec3[i], tmp);
@@ -195,13 +201,15 @@ static void zvec_combine(zval_t* zvec1, zval_t* zvec2, zval_t* zvec3,
 // set zvec2 to 1/lambda * zvec1
 static void zvec_antiscale(zval_t* zvec1, zval_t* zvec2,
 		zval_t lambda, unsigned nbvals) {
-	for (unsigned i = 0; i < nbvals; i++) {
+	unsigned i;
+	for (i = 0; i < nbvals; i++) {
 		zval_div(zvec2[i], zvec1[i], lambda);
 	}
 }
 
 static void zvec_neg(zval_t* zvec1, zval_t* zvec2, unsigned nbvals) {
-	for (unsigned i = 0; i < nbvals; i++) {
+	unsigned i;
+	for (i = 0; i < nbvals; i++) {
 		zval_neg(zvec2[i], zvec1[i]);
 	}
 }
@@ -277,7 +285,7 @@ static void zvec_gcd(zval_t* zvec, unsigned nbvals, zval_t *pgcd) {
 		}
 	}
 	while (notzero);
-	for(i = 0; i < (int) nbvals; i++) {
+	for (i = 0; i < (int) nbvals; i++) {
 		zval_clear(vals[i]);
 	}
 	free(vals);
@@ -299,7 +307,8 @@ static int NOWUNUSED zvec_fprint(FILE* stream, zval_t* zvec, unsigned nbvals) {
 	if (nbvals != 0) {
 		c += zval_fprint(stream, zvec[0]);
 	}
-	for (unsigned i = 1; i < nbvals; i++) {
+	unsigned i;
+	for (i = 1; i < nbvals; i++) {
 		c += fprintf(stream, ", ");
 		c += zval_fprint(stream, zvec[i]);
 	}
@@ -335,7 +344,8 @@ static zmat_p zmat_alloc(unsigned nbrows, unsigned nbcols) {
 		zval_t** vals = safe_malloc(nbrows * sizeof(zval_t*));
 		zmat->rawvals = rawvals;
 		zmat->vals = vals;
-		for (int i = 0; i < (int) nbrows; i++) {
+		int i;
+		for (i = 0; i < (int) nbrows; i++) {
 			*vals++ = rawvals;
 			rawvals += nbcols;
 		}
@@ -362,11 +372,12 @@ static void NOWUNUSED zmat_safe_free(zmat_p zmat) {
 // add rows to the matrix
 static void zmat_extend(zmat_p zmat, unsigned nbrows) {
 	zmat->vals = safe_realloc(zmat->vals, nbrows * sizeof(zval_t*));
+	int i;
 	if (zmat->nbvals < nbrows * zmat->nbcols) {
 		zmat->rawvals = safe_realloc(zmat->rawvals, nbrows * zmat->nbcols * sizeof(zval_t));
 		zvec_set_i(zmat->rawvals + zmat->nbrows * zmat->nbcols, 0,
 				 zmat->nbvals - zmat->nbrows * zmat->nbcols);
-		for (int i = (int) zmat->nbvals; i < (int) (zmat->nbcols * nbrows); i++) {
+		for (i = (int) zmat->nbvals; i < (int) (zmat->nbcols * nbrows); i++) {
 			zval_init(zmat->rawvals[i]);
 		}
 		zmat->nbvals = zmat->nbcols*nbrows;
@@ -375,7 +386,7 @@ static void zmat_extend(zmat_p zmat, unsigned nbrows) {
 		zvec_set_i(zmat->rawvals + zmat->nbrows * zmat->nbcols, 0,
 				 (nbrows - zmat->nbrows) * zmat->nbcols);
 	}
-	for (int i = 0; i < (int) nbrows; i++) {
+	for (i = 0; i < (int) nbrows; i++) {
 		zmat->vals[i] = zmat->rawvals + (i * zmat->nbcols);
 	}
 	zmat->nbrows = nbrows;
@@ -387,9 +398,10 @@ static void NOWUNUSED zmat_fprint(FILE* stream, zmat_p zmat) {
 		fprintf(stream, "\n");
 		return;
 	}
-	for (int i = 0; i < (int) zmat->nbrows; i++) {
+	int i, j;
+	for (i = 0; i < (int) zmat->nbrows; i++) {
 		zval_t* vals = *(zmat->vals+i);
-		for (int j = 0; j < (int) zmat->nbcols; j++) {
+		for (j = 0; j < (int) zmat->nbcols; j++) {
 			fprintf(stream, "%" STRINGOF(FPRINT_NBDIGITS) "li", zval_get_i(*vals++));
 		}
 		fprintf(stream, "\n");
@@ -419,7 +431,8 @@ static void bvec_lor(int* bvec1, int* bvec2, int* bvec3, unsigned nbvals) {
 	cp1 = bvec1;
 	cp2 = bvec2;
 	cp3 = bvec3;
-	for (int i = 0; i < (int) nbvals; i++) {
+	int i;
+	for (i = 0; i < (int) nbvals; i++) {
 		*cp3 = *cp1 | *cp2;
 		cp3++;
 		cp1++;
@@ -457,7 +470,8 @@ static bmat_p bmat_alloc(int nbrows, int nbcols) {
 	}
 	bmat->vals = vals = safe_malloc(nbrows * sizeof(int*));
 	bmat->rawvals = rawvals = safe_malloc(nbrows * nbcols * sizeof(int));
-	for (int i = 0; i < nbrows; i++) {
+	int i;
+	for (i = 0; i < nbrows; i++) {
 		*vals++ = rawvals;
 		rawvals += nbcols;
 	}
@@ -482,7 +496,8 @@ static void bmat_extend(bmat_p bmat, zmat_p zmat, unsigned nbrows) {
 	unsigned nbcols = (zmat->nbrows - 1) / WSIZE + 1;
 	bmat->vals = safe_realloc(bmat->vals, nbrows * sizeof(int*));
 	bmat->rawvals = safe_realloc(bmat->rawvals, nbrows * nbcols * sizeof(int));
-	for (int i = 0; i < (int) nbrows; i++) {
+	int i;
+	for (i = 0; i < (int) nbrows; i++) {
 		bmat->vals[i] = bmat->rawvals + (i * nbcols);
 	}
 	bmat->nbrows = nbrows;
@@ -491,9 +506,10 @@ static void bmat_extend(bmat_p bmat, zmat_p zmat, unsigned nbrows) {
 static void NOWUNUSED bmat_fprint(FILE* stream, bmat_p bmat) {
 	int *vals;
 	fprintf(stream, "%d %d\n", bmat->nbrows, bmat->nbcols);
-	for (int i = 0; i < (int) bmat->nbrows; i++) {
+	int i, j;
+	for (i = 0; i < (int) bmat->nbrows; i++) {
 		vals = *(bmat->vals + i);
-		for (int j = 0; j < (int) bmat->nbcols; j++) {
+		for (j = 0; j < (int) bmat->nbcols; j++) {
 			fprintf(stream, " %10X ", *vals++);
 		}
 		fprintf(stream, "\n");
@@ -1153,10 +1169,11 @@ static zmat_p rays_of_constrs(zmat_p* pconstrs, unsigned nbmaxrays) {
 	unsigned nbdims = constrs->nbcols - 1;
 	nbmaxrays = nbmaxrays < nbdims ? nbdims : nbmaxrays;
 	zmat_p rays = zmat_alloc(nbmaxrays, nbdims + 1);
-	for (unsigned i = 0; i < nbmaxrays * (nbdims + 1); i++) {
+	unsigned i;
+	for (i = 0; i < nbmaxrays * (nbdims + 1); i++) {
 		zval_set_i(rays->rawvals[i], 0);
 	}
-	for (unsigned i = 0; i < nbdims; i++) {
+	for (i = 0; i < nbdims; i++) {
 		zval_set_i(rays->vals[i][i + 1], 1);
 	}
 	zval_set_i(rays->vals[nbdims - 1][0], 1);
@@ -1177,10 +1194,11 @@ static zmat_p constrs_of_rays(zmat_p* prays, unsigned nbmaxconstrs) {
 	unsigned nbdims = rays->nbcols - 1;
 	nbmaxconstrs = nbmaxconstrs < nbdims ? nbdims : nbmaxconstrs;
 	zmat_p constrs = zmat_alloc(nbmaxconstrs, nbdims + 1);
-	for (unsigned i = 0; i < nbmaxconstrs * (nbdims + 1); i++) {
+	unsigned i;
+	for (i = 0; i < nbmaxconstrs * (nbdims + 1); i++) {
 		zval_set_i(constrs->rawvals[i], 0);
 	}
-	for (unsigned i = 0; i < nbdims; i++) {
+	for (i = 0; i < nbdims; i++) {
 		zval_set_i(constrs->vals[i][i + 1], 1);
 	}
 	constrs->nbrows = nbdims;
@@ -1271,7 +1289,8 @@ static Psysteme sc_of_constrs(zmat_p constrs, Pbase base) {
 	sc->nb_ineq = 0;
 	sc->inegalites = NULL;
 	Pcontrainte pce = NULL, pci = NULL;
-	for (unsigned i = 0; i < constrs->nbrows; i++) {
+	unsigned i;
+	for (i = 0; i < constrs->nbrows; i++) {
 		Pvecteur pv = vecteur_of_zvec(constrs->vals[i] + 1, base);
 		int cst = zval_get_i(constrs->vals[i][constrs->nbcols - 1]);
 		vect_add_elem(&pv, TCST, cst);
@@ -1336,7 +1355,8 @@ static Ptsg sg_of_rays(zmat_p rays, Pbase base) {
 	sg->dtes_sg.vsg = NULL;
 	Psommet verts = NULL; Pray_dte urays = NULL, brays = NULL;
 	Pvecteur pv;
-	for (unsigned i = 0; i < rays->nbrows; i++) {
+	unsigned i;
+	for (i = 0; i < rays->nbrows; i++) {
 		pv = vecteur_of_zvec(rays->vals[i] + 1, base);
 		if (zval_equal_i(rays->vals[i][0], 0)) {
 			sg->dtes_sg.nb_v++;
