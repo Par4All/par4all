@@ -54,7 +54,9 @@ libsc_la_SOURCES = 	sc_alloc.c \
 		sc_error.c \
 		sc_io.c \
 		sc_new_loop_bound.c \
-		sc_simplexe_feasibility.c \
+		sc_simplex_feasibility_fixprec.c \
+		sc_simplex_feasibility_mulprec.c \
+		sc_simplex_feasibility.c \
 		sc_debug.c \
 		sc_janus_feasibility.c \
 		sc_gram.y \

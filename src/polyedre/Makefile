@@ -25,7 +25,7 @@ OBSOLETE_FILES= elarg.c elim_red.c env.c incl_p_h.c inter_poly.c \
 
 TARGET	= polyedre
 
-LIB_CFILES= 	sc_enveloppe.c chernikova.c 
+LIB_CFILES= 	sc_enveloppe.c sc_enumerate.c chernikova_fixprec.c chernikova_mulprec.c chernikova.c
 
 LIB_TARGET	= lib$(TARGET).a
 
