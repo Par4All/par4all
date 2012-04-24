@@ -155,31 +155,34 @@ set points_to_block_projection(set pts, list  l)
 {
   list pls = NIL; // Possibly lost sinks
   FOREACH(ENTITY, e, l) {
-    SET_FOREACH(points_to, pt, pts){
-      cell source = points_to_source(pt);
-      cell sink = points_to_sink(pt);
-      entity e_sr = reference_variable(cell_to_reference(source));
-      entity e_sk = reference_variable(cell_to_reference(sink));
+    type uet = ultimate_type(entity_type(e));
+    if(pointer_type_p(uet)) {
+      SET_FOREACH(points_to, pt, pts){
+	cell source = points_to_source(pt);
+	cell sink = points_to_sink(pt);
+	entity e_sr = reference_variable(cell_to_reference(source));
+	entity e_sk = reference_variable(cell_to_reference(sink));
 
-      if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
-	set_del_element(pts, pts, (void*)pt);
-	if(heap_cell_p(sink)) {
-	  /* Check for memory leaks */
-	  pls = CONS(CELL, sink, pls);
-	}
-      }
-      else if(e == e_sk
-	      && (!(variable_static_p(e_sk)
-		    || top_level_entity_p(e_sk)
-		    || heap_cell_p(sink)))) {
-	if(gen_in_list_p(e_sr, l)) {
-	  /* Both the sink and the source disappear: the arc is removed */
+	if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
 	  set_del_element(pts, pts, (void*)pt);
+	  if(heap_cell_p(sink)) {
+	    /* Check for memory leaks */
+	    pls = CONS(CELL, sink, pls);
+	  }
 	}
-	else {
-	  pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
-	  list lhs = CONS(CELL, source, NIL);
-	  pts = points_to_nowhere_typed(lhs, pts);
+	else if(e == e_sk
+		&& (!(variable_static_p(e_sk)
+		      || top_level_entity_p(e_sk)
+		      || heap_cell_p(sink)))) {
+	  if(gen_in_list_p(e_sr, l)) {
+	    /* Both the sink and the source disappear: the arc is removed */
+	    set_del_element(pts, pts, (void*)pt);
+	  }
+	  else {
+	    pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
+	    list lhs = CONS(CELL, source, NIL);
+	    pts = points_to_nowhere_typed(lhs, pts);
+	  }
 	}
       }
     }
@@ -236,8 +239,13 @@ set points_to_function_projection(set pts)
   set_assign(res, pts);
 
   SET_FOREACH(points_to, pt, pts) {
-    if(cell_out_of_scope_p(points_to_source(pt)))
-      set_del_element(res, res, (void*)pt);
+    if(cell_out_of_scope_p(points_to_source(pt))) {
+      /* Preserve the return value */
+      reference r = cell_any_reference(points_to_source(pt));
+      entity v = reference_variable(r);
+      if(function_to_return_value(get_current_module_entity())!=v)
+	set_del_element(res, res, (void*)pt);
+    }
   }
   return res;
 }

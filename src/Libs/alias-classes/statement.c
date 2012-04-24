@@ -139,7 +139,8 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
    * find declarations in dead code...
    */
   // FI: a temporary fix to the problem, to run experiments...
-  if(empty_pt_map_p(pt_in) && !declaration_statement_p(s))
+  if(empty_pt_map_p(pt_in) && !declaration_statement_p(s)
+     && s!=get_current_module_statement())
     clear_pt_map(pt_out); // FI: memory leak?
     
 

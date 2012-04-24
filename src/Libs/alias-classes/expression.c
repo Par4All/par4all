@@ -211,6 +211,31 @@ pt_map call_to_points_to(call c, pt_map pt_in)
      || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
     clear_pt_map(pt_out);
   }
+  else if(ENTITY_C_RETURN_P(f)) {
+    /* it is assumed that only one return is present in any module
+       code because internal returns are replaced by gotos */
+    if(ENDP(al)) {
+      // clear_pt_map(pt_out);
+      ; // the necessary projections are performed elsewhere
+    }
+    else {
+      expression rhs = EXPRESSION(CAR(al));
+      type rhst = expression_to_type(rhs);
+      // FI: should we use the type of the current module?
+      if(pointer_type_p(rhst)) {
+	list sinks = expression_to_points_to_sinks(rhs, pt_out);
+	entity rv = function_to_return_value(get_current_module_entity());
+	reference rvr = make_reference(rv, NIL);
+	cell rvc = make_cell_reference(rvr);
+	list sources = CONS(CELL, rvc, NIL);
+	pt_out = list_assignment_to_points_to(sources, sinks, pt_out);
+	gen_free_list(sources);
+	// FI: not too sure about "sinks" being or not a memory leak
+	; // The necessary projections are performed elsewhere
+      }
+      free_type(rhst);
+    }
+  }
   else if(ENTITY_FCLOSE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     pt_out = freed_pointer_to_points_to(lhs, pt_out);
