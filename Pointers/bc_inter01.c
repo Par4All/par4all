@@ -13,6 +13,7 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2){
 
   *pa2 = a1;
   (*pa2)->q = b2;
+  printf("adress of (*pa2)->q = %p", (*pa2)->q);
 }
 
 int main() {

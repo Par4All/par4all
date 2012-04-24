@@ -15,8 +15,7 @@ void call17(int *x)
 POINTS-TO
 
 
-// Points To IN:
-// x -> _x_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -25,7 +24,8 @@ void call17(int *x)
 {
    /* check aliases */
 
-// Points To: none
+// Points To:
+// x -> _x_1[0] , EXACT
 
    int *y = x;
 

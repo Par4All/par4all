@@ -53,8 +53,7 @@ int foo(int a)
 POINTS-TO
 
 
-// Points To IN:
-// p -> _p_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -73,8 +72,7 @@ int bla(int *p)
    return 17;
 }
 
-// Points To IN:
-// q -> _q_1[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none

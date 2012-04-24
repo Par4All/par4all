@@ -47,7 +47,10 @@ POINTS TO
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 
-// Points To: none
+// Points To:
+// _a -> __a_2[0] , EXACT
+// _b -> __b_3[0] , EXACT
+// _c -> __c_4[0] , EXACT
 
    _a[_i] = _b[_i]+_c[_i];
 }
@@ -60,19 +63,31 @@ void call16(int _i, int *_a, int *_b, int *_c)
 void dotprod(int *a, int *b, int *c)
 {
 
-// Points To: none
+// Points To:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    int i;
 
-// Points To: none
+// Points To:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    for(i = 0; i <= 999999; i += 1)
 
-// Points To: none
+// Points To:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
       call16(i, a, b, c);
 
-// Points To: none
+// Points To:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    
    
