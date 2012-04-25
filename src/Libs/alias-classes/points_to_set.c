@@ -279,6 +279,7 @@ void print_points_to(const points_to pt)
     reference r1 = cell_to_reference(source);
     reference r2 = cell_to_reference(sink);
 
+    fprintf(stderr,"%p ", pt);
     print_reference(r1);
     fprintf(stderr,"->");
     print_reference(r2);
@@ -301,7 +302,6 @@ void print_points_to_set(string what,  set s)
   fprintf(stderr, "\n");
 }
 
-
 /* test if a cell appear as a source in a set of points-to */
 bool source_in_set_p(cell source, set s)
 {
@@ -312,6 +312,35 @@ bool source_in_set_p(cell source, set s)
       return true;
   }
   return in_p;
+}
+
+/* test if a cell appear as a sink in a set of points-to */
+bool sink_in_set_p(cell sink, set s)
+{
+  bool in_p = false;
+  SET_FOREACH ( points_to, pt, s ) {
+    if( cell_equal_p(points_to_sink(pt),sink) )
+      in_p = true;
+  }
+  return in_p;
+}
+
+/* The approximation is not taken into account
+ *
+ * It might be faster to look up the different points-to arcs that can
+ * be made with source, sink and any approximation.
+ */
+points_to find_arc_in_points_to_set(cell source, cell sink, pt_map s)
+{
+  points_to fpt = points_to_undefined;
+  SET_FOREACH(points_to, pt, s) {
+    if(cell_equal_p(points_to_source(pt), source)
+       && cell_equal_p(points_to_sink(pt), sink) ) {
+      fpt = pt;
+      break;
+    }
+  }
+  return fpt;
 }
 
 /* source is assumed to be either nowhere/undefined or anywhere, it
@@ -814,18 +843,6 @@ list reference_to_sinks(reference r, pt_map in, bool fresh_p)
   return sinks;
 }
 
-/* test if a cell appear as a sink in a set of points-to */
-bool sink_in_set_p(cell sink, set s)
-{
-  bool in_p = false;
-  SET_FOREACH ( points_to, pt, s ) {
-    if( cell_equal_p(points_to_sink(pt),sink) )
-      in_p = true;
-  }
-  return in_p;
-}
-
-
 /* Merge two points-to sets
  *
  * This function is required to compute the points-to set resulting of
@@ -903,7 +920,19 @@ bool cell_in_list_p(cell c, const list lx)
   return false; /* else no found */
 }
 
-bool points_to_compare_cell(cell c1, cell c2){
+bool points_to_in_list_p(points_to pt, const list lx)
+{
+  list l = (list) lx;
+  for (; !ENDP(l); POP(l))
+    if (points_to_equal_p(POINTS_TO(CAR(l)), pt)) return true; /* found! */
+
+  return false; /* else no found */
+}
+
+bool points_to_compare_cell(cell c1, cell c2)
+{
+  if(c1==c2)
+    return true;
 
   int i = 0;
   reference r1 = cell_to_reference(c1);
@@ -940,10 +969,9 @@ bool points_to_compare_cell(cell c1, cell c2){
   return (i== 0 ? true: false) ;
 }
 
-
-
 /* Order the two points-to relations according to the alphabetical
-   order of the underlying variables. Return -1, 0, or 1. */
+ * order of the underlying variables. Return -1, 0, or 1.
+ */
 int points_to_compare_location(void * vpt1, void * vpt2) {
   int i = 0;
   points_to pt1 = *((points_to *) vpt1);
@@ -1064,5 +1092,35 @@ bool consistent_points_to_set(set s)
       }
     }
   }
+
+  /* Make sure that the element of set "s" belong to "s" (issue with
+   * side effects performed on subscript expressions).
+   */
+  SET_FOREACH(points_to, pt, s) {
+    if(!set_belong_p(s,pt)) {
+      fprintf(stderr, "Points-to %p ", pt);
+      print_points_to(pt);
+      fprintf(stderr, " is in set s but does not belong to it!\n");
+      consistent_p = false;
+    }
+  }
+
   return consistent_p;
+}
+
+void upgrade_approximations_in_points_to_set(pt_map pts)
+{
+  SET_FOREACH(points_to, pt, pts) {
+    approximation a = points_to_approximation(pt);
+    if(!approximation_exact_p(a)) {
+      cell source = points_to_source(pt);
+      list sinks = source_to_sinks(source, pts, false);
+      if(gen_length(sinks)==1) {
+	cell sink = points_to_sink(pt);
+	if(!cell_abstract_location_p(sink))
+	  approximation_tag(a) = is_approximation_exact;
+      }
+      gen_free_list(sinks);
+    }
+  }
 }

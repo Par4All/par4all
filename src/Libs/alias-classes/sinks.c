@@ -283,23 +283,22 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     //offset_cells(sinks, m_one);
     //free_expression(m_one);
    }
-  else if(ENTITY_POST_INCREMENT_P(f)) {
+  else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
     // arithmetic05: "q=p++;" p++ must be evaluated
+    //list sources = expression_to_points_to_sinks(a, in);
+    //if(gen_length(sources)==1) {
+    //cell source = CELL(CAR(sources));
     sinks = expression_to_points_to_sinks(a, in);
-    /* We have to undo the impact of side effects */
-    expression m_one = int_to_expression(-1);
-    offset_cells(sinks, m_one);
-    free_expression(m_one);
-   }
-  else if(ENTITY_POST_DECREMENT_P(f)) {
-    //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
-    /* We have to undo the impact of side effects */
-    expression one = int_to_expression(1);
-    offset_cells(sinks, one);
-    free_expression(one);
-   }
+    /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
+    expression delta = expression_undefined;
+    if(ENTITY_POST_INCREMENT_P(f))
+      delta = int_to_expression(-1);
+    else
+      delta = int_to_expression(1);
+    offset_points_to_cells(sinks, delta);
+    free_expression(delta);
+  }
   else {
   // FI: to be continued
     pips_internal_error("Unexpected unary pointer operator\n");
@@ -417,13 +416,14 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   list sinks = NIL;
   type t1 = expression_to_type(a1);
   type t2 = expression_to_type(a2);
+  // FI: the first two cases should be unified with a=a1 or a2
   if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
     sinks = expression_to_points_to_sinks(a1, in);
-    offset_cells(sinks, a2);
+    offset_points_to_cells(sinks, a2);
   }
   else if(pointer_type_p(t2) && scalar_integer_type_p(t1)) {
     sinks = expression_to_points_to_sinks(a2, in);
-    offset_cells(sinks, a1);
+    offset_points_to_cells(sinks, a1);
   }
   else
     pips_internal_error("Not implemented for %p and %p and %p\n", a1, a2, in);
@@ -970,7 +970,7 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   }
   case  is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
-    sinks = subscript_to_points_to_sinks(sub, in, true);
+    sinks = subscript_to_points_to_sinks(sub, in, eval_p);
     break;
   }
   case  is_syntax_application: {

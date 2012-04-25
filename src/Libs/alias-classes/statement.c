@@ -129,6 +129,11 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     pt_out = points_to_block_projection(pt_out, dl);
   }
 
+  /* Because arc removals do not update the approximations of the
+     remaining arcs, let's upgrade approximations before the
+     information is passed. Useful for arithmetic02. */
+  upgrade_approximations_in_points_to_set(pt_out);
+
   /* Really dangerous here: if pt_map "in" is empty, then pt_map "out"
    * must be empty to...
    *
@@ -395,25 +400,31 @@ pt_map any_loop_to_points_to(statement b,
 			     pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-
-  //  set pt_out = set_generic_make(set_private, points_to_equal_p,
-  //                              points_to_rank);
-  // pt_map cur = new_pt_map();
   int i = 0;
   // FI: k is linked to the cycles in points-to graph, and should not
-  // be linked to the number of convergence iterations
+  // be linked to the number of convergence iterations. I assume here
+  // that the minimal number of iterations is greater than the
+  // k-limiting factor
   int k = get_int_property("POINTS_TO_K_LIMITING")+10;
 
-  /* First, enter the loop: initialization + condition check */
+  /* First, enter or skip the loop: initialization + condition check */
   if(!expression_undefined_p(init))
     pt_out = expression_to_points_to(init, pt_out);
-  if(!expression_undefined_p(c))
+  pt_map pt_out_skip = full_copy_pt_map(pt_out);
+  if(!expression_undefined_p(c)) {
     pt_out = condition_to_points_to(c, pt_out, true);
-  // pt_in = points_to_expression(exp_inc, pt_in, true);
+    pt_out_skip = condition_to_points_to(c, pt_out_skip, false);
+  }
 
-  /* pt_out(i) = f(pt_out(i-1)) U pt_out(i-1)
+  /* Comput pt_out as loop invariant: pt_out holds at the beginning of
+   * the loop body.
+   *
+   * pt_out(i) = f(pt_out(i-1)) U pt_out(i-1)
    *
    * prev = pt_out(i-1)
+   *
+   * Note: the pt_out variable is also used to carry the loop exit
+   * points-to set.
    */
   pt_map prev = new_pt_map();
   // FI: it should be a while loop to reach convergence
@@ -438,12 +449,6 @@ pt_map any_loop_to_points_to(statement b,
     if(!expression_undefined_p(c))
       pt_out = condition_to_points_to(c, pt_out, true);
 
-    /* Perform the k-limiting on the latest points to information */
-    //int k = get_int_property("POINTS_TO_K_LIMITING");
-    //pt_out = k_limit_points_to(pt_out, k);
-
-    // set_clear(pt_in); is pt_in useful?
-
     /* Merge the previous resut and the current result. */
     // FI: move to pt_map
     pt_out = merge_points_to_set(prev, pt_out);
@@ -451,6 +456,13 @@ pt_map any_loop_to_points_to(statement b,
     /* Check convergence */
     if(set_equal_p(prev, pt_out)) {
       fix_point_p = true;
+      /* Add the last iteration to obtain the pt_out holding when
+	 exiting the loop */
+      pt_out = statement_to_points_to(b, prev);
+      if(!expression_undefined_p(inc))
+	pt_out = expression_to_points_to(inc, pt_out);
+      if(!expression_undefined_p(c))
+	pt_out = condition_to_points_to(c, pt_out, false);
       break;
     }
   }
@@ -458,19 +470,11 @@ pt_map any_loop_to_points_to(statement b,
   if(!fix_point_p)
     pips_internal_error("Loop convergence not reached.\n");
 
-  // FI: this should be useless because the propagation has already
-  // happened within the convergence loop...
-  //pt_map pt_b = full_copy_pt_map(pt_out);
-  //points_to_storage(pt_b, b , true);
-  // FI: I would expect something like
-  // pt_tmp = statement_to_points_to(b, pt_out);
-
   /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
      information is changed accordingly. */
   pt_out = points_to_independent_store(pt_out);
-  /* The condition must be false when exiting the loop */
-  if(!expression_undefined_p(inc))
-    pt_out = condition_to_points_to(c, pt_out, false);
+
+  pt_out = merge_points_to_set(pt_out, pt_out_skip);
 
   return pt_out;
 }
