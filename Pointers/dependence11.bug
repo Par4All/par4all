@@ -1,12 +1,5 @@
--------------new validation for points-to analysis------------- 
+pips error in r_cell_reference_to_type: (/home/amira/MYPIPS/prod/pips/src/Libs/effects-util/type.c:268) assertion failed
 
-every test case added is either a bug to fixe either an enhancement of
-the points-to analysis, please add a comment about the bug when you
-add a test case.
+ 'there should be no memory access paths to variable names
+' not verified
 
-bc_inter01: est-ce que ca marche en intraprocedural?
-bc_inter02: idem
-bc_inter03: idem
-bc_inter04: ou est l'interprocedural
-
-beatrice01: problemes? objectifs?
