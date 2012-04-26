@@ -1,7 +1,7 @@
-delete dependence09
+delete dependence13
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create dependence09 dependence09.c
+create dependence13 dependence13.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -10,18 +10,19 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 activate PRINT_CODE_PROPER_EFFECTS
 
 echo
-echo Proper effects for "dependence09"
+echo Proper effects for "dependence13"
 echo
-display PRINTED_FILE[dependence09]
+display PRINTED_FILE[dependence13]
 
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo
-echo POINTS TO for "dependence09"
+echo POINTS TO for "dependence13"
 echo
-display PRINTED_FILE[dependence09]
+display PRINTED_FILE[dependence13]
+
 
  
 
 close
-delete dependence09
+delete dependence13
