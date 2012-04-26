@@ -721,6 +721,24 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       }
     }
 
+    /* The source may be an array field */
+    if(ENDP(sinks)) {
+      bool to_be_freed = false;
+      type st = points_to_cell_to_type(source, &to_be_freed);
+      if(array_type_p(st)) {
+	// FI: I'm not too sure I cannot copy the reference because it
+	// has to ne modified
+	reference nr = copy_reference(cell_any_reference(source));
+	expression zero = int_to_expression(0);
+	reference_indices(nr) = gen_nconc(reference_indices(nr),
+					  CONS(EXPRESSION,zero, NIL));
+	cell nc = make_cell_reference(nr);
+	sinks = CONS(CELL, nc, NIL);
+      }
+      if(to_be_freed)
+	free_type(st);
+    }
+
     /* 3. If the previous steps have failed, build a new sink if the
        source is a formal parameter. */
     // FI: you must generate sinks for formal parameters, global

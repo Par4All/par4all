@@ -420,6 +420,39 @@ type cell_to_type(cell c, bool *to_be_freed)
   return cell_reference_to_type(ref, to_be_freed);
 }
 
+/* FI: I need more generality than is offered by cell_to_type() */
+type points_to_cell_to_type(cell c, bool *to_be_freed)
+{
+  type t = type_undefined;
+  pips_assert("a cell cannot be a gap yet\n", !cell_gap_p(c));
+  reference ref = cell_any_reference(c);
+
+  entity v = reference_variable(ref);
+  list sl = reference_indices(ref);
+
+  if(ENDP(sl)) {
+    t = entity_type(v);
+    *to_be_freed = false;
+  }
+  else {
+    expression ls = EXPRESSION(CAR(gen_last(sl)));
+    syntax lss = expression_syntax(ls);
+    if(syntax_reference_p(lss)) {
+      reference r = syntax_reference(lss);
+      entity f = reference_variable(r);
+      if(entity_field_p(f)) {
+	t = entity_type(f);
+	*to_be_freed = false;
+      }
+    }
+  }
+    
+  if(type_undefined_p(t))
+    t = cell_reference_to_type(ref, to_be_freed);
+
+  return t;
+}
+
 /**
     tests if the actual argument type and the formal argument type are compatible
     with the current state of the interprocedural translation algorithms. Input types
