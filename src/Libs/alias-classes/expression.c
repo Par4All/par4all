@@ -1175,7 +1175,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
       /* Make a points-to NULL and remove the arc from the current out */
       cell source = make_cell_reference(copy_reference(r));
       cell sink = make_null_pointer_value_cell();
-      points_to a = make_points_to(source, sink, make_approximation_must(),
+      points_to a = make_points_to(source, sink, make_approximation_exact(),
 				   make_descriptor_none());
       add_arc_to_pt_map(a, in);
     }

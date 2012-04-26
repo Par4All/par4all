@@ -871,7 +871,8 @@ set merge_points_to_set(set s1, set s2) {
     Union_set = set_union(Union_set, s1, s2);
 
     SET_FOREACH ( points_to, i, Intersection_set ) {
-      if ( approximation_tag(points_to_approximation(i)) == 2 )
+      if ( approximation_exact_p(points_to_approximation(i)) 
+	   || approximation_must_p(points_to_approximation(i)) )
 	Definite_set = set_add_element(Definite_set,Definite_set,
 				       (void*) i );
     }

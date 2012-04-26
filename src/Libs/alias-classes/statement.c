@@ -189,7 +189,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  FOREACH(CELL, source, l) {
 	    cell sink = cell_to_nowhere_sink(source); 
 	    points_to pt = make_points_to(source, sink,
-					  make_approximation_must(),
+					  make_approximation_exact(),
 					  make_descriptor_none());
 	    add_arc_to_pt_map(pt, pt_out);
 	  }
