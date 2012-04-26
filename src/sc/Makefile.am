@@ -27,15 +27,16 @@ other_headers= sc-private.h
 
 BUILT_SOURCES=$(TARGET).h sc_gram.h
 nodist_include_HEADERS=$(TARGET).h
-AM_CPPFLAGS=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I$(top_srcdir)
 
 AM_YFLAGS=-p syst_ -d
 AM_LFLAGS=-p syst_
 
+local_flags=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I$(top_srcdir)
 if WITH_GMP
-# curiously enough, I have to manually add AM_CPPFLAGS again here
-libsc_la_CPPFLAGS = $(GMP_CFLAGS) $(AM_CPPFLAGS)
+AM_CPPFLAGS = $(GMP_CFLAGS) $(local_flags)
 libsc_la_LDFLAGS = $(GMP_LIBS)
+else
+AM_CPPFLAGS = $(local_flags)
 endif
 
 libsc_la_SOURCES = 	sc_alloc.c \
