@@ -8,11 +8,10 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 
 AM_INIT_AUTOMAKE([gnu 1.0])
-AC_LANG([C])
 
 # Checks for programs.
 AX_PROG_YACC
-AC_PROG_CC
+AC_PROG_CC_C99
 gl_EARLY
 
 # must be right there
