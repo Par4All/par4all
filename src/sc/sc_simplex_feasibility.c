@@ -43,7 +43,7 @@ static bool usegmp() {
 
 bool sc_simplex_feasibility_ofl_ctrl(Psysteme sys, int ofl_ctrl) {
 	if (usegmp()) {
-#ifdef LINEAR_DEPEND_GMP
+#ifdef HAVE_GMP_H
 		return sc_simplex_feasibility_ofl_ctrl_mulprec(sys, ofl_ctrl);
 #else
 		WNOGMP;

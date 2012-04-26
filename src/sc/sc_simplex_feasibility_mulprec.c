@@ -22,11 +22,12 @@
 
 */
 
-#ifdef LINEAR_DEPEND_GMP
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#ifdef HAVE_GMP_H
 
 #include "../arithmetique/arith_mulprec.h"
 #include "sc_simplex_feasibility.h"

@@ -49,7 +49,7 @@ static bool usegmp() {
 Ptsg sc_to_sg_chernikova(Psysteme sc) {
 	Ptsg sg;
 	if (usegmp()) {
-#ifdef LINEAR_DEPEND_GMP
+#ifdef HAVE_GMP_H
 		sg = sc_to_sg_chernikova_mulprec(sc);
 #else
 		WNOGMP;
@@ -65,7 +65,7 @@ Ptsg sc_to_sg_chernikova(Psysteme sc) {
 Psysteme sg_to_sc_chernikova(Ptsg sg) {
 	Psysteme sc;
 	if (usegmp()) {
-#ifdef LINEAR_DEPEND_GMP
+#ifdef HAVE_GMP_H
 		sc = sg_to_sc_chernikova_mulprec(sg);
 #else
 		WNOGMP;
@@ -81,7 +81,7 @@ Psysteme sg_to_sc_chernikova(Ptsg sg) {
 Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2) {
 	Psysteme sc;
 	if (usegmp()) {
-#ifdef LINEAR_DEPEND_GMP
+#ifdef HAVE_GMP_H
 		sc = sc_convex_hull_mulprec(sc1, sc2);
 #else
 		WNOGMP;

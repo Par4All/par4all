@@ -21,8 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#ifndef LINEAR_DEPEND_GMP
+#ifndef HAVE_GMP_H
 #error "arith_mulprec.h requires GMP"
 #endif
 

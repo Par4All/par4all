@@ -868,7 +868,7 @@ static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
 	jx = safe_malloc(nbconstrs * sizeof(unsigned));
 	CATCH(any_exception_error) {
 		zvec_free(tmp, nbdims + 1);
-		zval_clear(one); zval_clear(mone);
+		zval_clear(one); //zval_clear(mone);
 		safe_free(bx);
 		safe_free(jx);
 		safe_free(trace);
@@ -1115,7 +1115,7 @@ static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
 	constrs2->nbrows = nbeqs2 +nbineqs2;
 	rays2->nbrows = nbbrays2 + nburays2;
 	zvec_free(tmp, nbdims + 1);
-	zval_clear(one); zval_clear(mone);
+	zval_clear(one); //zval_clear(mone);
 	zmat_free(constrs);
 	zmat_free(rays);
 	*pconstrs = constrs2;
@@ -1123,7 +1123,7 @@ static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
 	return;
 empty:
 	zvec_free(tmp, nbdims + 1);
-	zval_clear(one); zval_clear(mone);
+	zval_clear(one); //zval_clear(mone);
 	safe_free(bx);
 	safe_free (jx);
 	UNCATCH(any_exception_error);

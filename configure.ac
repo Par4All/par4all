@@ -70,6 +70,11 @@ AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
 			   	CFLAGS="-g -O0 -Wall -Werror"
 			  ]
 )
+AX_ARG_ENABLE([gmp],[enable use of GNU multi-precision library],[no],
+			  [
+			   AX_CHECK_PKG([gmp], [__gmpz_mul], [gmp.h])
+			   ]
+			  )
 
 AC_CONFIG_FILES([Makefile
 				 linearlibs.pc
@@ -90,5 +95,5 @@ AC_CONFIG_FILES([Makefile
                  src/vecteur/Makefile])
 
 AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_mkdir])
-AX_OUTPUT([minimum])
+AX_OUTPUT([minimum],[gmp])
 
