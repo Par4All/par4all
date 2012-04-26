@@ -861,9 +861,9 @@ static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
 	unsigned status;
 	unsigned* trace = NULL, * bx = NULL, * jx = NULL, dimrayspace, b;
 	zval_t* tmp = zvec_alloc(nbdims + 1);;
-	zval_t one, mone;
-	zval_init(one); zval_init(mone);
-	zval_set_i(one, 1); zval_set_i(mone, -1);
+	zval_t one/*, mone*/;
+	zval_init(one);/* zval_init(mone);*/
+	zval_set_i(one, 1);/* zval_set_i(mone, -1);*/
 	bx = safe_malloc(nbconstrs * sizeof(unsigned));
 	jx = safe_malloc(nbconstrs * sizeof(unsigned));
 	CATCH(any_exception_error) {

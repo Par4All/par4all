@@ -601,6 +601,7 @@ static bool duplicate_vertex_p(Value ** R, int b, int e, int d, Value * N)
 }
 #endif
 
+#if 0
 /* Evaluate  that the point defined by the value array N meets the
    sparse equality defined by v and b. See also contrainte_eval(). */
 static Value eval_constraint_with_vertex(
@@ -671,7 +672,9 @@ static bool vertex_strictly_meets_inequality_p
   bool meets_p = value_neg_p(k);
   return meets_p;
 }
+#endif
 
+#if 0
 /* Check if the Value vector N is inside the set of integer points defined by sc
  *
  * Used to avoid adding redundant vertices.
@@ -703,6 +706,7 @@ static bool redundant_vertex_p(Psysteme sc, int d, Value * N, bool strict_p)
 
   return redundant_p;
 }
+#endif
 
 #ifdef CHERNIKOVA_DEPRECATED
 /* Returns the convex hull sc of two constraint systems, sc1 and
