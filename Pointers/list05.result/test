@@ -223,7 +223,7 @@ void list_free(list l)
 // n -> _l_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       p = n;
    }

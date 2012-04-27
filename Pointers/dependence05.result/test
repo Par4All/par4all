@@ -126,7 +126,7 @@ int * dependence05()
 
 // Points To:
 // b -> *HEAP*_l_10[0] , EXACT
-// c -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    return b;
