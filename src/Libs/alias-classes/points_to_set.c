@@ -746,12 +746,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
     if(ENDP(sinks)) {
       reference r = cell_any_reference(source);
       entity v = reference_variable(r);
-      if(formal_parameter_p(v)
-	 || /* global_variable_p(v)*/
-	 /* FI: wrong test anywhere might have been top-level? */
-	 /* FI: wrong, how about static global variables? */
-	 /* FI: see for instance global07.c */
-	 top_level_entity_p(v)) {
+      if(formal_parameter_p(v)) {
 	// Find stub type
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
@@ -769,19 +764,39 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  add_arc_to_points_to_context(copy_points_to(npt));
 	  sinks = CONS(CELL, copy_cell(nsink), sinks);
       }
-      else if(static_global_variable_p(v)) {
+      else if(top_level_entity_p(v) || static_global_variable_p(v)) {
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
 	//points_to pt = create_stub_points_to(source, st, basic_undefined);
-	points_to pt = create_k_limited_stub_points_to(source, st, pts);
-	pts = add_arc_to_pt_map(pt, pts);
-	add_arc_to_points_to_context(copy_points_to(pt));
-	sinks = source_to_sinks(source, pts, false);
-	/* cell nc = add_virtual_sink_to_source(source);
-	 * points_to npt = make_points_to(copy_cell(source), nc, may/must)
-	 * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
-	 */
-	;
+	points_to pt = points_to_undefined;
+	if(const_variable_p(v)) {
+	  expression init = variable_initial_expression(v);
+	  sinks = expression_to_points_to_sinks(init, pts);
+	  free_expression(init);
+	  /* Add these new arcs to the context */
+	  bool exact_p = gen_length(sinks)==1;
+	  FOREACH(CELL, sink, sinks) {
+	    cell nsource = copy_cell(source);
+	    cell nsink = copy_cell(sink);
+	    approximation na = exact_p? make_approximation_exact():
+	      make_approximation_may();
+	    points_to npt = make_points_to(nsource, nsink, na,
+					   make_descriptor_none());
+	    pts = add_arc_to_pt_map(npt, pts);
+	    add_arc_to_points_to_context(copy_points_to(npt));
+	  }
+	}
+	else {
+	  pt = create_k_limited_stub_points_to(source, st, pts);
+
+	  pts = add_arc_to_pt_map(pt, pts);
+	  add_arc_to_points_to_context(copy_points_to(pt));
+	  sinks = source_to_sinks(source, pts, false);
+	  /* cell nc = add_virtual_sink_to_source(source);
+	   * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+	   * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+	   */
+	  ;
 	  /* The pointer may be NULL */
 	  cell nsource = copy_cell(source);
 	  cell nsink = make_null_pointer_value_cell();
@@ -791,6 +806,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  pts = add_arc_to_pt_map(npt, pts);
 	  add_arc_to_points_to_context(copy_points_to(npt));
 	  sinks = CONS(CELL, copy_cell(nsink), sinks);
+	}
       }
       else if(entity_stub_sink_p(v)) {
 	//type ost = ultimate_type(entity_type(v));
