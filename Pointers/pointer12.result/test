@@ -17,17 +17,17 @@ void pointer12(array_2D a)
    int i, j;
 
 // Points To:
-// a.array -> _a_1[0] , MAY
+// a.array -> _a_1[0] , EXACT
 
    a.d1 = 5;
 
 // Points To:
-// a.array -> _a_1[0] , MAY
+// a.array -> _a_1[0] , EXACT
 
    a.d2 = 4;
 
 // Points To:
-// a.array -> _a_1[0] , MAY
+// a.array -> _a_1[0] , EXACT
 
    a.array = malloc(a.d1+a.d2*sizeof(double));
 

@@ -44,15 +44,18 @@ int main()
 
    int *ap[10];
 
-// Points To: none
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    tf_t s;
 
-// Points To: none
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    tf_t *sp = &s;
 
 // Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // sp -> s , EXACT
 
 

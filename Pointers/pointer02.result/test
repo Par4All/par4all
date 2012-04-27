@@ -25,19 +25,19 @@ void pointer02(int n, float *p)
    p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer02.c", 11, (const char *) 0);
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 
    float *r = p-1;
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 // r -> _p_2[-1] , EXACT
 
 
    for(i = 0; i <= n-1; i += 1)
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 // r -> _p_2[-1] , EXACT
 
       p[i] = r[i];

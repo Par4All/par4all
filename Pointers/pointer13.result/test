@@ -51,10 +51,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    a&&b&&c&&cnt?(void) 0:__assert_fail("a&&b&&c&&cnt", "./pointer13.c", 15, (const char *) 0);
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *NULL_POINTER* , EXACT
@@ -62,10 +62,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    int sz = 0;
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *NULL_POINTER* , EXACT
@@ -73,10 +73,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    int i;
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *NULL_POINTER* , EXACT
@@ -85,10 +85,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    if (sz<*cnt) {
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *NULL_POINTER* , EXACT
@@ -100,10 +100,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
          free(w);
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *NULL_POINTER* , EXACT
@@ -111,10 +111,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
       w = (double *) malloc(*cnt*sizeof(double));
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *ANY_MODULE*:*HEAP* , EXACT
@@ -123,10 +123,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    }
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *ANY_MODULE*:*HEAP* , MAY
@@ -135,10 +135,10 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    for(i = 0; i <= *cnt-1; i += 1)
 
 // Points To:
-// a -> _a_1[0] , MAY
-// b -> _b_2[0] , MAY
-// c -> _c_3[0] , MAY
-// cnt -> _cnt_5[0] , MAY
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
+// cnt -> _cnt_5[0] , EXACT
 // d -> *NULL_POINTER* , MAY
 // d -> _d_4[0] , MAY
 // w -> *ANY_MODULE*:*HEAP* , MAY

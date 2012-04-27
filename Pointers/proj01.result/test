@@ -66,7 +66,7 @@ int main(void)
    }
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    // pp points to a dead value in the stack
@@ -74,14 +74,14 @@ int main(void)
    **pp = 0;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    // segfault?
    *pp = &j;
 
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    return 0;
 }
