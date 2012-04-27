@@ -2,11 +2,14 @@
 POINTS TO
 
 
-// Points To IN: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_4 , MAY
 
 
 // Points To OUT:
-// p -> _p_4 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_4 , MAY
 
 int global06()
 {
@@ -23,8 +26,10 @@ int global06()
    q = p;
 
 // Points To:
-// p -> _p_4 , EXACT
-// q -> _p_4 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_4 , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _p_4 , MAY
 
 
    return 0;
