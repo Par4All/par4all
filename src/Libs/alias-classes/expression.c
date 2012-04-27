@@ -438,33 +438,22 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
   list sources = expression_to_points_to_sources(lhs, pt_out);
   FOREACH(CELL, source, sources) {
     list sinks = source_to_sinks(source, pt_out, false);
+    if(ENDP(sinks)) {
+      entity v = reference_variable(cell_any_reference(source));
+      pips_internal_error("Sink missing for a source based on \"%s\".\n",
+			  entity_user_name(v));
+    }
+    offset_cells(source, sinks, delta, pt_out);
     // FI: we could perform some filtering out of pt_in
     // If an arc points from source to nowehere/undefined or to the
     // null location, this arc should be removed from pt_in as it
     // cannot lead to an execution reaching the next statement.
-    if(false && ENDP(sinks)) {
-      /* Three possibilities: the referenced variable is a formal
-	 parameter, or the referenced variable is a global variable or
-	 an internal error has been encountered. And a fourth
-	 possibility if we really operate on demand: a virtual entity
-	 of the calling context */
-      reference r = cell_any_reference(source);
-      entity v = reference_variable(r);
-      if(formal_parameter_p(v)
-	 || static_global_variable_p(v)
-	 || top_level_entity_p(v)) {
-	// Find stub type
-	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
-	// FI: the type retrieval must be improved for arrays & Co
-	points_to pt = create_stub_points_to(source, st, basic_undefined);
-	pt_out = add_arc_to_pt_map(pt, pt_out);
-	sinks = source_to_sinks(source, pt_out, false);
-      }
-      if(ENDP(sinks))
-	pips_internal_error("Sink missing for a source based on \"%s\".\n",
-			    entity_user_name(v));
+    FOREACH(CELL, sink, sinks) { 
+      if(nowhere_cell_p(sink))
+	remove_points_to_arcs(source, sink, pt_out);
+      else if(null_cell_p(sink))
+	remove_points_to_arcs(source, sink, pt_out);
     }
-    offset_cells(source, sinks, delta, pt_out);
   }
   // FI: should we free the sources list? Fully free it?
   return pt_out;

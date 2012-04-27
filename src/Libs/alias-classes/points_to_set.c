@@ -1159,3 +1159,18 @@ void upgrade_approximations_in_points_to_set(pt_map pts)
     }
   }
 }
+
+void remove_points_to_arcs(cell source, cell sink, pt_map pt)
+{
+  points_to a = make_points_to(copy_cell(source), copy_cell(sink),
+			       make_approximation_may(),
+			       make_descriptor_none());
+  remove_arc_from_pt_map(a, pt);
+  free_points_to(a);
+
+  a = make_points_to(copy_cell(source), copy_cell(sink),
+			       make_approximation_exact(),
+			       make_descriptor_none());
+  remove_arc_from_pt_map(a, pt);
+  free_points_to(a);
+}
