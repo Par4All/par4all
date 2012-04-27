@@ -45,17 +45,17 @@ void dereferencing05()
    *p++ = 0.;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0[1] , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    *p-- = 0.;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0[0] , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    *++p = 0.;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0[1] , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    *--p = 0.;
 }

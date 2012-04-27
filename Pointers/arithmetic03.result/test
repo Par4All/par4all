@@ -58,7 +58,7 @@ void arithmetic03(int *p)
 // Points To:
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1[0] , MAY
-// q -> *NULL_POINTER*[1] , MAY
+// q -> *NULL_POINTER* , MAY
 // q -> _p_1[1] , MAY
 
    return;
