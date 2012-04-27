@@ -230,8 +230,9 @@ points_to create_stub_points_to(cell c, type t,
 
   entity formal_parameter = create_stub_entity(e, t);
 
+  /* Do we want to assume that "int * p;" defines a pointer to an array? */
   bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-  if(!type_strict_p && !derived_type_p(t))
+  if(!type_strict_p && !derived_type_p(t) && !type_functional_p(t))
     sink_ref = make_reference(formal_parameter,
 			      CONS(EXPRESSION, int_to_expression(0), NIL));
   else
@@ -440,10 +441,10 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       }
     }
   }
-  else if(type_functional_p(upt))
-    // FI: we probably should change this
-    ;/*we don't know how to handle pointers to functions: nothing to
-       be done for points-to analysis. */
+  else if(type_functional_p(upt)) {
+    pt_to = create_stub_points_to(c, upt, basic_undefined);
+    add_arc_to_pt_map(pt_to, pt_in);
+}
   else if(type_void_p(upt)) {
     /* Create a target of unknown type */
     pt_to = create_stub_points_to(c, upt/* make_type_unknown() */, basic_undefined /*memory leak?*/);

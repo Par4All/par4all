@@ -407,6 +407,9 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   }
   else {
     // FI: fopen(), fclose() should be dealt with
+    // fopen implies that its path argument is not NULL, just like a test
+    // fclose implies that its fp argument is not NULL on input and
+    // points to undefined on output.
 
     // Not safe till all previous tests are defined
     // It is assumed that other intrinsics do not generate points-to arcs...
@@ -435,7 +438,11 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
   list sources = expression_to_points_to_sources(lhs, pt_out);
   FOREACH(CELL, source, sources) {
     list sinks = source_to_sinks(source, pt_out, false);
-    if(ENDP(sinks)) {
+    // FI: we could perform some filtering out of pt_in
+    // If an arc points from source to nowehere/undefined or to the
+    // null location, this arc should be removed from pt_in as it
+    // cannot lead to an execution reaching the next statement.
+    if(false && ENDP(sinks)) {
       /* Three possibilities: the referenced variable is a formal
 	 parameter, or the referenced variable is a global variable or
 	 an internal error has been encountered. And a fourth
@@ -503,7 +510,16 @@ points_to offset_cell(points_to pt, expression delta)
   points_to npt = copy_points_to(pt);
   reference r = cell_any_reference(points_to_sink(npt));
   entity v = reference_variable(r);
-  if(entity_array_p(v)
+  cell sink = points_to_sink(npt);
+  if(nowhere_cell_p(sink))
+    ; // user error: possible incrementation of an uninitialized pointer
+  else if(null_cell_p(sink))
+    ; // Impossible: possible incrementation of a NULL pointer
+  else if(anywhere_cell_p(sink))
+    ; // It is already fuzzy no need to add more
+  // FI: it might be necessary to exclude *HEAP* too when a minimal
+  // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
+  else if(entity_array_p(v)
      || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
     value v = EvalExpression(delta);
     list sl = reference_indices(r);
@@ -590,7 +606,15 @@ void offset_points_to_cell(cell sink, expression delta)
      "delta" can be statically evaluated */
   reference r = cell_any_reference(sink);
   entity v = reference_variable(r);
-  if(entity_array_p(v)
+  if(nowhere_cell_p(sink))
+    ; // user error: possible incrementation of an uninitialized pointer
+  else if(null_cell_p(sink))
+    ; // Impossible: possible incrementation of a NULL pointer
+  else if(anywhere_cell_p(sink))
+    ; // It is already fuzzy no need to add more
+  // FI: it might be necessary to exclude *HEAP* too when a minimal
+  // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
+  else if(entity_array_p(v)
      || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
     value v = EvalExpression(delta);
     list sl = reference_indices(r);
