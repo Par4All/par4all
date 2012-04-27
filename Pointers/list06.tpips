@@ -1,4 +1,4 @@
-setenv WSPACE=rand04
+setenv WSPACE=list06
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -7,32 +7,26 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
-# Key property for this test case
+# Key property for this test case: must be set to false
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 #module main
 
 
 echo 
-echo PROPER EFFECTS
+echo PROPER  EFFECTS
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
+display PRINTED_FILE[%ALLFUNC]
+
+
 
 echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE
+display PRINTED_FILE[%ALLFUNC]
 
 close
-
-# Check message about dangling pointers
-
-# They are useless in this case, with dependencies on pointer values,
-# till the interprocedural stuff is developed
-
-# shell cat rand04.database/Warnings
-
 delete $WSPACE
 quit

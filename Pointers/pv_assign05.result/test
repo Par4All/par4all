@@ -90,10 +90,10 @@ int main()
    (s1.b)[0] = &j;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s1.a -> i , EXACT
+// s1.b[0] -> j , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -104,10 +104,10 @@ int main()
    s2.a = s1.a;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s1.a -> i , EXACT
+// s1.b[0] -> j , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s2.a -> i , EXACT
@@ -118,14 +118,14 @@ int main()
    (s2.b)[0] = (s1.b)[0];
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s1.a -> i , EXACT
+// s1.b[0] -> j , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s2.a -> i , EXACT
+// s2.b[0] -> j , EXACT
 // tab_s[*].b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab_s[*].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab_s[*].c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -133,42 +133,35 @@ int main()
    tab_s[0].a = s1.a;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s1.a -> i , EXACT
+// s1.b[0] -> j , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s2.a -> i , EXACT
+// s2.b[0] -> j , EXACT
 // tab_s[*].b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[*].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab_s[*].c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // tab_s[0].a -> i , EXACT
 
    (tab_s[0].b)[0] = (s1.b)[0];
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s1.a -> i , EXACT
+// s1.b[0] -> j , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // s2.a -> i , EXACT
+// s2.b[0] -> j , EXACT
 // tab_s[*].b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[*].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab_s[*].c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // tab_s[0].a -> i , EXACT
+// tab_s[0].b[0] -> j , EXACT
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer *ANYWHERE*_b0 

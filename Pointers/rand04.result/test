@@ -124,5 +124,3 @@ int main(void)
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_condition_to_points_to) Interprocedural points-to not implemented yet. Call site ignored. 0x1a2d460 0x1a31220 0x1.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_condition_to_points_to) Interprocedural points-to not implemented yet. Call site ignored. 0x1a2d460 0x19cc280 (nil).

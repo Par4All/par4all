@@ -38,22 +38,25 @@ int main()
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int i = 5;
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    a = b[i];
 
 // Points To:
-// a -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// a -> b[*] , EXACT
+// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    b[++i] = a;
 
 // Points To:
-// a -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// a -> b[*] , EXACT
+// b[*] -> b[*] , EXACT
 
    return 0;
 }
