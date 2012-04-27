@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// argv[*] -> _argv_2[0] , MAY
 
 
 // Points To OUT: none
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
    int *pi;
 
@@ -66,7 +67,6 @@ int main(int argc, char *argv[])
 // Points To:
 // argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE* , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    return 0;
