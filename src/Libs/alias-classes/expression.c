@@ -823,7 +823,11 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
    *
    * FI->AM: typed nowhere?
    */
-  list N = CONS(CELL, make_nowhere_cell(), NIL);
+  //list N = CONS(CELL, make_nowhere_cell(), NIL);
+  type t = expression_to_type(lhs);
+  type pt = type_to_pointed_type(t);
+  list N = CONS(CELL, make_typed_nowhere_cell(pt), NIL);
+  free_type(t);
 
   pips_assert("L is not empty", !ENDP(L));
   pips_assert("R is not empty", !ENDP(R));
