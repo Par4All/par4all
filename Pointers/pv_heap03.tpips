@@ -1,4 +1,4 @@
-setenv WS=proj00
+setenv WS=pv_heap03
 delete $WS
 create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -7,6 +7,7 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 ##TODO: explain
 
@@ -30,9 +31,9 @@ echo
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[%ALLFUNC]
 
-echo
-echo Warnings
-echo
+#echo
+#echo Warnings
+#echo
 
 close
 #shell cat $WS.database/Warnings
