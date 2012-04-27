@@ -21,7 +21,8 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -30,20 +31,24 @@ void arithmetic03(int *p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    int *q;
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    q = p;
 
 // Points To:
-// p -> _p_1[0] , EXACT
-// q -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _p_1[0] , MAY
 
    // not standard compliant as p does not points towards an array, but
    // gcc -c -Wall -std=c99 does not mention it... I guess it would
@@ -51,8 +56,10 @@ void arithmetic03(int *p)
    q++;
 
 // Points To:
-// p -> _p_1[0] , EXACT
-// q -> _p_1[1] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *NULL_POINTER*[1] , MAY
+// q -> _p_1[1] , MAY
 
    return;
 }

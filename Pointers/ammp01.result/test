@@ -181,14 +181,1023 @@ int activate(int i1, int i2)
 
 POINTS-TO
 
+
+// Points To IN:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+
+// Points To OUT:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *NULL_POINTER* , EXACT
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+ATOM * a_m_serial(int serial)
+{
+
+// Points To: none
+
+   static ATOM *ap = (void *) 0;
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+
+   static ATOM *lastmatched = (void *) 0;
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// lastmatched -> *NULL_POINTER* , EXACT
+
+   int i, n, a_number();
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// lastmatched -> *NULL_POINTER* , EXACT
+
+   if (atomUPDATE)
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// lastmatched -> *NULL_POINTER* , EXACT
+
+      n = a_number();
+   else
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// lastmatched -> *NULL_POINTER* , EXACT
+
+      n = atomNUMBER;
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// lastmatched -> *NULL_POINTER* , EXACT
+
+
+   ap = first;
+
+// Points To:
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , EXACT
+
+   /* static pointer is hook for more efficient search */
+   if (ap==(void *) 0)
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , EXACT
+
+      return (void *) 0;
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , EXACT
+
+   if (lastmatched==(void *) 0)
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , EXACT
+
+      lastmatched = first;
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+
+
+   if (serial==lastmatched->serial)
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+
+      return lastmatched;
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+
+   if (serial>lastmatched->serial)
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+
+      ap = lastmatched;
+
+// Points To:
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+
+   for(i = 0; i <= n-1; i += 1) {
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+      if (ap->serial==serial) {
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+         lastmatched = ap;
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+         return ap;
+      }
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+      if (ap==ap->next)
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+         ap = first;
+      else
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+         ap = ap->next;
+   }
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// _first_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8.next -> _first_8_8_8 , MAY
+// _first_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8.next -> _first_8_8_8_8 , MAY
+// _first_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8.next -> _first_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8.next -> _first_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
+// _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_m_serial -> *NULL_POINTER* , MAY
+// a_m_serial -> _first_8 , MAY
+// a_m_serial -> _first_8_8 , MAY
+// a_m_serial -> _first_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// ap -> _first_8_8 , MAY
+// ap -> _first_8_8_8 , MAY
+// ap -> _first_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
+// lastmatched -> *NULL_POINTER* , MAY
+// lastmatched -> _first_8 , MAY
+// lastmatched -> _first_8_8 , MAY
+// lastmatched -> _first_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8 , MAY
+// lastmatched -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
+
+   return (void *) 0;
+}
+
+// Points To IN:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+
+// Points To OUT:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// a_next -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a_next -> *NULL_POINTER* , MAY
+// a_next -> _first_8_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+ATOM * a_next(int flag)
+{
+
+// Points To: none
+
+   static ATOM *ap = (void *) 0;
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+
+   if (ap==(void *) 0)
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+
+      ap = first;
+
+// Points To:
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+   if (ap==(void *) 0)
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+      return (void *) 0;
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+   if (flag<=0) {
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+      ap = first;
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+      return ap;
+   }
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// a_next -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+   if (ap==ap->next)
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// a_next -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+      return (void *) 0;
+
+// Points To:
+// a_next -> *NULL_POINTER* , MAY
+// a_next -> _first_8 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+   ap = ap->next;
+
+// Points To:
+// _first_8.next -> *NULL_POINTER* , MAY
+// _first_8.next -> _first_8_8 , MAY
+// a_next -> *NULL_POINTER* , MAY
+// a_next -> _first_8 , MAY
+// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8_8 , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8 , MAY
+
+   return ap;
+}
+
+// Points To IN: none
+
+
+// Points To OUT:
+// first -> *NULL_POINTER* , MAY
+
+int a_number()
+{
+
+// Points To: none
+
+   ATOM *ap;
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (atomUPDATE) {
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      atomUPDATE = 0;
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      atomNUMBER = 0;
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      if (first==(void *) 0)
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// first -> *NULL_POINTER* , EXACT
+
+         return 0;
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// first -> *NULL_POINTER* , MAY
+
+      ap = first;
+l99999:      ;
+
+// Points To: none
+
+      if (!1) goto _break_1;
+
+// Points To: none
+
+      if (ap->next==(void *) 0) goto _break_1;
+
+// Points To: none
+
+      atomNUMBER++;
+
+// Points To: none
+
+      if (ap->next==ap) goto _break_1;
+
+// Points To: none
+
+      ap = ap->next;
+      goto l99999;
+
+// Points To:
+// ap -> *NULL_POINTER* , EXACT
+// first -> *NULL_POINTER* , MAY
+
+_break_1:      ;
+   }
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+// first -> *NULL_POINTER* , MAY
+
+   return atomNUMBER;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int activate(int i1, int i2)
+{
+
+// Points To: none
+
+   int upper, lower;
+
+// Points To: none
+
+   ATOM *ap, *a_m_serial(int), *a_next(int);
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i, numatm, a_number();
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   if (i2==0) {
+
+// Points To:
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      ap = a_m_serial(i1);
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+      if (ap!=(void *) 0)
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+         ap->active = 1;
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+      return 0;
+   }
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+
+   upper = i2;
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+   lower = i1;
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+   if (i2<i1) {
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+      lower = i2;
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+      upper = i1;
+   }
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+
+   numatm = a_number();
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+   for(i = 0; i <= numatm-1; i += 1) {
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+      ap = a_next(i);
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+      if (ap->serial>=lower&&ap->serial<=upper)
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+         ap->active = 1;
+   }
+
+// Points To:
+// ap -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+
+   return 0;
+}
 C_PARSER[a_m_serial] (CreateReturnEntity) Type of "a_m_serial" is undefined. Return value cannot be created.
 C_PARSER[a_next] (CreateReturnEntity) Type of "a_next" is undefined. Return value cannot be created.
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_m_serial"
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_next"
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (possible_constant_paths) Uninitialized pointer 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (expression_to_constant_paths) user error
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (expression_to_constant_paths) Uninitialized pointer dereferencing
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (set_debug_stack_pointer) debug level stack is set to 2
-unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module a_m_serial.
-unknown[unknown] (display_a_resource) user error
-unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_next] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_m_serial" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_next" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_next" is still ignored
+On going implementation...
