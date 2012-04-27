@@ -29,7 +29,9 @@ void dependence10(int flag, int *a)
 POINTS TO for "dependence10"
 
 
-// Points To IN: none
+// Points To IN:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 
 
 // Points To OUT: none
@@ -38,24 +40,28 @@ void dependence10(int flag, int *a)
 {
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 
    int *p;
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int b[10];
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int i;
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    
@@ -63,20 +69,24 @@ void dependence10(int flag, int *a)
    if (flag)
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       p = a;
    else
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       p = b;
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
+// p -> *NULL_POINTER* , MAY
 // p -> _a_2[0] , MAY
 // p -> b[0] , MAY
 
@@ -86,7 +96,9 @@ void dependence10(int flag, int *a)
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// a -> _a_2[0] , EXACT
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
+// p -> *NULL_POINTER* , MAY
 // p -> _a_2[0] , MAY
 // p -> b[0] , MAY
 

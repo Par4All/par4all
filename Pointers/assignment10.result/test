@@ -1,0 +1,42 @@
+
+PROPER  EFFECTS
+
+int assignment10()
+{
+   struct {
+      int a[10];
+   } s;
+//             <    is written>: q
+   int *q = s.a;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   return *q;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int assignment10()
+{
+
+// Points To: none
+
+   struct {
+      int a[10];
+   } s;
+
+// Points To: none
+
+   int *q = s.a;
+
+// Points To:
+// q -> s.a[0] , EXACT
+
+
+   return *q;
+}

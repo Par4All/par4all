@@ -1,5 +1,0 @@
-pips error in r_cell_reference_to_type: (/home/amira/MYPIPS/prod/pips/src/Libs/effects-util/type.c:268) assertion failed
-
- 'there should be no memory access paths to variable names
-' not verified
-

@@ -46,7 +46,8 @@ POINTS TO for "dependence05"
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// dependence05 -> *HEAP*_l_10[0] , EXACT
 
 int * dependence05()
 {
@@ -124,7 +125,6 @@ int * dependence05()
    free(c);
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b -> *HEAP*_l_10[0] , EXACT
 // c -> *ANY_MODULE*:*NOWHERE* , EXACT
 
