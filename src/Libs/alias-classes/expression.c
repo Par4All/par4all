@@ -478,7 +478,7 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
   FOREACH(CELL, sink, sinks) {
     points_to pt = find_arc_in_points_to_set(source, sink, in);
     add_arc_to_pt_map(pt, old);
-    points_to npt = offset_cell(pt, delta, in);
+    points_to npt = offset_cell(pt, delta);
     add_arc_to_pt_map(npt, new);
   }
   difference_of_pt_maps(in, in, old);
@@ -496,7 +496,7 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
  * represent set "in", it is not possible to perform a side effect on
  * "sink" without removing and reinserting the corresponding arc.
  */
-points_to offset_cell(points_to pt, expression delta, pt_map in)
+points_to offset_cell(points_to pt, expression delta)
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
@@ -1452,12 +1452,17 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 	}
 	if(!cell_undefined_p(source)) {
 	  // FI: we should be able to remove an arc regardless of its
-	  // approximation...
-	  points_to a = make_points_to(source, sink, make_approximation_exact(),
-				     make_descriptor_none());
+	  // approximation... Not so simple as it's part of the key
+	  // used by the hash table!
+	  points_to a = make_points_to(copy_cell(source),
+				       copy_cell(sink),
+				       make_approximation_exact(),
+				       make_descriptor_none());
 	  remove_arc_from_pt_map(a, out);
-	  free(points_to_approximation(a));
-	  points_to_approximation(a) = make_approximation_may();
+	  free_points_to(a);
+	  a = make_points_to(copy_cell(source), copy_cell(sink),
+			     make_approximation_may(),
+			     make_descriptor_none());
 	  remove_arc_from_pt_map(a, out);
 	  free_points_to(a);
 	}

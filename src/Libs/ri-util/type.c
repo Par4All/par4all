@@ -2097,6 +2097,7 @@ type reference_to_type(reference ref)
     }
   else
     {
+      // The unknown type ends up here
       pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
 			  type_tag(exp_type),
 			  type_to_string(exp_type),

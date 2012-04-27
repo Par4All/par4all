@@ -85,6 +85,7 @@ return out;
  */
 pt_map statement_to_points_to(statement s, pt_map pt_in)
 {
+  pips_assert("pt_in is consistent", consistent_pt_map_p(pt_in));
   pt_map pt_out = new_pt_map();
   //assign_pt_map(pt_out, pt_in);
   pt_out = full_copy_pt_map(pt_in);
@@ -102,6 +103,8 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   else {
     pt_out = instruction_to_points_to(i, pt_out);
   }
+
+  pips_assert("pt_out is consistent", consistent_pt_map_p(pt_out));
 
   reset_heap_model();
 
@@ -148,6 +151,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
      && s!=get_current_module_statement())
     clear_pt_map(pt_out); // FI: memory leak?
     
+  pips_assert("pt_out is consistent on exit", consistent_pt_map_p(pt_out));
 
   return pt_out;
 }
@@ -507,7 +511,8 @@ pt_map k_limit_points_to(pt_map pt_out, int k)
       if(to_be_freed) free_type(kc_type);
     }
 
-    points_to npt = make_points_to(sc, kc, points_to_approximation(pt),
+    points_to npt = make_points_to(sc, kc,
+				   copy_approximation(points_to_approximation(pt)),
 				   make_descriptor_none());
     if(!points_to_equal_p(npt,pt)){
       // FI: should be moved to pt_map type...

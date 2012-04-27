@@ -329,10 +329,12 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
       // FI: side effect or allocation of a new cell?
-      (void) points_to_cell_add_field_dimension(pc, f);
+      cell npc = copy_cell(pc);
+      (void) points_to_cell_add_field_dimension(npc, f);
       // FI: does this call allocate a full new list?
       if(eval_p) {
-	list dL = source_to_sinks(pc, in, true);
+	list dL = source_to_sinks(npc, in, true);
+	free_cell(npc);
 	if(ENDP(dL))
 	  pips_internal_error("Dereferencing error.\n");
 	else {
@@ -344,7 +346,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	}
       }
       else
-	sinks = gen_nconc(sinks, CONS(CELL, pc, NIL));
+	sinks = gen_nconc(sinks, CONS(CELL, npc, NIL));
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
@@ -683,7 +685,9 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
       if(eval_p) {
 	// FI: we have a pointer. It denotes another location.
 	sinks = source_to_sinks(nc, in, true);
-	free_cell(nc);
+	// FI: in some cases, nc is reused in sinks
+	if(!gen_in_list_p(nc, sinks))
+	  free_cell(nc);
       }
       else {
       // FI: without dereferencing

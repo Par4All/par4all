@@ -264,7 +264,7 @@ bool cell_out_of_scope_p(cell c)
   return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
 }
 
-/*print a points-to arc for debug*/
+/* print a points-to arc for debug */
 void print_points_to(const points_to pt)
 {
   if(points_to_undefined_p(pt))
@@ -1075,6 +1075,10 @@ bool consistent_points_to_set(set s)
 {
   bool consistent_p = true;
 
+  SET_FOREACH(points_to, a, s) {
+    consistent_p = consistent_p && points_to_consistent_p(a);
+  }
+
   SET_FOREACH(points_to, pt1, s) {
     SET_FOREACH(points_to, pt2, s) {
       if(pt1!=pt2) {
@@ -1127,19 +1131,31 @@ bool consistent_points_to_set(set s)
   return consistent_p;
 }
 
+/* because of points-to set implementation, you cannot change
+ * approximations by side effects.
+ */
 void upgrade_approximations_in_points_to_set(pt_map pts)
 {
   SET_FOREACH(points_to, pt, pts) {
     approximation a = points_to_approximation(pt);
     if(!approximation_exact_p(a)) {
       cell source = points_to_source(pt);
-      list sinks = source_to_sinks(source, pts, false);
-      if(gen_length(sinks)==1) {
-	cell sink = points_to_sink(pt);
-	if(!cell_abstract_location_p(sink))
-	  approximation_tag(a) = is_approximation_exact;
+      if(!cell_abstract_location_p(source) // Represents may locations
+	 && !stub_points_to_cell_p(source)) { // May not exist...
+	list sinks = source_to_sinks(source, pts, false);
+	if(gen_length(sinks)==1) {
+	  cell sink = points_to_sink(pt);
+	  if(!cell_abstract_location_p(sink)) {
+	    points_to npt = make_points_to(copy_cell(source),
+					   copy_cell(sink),
+					   make_approximation_exact(),
+					   make_descriptor_none());
+	    remove_arc_from_pt_map(pt, pts);
+	    add_arc_to_pt_map(npt, pts);
+	  }
+	}
+	gen_free_list(sinks);
       }
-      gen_free_list(sinks);
     }
   }
 }
