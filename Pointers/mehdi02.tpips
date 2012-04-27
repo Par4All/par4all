@@ -1,0 +1,20 @@
+setenv WS=mehdi02
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo
+echo POINTS TO
+echo 
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+close
+delete $WS
+quit
