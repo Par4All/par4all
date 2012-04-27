@@ -766,10 +766,17 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
   // FI: seems just plain wrong for a sink
-  pips_internal_error("Not implemented yet");
+  // pips_internal_error("Not implemented yet");
   if( sizeofexpression_expression_p(soe) ){
     expression ne = sizeofexpression_expression(soe);
     sinks = expression_to_points_to_sinks(ne, in);
+  }
+  if( sizeofexpression_type_p(soe) ){
+    type t = sizeofexpression_type(soe);
+    // FI: a better job could be done. A stub should be allocated in
+    // the formal context of the procedure
+    cell c = make_anywhere_cell(t);
+    sinks = CONS(CELL, c, NIL);
   }
   return sinks;
 }
@@ -984,10 +991,11 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   }
   case  is_syntax_va_arg: {
     // FI: useful?
-    pips_internal_error("Not implemented yet\n");
+    //pips_internal_error("Not implemented yet\n");
     list soel = syntax_va_arg(s);
-    sizeofexpression soe = SIZEOFEXPRESSION(CAR(soel));
-    sinks = sizeofexpression_to_points_to_sinks(soe, in);
+    sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
+    sizeofexpression soet = SIZEOFEXPRESSION(CAR(CDR(soel)));
+    sinks = sizeofexpression_to_points_to_sinks(soet, in);
     break;
   }
   default:

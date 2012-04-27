@@ -1004,6 +1004,8 @@ bool opkill_may_vreference(cell c1, cell c2)
   return (i==0? true: false);
 }
 
+/* FI->MA: comments are needed to know if c1 kills c2 or the other way
+   round... */
 bool opkill_must_vreference(cell c1, cell c2)
 {
   int i = 0;
@@ -1023,7 +1025,12 @@ bool opkill_must_vreference(cell c1, cell c2)
 	expression se1 = EXPRESSION(CAR(sl1));
 	expression se2 = EXPRESSION(CAR(sl2));
 	if(expression_constant_p(se2) && unbounded_expression_p(se1)){
+	  //i = 0;
+	  i = 1;
+	}
+	else if(expression_constant_p(se1) && unbounded_expression_p(se2)){
 	  i = 0;
+	  //i = 1;
 	}
 	else if (expression_constant_p(se1) && expression_constant_p(se2)){
 	  int i1 = expression_to_int(se1);
