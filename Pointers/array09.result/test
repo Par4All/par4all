@@ -44,8 +44,7 @@ int bar(int *p)
    a[*p++] = 2.;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[1] , MAY
+// p -> _p_1[1] , EXACT
 
    return 0;
 }
@@ -97,10 +96,8 @@ int toto(int *p)
    a[*(q = p++)] = 2.;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[1] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _p_1[0] , MAY
+// p -> _p_1[1] , EXACT
+// q -> _p_1[0] , EXACT
 
    return 0;
 }
