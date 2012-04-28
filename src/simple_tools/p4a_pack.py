@@ -312,7 +312,7 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, version,
     (publish_dir, deb_publish_dir) = make_publish_dirs_from_template(publish_dir, distro, arch, version, deb_publish_dir, deb_distro, deb_arch)
 
     for file in files:
-        file = os.path.abspath(os.path.expanduser(file))
+        file = os.path.abspath(file)
         if not os.path.exists(file):
             p4a_util.die("Invalid file: " + file)
         p4a_util.warn("\n\nCopying " + file + " in " + publish_dir + " on " + default_publish_host)
@@ -358,7 +358,7 @@ def work(options, args = []):
 
     pack_dir = options.pack_dir
     if pack_dir:
-        pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
+        pack_dir = os.path.realpath(os.path.abspath(pack_dir))
         p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
     else:
         pack_dir = default_pack_dir
@@ -423,6 +423,8 @@ def work(options, args = []):
 
     prefix = options.install_prefix
     if prefix:
+        # Make the script working with relative path too:
+        prefix = os.path.abspath(prefix)
         p4a_util.warn("Installation prefix: " + prefix + " (--install-prefix)")
     else:
         prefix = default_install_prefix
@@ -434,7 +436,8 @@ def work(options, args = []):
 
     output_dir = options.pack_output_dir
     if output_dir:
-        output_dir = os.path.abspath(os.path.expanduser(output_dir))
+        # Make the script working with relative path too:
+        output_dir = os.path.abspath(output_dir)
         p4a_util.warn("Packages will be put in " + output_dir + " (--pack-output-dir)")
         if output_dir == os.getcwd():
             output_dir = None
