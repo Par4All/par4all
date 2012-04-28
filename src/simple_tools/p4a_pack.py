@@ -501,10 +501,7 @@ def main():
     '''The function called when this program is executed by its own'''
 
     parser = optparse.OptionParser(description = __doc__,
-        usage = "%prog <--deb|--tgz|-stgz> [--version=0.1] [--append-date] "
-            + "[--dir=/current/install/dir] [--prefix=/final/install/dir] "
-            + "[--publish] [other options] [optional additional files to publish]; "
-            + "run %prog --help for options")
+        usage = "%prog --deb|--tgz|-stgz [other options] [optional additional files to publish]")
 
     add_module_options(parser)
 
