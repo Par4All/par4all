@@ -30,7 +30,7 @@ int main()
    s = "hello\n";
 
 // Points To:
-// s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// s -> "hello\n" , EXACT
 
    return 0;
 }

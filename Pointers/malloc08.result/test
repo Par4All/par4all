@@ -96,7 +96,8 @@ int main(int argc, char *argv[])
 // Points To:
 // argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> i , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// qi -> i , MAY
 
 
    return 0;
