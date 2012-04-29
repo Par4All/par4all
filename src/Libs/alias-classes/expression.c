@@ -848,31 +848,35 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     SET_FOREACH(points_to, pts, pt_out) {
       cell r = points_to_sink(pts);
       if(points_to_cell_in_list_p(r, R)) {
-	if(!null_cell_p(r) && !anywhere_cell_p(r) && nowhere_cell_p(r)) {
+	if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
 	  /* FI: should be easier and more efficient to substitute the
 	     sink... But is is impossible with the representation of
 	     the points-to set. */
+	  /*
 	  cell source = copy_cell(points_to_source(pts));
 	  cell sink = make_nowhere_cell();
 	  approximation a = copy_approximation(points_to_approximation(pts));
 	  points_to npts = make_points_to(source, sink, a, make_descriptor_none());
 	  add_arc_to_pt_map(npts, pt_out);
-	// FI: assuming you can perform the removal inside the loop...
-	remove_arc_from_pt_map(pts, pt_out);
-	{
-	  cell source = points_to_source(pts);
-	// FI: it should be a make_typed_nowhere_cell()
-	bool to_be_freed;
-	type t = points_to_cell_to_type(source, &to_be_freed);
-	type pt = type_to_pointed_type(t);
-	cell sink = make_typed_nowhere_cell(pt);
-	approximation a = make_approximation_may();
-	points_to npt = make_points_to(source, sink, a,
-				       make_descriptor_none());
-	add_arc_to_pt_map(npt, pt_out);
-	//free_points_to(pts);
-	if(to_be_freed) free_type(t);
-	}
+	  */
+	  // FI: pv_whileloop05, lots of related cells to remove after a free...
+	  // FI: assuming you can perform the removal inside the loop...
+	  remove_arc_from_pt_map(pts, pt_out);
+	  {
+	    cell source = points_to_source(pts);
+	    // FI: it should be a make_typed_nowhere_cell()
+	    bool to_be_freed;
+	    type t = points_to_cell_to_type(source, &to_be_freed);
+	    type pt = type_to_pointed_type(t);
+	    cell sink = make_typed_nowhere_cell(pt);
+	    //approximation a = make_approximation_may(); // FI: why may?
+	    approximation a = copy_approximation(points_to_approximation(pts));
+	    points_to npt = make_points_to(source, sink, a,
+					   make_descriptor_none());
+	    add_arc_to_pt_map(npt, pt_out);
+	    //free_points_to(pts);
+	    if(to_be_freed) free_type(t);
+	  }
 	}
       }
     }
