@@ -1004,8 +1004,7 @@ bool opkill_may_vreference(cell c1, cell c2)
   return (i==0? true: false);
 }
 
-/* FI->MA: comments are needed to know if c1 kills c2 or the other way
-   round... */
+/* returns true if c2 kills c1 */
 bool opkill_must_vreference(cell c1, cell c2)
 {
   int i = 0;
@@ -1081,6 +1080,7 @@ bool opkill_may_constant_path(cell c1, cell c2)
   return kill_may_p;
 }
 
+/* returns true if c2 kills c1*/
 bool opkill_must_constant_path(cell c1, cell c2)
 {
   bool kill_must_p;
