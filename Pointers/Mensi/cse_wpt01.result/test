@@ -1,0 +1,75 @@
+
+PROPER  EFFECTS
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+   int i;
+   int j;
+   int k;
+//             <    is written>: p
+   int *p = &j;
+//             <    is written>: q
+   int *q = &k;
+//             <    is read   >: j
+//             <    is written>: i
+   i = 2*(j+2);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *p = *q;
+//             <    is read   >: j
+//             <    is written>: k
+   k = 3*(j+2);
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int j;
+
+// Points To: none
+
+   int k;
+
+// Points To: none
+
+   int *p = &j;
+
+// Points To:
+// p -> j , EXACT
+
+   int *q = &k;
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   i = 2*(j+2);
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   *p = *q;
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   k = 3*(j+2);
+}
