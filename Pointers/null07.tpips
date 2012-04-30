@@ -1,4 +1,5 @@
-setenv WSPACE=pv_whileloop06
+setenv WSPACE=null07
+
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -8,10 +9,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # Key property for this test case
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-# Do not create to many stubs, easier to debug...
-setproperty POINTS_TO_PATH_LIMIT 2
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 #module main
 
@@ -20,7 +18,7 @@ echo
 echo PROPER  EFFECTS
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE
 
 
 
@@ -28,7 +26,7 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE
 
 close
 delete $WSPACE

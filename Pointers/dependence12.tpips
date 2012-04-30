@@ -6,6 +6,7 @@ create dependence12 dependence12.c
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+setproperty POINTS_TO_PATH_LIMIT 10
 
 activate PRINT_CODE_PROPER_EFFECTS
 

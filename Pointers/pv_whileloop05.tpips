@@ -11,7 +11,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 # Do not create to many stubs, easier to debug...
-setproperty POINTS_TO_K_LIMITING 2
+setproperty POINTS_TO_PATH_LIMIT 2
 
 #module main
 

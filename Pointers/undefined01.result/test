@@ -1,0 +1,40 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   *p = 1;
+
+// Points To: none
+
+
+   return 0;
+}
