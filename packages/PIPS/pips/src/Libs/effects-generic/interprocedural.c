@@ -54,7 +54,7 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 
 
-
+extern string compilation_unit_of_module(const char *);
 
 /**************************************************** FORTRAN */
 
@@ -503,10 +503,12 @@ list generic_c_effects_backward_translation(entity callee,
 	    {
 	      type real_arg_t = expression_to_type(real_arg);
 	      if (types_compatible_for_effects_interprocedural_translation_p(real_arg_t, te))
-		l_eff = gen_nconc
-		  (l_eff,
-		   (*c_effects_on_formal_parameter_backward_translation_func)
-		   (l_eff_on_current_formal, real_arg, context));
+		{
+		  l_eff = gen_nconc
+		    (l_eff,
+		     (*c_effects_on_formal_parameter_backward_translation_func)
+		     (l_eff_on_current_formal, real_arg, context));
+		}
 	      else
 		{
 		  bool read_p = false;
@@ -540,6 +542,18 @@ list generic_c_effects_backward_translation(entity callee,
   /* 		      entity_user_name(callee), */
   /* 		      entity_user_name(get_current_module_entity())); */
   /*     } */
+
+  pips_debug_effects(5, "effects before fields translation:\n", l_eff);
+  //  pips_debug(8, "callee's name is %s, current module name %s\n", entity_name(callee), entity_name(get_current_module_entity()));
+
+  //  string callee_cu_name = compilation_unit_of_module(entity_local_name(callee));
+  //  string current_cu_name = compilation_unit_of_module(entity_local_name(get_current_module_entity()));
+  //  pips_debug(8, "callee cu name %s, current cu name %s\n", callee_cu_name, current_cu_name);
+
+  effects_translate_fields_compilation_unit(l_eff,
+					    compilation_unit_of_module(entity_local_name(callee)),
+					    compilation_unit_of_module(entity_local_name(get_current_module_entity())));
+
 
   (*effects_translation_end_func)();
 
@@ -616,6 +630,11 @@ list generic_c_effects_forward_translation
 
 
   l_res = gen_nconc(l_global, l_formal);
+
+  pips_debug_effects(2,"effects before, fields translation: \n",l_res);
+  effects_translate_fields_compilation_unit(l_res,
+					    compilation_unit_of_module(entity_local_name(get_current_module_entity())),
+					    compilation_unit_of_module(entity_local_name(callee)));
   pips_debug_effects(2,"Ending with effects : \n",l_res);
  (*effects_translation_end_func)();
   return(l_res);
@@ -666,4 +685,126 @@ list generic_effects_forward_translation(entity callee,
 
   return el;
 
+}
+
+static void effect_translate_fields(effect eff)
+{
+  pips_debug_effect(8, "input effect\n", eff);
+  list l_indices = cell_indices(effect_cell(eff));
+
+  if (!ENDP(l_indices))
+    {
+
+  type current_type = entity_basic_concrete_type(effect_entity(eff));
+
+
+  
+  while(!ENDP(l_indices))
+    {
+      switch(type_tag(current_type))
+	{
+	case is_type_void:
+	case is_type_functional:
+	  // not expected because there are no more indices
+	  pips_internal_error("void or functional type not expected here, please report\n");
+	case is_type_variable:
+	  {
+	    pips_debug(8, "variable case\n");
+	    basic current_basic = variable_basic(type_variable(current_type));
+	    list current_dims = variable_dimensions(type_variable(current_type));
+	    
+	    /* skip array dimensions */
+	    pips_debug(8, "poping %d dimensions\n",  (int) gen_length(current_dims) );
+	    for(int i=0; i< (int) gen_length(current_dims) && !ENDP(l_indices); i++, POP(l_indices));
+
+	    if (!ENDP(l_indices)) 
+	      {
+		switch(basic_tag(current_basic))
+		  {
+		  case is_basic_pointer:
+		    pips_debug(8, "pointer case, poping one dimension\n");
+		    POP(l_indices);
+		    current_type = basic_pointer(current_basic);
+		    break;
+		  case is_basic_derived:
+		    pips_debug(8, "derived case\n");
+		    current_type = entity_basic_concrete_type(basic_derived(current_basic));
+		    break;
+		  case is_basic_typedef:
+		    pips_debug(8, "typedef case\n");
+		    current_type = entity_basic_concrete_type(basic_typedef(current_basic));
+		    break;
+		  default:
+		    pips_internal_error("this kind of basic should not appear here\n");
+		  }
+	      }
+
+	    break;
+	  }
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  pips_debug(8, "struct, union or enum case\n");
+	  expression exp = EXPRESSION(CAR(l_indices));
+	  pips_assert("current index must be a field entity",
+		      expression_reference_p(exp)
+		      && entity_field_p(reference_variable(expression_reference(exp))));
+	  reference exp_ref = expression_reference(exp);
+	  entity exp_ent = reference_variable(exp_ref);
+	  const char* exp_ent_name = entity_user_name(exp_ent);
+
+	  // search for matching field in current type
+	  list l_current_fields = type_fields(current_type);
+	  bool found = false;
+	  entity current_field = entity_undefined;
+	  while(!found && !ENDP(l_current_fields))
+	    {
+	      current_field = ENTITY(CAR(l_current_fields));
+	      pips_debug(8, "current field: %s \n", entity_name(current_field));
+
+	      if (same_entity_p(exp_ent, current_field))
+		{
+		  pips_debug(8, "same field entities\n");
+		  found = true;
+		}
+	      else if (same_string_p(entity_user_name(current_field), exp_ent_name))
+		{
+		  pips_debug(8, "matching field \n");
+		  found = true;
+		}
+	      POP(l_current_fields);
+	    }
+	  if (found)
+	    {
+	      reference_variable(exp_ref) = current_field;
+	      current_type = entity_basic_concrete_type(current_field);
+	      POP(l_indices);
+	    }
+	  else
+	    pips_internal_error("matching field not found\n");
+	  break;
+	default:
+	  pips_internal_error("unexpected type: %s\n", type_to_string(current_type) );
+	}      
+    }
+    }
+}
+
+void effects_translate_fields_compilation_unit(list l_eff, string source_cu_name, string target_cu_name)
+{
+
+  pips_debug(8, "source name: %s, target name %s\n",
+	     source_cu_name, target_cu_name);
+  //  if(false)
+  if (same_string_p(source_cu_name, target_cu_name))
+    {
+      pips_debug(8, "same compilation units \n");
+    }
+  else
+    {
+      FOREACH(EFFECT, eff, l_eff)
+	{
+	  effect_translate_fields(eff);
+	}
+    }
 }

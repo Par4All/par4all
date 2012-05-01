@@ -283,23 +283,22 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     //offset_cells(sinks, m_one);
     //free_expression(m_one);
    }
-  else if(ENTITY_POST_INCREMENT_P(f)) {
+  else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
     // arithmetic05: "q=p++;" p++ must be evaluated
+    //list sources = expression_to_points_to_sinks(a, in);
+    //if(gen_length(sources)==1) {
+    //cell source = CELL(CAR(sources));
     sinks = expression_to_points_to_sinks(a, in);
-    /* We have to undo the impact of side effects */
-    expression m_one = int_to_expression(-1);
-    offset_cells(sinks, m_one);
-    free_expression(m_one);
-   }
-  else if(ENTITY_POST_DECREMENT_P(f)) {
-    //sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sinks(a, in);
-    /* We have to undo the impact of side effects */
-    expression one = int_to_expression(1);
-    offset_cells(sinks, one);
-    free_expression(one);
-   }
+    /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
+    expression delta = expression_undefined;
+    if(ENTITY_POST_INCREMENT_P(f))
+      delta = int_to_expression(-1);
+    else
+      delta = int_to_expression(1);
+    offset_points_to_cells(sinks, delta);
+    free_expression(delta);
+  }
   else {
   // FI: to be continued
     pips_internal_error("Unexpected unary pointer operator\n");
@@ -330,10 +329,12 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
       // FI: side effect or allocation of a new cell?
-      (void) points_to_cell_add_field_dimension(pc, f);
+      cell npc = copy_cell(pc);
+      (void) points_to_cell_add_field_dimension(npc, f);
       // FI: does this call allocate a full new list?
       if(eval_p) {
-	list dL = source_to_sinks(pc, in, true);
+	list dL = source_to_sinks(npc, in, true);
+	free_cell(npc);
 	if(ENDP(dL))
 	  pips_internal_error("Dereferencing error.\n");
 	else {
@@ -345,7 +346,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	}
       }
       else
-	sinks = gen_nconc(sinks, CONS(CELL, pc, NIL));
+	sinks = gen_nconc(sinks, CONS(CELL, npc, NIL));
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
@@ -417,13 +418,14 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   list sinks = NIL;
   type t1 = expression_to_type(a1);
   type t2 = expression_to_type(a2);
+  // FI: the first two cases should be unified with a=a1 or a2
   if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
     sinks = expression_to_points_to_sinks(a1, in);
-    offset_cells(sinks, a2);
+    offset_points_to_cells(sinks, a2);
   }
   else if(pointer_type_p(t2) && scalar_integer_type_p(t1)) {
     sinks = expression_to_points_to_sinks(a2, in);
-    offset_cells(sinks, a1);
+    offset_points_to_cells(sinks, a1);
   }
   else
     pips_internal_error("Not implemented for %p and %p and %p\n", a1, a2, in);
@@ -445,11 +447,21 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
 
   if(ENTITY_CONDITIONAL_P(f)) {
     //bool eval_p = true;
+    expression c = EXPRESSION(CAR(al));
+    pt_map in_t = full_copy_pt_map(in);
+    pt_map in_f = full_copy_pt_map(in);
+    in_t = condition_to_points_to(c, in_t, true);
+    in_f = condition_to_points_to(c, in_f, true);
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    list sinks1 = expression_to_points_to_cells(e1, in, eval_p);
-    list sinks2 = expression_to_points_to_cells(e2, in, eval_p);
+    list sinks1 = NIL;
+    if(!empty_pt_map_p(in_t))
+      sinks1 = expression_to_points_to_cells(e1, in_t, eval_p);
+    list sinks2 = NIL;
+    if(!empty_pt_map_p(in_f))
+      sinks2 = expression_to_points_to_cells(e2, in_f, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
+    free_pt_map(in_t), free_pt_map(in_f);
   }
   // FI: any other ternary intrinsics?
 
@@ -520,6 +532,29 @@ void print_points_to_cells(list cl)
   fprintf(stderr, "\n");
 }
 
+/* Points-to cannot used any kind of reference, just constant references */
+reference simplified_reference(reference r)
+{
+  list sl = reference_indices(r);
+  list nsl = NIL;
+
+  FOREACH(EXPRESSION, s, sl) {
+    value v = EvalExpression(s);
+    expression ns = expression_undefined;
+    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+      int cs = constant_int(value_constant(v));
+      ns = int_to_expression(cs);
+    }
+    else {
+      ns = make_unbounded_expression();
+    }
+    nsl = gen_nconc(nsl, CONS(EXPRESSION, ns, NIL));
+  }
+
+  entity var = reference_variable(r);
+  reference nr = make_reference(var, nsl);
+  return nr;
+}
 
  /* Returns a list of memory cells "sinks" possibly accessed by the evaluation
   * of reference "r". No sharing between the returned list "sinks" and
@@ -578,7 +613,8 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     }
     else if(nd==rd) {
       // FI: eval_p is not used here...
-      cell nc = make_cell_reference(copy_reference(r));
+      reference nr = simplified_reference(r);
+      cell nc = make_cell_reference(nr);
       sinks = CONS(CELL, nc, NIL);
     }
     else { // rd is too big
@@ -649,7 +685,9 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
       if(eval_p) {
 	// FI: we have a pointer. It denotes another location.
 	sinks = source_to_sinks(nc, in, true);
-	free_cell(nc);
+	// FI: in some cases, nc is reused in sinks
+	if(!gen_in_list_p(nc, sinks))
+	  free_cell(nc);
       }
       else {
       // FI: without dereferencing
@@ -728,10 +766,17 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
   // FI: seems just plain wrong for a sink
-  pips_internal_error("Not implemented yet");
+  // pips_internal_error("Not implemented yet");
   if( sizeofexpression_expression_p(soe) ){
     expression ne = sizeofexpression_expression(soe);
     sinks = expression_to_points_to_sinks(ne, in);
+  }
+  if( sizeofexpression_type_p(soe) ){
+    type t = sizeofexpression_type(soe);
+    // FI: a better job could be done. A stub should be allocated in
+    // the formal context of the procedure
+    cell c = make_anywhere_cell(t);
+    sinks = CONS(CELL, c, NIL);
   }
   return sinks;
 }
@@ -936,7 +981,7 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   }
   case  is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
-    sinks = subscript_to_points_to_sinks(sub, in, true);
+    sinks = subscript_to_points_to_sinks(sub, in, eval_p);
     break;
   }
   case  is_syntax_application: {
@@ -946,10 +991,11 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   }
   case  is_syntax_va_arg: {
     // FI: useful?
-    pips_internal_error("Not implemented yet\n");
+    //pips_internal_error("Not implemented yet\n");
     list soel = syntax_va_arg(s);
-    sizeofexpression soe = SIZEOFEXPRESSION(CAR(soel));
-    sinks = sizeofexpression_to_points_to_sinks(soe, in);
+    sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
+    sizeofexpression soet = SIZEOFEXPRESSION(CAR(CDR(soel)));
+    sinks = sizeofexpression_to_points_to_sinks(soet, in);
     break;
   }
   default:

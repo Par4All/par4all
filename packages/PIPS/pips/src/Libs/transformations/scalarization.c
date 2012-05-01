@@ -1029,6 +1029,61 @@ static bool statement_entity_references_constant_in_context_p(statement s,
   return constant_p;
 }
 
+typedef struct {
+  entity e;
+  bool used_through_external_calls;
+} calls_test_ctxt;
+
+
+
+
+static bool entity_accessed_in_call_in(call c, calls_test_ctxt *ctxt)
+{
+  entity func = call_function(c);
+  type uet = ultimate_type(entity_type(func));
+  if(type_functional_p(uet) && value_code_p(entity_initial(func))) 
+    {
+      // get the summary effects of the function
+      const char *func_name = module_local_name(func);
+      list func_eff = effects_to_list((effects) db_get_memory_resource(DBR_SUMMARY_REGIONS,
+								       func_name,
+								       true));
+      /* tests if the function may refer to the global variable */
+      list l_conflicts = effects_entities_which_may_conflict_with_scalar_entity(func_eff, ctxt->e);
+      if (!ENDP(l_conflicts))
+	{
+	  ctxt->used_through_external_calls = true;
+	  gen_free_list(l_conflicts);
+	}
+    }
+  return (!ctxt->used_through_external_calls);
+}
+
+static bool entity_accessed_in_statement_declarations_calls_in(statement s, calls_test_ctxt * ctxt)
+{
+  if (declaration_statement_p(s))
+    {
+      list l_decls = statement_declarations(s);
+      FOREACH(ENTITY, e, l_decls)
+	{
+	  gen_context_recurse(entity_initial(e), &ctxt,
+				    call_domain, entity_accessed_in_call_in, gen_null);
+	}
+    }
+  return (!ctxt->used_through_external_calls);
+}
+
+static bool entity_accessed_through_calls_in_statement_p(entity e, statement s)
+{
+  calls_test_ctxt ctxt;
+  ctxt.e = e;
+  ctxt.used_through_external_calls = false;
+  gen_context_multi_recurse(s, &ctxt,
+		      statement_domain, entity_accessed_in_statement_declarations_calls_in, gen_null,
+		      call_domain, entity_accessed_in_call_in, gen_null, NULL);
+  return (ctxt.used_through_external_calls);
+}
+
 
 /* Scalarize array references in any kind of statement
  *
@@ -1100,7 +1155,9 @@ static bool statement_scalarization(statement s,
              // several times in the
              // effect list
        && nd > 0 // Only array references can be scalarized
-       && !volatile_variable_p(pv)) { // Volatile arrays cannot be scalarized
+       && !volatile_variable_p(pv) // Volatile arrays cannot be scalarized
+       && (!top_level_entity_p(pv) || !entity_accessed_through_calls_in_statement_p(pv, s)) // global arrays accessed through calls cannot yet be scalarized
+       ) { 
       // Does the current variable appear in the in effect?
       entity iv = (entity) gen_find(pv,
                                     irl,
