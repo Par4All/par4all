@@ -155,31 +155,34 @@ set points_to_block_projection(set pts, list  l)
 {
   list pls = NIL; // Possibly lost sinks
   FOREACH(ENTITY, e, l) {
-    SET_FOREACH(points_to, pt, pts){
-      cell source = points_to_source(pt);
-      cell sink = points_to_sink(pt);
-      entity e_sr = reference_variable(cell_to_reference(source));
-      entity e_sk = reference_variable(cell_to_reference(sink));
+    type uet = ultimate_type(entity_type(e));
+    if(pointer_type_p(uet)) {
+      SET_FOREACH(points_to, pt, pts){
+	cell source = points_to_source(pt);
+	cell sink = points_to_sink(pt);
+	entity e_sr = reference_variable(cell_to_reference(source));
+	entity e_sk = reference_variable(cell_to_reference(sink));
 
-      if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
-	set_del_element(pts, pts, (void*)pt);
-	if(heap_cell_p(sink)) {
-	  /* Check for memory leaks */
-	  pls = CONS(CELL, sink, pls);
-	}
-      }
-      else if(e == e_sk
-	      && (!(variable_static_p(e_sk)
-		    || top_level_entity_p(e_sk)
-		    || heap_cell_p(sink)))) {
-	if(gen_in_list_p(e_sr, l)) {
-	  /* Both the sink and the source disappear: the arc is removed */
+	if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
 	  set_del_element(pts, pts, (void*)pt);
+	  if(heap_cell_p(sink)) {
+	    /* Check for memory leaks */
+	    pls = CONS(CELL, sink, pls);
+	  }
 	}
-	else {
-	  pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
-	  list lhs = CONS(CELL, source, NIL);
-	  pts = points_to_nowhere_typed(lhs, pts);
+	else if(e == e_sk
+		&& (!(variable_static_p(e_sk)
+		      || top_level_entity_p(e_sk)
+		      || heap_cell_p(sink)))) {
+	  if(gen_in_list_p(e_sr, l)) {
+	    /* Both the sink and the source disappear: the arc is removed */
+	    set_del_element(pts, pts, (void*)pt);
+	  }
+	  else {
+	    pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
+	    list lhs = CONS(CELL, source, NIL);
+	    pts = points_to_nowhere_typed(lhs, pts);
+	  }
 	}
       }
     }
@@ -228,16 +231,27 @@ set points_to_source_projection(set pts, entity e)
   return pts;
 }
 
-
+/* FI: side-effects to be used in this function */
 set points_to_function_projection(set pts)
 {
   set res = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
   set_assign(res, pts);
+  /* Do we have a useful return value? */
+  type ft = ultimate_type(entity_type(get_current_module_entity()));
+  type rt = ultimate_type(functional_result(type_functional(ft)));
+  entity rv = entity_undefined;
+  if(pointer_type_p(rt))
+    rv = function_to_return_value(get_current_module_entity());
 
   SET_FOREACH(points_to, pt, pts) {
-    if(cell_out_of_scope_p(points_to_source(pt)))
-      set_del_element(res, res, (void*)pt);
+    if(cell_out_of_scope_p(points_to_source(pt))) {
+      /* Preserve the return value */
+      reference r = cell_any_reference(points_to_source(pt));
+      entity v = reference_variable(r);
+      if(rv!=v)
+	set_del_element(res, res, (void*)pt);
+    }
   }
   return res;
 }
@@ -250,7 +264,7 @@ bool cell_out_of_scope_p(cell c)
   return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
 }
 
-/*print a points-to arc for debug*/
+/* print a points-to arc for debug */
 void print_points_to(const points_to pt)
 {
   if(points_to_undefined_p(pt))
@@ -265,6 +279,7 @@ void print_points_to(const points_to pt)
     reference r1 = cell_to_reference(source);
     reference r2 = cell_to_reference(sink);
 
+    fprintf(stderr,"%p ", pt);
     print_reference(r1);
     fprintf(stderr,"->");
     print_reference(r2);
@@ -287,7 +302,6 @@ void print_points_to_set(string what,  set s)
   fprintf(stderr, "\n");
 }
 
-
 /* test if a cell appear as a source in a set of points-to */
 bool source_in_set_p(cell source, set s)
 {
@@ -298,6 +312,35 @@ bool source_in_set_p(cell source, set s)
       return true;
   }
   return in_p;
+}
+
+/* test if a cell appear as a sink in a set of points-to */
+bool sink_in_set_p(cell sink, set s)
+{
+  bool in_p = false;
+  SET_FOREACH ( points_to, pt, s ) {
+    if( cell_equal_p(points_to_sink(pt),sink) )
+      in_p = true;
+  }
+  return in_p;
+}
+
+/* The approximation is not taken into account
+ *
+ * It might be faster to look up the different points-to arcs that can
+ * be made with source, sink and any approximation.
+ */
+points_to find_arc_in_points_to_set(cell source, cell sink, pt_map s)
+{
+  points_to fpt = points_to_undefined;
+  SET_FOREACH(points_to, pt, s) {
+    if(cell_equal_p(points_to_source(pt), source)
+       && cell_equal_p(points_to_sink(pt), sink) ) {
+      fpt = pt;
+      break;
+    }
+  }
+  return fpt;
 }
 
 /* source is assumed to be either nowhere/undefined or anywhere, it
@@ -678,6 +721,24 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       }
     }
 
+    /* The source may be an array field */
+    if(ENDP(sinks)) {
+      bool to_be_freed = false;
+      type st = points_to_cell_to_type(source, &to_be_freed);
+      if(array_type_p(st)) {
+	// FI: I'm not too sure I cannot copy the reference because it
+	// has to ne modified
+	reference nr = copy_reference(cell_any_reference(source));
+	expression zero = int_to_expression(0);
+	reference_indices(nr) = gen_nconc(reference_indices(nr),
+					  CONS(EXPRESSION,zero, NIL));
+	cell nc = make_cell_reference(nr);
+	sinks = CONS(CELL, nc, NIL);
+      }
+      if(to_be_freed)
+	free_type(st);
+    }
+
     /* 3. If the previous steps have failed, build a new sink if the
        source is a formal parameter. */
     // FI: you must generate sinks for formal parameters, global
@@ -685,12 +746,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
     if(ENDP(sinks)) {
       reference r = cell_any_reference(source);
       entity v = reference_variable(r);
-      if(formal_parameter_p(v)
-	 || /* global_variable_p(v)*/
-	 /* FI: wrong test anywhere might have been top-level? */
-	 /* FI: wrong, how about static global variables? */
-	 /* FI: see for instance global07.c */
-	 top_level_entity_p(v)) {
+      if(formal_parameter_p(v)) {
 	// Find stub type
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
@@ -708,19 +764,39 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  add_arc_to_points_to_context(copy_points_to(npt));
 	  sinks = CONS(CELL, copy_cell(nsink), sinks);
       }
-      else if(static_global_variable_p(v)) {
+      else if(top_level_entity_p(v) || static_global_variable_p(v)) {
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
 	// FI: the type retrieval must be improved for arrays & Co
 	//points_to pt = create_stub_points_to(source, st, basic_undefined);
-	points_to pt = create_k_limited_stub_points_to(source, st, pts);
-	pts = add_arc_to_pt_map(pt, pts);
-	add_arc_to_points_to_context(copy_points_to(pt));
-	sinks = source_to_sinks(source, pts, false);
-	/* cell nc = add_virtual_sink_to_source(source);
-	 * points_to npt = make_points_to(copy_cell(source), nc, may/must)
-	 * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
-	 */
-	;
+	points_to pt = points_to_undefined;
+	if(const_variable_p(v)) {
+	  expression init = variable_initial_expression(v);
+	  sinks = expression_to_points_to_sinks(init, pts);
+	  free_expression(init);
+	  /* Add these new arcs to the context */
+	  bool exact_p = gen_length(sinks)==1;
+	  FOREACH(CELL, sink, sinks) {
+	    cell nsource = copy_cell(source);
+	    cell nsink = copy_cell(sink);
+	    approximation na = exact_p? make_approximation_exact():
+	      make_approximation_may();
+	    points_to npt = make_points_to(nsource, nsink, na,
+					   make_descriptor_none());
+	    pts = add_arc_to_pt_map(npt, pts);
+	    add_arc_to_points_to_context(copy_points_to(npt));
+	  }
+	}
+	else {
+	  pt = create_k_limited_stub_points_to(source, st, pts);
+
+	  pts = add_arc_to_pt_map(pt, pts);
+	  add_arc_to_points_to_context(copy_points_to(pt));
+	  sinks = source_to_sinks(source, pts, false);
+	  /* cell nc = add_virtual_sink_to_source(source);
+	   * points_to npt = make_points_to(copy_cell(source), nc, may/must)
+	   * pt_out = update_pt_map(); set_add_element()? add_arc_to_pt_map()
+	   */
+	  ;
 	  /* The pointer may be NULL */
 	  cell nsource = copy_cell(source);
 	  cell nsink = make_null_pointer_value_cell();
@@ -730,6 +806,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  pts = add_arc_to_pt_map(npt, pts);
 	  add_arc_to_points_to_context(copy_points_to(npt));
 	  sinks = CONS(CELL, copy_cell(nsink), sinks);
+	}
       }
       else if(entity_stub_sink_p(v)) {
 	//type ost = ultimate_type(entity_type(v));
@@ -800,18 +877,6 @@ list reference_to_sinks(reference r, pt_map in, bool fresh_p)
   return sinks;
 }
 
-/* test if a cell appear as a sink in a set of points-to */
-bool sink_in_set_p(cell sink, set s)
-{
-  bool in_p = false;
-  SET_FOREACH ( points_to, pt, s ) {
-    if( cell_equal_p(points_to_sink(pt),sink) )
-      in_p = true;
-  }
-  return in_p;
-}
-
-
 /* Merge two points-to sets
  *
  * This function is required to compute the points-to set resulting of
@@ -840,7 +905,8 @@ set merge_points_to_set(set s1, set s2) {
     Union_set = set_union(Union_set, s1, s2);
 
     SET_FOREACH ( points_to, i, Intersection_set ) {
-      if ( approximation_tag(points_to_approximation(i)) == 2 )
+      if ( approximation_exact_p(points_to_approximation(i)) 
+	   || approximation_must_p(points_to_approximation(i)) )
 	Definite_set = set_add_element(Definite_set,Definite_set,
 				       (void*) i );
     }
@@ -889,7 +955,19 @@ bool cell_in_list_p(cell c, const list lx)
   return false; /* else no found */
 }
 
-bool points_to_compare_cell(cell c1, cell c2){
+bool points_to_in_list_p(points_to pt, const list lx)
+{
+  list l = (list) lx;
+  for (; !ENDP(l); POP(l))
+    if (points_to_equal_p(POINTS_TO(CAR(l)), pt)) return true; /* found! */
+
+  return false; /* else no found */
+}
+
+bool points_to_compare_cell(cell c1, cell c2)
+{
+  if(c1==c2)
+    return true;
 
   int i = 0;
   reference r1 = cell_to_reference(c1);
@@ -926,10 +1004,9 @@ bool points_to_compare_cell(cell c1, cell c2){
   return (i== 0 ? true: false) ;
 }
 
-
-
 /* Order the two points-to relations according to the alphabetical
-   order of the underlying variables. Return -1, 0, or 1. */
+ * order of the underlying variables. Return -1, 0, or 1.
+ */
 int points_to_compare_location(void * vpt1, void * vpt2) {
   int i = 0;
   points_to pt1 = *((points_to *) vpt1);
@@ -1014,6 +1091,10 @@ bool consistent_points_to_set(set s)
 {
   bool consistent_p = true;
 
+  SET_FOREACH(points_to, a, s) {
+    consistent_p = consistent_p && points_to_consistent_p(a);
+  }
+
   SET_FOREACH(points_to, pt1, s) {
     SET_FOREACH(points_to, pt2, s) {
       if(pt1!=pt2) {
@@ -1050,5 +1131,62 @@ bool consistent_points_to_set(set s)
       }
     }
   }
+
+  /* Make sure that the element of set "s" belong to "s" (issue with
+   * side effects performed on subscript expressions).
+   */
+  SET_FOREACH(points_to, pt, s) {
+    if(!set_belong_p(s,pt)) {
+      fprintf(stderr, "Points-to %p ", pt);
+      print_points_to(pt);
+      fprintf(stderr, " is in set s but does not belong to it!\n");
+      consistent_p = false;
+    }
+  }
+
   return consistent_p;
+}
+
+/* because of points-to set implementation, you cannot change
+ * approximations by side effects.
+ */
+void upgrade_approximations_in_points_to_set(pt_map pts)
+{
+  SET_FOREACH(points_to, pt, pts) {
+    approximation a = points_to_approximation(pt);
+    if(!approximation_exact_p(a)) {
+      cell source = points_to_source(pt);
+      if(!cell_abstract_location_p(source) // Represents may locations
+	 && !stub_points_to_cell_p(source)) { // May not exist...
+	list sinks = source_to_sinks(source, pts, false);
+	if(gen_length(sinks)==1) {
+	  cell sink = points_to_sink(pt);
+	  if(!cell_abstract_location_p(sink)) {
+	    points_to npt = make_points_to(copy_cell(source),
+					   copy_cell(sink),
+					   make_approximation_exact(),
+					   make_descriptor_none());
+	    remove_arc_from_pt_map(pt, pts);
+	    add_arc_to_pt_map(npt, pts);
+	  }
+	}
+	gen_free_list(sinks);
+      }
+    }
+  }
+}
+
+void remove_points_to_arcs(cell source, cell sink, pt_map pt)
+{
+  points_to a = make_points_to(copy_cell(source), copy_cell(sink),
+			       make_approximation_may(),
+			       make_descriptor_none());
+  remove_arc_from_pt_map(a, pt);
+  free_points_to(a);
+
+  a = make_points_to(copy_cell(source), copy_cell(sink),
+			       make_approximation_exact(),
+			       make_descriptor_none());
+  remove_arc_from_pt_map(a, pt);
+  free_points_to(a);
 }

@@ -324,7 +324,11 @@ entity entity_all_xxx_locations(string xxx)
     //area a = make_area(0,NIL); /* Size and layout are unknown */
     //type t = make_type_area(a);
     /*FI: more work to be done here... */
-    entity_type(dynamic) = make_type_unknown();
+    /* FI: I'd like to make the type variable, overloaded,... */
+    // entity_type(dynamic) = make_type_unknown();
+    basic b = make_basic_overloaded();
+    variable v = make_variable(b, NIL, NIL);
+    entity_type(dynamic) = make_type_variable(v);
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
     entity_kind(dynamic)=ABSTRACT_LOCATION;
