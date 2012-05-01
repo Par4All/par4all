@@ -26,3 +26,5 @@ assignment01, 02, 03, 04: check handling of basic scalar pointer assignment (FI)
 test01, 02, 03, 04: check handling of test statements (FI)
 
 decl06: check generation of nowhere in a pointer declaration
+
+pointerxy: copied from Rice

@@ -90,78 +90,114 @@ POINTS TO
 
 
 // Points To IN:
-// filename -> _filename_1[0] , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// LoadPGM_bmatrix -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
 
 // Points To:
-// filename -> _filename_1[0] , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    int height, width, gris;
 
 // Points To:
-// filename -> _filename_1[0] , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    byte **m;
 
 // Points To:
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    FILE *file;
 
 // Points To:
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    char *buffer;
 
 // Points To:
 // buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    int i;
 
 // Points To:
 // buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
 
    buffer = (char *) calloc(80, sizeof(char));
@@ -169,48 +205,69 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    file = fopen(filename, "rb");
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    if (file==(void *) 0)
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *NULL_POINTER* , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
       nrerror("ouverture du fichier impossible\n");
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
@@ -219,25 +276,37 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
       nrerror("entete du fichier %s invalide\n");
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    
    //width  = atoi(readitem(file, buffer));
@@ -248,119 +317,173 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    *nrh = height-1;
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    *ncl = 0;
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    *nch = width-1;
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
 
    for(i = 0; i <= height-1; i += 1)
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
       ReadPGMrow(file, width, m[i]);
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
 
    fclose(file);
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
-// file -> *ANY_MODULE*:*NOWHERE* , EXACT
-// filename -> _filename_1[0] , EXACT
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    free(buffer);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*NOWHERE* , EXACT
-// file -> *ANY_MODULE*:*NOWHERE* , EXACT
-// filename -> _filename_1[0] , EXACT
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> *NULL_POINTER* , MAY
+// filename -> _filename_1[0] , MAY
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// nch -> _nch_5[0] , EXACT
-// ncl -> _ncl_4[0] , EXACT
-// nrh -> _nrh_3[0] , EXACT
-// nrl -> _nrl_2[0] , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
 
    return m;
 }
 
 // Points To IN:
-// file -> _file_1[0] , EXACT
-// line -> _line_3[0] , EXACT
+// file -> *NULL_POINTER* , MAY
+// file -> _file_1 , MAY
+// line -> *NULL_POINTER* , MAY
+// line -> _line_3[0] , MAY
 
 
 // Points To OUT: none
@@ -369,8 +492,10 @@ void ReadPGMrow(FILE *file, int width, byte *line)
 {
 
 // Points To:
-// file -> _file_1[0] , EXACT
-// line -> _line_3[0] , EXACT
+// file -> *NULL_POINTER* , MAY
+// file -> _file_1 , MAY
+// line -> *NULL_POINTER* , MAY
+// line -> _line_3[0] , MAY
 
    fread(&line[0], sizeof(byte), width, file);
 }
@@ -385,7 +510,8 @@ int bmatrix(int f1, int f2, int f3, int f4)
 }
 
 // Points To IN:
-// f1 -> _f1_1[0] , EXACT
+// f1 -> *NULL_POINTER* , MAY
+// f1 -> _f1_1[0] , MAY
 
 
 // Points To OUT: none

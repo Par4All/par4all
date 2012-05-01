@@ -1,0 +1,55 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+int main()
+{
+
+// Points To: none
+
+   struct p_s {
+      struct q_s *q;
+   };
+
+// Points To: none
+
+   struct q_s {
+      int r;
+   };
+
+// Points To: none
+
+   struct p_s *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct q_s *x;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   p = (struct p_s *) malloc(sizeof(struct p_s ));
+
+// Points To:
+// p -> *HEAP*_l_18 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p->q = x;
+
+// Points To:
+// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *HEAP*_l_18 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   return 0;
+}

@@ -1,31 +1,5 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   float *a, *p;
-   int i;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
-
-   a = (float *) malloc(10*sizeof(float));
-//             <    is read   >: a
-//             <    is written>: i p
-
-   p = a, i = 0;
-//             <    is read   >: i
-   while (i<10) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      *p = 1.0;
-//             <    is read   >: p
-//             <    is written>: p
-      p++;
-   }
-   return 0;
-}
-
-POINTS-TO
+POINTS TO
 
 
 // Points To IN: none
@@ -68,15 +42,37 @@ int main()
 
 // Points To:
 // a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+// p -> *HEAP*_l_8[4] , MAY
+// p -> *HEAP*_l_8[5] , MAY
+// p -> *HEAP*_l_8[6] , MAY
+// p -> *HEAP*_l_8[7] , MAY
+// p -> *HEAP*_l_8[8] , MAY
+// p -> *HEAP*_l_8[9] , MAY
+// p -> *HEAP*_l_8[10] , MAY
+// p -> *HEAP*_l_8[11] , MAY
 
       *p = 1.0;
 
 // Points To:
 // a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+// p -> *HEAP*_l_8[4] , MAY
+// p -> *HEAP*_l_8[5] , MAY
+// p -> *HEAP*_l_8[6] , MAY
+// p -> *HEAP*_l_8[7] , MAY
+// p -> *HEAP*_l_8[8] , MAY
+// p -> *HEAP*_l_8[9] , MAY
+// p -> *HEAP*_l_8[10] , MAY
+// p -> *HEAP*_l_8[11] , MAY
 
       p++;
    }
@@ -85,6 +81,17 @@ int main()
 // a -> *HEAP*_l_8[0] , EXACT
 // p -> *HEAP*_l_8[*] , MAY
 // p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+// p -> *HEAP*_l_8[4] , MAY
+// p -> *HEAP*_l_8[5] , MAY
+// p -> *HEAP*_l_8[6] , MAY
+// p -> *HEAP*_l_8[7] , MAY
+// p -> *HEAP*_l_8[8] , MAY
+// p -> *HEAP*_l_8[9] , MAY
+// p -> *HEAP*_l_8[10] , MAY
+// p -> *HEAP*_l_8[11] , MAY
 
    return 0;
 }

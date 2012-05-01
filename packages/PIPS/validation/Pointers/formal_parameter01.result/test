@@ -37,59 +37,75 @@ POINTS TO
 
 
 // Points To IN:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
-// pi -> _pi_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 
 
 // Points To OUT:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
 
 int formal_parameter01(int **pi)
 {
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
-// pi -> _pi_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 
    int **q;
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
-// pi -> _pi_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int *i;
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
 // i -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pi -> _pi_1[0] , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    i = 0;
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
 // i -> *NULL_POINTER* , EXACT
-// pi -> _pi_1[0] , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = pi;
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
 // i -> *NULL_POINTER* , EXACT
-// pi -> _pi_1[0] , EXACT
-// q -> _pi_1[0] , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _pi_1[0] , MAY
 
    pi = &i;
 
 // Points To:
-// _pi_1[0] -> _pi_1_1[0] , EXACT
+// _pi_1[0] -> *NULL_POINTER* , MAY
+// _pi_1[0] -> _pi_1_1[0] , MAY
 // i -> *NULL_POINTER* , EXACT
 // pi -> i , EXACT
-// q -> _pi_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _pi_1[0] , MAY
 
    return 0;
 }

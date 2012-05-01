@@ -4,46 +4,48 @@ Proper effects for "dependence02"
 void dependence02(int *b)
 {
    int *a;
-//               <must be read   >: b
-//               <must be written>: a
+//             <    is read   >: b
+//             <    is written>: a
 
    a = b;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: a
-   // a and b are aliased, a points_to b[0]
-   
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a
    *a = 0;
 }
 
 POINTS TO for "dependence02"
 
-//  {(b,_b_1,-Exact-)}
-void dependence02(int *b)
-{
-//  {(b,_b_1,-Exact-)}
-   int *a;
-//  {(b,_b_1,-Exact-)}
 
-   a = b;
-//  {(a,_b_1,-Exact-);(b,_b_1,-Exact-)}
-   // a and b are aliased, a points_to b[0]
-   
-   *a = 0;
-}
+// Points To IN:
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
 
-Proper effects using points_to
+
+// Points To OUT: none
 
 void dependence02(int *b)
 {
+
+// Points To:
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
+
    int *a;
-//               <must be read   >: b
-//               <must be written>: a
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
+
 
    a = b;
-//               <must be read   >: a
-//               <must be written>: _b_1
-   // a and b are aliased, a points_to b[0]
-   
+
+// Points To:
+// a -> *NULL_POINTER* , MAY
+// a -> _b_1[0] , MAY
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
+
    *a = 0;
 }
 

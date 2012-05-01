@@ -1,23 +1,5 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int *a[2];
-//             <    is written>: b
-   int b = 0;
-//             <    is written>: c
-   int c = 1;
-//             <    is written>: a[0]
-   a[0] = &b;
-//             <    is written>: a[1]
-   a[1] = &b;
-//             <    is written>: a[1]
-   a[1] = &c;
-   return 0;
-}
-
-POINTS-TO
+POINTS TO
 
 
 // Points To IN: none
@@ -32,30 +14,36 @@ int main()
 
    int *a[2];
 
-// Points To: none
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int b = 0;
 
-// Points To: none
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int c = 1;
 
-// Points To: none
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    a[0] = &b;
 
 // Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // a[0] -> b , EXACT
 
    a[1] = &b;
 
 // Points To:
-// a[1] -> b , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // a[0] -> b , EXACT
+// a[1] -> b , EXACT
 
    a[1] = &c;
 
 // Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // a[0] -> b , EXACT
 // a[1] -> c , EXACT
 

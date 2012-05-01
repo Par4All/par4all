@@ -9,6 +9,8 @@ void recurrence01(list l)
 {
   int i = 0;
   l->content = &i;
+  l->next->content = &i;
+  l->next->next->content = &i;
   l->next->next->next->content = &i;
   return;
 }

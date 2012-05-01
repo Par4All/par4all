@@ -1,0 +1,30 @@
+
+POINTS TO for malloc01
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// malloc01 -> *ANY_MODULE*:*HEAP* , EXACT
+
+char * malloc01(unsigned int n)
+{
+
+// Points To: none
+
+   char *p = malloc(n);
+
+// Points To:
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+
+
+   return p;
+
+// Points To:
+// malloc01 -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+
+   int i;
+}
+INIT_POINTS_TO_ANALYSIS[malloc01] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

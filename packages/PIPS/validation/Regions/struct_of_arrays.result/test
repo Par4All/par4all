@@ -1,0 +1,142 @@
+
+//  <p_SG-R-EXACT-{}>
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-W-EXACT-{PHI1==0, 0<=PHI5,
+//    PHI5<=9, 0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29}>
+
+void foo(SGlobal *p_SG)
+{
+   int i;
+
+//  <p_SG-R-EXACT-{}>
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-W-EXACT-{PHI1==0, 0<=PHI5,
+//    PHI5<=9, 0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29}>
+
+   for(i = 0; i <= 9; i += 1) {
+      int j;
+
+//  <p_SG-R-EXACT-{}>
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-W-EXACT-{PHI1==0, PHI5==i,
+//    0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29, 0<=i, i<=9}>
+
+      for(j = 0; j <= 19; j += 1) {
+         int k;
+
+//  <p_SG-R-EXACT-{}>
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-W-EXACT-{PHI1==0, PHI5==i,
+//    PHI6==j, 0<=PHI7, PHI7<=29, 0<=j, j<=19, 0<=i, i<=9}>
+
+         for(k = 0; k <= 29; k += 1)
+
+//  <p_SG-R-EXACT-{}>
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-W-EXACT-{PHI1==0, PHI5==i,
+//    PHI6==j, PHI7==k, 0<=k, k<=29, 0<=j, j<=19, 0<=i, i<=9}>
+
+            (((p_SG->S1.S11.in)[i])[j])[k] = i+j+k;
+      }
+   }
+}
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+int main()
+{
+   SGlobal my_SG;
+
+//  <my_SG.S1.S11.in[PHI4][PHI5][PHI6]-W-EXACT-{0<=PHI4, PHI4<=9,
+//    0<=PHI5, PHI5<=19, 0<=PHI6, PHI6<=29}>
+
+
+   foo(&my_SG);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   memcpy(&(((my_SG.S2.S21.out)[0])[0])[0], &(((my_SG.S1.S11.in)[0])[0])[0], 10*20*30*sizeof(float));
+   return 0;
+}
+
+//  <p_SG-IN-EXACT-{}>
+
+void foo(SGlobal *p_SG)
+{
+   int i;
+
+//  <p_SG-IN-EXACT-{}>
+
+   for(i = 0; i <= 9; i += 1) {
+      int j;
+
+//  <p_SG-IN-EXACT-{}>
+
+      for(j = 0; j <= 19; j += 1) {
+         int k;
+
+//  <p_SG-IN-EXACT-{}>
+
+         for(k = 0; k <= 29; k += 1)
+
+//  <p_SG-IN-EXACT-{}>
+
+            (((p_SG->S1.S11.in)[i])[j])[k] = i+j+k;
+      }
+   }
+}
+
+//  <*ANY_MODULE*:*ANYWHERE*-IN-MAY-{}>
+
+int main()
+{
+   SGlobal my_SG;
+
+   foo(&my_SG);
+
+//  <*ANY_MODULE*:*ANYWHERE*-IN-MAY-{}>
+
+   memcpy(&(((my_SG.S2.S21.out)[0])[0])[0], &(((my_SG.S1.S11.in)[0])[0])[0], 10*20*30*sizeof(float));
+   return 0;
+}
+
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-OUT-MAY-{PHI1==0, 0<=PHI5,
+//    PHI5<=9, 0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29}>
+
+void foo(SGlobal *p_SG)
+{
+   int i;
+
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-OUT-MAY-{PHI1==0, 0<=PHI5,
+//    PHI5<=9, 0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29}>
+
+   for(i = 0; i <= 9; i += 1) {
+      int j;
+
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-OUT-MAY-{PHI1==0, PHI5==i,
+//    0<=PHI6, PHI6<=19, 0<=PHI7, PHI7<=29, 0<=i, i<=9}>
+
+      for(j = 0; j <= 19; j += 1) {
+         int k;
+
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-OUT-MAY-{PHI1==0, PHI5==i,
+//    PHI6==j, 0<=PHI7, PHI7<=29, 0<=j, j<=19, 0<=i, i<=9}>
+
+         for(k = 0; k <= 29; k += 1)
+
+//  <p_SG[PHI1].S1.S11.in[PHI5][PHI6][PHI7]-OUT-MAY-{PHI1==0, PHI5==i,
+//    PHI6==j, PHI7==k, 0<=k, k<=29, 0<=j, j<=19, 0<=i, i<=9}>
+
+            (((p_SG->S1.S11.in)[i])[j])[k] = i+j+k;
+      }
+   }
+}
+int main()
+{
+   SGlobal my_SG;
+
+//  <my_SG.S1.S11.in[PHI4][PHI5][PHI6]-OUT-MAY-{0<=PHI4, PHI4<=9,
+//    0<=PHI5, PHI5<=19, 0<=PHI6, PHI6<=29}>
+
+
+   foo(&my_SG);
+   memcpy(&(((my_SG.S2.S21.out)[0])[0])[0], &(((my_SG.S1.S11.in)[0])[0])[0], 10*20*30*sizeof(float));
+   return 0;
+}

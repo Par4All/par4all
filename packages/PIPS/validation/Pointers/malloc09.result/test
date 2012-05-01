@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// argv[*] -> _argv_2[0] , MAY
 
 
 // Points To OUT:
@@ -43,7 +44,7 @@ int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// argv[*] -> _argv_2[0] , MAY
 
    int ***ppp, i = 1;
 
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 // *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
 // *HEAP*_l_22 -> *HEAP*_l_23 , EXACT
 // argv[*] -> _argv_2[0] , EXACT
-// ppp -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    return 0;

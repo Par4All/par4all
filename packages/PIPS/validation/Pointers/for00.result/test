@@ -84,7 +84,6 @@ int main()
       a = b;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // a -> c , MAY
 // a -> d , MAY
 // b -> c , MAY

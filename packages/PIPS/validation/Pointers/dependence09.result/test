@@ -1,0 +1,132 @@
+
+Proper effects for "dependence09"
+
+struct my_struct  dependence09()
+{
+   int *b, *a;
+   int i;
+   struct my_struct s;
+//             <    is written>: a
+
+   a = s.a;
+//             <    is written>: b
+   // a points_to s[1]
+   b = s.b;
+//             <    is written>: i
+   // b points_to s[2]
+   
+   
+   for(i = 0; i <= 9; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a i
+      a[i] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b i
+      b[i] = 1;
+   }
+//             <may be read   >: s.a[*] s.b[*]
+
+   return s;
+}
+
+POINTS TO for "dependence09"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+struct my_struct  dependence09()
+{
+
+// Points To: none
+
+   int *b, *a;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   int i;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct my_struct s;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   a = s.a;
+
+// Points To:
+// a -> s.a[0] , EXACT
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   // a points_to s[1]
+   b = s.b;
+
+// Points To:
+// a -> s.a[0] , EXACT
+// b -> s.b[0] , EXACT
+
+   // b points_to s[2]
+   
+   
+   for(i = 0; i <= 9; i += 1) {
+
+// Points To:
+// a -> s.a[0] , EXACT
+// b -> s.b[0] , EXACT
+
+      a[i] = 0;
+
+// Points To:
+// a -> s.a[0] , EXACT
+// b -> s.b[0] , EXACT
+
+      b[i] = 1;
+   }
+
+// Points To:
+// a -> s.a[0] , EXACT
+// b -> s.b[0] , EXACT
+
+
+   return s;
+}
+
+Proper effects using points_to
+
+struct my_struct  dependence09()
+{
+   int *b, *a;
+   int i;
+   struct my_struct s;
+//             <    is written>: a
+
+   a = s.a;
+//             <    is written>: b
+   // a points_to s[1]
+   b = s.b;
+//             <    is written>: i
+   // b points_to s[2]
+   
+   
+   for(i = 0; i <= 9; i += 1) {
+//             <    is read   >: a i
+//             <    is written>: s.a[i]
+      a[i] = 0;
+//             <    is read   >: b i
+//             <    is written>: s.b[i]
+      b[i] = 1;
+   }
+//             <may be read   >: s.a[*] s.b[*]
+
+   return s;
+}
+
