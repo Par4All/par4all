@@ -76,22 +76,26 @@ int main()
    p++;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[1] , MAY
+// p -> a[2] , MAY
 
    ++p;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[2] , MAY
+// p -> a[3] , MAY
 
    p--;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[1] , MAY
+// p -> a[2] , MAY
 
    --p;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[0] , MAY
+// p -> a[1] , MAY
 
    return 0;
 }

@@ -4,10 +4,10 @@ Proper effects for "dependence04"
 void dependence04()
 {
    int *b;
-//               <must be written>: b
+//             <    is written>: b
    b = &global_a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: b
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b
    // b points_to global_a
    
    *b = 0;
@@ -15,28 +15,27 @@ void dependence04()
 
 POINTS TO for "dependence04"
 
-//  {}
-void dependence04()
-{
-//  points to = {}
-   int *b;
-//  points to = {}
-   b = &global_a;
-//  {(b,global_a,-Exact-)}
-   // b points_to global_a
-   
-   *b = 0;
-}
 
-Proper effects using points_to
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void dependence04()
 {
+
+// Points To: none
+
    int *b;
-//               <must be written>: b
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+
    b = &global_a;
-//               <must be read   >: b
-//               <must be written>: global_a
+
+// Points To:
+// b -> global_a , EXACT
+
    // b points_to global_a
    
    *b = 0;

@@ -27,8 +27,12 @@ POINTS-TO
 
 
 // Points To IN:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
 
 // Points To OUT: none
@@ -37,64 +41,103 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 {
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    int nbout;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    int col = 0;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    int indent = 0;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    int ui32;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    int i32;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    static char buffer[2000];
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
 
    if (!my_fputc)
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , EXACT
 
       return 0;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
 
    nbout = 0;
 
 // Points To:
-// _stream -> __stream_3[0] , EXACT
-// fmt -> _fmt_1[0] , EXACT
+// _stream -> *NULL_POINTER* , MAY
+// _stream -> __stream_3[0] , MAY
+// fmt -> *NULL_POINTER* , MAY
+// fmt -> _fmt_1[0] , MAY
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
    *va_arg(pa, int *) = col;
 }

@@ -41,20 +41,20 @@ int formal_parameter03(int ppp[10][10][10])
    int *q = ppp[0][0];
 
 // Points To:
-// q -> ppp[0][0] , EXACT
+// q -> ppp[0][0][0] , EXACT
 
    int **qq = ppp[0];
 
 // Points To:
-// q -> ppp[0][0] , EXACT
-// qq -> ppp[0] , EXACT
+// q -> ppp[0][0][0] , EXACT
+// qq -> ppp[0][0] , EXACT
 
    int ***qqq = ppp;
 
 // Points To:
-// q -> ppp[0][0] , EXACT
-// qq -> ppp[0] , EXACT
-// qqq -> ppp , EXACT
+// q -> ppp[0][0][0] , EXACT
+// qq -> ppp[0][0] , EXACT
+// qqq -> ppp[0] , EXACT
 
    return 0;
 }

@@ -110,121 +110,144 @@ int main()
 
    int *tab2[10];
 
-// Points To: none
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int tab3[10][10];
 
-// Points To: none
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int **tab4;
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    int tab5[15];
 
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    int i;
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    foo(tab);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(tab);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    
    foo(tab2[4]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(tab3[5]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(tab4[6]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(&tab[0]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(&tab5[3]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    printf("%s:\n", "tab2[4]");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(tab2[4]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab3[5]");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(tab3[5]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab4[6]");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(tab4[6]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(&tab[0]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab5");
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(&tab5[3]);
 
 // Points To:
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    return 1;
 }

@@ -124,7 +124,3 @@ int main(void)
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pi1 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pi2 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pp 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pp 

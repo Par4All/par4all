@@ -33,21 +33,25 @@ int main()
 
    s_t s;
 
-// Points To: none
+// Points To:
+// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int j;
 
-// Points To: none
+// Points To:
+// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    init_s(s, 10);
 
-// Points To: none
+// Points To:
+// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    compute_s(s, 10);
 
-// Points To: none
+// Points To:
+// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
    

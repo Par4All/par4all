@@ -14,105 +14,39 @@ int main()
    struct q_s *u;
    struct q_s *x;
    struct q_s **z;
-//               <must be written>: a
+//             <    is written>: a
    int a = 0;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ u
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: u _MALLOC_EFFECTS:_MALLOC_
    u = (struct q_s *) malloc(sizeof(struct q_s ));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
    b = (struct q_s *) malloc(sizeof(struct q_s ));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = (struct p_s *) malloc(sizeof(struct p_s ));
-//               <must be read   >: b
-//               <must be written>: x
+//             <    is read   >: b
+//             <    is written>: x
    x = b;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p x
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p x
    p->q = x;
-//               <must be read   >: p
-//               <must be written>: z
-   
-   
-   
+//             <    is read   >: p
+//             <    is written>: z
    z = &p->q;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: b p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b p
    p->q = b;
-//               <must be written>: z
+//             <    is written>: z
    z = &u;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    p->q->r = a;
    return 0;
 }
 
-POINTS TO for "main"
-
-//  {}
-int main()
-{
-//  points to = {}
-   struct p_s {
-      struct q_s *q;
-   };
-//  points to = {}
-   struct q_s {
-      int r;
-   };
-//  points to = {}
-   struct p_s *p;
-//  points to = {}
-   struct q_s *b;
-//  points to = {}
-   struct q_s *u;
-//  points to = {}
-   struct q_s *x;
-//  points to = {}
-   struct q_s **z;
-//  points to = {}
-   int a = 0;
-//  points to = {}
-   u = (struct q_s *) malloc(sizeof(struct q_s ));
-//  {(u,*HEAP*_l_20,-Exact-)}
-   b = (struct q_s *) malloc(sizeof(struct q_s ));
-//  {(b,*HEAP*_l_21,-Exact-);(u,*HEAP*_l_20,-Exact-)}
-   p = (struct p_s *) malloc(sizeof(struct p_s ));
-//  {(b,*HEAP*_l_21,-Exact-);(p,*HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,
-//   -Exact-)}
-   x = b;
-//  {(b,*HEAP*_l_21,-Exact-);(p,*HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,
-//   -Exact-);(x,*HEAP*_l_21,-Exact-)}
-   p->q = x;
-//  {(b,*HEAP*_l_21,-Exact-);(p[0][q],*HEAP*_l_21,-Exact-);(p,
-//   *HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,-Exact-);(x,*HEAP*_l_21,
-//   -Exact-)}
-   
-   
-   
-   z = &p->q;
-//  {(b,*HEAP*_l_21,-Exact-);(p[0][q],*HEAP*_l_21,-Exact-);(p,
-//   *HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,-Exact-);(x,*HEAP*_l_21,
-//   -Exact-);(z,p[0][q],-Exact-)}
-   p->q = b;
-//  {(b,*HEAP*_l_21,-Exact-);(p[0][q],*HEAP*_l_21,-Exact-);(p,
-//   *HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,-Exact-);(x,*HEAP*_l_21,
-//   -Exact-);(z,p[0][q],-Exact-)}
-   z = &u;
-//  {(b,*HEAP*_l_21,-Exact-);(p[0][q],*HEAP*_l_21,-Exact-);(p,
-//   *HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,-Exact-);(x,*HEAP*_l_21,
-//   -Exact-);(z,u,-Exact-)}
-
-   p->q->r = a;
-//  {(b,*HEAP*_l_21,-Exact-);(p[0][q],*HEAP*_l_21,-Exact-);(p,
-//   *HEAP*_l_22,-Exact-);(u,*HEAP*_l_20,-Exact-);(x,*HEAP*_l_21,
-//   -Exact-);(z,u,-Exact-)}
-   return 0;
-}
-
-Proper effects using points_to
+Proper Pointer effects for "main"
 
 int main()
 {
@@ -127,38 +61,194 @@ int main()
    struct q_s *u;
    struct q_s *x;
    struct q_s **z;
-//               <must be written>: a
+//             <    is written>: a
    int a = 0;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ u
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: u _MALLOC_EFFECTS:_MALLOC_
    u = (struct q_s *) malloc(sizeof(struct q_s ));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
    b = (struct q_s *) malloc(sizeof(struct q_s ));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = (struct p_s *) malloc(sizeof(struct p_s ));
-//               <must be read   >: b
-//               <must be written>: x
+//             <    is read   >: b
+//             <    is written>: x
    x = b;
-//               <must be read   >: p x
-//               <must be written>: *HEAP*_l_22[.q]
+//             <    is read   >: p x
+//             <    is written>: p[0].q
    p->q = x;
-//               <must be read   >: p
-//               <must be written>: z
-   
-   
-   
+//             <    is read   >: p
+//             <    is written>: z
    z = &p->q;
-//               <must be read   >: b p
-//               <must be written>: *HEAP*_l_22[.q]
+//             <    is read   >: b p
+//             <    is written>: p[0].q
    p->q = b;
-//               <must be written>: z
+//             <    is written>: z
    z = &u;
-//               <must be read   >: *HEAP*_l_22[.q] a p
-//               <must be written>: *HEAP*_l_21[.r]
+//             <    is read   >: a p p[0].q
+//             <    is written>: p[0].q[0].r
 
    p->q->r = a;
    return 0;
 }
 
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+
+int main()
+{
+
+// Points To: none
+
+   struct p_s {
+      struct q_s *q;
+   };
+
+// Points To: none
+
+   struct q_s {
+      int r;
+   };
+
+// Points To: none
+
+   struct p_s *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct q_s *b;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct q_s *u;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct q_s *x;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct q_s **z;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   int a = 0;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   u = (struct q_s *) malloc(sizeof(struct q_s ));
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   b = (struct q_s *) malloc(sizeof(struct q_s ));
+
+// Points To:
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p = (struct p_s *) malloc(sizeof(struct p_s ));
+
+// Points To:
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   x = b;
+
+// Points To:
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p->q = x;
+
+// Points To:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   z = &p->q;
+
+// Points To:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> *ANY_MODULE*:*HEAP* , EXACT
+
+   p->q = b;
+
+// Points To:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> *ANY_MODULE*:*HEAP* , EXACT
+
+   z = &u;
+
+// Points To:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> u , EXACT
+
+
+   p->q->r = a;
+
+// Points To:
+// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP* , EXACT
+// x -> *ANY_MODULE*:*HEAP* , EXACT
+// z -> u , EXACT
+
+   return 0;
+}

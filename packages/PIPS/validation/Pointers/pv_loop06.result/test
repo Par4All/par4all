@@ -1,25 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int i;
-   int *p, *q;
-   int a[10];
-   int b[10];
-//             <    is written>: p
-
-   p = &a[0];
-//             <    is written>: q
-   q = &b[0];
-//             <    is written>: i
-   for(i = 0; i <= 9; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      *p++ = 2**q++;
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -71,18 +50,62 @@ int main()
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> a[*] , MAY
 // p -> a[0] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+// p -> a[4] , MAY
+// p -> a[5] , MAY
+// p -> a[6] , MAY
+// p -> a[7] , MAY
+// p -> a[8] , MAY
+// p -> a[9] , MAY
+// p -> a[10] , MAY
+// p -> a[11] , MAY
+// q -> b[*] , MAY
 // q -> b[0] , MAY
+// q -> b[1] , MAY
+// q -> b[2] , MAY
+// q -> b[3] , MAY
+// q -> b[4] , MAY
+// q -> b[5] , MAY
+// q -> b[6] , MAY
+// q -> b[7] , MAY
+// q -> b[8] , MAY
+// q -> b[9] , MAY
+// q -> b[10] , MAY
+// q -> b[11] , MAY
 
       *p++ = 2**q++;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> a[*] , MAY
 // p -> a[0] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+// p -> a[4] , MAY
+// p -> a[5] , MAY
+// p -> a[6] , MAY
+// p -> a[7] , MAY
+// p -> a[8] , MAY
+// p -> a[9] , MAY
+// p -> a[10] , MAY
+// p -> a[11] , MAY
+// q -> b[*] , MAY
 // q -> b[0] , MAY
+// q -> b[1] , MAY
+// q -> b[2] , MAY
+// q -> b[3] , MAY
+// q -> b[4] , MAY
+// q -> b[5] , MAY
+// q -> b[6] , MAY
+// q -> b[7] , MAY
+// q -> b[8] , MAY
+// q -> b[9] , MAY
+// q -> b[10] , MAY
+// q -> b[11] , MAY
 
    return 0;
 }

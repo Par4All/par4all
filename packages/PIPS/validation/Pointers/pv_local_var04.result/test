@@ -3,8 +3,10 @@ PROPER  EFFECTS
 
 int main()
 {
+//             <    is written>: pp
+   int *pp = (void *) 0;
 //             <    is read   >: a
-
+   // FI: to manage an empty points-to set
    if (a>1) {
       static int *p = &a;
       static int *q;
@@ -33,58 +35,71 @@ POINTS-TO
 
 
 // Points To OUT:
-// p -> a , MAY
-// q -> b , MAY
-// r -> a , MAY
-// s -> b , MAY
+// p -> a , EXACT
+// q -> b , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
 
 int main()
 {
 
 // Points To: none
 
+   int *pp = (void *) 0;
 
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+
+   // FI: to manage an empty points-to set
    if (a>1) {
 
-// Points To: none
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
 
       static int *p = &a;
 
 // Points To:
 // p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
       static int *q;
 
 // Points To:
 // p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       q = &b;
 
 // Points To:
 // p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
 // q -> b , EXACT
 
       a = a-1;
    }
    else {
 
-// Points To: none
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
 
       static int *r = &a;
 
 // Points To:
+// pp -> *NULL_POINTER* , EXACT
 // r -> a , EXACT
 
       static int *s;
 
 // Points To:
+// pp -> *NULL_POINTER* , EXACT
 // r -> a , EXACT
 // s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       s = &b;
 
 // Points To:
+// pp -> *NULL_POINTER* , EXACT
 // r -> a , EXACT
 // s -> b , EXACT
 
@@ -92,10 +107,11 @@ int main()
    }
 
 // Points To:
-// p -> a , MAY
-// q -> b , MAY
-// r -> a , MAY
-// s -> b , MAY
+// p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
+// q -> b , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
 
    return 0;
 }

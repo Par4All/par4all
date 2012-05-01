@@ -28,32 +28,51 @@ POINTS-TO
 
 
 // Points To IN:
-// _pp_1[0] -> _pp_1_1[0] , EXACT
-// _qq_2[0] -> _qq_2_2[0] , EXACT
-// pp -> _pp_1[0] , EXACT
-// qq -> _qq_2[0] , EXACT
+// _pp_1[0] -> *NULL_POINTER* , MAY
+// _pp_1[0] -> _pp_1_1[0] , MAY
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0] , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1[0] , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2[0] , MAY
 
 
 // Points To OUT:
-// _pp_1[0] -> _qq_2_2[0] , EXACT
-// _qq_2[0] -> _qq_2_2[0] , EXACT
+// _pp_1[0] -> *ANY_MODULE*:*ANYWHERE* , MAY
+// _pp_1[0] -> *NULL_POINTER* , MAY
+// _pp_1[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0] , MAY
 
 void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1[0] -> _pp_1_1[0] , EXACT
-// _qq_2[0] -> _qq_2_2[0] , EXACT
-// pp -> _pp_1[0] , EXACT
-// qq -> _qq_2[0] , EXACT
+// _pp_1[0] -> *NULL_POINTER* , MAY
+// _pp_1[0] -> _pp_1_1[0] , MAY
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0] , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1[0] , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2[0] , MAY
 
    *pp = *qq;
 
 // Points To:
-// _pp_1[0] -> _qq_2_2[0] , EXACT
-// _qq_2[0] -> _qq_2_2[0] , EXACT
-// pp -> _pp_1[0] , EXACT
-// qq -> _qq_2[0] , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> _qq_2_2[0] , MAY
+// _pp_1[0] -> *ANY_MODULE*:*ANYWHERE* , MAY
+// _pp_1[0] -> *NULL_POINTER* , MAY
+// _pp_1[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0] , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1[0] , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2[0] , MAY
 
    printf("pointers exchanged");
 }

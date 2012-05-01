@@ -52,22 +52,22 @@ int main()
    p++;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[1] , EXACT
 
    ++p;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[2] , EXACT
 
    p--;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[1] , EXACT
 
    --p;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[0] , EXACT
 
    return 0;
 }

@@ -69,8 +69,8 @@ int main()
    *p++ = 2**q++;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[1] , EXACT
+// q -> b[1] , EXACT
 
    return 0;
 }

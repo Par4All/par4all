@@ -10,8 +10,8 @@ struct my_struct dependence09() {
   int i;
   struct my_struct s;
 
-  a = s.a; // a points_to s[0][0]
-  b = s.b; // b points_to s[1][0]
+  a = s.a; // a points_to s[1]
+  b = s.b; // b points_to s[2]
 
 
   for ( i = 0; i < 10; i++ ) {

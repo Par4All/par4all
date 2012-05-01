@@ -1,48 +1,5 @@
 
-PROPER  EFFECTS
-
-int main(void)
-{
-   int i;
-   int **pp;
-//             <    is read   >: __TIME_EFFECTS:KALI
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
-//                               __TIME_EFFECTS:KALI
-   srand(time((void *) 0));
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
-//                               __IO_EFFECTS:LUNS[1]
-
-   if (alea()) {
-//             <    is written>: pi
-      int *pi = &i;
-//             <    is written>: pp
-      pp = &pi;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-      **pp = 1;
-   }
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   
-   // pp points to a dead value in the stack
-   printf("%p\n", pp);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // possible segfault.
-   // should generate an error while analyzing?
-   **pp = 0;
-   return 0;
-}
-
-POINTS-TO
+POINTS TO
 
 
 // Points To IN: none
@@ -92,14 +49,16 @@ int main(void)
    }
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 
    
    // pp points to a dead value in the stack
    printf("%p\n", pp);
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 
    
    // possible segfault.
@@ -107,7 +66,32 @@ int main(void)
    **pp = 0;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 
    return 0;
 }
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+static int alea(void)
+{
+
+// Points To: none
+
+   int r = rand();
+
+// Points To: none
+
+   printf("%d\n", r);
+
+// Points To: none
+
+   return rand()%2==1;
+}
+
+Warnings
+

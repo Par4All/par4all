@@ -36,7 +36,9 @@ int toto(int *p)
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -45,12 +47,14 @@ int bar(int *p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    int b[100];
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    p = &b[0];
 
@@ -65,7 +69,9 @@ int bar(int *p)
    return 0;
 }
 
-// Points To IN: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -74,12 +80,14 @@ int foo(int *p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    int b[100];
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    p = &b[0];
 
@@ -94,7 +102,9 @@ int foo(int *p)
    return 0;
 }
 
-// Points To IN: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -103,25 +113,28 @@ int toto(int *p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    int *q;
 
 // Points To:
-// p -> _p_1[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int b[100];
 
 // Points To:
-// p -> _p_1[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p = &b[0];
 
 // Points To:
 // p -> b[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    a[*(q = p++)] = 2.;
 

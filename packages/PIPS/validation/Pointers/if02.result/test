@@ -1,0 +1,223 @@
+
+Proper effects for "main"
+
+int main()
+{
+   int ***p;                                                            /*0005*/
+   int a, b, *aa, *bb, **aaa, **bbb;                                    /*0006*/
+//             <    is written>: a
+
+   a = 1;                                                               /*0008*/
+//             <    is written>: b
+   b = 2;                                                               /*0009*/
+//             <    is written>: aa
+
+   aa = &a;                                                             /*0011*/
+//             <    is written>: bb
+   bb = &b;                                                             /*0012*/
+//             <    is written>: aaa
+
+   aaa = &aa;                                                           /*0014*/
+//             <    is written>: bbb
+   bbb = &bb;                                                           /*0015*/
+//             <    is written>: p
+
+   p = &bbb;                                                            /*0017*/
+
+   if (0==0)                                                            /*0019*/
+//             <    is written>: p
+      p = &aaa;                                                         /*0020*/
+   else
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      **p = bb;                                                         /*0022*/
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", ***p);                                                /*0024*/
+
+   return 0;                                                            /*0026*/
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int ***p;                                                            /*0005*/
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   int a, b, *aa, *bb, **aaa, **bbb;                                    /*0006*/
+
+// Points To:
+// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   a = 1;                                                               /*0008*/
+
+// Points To:
+// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   b = 2;                                                               /*0009*/
+
+// Points To:
+// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   aa = &a;                                                             /*0011*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   bb = &b;                                                             /*0012*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bb -> b , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   aaa = &aa;                                                           /*0014*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   bbb = &bb;                                                           /*0015*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   p = &bbb;                                                            /*0017*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> bbb , EXACT
+
+
+   if (0==0)                                                            /*0019*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> bbb , EXACT
+
+      p = &aaa;                                                         /*0020*/
+   else
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> bbb , EXACT
+
+      **p = bb;                                                         /*0022*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> aaa , MAY
+// p -> bbb , MAY
+
+
+   printf("%d\n", ***p);                                                /*0024*/
+
+// Points To:
+// aa -> a , EXACT
+// aaa -> aa , EXACT
+// bb -> b , EXACT
+// bbb -> bb , EXACT
+// p -> aaa , MAY
+// p -> bbb , MAY
+
+
+   return 0;                                                            /*0026*/
+}
+
+Proper effects using points_to
+
+int main()
+{
+   int ***p;                                                            /*0005*/
+   int a, b, *aa, *bb, **aaa, **bbb;                                    /*0006*/
+//             <    is written>: a
+
+   a = 1;                                                               /*0008*/
+//             <    is written>: b
+   b = 2;                                                               /*0009*/
+//             <    is written>: aa
+
+   aa = &a;                                                             /*0011*/
+//             <    is written>: bb
+   bb = &b;                                                             /*0012*/
+//             <    is written>: aaa
+
+   aaa = &aa;                                                           /*0014*/
+//             <    is written>: bbb
+   bbb = &bb;                                                           /*0015*/
+//             <    is written>: p
+
+   p = &bbb;                                                            /*0017*/
+
+   if (0==0)                                                            /*0019*/
+//             <    is written>: p
+      p = &aaa;                                                         /*0020*/
+   else
+//             <    is read   >: bb bbb p
+//             <    is written>: bb
+      **p = bb;                                                         /*0022*/
+//             <may be read   >: a aa aaa b bb bbb stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", ***p);                                                /*0024*/
+
+   return 0;                                                            /*0026*/
+}

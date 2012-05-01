@@ -9,6 +9,10 @@ tf_t *q = &s;
 
 void call03()
 {
+  // To avoid a problem with the semantics of the empty points-to set
+  // The solution might be to add always an arc ANYWHERE->ANYWHERE
+  // when entering a module statement
+  int * p = i;
   *pi = 1;
   pi++;
   q->one = 1;
