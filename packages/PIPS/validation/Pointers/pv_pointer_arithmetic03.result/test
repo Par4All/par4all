@@ -72,22 +72,22 @@ int main()
    p = p+i;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[*] , EXACT
 
    p = p+j;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[*] , EXACT
 
    p = p-i;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[*] , EXACT
 
    p = p-j;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[*] , EXACT
 
    return 0;
 }

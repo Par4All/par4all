@@ -28,7 +28,11 @@ display PRINTED_FILE
 close
 
 # Check message about dangling pointers
-shell cat rand04.database/Warnings
+
+# They are useless in this case, with dependencies on pointer values,
+# till the interprocedural stuff is developed
+
+# shell cat rand04.database/Warnings
 
 delete $WSPACE
 quit

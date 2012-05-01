@@ -1289,14 +1289,25 @@ reference reference_add_field_dimension(reference r, entity f)
        || entity_typed_nowhere_locations_p(v)
        || entity_null_locations_p(v)
        )) {
-    type t = reference_to_type(r);
+    bool to_be_freed = false;
+    type t = points_to_reference_to_type(r, &to_be_freed);
     //type t = ultimate_type(entity_type(v));
+    type ut = ultimate_type(t);
 
-    if(struct_type_p(t)) {
+    if(struct_type_p(ut)) {
       entity ste = basic_derived(variable_basic(type_variable(t)));
-      type st = entity_type(ste);
-      pips_assert("st is a struct type", type_struct_p(st));
-      list fl = type_struct(st);
+      type st = ultimate_type(entity_type(ste));
+      list fl = list_undefined;
+      /* FI: a problem due to typedefs apparently */
+      if(type_struct_p(st))
+	fl = type_struct(st);
+      else if(struct_type_p(st)) {
+	entity nste = basic_derived(variable_basic(type_variable(st)));
+	type nst = ultimate_type(entity_type(nste));
+	fl = type_struct(nst);
+      }
+      else
+	pips_internal_error("Misunderstanding of struct typing.\n");
       if(entity_is_argument_p(f,fl)) {
 	expression s = entity_to_expression(f);
 	reference_indices(r) = gen_nconc(reference_indices(r),
@@ -1309,8 +1320,10 @@ reference reference_add_field_dimension(reference r, entity f)
       }
     }
     else {
+      /* Nothing done when the heap is modeled by a unique entity */
       ; // FI: could be useful for unions as well
     }
+    if(to_be_freed) free_type(t);
   }
   return r;
 }

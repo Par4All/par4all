@@ -161,11 +161,11 @@ pt_map points_to_to_context_points_to(pt_map in)
 
 static pt_map points_to_context = pt_map_undefined;
 
-void init_points_to_context()
+void init_points_to_context(pt_map init)
 {
   pips_assert("points_to_context is undefined",
 	      pt_map_undefined_p(points_to_context));
-  points_to_context = new_pt_map();
+  points_to_context = full_copy_pt_map(init);
 }
 
 void reset_points_to_context()
@@ -186,7 +186,7 @@ pt_map get_points_to_context()
   return points_to_context;
 }
 
-#define FRANCOIS 0
+#define FRANCOIS 1
 
 /* Pass INTRAPROCEDURAL_POINTS_TO_ANALYSIS
  *
@@ -198,7 +198,6 @@ static bool generic_points_to_analysis(char * module_name) {
   set pts_to_out = set_generic_make(set_private, points_to_equal_p, points_to_rank);
   
   init_pt_to_list();
-  init_points_to_context();
   module = module_name_to_entity(module_name);
   set_current_module_entity(module);
   make_effects_private_current_context_stack();
@@ -223,6 +222,7 @@ static bool generic_points_to_analysis(char * module_name) {
   /* Transform the list of init_pts_to_list in set of points-to.*/
   pts_to_list = gen_full_copy_list(points_to_list_list(init_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
+  init_points_to_context(pt_in);
   // FI: this should be useless as stubs are built on demand
   // pt_in = set_assign_list(pt_in, NIL);
   gen_free_list(pts_to_list);

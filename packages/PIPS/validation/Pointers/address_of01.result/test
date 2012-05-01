@@ -31,7 +31,7 @@ int foo()
    p = 1+&i;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> i[1] , EXACT
 
    return 0;
 }

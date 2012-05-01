@@ -1,0 +1,319 @@
+
+Proper effects for "dependence12"
+
+void dependence12(struct my_struct *s)
+{
+   int *a;
+   int i;
+//             <    is read   >: s
+   
+   // loop over a chained list
+   while (s!=(void *) 0) {
+//             <    is read   >: s
+//             <    is written>: a
+      a = s->a;
+//             <    is written>: i
+      // a points_to "s[0][0][0]", but where does s points_to ?
+      for(i = 0; i <= 9; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a i
+         a[i] = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: s
+      s = s->next;
+   }
+}
+
+POINTS TO for "dependence12"
+
+
+// Points To IN:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// s -> *NULL_POINTER* , MAY
+// s -> _s_1 , MAY
+
+
+// Points To OUT:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+
+void dependence12(struct my_struct *s)
+{
+
+// Points To:
+// s -> *NULL_POINTER* , MAY
+// s -> _s_1 , MAY
+
+   int *a;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *NULL_POINTER* , MAY
+// s -> _s_1 , MAY
+
+   int i;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *NULL_POINTER* , MAY
+// s -> _s_1 , MAY
+
+   
+   // loop over a chained list
+   while (s!=(void *) 0) {
+
+// Points To:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// a -> *ANY_MODULE*:*NOWHERE* , MAY
+// a -> _s_1.a[0] , MAY
+// a -> _s_1_1.a[0] , MAY
+// a -> _s_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// s -> _s_1 , MAY
+// s -> _s_1_1 , MAY
+// s -> _s_1_1_1 , MAY
+// s -> _s_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+
+      a = s->a;
+
+// Points To:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// a -> _s_1.a[0] , MAY
+// a -> _s_1_1.a[0] , MAY
+// a -> _s_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// s -> _s_1 , MAY
+// s -> _s_1_1 , MAY
+// s -> _s_1_1_1 , MAY
+// s -> _s_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+
+      // a points_to "s[0][0][0]", but where does s points_to ?
+      for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// a -> _s_1.a[0] , MAY
+// a -> _s_1_1.a[0] , MAY
+// a -> _s_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// s -> _s_1 , MAY
+// s -> _s_1_1 , MAY
+// s -> _s_1_1_1 , MAY
+// s -> _s_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+
+         a[i] = 0;
+
+// Points To:
+// _s_1.next -> *NULL_POINTER* , MAY
+// _s_1.next -> _s_1_1 , MAY
+// _s_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1.next -> _s_1_1_1 , MAY
+// _s_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1.next -> _s_1_1_1_1 , MAY
+// _s_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1.next -> _s_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1.next -> _s_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> *NULL_POINTER* , MAY
+// _s_1_1_1_1_1_1_1_1_1_1.next -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+// a -> _s_1.a[0] , MAY
+// a -> _s_1_1.a[0] , MAY
+// a -> _s_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// a -> _s_1_1_1_1_1_1_1_1_1_1.a[0] , MAY
+// s -> _s_1 , MAY
+// s -> _s_1_1 , MAY
+// s -> _s_1_1_1 , MAY
+// s -> _s_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1 , MAY
+// s -> _s_1_1_1_1_1_1_1_1_1_1 , MAY
+
+      s = s->next;
+   }
+}
+
+Proper effects using points_to
+
+void dependence12(struct my_struct *s)
+{
+   int *a;
+   int i;
+//             <    is read   >: s
+   
+   // loop over a chained list
+   while (s!=(void *) 0) {
+//             <    is read   >: s
+//             <    is written>: a
+      a = s->a;
+//             <    is written>: i
+      // a points_to "s[0][0][0]", but where does s points_to ?
+      for(i = 0; i <= 9; i += 1)
+//             <may be written>: _s_1.a[i] _s_1_1.a[i] _s_1_1_1.a[i] 
+//                               _s_1_1_1_1.a[i] _s_1_1_1_1_1.a[i] 
+//                               _s_1_1_1_1_1_1.a[i] 
+//                               _s_1_1_1_1_1_1_1.a[i] 
+//                               _s_1_1_1_1_1_1_1_1.a[i] 
+//                               _s_1_1_1_1_1_1_1_1_1.a[i] 
+//                               _s_1_1_1_1_1_1_1_1_1_1.a[i]
+//             <    is read   >: a i
+         a[i] = 0;
+//             <may be read   >: _s_1.next _s_1_1.next _s_1_1_1.next 
+//                               _s_1_1_1_1.next _s_1_1_1_1_1.next 
+//                               _s_1_1_1_1_1_1.next 
+//                               _s_1_1_1_1_1_1_1.next 
+//                               _s_1_1_1_1_1_1_1_1.next 
+//                               _s_1_1_1_1_1_1_1_1_1.next 
+//                               _s_1_1_1_1_1_1_1_1_1_1.next
+//             <    is read   >: s
+//             <    is written>: s
+      s = s->next;
+   }
+}
+

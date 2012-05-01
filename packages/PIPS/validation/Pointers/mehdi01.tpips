@@ -10,14 +10,14 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 
 echo
-echo Proper effetcs for "mehdi01"
+echo Proper effects for "main"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
 echo
-echo Proper Pointer effetcs for "mehdi01"
+echo Proper Pointer effects for "main"
 echo
 
 activate PRINT_CODE_PROPER_POINTER_EFFECTS 

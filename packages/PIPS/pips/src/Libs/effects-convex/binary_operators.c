@@ -606,10 +606,22 @@ effect regions_must_convex_hull(region r1, region r2)
     /* otherwise, we have to compute the convex-hull of the two predicates */
     if (op_statistics_p()) nb_umust++;
 
+
+    Pbase b1 = s1->base;
+    Pbase b2 = s2->base;
+    Pbase volatile b = base_union(b1, b2);
+    s1->base = b;
+    sc_dimension(s1) = base_dimension(b);
+    s2->base = base_copy(b);
+    sc_dimension(s2) = sc_dimension(s1);
+    base_rm(b1);
+    base_rm(b2);
+
+
     CATCH(overflow_error)
     {
       pips_debug(1, "overflow error\n");
-      sr = sc_rn(base_dup(s1->base));
+      sr = sc_rn(base_dup(b));
     }
     TRY
       {
@@ -743,7 +755,7 @@ effect regions_must_convex_hull(region r1, region r2)
 	      }
 	  }
       }
-    reg = region_dup(r1);
+    reg = copy_effect(r1);
     sc_rm(region_system(reg));
     region_system_(reg) = newgen_Psysteme(sr);
     region_approximation_tag(reg) = appr;

@@ -1372,18 +1372,38 @@ list c_convex_effects_on_actual_parameter_forward_translation
 				min_i = general_case ? nb_phi_real+1 : nb_phi_real;
 				sc_formal = region_system(eff_formal);
 
-
+				pips_debug(8, "nb_phi_real: %d, min_i: %d, min_phi: %d\n", nb_phi_real, min_i, min_phi);
 				for(i = min_i; i <= nb_phi_orig; i++)
 				  {
+				    pips_debug(8, "renaming %d-th index into %d-th\n", i, i-min_i+min_phi);
 				    entity phi_i = make_phi_entity(i);
 				    entity psi_formal = make_psi_entity(i-min_i+min_phi);
 
-				    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_formal);
+				    // the call to gen_nth is rather costly
+				    expression original_index_exp =
+				      EXPRESSION( gen_nth(i-1, cell_indices(effect_cell(eff_orig))));
+				    
+				    pips_assert("index expression of an effect must be a reference",
+						expression_reference_p(original_index_exp));
+				    if (entity_field_p(reference_variable(expression_reference(original_index_exp))))
+				      {
+					pips_debug(8, "field expression (%s)\n",
+						   entity_name(reference_variable(expression_reference(original_index_exp))));
+					new_inds = gen_nconc(new_inds,
+							     CONS(EXPRESSION,
+								  copy_expression(original_index_exp),
+								  NIL));
+				      }
+				    else
+				      {
+					pips_debug(8, "phi expression \n");
+					sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_formal);
 
-				    new_inds = gen_nconc(new_inds,
-							 CONS(EXPRESSION,
-							      make_phi_expression(i-nb_phi_real+1),
-							      NIL));
+					new_inds = gen_nconc(new_inds,
+							     CONS(EXPRESSION,
+								  make_phi_expression(i-nb_phi_real+1),
+								  NIL));
+				      }
 
 				  }
 				for(i=min_phi; i<= nb_phi_orig-min_i+min_phi; i++)

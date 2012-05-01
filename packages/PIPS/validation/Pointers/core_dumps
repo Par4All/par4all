@@ -1,0 +1,11 @@
+#/bin/sh
+
+# To find out core dumps among any diffs
+
+for i in *.err;
+ do j=`basename $i .err`;
+  if test -e $j.diff;
+  then echo -n "";
+  else echo $j;
+  fi;
+done

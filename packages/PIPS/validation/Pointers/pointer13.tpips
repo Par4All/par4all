@@ -1,0 +1,14 @@
+delete pointer13
+create pointer13 pointer13.c
+
+
+echo
+echo POINTS TO for "pointer13"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer13]
+
+close
+shell cat pointer13.database/Warnings
+delete pointer13
+quit

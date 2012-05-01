@@ -324,6 +324,12 @@ static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to
 			pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
 		      break;
 		    }
+		  case is_basic_overloaded:
+		    {
+		      t = current_type;
+		      *to_be_freed = false;
+		      break;
+		    }
 		  default:
 		    {
 		      pips_internal_error("unexpected basic tag");
@@ -400,6 +406,12 @@ type cell_reference_to_type(reference ref, bool *to_be_freed)
 			 NIL, NIL));
 	  *to_be_freed = true;
 	}
+      else if(type_unknown_p(ref_type)) {
+	/* FI: for some abstract locations that have type unknown
+	   instead of type variable, with basic overloaded */
+	t = ref_type;
+	*to_be_freed = false;
+      }
       else
 	{
 	  pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
@@ -418,6 +430,48 @@ type cell_to_type(cell c, bool *to_be_freed)
   reference ref = cell_reference_p(c)? cell_reference(c) : preference_reference(cell_preference(c));
 
   return cell_reference_to_type(ref, to_be_freed);
+}
+
+/* FI: I need more generality than is offered by cell_to_type() */
+type points_to_reference_to_type(reference ref, bool *to_be_freed)
+{
+  type t = type_undefined;
+
+  entity v = reference_variable(ref);
+  list sl = reference_indices(ref);
+
+  if(ENDP(sl)) {
+    t = entity_type(v);
+    *to_be_freed = false;
+  }
+  else {
+    expression ls = EXPRESSION(CAR(gen_last(sl)));
+    syntax lss = expression_syntax(ls);
+    if(syntax_reference_p(lss)) {
+      reference r = syntax_reference(lss);
+      entity f = reference_variable(r);
+      if(entity_field_p(f)) {
+	t = entity_type(f);
+	*to_be_freed = false;
+      }
+    }
+  }
+    
+  if(type_undefined_p(t))
+    t = cell_reference_to_type(ref, to_be_freed);
+
+  return t;
+}
+/* FI: I need more generality than is offered by cell_to_type() */
+type points_to_cell_to_type(cell c, bool *to_be_freed)
+{
+  type t = type_undefined;
+  pips_assert("a cell cannot be a gap yet\n", !cell_gap_p(c));
+  reference ref = cell_any_reference(c);
+
+  t = points_to_reference_to_type(ref, to_be_freed);
+
+  return t;
 }
 
 /**

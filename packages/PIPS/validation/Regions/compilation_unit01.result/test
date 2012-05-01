@@ -1,0 +1,150 @@
+
+//  <B[PHI1].im-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <B[PHI1].re-W-EXACT-{0<=PHI1, PHI1<=9}>
+
+void init(CplFloat B[10])
+{
+   int i;
+
+//  <B[PHI1].im-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <B[PHI1].re-W-EXACT-{0<=PHI1, PHI1<=9}>
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  <B[PHI1].re-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      B[i].re = 1.0*i;
+
+//  <B[PHI1].im-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      B[i].im = 2.0*i;
+   }
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+   CplFloat A[10];
+
+//  <A[PHI1].im-W-EXACT-{0<=PHI1, PHI1<=9}>
+//  <A[PHI1].re-W-EXACT-{0<=PHI1, PHI1<=9}>
+
+
+   init(A);
+   {
+      int i;
+
+//  <A[PHI1].im-R-EXACT-{0<=PHI1, PHI1<=9}>
+//  <A[PHI1].re-R-EXACT-{0<=PHI1, PHI1<=9}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+      for(i = 0; i <= 9; i += 1)
+
+//  <A[PHI1].im-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <A[PHI1].re-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         printf("A[%d] = %f + i %f\n", i, A[i].re, A[i].im);
+   }
+
+   return 0;
+}
+void init(CplFloat B[10])
+{
+   int i;
+   for(i = 0; i <= 9; i += 1) {
+      B[i].re = 1.0*i;
+      B[i].im = 2.0*i;
+   }
+}
+
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
+
+int main()
+{
+   CplFloat A[10];
+
+   init(A);
+   {
+      int i;
+
+//  <A[PHI1].im-IN-EXACT-{0<=PHI1, PHI1<=9}>
+//  <A[PHI1].re-IN-EXACT-{0<=PHI1, PHI1<=9}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
+
+
+      for(i = 0; i <= 9; i += 1)
+
+//  <A[PHI1].im-IN-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <A[PHI1].re-IN-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+         printf("A[%d] = %f + i %f\n", i, A[i].re, A[i].im);
+   }
+
+   return 0;
+}
+
+//  <B[PHI1].im-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+//  <B[PHI1].re-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+
+void init(CplFloat B[10])
+{
+   int i;
+
+//  <B[PHI1].im-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+//  <B[PHI1].re-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  <B[PHI1].re-OUT-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      B[i].re = 1.0*i;
+
+//  <B[PHI1].im-OUT-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      B[i].im = 2.0*i;
+   }
+}
+int main()
+{
+   CplFloat A[10];
+
+//  <A[PHI1].im-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+//  <A[PHI1].re-OUT-EXACT-{0<=PHI1, PHI1<=9}>
+
+
+   init(A);
+   {
+      int i;
+
+      for(i = 0; i <= 9; i += 1)
+
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0, 0<=i, i<=9}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==1, 0<=i, i<=9}>
+
+         printf("A[%d] = %f + i %f\n", i, A[i].re, A[i].im);
+   }
+
+   return 0;
+}

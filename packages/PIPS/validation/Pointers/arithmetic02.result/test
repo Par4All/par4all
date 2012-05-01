@@ -70,7 +70,7 @@ int main()
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    /*   repère le dernier élément de t   */
    
@@ -79,7 +79,7 @@ int main()
 // Points To:
 // p -> t[0] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    while (p<=pfin) {
 
@@ -95,7 +95,7 @@ int main()
 // p -> t[8] , MAY
 // p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
       if (*p==0)
 
@@ -111,7 +111,7 @@ int main()
 // p -> t[8] , MAY
 // p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
          printf("%d ", p-pdeb);
 
@@ -127,42 +127,22 @@ int main()
 // p -> t[8] , MAY
 // p -> t[9] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
       p++;
    }
 
 // Points To:
-// p -> t[0] , MAY
-// p -> t[1] , MAY
-// p -> t[2] , MAY
-// p -> t[3] , MAY
-// p -> t[4] , MAY
-// p -> t[5] , MAY
-// p -> t[6] , MAY
-// p -> t[7] , MAY
-// p -> t[8] , MAY
-// p -> t[9] , MAY
-// p -> t[10] , MAY
+// p -> t[10] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    printf("\n");
 
 // Points To:
-// p -> t[0] , MAY
-// p -> t[1] , MAY
-// p -> t[2] , MAY
-// p -> t[3] , MAY
-// p -> t[4] , MAY
-// p -> t[5] , MAY
-// p -> t[6] , MAY
-// p -> t[7] , MAY
-// p -> t[8] , MAY
-// p -> t[9] , MAY
-// p -> t[10] , MAY
+// p -> t[10] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    return 0;
 }

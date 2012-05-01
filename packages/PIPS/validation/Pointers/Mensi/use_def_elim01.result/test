@@ -1,0 +1,42 @@
+
+PROPER  EFFECTS
+
+int use_def_elim01()
+{
+   int i, *x, *y;
+//             <    is written>: i
+   i = 2;
+//             <    is written>: x
+   x = &i;
+//             <    is read   >: x
+//             <    is written>: y
+   y = x;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: y
+   *y = 1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return *y;
+}
+
+POINTS-TO
+
+int use_def_elim01() {
+
+   int i, *x, *y;
+
+   i = 2;
+   x = &i;
+   y = x;
+
+// Points To:
+// x -> i , EXACT
+// y -> i , EXACT
+
+   *y = 1;
+
+// Points To:
+// x -> i , EXACT
+// y -> i , EXACT
+
+   return *y;
+}

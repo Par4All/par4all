@@ -1,17 +1,5 @@
 
-PROPER  EFFECTS
-
-int global01()
-{
-//             <    is written>: i
-   i = &k;
-//             <    is read   >: i
-//             <    is written>: j
-   j = i;
-   return 0;
-}
-
-POINTS-TO
+POINTS TO
 
 
 // Points To IN: none
@@ -23,19 +11,29 @@ POINTS-TO
 
 int global01()
 {
+   // To avoid a problem with the semantics of the empty points-to set
+   // The solution might be to add always an arc ANYWHERE->ANYWHERE
+   // when entering a module statement
 
 // Points To: none
+
+   int *p = &k;
+
+// Points To:
+// p -> k , EXACT
 
    i = &k;
 
 // Points To:
 // i -> k , EXACT
+// p -> k , EXACT
 
    j = i;
 
 // Points To:
 // i -> k , EXACT
 // j -> k , EXACT
+// p -> k , EXACT
 
    return 0;
 }

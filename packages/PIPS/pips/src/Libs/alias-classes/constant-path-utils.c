@@ -1004,6 +1004,7 @@ bool opkill_may_vreference(cell c1, cell c2)
   return (i==0? true: false);
 }
 
+/* returns true if c2 kills c1 */
 bool opkill_must_vreference(cell c1, cell c2)
 {
   int i = 0;
@@ -1023,7 +1024,12 @@ bool opkill_must_vreference(cell c1, cell c2)
 	expression se1 = EXPRESSION(CAR(sl1));
 	expression se2 = EXPRESSION(CAR(sl2));
 	if(expression_constant_p(se2) && unbounded_expression_p(se1)){
+	  //i = 0;
+	  i = 1;
+	}
+	else if(expression_constant_p(se1) && unbounded_expression_p(se2)){
 	  i = 0;
+	  //i = 1;
 	}
 	else if (expression_constant_p(se1) && expression_constant_p(se2)){
 	  int i1 = expression_to_int(se1);
@@ -1061,16 +1067,20 @@ bool opkill_may_constant_path(cell c1, cell c2)
   bool type_equal_p = true;
 
   if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
-    t1 = simple_effect_reference_type(r1);
-    t2 = simple_effect_reference_type(r2);
+    bool to_be_freed1, to_be_freed2;
+    t1 = points_to_reference_to_type(r1,&to_be_freed1);
+    t2 = points_to_reference_to_type(r2,&to_be_freed2);
     type_equal_p = opkill_may_type(t1,t2);
+    if(to_be_freed1) free_type(t1);
+    if(to_be_freed2) free_type(t2);
   }
-  kill_may_p =opkill_may_module(c1,c2) && opkill_may_name(c1,c2) &&
+  kill_may_p = opkill_may_module(c1,c2) && opkill_may_name(c1,c2) &&
     type_equal_p && opkill_may_vreference(c1,c2);
 
   return kill_may_p;
 }
 
+/* returns true if c2 kills c1*/
 bool opkill_must_constant_path(cell c1, cell c2)
 {
   bool kill_must_p;
@@ -1081,8 +1091,8 @@ bool opkill_must_constant_path(cell c1, cell c2)
   //entity v1 = reference_variable(r1);
   //entity v2 = reference_variable(r2);
   bool equal_p = true;
-  t1 = cell_reference_to_type(r1,&equal_p);
-  t2 = cell_reference_to_type(r2, &equal_p);
+  t1 = points_to_reference_to_type(r1,&equal_p);
+  t2 = points_to_reference_to_type(r2, &equal_p);
   equal_p = type_equal_p(t1,t2);
   /* if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){ */
   /*   if (entity_abstract_location_p(v1)) */
@@ -1209,7 +1219,8 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
       SET_FOREACH(points_to, pt, in_may){
 	if(points_to_compare_cell(points_to_source(pt),l)){
 	  // FI: it would be much easier/efficient to modify the approximation of pt
-	  points_to npt = make_points_to(l, points_to_sink(pt),
+	  // But it is incompatible with the implementation of sets...
+	  points_to npt = make_points_to(copy_cell(l), copy_cell(points_to_sink(pt)),
 					 make_approximation_may(),
 					 make_descriptor_none());
 	  set_add_element(gen_may1, gen_may1, (void*)npt);
@@ -1355,16 +1366,21 @@ set gen_may_constant_paths(cell l,
     FOREACH(cell, r, R){
       SET_FOREACH(points_to, i, in_may){
 	if (/* locations_equal_p */equal_must_vreference(r, points_to_source(i)) /* &&  !entity_abstract_location_p(el) */ ){
-	  pt = make_points_to(l, points_to_sink(i), make_approximation_may(), make_descriptor_none());
+	  cell nl = copy_cell(l);
+	  pt = make_points_to(nl, points_to_sink(i), make_approximation_may(), make_descriptor_none());
 	}
 	if(array_entity_p(reference_variable(cell_any_reference(r)))){
 	  reference ref = cell_any_reference(r);
 	  bool t_to_be_freed = false;
-	  type t = cell_reference_to_type(ref, &t_to_be_freed);
-	  if(pointer_type_p(t))
-	    pt = make_points_to(l, r, make_approximation_may(), make_descriptor_none());
-	  else
-	    pt = make_points_to(l, points_to_sink(i), make_approximation_may(), make_descriptor_none());
+	  type t = points_to_reference_to_type(ref, &t_to_be_freed);
+	  if(pointer_type_p(t)) {
+	    cell nl = copy_cell(l);
+	    pt = make_points_to(nl, r, make_approximation_may(), make_descriptor_none());
+	  }
+	  else {
+	    cell nl = copy_cell(l);
+	    pt = make_points_to(nl, points_to_sink(i), make_approximation_may(), make_descriptor_none());
+	  }
 	  if (t_to_be_freed) free_type(t);
 	}
 	if(!points_to_undefined_p(pt)) {
@@ -1382,7 +1398,8 @@ set gen_may_constant_paths(cell l,
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
       /*   a = make_approximation_may(); */
-      pt = make_points_to(l, r, a, make_descriptor_none());
+      cell nl = copy_cell(l);
+      pt = make_points_to(nl, r, a, make_descriptor_none());
       set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
     }
   }
@@ -1485,7 +1502,7 @@ set gen_must_constant_paths(cell l,
 	  if(array_entity_p(reference_variable(cell_any_reference(r)))){
 	    reference ref = cell_any_reference(r);
 	    bool t_to_be_freed = false;
-	    type t = cell_reference_to_type(ref, &t_to_be_freed);
+	    type t = points_to_reference_to_type(ref, &t_to_be_freed);
 	    /* if(reference_unbounded_indices_p(ref)) */
 	    /*   a = make_approximation_may(); */
 	    if(!pointer_type_p(t))

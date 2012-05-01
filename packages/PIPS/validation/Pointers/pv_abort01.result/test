@@ -3,8 +3,7 @@ PROPER  EFFECTS
 
 int main()
 {
-   int **a;
-   int b;
+   int **a, b;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a
    a[0] = &b;
@@ -24,12 +23,7 @@ int main()
 
 // Points To: none
 
-   int **a;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int b;
+   int **a, b;
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -42,3 +36,6 @@ int main()
 
    return 0;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of an undefined pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of an undefined pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of an undefined pointer.

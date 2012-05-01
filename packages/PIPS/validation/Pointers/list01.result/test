@@ -35,11 +35,12 @@ int main(void)
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// nil -> *NULL_POINTER* , EXACT
 
 
 // Points To OUT:
-// nil -> _nil_0[0] , EXACT
+// nil -> *NULL_POINTER* , EXACT
 
 int main(void)
 {
@@ -49,54 +50,54 @@ int main(void)
    list l = nil;
 
 // Points To:
-// l -> _nil_0[0] , EXACT
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
 
    int n;
 
 // Points To:
-// l -> _nil_0[0] , EXACT
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
 
    fscanf(stdin, "%d", &n);
 
 // Points To:
-// l -> _nil_0[0] , EXACT
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
 
    if (n>0)
 
 // Points To:
-// l -> _nil_0[0] , EXACT
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
 
       while (n--)
 
 // Points To:
 // l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// l -> _nil_0[0] , MAY
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , EXACT
 
          l = list_cons((double) n, l);
 
 // Points To:
 // l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// l -> _nil_0[0] , MAY
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , EXACT
 
    n = list_len(l);
 
 // Points To:
 // l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// l -> _nil_0[0] , MAY
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , EXACT
 
    fprintf(stdout, "n=%d", n);
 
 // Points To:
 // l -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// l -> _nil_0[0] , MAY
-// nil -> _nil_0[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , EXACT
 
    return 0;
 }

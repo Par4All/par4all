@@ -1,3 +1,54 @@
 
 PROPER  EFFECTS
 
+int main()
+{
+   int **a;
+   int b;
+//             <    is written>: a
+   a = (int **) (void *) 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a
+   a[0] = &b;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int **a;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int b;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a = (int **) (void *) 0;
+
+// Points To:
+// a -> *NULL_POINTER* , EXACT
+
+   a[0] = &b;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> b , EXACT
+// a -> *NULL_POINTER* , EXACT
+
+   return 0;
+}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of a null pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of  pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of  pointer.

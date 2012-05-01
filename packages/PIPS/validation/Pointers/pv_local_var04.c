@@ -1,9 +1,13 @@
 /* to test the non-elimination of static variables */
+
+#include <stdio.h>
+
 int a = 0;
 int b = 1;
+
 int main()
 {
-
+  int * pp = NULL; // FI: to manage an empty points-to set
   if (a>1)
     {
       static int *p = &a;

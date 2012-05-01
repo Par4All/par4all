@@ -52,22 +52,22 @@ int main()
    p = p+1;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[1] , EXACT
 
    p = p+3;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[4] , EXACT
 
    p = p-1;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[3] , EXACT
 
    p = p-2;
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> a[1] , EXACT
 
    return 0;
 }

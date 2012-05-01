@@ -73,19 +73,54 @@ int main()
 
 // Points To:
 // p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , EXACT
+// q -> *HEAP*_l_7[*] , MAY
+// q -> *HEAP*_l_7[0] , MAY
+// q -> *HEAP*_l_7[1] , MAY
+// q -> *HEAP*_l_7[2] , MAY
+// q -> *HEAP*_l_7[3] , MAY
+// q -> *HEAP*_l_7[4] , MAY
+// q -> *HEAP*_l_7[5] , MAY
+// q -> *HEAP*_l_7[6] , MAY
+// q -> *HEAP*_l_7[7] , MAY
+// q -> *HEAP*_l_7[8] , MAY
+// q -> *HEAP*_l_7[9] , MAY
+// q -> *HEAP*_l_7[10] , MAY
+// q -> *HEAP*_l_7[11] , MAY
 
       *q = i;
 
 // Points To:
 // p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , EXACT
+// q -> *HEAP*_l_7[*] , MAY
+// q -> *HEAP*_l_7[0] , MAY
+// q -> *HEAP*_l_7[1] , MAY
+// q -> *HEAP*_l_7[2] , MAY
+// q -> *HEAP*_l_7[3] , MAY
+// q -> *HEAP*_l_7[4] , MAY
+// q -> *HEAP*_l_7[5] , MAY
+// q -> *HEAP*_l_7[6] , MAY
+// q -> *HEAP*_l_7[7] , MAY
+// q -> *HEAP*_l_7[8] , MAY
+// q -> *HEAP*_l_7[9] , MAY
+// q -> *HEAP*_l_7[10] , MAY
+// q -> *HEAP*_l_7[11] , MAY
 
       q++;
 
 // Points To:
 // p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , EXACT
+// q -> *HEAP*_l_7[*] , MAY
+// q -> *HEAP*_l_7[1] , MAY
+// q -> *HEAP*_l_7[2] , MAY
+// q -> *HEAP*_l_7[3] , MAY
+// q -> *HEAP*_l_7[4] , MAY
+// q -> *HEAP*_l_7[5] , MAY
+// q -> *HEAP*_l_7[6] , MAY
+// q -> *HEAP*_l_7[7] , MAY
+// q -> *HEAP*_l_7[8] , MAY
+// q -> *HEAP*_l_7[9] , MAY
+// q -> *HEAP*_l_7[10] , MAY
+// q -> *HEAP*_l_7[11] , MAY
 
       i++;
    }
@@ -93,14 +128,36 @@ int main()
 
 // Points To:
 // p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , EXACT
+// q -> *HEAP*_l_7[*] , MAY
+// q -> *HEAP*_l_7[1] , MAY
+// q -> *HEAP*_l_7[2] , MAY
+// q -> *HEAP*_l_7[3] , MAY
+// q -> *HEAP*_l_7[4] , MAY
+// q -> *HEAP*_l_7[5] , MAY
+// q -> *HEAP*_l_7[6] , MAY
+// q -> *HEAP*_l_7[7] , MAY
+// q -> *HEAP*_l_7[8] , MAY
+// q -> *HEAP*_l_7[9] , MAY
+// q -> *HEAP*_l_7[10] , MAY
+// q -> *HEAP*_l_7[11] , MAY
 
 
    free(p);
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *HEAP*_l_7[*] , EXACT
+// q -> *HEAP*_l_7[*] , MAY
+// q -> *HEAP*_l_7[1] , MAY
+// q -> *HEAP*_l_7[2] , MAY
+// q -> *HEAP*_l_7[3] , MAY
+// q -> *HEAP*_l_7[4] , MAY
+// q -> *HEAP*_l_7[5] , MAY
+// q -> *HEAP*_l_7[6] , MAY
+// q -> *HEAP*_l_7[7] , MAY
+// q -> *HEAP*_l_7[8] , MAY
+// q -> *HEAP*_l_7[9] , MAY
+// q -> *HEAP*_l_7[10] , MAY
+// q -> *HEAP*_l_7[11] , MAY
 
    return 0;
 }

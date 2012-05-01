@@ -33,8 +33,8 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_14.q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// *HEAP*_l_15.q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// *HEAP*_l_14.q -> i , EXACT
+// *HEAP*_l_15.q -> i , EXACT
 
 int ptr_to_field()
 {
