@@ -393,7 +393,7 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
 
 /* Perform the same k-limiting scheme for all kinds of loops 
  *
- * The do while loop mus use an external special treatment for the
+ * The do while loop must use an external special treatment for the
  * first iteration.
  *
  * Derived from points_to_forloop().
