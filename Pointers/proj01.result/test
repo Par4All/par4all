@@ -79,9 +79,15 @@ int main(void)
    // segfault?
    *pp = &j;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: none
 
    return 0;
 }
+
+Warnings
+
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Dangling pointer pp 
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Possibly undefined pointer "*NOWHERE*_b1" is dereferenced.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Uninitialized or null pointer dereferenced: Sink missing for a source based on "pp".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (unary_intrinsic_call_to_points_to_sinks) No pointed location for variable "pp" and reference "pp"

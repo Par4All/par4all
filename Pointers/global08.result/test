@@ -1,0 +1,63 @@
+
+PROPER EFFECTS
+
+void global08()
+{
+   // To avoid a problem with the semantics of the empty points-to set
+   // The solution might be to add always an arc ANYWHERE->ANYWHERE
+   // when entering a module statement
+//             <    is written>: p
+   int *p = &i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   q->one = 1;
+   return;
+}
+
+PROPER POINTER EFFECTS
+
+void global08()
+{
+   // To avoid a problem with the semantics of the empty points-to set
+   // The solution might be to add always an arc ANYWHERE->ANYWHERE
+   // when entering a module statement
+//             <    is written>: p
+   int *p = &i;
+//             <    is read   >: q
+//             <    is written>: q[0].one
+   q->one = 1;
+   return;
+}
+
+POINTS TO
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_44 , MAY
+
+
+// Points To OUT:
+// q -> _q_44 , EXACT
+
+void global08()
+{
+   // To avoid a problem with the semantics of the empty points-to set
+   // The solution might be to add always an arc ANYWHERE->ANYWHERE
+   // when entering a module statement
+
+// Points To: none
+
+   int *p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   q->one = 1;
+
+// Points To:
+// p -> i , EXACT
+// q -> _q_44 , EXACT
+
+   return;
+}

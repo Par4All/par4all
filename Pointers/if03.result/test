@@ -30,8 +30,7 @@ int main()
 
       *p = 1;
 
-// Points To:
-// p -> *NULL_POINTER* , EXACT
+// Points To: none
 
 
    return 0;

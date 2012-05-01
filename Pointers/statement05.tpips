@@ -1,11 +1,16 @@
-setenv WSPACE=pv_loop05
+setenv WSPACE=statement05
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
+#setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
+
+setproperty POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING TRUE
+
+setproperty POINTS_TO_NULL_POINTER_DEREFERENCING TRUE
+
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # Key property for this test case

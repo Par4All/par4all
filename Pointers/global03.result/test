@@ -20,6 +20,7 @@ void call03()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
    (q->two)[4] = 2;
+   return;
 }
 
 PROPER POINTER EFFECTS
@@ -43,6 +44,7 @@ void call03()
 //             <    is read   >: q
 //             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
+   return;
 }
 
 POINTS TO
@@ -51,10 +53,13 @@ POINTS TO
 // Points To IN:
 // pi -> *NULL_POINTER* , MAY
 // pi -> _pi_84[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_92 , MAY
 
 
 // Points To OUT:
 // pi -> _pi_84[1] , EXACT
+// q -> _q_92 , EXACT
 
 void call03()
 {
@@ -73,6 +78,7 @@ void call03()
 
 // Points To:
 // p -> i[0] , EXACT
+// pi -> _pi_84[0] , EXACT
 
    pi++;
 
@@ -85,6 +91,14 @@ void call03()
 // Points To:
 // p -> i[0] , EXACT
 // pi -> _pi_84[1] , EXACT
+// q -> _q_92 , EXACT
 
    (q->two)[4] = 2;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92 , EXACT
+
+   return;
 }

@@ -1,4 +1,4 @@
-setenv WS=pv_forloop03
+setenv WS=pv_dowhileloop06
 delete $WS
 create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE

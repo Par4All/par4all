@@ -1,4 +1,4 @@
-setenv WS=inc02
+setenv WS=global08
 delete $WS
 create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -9,9 +9,6 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 # A pointer int * is incremented, this property must be reset
 setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
-# Necessary to analyze exactly the loop on array "t"
-setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
-
 ##TODO: explain
 
 echo 
@@ -19,23 +16,22 @@ echo PROPER EFFECTS
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[$WS]
 
 echo 
 echo PROPER POINTER EFFECTS
 echo
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[$WS]
 
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[main]
+display PRINTED_FILE[$WS]
 
 
 close
-shell cat $WS.database/Warnings
 delete $WS
 quit

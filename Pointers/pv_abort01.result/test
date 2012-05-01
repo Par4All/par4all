@@ -30,12 +30,9 @@ int main()
 
    a[0] = &b;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> b , EXACT
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: none
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_may_set) Dereferencing of an undefined pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (gen_must_set) Dereferencing of an undefined pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Uninitialized or null pointer dereferenced: Sink missing for a source based on "a".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.

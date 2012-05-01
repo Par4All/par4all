@@ -1,34 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int **x, **y, *z, *t;
-   int i, j;
-//             <    is written>: i
-   i = 1;
-//             <    is written>: j
-   j = 2;
-//             <    is written>: z
-
-   z = &i;
-//             <    is written>: t
-   t = &j;
-//             <    is read   >: t
-//             <    is written>: z
-
-   z = t;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: x z
-   *x = z;
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout x __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf(" x = %p\n", x);
-   return 0;
-}
-
 POINTS-TO
 
 

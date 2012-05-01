@@ -50,16 +50,11 @@ int main()
 
    *p = 1;
 
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// Points To: none
 
    *q = &i;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// Points To: none
 
 
    return 0;

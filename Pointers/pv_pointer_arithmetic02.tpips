@@ -1,4 +1,4 @@
-setenv WSPACE=pv_loop05
+setenv WSPACE=pv_pointer_arithmetic02
 delete $WSPACE
 create $WSPACE $WSPACE.c
 

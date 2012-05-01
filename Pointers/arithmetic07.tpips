@@ -9,6 +9,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 # Key property for this test case
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
 
 #module main
 
