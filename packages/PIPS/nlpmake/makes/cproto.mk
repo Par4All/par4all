@@ -39,11 +39,11 @@ $(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
 		for cproto_source in $$cproto_sources ; do \
 			case $$cproto_source in \
 				*.c)\
-					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_source ;;\
+					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DHAVE_CONFIG_H -DCPROTO_IS_PROTOTYPING" $$cproto_source ;;\
 				*)\
 					cproto_proxy=`basename $${cproto_source}`.c ;\
 					sed -n -e '/^%{/,/%}/ p' -e '1,/^%%/ d' -e '/^%%/,$$ p' $$cproto_source | sed -e '/^%/ d'  > $$cproto_proxy ; \
-					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_proxy |\
+					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DHAVE_CONFIG_H -DCPROTO_IS_PROTOTYPING" $$cproto_proxy |\
 						sed -e '/ yy/ d';\
 					rm -f $$cproto_proxy ;;\
 			esac ;\
