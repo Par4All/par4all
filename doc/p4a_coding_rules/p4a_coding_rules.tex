@@ -135,6 +135,21 @@ Another solution is to wrap error code between %
 remove such code on demand.
 
 
+Traditionally, automatic parallelizers focus on \texttt{for} loops
+with good properties, that is loops which are similar to Fortran
+\texttt{do} loops: an integer loop index which is initialized before
+entering the loop, and the value of which is incremented and compared
+with loop-invariant values at each iteration. \Apips front end
+performs the detection of such loops from C \texttt{for} and
+\texttt{while} loops, and the parallelizing effort exclusively focuses
+on them. It is thus of a tremendous importance to write these loops in
+such a way that they can be detected as Fortran-like \texttt{do}
+loops. In particular, this implies avoiding putting the \texttt{for}
+body code inside the increment expression as in:
+\begin{lstlisting}
+for (i=0; i<n; a[i] = i, i++);
+\end{lstlisting}
+
 
 One of the main other restrictions is that \Apips does not handle
 recursive functions.
