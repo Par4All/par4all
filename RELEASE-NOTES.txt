@@ -1,5 +1,5 @@
-Release notes for Par4All 1.3.1, 2012/01/30
-===========================================
+Release notes for Par4All 1.4, 2012/05/01
+=========================================
 
 Par4All is an open-source environment to do source-to-source
 transformations on C and Fortran programs for parallelizing, optimizing,
@@ -11,7 +11,7 @@ performance computer and GPU.
 Introduction
 ------------
 
-This is the public version of Par4All. It parallelizes C programs to
+Par4All parallelizes C programs to
 OpenMP, CUDA and OpenCL, and Fortran programs to OpenMP.
 
 This release presents new features of Par4All and PIPS that are described
@@ -90,7 +90,8 @@ Knowing issues
     parallelization. The point-to analysis is still on-going in PIPS, but
     in the general case it is untractable... So avoid if possible. Use
     nice C99 multidimensional arrays with dynamic size (as in Fortran for
-    long time) and pointer to arrays instead.
+    long time) and pointer to arrays instead. This is documented into the
+    coding rules, found at http://download.par4all.org/doc/p4a_coding_rules
 
   - there are still issues in the part that analyzes the control graph
     (the PIPS ``controlizer``). For example, right now we cannot deal well
