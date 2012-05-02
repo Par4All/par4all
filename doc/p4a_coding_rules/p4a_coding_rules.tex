@@ -187,8 +187,9 @@ possible and replaced by explicit argument passing in functions.
 \label{sec:data_structures}
 
 The C language provides several basic data structures, which can be
-combined to create more complicated ones. \Apips allows all combinations,
-but with some limitations in their usage.
+combined to create more complicated ones. \Apips allows all
+combinations, but with some limitations in their usage. Notice however
+that unions are not currently well analysed and must be avoided.
 
 
 \subsection{Pointers}
@@ -478,7 +479,7 @@ Keep the algorithmic attitude non offuscated contest
 
 #pragma
 
-No union
+No union -> added (BC, 2012-05-02)
 
 comments
 
