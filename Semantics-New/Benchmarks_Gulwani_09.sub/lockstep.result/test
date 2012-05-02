@@ -1,0 +1,92 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=n}
+
+void lockstep(int x, int y, int n)
+{
+
+//  T(x) {x==0}
+
+   x = 0;
+
+//  T(y) {x==0, y==0}
+
+   y = 0;
+
+//  T() {x==0, y==0, 0<=n}
+
+   if (!(n>=0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(x,y) {x==y, x#init==0, y#init==0, 1<=n, x+1<=n, 0<=x}
+
+   while (x<n) {
+
+//  T(x) {x==x#init+1, 1<=n, x<=n}
+
+      x++;
+
+//  T(y) {y==y#init+1, 1<=n, x<=n}
+
+      y++;
+   }
+
+//  T() {n==x, n==y, 0<=n}
+
+   if (!(y==n))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void lockstep(int x, int y, int n)
+{
+
+//  P() {}
+
+   x = 0;
+
+//  P(x) {x==0}
+
+   y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   if (!(n>=0))
+
+//  P(x,y) {x==0, y==0, n+1<=0}
+
+      exit(0);
+
+//  P(x,y) {x==0, y==0, 0<=n}
+
+   while (x<n) {
+
+//  P(x,y) {x==y, x+1<=n, 0<=x}
+
+      x++;
+
+//  P(x,y) {x==y+1, 1<=n, x<=n, 1<=x}
+
+      y++;
+   }
+
+//  P(x,y) {n==x, n==y, 0<=n}
+
+   if (!(y==n))
+
+//  P() {0==-1}
+
+      exit(1);
+}

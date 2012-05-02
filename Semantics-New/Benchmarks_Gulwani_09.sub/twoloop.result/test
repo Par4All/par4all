@@ -1,0 +1,98 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=n}
+
+void twoloop(int x, int y, int m, int n)
+{
+
+//  T() {0<=n}
+
+   if (!(n>=0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(y) {y==0, 0<=n}
+
+   y = 0;
+
+//  T(y) {y#init==0, 1<=n, y+1<=n, 0<=y}
+
+   while (y<n)
+
+//  T(y) {y==y#init+1, 1<=n, y<=n}
+
+      y++;
+
+//  T(x) {n==y, x==0, 0<=n}
+
+   x = 0;
+
+//  T(x) {n==y, x#init==0, 1<=n, x+1<=n, 0<=x}
+
+   while (x<n)
+
+//  T(x) {n==y, x==x#init+1, 1<=n, x<=n}
+
+      x++;
+
+//  T() {n==x, n==y, 0<=n}
+
+   if (!(x==y))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void twoloop(int x, int y, int m, int n)
+{
+
+//  P() {}
+
+   if (!(n>=0))
+
+//  P() {n+1<=0}
+
+      exit(0);
+
+//  P() {0<=n}
+
+   y = 0;
+
+//  P(y) {y==0, 0<=n}
+
+   while (y<n)
+
+//  P(y) {y+1<=n, 0<=y}
+
+      y++;
+
+//  P(y) {n==y, 0<=n}
+
+   x = 0;
+
+//  P(x,y) {n==y, x==0, 0<=n}
+
+   while (x<n)
+
+//  P(x,y) {n==y, x+1<=n, 0<=x}
+
+      x++;
+
+//  P(x,y) {n==x, n==y, 0<=n}
+
+   if (!(x==y))
+
+//  P() {0==-1}
+
+      exit(1);
+}
