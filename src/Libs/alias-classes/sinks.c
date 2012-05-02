@@ -1002,7 +1002,7 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
     // FI: useful?
     //pips_internal_error("Not implemented yet\n");
     list soel = syntax_va_arg(s);
-    sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
+    //sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
     sizeofexpression soet = SIZEOFEXPRESSION(CAR(CDR(soel)));
     sinks = sizeofexpression_to_points_to_sinks(soet, in);
     break;
