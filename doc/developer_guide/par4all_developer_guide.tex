@@ -359,7 +359,7 @@ The \Apfa distribution contains the following directories:
 \end{description}
 
 
-\section{Repositories and work-flow}
+\section{Repositories and integration work-flow}
 \label{sec:repos-workfl}
 
 For history tracking and collaborative development, \Apfa relies on a main
@@ -367,7 +367,7 @@ For history tracking and collaborative development, \Apfa relies on a main
 and the production and quality assurance team.
 
 The script \verb|p4a_git| is used to automate the management of the
-workflow.
+workflow and the integration of the different parts.
 
 Since \Apfa extends some tools such as \Apips, their are some
 ancillary repositories to ease the impedance matching between \Apfa and
@@ -385,7 +385,7 @@ branches are stored into a common \Agit view of the \Apips{} \Asvn
 repositories; these light branches can be pushed back into the \Apips{} \Asvn.
 
 
-\subsection{The p4a\_git script to deal with workflow}
+\subsection{The p4a\_git script to deal with workflow and integration}
 \label{sec:p4a_git-script-deal}
 
 The \verb|p4a_git| script is used to manage the workflow of \Apfa
@@ -450,11 +450,19 @@ out-of-phase commit in \Apips):
 \begin{verbatim}
 p4a_git --update-git-svn
 \end{verbatim}
+
 \item merge the new versions of the upstream packages into the \Apfa
   reference branches, such as \texttt{CRI-pips}:
 \begin{verbatim}
 p4a_git --fetch-remote-git
 \end{verbatim}
+  Note that this instruction and the following work into
+  \verb|$P4A_ROOT|, %$
+  so make sure it does not point to a default installation directory such
+  as \texttt{/usr/local/par4all}. You can update \verb|$P4A_ROOT| %$
+  or use the \verb|--root .| option if you worked in the \texttt{par4all}
+  working copy;
+
 \item pull all the component branches (such as \texttt{CRI-pips}) into the
   \Apfa integration branch hierarchy (such as \texttt{p4a-pips}):
 \begin{verbatim}
@@ -464,11 +472,10 @@ p4a_git --pull-remote-git
   afterwards send the \texttt{p4a-pips} back a few commits, cherry-pick
   from \texttt{CRI-pips} some useful contributions among broken commits.
 
-  Note that the 2 previous instructions work into \verb|$P4A_ROOT|, %$
-  so make sure it does not point to a default installation directory such
-  as \texttt{/usr/local/par4all}. You can update \verb|$P4A_ROOT| %$
-  or use the \verb|--root .| option if you worked in the \texttt{par4all}
-  working copy;
+  If you want to skip some commits in one package, say Linear for \Apips,
+  it is easier to do a \verb|p4a_git --pull-remote-git| and the go back on
+  \texttt{} branch with a \texttt{git branch -f p4a-linear ...};
+
 \item fuse all the component branches into the \Apfa integration
   branch hierarchy:
 \begin{verbatim}
