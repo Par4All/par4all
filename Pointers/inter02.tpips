@@ -1,0 +1,17 @@
+setenv WS=inter02
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+
+echo
+echo POINTS TO for "main"
+echo
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit
