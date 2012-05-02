@@ -378,8 +378,20 @@ compiler version, some of your favorite ones may be missing. Don't
 hesitate to contact us on \texttt{pipsdev at cri dot ensmp dot fr} so
 that we can integrate them.
 
-The effects of the cast operators on the analyses is currently under
-study: please use it sparingly.
+\subsection{Casts}
+\label{sec:casts}
+
+Casts are somewhat tricky to analyse because they induce translating a
+memory layout into another one, and this maybe very difficult in the
+general case, especially for a tool such as \Apips which tries to
+preserve the initial high level semantics of the program. 
+
+Hence the effects of the cast operators on the analyses is still
+currently under study: please use it sparingly. This does not concern
+casts added before invocations of the \texttt{malloc} function, and
+particular efforts have been made to handle conversions between arrays
+and pointers when the layout is preserved. This is particularly useful
+for function calls.
 
 \section{Values of scalar variables}
 \label{sec:values_of_scalar_variables}
@@ -484,7 +496,7 @@ No union -> added (BC, 2012-05-02)
 
 comments
 
-cast
+cast -> section added (BC, 2012-05-02)
 
 compléter linearization
 
