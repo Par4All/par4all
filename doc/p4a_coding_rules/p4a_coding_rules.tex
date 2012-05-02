@@ -43,16 +43,17 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Automatic parallelization is an intractable problem in the general case
-and it would be an illusion to rely on it in any case. Fortunately, well
-written programs can expose enough parallelism in a way automatic
-parallelizer can do a pretty good job. We advocate that to expose
-parallelism even before manual parallelization, programs should be cleaned
-enough from specific sequential processor optimizations.
+Automatic parallelization is an intractable problem in the general
+case and it would be an illusion to rely on it in any
+case. Fortunately, \emph{well written} sequential programs can expose
+enough parallelism, in such a way automatic parallelizers can do a
+pretty good job. In particular, we advocate that, before any attempt
+at manual or automatic parallelization, programs should be cleared of
+specific sequential processor optimizations.
 
 Here we present some coding rules specific to the \Apfa automatic
 parallelizer that is based on the \Apips source-to-source language
-transformation workbench but we think that these coding rules can be
+transformation workbench. But we think that these coding rules can be
 useful with other tools as interesting guidelines too.
 
 This document gives advices to write programs that are compliant with the
@@ -67,7 +68,7 @@ the easier it is to analyze.
 
 In the following we assume the reader is knowledgeable of the C99
 programming language and more specifically the ISO/IEC 9899:TC3 WG14
-norm\footnote{The last draft can be found here:
+standard\footnote{The last draft can be found here:
   \url{http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf}}.
 
 
@@ -130,16 +131,40 @@ void * my_malloc(size_t size, int err_code,
 \end{figure}
 
 Another solution is to wrap error code between %
-\lstinline|#ifdef ERROR_CONTROL ... #endif| pairs to be able remove to
+\lstinline|#ifdef ERROR_CONTROL ... #endif| pairs to be able to
 remove such code on demand.
 
-C99 offers the possibility of declaring data almost anywhere in the
-code. This feature is relatively new in \Apips and phases are unequally
-ready to accept this feature, which means that you may gather all data
-declarations at the beginning of a code block.
+
 
 One of the main other restrictions is that \Apips does not handle
 recursive functions.
+
+
+\subsection{Declaration scope}
+\label{sec:declaration-scope}
+
+C99 offers the possibility of declaring data almost anywhere in the
+code. This feature is relatively new in \Apips and phases are
+unequally ready to accept this feature, which means that you may
+gather all data declarations at the beginning of a code block. This is
+particularly true when declarations are intermingled with jumping
+constructs.
+
+\Apips analyses are interprocedural and can deal with parameter
+passing through global variables, or with static local
+variables. However, using global declarations may induce memory
+dependences which prevent parallelization. Program transformations
+(scalar and array privatization, array scalarization) which could
+remove some of these dependences, currently (and safely) do not deal
+with global variables. This would require interprocedural program
+transformations which are not yet available.
+
+In addition, the current generation of \Agpu code may choke on some
+case of global arrays that are not well outlined and forgotten.
+
+As a consequence, such global declarations should be avoided if
+possible and replaced by explicit argument passing in functions.
+
 
 
 \subsection{Data Structures}
@@ -324,15 +349,6 @@ will prefer the version of figure~\ref{fig:consecutive_array_accesses}
 to the version of figure~\ref{fig:disjoint_array_accesses}.
 
 
-\subsubsection{Declaration scope}
-\label{sec:declaration-scope}
-
-Even if \Apips is interprocedural and can deal with parameter passing
-through global variables, such global declarations should be avoided if
-possible and replaced by explicit argument passing in functions.
-
-For example, the actual generation of \Agpu code may choke on some case of
-global arrays that are not well outlined and forgotten.
 
 
 \section{Operators and standard libraries}
