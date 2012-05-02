@@ -99,16 +99,19 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     points_to_list pts_to_out = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    pt_map pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
+    pt_map pt_in_callee = new_pt_map();
+    pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
     list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
-    pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+    pt_map pt_out_callee = new_pt_map();
+    pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
     // FI: function name... set or list?
     pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
     ifdebug(8) print_points_to_set("pt_binded", pts_binded);
     pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
 						 pt_in_callee, pts_binded);
     ifdebug(8) print_points_to_set("pt_kill", pts_kill);
-    pt_map pt_end = set_difference(pt_end, pt_in, pts_kill);
+    pt_map pt_end = new_pt_map();
+    pt_end = set_difference(pt_end, pt_in, pts_kill);
     pt_map pts_gen = compute_points_to_gen_set(fpcl, pt_out_callee,
 					       pt_in_callee, pts_binded);
     pt_end = set_union(pt_end, pt_end, pts_gen);
