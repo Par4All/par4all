@@ -614,7 +614,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
  */
 points_to create_k_limited_stub_points_to(cell source, type t, pt_map in)
 {
-  int k = get_int_property("POINTS_TO_K_LIMITING");
+  int k = get_int_property("POINTS_TO_PATH_LIMIT");
   pips_assert("k is greater than one", k>=1);
   points_to pt = points_to_undefined;
   list p = CONS(CELL, source, NIL); // points-to path...
@@ -846,10 +846,13 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	}
       }
       if(ENDP(sinks)) {
+	/* We must be analyzing dead code... */
 	reference r = cell_any_reference(source);
 	print_reference(r);
-	pips_internal_error("Sink missing for a source based on \"%s\".\n",
-			    entity_user_name(v));
+	pips_user_warning("Uninitialized or null pointer dereferenced: "
+			  "Sink missing for a source based on \"%s\".\n"
+			  "Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.\n",
+			  entity_user_name(v));
       }
     }
   }

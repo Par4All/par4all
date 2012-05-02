@@ -51,7 +51,8 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
     entity pf = find_ith_parameter(called_func, ipc);
     expression lhs = entity_to_expression(pf);
     statement stmt = make_assign_statement(lhs, rhs);
-    s = set_assign(s, points_to_assignment(stmt, lhs, rhs, s));	
+    //s = set_assign(s, points_to_assignment(stmt, lhs, rhs, s));	
+    s = set_assign(s, assignment_to_points_to(lhs, rhs, s));	
   }
 
   SET_FOREACH(points_to, pt, s) {

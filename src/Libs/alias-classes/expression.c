@@ -94,8 +94,11 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
     if(sizeofexpression_type_p(soe))
       ; // pt_in is not modified
     else {
-      expression ne = sizeofexpression_expression(soe);
-      pt_out = expression_to_points_to(ne, pt_in);
+      // expression ne = sizeofexpression_expression(soe);
+      // FI: we have a problem because sizeof(*p) does not imply that
+      // *p is evaluated...
+      // pt_out = expression_to_points_to(ne, pt_in);
+      ;
     }
     break;
   }
@@ -103,7 +106,10 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
     subscript sub = syntax_subscript(s);
     expression a = subscript_array(sub);
     list sel = subscript_indices(sub);
-    pt_out = expression_to_points_to(a, pt_in);
+    /* a cannot evaluate to null or undefined */
+    /* FI: we may need a special case for stubs... */
+    pt_out = dereferencing_to_points_to(a, pt_in);
+    pt_out = expression_to_points_to(a, pt_out);
     pt_out = expressions_to_points_to(sel, pt_out);
     break;
   }
@@ -151,11 +157,26 @@ pt_map expressions_to_points_to(list el, pt_map pt_in)
 }
 
 /* The subscript expressions may impact the points-to
-   information. E.g. a[*(p++)] */
+ * information. E.g. a[*(p++)]
+ *
+ * I'm surprised that pointers can be indexed instead of being subscripted...
+ */
 pt_map reference_to_points_to(reference r, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
   list sel = reference_indices(r);
+  entity v = reference_variable(r);
+  type t = ultimate_type(entity_type(v));
+  // FI: some or all of these tests could be placed in
+  // dereferencing_to_points_to()
+  if(!entity_stub_sink_p(v)
+     && !formal_parameter_p(v)
+     && !ENDP(sel)
+     && pointer_type_p(t)) {
+    expression e = entity_to_expression(v);
+    pt_out = dereferencing_to_points_to(e, pt_in);
+    free_expression(e);
+  }
   pt_out = expressions_to_points_to(sel, pt_in);
   return pt_out;
 }
@@ -207,7 +228,12 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Unexpected type.\n");
 
-  if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
+  if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)) {
+    /* Is the dereferenced pointer null or undefined? */
+    expression p = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(p, pt_out); 
+  }
+  else if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
     clear_pt_map(pt_out);
   }
@@ -420,6 +446,52 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   return pt_out;
 }
 
+/* Make sure that expression p can be dereferenced in points-to graph "in" 
+ *
+ * Handling of NULL pointers according to property.
+ *
+ * Handling of undefined pointers according to property.
+ *
+ * "in" is modified by side effects. Arcs certainly incompatible with
+ * a dereferencing are removed. If dereferencing of p is no longer
+ * possible, return an empty points-to "in" as the expression cannot
+ * be evaluated.
+ *
+ * This is conditional to two properties.
+ */
+pt_map dereferencing_to_points_to(expression p, pt_map in)
+{
+  bool null_dereferencing_p
+    = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+  bool nowhere_dereferencing_p
+    = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  list sources = expression_to_points_to_sources(p, in);
+  if(gen_length(sources)==1
+     && !nowhere_dereferencing_p
+     && !null_dereferencing_p) {
+    list sinks = expression_to_points_to_sinks(p, in);
+    cell source = CELL(CAR(sources));
+    int n = (int) gen_length(sinks);
+    FOREACH(CELL, sink, sinks) {
+      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
+	remove_points_to_arcs(source, sink, in);
+	n--;
+      }
+      if(!null_dereferencing_p && null_cell_p(sink)) {
+	remove_points_to_arcs(source, sink, in);
+	n--;
+      }
+    }
+    if(n==0)
+      clear_pt_map(in);
+  }
+  else {
+      /* The issue will/might be taken care of later... */
+      ;
+  }
+  return in;
+}
+
 /* Update the sink locations associated to the source "lhs" under
  * points-to information pt_map by "delta".
  *
@@ -524,9 +596,8 @@ points_to offset_cell(points_to pt, expression delta)
 	value vlse = EvalExpression(lse);
 	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
 	  int ov =  constant_int(value_constant(vlse));
-	  // FI: crude limitation of the number of points-to nodes
-	  // created via constant subscript generation
-	  if(0<=ov && ov<=10) {
+	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	  if(-k <= ov && ov <= k) {
 	    expression nse = int_to_expression(dv+ov);
 	    EXPRESSION_(CAR(gen_last(sl))) = nse;
 	  }
@@ -619,9 +690,8 @@ void offset_points_to_cell(cell sink, expression delta)
 	value vlse = EvalExpression(lse);
 	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
 	  int ov =  constant_int(value_constant(vlse));
-	  // FI: very crude limitation on the number of points-to
-	  // nodes created via subscript computation
-	  if(0<= ov && ov<=10) {
+	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	  if(-k <= ov && ov <= k) {
 	    expression nse = int_to_expression(dv+ov);
 	    EXPRESSION_(CAR(gen_last(sl))) = nse;
 	  }
@@ -663,27 +733,6 @@ void offset_points_to_cell(cell sink, expression delta)
 }
 
 
-pt_map user_call_to_points_to(call c, pt_map pt_in)
-{
-  pt_map pt_out = pt_in;
-  entity f = call_function(c);
-
-  // FI: intraprocedural, use effects
-  // FI: interprocedural, check alias compatibility, generate gen and kill sets,...
-
-  // FI: we need a global variable here to make the decision without
-  // propagating an extra parameter everywhere
-
-  // pips_internal_error("Not implemented yet for function \"%s\"\n", entity_user_name(f));
-
-  pips_user_warning("The function call to \"%s\" is still ignored\n"
-		    "On going implementation...\n", entity_user_name(f));
-  //set_assign(pt_out, pt_in);
-  pt_out = pt_in;
-
-  return pt_out;
-}
-
 pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
@@ -739,14 +788,19 @@ pt_map pointer_assignment_to_points_to(expression lhs,
    */
   list R = expression_to_points_to_sinks(rhs,pt_out);
 
-  pips_assert("Left hand side reference list is not empty.\n", !ENDP(L));
-  pips_assert("Right hand side reference list is not empty.\n", !ENDP(R));
+  if(ENDP(L) || ENDP(R)) {
+    //pips_assert("Left hand side reference list is not empty.\n", !ENDP(L));
+    //pips_assert("Right hand side reference list is not empty.\n", !ENDP(R));
 
   // FI: where do we want to check for dereferencement of
   // nowhere/undefined and NULL? Here? Or within
   // list_assignment_to_points_to?
 
-  pt_out = list_assignment_to_points_to(L, R, pt_out);
+    /* We must be in a dead-code portion. If not pleased, adjust properties... */
+    clear_pt_map(pt_out);
+  }
+  else
+    pt_out = list_assignment_to_points_to(L, R, pt_out);
 
   // FI: memory leak(s)?
 
@@ -966,7 +1020,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
  */
 pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 {
-  /* Check dereferencing errors */
+  /* Check possible dereferencing errors */
   bool singleton_p = (gen_length(L)==1);
   FOREACH(CELL, c, L) {
     if(nowhere_cell_p(c)){
@@ -1156,6 +1210,10 @@ pt_map application_to_points_to(application a, pt_map pt_in)
 /* Update points-to set "in" according to the content of the
  * expression using side effects. Use "true_p" to know if the
  * condition must be met or not.
+ *
+ * FI: the side effects should not be taken into account because this
+ * function is often called twice, once for the true branch and once
+ * for the false branch of a test.
  */
 pt_map condition_to_points_to(expression c, pt_map in, bool true_p)
 {

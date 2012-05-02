@@ -232,39 +232,48 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     // for computing an approximation of memory(p)
     /* Locate the pointer, no dereferencing yet */
     list cl = expression_to_points_to_sources(a, in);
+    bool null_dereferencing_p
+      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+    bool nowhere_dereferencing_p
+      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
     /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
-      /* Do not create sharing between elements of "in" and elements of
-	 "sinks". */
-      list pointed = source_to_sinks(c, in, true);
-      if(ENDP(pointed)) {
-	reference r = cell_any_reference(c);
-	entity v = reference_variable(r);
-	string words_to_string(list);
-	pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+      /* Do we want to dereference c? */
+      if( (null_dereferencing_p || !null_cell_p(c))
+	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+	/* Do not create sharing between elements of "in" and elements of
+	   "sinks". */
+	list pointed = source_to_sinks(c, in, true);
+	if(ENDP(pointed)) {
+	  reference r = cell_any_reference(c);
+	  entity v = reference_variable(r);
+	  string words_to_string(list);
+	  pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
 			    entity_user_name(v),
 			    words_to_string(words_reference(r, NIL)));
-      }
-      else {
-	if(eval_p) {
-	  /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
-	  FOREACH(CELL, sc, pointed) {
-	    /* Do not create sharing between elements of "in" and elements of
-	       "sinks". */
-	    list starpointed = source_to_sinks(sc, in, true);
-	    if(ENDP(starpointed)) {
-	      reference sr = cell_any_reference(sc);
-	      entity sv = reference_variable(sr);
-	      string words_to_string(list);
-	      pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
-				  entity_user_name(sv),
-				  words_to_string(words_reference(sr, NIL)));
-	    }
-	    sinks = gen_nconc(sinks, starpointed);
-	  }
+	  /* The sinks list is empty, whether eval_p is true or not... */
 	}
-	else
-	  sinks = gen_nconc(sinks, pointed);
+	else {
+	  if(eval_p) {
+	    /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
+	    FOREACH(CELL, sc, pointed) {
+	      /* Do not create sharing between elements of "in" and elements of
+		 "sinks". */
+	      list starpointed = source_to_sinks(sc, in, true);
+	      if(ENDP(starpointed)) {
+		reference sr = cell_any_reference(sc);
+		entity sv = reference_variable(sr);
+		string words_to_string(list);
+		pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+				    entity_user_name(sv),
+				    words_to_string(words_reference(sr, NIL)));
+	      }
+	      sinks = gen_nconc(sinks, starpointed);
+	    }
+	  }
+	  else
+	    sinks = gen_nconc(sinks, pointed);
+	}
       }
     }
   }

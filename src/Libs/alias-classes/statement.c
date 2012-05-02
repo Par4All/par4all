@@ -306,8 +306,14 @@ pt_map test_to_points_to(test t, pt_map pt_in)
   // Translation of points_to_test
   statement ts = test_true(t);
   statement fs = test_false(t);
+  expression c = test_condition(t);
   pt_map pt_t =  pt_map_undefined;
   pt_map pt_f = pt_map_undefined;
+
+  /* Make sure the condition is exploited, either because of side
+   * effects or simply because of dereferencements.
+   */
+  pt_in = expression_to_points_to(c, pt_in);
 
   pt_map pt_in_t = full_copy_pt_map(pt_in);
   pt_map pt_in_f = full_copy_pt_map(pt_in);
@@ -317,7 +323,6 @@ pt_map test_to_points_to(test t, pt_map pt_in)
    *
    * "if(p=q)" or "if(*p++)" or "if(p)" which implies p->NULL in the
    * else branch. FI: to be checked with test cases */
-  expression c = test_condition(t);
   if(!empty_pt_map_p(pt_in_t)) // FI: we are in dead code
     pt_in_t = condition_to_points_to(c, pt_in_t, true);
   pt_t = statement_to_points_to(ts, pt_in_t);
@@ -412,7 +417,9 @@ pt_map any_loop_to_points_to(statement b,
   // be linked to the number of convergence iterations. I assume here
   // that the minimal number of iterations is greater than the
   // k-limiting factor
-  int k = get_int_property("POINTS_TO_K_LIMITING")+10;
+  int k = get_int_property("POINTS_TO_PATH_LIMIT")
+    + get_int_property("POINTS_TO_SUBSCRIPT_LIMIT")
+    +10; // Safety margin: might be set to max of both properties + 1 or 2...
 
   /* First, enter or skip the loop: initialization + condition check */
   if(!expression_undefined_p(init))
