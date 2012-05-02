@@ -189,7 +189,8 @@ possible and replaced by explicit argument passing in functions.
 The C language provides several basic data structures, which can be
 combined to create more complicated ones. \Apips allows all
 combinations, but with some limitations in their usage. Notice however
-that unions are not currently well analysed and must be avoided.
+that unions are not currently well analysed and must be avoided, as
+well as pointers towards functions, and recursive data structures.
 
 
 \subsection{Pointers}
@@ -507,7 +508,7 @@ assignation dynamique unique a chaque execution de la fonction
 
 * pas de tableaux de pointeurs
 
-* pas de pointeurs sur des fonctions
+* pas de pointeurs sur des fonctions -> added (BC, 2012-05-02)
 
 * verification des intrinsics utilises: je ne sais comment traiter ce
 probleme
