@@ -52,7 +52,7 @@ int main()
 // Pointer values:
 // p == &*HEAP*_l_8[0] (exact);
 // q == &*HEAP*_l_9[0] (exact);
-// r == &*HEAP*_l_10[0] (exact);
+// r == &*HEAP*_l_10 (exact);
 // s == *ANY_MODULE*:*UNDEFINED* (exact);
 
    s = calloc(1, 15);
@@ -60,7 +60,7 @@ int main()
 // Pointer values:
 // p == &*HEAP*_l_8[0] (exact);
 // q == &*HEAP*_l_9[0] (exact);
-// r == &*HEAP*_l_10[0] (exact);
+// r == &*HEAP*_l_10 (exact);
 // s == &*HEAP*_l_11[0] (exact);
 
    return 0;

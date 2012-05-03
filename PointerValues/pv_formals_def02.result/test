@@ -18,17 +18,17 @@ int foo(int **a)
    *a = (int *) malloc(sizeof(int));
 
 // Pointer values:
-// _a_1[0] == &*HEAP*_l_3[0] (exact);
+// _a_1[0] == &*HEAP*_l_3 (exact);
 // a == &_a_1[0] (exact);
-// a[0] == &*HEAP*_l_3[0] (exact);
+// a[0] == &*HEAP*_l_3 (exact);
 // a[*] == &_a_2[*][0] (may);
 
    **a = 1;
 
 // Pointer values:
-// _a_1[0] == &*HEAP*_l_3[0] (exact);
+// _a_1[0] == &*HEAP*_l_3 (exact);
 // a == &_a_1[0] (exact);
-// a[0] == &*HEAP*_l_3[0] (exact);
+// a[0] == &*HEAP*_l_3 (exact);
 // a[*] == &_a_2[*][0] (may);
 
    *a = (int *) malloc(sizeof(int)*2);

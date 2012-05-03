@@ -30,19 +30,19 @@ int main()
 
 // Pointer values:
 // p == *ANY_MODULE*:*UNDEFINED* (exact);
-// q == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_8 (exact);
 
    q[0] = a;
 
 // Pointer values:
 // p == *ANY_MODULE*:*UNDEFINED* (exact);
-// q == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_8 (exact);
 
    p = (int **) malloc(sizeof(int *));
 
 // Pointer values:
 // p == &*HEAP*_l_10[0] (exact);
-// q == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_8 (exact);
 
    p[0] = q;
 
@@ -50,13 +50,13 @@ int main()
 // *HEAP*_l_10[0] == q (exact);
 // p == &*HEAP*_l_10[0] (exact);
 // p[0] == q (exact);
-// q == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_8 (exact);
 
    free(p);
 
 // Pointer values:
 // p == *ANY_MODULE*:*UNDEFINED* (exact);
-// q == &*HEAP*_l_8[0] (exact);
+// q == &*HEAP*_l_8 (exact);
 
    return 0;
 }
