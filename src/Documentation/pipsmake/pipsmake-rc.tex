@@ -5736,6 +5736,12 @@ anywhere location.
 POINTS_TO_NULL_POINTER_DEREFERENCING FALSE
 \end{PipsProp}
 
+The property \PipsPropRef{POINTS_TO_NULL_POINTER_INITIALIZATION} allows the initialization of formal parameters and
+global variables to null location. The safe value is  {\tt TRUE}, it prevents from dereferencing a null pointer. When perfermorming
+interprocedural analysis it should be turned to {\tt FALSE}.
+\begin{PipsProp}{POINTS_TO_NULL_POINTER_INITIALIZATION}
+  POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
+\end{PipsProp}
 \subsubsection{Limits of Points-to Analyses}
 
 The integer property \PipsPropRef{POINTS_TO_PATH_LIMIT} specifies the
