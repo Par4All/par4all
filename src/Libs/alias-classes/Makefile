@@ -37,7 +37,8 @@ LIB_CFILES = 	alias_pairs.c \
 	        sinks.c \
 		unstructured.c \
 		variable.c \
-		interprocedural.c
+		interprocedural.c \
+		dereferencing.c
 
 
 INC_TARGET =	$(TARGET).h

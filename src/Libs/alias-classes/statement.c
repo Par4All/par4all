@@ -313,7 +313,7 @@ pt_map test_to_points_to(test t, pt_map pt_in)
   /* Make sure the condition is exploited, either because of side
    * effects or simply because of dereferencements.
    */
-  pt_in = expression_to_points_to(c, pt_in);
+  //pt_in = expression_to_points_to(c, pt_in);
 
   pt_map pt_in_t = full_copy_pt_map(pt_in);
   pt_map pt_in_f = full_copy_pt_map(pt_in);

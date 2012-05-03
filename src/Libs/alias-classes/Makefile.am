@@ -19,7 +19,8 @@ libalias_classes_la_SOURCES=alias_pairs.c \
 	        sinks.c \
 		unstructured.c \
 		variable.c \
-		interprocedural.c
+		interprocedural.c \
+		dereferencing.c
 
 include $(srcdir)/../pipslibs_includes.mk
 include $(top_srcdir)/makes/cproto.mk

@@ -228,12 +228,7 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Unexpected type.\n");
 
-  if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)) {
-    /* Is the dereferenced pointer null or undefined? */
-    expression p = EXPRESSION(CAR(al));
-    pt_out = dereferencing_to_points_to(p, pt_out); 
-  }
-  else if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
+  if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
     clear_pt_map(pt_out);
   }
@@ -296,6 +291,11 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
   else {
+    if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)) {
+      /* Is the dereferenced pointer null or undefined? */
+      expression p = EXPRESSION(CAR(al));
+      pt_out = dereferencing_to_points_to(p, pt_out); 
+    }
     if(!type_void_p(rt)) {
       value fv = entity_initial(f);
 
@@ -415,6 +415,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
     if(pointer_type_p(lhst)) {
+      pt_out = dereferencing_to_points_to(lhs, pt_out);
       expression delta = int_to_expression(1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -425,6 +426,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
     if(pointer_type_p(lhst)) {
+      pt_out = dereferencing_to_points_to(lhs, pt_out);
       expression delta = int_to_expression(-1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -444,52 +446,6 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   }
 
   return pt_out;
-}
-
-/* Make sure that expression p can be dereferenced in points-to graph "in" 
- *
- * Handling of NULL pointers according to property.
- *
- * Handling of undefined pointers according to property.
- *
- * "in" is modified by side effects. Arcs certainly incompatible with
- * a dereferencing are removed. If dereferencing of p is no longer
- * possible, return an empty points-to "in" as the expression cannot
- * be evaluated.
- *
- * This is conditional to two properties.
- */
-pt_map dereferencing_to_points_to(expression p, pt_map in)
-{
-  bool null_dereferencing_p
-    = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
-  bool nowhere_dereferencing_p
-    = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
-  list sources = expression_to_points_to_sources(p, in);
-  if(gen_length(sources)==1
-     && !nowhere_dereferencing_p
-     && !null_dereferencing_p) {
-    list sinks = expression_to_points_to_sinks(p, in);
-    cell source = CELL(CAR(sources));
-    int n = (int) gen_length(sinks);
-    FOREACH(CELL, sink, sinks) {
-      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
-      }
-      if(!null_dereferencing_p && null_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
-      }
-    }
-    if(n==0)
-      clear_pt_map(in);
-  }
-  else {
-      /* The issue will/might be taken care of later... */
-      ;
-  }
-  return in;
 }
 
 /* Update the sink locations associated to the source "lhs" under
@@ -512,8 +468,13 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
     list sinks = source_to_sinks(source, pt_out, false);
     if(ENDP(sinks)) {
       entity v = reference_variable(cell_any_reference(source));
-      pips_internal_error("Sink missing for a source based on \"%s\".\n",
+      //pips_internal_error("Sink missing for a source based on \"%s\".\n",
+      //		  entity_user_name(v));
+      pips_user_warning("No defined value for pointer \"%s\".\n",
 			  entity_user_name(v));
+      if(gen_length(sources)==1)
+	// The code cannot be executed
+	clear_pt_map(pt_out);
     }
     offset_cells(source, sinks, delta, pt_out);
     // FI: we could perform some filtering out of pt_in
@@ -769,15 +730,6 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 {
   pt_map pt_out = pt_in;
 
-  /* Do not take side effects into account, it has already been done
-     at a higher level */
-  // pt_out = expression_to_points_to(lhs, pt_out);
-  // pt_out = expression_to_points_to(rhs, pt_out); // FI: used to be "incur"
-
-  /* Change the "lhs" into a constant memory path using current
-   * points-to information pt_out.
-   */
-  //list L = expression_to_constant_paths(statement_undefined, lhs, pt_out);
   list L = expression_to_points_to_sources(lhs, pt_out);
 
   /* Retrieve the memory locations that might be reached by the rhs
@@ -1021,9 +973,12 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 {
   /* Check possible dereferencing errors */
+  list ndl = NIL; // null dereferencing error list
+  list udl = NIL; // undefined dereferencing error list
   bool singleton_p = (gen_length(L)==1);
   FOREACH(CELL, c, L) {
     if(nowhere_cell_p(c)){
+      udl = CONS(CELL, c, udl);
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
@@ -1032,6 +987,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	pips_user_warning("Dereferencing of an undefined pointer.\n");
     }
     else if(null_cell_p(c)) {
+      ndl = CONS(CELL, c, ndl);
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
@@ -1041,6 +997,52 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     }
   }
 
+  if(!ENDP(ndl) || !ENDP(udl)) {
+    if(!ENDP(ndl))
+      pips_user_warning("Possible NULL pointer dereferencing.\n");
+    else
+      pips_user_warning("Possible undefined pointer dereferencing.\n");
+
+    /* What do we want to do when the left hand side is NULL or UNDEFINED? */
+    bool null_dereferencing_p
+      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+    bool nowhere_dereferencing_p
+      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+    if(!null_dereferencing_p) {
+      gen_list_and_not(&L, ndl);
+    if(!nowhere_dereferencing_p) {
+      gen_list_and_not(&L, udl);
+    }
+      
+    // FI: I guess all undefined and nowhere cells in L should be
+    // removed and replaced by only one anywhere cell
+    // FI: it should be typed according to the content of the cells in del
+
+    if(!ENDP(ndl) && null_dereferencing_p) {
+      cell nc = CELL(CAR(ndl));
+      type t = entity_type(reference_variable(cell_any_reference(nc)));
+      cell c = make_anywhere_points_to_cell(t);
+      gen_list_and_not(&L, ndl);
+      L = CONS(CELL, c, L);
+    }
+
+    if(!ENDP(udl) && nowhere_dereferencing_p) {
+      cell nc = CELL(CAR(udl));
+      type t = entity_type(reference_variable(cell_any_reference(nc)));
+      cell c = make_anywhere_points_to_cell(t);
+      gen_list_and_not(&L, udl);
+      L = CONS(CELL, c, L);
+    }
+
+    gen_free_list(ndl), gen_free_list(udl);
+    }
+  }
+
+  if(ENDP(L)) {
+    /* The code cannot be executed */
+    clear_pt_map(pt_out);
+  }
+  else {
   /* Compute the data-flow equation for the may and the must edges...
    *
    * out = (in - kill) U gen ?
@@ -1079,6 +1081,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	       gen_may, gen_must,
 	       gen, kill, NULL);
   // clear_pt_map(pt_out); // FI: why not free?
+  }
 
   return pt_out;
 }
@@ -1313,6 +1316,14 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
   else if(ENTITY_LOGICAL_OPERATOR_P(f))
     out = boolean_intrinsic_call_condition_to_points_to(c, in, true_p);
   else {
+    if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)
+       || ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)
+       || ENTITY_PRE_INCREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) {
+      expression p = EXPRESSION(CAR(call_arguments(c)));
+      /* Make sure that all dereferencements are possible? Might be
+	 included in intrinsic_call_to_points_to()... */
+      dereferencing_to_points_to(p, in);
+    }
     // Take care of side effects as in "if(*p++)"
     out = intrinsic_call_to_points_to(c, in);
     //pips_internal_error("Not implemented yet.\n");

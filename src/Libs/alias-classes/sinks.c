@@ -257,18 +257,21 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	  if(eval_p) {
 	    /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
 	    FOREACH(CELL, sc, pointed) {
-	      /* Do not create sharing between elements of "in" and elements of
-		 "sinks". */
-	      list starpointed = source_to_sinks(sc, in, true);
-	      if(ENDP(starpointed)) {
-		reference sr = cell_any_reference(sc);
-		entity sv = reference_variable(sr);
-		string words_to_string(list);
-		pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
-				    entity_user_name(sv),
-				    words_to_string(words_reference(sr, NIL)));
+	      if( (null_dereferencing_p || !null_cell_p(sc))
+		  && (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
+		/* Do not create sharing between elements of "in" and elements of
+		   "sinks". */
+		list starpointed = source_to_sinks(sc, in, true);
+		if(ENDP(starpointed)) {
+		  reference sr = cell_any_reference(sc);
+		  entity sv = reference_variable(sr);
+		  string words_to_string(list);
+		  pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+				      entity_user_name(sv),
+				      words_to_string(words_reference(sr, NIL)));
+		}
+		sinks = gen_nconc(sinks, starpointed);
 	      }
-	      sinks = gen_nconc(sinks, starpointed);
 	    }
 	  }
 	  else
@@ -742,6 +745,8 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
   type t = entity_type(call_function(c));
   entity ne = entity_undefined;
   list sinks = NIL;
+
+  // FI->AM: we need interprocedural stuff here...
 
   /* FI: definitely the intraprocedural version */
   if(type_sensitive_p)
