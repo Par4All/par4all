@@ -423,6 +423,9 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
       value v_init = entity_initial(e);
       bool static_p = (!ctxt->initial_pointer_values_p) && entity_static_variable_p(e);
 
+      bool ignore = false;
+
+
       /* in case of a local static variable, and when not dealing with the initial analysis,
 	 we should generate a stub sink */
 
@@ -468,23 +471,60 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 	      rhs_exp = expression_undefined;
 	      break;
 	    case is_value_code:
+	      pips_debug(2, "value code\n");
+	      if (compilation_unit_entity_p(get_current_module_entity()))
+		{
+		  const char * e_user_name = entity_user_name(e);
+		  if (same_string_p(e_user_name, "__after_morecore_hook")
+		      || same_string_p(e_user_name, "__free_hook")
+		      || same_string_p(e_user_name, "__malloc_hook")
+		      || same_string_p(e_user_name, "__malloc_initialize_hook")
+		      || same_string_p(e_user_name, "__memalign_hook")
+		      || same_string_p(e_user_name, "__morecore")
+		      || same_string_p(e_user_name, "__realloc_hook"))
+		    {
+		      pips_debug(2, "standard library internal hook\n");
+		      ignore = true;
+		    }
+		  else
+		    {
+		      pips_debug(2,"compilation unit, ignoring value for the moment\n");
+		    }
+		}
+	      else
+		pips_internal_error("unexpected tag\n");
+	      break;
 	    case is_value_symbolic:
+	      pips_debug(2, "value symbolic\n");
+	      pips_internal_error("unexpected tag\n");
+	      break;
 	    case is_value_constant:
+	      pips_debug(2, "value constant\n");
+	      pips_internal_error("unexpected tag\n");
+	      break;
 	    case is_value_intrinsic:
+	      pips_debug(2, "value intrinsic\n");
+	      pips_internal_error("unexpected tag\n");
+	      break;
 	    default:
-	      pips_internal_error("unexpected tag");
+	      pips_internal_error("unexpected tag\n");
 	    }
 	}
 
-      pv_results pv_res = make_pv_results();
-      assignment_to_post_pv(lhs_exp, static_p, rhs_exp, true, l_in, &pv_res, ctxt);
-      l_out = pv_res.l_out;
-      free_pv_results_paths(&pv_res);
+      if (!ignore)
+	{
+	  pv_results pv_res = make_pv_results();
+	  assignment_to_post_pv(lhs_exp, static_p, rhs_exp, true, l_in, &pv_res, ctxt);
+	  l_out = pv_res.l_out;
+	  free_pv_results_paths(&pv_res);
 
-      free_expression(lhs_exp);
-      if (free_rhs_exp) free_expression(rhs_exp);
-      pips_debug_pvs(2, "returning:", l_out);
-      pips_debug(1, "end\n");
+	  free_expression(lhs_exp);
+	  if (free_rhs_exp) free_expression(rhs_exp);
+	  pips_debug_pvs(2, "returning:", l_out);
+	  pips_debug(1, "end\n");
+	}
+      else
+	l_out = l_in;
     }
   else
     l_out = l_in;
