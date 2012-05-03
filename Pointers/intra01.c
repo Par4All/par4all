@@ -6,6 +6,7 @@
 void bar(int **pp, int **qq) {
   *pp = *qq;
   printf("pointers exchanged");
+  return;
 }
 
 
@@ -14,6 +15,7 @@ void foo(){
   int i = 0 , j = 1,  *p = &i, *q = &j, **pp = &p, **qq = &q ;
   
   bar(pp, qq);
+  return;
 }
 
 

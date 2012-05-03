@@ -132,8 +132,7 @@ int main(void)
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> pi , MAY
+// pp -> pi , EXACT
 
    return 0;
 }

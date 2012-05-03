@@ -65,9 +65,7 @@ int main(void)
    // should generate an error while analyzing?
    **pp = 0;
 
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// Points To: none
 
    return 0;
 }

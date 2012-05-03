@@ -14,6 +14,7 @@ void point_to02()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
    (p->b)[2] = 3;
+   return;
 }
 
 POINTS-TO
@@ -40,8 +41,11 @@ void point_to02()
 
    p->a = 1;
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: none
 
    (p->b)[2] = 3;
+
+// Points To: none
+
+   return;
 }

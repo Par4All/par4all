@@ -113,8 +113,7 @@ int main(void)
       **pp = 0;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> *NULL_POINTER* , MAY
+// pp -> *NULL_POINTER* , EXACT
 
    return 0;
 }

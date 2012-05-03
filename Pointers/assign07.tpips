@@ -1,17 +1,12 @@
-delete formal_parameter04
-create formal_parameter04 formal_parameter04.c
+setenv WS=assign07
+delete $WS
+create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
-
-# To pass a pointer to a struct and not an implicit pointer to an
-# array of structs (but PIPS should work even if this property is set
-# to FALSE)
-
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_PATH_LIMIT 10
+setproperty POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING TRUE
 
 ##TODO: explain
 
@@ -37,5 +32,5 @@ display PRINTED_FILE[%ALLFUNC]
 
 
 close
-delete formal_parameter04
+delete $WS
 quit

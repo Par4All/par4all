@@ -24,7 +24,7 @@ void myprint(int *p)
   return;
 }
 
-int main() 
+int main(int argc, char ** argv) 
 {
   int tab[10];
   int *tab2[10];

@@ -16,7 +16,7 @@ setproperty POINTS_TO_PATH_LIMIT 2
 #module main
 
 
-echo 
+echo
 echo PROPER  EFFECTS
 echo
 activate PRINT_CODE_PROPER_EFFECTS

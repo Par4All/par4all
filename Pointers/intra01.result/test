@@ -11,6 +11,7 @@ void bar(int **pp, int **qq)
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("pointers exchanged");
+   return;
 }
 void foo()
 {
@@ -22,6 +23,7 @@ void foo()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    bar(pp, qq);
+   return;
 }
 
 POINTS-TO
@@ -39,7 +41,6 @@ POINTS-TO
 
 
 // Points To OUT:
-// _pp_1[0] -> *ANY_MODULE*:*ANYWHERE* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> _qq_2_2[0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
@@ -61,20 +62,24 @@ void bar(int **pp, int **qq)
    *pp = *qq;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *NULL_POINTER* , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0 -> _qq_2_2[0] , MAY
-// _pp_1[0] -> *ANY_MODULE*:*ANYWHERE* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> _qq_2_2[0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0] , MAY
-// pp -> *NULL_POINTER* , MAY
-// pp -> _pp_1[0] , MAY
-// qq -> *NULL_POINTER* , MAY
-// qq -> _qq_2[0] , MAY
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
 
    printf("pointers exchanged");
+
+// Points To:
+// _pp_1[0] -> *NULL_POINTER* , MAY
+// _pp_1[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0] , MAY
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
+
+   return;
 }
 
 // Points To IN: none
@@ -97,4 +102,12 @@ void foo()
 
 
    bar(pp, qq);
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+   return;
 }

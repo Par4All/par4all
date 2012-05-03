@@ -70,8 +70,7 @@ int bla(int *p)
    *p = 13;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// p -> _p_1[0] , EXACT
 
    return 17;
 }
@@ -112,51 +111,43 @@ int call19(int *q)
    i += *q;
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += bla(&k);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += k;
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += bla(&st.data);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += st.data;
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    // foo(int)
    i += foo(*q);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += foo(k);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += foo(st.data);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    return i;
 }

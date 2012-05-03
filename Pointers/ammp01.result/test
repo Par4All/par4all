@@ -229,7 +229,6 @@ POINTS-TO
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> *NULL_POINTER* , EXACT
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -243,7 +242,6 @@ POINTS-TO
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -418,7 +416,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -430,7 +427,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -444,7 +440,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -480,7 +475,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -492,7 +486,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -506,7 +499,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -542,7 +534,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -554,7 +545,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -568,7 +558,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -605,7 +594,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -617,7 +605,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -631,7 +618,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -667,7 +653,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -679,7 +664,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -693,7 +677,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -730,7 +713,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -742,7 +724,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -756,7 +737,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -793,7 +773,6 @@ ATOM * a_m_serial(int serial)
 // _first_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> *NULL_POINTER* , MAY
 // _first_8_8_8_8_8_8_8_8_8_8.next -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// a_m_serial -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_m_serial -> *NULL_POINTER* , MAY
 // a_m_serial -> _first_8 , MAY
 // a_m_serial -> _first_8_8 , MAY
@@ -805,7 +784,6 @@ ATOM * a_m_serial(int serial)
 // a_m_serial -> _first_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8 , MAY
 // a_m_serial -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8 , MAY
 // ap -> _first_8_8 , MAY
@@ -819,7 +797,6 @@ ATOM * a_m_serial(int serial)
 // ap -> _first_8_8_8_8_8_8_8_8_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8 , MAY
-// lastmatched -> *ANY_MODULE*:*ANYWHERE* , MAY
 // lastmatched -> *NULL_POINTER* , MAY
 // lastmatched -> _first_8 , MAY
 // lastmatched -> _first_8_8 , MAY
@@ -845,10 +822,8 @@ ATOM * a_m_serial(int serial)
 // Points To OUT:
 // _first_8.next -> *NULL_POINTER* , MAY
 // _first_8.next -> _first_8_8 , MAY
-// a_next -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a_next -> *NULL_POINTER* , MAY
 // a_next -> _first_8_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
@@ -949,7 +924,6 @@ ATOM * a_next(int flag)
 // _first_8.next -> _first_8_8 , MAY
 // a_next -> *NULL_POINTER* , MAY
 // a_next -> _first_8 , MAY
-// ap -> *ANY_MODULE*:*ANYWHERE* , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8_8 , MAY
 // first -> *NULL_POINTER* , MAY
@@ -1166,35 +1140,8 @@ int activate(int i1, int i2)
 
    return 0;
 }
-C_PARSER[a_m_serial] (CreateReturnEntity) Type of "a_m_serial" is undefined. Return value cannot be created.
-C_PARSER[a_next] (CreateReturnEntity) Type of "a_next" is undefined. Return value cannot be created.
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_m_serial"
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_next"
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_next] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (source_to_sinks) Possibly undefined pointer "*NULL_POINTER*" is dereferenced.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_m_serial" is still ignored
 On going implementation...
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_next" is still ignored
