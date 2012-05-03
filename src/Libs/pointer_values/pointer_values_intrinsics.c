@@ -1806,7 +1806,10 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 
       if (!entity_all_heap_locations_p(e) &&
 	  !entity_all_module_heap_locations_p(e))
-	  effect_add_dereferencing_dimension(eff);
+	{
+	  if (!entity_scalar_p(e))
+	    effect_add_dereferencing_dimension(eff); // well, in fact, it's a [0] array dimension!
+	}
       else
 	effect_to_may_effect(eff);
       pv_res->result_paths = CONS(EFFECT, eff, NIL);
