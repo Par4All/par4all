@@ -1,0 +1,28 @@
+setenv WS=ex3_modified
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WS]
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit
+
