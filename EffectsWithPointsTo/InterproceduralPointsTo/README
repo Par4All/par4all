@@ -1,0 +1,5 @@
+Interprocedural Points-to analysis's directory
+pointer01.c to illustrate the effect of return value at the level of the call site.
+pointer02.c to when we have a return value that is pointing to a set of locations.
+swap.c to illustrate the compute of interprocedural pt-to relations when we have &pi as effective parameter.
+inter04.c illustrate the compute of interprocedural pt-to relations when we have multiple levels pointers as effective parameter.
