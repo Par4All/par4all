@@ -140,3 +140,41 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
   return pt_out;
 }
 
+// FI: I assume we do not need the eval_p parameter here
+list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
+{
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  type t = entity_type(call_function(c));
+  entity ne = entity_undefined;
+  list sinks = NIL;
+  entity f = call_function(c);
+  // Interprocedural version
+  // Check if there is a return value at the level of POINTS TO OUT, if yes return its sink
+  if(interprocedural_points_to_analysis_p()) {
+    const char* mn = entity_local_name(f);
+    points_to_list pts_to_out = (points_to_list)
+      db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
+    list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
+    pt_map pt_out_callee = new_pt_map();
+    pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+    SET_FOREACH( points_to, pt, pt_out_callee) {
+      cell s = points_to_source(pt);
+      reference sr = cell_any_reference(s);
+      entity se = reference_variable(sr);
+      const char* sn = entity_local_name(se);
+      if( strcmp(mn, sn)==0) {
+	cell sc = copy_cell(points_to_sink(pt));
+	sinks = gen_nconc(CONS(CELL, sc, NULL), sinks);
+      }
+    }
+  /* FI: definitely the intraprocedural version */
+  }  else {
+    if(type_sensitive_p)
+      ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
+    else
+      ne = entity_all_xxx_locations(ANYWHERE_LOCATION);
+    
+    sinks = entity_to_sinks(ne);
+  }
+  return sinks;
+}

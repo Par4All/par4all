@@ -738,25 +738,6 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
   return sinks;
 }
 
-// FI: I assume we do not need the eval_p parameter here
-list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
-{
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  type t = entity_type(call_function(c));
-  entity ne = entity_undefined;
-  list sinks = NIL;
-
-  // FI->AM: we need interprocedural stuff here...
-
-  /* FI: definitely the intraprocedural version */
-  if(type_sensitive_p)
-    ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
-  else
-    ne = entity_all_xxx_locations(ANYWHERE_LOCATION);
-  
-  sinks = entity_to_sinks(ne);
-  return sinks;
-}
 
 // FI: do we need eval_p?
 list cast_to_points_to_sinks(cast c, pt_map in)
