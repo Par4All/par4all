@@ -881,7 +881,7 @@ list null_to_sinks(cell source, set pts)
 				 make_descriptor_none());
   pts = add_arc_to_pt_map(npt, pts);
   add_arc_to_points_to_context(copy_points_to(npt));
-  list sinks = CONS(CELL, copy_cell(nsink), sinks);
+  list sinks = CONS(CELL, copy_cell(nsink), NIL);
   return sinks;
 }
 
