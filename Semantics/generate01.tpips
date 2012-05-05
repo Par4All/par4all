@@ -39,5 +39,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[foo]
 
 close
-delete generate01
+#delete generate01
 quit
