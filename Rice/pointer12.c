@@ -1,11 +1,16 @@
-/* Parallelizarion with pointers */
+/* Parallelization with pointers and linearized array
+ *
+ * Plus bug in initialization of a.array in points-to pass
+ */
+
 #include<stdlib.h>
 #include<stdio.h>
- typedef struct{
-    int d1;
-    int d2;
-    double *array;
-  }array_2D; 
+
+typedef struct {
+  int d1;
+  int d2;
+  double *array;
+} array_2D; 
 
 void pointer12(array_2D a)
 {

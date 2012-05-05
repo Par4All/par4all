@@ -11,10 +11,10 @@ setproperty MEMORY_EFFECTS_ONLY FALSE
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
-activate C_PARSER
+#activate C_PARSER
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
@@ -86,7 +86,7 @@ echo
 shell touch malloc02.database/malloc02/malloc02.c
 shell touch malloc02.database/malloc02/USER_FILE
 shell touch malloc02.database/malloc02/PARSED_CODE
-setproperty PRETTYPRINT_C_CODE FALSE
+#setproperty PRETTYPRINT_C_CODE FALSE
 
 display PARALLELPRINTED_FILE[malloc02]
 

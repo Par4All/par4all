@@ -1,0 +1,138 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void pointer06()
+{
+
+// Points To: none
+
+   struct tree {
+      int val[10];
+      struct tree *left;
+      struct tree *right;
+   };
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// t -> *HEAP*_l_10 , EXACT
+
+   t->left = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
+// t -> *HEAP*_l_10 , EXACT
+
+   t->right = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
+// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
+// t -> *HEAP*_l_10 , EXACT
+
+   struct tree *tl = t->left;
+
+// Points To:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
+// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
+// t -> *HEAP*_l_10 , EXACT
+// tl -> *HEAP*_l_11 , EXACT
+
+   struct tree *tr = t->right;
+
+// Points To:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
+// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
+// t -> *HEAP*_l_10 , EXACT
+// tl -> *HEAP*_l_11 , EXACT
+// tr -> *HEAP*_l_12 , EXACT
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
+// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
+// t -> *HEAP*_l_10 , EXACT
+// tl -> *HEAP*_l_11 , EXACT
+// tr -> *HEAP*_l_12 , EXACT
+
+      (t->val)[i] = (tl->val)[i]+(tr->val)[i];
+}
+
+Proper effects with points-to
+
+void pointer06()
+{
+//             <    is declared>: tree
+   struct tree {
+      int val[10];
+      struct tree *left;
+      struct tree *right;
+   };
+//             <    is declared>: i
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+//             <    is declared>: t
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+//             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: *HEAP*_l_10.left 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+   t->left = (struct tree *) malloc(sizeof(struct tree ));
+//             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: *HEAP*_l_10.right 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+   t->right = (struct tree *) malloc(sizeof(struct tree ));
+//             <    is read   >: *HEAP*_l_10.left t
+//             <    is written>: tl
+//             <    is referenced>: t tl
+//             <    is declared>: tl
+   struct tree *tl = t->left;
+//             <    is read   >: *HEAP*_l_10.right t
+//             <    is written>: tr
+//             <    is referenced>: t tr
+//             <    is declared>: tr
+   struct tree *tr = t->right;
+//             <    is written>: i
+//             <    is referenced>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: *HEAP*_l_11.val[i] *HEAP*_l_12.val[i]
+//                               i t tl tr
+//             <    is written>: *HEAP*_l_10.val[i]
+//             <    is referenced>: i t tl tr
+      (t->val)[i] = (tl->val)[i]+(tr->val)[i];
+}
+
+Parallel code
+
+void pointer06()
+{
+   struct tree {
+      int val[10];
+      struct tree *left;
+      struct tree *right;
+   };
+   int i;
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+   t->left = (struct tree *) malloc(sizeof(struct tree ));
+   t->right = (struct tree *) malloc(sizeof(struct tree ));
+   struct tree *tl = t->left;
+   struct tree *tr = t->right;
+   forall(i = 0; i <= 9; i += 1)
+      (t->val)[i] = (tl->val)[i]+(tr->val)[i];
+}

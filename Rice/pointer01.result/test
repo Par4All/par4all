@@ -3,8 +3,10 @@ POINTS TO
 
 
 // Points To IN:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
 
 // Points To OUT: none
@@ -13,23 +15,32 @@ void pointer01(int n, float *p, float *q)
 {
 
 // Points To:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
    int i;
 
 // Points To:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
-
-   for(i = 0; i <= n-1; i += 1)
+   if (p!=(void *) 0&&q!=(void *) 0)
 
 // Points To:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> _p_2[0] , MAY
+// q -> _q_3[0] , MAY
 
-      p[i] = q[i];
+      for(i = 0; i <= n-1; i += 1)
+
+// Points To:
+// p -> _p_2[0] , MAY
+// q -> _q_3[0] , MAY
+
+         p[i] = q[i];
 }
 
 Proper effects with points-to
@@ -38,41 +49,49 @@ void pointer01(int n, float *p, float *q)
 {
 //             <    is declared>: i
    int i;
+//             <    is read   >: p q
+//             <    is referenced>: p q
+   if (p!=(void *) 0&&q!=(void *) 0)
 //             <    is read   >: n
 //             <    is written>: i
 //             <    is referenced>: i n
-
-   for(i = 0; i <= n-1; i += 1)
-//             <    is read   >: _q_3[i] i n p q
-//             <    is written>: _p_2[i]
+      for(i = 0; i <= n-1; i += 1)
+//             <may be read   >: _q_3[i]
+//             <may be written>: _p_2[i]
+//             <    is read   >: i n p q
 //             <    is referenced>: i n p q
-      p[i] = q[i];
+         p[i] = q[i];
 }
 
 Cumulated effects with points-to
 
-//             <may be read   >: _q_3[*] p q
+//             <may be read   >: _q_3[*] n
 //             <may be written>: _p_2[*]
-//             <may be referenced>: p q
-//             <    is read   >: n
-//             <    is referenced>: n
+//             <may be referenced>: n
+//             <    is read   >: p q
+//             <    is referenced>: p q
 void pointer01(int n, float *p, float *q)
 {
 //             <    is declared>: i
    int i;
+//             <may be read   >: _q_3[*] i n
+//             <may be written>: _p_2[*] i
+//             <may be referenced>: i n
+//             <    is read   >: p q
+//             <    is referenced>: p q
+   if (p!=(void *) 0&&q!=(void *) 0)
 //             <may be read   >: _q_3[*] i p q
 //             <may be written>: _p_2[*]
 //             <may be referenced>: p q
 //             <    is read   >: n
 //             <    is written>: i
 //             <    is referenced>: i n
-
-   for(i = 0; i <= n-1; i += 1)
+      for(i = 0; i <= n-1; i += 1)
 //             <may be read   >: _q_3[*]
 //             <may be written>: _p_2[*]
 //             <    is read   >: i n p q
 //             <    is referenced>: i n p q
-      p[i] = q[i];
+         p[i] = q[i];
 }
 
 Parallel code
@@ -80,7 +99,7 @@ Parallel code
 void pointer01(int n, float *p, float *q)
 {
    int i;
-
-   forall(i = 0; i <= n-1; i += 1)
-      p[i] = q[i];
+   if (p!=(void *) 0&&q!=(void *) 0)
+      forall(i = 0; i <= n-1; i += 1)
+         p[i] = q[i];
 }

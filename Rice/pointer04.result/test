@@ -1,0 +1,81 @@
+
+POINTS TO
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+
+
+// Points To OUT: none
+
+void pointer04(int n, float *p)
+{
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+
+   int i;
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+
+   p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer04.c", 13, (const char *) 0);
+
+// Points To:
+// p -> _p_2[0] , MAY
+
+   float *r = p+1;
+
+// Points To:
+// p -> _p_2[0] , MAY
+// r -> _p_2[1] , EXACT
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+// Points To:
+// p -> _p_2[0] , MAY
+// r -> _p_2[1] , EXACT
+
+      p[i] = r[i];
+}
+
+Proper effects with points-to
+
+void pointer04(int n, float *p)
+{
+//             <    is declared>: i
+   int i;
+//             <    is read   >: p
+//             <    is referenced>: p
+   p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer04.c", 13, (const char *) 0);
+//             <    is read   >: p
+//             <    is written>: r
+//             <    is referenced>: p r
+//             <    is declared>: r
+   float *r = p+1;
+//             <    is read   >: n
+//             <    is written>: i
+//             <    is referenced>: i n
+
+   for(i = 0; i <= n-1; i += 1)
+//             <may be written>: _p_2[i]
+//             <    is read   >: _p_2[1+i] i n p r
+//             <    is referenced>: i n p r
+      p[i] = r[i];
+}
+
+Parallel code
+
+void pointer04(int n, float *p)
+{
+   int i;
+   p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer04.c", 13, (const char *) 0);
+   float *r = p+1;
+
+   for(i = 0; i <= n-1; i += 1)
+      p[i] = r[i];
+}
