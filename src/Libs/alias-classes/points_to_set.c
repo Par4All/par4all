@@ -765,7 +765,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  /* pts = add_arc_to_pt_map(npt, pts); */
 	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
 	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
-	if(null_initialization_p)
+	//if(null_initialization_p)
 	  sinks = gen_nconc(null_to_sinks(source, pts), sinks);
       }
       else if(top_level_entity_p(v) || static_global_variable_p(v)) {
@@ -810,7 +810,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  /* pts = add_arc_to_pt_map(npt, pts); */
 	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
 	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
-	if(null_initialization_p)
+	  //if(null_initialization_p)
 	  sinks = gen_nconc(null_to_sinks(source, pts), sinks);
 	}
       }
