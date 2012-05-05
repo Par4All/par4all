@@ -20,7 +20,7 @@ int main()
 
 // Points To: none
 
-   int *p = a[0];
+   int *p = &a[0];
 
 // Points To:
 // p -> a[0] , EXACT
@@ -94,10 +94,9 @@ int main()
    // BEGIN BLOCK
    int a[1000];
 
-//  <a[PHI1]-R-EXACT-{PHI1==0}>
 //  <p-W-EXACT-{}>
 
-   int *p = a[0];
+   int *p = &a[0];
    int i;
 
 //  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999}>
@@ -151,7 +150,7 @@ int main()
 {
    // BEGIN BLOCK
    int a[1000];
-   int *p = a[0];
+   int *p = &a[0];
    int i;
 
    for(i = 0; i <= 999; i += 1) {
