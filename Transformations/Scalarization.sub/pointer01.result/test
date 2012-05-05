@@ -16,51 +16,47 @@ int main()
 
 // Points To: none
 
-   int *p;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-
    int a[1000];
 
+// Points To: none
+
+   int *p = a[0];
+
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> a[0] , EXACT
 
    int i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> a[0] , EXACT
 
 
    for(i = 0; i <= 999; i += 1) {
 
 // Points To:
 // p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[0] , MAY
 
       // BEGIN BLOCK
 
 // Points To:
 // p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[0] , MAY
 
       p = &a[i];
 
 // Points To:
-// p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[*] , EXACT
 
       a[i] = 1;
 
 // Points To:
-// p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[*] , EXACT
 
       *p = 0;
 
 // Points To:
-// p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[*] , EXACT
 
       a[i]++;
       // END BLOCK
@@ -68,7 +64,7 @@ int main()
 
 // Points To:
 // p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> a[0] , MAY
 
 
    printf("a[0]=%d\n", a[0]);
@@ -96,18 +92,22 @@ int main()
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    // BEGIN BLOCK
-   int *p;
    int a[1000];
+
+//  <a[PHI1]-R-EXACT-{PHI1==0}>
+//  <p-W-EXACT-{}>
+
+   int *p = a[0];
    int i;
 
-//  <a[PHI1]-R-MAY-{}>
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999}>
 //  <p-R-EXACT-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
 
    for(i = 0; i <= 999; i += 1) {
 
-//  <a[PHI1]-R-MAY-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999}>
 //  <p-R-EXACT-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
@@ -126,8 +126,8 @@ int main()
 
       *p = 0;
 
-//  <a[PHI1]-R-EXACT-{PHI1==i}>
-//  <a[PHI1]-W-EXACT-{PHI1==i}>
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=999}>
 
       a[i]++;
       // END BLOCK
@@ -150,16 +150,19 @@ After scalarization
 int main()
 {
    // BEGIN BLOCK
-   int *p;
    int a[1000];
+   int *p = a[0];
    int i;
 
    for(i = 0; i <= 999; i += 1) {
       // BEGIN BLOCK
-      p = &a[i];
-      a[i] = 1;
+      //PIPS generated variable
+      register int a_0;
+      p = &a_0;
+      a_0 = 1;
       *p = 0;
-      a[i]++;
+      a_0++;
+      a[i] = a_0;
       // END BLOCK
    }
 
