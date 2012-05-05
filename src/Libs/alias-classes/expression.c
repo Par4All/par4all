@@ -953,9 +953,10 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   //pt_out = expression_to_points_to(lhs, pt_out);
   type t = expression_to_type(lhs); // FI: let's hope ultimate type is useless here
 
-  if(pointer_type_p(t))
+  type ut = ultimate_type(t);
+  if(pointer_type_p(ut))
     pt_out = pointer_assignment_to_points_to(lhs, rhs, pt_out);
-  else if(struct_type_p(t))
+  else if(struct_type_p(ut))
     pt_out = struct_assignment_to_points_to(lhs, rhs, pt_out);
   // FI: unions are not dealt with...
   else
@@ -1412,7 +1413,9 @@ pt_map struct_assignment_to_points_to(expression lhs,
 	    list fl = type_struct(st); // field list
 	    FOREACH(ENTITY, f, fl) {
 	      type ft = entity_type(f); // field type
-	      if(pointer_type_p(ft) || struct_type_p(ft)) {
+	      type uft = ultimate_type(ft);
+	      bool array_p = array_type_p(ft) || array_type_p(uft);
+	      if(!array_p && pointer_type_p(uft) || struct_type_p(uft)) {
 		reference lr = copy_reference(cell_any_reference(lc));
 		reference rr = copy_reference(cell_any_reference(rc));
 		reference_add_field_dimension(lr, f);
@@ -1424,6 +1427,26 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		// free a list of objects of type xxx with one call
 		// The references within the expressions are now part of pt_out
 		// free_expression(lhs), free_expression(rhs);
+	      }
+	      else if(array_p && (array_of_pointers_type_p(uft)
+				  || pointer_type_p(uft)
+				  || array_of_struct_type_p(uft)
+				  || struct_type_p(uft))) {
+		// Same as above, but an unbounded subscript is added...
+		// Quite a special assign in C...
+		reference lr = copy_reference(cell_any_reference(lc));
+		reference rr = copy_reference(cell_any_reference(rc));
+		reference_add_field_dimension(lr, f);
+		reference_add_field_dimension(rr, f);
+		expression li = make_unbounded_expression();
+		expression ri = make_unbounded_expression();
+		reference_indices(lr) = gen_nconc(reference_indices(lr),
+						  CONS(EXPRESSION, li, NIL));
+		reference_indices(rr) = gen_nconc(reference_indices(rr),
+						  CONS(EXPRESSION, ri, NIL));
+		expression nlhs = reference_to_expression(lr);
+		expression nrhs = reference_to_expression(rr);
+		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
 	      }
 	      else {
 		; // Do nothing
