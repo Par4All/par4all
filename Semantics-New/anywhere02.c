@@ -6,8 +6,12 @@
  * Same as anywhere01, but the variables are formal parameters
  */
 
+#include <assert.h>
+
 void anywhere02(int n, int *p)
 {
+  assert(p!=0);
+
   n = 17;
 
   /* The write effect on n is absorbed by the unknown write effect
