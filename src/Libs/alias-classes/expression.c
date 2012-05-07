@@ -1415,7 +1415,7 @@ pt_map struct_assignment_to_points_to(expression lhs,
 	      type ft = entity_type(f); // field type
 	      type uft = ultimate_type(ft);
 	      bool array_p = array_type_p(ft) || array_type_p(uft);
-	      if(!array_p && pointer_type_p(uft) || struct_type_p(uft)) {
+	      if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
 		reference lr = copy_reference(cell_any_reference(lc));
 		reference rr = copy_reference(cell_any_reference(rc));
 		reference_add_field_dimension(lr, f);
