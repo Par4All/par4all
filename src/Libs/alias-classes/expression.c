@@ -951,7 +951,8 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
      the sink of lhs, but the standard probably forbid stupid side
      effects. */
   //pt_out = expression_to_points_to(lhs, pt_out);
-  type t = expression_to_type(lhs); // FI: let's hope ultimate type is useless here
+  bool to_be_freed = false;
+  type t = points_to_expression_to_type(lhs, &to_be_freed);
 
   type ut = ultimate_type(t);
   if(pointer_type_p(ut))
@@ -962,7 +963,8 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   else
     pt_out = pt_in; // What else?
 
-  free_type(t);
+  if(to_be_freed)
+    free_type(t);
 
   return pt_out;
 }
@@ -1036,7 +1038,7 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  *
  * Kill_1 = {pts=(l,r,a) in in | l in L && |L|=1}
  *
- * If the freed location r is precisely known, any war pointing
+ * If the freed location r is precisely known, any arc pointing
  * towards it can be removed:
  *
  * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1}
@@ -1085,90 +1087,115 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   free_type(t);
 
   pips_assert("L is not empty", !ENDP(L));
-  pips_assert("R is not empty", !ENDP(R));
 
-  /* Remove Kill_1 if it is not empty by definition */
-  if(gen_length(L)==1) {
-    SET_FOREACH(points_to, pts, pt_out) {
-      cell l = points_to_source(pts);
-      if(points_to_cell_in_list_p(l, L)) {
-	// FI: assuming you can perform the removal inside the loop...
-	remove_arc_from_pt_map(pts, pt_out);
-      }
-    }
+  /* Remove cells from R that do not belong to Heap: they cannot be
+     freed */
+  list nhl = NIL;
+  FOREACH(CELL, c, R) {
+    /* FI->AM: Should be taken care of by the lattice...
+     *
+     * We need heap_cell_p() for any abstract bucket, heap_cell_p() to
+     * detect the heap abstract location, heap_cell_p() to detect
+     * cells that may be in the heap, i.e. abstract locations that are
+     * greater then the heap abstract location.
+     */
+    if(!heap_cell_p(c) && !anywhere_cell_p(c))
+      nhl = CONS(CELL, c, nhl);
   }
+  gen_list_and_not(&R, nhl);
+  gen_free_list(nhl);
 
-  /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
-  if(gen_length(R)==1) {
-    SET_FOREACH(points_to, pts, pt_out) {
-      cell r = points_to_sink(pts);
-      if(points_to_cell_in_list_p(r, R)) {
-	if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
-	  /* FI: should be easier and more efficient to substitute the
-	     sink... But is is impossible with the representation of
-	     the points-to set. */
-	  /*
-	  cell source = copy_cell(points_to_source(pts));
-	  cell sink = make_nowhere_cell();
-	  approximation a = copy_approximation(points_to_approximation(pts));
-	  points_to npts = make_points_to(source, sink, a, make_descriptor_none());
-	  add_arc_to_pt_map(npts, pt_out);
-	  */
-	  // FI: pv_whileloop05, lots of related cells to remove after a free...
+  //pips_assert("R is not empty", !ENDP(R));
+
+  if(ENDP(R)) {
+    /* We have bumped into a non-legal free such as free(&i). See test
+       case malloc10.c */
+    clear_pt_map(pt_out);
+  }
+  else {
+
+    /* Remove Kill_1 if it is not empty by definition */
+    if(gen_length(L)==1) {
+      SET_FOREACH(points_to, pts, pt_out) {
+	cell l = points_to_source(pts);
+	if(points_to_cell_in_list_p(l, L)) {
 	  // FI: assuming you can perform the removal inside the loop...
 	  remove_arc_from_pt_map(pts, pt_out);
-	  {
-	    cell source = points_to_source(pts);
-	    // FI: it should be a make_typed_nowhere_cell()
-	    bool to_be_freed;
-	    type t = points_to_cell_to_type(source, &to_be_freed);
-	    type pt = type_to_pointed_type(t);
-	    cell sink = make_typed_nowhere_cell(pt);
-	    //approximation a = make_approximation_may(); // FI: why may?
-	    approximation a = copy_approximation(points_to_approximation(pts));
-	    points_to npt = make_points_to(source, sink, a,
-					   make_descriptor_none());
-	    add_arc_to_pt_map(npt, pt_out);
-	    //free_points_to(pts);
-	    if(to_be_freed) free_type(t);
+	}
+      }
+    }
+
+    /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
+    if(gen_length(R)==1) {
+      SET_FOREACH(points_to, pts, pt_out) {
+	cell r = points_to_sink(pts);
+	if(points_to_cell_in_list_p(r, R)) {
+	  if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
+	    /* FI: should be easier and more efficient to substitute the
+	       sink... But is is impossible with the representation of
+	       the points-to set. */
+	    /*
+	      cell source = copy_cell(points_to_source(pts));
+	      cell sink = make_nowhere_cell();
+	      approximation a = copy_approximation(points_to_approximation(pts));
+	      points_to npts = make_points_to(source, sink, a, make_descriptor_none());
+	      add_arc_to_pt_map(npts, pt_out);
+	    */
+	    // FI: pv_whileloop05, lots of related cells to remove after a free...
+	    // FI: assuming you can perform the removal inside the loop...
+	    remove_arc_from_pt_map(pts, pt_out);
+	    {
+	      cell source = points_to_source(pts);
+	      // FI: it should be a make_typed_nowhere_cell()
+	      bool to_be_freed;
+	      type t = points_to_cell_to_type(source, &to_be_freed);
+	      type pt = type_to_pointed_type(t);
+	      cell sink = make_typed_nowhere_cell(pt);
+	      //approximation a = make_approximation_may(); // FI: why may?
+	      approximation a = copy_approximation(points_to_approximation(pts));
+	      points_to npt = make_points_to(source, sink, a,
+					     make_descriptor_none());
+	      add_arc_to_pt_map(npt, pt_out);
+	      //free_points_to(pts);
+	      if(to_be_freed) free_type(t);
+	    }
 	  }
 	}
       }
     }
-  }
 
-  /* Add Gen_1 - Not too late since pt_out has aready been modified? */
-  pt_out = list_assignment_to_points_to(L, N, pt_out);
+    /* Add Gen_1 - Not too late since pt_out has aready been modified? */
+    pt_out = list_assignment_to_points_to(L, N, pt_out);
 
-  /* Add Gen_2: useless, already performed by Kill_2 */
-  /*
-  SET_FOREACH(points_to, pts, pt_out) {
-    cell r = points_to_sink(pts);
-    if(!null_cell_p(r) && points_to_cell_in_list_p(r, R)) {
+    /* Add Gen_2: useless, already performed by Kill_2 */
+    /*
+      SET_FOREACH(points_to, pts, pt_out) {
+      cell r = points_to_sink(pts);
+      if(!null_cell_p(r) && points_to_cell_in_list_p(r, R)) {
       cell source = copy_cell(points_to_source(pts));
       cell sink = make_nowhere_cell();
       approximation a = copy_approximation(points_to_approximation(pts));
       points_to npts = make_points_to(source, sink, a, make_descriptor_none());
       add_arc_to_pt_map(npts, pt_out);
-    }
-  }
-  */
+      }
+      }
+    */
 
-  /*
-   * Other pointers may or must now be dangling because their target
-   * has been freed.
-   */
+    /*
+     * Other pointers may or must now be dangling because their target
+     * has been freed.
+     */
 
-  FOREACH(CELL, c, R) {
-    if(!sink_in_set_p(c, pt_out)) {
-      if(heap_cell_p(c)) {
-	entity b = reference_variable(cell_any_reference(c));
-	pips_user_warning("Memory leak for bucket \"%s\".\n",
-			  entity_name(b));
+    FOREACH(CELL, c, R) {
+      if(!sink_in_set_p(c, pt_out)) {
+	if(heap_cell_p(c)) {
+	  entity b = reference_variable(cell_any_reference(c));
+	  pips_user_warning("Memory leak for bucket \"%s\".\n",
+			    entity_name(b));
+	}
       }
     }
   }
-
   // FI: memory leak(s) in this function?
   gen_free_list(L);
   gen_free_list(N);

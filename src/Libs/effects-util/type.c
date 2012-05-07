@@ -467,6 +467,25 @@ type points_to_reference_to_type(reference ref, bool *to_be_freed)
 
   return t;
 }
+
+/* FI: I need more generality than is offered by expression_to_type()
+   because fields are assimilated to subscripts. */
+type points_to_expression_to_type(expression e, bool * to_be_freed)
+{
+  type t = type_undefined;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    t = points_to_reference_to_type(r, to_be_freed);
+  }
+  else {
+    *to_be_freed = true;
+    t = expression_to_type(e);
+  }
+
+  return t;
+}
+
 /* FI: I need more generality than is offered by cell_to_type() */
 type points_to_cell_to_type(cell c, bool *to_be_freed)
 {
