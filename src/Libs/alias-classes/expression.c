@@ -390,6 +390,19 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     case is_value_constant:
       pt_out = pt_in; // FI?
       break;
+    case is_value_symbolic:{
+      value v = entity_initial(f);
+      symbolic s = value_symbolic(v);
+      expression ex = symbolic_expression(s);
+      pt_out = expression_to_points_to(ex, pt_in);
+    }
+      break;
+    case is_value_expression:{
+      value v = entity_initial(f);
+      expression ex = value_expression(v);
+      pt_out = expression_to_points_to(ex, pt_in);
+    }
+      break;
     default:
       pips_internal_error("unknown tag %d\n", tt);
       break;
