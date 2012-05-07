@@ -765,8 +765,10 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  /* pts = add_arc_to_pt_map(npt, pts); */
 	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
 	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
-	//if(null_initialization_p)
-	  sinks = gen_nconc(null_to_sinks(source, pts), sinks);
+	if(null_initialization_p){
+	  list ls = null_to_sinks(source, pts);
+	  sinks = gen_nconc(ls, sinks);
+	}
       }
       else if(top_level_entity_p(v) || static_global_variable_p(v)) {
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
@@ -810,8 +812,10 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  /* pts = add_arc_to_pt_map(npt, pts); */
 	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
 	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
-	  //if(null_initialization_p)
-	  sinks = gen_nconc(null_to_sinks(source, pts), sinks);
+	   if(null_initialization_p){
+	     list ls = null_to_sinks(source, pts);
+	     sinks = gen_nconc(ls, sinks);
+	   }
 	}
       }
       else if(entity_stub_sink_p(v)) {
@@ -835,8 +839,10 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  /* pts = add_arc_to_pt_map(npt, pts); */
 	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
 	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
-	  if(null_initialization_p)
-	    sinks = gen_nconc(null_to_sinks(source, pts), sinks);
+	  if(null_initialization_p) {
+	   list ls = null_to_sinks(source, pts);
+	   sinks = gen_nconc(ls, sinks);	 
+	  }
 	}
 	if(struct_type_p(rt)) {
 	  // FI FI FI - to be really programmed with the field type
