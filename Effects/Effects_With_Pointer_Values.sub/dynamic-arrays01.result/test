@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 // stdout == &__IO_EFFECTS:__stdout__ (exact);
 // sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
 
 // Pointer values:
 // argv == &_argv_1[0] (exact);
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 // stdout == &__IO_EFFECTS:__stdout__ (exact);
 // sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
 
 // Pointer values:
 // argv == &_argv_1[0] (exact);
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 // stdout == &__IO_EFFECTS:__stdout__ (exact);
 // sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
 
 // Pointer values:
 // argv == &_argv_1[0] (exact);
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 // stdout == &__IO_EFFECTS:__stdout__ (exact);
 // sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
 
 // Pointer values:
 // argv == &_argv_1[0] (exact);
@@ -389,22 +389,22 @@ int main(int argc, char **argv)
 
    array_a = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_a
-   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_b _MALLOC_EFFECTS:_MALLOC_
    array_b = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_b
-   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_c _MALLOC_EFFECTS:_MALLOC_
    array_c = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_c
-   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
 //             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: array_d _MALLOC_EFFECTS:_MALLOC_
    array_d = (float *) malloc(N*sizeof(float));
 //             <    is read   >: array_d
-   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
 //             <    is read   >: array_a
 //             <    is written>: *HEAP*_l_21[0]
    
@@ -483,7 +483,7 @@ int main(int argc, char **argv)
 
 //  <array_a-R-EXACT-{}>
 
-   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_b-W-EXACT-{}>
@@ -494,7 +494,7 @@ int main(int argc, char **argv)
 
 //  <array_b-R-EXACT-{}>
 
-   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_c-W-EXACT-{}>
@@ -505,7 +505,7 @@ int main(int argc, char **argv)
 
 //  <array_c-R-EXACT-{}>
 
-   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_d-W-EXACT-{}>
@@ -516,7 +516,7 @@ int main(int argc, char **argv)
 
 //  <array_d-R-EXACT-{}>
 
-   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
 
 //  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==0}>
 //  <array_a-R-EXACT-{}>
@@ -666,7 +666,7 @@ int main(int argc, char **argv)
 
 //  <array_a-R-EXACT-{}>
 
-   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_b-W-EXACT-{}>
@@ -677,7 +677,7 @@ int main(int argc, char **argv)
 
 //  <array_b-R-EXACT-{}>
 
-   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_c-W-EXACT-{}>
@@ -688,7 +688,7 @@ int main(int argc, char **argv)
 
 //  <array_c-R-EXACT-{}>
 
-   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
 
 //  <N-R-EXACT-{}>
 //  <array_d-W-EXACT-{}>
@@ -699,7 +699,7 @@ int main(int argc, char **argv)
 
 //  <array_d-R-EXACT-{}>
 
-   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
 
 //  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==0}>
 //  <array_a-R-EXACT-{}>
