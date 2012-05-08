@@ -1,23 +1,57 @@
-2012-03-06 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2012-05-04 Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.4
 
-    * Outline kernel callees with a prefix to avoid conflicts
+   * Outline kernel callees with a prefix to avoid conflicts
 
-    * New kernel generation algorithm for p4a: no longer inline callees in
-      kernels but call device functions instead
+   * New kernel generation algorithm for p4a: no longer inline callees in
+     kernels but call device functions instead
 
-    * Apply some callees unfolding after array linearization for non-C99
-      VLA devices
+   * Apply some callees unfolding after array linearization for non-C99
+     VLA devices
 
-    * nvcc compilation chain can use C++ compiler specified by user
+   * nvcc compilation chain can use C++ compiler specified by user
 
-    * Deal with OpenCL pointer in kernel callees
+   * Deal with OpenCL pointer in kernel callees
 
-    * Add another loop fusion algorithm based on array regions
+   * Add another loop fusion algorithm based on array regions
 
-    * Fix --select-module and other module filtering to cope new kernel
-      generation algorithm
+   * Fix --select-module and other module filtering to cope new kernel
+     generation algorithm
+
+   * Improve documentation
+
+   * Liveness analysis
+
+   * Generated variables are now prefixed p4a_ instead of P4A_ reserved
+     for the runtime itself
+
+   * More pointer values, effects and regions interaction
+
+   * New PHPiPS interface to ease cloud interfacing
+
+   * Loop nests with some variable declaration with initializations are
+     not perfect loop nests
+
+   * New --kernel-unroll option to unroll loops inside kernels
+
+   * Display OpenCL kernel compilation messages in the case of errors
+     or in debug mode
+
+   * Improve memory effects and regions analysis in the case of casts
+
+   * New privatization phase dealing even with global variables based on
+     liveness analysis
+
+   * New pointer values
+
+   * Improvement of the coding rules guide
+
+   * Improve packaging scripts
+
+   * Improve integration script
+
+   * Add OS distribution in error report email
 
 
 2012-02-09 Ronan Keryell <Ronan.Keryell@hpc-project.com>
