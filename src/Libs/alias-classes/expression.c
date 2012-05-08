@@ -1112,7 +1112,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * cells that may be in the heap, i.e. abstract locations that are
      * greater then the heap abstract location.
      */
-    if(!heap_cell_p(c) && !anywhere_cell_p(c))
+    if(!heap_cell_p(c) && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);

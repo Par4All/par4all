@@ -119,6 +119,23 @@ bool entity_anywhere_locations_p(entity e)
     return same_entity_p(e, entity_all_locations());
 }
 
+/* test if a cell is the bottom of the lattice*/
+bool cell_typed_anywhere_locations_p(cell c)
+{
+  reference r = cell_any_reference(c);
+  bool anywhere_p = reference_typed_anywhere_locations_p(r);
+  return anywhere_p;
+}
+
+/* test if a reference is the bottom of the lattice*/
+bool reference_typed_anywhere_locations_p(reference r)
+{
+  entity e = reference_variable(r);
+  bool anywhere_p = entity_typed_anywhere_locations_p(e);
+  return anywhere_p;
+}
+
+
 /* test if an entity is the bottom of the lattice*/
 bool entity_typed_anywhere_locations_p(entity e)
 {
