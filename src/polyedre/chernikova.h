@@ -1292,7 +1292,7 @@ static Psysteme sc_of_constrs(zmat_p constrs, Pbase base) {
 	unsigned i;
 	for (i = 0; i < constrs->nbrows; i++) {
 		Pvecteur pv = vecteur_of_zvec(constrs->vals[i] + 1, base);
-		int cst = zval_get_i(constrs->vals[i][constrs->nbcols - 1]);
+		Value cst = zval_get_i(constrs->vals[i][constrs->nbcols - 1]);
 		vect_add_elem(&pv, TCST, cst);
 		vect_chg_sgn(pv);
 		if (zval_equal_i(constrs->vals[i][0], 0)) {
