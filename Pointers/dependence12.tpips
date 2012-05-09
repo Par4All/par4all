@@ -22,14 +22,14 @@ echo POINTS TO for "dependence12"
 echo
 display PRINTED_FILE[dependence12]
 
-echo 
-echo Proper effects using points_to
-echo
-module dependence12
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#echo 
+#echo Proper effects using points_to
+#echo
+#module dependence12
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 #setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE
  
 
 close

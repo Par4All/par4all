@@ -1,4 +1,4 @@
-setenv WS=formal_parameter01
+setenv WS=formal_parameter00
 delete $WS
 create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE

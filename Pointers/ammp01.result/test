@@ -1142,9 +1142,3 @@ int activate(int i1, int i2)
 }
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_m_serial"
 C_PARSER[activate] (check_C_function_type) Type updated for function "a_next"
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_m_serial" is still ignored
-On going implementation...
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_next" is still ignored
-On going implementation...
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[activate] (user_call_to_points_to) The function call to "a_next" is still ignored
-On going implementation...

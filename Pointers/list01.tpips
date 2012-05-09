@@ -8,7 +8,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 #module main
 

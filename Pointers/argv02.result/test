@@ -1,0 +1,18 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// argv[*] -> _argv_2[*] , MAY
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To:
+// argv[*] -> _argv_2[*] , MAY
+
+   return 0;
+}

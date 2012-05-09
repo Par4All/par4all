@@ -1,0 +1,26 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _argv_2[*] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[*] , MAY
+
+
+// Points To OUT:
+// _argv_2[*] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*] , MAY
+
+int main(int argc, char **argv)
+{
+
+// Points To:
+// _argv_2[*] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[*] , MAY
+
+   return 0;
+}
