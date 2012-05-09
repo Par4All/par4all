@@ -89,13 +89,13 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Function has not a functional type.\n");
 
-  // FI: this function should be moved from semantics into effects-util
-  extern list load_summary_effects(entity e);
-  list el = load_summary_effects(f);
-  list wpl = written_pointers_set(el);
-  points_to_list pts_to_in = (points_to_list)
-    db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
   if(interprocedural_points_to_analysis_p()) {
+    // FI: this function should be moved from semantics into effects-util
+    extern list load_summary_effects(entity e);
+    list el = load_summary_effects(f);
+    list wpl = written_pointers_set(el);
+    points_to_list pts_to_in = (points_to_list)
+      db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
     points_to_list pts_to_out = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
@@ -118,9 +118,15 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     ifdebug(8) print_points_to_set("pt_end =",pt_end);
     pt_out = pt_end;
   }
-  else if(false) {
+  else if(interprocedural_points_to_analysis_p()) {
+    extern list load_summary_effects(entity e);
+    list el = load_summary_effects(f);
+    list wpl = written_pointers_set(el);
+    points_to_list pts_to_in = (points_to_list)
+      db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    pt_map pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
+    pt_map pt_in_callee = new_pt_map();
+    pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
     // list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
     // pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
     pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
@@ -128,14 +134,15 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
 						 pt_in_callee, pts_binded);
     ifdebug(8) print_points_to_set("pt_kill", pts_kill);
-    pt_map pt_end = set_difference(pt_end, pt_in, pts_kill);
+    pt_map pt_end = new_pt_map();
+    pt_end = set_difference(pt_end, pt_in, pts_kill);
     ifdebug(8) print_points_to_set("pt_end =",pt_end);
     pt_out = pt_end;
   }
-  else {
-    pips_user_warning("The function call to \"%s\" is still ignored\n"
-		      "On going implementation...\n", entity_user_name(f));
-  }
+  /* else { */
+  /*   pips_user_warning("The function call to \"%s\" is still ignored\n" */
+  /* 		      "On going implementation...\n", entity_user_name(f)); */
+  /* } */
 
   return pt_out;
 }
@@ -150,7 +157,7 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
   entity f = call_function(c);
   // Interprocedural version
   // Check if there is a return value at the level of POINTS TO OUT, if yes return its sink
-  if(interprocedural_points_to_analysis_p()) {
+  if(interprocedural_points_to_analysis_p() ||fast_interprocedural_points_to_analysis_p() ) {
     const char* mn = entity_local_name(f);
     points_to_list pts_to_out = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
@@ -168,7 +175,8 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
       }
     }
   /* FI: definitely the intraprocedural version */
-  }  else {
+  }
+  else {
     if(type_sensitive_p)
       ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
     else

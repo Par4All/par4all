@@ -344,20 +344,32 @@ bool init_points_to_analysis(char * module_name)
 }
 
 static bool interprocedural_points_to_p = true;
-
+static bool fast_interprocedural_points_to_p = true;
 bool interprocedural_points_to_analysis_p()
 {
   return interprocedural_points_to_p;
 }
 
+bool fast_interprocedural_points_to_analysis_p()
+{
+  return fast_interprocedural_points_to_p;
+}
+
 bool intraprocedural_points_to_analysis(char * module_name)
 {
   interprocedural_points_to_p = false;
+  fast_interprocedural_points_to_p = false;
   return generic_points_to_analysis(module_name);
 }
 
 bool interprocedural_points_to_analysis(char * module_name)
 {
   interprocedural_points_to_p = true;
+  return generic_points_to_analysis(module_name);
+}
+
+bool fast_interprocedural_points_to_analysis(char * module_name)
+{
+  fast_interprocedural_points_to_p = true;
   return generic_points_to_analysis(module_name);
 }

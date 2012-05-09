@@ -5474,12 +5474,9 @@ alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
-        ! SELECT.proper_effects_with_points_to
-        ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
         < MODULE.init_points_to_list
-        < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in
 \end{PipsMake}
@@ -5495,8 +5492,8 @@ expression and subexpression by the points-to analysis.
 \begin{PipsPass}{interprocedural_points_to_analysis}
 This pass is being implemented by Amira \textsc{Mensi}.
 The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
-compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. 
-This phase requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes
+both Gen and Kill sets at the level of the call site.It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5515,6 +5512,33 @@ interprocedural_points_to_analysis > MODULE.points_to
         < CALLEES.points_to_in
 \end{PipsMake}
 
+
+\subsection{Fast Interprocedural Points to Analysis}
+\label{subsection-fast-interprocedural-points-to-analysis}
+\index{Interprocedural Points to Analysis}
+
+\begin{PipsPass}{fast_interprocedural_points_to_analysis}
+This pass is being implemented by Amira \textsc{Mensi}.
+The \PipsPassRef{fast_interprocedural_points_to_analysis} is implemented in order to
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes only
+Kill sets at the call site level. It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias fast_interprocedural_points_to_analysis  'Fast Interprocedural Points To Analysis'
+
+fast_interprocedural_points_to_analysis > MODULE.points_to
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.init_points_to_list
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
+\end{PipsMake}
 
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
