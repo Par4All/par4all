@@ -1,0 +1,307 @@
+
+POINTS TO for array_of_pointers
+
+
+// Points To IN:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+
+// Points To OUT: none
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   y[i] = 0;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   p->one = 1;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   (p->two)[j] = 2.;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   *q[i] = 3;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int b;
+
+// Points To: none
+
+   int x[10];
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   tf_t s;
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   tf_t *sp = &s;
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// sp -> s , EXACT
+
+
+   call02(a, b, x, ap, sp);
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// sp -> s , EXACT
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+/* #include<stdio.h> */
+
+/* To obtain two read effects on a and b and a warning abount
+   ineffective update of i invall02 */
+typedef struct two_fields {
+   int one;
+   int two[10];
+} tf_t;
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p);
+
+int main();
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//             <    is read   >: j
+//             <    is written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//             <    is read   >: i
+//             <    is written>: y[i]
+   y[i] = 0;
+//             <    is read   >: p
+//             <    is written>: _p_5.one
+   p->one = 1;
+//             <    is read   >: j p
+//             <    is written>: _p_5.two[j]
+   (p->two)[j] = 2.;
+//             <may be written>: _q_4
+//             <    is read   >: i q[i]
+   *q[i] = 3;
+}
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: ap[*]
+//             <may be written>: x[*] call02:_p_5.two[*] call02:_q_4
+//             <    is read   >: a b sp
+//             <    is written>: call02:_p_5.one
+
+   call02(a, b, x, ap, sp);
+   return 0;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+/* #include<stdio.h> */
+
+/* To obtain two read effects on a and b and a warning abount
+   ineffective update of i invall02 */
+typedef struct two_fields {
+   int one;
+   int two[10];
+} tf_t;
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p);
+
+int main();
+//             <may be read   >: q[*]
+//             <may be written>: _p_5.two[*] _q_4 y[*]
+//             <    is read   >: i j p
+//             <    is written>: _p_5.one
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//             <    is read   >: j
+//             <    is written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//             <may be written>: y[*]
+//             <    is read   >: i
+   y[i] = 0;
+//             <    is read   >: p
+//             <    is written>: _p_5.one
+   p->one = 1;
+//             <may be written>: _p_5.two[*]
+//             <    is read   >: j p
+   (p->two)[j] = 2.;
+//             <may be read   >: q[*]
+//             <may be written>: _q_4
+//             <    is read   >: i
+   *q[i] = 3;
+}
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: call02:_p_5.two[*] call02:_q_4
+//             <    is written>: call02:_p_5.one
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: ap[*]
+//             <may be written>: x[*] call02:_p_5.two[*] call02:_q_4
+//             <    is read   >: a b sp
+//             <    is written>: call02:_p_5.one
+
+   call02(a, b, x, ap, sp);
+   return 0;
+}
+
+POINTS TO for array_of_pointers
+
+
+// Points To IN:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+
+// Points To OUT: none
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   y[i] = 0;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   p->one = 1;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   (p->two)[j] = 2.;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4 , EXACT
+
+   *q[i] = 3;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int b;
+
+// Points To: none
+
+   int x[10];
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   tf_t s;
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   tf_t *sp = &s;
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// sp -> s , EXACT
+
+
+   call02(a, b, x, ap, sp);
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// sp -> s , EXACT
+
+   return 0;
+}
+INIT_POINTS_TO_ANALYSIS[call02] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[array_of_pointers!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
