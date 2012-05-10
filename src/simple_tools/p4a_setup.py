@@ -760,7 +760,7 @@ def work(options, args = None):
         fortran = "false"
     accel_suffix=os.path.relpath(install_dir_share_accel,install_dir)
     scmp_suffix=os.path.relpath(install_dir_share_scmp,install_dir)
-    p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
+    p4a_rc.p4a_write_rc(install_dir_etc, dict(dist = install_dir,
         accel = accel_suffix, scmp = scmp_suffix, fortran = fortran))
 
     # Write version file.
