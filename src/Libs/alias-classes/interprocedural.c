@@ -73,8 +73,6 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
 
   // Code by Amira
   list fpcl = NIL; // Formal parameter cell list
-  //set_current_module_entity(f);
-  //const char* module_name = entity_module_name(e);
   type t = entity_type(f);
   if(type_functional_p(t)){
     list dl = code_declarations(value_code(entity_initial(f)));
@@ -89,8 +87,9 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Function has not a functional type.\n");
 
-  if(interprocedural_points_to_analysis_p()) {
-    // FI: this function should be moved from semantics into effects-util
+  if(interprocedural_points_to_analysis_p())
+    {
+      // FI: this function should be moved from semantics into effects-util
     extern list load_summary_effects(entity e);
     list el = load_summary_effects(f);
     list wpl = written_pointers_set(el);
@@ -118,7 +117,8 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     ifdebug(8) print_points_to_set("pt_end =",pt_end);
     pt_out = pt_end;
   }
-  else if(interprocedural_points_to_analysis_p()) {
+  else if(fast_interprocedural_points_to_analysis_p()) 
+    {
     extern list load_summary_effects(entity e);
     list el = load_summary_effects(f);
     list wpl = written_pointers_set(el);
@@ -138,11 +138,31 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     pt_end = set_difference(pt_end, pt_in, pts_kill);
     ifdebug(8) print_points_to_set("pt_end =",pt_end);
     pt_out = pt_end;
-  }
+    }
   /* else { */
   /*   pips_user_warning("The function call to \"%s\" is still ignored\n" */
   /* 		      "On going implementation...\n", entity_user_name(f)); */
   /* } */
+  else {
+    /* intraprocedural phase */
+    /* FOREACH(expression, arg, al) { */
+    /*   pt_out = expression_to_points_to(arg, pt_out); */
+    /* } */
+    FOREACH(expression, arg, al) {
+      list l_sink = expression_to_points_to_sources(arg, pt_out);
+      SET_FOREACH(points_to, pts, pt_out) {
+	FOREACH(cell, cel, l_sink) {
+	  cell source = points_to_source(pts);
+	  if(cell_equal_p(source, cel)) {
+	    cell sink = points_to_sink(pts);
+	    if(source_in_set_p(sink, pt_out))
+	      remove_arcs_from_pt_map(pts, pt_out);
+	  }
+	}
+      }
+    }
+  }
+
 
   return pt_out;
 }
@@ -185,4 +205,29 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
     sinks = entity_to_sinks(ne);
   }
   return sinks;
+}
+
+void remove_arcs_from_pt_map(points_to pts, pt_map pt_out)
+{
+  cell sink = points_to_sink(pts);
+  cell source = points_to_source(pts);
+  
+
+  SET_FOREACH(points_to, pt, pt_out) {
+    if(cell_equal_p(points_to_source(pt), sink) ||cell_equal_p(points_to_source(pt), source) ) {
+      remove_arc_from_pt_map(pts, pt_out);
+      entity e = entity_anywhere_locations();
+      reference r = make_reference(e, NIL);
+      cell source = make_cell_reference(r);
+      cell sink = copy_cell(source);
+      approximation a = make_approximation_exact();
+      points_to npt = make_points_to(source, sink, a, make_descriptor_none());
+      add_arc_to_pt_map(npt, pt_out);
+      remove_arcs_from_pt_map(pt, pt_out);
+
+    }
+
+  }
+
+
 }

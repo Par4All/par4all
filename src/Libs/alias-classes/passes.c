@@ -365,11 +365,13 @@ bool intraprocedural_points_to_analysis(char * module_name)
 bool interprocedural_points_to_analysis(char * module_name)
 {
   interprocedural_points_to_p = true;
+  fast_interprocedural_points_to_p = false;
   return generic_points_to_analysis(module_name);
 }
 
 bool fast_interprocedural_points_to_analysis(char * module_name)
 {
   fast_interprocedural_points_to_p = true;
+  interprocedural_points_to_p = false;
   return generic_points_to_analysis(module_name);
 }
