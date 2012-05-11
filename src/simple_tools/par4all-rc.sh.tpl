@@ -6,12 +6,31 @@
 #
 ##########################################################
 
-# Par4All source root. Might point to P4A_DIST if
-# sources are not installed.
-export P4A_ROOT='$root'
+# To debug here: set -vx
+
+# First try to compute a default value for Par4All distribution location:
+unset default_p4a_dist
+# Use the location of this source file:
+default_p4a_dist=$${BASH_ARGV[0]}
+
+# If default_p4a_dist is set, take the dirname of it:
+default_p4a_dist=$${default_p4a_dist:+`dirname $$default_p4a_dist`}
+
+# If we was not able to find the location, use a default value instead:
+default_p4a_dist=$${default_p4a_dist:-$dist}
+
+# Now take the absolute path.
+# Redirect cd to /dev/null to remove some parasitic output, just in case...
+default_p4a_dist=`cd $$default_p4a_dist >& /dev/null; pwd`
 
 # Path to the Par4All installation.
-export P4A_DIST='$dist'
+# Use the given P4A_DIST value if any, instead of the default value:
+export P4A_DIST=$${P4A_DIST:-$$default_p4a_dist}
+unset default_p4a_dist
+
+# Par4All source root. Might point to P4A_DIST if
+# sources are not installed.
+export P4A_ROOT=$${P4A_ROOT:-$$P4A_DIST}
 
 # Location of the Par4All_accelerator files.
 export P4A_ACCEL_DIR=$$P4A_DIST/$accel

@@ -6,12 +6,16 @@
 #
 ##########################################################
 
-# Par4All source root. Might point to P4A_DIST if
-# sources are not installed.
-setenv P4A_ROOT '$root'
+# If P4A_DIST is not externally defined, use a compile-time default value:
+if (! $$?P4A_DIST ) then
+    # Path to the Par4All installation.
+    setenv P4A_DIST '$dist'
+endif
 
-# Path to the Par4All installation.
-setenv P4A_DIST '$dist'
+# Par4All source root. Point to P4A_DIST if not defined:
+if (! $$?P4A_ROOT ) then
+  setenv P4A_ROOT $$P4A_DIST
+endif
 
 # Location of the Par4All_accelerator files.
 setenv P4A_ACCEL_DIR $$P4A_DIST/$accel

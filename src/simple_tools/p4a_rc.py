@@ -4,7 +4,7 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
-import p4a_util 
+import p4a_util
 import os
 
 '''
