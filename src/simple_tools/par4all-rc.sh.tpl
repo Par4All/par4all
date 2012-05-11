@@ -6,22 +6,34 @@
 #
 ##########################################################
 
-# To debug here: set -vx
+# To debug here:
+#set -vx
 
 # First try to compute a default value for Par4All distribution location:
 unset default_p4a_dist
 # Use the location of this source file:
 default_p4a_dist=$${BASH_ARGV[0]}
 
-# If default_p4a_dist is set, take the dirname of it:
-default_p4a_dist=$${default_p4a_dist:+`dirname $$default_p4a_dist`}
-
-# If we was not able to find the location, use a default value instead:
-default_p4a_dist=$${default_p4a_dist:-$dist}
-
-# Now take the absolute path.
-# Redirect cd to /dev/null to remove some parasitic output, just in case...
-default_p4a_dist=`cd $$default_p4a_dist >& /dev/null; pwd`
+if [ "x$$default_p4a_dist" != "x" ]; then
+  # If default_p4a_dist is set (that should work for bash),
+  # take the dirname of it.
+  # Here we have for example
+  #   default_p4a_dist = /usr/local/par4all/etc/par4all-rc.sh
+  # Take the directory of it:
+  default_p4a_dist=`dirname $$default_p4a_dist`
+  # Take the absolute path, just in case it was a relative path:
+  # Redirect cd to /dev/null to remove some parasitic output, just in case...
+  default_p4a_dist=`cd $$default_p4a_dist >& /dev/null; pwd`
+  # So now we have
+  #   default_p4a_dist = /usr/local/par4all/etc
+  # And then take the directory above:
+  default_p4a_dist=`dirname $$default_p4a_dist`
+  # So now we should have default_p4a_dist = /usr/local/par4all
+else
+  # If we was not able to find the location, use a default value
+  # instead that is replaced here by the p4a_setup.py script:
+  default_p4a_dist=$dist
+fi
 
 # Path to the Par4All installation.
 # Use the given P4A_DIST value if any, instead of the default value:
@@ -31,6 +43,7 @@ unset default_p4a_dist
 # Par4All source root. Might point to P4A_DIST if
 # sources are not installed.
 export P4A_ROOT=$${P4A_ROOT:-$$P4A_DIST}
+default_p4a_dist=$${default_p4a_dist:-$dist}
 
 # Location of the Par4All_accelerator files.
 export P4A_ACCEL_DIR=$$P4A_DIST/$accel
