@@ -714,7 +714,7 @@ def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext
         if ext == ".tpl":
             shutil.move(output_file, base)
             output_file = base
-    debug("Template " + template_file + " subsituted to " + output_file)
+    debug("Template " + template_file + " substituted to " + output_file)
     return output_file
 
 

@@ -6,9 +6,9 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
 import p4a_opts
-import p4a_rc 
+import p4a_rc
 import p4a_util
-import p4a_version 
+import p4a_version
 import glob
 import os
 import optparse
@@ -716,9 +716,11 @@ def work(options, args = None):
     # Create a shortcut name for binaries to the Python file, so that
     # we can type p4a instead of p4a.py. We need the .py versions
     # anyway since they can be imported by other Python programs
-    # I guess it does not sense on Windows... RK
+    # I guess it does not make sense on Windows... Should use os.symlink() RK
     for file in [ "p4a" ]:
-        p4a_util.run([ "ln", "-fs", os.path.join(install_python_lib_dir, file + '.py'), os.path.join(install_dir_bin, file) ])
+        # Use a relative target for the link so that we can move all
+        # install_dir_bin somewhere else and having it still working:
+        p4a_util.run([ "ln", "-fs", os.path.relpath(os.path.join(install_python_lib_dir, file + '.py'), install_dir_bin), os.path.join(install_dir_bin, file) ])
 
     # Install stuff still lacking from PIPS install.
     if not options.skip_pips:
@@ -758,7 +760,7 @@ def work(options, args = None):
         fortran = "false"
     accel_suffix=os.path.relpath(install_dir_share_accel,install_dir)
     scmp_suffix=os.path.relpath(install_dir_share_scmp,install_dir)
-    p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
+    p4a_rc.p4a_write_rc(install_dir_etc, dict(dist = install_dir,
         accel = accel_suffix, scmp = scmp_suffix, fortran = fortran))
 
     # Write version file.

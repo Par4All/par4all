@@ -43,16 +43,17 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Automatic parallelization is an intractable problem in the general case
-and it would be an illusion to rely on it in any case. Fortunately, well
-written programs can expose enough parallelism in a way automatic
-parallelizer can do a pretty good job. We advocate that to expose
-parallelism even before manual parallelization, programs should be cleaned
-enough from specific sequential processor optimizations.
+Automatic parallelization is an intractable problem in the general
+case and it would be an illusion to rely on it in any
+case. Fortunately, \emph{well written} sequential programs can expose
+enough parallelism, in such a way automatic parallelizers can do a
+pretty good job. In particular, we advocate that, before any attempt
+at manual or automatic parallelization, programs should be cleared of
+specific sequential processor optimizations.
 
 Here we present some coding rules specific to the \Apfa automatic
 parallelizer that is based on the \Apips source-to-source language
-transformation workbench but we think that these coding rules can be
+transformation workbench. But we think that these coding rules can be
 useful with other tools as interesting guidelines too.
 
 This document gives advices to write programs that are compliant with the
@@ -67,7 +68,7 @@ the easier it is to analyze.
 
 In the following we assume the reader is knowledgeable of the C99
 programming language and more specifically the ISO/IEC 9899:TC3 WG14
-norm\footnote{The last draft can be found here:
+standard\footnote{The last draft can be found here:
   \url{http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf}}.
 
 
@@ -130,27 +131,69 @@ void * my_malloc(size_t size, int err_code,
 \end{figure}
 
 Another solution is to wrap error code between %
-\lstinline|#ifdef ERROR_CONTROL ... #endif| pairs to be able remove to
+\lstinline|#ifdef ERROR_CONTROL ... #endif| pairs to be able to
 remove such code on demand.
 
-C99 offers the possibility of declaring data almost anywhere in the
-code. This feature is relatively new in \Apips and phases are unequally
-ready to accept this feature, which means that you may gather all data
-declarations at the beginning of a code block.
+
+Traditionally, automatic parallelizers focus on \texttt{for} loops
+with good properties, that is loops which are similar to Fortran
+\texttt{do} loops: an integer loop index which is initialized before
+entering the loop, and the value of which is incremented and compared
+with loop-invariant values at each iteration. \Apips front end
+performs the detection of such loops from C \texttt{for} and
+\texttt{while} loops, and the parallelizing effort exclusively focuses
+on them. It is thus of a tremendous importance to write these loops in
+such a way that they can be detected as Fortran-like \texttt{do}
+loops. In particular, this implies using simple comparison and
+increment expressions, and avoiding putting the \texttt{for} body code
+inside the increment expression as in:
+\begin{lstlisting}
+for (i=0; i<n; a[i] = i, i++);
+\end{lstlisting}
+
 
 One of the main other restrictions is that \Apips does not handle
 recursive functions.
+
+
+\subsection{Declaration scope}
+\label{sec:declaration-scope}
+
+C99 offers the possibility of declaring data almost anywhere in the
+code. This feature is relatively new in \Apips and phases are
+unequally ready to accept this feature, which means that you may
+gather all data declarations at the beginning of a code block. This is
+particularly true when declarations are intermingled with jumping
+constructs.
+
+\Apips analyses are interprocedural and can deal with parameter
+passing through global variables, or with static local
+variables. However, using global declarations may induce memory
+dependences which prevent parallelization. Program transformations
+(scalar and array privatization, array scalarization) which could
+remove some of these dependences, currently (and safely) do not deal
+with global variables. This would require interprocedural program
+transformations which are not yet available.
+
+In addition, the current generation of \Agpu code may choke on some
+case of global arrays that are not well outlined and forgotten.
+
+As a consequence, such global declarations should be avoided if
+possible and replaced by explicit argument passing in functions.
+
 
 
 \subsection{Data Structures}
 \label{sec:data_structures}
 
 The C language provides several basic data structures, which can be
-combined to create more complicated ones. \Apips allows all combinations,
-but with some limitations in their usage.
+cobmined to create more complicated ones. \Apips allows all
+combinations, but with some limitations in their usage. Notice however
+that unions are not currently well analysed and must be avoided, as
+well as pointers towards functions, and recursive data structures.
 
 
-\subsection{Pointers}
+\subsubsection{Pointers}
 \label{sec:pointers}
 
 Pointers allow to designate a single memory location using several
@@ -174,7 +217,7 @@ But if you want to make the most of \Apfa, just follow the next rules:
 \item always use the same expression to refer to a memory location
   inside a function; for instance, avoid the following kind of code:
   \begin{lstlisting}
-    parts = my_syst->domain[i]->parts;
+    parts = ym_syst->domain[i]->parts;
     parts[j] = ...;
   \end{lstlisting}
   since \lstinline|my_syst->domain[i]->parts| is designated by two
@@ -185,9 +228,11 @@ But if you want to make the most of \Apfa, just follow the next rules:
 \item do not assign two different memory locations to a pointer (that
   means that a pointer could be considered rather as single assignment
   variable);
-\item in particular, do not use pointer arithmetic;
 \item reserve the use of pointers for the sole dynamic allocation of
   arrays and to function parameter passing;
+\item do not use pointer arithmetic, or solely with with great care;
+  in particular do not use it if it leads to pointer aliasing (avoid
+  \texttt{p = p+i} or \texttt{p++} if \texttt{p} is a pointer);
 \item avoid function pointers, they currently lead to imprecise results.
 \item do not use recursive data structures such as linked lists, trees\ldots
 \end{itemize}
@@ -210,7 +255,7 @@ for(int i = 0; i < N; i++)
 \end{lstlisting}
 which is detected as a parallel loop!
 
-\subsection{Arrays}
+\subsubsection{Arrays}
 \label{sec:arrays}
 
 \subsubsection{Declarations}
@@ -235,15 +280,18 @@ That removes many older linearization old cases as seen later.
 \subsubsection{References to array elements}
 \label{sec:refer-array-elem}
 
-Since array reference are represented in \Apips by using integer
-polyhedron lattice, array references should be affine so that the
-parallelizer can prove iteration independence. For example
+\paragraph{Linearization}
+
+Array references are represented in \Apips by using integer
+polyhedron lattice, array reference indices should be affine so that
+the parallelizer can propagate information over the internal program
+representation, and prove iteration independence. For example
 \lstinline|a[2*i-3+m][3*i-j+6*n]| is an affine array reference but
 \lstinline|a[2*i*j][m*n-i+j]| is not (it is a polynomial of several
 variables).
 
-This explain why you should not use array linearization to emulate
-access to multidimensional arrays as one-dimensional arrays, such as:
+This explains why you should not use array linearization to emulate
+accesses to multidimensional arrays with one-dimensional arrays, as in:
 \begin{lstlisting}
 double a[n][m][l];
 double * p = a;
@@ -252,7 +300,7 @@ for(int i = 0; i < n; i++)
     for(int k = 0; k < l; k++)
       p[m*l*i + l*j + k] = ...;
 \end{lstlisting}
-instead of the cleaner understandable version:
+The cleaner understandable following version should be used instead:
 \begin{lstlisting}
 double a[n][m][l];
 for(int i = 0; i < n; i++)
@@ -260,10 +308,10 @@ for(int i = 0; i < n; i++)
     for(int k = 0; k < l; k++)
       a[i][j][k] = ...;
 \end{lstlisting}
-In the first cluttered version we have a polynomial expression which can
-not represented in the linear algebra framework of \Apips and this kind of
-loops can not be parallelized and communications on \Agpu cannot be
-generated.
+In the first cluttered version, the polynomial array index expression
+can not be represented in the linear algebra framework of \Apips; this
+kind of loop can not be parallelized, and communications on \Agpu
+cannot be generated.
 
 The following version:
 \begin{lstlisting}
@@ -272,9 +320,9 @@ double * p = a;
 for(int i = 0; i < n*m*l; i++)
   p[i] = ...;
 \end{lstlisting}
-can be parallelized in the \Aopenmp output but the communications cannot
-be generated in the \Agpu version yet. So avoid array linearization if
-possible.
+can be parallelized by \Apfa\ \Aopenmp compiler, but the
+communications cannot be generated in the \Agpu version yet. So avoid
+array linearization if possible.
 
 In the future, we may implement transformations that delinearize this kind
 of array accesses.
@@ -311,7 +359,10 @@ b[i-1] = ...;
   \label{fig:disjoint_array_accesses}
 \end{figure}
 
-To reduce their complexity, these analyses gather array elements in
+
+\paragraph{Successive array element references}
+
+To reduce their complexity, array element analyses gather array elements in
 sets represented by convex polyhedra. This means that non-convex sets
 of array elements are approximated by sets that contain elements which
 do not belong to the actual set, and are thus imprecise. Of course,
@@ -324,15 +375,20 @@ will prefer the version of figure~\ref{fig:consecutive_array_accesses}
 to the version of figure~\ref{fig:disjoint_array_accesses}.
 
 
-\subsubsection{Declaration scope}
-\label{sec:declaration-scope}
+\subsection{Casts}
+\label{sec:casts}
 
-Even if \Apips is interprocedural and can deal with parameter passing
-through global variables, such global declarations should be avoided if
-possible and replaced by explicit argument passing in functions.
+Casts are somewhat tricky to analyse because they induce translating a
+memory layout into another one, and this maybe very difficult in the
+general case, especially for a tool such as \Apips which tries to
+preserve the initial high level semantics of the program.
 
-For example, the actual generation of \Agpu code may choke on some case of
-global arrays that are not well outlined and forgotten.
+Hence the effects of the cast operators on the analyses is still
+currently under study: please use it sparingly. This does not concern
+casts added before invocations of the \texttt{malloc} function, and
+particular efforts have been made to handle conversions between arrays
+and pointers when the layout is preserved. This is particularly useful
+for function calls.
 
 
 \section{Operators and standard libraries}
@@ -344,8 +400,6 @@ compiler version, some of your favorite ones may be missing. Don't
 hesitate to contact us on \texttt{pipsdev at cri dot ensmp dot fr} so
 that we can integrate them.
 
-The effects of the cast operators on the analyses is currently under
-study: please use it sparingly.
 
 \section{Values of scalar variables}
 \label{sec:values_of_scalar_variables}
@@ -439,16 +493,18 @@ modernization, independently of \Apips or \Apfa.
 
 \end{document}
 
-do loops => simple for, without complex expressions
+do loops => simple for, without complex expressions -> done (BC, 2012-05-02)
 
 Keep the algorithmic attitude non offuscated contest
 
 
 #pragma
 
+No union -> added (BC, 2012-05-02)
+
 comments
 
-cast
+cast -> section added (BC, 2012-05-02)
 
 compléter linearization
 
@@ -464,15 +520,16 @@ Commentaires de François :
 * pas d'appels recursifs (c'est actuellement detecte a posteriori par
 pipsmake)
 
-* pas d'arithmetique sur pointeurs
+* pas d'arithmetique sur pointeurs -> updated (BC, 2012-05-02)
 
 * pas d'affectation multiples a un pointeur (ca doit faire sauter les
-codes exploitant des structures de donnees recursives); pour Ter@ops:
-assignation dynamique unique a chaque execution de la fonction
+codes exploitant des structures de donnees recursives) (BC: already
+done in the pointer subsection); pour Ter@ops: assignation dynamique
+unique a chaque execution de la fonction
 
 * pas de tableaux de pointeurs
 
-* pas de pointeurs sur des fonctions
+* pas de pointeurs sur des fonctions -> added (BC, 2012-05-02)
 
 * verification des intrinsics utilises: je ne sais comment traiter ce
 probleme

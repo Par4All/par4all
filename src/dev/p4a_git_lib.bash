@@ -20,8 +20,10 @@ P4A_ROOT=${P4A_ROOT:-$P4A_TOP/par4all}
 P4A_PRIV_ROOT=${P4A_PRIV_ROOT:-$P4A_TOP/par4all-priv}
 
 # To have verbose summary of log history of at most 10000 commits during
-# the merge:
-MERGE_LOG="--log=10000"
+# the merge.
+# There is also a new git behaviour (2012) that always launch an editor
+# but we do not need it...
+MERGE_OPTIONS="--log=10000 --no-edit"
 
 
 script=${0/*\//}
@@ -168,7 +170,7 @@ function pull_remote_1_git() {
 
     # Fortunately there is now in the recursive strategy a new
     # suboption to enforce the subtree directory instead of guessing it... :-/
-    git merge $MERGE_LOG --strategy=recursive -Xsubtree=$SUBTREE_DIR $TRACKING_BRANCH
+    git merge $MERGE_OPTIONS --strategy=recursive -Xsubtree=$SUBTREE_DIR $TRACKING_BRANCH
 }
 
 
@@ -239,20 +241,20 @@ function do_aggregate_branches() {
 	    # Merge into the current branch the branch that buffers the remote
 	    # PIPS git svn gateway that should have been populated by a
 	    # previous do_pull_remote_git:
-	    git merge $merge_strategy $MERGE_LOG $merge_origin_branch_prefix-$i
+	    git merge $merge_strategy $MERGE_OPTIONS $merge_origin_branch_prefix-$i
 	  done
 	fi
 	git checkout $merge_to_prefix_branches-packages
 	for i in $P4A_PACKAGES; do
 	    # The merge into packages branch:
-	    git merge $merge_strategy $MERGE_LOG $merge_to_prefix_branches-$i
+	    git merge $merge_strategy $MERGE_OPTIONS $merge_to_prefix_branches-$i
 	done
 	# And finish with the own branch:
         create_branch_if_needed $merge_to_prefix_branches-own $merge_origin_branch_prefix-own
 	git checkout $merge_to_prefix_branches
 	# Then merge into main branch the 2 subsidiary branches:
-	git merge $merge_strategy $MERGE_LOG $merge_to_prefix_branches-packages
-	git merge $merge_strategy $MERGE_LOG $merge_to_prefix_branches-own
+	git merge $merge_strategy $MERGE_OPTIONS $merge_to_prefix_branches-packages
+	git merge $merge_strategy $MERGE_OPTIONS $merge_to_prefix_branches-own
     )
 }
 
