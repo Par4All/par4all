@@ -26,6 +26,7 @@ LIB_CFILES =	interface.c \
 		methods.c \
 		compose.c \
 		unary_operators.c \
+		sc_enumerate.c \
 		utils.c \
 		debug.c \
 		interprocedural.c \
