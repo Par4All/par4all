@@ -49,8 +49,8 @@ endif
 ##################################################################### EXTERNALS
 
 ifdef WITH_DYNAMIC_LIBRARIES
-# in fact only needed for linear
-extern.libs	=
+# only needed for pips
+extern.libs	= polylib
 else
 # maybe must create a link to libpolylib64.a
 extern.libs	= polylib
