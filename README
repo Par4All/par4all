@@ -1,5 +1,0 @@
-The C3/Linear library depends on the polylib library.
-
-	http://icps.u-strasbg.fr/polylib/
-
-See src/README for more information about this library
