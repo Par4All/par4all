@@ -18,3 +18,6 @@ libeffects_convex_la_SOURCES=interface.c \
                 eval.c
 
 include $(srcdir)/../pipslibs_includes.mk
+
+# SOS
+CFLAGS	+= $(POLYLIB64_CFLAGS)
