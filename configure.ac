@@ -22,9 +22,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
-# Checks for libraries.
-AX_CHECK_PKG([polylib64],[Polyhedron_Enumerate],[polylib.h])
-
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_DIRENT
@@ -94,6 +91,6 @@ AC_CONFIG_FILES([Makefile
                  src/sparse_sc/Makefile
                  src/vecteur/Makefile])
 
-AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_mkdir])
+AX_DEPENDS([minimum],[lex yacc cproto std_headers alarm_gettimeofday_mkdir])
 AX_OUTPUT([minimum],[gmp])
 
