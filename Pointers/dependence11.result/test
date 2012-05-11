@@ -10,10 +10,10 @@ void dependence11(struct my_struct *s)
    a = s->a;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: b
-   // a points_to s[0][1]
+   // a points_to s[0][a], _s_1[0][a] or _s_1.a
    b = s->b;
 //             <    is written>: i
-   // b points_to s[0][2]?
+   // b points_to s[0][b], _s_1[0][b] or _s_1.b
    
    
    for(i = 0; i <= 9; i += 1) {
@@ -30,15 +30,15 @@ POINTS TO for "dependence11"
 
 
 // Points To IN:
-// _s_1.b -> *NULL_POINTER* , MAY
-// _s_1.b -> _s_1_1[0] , MAY
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_1[*] , MAY
 // s -> *NULL_POINTER* , MAY
 // s -> _s_1 , MAY
 
 
 // Points To OUT:
-// _s_1.b -> *NULL_POINTER* , MAY
-// _s_1.b -> _s_1_1[0] , MAY
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_1[*] , MAY
 
 void dependence11(struct my_struct *s)
 {
@@ -66,42 +66,42 @@ void dependence11(struct my_struct *s)
    a = s->a;
 
 // Points To:
-// a -> _s_1.a[0] , EXACT
+// a -> _s_1[0].a[0] , EXACT
 // b -> *ANY_MODULE*:*NOWHERE* , EXACT
 // s -> _s_1 , EXACT
 
-   // a points_to s[0][1]
+   // a points_to s[0][a], _s_1[0][a] or _s_1.a
    b = s->b;
 
 // Points To:
-// _s_1.b -> *NULL_POINTER* , MAY
-// _s_1.b -> _s_1_1[0] , MAY
-// a -> _s_1.a[0] , EXACT
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_1[*] , MAY
+// a -> _s_1[0].a[0] , EXACT
 // b -> *NULL_POINTER* , MAY
-// b -> _s_1_1[0] , MAY
+// b -> _s_1_1[*] , MAY
 // s -> _s_1 , EXACT
 
-   // b points_to s[0][2]?
+   // b points_to s[0][b], _s_1[0][b] or _s_1.b
    
    
    for(i = 0; i <= 9; i += 1) {
 
 // Points To:
-// _s_1.b -> *NULL_POINTER* , MAY
-// _s_1.b -> _s_1_1[0] , MAY
-// a -> _s_1.a[0] , EXACT
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_1[*] , MAY
+// a -> _s_1[0].a[0] , EXACT
 // b -> *NULL_POINTER* , MAY
-// b -> _s_1_1[0] , MAY
+// b -> _s_1_1[*] , MAY
 // s -> _s_1 , EXACT
 
       a[i] = 0;
 
 // Points To:
-// _s_1.b -> *NULL_POINTER* , MAY
-// _s_1.b -> _s_1_1[0] , MAY
-// a -> _s_1.a[0] , EXACT
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_1[*] , MAY
+// a -> _s_1[0].a[0] , EXACT
 // b -> *NULL_POINTER* , MAY
-// b -> _s_1_1[0] , MAY
+// b -> _s_1_1[*] , MAY
 // s -> _s_1 , EXACT
 
       b[i] = 1;

@@ -1,4 +1,4 @@
-setenv WS=global03
+setenv WS=global09
 delete $WS
 create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -9,21 +9,6 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 # A pointer int * is incremented, this property must be reset
 setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
-##TODO: explain
-
-echo 
-echo PROPER EFFECTS
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[$WS]
-
-echo 
-echo PROPER POINTER EFFECTS
-echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE[$WS]
-
 echo
 echo POINTS TO
 echo
@@ -33,5 +18,6 @@ display PRINTED_FILE[$WS]
 
 
 close
+shell cat $WS.database/Warnings
 delete $WS
 quit
