@@ -190,7 +190,7 @@ typedef long int zval_t;
 #define zval_fprint(stream, z) (fprintf(stream, "%li", z))
 
 /**
- * Output @a z on <tt>stdout</tt>.
+ * Output @a z on @c stdout.
  */
 #define zval_print(z) (printf("%li", z))
 
@@ -215,7 +215,7 @@ typedef struct {
  */
 typedef qval_s qval_t[1];
 
-static void qval_canonicalize_unsafe(qval_p q)
+static void qval_canonicalize_unsafe(qval_t q)
 {
 	if (zval_cmp_i(q->num, 0) == 0) {
 		zval_set_i(q->den, 1);
@@ -235,7 +235,7 @@ static void qval_canonicalize_unsafe(qval_p q)
  * Remove any factors that are common to the numerator and denominator of @a q,
  * and make the denominator positive.
  */
-static void NOWUNUSED qval_canonicalize(qval_p q)
+static void NOWUNUSED qval_canonicalize(qval_t q)
 {
 	if (zval_cmp_i(q->den, 0) < 0) {
 		zval_neg(q->num, q->num);
@@ -247,7 +247,7 @@ static void NOWUNUSED qval_canonicalize(qval_p q)
 /**
  * Initialize @a q and set its value to 0/1.
  */
-static void NOWUNUSED qval_init(qval_p q) {
+static void NOWUNUSED qval_init(qval_t q) {
 	q->num = 0;
 	q->den = 1;
 }
@@ -260,7 +260,7 @@ static void NOWUNUSED qval_init(qval_p q) {
 /**
  * Set the value of @a q1 from @a q2.
  */
-static void NOWUNUSED qval_set(qval_p q1, qval_p q2)
+static void NOWUNUSED qval_set(qval_t q1, qval_t q2)
 {
 	zval_set(q1->num, q2->num);
 	zval_set(q1->den, q2->den);
@@ -269,7 +269,7 @@ static void NOWUNUSED qval_set(qval_p q1, qval_p q2)
 /**
  * Set the value of @a q to @a q2num/@a q2den.
  */
-static void NOWUNUSED qval_set_i(qval_p q1, Value q2num, Value q2den)
+static void NOWUNUSED qval_set_i(qval_t q1, Value q2num, Value q2den)
 {
 	assert(zval_cmp_i(q2den, 0) != 0);
 	zval_set_i(q1->num, q2num);
@@ -280,7 +280,7 @@ static void NOWUNUSED qval_set_i(qval_p q1, Value q2num, Value q2den)
 /**
  * Set @a q1 to @a q2 + @a q3.
  */
-static void NOWUNUSED qval_add(qval_p q1, qval_p q2, qval_p q3)
+static void NOWUNUSED qval_add(qval_t q1, qval_t q2, qval_t q3)
 {
 	zval_t q3num; zval_init(q3num); zval_set(q3num, q3->num);
 	zval_t lcm; zval_init(lcm); zval_lcm(lcm, q2->den, q3->den);
@@ -447,7 +447,7 @@ static int NOWUNUSED qval_fprint(FILE* stream, qval_t q)
 }
 
 /**
- * Output @a q on <tt>stdout</tt>.
+ * Output @a q on @c stdout.
  */
 #define qval_print(q) (qval_fprint(stdout, q))
 

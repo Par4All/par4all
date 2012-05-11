@@ -22,6 +22,11 @@
 
 */
 
+/**
+ * @file
+ * This file provides a function to test whether a constraint system is
+ * feasible, using simplex method, in multiple precision.
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,9 +37,23 @@
 #include "../arithmetique/arith_mulprec.h"
 #include "sc_simplex_feasibility.h"
 
-bool sc_simplex_feasibility_ofl_ctrl_mulprec(Psysteme sys, int ofl_ctrl) {
+/**
+ * Main Function
+ */
+/**@{*/
+
+/**
+ * Determine whether a system @a sys of equations and inequations is feasible.
+ * Parameter @a ofl_ctrl indicates whether an overflow control is performed
+ * (possible values: @c NO_OFL_CTRL, @c FWD_OFL_CTRL).
+ * Since we are in multiple precision, this parameter is ignored.
+ */
+bool sc_simplex_feasibility_ofl_ctrl_mulprec(Psysteme sys, int ofl_ctrl)
+{
 	return sc_get_feasibility(sys, ofl_ctrl);
 }
+
+/**@}*/
 
 #endif
 

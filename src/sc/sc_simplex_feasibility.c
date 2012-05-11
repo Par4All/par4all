@@ -22,6 +22,12 @@
 
 */
 
+/**
+ * @file
+ * This file provides a function to test whether a constraint system is
+ * feasible, using simplex method.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -36,12 +42,24 @@
 
 #define WNOGMP (fprintf(stderr, "[" __FILE__ "] linear was compiled without GMP support\n"))
 
-static bool usegmp() {
+static bool usegmp()
+{
 	char* env = getenv("LINEAR_USE_GMP");
 	return env && atoi(env) != 0;
 }
 
-bool sc_simplex_feasibility_ofl_ctrl(Psysteme sys, int ofl_ctrl) {
+/**
+ * Main Function
+ */
+/**@{*/
+
+/**
+ * Determine whether a system @a sys of equations and inequations is feasible.
+ * Parameter @a ofl_ctrl indicates whether an overflow control is performed
+ * (possible values: @c NO_OFL_CTRL, @c FWD_OFL_CTRL).
+ */
+bool sc_simplex_feasibility_ofl_ctrl(Psysteme sys, int ofl_ctrl)
+{
 	if (usegmp()) {
 #ifdef HAVE_GMP_H
 		return sc_simplex_feasibility_ofl_ctrl_mulprec(sys, ofl_ctrl);
@@ -54,4 +72,6 @@ bool sc_simplex_feasibility_ofl_ctrl(Psysteme sys, int ofl_ctrl) {
 		return sc_simplex_feasibility_ofl_ctrl_fixprec(sys, ofl_ctrl);
 	}
 }
+
+/**@}*/
 

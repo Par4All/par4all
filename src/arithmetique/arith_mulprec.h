@@ -196,7 +196,7 @@ typedef mpz_t zval_t;
 #define zval_fprint(stream, z) (mpz_out_str(stream, 10, z))
 
 /**
- * Output @a z on <tt>stdout</tt>.
+ * Output @a z on @c stdout.
  */
 #define zval_print(z) (mpz_out_str(stdout, 10, z))
 
@@ -322,7 +322,7 @@ typedef qval_s qval_t[1];
 #define qval_fprint(stream, q) (mpq_out_str(stream, 10, q))
 
 /**
- * Output @a q on <tt>stdout</tt>.
+ * Output @a q on @c stdout.
  */
 #define qval_print(q) (mpq_out_str(stdout, 10, q))
 

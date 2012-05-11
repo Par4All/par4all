@@ -22,6 +22,14 @@
 
 */
 
+/**
+ * @file
+ * This header provides functions to test whether a constraint system is
+ * feasible, using the simplex method.
+ * It can be used with any of the headers @c arith_fixprec.c or @c
+ * arith_mulprec.c, this in fixed- or multiple-precision.
+ */
+
 #ifndef LINEAR_SC_SIMPLEX_FEASIBILITY_H
 #define LINEAR_SC_SIMPLEX_FEASIBILITY_H
 
@@ -37,17 +45,16 @@
 #include "contrainte.h"
 #include "sc.h"
 
-// Debugging
-
+// debugging
 #ifndef LINEAR_DEBUG_SIMPLEX
 #define DEBUG(code) {}
 #else
 #define DEBUG(code) {code}
 #endif
 
-// Memory management
-
-static void* safe_malloc(size_t size) {
+// memory management
+static void* safe_malloc(size_t size)
+{
 	void* m = malloc(size);
 	if (m == NULL) {
 		fprintf(stderr, "[" __FILE__ "] out of memory\n");
@@ -56,30 +63,72 @@ static void* safe_malloc(size_t size) {
 	return m;
 }
 
-// Variables
+/**
+ * @name Variables
+ * Each variable is represented by a non-negative, integer value.
+ */
+/**@{*/
 
+/**
+ * Type of variables.
+ */
 typedef int var_t;
 
+/**
+ * A special value used to represent the absence of variable.
+ */
 #define VAR_NULL (-1)
+
+/**
+ * Maximum number of variables.
+ */
 #define VAR_MAXNB (1971)
 
+/**
+ * Output @a var on stdio stream @a stream.
+ */
 #define var_fprint(stream, var) (fprintf(stream, "x%d", var))
 
+/**
+ * Output @a var on @c stdout.
+ */
 #define var_print(var) (var_fprint(stdout, var))
 
-// Vectors
+/**@}*/
 
+/**
+ * @name Vectors
+ * A vector is a structure to map each variable to a rational value.
+ */
+/**@{*/
+
+/**
+ * Type of vectors.
+ * Typically, most of values are equal to zero, so a sparse, linked-list
+ * structure is used.
+ * Internally, variables are ordered by decreasing order.
+ */
 typedef struct vec_s {
-	var_t var;
-	qval_t coeff;
-	struct vec_s* succ;
+	var_t var; /**< mapped variable */
+	qval_t coeff; /**< value associated to the variable */
+	struct vec_s* succ; /**< rest of the vector */
 } vec_s, *vec_p;
 
+/**
+ * The empty vector.
+ */
 #define VEC_NULL NULL
 
+/**
+ * Set @a vec to be the empty vector.
+ */
 #define vec_init(vec) (vec = VEC_NULL)
 
-static void vec_clear(vec_p* pvec) {
+/**
+ * Free the space occupied by @a pvec.
+ */
+static void vec_clear(vec_p* pvec)
+{
 	while (*pvec != VEC_NULL) {
 		vec_p succ = (*pvec)->succ;
 		qval_clear((*pvec)->coeff);
@@ -88,7 +137,11 @@ static void vec_clear(vec_p* pvec) {
 	}
 }
 
-static void vec_set(vec_p* pvec, vec_p vec) {
+/**
+ * Copy @a vec into @a pvec.
+ */
+static void vec_set(vec_p* pvec, vec_p vec)
+{
 	vec_clear(pvec);
 	bool first = true;
 	vec_p* last = NULL;
@@ -108,7 +161,13 @@ static void vec_set(vec_p* pvec, vec_p vec) {
 	}
 }
 
-static void vec_append_atfirst(vec_p* pvec, var_t var, qval_t coeff) {
+/**
+ * Add the element (@a var, @coeff) to @a pvec, in first position.
+ * @a var must be greater to any variable in @a pvec s.t. @a pvec remains
+ * consistent.
+ */
+static void vec_append_atfirst(vec_p* pvec, var_t var, qval_t coeff)
+{
 	assert(*pvec == VEC_NULL || (*pvec)->var < var);
 	vec_p hd = safe_malloc(sizeof(vec_s));
 	hd->var = var;
@@ -117,7 +176,11 @@ static void vec_append_atfirst(vec_p* pvec, var_t var, qval_t coeff) {
 	*pvec = hd;
 }
 
-static void vec_append(vec_p* pvec, var_t var, qval_t coeff) {
+/**
+ * Add the element (@a var, @a coeff) to @a pvec.
+ */
+static void vec_append(vec_p* pvec, var_t var, qval_t coeff)
+{
 	if (!qval_equal_i(coeff, 0, 1)) {
 		while (*pvec != VEC_NULL && (*pvec)->var > var) {
 			pvec = &(*pvec)->succ;
@@ -126,7 +189,11 @@ static void vec_append(vec_p* pvec, var_t var, qval_t coeff) {
 	vec_append_atfirst(pvec, var, coeff);
 }
 
-static void vec_get_coeff(qval_t coeff, vec_p vec, var_t var) {
+/**
+ * Get the value associated to @a var in @a vec, and store it into @a coeff.
+ */
+static void vec_get_coeff(qval_t coeff, vec_p vec, var_t var)
+{
 	while (vec != VEC_NULL && vec->var > var) {
 		vec = vec->succ;
 	}
@@ -138,7 +205,11 @@ static void vec_get_coeff(qval_t coeff, vec_p vec, var_t var) {
 	}
 }
 
-static void vec_iadd(vec_p* pvec, vec_p vec) {
+/**
+ * Set @a pvec to @a pvec + @a vec.
+ */
+static void vec_iadd(vec_p* pvec, vec_p vec)
+{
 	for (; vec != VEC_NULL; vec = vec->succ) {
 		var_t var = vec->var;
 		while (*pvec != VEC_NULL && (*pvec)->var > var) {
@@ -170,7 +241,11 @@ static void vec_iadd(vec_p* pvec, vec_p vec) {
 	}
 }
 
-static void vec_imul(vec_p* pvec, qval_t coeff) {
+/**
+ * Set @a pvec to @a coeff times @a pvec.
+ */
+static void vec_imul(vec_p* pvec, qval_t coeff)
+{
 	if (qval_equal_i(coeff, 0, 1)) {
 		vec_clear(pvec);
 	}
@@ -182,7 +257,11 @@ static void vec_imul(vec_p* pvec, qval_t coeff) {
 	}
 }
 
-static void vec_iaddmul(vec_p* pvec, qval_t coeff, vec_p vec) {
+/**
+ * Set @a pvec to @a pvec + @a coeff times @a vec.
+ */
+static void vec_iaddmul(vec_p* pvec, qval_t coeff, vec_p vec)
+{
 	if (qval_equal_i(coeff, 0, 1)) {
 		return;
 	}
@@ -223,13 +302,21 @@ static void vec_iaddmul(vec_p* pvec, qval_t coeff, vec_p vec) {
 	}
 }
 
-static void vec_ineg(vec_p vec) {
+/**
+ * Set @a vec to -@a vec.
+ */
+static void vec_ineg(vec_p vec)
+{
 	for (; vec != VEC_NULL; vec = vec->succ) {
 		qval_neg(vec->coeff, vec->coeff);
 	}
 }
 
-static int NOWUNUSED vec_fprint(FILE* stream, vec_p vec) {
+/**
+ * Output @a vec on stdio stream @a stream.
+ */
+static int NOWUNUSED vec_fprint(FILE* stream, vec_p vec)
+{
 	if (vec == VEC_NULL) {
 		return fprintf(stream, "0");
 	}
@@ -255,54 +342,107 @@ static int NOWUNUSED vec_fprint(FILE* stream, vec_p vec) {
 	}
 }
 
+/**
+ * Output @a vec on @c stdout.
+ */
 #define vec_print(vec) (vec_fprint(stdout, vec))
 
-// Constraint
+/**@}*/
 
-typedef enum {
-	CONSTR_EQ,
-	CONSTR_LE
+/**
+ * @name Linear Constraints
+ * A linear constraint is either a linear equality
+ * (@a a1 @a x1 + ... + @a an @a xn = @a b) or a linear inequality
+ * (@a a1 @a x1 + ... + @a an @a xn <= @a b).
+ */
+/**@{*/
+
+/**
+ * Type of linear constraint relations.
+ */
+typedef enum
+{
+	CONSTR_EQ, /**< equality */
+	CONSTR_LE /**< inequality */
 } constrrel_t;
 
+/**
+ * Type of linear constraint.
+ */
 typedef struct constr_s {
-	vec_p vec;
-	constrrel_t rel;
-	qval_t cst;
+	vec_p vec; /**< coefficients of variables */
+	constrrel_t rel; /**< equality or inequality relation */
+	qval_t cst; /**< constant term */
 } constr_s, *constr_p;
 
+/**
+ * Type of linear constraint.
+ */
 typedef constr_s constr_t[1];
 
-static void constr_init(constr_p constr) {
+/**
+ * Initialize @a constr and set it to 0 = 0.
+ */
+static void constr_init(constr_p constr)
+{
 	vec_init(constr->vec);
 	constr->rel = CONSTR_EQ;
 	qval_init(constr->cst);
 }
 
-static void constr_clear(constr_p constr) {
+/**
+ * Free the space occupied by @a constr.
+ */
+static void constr_clear(constr_p constr)
+{
 	vec_clear(&constr->vec);
 	qval_clear(constr->cst);
 }
 
-static void NOWUNUSED constr_set(constr_p constr1, constr_p constr2) {
+/**
+ * Copy @a constr2 into @a constr1.
+ */
+static void NOWUNUSED constr_set(constr_p constr1, constr_p constr2)
+{
 	vec_set(&constr1->vec, constr2->vec);
 	constr1->rel = constr2->rel;
 	qval_set(constr1->cst, constr2->cst);
 }
 
-#define constr_get_coeff(coeff, constr, var) (vec_get_coeff(coeff, (constr)->vec, var))
+/**
+ * Get the coefficient of @a var in @a constr, and store it into @a coeff.
+ */
+#define constr_get_coeff(coeff, constr, var) \
+	(vec_get_coeff(coeff, (constr)->vec, var))
 
-static void constr_iadd(constr_p constr1, constr_p constr2) {
+/**
+ * Set @a constr1 to @a constr1 + @a constr2.
+ * @a constr2 must be an equality.
+ */
+static void constr_iadd(constr_p constr1, constr_p constr2)
+{
+	// general case is not needed
 	assert(constr2->rel == CONSTR_EQ);
 	vec_iadd(&constr1->vec, constr2->vec);
 	qval_add(constr1->cst, constr1->cst, constr2->cst);
 }
 
-static void constr_imul(constr_p constr, qval_t coeff) {
+/**
+ * Set @a constr to @a coeff times @a constr.
+ * @a constr must be an equality or @a coeff a non-negative value.
+ */
+static void constr_imul(constr_p constr, qval_t coeff)
+{
 	vec_imul(&constr->vec, coeff);
 	qval_mul(constr->cst, constr->cst, coeff);
 }
 
-static void constr_iaddmul(constr_p constr1, qval_t coeff, constr_p constr2) {
+/**
+ * Set @a constr1 to @a constr1 + @a coeff times @a constr2.
+ * @a constr2 must be an equality or @a coeff a non-negative value.
+ */
+static void constr_iaddmul(constr_p constr1, qval_t coeff, constr_p constr2)
+{
 	if (!qval_equal_i(coeff, 0, 1)) {
 		vec_iaddmul(&constr1->vec, coeff, constr2->vec);
 		qval_t tmp;
@@ -313,7 +453,13 @@ static void constr_iaddmul(constr_p constr1, qval_t coeff, constr_p constr2) {
 	}
 }
 
-static void constr_makepos(constr_p constr) {
+/**
+ * Turn @a constr into an equivalent constraint whose constant term is
+ * non-negative.
+ * @a constr must be an equality.
+ */
+static void constr_makepos(constr_p constr)
+{
 	assert(constr->rel == CONSTR_EQ);
 	if (qval_cmp_i(constr->cst, 0, 1) < 0) {
 		vec_ineg(constr->vec);
@@ -321,7 +467,13 @@ static void constr_makepos(constr_p constr) {
 	}
 }
 
-static void constr_apply_pivot(constr_p constr, var_t pivot_var, constr_p pivot_constr) {
+/**
+ * Make @a pivot_var coefficient null in @a constr, using @a pivot_constr.
+ * @a pivot_constr must be an equality.
+ */
+static void constr_apply_pivot(constr_p constr, var_t pivot_var,
+		constr_p pivot_constr)
+{
 	qval_t coeff;
 	qval_init(coeff);
 	constr_get_coeff(coeff, constr, pivot_var);
@@ -330,7 +482,11 @@ static void constr_apply_pivot(constr_p constr, var_t pivot_var, constr_p pivot_
 	qval_clear(coeff);
 }
 
-static int NOWUNUSED constr_fprint(FILE* stream, constr_p constr) {
+/**
+ * Output @a constr on stdio stream @a stream.
+ */
+static int NOWUNUSED constr_fprint(FILE* stream, constr_p constr)
+{
 	int c = vec_fprint(stream, constr->vec);
 	if (constr->rel == CONSTR_EQ) {
 		c += fprintf(stream, " == ");
@@ -342,20 +498,43 @@ static int NOWUNUSED constr_fprint(FILE* stream, constr_p constr) {
 	return c;
 }
 
+/**
+ * Output @a constr on @c stdout.
+ */
 #define constr_print(constr) (constr_fprint(stdout, constr))
 
-// Simplex table
+/**@}*/
 
+/**
+ * @name Simplex Tableau
+ * A simplex tableau consists in a list of constraint, an objective function to
+ * minimize and its current value. Those data evolve when the simplex is
+ * running.
+ */
+/**@{*/
+
+/**
+ * Type of simplex tableau.
+ * The objective function and the associated value are stored into a constraint
+ * @c obj, other constraints are in the constraint table @c constr.
+ */
 typedef struct table_s {
-	constr_t obj;
-	constr_t* constrs;
-	int nbvars;
-	int nbconstrs;
+	constr_t obj; /**< objective function and value */
+	constr_t* constrs; /**< constraints */
+	int nbvars; /**< number of variables */
+	int nbconstrs; /**< number of constraints */
 } table_s, *table_p;
 
+/**
+ * Type of simplex tableau.
+ */
 typedef table_s table_t[1];
 
-static void table_init(table_p tbl, int nbconstrs) {
+/**
+ * Initialize @a tbl, with room for @a nbconstrs constraints.
+ */
+static void table_init(table_p tbl, int nbconstrs)
+{
 	constr_init(tbl->obj);
 	tbl->constrs = safe_malloc(nbconstrs * sizeof(constr_t));
 	int i;
@@ -366,7 +545,11 @@ static void table_init(table_p tbl, int nbconstrs) {
 	tbl->nbconstrs = nbconstrs;
 }
 
-static void table_clear(table_p tbl) {
+/**
+ * Free the space occupied by @a tbl.
+ */
+static void table_clear(table_p tbl)
+{
 	constr_clear(tbl->obj);
 	int i;
 	for (i = 0; i < tbl->nbconstrs; i++) {
@@ -375,18 +558,40 @@ static void table_clear(table_p tbl) {
 	free(tbl->constrs);
 }
 
+/**
+ * Number of variables in @a tbl.
+ */
 #define table_get_nbvars(tbl) ((tbl)->nbvars)
 
+/**
+ * Number of constraints in @a tbl.
+ */
 #define table_get_nbconstrs(tbl) ((tbl)->nbconstrs)
 
-static void table_makepos(table_p tbl) {
+/**
+ * Turn constraints into @a tbl into equivalent ones, whose constant term is
+ * non-negative.
+ * All constraints must be equalities.
+ */
+static void table_makepos(table_p tbl)
+{
 	int i;
 	for (i = 0; i < tbl->nbconstrs; i++) {
 		constr_makepos(tbl->constrs[i]);
 	}
 }
 
-static void table_addsignvars(table_p tbl) {
+/**
+ * Ensure that all variables in @a tbl are non-negative.
+ * Each occurrence of a unknown-sign variable @a a @a x is turned into
+ * @a a @a x+ - @a a @a x-, where @x+ and @x- are new, non-negative variables.
+ * Each occurrence of a negative variable @a a @a x is turned into -@a a @a x',
+ * where @a x' is a new, non-negative variable.
+ * We try to do this only when necessary, to limit the amount of newly created
+ * variables.
+ */
+static void table_addsignvars(table_p tbl)
+{
 	// first, we try to determine the sign of variables
 	static int vars_info[VAR_MAXNB]; // -1 negative or null, +1 positive or null, 0 unknown
 	int i;
@@ -452,7 +657,14 @@ static void table_addsignvars(table_p tbl) {
 	qval_clear(coeff);
 }
 
-static void table_addofsvars(table_p tbl) {
+/**
+ * Ensure that all constraints in @a tbl are equalities.
+ * A new offset variable is introduced into inequalities to turn them in
+ * equalities. E.g., inequality @a a1 @a x1 + ... + @a an @a xn <= @a b
+ * becomes: @a a1 @a x1 + ... + @a an @a xn + y = @a b.
+ */
+static void table_addofsvars(table_p tbl)
+{
 	qval_t one;
 	qval_init(one); qval_set_i(one, 1, 1);
 	int i;
@@ -469,7 +681,12 @@ static void table_addofsvars(table_p tbl) {
 
 static int NOWUNUSED table_fprint(FILE*, table_p);
 
-static void table_canonicalize(table_p tbl) {
+/**
+ * Canonicalize @a tbl: ensure that all variables are non-negative, and all
+ * constraints are equalities whose constant term is non-negative.
+ */
+static void table_canonicalize(table_p tbl)
+{
 	DEBUG(
 		fprintf(stderr, "Initial system:\n");
 		table_fprint(stderr, tbl);
@@ -491,7 +708,11 @@ static void table_canonicalize(table_p tbl) {
 	);
 }
 
-static void table_set_obj(table_p tbl) {
+/**
+ * Initialize the objective function and value from constraints in @a tbl.
+ */
+static void table_set_obj(table_p tbl)
+{
 	constr_p obj = tbl->obj;
 	int i;
 	for (i = 0; i < tbl->nbconstrs; i++) {
@@ -500,7 +721,12 @@ static void table_set_obj(table_p tbl) {
 	}
 }
 
-static void table_addobjvars(table_p tbl) {
+/**
+ * Add objective variables to each constraint of @tbl whose constant term is
+ * not zero.
+ */
+static void table_addobjvars(table_p tbl)
+{
 	qval_t one;
 	qval_init(one); qval_set_i(one, 1, 1);
 	int i;
@@ -516,7 +742,11 @@ static void table_addobjvars(table_p tbl) {
 	qval_clear(one);
 }
 
-static void table_prepare(table_p tbl) {
+/**
+ * Canonicalize @a tbl, set the objective and add objective variables.
+ */
+static void table_prepare(table_p tbl)
+{
 	table_canonicalize(tbl);
 	table_set_obj(tbl);
 	table_addobjvars(tbl);
@@ -527,9 +757,13 @@ static void table_prepare(table_p tbl) {
 	);
 }
 
-static var_t table_get_pivotvar(table_p tbl) {
-	// Bland's rule: find the lowest-numbered variable with negative value in the
-	// objective
+/**
+ * Get the next pivot variable in @tbl.
+ * Bland's rule is used to ensure termination: pivot variable is the
+ * lowest-numbered variable whose objective coefficient is negative.
+ */
+static var_t table_get_pivotvar(table_p tbl)
+{
 	var_t var = VAR_NULL;
 	vec_p vec;
 	for (vec = tbl->obj->vec; vec != VEC_NULL; vec = vec->succ) {
@@ -540,7 +774,12 @@ static var_t table_get_pivotvar(table_p tbl) {
 	return var;
 }
 
-static var_t table_get_assocvar(table_p tbl, int row) {
+/**
+ * Retrieve the variable associated with the row (i.e. constraint) @a row in @a
+ * tbl.
+ */
+static var_t table_get_assocvar(table_p tbl, int row)
+{
 	if (row != -1) {
 		qval_t tmp;
 		qval_init(tmp);
@@ -570,9 +809,14 @@ static var_t table_get_assocvar(table_p tbl, int row) {
 	return VAR_NULL;
 }
 
-static int table_get_pivotrow(table_p tbl, var_t var) {
-	// Bland's rule: among the rows with the pivot_ratio ratio, choose the one with
-	// the smaller associated variable index
+/**
+ * Get the next pivot row (i.e. constraint) in @tbl, corresponding to pivot
+ * variable @var.
+ * Bland's rule is used to ensure termination: among the rows with the best
+ * ratio, choose the one whose associated variable index is the smaller.
+ */
+static int table_get_pivotrow(table_p tbl, var_t var)
+{
 	int pivot_row = -1;
 	if (var != VAR_NULL) {
 		var_t pivot_assoc = VAR_NULL;
@@ -604,13 +848,22 @@ static int table_get_pivotrow(table_p tbl, var_t var) {
 	return pivot_row;
 }
 
-static bool table_get_pivot(table_p tbl, var_t* pvar, int* prow) {
+/**
+ * Get the next pivot variable and row in @tbl, and store them in @a pvar and
+ * @a prow respectively.
+ */
+static bool table_get_pivot(table_p tbl, var_t* pvar, int* prow)
+{
 	*pvar = table_get_pivotvar(tbl);
 	*prow = table_get_pivotrow(tbl, *pvar);
 	return *prow != -1;
 }
 
-static void table_apply_pivot(table_p tbl, var_t var, int row) {
+/**
+ * Apply pivot (@a var, @a row) in @a tbl.
+ */
+static void table_apply_pivot(table_p tbl, var_t var, int row)
+{
 	constr_p constr = tbl->constrs[row];
 	// pivot constraint is normalized s.t. its coefficient on var is 1
 	qval_t coeff;
@@ -629,7 +882,11 @@ static void table_apply_pivot(table_p tbl, var_t var, int row) {
 	}
 }
 
-static void table_run_simplex(table_p tbl) {
+/**
+ * Run simplex algorithm on @tbl.
+ */
+static void table_run_simplex(table_p tbl)
+{
 	int i = 0;
 	while (true) {
 		var_t var;
@@ -656,13 +913,22 @@ static void table_run_simplex(table_p tbl) {
 	}
 }
 
-static bool table_get_feasibility(table_p tbl) {
+/**
+ * Determine whether the constraint system described in @a tbl is feasible,
+ * using simplex method.
+ */
+static bool table_get_feasibility(table_p tbl)
+{
 	table_prepare(tbl);
 	table_run_simplex(tbl);
 	return qval_equal_i(tbl->obj->cst, 0, 1);
 }
 
-static int NOWUNUSED table_fprint(FILE* stream, table_p tbl) {
+/**
+ * Output @a tbl on stdio stream @a stream.
+ */
+static int NOWUNUSED table_fprint(FILE* stream, table_p tbl)
+{
 	int c = constr_fprint(stream, tbl->obj);
 	c += fprintf(stream, "\n");
 	int i;
@@ -689,24 +955,54 @@ static int NOWUNUSED table_fprint(FILE* stream, table_p tbl) {
 	return c;
 }
 
+/**
+ * Output @a tbl on @c stdout.
+ */
 #define table_print(tbl) (table_fprint(stdout, tbl))
 
-// Datatype conversions
+/**@}*/
 
+/**
+ * @name Datatype Conversion
+ * Here are utility functions to convert Linear types (@c Variable, @c Vecteur,
+ * @c Contrainte, @c Systeme) to datatypes used in this files.
+ * In most of conversion functions, a variable table @a vartbl is passed, to
+ * help translating Linear named variables into indices.
+ */
+/**@{*/
+
+/**
+ * Type of variable tables.
+ */
 typedef struct {
-	int nbvars;
-	Variable names[VAR_MAXNB];
+	int nbvars; /**< number of variables */
+	Variable names[VAR_MAXNB]; /** names of variables */
 } vartbl_s, *vartbl_p;
 
+/**
+ * Type of variable tables.
+ */
 typedef vartbl_s vartbl_t[1];
 
-static void vartbl_init(vartbl_p vartbl) {
+/**
+ * Initialize @vartbl to an empty table.
+ */
+static void vartbl_init(vartbl_p vartbl)
+{
 	vartbl->nbvars = 0;
 }
 
+/**
+ * Free the space occupied by @a vartbl.
+ */
 #define vartbl_clear(vartbl)
 
-static var_t vartbl_find(vartbl_p vartbl, Variable name) {
+/**
+ * Get the variable index associated to @a name, creating a new one if
+ * necessary.
+ */
+static var_t vartbl_find(vartbl_p vartbl, Variable name)
+{
 	int i;
 	for (i = 0; i < vartbl->nbvars; i++) {
 		if (vartbl->names[i] == name) {
@@ -717,7 +1013,11 @@ static var_t vartbl_find(vartbl_p vartbl, Variable name) {
 	return vartbl->nbvars++;
 }
 
-static void vec_set_vecteur(vartbl_t vartbl, vec_p* pvec, Pvecteur vec) {
+/**
+ * Copy @a vec into @a pvec.
+ */
+static void vec_set_vecteur(vartbl_t vartbl, vec_p* pvec, Pvecteur vec)
+{
 	vec_clear(pvec);
 	qval_t coeff;
 	qval_init(coeff);
@@ -731,7 +1031,12 @@ static void vec_set_vecteur(vartbl_t vartbl, vec_p* pvec, Pvecteur vec) {
 	qval_clear(coeff);
 }
 
-static void constr_set_contrainte(vartbl_t vartbl, constr_p constr1, Pcontrainte constr2, bool is_ineq) {
+/**
+ * Copy @a constr2 into @a constr1.
+ */
+static void constr_set_contrainte(vartbl_t vartbl,
+		constr_p constr1, Pcontrainte constr2, bool is_ineq)
+{
 	vec_set_vecteur(vartbl, &constr1->vec, constr2->vecteur);
 	constr1->rel = is_ineq ? CONSTR_LE : CONSTR_EQ;
 	Pvecteur vec;
@@ -743,7 +1048,11 @@ static void constr_set_contrainte(vartbl_t vartbl, constr_p constr1, Pcontrainte
 	}
 }
 
-static void table_init_set_systeme(table_p tbl, Psysteme sys) {
+/**
+ * Initialize @a tbl from @a sys.
+ */
+static void table_init_set_systeme(table_p tbl, Psysteme sys)
+{
 	vartbl_t vartbl;
 	vartbl_init(vartbl);
 	table_init(tbl, sys->nb_eq + sys->nb_ineq);
@@ -761,9 +1070,20 @@ static void table_init_set_systeme(table_p tbl, Psysteme sys) {
 	vartbl_clear(vartbl);
 }
 
-// Main function
+/**@}*/
 
-static inline bool sc_get_feasibility(Psysteme sys, int ofl_ctrl) {
+/**
+ * Main Function
+ */
+/**@{*/
+
+/**
+ * Determine whether a system @a sys of equations and inequations is feasible.
+ * Parameter @a ofl_ctrl indicates whether an overflow control is performed
+ * (possible values: @c NO_OFL_CTRL, @c FWD_OFL_CTRL).
+ */
+static inline bool sc_get_feasibility(Psysteme sys, int ofl_ctrl)
+{
 	if (ofl_ctrl != FWD_OFL_CTRL) {
 		fprintf(stderr, "[sc_simplexe_feasibility] "
 			"should not (yet) be called with control %d...\n", ofl_ctrl);
@@ -784,6 +1104,8 @@ static inline bool sc_get_feasibility(Psysteme sys, int ofl_ctrl) {
 	UNCATCH(simplex_arithmetic_error | timeout_error | overflow_error);
 	return feasible;
 }
+
+/**@}*/
 
 #endif
 
