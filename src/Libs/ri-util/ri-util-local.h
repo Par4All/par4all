@@ -906,6 +906,7 @@
 #define ATOLL_FUNCTION_NAME             "atoll"
 #define STRTOD_FUNCTION_NAME            "strtod"
 #define STRTOF_FUNCTION_NAME            "strtof"
+#define STRTOLD_FUNCTION_NAME           "strtold"
 #define STRTOL_FUNCTION_NAME            "strtol"
 #define STRTOLL_FUNCTION_NAME           "strtoll"
 #define STRTOUL_FUNCTION_NAME           "strtoul"
