@@ -3,6 +3,7 @@ include_HEADERS=$(TARGET).h
 BUILT_SOURCES=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libeffects-convex.la
+AM_CPPFLAGS	= $(POLYLIB64_CFLAGS)
 libeffects_convex_la_SOURCES=interface.c \
 		translation.c \
 		methods.c \
@@ -18,6 +19,3 @@ libeffects_convex_la_SOURCES=interface.c \
                 eval.c
 
 include $(srcdir)/../pipslibs_includes.mk
-
-# SOS
-CFLAGS	+= $(POLYLIB64_CFLAGS)
