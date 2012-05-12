@@ -5760,9 +5760,18 @@ anywhere location.
 POINTS_TO_NULL_POINTER_DEREFERENCING FALSE
 \end{PipsProp}
 
-The property \PipsPropRef{POINTS_TO_NULL_POINTER_INITIALIZATION} allows the initialization of formal parameters and
-global variables to null location. The safe value is  {\tt TRUE}, it prevents from dereferencing a null pointer. When perfermorming
-interprocedural analysis it should be turned to {\tt FALSE}.
+The property \PipsPropRef{POINTS_TO_NULL_POINTER_INITIALIZATION}
+allows the initialization of pointers that are formal parameters or
+global variables to \verb/NULL/ when computing a calling context. The
+most accurate property value is {\tt TRUE}, which makes sure that
+generated points-to stubs are different from NULL because two arcs are
+always generated: an arc towards the new points-to stub and an arc
+towards the \verb/NULL/ location. Thus it prevents from dereferencing
+a null pointer when dereferencing a points-to stub and it allows the
+comparison of two points-to stubs when a condition such as \verb/p!=q/
+is interpreted or the comparison of one points-to stub to NULL as in
+\verb/p!=NULL/. Temporarily, to perfemorm an interprocedural analysis,
+it must be turned to {\tt FALSE}.
 \begin{PipsProp}{POINTS_TO_NULL_POINTER_INITIALIZATION}
   POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
 \end{PipsProp}
