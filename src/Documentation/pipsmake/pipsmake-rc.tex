@@ -11782,6 +11782,18 @@ prefix, which improves readability.
 SCALARIZATION_PREFIX ""
 \end{PipsProp}
 
+When property \PipsPropRef{SCALARIZATION_USE_REGISTERS} is set to
+\texttt{TRUE} (default value), new variables are declared with the
+\texttt{register} qualifier. However, this is not always compatible with
+other phases. Set it to \texttt{FALSE} to toggle off this behavior.
+
+\begin{PipsProp}{SCALARIZATION_USE_REGISTERS}
+SCALARIZATION_USE_REGISTERS TRUE
+\end{PipsProp}
+
+
+
+
 Also, as explained above, Property
 \PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} is used to
 control the way new scalar variables are declared and initialized in

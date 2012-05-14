@@ -587,7 +587,8 @@ static void scalarize_variable_in_statement(entity pv,
   /* FI: the language could be checked, but Fortran prettyprinter
      ignores the qualifier and the qualifier benefits the complexity
      analyzer. */
-  set_register_qualifier(sv);
+  if (get_bool_property("SCALARIZATION_USE_REGISTERS"))
+    set_register_qualifier(sv);
   entity m = get_current_module_entity();
 
   if(get_bool_property("SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST")) {
