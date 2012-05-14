@@ -1065,8 +1065,8 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  * Memory leaks: the freed bucket may be the only bucket containing
  * pointers towards another bucket:
  *
- * ML = {} // Still to be done
- *
+ * PML = {source_to_sinks(r)|r in R}
+ * ML = {m|m in PML && heap_cell_p(m)}
  * Note: for DP and ML, we could compute may and must sets. We only
  * compute must sets to avoid swamping the log file with false alarms.
  *
@@ -1085,6 +1085,7 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
+  list PML = NIL;
 
   list L = expression_to_points_to_sources(lhs, pt_out);
   list R = expression_to_points_to_sinks(lhs, pt_out);
@@ -1169,6 +1170,11 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 	      points_to npt = make_points_to(source, sink, a,
 					     make_descriptor_none());
 	      add_arc_to_pt_map(npt, pt_out);
+	      /* Notify the user that the source of the new nowhere points to relation
+		 is a dangling pointer */
+	      entity b = reference_variable(cell_any_reference(source));
+	      pips_user_warning("Dangling pointer \"%s\".\n",
+				entity_name(b));
 	      //free_points_to(pts);
 	      if(to_be_freed) free_type(t);
 	    }
@@ -1196,24 +1202,26 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /*
      * Other pointers may or must now be dangling because their target
-     * has been freed.
+     * has been freed. Already detected at the level of Gen_2.
      */
 
     FOREACH(CELL, c, R) {
-      if(!sink_in_set_p(c, pt_out)) {
-	if(heap_cell_p(c)) {
-	  entity b = reference_variable(cell_any_reference(c));
+      PML = source_to_sinks(c, pt_out, true);
+      FOREACH(CELL, m, PML) {
+	if(heap_cell_p(m)) {
+	  entity b = reference_variable(cell_any_reference(m));
 	  pips_user_warning("Memory leak for bucket \"%s\".\n",
 			    entity_name(b));
 	}
       }
     }
   }
-  // FI: memory leak(s) in this function?
+
+// FI: memory leak(s) in this function?
   gen_free_list(L);
   gen_free_list(N);
   gen_full_free_list(R);
-
+  gen_free_list(PML);
   return pt_out;
 }
 
