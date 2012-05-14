@@ -1,0 +1,46 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   MyStruct *root;
+
+// Points To:
+// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   root = malloc(sizeof(MyStruct *));
+
+// Points To:
+// root -> *HEAP*_l_11 , EXACT
+
+   root->next = malloc(sizeof(MyStruct *));
+
+// Points To:
+// *HEAP*_l_11 -> *HEAP*_l_12 , EXACT
+// root -> *HEAP*_l_11 , EXACT
+
+   free(root);
+
+// Points To:
+// *HEAP*_l_11 -> *HEAP*_l_12 , EXACT
+// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   root->next->val = 1;
+
+// Points To: none
+
+   printf("val=%d", root->next->val);
+
+// Points To: none
+
+   return 0;
+}
