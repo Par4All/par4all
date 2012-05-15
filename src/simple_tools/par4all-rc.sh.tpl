@@ -46,19 +46,22 @@ export P4A_ROOT=$${P4A_ROOT:-$$P4A_DIST}
 default_p4a_dist=$${default_p4a_dist:-$dist}
 
 # Location of the Par4All_accelerator files.
-export P4A_ACCEL_DIR=$$P4A_DIST/$accel
+export P4A_ACCEL_DIR=$${P4A_ACCEL_DIR:-$$P4A_DIST/$accel}
+
+# Location of PyPS runtime:
+export PIPS_PYPS_RUNTIME_DIR=$${PIPS_PYPS_RUNTIME_DIR:-$$P4A_DIST/share/runtime}
 
 # Location of the Par4All_scmp files.
-export P4A_SCMP_DIR=$$P4A_DIST/$scmp
+export P4A_SCMP_DIR=$${PIPS_ROOT:-$$P4A_DIST/$scmp}
 
 # Location of the Par4All configuration files.
-export P4A_ETC=$$P4A_DIST/etc
+export P4A_ETC=$${PIPS_ROOT:-$$P4A_DIST/etc}
 
 # The Fortran 77 compiler to use.
-export PIPS_F77=$fortran
+export PIPS_F77=$${PIPS_ROOT:-$fortran}
 
 # Location of PIPS, needed in case of relocation
-export PIPS_ROOT=$$P4A_DIST
+export PIPS_ROOT=$${PIPS_ROOT:-$$P4A_DIST}
 
 prepend_to_path_var()
 {
