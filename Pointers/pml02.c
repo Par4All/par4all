@@ -8,8 +8,8 @@ typedef struct foo MyStruct;
 int main()
 {
   MyStruct *root;
-  root = malloc(sizeof(MyStruct*));
-  root->next = malloc(sizeof(MyStruct*));
+  root = malloc(sizeof(MyStruct));
+  root->next = malloc(sizeof(MyStruct));
   free(root);
   return 0;
 }
