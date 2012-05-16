@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -885,7 +885,7 @@ static int hash(Variable s)
  * BC, 13/12/94
  */
 bool 
-sc_simplexe_feasibility_ofl_ctrl(
+sc_simplex_feasibility_ofl_ctrl_fixprec(
     Psysteme sc, 
     int ofl_ctrl)
 {

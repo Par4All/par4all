@@ -140,6 +140,13 @@ filtering_catch_alarm_S (int sig)
 }
 #endif
 
+// GMP support
+
+static bool usegmp() {
+	char* env = getenv("LINEAR_USE_GMP");
+	return env && atoi(env) != 0;
+}
+
 /*  just a test to improve the Simplex/FM decision.
  * c is a list of constraints, equalities or inequalities
  * pc is the number of constraints in the list
@@ -505,9 +512,18 @@ static bool internal_sc_feasibility
 	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
 	    }
 	  }
+	} 
+	// sc_fourier_motzkin does not (yet?) support GMP
+	else if (usegmp()) {
+		if (n_cont_eq >= 6) {
+			ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc, true, int_p, ofl_ctrl);
+		}
+		else {
+			ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc, false, int_p, ofl_ctrl);
+		}
 	}else{
-	  /*FM*/
-	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);
+		/*FM*/
+		ok = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);
 	}
 	UNCATCH(overflow_error);    
       }/*of TRY*/
@@ -876,9 +892,9 @@ int ofl_ctrl;
     if (project_eq_p) {
       w = sc_copy(sc);
       ok = sc_fm_project_variables(&w, int_p, true, ofl_ctrl);
-      ok = sc_simplexe_feasibility_ofl_ctrl(w,ofl_ctrl);
+      ok = sc_simplex_feasibility_ofl_ctrl(w,ofl_ctrl);
     }else {    
-      ok = sc_simplexe_feasibility_ofl_ctrl(sc,ofl_ctrl);
+      ok = sc_simplex_feasibility_ofl_ctrl(sc,ofl_ctrl);
     } 
 
 #ifdef FILTERING

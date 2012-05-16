@@ -21,7 +21,6 @@
 
 ifdef WITH_DYNAMIC_LIBRARIES
 TARGET=linearlibs
-LDFLAGS+=-lpolylib
 DYNLIB_TARGET=lib$(TARGET).so
 DYNLIB_ARCHIVES=$(addprefix $(LIB.d)/lib, $(addsuffix .a, $(linear.libs)))
 endif
