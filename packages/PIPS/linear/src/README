@@ -19,9 +19,6 @@ The C data type for the coefficients is Value. It can be set to 32 or
 64 bit integers, but is incompatible with big nums. Arithmetic
 overflows are trapped.
 
-The convex hull is based on the Polylib implementation of
-Chernikova. The Polylib must be installed to use Linear fully.
-
 The library is also interfaced with the Janus libray.
 
 BUILDING THE LIBRARIES

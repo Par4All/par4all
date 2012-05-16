@@ -240,7 +240,6 @@ les anciens noms des fonctions */
 #define integer_projection(sci,sc,v) \
  sc_integer_projection_along_variable((sci),(sc),(v))
 
-
 typedef int (*two_int_infop)[2];
 
 #endif /* SYSTEME */

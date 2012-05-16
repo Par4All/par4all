@@ -1,18 +1,18 @@
 /* A substitute for POSIX 2008 <stddef.h>, for platforms that have issues.
 
-   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2009-2011 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
@@ -26,6 +26,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 #if defined __need_wchar_t || defined __need_size_t  \
   || defined __need_ptrdiff_t || defined __need_NULL \
@@ -37,9 +38,9 @@
    remember if special invocation has ever been used to obtain wint_t,
    in which case we need to clean up NULL yet again.  */
 
-# if !(defined _GL_STDDEF_H && defined _GL_STDDEF_WINT_T)
+# if !(defined _@GUARD_PREFIX@_STDDEF_H && defined _GL_STDDEF_WINT_T)
 #  ifdef __need_wint_t
-#   undef _GL_STDDEF_H
+#   undef _@GUARD_PREFIX@_STDDEF_H
 #   define _GL_STDDEF_WINT_T
 #  endif
 #  @INCLUDE_NEXT@ @NEXT_STDDEF_H@
@@ -48,14 +49,14 @@
 #else
 /* Normal invocation convention.  */
 
-# ifndef _GL_STDDEF_H
+# ifndef _@GUARD_PREFIX@_STDDEF_H
 
 /* The include_next requires a split double-inclusion guard.  */
 
 #  @INCLUDE_NEXT@ @NEXT_STDDEF_H@
 
-#  ifndef _GL_STDDEF_H
-#   define _GL_STDDEF_H
+#  ifndef _@GUARD_PREFIX@_STDDEF_H
+#   define _@GUARD_PREFIX@_STDDEF_H
 
 /* On NetBSD 5.0, the definition of NULL lacks proper parentheses.  */
 #if @REPLACE_NULL@
@@ -81,6 +82,6 @@
 # define wchar_t int
 #endif
 
-#  endif /* _GL_STDDEF_H */
-# endif /* _GL_STDDEF_H */
+#  endif /* _@GUARD_PREFIX@_STDDEF_H */
+# endif /* _@GUARD_PREFIX@_STDDEF_H */
 #endif /* __need_XXX */

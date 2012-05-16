@@ -30,6 +30,6 @@ obsolete_files= elarg.c elim_red.c env.c incl_p_h.c inter_poly.c \
 	poly.c sc_elarg.c inter_demi.c inter_hyp.c inter_obj.c saturation.c \
 	saturation.h sc_to_sg.c syst_convert.c liste-table.h GENPGM_TAGS.h
 
-libpolyedre_la_SOURCES= 	sc_enveloppe.c chernikova.c 
+libpolyedre_la_SOURCES= 	sc_enveloppe.c chernikova_fixprec.c chernikova_mulprec.c chernikova.c
 include $(top_srcdir)/makes/cproto.mk
 

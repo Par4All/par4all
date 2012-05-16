@@ -8,11 +8,10 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 
 AM_INIT_AUTOMAKE([gnu 1.0])
-AC_LANG([C])
 
 # Checks for programs.
 AX_PROG_YACC
-AC_PROG_CC
+AC_PROG_CC_C99
 gl_EARLY
 
 # must be right there
@@ -22,9 +21,6 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
-
-# Checks for libraries.
-AX_CHECK_PKG([polylib64],[Polyhedron_Enumerate],[polylib.h])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
@@ -71,6 +67,11 @@ AX_ARG_ENABLE([devel-mode],[enable developer mode],[no],
 			   	CFLAGS="-g -O0 -Wall -Werror"
 			  ]
 )
+AX_ARG_ENABLE([gmp],[enable use of GNU multi-precision library],[no],
+			  [
+			   AX_CHECK_PKG([gmp], [__gmpz_mul], [gmp.h])
+			   ]
+			  )
 
 AC_CONFIG_FILES([Makefile
 				 linearlibs.pc
@@ -90,6 +91,6 @@ AC_CONFIG_FILES([Makefile
                  src/sparse_sc/Makefile
                  src/vecteur/Makefile])
 
-AX_DEPENDS([minimum],[lex yacc polylib64 cproto std_headers alarm_gettimeofday_mkdir])
-AX_OUTPUT([minimum])
+AX_DEPENDS([minimum],[lex yacc cproto std_headers alarm_gettimeofday_mkdir])
+AX_OUTPUT([minimum],[gmp])
 
