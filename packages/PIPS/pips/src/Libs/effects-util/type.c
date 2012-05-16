@@ -259,30 +259,35 @@ static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to
       {
 	basic current_basic = variable_basic(type_variable(current_type)); /* current basic */
 	list l_current_dim = variable_dimensions(type_variable(current_type)); /* current type array dimensions */
-	size_t current_nb_dim = gen_length(l_current_dim);
+	int current_nb_dim = gen_length(l_current_dim);
+	int ref_l_ind_nb_dim = (int) gen_length(ref_l_ind);
+	int common_nb_dim = MIN(current_nb_dim, ref_l_ind_nb_dim);
 
 	pips_debug(8, "input type : %s\n", type_to_string(current_type));
-	pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
-
+	pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), current_nb_dim);
+	pips_debug(8, "common number of dimensions: %d\n", common_nb_dim);
 	/* the remainder of the function heavily relies on the following assumption */
-	pips_assert("there should be no memory access paths to variable names\n", gen_length(ref_l_ind) >= current_nb_dim);
+	//pips_assert("there should be no memory access paths to variable names\n", (int) gen_length(ref_l_ind) >= current_nb_dim);
 
-	if (ENDP(ref_l_ind)) /* We have reached the current basic and there are no array dimensions to skip */
+	if (ENDP(ref_l_ind)) /* We have reached the current type and there are no array dimensions to skip */
 	  {
 	    t = current_type;
 	    *to_be_freed = false;
 	  }
 	else
 	  {
-	    /* skip array dimensions if any */
-	    for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
+	    /* skip common array dimensions if any */
+	    for(int i=0; i< common_nb_dim; i++, POP(ref_l_ind), POP(l_current_dim));
 
 	    if (ENDP(ref_l_ind)) /* We have reached the current basic */
 	      {
 		/* Warning : qualifiers are set to NIL, because I do not see
 		   the need for something else for the moment. BC.
 		*/
-		t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
+		t = make_type(is_type_variable,
+			      make_variable(copy_basic(current_basic),
+					    gen_full_copy_list(l_current_dim),
+					    NIL));
 		*to_be_freed = true;
 	      }
 	    else
@@ -462,6 +467,25 @@ type points_to_reference_to_type(reference ref, bool *to_be_freed)
 
   return t;
 }
+
+/* FI: I need more generality than is offered by expression_to_type()
+   because fields are assimilated to subscripts. */
+type points_to_expression_to_type(expression e, bool * to_be_freed)
+{
+  type t = type_undefined;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    t = points_to_reference_to_type(r, to_be_freed);
+  }
+  else {
+    *to_be_freed = true;
+    t = expression_to_type(e);
+  }
+
+  return t;
+}
+
 /* FI: I need more generality than is offered by cell_to_type() */
 type points_to_cell_to_type(cell c, bool *to_be_freed)
 {

@@ -31,8 +31,8 @@ CLEANFILES=pips_includes
 lib_LTLIBRARIES=libpipslibs.la
 
 libpipslibs_la_SOURCES=
-libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS) $(LDFLAGS_NO_UNDEFINED)
-libpipslibs_la_CPPFLAGS=$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
+libpipslibs_la_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS) $(POLYLIB64_LIBS) $(LDFLAGS_NO_UNDEFINED)
+libpipslibs_la_CPPFLAGS=$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS) $(POLYLIB64_CFLAGS)
 libpipslibs_la_LIBADD=\
 	top-level/libtop-level.la\
 	pipsmake/libpipsmake.la\

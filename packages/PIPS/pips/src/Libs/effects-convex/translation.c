@@ -2279,7 +2279,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		      FOREACH(ENTITY,phi, l_phi)
 			{
 			  bool exact_projection;
-			  sc_output = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_output, phi, &exact_projection);
+			  sc_input = cell_reference_sc_exact_projection_along_variable(*output_ref, sc_input, phi, &exact_projection);
 			  *exact_p = *exact_p && exact_projection;
 			}
 		    }

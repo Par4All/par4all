@@ -1,0 +1,29 @@
+# This is a Python hack to change a global variable into something more
+# dynamic, looking to an environment variable, if any.
+
+# This is needed to allow PyPS to be moved around at other locations than
+# envisioned without having to patch this file.
+
+
+import os
+
+# The name of the variable used to specify where to find the PyPS runtime:
+PIPS_PYPS_RUNTIME_DIR_VARNAME = "PIPS_PYPS_RUNTIME_DIR"
+
+def PypsRuntimeDir(default_dir):
+    "Overide the string value access with a possible environment variable"
+    if PIPS_PYPS_RUNTIME_DIR_VARNAME in os.environ:
+        # If the PIPS_PYPS_RUNTIME_DIR_VARNAME environment variable is
+        # set, use it:
+        return os.environ[PIPS_PYPS_RUNTIME_DIR_VARNAME]
+    else:
+        # Use the compile-time value:
+        return default_dir
+
+# Some test cases:
+# Use to be: pypsruntime="/usr/local/par4all%/share/runtime"
+
+# Now the use case is:
+#pypsruntime = PypsRuntimeDir("/usr/local/par4all%/share/runtime")
+#print pypsruntime
+
