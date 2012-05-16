@@ -69,6 +69,8 @@ default_properties = dict(
     # Well, François Irigoin seems to have improved this, so avoid
     # the spam of parenthesis...
     # PRETTYPRINT_ALL_PARENTHESES = True
+
+    SCALARIZATION_USE_REGISTERS = False
 )
 
 # The default values of some PIPS properties are OK for C but has to be
