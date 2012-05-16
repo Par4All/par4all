@@ -614,7 +614,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
  */
 points_to create_k_limited_stub_points_to(cell source, type t, pt_map in)
 {
-  int k = get_int_property("POINTS_TO_K_LIMITING");
+  int k = get_int_property("POINTS_TO_PATH_LIMIT");
   pips_assert("k is greater than one", k>=1);
   points_to pt = points_to_undefined;
   list p = CONS(CELL, source, NIL); // points-to path...
@@ -678,6 +678,8 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
 list source_to_sinks(cell source, set pts, bool fresh_p)
 {
   list sinks = NIL;
+  // AM: Get the property POINTS_TO_NULL_POINTER_INITIALIZATION
+  bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
 
   /* Can we expect a sink? */
   if(nowhere_cell_p(source)) {
@@ -755,14 +757,18 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
 	  /* The pointer may be NULL */
-	  cell nsource = copy_cell(source);
-	  cell nsink = make_null_pointer_value_cell();
-	  points_to npt = make_points_to(nsource, nsink,
-					 make_approximation_may(),
-					 make_descriptor_none());
-	  pts = add_arc_to_pt_map(npt, pts);
-	  add_arc_to_points_to_context(copy_points_to(npt));
-	  sinks = CONS(CELL, copy_cell(nsink), sinks);
+	  /* cell nsource = copy_cell(source); */
+	  /* cell nsink = make_null_pointer_value_cell(); */
+	  /* points_to npt = make_points_to(nsource, nsink, */
+	  /* 				 make_approximation_may(), */
+	  /* 				 make_descriptor_none()); */
+	  /* pts = add_arc_to_pt_map(npt, pts); */
+	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
+	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
+	if(null_initialization_p){
+	  list ls = null_to_sinks(source, pts);
+	  sinks = gen_nconc(ls, sinks);
+	}
       }
       else if(top_level_entity_p(v) || static_global_variable_p(v)) {
 	type st = type_to_pointed_type(ultimate_type(entity_type(v)));
@@ -798,14 +804,18 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	   */
 	  ;
 	  /* The pointer may be NULL */
-	  cell nsource = copy_cell(source);
-	  cell nsink = make_null_pointer_value_cell();
-	  points_to npt = make_points_to(nsource, nsink,
-					 make_approximation_may(),
-					 make_descriptor_none());
-	  pts = add_arc_to_pt_map(npt, pts);
-	  add_arc_to_points_to_context(copy_points_to(npt));
-	  sinks = CONS(CELL, copy_cell(nsink), sinks);
+	  /* cell nsource = copy_cell(source); */
+	  /* cell nsink = make_null_pointer_value_cell(); */
+	  /* points_to npt = make_points_to(nsource, nsink, */
+	  /* 				 make_approximation_may(), */
+	  /* 				 make_descriptor_none()); */
+	  /* pts = add_arc_to_pt_map(npt, pts); */
+	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
+	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
+	   if(null_initialization_p){
+	     list ls = null_to_sinks(source, pts);
+	     sinks = gen_nconc(ls, sinks);
+	   }
 	}
       }
       else if(entity_stub_sink_p(v)) {
@@ -821,14 +831,18 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  add_arc_to_points_to_context(copy_points_to(pt));
 	  sinks = source_to_sinks(source, pts, false);
 	  /* The pointer may be NULL */
-	  cell nsource = copy_cell(source);
-	  cell nsink = make_null_pointer_value_cell();
-	  points_to npt = make_points_to(nsource, nsink,
-					 make_approximation_may(),
-					 make_descriptor_none());
-	  pts = add_arc_to_pt_map(npt, pts);
-	  add_arc_to_points_to_context(copy_points_to(npt));
-	  sinks = CONS(CELL, copy_cell(nsink), sinks);
+	  /* cell nsource = copy_cell(source); */
+	  /* cell nsink = make_null_pointer_value_cell(); */
+	  /* points_to npt = make_points_to(nsource, nsink, */
+	  /* 				 make_approximation_may(), */
+	  /* 				 make_descriptor_none()); */
+	  /* pts = add_arc_to_pt_map(npt, pts); */
+	  /* add_arc_to_points_to_context(copy_points_to(npt)); */
+	  /* sinks = CONS(CELL, copy_cell(nsink), sinks); */
+	  if(null_initialization_p) {
+	   list ls = null_to_sinks(source, pts);
+	   sinks = gen_nconc(ls, sinks);	 
+	  }
 	}
 	if(struct_type_p(rt)) {
 	  // FI FI FI - to be really programmed with the field type
@@ -846,15 +860,34 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	}
       }
       if(ENDP(sinks)) {
+	/* We must be analyzing dead code... */
 	reference r = cell_any_reference(source);
 	print_reference(r);
-	pips_internal_error("Sink missing for a source based on \"%s\".\n",
-			    entity_user_name(v));
+	pips_user_warning("Uninitialized or null pointer dereferenced: "
+			  "Sink missing for a source based on \"%s\".\n"
+			  "Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.\n",
+			  entity_user_name(v));
       }
     }
   }
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
+  return sinks;
+}
+
+/* Create a list of null sinks and add a new null points-to relation to pts.
+   pts is modified by side effect.
+*/
+list null_to_sinks(cell source, set pts)
+{
+  cell nsource = copy_cell(source);
+  cell nsink = make_null_pointer_value_cell();
+  points_to npt = make_points_to(nsource, nsink,
+				 make_approximation_may(),
+				 make_descriptor_none());
+  pts = add_arc_to_pt_map(npt, pts);
+  add_arc_to_points_to_context(copy_points_to(npt));
+  list sinks = CONS(CELL, copy_cell(nsink), NIL);
   return sinks;
 }
 

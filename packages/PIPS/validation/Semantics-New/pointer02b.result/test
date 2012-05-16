@@ -3,6 +3,9 @@ Proper effects for "foo" with points-to information
 
 void foo(double *p)
 {
+//             <    is read   >: p
+   if (!(p!=0))
+      abort();
 //             <    is read   >: _p_1 p
 //             <    is written>: _p_1
    (*p)++;

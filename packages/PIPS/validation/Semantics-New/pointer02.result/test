@@ -26,6 +26,14 @@ void foo(double *p)
 
 //  T() {}
 
+   if (!(p!=0))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T() {}
+
    (*p)++;
 }
 
@@ -85,6 +93,8 @@ Proper effects for "foo" with points-to information
 
 void foo(double *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer02.c", 13, (const char *) 0);
 //             <    is read   >: _p_1 p
 //             <    is written>: _p_1
    (*p)++;
@@ -113,6 +123,8 @@ Cumulated effects for "foo" with points-to information
 //             <    is written>: _p_1
 void foo(double *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer02.c", 13, (const char *) 0);
 //             <    is read   >: _p_1 p
 //             <    is written>: _p_1
    (*p)++;
@@ -146,6 +158,10 @@ Transformers for "foo" with points-to information
 
 void foo(double *p)
 {
+
+//  T() {}
+
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer02.c", 13, (const char *) 0);
 
 //  T() {}
 

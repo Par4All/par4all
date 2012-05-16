@@ -1,27 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int a[10];
-   int *p;
-//             <    is written>: p
-   p = &a[0];
-//             <    is read   >: p
-//             <    is written>: p
-   p = p+1;
-//             <    is read   >: p
-//             <    is written>: p
-   p = p+3;
-//             <    is read   >: p
-//             <    is written>: p
-   p = p-1;
-//             <    is read   >: p
-//             <    is written>: p
-   p = p-2;
-   return 0;
-}
-
 POINTS-TO
 
 

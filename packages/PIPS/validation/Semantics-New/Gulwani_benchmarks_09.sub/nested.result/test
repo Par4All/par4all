@@ -1,0 +1,105 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void nested()
+{
+
+
+//  T(m,t,x,y) {}
+
+   int x, y, m, t;
+
+//  T() {t==0, y==0, 0<=m}
+
+   if (!(y==0&&m>=0&&t==0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(t,y) {t#init==0, y#init==0, 1<=m, t<=m, t+1<=m+y, y+1<=m, y<=t,
+//    0<=y}
+
+
+   while (y<m) {
+
+//  T(y) {y==y#init+1, 1<=m, y<=m}
+
+      y++;
+
+//  T(t) {t==0, 1<=m, y<=m}
+
+      t = 0;
+
+//  T(t) {t#init==0, 1<=m, y<=m, 0<=t, t+1<=y, 1<=y}
+
+      while (t<y)
+
+//  T(t) {t==t#init+1, y<=m, t<=y, 1<=y}
+
+         t++;
+   }
+
+//  T() {m==t, m==y, 0<=m}
+
+   if (!(t==m))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void nested()
+{
+
+
+//  P() {}
+
+   int x, y, m, t;
+
+//  P(m,t,x,y) {}
+
+   if (!(y==0&&m>=0&&t==0))
+
+//  P(m,t,x,y) {}
+
+      exit(0);
+
+//  P(m,t,x,y) {t==0, y==0, 0<=m}
+
+
+   while (y<m) {
+
+//  P(m,t,x,y) {t<=m, t+1<=m+y, y+1<=m, y<=t, 0<=y}
+
+      y++;
+
+//  P(m,t,x,y) {1<=m, t<=m, t+2<=m+y, y<=m, y<=t+1, 1<=y}
+
+      t = 0;
+
+//  P(m,t,x,y) {t==0, 1<=m, y<=m, 1<=y}
+
+      while (t<y)
+
+//  P(m,t,x,y) {y<=m, 0<=t, t+1<=y}
+
+         t++;
+   }
+
+//  P(m,t,x,y) {m==t, m==y, 0<=m}
+
+   if (!(t==m))
+
+//  P() {0==-1}
+
+      exit(1);
+}

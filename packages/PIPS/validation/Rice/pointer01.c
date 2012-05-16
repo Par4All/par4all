@@ -1,9 +1,13 @@
-/* Parallelizarion with pointers */
+/* Parallelization with pointers */
 
-void pointer01(int n, float *p, float *q)
+#include <stdio.h>
+
+void pointer01(int n, float * p, float * q)
 {
   int i;
 
-  for(i=0; i<n; i++)
-    p[i] = q[i];
+  if(p!=NULL && q!=NULL) {
+    for(i=0; i<n; i++)
+      p[i] = q[i];
+  }
 }

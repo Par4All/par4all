@@ -81,7 +81,6 @@ void list06(list l)
 // Points To:
 // _l_1.next -> *NULL_POINTER* , MAY
 // _l_1.next -> _l_1_1 , MAY
-// l -> *ANY_MODULE*:*ANYWHERE* , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // l -> _l_1_1 , MAY

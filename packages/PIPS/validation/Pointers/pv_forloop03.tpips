@@ -8,6 +8,7 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
 
 ##TODO: explain
 

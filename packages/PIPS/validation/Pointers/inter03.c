@@ -1,30 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
 
-#define N 5
-#define M 3
-
-
-
-void foo(int *p)
-{
-  int i;
-  
-  for (i = 0; i<10; i++)
-    p[i] = i;
-  return;
-}
-
-void myprint(int *p)
-{
-  int i;
-  
-  for (i = 0; i<10; i++)
-    printf("\t%d\n", p[i]);
-  return;
-}
-
-int main() 
+int main(int argc, char ** argv) 
 {
   int tab[10];
   int *tab2[10];

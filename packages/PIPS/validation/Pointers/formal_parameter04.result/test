@@ -78,32 +78,27 @@ int formal_parameter04(my_struct *p)
    (p->one)[0] = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 
    (p->two->one)[0] = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 
    (p->two->two->one)[0] = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 
    (p->two->two->two->one)[0] = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 
    p->two->two->two->two = 0;
 
 // Points To:
 // *ANY_MODULE*:*ANYWHERE* -> *NULL_POINTER* , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *NULL_POINTER* , MAY
 // _p_1.two -> *NULL_POINTER* , MAY
 // _p_1.two -> _p_1_1 , MAY
 // _p_1_1.two -> *NULL_POINTER* , MAY
@@ -111,8 +106,7 @@ int formal_parameter04(my_struct *p)
 // _p_1_1_1.two -> *NULL_POINTER* , MAY
 // _p_1_1_1.two -> _p_1_1_1_1 , MAY
 // _p_1_1_1_1.two -> *NULL_POINTER* , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 
    return 0;
 }

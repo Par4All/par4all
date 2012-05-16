@@ -1,0 +1,84 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=x, x<=2, 0<=y, y<=2}
+
+void ex1a(int x, int y)
+{
+
+//  T() {0<=x, x<=2, 0<=y, y<=2}
+
+   if (!(x>=0&&x<=2&&y>=0&&y<=2))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(x,y) {x+y#init==x#init+y, 0<=x, y<=x+2, x<=y+2, 0<=y, y#init<=y}
+
+   while (rand()) {
+
+//  T(x) {x==x#init+2}
+
+      x = x+2;
+
+//  T(y) {y==y#init+2}
+
+      y = y+2;
+   }
+
+//  T() {0<=x, y<=x+2, x<=y+2, 0<=y}
+
+   if (y==0&&x<=4)
+
+//  T() {y==0, 0<=x, x<=2}
+
+      if (!(x<4))
+
+//  T() {0==-1}
+
+         exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ex1a(int x, int y)
+{
+
+//  P() {}
+
+   if (!(x>=0&&x<=2&&y>=0&&y<=2))
+
+//  P() {}
+
+      exit(0);
+
+//  P() {0<=x, x<=2, 0<=y, y<=2}
+
+   while (rand()) {
+
+//  P(x,y) {0<=x, y<=x+2, x<=y+2, 0<=y}
+
+      x = x+2;
+
+//  P(x,y) {2<=x, y<=x, x<=y+4, 0<=y}
+
+      y = y+2;
+   }
+
+//  P(x,y) {0<=x, y<=x+2, x<=y+2, 0<=y}
+
+   if (y==0&&x<=4)
+
+//  P(x,y) {y==0, 0<=x, x<=2}
+
+      if (!(x<4))
+
+//  P() {0==-1}
+
+         exit(1);
+}

@@ -7,7 +7,7 @@ tf_t s;
 int *pi = &i[0];
 tf_t *q = &s;
 
-void call03()
+int global03()
 {
   // To avoid a problem with the semantics of the empty points-to set
   // The solution might be to add always an arc ANYWHERE->ANYWHERE
@@ -17,9 +17,5 @@ void call03()
   pi++;
   q->one = 1;
   q->two[4] = 2;
-}
-
-main()
-{
-  call03();
+  return *p;
 }

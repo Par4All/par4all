@@ -1,6 +1,6 @@
 
 setenv FILE=dynamic-arrays01.c
-setenv WSPACE=dynamic-arrays01_2
+setenv WSPACE=dynamic-arrays01_3
 delete $WSPACE
 setenv CPPFLAGS = -DP4A_COMMUNICATION_RUNTIME
 create $WSPACE $FILE

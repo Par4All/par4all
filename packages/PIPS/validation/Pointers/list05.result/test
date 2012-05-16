@@ -113,7 +113,6 @@ void list_free(list l)
 // _l_1_1_1_1_1_1_1_1_1_1.next -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
-// n -> *ANY_MODULE*:*ANYWHERE* , MAY
 // n -> *NULL_POINTER* , MAY
 // n -> _l_1 , MAY
 // n -> _l_1_1 , MAY
@@ -125,7 +124,6 @@ void list_free(list l)
 // n -> _l_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
-// p -> *ANY_MODULE*:*ANYWHERE* , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _l_1 , MAY
 // p -> _l_1_1 , MAY
@@ -163,7 +161,6 @@ void list_free(list l)
 // _l_1_1_1_1_1_1_1_1_1_1.next -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
-// n -> *ANY_MODULE*:*ANYWHERE* , MAY
 // n -> *NULL_POINTER* , MAY
 // n -> _l_1_1 , MAY
 // n -> _l_1_1_1 , MAY
@@ -174,7 +171,6 @@ void list_free(list l)
 // n -> _l_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
-// p -> *ANY_MODULE*:*ANYWHERE* , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _l_1 , MAY
 // p -> _l_1_1 , MAY
@@ -212,7 +208,6 @@ void list_free(list l)
 // _l_1_1_1_1_1_1_1_1_1_1.next -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
-// n -> *ANY_MODULE*:*ANYWHERE* , MAY
 // n -> *NULL_POINTER* , MAY
 // n -> _l_1_1 , MAY
 // n -> _l_1_1_1 , MAY
@@ -251,7 +246,6 @@ void list_free(list l)
 // _l_1_1_1_1_1_1_1_1_1_1.next -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
-// n -> *ANY_MODULE*:*ANYWHERE* , MAY
 // n -> *NULL_POINTER* , MAY
 // n -> _l_1 , MAY
 // n -> _l_1_1 , MAY
@@ -263,7 +257,6 @@ void list_free(list l)
 // n -> _l_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1 , MAY
 // n -> _l_1_1_1_1_1_1_1_1_1_1 , MAY
-// p -> *ANY_MODULE*:*ANYWHERE* , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _l_1 , MAY
 // p -> _l_1_1 , MAY

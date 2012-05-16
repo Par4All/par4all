@@ -2,12 +2,15 @@
 
 // Defined for a smaller version of pointer01.tpips, used for debugging
 
+#include <assert.h>
+
 int x;
 int y;
 int z;
 
 void foo(int *p)
 {
+  assert(p!=0);
   (*p)++;
 }
 

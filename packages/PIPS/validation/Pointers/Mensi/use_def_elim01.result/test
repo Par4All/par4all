@@ -20,12 +20,35 @@ int use_def_elim01()
 
 POINTS-TO
 
-int use_def_elim01() {
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int use_def_elim01()
+{
+
+// Points To: none
 
    int i, *x, *y;
 
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    i = 2;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    x = &i;
+
+// Points To:
+// x -> i , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    y = x;
 
 // Points To:

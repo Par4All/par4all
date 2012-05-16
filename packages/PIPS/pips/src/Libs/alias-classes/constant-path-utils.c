@@ -353,7 +353,7 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 /*     l = CONS(CELL, c, NIL); */
 /*   else if (set_empty_p(in)|| entity_null_locations_p(reference_variable(cr)) */
 /* 			      || entity_nowhere_locations_p(reference_variable(cr))){ */
-/*     if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){ */
+/*     if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){ */
 /*       pips_user_error("Uninitialized pointer\n"); */
 /*     } */
 /*     else { */
@@ -454,7 +454,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
 	   || entity_null_locations_p(reference_variable(cr))
 	   || entity_nowhere_locations_p(reference_variable(cr)))
       && 
-      !get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
+      get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
     {
       set_methods_for_proper_simple_effects();
       l_in = set_to_sorted_list(in,
@@ -464,7 +464,7 @@ list expression_to_constant_paths(statement s, expression e, set in)
       generic_effects_reset_all_methods();
       l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
     }
-  else if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
+  else if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
       pips_user_warning("Uninitialized pointer");
       bool to_be_freed = false;
       type c_type = cell_to_type(c, &to_be_freed);
@@ -627,7 +627,7 @@ list possible_constant_paths(
   entity anywhere = entity_undefined;
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   if (ENDP(l)) {
-    if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING"))
+    if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING"))
       pips_user_error("Uninitialized pointer \n");
     else {
       pips_user_warning("Uninitialized pointer \n");
@@ -1232,7 +1232,7 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 
   // Possibly generate an error for dereferencing an undefined pointer
   bool error_p =
-    get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+    !get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
   int lc = (int) gen_length(L);
   FOREACH(cell, l, L){
     reference lr = cell_any_reference(l);

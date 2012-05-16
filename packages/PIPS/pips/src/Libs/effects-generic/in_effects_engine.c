@@ -375,7 +375,7 @@ static list r_in_effects_of_sequence(list l_inst, in_effects_context *ctxt)
 	  ifdebug(6)
 	    {
 	      pips_debug(6," in effects for first statement:\n");
-	      (*effects_prettyprint_func)(rb_lin);
+	      (*effects_prettyprint_func)(s1_lin);
 	    }
 
 	  /* Nga Nguyen, 25/04/2002.rb_lin may contain regions with infeasible system {0==-1}

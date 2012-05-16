@@ -1,0 +1,371 @@
+
+POINTS TO for pointer02
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_10 , MAY
+// alloc_pointer -> *HEAP*_l_12 , MAY
+
+pointer alloc_pointer(int v)
+{
+
+
+// Points To: none
+
+   pointer p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   if (0==0)
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = malloc(sizeof(int));
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_12 , MAY
+
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_12 , MAY
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2, p3;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p2 = alloc_pointer(17);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p3 = alloc_pointer(19);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+
+   
+   
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+//#include<stdlib.h>
+
+// Points To: none
+
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+
+// Points To: none
+
+pointer alloc_pointer(int v);
+
+
+
+
+// Points To: none
+
+int main(void);
+
+PROPER  EFFECTS WITH POINTS TO
+
+pointer alloc_pointer(int v)
+{
+
+   pointer p;
+   if (0==0)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(sizeof(int));
+   else
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_10 *HEAP*_l_12
+//             <    is read   >: p v
+
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+int main(void)
+{
+   pointer p1, p2, p3;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p2 _MALLOC_EFFECTS:_MALLOC_
+   p2 = alloc_pointer(17);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p3 _MALLOC_EFFECTS:_MALLOC_
+   p3 = alloc_pointer(19);
+   
+   
+   return;
+}
+//#include<stdlib.h>
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+pointer alloc_pointer(int v);
+
+
+
+int main(void);
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+pointer alloc_pointer(int v)
+{
+
+   pointer p;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   if (0==0)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(sizeof(int));
+   else
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_10 *HEAP*_l_12
+//             <    is read   >: p v
+
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1, p2, p3;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p2 _MALLOC_EFFECTS:_MALLOC_
+   p2 = alloc_pointer(17);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p3 _MALLOC_EFFECTS:_MALLOC_
+   p3 = alloc_pointer(19);
+   
+   
+   return;
+}
+//#include<stdlib.h>
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+pointer alloc_pointer(int v);
+
+
+
+int main(void);
+
+POINTS TO for pointer02
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_10 , MAY
+// alloc_pointer -> *HEAP*_l_12 , MAY
+
+pointer alloc_pointer(int v)
+{
+
+
+// Points To: none
+
+   pointer p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   if (0==0)
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = malloc(sizeof(int));
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_12 , MAY
+
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_12 , MAY
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2, p3;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_12 , MAY
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p2 = alloc_pointer(17);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_12 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_12 , MAY
+// p3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p3 = alloc_pointer(19);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_12 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_12 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_10 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_12 , MAY
+
+   
+   
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+//#include<stdlib.h>
+
+// Points To: none
+
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+
+// Points To: none
+
+pointer alloc_pointer(int v);
+
+
+
+
+// Points To: none
+
+int main(void);
+INIT_POINTS_TO_ANALYSIS[alloc_pointer] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INIT_POINTS_TO_ANALYSIS[pointer02!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) The function call to "alloc_pointer" is still ignored
+On going implementation...
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_12".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_10".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_10".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_12".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_10".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_12".
