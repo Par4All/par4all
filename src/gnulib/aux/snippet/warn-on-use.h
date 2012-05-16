@@ -1,5 +1,5 @@
 /* A C macro for emitting warnings if a function is used.
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published
@@ -9,7 +9,7 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
@@ -67,7 +67,10 @@
 /* A compiler attribute is available in gcc versions 4.3.0 and later.  */
 #  define _GL_WARN_ON_USE(function, message) \
 extern __typeof__ (function) function __attribute__ ((__warning__ (message)))
-
+# elif __GNUC__ >= 3 && GNULIB_STRICT_CHECKING
+/* Verify the existence of the function.  */
+#  define _GL_WARN_ON_USE(function, message) \
+extern __typeof__ (function) function
 # else /* Unsupported.  */
 #  define _GL_WARN_ON_USE(function, message) \
 _GL_WARN_EXTERN_C int _gl_warn_on_use
@@ -85,6 +88,10 @@ _GL_WARN_EXTERN_C int _gl_warn_on_use
 #  define _GL_WARN_ON_USE_CXX(function,rettype,parameters_and_attributes,msg) \
 extern rettype function parameters_and_attributes \
      __attribute__ ((__warning__ (msg)))
+# elif __GNUC__ >= 3 && GNULIB_STRICT_CHECKING
+/* Verify the existence of the function.  */
+#  define _GL_WARN_ON_USE_CXX(function,rettype,parameters_and_attributes,msg) \
+extern rettype function parameters_and_attributes
 # else /* Unsupported.  */
 #  define _GL_WARN_ON_USE_CXX(function,rettype,parameters_and_attributes,msg) \
 _GL_WARN_EXTERN_C int _gl_warn_on_use
