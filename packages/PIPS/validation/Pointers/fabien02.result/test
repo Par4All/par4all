@@ -31,8 +31,8 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -57,8 +57,8 @@ POINTS-TO
 
 // Points To OUT:
 // *HEAP*_l_28 -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -106,8 +106,8 @@ rec reverse_copy(rec p)
 
 // Points To:
 // *HEAP*_l_28 -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -144,8 +144,8 @@ rec reverse_copy(rec p)
 
 // Points To:
 // *HEAP*_l_28 -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -183,8 +183,8 @@ rec reverse_copy(rec p)
 
 // Points To:
 // *HEAP*_l_28 -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -222,8 +222,8 @@ rec reverse_copy(rec p)
 
 // Points To:
 // *HEAP*_l_28 -> *NULL_POINTER* , EXACT
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY
@@ -262,8 +262,8 @@ rec reverse_copy(rec p)
 
 // Points To:
 // *HEAP*_l_28 -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
-// _p_1.n -> _p_1_1 , MAY
+// _p_1[0].n -> *NULL_POINTER* , MAY
+// _p_1[0].n -> _p_1_1 , MAY
 // _p_1_1.n -> *NULL_POINTER* , MAY
 // _p_1_1.n -> _p_1_1_1 , MAY
 // _p_1_1_1.n -> *NULL_POINTER* , MAY

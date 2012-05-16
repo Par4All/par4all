@@ -1,0 +1,1 @@
+The pointer assignment leads to an error in r_cell_reference_to_type() which does not suprises me (FI).

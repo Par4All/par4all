@@ -1,13 +1,5 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: i j inter01:0`l k
-   inter01();
-}
-
-POINTS-TO
+POINTS TO for inter01
 
 
 // Points To IN: none
@@ -15,10 +7,45 @@ POINTS-TO
 
 // Points To OUT: none
 
-int main()
+void inter01()
 {
 
 // Points To: none
 
-   inter01();
+   static int l;
+
+// Points To: none
+
+   int m;
+
+// Points To: none
+
+   int n;
+
+// Points To: none
+
+
+   for(n = 0; n <= 9; n += 1) {
+
+// Points To: none
+
+      i = 1;
+
+// Points To: none
+
+      j = 2;
+
+// Points To: none
+
+      k = 3;
+
+// Points To: none
+
+      l = 4;
+
+// Points To: none
+
+      m = 5;
+   }
 }
+INIT_POINTS_TO_ANALYSIS[inter01] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

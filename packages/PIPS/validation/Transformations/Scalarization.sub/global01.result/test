@@ -1,0 +1,25 @@
+#
+# Code after scalarization for module foo
+#
+void foo(int k)
+{
+   a[k] = k;
+}
+#
+# Code after scalarization for module main
+#
+int main()
+{
+   int res = 0;
+   {
+      int i;
+      for(i = 0; i <= 9; i += 1) {
+         //PIPS generated variable
+         register int b_0;
+         foo(i);
+         b_0 = i*i;
+         res = res+a[i]+b_0;
+      }
+   }
+   printf("res = %d\n", res);
+}

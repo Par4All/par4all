@@ -1,0 +1,122 @@
+
+PROPER EFFECTS
+
+void assign07()
+{
+   int ***p;
+   int **q;
+   int *r;
+   int i;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: p
+   //q = &r;
+   p = &q;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   **p = r;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   ***p = 0;
+   return;
+}
+void foo()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   assign07();
+}
+
+PROPER POINTER EFFECTS
+
+void foo()
+{
+   assign07();
+}
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void assign07()
+{
+
+// Points To: none
+
+   int ***p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int **q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int *r;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   int i;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   r = &i;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> i , EXACT
+
+   //q = &r;
+   p = &q;
+
+// Points To:
+// p -> q , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> i , EXACT
+
+   **p = r;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// p -> q , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> i , EXACT
+
+   ***p = 0;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// p -> q , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> i , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void foo()
+{
+
+// Points To: none
+
+   assign07();
+}

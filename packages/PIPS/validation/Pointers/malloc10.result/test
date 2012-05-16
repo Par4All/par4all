@@ -1,0 +1,42 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i p
+   int i = 1, *p = &i;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(p);
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 1, *p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+
+   free(p);
+
+// Points To: none
+
+
+   return 0;
+}
+C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined

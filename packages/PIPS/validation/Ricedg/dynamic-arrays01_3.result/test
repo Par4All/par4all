@@ -1,11 +1,14 @@
 
 // Points To IN:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
 
 // Points To OUT:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -15,64 +18,82 @@ int main(int argc, char **argv)
 {
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
    int i;
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
 
    if (argc>1)
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
       N = atoi(argv[1]);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
 
    array_a = (float *) malloc(N*sizeof(float));
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 
    array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "./dynamic-arrays01.c", 22, (const char *) 0);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 
    array_b = (float *) malloc(N*sizeof(float));
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 
    array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "./dynamic-arrays01.c", 24, (const char *) 0);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 
    array_c = (float *) malloc(N*sizeof(float));
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -80,8 +101,10 @@ int main(int argc, char **argv)
    array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "./dynamic-arrays01.c", 26, (const char *) 0);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -89,8 +112,10 @@ int main(int argc, char **argv)
    array_d = (float *) malloc(N*sizeof(float));
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -99,8 +124,10 @@ int main(int argc, char **argv)
    array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "./dynamic-arrays01.c", 28, (const char *) 0);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -111,8 +138,10 @@ int main(int argc, char **argv)
    array_a[0] = 2.0f;
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -121,8 +150,10 @@ int main(int argc, char **argv)
    array_b[0] = 2.0f;
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -131,8 +162,10 @@ int main(int argc, char **argv)
    array_c[0] = 2.0f;
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -142,8 +175,10 @@ int main(int argc, char **argv)
    for(i = 1; i <= N-1; i += 1) {
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -152,8 +187,10 @@ int main(int argc, char **argv)
       array_a[i] = 1.0f/((float) i);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -162,8 +199,10 @@ int main(int argc, char **argv)
       array_b[i] = 1.0f/((float) 2*i);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -173,8 +212,10 @@ int main(int argc, char **argv)
    }
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -185,8 +226,10 @@ int main(int argc, char **argv)
    for(i = 1; i <= N-1; i += 1) {
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -195,8 +238,10 @@ int main(int argc, char **argv)
       array_a[i] = array_b[i]+array_c[i];
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -206,8 +251,10 @@ int main(int argc, char **argv)
    }
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -217,8 +264,10 @@ int main(int argc, char **argv)
    for(i = 1; i <= N-1; i += 1)
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -227,8 +276,10 @@ int main(int argc, char **argv)
       printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
 
 // Points To:
-// _argv_2[0] -> _argv_2_2[0] , EXACT
-// argv -> _argv_2[0] , EXACT
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 // array_a -> *HEAP*_l_21[0] , EXACT
 // array_b -> *HEAP*_l_23[0] , EXACT
 // array_c -> *HEAP*_l_25[0] , EXACT
@@ -245,7 +296,7 @@ int main(int argc, char **argv)
 //             <    is referenced>: argc
 
    if (argc>1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: _argv_2[1] *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: N
 //             <    is referenced>: N argv
       N = atoi(argv[1]);

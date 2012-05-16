@@ -444,7 +444,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -453,7 +453,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
             ((f.champ)[i].p)[j] = i*j;
 
@@ -462,7 +462,6 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
             
             
@@ -474,7 +473,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       
       // definition of g
@@ -485,7 +484,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       for(i = 0; i <= 4; i += 1)
 
@@ -494,7 +493,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
          for(j = 0; j <= 9; j += 1)
 
@@ -503,7 +502,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
             ((g.champ)[i].array)[j] = i+j;
 
@@ -512,7 +511,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       
       // definition of h, does not modify g
@@ -523,7 +522,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       printf("\nstruct with array of structs with array copy : \n");
 
@@ -532,7 +531,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       for(i = 0; i <= 4; i += 1)
 
@@ -541,7 +540,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -550,7 +549,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
             ((h.champ)[i].array)[j] = i*j;
 
@@ -559,7 +558,7 @@ int main()
 // b.p -> *HEAP*_l_40[0] , EXACT
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
             
             
@@ -574,7 +573,7 @@ int main()
 // b.p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
 // e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    return 0;
 }

@@ -1,0 +1,35 @@
+
+POINTS TO
+
+
+// Points To IN:
+// pa -> a[0] , EXACT
+// qa -> *NULL_POINTER* , MAY
+// qa -> _qa_48 , MAY
+
+
+// Points To OUT:
+// pa -> a[0] , EXACT
+// qa -> _qa_48[1] , EXACT
+
+int global09()
+{
+
+// Points To: none
+
+   int *p = pa;
+
+// Points To:
+// p -> a[0] , EXACT
+// pa -> a[0] , EXACT
+
+   qa++;
+
+// Points To:
+// p -> a[0] , EXACT
+// pa -> a[0] , EXACT
+// qa -> _qa_48[1] , EXACT
+
+   return *p;
+}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global09] (source_to_sinks) Initialization of global variable "qa" is ignored because the const qualifier is not used.

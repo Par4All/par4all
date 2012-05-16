@@ -7,4 +7,5 @@ void point_to02()
 
   p->a = 1;
   p->b[2] = 3;
+  return;
 }

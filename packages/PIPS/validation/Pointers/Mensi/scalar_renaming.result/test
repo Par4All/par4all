@@ -54,40 +54,34 @@ int scalar_renaming()
    p = &T;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
    for(i = 0; i <= 99; i += 1) {
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
       T = A[i]+B[i];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
       /* S1 */
       C[i] = T+T;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
       /* S2 */
       T = D[i]-B[i];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
       /* S3 */
       *p = 1;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
       /* S4 */
@@ -95,7 +89,6 @@ int scalar_renaming()
    }
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> T , EXACT
 
 

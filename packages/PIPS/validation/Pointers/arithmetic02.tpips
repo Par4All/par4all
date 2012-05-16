@@ -11,7 +11,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 # Necessary to analyze exactly the loop on array "t"
-setproperty POINTS_TO_PATH_LIMIT 10
+setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
 
 #module main
 

@@ -1,0 +1,37 @@
+
+POINTS TO for inter04
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void inter04()
+{
+
+// Points To: none
+
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+
+   bar(pp, qq);
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+   return;
+}
+C_PARSER[inter04] (simplify_C_expression) Variable "i" is probably used before it is defined
+C_PARSER[inter04] (simplify_C_expression) Variable "j" is probably used before it is defined
+INIT_POINTS_TO_ANALYSIS[inter04] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[bar] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

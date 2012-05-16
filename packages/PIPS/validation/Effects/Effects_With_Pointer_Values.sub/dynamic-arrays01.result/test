@@ -1,0 +1,825 @@
+
+// IN Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+// OUT Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+int main(int argc, char **argv)
+{
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i;
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   if (argc>1)
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      N = atoi(argv[1]);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   array_a = (float *) malloc(N*sizeof(float));
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_b = (float *) malloc(N*sizeof(float));
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == *ANY_MODULE*:*UNDEFINED* (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_c = (float *) malloc(N*sizeof(float));
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == *ANY_MODULE*:*UNDEFINED* (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_d = (float *) malloc(N*sizeof(float));
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   array_a[0] = 2.0f;
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_b[0] = 2.0f;
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   array_c[0] = 2.0f;
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   for(i = 1; i <= N-1; i += 1) {
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      array_a[i] = 1.0f/((float) i);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      array_b[i] = 1.0f/((float) 2*i);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      array_a[i] = array_b[i]+array_c[i];
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      array_d[i] = array_a[i-1]*2;
+   }
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   for(i = 1; i <= N-1; i += 1)
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+// Pointer values:
+// argv == &_argv_1[0] (exact);
+// argv[*] == &_argv_2[*][0] (may);
+// array_a == &*HEAP*_l_21[0] (exact);
+// array_b == &*HEAP*_l_23[0] (exact);
+// array_c == &*HEAP*_l_25[0] (exact);
+// array_d == &*HEAP*_l_27[0] (exact);
+// stderr == &__IO_EFFECTS:__stderr__ (exact);
+// stdin == &__IO_EFFECTS:__stdin__ (exact);
+// stdout == &__IO_EFFECTS:__stdout__ (exact);
+// sys_errlist[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int i;
+//             <    is read   >: argc
+
+   if (argc>1)
+//             <may be read   >: _argv_2[*][*]
+//             <    is read   >: _argv_1[1] argv
+//             <    is written>: N
+      N = atoi(argv[1]);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_a _MALLOC_EFFECTS:_MALLOC_
+
+   array_a = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_a
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_b _MALLOC_EFFECTS:_MALLOC_
+   array_b = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_b
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_c _MALLOC_EFFECTS:_MALLOC_
+   array_c = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_c
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: array_d _MALLOC_EFFECTS:_MALLOC_
+   array_d = (float *) malloc(N*sizeof(float));
+//             <    is read   >: array_d
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
+//             <    is read   >: array_a
+//             <    is written>: *HEAP*_l_21[0]
+   
+   
+   array_a[0] = 2.0f;
+//             <    is read   >: array_b
+//             <    is written>: *HEAP*_l_23[0]
+   array_b[0] = 2.0f;
+//             <    is read   >: array_c
+//             <    is written>: *HEAP*_l_25[0]
+   array_c[0] = 2.0f;
+//             <    is read   >: N
+//             <    is written>: i
+
+   for(i = 1; i <= N-1; i += 1) {
+//             <    is read   >: N array_a i
+//             <    is written>: *HEAP*_l_21[i]
+      array_a[i] = 1.0f/((float) i);
+//             <    is read   >: N array_b i
+//             <    is written>: *HEAP*_l_23[i]
+      array_b[i] = 1.0f/((float) 2*i);
+//             <    is read   >: N array_c i
+//             <    is written>: *HEAP*_l_25[i]
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+//             <    is read   >: N
+//             <    is written>: i
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+//             <    is read   >: *HEAP*_l_23[i] *HEAP*_l_25[i] N 
+//                               array_a array_b array_c i
+//             <    is written>: *HEAP*_l_21[i]
+      array_a[i] = array_b[i]+array_c[i];
+//             <    is read   >: *HEAP*_l_21[i-1] N array_a array_d i
+//             <    is written>: *HEAP*_l_27[i]
+      array_d[i] = array_a[i-1]*2;
+   }
+//             <    is read   >: N
+//             <    is written>: i
+
+   for(i = 1; i <= N-1; i += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: *HEAP*_l_21[i] *HEAP*_l_27[i] N 
+//                               array_a array_d i stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int i;
+
+//  <argc-R-EXACT-{}>
+
+
+   if (argc>1)
+
+//  <N-W-EXACT-{}>
+//  <_argv_1[PHI1]-R-EXACT-{PHI1==1, N==30000000, 2<=argc}>
+//  <_argv_2[PHI1][PHI2]-R-MAY-{N==30000000, 2<=argc}>
+//  <argv-R-EXACT-{}>
+
+      N = atoi(argv[1]);
+
+//  <N-R-EXACT-{}>
+//  <array_a-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   array_a = (float *) malloc(N*sizeof(float));
+
+//  <array_a-R-EXACT-{}>
+
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_b-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_b = (float *) malloc(N*sizeof(float));
+
+//  <array_b-R-EXACT-{}>
+
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_c-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_c = (float *) malloc(N*sizeof(float));
+
+//  <array_c-R-EXACT-{}>
+
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_d-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_d = (float *) malloc(N*sizeof(float));
+
+//  <array_d-R-EXACT-{}>
+
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_a-R-EXACT-{}>
+
+   
+   
+   array_a[0] = 2.0f;
+
+//  <*HEAP*_l_23[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_b-R-EXACT-{}>
+
+   array_b[0] = 2.0f;
+
+//  <*HEAP*_l_25[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_c-R-EXACT-{}>
+
+   array_c[0] = 2.0f;
+
+//  <N-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+
+   for(i = 1; i <= N-1; i += 1) {
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_a[i] = 1.0f/((float) i);
+
+//  <*HEAP*_l_23[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_b[i] = 1.0f/((float) 2*i);
+
+//  <*HEAP*_l_25[PHI1]-W-EXACT-{PHI1==i, 2<=N, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+
+//  <N-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_23[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_25[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_a[i] = array_b[i]+array_c[i];
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{PHI1==i-1, i+1<=N, 1<=i}>
+//  <*HEAP*_l_27[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_d[i] = array_a[i-1]*2;
+   }
+
+//  <N-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+
+   for(i = 1; i <= N-1; i += 1)
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_27[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+   return 0;
+}
+
+//  <N-R-EXACT-{}>
+//  <N-W-MAY-{}>
+//  <_argv_1[PHI1]-R-MAY-{PHI1==1, N==30000000, 2<=argc}>
+//  <_argv_2[PHI1][PHI2]-R-MAY-{N==30000000, 2<=argc}>
+//  <argc-R-EXACT-{}>
+//  <argv-R-MAY-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_a-W-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <array_b-W-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <array_c-W-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <array_d-W-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main(int argc, char **argv)
+{
+   int i;
+
+//  <N-W-MAY-{}>
+//  <_argv_1[PHI1]-R-MAY-{PHI1==1, N==30000000, 2<=argc}>
+//  <_argv_2[PHI1][PHI2]-R-MAY-{N==30000000, 2<=argc}>
+//  <argc-R-EXACT-{}>
+//  <argv-R-MAY-{}>
+
+
+   if (argc>1)
+
+//  <N-W-EXACT-{}>
+//  <_argv_1[PHI1]-R-EXACT-{PHI1==1, N==30000000, 2<=argc}>
+//  <_argv_2[PHI1][PHI2]-R-MAY-{N==30000000, 2<=argc}>
+//  <argv-R-EXACT-{}>
+
+      N = atoi(argv[1]);
+
+//  <N-R-EXACT-{}>
+//  <array_a-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   array_a = (float *) malloc(N*sizeof(float));
+
+//  <array_a-R-EXACT-{}>
+
+   array_a!=(void *) 0?(void) 0:__assert_fail("array_a!=((void *)0)", "$VDIR/dynamic-arrays01.c", 22, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_b-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_b = (float *) malloc(N*sizeof(float));
+
+//  <array_b-R-EXACT-{}>
+
+   array_b!=(void *) 0?(void) 0:__assert_fail("array_b!=((void *)0)", "$VDIR/dynamic-arrays01.c", 24, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_c-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_c = (float *) malloc(N*sizeof(float));
+
+//  <array_c-R-EXACT-{}>
+
+   array_c!=(void *) 0?(void) 0:__assert_fail("array_c!=((void *)0)", "$VDIR/dynamic-arrays01.c", 26, (const char *) 0);
+
+//  <N-R-EXACT-{}>
+//  <array_d-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   array_d = (float *) malloc(N*sizeof(float));
+
+//  <array_d-R-EXACT-{}>
+
+   array_d!=(void *) 0?(void) 0:__assert_fail("array_d!=((void *)0)", "$VDIR/dynamic-arrays01.c", 28, (const char *) 0);
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_a-R-EXACT-{}>
+
+   
+   
+   array_a[0] = 2.0f;
+
+//  <*HEAP*_l_23[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_b-R-EXACT-{}>
+
+   array_b[0] = 2.0f;
+
+//  <*HEAP*_l_25[PHI1]-W-EXACT-{PHI1==0}>
+//  <array_c-R-EXACT-{}>
+
+   array_c[0] = 2.0f;
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_23[PHI1]-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_25[PHI1]-W-EXACT-{1<=PHI1, PHI1+1<=N, 2<=N}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+
+   for(i = 1; i <= N-1; i += 1) {
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_a[i] = 1.0f/((float) i);
+
+//  <*HEAP*_l_23[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_b[i] = 1.0f/((float) 2*i);
+
+//  <*HEAP*_l_25[PHI1]-W-EXACT-{PHI1==i, 2<=N, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_c[i] = 1.0f/((float) 3*i);
+   }
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{0<=PHI1, PHI1+2<=N}>
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_23[PHI1]-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_25[PHI1]-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_27[PHI1]-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+   
+   
+   for(i = 1; i <= N-1; i += 1) {
+
+//  <*HEAP*_l_21[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_23[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_25[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_b-R-EXACT-{}>
+//  <array_c-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_a[i] = array_b[i]+array_c[i];
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{PHI1==i-1, i+1<=N, 1<=i}>
+//  <*HEAP*_l_27[PHI1]-W-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      array_d[i] = array_a[i-1]*2;
+   }
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <*HEAP*_l_27[PHI1]-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   for(i = 1; i <= N-1; i += 1)
+
+//  <*HEAP*_l_21[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <*HEAP*_l_27[PHI1]-R-EXACT-{PHI1==i, i+1<=N, 1<=i}>
+//  <N-R-EXACT-{}>
+//  <array_a-R-EXACT-{}>
+//  <array_d-R-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      printf("a[%d] = %f, d[%d] = %f\n", i, array_a[i], i, array_d[i]);
+
+   return 0;
+}

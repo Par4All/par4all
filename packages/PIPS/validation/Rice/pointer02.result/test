@@ -1,0 +1,47 @@
+void pointer02(int n, float *p)
+{
+//             <    is declared>: i
+   int i;
+//             <    is read   >: p
+//             <    is referenced>: p
+   p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer02.c", 9, (const char *) 0);
+//             <    is read   >: p
+//             <    is written>: r
+//             <    is referenced>: p r
+//             <    is declared>: r
+   float *r = p-1;
+//             <    is read   >: n
+//             <    is written>: i
+//             <    is referenced>: i n
+
+   for(i = 0; i <= n-1; i += 1)
+//             <may be written>: _p_2[i]
+//             <    is read   >: _p_2[-1+i] i n p r
+//             <    is referenced>: i n p r
+      p[i] = r[i];
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 12 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 13 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	10 --> 13 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	13 --> 13 with conflicts
+		from <_p_2[i]-W-MAY> to <_p_2[i]-W-MAY>
+		from <_p_2[i]-W-MAY> to <_p_2[-1+i]-R-EXACT>
+		from <_p_2[-1+i]-R-EXACT> to <_p_2[i]-W-MAY>
+
+****************** End of Dependence Graph ******************
+void pointer02(int n, float *p)
+{
+   int i;
+   p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer02.c", 9, (const char *) 0);
+   float *r = p-1;
+
+   for(i = 0; i <= n-1; i += 1)
+      p[i] = r[i];
+}

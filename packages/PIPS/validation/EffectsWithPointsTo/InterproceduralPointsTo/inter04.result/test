@@ -1,0 +1,203 @@
+
+POINTS TO for inter04
+
+
+// Points To IN:
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+
+// Points To OUT:
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+
+void bar(int **pp, int **qq)
+{
+
+// Points To:
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+   *pp = *qq;
+
+// Points To:
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void inter04()
+{
+
+// Points To: none
+
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+
+   bar(pp, qq);
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void bar(int **pp, int **qq)
+{
+//             <    is read   >: _qq_2 pp qq
+//             <    is written>: _pp_1
+   *pp = *qq;
+   return;
+}
+void inter04()
+{
+//             <    is written>: i j p pp q qq
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+//             <    is read   >: pp qq bar:_qq_2
+//             <    is written>: bar:_pp_1
+
+   bar(pp, qq);
+   return;
+}
+/* compute proper and cumulated effects for intra01
+   compute proper and cumulated effects with points to for intra02
+   compute proper and cumulated pointer effects for intra03
+*/
+
+void bar(int **pp, int **qq);
+
+
+
+void inter04();
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: _qq_2 pp qq
+//             <    is written>: _pp_1
+void bar(int **pp, int **qq)
+{
+//             <    is read   >: _qq_2 pp qq
+//             <    is written>: _pp_1
+   *pp = *qq;
+   return;
+}
+//             <    is read   >: bar:_qq_2
+//             <    is written>: bar:_pp_1
+void inter04()
+{
+//             <    is written>: i j p pp q qq
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+//             <    is read   >: pp qq bar:_qq_2
+//             <    is written>: bar:_pp_1
+
+   bar(pp, qq);
+   return;
+}
+/* compute proper and cumulated effects for intra01
+   compute proper and cumulated effects with points to for intra02
+   compute proper and cumulated pointer effects for intra03
+*/
+
+void bar(int **pp, int **qq);
+
+
+
+void inter04();
+
+POINTS TO for inter04
+
+
+// Points To IN:
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+
+// Points To OUT:
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+
+void bar(int **pp, int **qq)
+{
+
+// Points To:
+// _pp_1 -> _pp_1_1 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+   *pp = *qq;
+
+// Points To:
+// _pp_1 -> _qq_2_2 , EXACT
+// _qq_2 -> _qq_2_2 , EXACT
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void inter04()
+{
+
+// Points To: none
+
+   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+
+   bar(pp, qq);
+
+// Points To:
+// p -> j , EXACT
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+   return;
+}
+INIT_POINTS_TO_ANALYSIS[bar] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+C_PARSER[inter04] (simplify_C_expression) Variable "i" is probably used before it is defined
+C_PARSER[inter04] (simplify_C_expression) Variable "j" is probably used before it is defined
+INIT_POINTS_TO_ANALYSIS[inter04] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
+On going implementation...
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
+On going implementation...
+INIT_POINTS_TO_ANALYSIS[inter04!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
+On going implementation...

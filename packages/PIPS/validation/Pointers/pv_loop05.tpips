@@ -5,6 +5,7 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # Key property for this test case

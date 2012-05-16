@@ -3,7 +3,11 @@ Proper effects for "anywhere02"
 
 void anywhere02(int n, int *p)
 {
+//             <    is read   >: p
+   if (!(p!=0))
+      abort();
 //             <    is written>: n
+
    n = 17;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
@@ -32,7 +36,11 @@ Transformers for "anywhere02"
 
 void anywhere02(int n, int *p)
 {
+//             <    is read   >: p
+   if (!(p!=0))
+      abort();
 //             <    is written>: n
+
    n = 17;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
@@ -66,6 +74,15 @@ void anywhere02(int n, int *p)
 {
 
 //  P() {}
+
+   if (!(p!=0))
+
+//  P() {}
+
+      abort();
+
+//  P() {}
+
 
    n = 17;
 
@@ -102,7 +119,10 @@ Proper effects for "anywhere02"
 
 void anywhere02(int n, int *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./anywhere02.c", 13, (const char *) 0);
 //             <    is written>: n
+
    n = 17;
 //             <    is read   >: p
 //             <    is written>: _p_2[0] n
@@ -131,7 +151,10 @@ Transformers for "anywhere02"
 
 void anywhere02(int n, int *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./anywhere02.c", 13, (const char *) 0);
 //             <    is written>: n
+
    n = 17;
 //             <    is read   >: p
 //             <    is written>: _p_2[0] n
@@ -165,6 +188,11 @@ void anywhere02(int n, int *p)
 {
 
 //  P() {}
+
+   p!=0?(void) 0:__assert_fail("p!=0", "./anywhere02.c", 13, (const char *) 0);
+
+//  P() {}
+
 
    n = 17;
 

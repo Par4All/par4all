@@ -3,6 +3,9 @@ Proper effects for "foo"
 
 void foo(int *p)
 {
+//             <    is read   >: p
+   if (!(p!=0))
+      abort();
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    (*p)++;
@@ -14,6 +17,9 @@ Cumulated effects for "foo"
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void foo(int *p)
 {
+//             <    is read   >: p
+   if (!(p!=0))
+      abort();
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    (*p)++;
@@ -26,6 +32,14 @@ Transformers for "foo"
 
 void foo(int *p)
 {
+
+//  T() {}
+
+   if (!(p!=0))
+
+//  T() {0==-1}
+
+      abort();
 
 //  T() {}
 
@@ -126,6 +140,8 @@ Proper effects for "foo" with points-to information
 
 void foo(int *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer03.c", 13, (const char *) 0);
 //             <    is read   >: _p_1[0] p
 //             <    is written>: _p_1[0]
    (*p)++;
@@ -159,6 +175,8 @@ Cumulated effects for "foo" with points-to information
 //             <    is written>: _p_1[0]
 void foo(int *p)
 {
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer03.c", 13, (const char *) 0);
 //             <    is read   >: _p_1[0] p
 //             <    is written>: _p_1[0]
    (*p)++;
@@ -197,6 +215,10 @@ Transformers for "foo" with points-to information
 
 void foo(int *p)
 {
+
+//  T() {}
+
+   p!=0?(void) 0:__assert_fail("p!=0", "./pointer03.c", 13, (const char *) 0);
 
 //  T() {}
 

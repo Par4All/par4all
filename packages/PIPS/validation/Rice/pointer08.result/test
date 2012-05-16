@@ -5,7 +5,8 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
 
 void pointer08()
 {
@@ -25,15 +26,29 @@ void pointer08()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// t -> *HEAP*_l_8 , EXACT
+// t -> *HEAP*_l_10 , EXACT
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// t[0].tree_list[*] -> *HEAP*_l_10 , MAY
-// t -> *HEAP*_l_8 , MAY
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , EXACT
 
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , EXACT
+
+   // FI: without this statement, we do not get points-to information
+   // for "return"....
+   i++;
+
+// Points To:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , EXACT
+
+   return;
 }
 
 Proper effects with points-to
@@ -54,30 +69,44 @@ void pointer08()
 //             <    is written>: i
 //             <    is referenced>: i
    for(i = 0; i <= 9; i += 1)
-//             <may be written>: *HEAP*_l_8.tree_list[i]
 //             <    is read   >: i t _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: *HEAP*_l_10.tree_list[i] 
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: i t
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+//             <    is read   >: i
+//             <    is written>: i
+//             <    is referenced>: i
+   // FI: without this statement, we do not get points-to information
+   // for "return"....
+   i++;
+   return;
 }
 
  *********************** Use-Def Chains *********************
 
-	07 --> 09 with conflicts
+	09 --> 11 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	07 --> 10 with conflicts
+	09 --> 12 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	08 --> 10 with conflicts
+	09 --> 16 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	10 --> 12 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <t-W-EXACT> to <t-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <t-WE-EXACT> to <t-RE-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	10 --> 10 with conflicts
+	11 --> 16 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 12 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <*HEAP*_l_8.tree_list[i]-W-MAY> to <*HEAP*_l_8.tree_list[i]-W-MAY>
+		from <*HEAP*_l_10.tree_list[i]-W-EXACT> to <*HEAP*_l_10.tree_list[i]-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	12 --> 16 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -92,4 +121,8 @@ void pointer08()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
    for(i = 0; i <= 9; i += 1)
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+   // FI: without this statement, we do not get points-to information
+   // for "return"....
+   i++;
+   return;
 }

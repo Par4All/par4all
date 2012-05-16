@@ -1,0 +1,48 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT: none
+
+void call24(int *p)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = 0, n;
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+   while (n) {
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      call24(p);
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      n--;
+   }
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+   return 0;
+}

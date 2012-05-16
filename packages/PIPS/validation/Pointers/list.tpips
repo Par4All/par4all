@@ -11,6 +11,9 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty POINTS_TO_PATH_LIMIT 10
 
+# avoid typing issue due to extra-dimension
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
 #module main
 
 

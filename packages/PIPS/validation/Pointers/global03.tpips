@@ -1,5 +1,6 @@
-delete global03
-create global03 global03.c
+setenv WS=global03
+delete $WS
+create $WS $WS.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
@@ -15,22 +16,22 @@ echo PROPER EFFECTS
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[$WS]
 
 echo 
 echo PROPER POINTER EFFECTS
 echo
 activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[$WS]
 
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[call03]
+display PRINTED_FILE[$WS]
 
 
 close
-delete global03
+delete $WS
 quit

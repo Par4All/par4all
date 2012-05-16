@@ -1,0 +1,100 @@
+
+TRANSFORMERS
+
+
+//  T() {1<=n}
+
+void ex1b(int x, int n, int m)
+{
+
+//  T() {1<=n}
+
+   if (!(n>0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(x) {x==0, 1<=n}
+
+   x = 0;
+
+//  T(m) {m==0, x==0, 1<=n}
+
+   m = 0;
+
+//  T(m,x) {m#init==0, x#init==0, 1<=n, x+1<=n, 0<=x}
+
+   while (x<n) {
+
+//  T(m) {1<=n, x+1<=n}
+
+      if (rand())
+
+//  T(m) {m==x, m+1<=n, 1<=n}
+
+         m = x;
+
+//  T(x) {x==x#init+1, 1<=n, x<=n}
+
+      x = x+1;
+   }
+
+//  T() {n==x, 0<=m, m+1<=n, 1<=n}
+
+   if (!(m>=0&&m<n))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ex1b(int x, int n, int m)
+{
+
+//  P() {}
+
+   if (!(n>0))
+
+//  P() {n<=0}
+
+      exit(0);
+
+//  P() {1<=n}
+
+   x = 0;
+
+//  P(x) {x==0, 1<=n}
+
+   m = 0;
+
+//  P(m,x) {m==0, x==0, 1<=n}
+
+   while (x<n) {
+
+//  P(m,x) {0<=m, m+1<=n, m<=x, x+1<=n}
+
+      if (rand())
+
+//  P(m,x) {0<=m, m+1<=n, m<=x, x+1<=n}
+
+         m = x;
+
+//  P(m,x) {0<=m, m<=x, x+1<=n}
+
+      x = x+1;
+   }
+
+//  P(m,x) {n==x, 0<=m, m+1<=n, 1<=n}
+
+   if (!(m>=0&&m<n))
+
+//  P() {0==-1}
+
+      exit(1);
+}
