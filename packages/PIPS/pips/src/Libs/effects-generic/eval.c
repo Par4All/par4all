@@ -280,8 +280,15 @@ list generic_eval_cell_with_points_to(
 		     In case there are no more dereferencing dimensions, we would then reuse the sink abstract location.
 		     Otherwise (which is presently the only default case), we return an all location cell
 		  */
-		  l = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), l);
-		  *exact_p = false;
+		  if (entity_null_locations_p(sink_ent) && approximation_may_p(points_to_approximation(pt)))
+		    {
+		      pips_debug(5, "Null pointer, may approximation: ignore, assuming code is correct\n");
+		    }
+		  else
+		    {
+		      l = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), l);
+		      *exact_p = false;
+		    }
 		}
 	      else
 		{

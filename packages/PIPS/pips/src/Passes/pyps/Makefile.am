@@ -1,7 +1,7 @@
 SUBDIRS  = doc drivers impl
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 
-dist_noinst_DATA=pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
+dist_noinst_DATA=pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in pypsconfig.py.in
 
 dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 
@@ -70,7 +70,8 @@ pyps.py:$(p2p_cmd) Makefile
 pips-make: pips-make.in
 	$(AM_V_GEN)sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
 
-pypsconfig.py:Makefile
-	$(AM_V_GEN)echo 'pypsruntime="$(pypsruntimedir)"' > pypsconfig.py
+pypsconfig.py: Makefile pypsconfig.py.in
+	$(AM_V_GEN)cp $(srcdir)/pypsconfig.py.in pypsconfig.py
+	$(AM_V_GEN)echo 'pypsruntime = PypsRuntimeDir("$(pypsruntimedir)")' >> pypsconfig.py
 
 CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h pypsconfig.py

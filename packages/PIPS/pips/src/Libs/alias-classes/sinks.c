@@ -232,39 +232,51 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     // for computing an approximation of memory(p)
     /* Locate the pointer, no dereferencing yet */
     list cl = expression_to_points_to_sources(a, in);
+    bool null_dereferencing_p
+      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+    bool nowhere_dereferencing_p
+      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
     /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
-      /* Do not create sharing between elements of "in" and elements of
-	 "sinks". */
-      list pointed = source_to_sinks(c, in, true);
-      if(ENDP(pointed)) {
-	reference r = cell_any_reference(c);
-	entity v = reference_variable(r);
-	string words_to_string(list);
-	pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+      /* Do we want to dereference c? */
+      if( (null_dereferencing_p || !null_cell_p(c))
+	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+	/* Do not create sharing between elements of "in" and elements of
+	   "sinks". */
+	list pointed = source_to_sinks(c, in, true);
+	if(ENDP(pointed)) {
+	  reference r = cell_any_reference(c);
+	  entity v = reference_variable(r);
+	  string words_to_string(list);
+	  pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
 			    entity_user_name(v),
 			    words_to_string(words_reference(r, NIL)));
-      }
-      else {
-	if(eval_p) {
-	  /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
-	  FOREACH(CELL, sc, pointed) {
-	    /* Do not create sharing between elements of "in" and elements of
-	       "sinks". */
-	    list starpointed = source_to_sinks(sc, in, true);
-	    if(ENDP(starpointed)) {
-	      reference sr = cell_any_reference(sc);
-	      entity sv = reference_variable(sr);
-	      string words_to_string(list);
-	      pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
-				  entity_user_name(sv),
-				  words_to_string(words_reference(sr, NIL)));
-	    }
-	    sinks = gen_nconc(sinks, starpointed);
-	  }
+	  /* The sinks list is empty, whether eval_p is true or not... */
 	}
-	else
-	  sinks = gen_nconc(sinks, pointed);
+	else {
+	  if(eval_p) {
+	    /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
+	    FOREACH(CELL, sc, pointed) {
+	      if( (null_dereferencing_p || !null_cell_p(sc))
+		  && (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
+		/* Do not create sharing between elements of "in" and elements of
+		   "sinks". */
+		list starpointed = source_to_sinks(sc, in, true);
+		if(ENDP(starpointed)) {
+		  reference sr = cell_any_reference(sc);
+		  entity sv = reference_variable(sr);
+		  string words_to_string(list);
+		  pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+				      entity_user_name(sv),
+				      words_to_string(words_reference(sr, NIL)));
+		}
+		sinks = gen_nconc(sinks, starpointed);
+	      }
+	    }
+	  }
+	  else
+	    sinks = gen_nconc(sinks, pointed);
+	}
       }
     }
   }
@@ -726,23 +738,6 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
   return sinks;
 }
 
-// FI: I assume we do not need the eval_p parameter here
-list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
-{
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  type t = entity_type(call_function(c));
-  entity ne = entity_undefined;
-  list sinks = NIL;
-
-  /* FI: definitely the intraprocedural version */
-  if(type_sensitive_p)
-    ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
-  else
-    ne = entity_all_xxx_locations(ANYWHERE_LOCATION);
-  
-  sinks = entity_to_sinks(ne);
-  return sinks;
-}
 
 // FI: do we need eval_p?
 list cast_to_points_to_sinks(cast c, pt_map in)
@@ -993,7 +988,7 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
     // FI: useful?
     //pips_internal_error("Not implemented yet\n");
     list soel = syntax_va_arg(s);
-    sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
+    //sizeofexpression soev = SIZEOFEXPRESSION(CAR(soel));
     sizeofexpression soet = SIZEOFEXPRESSION(CAR(CDR(soel)));
     sinks = sizeofexpression_to_points_to_sinks(soet, in);
     break;

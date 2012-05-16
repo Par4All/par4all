@@ -105,7 +105,8 @@ static list search_or_sort_effects(entity e, list args);
 /* MB */
 static list generic_string_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
-static list strtoxxx_effects(entity e, list args);
+static list strtod_like_effects(entity e, list args);
+static list strtol_like_effects(entity e, list args);
 static list strdup_effects(entity, list);
 
 
@@ -970,12 +971,13 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ATOI_FUNCTION_NAME,                     safe_c_read_only_effects},
   {ATOL_FUNCTION_NAME,                     safe_c_read_only_effects},
   {ATOLL_FUNCTION_NAME,                    safe_c_read_only_effects},
-  {STRTOD_FUNCTION_NAME,                   strtoxxx_effects},
-  {STRTOF_FUNCTION_NAME,                   strtoxxx_effects},
-  {STRTOL_FUNCTION_NAME,                   strtoxxx_effects},
-  {STRTOLL_FUNCTION_NAME,                  strtoxxx_effects},
-  {STRTOUL_FUNCTION_NAME,                  strtoxxx_effects},
-  {STRTOULL_FUNCTION_NAME,                 strtoxxx_effects},
+  {STRTOD_FUNCTION_NAME,                   strtod_like_effects},
+  {STRTOF_FUNCTION_NAME,                   strtod_like_effects},
+  {STRTOLD_FUNCTION_NAME,                  strtod_like_effects},
+  {STRTOL_FUNCTION_NAME,                   strtol_like_effects},
+  {STRTOLL_FUNCTION_NAME,                  strtol_like_effects},
+  {STRTOUL_FUNCTION_NAME,                  strtol_like_effects},
+  {STRTOULL_FUNCTION_NAME,                 strtol_like_effects},
   {RAND_FUNCTION_NAME,                     rgs_effects},
   {SRAND_FUNCTION_NAME,                    rgsi_effects},
   {CALLOC_FUNCTION_NAME,                   no_write_effects},
@@ -2965,16 +2967,15 @@ static list search_or_sort_effects(entity e, list args)
 
 
 /**
-    generate effects for strtoxxx functions
+    generate effects for strtod like functions
  */
-static list strtoxxx_effects(entity e __attribute__ ((unused)), list args)
+static list strtod_like_effects(entity e __attribute__ ((unused)), list args)
 {
   list le = NIL;
+  pips_debug(8, "begin \n");
   expression nptr_exp = EXPRESSION(CAR(args));
   POP(args);
   expression endptr_exp = EXPRESSION(CAR(args));
-  POP(args);
-  expression base_exp = EXPRESSION(CAR(args));
 
   /* the first expression must be char * or char[], and all its components may be read */
   le = c_actual_argument_to_may_summary_effects(nptr_exp, 'r');
@@ -3010,6 +3011,32 @@ static list strtoxxx_effects(entity e __attribute__ ((unused)), list args)
       le = gen_nconc(le, lme_endptr);
       le = gen_nconc(le, le_endptr);
     }
+
+  pips_debug_effects(8,"final_effects:", le);
+  return le;
+}
+
+
+
+/**
+    generate effects for strtol like functions
+ */
+static list strtol_like_effects(entity e, list args)
+{
+  pips_debug(8, "begin \n");
+
+  list le = NIL;
+
+  /* the first and second argument are used as in strtod like functions */
+  le = strtod_like_effects(e, args);
+
+  // don't move this upwards because it modifies args
+  // expression nptr_exp = EXPRESSION(CAR(args));
+  POP(args);
+  // expression endptr_exp = EXPRESSION(CAR(args));
+  POP(args);
+  expression base_exp = EXPRESSION(CAR(args));
+
   /* the third expression is solely read */
   le = gen_nconc(le, generic_proper_effects_of_expression(base_exp));
 

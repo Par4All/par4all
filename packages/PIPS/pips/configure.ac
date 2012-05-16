@@ -40,6 +40,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
+
+# Checks for libraries.
+AX_CHECK_PKG([polylib64],[Polyhedron_Enumerate],[polylib.h])
+
 AX_CHECK_PROG([perl])
 AX_CHECK_CPROTO([4.7])
 AX_CHECK_PROG([newgen])
@@ -385,6 +389,6 @@ AC_CONFIG_FILES([pips_config.h
 #                 src/Scripts/stf/Makefile
                  
 
-AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
+AX_DEPENDS([minimum],[lex yacc polylib64 newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
 AX_OUTPUT([minimum],[tpips pyps pyps-extra gpips hpfc doc fortran95 paws])

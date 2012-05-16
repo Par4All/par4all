@@ -5474,12 +5474,9 @@ alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
-        ! SELECT.proper_effects_with_points_to
-        ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
         < MODULE.init_points_to_list
-        < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in
 \end{PipsMake}
@@ -5495,22 +5492,53 @@ expression and subexpression by the points-to analysis.
 \begin{PipsPass}{interprocedural_points_to_analysis}
 This pass is being implemented by Amira \textsc{Mensi}.
 The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
-compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. 
-This phase requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes
+both Gen and Kill sets at the level of the call site.It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
 \end{PipsPass}
 
 \begin{PipsMake}
 alias interprocedural_points_to_analysis  'Interprocedural Points To Analysis'
 
 interprocedural_points_to_analysis > MODULE.points_to
-                                  < PROGRAM.entities
-                                  < MODULE.code
-                                  < MODULE.points_to_out
-                                  < MODULE.points_to_in
-                                  < MODULE.points_to
-                                  < CALLEES.summary_effects
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.init_points_to_list
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
 \end{PipsMake}
 
+
+\subsection{Fast Interprocedural Points to Analysis}
+\label{subsection-fast-interprocedural-points-to-analysis}
+\index{Interprocedural Points to Analysis}
+
+\begin{PipsPass}{fast_interprocedural_points_to_analysis}
+This pass is being implemented by Amira \textsc{Mensi}.
+The \PipsPassRef{fast_interprocedural_points_to_analysis} is implemented in order to
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes only
+Kill sets at the call site level. It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias fast_interprocedural_points_to_analysis  'Fast Interprocedural Points To Analysis'
+
+fast_interprocedural_points_to_analysis > MODULE.points_to
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.init_points_to_list
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
+\end{PipsMake}
 
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
@@ -5569,6 +5597,8 @@ simple_pointer_values > MODULE.simple_pointer_values
 The following properties are defined to ensure the safe use
 of \PipsPassRef{intraprocedural_points_to_analysis}.
 
+\subsubsection{Impact of Types}
+
 The property \PipsPropRef{ALIASING_ACROSS_TYPES} specifies that two
 pointers of different effective types can be aliased. The default and
 safe value is {\tt TRUE}; when it is turned to {\tt FALSE} two
@@ -5609,7 +5639,7 @@ point. The safe and default value is {\tt TRUE}
 ALIASING_ACROSS_IO_STREAMS TRUE
 \end{PipsProp}
 
-
+\subsubsection{Heap Modeling}
 
 The following string property defines the lattice of maximal elements
 to use when precise information is lost. Three values are possible:
@@ -5671,25 +5701,6 @@ safe result is the top abstract location.
 ABSTRACT_HEAP_LOCATIONS "unique"
 \end{PipsProp}
 
-% no longer used {
-% The following property is used to bound the length of any generic
-% access path or reference. Its default value is 0. It means that no limit is set.
-% \begin{PipsProp}{GAP_MAX_LENGTH}
-% GAP_MAX_LENGTH 0
-% \end{PipsProp}
-% }
-
-The property \PipsPropRef{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING}
-specifies that we are dereferencing an uninitialized pointer. The safe
-value is {\tt TRUE} and it stops the analysis with a
-pips\_user\_error. However the default value is {\tt FALSE} which
-arises a pips\_user\_warning and we continue the analysis, it's due to
-dead code: we don't have to stop the analysis if a dereferencing will never
-be executed.
-\begin{PipsProp}{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING}
-POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING FALSE
-\end{PipsProp}
-
 The property \PipsPropRef{POINTS_TO_STRICT_POINTER_TYPES}
 is used to handle pointer arithmetic. According to C standard(section 6.5.6, item 8)
 the following C code :
@@ -5707,11 +5718,78 @@ POINTS_TO_STRICT_POINTER_TYPES FALSE
 \end{PipsProp}
 
 
-The integer property \PipsPropRef{POINTS_TO_K_LIMITING} specifies the maximum authorized length
-of an access path. Beyond this value the access path is changed into an ANYWHERE. This property
-is necessary while computing points to relations inside loops and it's default value is 10.
-\begin{PipsProp}{POINTS_TO_K_LIMITING}
-POINTS_TO_K_LIMITING 10
+% no longer used {
+% The following property is used to bound the length of any generic
+% access path or reference. Its default value is 0. It means that no limit is set.
+% \begin{PipsProp}{GAP_MAX_LENGTH}
+% GAP_MAX_LENGTH 0
+% \end{PipsProp}
+% }
+
+\subsubsection{Dereferenceing of Null and Undefined Pointers}
+
+The property
+\PipsPropRef{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING} specifies
+what to do when an uninitialized pointer is or may be dereferenced. The safe
+value is {\tt FALSE}. The points-to analysis assumed that no undefined
+pointer is ever dereferenced. So if a pointer may be undefined and is
+dereferenced, the arc is considered impossible and removed from the
+points-to information. If not other arc provides some value for this
+pointer, the code is assumed dead and the current points-to set is
+reduced to the empty set. A warning about dead code is
+emitted. However the property can be set to {\tt TRUE} and the
+dereferencing of an undefined pointer is accepted and results in an
+anywhere location.
+\begin{PipsProp}{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING}
+POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING FALSE
+\end{PipsProp}
+
+The property
+\PipsPropRef{POINTS_TO_NULL_POINTER_DEREFERENCING} is very similar to the previous one. It specifies
+what to do when an null pointer is or may be dereferenced. The safe
+value is {\tt FALSE}. The points-to analysis assumed that no null
+pointer is ever dereferenced. So if a pointer may be undefined and is
+dereferenced, the arc is considered impossible and removed from the
+points-to information. If not other arc provides some value for this
+pointer, the code is assumed dead and the current points-to set is
+reduced to the empty set. A warning about dead code is
+emitted. However the property can be set to {\tt TRUE} and the
+dereferencing of an undefined pointer is accepted and results in an
+anywhere location.
+\begin{PipsProp}{POINTS_TO_NULL_POINTER_DEREFERENCING}
+POINTS_TO_NULL_POINTER_DEREFERENCING FALSE
+\end{PipsProp}
+
+The property \PipsPropRef{POINTS_TO_NULL_POINTER_INITIALIZATION}
+allows the initialization of pointers that are formal parameters or
+global variables to \verb/NULL/ when computing a calling context. The
+most accurate property value is {\tt TRUE}, which makes sure that
+generated points-to stubs are different from NULL because two arcs are
+always generated: an arc towards the new points-to stub and an arc
+towards the \verb/NULL/ location. Thus it prevents from dereferencing
+a null pointer when dereferencing a points-to stub and it allows the
+comparison of two points-to stubs when a condition such as \verb/p!=q/
+is interpreted or the comparison of one points-to stub to NULL as in
+\verb/p!=NULL/. Temporarily, to perform an interprocedural analysis,
+it must be turned to {\tt FALSE}.
+\begin{PipsProp}{POINTS_TO_NULL_POINTER_INITIALIZATION}
+  POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
+\end{PipsProp}
+\subsubsection{Limits of Points-to Analyses}
+
+The integer property \PipsPropRef{POINTS_TO_PATH_LIMIT} specifies the
+maximum number of occurences of an object of a given type in a
+non-cyclic path generated by the points-to graph. New nodes are created as long as no such path exists. When the limit is reached, a cycle is created.
+\begin{PipsProp}{POINTS_TO_PATH_LIMIT}
+POINTS_TO_PATH_LIMIT 2
+\end{PipsProp}
+
+The integer property \PipsPropRef{POINTS_TO_SUBSCRIPT_LIMIT} specifies
+the maximum number of subscript of an object can be generated via
+pointer arithmetic. When the limit is reached, an unbounded subscript,
+*, is used to model any possible subscript value.
+\begin{PipsProp}{POINTS_TO_SUBSCRIPT_LIMIT}
+POINTS_TO_SUBSCRIPT_LIMIT 2
 \end{PipsProp}
 
 \subsection{Menu for Alias Views}
@@ -11704,6 +11782,18 @@ prefix, which improves readability.
 SCALARIZATION_PREFIX ""
 \end{PipsProp}
 
+When property \PipsPropRef{SCALARIZATION_USE_REGISTERS} is set to
+\texttt{TRUE} (default value), new variables are declared with the
+\texttt{register} qualifier. However, this is not always compatible with
+other phases. Set it to \texttt{FALSE} to toggle off this behavior.
+
+\begin{PipsProp}{SCALARIZATION_USE_REGISTERS}
+SCALARIZATION_USE_REGISTERS TRUE
+\end{PipsProp}
+
+
+
+
 Also, as explained above, Property
 \PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} is used to
 control the way new scalar variables are declared and initialized in
@@ -13404,7 +13494,6 @@ Display the code decorated with the points to information.
 print_code_points_to_list      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.proper_effects
         < MODULE.init_points_to_list
         < MODULE.points_to
 \end{PipsMake}

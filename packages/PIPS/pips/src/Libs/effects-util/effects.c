@@ -289,7 +289,7 @@ bool anywhere_effect_p(effect e)
   return anywhere_p;
 }
 
-/* Is it an anywhere effect? */
+/* Is it an anywhere cell? */
 bool anywhere_cell_p(cell c)
 {
   bool anywhere_p;

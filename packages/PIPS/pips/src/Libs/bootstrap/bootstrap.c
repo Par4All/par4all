@@ -5285,6 +5285,7 @@ CreateIntrinsics( set module_list )
         {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
         {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {STRTOF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {STRTOLD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {STRTOL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
         {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
         {STRTOUL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},

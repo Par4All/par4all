@@ -250,9 +250,10 @@ points_to create_stub_points_to(cell c, type t,
    * tests and while loops. It may also lead to more precise
    * fix-points for the points-to graph.
   */
-  // approximation rel = make_approximation_exact();
-  approximation rel = make_approximation_may();
-
+  // AM: Get the property POINTS_TO_NULL_POINTER_INITIALIZATION
+  bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+  approximation rel = null_initialization_p? make_approximation_may():
+    make_approximation_exact();
   pt_to = make_points_to(source_cell, sink_cell, rel,
 			 make_descriptor_none());
   pointer_index ++;
@@ -357,12 +358,16 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   /* The pointer may be NULL or undefined. We neglect undefined/nowhere */
+  // AM: Get the property POINTS_TO_NULL_POINTER_INITIALIZATION
+  bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+  if(null_initialization_p) {
   cell nc = copy_cell(c);
   cell null_c = make_null_pointer_value_cell();
   points_to npt = make_points_to(nc, null_c,
 				 make_approximation_may(),
 				 make_descriptor_none());
   pt_in = add_arc_to_pt_map(npt, pt_in);
+  }
 
   /* The pointer may points towards another object (or set of object) */
   type upt = type_to_pointed_type(pt);
