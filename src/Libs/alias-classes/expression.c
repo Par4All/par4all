@@ -1105,6 +1105,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   /* Remove cells from R that do not belong to Heap: they cannot be
      freed */
   list nhl = NIL;
+  list inds = NIL;
   FOREACH(CELL, c, R) {
     /* FI->AM: Should be taken care of by the lattice...
      *
@@ -1113,12 +1114,23 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * cells that may be in the heap, i.e. abstract locations that are
      * greater then the heap abstract location.
      */
+    /* if c is a heap location with indices other than zero then we have bumped into 
+       a non-legal free */
+    if(heap_cell_p(c)) {
+      reference r = cell_any_reference(c);
+      inds = reference_indices(r);
+      if(!ENDP(inds)) {
+	expression ind = EXPRESSION (CAR(inds));
+	if(!expression_null_p(ind))
+	  nhl = CONS(CELL, c, nhl);
+      }
+    }
     if(!heap_cell_p(c) && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);
   gen_free_list(nhl);
-
+  gen_free_list(inds);
   //pips_assert("R is not empty", !ENDP(R));
 
   if(ENDP(R)) {
