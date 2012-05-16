@@ -9,7 +9,7 @@ delete pointer02b
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create pointer02b pointer02.c
+create pointer02b pointer02b.c
 
 #
 # Let's try again with points-to information

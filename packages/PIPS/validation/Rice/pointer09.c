@@ -1,4 +1,7 @@
+// FI: I do not understand this test case ...
+
 #include<stdlib.h>
+
 void pointer09()
 {
   struct tree{

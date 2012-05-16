@@ -1,0 +1,39 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
+
+int main()
+{
+
+// Points To: none
+
+   list *root;
+
+// Points To:
+// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   root = malloc(sizeof(list *));
+
+// Points To:
+// root -> *HEAP*_l_8 , EXACT
+
+   root->next = malloc(sizeof(list *));
+
+// Points To:
+// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
+// root -> *HEAP*_l_8 , EXACT
+
+   free(root);
+
+// Points To:
+// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
+// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return 0;
+}

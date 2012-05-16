@@ -1,0 +1,38 @@
+setenv WS=use_def_elim01
+delete $WS
+create $WS Mensi/$WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+# A pointer int * is incremented, this property must be reset
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
+
+##TODO: explain
+
+echo 
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[use_def_elim01]
+
+echo 
+echo PROPER POINTER EFFECTS
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[use_def_elim01]
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[use_def_elim01]
+
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

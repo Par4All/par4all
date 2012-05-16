@@ -28,5 +28,12 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 
 close
+
+echo
+echo Warnings
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

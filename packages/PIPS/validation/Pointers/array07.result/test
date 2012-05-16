@@ -42,13 +42,13 @@ int main()
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p -> t[*] , MAY
+// p -> t[i][0] , MAY
 
       p = t[i];
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p -> t[*] , MAY
+// p -> t[*][0] , MAY
 
 
    return 0;

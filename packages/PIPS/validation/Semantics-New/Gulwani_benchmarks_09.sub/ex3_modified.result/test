@@ -1,0 +1,104 @@
+
+TRANSFORMERS
+
+
+//  T() {m==y, x==0, 0<=m, m<=n}
+
+void ex3_modified(int x, int y, int n, int m)
+{
+
+//  T() {m==y, x==0, 0<=m, m<=n}
+
+   if (!(x==0&&y==m&&n>=m&&m>=0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T() {m==y, x==0, 0<=m, m<=n, 1<=n}
+
+   while (x<n) {
+
+//  T(x) {0<=m, m<=n, x+1<=m, x#init+1<=m, 1<=n, x+1<=n, x#init+1<=n,
+//    x#init<=x}
+
+      while (x<n&&x<m)
+
+//  T(x) {x==x#init+1, 0<=m, m<=n, x<=m, 1<=n, x<=n}
+
+         x++;
+
+//  T(x,y) {x+y#init==x#init+y, 0<=m, m<=n, x#init+1<=m+n, m<=x,
+//    m<=x#init, 1<=n, x+1<=n, x#init+1<=n, y#init<=y}
+
+      while (x<n&&x>=m) {
+
+//  T(x) {x==x#init+1, 0<=m, m+1<=x, x<=n}
+
+         x++;
+
+//  T(y) {y==y#init+1, 0<=m, m+1<=x, x<=n}
+
+         y++;
+      }
+   }
+
+//  T() {n==x, n==y, 0<=m, m<=n}
+
+   if (!(y==n))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ex3_modified(int x, int y, int n, int m)
+{
+
+//  P() {}
+
+   if (!(x==0&&y==m&&n>=m&&m>=0))
+
+//  P() {}
+
+      exit(0);
+
+//  P() {m==y, x==0, 0<=m, m<=n}
+
+   while (x<n) {
+
+//  P() {m==y, x==0, 0<=m, m<=n, 1<=n}
+
+      while (x<n&&x<m)
+
+//  P(x) {m==y, m<=n, x+1<=m, 0<=x}
+
+         x++;
+
+//  P(x) {m==x, m==y, 0<=m, m<=n, 1<=n}
+
+      while (x<n&&x>=m) {
+
+//  P(x,y) {x==y, 0<=m, m<=x, x+1<=n}
+
+         x++;
+
+//  P(x,y) {x==y+1, 0<=m, m+1<=x, x<=n}
+
+         y++;
+      }
+   }
+
+//  P(x,y) {n==x, n==y, 0<=m, m<=n}
+
+   if (!(y==n))
+
+//  P() {0==-1}
+
+      exit(1);
+}

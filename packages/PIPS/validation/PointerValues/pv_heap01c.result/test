@@ -52,7 +52,7 @@ int main()
 // Pointer values:
 // p == &*HEAP*_b0[0] (exact);
 // q == &*HEAP*_b0[0] (exact);
-// r == &*HEAP*_b1[0] (exact);
+// r == &*HEAP*_b1 (exact);
 // s == *ANY_MODULE*:*UNDEFINED* (exact);
 
    s = malloc(15);
@@ -60,7 +60,7 @@ int main()
 // Pointer values:
 // p == &*HEAP*_b0[0] (exact);
 // q == &*HEAP*_b0[0] (exact);
-// r == &*HEAP*_b1[0] (exact);
+// r == &*HEAP*_b1 (exact);
 // s == &*HEAP*_b2[0] (exact);
 
    p = (int *) malloc(n*sizeof(int));
@@ -68,7 +68,7 @@ int main()
 // Pointer values:
 // p == &*HEAP*_b3[0] (exact);
 // q == &*HEAP*_b0[0] (exact);
-// r == &*HEAP*_b1[0] (exact);
+// r == &*HEAP*_b1 (exact);
 // s == &*HEAP*_b2[0] (exact);
 
    return 0;

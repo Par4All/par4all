@@ -1,63 +1,51 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int a;
-   int b;
-   int x[10];
-   int *ap[10];
-   tf_t s;
-//             <    is written>: sp
-   tf_t *sp = &s;
-//             <may be read   >: ap[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: a b sp
-
-   call02(a, b, x, ap, sp);
-}
-
-POINTS-TO
+POINTS TO
 
 
-// Points To IN: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5 , MAY
+// q[*] -> _q_4[*] , MAY
 
 
 // Points To OUT: none
 
-int main()
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5 , MAY
+// q[*] -> _q_4[*] , MAY
 
-   int a;
-
-// Points To: none
-
-   int b;
-
-// Points To: none
-
-   int x[10];
-
-// Points To: none
-
-   int *ap[10];
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5 , MAY
+// q[*] -> _q_4[*] , EXACT
 
-   tf_t s;
-
-// Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   tf_t *sp = &s;
+   y[i] = 0;
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// sp -> s , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5 , MAY
+// q[*] -> _q_4[*] , EXACT
 
+   p->one = 1;
 
-   call02(a, b, x, ap, sp);
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4[*] , EXACT
+
+   (p->two)[j] = 2.;
+
+// Points To:
+// p -> _p_5 , EXACT
+// q[*] -> _q_4[*] , EXACT
+
+   *q[i] = 3;
 }

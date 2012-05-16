@@ -3,14 +3,25 @@ POINTS TO
 
 
 // Points To IN:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
 
 // Points To OUT: none
 
 void pointer11(int n, float *p, float *q)
 {
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
+
+   p!=(void *) 0&&q!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0) && q!=((void *)0)", "./pointer11.c", 8, (const char *) 0);
+
 
 // Points To:
 // p -> _p_2[0] , EXACT
@@ -36,14 +47,23 @@ void pointer11(int n, float *p, float *q)
 // q -> _q_3[0] , EXACT
 
       p[i] = q[i];
+
+// Points To:
+// p -> _q_3[0] , EXACT
+// q -> _q_3[0] , EXACT
+
+
+   return;
 }
 
 Proper effects with points-to
 
 
 // Points To IN:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
 
 // Points To OUT: none
@@ -52,6 +72,15 @@ void pointer11(int n, float *p, float *q)
 {
 
 // Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
+
+   p!=(void *) 0&&q!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0) && q!=((void *)0)", "./pointer11.c", 8, (const char *) 0);
+
+
+// Points To:
 // p -> _p_2[0] , EXACT
 // q -> _q_3[0] , EXACT
 
@@ -75,16 +104,27 @@ void pointer11(int n, float *p, float *q)
 // q -> _q_3[0] , EXACT
 
       p[i] = q[i];
+
+// Points To:
+// p -> _q_3[0] , EXACT
+// q -> _q_3[0] , EXACT
+
+
+   return;
 }
 
 Parallel code
 
 void pointer11(int n, float *p, float *q)
 {
+   p!=(void *) 0&&q!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0) && q!=((void *)0)", "./pointer11.c", 8, (const char *) 0);
+
    int i;
    p = q;
 
 #pragma omp parallel for 
    for(i = 0; i <= n-1; i += 1)
       p[i] = q[i];
+
+   return;
 }

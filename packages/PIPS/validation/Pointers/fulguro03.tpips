@@ -1,0 +1,43 @@
+setenv WS=fulguro03
+delete $WS
+create $WS $WS.c
+
+# A user error occurs if the typing is strict...
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
+#setenv EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL 8
+##TODO: explain
+
+# avoid typing issue due to extra-dimension... but this is not
+# compatible with the source code
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+echo 
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER POINTER EFFECTS
+echo
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+delete $WS
+quit

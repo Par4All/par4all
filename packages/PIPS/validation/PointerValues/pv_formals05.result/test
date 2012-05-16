@@ -37,12 +37,12 @@ int main()
    q = (my_struct *) malloc(sizeof(my_struct));
 
 // Pointer values:
-// q == &*HEAP*_l_14[0] (exact);
+// q == &*HEAP*_l_14 (exact);
 
    res = foo(q);
 
 // Pointer values:
-// q == &*HEAP*_l_14[0] (exact);
+// q == &*HEAP*_l_14 (exact);
 
    return res;
 }

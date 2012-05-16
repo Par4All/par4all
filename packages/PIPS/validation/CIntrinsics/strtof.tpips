@@ -1,0 +1,25 @@
+delete strtof
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete strtof
+create strtof strtof.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+module main
+
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE
+
+close
+delete strtof
+quit

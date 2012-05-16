@@ -100,33 +100,3 @@ struct my_struct  dependence09()
    return s;
 }
 
-Proper effects using points_to
-
-struct my_struct  dependence09()
-{
-   int *b, *a;
-   int i;
-   struct my_struct s;
-//             <    is written>: a
-
-   a = s.a;
-//             <    is written>: b
-   // a points_to s[1]
-   b = s.b;
-//             <    is written>: i
-   // b points_to s[2]
-   
-   
-   for(i = 0; i <= 9; i += 1) {
-//             <    is read   >: a i
-//             <    is written>: s.a[i]
-      a[i] = 0;
-//             <    is read   >: b i
-//             <    is written>: s.b[i]
-      b[i] = 1;
-   }
-//             <may be read   >: s.a[*] s.b[*]
-
-   return s;
-}
-

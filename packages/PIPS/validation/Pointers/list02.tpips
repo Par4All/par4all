@@ -7,8 +7,7 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
-# Key property for this test case: must be set to false
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty POINTS_TO_PATH_LIMIT 10
 
 #module main

@@ -3,33 +3,26 @@ PROPER  EFFECTS
 
 int main()
 {
-//             <    is written>: i
-   int i = 0;
+   int i;
    int *p, *q;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   int a[10];
+   int b[10];
+//             <    is written>: p
 
-   p = (int *) malloc(10*sizeof(int));
-//             <    is read   >: p
+   p = &a[0];
 //             <    is written>: q
-   q = p;
+   q = &b[0];
+//             <    is written>: i
+   i = 0;
 //             <    is read   >: i
-
-   while (i<5) {
+   while (i<10) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i q
-      *q = i;
-//             <    is read   >: q
-//             <    is written>: q
-      q++;
+      *p++ = 2**q++;
 //             <    is read   >: i
 //             <    is written>: i
       i++;
    }
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-
-   free(p);
    return 0;
 }
 
@@ -46,7 +39,7 @@ int main()
 
 // Points To: none
 
-   int i = 0;
+   int i;
 
 // Points To: none
 
@@ -56,110 +49,77 @@ int main()
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-
-   p = (int *) malloc(10*sizeof(int));
+   int a[10];
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   q = p;
+   int b[10];
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[0] , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
-   while (i<5) {
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , MAY
-// q -> *HEAP*_l_7[0] , MAY
-// q -> *HEAP*_l_7[1] , MAY
-// q -> *HEAP*_l_7[2] , MAY
-// q -> *HEAP*_l_7[3] , MAY
-// q -> *HEAP*_l_7[4] , MAY
-// q -> *HEAP*_l_7[5] , MAY
-// q -> *HEAP*_l_7[6] , MAY
-// q -> *HEAP*_l_7[7] , MAY
-// q -> *HEAP*_l_7[8] , MAY
-// q -> *HEAP*_l_7[9] , MAY
-// q -> *HEAP*_l_7[10] , MAY
-// q -> *HEAP*_l_7[11] , MAY
-
-      *q = i;
+   p = &a[0];
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , MAY
-// q -> *HEAP*_l_7[0] , MAY
-// q -> *HEAP*_l_7[1] , MAY
-// q -> *HEAP*_l_7[2] , MAY
-// q -> *HEAP*_l_7[3] , MAY
-// q -> *HEAP*_l_7[4] , MAY
-// q -> *HEAP*_l_7[5] , MAY
-// q -> *HEAP*_l_7[6] , MAY
-// q -> *HEAP*_l_7[7] , MAY
-// q -> *HEAP*_l_7[8] , MAY
-// q -> *HEAP*_l_7[9] , MAY
-// q -> *HEAP*_l_7[10] , MAY
-// q -> *HEAP*_l_7[11] , MAY
+// p -> a[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-      q++;
+   q = &b[0];
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , MAY
-// q -> *HEAP*_l_7[1] , MAY
-// q -> *HEAP*_l_7[2] , MAY
-// q -> *HEAP*_l_7[3] , MAY
-// q -> *HEAP*_l_7[4] , MAY
-// q -> *HEAP*_l_7[5] , MAY
-// q -> *HEAP*_l_7[6] , MAY
-// q -> *HEAP*_l_7[7] , MAY
-// q -> *HEAP*_l_7[8] , MAY
-// q -> *HEAP*_l_7[9] , MAY
-// q -> *HEAP*_l_7[10] , MAY
-// q -> *HEAP*_l_7[11] , MAY
+// p -> a[0] , EXACT
+// q -> b[0] , EXACT
+
+   i = 0;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> b[0] , EXACT
+
+   while (i<10) {
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+// q -> b[*] , MAY
+// q -> b[0] , MAY
+// q -> b[1] , MAY
+// q -> b[2] , MAY
+// q -> b[3] , MAY
+
+      *p++ = 2**q++;
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+// q -> b[*] , MAY
+// q -> b[1] , MAY
+// q -> b[2] , MAY
+// q -> b[3] , MAY
 
       i++;
    }
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-// q -> *HEAP*_l_7[*] , MAY
-// q -> *HEAP*_l_7[0] , MAY
-// q -> *HEAP*_l_7[1] , MAY
-// q -> *HEAP*_l_7[2] , MAY
-// q -> *HEAP*_l_7[3] , MAY
-// q -> *HEAP*_l_7[4] , MAY
-// q -> *HEAP*_l_7[5] , MAY
-// q -> *HEAP*_l_7[6] , MAY
-// q -> *HEAP*_l_7[7] , MAY
-// q -> *HEAP*_l_7[8] , MAY
-// q -> *HEAP*_l_7[9] , MAY
-// q -> *HEAP*_l_7[10] , MAY
-// q -> *HEAP*_l_7[11] , MAY
-
-
-   free(p);
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *HEAP*_l_7[*] , MAY
-// q -> *HEAP*_l_7[0] , MAY
-// q -> *HEAP*_l_7[1] , MAY
-// q -> *HEAP*_l_7[2] , MAY
-// q -> *HEAP*_l_7[3] , MAY
-// q -> *HEAP*_l_7[4] , MAY
-// q -> *HEAP*_l_7[5] , MAY
-// q -> *HEAP*_l_7[6] , MAY
-// q -> *HEAP*_l_7[7] , MAY
-// q -> *HEAP*_l_7[8] , MAY
-// q -> *HEAP*_l_7[9] , MAY
-// q -> *HEAP*_l_7[10] , MAY
-// q -> *HEAP*_l_7[11] , MAY
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+// q -> b[*] , MAY
+// q -> b[0] , MAY
+// q -> b[1] , MAY
+// q -> b[2] , MAY
+// q -> b[3] , MAY
 
    return 0;
 }

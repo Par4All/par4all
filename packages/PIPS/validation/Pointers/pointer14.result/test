@@ -1,0 +1,49 @@
+
+POINTS TO for pointer14
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void pointer14()
+{
+
+// Points To: none
+
+   double *(*t[3][4])[5][6][7];
+
+// Points To:
+// t[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   double *a[5][6][7];
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   double z;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   t[0][0] = &a;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[0][0] -> a , EXACT
+
+   a[1][2][3] = &z;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[1][2][3] -> z , EXACT
+// t[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[0][0] -> a , EXACT
+
+   return;
+}
+INIT_POINTS_TO_ANALYSIS[pointer14] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

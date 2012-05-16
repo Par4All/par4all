@@ -1,32 +1,5 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   float f;
-   int *p, *q;
-   int a[10];
-   int b[10];
-//             <    is written>: p
-
-   p = &a[0];
-//             <    is written>: q
-   q = &b[0];
-//             <    is written>: f
-   f = 0.0;
-//             <    is read   >: f
-   while (f<10.5) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      *p++ = 2**q++;
-//             <    is read   >: f
-//             <    is written>: f
-      f += 1.0;
-   }
-   return 0;
-}
-
-POINTS-TO
+POINTS TO
 
 
 // Points To IN: none

@@ -62,16 +62,14 @@ int inc01(int *pi)
 // Points To:
 // pi -> *NULL_POINTER* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _pi_1[0] , MAY
+// q -> _pi_1[0] , EXACT
 
    *q = i++;
 
 // Points To:
 // pi -> *NULL_POINTER* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _pi_1[0] , MAY
+// q -> _pi_1[0] , EXACT
 
    return 0;
 }
@@ -89,8 +87,8 @@ int inc01(int *pi)
 //             <may be read   >: _pi_1[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: i
    i = *q;
-//             <may be written>: _pi_1[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i q
+//             <    is written>: _pi_1[0] i
    *q = i++;
    return 0;
 }

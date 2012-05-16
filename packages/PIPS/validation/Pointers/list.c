@@ -27,29 +27,45 @@ void list_free(list l)
     free(p);
     p = n;
   }
+  return;
 }
 
 void list_clean(list * p)
 {
   list_free(*p);
   *p = nil;
+  return;
 }
 
 // getter
+// FI: double return...
 list list_next(list l)
 {
+  //if (l==nil)
+  //  return nil;
+  //else
+  //  return l->next;
+  list n;
   if (l==nil)
-    return nil;
+    n = nil;
   else
-    return l->next;
+    n = l->next;
+  return n;
 }
 
+// FI: same issue as above, double return, would be could tests for unstructured
 double list_value(list l)
 {
+  /* if (l==nil) */
+  /*   return 0.0; */
+  /* else */
+  /*   return l->value; */
+  double v;
   if (l==nil)
-    return 0.0;
+    v = 0.0;
   else
-    return l->value;
+    v = l->value;
+  return v;
 }
 
 // observer

@@ -1,0 +1,74 @@
+
+TRANSFORMERS
+
+
+//  T() {0<=n}
+
+void counter(int x, int n)
+{
+
+//  T(x) {x==0}
+
+   x = 0;
+
+//  T() {x==0, 0<=n}
+
+   if (!(x==0&&n>=0))
+
+//  T() {0==-1}
+
+      exit(0);
+
+//  T(x) {x#init==0, 1<=n, x+1<=n, 0<=x}
+
+   while (x<n)
+
+//  T(x) {x==x#init+1, 1<=n, x<=n}
+
+      x++;
+
+//  T() {n==x, 0<=n}
+
+   if (!(x==n))
+
+//  T() {0==-1}
+
+      exit(1);
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void counter(int x, int n)
+{
+
+//  P() {}
+
+   x = 0;
+
+//  P(x) {x==0}
+
+   if (!(x==0&&n>=0))
+
+//  P(x) {x==0, n+1<=0}
+
+      exit(0);
+
+//  P(x) {x==0, 0<=n}
+
+   while (x<n)
+
+//  P(x) {x+1<=n, 0<=x}
+
+      x++;
+
+//  P(x) {n==x, 0<=n}
+
+   if (!(x==n))
+
+//  P() {0==-1}
+
+      exit(1);
+}

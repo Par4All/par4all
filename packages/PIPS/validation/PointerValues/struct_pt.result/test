@@ -1,0 +1,67 @@
+
+// IN Pointer values: none
+
+
+// OUT Pointer values: none
+
+int main()
+{
+
+// Pointer values: none
+
+   typedef struct my_struct {
+      int i;
+      int *p;
+   } my_str;
+
+// Pointer values: none
+
+   my_str *m, *n;
+
+// Pointer values:
+// m == *ANY_MODULE*:*UNDEFINED* (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int j;
+
+// Pointer values:
+// m == *ANY_MODULE*:*UNDEFINED* (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   j = 2;
+
+// Pointer values:
+// m == *ANY_MODULE*:*UNDEFINED* (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   m = (my_str *) malloc(sizeof(my_str));
+
+// Pointer values:
+// m == &*HEAP*_l_10 (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   m->i = 1;
+
+// Pointer values:
+// m == &*HEAP*_l_10 (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   m->p = &j;
+
+// Pointer values:
+// *HEAP*_l_10.p == &j (exact);
+// m == &*HEAP*_l_10 (exact);
+// m[0].p == &j (exact);
+// n == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   n = m;
+
+// Pointer values:
+// *HEAP*_l_10.p == &j (exact);
+// m == &*HEAP*_l_10 (exact);
+// m[0].p == &j (exact);
+// n == m (exact);
+
+
+   return 0;
+}

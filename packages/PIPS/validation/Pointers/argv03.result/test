@@ -1,0 +1,34 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> _argv_2_2[*] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2 , EXACT
+
+
+// Points To OUT:
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> _argv_2_2[*] , MAY
+
+int argv03(int argc, char *(*argv)[argc])
+{
+
+// Points To:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2 , EXACT
+
+   char *p = (*argv)[1];
+
+// Points To:
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> _argv_2_2[*] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _argv_2_2[*] , MAY
+
+   return p==p;
+}

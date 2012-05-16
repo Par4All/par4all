@@ -7,6 +7,7 @@ struct my_struct  dependence13()
    int i;
    struct my_struct s;
 //             <may be read   >: s.a[*] s.b[*]
+//             <    is read   >: s.p
 
    return s;
 }
@@ -41,6 +42,7 @@ struct my_struct  dependence13()
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s.p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    return s;

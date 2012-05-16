@@ -1,0 +1,20 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2 , MAY
+
+
+// Points To OUT: none
+
+int main(int argc, char **argv)
+{
+
+// Points To:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2 , MAY
+
+   return 0;
+}

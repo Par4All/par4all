@@ -1,0 +1,23 @@
+int main()
+{
+   float res;
+   char *input_chain;
+   char *remaining_chain;
+//             <    is written>: input_chain
+   input_chain = "  0.3 ; and this is the remainder.\n";
+//             <may be read   >: input_chain[*]
+//             <    is written>: remaining_chain res
+   res = strtod(input_chain, &remaining_chain);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: res stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("my float is :%f\n", res);
+//             <may be read   >: remaining_chain[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: remaining_chain stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("and my remaining chain : %s", remaining_chain);
+   return 0;
+}

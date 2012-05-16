@@ -11,6 +11,7 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 # to FALSE)
 
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_PATH_LIMIT 10
 
 ##TODO: explain
 
