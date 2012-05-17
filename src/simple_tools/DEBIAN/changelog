@@ -1,3 +1,22 @@
+2012-05-17 Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.4.1
+
+   * Update package dependencies for Ubuntu 12.04 and Debian/testing
+	 & /unstable.
+
+   * Make Par4All relocatable after compile-time (.deb package and .tar.gz)
+
+   * Improve the coding rules guide
+
+   * Update dependent package list for Ubuntu 12.04 and to be able to run
+     Stars-PM demo
+
+   * Do not add "register" qualifier in scalarization phase
+
+   * The license of the PIPS C3 Linear library changes from GPLv3 to LGPL
+
+
 2012-05-04 Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.4
