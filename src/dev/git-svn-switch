@@ -13,10 +13,18 @@
 #   for i in *; do (cd $i; git-svn-switch http://svn.cri.ensmp.fr/svn https://scm.cri.ensmp.fr/svn); done
 
 # Basically implement https://git.wiki.kernel.org/index.php/GitSvnSwitch
-# It guesses you have new stuff to fetch from the SVN server.
+# and add a reset to one version in the past to be sure to have new stuff
+# to fetch from the SVN server.
+# It guesses that the previous svn version is the current - 1
+
+
+# Irresponsible of this: Ronan.Keryell at wild-systems.com
+# I think afterwards it would have been easier to add a switch option to
+# git svn instead of hacking this way...
+
 
 # Switch tracing mode on, so that if something goes wrong we can figure
-# out where to resume later:
+# out where to resume later, back-track and so on:
 set -vx
 
 old_url_string="$1"
@@ -26,6 +34,14 @@ old_url=`git config --get svn-remote.svn.url`
 
 # Do the URL rewriting (we hope there are no '|' in the URL):
 new_url=`echo "$old_url" | sed -e "s|$old_url_string|$new_url_string|"`
+
+# Get the previous svn revision so that we can reset to it to be sure we
+# will fetch something (well, we guess here that the previous version is
+# current - 1):
+current_svn_revision=`git svn info | awk '/^Revision:/ { print $2 - 1 }'`
+
+# Go back to previous version:
+git svn reset -r $current_svn_revision
 
 git config --replace-all svn-remote.svn.url "$new_url"
 git svn fetch
