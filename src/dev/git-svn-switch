@@ -1,0 +1,35 @@
+#! /bin/sh
+
+# Switch the SVN URL of a local git-svn repository
+
+# git-svn-switch <old-url-substring> <new-url-substring>
+
+# Do a fetch and replace in the URL old-url-substring by new-url-substring.
+# The rationale for substring is to be able to process many git-svn repository
+
+# Typical use case:
+#   git-svn-switch http://svn.cri.ensmp.fr/svn https://scm.cri.ensmp.fr/svn
+# or to update a bunch of git-svn repositories in the same directory:
+#   for i in *; do (cd $i; git-svn-switch http://svn.cri.ensmp.fr/svn https://scm.cri.ensmp.fr/svn); done
+
+# Basically implement https://git.wiki.kernel.org/index.php/GitSvnSwitch
+# It guesses you have new stuff to fetch from the SVN server.
+
+# Switch tracing mode on, so that if something goes wrong we can figure
+# out where to resume later:
+set -vx
+
+old_url_string="$1"
+new_url_string="$2"
+
+old_url=`git config --get svn-remote.svn.url`
+
+# Do the URL rewriting (we hope there are no '|' in the URL):
+new_url=`echo "$old_url" | sed -e "s|$old_url_string|$new_url_string|"`
+
+git config --replace-all svn-remote.svn.url "$new_url"
+git svn fetch
+git config --replace-all svn-remote.svn.url "$old_url"
+git svn rebase -l
+git config --replace-all svn-remote.svn.url "$new_url"
+git svn rebase
