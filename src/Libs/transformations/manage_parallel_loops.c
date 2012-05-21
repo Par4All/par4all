@@ -1,5 +1,5 @@
 /*
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech - HPC Project
 
   This file is part of PIPS.
 
@@ -34,6 +34,8 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
+#include "complexity_ri.h"
+#include "complexity.h"
 
 
 static list current = NIL;
@@ -123,3 +125,94 @@ bool limit_nested_parallelism (const const char* module_name) {
 
   return true;
 }
+
+/*****************************************************************/
+
+typedef struct  limit_uninteresting_parallelism_context{
+  bool (*loop_cost_testing_function)(statement,  struct limit_uninteresting_parallelism_context *);
+  int startup_overhead;
+  int bandwidth;
+  int frequency;
+} limit_uninteresting_parallelism_context;
+
+static void init_limit_uninteresting_parallelism_context(limit_uninteresting_parallelism_context *p_ctxt,
+							 bool (*loop_cost_testing_function)(statement, limit_uninteresting_parallelism_context *))
+{
+  p_ctxt->loop_cost_testing_function = loop_cost_testing_function;
+  p_ctxt->startup_overhead = get_int_property("COMPUTATION_INTENSITY_STARTUP_OVERHEAD");
+  p_ctxt->bandwidth = get_int_property("COMPUTATION_INTENSITY_BANDWIDTH");
+  p_ctxt->frequency = get_int_property("COMPUTATION_INTENSITY_FREQUENCY");
+}
+
+static bool complexity_cost_effective_loop_p(statement s,
+					     limit_uninteresting_parallelism_context * p_ctxt)
+{
+  pips_assert("input statement must be a loop", statement_loop_p(s));
+  bool result = true;
+  complexity comp = load_statement_complexity(s);
+
+  Ppolynome instruction_time = polynome_dup(complexity_polynome(comp));
+  polynome_scalar_mult(&instruction_time, 1.f/p_ctxt->frequency);
+  polynome_scalar_add(&instruction_time, p_ctxt->startup_overhead);
+
+  int max_degree = polynome_max_degree(instruction_time);
+  pips_debug(1, "max_degree is: %d\n", max_degree);
+  float coeff=-1.f;
+  for(Ppolynome p = instruction_time; !POLYNOME_NUL_P(p); p = polynome_succ(p))
+    {
+      int curr_degree =  (int)vect_sum(monome_term(polynome_monome(p)));
+      if(curr_degree == max_degree) {
+	coeff = monome_coeff(polynome_monome(p));
+	break;
+      }
+    }
+  polynome_rm(&instruction_time);
+
+  pips_debug(1, "coeff is: %f\n", coeff);
+  result = (coeff > (float) (p_ctxt->startup_overhead + 10));
+  return result;
+}
+
+static bool limit_uninteresting_parallelism_statement_in(statement s,
+							 limit_uninteresting_parallelism_context * p_ctxt)
+{
+
+  if (statement_loop_p(s))
+    {
+      pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n",
+		 statement_ordering(s), statement_number(s));
+      ifdebug(1) {
+	print_statement(s);
+      }
+
+
+      loop l = statement_loop(s);
+      if (loop_parallel_p(l) && ! p_ctxt->loop_cost_testing_function(s, p_ctxt))
+	{
+	  execution_tag(loop_execution(l)) = is_execution_sequential;
+	}
+    }
+  return true;
+}
+
+/**
+**/
+bool limit_parallelism_using_complexity(const const char* module_name)
+{
+
+  statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
+					  "MANAGE_PARALLEL_LOOPS_DEBUG_LEVEL");
+  set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
+
+  limit_uninteresting_parallelism_context ctxt;
+  init_limit_uninteresting_parallelism_context(&ctxt, complexity_cost_effective_loop_p);
+  gen_context_recurse(get_current_module_statement(), &ctxt,
+		      statement_domain, limit_uninteresting_parallelism_statement_in, gen_null);
+
+  reset_complexity_map();
+  // Put back the new statement module
+  PIPS_PHASE_POSTLUDE(mod_stmt);
+
+  return true;
+}
+
