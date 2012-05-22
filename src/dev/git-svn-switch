@@ -1,0 +1,51 @@
+#! /bin/sh
+
+# Switch the SVN URL of a local git-svn repository
+
+# git-svn-switch <old-url-substring> <new-url-substring>
+
+# Do a fetch and replace in the URL old-url-substring by new-url-substring.
+# The rationale for substring is to be able to process many git-svn repository
+
+# Typical use case:
+#   git-svn-switch http://svn.cri.ensmp.fr/svn https://scm.cri.ensmp.fr/svn
+# or to update a bunch of git-svn repositories in the same directory:
+#   for i in *; do (cd $i; git-svn-switch http://svn.cri.ensmp.fr/svn https://scm.cri.ensmp.fr/svn); done
+
+# Basically implement https://git.wiki.kernel.org/index.php/GitSvnSwitch
+# and add a reset to one version in the past to be sure to have new stuff
+# to fetch from the SVN server.
+# It guesses that the previous svn version is the current - 1
+
+
+# Irresponsible of this: Ronan.Keryell at wild-systems.com
+# I think afterwards it would have been easier to add a switch option to
+# git svn instead of hacking this way...
+
+
+# Switch tracing mode on and exit on error, so that if something goes
+# wrong we can figure out where to resume later, back-track and so on:
+set -vxe
+
+old_url_string="$1"
+new_url_string="$2"
+
+old_url=`git config --get svn-remote.svn.url`
+
+# Do the URL rewriting (we hope there are no '|' in the URL):
+new_url=`echo "$old_url" | sed -e "s|$old_url_string|$new_url_string|"`
+
+# Get the previous svn revision so that we can reset to it to be sure we
+# will fetch something (well, we guess here that the previous version is
+# current - 1):
+current_svn_revision=`git svn info | awk '/^Revision:/ { print $2 - 1 }'`
+
+# Go back to previous version:
+git svn reset -r $current_svn_revision
+
+git config --replace-all svn-remote.svn.url "$new_url"
+git svn fetch
+git config --replace-all svn-remote.svn.url "$old_url"
+git svn rebase -l
+git config --replace-all svn-remote.svn.url "$new_url"
+git svn rebase
