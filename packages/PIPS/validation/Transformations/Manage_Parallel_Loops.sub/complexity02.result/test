@@ -1,0 +1,27 @@
+#
+# Code after internalize_parallel_code for module main
+#
+int main()
+{
+   int a[2];
+   {
+      int i;
+
+#pragma omp parallel for 
+      for(i = 0; i <= 1; i += 1)
+         a[i] = sin(i*1.0);
+   }
+}
+#
+# Code after limit_parallelism_using_complexity for module main
+#
+int main()
+{
+   int a[2];
+   {
+      int i;
+
+      for(i = 0; i <= 1; i += 1)
+         a[i] = sin(i*1.0);
+   }
+}

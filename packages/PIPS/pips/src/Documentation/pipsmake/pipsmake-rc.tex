@@ -6565,6 +6565,22 @@ Those values have limited meaning here, only their ratio have some.
 Having \PipsPropRef{COMPUTATION_INTENSITY_FREQUENCY} and \PipsPropRef{COMPUTATION_INTENSITY_BANDWIDTH}
 of the same magnitude clearly limits the number of generated pragmas\dots
 
+\subsection{Limit parallelism using complexity}
+\label{sec:limit_parallelism_using_complexity}
+
+\begin{PipsPass}{limit_parallelism_using_complexity}
+  Parallel loops which are considered as not complex enough are
+  replaced by sequential ones using a simple cost model based on
+  complexity (see \PipsPassRef{uniform_complexities}).
+\end{PipsPass}
+
+\begin{PipsMake}
+limit_parallelism_using_complexity > MODULE.code
+	< MODULE.code
+	< MODULE.complexities
+\end{PipsMake}
+
+
 \subsection{Limit Parallelism in Parallel Loop Nests}
 \label{sec:manage-parallel-loops}
 
