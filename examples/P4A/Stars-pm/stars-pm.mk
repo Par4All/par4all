@@ -44,7 +44,11 @@ CPROTO_GRAPHICS_SRC = $(GRAPHICS_SRC)
 P4A_OMP_FLAGS=-DFFTW3_THREADED -lfftw3f_threads
 P4A_CUDA_FLAGS=--atomic
 P4A_ACCEL_OPENMP_FLAGS=$(P4A_OMP_FLAGS)
-NVCCFLAGS+=-lcufft
+# With nvcc 4.2, gcc 4.6 and FFTW3 there is a bug when parsing fftw3.h in nvcc,
+# so work around by claiming we use ICC here with -D__ICC...
+# TODO: clean this at the application level.
+# There is the same issue with cproto, but cproto survives better...
+NVCCFLAGS+=-lcufft -D__ICC
 LDLIBS+= -lm -lfftw3f
 CULIBS+= -lm --fftw3
 OPENCLLIBS+= -lm -lfftw3f
