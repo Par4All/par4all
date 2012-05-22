@@ -1,42 +1,344 @@
-setenv WS=pointer_free
-delete $WS
-setproperty ABORT_ON_USER_ERROR TRUE
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
-setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-create $WS $WS.c
+
+POINTS TO for pointer_free
 
 
-echo
-echo POINTS TO for "$WS"
-echo
-#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALL]
-
-echo 
-echo PROPER  EFFECTS WITH POINTS TO
-echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALL]
+// Points To IN: none
 
 
-echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
-echo
-activate CUMULATED_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALL]
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_7 , EXACT
 
-echo
-echo POINTS TO for "$WS"
-echo
-activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALL]
+pointer alloc_pointer(int v)
+{
 
-close
-shell cat $WS.database/Warnings
-delete $WS
-quit
+// Points To: none
+
+   pointer p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_7 , EXACT
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_7 , EXACT
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p2 = p1;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+
+   pointer_free(p1);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
+
+
+   return;
+}
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   free(p);
+
+// Points To: none
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+//#include<stdlib.h>
+
+// Points To: none
+
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+
+// Points To: none
+
+pointer alloc_pointer(int v);
+
+
+// Points To: none
+
+void pointer_free(pointer p);
+
+
+
+
+
+// Points To: none
+
+int main(void);
+
+PROPER  EFFECTS WITH POINTS TO
+
+pointer alloc_pointer(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <    is read   >: p v
+//             <    is written>: *HEAP*_l_7
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p1);
+
+   return;
+}
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+   return;
+}
+//#include<stdlib.h>
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+pointer alloc_pointer(int v);
+
+void pointer_free(pointer p);
+
+
+
+
+int main(void);
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+pointer alloc_pointer(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <    is read   >: p v
+//             <    is written>: *HEAP*_l_7
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p1);
+
+   return;
+}
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+   return;
+}
+//#include<stdlib.h>
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+pointer alloc_pointer(int v);
+
+void pointer_free(pointer p);
+
+
+
+
+int main(void);
+
+POINTS TO for pointer_free
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_7 , EXACT
+
+pointer alloc_pointer(int v)
+{
+
+// Points To: none
+
+   pointer p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_7 , EXACT
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_7 , EXACT
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_7 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p2 = p1;
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_7 , EXACT
+// p2 -> alloc_pointer:*HEAP*_l_7 , EXACT
+
+   pointer_free(p1);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_7 , EXACT
+// p2 -> alloc_pointer:*HEAP*_l_7 , EXACT
+
+
+   return;
+}
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   free(p);
+
+// Points To: none
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+//#include<stdlib.h>
+
+// Points To: none
+
+typedef int *pointer;
+
+// should catch that returned value is malloc'ed there
+
+// Points To: none
+
+pointer alloc_pointer(int v);
+
+
+// Points To: none
+
+void pointer_free(pointer p);
+
+
+
+
+
+// Points To: none
+
+int main(void);
+INIT_POINTS_TO_ANALYSIS[alloc_pointer] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[pointer_free] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[pointer_free!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_7".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_7".
