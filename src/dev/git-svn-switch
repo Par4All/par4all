@@ -23,9 +23,9 @@
 # git svn instead of hacking this way...
 
 
-# Switch tracing mode on, so that if something goes wrong we can figure
-# out where to resume later, back-track and so on:
-set -vx
+# Switch tracing mode on and exit on error, so that if something goes
+# wrong we can figure out where to resume later, back-track and so on:
+set -vxe
 
 old_url_string="$1"
 new_url_string="$2"
