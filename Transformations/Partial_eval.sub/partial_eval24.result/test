@@ -1,0 +1,53 @@
+int main(void)
+{
+   void (*point)(void);
+   
+   /* partial_eval & normalization should cope with function address
+        expressions */
+   point = star;
+
+   point = &star;
+   return point!=(void *) 0;
+}
+file with preconditions
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   void (*point)(void);
+
+//  P() {}
+
+   
+   /* partial_eval & normalization should cope with function address
+        expressions */
+   point = star;
+
+//  P() {}
+
+
+   point = &star;
+
+//  P() {}
+
+   return point!=(void *) 0;
+}
+
+file after partial evaluation
+
+int main(void)
+{
+   void (*point)(void);
+   
+   /* partial_eval & normalization should cope with function address
+        expressions */
+   point = star;
+
+   point = &star;
+   return point!=(void *) 0;
+}
