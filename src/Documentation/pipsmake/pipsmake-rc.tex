@@ -8005,7 +8005,7 @@ The intermediate part simulates the parallel code to the kernel from the host
 kernelize				> MODULE.code
 		> MODULE.callees
 		> PROGRAM.kernels
-		! MODULE.privatize_module
+                ! MODULE.privatize_module
 		! MODULE.coarse_grain_parallelization
 		< PROGRAM.entities
 		< MODULE.code
@@ -8217,7 +8217,7 @@ alias gpu_ify 'Distribute // loop nests on GPU'
 gpu_ify                    > MODULE.code
 		> MODULE.callees
 		> PROGRAM.entities
-		! MODULE.privatize_module
+		< MODULE.privatized
 		< PROGRAM.entities
 		< MODULE.code
         < MODULE.cumulated_effects
@@ -11309,8 +11309,8 @@ written scalar by reference or not. This property might lead to incorrect code !
 \begin{PipsMake}
 
 outline      > MODULE.code
-		! MODULE.privatize_module
         > PROGRAM.entities
+	< MODULE.privatized
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.regions
@@ -12177,6 +12177,15 @@ depending on their target.
 \subsubsection{Scalar Privatization}
 \index{Scalar Privatization}
 
+Two phases implement scalar privatization. Both detect variables which
+are local to a loop nest. They differ in the way they handle global
+variables: \PipsPassRef{privatize_module} privatizes only local
+variables and function parameters, whereas
+\PipsPassRef{privatize_module_even_globals} also tries to privatize
+global variables. Both phases produce a fake resource,
+\texttt{MODULE.privatized}, so that one or the other can be
+activated. The default phase is \PipsPassRef{privatize_module}.
+
 \begin{PipsPass}{privatize_module}
 Privatizer detects variables that are local to a loop nest and marks
 these variables as private. A variable is private to a loop if the
@@ -12191,6 +12200,7 @@ correct since the initial semantics is unspecified.
 \begin{PipsMake}
 alias privatize_module 'Privatize Scalars'
 privatize_module                    > MODULE.code
+                                    > MODULE.privatized
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
@@ -12213,6 +12223,7 @@ privatize_module                    > MODULE.code
 \begin{PipsMake}
 alias privatize_module_even_globals 'Privatize Local and Global Scalars'
 privatize_module_even_globals       > MODULE.code
+                                    > MODULE.privatized
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
@@ -12223,6 +12234,14 @@ privatize_module_even_globals       > MODULE.code
         < CALLEES.summary_effects
 \end{PipsMake}
 
+The results of this phase are not always as good as expected. this
+happens when global variables are also used/defined in called
+modules. Requiring that \PipsPassRef{privatize_module_even_globals} is
+called on callees first (by using a bang rule), is not sufficient,
+because declaring variable as private does not remove the effects on
+the variables. Enforcing that \PipsPassRef{localize_declaration} is
+first performed on the called modules partially solves the problems,
+except for loop indices of outermost loops which are not localized.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DECLARATION LOCALIZATION
@@ -12253,7 +12272,7 @@ for(i=0;i<10;i++)
 
 \begin{PipsMake}
 localize_declaration > MODULE.code
-		! MODULE.privatize_module
+        < MODULE.privatized
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
@@ -12392,7 +12411,7 @@ Loop private scalar variables are expanded
 \begin{PipsMake}
 alias variable_expansion 'Expand Scalar'
 variable_expansion                    > MODULE.code
-		! MODULE.privatize_module
+        < MODULE.privatized
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}

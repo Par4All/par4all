@@ -123,6 +123,12 @@ bool entity_privatizable_in_loop_statement_p(entity e, statement stmt, bool even
     bool result = entity_scalar_p(e);
     loop l = statement_loop(stmt);
 
+    ifdebug(4)
+      {
+	pips_debug(4, "begin for statement: \n");
+	print_statement(stmt);
+      }
+
     /* For C, it should be checked that e has no initial value because
        there is no dependence arc between the initialization in t he
        declaration and the other references. This is not very smart,
@@ -159,7 +165,7 @@ bool entity_privatizable_in_loop_statement_p(entity e, statement stmt, bool even
 	    /* check that e is not used through called functions */
 	    /* It may be passed to a function as a parameter,
 	       but it must not be used as a global variable */
-	    gen_context_recurse(loop_body(l), &ctxt, call_domain, call_in, gen_null);
+	    gen_context_multi_recurse(loop_body(l), &ctxt, call_domain, call_in, gen_null, NULL);
 	    result = !ctxt.used_through_external_calls;
 	  }
 	else
@@ -229,9 +235,10 @@ static void scan_statement(statement s, list loops, bool even_globals)
             }
         }
 
-        /* Add the loop index because it does not have to be taken
+        /* Add the loop index if it's privatizable because it does not have to be taken
            into account for parallelization. */
-        loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
+	//if (entity_privatizable_in_loop_statement_p( loop_index(l), s, even_globals))
+	  loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
 
         /* FI: add the local variables of the loop body at least, but
            they might have to be added recursively for all enclosed
@@ -592,6 +599,7 @@ bool generic_privatize_module(char *mod_name, bool even_globals)
         db_get_memory_resource(DBR_CHAINS, mod_name, true);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
+    pips_debug(1, "\n begin for module %s\n\n", mod_name);
     set_ordering_to_statement(mod_stat);
 
     /* Set the prettyprint language for debug */
@@ -637,6 +645,7 @@ bool generic_privatize_module(char *mod_name, bool even_globals)
 
     debug_off();
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stat);
+    DB_PUT_FILE_RESOURCE(DBR_PRIVATIZED, mod_name, strdup(""));
 
     reset_current_module_entity();
     reset_current_module_statement();
