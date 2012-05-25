@@ -14,5 +14,7 @@ int main(int argc, char *argv[])
   pz = (float *) malloc(sizeof(float));
   pt = (int (*)[30]) malloc(sizeof(*pt));
 
+  pt++;
+
   return 0;
 }

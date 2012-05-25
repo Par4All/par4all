@@ -7,6 +7,9 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 ##TODO: explain
 
+# Easier when this property is set to true
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
 echo 
 echo PROPER EFFECTS
 echo
