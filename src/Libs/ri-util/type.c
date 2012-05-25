@@ -4945,6 +4945,27 @@ int variable_dimension_number(variable v)
   return d;
 }
 
+/* convert a scalar type "t" into a newly allocated array type "at"
+ * whose elements are of type "t". The dimension is unbounded.
+ *
+ * This useful when dealing with pointers that are not precisely
+ * typed. In C you have often to assume they point towards an array
+ * since pointer arithmetic is OK by default.
+ *
+ * The behavior of this function is not well defined when typedef are
+ * used...
+ */
+type type_to_array_type(type t)
+{
+  pips_assert("t is not an array type", !array_type_p(t));
+  type at = copy_type(t);
+  variable vt = type_variable(at);
+  dimension d = make_dimension(int_to_expression(0),
+			       make_unbounded_expression());
+  variable_dimensions(vt) = CONS(DIMENSION, d, NIL);
+  return at;
+}
+
 /*
  *  that is all
  */
