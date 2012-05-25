@@ -117,7 +117,7 @@ list call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   tag tt = value_tag(v);
   switch (tt) {
   case is_value_code:
-    sinks = user_call_to_points_to_sinks(c, in);
+    sinks = user_call_to_points_to_sinks(c, in, eval_p);
     break;
   case is_value_symbolic:
     break;
@@ -340,25 +340,29 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
-      // FI: side effect or allocation of a new cell?
-      cell npc = copy_cell(pc);
-      (void) points_to_cell_add_field_dimension(npc, f);
-      // FI: does this call allocate a full new list?
-      if(eval_p) {
-	list dL = source_to_sinks(npc, in, true);
-	free_cell(npc);
-	if(ENDP(dL))
-	  pips_internal_error("Dereferencing error.\n");
-	else {
-	  FOREACH(CELL, ec, dL) {
-	    // (void) cell_add_field_dimension(ec, f);
-	    // FI: should we allocate new cells? Done
-	    sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+      if(!null_cell_p(pc) && !nowhere_cell_p(pc)) {
+	// FI: side effect or allocation of a new cell?
+	cell npc = copy_cell(pc);
+	if(!heap_cell_p(npc))
+	  points_to_cell_add_zero_subscripts(npc);
+	(void) points_to_cell_add_field_dimension(npc, f);
+	// FI: does this call allocate a full new list?
+	if(eval_p) {
+	  list dL = source_to_sinks(npc, in, true);
+	  free_cell(npc);
+	  if(ENDP(dL)) // FI: this might mean dead code...
+	    pips_internal_error("Dereferencing error.\n");
+	  else {
+	    FOREACH(CELL, ec, dL) {
+	      // (void) cell_add_field_dimension(ec, f);
+	      // FI: should we allocate new cells? Done
+	      sinks = gen_nconc(sinks, CONS(CELL, ec, NIL));
+	    }
 	  }
 	}
+	else
+	  sinks = gen_nconc(sinks, CONS(CELL, npc, NIL));
       }
-      else
-	sinks = gen_nconc(sinks, CONS(CELL, npc, NIL));
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
@@ -813,11 +817,101 @@ int get_heap_counter()
   return ++malloc_counter;
 }
 
-// FI: lots of issues here; the potential cast is lost...
-// e is the arguments of the malloc call...
-// Basic heap modelling
+/* Heap modelling
+ *
+ * FI: lots of issues here; the potential cast is lost...
+ *
+ * FI: the high-level switch I have added to understand the management
+ * of options is performed at a much much lower level, which may be
+ * good or not. I do not think it's good for readbility, but factoring
+ * is good. See malloc_to_abstract_location()
+ *
+ * e is the arguments of the malloc call...
+ *
+ * Basic heap modelling
+ *
+ * ABSTRACT_HEAP_LOCATIONS:
+ *
+ *  "unique": do not generate heap abstract
+ * locations for each line number...
+ *
+ * "insensitive": control path are not taken into account; all
+ * malloc() located in one function are equivalent.
+ *
+ * "flow-sensitive": take into account the line number or the occurence number?
+ *
+ * "context-sensitive": take into account the call stack; not implemented
+ *
+ * ALIASING_ACROSS_TYPE: you should have one heap per type if aliasing
+ * across type is forbidden. The impact of its composition with the
+ * previous property is not specified...
+ */
 list malloc_to_points_to_sinks(expression e,
 			       pt_map in __attribute__ ((unused)))
+{
+  list sinks = NIL;
+  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+
+  if(same_string_p(opt, "unique")) {
+    sinks = unique_malloc_to_points_to_sinks(e);
+  }
+  else if(same_string_p(opt, "insensitive")) {
+    sinks = insensitive_malloc_to_points_to_sinks(e);
+  }
+  else if(same_string_p(opt, "flow-sensitive")) {
+    sinks = flow_sensitive_malloc_to_points_to_sinks(e);
+  }
+  else if(same_string_p(opt, "context-sensitive")) {
+    // Context sensitivity is dealt with in the translation functions, not here
+    sinks = flow_sensitive_malloc_to_points_to_sinks(e);
+  }
+  else {
+    pips_user_error("Unexpected value \"%s\" for Property ABSTRACT_HEAP_LOCATION."
+		    "Possible values are \"unique\", \"insensitive\","
+		    "\"flow-sensitive\", \"context-sensitive\".\n", opt);
+  }
+
+  return sinks;
+}
+
+/* FI->AM: is "unique" multiple when ALIASING_ACROSS_TYPE is set to false? 
+ *
+ * FI->AM: the comments in pipsmake-rc.tex are not sufficient to
+ * understand what the choices are.
+ *
+ * If ALIASING_ACROSS_TYPES, return an overloaded unique heap entity
+ */
+list unique_malloc_to_points_to_sinks(expression e)
+{
+  list m = NIL;
+  if(get_bool_property("ALIASING_ACROSS_TYPES")) {
+    /* We need only one HEAP abstract location: Pointers/assign03 */
+    m = flow_sensitive_malloc_to_points_to_sinks(e);
+  }
+  else {
+    /* We need one HEAP abstract location per type: Pointers/assign02
+     *
+     * Note: we must be careful about dereferencing and fields...
+     */
+    m = flow_sensitive_malloc_to_points_to_sinks(e);
+  }
+  return m;
+}
+
+/* FI->AM: what's the difference with the previous option? Reference
+ * to your dissertation?
+ */
+list insensitive_malloc_to_points_to_sinks(expression e)
+{
+  list m = NIL;
+  // FI: I'm waiting for this error to happen
+  pips_internal_error("Not implemented yet?");
+  m = flow_sensitive_malloc_to_points_to_sinks(e);
+  return m;
+}
+
+list flow_sensitive_malloc_to_points_to_sinks(expression e)
 {
   // expression sizeof_exp = EXPRESSION (CAR(call_arguments(expression_call(rhs))));
   // FI: kind of dumb since it is int or size_t
@@ -837,8 +931,6 @@ list malloc_to_points_to_sinks(expression e,
     make_sensitivity_information(get_heap_statement(), 
 				 get_current_module_entity(),
 				 NIL);
-  //string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   // FI: why use &si instead of si?
   entity me = malloc_to_abstract_location(e, &si);
@@ -902,10 +994,13 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
 
+  /* Add subscript when possible */
   FOREACH(CELL, c, sources) {
-    list ncsl = gen_full_copy_list(csl);
-    reference r = cell_any_reference(c);
-    reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+    if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)) {
+      list ncsl = gen_full_copy_list(csl);
+      reference r = cell_any_reference(c);
+      reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+    }
   }
 
   gen_full_free_list(csl);

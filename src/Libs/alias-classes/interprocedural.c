@@ -168,10 +168,11 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
 }
 
 // FI: I assume we do not need the eval_p parameter here
-list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
+list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)), bool eval_p)
 {
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  type t = entity_type(call_function(c));
+  type t = ultimate_type(entity_type(call_function(c)));
+  type rt = ultimate_type(functional_result(type_functional(t)));
   entity ne = entity_undefined;
   list sinks = NIL;
   entity f = call_function(c);
@@ -197,8 +198,14 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)))
   /* FI: definitely the intraprocedural version */
   }
   else {
-    if(type_sensitive_p)
-      ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
+    if(type_sensitive_p) {
+      if(eval_p) {
+	type prt = ultimate_type(type_to_pointed_type(rt));
+	ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,prt);
+      }
+      else
+	ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,rt);
+    }
     else
       ne = entity_all_xxx_locations(ANYWHERE_LOCATION);
     
