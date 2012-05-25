@@ -6869,6 +6869,12 @@ if_conversion_compact                  > MODULE.code
 
 \subsection{Loop Unswitching}
 
+\begin{PipsPass}{loop_nest_unswitching}
+  This phase apply loop distribution on a loop-invariant test. So it
+  transforms a loop with an if/then/else inside into an if/then/else with
+  the loop duplicated into the ``then'' and ``else'' branches.
+\end{PipsPass}
+
 \begin{PipsMake}
 loop_nest_unswitching                  > MODULE.code
         < PROGRAM.entities
