@@ -9,7 +9,7 @@ void call11(int n, int m, int x[n][m])
       x[i][j] = 0;
 }
 
-main()
+int main()
 {
   int d1 = 10;
   int d2 = 10;
@@ -21,4 +21,5 @@ main()
   for(i=0; i<d1;i++)
     for(j=0; j<d2;j++)
       call11(d3, d4, &y[i][j][0]);
+  return 0;
 }

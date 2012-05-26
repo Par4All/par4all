@@ -10,4 +10,5 @@ int struct01()
   x.second = 2;
 
   y[0] = 1;
+  return 0;
 }

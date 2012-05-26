@@ -16,4 +16,5 @@ int struct02()
       x[i].second = 1;
     }
   }
+  return 0;
 }

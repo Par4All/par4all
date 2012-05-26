@@ -30,4 +30,5 @@ int main(void)
   pointer_free(p1);
   pointer_free(p2);
   pointer_free(p3);
+  return 0;
 }

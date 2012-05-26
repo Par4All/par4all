@@ -9,10 +9,11 @@ void call09(int i, int j)
   i = i + j;
 }
 
-main()
+int main()
 {
   tf_t s;
   tf_t *sp = &s;
 
   call09(s.one, sp->one);
+  return 0;
 }

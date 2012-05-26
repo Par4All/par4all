@@ -8,7 +8,7 @@ void call05(int r, int m, int *x)
       x[j] = 10*r+j;
 }
 
-main()
+int main()
 {
   int d1 = 4;
   int d2 = 4;
@@ -23,4 +23,5 @@ main()
       printf("y[%d][%d] = %d\t", i, j, y[i][j]);
     printf("\n");
   }
+  return 0;
 }

@@ -8,7 +8,8 @@ void dereferencing06()
   *p++=1;
 }
 
-main()
+int main()
 {
   dereferencing06();
+  return 0;
 }

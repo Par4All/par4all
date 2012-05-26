@@ -27,4 +27,5 @@ int main(void)
   fprintf(stdout, "p1=%d p2=%d p3=%d\n", // 36 17 53
           // no pointer assigned
           pointer_get(p1), pointer_get(p2), pointer_get(p3));
+  return 0;
 }
