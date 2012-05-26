@@ -28,9 +28,9 @@ void sum_vprod(int n)
 
   if ((4*8*8*4)>1)
     {
-      MPI_Reduce((double*)(cs1),(double*)(cs2),2*n,1,
-		 1,0,1);
-      MPI_Bcast((double*)(cs2),2*n,1,0,1);
+      /* MPI_Reduce((double*)(cs1),(double*)(cs2),2*n,1, */
+      /* 		 1,0,1); */
+      /* MPI_Bcast((double*)(cs2),2*n,1,0,1); */
     }
   else
     {

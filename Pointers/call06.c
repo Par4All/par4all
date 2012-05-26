@@ -1,4 +1,5 @@
 /* #include<stdio.h> */
+#include<stdlib.h>
 
 void call06(int r, int m, int *x)
 {

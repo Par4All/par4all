@@ -1,3 +1,4 @@
+#include<stdlib.h>
 int main()
 {
   typedef struct my_struct {
