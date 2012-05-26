@@ -527,26 +527,7 @@ void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
     fprintf(stderr, "Not a Newgen cell object\n");
 }
 
-/* Debug: use stderr */
-void print_points_to_cell(cell c)
-{
-  fprint_points_to_cell(stderr, c);
-}
 
-/* Debug */
-void print_points_to_cells(list cl)
-{
-  if(ENDP(cl))
-    fprintf(stderr, "Empty cell list");
-  else {
-    FOREACH(CELL, c, cl) {
-      print_points_to_cell(c);
-      if(!ENDP(CDR(cl)))
-	fprintf(stderr, ", ");
-    }
-  }
-  fprintf(stderr, "\n");
-}
 
 /* Points-to cannot used any kind of reference, just constant references */
 reference simplified_reference(reference r)

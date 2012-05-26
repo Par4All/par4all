@@ -85,3 +85,24 @@ bool points_to_cell_in_list_p(cell c, list L)
   }
   return found_p;
 }
+
+/* Debug: use stderr */
+void print_points_to_cell(cell c)
+{
+  fprint_points_to_cell(stderr, c);
+}
+
+/* Debug */
+void print_points_to_cells(list cl)
+{
+  if(ENDP(cl))
+    fprintf(stderr, "Empty cell list");
+  else {
+    FOREACH(CELL, c, cl) {
+      print_points_to_cell(c);
+      if(!ENDP(CDR(cl)))
+	fprintf(stderr, ", ");
+    }
+  }
+  fprintf(stderr, "\n");
+}
