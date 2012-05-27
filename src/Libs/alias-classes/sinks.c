@@ -508,27 +508,6 @@ list points_to_null_sinks()
 }
 */
 
- /* Debug: print a cell list for points-to. Parameter f is not useful
-    in a debugging context. */
-void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
-{
-  int dn = cell_domain_number(c);
-
-  // For debugging with gdb, dynamic type checking
-  if(dn==cell_domain) {
-    if(cell_undefined_p(c))
-      fprintf(stderr, "cell undefined\n");
-    else {
-      reference r = cell_any_reference(c);
-      print_reference(r);
-    }
-  }
-  else
-    fprintf(stderr, "Not a Newgen cell object\n");
-}
-
-
-
 /* Points-to cannot used any kind of reference, just constant references */
 reference simplified_reference(reference r)
 {
