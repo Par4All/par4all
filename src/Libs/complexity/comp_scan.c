@@ -873,6 +873,12 @@ list effects_list;
 {
   complexity comp = complexity_undefined;
 
+  ifdebug(1){
+    pips_debug(1, "syntax is:");
+    print_syntax(s);
+    fprintf(stderr, "\n");
+  }
+
   trace_on("syntax");
 
   switch (syntax_tag(s)) {
@@ -906,7 +912,7 @@ list effects_list;
 				      pbasic, precond, effects_list);
     else {
       /* Compiler generated constant: equivalent to a constant load... */
-      pips_internal_error("Not implemented yet");
+      comp = make_zero_complexity();
     }
     break;
   }
