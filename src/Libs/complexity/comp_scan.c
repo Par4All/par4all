@@ -706,6 +706,7 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
     }
 
      complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
+     cbody = complexity_dup(cbody);
      complexity_add(&cbody,ctest);
      complexity_mult(&cbody,range);
 
@@ -872,12 +873,6 @@ transformer precond;
 list effects_list;
 {
   complexity comp = complexity_undefined;
-
-  ifdebug(1){
-    pips_debug(1, "syntax is:");
-    print_syntax(s);
-    fprintf(stderr, "\n");
-  }
 
   trace_on("syntax");
 
