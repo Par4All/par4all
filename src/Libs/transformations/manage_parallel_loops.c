@@ -146,6 +146,13 @@ static void init_limit_uninteresting_parallelism_context(limit_uninteresting_par
   p_ctxt->parallel_loops = NIL;
 }
 
+
+/** Cost function to test whether a loop is worth parallelizing
+
+    Currently tests whether the highest coefficient in the whole loop
+    complexity polynome divided by COMPUTATION_INTENSITY_FREQUENCY
+    is higher than COMPUTATION_INTENSITY_STARTUP_OVERHEAD + 10.
+ */
 static bool complexity_cost_effective_loop_p(statement s,
 					     limit_uninteresting_parallelism_context * p_ctxt)
 {
