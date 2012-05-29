@@ -1,9 +1,9 @@
 /* For IEF - Ter@ops */
 
 #include <stdio.h>
-#include<stdlib.h>
-#include<math.h>
+#include <stdlib.h>
 #include <string.h>
+
 typedef unsigned char byte;
 
 void nrerror(char error_text[])
@@ -39,7 +39,7 @@ void ReadPGMrow(FILE  *file, int width, byte  *line)
 
 byte ** LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-  int height = 1, width = 2;
+  int height=10, width=10; //, gris;
   byte **m;
   FILE *file;
   char *buffer;
