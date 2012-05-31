@@ -366,7 +366,8 @@ bool same_type_p(type t1, type t2)
 
    Francois Irigoin, 10 March 1992
 */
-bool type_equal_p(type t1, type t2)
+/* If strict_p, a typedef type is not equal to its definition. */
+bool generic_type_equal_p(type t1, type t2, bool strict_p)
 {
   bool tequal = false;
 
@@ -386,10 +387,10 @@ bool type_equal_p(type t1, type t2)
   case is_type_area:
     return area_equal_p(type_area(t1), type_area(t2));
   case is_type_variable:
-    tequal = variable_equal_p(type_variable(t1), type_variable(t2));
+    tequal = generic_variable_equal_p(type_variable(t1), type_variable(t2), strict_p);
     return tequal;
   case is_type_functional:
-    return functional_equal_p(type_functional(t1), type_functional(t2));
+    return generic_functional_equal_p(type_functional(t1), type_functional(t2), strict_p);
   case is_type_unknown:
     return true;
   case is_type_void:
@@ -399,6 +400,18 @@ bool type_equal_p(type t1, type t2)
   }
 
   return false; /* just to avoid a warning */
+}
+
+bool type_equal_p(type t1, type t2)
+{
+  return generic_type_equal_p(t1, t2, true);
+}
+
+bool ultimate_type_equal_p(type t1, type t2)
+{
+  type ut1 = ultimate_type(t1);
+  type ut2 = ultimate_type(t2);
+  return generic_type_equal_p(ut1, ut2, false);
 }
 
 type make_scalar_integer_type(_int n)
@@ -444,7 +457,7 @@ bool qualifiers_equal_p(list dims1, list dims2) {
     return gen_equals(dims1,dims2,(gen_eq_func_t)qualifier_equal_p);
 }         
 
-bool variable_equal_p(variable v1, variable v2)
+bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
 {
   if(v1 == v2)
       return true;
@@ -455,9 +468,9 @@ bool variable_equal_p(variable v1, variable v2)
   else {
       /* must check basic, dimension and qualifiers */
       return 
-          basic_equal_p(variable_basic(v1), variable_basic(v2)) &&
-          dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2)) &&
-          qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
+	generic_basic_equal_p(variable_basic(v1), variable_basic(v2), strict_p)
+	&& dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2))
+	&& qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
 
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
@@ -488,7 +501,13 @@ bool variable_equal_p(variable v1, variable v2)
   }
   return true;
 }
-bool basic_equal_p(basic b1, basic b2)
+
+bool variable_equal_p(variable v1, variable v2)
+{
+  return generic_variable_equal_p(v1, v2, true);
+}
+
+bool generic_basic_equal_p(basic b1, basic b2, bool strict_p)
 {
   if(b1 == b2)
     return true;
@@ -496,8 +515,12 @@ bool basic_equal_p(basic b1, basic b2)
     return false;
   else if (b1 != basic_undefined && b2 == basic_undefined)
     return false;
-  else if (basic_tag(b1) != basic_tag(b2))
-    return false;
+  else if (basic_tag(b1) != basic_tag(b2)) {
+    if(strict_p)
+      return false;
+    else
+      return same_basic_p(b1, b2);
+  }
 
   /* assertion: b1 and b2 are defined and have the same tag
      (see previous tests) */
@@ -533,8 +556,8 @@ bool basic_equal_p(basic b1, basic b2)
 
       return (type_void_p(t1) && type_void_p(t2)) ||
              (type_variable_p(t1) && type_variable_p(t2) &&
-              basic_equal_p(variable_basic(type_variable(t1)),
-                            variable_basic(type_variable(t2))) );
+              generic_basic_equal_p(variable_basic(type_variable(t1)),
+				    variable_basic(type_variable(t2)), strict_p));
     }
   case is_basic_derived:
     {
@@ -561,6 +584,11 @@ bool basic_equal_p(basic b1, basic b2)
   return false; /* just to avoid a warning */
 }
 
+bool basic_equal_p(basic b1, basic b2)
+{
+  return generic_basic_equal_p(b1, b2, true);
+}
+
 /* check if two basics are similar. That is if they are equal modulo typedefs */
 bool same_basic_p(basic b1, basic b2)
 {
@@ -579,7 +607,7 @@ bool same_basic_p(basic b1, basic b2)
 
 }
 
-bool functional_equal_p(functional f1, functional f2)
+bool generic_functional_equal_p(functional f1, functional f2, bool strict_p)
 {
     if(f1 == f2)
 	return true;
@@ -598,15 +626,20 @@ bool functional_equal_p(functional f1, functional f2)
 	    parameter p1 = PARAMETER(CAR(lp1));
 	    parameter p2 = PARAMETER(CAR(lp2));
 
-	    if(!parameter_equal_p(p1, p2))
+	    if(!generic_parameter_equal_p(p1, p2, strict_p))
 		return false;
 	}
 
-	return type_equal_p(functional_result(f1), functional_result(f2));
+	return generic_type_equal_p(functional_result(f1), functional_result(f2), strict_p);
     }
 }
 
-bool parameter_equal_p(parameter p1, parameter p2)
+bool functional_equal_p(functional f1, functional f2)
+{
+  return generic_functional_equal_p(f1, f2, true);
+}
+
+bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p)
 {
     if(p1 == p2)
 	return true;
@@ -615,8 +648,13 @@ bool parameter_equal_p(parameter p1, parameter p2)
     else if (p1 != parameter_undefined && p2 == parameter_undefined)
 	return false;
     else
-	return type_equal_p(parameter_type(p1), parameter_type(p2))
+      return generic_type_equal_p(parameter_type(p1), parameter_type(p2), strict_p)
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
+}
+
+bool parameter_equal_p(parameter p1, parameter p2)
+{
+  return generic_parameter_equal_p(p1, p2, true);
 }
 
 bool mode_equal_p(mode m1, mode m2)
@@ -4943,6 +4981,27 @@ int variable_dimension_number(variable v)
     d++;
 
   return d;
+}
+
+/* convert a scalar type "t" into a newly allocated array type "at"
+ * whose elements are of type "t". The dimension is unbounded.
+ *
+ * This useful when dealing with pointers that are not precisely
+ * typed. In C you have often to assume they point towards an array
+ * since pointer arithmetic is OK by default.
+ *
+ * The behavior of this function is not well defined when typedef are
+ * used...
+ */
+type type_to_array_type(type t)
+{
+  pips_assert("t is not an array type", !array_type_p(t));
+  type at = copy_type(t);
+  variable vt = type_variable(at);
+  dimension d = make_dimension(int_to_expression(0),
+			       make_unbounded_expression());
+  variable_dimensions(vt) = CONS(DIMENSION, d, NIL);
+  return at;
 }
 
 /*

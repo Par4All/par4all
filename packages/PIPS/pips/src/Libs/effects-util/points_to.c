@@ -85,3 +85,43 @@ bool points_to_cell_in_list_p(cell c, list L)
   }
   return found_p;
 }
+
+ /* Debug: print a cell list for points-to. Parameter f is not useful
+    in a debugging context. */
+void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)
+{
+  int dn = cell_domain_number(c);
+
+  // For debugging with gdb, dynamic type checking
+  if(dn==cell_domain) {
+    if(cell_undefined_p(c))
+      fprintf(stderr, "cell undefined\n");
+    else {
+      reference r = cell_any_reference(c);
+      print_reference(r);
+    }
+  }
+  else
+    fprintf(stderr, "Not a Newgen cell object\n");
+}
+
+/* Debug: use stderr */
+void print_points_to_cell(cell c)
+{
+  fprint_points_to_cell(stderr, c);
+}
+
+/* Debug */
+void print_points_to_cells(list cl)
+{
+  if(ENDP(cl))
+    fprintf(stderr, "Empty cell list");
+  else {
+    FOREACH(CELL, c, cl) {
+      print_points_to_cell(c);
+      if(!ENDP(CDR(cl)))
+	fprintf(stderr, ", ");
+    }
+  }
+  fprintf(stderr, "\n");
+}

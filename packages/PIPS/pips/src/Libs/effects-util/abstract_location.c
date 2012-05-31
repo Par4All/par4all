@@ -459,8 +459,13 @@ reference original_malloc_to_abstract_location(expression lhs,
   return r;
 }
 
-/* FLOW AND CONTEXT SENSITIVITY INFORMATION HOOK */
-
+/*
+ * FLOW AND CONTEXT SENSITIVITY INFORMATION HOOK
+ *
+ * FI->AM: How come the properties are not exploited here?
+ *
+ * FI->AM: do you understand that the data structure "si" is copied back?
+ */
 sensitivity_information make_sensitivity_information(statement current_stmt,
 						     entity current_module,
 						     list enclosing_flow)

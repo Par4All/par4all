@@ -706,6 +706,7 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
     }
 
      complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
+     cbody = complexity_dup(cbody);
      complexity_add(&cbody,ctest);
      complexity_mult(&cbody,range);
 
@@ -906,7 +907,7 @@ list effects_list;
 				      pbasic, precond, effects_list);
     else {
       /* Compiler generated constant: equivalent to a constant load... */
-      pips_internal_error("Not implemented yet");
+      comp = make_zero_complexity();
     }
     break;
   }
@@ -946,7 +947,7 @@ list effects_list;
     list ind = reference_indices(ref);
 
     const char* name = module_local_name(var);
-    basic b = variable_basic(type_variable(entity_type(var)));
+    basic b = variable_basic(type_variable(entity_basic_concrete_type(var)));
     basic ib = MAKE_INT_BASIC;    /* indices basic */
     complexity comp, ci, ca;      /* ci=compindexation, ca=compaccess */
 
@@ -957,10 +958,12 @@ list effects_list;
 	*pbasic = simple_basic_dup(b);
     else if (basic_string_p(b))
 	*pbasic = MAKE_STRING_BASIC;
+    else if (basic_derived_p(b) || basic_pointer_p(b)){
+	*pbasic = MAKE_ADDRESS_BASIC;
+    }
     else {
-	user_warning("reference_to_complexity",
-		     "basic_tag %d, not in 4->9\n", (int)basic_tag(b));
-	*pbasic = MAKE_INT_BASIC;
+      user_warning("reference_to_complexity",
+		     "basic_tag %d, not in 1->9\n", (int)basic_tag(b));
     }
 
     comp = indices_to_complexity(ind, &ib, precond, effects_list);

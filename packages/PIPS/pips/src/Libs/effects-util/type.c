@@ -450,14 +450,27 @@ type points_to_reference_to_type(reference ref, bool *to_be_freed)
     *to_be_freed = false;
   }
   else {
-    expression ls = EXPRESSION(CAR(gen_last(sl)));
-    syntax lss = expression_syntax(ls);
-    if(syntax_reference_p(lss)) {
-      reference r = syntax_reference(lss);
-      entity f = reference_variable(r);
-      if(entity_field_p(f)) {
-	t = entity_type(f);
-	*to_be_freed = false;
+    int ns = (int) gen_length(sl);
+    expression fs = EXPRESSION(CAR(sl));
+    bool int_p = expression_integer_constant_p(fs);
+    // FI: faire un cas particulier pour des cas comme i[1] ou i est un scalaire?
+    // FI: I do not know what can happen with struct objects; they are
+    // scalar, a dimension may be added and nevertheless a field may be
+    // accessed....
+    if(entity_scalar_p(v) && ns==1 && int_p) {
+      *to_be_freed = false;
+      t = entity_type(v);
+    }
+    else {
+      expression ls = EXPRESSION(CAR(gen_last(sl)));
+      syntax lss = expression_syntax(ls);
+      if(syntax_reference_p(lss)) {
+	reference r = syntax_reference(lss);
+	entity f = reference_variable(r);
+	if(entity_field_p(f)) {
+	  t = entity_type(f);
+	  *to_be_freed = false;
+	}
       }
     }
   }
@@ -756,4 +769,231 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
     }
 
   return result;
+}
+
+/* Make sure that cell l can points towards cell r 
+ *
+ * FI-AM/FC: Unfortunately, a lot of specification work is missing to develop
+ * this function while taking care of abstract locations and their lattice. 
+ *
+ * 1. Restrictions on cell "l"
+ *
+ *  1.1 "l" cannot be the abstract nowhere/undefined cell
+ *
+ * ...
+ *
+ * Note: this should be part of points_to_set_consistent_p(), which is
+ * called consistent_points_to_set(), but this function goes beyond
+ * checking the compatibility. It enforces it when legal and possible.
+ *
+ * Maybe this function should be relocated in alias-classes
+ *
+ * Beware of possible side-effects on l
+ */
+void points_to_cell_types_compatibility(cell l, cell r)
+{
+  if(points_to_source_cell_compatible_p(l))
+    if(points_to_sink_cell_compatible_p(r)) {
+      // FI: I'm not sure enought filtering has been performed... to
+      // have here type information, especially with an anywhere or a
+      // nowhere/undefined not typed
+
+      // FI : tests supplementaires pour eviter les cells qui ne sont pas typees:-(
+
+      bool l_to_be_freed, r_to_be_freed;
+      type lt = points_to_cell_to_type(l, &l_to_be_freed);
+      type rt = points_to_cell_to_type(r, &r_to_be_freed);
+      type ult = ultimate_type(lt);
+      type urt = ultimate_type(rt);
+
+      if(pointer_type_p(ult)) {
+	type pt = ultimate_type(type_to_pointed_type(ult));
+
+	// Several options are possible
+
+	bool get_bool_property(const char *);
+	if(ultimate_type_equal_p(pt, urt)) 
+	  ; // the pointed type is the type of the right cell
+	else if(array_type_p(urt)
+		&& !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+	  /* Formal parameters and potentially stubs can be assumed to
+	   * points towards an array although they are declared as
+	   * pointers to a scalar. */
+	  if(type_variable_p(pt)) {
+	    basic pb = variable_basic(type_variable(pt));
+	    basic rb = variable_basic(type_variable(urt));
+	    if(basic_equal_p(pb,rb)) {
+	      ; // OK, they are compatible
+	    }
+	    else {
+	      fprintf(stderr, "Type pointed by source \"pt\": \"");
+	      print_type(pt);
+	      fprintf(stderr, "\"\nSink type \"urt\": \"");
+	      print_type(urt);
+	      pips_internal_error("\"\nIncompatible basics.\n");
+	    }
+	  }
+	  else {
+	      fprintf(stderr, "Pointed type \"pt\": ");
+	      print_type(pt);
+	    pips_internal_error("Unexpected type \"pt\".\n");
+	  }
+	}
+	else if(type_functional_p(urt)) {
+	  // FI->AM: we should check that the function is a constant
+	  // with no parameters
+	  type ret_t = functional_result(type_functional(urt));
+	  type u_ret_t = ultimate_type(ret_t);
+	  if(pointer_type_p(u_ret_t)) {
+	    pips_internal_error("This should be useless.\n");
+	    // FI->AM: must be useless... Designed for C constant strings, but...
+	    type p_u_ret_t = type_to_pointed_type(u_ret_t);
+	    if(ultimate_type_equal_p(pt, p_u_ret_t))
+	      ;
+	    else
+	      pips_internal_error("Type mismatch.\n");
+	  }
+	  else if(string_type_p(u_ret_t)) {
+	    // FI: hidden pointer...
+	    // char * fmt; ftm = "foo";
+	    variable ptv = type_variable(pt);
+	    basic ptb = variable_basic(ptv);
+	    if(basic_int_p(ptb) && basic_int(ptb)==1)
+	      ; // char
+	    else
+	      pips_internal_error("Illegal string assignment...\n");
+	  }
+	  else {
+	    pips_internal_error("Illegal assignment to pointer...\n");
+	  }
+	}
+	else {
+	  /* Here we may be in trouble because of the heap modeling
+	   * malloc() returns by default a "void *", or sometimes a
+	   * "char *" which may be casted into anything...
+	   *
+	   * The dimension of the allocated array should be given by
+	   * the size of the pointed type and by the size of the right
+	   * type.
+	   *
+	   * Also, we have different heap modelling, with different flexibilities
+	   */
+	  if(heap_cell_p(r) && !all_heap_locations_cell_p(r) 
+	     /*&& !all_heap_locations_typed_cell_p(r) */) {
+	    type nt = copy_type(pt);
+	    if(array_type_p(nt)
+	       || get_bool_property("POINTS_TO_STRICT_POINTER_TYPES"))
+	      ; // Do not add a dimension to an existing array.
+	    else {
+	      variable v = type_variable(nt);
+	      expression z = int_to_expression(0);
+	      // FI FI FI: should be computed... and checked
+	      expression s = make_unbounded_expression();
+	      dimension d = make_dimension(z, s);
+	      variable_dimensions(v) = CONS(DIMENSION, d, NIL);
+	    }
+	    // FI: could be a function entity_type_substitution()...
+	    // but interference with r_to_be_freed
+	    r_to_be_freed = true;
+	    reference rr = cell_any_reference(r);
+	    entity rv = reference_variable(rr);
+	    entity_type(rv) = nt;
+	  }
+	  else if(all_heap_locations_cell_p(r))
+	    ; // always compatible
+	  else if(false /* all_heap_locations_typed_cell_p(r)*/)
+	    ; // FI: I am not sure what to do...
+	  else if(null_cell_p(r)) {
+	    ; // always compatible
+	  }
+	  else if(anywhere_cell_p(r)) {
+	    ; // not typed anywhere, always compatible
+	  }
+	  else if(nowhere_cell_p(r)) {
+	    ; // not typed nowhere/undefined, always compatible
+	  }
+	  else {
+	    /* There must be a typing issue. */
+	      fprintf(stderr, "Type pointed by source cell, \"pt\": \"");
+	      void print_points_to_cell(cell); // FI: library organization
+	      print_points_to_cell(l);
+	      fprintf(stderr, "\" with type: \"");
+	      print_type(pt);
+	      fprintf(stderr, "\"\nType of sink cell, \"urt\": \"");
+	      print_points_to_cell(r);
+	      fprintf(stderr, "\" with type: \"");
+	      print_type(urt);
+	      fprintf(stderr, "\"\n");
+	      pips_internal_error("Incompatible Types.\n");
+	  }
+	}
+      }
+      else if(array_type_p(ult)) {
+	/* This may happen with the heap model */
+	extern bool get_bool_property(const char *);
+	if(!get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+	  /* Is it an (implicit) array of pointers*/
+	  basic ultb = variable_basic(type_variable(ult));
+	  if(basic_pointer_p(ultb)) {
+	    type pt = ultimate_type(basic_pointer(ultb));
+	    if(generic_type_equal_p(pt, urt, false)) {
+	      // FI: subscripts must be added to the source reference lr
+	      // FI: implicit typing of pointers as array of pointers
+	      reference lr = cell_any_reference(l);
+	      reference_add_zero_subscripts(lr, ult);
+	    }
+	    else {
+	      // FI: error message could be improved...
+	      pips_internal_error("Incompatible types.\n");
+	    }
+	  }
+	  else
+	    pips_internal_error("Not an array of pointers.\n");
+	}
+	else
+	  pips_internal_error("The source is an array but not a pointer.\n");
+      }
+      else if(overloaded_type_p(ult)) {
+	/* This may happen with the heap model */
+	; // A pointer type is assumed
+      }
+      else {
+	// Could be checked by points_to_source_cell_compatible_p()
+	pips_internal_error("The source is not a pointer.\n");
+      }
+
+      if(l_to_be_freed) free_type(lt);
+      if(r_to_be_freed) free_type(rt);
+    }
+  return;
+}
+
+/*
+ * Restrictions on a source cell "c"
+ *
+ * 1. "l" cannot be the abstract nowhere/undefined cell
+ * 2. "l" cannot be the/a null pointer
+ */
+bool points_to_source_cell_compatible_p(cell c)
+{
+  bool compatible_p = true;
+
+  if(nowhere_cell_p(c))
+    compatible_p = false;
+  else if(null_cell_p(c))
+    compatible_p = false;
+
+  return compatible_p;
+}
+
+/*
+ * Restrictions on a sink cell "c"
+ *
+ * FI: I cannot think of any right now...
+ */
+bool points_to_sink_cell_compatible_p(cell c __attribute__ ((unused)))
+{
+  bool compatible_p = true;
+
+  return compatible_p;
 }

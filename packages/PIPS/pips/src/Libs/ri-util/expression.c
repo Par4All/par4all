@@ -220,7 +220,28 @@ reference expression_to_reference(expression e)
     return syntax_reference(s);
 }
 
+/* Add a zero subscript to a reference "r" by side effect.
+ *
+ * Used when array names are used to convert to the first array element
+ */
+void reference_add_zero_subscripts(reference r, type t)
+{
+  pips_assert("type is of kind variable", type_variable_p(t));
+  variable v = type_variable(t);
 
+  // FI: this assert makes sense within the ri-util framework but is
+  // too strong for the kind of references used in effects-util
+  // pips_assert("scalar type", ENDP(reference_indices(r)));
+
+  list dl = variable_dimensions(v);
+  list sl = NIL; // subscript list
+  FOREACH(DIMENSION, d, dl) {
+    expression s = int_to_expression(0);
+    // reference_indices(r) = CONS(EXPRESSION, s, reference_indices(r));
+    sl = CONS(EXPRESSION, s, sl);
+  }
+  reference_indices(r) = gen_nconc(reference_indices(r), sl);
+}
 
 /* Build an expression that call a function or procedure.
 

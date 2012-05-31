@@ -1465,9 +1465,17 @@ pt_map struct_assignment_to_points_to(expression lhs,
 	    }
 	  }
 	  else {
-	    pips_assert("Both types are struct",
-			struct_type_p(lt) && struct_type_p(rt));
-	    pips_assert("Both type are equal", type_equal_p(lt, rt));
+	    pips_assert("Both types are struct or array of struct",
+			(struct_type_p(lt) || array_of_struct_type_p(lt))
+			 && (struct_type_p(rt) || array_of_struct_type_p(rt)));
+	    /* We may have an implicit array of struct in the right or
+	     * left hand side
+	     */
+	    // pips_assert("Both type are equal", type_equal_p(lt, rt));
+	    basic ltb = variable_basic(type_variable(lt));
+	    basic rtb = variable_basic(type_variable(rt));
+	    pips_assert("Both type are somehow equal",
+			basic_equal_p(ltb, rtb));
 	    entity ste = basic_derived(variable_basic(type_variable(lt)));
 	    type st = entity_type(ste); // structure type
 	    list fl = type_struct(st); // field list
@@ -1478,6 +1486,11 @@ pt_map struct_assignment_to_points_to(expression lhs,
 	      if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
 		reference lr = copy_reference(cell_any_reference(lc));
 		reference rr = copy_reference(cell_any_reference(rc));
+		/* FI: conditionally add zero subscripts necessary to
+		   move from an array "a" to its first element,
+		   e.g. a[0][0][0] */
+		reference_add_zero_subscripts(lr, lt);
+		reference_add_zero_subscripts(rr, rt);
 		reference_add_field_dimension(lr, f);
 		reference_add_field_dimension(rr, f);
 		expression nlhs = reference_to_expression(lr);

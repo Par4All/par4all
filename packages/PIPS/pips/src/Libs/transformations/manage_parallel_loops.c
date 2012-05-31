@@ -133,6 +133,7 @@ typedef struct  limit_uninteresting_parallelism_context{
   int startup_overhead;
   int bandwidth;
   int frequency;
+  list parallel_loops;
 } limit_uninteresting_parallelism_context;
 
 static void init_limit_uninteresting_parallelism_context(limit_uninteresting_parallelism_context *p_ctxt,
@@ -142,8 +143,16 @@ static void init_limit_uninteresting_parallelism_context(limit_uninteresting_par
   p_ctxt->startup_overhead = get_int_property("COMPUTATION_INTENSITY_STARTUP_OVERHEAD");
   p_ctxt->bandwidth = get_int_property("COMPUTATION_INTENSITY_BANDWIDTH");
   p_ctxt->frequency = get_int_property("COMPUTATION_INTENSITY_FREQUENCY");
+  p_ctxt->parallel_loops = NIL;
 }
 
+
+/** Cost function to test whether a loop is worth parallelizing
+
+    Currently tests whether the highest coefficient in the whole loop
+    complexity polynome divided by COMPUTATION_INTENSITY_FREQUENCY
+    is higher than COMPUTATION_INTENSITY_STARTUP_OVERHEAD + 10.
+ */
 static bool complexity_cost_effective_loop_p(statement s,
 					     limit_uninteresting_parallelism_context * p_ctxt)
 {
@@ -176,23 +185,58 @@ static bool complexity_cost_effective_loop_p(statement s,
 static bool limit_uninteresting_parallelism_statement_in(statement s,
 							 limit_uninteresting_parallelism_context * p_ctxt)
 {
+    if (statement_loop_p(s))
+    {
+      pips_debug(1, "Entering loop statement with ordering: %03zd and number: %03zd\n",
+		 statement_ordering(s), statement_number(s));
+      ifdebug(1) {
+	print_statement(s);
+      }
+      loop l = statement_loop(s);
+      if (loop_parallel_p(l))
+	p_ctxt->parallel_loops = CONS(LOOP, l, p_ctxt->parallel_loops);
+
+    }
+  return true;
+}
+
+static void limit_uninteresting_parallelism_statement_out(statement s,
+							 limit_uninteresting_parallelism_context * p_ctxt)
+{
 
   if (statement_loop_p(s))
     {
-      pips_debug(1, "Entering statement with ordering: %03zd and number: %03zd\n",
+      pips_debug(1, "Dealing with loop statement with ordering: %03zd and number: %03zd\n",
 		 statement_ordering(s), statement_number(s));
       ifdebug(1) {
 	print_statement(s);
       }
 
-
       loop l = statement_loop(s);
       if (loop_parallel_p(l) && ! p_ctxt->loop_cost_testing_function(s, p_ctxt))
 	{
+	  POP(p_ctxt->parallel_loops);
 	  execution_tag(loop_execution(l)) = is_execution_sequential;
+	  /* now deal with loop locals: they must be propagated back to outer parallel loops */
+	  list l_locals = loop_locals(l);
+	  entity index = loop_index(l);
+	  if (!ENDP(p_ctxt->parallel_loops) && !ENDP(l_locals))
+	    {
+	      loop previous_parallel_loop = LOOP(CAR(p_ctxt->parallel_loops));
+	      list previous_parallel_loop_locals = loop_locals(previous_parallel_loop);
+	      list to_add = NIL;
+	      FOREACH(ENTITY, local, l_locals)
+		{
+		  if (local != index
+		      && gen_find_eq( local, previous_parallel_loop_locals ) == entity_undefined )
+		    to_add = CONS(ENTITY, local, to_add);
+		}
+	      loop_locals(previous_parallel_loop) = gen_append(previous_parallel_loop_locals, to_add);
+	    }
 	}
+      pips_debug(1, "leaving loop\n");
+
     }
-  return true;
 }
 
 /**
@@ -207,7 +251,7 @@ bool limit_parallelism_using_complexity(const const char* module_name)
   limit_uninteresting_parallelism_context ctxt;
   init_limit_uninteresting_parallelism_context(&ctxt, complexity_cost_effective_loop_p);
   gen_context_recurse(get_current_module_statement(), &ctxt,
-		      statement_domain, limit_uninteresting_parallelism_statement_in, gen_null);
+		      statement_domain, limit_uninteresting_parallelism_statement_in, limit_uninteresting_parallelism_statement_out);
 
   reset_complexity_map();
   // Put back the new statement module
