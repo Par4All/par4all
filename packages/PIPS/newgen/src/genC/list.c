@@ -145,7 +145,7 @@ bool gen_list_cyclic_p (const list ml)
 }
 
 /** @return the length of the list
- *  @param cp, the list to evaluate, assumed to be acyclic
+ *  @param[in] l, the list to evaluate, assumed to be acyclic
  */
 size_t gen_length(const list l)
 {
@@ -322,7 +322,7 @@ list gen_nreverse(list cp)
 }
 
 /**@brief free the spine of the list
- * @param l, the list to free
+ * @param[in,out] l, the list to free
  */
 void gen_free_list(list l)
 {
@@ -567,6 +567,14 @@ gen_free_string_list(list /* of string */ ls)
     gen_free_list(ls);
 }
 
+
+/* Return the last element of a list
+
+   @param[in] l is the list we want the last element
+
+   @return the last element. If the list is empty, return an empty
+   element.
+*/
 list gen_last(list l)
 {
     if (ENDP(l)) return l;         /* NIL case */
