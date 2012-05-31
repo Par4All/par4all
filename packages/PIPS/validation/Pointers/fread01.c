@@ -10,6 +10,6 @@ int main ()
   if (n == -1)
     printf("fread failed");
   fclose (fp);
- 
+  return 0; 
 }
 

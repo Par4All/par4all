@@ -1,0 +1,62 @@
+#
+# Code after privatize_module for module main
+#
+int main()
+{
+   int a[10000][2], x;
+   {
+      int i;
+
+#pragma omp for private(i,x)
+      for(i = 0; i <= 9999; i += 1) {
+         int j;
+#pragma omp for private(j,x)
+         for(j = 0; j <= 1; j += 1) {
+            x = i+j;
+            a[i][j] = sin(x*1.0);
+         }
+      }
+   }
+   return 0;
+}
+#
+# Code after internalize_parallel_code for module main
+#
+int main()
+{
+   int a[10000][2], x;
+   {
+      int i;
+
+#pragma omp parallel for 
+      for(i = 0; i <= 9999; i += 1) {
+         int j;
+#pragma omp parallel for private(x)
+         for(j = 0; j <= 1; j += 1) {
+            x = i+j;
+            a[i][j] = sin(x*1.0);
+         }
+      }
+   }
+   return 0;
+}
+#
+# Code after limit_parallelism_using_complexity for module main
+#
+int main()
+{
+   int a[10000][2], x;
+   {
+      int i;
+
+#pragma omp parallel for private(x)
+      for(i = 0; i <= 9999; i += 1) {
+         int j;
+         for(j = 0; j <= 1; j += 1) {
+            x = i+j;
+            a[i][j] = sin(x*1.0);
+         }
+      }
+   }
+   return 0;
+}

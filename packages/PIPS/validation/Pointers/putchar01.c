@@ -12,7 +12,8 @@ void putchar01()
   /* (void) putchar((int)'\n'); */
 }
 
-main()
+int main()
 {
   putchar01();
+  return 0;
 }

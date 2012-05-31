@@ -1,5 +1,5 @@
 /* Check the impact of exit() */
-
+#include<stdlib.h>
 void exit01()
 {
   int i;

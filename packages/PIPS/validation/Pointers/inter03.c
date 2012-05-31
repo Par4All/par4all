@@ -1,3 +1,23 @@
+#include<stdio.h>
+
+void foo(int *p)
+{
+  int i;
+  
+  for (i = 0; i<10; i++)
+    p[i] = i;
+  return;
+}
+
+void myprint(int *p)
+{
+  int i;
+  
+  for (i = 0; i<10; i++)
+    printf("\t%d\n", p[i]);
+  return;
+}
+
 
 int main(int argc, char ** argv) 
 {
@@ -7,8 +27,7 @@ int main(int argc, char ** argv)
   int **tab4;
   int tab5[15];
   
-  int i;
-
+  
   foo(tab);
   printf("%s\n", "tab");
   myprint(tab);

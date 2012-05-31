@@ -14,4 +14,5 @@ int struct05()
       x[i].second = x[i].first;
     }
   }
+  return 0;
 }

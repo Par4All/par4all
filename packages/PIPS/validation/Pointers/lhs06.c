@@ -17,4 +17,5 @@ int lhs06(const char * fmt,
   nbout = 0;
 
   * (__builtin_va_arg(pa,int *)) = col;
+  return 0;
 }

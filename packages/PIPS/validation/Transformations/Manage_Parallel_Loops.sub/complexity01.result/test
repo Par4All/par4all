@@ -1,4 +1,18 @@
 #
+# Code after privatize_module for module main
+#
+int main()
+{
+   int a[10000];
+   {
+      int i;
+
+#pragma omp for private(i)
+      for(i = 0; i <= 9999; i += 1)
+         a[i] = sin(i*1.0);
+   }
+}
+#
 # Code after internalize_parallel_code for module main
 #
 int main()

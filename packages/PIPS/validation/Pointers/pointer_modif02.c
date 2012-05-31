@@ -1,5 +1,5 @@
 
-foo(int ** dest, int *source)
+void foo(int ** dest, int *source)
 {
   *dest = source;
 }

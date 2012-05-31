@@ -57,6 +57,7 @@ int main(void)
 //             <    is read   >: p3 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    pointer_free(p3);
+   return 0;
 }
 
 POINTS-TO
@@ -163,4 +164,11 @@ int main(void)
 // p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
    pointer_free(p3);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   return 0;
 }

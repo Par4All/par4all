@@ -1,4 +1,4 @@
-//#include<stdlib.h>
+#include<stdlib.h>
 typedef int * pointer;
 
 // should catch that returned value is malloc'ed there

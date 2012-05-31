@@ -17,14 +17,15 @@ void call02(int i, int j, int y[10], int * q[10], tf_t *p)
   *q[i]=3;
 }
 
-main()
+int main()
 {
-  int a;
-  int b;
+  int a = 1;
+  int b = 2;
   int x[10];
   int * ap[10];
   tf_t s;
   tf_t *sp = &s;
 
   call02(a, b, x, ap, sp);
+  return 0;
 }

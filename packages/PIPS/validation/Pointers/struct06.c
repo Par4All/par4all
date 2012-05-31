@@ -13,4 +13,5 @@ int struct06()
   for(i=0;i<10;i++) {
     x[i].un.first = x[i].deux.second;
   }
+  return 0;
 }

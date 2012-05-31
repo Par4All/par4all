@@ -15,5 +15,5 @@ int main ()
       fprintf (pFile,"Name %d %s\n",n,name);
     }
   fclose (pFile);
-
+  return 0;
 }

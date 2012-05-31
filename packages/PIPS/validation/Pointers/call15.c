@@ -8,10 +8,11 @@ void call15(int * pi, tf_t *q)
   q->one = 1;
 }
 
-main()
+int main()
 {
   int i;
   tf_t s;
 
   call15(&i, &s);
+  return 0;
 }

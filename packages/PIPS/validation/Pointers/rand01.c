@@ -9,4 +9,5 @@ int main ()
    srandom (graine);         /* generator initialization */
    virgule = (double) rand () / (RAND_MAX+1);
    entier = 1 + rand ();
+   return 0;
 }

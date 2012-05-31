@@ -4,13 +4,13 @@
 
 void call14(int n, int m, int *x)
 {
-  int i, j;
+  int i;
 
   for(i=0; i<n*m;i++)
       x[i] = i;
 }
 
-main()
+int main()
 {
   int d1 = 4;
   int d2 = 4;
@@ -24,4 +24,5 @@ main()
       printf("y[%d][%d] = %d\t", i, j, y[i][j]);
     printf("\n");
   }
+  return 0;
 }
