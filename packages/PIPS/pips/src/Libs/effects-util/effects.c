@@ -332,6 +332,7 @@ bool heap_effect_p(effect e)
   return heap_p;
 }
 
+/* Any heap cell, more or less abstract or typed */
 bool heap_cell_p(cell c)
 {
   bool heap_p;
@@ -343,6 +344,28 @@ bool heap_cell_p(cell c)
 
   return heap_p;
 }
+
+bool all_heap_locations_cell_p(cell c)
+{
+  bool heap_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  heap_p = entity_all_heap_locations_p(v);
+
+  return heap_p;
+}
+
+//bool all_heap_locations_typed_cell_p(cell c)
+//{
+//  bool heap_p;
+//  reference r = cell_any_reference(c);
+//  entity v = reference_variable(r);
+//
+//  heap_p = entity_all_heap_locations_typed_p(v);
+//
+//  return heap_p;
+//}
 
 bool nowhere_cell_p(cell c)
 {
@@ -1288,6 +1311,7 @@ reference reference_add_field_dimension(reference r, entity f)
        || entity_nowhere_locations_p(v)
        || entity_typed_nowhere_locations_p(v)
        || entity_null_locations_p(v)
+       || entity_all_heap_locations_p(v) // Not typed, hopefully...
        )) {
     bool to_be_freed = false;
     type t = points_to_reference_to_type(r, &to_be_freed);
@@ -1320,10 +1344,45 @@ reference reference_add_field_dimension(reference r, entity f)
       }
     }
     else {
-      /* Nothing done when the heap is modeled by a unique entity */
-      ; // FI: could be useful for unions as well
+      if(entity_all_module_heap_locations_p(v) || entity_all_heap_locations_p(v))
+	/* Nothing done when the heap is modeled by a unique entity */
+	; // FI: could be useful for unions as well
+      else
+	pips_internal_error("Attempt at adding a field to an object that is not"
+			    " a struct.\n");
     }
     if(to_be_freed) free_type(t);
   }
+  else if(entity_typed_anywhere_locations_p(v)
+       || entity_all_heap_locations_p(v) // Not typed, hopefully...?
+       ) {
+    /* This kind of entity cannot support a concrete access path but
+     * the type must be updated according to the field "f"
+     */
+    type nt = entity_type(f); // ultimate_type()?
+    if(entity_typed_anywhere_locations_p(v)) {
+      entity ne = entity_typed_anywhere_locations(nt);
+      reference_variable(r) = ne;
+    }
+    else if(entity_all_heap_locations_p(v)) {
+      entity ne = entity_all_heap_locations_typed(nt);
+      reference_variable(r) = ne;
+    }
+  }
+
   return r;
+}
+
+/* Convert a reference to an array into a reference to its first element
+ *
+ * Note: is this unconditional? Do you add the right number of
+ * subscripts according to the type?
+ */
+void points_to_cell_add_zero_subscripts(cell c)
+{
+  bool to_be_freed = false;
+  type t = points_to_cell_to_type(c, &to_be_freed);
+  reference r = cell_any_reference(c);
+  reference_add_zero_subscripts(r, t);
+  if(to_be_freed) free_type(t);
 }

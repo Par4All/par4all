@@ -187,14 +187,18 @@ normalized NormalizeReference(reference r)
 	      entity_domain_number(e)==entity_domain);
 
   if (!type_variable_p(t)) {
-    if(type_functional_p(t))
+    if(type_functional_p(t)) {
+      // FI: we might not want to keep the warning for C code...
       pips_user_warning("Reference to function \"%s\" cannot be normalized.\n"
 			"Is it an undeclared variable?\n",
 			entity_user_name(e));
-    else
+      n = make_normalized(is_normalized_complex, UU);
+    }
+    else {
       pips_user_warning("Reference to entity \"%s\" cannot be normalized because of its type tag %d\n",
 			entity_name(e), type_tag(t));
-    pips_user_error("Referenced entity should be a variable!\n");
+      pips_user_error("Referenced entity should be a variable!\n");
+    }
   }
   else {
     Variable v = (Variable) e;

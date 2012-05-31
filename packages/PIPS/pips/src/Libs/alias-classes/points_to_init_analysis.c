@@ -217,26 +217,48 @@ points_to create_stub_points_to(cell c, type t,
 				__attribute__ ((__unused__)) basic b)
 {
   points_to pt_to = points_to_undefined;
-  //basic bb = basic_undefined;
-  //type pt = type_undefined;
-  //expression ex = make_unbounded_expression();
   reference sink_ref = reference_undefined;
   cell source_cell = copy_cell(c);
   reference r = cell_any_reference(source_cell);
   entity e = reference_variable(r);
 
-  //const char * en = entity_user_name(e); 
-  //string s = NULL;
-
   entity formal_parameter = create_stub_entity(e, t);
 
-  /* Do we want to assume that "int * p;" defines a pointer to an array? */
+  /* Do we want to assume that "int * p;" defines a pointer to an
+   * array of unbounded dimension?
+   */
   bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-  if(!type_strict_p && !derived_type_p(t) && !type_functional_p(t))
-    sink_ref = make_reference(formal_parameter,
-			      CONS(EXPRESSION, int_to_expression(0), NIL));
-  else
+  if(!type_strict_p
+     // && !derived_type_p(t)
+     && !type_functional_p(t)
+     && !array_type_p(t)) {
+    /* We have a choice here: either points to the first element of an
+     * implicit array or points towards the array. To be consistent
+     * with the interpretation of "p=a;" and "p=&a[0]", we chose to
+     * points towards the object itself.
+     *
+     * Beatrice Creusillet also suggests to check if the source cell
+     * is an array and then to generate a special sink with an
+     * unbounded expression to express the facte that several targets
+     * are defined at once and that the set of arcs is between any
+     * element of the source and any target.
+     */
+    //sink_ref =
+    //make_reference(formal_parameter,
+    //		     CONS(EXPRESSION, make_unbounded_expression(), NIL));
+    //sink_ref =
+    //  make_reference(formal_parameter,
+    //		     CONS(EXPRESSION, int_to_expression(0), NIL));
     sink_ref = make_reference(formal_parameter,  NIL);
+  }
+  else {
+    if(array_type_p(t))
+      sink_ref =
+	make_reference(formal_parameter,
+		       CONS(EXPRESSION, make_unbounded_expression(), NIL));
+    else
+      sink_ref = make_reference(formal_parameter,  NIL);
+  }
 
   cell sink_cell = make_cell_reference(sink_ref);
 
@@ -259,6 +281,26 @@ points_to create_stub_points_to(cell c, type t,
   pointer_index ++;
   
   return pt_to;
+}
+
+/* Take into account the POINTS_TO_STRICT_POINTER_TYPE to allocate a
+ * sink cell of type "t" if the strictness is requested and of type
+ * "array of t" if not.
+ */
+points_to create_advanced_stub_points_to(cell c, type t)
+{
+  points_to pt = points_to_undefined;
+  bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(strict_p)
+    pt = create_stub_points_to(c, t, basic_undefined);
+  else {
+    /* assume that pointer always points towards an array of
+       unknown dimension. */
+    type at = type_to_array_type(t);
+    pt = create_stub_points_to(c, at, basic_undefined);
+    // FI: I do not know if we should free t [and/or at]
+  }
+  return pt;
 }
 
 /* To create the points-to stub associated to the formal parameter,
@@ -291,7 +333,7 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
   string formal_name = strdup(concatenate(get_current_module_name() ,MODULE_SEP_STRING, s, NULL));
   entity formal_parameter = gen_find_entity(formal_name);
   type pt = type_undefined;
-  bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
   bb = variable_basic(type_variable(t));
   list l_dim = variable_dimensions(type_variable(t));
   basic base = copy_basic(bb);
@@ -313,9 +355,20 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
     pt = copy_type(t);    
 
   if(entity_undefined_p(formal_parameter)) {
+    entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,
+					    POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
+    // FI->AM: weird, it is redone when the entity already exists
+    entity_kind(DummyTarget) = ENTITY_POINTER_DUMMY_TARGETS_AREA;
+    storage rs = make_storage_ram(make_ram(get_current_module_entity(),
+					   DummyTarget,
+					   UNKNOWN_RAM_OFFSET, NIL));
     formal_parameter = make_entity(formal_name,
 				   pt,
-				   make_storage_rom(),
+				   // FI->AM: if it is made rom, then
+				   // the entitY is no longer
+				   // recognized by entity_stub_sink_p()
+				   // make_storage_rom(),
+				   rs,
 				   make_value_unknown());
   }
 
@@ -324,8 +377,11 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
   else if((int)gen_length(l_dim)>1){
     sink_ref = make_reference(formal_parameter,l_ind);
   }
-  else
-    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+  else {
+    // sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+    // FI: no reason to index an array; see "p = &a;"
+    sink_ref = make_reference(formal_parameter, NIL);
+  }
 
   cell sink_cell = make_cell_reference(sink_ref);
   approximation rel = make_approximation_exact();
@@ -381,62 +437,71 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
     else {
       switch(basic_tag(fpb)){
       case is_basic_int:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	// type st = type_undefined; // sink type
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_float:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_logical:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_overloaded:{
+	// FI: Oops, what are we doing here?
 	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_complex:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_pointer:{
-	pt_to = create_stub_points_to(c, upt, fpb); 
+	pt_to = create_advanced_stub_points_to(c, upt); 
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	cell sink = points_to_sink(pt_to);
-	set tmp = pointer_formal_parameter_to_stub_points_to(upt, sink);
-	pt_in = set_union(pt_in, pt_in,tmp);
-	set_free(tmp);
+	if(false) {
+	  /* Recursive descent for pointers: the new sink becomes the
+	     new source... FI: I do not think this is useful because
+	     they will be created on demand... */
+	  set tmp = pointer_formal_parameter_to_stub_points_to(upt, sink);
+	  pt_in = set_union(pt_in, pt_in,tmp);
+	  set_free(tmp);
+	}
 	/* what about storage*/
 	break;
       }
       case is_basic_derived:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_bit:
+	pips_internal_error("Not implemented.\n");
 	break;
       case is_basic_string:{
+	// FI: I'm not too sure about what to do for strings...
 	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_typedef:{
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_advanced_stub_points_to(c, upt);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -636,8 +701,28 @@ set array_formal_parameter_to_stub_points_to(type t,cell c)
     reference ref = make_reference(e, CONS(EXPRESSION, ind, NULL));
     reference_consistent_p(ref);
     cell cel = make_cell_reference(ref);
-    type pt = basic_pointer(fpb);
+    type pt = copy_type(basic_pointer(fpb));
+    list sl = NIL;
+    if(array_type_p(t)) {
+      // FI->BC: to follow Beatrice's idea that dimensions of the sources
+      // have to be replicated in the target
+      // I am afraid this is going to make typing and subscript analysis impossible
+      // I do not see the point of addind a unique extra-dimension
+      // The fun part: imagine a n-D array of pointers towards m-D arrays...
+      // The target stub is an n+m-D array...
+      list dl = variable_dimensions(type_variable(t));
+      list ndl = gen_full_copy_list(dl);
+      variable_dimensions(type_variable(pt))
+	= gen_nconc(ndl, variable_dimensions(type_variable(pt)));
+      int d = gen_length(dl), i;
+      for(i=0;i<d; i++) {
+	sl = CONS(EXPRESSION, make_unbounded_expression(), sl);
+      }
+    }
     points_to pt_to = create_stub_points_to(cel, pt, fpb);
+    cell sink = points_to_sink(pt_to);
+    reference sr = cell_any_reference(sink);
+    reference_indices(sr) = gen_nconc(sl, reference_indices(sr));
     pt_in = set_add_element(pt_in, pt_in,
 			    (void*) pt_to );
   }
