@@ -1,4 +1,5 @@
-
+#include<math.h>
+#include<stdlib.h>
 typedef struct {
   float re;
   float im;

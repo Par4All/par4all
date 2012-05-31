@@ -4,4 +4,5 @@ int main()
 {
   char* s= "sortie de puts";
   puts(s);
+  return 0;
 }

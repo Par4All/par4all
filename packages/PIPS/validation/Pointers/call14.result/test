@@ -32,6 +32,7 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
+   return 0;
 }
 
 POINTS-TO
@@ -83,4 +84,8 @@ int main()
 
       printf("\n");
    }
+
+// Points To: none
+
+   return 0;
 }

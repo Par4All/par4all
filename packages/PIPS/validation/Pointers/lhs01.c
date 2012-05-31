@@ -34,7 +34,8 @@ void lhs01()
     j = 3;
 }
 
-main()
+int main()
 {
   lhs01();
+  return 0;
 }

@@ -9,11 +9,12 @@ void call04(int n, int m, int x[n][m])
       x[i][j] = 0;
 }
 
-main()
+int main()
 {
   int d1 = 10;
   int d2 = 10;
   int y[d1][d2];
 
   call04(d1, d2, y);
+  return 0;
 }

@@ -54,6 +54,7 @@ int main(void)
    // 36 17 53
    // no pointer assigned
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+   return 0;
 }
 void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
@@ -189,6 +190,13 @@ int main(void)
    // 36 17 53
    // no pointer assigned
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+
+// Points To:
+// p1 -> i1 , EXACT
+// p2 -> i2 , EXACT
+// p3 -> i3 , EXACT
+
+   return 0;
 }
 
 // Points To IN:

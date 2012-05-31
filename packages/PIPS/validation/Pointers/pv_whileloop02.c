@@ -1,4 +1,5 @@
 /* while loop case: no pointer is modified inside loop */
+#include<stdlib.h>
 int main()
 {
   int i=0;

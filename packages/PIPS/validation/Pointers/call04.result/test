@@ -12,6 +12,7 @@ int main()
 //             <    is read   >: d1 d2
 
    call04(d1, d2, y);
+   return 0;
 }
 
 POINTS-TO
@@ -41,4 +42,8 @@ int main()
 
 
    call04(d1, d2, y);
+
+// Points To: none
+
+   return 0;
 }

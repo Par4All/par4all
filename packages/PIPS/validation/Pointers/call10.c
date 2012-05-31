@@ -14,10 +14,11 @@ void call10(int i, int x[10], int j, int y[10])
     y[i] = 0;
 }
 
-main()
+int main()
 {
   tf_t s;
   tf_t *sp = &s;
 
   call10(s.one, s.two, sp->one, sp->two);
+  return 0;
 }

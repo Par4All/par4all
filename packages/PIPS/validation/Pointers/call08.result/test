@@ -8,7 +8,7 @@ int main()
 //             <    is written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i, j;
+   int i;
 //             <    is read   >: d1
 //             <    is written>: i
 
@@ -16,6 +16,15 @@ int main()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: d1 d2 i
       call08(i, d2, &y[i][1]);
+   
+   /*
+     for(i=0;i<d1;i++) {
+       for(j=0;j<d2;j++)
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+       printf("\n");
+     }
+     */
+   return 0;
 }
 
 POINTS-TO
@@ -43,7 +52,7 @@ int main()
 
 // Points To: none
 
-   int i, j;
+   int i;
 
 // Points To: none
 
@@ -53,4 +62,16 @@ int main()
 // Points To: none
 
       call08(i, d2, &y[i][1]);
+
+// Points To: none
+
+   
+   /*
+     for(i=0;i<d1;i++) {
+       for(j=0;j<d2;j++)
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+       printf("\n");
+     }
+     */
+   return 0;
 }

@@ -10,6 +10,7 @@ int main()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    call10(s.one, s.two, sp->one, sp->two);
+   return 0;
 }
 
 POINTS-TO
@@ -36,4 +37,9 @@ int main()
 
 
    call10(s.one, s.two, sp->one, sp->two);
+
+// Points To:
+// sp -> s , EXACT
+
+   return 0;
 }
