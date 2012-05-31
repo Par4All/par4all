@@ -30,7 +30,6 @@ FWD_DIRS = \
 	linearlibs
 
 #	plint \
-#	janusvalue \
 #	Tests
 
 FWD_PARALLEL	= 1
