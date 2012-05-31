@@ -12,10 +12,11 @@ void call01(int * pi, tf_t *q)
   q->two[4] = 2;
 }
 
-main()
+int main()
 {
   int i;
   tf_t s;
 
   call01(&i, &s);
+  return 0;
 }

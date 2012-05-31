@@ -1,4 +1,5 @@
 /* do while loop case with pointer arithmetic: conservatively handled */
+#include<stdlib.h>
 int main()
 {
   int i=0;

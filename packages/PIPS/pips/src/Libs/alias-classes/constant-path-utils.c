@@ -1361,6 +1361,7 @@ set gen_may_constant_paths(cell l,
 				     points_to_rank);
   points_to pt = points_to_undefined;
   if(!(*address_of_p)){
+    pips_internal_error("address_of_p should always be true in the new implementation/.\n");
     /* here we have x = y, then we generate (x,y1,a)|(y,y1,a) as
        points to relation */
     FOREACH(cell, r, R){
@@ -1399,6 +1400,8 @@ set gen_may_constant_paths(cell l,
       /* if(reference_unbounded_indices_p(ref)) */
       /*   a = make_approximation_may(); */
       cell nl = copy_cell(l);
+      /* Make sure the types are compatible... */
+      points_to_cell_types_compatibility(nl, r);
       pt = make_points_to(nl, r, a, make_descriptor_none());
       set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
     }

@@ -1,4 +1,6 @@
-
+void read(int d){
+  ;
+}
 int main(){
      int *a, b, c, d ;
      c = 3;       /* S1 */

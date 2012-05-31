@@ -358,6 +358,7 @@ entity entity_all_xxx_locations(string xxx)
   return dynamic;
 }
 
+/* FI->AM: the predicate entity_all_xxx_locations_typed_p() is missing... */
 entity entity_all_xxx_locations_typed(string xxx, type t)
 {
   entity e = entity_undefined;
@@ -365,6 +366,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
   bool found_p = false; // a break could be used instead
 
   pips_assert("Type t is defined", !type_undefined_p(t));
+  pips_assert("Type t is not functional", !type_functional_p(t));
 
   for(count = 0; !found_p; count++) {
     string name = string_undefined;
@@ -382,7 +384,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
       entity_type(e) = copy_type(t);
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
-      entity_kind(e)=ABSTRACT_LOCATION;
+      entity_kind(e) = ABSTRACT_LOCATION;
       found_p = true;
     }
     else if(type_equal_p(t, ot))
@@ -399,7 +401,10 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
 }
 
 /* test if an entity is the set of all memory locations in the xxx
-   area of any module. */
+ * area of any module.
+ *
+ * FI->AM: how come w generate *HEAP* and we check *HEAP**ANYWHERE*?
+ */
 bool entity_all_xxx_locations_p(entity e, string xxx)
 {
   bool dynamic_p;
@@ -432,10 +437,26 @@ bool entity_all_module_heap_locations_p(entity e)
   return entity_all_module_xxx_locations_p(e, HEAP_AREA_LOCAL_NAME);
 }
 
-/* return ANY_MODULE:*HEAP* */
+/* return ANY_MODULE:*HEAP*
+ *
+ * FI->AM: I move it to ANY_MODULE:*HEAP**ANYWHERE*
+ *
+ * Not compatible with entity_all_locations_p()...
+ */
 entity entity_all_heap_locations()
 {
-  return entity_all_xxx_locations(HEAP_AREA_LOCAL_NAME);
+  return entity_all_xxx_locations(HEAP_AREA_LOCAL_NAME ANYWHERE_LOCATION);
+}
+
+/* test if an entity is the set of all heap locations
+ *
+ * We look for "*ANY_MODULE*:*HEAP**ANYWHERE*"... unless it is "foo:*HEAP**ANYWHERE*"
+ *
+ * FI->AM: this is not compatible with the entity name *ANY-MODULE*:*HEAP*
+ */
+bool entity_all_heap_locations_p(entity e)
+{
+  return entity_all_xxx_locations_p(e, HEAP_AREA_LOCAL_NAME);
 }
 
 entity entity_all_heap_locations_typed(type t)
@@ -443,11 +464,11 @@ entity entity_all_heap_locations_typed(type t)
   return entity_all_xxx_locations_typed(HEAP_AREA_LOCAL_NAME, t);
 }
 
-/* test if an entity is the set of all heap locations */
-bool entity_all_heap_locations_p(entity e)
-{
-  return entity_all_xxx_locations_p(e, HEAP_AREA_LOCAL_NAME);
-}
+// FI->AM: missing predicate...
+//bool entity_all_heap_locations_typed_p(entity e)
+//{
+//  return entity_all_xxx_locations_typed_p(e, HEAP_AREA_LOCAL_NAME);
+//}
 
 
 /* return m:*STACK**ANYWHERE */

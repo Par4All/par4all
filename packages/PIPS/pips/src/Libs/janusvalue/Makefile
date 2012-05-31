@@ -1,4 +1,4 @@
-# $Id$
+# $Id: Makefile 1432 2011-12-31 08:19:07Z coelho $
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -37,6 +37,6 @@ INSTALL_INC	+= $(OTHER_HEADERS)
 
 ################################################################## COMMON STUFF
 
-ROOT    = ../..
-PROJECT = linear
+ROOT    = ../../..
+PROJECT = pips
 include $(ROOT)/makes/main.mk

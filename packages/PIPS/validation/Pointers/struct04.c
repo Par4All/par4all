@@ -14,4 +14,5 @@ int struct04()
   //y[0] = 1;
 
   x.first = x.second + 1;
+  return 0;
 }

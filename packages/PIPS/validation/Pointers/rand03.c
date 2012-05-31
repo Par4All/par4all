@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <math.h>
 
 typedef struct {
   float re;
@@ -36,14 +38,13 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
     }
 }
 
-
-
-main ()
+int main()
 {
   int ny=10,nx=10;
   Cplfloat pt_in[ny][nx];
-  float Sigma2;
+  float Sigma2 = 0.;
   Cplfloat pt_out[ny][nx];
   
   AddNoise(ny,nx,pt_in, Sigma2,pt_out);
+  return 0;
 }

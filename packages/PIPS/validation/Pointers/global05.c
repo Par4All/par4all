@@ -23,7 +23,8 @@ void global05()
 
 // FI: I'm not sure the call is useful to make the point about virtual
 // context for global variables
-main()
+int main()
 {
   global05();
+  return 0;
 }

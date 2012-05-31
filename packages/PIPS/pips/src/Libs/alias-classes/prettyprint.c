@@ -333,3 +333,31 @@ print_alias_classes( const char* module_name )
 
     return success;
 }
+
+#include "alias-classes.h"
+
+/* For debugging: prettyprint many different kinds of newgen objects */
+void dprint(expression x)
+{
+  int ot = expression_domain_number(x);
+  if(ot==0)
+    (void) fprintf(stderr,"PROBABLY AN EMPTY LIST\n");
+  else if(expression_undefined_p(x))
+    (void) fprintf(stderr,"UNDEFINED NEWGEN OBJECT\n");
+  else if(ot==expression_domain)
+    print_expression( x);
+  else if(ot==reference_domain)
+    print_reference((reference) x);
+  else if(ot==points_to_domain)
+    print_points_to((points_to) x);
+  else if(ot==cell_domain)
+    print_points_to_cell((cell) x);
+  else if(ot==type_domain)
+    print_type((type) x);
+  else if(ot==statement_domain)
+    print_statement((statement) x);
+  else if(ot>1000 || ot<=0) // FI: I do not know how to get the largest Newgen type
+    // We could assume that the object is a list and look for the type
+    // of the first object...
+    (void) fprintf(stderr,"NOT A NEWGEN OBJECT. MAYBE A LIST\n");
+}

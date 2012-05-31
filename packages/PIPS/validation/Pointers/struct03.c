@@ -14,4 +14,5 @@ int struct03()
     x[i].un.first = 1;
     x[i].deux.second = 0;
   }
+  return 0;
 }

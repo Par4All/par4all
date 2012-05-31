@@ -1,0 +1,28 @@
+delete partial_eval24
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval24 partial_eval24.c
+
+module main
+
+display PRINTED_FILE
+
+echo file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+apply PARTIAL_EVAL
+
+echo
+echo file after partial evaluation
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete partial_eval24
+quit

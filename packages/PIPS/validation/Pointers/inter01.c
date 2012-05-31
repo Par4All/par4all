@@ -21,7 +21,8 @@ void inter01()
   }
 }
 
-main()
+int main()
 {
   inter01();
+  return 0;
 }

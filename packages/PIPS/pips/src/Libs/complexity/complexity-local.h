@@ -80,6 +80,7 @@
 #define COMPLEX_NBYTES 2*FLOAT_NBYTES    /* complex, single-precision */
 #define DCOMPLEX_NBYTES 2*DOUBLE_NBYTES  /* complex, double-precision */
 #define MAKE_INT_BASIC make_basic(is_basic_int, (void *) INT_NBYTES)
+#define MAKE_ADDRESS_BASIC make_basic(is_basic_int, (void *) DEFAULT_POINTER_TYPE_SIZE)
 #define MAKE_FLOAT_BASIC make_basic(is_basic_float, (void *) FLOAT_NBYTES)
 #define MAKE_DOUBLE_BASIC make_basic(is_basic_float, (void *) DOUBLE_NBYTES)
 #define MAKE_COMPLEX_BASIC make_basic(is_basic_complex, (void *) COMPLEX_NBYTES)

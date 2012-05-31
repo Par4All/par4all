@@ -10,4 +10,5 @@ int main()
 
   y[0]=0.;
   printf(fmt, i, i+j, x);
+  return 0;
 }

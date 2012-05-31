@@ -405,10 +405,12 @@ int maximize;
 	    comp = power_op_handler(args, precond, effects_list, keep_symbols, maximize);
 	else if (same_string_p(name, UNARY_MINUS_OPERATOR_NAME))
 	    comp = unary_minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-    else if (same_string_p(name,FIELD_OPERATOR_NAME))
-        comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
-    else
-        pips_user_warning("operator '%s' skipped\n",name);
+	else if (same_string_p(name, UNARY_PLUS_OPERATOR_NAME))
+	    comp = unary_plus_op_handler(args, precond, effects_list, keep_symbols, maximize);
+        else if (same_string_p(name, FIELD_OPERATOR_NAME))
+            comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
+        else
+            pips_user_warning("operator '%s' skipped\n",name);
 
 	break;
     default:pips_internal_error("not handled case");
@@ -538,6 +540,21 @@ int maximize;
 
     return (c1);
 }
+
+complexity unary_plus_op_handler(args, precond, effects_list, keep_symbols, maximize)
+list args;
+transformer precond;
+list effects_list;
+bool keep_symbols;
+int maximize;
+{
+    complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
+					   precond, effects_list, keep_symbols,
+					   maximize);
+
+    return (c1);
+}
+
 
 complexity divide_op_handler(args, precond, effects_list, keep_symbols, maximize)
 list args;

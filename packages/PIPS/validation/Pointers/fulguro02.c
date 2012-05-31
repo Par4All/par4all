@@ -141,11 +141,12 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
    return FLGR_RET_TYPE_UNKNOWN;
 }
 
-main()
+int main()
 {
     FLGR_Data2D d2d;
     FLGR_Data2D d1;
     FLGR_Data2D d2;
     flgr2d_arith_add_fgINT32(&d2d,&d1,&d2);
     printf("%d%d\n",d2d.size,d2d.row[0]->array[0]);
+    return 0;
 }

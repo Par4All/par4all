@@ -10,4 +10,5 @@ int main()
 
   nbytes = sizeof(buf);
   bytes_read = read(fd, buf, nbytes);
+  return 0;
 }

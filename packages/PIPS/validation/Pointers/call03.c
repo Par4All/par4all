@@ -15,7 +15,8 @@ void call03()
   q->two[4] = 2;
 }
 
-main()
+int main()
 {
   call03();
+  return 0;
 }
