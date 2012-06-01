@@ -1,23 +1,23 @@
 %%
 %% $Id$
 %%
-%% Copyright 1989-2010 MINES ParisTech
+%% Copyright 1989-2012 MINES ParisTech
 %%
-%% This file is part of PIPS.
+%% This file is part of Linear/C3 Library.
 %%
-%% PIPS is free software: you can redistribute it and/or modify it
-%% under the terms of the GNU General Public License as published by
+%% Linear/C3 Library is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU Lesser General Public License as published by
 %% the Free Software Foundation, either version 3 of the License, or
 %% any later version.
 %%
-%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
 %% WARRANTY; without even the implied warranty of MERCHANTABILITY or
 %% FITNESS FOR A PARTICULAR PURPOSE.
 %%
-%% See the GNU General Public License for more details.
+%% See the GNU Lesser General Public License for more details.
 %%
-%% You should have received a copy of the GNU General Public License
-%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 %%
 
 
@@ -488,7 +488,7 @@ lecture.
 \paragraph{} Par défaut, le nom des variables sont fournies par la fonctions 
 variable\_default\_name, mais {\bf sl\_set\_variable\_name} permet de changer
 cette fonction d'accés à volonté. C'est utile lorsque les variables sont 
-des entités de PIPS.
+des entités de Linear/C3 Library.
 @D fonctions sclist @{
 /* char* sl_set_variable_name( in_fu ) give the function to read variables */
 void  sl_set_variable_name( in_fu )

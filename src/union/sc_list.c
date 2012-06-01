@@ -44,7 +44,7 @@
 #line 24 "sc_list.w"
 
 
-#ifdef DEBUG_UNION_PIPS
+#ifdef DEBUG_UNION_Linear/C3 Library
 extern char* entity_local_name(Variable);
 char* (*union_variable_name)(Variable) = entity_local_name;
 #else

@@ -1,23 +1,23 @@
 %%
 %% $Id$
 %%
-%% Copyright 1989-2010 MINES ParisTech
+%% Copyright 1989-2012 MINES ParisTech
 %%
-%% This file is part of PIPS.
+%% This file is part of Linear/C3 Library.
 %%
-%% PIPS is free software: you can redistribute it and/or modify it
-%% under the terms of the GNU General Public License as published by
+%% Linear/C3 Library is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU Lesser General Public License as published by
 %% the Free Software Foundation, either version 3 of the License, or
 %% any later version.
 %%
-%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
 %% WARRANTY; without even the implied warranty of MERCHANTABILITY or
 %% FITNESS FOR A PARTICULAR PURPOSE.
 %%
-%% See the GNU General Public License for more details.
+%% See the GNU Lesser General Public License for more details.
 %%
-%% You should have received a copy of the GNU General Public License
-%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 %%
 
 % title 	: Extension de C3 aux Unions de Polyèdres.
@@ -57,7 +57,7 @@
 
 \paragraph{Nécessité de l'union de polyèdres.}
 Les polyèdres convexes sont intensément 
-utilisés dans le paralléliseur automatique PIPS~\cite{IJT91},
+utilisés dans le paralléliseur automatique Linear/C3 Library~\cite{IJT91},
 notamment pour le calcul des dépendances de données.
 
 La méthode de Feautrier pour
@@ -338,7 +338,7 @@ les versions antérieures.
 
 extern char* (*union_variable_name)(Variable);
 
-#if(defined(DEBUG_UNION_C3) || defined(DEBUG_UNION_PIPS))
+#if(defined(DEBUG_UNION_C3) || defined(DEBUG_UNION_Linear/C3 Library))
 #define C3_DEBUG( fun, code )         \
   {if(getenv("DEBUG_UNION")){fprintf(stderr,"[%s]\n", fun); {code}}}
 #define C3_RETURN( type, val )      \
