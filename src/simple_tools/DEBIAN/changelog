@@ -1,3 +1,22 @@
+2012-05-31 Ronan Keryell <Ronan.Keryell@wild-systems.com>
+
+ * Par4All 1.4.2
+
+   * Change Stars-PM demo Makefile to avoid nvcc choking on recent FFTW3 headers
+
+   * Fix normalization for Chirp code from SMECY project
+
+   * Make different privatization phases easier to select
+
+   * Improved complexity analysis for SMECY project (cluster 3)
+
+   * Added a phase limit_parallelism_using_complexity to
+     automatically skip the parallelization of non enough
+     compute-intensive loops
+
+   * Add a git-svn-switch script to ease upstream SVN URL changes
+
+
 2012-05-17 Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.4.1
