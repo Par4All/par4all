@@ -4,6 +4,7 @@
 + scalar deps with proper effects
 + check => ok => deadcode (#define)
 - bug: partial eval is over-optimistic when pointers are involved
+- while-unrolling should check the two last stages for convergence!
 
 * input
 + may skip unrelated statements?
