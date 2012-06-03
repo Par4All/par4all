@@ -89,18 +89,21 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
 
   if(interprocedural_points_to_analysis_p())
     {
+      points_to_list pts_to_out = (points_to_list)
+	db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
+      list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
+      /* if callee's out is empty there is no need to start an interprocedural analysis */
+      if(!ENDP(l_pt_to_out)) {
       // FI: this function should be moved from semantics into effects-util
     extern list load_summary_effects(entity e);
     list el = load_summary_effects(f);
     list wpl = written_pointers_set(el);
     points_to_list pts_to_in = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
-    points_to_list pts_to_out = (points_to_list)
-      db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
+   
     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
     pt_map pt_in_callee = new_pt_map();
     pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
-    list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
     pt_map pt_out_callee = new_pt_map();
     pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
     // FI: function name... set or list?
@@ -116,6 +119,10 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     pt_end = set_union(pt_end, pt_end, pts_gen);
     ifdebug(8) print_points_to_set("pt_end =",pt_end);
     pt_out = pt_end;
+      }
+      else {
+	pips_user_warning("Function has not a side effect on pointers variables");
+      }
   }
   else if(fast_interprocedural_points_to_analysis_p()) 
     {

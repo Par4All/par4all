@@ -592,8 +592,9 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 		  reference source_ref =  effect_any_reference(ef);
 		  effects_free(l1);
 		  generic_effects_reset_all_methods();
+		  type p_ent_type = type_to_pointed_type(ent_type);
 		  cell source_cell = make_cell_reference(source_ref);
-		  pt_to = create_stub_points_to(source_cell, ent_type, fpb);
+		  pt_to = create_stub_points_to(source_cell, p_ent_type, fpb);
 		  pt_in = set_add_element(pt_in, pt_in,
 					  (void*) pt_to );
 		}
