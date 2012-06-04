@@ -4128,331 +4128,335 @@ digraph "dag_1" {
 
   // computation vertices
   "604 vol" [shape=diamond];
+  "603 ?" -> "604 vol" [arrowhead=empty,label="volcurrent"];
+  "596 vol" -> "604 vol" [arrowhead=empty,label="volcurrent"];
   "602 ?" [shape=none];
-  "595 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "594 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
   "601 ?" [shape=none];
   "601 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "595 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "594 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "588 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "587 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "580 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "573 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "566 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "559 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "552 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "600 <" [shape=trapezium,orientation=270];
   "600 <" -> "604 vol" [label="imWork1"];
   "600 <" -> "imWork1'";
   "599 ?" [shape=none];
   "599 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "594 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "587 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "595 ?" [shape=none];
-  "595 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
+  "593 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "586 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "596 vol" [shape=diamond];
+  "596 vol" -> "604 vol" [arrowhead=empty,label="volcurrent"];
+  "596 vol" -> "603 ?" [arrowhead=empty,label="volcurrent"];
   "594 ?" [shape=none];
-  "594 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "594 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "594 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "588 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "593 <" [shape=trapezium,orientation=270];
-  "593 <" -> "600 <" [label="imWork1"];
-  "592 ?" [shape=none];
-  "592 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "587 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "588 ?" [shape=none];
-  "588 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
+  "594 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "593 ?" [shape=none];
+  "593 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "587 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "580 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "592 <" [shape=trapezium,orientation=270];
+  "592 <" -> "600 <" [label="imWork1"];
+  "592 <" -> "596 vol" [label="imWork1"];
+  "591 ?" [shape=none];
+  "591 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "586 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
   "587 ?" [shape=none];
-  "587 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "586 <" [shape=trapezium,orientation=270];
-  "586 <" -> "593 <" [label="imWork1"];
-  "585 ?" [shape=none];
-  "585 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "581 ?" [shape=none];
-  "581 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "586 ?" [shape=none];
+  "586 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "580 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "585 <" [shape=trapezium,orientation=270];
+  "585 <" -> "592 <" [label="imWork1"];
+  "584 ?" [shape=none];
+  "584 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
   "580 ?" [shape=none];
-  "580 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "579 <" [shape=trapezium,orientation=270];
-  "579 <" -> "586 <" [label="imWork1"];
-  "578 ?" [shape=none];
-  "578 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "574 ?" [shape=none];
-  "574 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "579 ?" [shape=none];
+  "579 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "578 <" [shape=trapezium,orientation=270];
+  "578 <" -> "585 <" [label="imWork1"];
+  "577 ?" [shape=none];
+  "577 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
   "573 ?" [shape=none];
-  "573 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "572 <" [shape=trapezium,orientation=270];
-  "572 <" -> "579 <" [label="imWork1"];
-  "571 ?" [shape=none];
-  "571 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "567 ?" [shape=none];
-  "567 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "572 ?" [shape=none];
+  "572 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "571 <" [shape=trapezium,orientation=270];
+  "571 <" -> "578 <" [label="imWork1"];
+  "570 ?" [shape=none];
+  "570 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
   "566 ?" [shape=none];
-  "566 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "565 <" [shape=trapezium,orientation=270];
-  "565 <" -> "572 <" [label="imWork1"];
-  "564 ?" [shape=none];
-  "564 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "566 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "560 ?" [shape=none];
-  "560 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "560 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "565 ?" [shape=none];
+  "565 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "564 <" [shape=trapezium,orientation=270];
+  "564 <" -> "571 <" [label="imWork1"];
+  "563 ?" [shape=none];
+  "563 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "565 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
   "559 ?" [shape=none];
-  "559 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "560 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "558 <" [shape=trapezium,orientation=270];
-  "558 <" -> "565 <" [label="imWork1"];
-  "557 ?" [shape=none];
-  "557 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "566 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "559 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "557 ?" [arrowhead=empty,label="ret_20"];
-  "553 ?" [shape=none];
-  "553 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "560 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "559 ?" [arrowhead=empty,label="ret_19"];
+  "558 ?" [shape=none];
+  "558 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "557 <" [shape=trapezium,orientation=270];
+  "557 <" -> "564 <" [label="imWork1"];
+  "556 ?" [shape=none];
+  "556 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "565 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "558 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "556 ?" [arrowhead=empty,label="ret_20"];
   "552 ?" [shape=none];
-  "552 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "560 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "553 ?" [arrowhead=empty,label="_return7"];
-  "551 <" [shape=trapezium,orientation=270];
-  "551 <" -> "558 <" [label="imWork1"];
+  "552 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "559 ?" [arrowhead=empty,label="ret_19"];
+  "551 ?" [shape=none];
+  "551 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "552 ?" [arrowhead=empty,label="_return7"];
+  "550 <" [shape=trapezium,orientation=270];
+  "550 <" -> "557 <" [label="imWork1"];
   "imin" -> "600 <";
-  "imin" -> "593 <";
-  "imin" -> "586 <";
-  "imin" -> "579 <";
-  "imin" -> "572 <";
-  "imin" -> "565 <";
-  "imin" -> "558 <";
-  "imin" -> "551 <";
-  "547 D8" [shape=box];
-  "547 D8" -> "551 <" [label="imWork1"];
-  "imWork1" -> "547 D8";
+  "imin" -> "592 <";
+  "imin" -> "585 <";
+  "imin" -> "578 <";
+  "imin" -> "571 <";
+  "imin" -> "564 <";
+  "imin" -> "557 <";
+  "imin" -> "550 <";
+  "imWork1" -> "550 <";
 }
 // graph for dag "dag_2" of module "freia_52" in dot format
 digraph "dag_2" {
@@ -4793,331 +4797,335 @@ digraph "dag_cleaned_1" {
 
   // computation vertices
   "604 vol" [shape=diamond];
+  "603 ?" -> "604 vol" [arrowhead=empty,label="volcurrent"];
+  "596 vol" -> "604 vol" [arrowhead=empty,label="volcurrent"];
   "602 ?" [shape=none];
-  "595 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "594 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
   "601 ?" [shape=none];
   "601 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "595 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "594 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "588 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "587 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "580 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "573 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "566 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "559 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "552 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
   "600 <" [shape=trapezium,orientation=270];
   "600 <" -> "604 vol" [label="imWork1"];
   "600 <" -> "imWork1'";
   "599 ?" [shape=none];
   "599 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "594 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "587 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "595 ?" [shape=none];
-  "595 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
+  "593 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "586 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "596 vol" [shape=diamond];
+  "596 vol" -> "604 vol" [arrowhead=empty,label="volcurrent"];
+  "596 vol" -> "603 ?" [arrowhead=empty,label="volcurrent"];
   "594 ?" [shape=none];
-  "594 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "594 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "594 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "588 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "593 <" [shape=trapezium,orientation=270];
-  "593 <" -> "600 <" [label="imWork1"];
-  "592 ?" [shape=none];
-  "592 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "592 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "587 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "588 ?" [shape=none];
-  "588 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "588 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
+  "594 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "593 ?" [shape=none];
+  "593 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "593 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "587 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "580 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "592 <" [shape=trapezium,orientation=270];
+  "592 <" -> "600 <" [label="imWork1"];
+  "592 <" -> "596 vol" [label="imWork1"];
+  "591 ?" [shape=none];
+  "591 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "591 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "586 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
   "587 ?" [shape=none];
-  "587 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "587 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "581 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "586 <" [shape=trapezium,orientation=270];
-  "586 <" -> "593 <" [label="imWork1"];
-  "585 ?" [shape=none];
-  "585 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "585 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "580 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "581 ?" [shape=none];
-  "581 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "581 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "587 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "586 ?" [shape=none];
+  "586 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "586 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "580 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "585 <" [shape=trapezium,orientation=270];
+  "585 <" -> "592 <" [label="imWork1"];
+  "584 ?" [shape=none];
+  "584 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "584 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "579 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
   "580 ?" [shape=none];
-  "580 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "580 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "574 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "579 <" [shape=trapezium,orientation=270];
-  "579 <" -> "586 <" [label="imWork1"];
-  "578 ?" [shape=none];
-  "578 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "578 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "573 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "574 ?" [shape=none];
-  "574 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "574 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "580 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "579 ?" [shape=none];
+  "579 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "579 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "573 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "578 <" [shape=trapezium,orientation=270];
+  "578 <" -> "585 <" [label="imWork1"];
+  "577 ?" [shape=none];
+  "577 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "577 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "572 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
   "573 ?" [shape=none];
-  "573 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "573 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "567 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "572 <" [shape=trapezium,orientation=270];
-  "572 <" -> "579 <" [label="imWork1"];
-  "571 ?" [shape=none];
-  "571 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "571 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "566 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "567 ?" [shape=none];
-  "567 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "567 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "573 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "572 ?" [shape=none];
+  "572 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "572 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "566 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "571 <" [shape=trapezium,orientation=270];
+  "571 <" -> "578 <" [label="imWork1"];
+  "570 ?" [shape=none];
+  "570 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "570 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "565 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
   "566 ?" [shape=none];
-  "566 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "566 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "560 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "565 <" [shape=trapezium,orientation=270];
-  "565 <" -> "572 <" [label="imWork1"];
-  "564 ?" [shape=none];
-  "564 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "564 ?" -> "566 ?" [arrowhead=empty,label="ret_20"];
-  "559 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "560 ?" [shape=none];
-  "560 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "560 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "560 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "566 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "565 ?" [shape=none];
+  "565 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "565 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "559 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "564 <" [shape=trapezium,orientation=270];
+  "564 <" -> "571 <" [label="imWork1"];
+  "563 ?" [shape=none];
+  "563 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "563 ?" -> "565 ?" [arrowhead=empty,label="ret_20"];
+  "558 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
   "559 ?" [shape=none];
-  "559 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "559 ?" -> "560 ?" [arrowhead=empty,label="_return7"];
-  "553 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "558 <" [shape=trapezium,orientation=270];
-  "558 <" -> "565 <" [label="imWork1"];
-  "557 ?" [shape=none];
-  "557 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "594 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "592 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "587 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "585 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "580 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "578 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "573 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "571 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "566 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "564 ?" [arrowhead=empty,label="ret_20"];
-  "557 ?" -> "559 ?" [arrowhead=empty,label="ret_20"];
-  "552 ?" -> "557 ?" [arrowhead=empty,label="ret_20"];
-  "553 ?" [shape=none];
-  "553 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "595 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "588 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "581 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "574 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "567 ?" [arrowhead=empty,label="ret_19"];
-  "553 ?" -> "560 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "559 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "559 ?" [arrowhead=empty,label="ret_19"];
+  "558 ?" [shape=none];
+  "558 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "558 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
+  "552 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "557 <" [shape=trapezium,orientation=270];
+  "557 <" -> "564 <" [label="imWork1"];
+  "556 ?" [shape=none];
+  "556 ?" -> "601 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "599 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "593 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "591 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "586 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "584 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "579 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "577 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "572 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "570 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "565 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "563 ?" [arrowhead=empty,label="ret_20"];
+  "556 ?" -> "558 ?" [arrowhead=empty,label="ret_20"];
+  "551 ?" -> "556 ?" [arrowhead=empty,label="ret_20"];
   "552 ?" [shape=none];
-  "552 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "595 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "588 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "581 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "574 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "567 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "560 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
-  "552 ?" -> "553 ?" [arrowhead=empty,label="_return7"];
-  "551 <" [shape=trapezium,orientation=270];
-  "551 <" -> "558 <" [label="imWork1"];
+  "552 ?" -> "602 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "594 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "587 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "580 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "573 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "566 ?" [arrowhead=empty,label="ret_19"];
+  "552 ?" -> "559 ?" [arrowhead=empty,label="ret_19"];
+  "551 ?" [shape=none];
+  "551 ?" -> "602 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "601 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "594 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "593 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "587 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "586 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "580 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "579 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "573 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "572 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "566 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "565 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "559 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "558 ?" [arrowhead=empty,label="_return7"];
+  "551 ?" -> "552 ?" [arrowhead=empty,label="_return7"];
+  "550 <" [shape=trapezium,orientation=270];
+  "550 <" -> "557 <" [label="imWork1"];
   "imin" -> "600 <";
-  "imin" -> "593 <";
-  "imin" -> "586 <";
-  "imin" -> "579 <";
-  "imin" -> "572 <";
-  "imin" -> "565 <";
-  "imin" -> "558 <";
-  "imin" -> "551 <";
-  "547 D8" [shape=box];
-  "547 D8" -> "551 <" [label="imWork1"];
-  "imWork1" -> "547 D8";
+  "imin" -> "592 <";
+  "imin" -> "585 <";
+  "imin" -> "578 <";
+  "imin" -> "571 <";
+  "imin" -> "564 <";
+  "imin" -> "557 <";
+  "imin" -> "550 <";
+  "imWork1" -> "550 <";
 }
 // graph for dag "dag_cleaned_2" of module "freia_52" in dot format
 digraph "dag_cleaned_2" {
@@ -5459,35 +5467,44 @@ digraph "freia_52_spoc_helper_1_0" {
   "imWork1'" [shape=circle];
 
   // computation vertices
-  "604 vol" [shape=diamond];
   "600 <" [shape=trapezium,orientation=270];
-  "600 <" -> "604 vol" [label="imWork1"];
   "600 <" -> "imWork1'";
-  "593 <" [shape=trapezium,orientation=270];
-  "593 <" -> "600 <" [label="imWork1_2"];
-  "586 <" [shape=trapezium,orientation=270];
-  "586 <" -> "593 <" [label="imWork1_3"];
-  "579 <" [shape=trapezium,orientation=270];
-  "579 <" -> "586 <" [label="imWork1_4"];
-  "572 <" [shape=trapezium,orientation=270];
-  "572 <" -> "579 <" [label="imWork1_5"];
-  "565 <" [shape=trapezium,orientation=270];
-  "565 <" -> "572 <" [label="imWork1_6"];
-  "558 <" [shape=trapezium,orientation=270];
-  "558 <" -> "565 <" [label="imWork1_7"];
-  "551 <" [shape=trapezium,orientation=270];
-  "551 <" -> "558 <" [label="imWork1_8"];
+  "596 vol" [shape=diamond];
+  "592 <" [shape=trapezium,orientation=270];
+  "592 <" -> "600 <" [label="imWork1_2"];
+  "592 <" -> "596 vol" [label="imWork1_2"];
+  "585 <" [shape=trapezium,orientation=270];
+  "585 <" -> "592 <" [label="imWork1_3"];
+  "578 <" [shape=trapezium,orientation=270];
+  "578 <" -> "585 <" [label="imWork1_4"];
+  "571 <" [shape=trapezium,orientation=270];
+  "571 <" -> "578 <" [label="imWork1_5"];
+  "564 <" [shape=trapezium,orientation=270];
+  "564 <" -> "571 <" [label="imWork1_6"];
+  "557 <" [shape=trapezium,orientation=270];
+  "557 <" -> "564 <" [label="imWork1_7"];
+  "550 <" [shape=trapezium,orientation=270];
+  "550 <" -> "557 <" [label="imWork1_8"];
   "imin" -> "600 <";
-  "imin" -> "593 <";
-  "imin" -> "586 <";
-  "imin" -> "579 <";
-  "imin" -> "572 <";
-  "imin" -> "565 <";
-  "imin" -> "558 <";
-  "imin" -> "551 <";
-  "547 D8" [shape=box];
-  "547 D8" -> "551 <" [label="imWork1_9"];
-  "imWork1" -> "547 D8";
+  "imin" -> "592 <";
+  "imin" -> "585 <";
+  "imin" -> "578 <";
+  "imin" -> "571 <";
+  "imin" -> "564 <";
+  "imin" -> "557 <";
+  "imin" -> "550 <";
+  "imWork1" -> "550 <";
+}
+// graph for dag "freia_52_spoc_helper_1_1" of module "freia_52" in dot format
+digraph "freia_52_spoc_helper_1_1" {
+  // inputs
+  "imWork1" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "604 vol" [shape=diamond];
+  "imWork1" -> "604 vol";
 }
 // graph for dag "freia_52_spoc_helper_2_0" of module "freia_52" in dot format
 digraph "freia_52_spoc_helper_2_0" {
@@ -7394,15 +7411,15 @@ freia_status freia_52_spoc_helper_0_10_1(
 
 // dag 1: 10 ops and 0 copies, optimized to 10 ops and 0+0+0 copies
 // split 0: 1 cut
-// # SPOC calls: 1
+// split 1: 1 cut
+// # SPOC calls: 2
 
 // FREIA-SPoC helper function for module freia_52
 freia_status freia_52_spoc_helper_1_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
-  const int32_t * pi0,
-  int32_t * po1)
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -7412,117 +7429,110 @@ freia_status freia_52_spoc_helper_1_0_0(
   freia_status ret;
   spoc_reduction reduc;
   freia_reduction_results redres;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
 
   // STAGE 0
-  // 0`imWork1 [0 input 0] -> [0 poc 0] 547 dilate_8c
+  // 0`imWork1 [0 input 0] -> [0 alu] 550 inf
   // nope
-  // poc 547 dilate_8c stage 0 side 0
-  si.poc[0][0].op = SPOC_POC_DILATE;
-  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = pi0[i];
-
-  // 0`imWork1_9 [0 poc 0] -> [0 alu] 551 inf
+  // 0`imin [0 input 1] -> [0 alu] 550 inf
   // nope
-  // 0`imin [0 input 1] -> [0 alu] 551 inf
-  // nope
-  // alu 551 inf stage 0
+  // alu 550 inf stage 0
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 1
-  // 0`imWork1_8 [0 alu] -> [1 alu] 558 inf
+  // 0`imWork1_8 [0 alu] -> [1 alu] 557 inf
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_8 [1 input 0] -> [1 alu] 558 inf
+  // 0`imWork1_8 [1 input 0] -> [1 alu] 557 inf
   // nope
-  // 0`imin [0 input 1] -> [1 alu] 558 inf
+  // 0`imin [0 input 1] -> [1 alu] 557 inf
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`imin [1 input 1] -> [1 alu] 558 inf
+  // 0`imin [1 input 1] -> [1 alu] 557 inf
   // nope
-  // alu 558 inf stage 1
+  // alu 557 inf stage 1
   si.alu[1][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 2
-  // 0`imWork1_7 [1 alu] -> [2 alu] 565 inf
+  // 0`imWork1_7 [1 alu] -> [2 alu] 564 inf
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_7 [2 input 0] -> [2 alu] 565 inf
+  // 0`imWork1_7 [2 input 0] -> [2 alu] 564 inf
   // nope
-  // 0`imin [1 poc 1] -> [2 alu] 565 inf
+  // 0`imin [1 poc 1] -> [2 alu] 564 inf
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // 0`imin [2 input 1] -> [2 alu] 565 inf
+  // 0`imin [2 input 1] -> [2 alu] 564 inf
   // nope
-  // alu 565 inf stage 2
+  // alu 564 inf stage 2
   si.alu[2][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 3
-  // 0`imWork1_6 [2 alu] -> [3 alu] 572 inf
+  // 0`imWork1_6 [2 alu] -> [3 alu] 571 inf
   si.mux[2][0].op = SPOC_MUX_IN1;
   si.mux[2][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_6 [3 input 0] -> [3 alu] 572 inf
+  // 0`imWork1_6 [3 input 0] -> [3 alu] 571 inf
   // nope
-  // 0`imin [2 poc 1] -> [3 alu] 572 inf
+  // 0`imin [2 poc 1] -> [3 alu] 571 inf
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // 0`imin [3 input 1] -> [3 alu] 572 inf
+  // 0`imin [3 input 1] -> [3 alu] 571 inf
   // nope
-  // alu 572 inf stage 3
+  // alu 571 inf stage 3
   si.alu[3][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 4
-  // 0`imWork1_5 [3 alu] -> [4 alu] 579 inf
+  // 0`imWork1_5 [3 alu] -> [4 alu] 578 inf
   si.mux[3][0].op = SPOC_MUX_IN1;
   si.mux[3][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_5 [4 input 0] -> [4 alu] 579 inf
+  // 0`imWork1_5 [4 input 0] -> [4 alu] 578 inf
   // nope
-  // 0`imin [3 poc 1] -> [4 alu] 579 inf
+  // 0`imin [3 poc 1] -> [4 alu] 578 inf
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`imin [4 input 1] -> [4 alu] 579 inf
+  // 0`imin [4 input 1] -> [4 alu] 578 inf
   // nope
-  // alu 579 inf stage 4
+  // alu 578 inf stage 4
   si.alu[4][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 5
-  // 0`imWork1_4 [4 alu] -> [5 alu] 586 inf
+  // 0`imWork1_4 [4 alu] -> [5 alu] 585 inf
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_4 [5 input 0] -> [5 alu] 586 inf
+  // 0`imWork1_4 [5 input 0] -> [5 alu] 585 inf
   // nope
-  // 0`imin [4 poc 1] -> [5 alu] 586 inf
+  // 0`imin [4 poc 1] -> [5 alu] 585 inf
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`imin [5 input 1] -> [5 alu] 586 inf
+  // 0`imin [5 input 1] -> [5 alu] 585 inf
   // nope
-  // alu 586 inf stage 5
+  // alu 585 inf stage 5
   si.alu[5][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 6
-  // 0`imWork1_3 [5 alu] -> [6 alu] 593 inf
+  // 0`imWork1_3 [5 alu] -> [6 alu] 592 inf
   si.mux[5][0].op = SPOC_MUX_IN1;
   si.mux[5][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_3 [6 input 0] -> [6 alu] 593 inf
+  // 0`imWork1_3 [6 input 0] -> [6 alu] 592 inf
   // nope
-  // 0`imin [5 poc 1] -> [6 alu] 593 inf
+  // 0`imin [5 poc 1] -> [6 alu] 592 inf
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`imin [6 input 1] -> [6 alu] 593 inf
+  // 0`imin [6 input 1] -> [6 alu] 592 inf
   // nope
-  // alu 593 inf stage 6
+  // alu 592 inf stage 6
   si.alu[6][0].op = SPOC_ALU_INF_IN0_IN1;
+
+  // 0`imWork1_2 [6 alu] -> [6 measure 0] 592 inf
+  si.mux[6][0].op = SPOC_MUX_IN1;
+  si.mux[6][2].op = SPOC_MUX_IN0;
 
 
   // STAGE 7
-  // 0`imWork1_2 [6 alu] -> [7 alu] 600 inf
-  si.mux[6][0].op = SPOC_MUX_IN1;
-  si.mux[6][2].op = SPOC_MUX_IN0;
+  // 0`imWork1_2 [6 measure 0] -> [7 alu] 600 inf
   // 0`imWork1_2 [7 input 0] -> [7 alu] 600 inf
   // nope
   // 0`imin [6 poc 1] -> [7 alu] 600 inf
@@ -7532,14 +7542,11 @@ freia_status freia_52_spoc_helper_1_0_0(
   // alu 600 inf stage 7
   si.alu[7][0].op = SPOC_ALU_INF_IN0_IN1;
 
-  // 0`imWork1 [7 alu] -> [7 measure 0] 600 inf
-  si.mux[7][0].op = SPOC_MUX_IN1;
-  si.mux[7][2].op = SPOC_MUX_IN0;
-
 
   // output image 0`imWork1 on 0
-  // 0`imWork1 [7 measure 0] -> [7 output 0] 0 null
-  // nope
+  // 0`imWork1 [7 alu] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN1;
+  si.mux[7][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
   // 0`imWork1 [7 output 0] -> [7 output 0] 0 null
@@ -7563,8 +7570,57 @@ freia_status freia_52_spoc_helper_1_0_0(
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // measure 604 global_vol stage 7 side 0
-  *po1 = (int32_t) reduc.measure[7][0].volume;
+  // measure 596 global_vol stage 6 side 0
+  *po0 = (int32_t) reduc.measure[6][0].volume;
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_52
+freia_status freia_52_spoc_helper_1_1_0(
+  const freia_data2d * i0,
+  int32_t * po0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`imWork1 [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 604 global_vol stage 0 side 0
+  *po0 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;
 }
@@ -7779,7 +7835,7 @@ int freia_52(void)
    //PIPS generated variable
    int32_t volcurrent, volprevious;                                     /*0077*/
    //PIPS generated variable
-   freia_status ret_20;                                                 /*0078*/
+   freia_status ret_20 = 0;                                             /*0078*/
    //PIPS generated variable
    int i_52;                                                            /*0079*/
    // hardware accelerator generated variable
@@ -8298,89 +8354,88 @@ int freia_52(void)
    freia_common_destruct_data(w2_1_5);
    freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0546*/
-      i_52 = 1;                                                         /*0548*/
+      i_52 = 1;                                                         /*0547*/
       
       
-      _return12 = 0;                                                    /*0549*/
-      ret_20 = 0;                                                       /*0550*/
-      volprevious = volcurrent;                                         /*0554*/
-      i_52 = 1;                                                         /*0555*/
+      _return12 = 0;                                                    /*0548*/
+      ret_20 = 0;                                                       /*0549*/
+      volprevious = volcurrent;                                         /*0553*/
+      i_52 = 1;                                                         /*0554*/
       
       
-      _return12 = 0;                                                    /*0556*/
-      volprevious = volcurrent;                                         /*0561*/
-      i_52 = 1;                                                         /*0562*/
+      _return12 = 0;                                                    /*0555*/
+      volprevious = volcurrent;                                         /*0560*/
+      i_52 = 1;                                                         /*0561*/
       
       
-      _return12 = 0;                                                    /*0563*/
-      volprevious = volcurrent;                                         /*0568*/
-      i_52 = 1;                                                         /*0569*/
+      _return12 = 0;                                                    /*0562*/
+      volprevious = volcurrent;                                         /*0567*/
+      i_52 = 1;                                                         /*0568*/
       
       
-      _return12 = 0;                                                    /*0570*/
-      volprevious = volcurrent;                                         /*0575*/
-      i_52 = 1;                                                         /*0576*/
+      _return12 = 0;                                                    /*0569*/
+      volprevious = volcurrent;                                         /*0574*/
+      i_52 = 1;                                                         /*0575*/
       
       
-      _return12 = 0;                                                    /*0577*/
-      volprevious = volcurrent;                                         /*0582*/
-      i_52 = 1;                                                         /*0583*/
+      _return12 = 0;                                                    /*0576*/
+      volprevious = volcurrent;                                         /*0581*/
+      i_52 = 1;                                                         /*0582*/
       
       
-      _return12 = 0;                                                    /*0584*/
-      volprevious = volcurrent;                                         /*0589*/
-      i_52 = 1;                                                         /*0590*/
+      _return12 = 0;                                                    /*0583*/
+      volprevious = volcurrent;                                         /*0588*/
+      i_52 = 1;                                                         /*0589*/
       
       
-      _return12 = 0;                                                    /*0591*/
-      volprevious = volcurrent;                                         /*0596*/
+      _return12 = 0;                                                    /*0590*/
+      volprevious = volcurrent;                                         /*0595*/
       i_52 = 1;                                                         /*0597*/
       
       
       _return12 = 0;                                                    /*0598*/
-      volprevious = volcurrent;                                         /*0603*/
+      freia_52_spoc_helper_1_0_0(imWork1, imWork1, imin, &volcurrent);  /*0550*/
       
       
-      freia_52_spoc_helper_1_0_0(imWork1, imWork1, imin, freia_morpho_kernel_8c, &volcurrent);        /*0547*/
+      _return7 = ret_20;                                                /*0551*/
+      ret_19 |= _return7;                                               /*0552*/
+      ret_20 = 0;                                                       /*0556*/
       
       
-      _return7 = ret_20;                                                /*0552*/
-      ret_19 |= _return7;                                               /*0553*/
-      ret_20 = 0;                                                       /*0557*/
+      _return7 = ret_20;                                                /*0558*/
+      ret_19 |= _return7;                                               /*0559*/
+      ret_20 = 0;                                                       /*0563*/
       
       
-      _return7 = ret_20;                                                /*0559*/
-      ret_19 |= _return7;                                               /*0560*/
-      ret_20 = 0;                                                       /*0564*/
+      _return7 = ret_20;                                                /*0565*/
+      ret_19 |= _return7;                                               /*0566*/
+      ret_20 = 0;                                                       /*0570*/
       
       
-      _return7 = ret_20;                                                /*0566*/
-      ret_19 |= _return7;                                               /*0567*/
-      ret_20 = 0;                                                       /*0571*/
+      _return7 = ret_20;                                                /*0572*/
+      ret_19 |= _return7;                                               /*0573*/
+      ret_20 = 0;                                                       /*0577*/
       
       
-      _return7 = ret_20;                                                /*0573*/
-      ret_19 |= _return7;                                               /*0574*/
-      ret_20 = 0;                                                       /*0578*/
+      _return7 = ret_20;                                                /*0579*/
+      ret_19 |= _return7;                                               /*0580*/
+      ret_20 = 0;                                                       /*0584*/
       
       
-      _return7 = ret_20;                                                /*0580*/
-      ret_19 |= _return7;                                               /*0581*/
-      ret_20 = 0;                                                       /*0585*/
+      _return7 = ret_20;                                                /*0586*/
+      ret_19 |= _return7;                                               /*0587*/
+      ret_20 = 0;                                                       /*0591*/
       
       
-      _return7 = ret_20;                                                /*0587*/
-      ret_19 |= _return7;                                               /*0588*/
-      ret_20 = 0;                                                       /*0592*/
-      
-      
-      _return7 = ret_20;                                                /*0594*/
-      ret_19 |= _return7;                                               /*0595*/
+      _return7 = ret_20;                                                /*0593*/
+      ret_19 |= _return7;                                               /*0594*/
       ret_20 = 0;                                                       /*0599*/
       
       
       _return7 = ret_20;                                                /*0601*/
       ret_19 |= _return7;                                               /*0602*/
+      volprevious = volcurrent;                                         /*0603*/
+      freia_52_spoc_helper_1_1_0(imWork1, &volcurrent);                 /*0604*/
    }
    while (volcurrent!=volprevious);                                     /*0546*/
    
@@ -8534,7 +8589,7 @@ int freia_52(void)
    //PIPS generated variable
    int32_t volcurrent, volprevious;                                     /*0077*/
    //PIPS generated variable
-   freia_status ret_20;                                                 /*0078*/
+   freia_status ret_20 = 0;                                             /*0078*/
    //PIPS generated variable
    int i_52;                                                            /*0079*/
    // hardware accelerator generated variable
@@ -9053,89 +9108,88 @@ int freia_52(void)
    freia_common_destruct_data(w2_1_5);
    freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0546*/
-      i_52 = 1;                                                         /*0548*/
+      i_52 = 1;                                                         /*0547*/
       
       
-      _return12 = 0;                                                    /*0549*/
-      ret_20 = 0;                                                       /*0550*/
-      volprevious = volcurrent;                                         /*0554*/
-      i_52 = 1;                                                         /*0555*/
+      _return12 = 0;                                                    /*0548*/
+      ret_20 = 0;                                                       /*0549*/
+      volprevious = volcurrent;                                         /*0553*/
+      i_52 = 1;                                                         /*0554*/
       
       
-      _return12 = 0;                                                    /*0556*/
-      volprevious = volcurrent;                                         /*0561*/
-      i_52 = 1;                                                         /*0562*/
+      _return12 = 0;                                                    /*0555*/
+      volprevious = volcurrent;                                         /*0560*/
+      i_52 = 1;                                                         /*0561*/
       
       
-      _return12 = 0;                                                    /*0563*/
-      volprevious = volcurrent;                                         /*0568*/
-      i_52 = 1;                                                         /*0569*/
+      _return12 = 0;                                                    /*0562*/
+      volprevious = volcurrent;                                         /*0567*/
+      i_52 = 1;                                                         /*0568*/
       
       
-      _return12 = 0;                                                    /*0570*/
-      volprevious = volcurrent;                                         /*0575*/
-      i_52 = 1;                                                         /*0576*/
+      _return12 = 0;                                                    /*0569*/
+      volprevious = volcurrent;                                         /*0574*/
+      i_52 = 1;                                                         /*0575*/
       
       
-      _return12 = 0;                                                    /*0577*/
-      volprevious = volcurrent;                                         /*0582*/
-      i_52 = 1;                                                         /*0583*/
+      _return12 = 0;                                                    /*0576*/
+      volprevious = volcurrent;                                         /*0581*/
+      i_52 = 1;                                                         /*0582*/
       
       
-      _return12 = 0;                                                    /*0584*/
-      volprevious = volcurrent;                                         /*0589*/
-      i_52 = 1;                                                         /*0590*/
+      _return12 = 0;                                                    /*0583*/
+      volprevious = volcurrent;                                         /*0588*/
+      i_52 = 1;                                                         /*0589*/
       
       
-      _return12 = 0;                                                    /*0591*/
-      volprevious = volcurrent;                                         /*0596*/
+      _return12 = 0;                                                    /*0590*/
+      volprevious = volcurrent;                                         /*0595*/
       i_52 = 1;                                                         /*0597*/
       
       
       _return12 = 0;                                                    /*0598*/
-      volprevious = volcurrent;                                         /*0603*/
+      freia_52_spoc_helper_1_0_0(imWork1, imWork1, imin, &volcurrent);  /*0550*/
       
       
-      freia_52_spoc_helper_1_0_0(imWork1, imWork1, imin, freia_morpho_kernel_8c, &volcurrent);        /*0547*/
+      _return7 = ret_20;                                                /*0551*/
+      ret_19 |= _return7;                                               /*0552*/
+      ret_20 = 0;                                                       /*0556*/
       
       
-      _return7 = ret_20;                                                /*0552*/
-      ret_19 |= _return7;                                               /*0553*/
-      ret_20 = 0;                                                       /*0557*/
+      _return7 = ret_20;                                                /*0558*/
+      ret_19 |= _return7;                                               /*0559*/
+      ret_20 = 0;                                                       /*0563*/
       
       
-      _return7 = ret_20;                                                /*0559*/
-      ret_19 |= _return7;                                               /*0560*/
-      ret_20 = 0;                                                       /*0564*/
+      _return7 = ret_20;                                                /*0565*/
+      ret_19 |= _return7;                                               /*0566*/
+      ret_20 = 0;                                                       /*0570*/
       
       
-      _return7 = ret_20;                                                /*0566*/
-      ret_19 |= _return7;                                               /*0567*/
-      ret_20 = 0;                                                       /*0571*/
+      _return7 = ret_20;                                                /*0572*/
+      ret_19 |= _return7;                                               /*0573*/
+      ret_20 = 0;                                                       /*0577*/
       
       
-      _return7 = ret_20;                                                /*0573*/
-      ret_19 |= _return7;                                               /*0574*/
-      ret_20 = 0;                                                       /*0578*/
+      _return7 = ret_20;                                                /*0579*/
+      ret_19 |= _return7;                                               /*0580*/
+      ret_20 = 0;                                                       /*0584*/
       
       
-      _return7 = ret_20;                                                /*0580*/
-      ret_19 |= _return7;                                               /*0581*/
-      ret_20 = 0;                                                       /*0585*/
+      _return7 = ret_20;                                                /*0586*/
+      ret_19 |= _return7;                                               /*0587*/
+      ret_20 = 0;                                                       /*0591*/
       
       
-      _return7 = ret_20;                                                /*0587*/
-      ret_19 |= _return7;                                               /*0588*/
-      ret_20 = 0;                                                       /*0592*/
-      
-      
-      _return7 = ret_20;                                                /*0594*/
-      ret_19 |= _return7;                                               /*0595*/
+      _return7 = ret_20;                                                /*0593*/
+      ret_19 |= _return7;                                               /*0594*/
       ret_20 = 0;                                                       /*0599*/
       
       
       _return7 = ret_20;                                                /*0601*/
       ret_19 |= _return7;                                               /*0602*/
+      volprevious = volcurrent;                                         /*0603*/
+      freia_52_spoc_helper_1_1_0(imWork1, &volcurrent);                 /*0604*/
    }
    while (volcurrent!=volprevious);                                     /*0546*/
    

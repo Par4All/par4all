@@ -210,43 +210,45 @@ digraph "dag_1" {
   "26 <" -> "out'";
   "25 D8" [shape=box];
   "25 D8" -> "26 <" [label="out"];
-  "24 <" [shape=trapezium,orientation=270];
-  "24 <" -> "25 D8" [label="out"];
-  "23 D8" [shape=box];
-  "23 D8" -> "24 <" [label="out"];
-  "22 <" [shape=trapezium,orientation=270];
-  "22 <" -> "23 D8" [label="out"];
-  "21 D8" [shape=box];
-  "21 D8" -> "22 <" [label="out"];
-  "20 <" [shape=trapezium,orientation=270];
-  "20 <" -> "21 D8" [label="out"];
-  "19 D8" [shape=box];
-  "19 D8" -> "20 <" [label="out"];
-  "18 <" [shape=trapezium,orientation=270];
-  "18 <" -> "19 D8" [label="out"];
-  "17 D8" [shape=box];
-  "17 D8" -> "18 <" [label="out"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "17 D8" [label="out"];
-  "15 D8" [shape=box];
-  "15 D8" -> "16 <" [label="out"];
-  "14 <" [shape=trapezium,orientation=270];
-  "14 <" -> "15 D8" [label="out"];
-  "13 D8" [shape=box];
-  "13 D8" -> "14 <" [label="out"];
-  "12 <" [shape=trapezium,orientation=270];
-  "12 <" -> "13 D8" [label="out"];
+  "24 vol" [shape=diamond];
+  "23 <" [shape=trapezium,orientation=270];
+  "23 <" -> "25 D8" [label="out"];
+  "23 <" -> "24 vol" [label="out"];
+  "22 D8" [shape=box];
+  "22 D8" -> "23 <" [label="out"];
+  "21 <" [shape=trapezium,orientation=270];
+  "21 <" -> "22 D8" [label="out"];
+  "20 D8" [shape=box];
+  "20 D8" -> "21 <" [label="out"];
+  "19 <" [shape=trapezium,orientation=270];
+  "19 <" -> "20 D8" [label="out"];
+  "18 D8" [shape=box];
+  "18 D8" -> "19 <" [label="out"];
+  "17 <" [shape=trapezium,orientation=270];
+  "17 <" -> "18 D8" [label="out"];
+  "16 D8" [shape=box];
+  "16 D8" -> "17 <" [label="out"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "16 D8" [label="out"];
+  "14 D8" [shape=box];
+  "14 D8" -> "15 <" [label="out"];
+  "13 <" [shape=trapezium,orientation=270];
+  "13 <" -> "14 D8" [label="out"];
+  "12 D8" [shape=box];
+  "12 D8" -> "13 <" [label="out"];
+  "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "12 D8" [label="out"];
   "in" -> "26 <";
-  "in" -> "24 <";
-  "in" -> "22 <";
-  "in" -> "20 <";
-  "in" -> "18 <";
-  "in" -> "16 <";
-  "in" -> "14 <";
-  "in" -> "12 <";
-  "11 D8" [shape=box];
-  "11 D8" -> "12 <" [label="out"];
-  "out" -> "11 D8";
+  "in" -> "23 <";
+  "in" -> "21 <";
+  "in" -> "19 <";
+  "in" -> "17 <";
+  "in" -> "15 <";
+  "in" -> "13 <";
+  "in" -> "11 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "11 <" [label="out"];
+  "out" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_while_00" in dot format
 digraph "dag_cleaned_0" {
@@ -288,43 +290,45 @@ digraph "dag_cleaned_1" {
   "26 <" -> "out'";
   "25 D8" [shape=box];
   "25 D8" -> "26 <" [label="out"];
-  "24 <" [shape=trapezium,orientation=270];
-  "24 <" -> "25 D8" [label="out"];
-  "23 D8" [shape=box];
-  "23 D8" -> "24 <" [label="out"];
-  "22 <" [shape=trapezium,orientation=270];
-  "22 <" -> "23 D8" [label="out"];
-  "21 D8" [shape=box];
-  "21 D8" -> "22 <" [label="out"];
-  "20 <" [shape=trapezium,orientation=270];
-  "20 <" -> "21 D8" [label="out"];
-  "19 D8" [shape=box];
-  "19 D8" -> "20 <" [label="out"];
-  "18 <" [shape=trapezium,orientation=270];
-  "18 <" -> "19 D8" [label="out"];
-  "17 D8" [shape=box];
-  "17 D8" -> "18 <" [label="out"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "17 D8" [label="out"];
-  "15 D8" [shape=box];
-  "15 D8" -> "16 <" [label="out"];
-  "14 <" [shape=trapezium,orientation=270];
-  "14 <" -> "15 D8" [label="out"];
-  "13 D8" [shape=box];
-  "13 D8" -> "14 <" [label="out"];
-  "12 <" [shape=trapezium,orientation=270];
-  "12 <" -> "13 D8" [label="out"];
+  "24 vol" [shape=diamond];
+  "23 <" [shape=trapezium,orientation=270];
+  "23 <" -> "25 D8" [label="out"];
+  "23 <" -> "24 vol" [label="out"];
+  "22 D8" [shape=box];
+  "22 D8" -> "23 <" [label="out"];
+  "21 <" [shape=trapezium,orientation=270];
+  "21 <" -> "22 D8" [label="out"];
+  "20 D8" [shape=box];
+  "20 D8" -> "21 <" [label="out"];
+  "19 <" [shape=trapezium,orientation=270];
+  "19 <" -> "20 D8" [label="out"];
+  "18 D8" [shape=box];
+  "18 D8" -> "19 <" [label="out"];
+  "17 <" [shape=trapezium,orientation=270];
+  "17 <" -> "18 D8" [label="out"];
+  "16 D8" [shape=box];
+  "16 D8" -> "17 <" [label="out"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "16 D8" [label="out"];
+  "14 D8" [shape=box];
+  "14 D8" -> "15 <" [label="out"];
+  "13 <" [shape=trapezium,orientation=270];
+  "13 <" -> "14 D8" [label="out"];
+  "12 D8" [shape=box];
+  "12 D8" -> "13 <" [label="out"];
+  "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "12 D8" [label="out"];
   "in" -> "26 <";
-  "in" -> "24 <";
-  "in" -> "22 <";
-  "in" -> "20 <";
-  "in" -> "18 <";
-  "in" -> "16 <";
-  "in" -> "14 <";
-  "in" -> "12 <";
-  "11 D8" [shape=box];
-  "11 D8" -> "12 <" [label="out"];
-  "out" -> "11 D8";
+  "in" -> "23 <";
+  "in" -> "21 <";
+  "in" -> "19 <";
+  "in" -> "17 <";
+  "in" -> "15 <";
+  "in" -> "13 <";
+  "in" -> "11 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "11 <" [label="out"];
+  "out" -> "10 D8";
 }
 // graph for dag "freia_while_00_spoc_helper_0_0" of module "freia_while_00" in dot format
 digraph "freia_while_00_spoc_helper_0_0" {
@@ -366,43 +370,45 @@ digraph "freia_while_00_spoc_helper_1_0" {
   "26 <" -> "out'";
   "25 D8" [shape=box];
   "25 D8" -> "26 <" [label="out_4"];
-  "24 <" [shape=trapezium,orientation=270];
-  "24 <" -> "25 D8" [label="out_5"];
-  "23 D8" [shape=box];
-  "23 D8" -> "24 <" [label="out_6"];
-  "22 <" [shape=trapezium,orientation=270];
-  "22 <" -> "23 D8" [label="out_7"];
-  "21 D8" [shape=box];
-  "21 D8" -> "22 <" [label="out_8"];
-  "20 <" [shape=trapezium,orientation=270];
-  "20 <" -> "21 D8" [label="out_9"];
-  "19 D8" [shape=box];
-  "19 D8" -> "20 <" [label="out_10"];
-  "18 <" [shape=trapezium,orientation=270];
-  "18 <" -> "19 D8" [label="out_11"];
-  "17 D8" [shape=box];
-  "17 D8" -> "18 <" [label="out_12"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "17 D8" [label="out_13"];
-  "15 D8" [shape=box];
-  "15 D8" -> "16 <" [label="out_14"];
-  "14 <" [shape=trapezium,orientation=270];
-  "14 <" -> "15 D8" [label="out_15"];
-  "13 D8" [shape=box];
-  "13 D8" -> "14 <" [label="out_16"];
-  "12 <" [shape=trapezium,orientation=270];
-  "12 <" -> "13 D8" [label="out_17"];
+  "24 vol" [shape=diamond];
+  "23 <" [shape=trapezium,orientation=270];
+  "23 <" -> "25 D8" [label="out_5"];
+  "23 <" -> "24 vol" [label="out_5"];
+  "22 D8" [shape=box];
+  "22 D8" -> "23 <" [label="out_6"];
+  "21 <" [shape=trapezium,orientation=270];
+  "21 <" -> "22 D8" [label="out_7"];
+  "20 D8" [shape=box];
+  "20 D8" -> "21 <" [label="out_8"];
+  "19 <" [shape=trapezium,orientation=270];
+  "19 <" -> "20 D8" [label="out_9"];
+  "18 D8" [shape=box];
+  "18 D8" -> "19 <" [label="out_10"];
+  "17 <" [shape=trapezium,orientation=270];
+  "17 <" -> "18 D8" [label="out_11"];
+  "16 D8" [shape=box];
+  "16 D8" -> "17 <" [label="out_12"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "16 D8" [label="out_13"];
+  "14 D8" [shape=box];
+  "14 D8" -> "15 <" [label="out_14"];
+  "13 <" [shape=trapezium,orientation=270];
+  "13 <" -> "14 D8" [label="out_15"];
+  "12 D8" [shape=box];
+  "12 D8" -> "13 <" [label="out_16"];
+  "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "12 D8" [label="out_17"];
   "in" -> "26 <";
-  "in" -> "24 <";
-  "in" -> "22 <";
-  "in" -> "20 <";
-  "in" -> "18 <";
-  "in" -> "16 <";
-  "in" -> "14 <";
-  "in" -> "12 <";
-  "11 D8" [shape=box];
-  "11 D8" -> "12 <" [label="out_18"];
-  "out" -> "11 D8";
+  "in" -> "23 <";
+  "in" -> "21 <";
+  "in" -> "19 <";
+  "in" -> "17 <";
+  "in" -> "15 <";
+  "in" -> "13 <";
+  "in" -> "11 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "11 <" [label="out_18"];
+  "out" -> "10 D8";
 }
 
 ! acceleration function
@@ -533,7 +539,7 @@ freia_status freia_while_00_spoc_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
+// dag 1: 18 ops and 0 copies, optimized to 18 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -543,7 +549,8 @@ freia_status freia_while_00_spoc_helper_1_0_0(
   const freia_data2d * i0,
   const freia_data2d * i1,
   const int32_t * pi0,
-  int32_t * po1)
+  int32_t * po1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -560,159 +567,161 @@ freia_status freia_while_00_spoc_helper_1_0_0(
 
 
   // STAGE 0
-  // out [0 input 1] -> [0 poc 1] 11 dilate_8c
+  // out [0 input 1] -> [0 poc 1] 10 dilate_8c
   // nope
-  // poc 11 dilate_8c stage 0 side 1
+  // poc 10 dilate_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][1].kernel[i] = pi0[i];
 
-  // in [0 input 0] -> [0 alu] 12 inf
+  // in [0 input 0] -> [0 alu] 11 inf
   // nope
-  // out_18 [0 poc 1] -> [0 alu] 12 inf
+  // out_18 [0 poc 1] -> [0 alu] 11 inf
   // nope
-  // alu 12 inf stage 0
+  // alu 11 inf stage 0
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 1
-  // out_17 [0 alu] -> [1 poc 0] 13 dilate_8c
+  // out_17 [0 alu] -> [1 poc 0] 12 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // out_17 [1 input 0] -> [1 poc 0] 13 dilate_8c
+  // out_17 [1 input 0] -> [1 poc 0] 12 dilate_8c
   // nope
-  // poc 13 dilate_8c stage 1 side 0
+  // poc 12 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = pi0[i];
 
-  // in [0 input 0] -> [1 alu] 14 inf
+  // in [0 input 0] -> [1 alu] 13 inf
   si.mux[0][1].op = SPOC_MUX_IN0;
   si.mux[0][3].op = SPOC_MUX_IN0;
-  // in [1 input 1] -> [1 alu] 14 inf
+  // in [1 input 1] -> [1 alu] 13 inf
   // nope
-  // out_16 [1 poc 0] -> [1 alu] 14 inf
+  // out_16 [1 poc 0] -> [1 alu] 13 inf
   // nope
-  // alu 14 inf stage 1
+  // alu 13 inf stage 1
   si.alu[1][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 2
-  // out_15 [1 alu] -> [2 poc 0] 15 dilate_8c
+  // out_15 [1 alu] -> [2 poc 0] 14 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
-  // out_15 [2 input 0] -> [2 poc 0] 15 dilate_8c
+  // out_15 [2 input 0] -> [2 poc 0] 14 dilate_8c
   // nope
-  // poc 15 dilate_8c stage 2 side 0
+  // poc 14 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[2][0].kernel[i] = pi0[i];
 
-  // in [1 poc 1] -> [2 alu] 16 inf
+  // in [1 poc 1] -> [2 alu] 15 inf
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // in [2 input 1] -> [2 alu] 16 inf
+  // in [2 input 1] -> [2 alu] 15 inf
   // nope
-  // out_14 [2 poc 0] -> [2 alu] 16 inf
+  // out_14 [2 poc 0] -> [2 alu] 15 inf
   // nope
-  // alu 16 inf stage 2
+  // alu 15 inf stage 2
   si.alu[2][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 3
-  // out_13 [2 alu] -> [3 poc 0] 17 dilate_8c
+  // out_13 [2 alu] -> [3 poc 0] 16 dilate_8c
   si.mux[2][0].op = SPOC_MUX_IN1;
   si.mux[2][2].op = SPOC_MUX_IN0;
-  // out_13 [3 input 0] -> [3 poc 0] 17 dilate_8c
+  // out_13 [3 input 0] -> [3 poc 0] 16 dilate_8c
   // nope
-  // poc 17 dilate_8c stage 3 side 0
+  // poc 16 dilate_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[3][0].kernel[i] = pi0[i];
 
-  // in [2 poc 1] -> [3 alu] 18 inf
+  // in [2 poc 1] -> [3 alu] 17 inf
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // in [3 input 1] -> [3 alu] 18 inf
+  // in [3 input 1] -> [3 alu] 17 inf
   // nope
-  // out_12 [3 poc 0] -> [3 alu] 18 inf
+  // out_12 [3 poc 0] -> [3 alu] 17 inf
   // nope
-  // alu 18 inf stage 3
+  // alu 17 inf stage 3
   si.alu[3][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 4
-  // out_11 [3 alu] -> [4 poc 0] 19 dilate_8c
+  // out_11 [3 alu] -> [4 poc 0] 18 dilate_8c
   si.mux[3][0].op = SPOC_MUX_IN1;
   si.mux[3][2].op = SPOC_MUX_IN0;
-  // out_11 [4 input 0] -> [4 poc 0] 19 dilate_8c
+  // out_11 [4 input 0] -> [4 poc 0] 18 dilate_8c
   // nope
-  // poc 19 dilate_8c stage 4 side 0
+  // poc 18 dilate_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_DILATE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[4][0].kernel[i] = pi0[i];
 
-  // in [3 poc 1] -> [4 alu] 20 inf
+  // in [3 poc 1] -> [4 alu] 19 inf
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // in [4 input 1] -> [4 alu] 20 inf
+  // in [4 input 1] -> [4 alu] 19 inf
   // nope
-  // out_10 [4 poc 0] -> [4 alu] 20 inf
+  // out_10 [4 poc 0] -> [4 alu] 19 inf
   // nope
-  // alu 20 inf stage 4
+  // alu 19 inf stage 4
   si.alu[4][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 5
-  // out_9 [4 alu] -> [5 poc 0] 21 dilate_8c
+  // out_9 [4 alu] -> [5 poc 0] 20 dilate_8c
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // out_9 [5 input 0] -> [5 poc 0] 21 dilate_8c
+  // out_9 [5 input 0] -> [5 poc 0] 20 dilate_8c
   // nope
-  // poc 21 dilate_8c stage 5 side 0
+  // poc 20 dilate_8c stage 5 side 0
   si.poc[5][0].op = SPOC_POC_DILATE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[5][0].kernel[i] = pi0[i];
 
-  // in [4 poc 1] -> [5 alu] 22 inf
+  // in [4 poc 1] -> [5 alu] 21 inf
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // in [5 input 1] -> [5 alu] 22 inf
+  // in [5 input 1] -> [5 alu] 21 inf
   // nope
-  // out_8 [5 poc 0] -> [5 alu] 22 inf
+  // out_8 [5 poc 0] -> [5 alu] 21 inf
   // nope
-  // alu 22 inf stage 5
+  // alu 21 inf stage 5
   si.alu[5][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 6
-  // out_7 [5 alu] -> [6 poc 0] 23 dilate_8c
+  // out_7 [5 alu] -> [6 poc 0] 22 dilate_8c
   si.mux[5][0].op = SPOC_MUX_IN1;
   si.mux[5][2].op = SPOC_MUX_IN0;
-  // out_7 [6 input 0] -> [6 poc 0] 23 dilate_8c
+  // out_7 [6 input 0] -> [6 poc 0] 22 dilate_8c
   // nope
-  // poc 23 dilate_8c stage 6 side 0
+  // poc 22 dilate_8c stage 6 side 0
   si.poc[6][0].op = SPOC_POC_DILATE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[6][0].kernel[i] = pi0[i];
 
-  // in [5 poc 1] -> [6 alu] 24 inf
+  // in [5 poc 1] -> [6 alu] 23 inf
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // in [6 input 1] -> [6 alu] 24 inf
+  // in [6 input 1] -> [6 alu] 23 inf
   // nope
-  // out_6 [6 poc 0] -> [6 alu] 24 inf
+  // out_6 [6 poc 0] -> [6 alu] 23 inf
   // nope
-  // alu 24 inf stage 6
+  // alu 23 inf stage 6
   si.alu[6][0].op = SPOC_ALU_INF_IN0_IN1;
+
+  // out_5 [6 alu] -> [6 measure 0] 23 inf
+  si.mux[6][0].op = SPOC_MUX_IN1;
+  si.mux[6][2].op = SPOC_MUX_IN0;
 
 
   // STAGE 7
-  // out_5 [6 alu] -> [7 poc 0] 25 dilate_8c
-  si.mux[6][0].op = SPOC_MUX_IN1;
-  si.mux[6][2].op = SPOC_MUX_IN0;
+  // out_5 [6 measure 0] -> [7 poc 0] 25 dilate_8c
   // out_5 [7 input 0] -> [7 poc 0] 25 dilate_8c
   // nope
   // poc 25 dilate_8c stage 7 side 0
@@ -761,8 +770,11 @@ freia_status freia_while_00_spoc_helper_1_0_0(
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
+  // measure 24 global_vol stage 6 side 0
+  *po1 = (int32_t) reduc.measure[6][0].volume;
+
   // measure 27 global_vol stage 7 side 0
-  *po1 = (int32_t) reduc.measure[7][0].volume;
+  *po2 = (int32_t) reduc.measure[7][0].volume;
 
   return ret;
 }
@@ -773,10 +785,8 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0001*/
    freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);      /*0002*/
-   while (volcurrent!=volprevious) {                                    /*0009*/
-      volprevious = volcurrent;                                         /*0010*/
-      freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);            /*0011*/
-   }
+   while (volcurrent!=volprevious)                                      /*0009*/
+      freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volprevious, &volcurrent);             /*0010*/
    return 0;                                                            /*0028*/
 }
 
@@ -786,10 +796,8 @@ int freia_while_00(freia_data2d *out, const freia_data2d *in)
 {
    int volprevious, volcurrent;                                         /*0001*/
    freia_while_00_spoc_helper_0_0_0(out, in, freia_morpho_kernel_8c, &volprevious, &volcurrent);      /*0002*/
-   while (volcurrent!=volprevious) {                                    /*0009*/
-      volprevious = volcurrent;                                         /*0010*/
-      freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);            /*0011*/
-   }
+   while (volcurrent!=volprevious)                                      /*0009*/
+      freia_while_00_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volprevious, &volcurrent);             /*0010*/
    return 0;                                                            /*0028*/
 }
 #
