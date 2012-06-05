@@ -1393,11 +1393,24 @@ reference reference_add_field_dimension(reference r, entity f)
  * Note: is this unconditional? Do you add the right number of
  * subscripts according to the type?
  */
-void points_to_cell_add_zero_subscripts(cell c)
+void points_to_cell_add_fixed_subscripts(cell c, bool zero_p)
 {
   bool to_be_freed = false;
   type t = points_to_cell_to_type(c, &to_be_freed);
   reference r = cell_any_reference(c);
-  reference_add_zero_subscripts(r, t);
+  if(zero_p)
+    reference_add_zero_subscripts(r, t);
+  else
+    reference_add_unbounded_subscripts(r, t);
   if(to_be_freed) free_type(t);
+}
+
+void points_to_cell_add_zero_subscripts(cell c)
+{
+  points_to_cell_add_fixed_subscripts(c, true);
+}
+
+void points_to_cell_add_unbounded_subscripts(cell c)
+{
+  points_to_cell_add_fixed_subscripts(c, false);
 }

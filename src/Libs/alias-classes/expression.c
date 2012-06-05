@@ -996,6 +996,21 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   list L = expression_to_points_to_sources(lhs, pt_out);
 
+  /* Make sure all cells in L are pointers: l may be an array of pointers */
+  /* FI: I am not sure it is useful here because the conversion to an
+     array due to property POINTS_TO_STRICT_POINTER_TYPES may not have
+     occured yet */
+  FOREACH(CELL, l, L) {
+    bool to_be_freed;
+    type lt = points_to_cell_to_type(l, &to_be_freed);
+    if(array_type_p(lt)) {
+      //reference lr = cell_any_reference(l);
+      //reference_add_zero_subscripts(lr, lt);
+      points_to_cell_add_unbounded_subscripts(l);
+    }
+    if(to_be_freed) free_type(lt);
+  }
+
   /* Retrieve the memory locations that might be reached by the rhs
    *
    * Update the calling context by adding new stubs linked directly or

@@ -503,7 +503,7 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
 type points_to_cell_to_type(cell c, bool *to_be_freed)
 {
   type t = type_undefined;
-  pips_assert("a cell cannot be a gap yet\n", !cell_gap_p(c));
+  pips_assert("a cell cannot be a gap yet", !cell_gap_p(c));
   reference ref = cell_any_reference(c);
 
   t = points_to_reference_to_type(ref, to_be_freed);

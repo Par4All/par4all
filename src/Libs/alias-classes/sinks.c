@@ -241,8 +241,9 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       bool to_be_freed = false;
       type ct = points_to_cell_to_type(c, &to_be_freed);
       if(/* eval_p && */array_type_p(ct)) {
-	reference r = cell_any_reference(c);
-	reference_add_zero_subscripts(r, ct);
+	//reference r = cell_any_reference(c);
+	//reference_add_zero_subscripts(r, ct);
+	points_to_cell_add_unbounded_subscripts(c);
       }
       if(to_be_freed) free_type(ct);
       /* Do we want to dereference c? */

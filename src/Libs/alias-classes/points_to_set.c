@@ -866,6 +866,16 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
     }
   }
   else {
+    /* 0. Is the source a pointer? You would expect a yes, but C
+       pointer arithmetics requires some strange typing. We assume it
+       is an array of pointers. */
+    bool to_be_freed;
+    type ct = points_to_cell_to_type(source, &to_be_freed);
+    if(array_type_p(ct)) {
+      points_to_cell_add_unbounded_subscripts(source);
+    }
+    if(to_be_freed) free_type(ct);
+
     /* 1. Try to find the source in the points-to information */
     SET_FOREACH( points_to, pt, pts) {
       if(cell_equal_p(source, points_to_source(pt))) {
@@ -886,7 +896,8 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
     }
 
     /* The source may be an array field */
-    if(ENDP(sinks)) {
+    /* FI: I think this is all wrong */
+    if(false && ENDP(sinks)) {
       bool to_be_freed = false;
       type st = points_to_cell_to_type(source, &to_be_freed);
       if(array_type_p(st)) {
