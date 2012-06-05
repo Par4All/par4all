@@ -238,6 +238,13 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
     /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
+      bool to_be_freed = false;
+      type ct = points_to_cell_to_type(c, &to_be_freed);
+      if(/* eval_p && */array_type_p(ct)) {
+	reference r = cell_any_reference(c);
+	reference_add_zero_subscripts(r, ct);
+      }
+      if(to_be_freed) free_type(ct);
       /* Do we want to dereference c? */
       if( (null_dereferencing_p || !null_cell_p(c))
 	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
@@ -417,7 +424,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     /* Should be handled like a malloc, using the line number for malloc() */
     pips_user_warning("Fopen() not precisely implemented.\n");
     type rt = functional_result(type_functional(entity_type(f)));
-    type ct = type_to_pointed_type(rt);
+    type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedefs?
     sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
   }
   else {
@@ -810,8 +817,8 @@ list malloc_to_points_to_sinks(expression e,
 			       pt_map in __attribute__ ((unused)))
 {
   list sinks = NIL;
-  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  const char * opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   if(same_string_p(opt, "unique")) {
     sinks = unique_malloc_to_points_to_sinks(e);
@@ -954,7 +961,8 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
 
-  /* Add subscript when possible */
+  /* Add subscript when possible. For typing reason, typed anywhere
+     cell should be subscripted. */
   FOREACH(CELL, c, sources) {
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);

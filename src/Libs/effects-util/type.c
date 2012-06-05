@@ -792,7 +792,7 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
  */
 void points_to_cell_types_compatibility(cell l, cell r)
 {
-  if(points_to_source_cell_compatible_p(l))
+  if(points_to_source_cell_compatible_p(l)) {
     if(points_to_sink_cell_compatible_p(r)) {
       // FI: I'm not sure enought filtering has been performed... to
       // have here type information, especially with an anywhere or a
@@ -803,16 +803,16 @@ void points_to_cell_types_compatibility(cell l, cell r)
       bool l_to_be_freed, r_to_be_freed;
       type lt = points_to_cell_to_type(l, &l_to_be_freed);
       type rt = points_to_cell_to_type(r, &r_to_be_freed);
-      type ult = ultimate_type(lt);
-      type urt = ultimate_type(rt);
+      type ult = compute_basic_concrete_type(lt);
+      type urt = compute_basic_concrete_type(rt);
 
       if(pointer_type_p(ult)) {
-	type pt = ultimate_type(type_to_pointed_type(ult));
+	type pt = compute_basic_concrete_type(type_to_pointed_type(ult));
 
 	// Several options are possible
 
 	bool get_bool_property(const char *);
-	if(ultimate_type_equal_p(pt, urt)) 
+	if(array_pointer_type_equal_p(pt, urt)) 
 	  ; // the pointed type is the type of the right cell
 	else if(array_type_p(urt)
 		&& !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
@@ -843,15 +843,16 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	  // FI->AM: we should check that the function is a constant
 	  // with no parameters
 	  type ret_t = functional_result(type_functional(urt));
-	  type u_ret_t = ultimate_type(ret_t);
+	  type u_ret_t = compute_basic_concrete_type(ret_t);
 	  if(pointer_type_p(u_ret_t)) {
 	    pips_internal_error("This should be useless.\n");
 	    // FI->AM: must be useless... Designed for C constant strings, but...
 	    type p_u_ret_t = type_to_pointed_type(u_ret_t);
-	    if(ultimate_type_equal_p(pt, p_u_ret_t))
+	    if(array_pointer_type_equal_p(pt, p_u_ret_t))
 	      ;
 	    else
 	      pips_internal_error("Type mismatch.\n");
+	    free_type(u_ret_t);
 	  }
 	  else if(string_type_p(u_ret_t)) {
 	    // FI: hidden pointer...
@@ -934,8 +935,12 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	if(!get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
 	  /* Is it an (implicit) array of pointers*/
 	  basic ultb = variable_basic(type_variable(ult));
-	  if(basic_pointer_p(ultb)) {
-	    type pt = ultimate_type(basic_pointer(ultb));
+	  if(basic_pointer_p(ultb)) { // Array 
+	    // FI: "pt" should be freed later...
+	    // FI: should have been done earlier when building l
+	    // reference lr = cell_any_reference(l);
+	    // reference_add_zero_subscripts(lr, ult);
+	    type pt = compute_basic_concrete_type(basic_pointer(ultb));
 	    if(generic_type_equal_p(pt, urt, false)) {
 	      // FI: subscripts must be added to the source reference lr
 	      // FI: implicit typing of pointers as array of pointers
@@ -964,7 +969,9 @@ void points_to_cell_types_compatibility(cell l, cell r)
 
       if(l_to_be_freed) free_type(lt);
       if(r_to_be_freed) free_type(rt);
+      free_type(ult), free_type(urt);
     }
+  }
   return;
 }
 

@@ -1344,9 +1344,24 @@ reference reference_add_field_dimension(reference r, entity f)
       }
     }
     else {
-      if(entity_all_module_heap_locations_p(v) || entity_all_heap_locations_p(v))
+      if(entity_all_module_heap_locations_p(v)
+	 || entity_all_heap_locations_p(v)) {
 	/* Nothing done when the heap is modeled by a unique entity */
 	; // FI: could be useful for unions as well
+      }
+      else if(array_of_struct_type_p(ut)) {
+	extern bool get_int_property(const char *);
+	bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+	if(!strict_p) {
+	  // An implicit 0 subscript should be added
+	  expression z = int_to_expression(0);
+	  // FI: This should be guarded as for the other structures
+	  // Some code should be factorized out
+	  expression s = entity_to_expression(f);
+	  pips_assert("No indices yet.\n", ENDP(reference_indices(r)));
+	  reference_indices(r) = CONS(EXPRESSION, z, CONS(EXPRESSION, s, NIL));
+	}
+      }
       else
 	pips_internal_error("Attempt at adding a field to an object that is not"
 			    " a struct.\n");

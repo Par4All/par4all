@@ -339,6 +339,9 @@ print_alias_classes( const char* module_name )
 /* For debugging: prettyprint many different kinds of newgen objects */
 void dprint(expression x)
 {
+  if(expression_undefined_p(x))
+    (void) fprintf(stderr, "UNDEFINED NEWGEN OBJECT\n");
+  else {
   int ot = expression_domain_number(x);
   if(ot==0)
     (void) fprintf(stderr,"PROBABLY AN EMPTY LIST\n");
@@ -360,4 +363,5 @@ void dprint(expression x)
     // We could assume that the object is a list and look for the type
     // of the first object...
     (void) fprintf(stderr,"NOT A NEWGEN OBJECT. MAYBE A LIST\n");
+  }
 }

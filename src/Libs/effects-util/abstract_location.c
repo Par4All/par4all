@@ -89,7 +89,8 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
 
     /* FI: Beware, the symbol table is updated but this is not
        reflected in pipsmake.rc */
-    entity_type(e) = t;
+    type ct = compute_basic_concrete_type(t);
+    entity_type(e) = ct;
     entity_storage(e) = make_storage_ram(r);
     entity_initial(e) = make_value_unknown();
     entity_kind(e) = ABSTRACT_LOCATION;
@@ -98,8 +99,38 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
   else {
     /* We might be in trouble, unless a piece of code is
        reanalyzed. Let's assume the type is unchanged */
-    pips_assert("The type is unchanged",
-		type_equal_p(t, entity_type(e)));
+    type ct = compute_basic_concrete_type(t);
+    type et = entity_type(e);
+    // FI: too strong if 1-D arrays and pointers can be assimilated
+    //pips_assert("The type is unchanged",
+    // type_equal_p(ct, et));
+    if(!type_equal_p(ct,et)) {
+      if(pointer_type_p(ct) && array_type_p(et)) {
+	type pt = type_to_pointed_type(ct);
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(et);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	if(d==1 && basic_equal_p(pb, eb)) 
+	  ;
+	else
+	  pips_assert("The type is unchanged or compatible", false);
+      }
+      else if(pointer_type_p(et) && array_type_p(ct)) {
+	type pt = type_to_pointed_type(et);
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(ct);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	if(d==1 && basic_equal_p(pb, eb)) 
+	  ;
+	else
+	  pips_assert("The type is unchanged or compatible", false);
+      }
+      else
+	pips_assert("The type is unchanged or compatible", false);
+    }
+    free_type(ct);
   }
   return e;
 
