@@ -1,4 +1,4 @@
-setenv WS=inter04
+setenv WS=assignment12
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
@@ -12,6 +12,8 @@ echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[%ALLFUNC]
+
+quit
 
 echo
 echo EFFECTS WITH POINTS-TO "$WS"
