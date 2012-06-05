@@ -45,7 +45,7 @@
   not that simple with limited depth?
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
-- and then match back of necessary to available low level ops.
+- and then match back if necessary to available low level ops.
 
 * output
 + symmetry (flipping)
@@ -76,7 +76,8 @@
 + cleanup declarations
 + it seems that some unused image are not removed (license_plate_copies)
 + should cleanup dead code in generated code (ret |= 0; ...)
-- there may be useless copies in the output... see antibio
++ there may be useless copies in the output...
+  see antibio external after copies?
 - spoc hwac calls the accelerator for copies? so it shows
 
 * validation
@@ -89,8 +90,8 @@
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 + reuse of images in some cases when nodes are reordered... SSA?
 + wrong copy extraction order in vs_core_2, and copies not really removed
-- should turn = in image copies?
-- WW scalar dependencies may result in split that could be avoided
+- should turn = in image copies? shuffle is at least checked
+- WW scalar dependencies may result in split that could be avoided?
 
 * spoc target
 + check for not implemented functions, and skip them! convolution, other?
