@@ -54,6 +54,7 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_70" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -109,6 +110,7 @@ digraph "dag_0" {
   "in" -> "32 !";
 }
 // graph for dag "dag_cleaned_0" of module "freia_70" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -234,6 +236,7 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_70" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -289,6 +292,7 @@ digraph "dag_0" {
   "in" -> "32 !";
 }
 // graph for dag "dag_cleaned_0" of module "freia_70" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -322,6 +326,7 @@ digraph "dag_cleaned_0" {
   "in" -> "32 !";
 }
 // graph for dag "freia_70_spoc_helper_0_0" of module "freia_70" in dot format
+// DAG "freia_70_spoc_helper_0_0": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -343,6 +348,7 @@ digraph "freia_70_spoc_helper_0_0" {
   "in" -> "32 !";
 }
 // graph for dag "freia_70_spoc_helper_0_1" of module "freia_70" in dot format
+// DAG "freia_70_spoc_helper_0_1": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_spoc_helper_0_1" {
   // inputs
   "out_1" [shape=circle];
@@ -364,6 +370,7 @@ digraph "freia_70_spoc_helper_0_1" {
   "out_1" -> "36 D8";
 }
 // graph for dag "freia_70_spoc_helper_0_2" of module "freia_70" in dot format
+// DAG "freia_70_spoc_helper_0_2": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_spoc_helper_0_2" {
   // inputs
   "w1_1_1" [shape=circle];
@@ -379,6 +386,7 @@ digraph "freia_70_spoc_helper_0_2" {
   "w2_0" -> "49 <";
 }
 // graph for dag "freia_70_spoc_helper_0_3" of module "freia_70" in dot format
+// DAG "freia_70_spoc_helper_0_3": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_spoc_helper_0_3" {
   // inputs
   "w1_1" [shape=circle];
@@ -874,6 +882,7 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_70" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -929,6 +938,7 @@ digraph "dag_0" {
   "in" -> "32 !";
 }
 // graph for dag "dag_cleaned_0" of module "freia_70" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -962,6 +972,7 @@ digraph "dag_cleaned_0" {
   "in" -> "32 !";
 }
 // graph for dag "freia_70_terapix_helper_0_0_0" of module "freia_70" in dot format
+// DAG "freia_70_terapix_helper_0_0_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1544,6 +1555,7 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_70" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -1599,6 +1611,7 @@ digraph "dag_0" {
   "in" -> "32 !";
 }
 // graph for dag "dag_cleaned_0" of module "freia_70" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1632,6 +1645,7 @@ digraph "dag_cleaned_0" {
   "in" -> "32 !";
 }
 // graph for dag "freia_70_opencl_helper_0_0" of module "freia_70" in dot format
+// DAG "freia_70_opencl_helper_0_0": #i=1 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1665,6 +1679,7 @@ digraph "freia_70_opencl_helper_0_0" {
   "in" -> "32 !";
 }
 // graph for dag "freia_70_opencl_helper_0_0_2" of module "freia_70" in dot format
+// DAG "freia_70_opencl_helper_0_0_2": #i=3 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_70_opencl_helper_0_0_2" {
   // inputs
   "w1_0_2" [shape=circle];

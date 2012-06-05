@@ -35,6 +35,7 @@ freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 ! graphs
 
 // graph for dag "dag_0" of module "freia_07" in dot format
+// DAG "dag_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -69,6 +70,7 @@ digraph "dag_0" {
   "i0" -> "18 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_07" in dot format
+// DAG "dag_cleaned_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -163,6 +165,7 @@ freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 ! graphs
 
 // graph for dag "dag_0" of module "freia_07" in dot format
+// DAG "dag_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -197,6 +200,7 @@ digraph "dag_0" {
   "i0" -> "18 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_07" in dot format
+// DAG "dag_cleaned_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -231,6 +235,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "18 +";
 }
 // graph for dag "freia_07_spoc_helper_0_0" of module "freia_07" in dot format
+// DAG "freia_07_spoc_helper_0_0": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_07_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -252,6 +257,7 @@ digraph "freia_07_spoc_helper_0_0" {
   "i0" -> "18 +";
 }
 // graph for dag "freia_07_spoc_helper_0_1" of module "freia_07" in dot format
+// DAG "freia_07_spoc_helper_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_07_spoc_helper_0_1" {
   // inputs
   "i2" [shape=circle];
@@ -528,6 +534,7 @@ freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 ! graphs
 
 // graph for dag "dag_0" of module "freia_07" in dot format
+// DAG "dag_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -562,6 +569,7 @@ digraph "dag_0" {
   "i0" -> "18 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_07" in dot format
+// DAG "dag_cleaned_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -596,6 +604,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "18 +";
 }
 // graph for dag "freia_07_terapix_helper_0_0_0" of module "freia_07" in dot format
+// DAG "freia_07_terapix_helper_0_0_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "freia_07_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -1004,6 +1013,7 @@ freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 ! graphs
 
 // graph for dag "dag_0" of module "freia_07" in dot format
+// DAG "dag_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -1038,6 +1048,7 @@ digraph "dag_0" {
   "i0" -> "18 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_07" in dot format
+// DAG "dag_cleaned_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -1072,6 +1083,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "18 +";
 }
 // graph for dag "freia_07_opencl_helper_0_0" of module "freia_07" in dot format
+// DAG "freia_07_opencl_helper_0_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "freia_07_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -1106,6 +1118,7 @@ digraph "freia_07_opencl_helper_0_0" {
   "i0" -> "18 +";
 }
 // graph for dag "freia_07_opencl_helper_0_0_0" of module "freia_07" in dot format
+// DAG "freia_07_opencl_helper_0_0_0": #i=4 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "freia_07_opencl_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];

@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -169,6 +170,7 @@ digraph "dag_0" {
   "in" -> "21 max";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -384,6 +386,7 @@ int main(int argc, char *argv[])
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -464,6 +467,7 @@ digraph "dag_0" {
   "in" -> "21 max";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -524,6 +528,7 @@ digraph "dag_cleaned_0" {
   "in" -> "21 max";
 }
 // graph for dag "main_spoc_helper_0_0" of module "main" in dot format
+// DAG "main_spoc_helper_0_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1162,6 +1167,7 @@ int main(int argc, char *argv[])
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -1242,6 +1248,7 @@ digraph "dag_0" {
   "in" -> "21 max";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1302,6 +1309,7 @@ digraph "dag_cleaned_0" {
   "in" -> "21 max";
 }
 // graph for dag "main_terapix_helper_0_0_0" of module "main" in dot format
+// DAG "main_terapix_helper_0_0_0": #i=1 #o=2 #c=12 #s=0 #I=0 #B=0 #A=0
 digraph "main_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1339,6 +1347,7 @@ digraph "main_terapix_helper_0_0_0" {
   "in" -> "21 max";
 }
 // graph for dag "main_terapix_helper_0_0_1" of module "main" in dot format
+// DAG "main_terapix_helper_0_0_1": #i=2 #o=2 #c=11 #s=0 #I=0 #B=0 #A=0
 digraph "main_terapix_helper_0_0_1" {
   // inputs
   "od_5" [shape=circle];
@@ -2497,6 +2506,7 @@ int main(int argc, char *argv[])
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -2577,6 +2587,7 @@ digraph "dag_0" {
   "in" -> "21 max";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -2637,6 +2648,7 @@ digraph "dag_cleaned_0" {
   "in" -> "21 max";
 }
 // graph for dag "main_opencl_helper_0_0" of module "main" in dot format
+// DAG "main_opencl_helper_0_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -2697,6 +2709,7 @@ digraph "main_opencl_helper_0_0" {
   "in" -> "21 max";
 }
 // graph for dag "main_opencl_helper_0_0_1" of module "main" in dot format
+// DAG "main_opencl_helper_0_0_1": #i=3 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_0_1" {
   // inputs
   "in" [shape=circle];

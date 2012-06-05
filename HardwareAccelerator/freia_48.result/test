@@ -28,6 +28,7 @@ freia_status freia_48(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_48" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=4 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -53,6 +54,7 @@ digraph "dag_0" {
   "in" -> "10 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_48" in dot format
+// DAG "dag_cleaned_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -117,6 +119,7 @@ freia_status freia_48(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_48" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=4 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -142,6 +145,7 @@ digraph "dag_0" {
   "in" -> "10 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_48" in dot format
+// DAG "dag_cleaned_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -163,6 +167,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 *_";
 }
 // graph for dag "freia_48_spoc_helper_0_0" of module "freia_48" in dot format
+// DAG "freia_48_spoc_helper_0_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_48_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -342,6 +347,7 @@ freia_status freia_48(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_48" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=4 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -367,6 +373,7 @@ digraph "dag_0" {
   "in" -> "10 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_48" in dot format
+// DAG "dag_cleaned_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -388,6 +395,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 *_";
 }
 // graph for dag "freia_48_terapix_helper_0_0_0" of module "freia_48" in dot format
+// DAG "freia_48_terapix_helper_0_0_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_48_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -733,6 +741,7 @@ freia_status freia_48(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_48" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=4 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -758,6 +767,7 @@ digraph "dag_0" {
   "in" -> "10 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_48" in dot format
+// DAG "dag_cleaned_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -779,6 +789,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 *_";
 }
 // graph for dag "freia_48_opencl_helper_0_0" of module "freia_48" in dot format
+// DAG "freia_48_opencl_helper_0_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_48_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -800,6 +811,7 @@ digraph "freia_48_opencl_helper_0_0" {
   "in" -> "11 *_";
 }
 // graph for dag "freia_48_opencl_helper_0_0_0" of module "freia_48" in dot format
+// DAG "freia_48_opencl_helper_0_0_0": #i=2 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_48_opencl_helper_0_0_0" {
   // inputs
   "in" [shape=circle];

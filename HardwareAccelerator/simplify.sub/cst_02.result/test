@@ -24,6 +24,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "cst_02" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -42,6 +43,7 @@ digraph "dag_0" {
   "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -84,6 +86,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 ! graphs
 
 // graph for dag "cst_02_spoc_helper_0_0" of module "cst_02" in dot format
+// DAG "cst_02_spoc_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "cst_02_spoc_helper_0_0" {
   // inputs
 
@@ -95,6 +98,7 @@ digraph "cst_02_spoc_helper_0_0" {
   "11 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_02" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -113,6 +117,7 @@ digraph "dag_0" {
   "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -234,6 +239,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 ! graphs
 
 // graph for dag "cst_02_terapix_helper_0_0_0" of module "cst_02" in dot format
+// DAG "cst_02_terapix_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "cst_02_terapix_helper_0_0_0" {
   // inputs
 
@@ -245,6 +251,7 @@ digraph "cst_02_terapix_helper_0_0_0" {
   "11 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_02" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -263,6 +270,7 @@ digraph "dag_0" {
   "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -472,6 +480,7 @@ freia_status cst_02(freia_data2d *o, const freia_data2d *i)
 ! graphs
 
 // graph for dag "cst_02_opencl_helper_0_0" of module "cst_02" in dot format
+// DAG "cst_02_opencl_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "cst_02_opencl_helper_0_0" {
   // inputs
 
@@ -483,6 +492,7 @@ digraph "cst_02_opencl_helper_0_0" {
   "11 C" -> "o";
 }
 // graph for dag "dag_0" of module "cst_02" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -501,6 +511,7 @@ digraph "dag_0" {
   "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 

@@ -268,6 +268,7 @@ int license_plate_copies(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate_copies" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=66 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -551,6 +552,7 @@ digraph "dag_0" {
   "in" -> "62 =";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate_copies" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1151,6 +1153,7 @@ int license_plate_copies(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate_copies" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=66 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -1434,6 +1437,7 @@ digraph "dag_0" {
   "in" -> "62 =";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate_copies" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1585,6 +1589,7 @@ digraph "dag_cleaned_0" {
   "in" -> "244 &";
 }
 // graph for dag "license_plate_copies_spoc_helper_0_0" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_spoc_helper_0_0": #i=1 #o=1 #c=68 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1733,6 +1738,7 @@ digraph "license_plate_copies_spoc_helper_0_0" {
   "in" -> "64 E8";
 }
 // graph for dag "license_plate_copies_spoc_helper_0_1" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_spoc_helper_0_1": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_spoc_helper_0_1" {
   // inputs
   "in" [shape=circle];
@@ -3493,6 +3499,7 @@ int license_plate_copies(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate_copies" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=66 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -3776,6 +3783,7 @@ digraph "dag_0" {
   "in" -> "62 =";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate_copies" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -3927,6 +3935,7 @@ digraph "dag_cleaned_0" {
   "in" -> "244 &";
 }
 // graph for dag "license_plate_copies_terapix_helper_0_0_0" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_terapix_helper_0_0_0": #i=1 #o=2 #c=37 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -4014,6 +4023,7 @@ digraph "license_plate_copies_terapix_helper_0_0_0" {
   "in" -> "64 E8";
 }
 // graph for dag "license_plate_copies_terapix_helper_0_0_1" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_terapix_helper_0_0_1": #i=3 #o=1 #c=32 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_terapix_helper_0_0_1" {
   // inputs
   "imcloseth" [shape=circle];
@@ -6544,6 +6554,7 @@ int license_plate_copies(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate_copies" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=66 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -6827,6 +6838,7 @@ digraph "dag_0" {
   "in" -> "62 =";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate_copies" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -6978,6 +6990,7 @@ digraph "dag_cleaned_0" {
   "in" -> "244 &";
 }
 // graph for dag "license_plate_copies_opencl_helper_0_0" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_0_0": #i=1 #o=1 #c=69 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -7129,6 +7142,7 @@ digraph "license_plate_copies_opencl_helper_0_0" {
   "in" -> "64 E8";
 }
 // graph for dag "license_plate_copies_opencl_helper_0_0_1" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_0_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_opencl_helper_0_0_1" {
   // inputs
   "imclose" [shape=circle];

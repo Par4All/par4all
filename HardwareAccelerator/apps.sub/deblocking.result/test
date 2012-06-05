@@ -159,6 +159,7 @@ int main(int argc, char **argv)
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=34 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "cst" [shape=circle];
@@ -264,6 +265,7 @@ digraph "dag_0" {
   "cst" -> "53 ^";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=32 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -658,6 +660,7 @@ int main(int argc, char **argv)
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=34 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "cst" [shape=circle];
@@ -763,6 +766,7 @@ digraph "dag_0" {
   "cst" -> "53 ^";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=32 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -857,6 +861,7 @@ digraph "dag_cleaned_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_spoc_helper_0_0" of module "main" in dot format
+// DAG "main_spoc_helper_0_0": #i=1 #o=1 #c=5 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -879,6 +884,7 @@ digraph "main_spoc_helper_0_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_spoc_helper_0_1" of module "main" in dot format
+// DAG "main_spoc_helper_0_1": #i=2 #o=2 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_1" {
   // inputs
   "immap_5" [shape=circle];
@@ -905,6 +911,7 @@ digraph "main_spoc_helper_0_1" {
   "immap_5" -> "82 +_";
 }
 // graph for dag "main_spoc_helper_0_10" of module "main" in dot format
+// DAG "main_spoc_helper_0_10": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_10" {
   // inputs
   "implan1" [shape=circle];
@@ -920,6 +927,7 @@ digraph "main_spoc_helper_0_10" {
   "implan1" -> "109 |";
 }
 // graph for dag "main_spoc_helper_0_11" of module "main" in dot format
+// DAG "main_spoc_helper_0_11": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_11" {
   // inputs
   "implan3" [shape=circle];
@@ -935,6 +943,7 @@ digraph "main_spoc_helper_0_11" {
   "out_6" -> "110 |";
 }
 // graph for dag "main_spoc_helper_0_12" of module "main" in dot format
+// DAG "main_spoc_helper_0_12": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_12" {
   // inputs
   "implan4" [shape=circle];
@@ -950,6 +959,7 @@ digraph "main_spoc_helper_0_12" {
   "out_5" -> "111 |";
 }
 // graph for dag "main_spoc_helper_0_13" of module "main" in dot format
+// DAG "main_spoc_helper_0_13": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_13" {
   // inputs
   "implan5" [shape=circle];
@@ -965,6 +975,7 @@ digraph "main_spoc_helper_0_13" {
   "out_4" -> "112 |";
 }
 // graph for dag "main_spoc_helper_0_14" of module "main" in dot format
+// DAG "main_spoc_helper_0_14": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_14" {
   // inputs
   "implan6" [shape=circle];
@@ -980,6 +991,7 @@ digraph "main_spoc_helper_0_14" {
   "out_3" -> "113 |";
 }
 // graph for dag "main_spoc_helper_0_15" of module "main" in dot format
+// DAG "main_spoc_helper_0_15": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_15" {
   // inputs
   "implan7" [shape=circle];
@@ -995,6 +1007,7 @@ digraph "main_spoc_helper_0_15" {
   "out_2" -> "114 |";
 }
 // graph for dag "main_spoc_helper_0_16" of module "main" in dot format
+// DAG "main_spoc_helper_0_16": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_16" {
   // inputs
   "implan8" [shape=circle];
@@ -1010,6 +1023,7 @@ digraph "main_spoc_helper_0_16" {
   "out_1" -> "115 |";
 }
 // graph for dag "main_spoc_helper_0_2" of module "main" in dot format
+// DAG "main_spoc_helper_0_2": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_2" {
   // inputs
   "immap" [shape=circle];
@@ -1025,6 +1039,7 @@ digraph "main_spoc_helper_0_2" {
   "immap" -> "98 :";
 }
 // graph for dag "main_spoc_helper_0_3" of module "main" in dot format
+// DAG "main_spoc_helper_0_3": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_3" {
   // inputs
   "filter2" [shape=circle];
@@ -1044,6 +1059,7 @@ digraph "main_spoc_helper_0_3" {
   "immap" -> "99 :";
 }
 // graph for dag "main_spoc_helper_0_4" of module "main" in dot format
+// DAG "main_spoc_helper_0_4": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_4" {
   // inputs
   "filter3" [shape=circle];
@@ -1063,6 +1079,7 @@ digraph "main_spoc_helper_0_4" {
   "immap" -> "100 :";
 }
 // graph for dag "main_spoc_helper_0_5" of module "main" in dot format
+// DAG "main_spoc_helper_0_5": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_5" {
   // inputs
   "filter4" [shape=circle];
@@ -1082,6 +1099,7 @@ digraph "main_spoc_helper_0_5" {
   "immap" -> "101 :";
 }
 // graph for dag "main_spoc_helper_0_6" of module "main" in dot format
+// DAG "main_spoc_helper_0_6": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_6" {
   // inputs
   "filter5" [shape=circle];
@@ -1101,6 +1119,7 @@ digraph "main_spoc_helper_0_6" {
   "immap" -> "102 :";
 }
 // graph for dag "main_spoc_helper_0_7" of module "main" in dot format
+// DAG "main_spoc_helper_0_7": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_7" {
   // inputs
   "filter6" [shape=circle];
@@ -1120,6 +1139,7 @@ digraph "main_spoc_helper_0_7" {
   "immap" -> "103 :";
 }
 // graph for dag "main_spoc_helper_0_8" of module "main" in dot format
+// DAG "main_spoc_helper_0_8": #i=2 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_8" {
   // inputs
   "filter7" [shape=circle];
@@ -1139,6 +1159,7 @@ digraph "main_spoc_helper_0_8" {
   "immap" -> "104 :";
 }
 // graph for dag "main_spoc_helper_0_9" of module "main" in dot format
+// DAG "main_spoc_helper_0_9": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "main_spoc_helper_0_9" {
   // inputs
   "filter8" [shape=circle];
@@ -2997,6 +3018,7 @@ int main(int argc, char **argv)
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=34 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "cst" [shape=circle];
@@ -3102,6 +3124,7 @@ digraph "dag_0" {
   "cst" -> "53 ^";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=32 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -3196,6 +3219,7 @@ digraph "dag_cleaned_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_terapix_helper_0_0_0" of module "main" in dot format
+// DAG "main_terapix_helper_0_0_0": #i=1 #o=8 #c=12 #s=0 #I=0 #B=0 #A=0
 digraph "main_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -3246,6 +3270,7 @@ digraph "main_terapix_helper_0_0_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_terapix_helper_0_1_0" of module "main" in dot format
+// DAG "main_terapix_helper_0_1_0": #i=9 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "main_terapix_helper_0_1_0" {
   // inputs
   "filter2" [shape=circle];
@@ -5308,6 +5333,7 @@ int main(int argc, char **argv)
 ! graphs
 
 // graph for dag "dag_0" of module "main" in dot format
+// DAG "dag_0": #i=2 #o=1 #c=34 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "cst" [shape=circle];
@@ -5413,6 +5439,7 @@ digraph "dag_0" {
   "cst" -> "53 ^";
 }
 // graph for dag "dag_cleaned_0" of module "main" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=32 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -5507,6 +5534,7 @@ digraph "dag_cleaned_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_opencl_helper_0_0" of module "main" in dot format
+// DAG "main_opencl_helper_0_0": #i=1 #o=8 #c=12 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -5557,6 +5585,7 @@ digraph "main_opencl_helper_0_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_opencl_helper_0_0_1" of module "main" in dot format
+// DAG "main_opencl_helper_0_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_0_1" {
   // inputs
   "immap_6" [shape=circle];
@@ -5576,6 +5605,7 @@ digraph "main_opencl_helper_0_0_1" {
   "imtmp" -> "74 -";
 }
 // graph for dag "main_opencl_helper_0_1" of module "main" in dot format
+// DAG "main_opencl_helper_0_1": #i=9 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_1" {
   // inputs
   "filter2" [shape=circle];
@@ -5650,6 +5680,7 @@ digraph "main_opencl_helper_0_1" {
   "immap_5" -> "82 +_";
 }
 // graph for dag "main_opencl_helper_0_1_0" of module "main" in dot format
+// DAG "main_opencl_helper_0_1_0": #i=9 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_1_0" {
   // inputs
   "filter2" [shape=circle];

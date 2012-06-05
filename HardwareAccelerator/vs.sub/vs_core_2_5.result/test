@@ -58,6 +58,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
 ! graphs
 
 // graph for dag "dag_0" of module "vs_core_2" in dot format
+// DAG "dag_0": #i=3 #o=2 #c=16 #s=1 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "bg" [shape=circle];
@@ -117,6 +118,7 @@ digraph "dag_0" {
   "in" -> "15 -|";
 }
 // graph for dag "dag_cleaned_0" of module "vs_core_2" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=2 #c=16 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "bg" [shape=circle];
@@ -279,6 +281,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
 ! graphs
 
 // graph for dag "dag_0" of module "vs_core_2" in dot format
+// DAG "dag_0": #i=3 #o=2 #c=16 #s=1 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "bg" [shape=circle];
@@ -338,6 +341,7 @@ digraph "dag_0" {
   "in" -> "15 -|";
 }
 // graph for dag "dag_cleaned_0" of module "vs_core_2" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=2 #c=16 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "bg" [shape=circle];
@@ -393,6 +397,7 @@ digraph "dag_cleaned_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_spoc_helper_0_0" of module "vs_core_2" in dot format
+// DAG "vs_core_2_spoc_helper_0_0": #i=2 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_spoc_helper_0_0" {
   // inputs
   "bg" [shape=circle];
@@ -416,6 +421,7 @@ digraph "vs_core_2_spoc_helper_0_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_spoc_helper_0_1" of module "vs_core_2" in dot format
+// DAG "vs_core_2_spoc_helper_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_spoc_helper_0_1" {
   // inputs
   "t0" [shape=circle];
@@ -435,6 +441,7 @@ digraph "vs_core_2_spoc_helper_0_1" {
   "bg" -> "20 *_";
 }
 // graph for dag "vs_core_2_spoc_helper_0_2" of module "vs_core_2" in dot format
+// DAG "vs_core_2_spoc_helper_0_2": #i=1 #o=1 #c=8 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_spoc_helper_0_2" {
   // inputs
   "mv_6" [shape=circle];
@@ -463,6 +470,7 @@ digraph "vs_core_2_spoc_helper_0_2" {
   "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_spoc_helper_0_3" of module "vs_core_2" in dot format
+// DAG "vs_core_2_spoc_helper_0_3": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_spoc_helper_0_3" {
   // inputs
   "mv_1" [shape=circle];
@@ -1038,6 +1046,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
 ! graphs
 
 // graph for dag "dag_0" of module "vs_core_2" in dot format
+// DAG "dag_0": #i=3 #o=2 #c=16 #s=1 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "bg" [shape=circle];
@@ -1097,6 +1106,7 @@ digraph "dag_0" {
   "in" -> "15 -|";
 }
 // graph for dag "dag_cleaned_0" of module "vs_core_2" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=2 #c=16 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "bg" [shape=circle];
@@ -1152,6 +1162,7 @@ digraph "dag_cleaned_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_terapix_helper_0_0_0" of module "vs_core_2" in dot format
+// DAG "vs_core_2_terapix_helper_0_0_0": #i=2 #o=2 #c=7 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_terapix_helper_0_0_0" {
   // inputs
   "bg" [shape=circle];
@@ -1182,6 +1193,7 @@ digraph "vs_core_2_terapix_helper_0_0_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_terapix_helper_0_1_0" of module "vs_core_2" in dot format
+// DAG "vs_core_2_terapix_helper_0_1_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_terapix_helper_0_1_0" {
   // inputs
   "mv_6" [shape=circle];
@@ -1197,6 +1209,7 @@ digraph "vs_core_2_terapix_helper_0_1_0" {
   "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_terapix_helper_0_1_1" of module "vs_core_2" in dot format
+// DAG "vs_core_2_terapix_helper_0_1_1": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_terapix_helper_0_1_1" {
   // inputs
   "t1_1" [shape=circle];
@@ -1210,6 +1223,7 @@ digraph "vs_core_2_terapix_helper_0_1_1" {
   "t1_1" -> "36 D8";
 }
 // graph for dag "vs_core_2_terapix_helper_0_1_2" of module "vs_core_2" in dot format
+// DAG "vs_core_2_terapix_helper_0_1_2": #i=2 #o=1 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_terapix_helper_0_1_2" {
   // inputs
   "t1" [shape=circle];
@@ -2539,6 +2553,7 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
 ! graphs
 
 // graph for dag "dag_0" of module "vs_core_2" in dot format
+// DAG "dag_0": #i=3 #o=2 #c=16 #s=1 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "bg" [shape=circle];
@@ -2598,6 +2613,7 @@ digraph "dag_0" {
   "in" -> "15 -|";
 }
 // graph for dag "dag_cleaned_0" of module "vs_core_2" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=2 #c=16 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "bg" [shape=circle];
@@ -2653,6 +2669,7 @@ digraph "dag_cleaned_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_opencl_helper_0_0" of module "vs_core_2" in dot format
+// DAG "vs_core_2_opencl_helper_0_0": #i=2 #o=2 #c=7 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_opencl_helper_0_0" {
   // inputs
   "bg" [shape=circle];
@@ -2683,6 +2700,7 @@ digraph "vs_core_2_opencl_helper_0_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_opencl_helper_0_0_0" of module "vs_core_2" in dot format
+// DAG "vs_core_2_opencl_helper_0_0_0": #i=2 #o=2 #c=7 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_opencl_helper_0_0_0" {
   // inputs
   "bg" [shape=circle];
@@ -2713,6 +2731,7 @@ digraph "vs_core_2_opencl_helper_0_0_0" {
   "in" -> "15 -|";
 }
 // graph for dag "vs_core_2_opencl_helper_0_1" of module "vs_core_2" in dot format
+// DAG "vs_core_2_opencl_helper_0_1": #i=2 #o=1 #c=9 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_opencl_helper_0_1" {
   // inputs
   "mv_6" [shape=circle];
@@ -2745,6 +2764,7 @@ digraph "vs_core_2_opencl_helper_0_1" {
   "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_opencl_helper_0_1_2" of module "vs_core_2" in dot format
+// DAG "vs_core_2_opencl_helper_0_1_2": #i=3 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "vs_core_2_opencl_helper_0_1_2" {
   // inputs
   "t2" [shape=circle];

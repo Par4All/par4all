@@ -18,6 +18,7 @@ void border_o(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "border_o" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -31,6 +32,7 @@ digraph "dag_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_o" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -70,6 +72,7 @@ void border_o(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_o_spoc_helper_0_0" of module "border_o" in dot format
+// DAG "border_o_spoc_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_o_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -83,6 +86,7 @@ digraph "border_o_spoc_helper_0_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_0" of module "border_o" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -96,6 +100,7 @@ digraph "dag_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_o" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -220,6 +225,7 @@ void border_o(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_o_terapix_helper_0_0_0" of module "border_o" in dot format
+// DAG "border_o_terapix_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_o_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -233,6 +239,7 @@ digraph "border_o_terapix_helper_0_0_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_0" of module "border_o" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -246,6 +253,7 @@ digraph "dag_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_o" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -485,6 +493,7 @@ void border_o(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_o_opencl_helper_0_0" of module "border_o" in dot format
+// DAG "border_o_opencl_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_o_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -498,6 +507,7 @@ digraph "border_o_opencl_helper_0_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_0" of module "border_o" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -511,6 +521,7 @@ digraph "dag_0" {
   "in" -> "8 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_o" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
