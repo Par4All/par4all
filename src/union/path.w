@@ -419,7 +419,7 @@ et calcule sa faisabilité.
  * Returns true if the input path is possible and FALSE if it 
  * is not possible or undefined.                 
  */
-#ifdef TRACE_Linear/C3 Library_PATH
+#ifdef TRACE_LINEAR_PATH
 extern char* entity_local_name() ;
 #endif 
 
@@ -430,7 +430,7 @@ int ofl_ctrl;
   Pdisjunct  dj;
   Ppath      pa;
   boolean    ret_bo = FALSE;
-#ifdef TRACE_Linear/C3 Library_PATH
+#ifdef TRACE_LINEAR_PATH
   FILE*      report_file;
 #endif 
 
@@ -438,7 +438,7 @@ int ofl_ctrl;
   if ( pa_empty_p    ( in_pa )) return FALSE;
   if ( pa_full_p     ( in_pa )) return TRUE;
   
-#ifdef TRACE_Linear/C3 Library_PATH
+#ifdef TRACE_LINEAR_PATH
   /* Just to keep trace of input paths if wanted */
   if (getenv("KEEP_PATH") != (char*) NULL) {
     struct timeval  *tp = (struct timeval*)  malloc(sizeof(struct timeval));
@@ -464,7 +464,7 @@ int ofl_ctrl;
   else                                 ret_bo = TRUE;
 
 
-#ifdef TRACE_Linear/C3 Library_PATH
+#ifdef TRACE_LINEAR_PATH
   /* keep trace of paths */
   if (getenv("KEEP_PATH") != (char*) NULL) {
     fprintf( report_file, 
