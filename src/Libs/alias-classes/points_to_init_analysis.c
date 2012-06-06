@@ -306,7 +306,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
   cell source_cell = copy_cell(c);
   reference r = cell_any_reference(source_cell);
   entity v = reference_variable(r);
-  list sl = reference_indices(r); // They may include fields as well
+  //list sl = reference_indices(r); // They may include fields as well
                                   // as usual array subscripts
   //int rd = (int) gen_length(sl); // FI: To be used later
 
@@ -338,7 +338,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
     variable nstv = type_variable(st);
     variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
     sink_cell = create_scalar_stub_sink_cell(v, st, vd);
-    reference r = cell_any_reference(sink_cell);
+    //reference r = cell_any_reference(sink_cell);
     // Add the missing subscripts to the sink cell reference, if they
     // are not added by create_scalar_stub_sink()
     /*

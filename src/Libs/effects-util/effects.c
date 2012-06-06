@@ -41,6 +41,7 @@
 #include "misc.h"
 
 #include "ri-util.h"
+#include "properties.h"
 #include "effects-util.h"
 #include "text.h"
 #include "text-util.h"
