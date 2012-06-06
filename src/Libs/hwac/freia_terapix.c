@@ -1204,6 +1204,7 @@ static _int freia_terapix_call
 
   if (image_height==0)
   {
+    // what about vol(cst())?
     pips_assert("at least one image is needed!", n_ins||n_outs);
     // dynamic adjustment of the imagelet size
     sb_cat(decl,
@@ -1226,7 +1227,7 @@ static _int freia_terapix_call
              "    imagelet_size = max_size;\n");
     }
   }
-  else
+  else // assume the provided image_height
   {
     // we adjust statically the imagelet size so that we avoid recomputing
     // pixels... the formula must match whatever the scheduler does!
