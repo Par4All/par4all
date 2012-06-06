@@ -599,7 +599,11 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
       // FI: eval_p is not used here...
       reference nr = simplified_reference(r);
       cell nc = make_cell_reference(nr);
-      sinks = CONS(CELL, nc, NIL);
+      if(eval_p) {
+	sinks = source_to_sinks(nc, in, true); // FI: allocate a new copy
+      }
+      else
+	sinks = CONS(CELL, nc, NIL);
     }
     else { // rd is too big
       // Could be a structure with field accesses expressed as indices
@@ -728,7 +732,7 @@ list cast_to_points_to_sinks(cast c, pt_map in)
   return sinks;
 }
 
-// FI: do we need eval_p?
+// FI: do we need eval_p? eval_p is assumed always true
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
@@ -739,11 +743,16 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
     sinks = expression_to_points_to_sinks(ne, in);
   }
   if( sizeofexpression_type_p(soe) ){
-    type t = sizeofexpression_type(soe);
+    type t = compute_basic_concrete_type(sizeofexpression_type(soe));
     // FI: a better job could be done. A stub should be allocated in
     // the formal context of the procedure
-    cell c = make_anywhere_cell(t);
-    sinks = CONS(CELL, c, NIL);
+    if(pointer_type_p(t)) {
+      type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+      cell c = make_anywhere_cell(pt);
+      sinks = CONS(CELL, c, NIL);
+    }
+    else
+      pips_internal_error("Unexpected type.\n");
   }
   return sinks;
 }

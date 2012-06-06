@@ -429,6 +429,8 @@ list anywhere_to_sinks(cell source, pt_map pts)
     }
     else
       // FI: struct might be dereferenced?
+      // FI: should this be tested when entering this function rather
+      // than expecting that the caller is safe
       pips_internal_error("Unexpected dereferenced type.\n");
   }
   else if(type_area_p(vt)) {

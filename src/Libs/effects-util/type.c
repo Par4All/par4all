@@ -885,7 +885,7 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    if(array_type_p(nt)
 	       || get_bool_property("POINTS_TO_STRICT_POINTER_TYPES"))
 	      ; // Do not add a dimension to an existing array.
-	    else {
+	    else if(!type_void_p(nt)) {
 	      variable v = type_variable(nt);
 	      expression z = int_to_expression(0);
 	      // FI FI FI: should be computed... and checked

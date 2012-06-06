@@ -1233,14 +1233,19 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      */
 
     FOREACH(CELL, c, R) {
-      PML = source_to_sinks(c, pt_out, true);
-      FOREACH(CELL, m, PML) {
-	if(heap_cell_p(m)) {
-	  entity b = reference_variable(cell_any_reference(m));
-	  pips_user_warning("Memory leak for bucket \"%s\".\n",
-			    entity_name(b));
+      bool to_be_freed;
+      type ct = points_to_cell_to_type(c, &to_be_freed);
+      if(pointer_type_p(ct)) {
+	PML = source_to_sinks(c, pt_out, true);
+	FOREACH(CELL, m, PML) {
+	  if(heap_cell_p(m)) {
+	    entity b = reference_variable(cell_any_reference(m));
+	    pips_user_warning("Memory leak for bucket \"%s\".\n",
+			      entity_name(b));
+	  }
 	}
       }
+      if(to_be_freed) free_type(ct);
     }
   }
 
