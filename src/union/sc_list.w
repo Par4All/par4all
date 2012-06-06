@@ -45,7 +45,7 @@ Les fonctions sont dans le fichier :
 @O sc_list.c  -d @{
 @< includes @>
 
-#ifdef DEBUG_UNION_Linear/C3 Library
+#ifdef DEBUG_UNION_LINEAR
 extern char* entity_local_name();
 char* (*union_variable_name)(Variable) = entity_local_name;
 #else

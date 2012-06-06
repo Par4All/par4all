@@ -338,7 +338,7 @@ les versions antérieures.
 
 extern char* (*union_variable_name)(Variable);
 
-#if(defined(DEBUG_UNION_C3) || defined(DEBUG_UNION_Linear/C3 Library))
+#if(defined(DEBUG_UNION_C3) || defined(DEBUG_UNION_LINEAR))
 #define C3_DEBUG( fun, code )         \
   {if(getenv("DEBUG_UNION")){fprintf(stderr,"[%s]\n", fun); {code}}}
 #define C3_RETURN( type, val )      \
