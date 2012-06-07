@@ -135,35 +135,61 @@ list caller_addresses(cell c, list args, set pt_in, set pt_binded)
 }
 
 
-
-
-/* returns all the element of E.
-   E = {e in pt_in U pt_out|entity_stub_sink_p(e)}
-
-*/
-list stubs_list(pt_map pt_in, pt_map pt_out)
+/* Add cells referencing a points-to stub found in parameter "s" are
+ * copied and added to list "osl".
+ *
+ * The stubs are returned as cells not as entities.
+ *
+ * New cells are allocated. No sharing is created between parameter
+ * "s" and result "sl".
+ */
+list points_to_set_to_stub_cell_list(pt_map s, list osl)
 {
-  list list_e = NIL;
-  pt_map tmp = new_pt_map();
-  tmp = set_union(tmp, pt_in, pt_out);
-  SET_FOREACH(points_to, pt, tmp) {
+  list sl = osl;
+  SET_FOREACH(points_to, pt, s) {
     cell sink = points_to_sink(pt);
     reference r1 = cell_any_reference(sink);
     entity e1 = reference_variable(r1);
-    if(entity_stub_sink_p(e1) && !points_to_cell_in_list_p(sink, list_e))
-      list_e = gen_nconc(CONS(CELL, sink, NIL), list_e);
+    if(entity_stub_sink_p(e1) && !points_to_cell_in_list_p(sink, sl))
+      sl = CONS(CELL, copy_cell(sink), sl);
       
     cell source = points_to_source(pt);
     reference r2 = cell_any_reference(source);
     entity e2 = reference_variable(r2);
-    if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, list_e))
-      list_e = gen_nconc(CONS(CELL, source, NIL), list_e);
+    if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, sl))
+      sl = CONS(CELL, copy_cell(source), sl);
   }
-  print_points_to_cells(list_e);
-  gen_sort_list(list_e,(gen_cmp_func_t)points_to_compare_cell );
-  return list_e;
+  print_points_to_cells(sl);
+  gen_sort_list(sl, (gen_cmp_func_t) points_to_compare_cell );
+  print_points_to_cells(sl);
+  return sl;
 }
 
+
+/* returns all the element of E, the set of stubs created when the callee is analyzed.
+ *
+ * E = {e in pt_in U pt_out|entity_stub_sink_p(e)}
+ *
+ * FI->AM: a[*][*] or p[next] really are elements of set E?
+ */
+list stubs_list(pt_map pt_in, pt_map pt_out)
+{
+  list sli = points_to_set_to_stub_cell_list(pt_in, NIL);
+  list slo = points_to_set_to_stub_cell_list(pt_out, sli);
+  return slo;
+}
+
+/* Check compatibility of points-to set pt_in of the callee and
+ * pt_binded of the call site in the caller.
+ *
+ * Parameter "stubs" is the set E in the intraprocedural and
+ * interprocedural analysis chapters of Amira Mensi's PhD
+ * dissertation. The list "stubs" contains all the stubs generated
+ * when the callee is analyzed.
+ *
+ * Parameter "args" is a list of cells. Each cell is a reference to a
+ * formal parameter of the callee.
+ */
 bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in)
 {
   bool compatible_p = true;

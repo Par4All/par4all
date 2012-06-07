@@ -1137,6 +1137,7 @@ bool points_to_in_list_p(points_to pt, const list lx)
   return false; /* else no found */
 }
 
+/*  */
 bool points_to_compare_cell(cell c1, cell c2)
 {
   if(c1==c2)
