@@ -814,6 +814,17 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	bool get_bool_property(const char *);
 	if(array_pointer_type_equal_p(pt, urt)) 
 	  ; // the pointed type is the type of the right cell
+	// FI: we could/should add a compatibility type between void
+	// and any scalar type
+	// The problem occurs in Pointers/fulguro13 because a cast is
+	// not processed:
+	// fgUINT16 *array_s = (fgUINT16 *) vct->array;
+	// FI->AM/FC/PJ: we need a trick to handle the casts or the
+	// typing of the points-to graph is not possible
+	else if(scalar_type_p(pt) && type_void_p(urt)) {
+	  // A void * pointer may be asigned to anything?
+	  ; // OK, they are compatible...
+	}
 	else if(array_type_p(urt)
 		&& !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
 	  /* Formal parameters and potentially stubs can be assumed to
@@ -837,6 +848,25 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	      fprintf(stderr, "Pointed type \"pt\": ");
 	      print_type(pt);
 	    pips_internal_error("Unexpected type \"pt\".\n");
+	  }
+	}
+	else if(array_type_p(urt)
+		&& get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+	  // Pointers/assignment10.c
+	  if(type_variable_p(pt)) {
+	    basic pb = variable_basic(type_variable(pt));
+	    basic rb = variable_basic(type_variable(urt));
+	    if(basic_equal_p(pb,rb)) {
+	      // OK, they are compatible, but r must be subscripted
+	      points_to_cell_add_zero_subscripts(r);
+	    }
+	    else {
+	      fprintf(stderr, "Type pointed by source \"pt\": \"");
+	      print_type(pt);
+	      fprintf(stderr, "\"\nSink type \"urt\": \"");
+	      print_type(urt);
+	      pips_internal_error("\"\nIncompatible basics.\n");
+	    }
 	  }
 	}
 	else if(type_functional_p(urt)) {

@@ -307,7 +307,7 @@ type malloc_arg_to_type(expression e)
  */
 entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
 {
-    entity e = entity_undefined;
+  entity e = entity_undefined;
   const char* opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 

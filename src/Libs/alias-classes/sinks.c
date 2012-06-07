@@ -419,7 +419,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   else if (ENTITY_REALLOC_SYSTEM_P(f)) { // REALLOC has two arguments
     // FI: see man realloc() for its complexity:-(
     // FI: we need a realloc_to_points_to_sinks() to exploit both arguments...
-    sinks = malloc_to_points_to_sinks(a1, in);
+    sinks = malloc_to_points_to_sinks(a2, in);
   }
   else if(ENTITY_FOPEN_P(f)) {
     /* Should be handled like a malloc, using the line number for malloc() */

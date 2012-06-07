@@ -235,7 +235,11 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
   int i;
   list sl = NIL;
   for(i=0;i<d;i++) {
+    // FI: to be understood; parameter "d" is passed to reflect the
+    // dimensions of the source
     sl = CONS(EXPRESSION, make_unbounded_expression(), sl);
+    // sl = CONS(EXPRESSION, int_to_expression(0), sl);
+    ;
   }
   reference_indices(sink_ref) = sl;
 

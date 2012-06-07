@@ -660,7 +660,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
 	// And restore p
 	CDR(np) = NIL;
 	gen_free_list(np);
-	if(!points_to_undefined_p(pt)) // Stop as soon as an arc has been created
+	if(!points_to_undefined_p(pt)) // Stop as soon as an arc has been created; FI->AM/FC: may not be correct...
 	  break;
       }
     }
@@ -733,6 +733,8 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
 
   /* 1. Try to find the source in the points-to information */
   SET_FOREACH(points_to, pt, pts) {
+    // FI: a more flexible test is needed as the sink cell may be
+    // either a, or a[0] or a[*] or a[*][*] or...
     if(cell_equal_p(nsink, points_to_sink(pt))) {
       cell sc = fresh_p? copy_cell(points_to_source(pt))
 	: points_to_source(pt);
@@ -874,15 +876,26 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
     bool to_be_freed;
     type ct = points_to_cell_to_type(source, &to_be_freed);
     if(array_type_p(ct)) {
-      points_to_cell_add_unbounded_subscripts(source);
+      basic ctb = variable_basic(type_variable(ct));
+      // FI->AM: I am not happy at all with his
+      if(basic_pointer_p(ctb))
+	points_to_cell_add_unbounded_subscripts(source);
+      else {
+	// Pointers/dependence11.c: an array is a kind of constant pointer
+	// No need to eval more
+	cell sc = copy_cell(source);
+	sinks = CONS(CELL, sc, sinks);
+      }
     }
     if(to_be_freed) free_type(ct);
 
     /* 1. Try to find the source in the points-to information */
-    SET_FOREACH( points_to, pt, pts) {
-      if(cell_equal_p(source, points_to_source(pt))) {
-	cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
-	sinks = CONS(CELL, sc, sinks);
+    if(ENDP(sinks)) {
+      SET_FOREACH( points_to, pt, pts) {
+	if(cell_equal_p(source, points_to_source(pt))) {
+	  cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+	  sinks = CONS(CELL, sc, sinks);
+	}
       }
     }
 
