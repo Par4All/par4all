@@ -94,67 +94,71 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
       list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
       /* if callee's out is empty there is no need to start an interprocedural analysis */
       if(!ENDP(l_pt_to_out)) {
-      // FI: this function should be moved from semantics into effects-util
-    extern list load_summary_effects(entity e);
-    list el = load_summary_effects(f);
-    list wpl = written_pointers_set(el);
-    points_to_list pts_to_in = (points_to_list)
-      db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
+	// FI: this function should be moved from semantics into effects-util
+	extern list load_summary_effects(entity e);
+	list el = load_summary_effects(f);
+	list wpl = written_pointers_set(el);
+	points_to_list pts_to_in = (points_to_list)
+	  db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
    
-    list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    pt_map pt_in_callee = new_pt_map();
-    pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
-    pt_map pt_out_callee = new_pt_map();
-    pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
-    // FI: function name... set or list?
-    pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
-    ifdebug(8) print_points_to_set("pt_binded", pts_binded);
-    pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
-						 pt_in_callee, pts_binded);
-    ifdebug(8) print_points_to_set("pt_kill", pts_kill);
-    pt_map pt_end = new_pt_map();
-    pt_end = set_difference(pt_end, pt_in, pts_kill);
-    pt_map pts_gen = compute_points_to_gen_set(fpcl, pt_out_callee,
-					       pt_in_callee, pts_binded);
-    pt_end = set_union(pt_end, pt_end, pts_gen);
-    ifdebug(8) print_points_to_set("pt_end =",pt_end);
-    pt_out = pt_end;
+	list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
+	pt_map pt_in_callee = new_pt_map();
+	pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
+	pt_map pt_out_callee = new_pt_map();
+	pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+	// FI: function name... set or list?
+	pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
+	ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+	/* We have to test if pts_binded is compatible with pt_in_callee */
+	/* We have to start by computing all the elements of E (stubs) */
+	list stubs = stubs_list(pt_in_callee, pt_out_callee);
+	bool compatible_p = sets_binded_and_in_compatibles_p(stubs, fpcl, pts_binded, pt_in_callee);
+	if(compatible_p) {
+
+	  pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
+						       pt_in_callee, pts_binded);
+	  ifdebug(8) print_points_to_set("pt_kill", pts_kill);
+	  pt_map pt_end = new_pt_map();
+	  pt_end = set_difference(pt_end, pt_in, pts_kill);
+	  pt_map pts_gen = compute_points_to_gen_set(fpcl, pt_out_callee,
+						     pt_in_callee, pts_binded);
+	  pt_end = set_union(pt_end, pt_end, pts_gen);
+	  ifdebug(8) print_points_to_set("pt_end =",pt_end);
+	  pt_out = pt_end;
+	}
+	else {
+	  pips_user_warning("Aliasing between arguments, we have to create a new contect\n ");
+	}
       }
       else {
 	pips_user_warning("Function has not a side effect on pointers variables");
       }
-  }
+      
+    }
   else if(fast_interprocedural_points_to_analysis_p()) 
     {
-    extern list load_summary_effects(entity e);
-    list el = load_summary_effects(f);
-    list wpl = written_pointers_set(el);
-    points_to_list pts_to_in = (points_to_list)
-      db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
-    list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    pt_map pt_in_callee = new_pt_map();
-    pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
-    // list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
-    // pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
-    pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
-    ifdebug(8) print_points_to_set("pt_binded", pts_binded);
-    pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
-						 pt_in_callee, pts_binded);
-    ifdebug(8) print_points_to_set("pt_kill", pts_kill);
-    pt_map pt_end = new_pt_map();
-    pt_end = set_difference(pt_end, pt_in, pts_kill);
-    ifdebug(8) print_points_to_set("pt_end =",pt_end);
-    pt_out = pt_end;
+      extern list load_summary_effects(entity e);
+      list el = load_summary_effects(f);
+      list wpl = written_pointers_set(el);
+      points_to_list pts_to_in = (points_to_list)
+	db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
+      list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
+      pt_map pt_in_callee = new_pt_map();
+      pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
+      // list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
+      // pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+      pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
+      ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+      pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
+						   pt_in_callee, pts_binded);
+      ifdebug(8) print_points_to_set("pt_kill", pts_kill);
+      pt_map pt_end = new_pt_map();
+      pt_end = set_difference(pt_end, pt_in, pts_kill);
+      ifdebug(8) print_points_to_set("pt_end =",pt_end);
+      pt_out = pt_end;
     }
-  /* else { */
-  /*   pips_user_warning("The function call to \"%s\" is still ignored\n" */
-  /* 		      "On going implementation...\n", entity_user_name(f)); */
-  /* } */
   else {
     /* intraprocedural phase */
-    /* FOREACH(expression, arg, al) { */
-    /*   pt_out = expression_to_points_to(arg, pt_out); */
-    /* } */
     FOREACH(expression, arg, al) {
       list l_sink = expression_to_points_to_sources(arg, pt_out);
       SET_FOREACH(points_to, pts, pt_out) {

@@ -1143,8 +1143,8 @@ bool points_to_compare_cell(cell c1, cell c2)
     return true;
 
   int i = 0;
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
   list sl1 = NIL, sl2 = NIL;
@@ -1362,4 +1362,12 @@ void remove_points_to_arcs(cell source, cell sink, pt_map pt)
 			       make_descriptor_none());
   remove_arc_from_pt_map(a, pt);
   free_points_to(a);
+}
+
+
+bool points_to_cell_equal_p(cell c1, cell c2)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  return reference_equal_p(r1,r2);
 }

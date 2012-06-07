@@ -81,32 +81,21 @@ list written_pointers_set(list eff) {
 
 }
 
-
-
-/* Translate each element of E into the caller's scope */
-list caller_addresses(cell c, list args, set pt_in, set pt_binded)
-{
-  
-  cell c_f = formal_access_paths(c, args, pt_in);
-  list a_p = actual_access_paths(c_f, pt_binded);
-  return a_p;
-}
-
-
 /* For each stub cell e  find its formal corresponding parameter and add to it a dereferencing dimension */
 cell formal_access_paths(cell e, list args, set pt_in)
 {
   cell f_a = cell_undefined;
   bool find_p = false;
-  SET_FOREACH(points_to, pt, pt_in) {
-    FOREACH(CELL, c, args) {
-      if(cell_equal_p(c, points_to_source(pt)) && cell_equal_p(e, points_to_sink(pt)))
+
+  FOREACH(CELL, c, args) {
+    SET_FOREACH(points_to, pt, pt_in) {
+      if(points_to_cell_equal_p(c, points_to_source(pt)) && points_to_cell_equal_p(e, points_to_sink(pt)))
 	{
 	  find_p = true;
 	  f_a = add_array_dimension(c);
 	}
     }
-    if(!find_p && cell_equal_p(e, points_to_sink(pt)))
+    if(!find_p && points_to_cell_equal_p(e, points_to_sink(pt)))
       {
 	cell new_e = points_to_source(pt);
 	cell c  = formal_access_paths(new_e, args, pt_in);
@@ -135,6 +124,78 @@ list actual_access_paths(cell c, set pt_binded)
 }
 
 
+
+/* Translate each element of E into the caller's scope */
+list caller_addresses(cell c, list args, set pt_in, set pt_binded)
+{
+  
+  cell c_f = formal_access_paths(c, args, pt_in);
+  list a_p = actual_access_paths(c_f, pt_binded);
+  return a_p;
+}
+
+
+
+
+/* returns all the element of E.
+   E = {e in pt_in U pt_out|entity_stub_sink_p(e)}
+
+*/
+list stubs_list(pt_map pt_in, pt_map pt_out)
+{
+  list list_e = NIL;
+  pt_map tmp = new_pt_map();
+  tmp = set_union(tmp, pt_in, pt_out);
+  SET_FOREACH(points_to, pt, tmp) {
+    cell sink = points_to_sink(pt);
+    reference r1 = cell_any_reference(sink);
+    entity e1 = reference_variable(r1);
+    if(entity_stub_sink_p(e1) && !points_to_cell_in_list_p(sink, list_e))
+      list_e = gen_nconc(CONS(CELL, sink, NIL), list_e);
+      
+    cell source = points_to_source(pt);
+    reference r2 = cell_any_reference(source);
+    entity e2 = reference_variable(r2);
+    if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, list_e))
+      list_e = gen_nconc(CONS(CELL, source, NIL), list_e);
+  }
+  print_points_to_cells(list_e);
+  gen_sort_list(list_e,(gen_cmp_func_t)points_to_compare_cell );
+  return list_e;
+}
+
+bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in)
+{
+  bool compatible_p = true;
+  list tmp = gen_full_copy_list(stubs);
+
+  while(!ENDP(stubs) && compatible_p) {
+    cell st = CELL(CAR(stubs));
+    FOREACH(CELL, c, tmp) {
+      if(! points_to_cell_equal_p(c, st)) {
+	list act1 = caller_addresses(c, args, pt_in, pt_binded);
+	list act2 = caller_addresses(st, args, pt_in, pt_binded);
+	gen_list_and(&act1, act2);
+	if(!ENDP(act1)) {
+	  compatible_p = false;
+	  break;
+	}
+	gen_free_list(act1);
+	gen_free_list(act2);
+      }
+    }
+    stubs = CDR(stubs);
+  }
+  gen_full_free_list(tmp);
+  return compatible_p;
+
+}
+
+
+
+
+
+
 /* Translate the out set into the scope of the caller */ 
 set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in, set pt_binded)
 {
@@ -157,7 +218,7 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
 
   FOREACH(CELL, c, written_cs) {
     SET_FOREACH(points_to, pt, pt_caller) {
-      if(cell_equal_p(c, points_to_source(pt)))
+      if(points_to_cell_equal_p(c, points_to_source(pt)))
 	set_add_element(kill, kill, (void*)pt);
     }
   }
@@ -227,108 +288,4 @@ set compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded)
 
 
 
-/* /\* computing the points-to of a call, user_functions not yet implemented. *\/ */
-/* set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__unused__))) { */
-/*   entity e = call_function(c); */
-/*   cons* pc = call_arguments(c); */
-/*   tag tt; */
-/*   set pt_out = set_generic_make(set_private, points_to_equal_p, */
-/*                                 points_to_rank); */
-
-/*   set pt_in_callee = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set pt_out_callee = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*   set pts_binded = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*   set pt_written = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*   set pts_gen = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set pts_kill = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*  set pt_end = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set tmp = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*   pt_in = points_to_init(s, pt_in); */
-/*   switch (tt = value_tag(entity_initial(e))) { */
-/*   case is_value_code:{ */
-    
-/*     /\* reset_current_module_entity(); *\/ */
-/*     /\* call to an external function; preliminary version*\/ */
-/*     pips_user_warning("The function call to \"%s\" is ignored\n" */
-/*                       "On going implementation...\n", entity_user_name(e)); */
-/*     set_assign(pt_out, pt_in); */
-    
-    
-/*     set_current_module_entity(e); */
-/*     const char* module_name = entity_module_name(e); */
-/*     type t = entity_type(e); */
-/*     if(type_functional_p(t)){ */
-/*       list dl = code_declarations(value_code(entity_initial(e))); */
-/*       FOREACH(ENTITY, fp, dl) { */
-/*     	if(formal_parameter_p(fp)) { */
-/*     	  reference r = make_reference(fp, NIL); */
-/*     	  cell c = make_cell_reference(r); */
-/*     	  formal_param = gen_nconc(CONS(CELL, c, NULL), formal_param); */
-/*     	} */
-/*       } */
-/*     } */
-/*     l_effect =  load_summary_effects(e); */
-/*     points_to_list pts_to_in = (points_to_list) */
-/*       db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(e), true); */
-/*     points_to_list pts_to_out = (points_to_list) */
-/*       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(e), true); */
-/*     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in)); */
-/*     pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in); */
-/*     list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out)); */
-/*     pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out); */
-/*     list effs = written_pointers(l_effect); */
-/*     pts_binded = pt_binded(e,pc , pt_in); */
-/*     print_points_to_set("pt_binded", pts_binded); */
-/*     pts_kill = pt_kill(effs, pt_in, formal_param, pt_in_callee, pts_binded); */
-/*     print_points_to_set("pt_kill", pts_kill); */
-/*     pts_gen = pt_gen(formal_param, pt_out_callee, pt_in_callee, pts_binded); */
-/*     print_points_to_set("pt_gen", pts_gen); */
-/*     tmp = set_difference(tmp,pt_in_callee, pts_kill); */
-/*     pt_end = set_union(pt_end, tmp, pts_gen); */
-/*     print_points_to_set("pt_end =",pt_end); */
-/*   } */
-/*     break; */
-/*   case is_value_symbolic:{ */
-/*     SET_FOREACH(points_to, pt, pt_in) { */
-/*       pt_out = set_add_element(pt_out, pt_out, (void*)pt); */
-/*     } */
-/*   } */
-/*     break; */
-/*   case is_value_constant:{ */
-/*     SET_FOREACH(points_to, pt, pt_in) { */
-/*       pt_out = set_add_element(pt_out, pt_out, (void*)pt); */
-/*     } */
-/*   } */
-/*     /\* pt_out = set_assign(pt_out, pt_in); *\/ */
-/*     break; */
-/*   case is_value_unknown: */
-/*     pips_internal_error("function %s has an unknown value\n", */
-/*                         entity_name(e)); */
-/*     break; */
-/*   case is_value_intrinsic: { */
-/*     set_methods_for_proper_simple_effects(); */
-/*     list el = call_to_proper_effects(c); */
-/*     generic_effects_reset_all_methods(); */
-/*     pips_debug(5, "intrinsic function %s\n", entity_name(e)); */
-/*     pt_out = points_to_intrinsic(s, c, e, pc, pt_in, el); */
-/*   } */
-/*     break; */
-/*   default: */
-/*     pips_internal_error("unknown tag %d\n", tt); */
-/*     break; */
-/*   } */
-
-/*   return pt_out; */
-/* } */
 
