@@ -1071,6 +1071,11 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  *
  * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1}
  *
+ * If the freed location r is precisely known, any arc pointing
+ * from it can be removed:
+ *
+ * Kill_3 = {pts=(l,r,a) in in | l in R && |R|=1}
+ *
  * out = (in - Kill_1 - Kill_2) U Gen_1 U Gen_2
  *
  * Warnings for dangling pointers:
@@ -1155,6 +1160,39 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   }
   else {
 
+    /* Memory leak detection... Must be computed early, before pt_out
+       has been (too?) modified. Transitive closure not performed... */
+    if(gen_length(R)==1) {
+      FOREACH(CELL, c, R) {
+	bool to_be_freed;
+	type ct = points_to_cell_to_type(c, &to_be_freed);
+	if(pointer_type_p(ct) || struct_type_p(ct)
+	   || array_of_pointers_type_p(ct)
+	   || array_of_struct_type_p(ct)) {
+	  // FI: this might not work for arrays of pointers?
+	  // Many for of "source" can be developped when we are dealing
+	  // struct and arrays
+	  // FI: do we need a specific version of source_to_sinks()?
+	  entity v = reference_variable(cell_any_reference(c));
+	  //cell nc = make_cell_reference(make_reference(v, NIL));
+	  PML = variable_to_sinks(v, pt_out, true);
+	  FOREACH(CELL, m, PML) {
+	    if(heap_cell_p(m)) {
+	      entity b = reference_variable(cell_any_reference(m));
+	      pips_user_warning("Memory leak for bucket \"%s\".\n",
+				entity_name(b));
+	      // The impact of this memory leak should be computed
+	      // transitively and recursively
+	      // FI->AM: we could almost call recursively
+	      // freed_freed_pointer_to_points_to() with a reference to b...
+	    }
+	  }
+	  //free_cell(nc);
+	}
+	if(to_be_freed) free_type(ct);
+      }
+    }
+
     /* Remove Kill_1 if it is not empty by definition */
     if(gen_length(L)==1) {
       SET_FOREACH(points_to, pts, pt_out) {
@@ -1210,6 +1248,18 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
       }
     }
 
+    /* Remove Kill_3 if it is not empty by definition */
+    if(gen_length(R)==1) {
+      SET_FOREACH(points_to, pts, pt_out) {
+	cell l = points_to_source(pts);
+	if(related_points_to_cell_in_list_p(l, R)) {
+	  // Potentially memory leaked cell:
+	  cell r = points_to_sink(pts);
+	  remove_arc_from_pt_map(pts, pt_out);
+	}
+      }
+    }
+
     /* Add Gen_1 - Not too late since pt_out has aready been modified? */
     pt_out = list_assignment_to_points_to(L, N, pt_out);
 
@@ -1231,22 +1281,6 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * Other pointers may or must now be dangling because their target
      * has been freed. Already detected at the level of Gen_2.
      */
-
-    FOREACH(CELL, c, R) {
-      bool to_be_freed;
-      type ct = points_to_cell_to_type(c, &to_be_freed);
-      if(pointer_type_p(ct)) {
-	PML = source_to_sinks(c, pt_out, true);
-	FOREACH(CELL, m, PML) {
-	  if(heap_cell_p(m)) {
-	    entity b = reference_variable(cell_any_reference(m));
-	    pips_user_warning("Memory leak for bucket \"%s\".\n",
-			      entity_name(b));
-	  }
-	}
-      }
-      if(to_be_freed) free_type(ct);
-    }
   }
 
 // FI: memory leak(s) in this function?

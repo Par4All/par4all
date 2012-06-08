@@ -1028,6 +1028,26 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
   return sinks;
 }
 
+/* Return all cells in points-to set "pts" who source is based on entity "e". 
+ *
+ * Similar to source_to_sinks, but much easier and shorter.
+ */
+list variable_to_sinks(entity e, pt_map pts, bool fresh_p)
+{
+  list sinks = NIL;
+  SET_FOREACH( points_to, pt, pts) {
+    cell source = points_to_source(pt);
+    reference sr = cell_any_reference(source);
+    entity v = reference_variable(sr);
+    if(e==v) {
+      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+      sinks = CONS(CELL, sc, sinks);
+    }
+  }
+  return sinks;
+
+}
+
 /* Create a list of null sinks and add a new null points-to relation to pts.
    pts is modified by side effect.
 */
