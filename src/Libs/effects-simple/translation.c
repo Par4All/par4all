@@ -184,9 +184,12 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 	}
     }
 
-  // FI->BC: something is missing here
+  // FI->BC: something is missing here points-to
   // If the target is an array, the first subscript at least should be
-  // replicated: if p in a pointer to an array a, p[0] is a[0], not a
+  // replicated: if "p" in a pointer to an array "a", "p[0]" is "a[0]", not "a"
+  //
+  // This happens because "int * p;" defines implictly "p" as a
+  // pointer to an array
 
   if (! entity_all_locations_p(reference_variable(*output_ref)))
     {
@@ -194,7 +197,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
       entity vt = entity_type(v); // FI: should probably be a concrete
       // type, but hopefully this has been done earlier when computing
       // points-to
-      list sl = array_type_p(vt)? input_remaining_indices :
+      list sl = (false && array_type_p(vt))? input_remaining_indices :
 	CDR(input_remaining_indices);
       FOREACH(EXPRESSION, input_ind, sl)
 	{
