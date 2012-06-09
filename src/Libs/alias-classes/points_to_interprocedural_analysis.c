@@ -255,7 +255,7 @@ bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set 
 	  reference hr = make_reference(he, NIL);
 	  cell hc = make_cell_reference(hr);
 	  
-	  if((int)gen_length(act1) == 1 && (points_to_cell_in_list_p(nc, act1)|| points_to_cell_in_list_p(hc, act1)))
+	  if((int)gen_length(act1) == 1 && (!points_to_cell_in_list_p(nc, act1)|| !points_to_cell_in_list_p(hc, act1)))
 	    compatible_p = false;
 	  break;
 	}
@@ -286,7 +286,8 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
   FOREACH(CELL, c, written) {
     reference r1 = cell_any_reference(c);
     list ind1 = reference_indices(r1);
-    reference_indices_(r1) = NIL;
+    /* no need to remove indices ? */
+    /* reference_indices_(r1) = NIL; */
     tmp = caller_addresses(c, args, pt_in, pt_binded);
     FOREACH(CELL, cel, tmp) {
       r1 = cell_any_reference(cel);
