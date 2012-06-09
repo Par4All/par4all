@@ -290,12 +290,10 @@ int main()
       f(&x0, &y0, &x0);
 
 // Points To:
-// x0 -> *ANY_MODULE*:*NOWHERE* , MAY
-// x0 -> y , MAY
+// x0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // y0 -> *ANY_MODULE*:*NOWHERE* , MAY
 // y0 -> y , MAY
-// y0 -> z , MAY
-// z0 -> x , MAY
+// z0 -> *ANY_MODULE*:*NOWHERE* , MAY
 // z0 -> z , MAY
 
 
@@ -319,5 +317,3 @@ int main();
 INIT_POINTS_TO_ANALYSIS[f] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[wilson!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Aliasing between arguments, we have to create a new context
- 

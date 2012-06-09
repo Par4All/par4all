@@ -1,5 +1,5 @@
 
-POINTS TO for wilson
+POINTS TO for wilson_aliasing
 
 
 // Points To IN:
@@ -67,30 +67,7 @@ int main()
 // z0 -> z , EXACT
 
 
-   if (1)
-
-// Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
-// z0 -> z , EXACT
-
-      f(&x0, &y0, &z0);
-   else if (2)
-
-// Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
-// z0 -> z , EXACT
-
-      f(&z0, &x0, &y0);
-   else
-
-// Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
-// z0 -> z , EXACT
-
-      f(&x0, &y0, &x0);
+   f(&x0, &y0, &x0);
 
 // Points To:
 // x0 -> x , EXACT
@@ -133,19 +110,10 @@ int main()
    int x, y, z;
 //             <    is written>: x0 y0 z0
    int *x0 = &x, *y0 = &y, *z0 = &z;
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
 
-   if (1)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&x0, &y0, &z0);
-   else if (2)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&z0, &x0, &y0);
-   else
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&x0, &y0, &x0);
+   f(&x0, &y0, &x0);
 
    return 0;
 }
@@ -177,18 +145,7 @@ int main()
 //             <    is read   >: f:_q_2 f:_r_3
 //             <    is written>: f:_p_1 f:_q_2
 
-   if (1)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&x0, &y0, &z0);
-   else if (2)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&z0, &x0, &y0);
-   else
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
-      f(&x0, &y0, &x0);
+   f(&x0, &y0, &x0);
 
    return 0;
 }
@@ -196,7 +153,7 @@ void f(int **p, int **q, int **r);
 
 int main();
 
-POINTS TO for wilson
+POINTS TO for wilson_aliasing
 
 
 // Points To IN:
@@ -264,39 +221,12 @@ int main()
 // z0 -> z , EXACT
 
 
-   if (1)
+   f(&x0, &y0, &x0);
 
 // Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
+// x0 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// y0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // z0 -> z , EXACT
-
-      f(&x0, &y0, &z0);
-   else if (2)
-
-// Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
-// z0 -> z , EXACT
-
-      f(&z0, &x0, &y0);
-   else
-
-// Points To:
-// x0 -> x , EXACT
-// y0 -> y , EXACT
-// z0 -> z , EXACT
-
-      f(&x0, &y0, &x0);
-
-// Points To:
-// x0 -> *ANY_MODULE*:*NOWHERE* , MAY
-// x0 -> y , MAY
-// y0 -> *ANY_MODULE*:*NOWHERE* , MAY
-// y0 -> y , MAY
-// y0 -> z , MAY
-// z0 -> x , MAY
-// z0 -> z , MAY
 
 
    return 0;
@@ -318,6 +248,6 @@ void f(int **p, int **q, int **r);
 int main();
 INIT_POINTS_TO_ANALYSIS[f] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[wilson!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[wilson_aliasing!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Aliasing between arguments, we have to create a new context
  
