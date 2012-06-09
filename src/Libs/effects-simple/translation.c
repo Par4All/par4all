@@ -194,7 +194,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   if (! entity_all_locations_p(reference_variable(*output_ref)))
     {
       entity v = reference_variable(*output_ref);
-      entity vt = entity_type(v); // FI: should probably be a concrete
+      type vt = entity_type(v); // FI: should probably be a concrete
       // type, but hopefully this has been done earlier when computing
       // points-to
       list sl = (false && array_type_p(vt))? input_remaining_indices :

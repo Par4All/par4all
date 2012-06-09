@@ -1254,7 +1254,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 	cell l = points_to_source(pts);
 	if(related_points_to_cell_in_list_p(l, R)) {
 	  // Potentially memory leaked cell:
-	  cell r = points_to_sink(pts);
+	  //cell r = points_to_sink(pts);
 	  remove_arc_from_pt_map(pts, pt_out);
 	}
       }

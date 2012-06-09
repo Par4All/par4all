@@ -80,7 +80,7 @@
  */
 pt_map dereferencing_to_points_to(expression p, pt_map in)
 {
-  pt_map out = in;
+  //pt_map out = in;
   bool null_dereferencing_p
     = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
   bool nowhere_dereferencing_p
@@ -121,7 +121,7 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
     switch(t) {
     case is_syntax_reference: {
       reference r = syntax_reference(s);
-      out = reference_dereferencing_to_points_to(r, in,
+      /*out = */reference_dereferencing_to_points_to(r, in,
 						 nowhere_dereferencing_p,
 						 null_dereferencing_p);
       break;
