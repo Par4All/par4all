@@ -1177,8 +1177,8 @@ bool points_to_compare_cell(cell c1, cell c2)
     return true;
 
   int i = 0;
-  reference r1 = cell_any_reference(c1);
-  reference r2 = cell_any_reference(c2);
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
   list sl1 = NIL, sl2 = NIL;
@@ -1210,6 +1210,50 @@ bool points_to_compare_cell(cell c1, cell c2)
 
   return (i== 0 ? true: false) ;
 }
+
+/*  */
+bool points_to_compare_ptr_cell(const void * vcel1, const void * vcel2)
+{
+  int i = 0;
+  cell c1 = *((cell *)vcel1);
+  cell c2 = *((cell *)vcel2);
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+  list sl1 = NIL, sl2 = NIL;
+  extern const char* entity_minimal_user_name(entity);
+  string n1 =   entity_abstract_location_p(v1)?
+    (string) entity_local_name(v1) :  (string) entity_minimal_user_name(v1);
+  string n2 =   entity_abstract_location_p(v2)?
+    (string) entity_local_name(v2) : (string) entity_minimal_user_name(v2);
+  i = strcmp(n1, n2);
+  if(i==0) {
+    sl1 = reference_indices(r1);
+    sl2 = reference_indices(r2);
+    int i1 = gen_length(sl1);
+    int i2 = gen_length(sl2);
+
+    i = i2>i1? 1 : (i2<i1? -1 : 0);
+
+    for(;i==0 && !ENDP(sl1); POP(sl1), POP(sl2)){
+      expression se1 = EXPRESSION(CAR(sl1));
+      expression se2 = EXPRESSION(CAR(sl2));
+      if(expression_constant_p(se1) && expression_constant_p(se2)){
+	int i1 = expression_to_int(se1);
+	int i2 = expression_to_int(se2);
+	i = i2>i1? 1 : (i2<i1? -1 : 0);
+      }else{
+	string s1 = words_to_string(words_expression(se1, NIL));
+	string s2 = words_to_string(words_expression(se2, NIL));
+	i = strcmp(s1, s2);
+      }
+    }
+  }
+
+  return i;
+}
+
 
 /* Order the two points-to relations according to the alphabetical
  * order of the underlying variables. Return -1, 0, or 1.
@@ -1404,4 +1448,23 @@ bool points_to_cell_equal_p(cell c1, cell c2)
   reference r1 = cell_any_reference(c1);
   reference r2 = cell_any_reference(c2);
   return reference_equal_p(r1,r2);
+}
+
+
+/* Compute A = A inter B: complexity in O(n2) */
+void
+points_to_cell_list_and(list * a, const list b)
+{
+  if (ENDP(*a))
+    return ;
+  if (!points_to_cell_in_list_p(CELL(CAR(*a)),b)) {
+    /* This element of a is not in list b: delete it: */
+    cons *aux = *a;
+
+    *a = CDR(*a);
+    free(aux);
+    points_to_cell_list_and(a, b);
+  }
+  else
+    points_to_cell_list_and(&CDR(*a), b);
 }

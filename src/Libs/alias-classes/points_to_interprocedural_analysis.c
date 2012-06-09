@@ -82,33 +82,75 @@ list written_pointers_set(list eff) {
 }
 
 /* For each stub cell e  find its formal corresponding parameter and add to it a dereferencing dimension */
-cell formal_access_paths(cell e, list args, set pt_in)
-{
-  cell f_a = cell_undefined;
-  bool find_p = false;
+/* cell formal_access_paths(cell e, list args, set pt_in) */
+/* { */
+/*   cell f_a = cell_undefined; */
+/*   bool find_p = false; */
 
-  FOREACH(CELL, c, args) {
-    SET_FOREACH(points_to, pt, pt_in) {
-      if(points_to_cell_equal_p(c, points_to_source(pt)) && points_to_cell_equal_p(e, points_to_sink(pt)))
-	{
-	  find_p = true;
-	  f_a = add_array_dimension(c);
-	}
-    }
-    if(!find_p && points_to_cell_equal_p(e, points_to_sink(pt)))
-      {
-	cell new_e = points_to_source(pt);
-	cell c  = formal_access_paths(new_e, args, pt_in);
-	f_a = add_array_dimension(c);
-      }
-    }
+/*   FOREACH(CELL, c, args) { */
+/*     SET_FOREACH(points_to, pt, pt_in) { */
+/*       if(points_to_cell_equal_p(c, points_to_source(pt)) && points_to_cell_equal_p(e, points_to_sink(pt))) */
+/* 	{ */
+/* 	  find_p = true; */
+/* 	  f_a = add_array_dimension(c); */
+/* 	  break ; */
+/* 	} */
+/*     } */
+/*     if(!find_p && points_to_cell_equal_p(e, points_to_sink(pt))) */
+/*       { */
+/* 	cell new_e = points_to_source(pt); */
+/* 	cell c  = formal_access_paths(new_e, args, pt_in); */
+/* 	f_a = add_array_dimension(c); */
+/* 	break ; */
+/*       } */
+/*     } */
 
   
+/*   if(cell_undefined_p(f_a))  */
+/*     pips_user_error("Formal acces paths undefined \n"); */
+
+/*   return f_a; */
+/* } */
+
+/* For each stub cell e  find its formal corresponding parameter and add to it a dereferencing dimension */
+cell formal_access_paths(cell e, list args, set pt_in)
+{
+  int i;
+  cell f_a = cell_undefined;
+  reference r1 = cell_any_reference(e);
+  reference r = reference_undefined;
+  entity v1 = reference_variable(r1);
+  const char * en1 = entity_local_name(v1);
+  list sl = NIL; 
+  bool change_p = false ;
+  while(!ENDP(args) && !change_p) {
+    cell c = CELL(CAR(args));
+    reference r2 = cell_to_reference(c);
+    entity v2 = reference_variable(r2);
+    const char * en2 = entity_local_name(v2);
+    char *cmp = strstr(en1, en2);
+    r = copy_reference(r2);
+    for(i = 0; cmp != NULL && cmp[i]!= '\0' ; i++) {
+      if(cmp[i]== '_') 	{
+	expression s =  int_to_expression(0);
+	sl = CONS(EXPRESSION, s, sl);
+	change_p = true;
+      }
+    }
+    if(change_p) {
+      reference_indices(r) = gen_nconc(reference_indices(r), sl);
+      f_a = make_cell_reference(r);  
+      break ;
+    }
+    args = CDR(args);
+  }
+ 
   if(cell_undefined_p(f_a)) 
     pips_user_error("Formal acces paths undefined \n");
 
   return f_a;
 }
+
 
 /* Evalute c using points-to relation already computed */ 
 list actual_access_paths(cell c, set pt_binded)
@@ -159,9 +201,9 @@ list points_to_set_to_stub_cell_list(pt_map s, list osl)
     if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, sl))
       sl = CONS(CELL, copy_cell(source), sl);
   }
-  print_points_to_cells(sl);
-  gen_sort_list(sl, (gen_cmp_func_t) points_to_compare_cell );
-  print_points_to_cells(sl);
+  
+  gen_sort_list(sl, (gen_cmp_func_t) points_to_compare_ptr_cell );
+  ifdebug(1) print_points_to_cells(sl);
   return sl;
 }
 
@@ -190,20 +232,31 @@ list stubs_list(pt_map pt_in, pt_map pt_out)
  * Parameter "args" is a list of cells. Each cell is a reference to a
  * formal parameter of the callee.
  */
-bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in)
+bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in, set pt_out)
 {
   bool compatible_p = true;
   list tmp = gen_full_copy_list(stubs);
+  gen_sort_list(args, (gen_cmp_func_t) points_to_compare_ptr_cell );
+  pt_map io = new_pt_map();
+  io = set_union(io, pt_in, pt_out);
 
   while(!ENDP(stubs) && compatible_p) {
     cell st = CELL(CAR(stubs));
     FOREACH(CELL, c, tmp) {
       if(! points_to_cell_equal_p(c, st)) {
-	list act1 = caller_addresses(c, args, pt_in, pt_binded);
-	list act2 = caller_addresses(st, args, pt_in, pt_binded);
-	gen_list_and(&act1, act2);
+	list act1 = caller_addresses(c, args, io, pt_binded);
+	list act2 = caller_addresses(st, args, io, pt_binded);
+	points_to_cell_list_and(&act1, act2);
 	if(!ENDP(act1)) {
-	  compatible_p = false;
+	  entity ne = entity_null_locations();
+	  reference nr = make_reference(ne, NIL);
+	  cell nc = make_cell_reference(nr);
+	  entity he =  entity_all_heap_locations();
+	  reference hr = make_reference(he, NIL);
+	  cell hc = make_cell_reference(hr);
+	  
+	  if((int)gen_length(act1) == 1 && (points_to_cell_in_list_p(nc, act1)|| points_to_cell_in_list_p(hc, act1)))
+	    compatible_p = false;
 	  break;
 	}
 	gen_free_list(act1);
@@ -213,6 +266,7 @@ bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set 
     stubs = CDR(stubs);
   }
   gen_full_free_list(tmp);
+  free_pt_map(io);
   return compatible_p;
 
 }
