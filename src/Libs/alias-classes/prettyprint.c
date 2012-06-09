@@ -342,30 +342,50 @@ void dprint(expression x)
   if(expression_undefined_p(x))
     (void) fprintf(stderr, "UNDEFINED NEWGEN OBJECT\n");
   else {
-  int ot = expression_domain_number(x);
-  if(ot==0)
-    (void) fprintf(stderr,"PROBABLY AN EMPTY LIST\n");
-  else if(expression_undefined_p(x))
-    (void) fprintf(stderr,"UNDEFINED NEWGEN OBJECT\n");
-  else if(ot==expression_domain)
-    print_expression( x);
-  else if(ot==reference_domain)
-    print_reference((reference) x);
-  else if(ot==points_to_domain)
-    print_points_to((points_to) x);
-  else if(ot==cell_domain)
-    print_points_to_cell((cell) x);
-  else if(ot==type_domain)
-    print_type((type) x);
-  else if(ot==statement_domain)
-    print_statement((statement) x);
-  else if(ot==effect_domain)
-    print_effect((effect) x);
-  else if(0<=ot && ot<1000)
-    (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d", ot);
-  else if(ot>1000 || ot<=0) // FI: I do not know how to get the largest Newgen type
-    // We could assume that the object is a list and look for the type
-    // of the first object...
-    (void) fprintf(stderr,"NOT A NEWGEN OBJECT. MAYBE A LIST\n");
+    int ot = expression_domain_number(x);
+    if(ot==0)
+      (void) fprintf(stderr,"PROBABLY AN EMPTY LIST\n");
+    else if(expression_undefined_p(x))
+      (void) fprintf(stderr,"UNDEFINED NEWGEN OBJECT\n");
+    else if(ot==expression_domain)
+      print_expression( x);
+    else if(ot==reference_domain)
+      print_reference((reference) x);
+    else if(ot==points_to_domain)
+      print_points_to((points_to) x);
+    else if(ot==cell_domain)
+      print_points_to_cell((cell) x);
+    else if(ot==type_domain)
+      print_type((type) x);
+    else if(ot==statement_domain)
+      print_statement((statement) x);
+    else if(ot==effect_domain)
+      print_effect((effect) x);
+    else if(0<=ot && ot<1000)
+      (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d", ot);
+    else if(ot>1000 || ot<=0) {
+      // FI: I do not know how to get the largest Newgen type
+      // We could assume that the object is a list and look for the type
+      // of the first object...
+      (void) fprintf(stderr,"NOT A NEWGEN OBJECT. MAYBE A LIST\n");
+      expression cx = EXPRESSION(CAR((list) x));
+      int cot = expression_domain_number(cx);
+      if(cot==expression_domain)
+	print_expressions((list) x);
+      else if(cot==reference_domain)
+	print_references((list) x);
+      else if(cot==points_to_domain) {
+	// print_points_to_list((list) x); FI: not found?
+	fprintf(stderr, "No function found to print a list of points-to.\n");
+      }
+      else if(cot==cell_domain)
+	print_points_to_cells((list) x);
+      else if(cot==type_domain)
+	print_types((list) x);
+      else if(cot==statement_domain)
+	print_statements((list) x);
+      else if(cot==effect_domain)
+	print_effects((list) x);
+    }
   }
 }

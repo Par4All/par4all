@@ -1004,9 +1004,10 @@ pt_map pointer_assignment_to_points_to(expression lhs,
     bool to_be_freed;
     type lt = points_to_cell_to_type(l, &to_be_freed);
     if(array_type_p(lt)) {
-      //reference lr = cell_any_reference(l);
-      //reference_add_zero_subscripts(lr, lt);
-      points_to_cell_add_unbounded_subscripts(l);
+      // For Pointers/properties04.c, you want a zero subscript for
+      // the lhs
+      points_to_cell_add_zero_subscripts(l);
+      // points_to_cell_add_unbounded_subscripts(l);
     }
     if(to_be_freed) free_type(lt);
   }
