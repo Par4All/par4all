@@ -74,18 +74,23 @@ int main()
 // y0 -> y , EXACT
 // z0 -> z , EXACT
 
-      /* f(&x0, &y0, &z0); */
-      /* else*/
-      if (2)
+      f(&x0, &y0, &z0);
+   else if (2)
 
 // Points To:
 // x0 -> x , EXACT
 // y0 -> y , EXACT
 // z0 -> z , EXACT
 
-         /* f(&z0, &x0, &y0); */
-         /* else */
-         f(&x0, &y0, &x0);
+      f(&z0, &x0, &y0);
+   else
+
+// Points To:
+// x0 -> x , EXACT
+// y0 -> y , EXACT
+// z0 -> z , EXACT
+
+      f(&x0, &y0, &x0);
 
 // Points To:
 // x0 -> x , EXACT
@@ -130,14 +135,17 @@ int main()
    int *x0 = &x, *y0 = &y, *z0 = &z;
 
    if (1)
-      /* f(&x0, &y0, &z0); */
-      /* else*/
-      if (2)
 //             <    is read   >: f:_q_2 f:_r_3
 //             <    is written>: f:_p_1 f:_q_2
-         /* f(&z0, &x0, &y0); */
-         /* else */
-         f(&x0, &y0, &x0);
+      f(&x0, &y0, &z0);
+   else if (2)
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
+      f(&z0, &x0, &y0);
+   else
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
+      f(&x0, &y0, &x0);
 
    return 0;
 }
@@ -159,27 +167,28 @@ void f(int **p, int **q, int **r)
    *q = *r;
    return;
 }
-//             <may be read   >: f:_q_2 f:_r_3
-//             <may be written>: f:_p_1 f:_q_2
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
 int main()
 {
    int x, y, z;
 //             <    is written>: x0 y0 z0
    int *x0 = &x, *y0 = &y, *z0 = &z;
-//             <may be read   >: f:_q_2 f:_r_3
-//             <may be written>: f:_p_1 f:_q_2
-
-   if (1)
-//             <may be read   >: f:_q_2 f:_r_3
-//             <may be written>: f:_p_1 f:_q_2
-      /* f(&x0, &y0, &z0); */
-      /* else*/
-      if (2)
 //             <    is read   >: f:_q_2 f:_r_3
 //             <    is written>: f:_p_1 f:_q_2
-         /* f(&z0, &x0, &y0); */
-         /* else */
-         f(&x0, &y0, &x0);
+
+   if (1)
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
+      f(&x0, &y0, &z0);
+   else if (2)
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
+      f(&z0, &x0, &y0);
+   else
+//             <    is read   >: f:_q_2 f:_r_3
+//             <    is written>: f:_p_1 f:_q_2
+      f(&x0, &y0, &x0);
 
    return 0;
 }
@@ -189,3 +198,125 @@ int main();
 
 POINTS TO for wilson
 
+
+// Points To IN:
+// _q_2 -> _q_2_2 , EXACT
+// _r_3 -> _r_3_3 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+// r -> _r_3 , EXACT
+
+
+// Points To OUT:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _r_3_3 , EXACT
+// _r_3 -> _r_3_3 , EXACT
+
+void f(int **p, int **q, int **r)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+// r -> _r_3 , EXACT
+
+   *p = *q;
+
+// Points To:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _q_2_2 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+// r -> _r_3 , EXACT
+
+   *q = *r;
+
+// Points To:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _r_3_3 , EXACT
+// _r_3 -> _r_3_3 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+// r -> _r_3 , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int x, y, z;
+
+// Points To: none
+
+   int *x0 = &x, *y0 = &y, *z0 = &z;
+
+// Points To:
+// x0 -> x , EXACT
+// y0 -> y , EXACT
+// z0 -> z , EXACT
+
+
+   if (1)
+
+// Points To:
+// x0 -> x , EXACT
+// y0 -> y , EXACT
+// z0 -> z , EXACT
+
+      f(&x0, &y0, &z0);
+   else if (2)
+
+// Points To:
+// x0 -> x , EXACT
+// y0 -> y , EXACT
+// z0 -> z , EXACT
+
+      f(&z0, &x0, &y0);
+   else
+
+// Points To:
+// x0 -> x , EXACT
+// y0 -> y , EXACT
+// z0 -> z , EXACT
+
+      f(&x0, &y0, &x0);
+
+// Points To:
+// x0 -> x , MAY
+// x0 -> y , MAY
+// y0 -> y , MAY
+// y0 -> z , MAY
+// z0 -> x , MAY
+// z0 -> z , MAY
+
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+
+// Points To: none
+
+void f(int **p, int **q, int **r);
+
+
+// Points To: none
+
+int main();
+INIT_POINTS_TO_ANALYSIS[f] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[wilson!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) Aliasing between arguments, we have to create a new context
+ 

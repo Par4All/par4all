@@ -11,12 +11,12 @@ int main()
   int *x0 = &x, *y0 = &y, *z0 = &z;
 
   if(1)
-    /* f(&x0, &y0, &z0); */
-    /* else*/
-     if(2)
-    /* f(&z0, &x0, &y0); */
-  /* else */
-       f(&x0, &y0, &x0);
+    f(&x0, &y0, &z0);
+  else
+    if(2)
+      f(&z0, &x0, &y0);
+    else
+      f(&x0, &y0, &x0);
 
   return 0;
 }
