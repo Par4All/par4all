@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -131,9 +131,9 @@ void smart_log_handler(const char *fmt, va_list args)
 #define PIPS_THANKS_STRING(arch)                                        \
   "%s (ARCH=" arch ")\n  running as %s\n"                               \
   "\n"                                                                  \
-  "  (c) 1988-2011 Centre de Recherche en Informatique,\n"              \
+  "  (c) 1988-2012 Centre de Recherche en Informatique,\n"              \
   "                Unite de Recherche Mathematiques et Systemes,\n"     \
-  "                MINES-ParisTech, France.\n"                          \
+  "                MINES ParisTech, France.\n"                          \
   "\n"                                                                  \
   "  CRI URL: http://cri.mines-paristech.fr/\n"                         \
   "  PIPS URL: http://pips4u.org/\n"                                    \
@@ -141,7 +141,7 @@ void smart_log_handler(const char *fmt, va_list args)
   "\n"                                                                  \
   "  This software is provided as is, under the terms of the GPL.\n"    \
   "  It includes and uses software from GNU (gnulib, readline),\n"      \
-  "  Berkeley (fsplit), IRISA and others (polylib)...\n"                \
+  "  Berkeley (fsplit), INRIA, IRISA and others (polylib, janus)...\n"  \
   "\n"
 
 /* display pips thanks on startup, if it on a tty.
