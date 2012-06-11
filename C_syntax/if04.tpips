@@ -1,0 +1,5 @@
+delete if04
+create if04 if04.c
+display PRINTED_FILE[%MAIN]
+close
+quit

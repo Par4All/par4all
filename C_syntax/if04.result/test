@@ -1,0 +1,14 @@
+int main(void)
+{
+   char *argument = "input";
+
+   if (argument[0]=='-')
+      if (argument[1]=='v')
+         printf("verbose\n");
+      else if (argument[1]=='o')
+         printf("output\n");
+   else
+      printf("input\n");
+
+   return 0;
+}
