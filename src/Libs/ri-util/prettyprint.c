@@ -355,14 +355,49 @@ string get_C_label_printf_format(const char* label) {
 }
 
 /**
+ * @brief Can this test be printed without enclosing braces?
+ */
+bool one_liner_test_p(test t)
+{
+  bool one_liner_p = false;
+  /* We must make sure that the else clause or the final else clause
+     is not empty */
+  statement f = test_false(t);
+
+  if(empty_statement_p(f) || nop_statement_p(f))
+    one_liner_p = false;
+  else if(statement_test_p(f)) {
+    /* Go down recursively for "else if" constructs. */
+    instruction i = statement_instruction(f);
+    test ft = instruction_test(i);
+      one_liner_p = one_liner_test_p(ft);
+  }
+  else
+    one_liner_p = true;
+
+  return one_liner_p;
+}
+
+/**
  * @brief Can this statement be printed on one line, without enclosing braces?
  */
 bool one_liner_p(statement s)
 {
   instruction i = statement_instruction(s);
-  bool yes = (instruction_test_p(i) || instruction_loop_p(i) || instruction_whileloop_p(i)
+  bool yes = (instruction_loop_p(i) || instruction_whileloop_p(i)
 	      || instruction_call_p(i) || instruction_expression_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
 	      || return_instruction_p(i));
+
+  if(!yes && instruction_test_p(i)) {
+    test t = instruction_test(i);
+    statement f = test_false(t);
+    if(empty_statement_p(f) || nop_statement_p(f))
+      yes = true; // No need to worry
+    else {
+      // Make sure there is no internal dangling else...
+      yes = one_liner_test_p(t);
+    }
+  }
 
   yes = yes && ENDP(statement_declarations(s));
 
