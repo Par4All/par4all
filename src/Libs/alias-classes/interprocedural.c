@@ -86,11 +86,11 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
   pt_out = pt_in;
 
   // Code by Amira
-  list fpcl = NIL; // Formal parameter cell list
+  //list fpcl = NIL; // Formal parameter cell list
   type t = entity_type(f);
   if(type_functional_p(t)){
     list dl = code_declarations(value_code(entity_initial(f)));
-    fpcl = points_to_cells_parameters(dl);   
+    /*fpcl = */points_to_cells_parameters(dl);   
   }
   else {
     pips_internal_error("Function has not a functional type.\n");
