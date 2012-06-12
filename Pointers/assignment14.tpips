@@ -1,4 +1,4 @@
-setenv WS=assignment12
+setenv WS=assignment14
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
