@@ -341,6 +341,8 @@ void dprint(expression x)
 {
   if(expression_undefined_p(x))
     (void) fprintf(stderr, "UNDEFINED NEWGEN OBJECT\n");
+  else if(x==0)
+    (void) fprintf(stderr, "EMPTY LIST\n");
   else {
     int ot = expression_domain_number(x);
     if(ot==0)

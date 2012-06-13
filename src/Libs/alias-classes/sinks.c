@@ -243,7 +243,9 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       if(/* eval_p && */array_type_p(ct)) {
 	//reference r = cell_any_reference(c);
 	//reference_add_zero_subscripts(r, ct);
-	points_to_cell_add_unbounded_subscripts(c);
+	// FI: for assignment13.c and _t_2_2, we need a zero subscript
+	points_to_cell_add_zero_subscripts(c);
+	//points_to_cell_add_unbounded_subscripts(c);
       }
       if(to_be_freed) free_type(ct);
       /* Do we want to dereference c? */
@@ -374,7 +376,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
-    list L = expression_to_points_to_sources(a1, in);
+    // FI: memory leak, but you need a copy to add the field
+    list L = gen_full_copy_list(expression_to_points_to_sources(a1, in));
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
