@@ -355,49 +355,65 @@ string get_C_label_printf_format(const char* label) {
 }
 
 /**
- * @brief Can this test be printed without enclosing braces?
+ * @brief True is statement "s" can be printed out without enclosing
+ * braces when it is the true branch of a test. This is a special case
+ * because of dangling else clauses.
  */
-bool one_liner_test_p(test t)
-{
-  bool one_liner_p = false;
-  /* We must make sure that the else clause or the final else clause
-     is not empty */
-  statement f = test_false(t);
-
-  if(empty_statement_p(f) || nop_statement_p(f))
-    one_liner_p = false;
-  else if(statement_test_p(f)) {
-    /* Go down recursively for "else if" constructs. */
-    instruction i = statement_instruction(f);
-    test ft = instruction_test(i);
-      one_liner_p = one_liner_test_p(ft);
-  }
-  else
-    one_liner_p = true;
-
-  return one_liner_p;
-}
+/* bool one_liner_true_branch_p(statement s) */
+/* { */
+/*   bool one_p = false; */
+ 
+/*   if(!statement_test_p(s)) */
+/*     one_p = one_liner_p(s); */
+/*   else { */
+/*     test t = instruction_test(statement_instruction(s)); */
+/*     statement f = test_false(t); */
+/*     if(!(empty_statement_p(f) || nop_statement_p(f))) */
+/*       one_p = true; // No need to worry, the else clause exists */
+/*     else { */
+/*       // Make sure there is no internal dangling else... */
+/*       one_p = one_liner_test_p(t); */
+/*     } */
+/*   } */
+/*   return one_p; */
+/* } */
 
 /**
- * @brief Can this statement be printed on one line, without enclosing braces?
+ * @brief True is test "t" contains a non-empty final "else" clause.
+ */
+/* bool one_liner_test_p(test t) */
+/* { */
+/*   bool one_liner_p = false; */
+/*   /\* We must make sure that the final else clause is not empty *\/ */
+/*   statement f = test_false(t); */
+
+/*   if(empty_statement_p(f) || nop_statement_p(f)) */
+/*     one_liner_p = false; */
+/*   else if(statement_test_p(f)) { */
+/*     /\* Go down recursively for "else if" constructs. *\/ */
+/*     instruction i = statement_instruction(f); */
+/*     test ft = instruction_test(i); */
+/*       one_liner_p = one_liner_test_p(ft); */
+/*   } */
+/*   else */
+/*     one_liner_p = true; */
+
+/*   return one_liner_p; */
+/* } */
+
+/**
+ * @brief Can this statement be printed on one line, without enclosing
+ * braces, if it is embedded in a loop? 
+ *
+ * Another test must be used if Statement "s" is embedded in a test a
+ * a true branch.
  */
 bool one_liner_p(statement s)
 {
   instruction i = statement_instruction(s);
-  bool yes = (instruction_loop_p(i) || instruction_whileloop_p(i)
+  bool yes = (instruction_test_p(i) || instruction_loop_p(i) || instruction_whileloop_p(i)
 	      || instruction_call_p(i) || instruction_expression_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
 	      || return_instruction_p(i));
-
-  if(!yes && instruction_test_p(i)) {
-    test t = instruction_test(i);
-    statement f = test_false(t);
-    if(empty_statement_p(f) || nop_statement_p(f))
-      yes = true; // No need to worry
-    else {
-      // Make sure there is no internal dangling else...
-      yes = one_liner_test_p(t);
-    }
-  }
 
   yes = yes && ENDP(statement_declarations(s));
 
@@ -3554,6 +3570,20 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
   return (r);
 }
 
+static bool test_with_no_else_clause_p(test t)
+{
+  bool no_else_p = true;
+  if(empty_statement_p(test_false(t)))
+    no_else_p = false;
+  else {
+    statement fs = test_false(t);
+    if(statement_test_p(fs)) // Go down recursively
+      no_else_p = test_with_no_else_clause_p(statement_test(fs));
+    else
+      no_else_p = true;
+  }
+  return no_else_p;
+}
 
 /* Some code shared by text_block_if and text_block_ifthen */
 static bool test_with_dangling_else_p(test t)
@@ -3564,7 +3594,7 @@ static bool test_with_dangling_else_p(test t)
   statement ts = effective_test_true(t);
   bool inner_test_p = statement_test_p(ts);
   bool inner_else_p = inner_test_p?
-    !empty_statement_p(test_false(statement_test(ts))) : false;
+    test_with_no_else_clause_p(statement_test(ts)) : false;
   bool dangling_else_p = inner_test_p && outer_else_p && !inner_else_p;
 
   return dangling_else_p;
