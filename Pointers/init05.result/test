@@ -1,0 +1,39 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *p = a;
+
+// Points To:
+// p -> a[0] , EXACT
+
+   int (*q)[10] = &a;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a , EXACT
+
+   int *r = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a , EXACT
+// r -> a[0] , EXACT
+
+
+   return 0;
+}
