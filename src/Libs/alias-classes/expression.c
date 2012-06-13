@@ -1004,10 +1004,18 @@ pt_map pointer_assignment_to_points_to(expression lhs,
     bool to_be_freed;
     type lt = points_to_cell_to_type(l, &to_be_freed);
     if(array_type_p(lt)) {
+      cell nl = copy_cell(l);
       // For Pointers/properties04.c, you want a zero subscript for
       // the lhs
       points_to_cell_add_zero_subscripts(l);
-      // points_to_cell_add_unbounded_subscripts(l);
+      // FI: since it is an array, most of the pointers will be unchanged
+      // FI: this should be useless, but it has an impact because
+      // points-to stubs are computed on demand; see Pointers/assignment12.c
+      points_to_cell_add_unbounded_subscripts(nl);
+      list os = source_to_sinks(nl, pt_out, true);
+      list nll = CONS(CELL, nl, NIL);
+      pt_out = list_assignment_to_points_to(nll, os, pt_out);
+      gen_free_list(nll);
     }
     if(to_be_freed) free_type(lt);
   }
