@@ -1428,11 +1428,12 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   bool address_of_p = true;
   pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
   pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
-  pt_map kill = new_pt_map();
+  pt_map kill/* = new_pt_map()*/;
   // FI->AM: do we really want to keep the same arc with two different
   // approximations? The whole business of may/must does not seem
   // useful. 
-  union_of_pt_maps(kill, kill_may, kill_must);
+  // union_of_pt_maps(kill, kill_may, kill_must);
+  kill = kill_must;
   pt_map gen = new_pt_map();
   union_of_pt_maps(gen, gen_may, gen_must);
 
@@ -1448,10 +1449,23 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   difference_of_pt_maps(pt_out, pt_out, kill);
   union_of_pt_maps(pt_out, pt_out, gen);
 
+  // FI->AM: use kill_may to reduce the precision of these arcs
+  SET_FOREACH(points_to, pt, kill_may) {
+    approximation a = points_to_approximation(pt);
+    if(approximation_exact_p(a)) {
+      points_to npt = make_points_to(copy_cell(points_to_source(pt)),
+				     copy_cell(points_to_sink(pt)),
+				     make_approximation_may(),
+				     copy_descriptor(points_to_descriptor(pt)));
+      remove_arc_from_pt_map(pt, pt_out);
+      add_arc_to_pt_map(npt, pt_out);
+    }
+  }
+
   free_pt_maps(in_may, in_must,
 	       kill_may, kill_must,
 	       gen_may, gen_must,
-	       gen, kill, NULL);
+	       gen,/* kill,*/ NULL);
   // clear_pt_map(pt_out); // FI: why not free?
   }
 
