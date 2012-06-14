@@ -942,6 +942,10 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	// FI: This is not going to work with typedefs...
 	bool array_p = array_type_p(entity_type(v));
 	points_to pt = create_k_limited_stub_points_to(source, st, array_p, pts);
+	if(null_initialization_p) {
+	  free_approximation(points_to_approximation(pt));
+	  points_to_approximation(pt) = make_approximation_may();
+	}
 	pts = add_arc_to_pt_map(pt, pts);
 	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
@@ -983,6 +987,11 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	  bool array_p = array_type_p(st);
 	  pt = create_k_limited_stub_points_to(source, st, array_p, pts);
 
+	  // FI: cut-and-pasted from line 945
+	  if(null_initialization_p) {
+	    free_approximation(points_to_approximation(pt));
+	    points_to_approximation(pt) = make_approximation_may();
+	  }
 	  pts = add_arc_to_pt_map(pt, pts);
 	  add_arc_to_points_to_context(copy_points_to(pt));
 	  sinks = source_to_sinks(source, pts, false);

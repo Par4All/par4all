@@ -303,7 +303,7 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
 points_to create_stub_points_to(cell c, // source of the points-to
 				type st, // expected type for the sink cell 
 				// or the sink cell reference...
-				__attribute__ ((__unused__)) basic b)
+				bool exact_p)
 {
   points_to pt_to = points_to_undefined;
   //reference sink_ref = reference_undefined;
@@ -357,9 +357,8 @@ points_to create_stub_points_to(cell c, // source of the points-to
     //pips_internal_error("Not implemented yet!\n");
   }
 
-  bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
-  approximation rel = null_initialization_p? make_approximation_may():
-    make_approximation_exact();
+  approximation rel = exact_p? make_approximation_exact():
+    make_approximation_may();
   pt_to = make_points_to(source_cell, sink_cell, rel,
 			 make_descriptor_none());
   pointer_index ++;
@@ -371,17 +370,17 @@ points_to create_stub_points_to(cell c, // source of the points-to
  * sink cell of type "t" if the strictness is requested and of type
  * "array of t" if not.
  */
-points_to create_advanced_stub_points_to(cell c, type t)
+points_to create_advanced_stub_points_to(cell c, type t, bool exact_p)
 {
   points_to pt = points_to_undefined;
   bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
   if(strict_p)
-    pt = create_stub_points_to(c, t, basic_undefined);
+    pt = create_stub_points_to(c, t, exact_p);
   else {
-    /* assume that pointer always points towards an array of
+    /* assume that pointers always points towards an array of
        unknown dimension. */
     type at = type_to_array_type(t);
-    pt = create_stub_points_to(c, at, basic_undefined);
+    pt = create_stub_points_to(c, at, exact_p);
     // FI: I do not know if we should free t [and/or at]
   }
   return pt;
@@ -391,7 +390,7 @@ points_to create_advanced_stub_points_to(cell c, type t)
  * the sink name is a concatenation of the formal parmater and the
  * POINTS_TO_MODULE_NAME.
  */
-points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basic b)
+points_to create_pointer_to_array_stub_points_to(cell c, type t, bool exact_p)
 { 
   list l_ind = NIL;
   basic bb = basic_undefined;
@@ -468,7 +467,8 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t,__attribute__ ((
   }
 
   cell sink_cell = make_cell_reference(sink_ref);
-  approximation rel = make_approximation_exact();
+  approximation rel =
+    exact_p? make_approximation_exact() : make_approximation_may();
   points_to pt_to = make_points_to(source_cell, sink_cell, rel,
 				   make_descriptor_none());
   pointer_index ++;
@@ -501,12 +501,12 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
   // AM: Get the property POINTS_TO_NULL_POINTER_INITIALIZATION
   bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
   if(null_initialization_p) {
-  cell nc = copy_cell(c);
-  cell null_c = make_null_pointer_value_cell();
-  points_to npt = make_points_to(nc, null_c,
-				 make_approximation_may(),
-				 make_descriptor_none());
-  pt_in = add_arc_to_pt_map(npt, pt_in);
+    cell nc = copy_cell(c);
+    cell null_c = make_null_pointer_value_cell();
+    points_to npt = make_points_to(nc, null_c,
+				   make_approximation_may(),
+				   make_descriptor_none());
+    pt_in = add_arc_to_pt_map(npt, pt_in);
   }
 
   /* The pointer may points towards another object (or set of object) */
@@ -514,7 +514,8 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
   if( type_variable_p(upt) ){
     basic fpb = variable_basic(type_variable(upt));
     if( array_type_p(upt) ){
-      pt_to = create_pointer_to_array_stub_points_to(c, upt , fpb);
+      pt_to = create_pointer_to_array_stub_points_to(c, upt,
+						     !null_initialization_p);
       pt_in = set_add_element(pt_in, pt_in,
 			      (void*) pt_to );
     }
@@ -522,38 +523,38 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       switch(basic_tag(fpb)){
       case is_basic_int:{
 	// type st = type_undefined; // sink type
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_float:{
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_logical:{
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_overloaded:{
 	// FI: Oops, what are we doing here?
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_complex:{
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_pointer:{
-	pt_to = create_advanced_stub_points_to(c, upt); 
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p); 
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	cell sink = points_to_sink(pt_to);
@@ -569,7 +570,7 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_derived:{
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -579,13 +580,13 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       case is_basic_string:{
 	// FI: I'm not too sure about what to do for strings...
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_typedef:{
-	pt_to = create_advanced_stub_points_to(c, upt);
+	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -596,12 +597,13 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
     }
   }
   else if(type_functional_p(upt)) {
-    pt_to = create_stub_points_to(c, upt, basic_undefined);
+    pt_to = create_stub_points_to(c, upt, !null_initialization_p);
     add_arc_to_pt_map(pt_to, pt_in);
 }
   else if(type_void_p(upt)) {
     /* Create a target of unknown type */
-    pt_to = create_stub_points_to(c, upt/* make_type_unknown() */, basic_undefined /*memory leak?*/);
+    pt_to = create_stub_points_to(c, upt/* make_type_unknown() */, 
+				  !null_initialization_p);
     pt_in = set_add_element(pt_in, pt_in, (void*) pt_to );
   }
   else
@@ -625,6 +627,7 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 {
   reference r = reference_undefined;
   entity e = entity_undefined;
+  bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
   points_to pt_to = points_to_undefined;
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
@@ -678,7 +681,7 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 		  generic_effects_reset_all_methods();
 		  type p_ent_type = type_to_pointed_type(ent_type);
 		  cell source_cell = make_cell_reference(source_ref);
-		  pt_to = create_stub_points_to(source_cell, p_ent_type, fpb);
+		  pt_to = create_stub_points_to(source_cell, p_ent_type, exact_p);
 		  pt_in = set_add_element(pt_in, pt_in,
 					  (void*) pt_to );
 		}
@@ -709,6 +712,8 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
 			       points_to_rank);
+  bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+
   /* maybe should be removed if we have already called ultimate type
    * in formal_points_to_parameter() */
 
@@ -757,7 +762,7 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
 		  effects_free(l1);
 		  generic_effects_reset_all_methods();
 		  cell source_cell = make_cell_reference(source_ref);
-		  pt_to = create_stub_points_to(source_cell, ent_type, fpb);
+		  pt_to = create_stub_points_to(source_cell, ent_type, exact_p);
 		  pt_in = set_add_element(pt_in, pt_in,
 					  (void*) pt_to );
 		}
@@ -779,6 +784,7 @@ set array_formal_parameter_to_stub_points_to(type t, cell c)
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
 			       points_to_rank);
+  bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
   basic fpb = variable_basic(type_variable(t));
   if(basic_pointer_p(fpb)) {
     reference r = cell_any_reference(c);
@@ -807,7 +813,7 @@ set array_formal_parameter_to_stub_points_to(type t, cell c)
       }
     }
     // FI: d is recomputed below in the same way
-    points_to pt_to = create_stub_points_to(cel, pt, fpb/*, d*/);
+    points_to pt_to = create_stub_points_to(cel, pt, exact_p);
     cell source = points_to_source(pt_to);
     reference sr = cell_any_reference(source);
     reference_indices(sr) = gen_nconc(sl, reference_indices(sr));
