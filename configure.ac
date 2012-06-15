@@ -293,6 +293,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Libs/transformations/Makefile
 				 src/Libs/accel-util/Makefile
 				 src/Libs/pocc-interface/Makefile
+				 src/Libs/taskify/Makefile
 				 src/Libs/transformer/Makefile
 				 src/Libs/static_controlize/Makefile
 				 src/Libs/paf-util/Makefile

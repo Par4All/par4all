@@ -74,7 +74,7 @@ static const char* get_clean_mod_name(const char *mod_name) {
 /**
  * Build the outline function name
  */
-static string build_outline_name(const char *base_prefix,
+string build_outline_name(const char *base_prefix,
                                       const char *mod_name) {
   bool name_suffix_p = get_bool_property("GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME");
 
