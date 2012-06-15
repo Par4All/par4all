@@ -41,7 +41,7 @@ void run(void)
 //  T(x,y) {x+y#init==x#init+y, y<=x+y#init, x+y#init<=y+5,
 //    x+2y#init<=y+8, 0<=y#init, y#init<=5}
 
-         if (flip())
+         if (flip()) {
 
 //  T(x,y) {x+y#init==x#init+y, 0<=x#init, x#init<=5, x#init+y<=8,
 //    5y<=x#init+6y#init, y#init<=y, y<=y#init+1, 0<=y#init,
@@ -151,6 +151,7 @@ void run(void)
 
                   assert_error();
             }
+         }
          else if (flip())
 
 //  T(x,y) {x+y#init==x#init+y, 0<=x, y<=x+5, x<=y+5, 0<=y, y#init<=y}
@@ -1049,7 +1050,7 @@ void run(void)
 //  T(x,y) {x+y#init==x#init+y, x<=x#init, x#init+y<=2x+3,
 //    x#init+y<=x+6, y<=x+2, x<=y+2, x#init<=6, x#init<=y+3}
 
-            if (flip())
+            if (flip()) {
 
 //  T() {x<=6, y<=x+2, 3y<=x+14, x<=y+2, 3x<=y+14, y<=6}
 
@@ -1173,6 +1174,7 @@ void run(void)
 
                      ;
                }
+            }
             else if (flip())
 
 //  T(x,y) {x==x#init-1, x+y==8, x+y#init==9, 3<=x, x<=5}
@@ -1493,7 +1495,7 @@ void run(void)
 
 //  P(x,y) {0<=x, x<=5, x+y<=8, 0<=y, y<=5}
 
-         if (flip())
+         if (flip()) {
 
 //  P(x,y) {0<=x, x<=5, x+y<=8, 0<=y, y<=5}
 
@@ -1601,6 +1603,7 @@ void run(void)
 
                   assert_error();
             }
+         }
          else if (flip())
 
 //  P(x,y) {0<=x, x<=5, x+y<=8, 0<=y, y<=5}
@@ -2492,7 +2495,7 @@ void run(void)
 
 //  P(x,y) {x<=6, y<=x+2, x<=y+2, y<=6}
 
-            if (flip())
+            if (flip()) {
 
 //  P(x,y) {x<=6, y<=x+2, x<=y+2, y<=6}
 
@@ -2616,6 +2619,7 @@ void run(void)
 
                      ;
                }
+            }
             else if (flip())
 
 //  P(x,y) {x<=6, y<=x+2, x<=y+2, y<=6}
