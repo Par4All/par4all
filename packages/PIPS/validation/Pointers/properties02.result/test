@@ -1,0 +1,21 @@
+
+Proper effects for properties02
+
+void properties02(int n, int *p)
+{
+   int i;
+//             <    is written>: q
+   int *q = &i;
+//             <    is read   >: p
+   p!=0?(void) 0:__assert_fail("p!=0", "./properties02.c", 14, (const char *) 0);
+//             <    is read   >: p
+//             <    is written>: _p_2
+
+   *p = 19;
+//             <    is read   >: q
+//             <    is written>: i
+
+   *q = 1;
+
+   return;
+}

@@ -70,7 +70,7 @@ int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
 // Points To:
-// zaza -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// zaza -> fifi[3] , EXACT
 
    /* proper effects are not precise here for loulou because 
          of the internal representation of the expression */
@@ -90,7 +90,7 @@ int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
 // Points To:
-// zaza -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// zaza -> fifi[3] , EXACT
 
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+(3+(6-1-0+1)*(0+(size-1-0+1)*0)));
 }

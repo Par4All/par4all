@@ -1,0 +1,61 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int (*q)[10];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int *r;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   p = a;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q = &a;
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   r = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> a , EXACT
+// r -> a[0] , EXACT
+
+
+   return 0;
+}

@@ -3,6 +3,8 @@ delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 create $WS $WS.c
 
+# The test is much easier with this property set to true
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 echo
 echo POINTS TO for "$WS"

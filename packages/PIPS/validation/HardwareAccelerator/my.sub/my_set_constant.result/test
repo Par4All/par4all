@@ -15,6 +15,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_set_constant" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -26,6 +27,7 @@ digraph "dag_0" {
   "4 C" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -57,6 +59,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_set_constant" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -68,6 +71,7 @@ digraph "dag_0" {
   "4 C" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -79,6 +83,7 @@ digraph "dag_cleaned_0" {
   "4 C" -> "o";
 }
 // graph for dag "my_set_constant_spoc_helper_0_0" of module "my_set_constant" in dot format
+// DAG "my_set_constant_spoc_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_set_constant_spoc_helper_0_0" {
   // inputs
 
@@ -187,6 +192,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_set_constant" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -198,6 +204,7 @@ digraph "dag_0" {
   "4 C" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -209,6 +216,7 @@ digraph "dag_cleaned_0" {
   "4 C" -> "o";
 }
 // graph for dag "my_set_constant_terapix_helper_0_0_0" of module "my_set_constant" in dot format
+// DAG "my_set_constant_terapix_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_set_constant_terapix_helper_0_0_0" {
   // inputs
 
@@ -405,6 +413,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_set_constant" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -416,6 +425,7 @@ digraph "dag_0" {
   "4 C" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -427,6 +437,7 @@ digraph "dag_cleaned_0" {
   "4 C" -> "o";
 }
 // graph for dag "my_set_constant_opencl_helper_0_0" of module "my_set_constant" in dot format
+// DAG "my_set_constant_opencl_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_set_constant_opencl_helper_0_0" {
   // inputs
 
@@ -438,6 +449,7 @@ digraph "my_set_constant_opencl_helper_0_0" {
   "4 C" -> "o";
 }
 // graph for dag "my_set_constant_opencl_helper_0_0_0" of module "my_set_constant" in dot format
+// DAG "my_set_constant_opencl_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_set_constant_opencl_helper_0_0_0" {
   // inputs
 

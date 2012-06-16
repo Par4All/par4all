@@ -39,6 +39,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "copy_00" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -74,6 +75,7 @@ digraph "dag_0" {
   "in" -> "12 D8";
 }
 // graph for dag "dag_cleaned_0" of module "copy_00" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -182,6 +184,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 ! graphs
 
 // graph for dag "copy_00_spoc_helper_0_0" of module "copy_00" in dot format
+// DAG "copy_00_spoc_helper_0_0": #i=1 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "copy_00_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -202,6 +205,7 @@ digraph "copy_00_spoc_helper_0_0" {
   "in" -> "12 D8";
 }
 // graph for dag "copy_00_spoc_helper_0_1" of module "copy_00" in dot format
+// DAG "copy_00_spoc_helper_0_1": #i=1 #o=1 #c=6 #s=0 #I=0 #B=0 #A=0
 digraph "copy_00_spoc_helper_0_1" {
   // inputs
   "in" [shape=circle];
@@ -226,6 +230,7 @@ digraph "copy_00_spoc_helper_0_1" {
   "in" -> "13 E8";
 }
 // graph for dag "dag_0" of module "copy_00" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -261,6 +266,7 @@ digraph "dag_0" {
   "in" -> "12 D8";
 }
 // graph for dag "dag_cleaned_0" of module "copy_00" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -587,6 +593,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 ! graphs
 
 // graph for dag "copy_00_terapix_helper_0_0_0" of module "copy_00" in dot format
+// DAG "copy_00_terapix_helper_0_0_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "copy_00_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -622,6 +629,7 @@ digraph "copy_00_terapix_helper_0_0_0" {
   "in" -> "12 D8";
 }
 // graph for dag "dag_0" of module "copy_00" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -657,6 +665,7 @@ digraph "dag_0" {
   "in" -> "12 D8";
 }
 // graph for dag "dag_cleaned_0" of module "copy_00" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1172,6 +1181,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 ! graphs
 
 // graph for dag "copy_00_opencl_helper_0_0" of module "copy_00" in dot format
+// DAG "copy_00_opencl_helper_0_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "copy_00_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1207,6 +1217,7 @@ digraph "copy_00_opencl_helper_0_0" {
   "in" -> "12 D8";
 }
 // graph for dag "copy_00_opencl_helper_0_0_1" of module "copy_00" in dot format
+// DAG "copy_00_opencl_helper_0_0_1": #i=4 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "copy_00_opencl_helper_0_0_1" {
   // inputs
   "a" [shape=circle];
@@ -1229,6 +1240,7 @@ digraph "copy_00_opencl_helper_0_0_1" {
   "b" -> "22 -";
 }
 // graph for dag "dag_0" of module "copy_00" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -1264,6 +1276,7 @@ digraph "dag_0" {
   "in" -> "12 D8";
 }
 // graph for dag "dag_cleaned_0" of module "copy_00" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];

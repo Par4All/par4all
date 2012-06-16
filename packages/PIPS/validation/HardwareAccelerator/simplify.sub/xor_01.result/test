@@ -19,6 +19,7 @@ freia_status xor_01(freia_data2d *o)
 ! graphs
 
 // graph for dag "dag_0" of module "xor_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "o" [shape=circle];
@@ -35,6 +36,7 @@ digraph "dag_0" {
   "o" -> "7 ^";
 }
 // graph for dag "dag_cleaned_0" of module "xor_01" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -73,6 +75,7 @@ freia_status xor_01(freia_data2d *o)
 ! graphs
 
 // graph for dag "dag_0" of module "xor_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "o" [shape=circle];
@@ -89,6 +92,7 @@ digraph "dag_0" {
   "o" -> "7 ^";
 }
 // graph for dag "dag_cleaned_0" of module "xor_01" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -100,6 +104,7 @@ digraph "dag_cleaned_0" {
   "8 C" -> "o";
 }
 // graph for dag "xor_01_spoc_helper_0_0" of module "xor_01" in dot format
+// DAG "xor_01_spoc_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "xor_01_spoc_helper_0_0" {
   // inputs
 
@@ -218,6 +223,7 @@ freia_status xor_01(freia_data2d *o)
 ! graphs
 
 // graph for dag "dag_0" of module "xor_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "o" [shape=circle];
@@ -234,6 +240,7 @@ digraph "dag_0" {
   "o" -> "7 ^";
 }
 // graph for dag "dag_cleaned_0" of module "xor_01" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -245,6 +252,7 @@ digraph "dag_cleaned_0" {
   "8 C" -> "o";
 }
 // graph for dag "xor_01_terapix_helper_0_0_0" of module "xor_01" in dot format
+// DAG "xor_01_terapix_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "xor_01_terapix_helper_0_0_0" {
   // inputs
 
@@ -451,6 +459,7 @@ freia_status xor_01(freia_data2d *o)
 ! graphs
 
 // graph for dag "dag_0" of module "xor_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "o" [shape=circle];
@@ -467,6 +476,7 @@ digraph "dag_0" {
   "o" -> "7 ^";
 }
 // graph for dag "dag_cleaned_0" of module "xor_01" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -478,6 +488,7 @@ digraph "dag_cleaned_0" {
   "8 C" -> "o";
 }
 // graph for dag "xor_01_opencl_helper_0_0" of module "xor_01" in dot format
+// DAG "xor_01_opencl_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "xor_01_opencl_helper_0_0" {
   // inputs
 

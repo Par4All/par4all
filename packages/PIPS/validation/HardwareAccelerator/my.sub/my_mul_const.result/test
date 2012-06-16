@@ -15,6 +15,7 @@ freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_mul_const" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -28,6 +29,7 @@ digraph "dag_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -61,6 +63,7 @@ freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_mul_const" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -74,6 +77,7 @@ digraph "dag_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -87,6 +91,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_spoc_helper_0_0" of module "my_mul_const" in dot format
+// DAG "my_mul_const_spoc_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_mul_const_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -200,6 +205,7 @@ freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_mul_const" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -213,6 +219,7 @@ digraph "dag_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -226,6 +233,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_terapix_helper_0_0_0" of module "my_mul_const" in dot format
+// DAG "my_mul_const_terapix_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_mul_const_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -435,6 +443,7 @@ freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_mul_const" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -448,6 +457,7 @@ digraph "dag_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -461,6 +471,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_opencl_helper_0_0" of module "my_mul_const" in dot format
+// DAG "my_mul_const_opencl_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_mul_const_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -474,6 +485,7 @@ digraph "my_mul_const_opencl_helper_0_0" {
   "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_opencl_helper_0_0_0" of module "my_mul_const" in dot format
+// DAG "my_mul_const_opencl_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_mul_const_opencl_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];

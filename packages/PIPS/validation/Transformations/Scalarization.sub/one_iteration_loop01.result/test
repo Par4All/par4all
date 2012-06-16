@@ -1,0 +1,16 @@
+void foo(int size, Cplfloat in[size], float out[size])
+{
+   int j;
+
+#pragma omp parallel for 
+   for(j = 0; j <= size-1; j += 1)
+      out[j] = in[j].re*in[j].re+in[j].im*in[j].im;
+}
+void foo(int size, Cplfloat in[size], float out[size])
+{
+   int j;
+
+#pragma omp parallel for 
+   for(j = 0; j <= size-1; j += 1)
+      out[j] = in[j].re*in[j].re+in[j].im*in[j].im;
+}
