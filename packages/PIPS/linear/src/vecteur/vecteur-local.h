@@ -2,23 +2,23 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
-  This file is part of PIPS.
+  This file is part of Linear/C3 Library.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
+  Linear/C3 Library is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+  See the GNU Lesser General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -31,14 +31,14 @@
  *  - les fonctions d'interface avec GenPgm dont les noms commencent par
  *    "_gC_" ont ete deplacees dans _gC_lib
  *  - passage a "char *" pour le type Variable au lieu de "int" (Linear-C3)
- *    et de "entity *" (PIPS); le package n'est pas independant de la
+ *    et de "entity *" (Linear/C3 Library); le package n'est pas independant de la
  *    definition du type "Variable"; il faudrait ameliorer ca avec un
  *    package "Variable"
  *  - ajout des fonctions d'interface avec Newgen: (RT, 27/11/89)
  *  - ajout de la notion de base, comme cas particulier de vecteur
  *    (FI, 27/11/89) ou le champ "Value" n'a pas de signification
  *  - suppression de l'include de vecteur-basic-types.h; la fusion entre
- *    les versions C3 et PIPS ne necessite plus cette distinction; il y a
+ *    les versions C3 et Linear/C3 Library ne necessite plus cette distinction; il y a
  *    tellement peu de code a ecrire pour les variables et les valeurs
  *    qu'il est inutile d'avoir une directory differente pour lui
  *  - rapatriement de la definition du terme constant TCST et de la macro

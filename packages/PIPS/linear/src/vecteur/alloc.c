@@ -2,23 +2,23 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
-  This file is part of PIPS.
+  This file is part of Linear/C3 Library.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
+  Linear/C3 Library is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+  See the GNU Lesser General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -192,7 +192,7 @@ Pvecteur vect_make(Pvecteur v, Variable var, Value val, ...)
 
    FI: I add this function to check under gdb that a given point
    belongs to a constraint system. The manual verification is tedious
-   and error prone. This is done for debugging in PIPS the
+   and error prone. This is done for debugging in Linear/C3 Library the
    linked_regions bug.
  */
 Pvecteur vect_make_dense(Pbase b, Value val, ...)
