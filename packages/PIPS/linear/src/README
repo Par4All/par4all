@@ -45,10 +45,10 @@ the order in which libraires should be built:
   LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
 
 architecture:
-  PIPS_ARCH=.
+  Linear/C3 Library_ARCH=.
 
 compilers and options:
-  see ${LINEAR_INCDIR}/makefile_macros.${PIPS_ARCH}
+  see ${LINEAR_INCDIR}/makefile_macros.${Linear/C3 Library_ARCH}
   you can define your own file.
 
 - then gmake LIBS=${LINEAR_ORDERED_LIBS} recompile
@@ -58,7 +58,7 @@ USING THE LIBRARY
 -----------------
 
   include the needed headers stored in $LINEAR_INCLUDEDIR
-  links to the libraries stored in $LINEAR_LIBDIR/$PIPS_ARCH
+  links to the libraries stored in $LINEAR_LIBDIR/$Linear/C3 Library_ARCH
 
   For use examples, see the Tests directory.
 

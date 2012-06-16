@@ -2,23 +2,23 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
-  This file is part of PIPS.
+  This file is part of Linear/C3 Library.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
+  Linear/C3 Library is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+  See the GNU Lesser General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -134,7 +134,7 @@ catch_alarm_projection (int sig)
  *  - ajout de la normalisation de l'equation eq avant les substitutions;
  *    cette normalisation permet de detecter une equation infaisable; le
  *    probleme a ete mis en evidence par Yi-Qing dans le test de dependance
- *    de PIPS pour T(2*i+4*j) vs T(2*i+2*j+1) donnant 2*j + 2*di + 2*dj + 1 =0;
+ *    de Linear/C3 Library pour T(2*i+4*j) vs T(2*i+2*j+1) donnant 2*j + 2*di + 2*dj + 1 =0;
  *    la projection de j faisait perdre la non-faisabilite; Francois Irigoin,
  *    8 novembre 1991
  *

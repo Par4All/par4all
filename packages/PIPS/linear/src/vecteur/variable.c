@@ -2,23 +2,23 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
-  This file is part of PIPS.
+  This file is part of Linear/C3 Library.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
+  Linear/C3 Library is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+  See the GNU Lesser General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -106,7 +106,7 @@ char * variable_dump_name(Variable v) {
 /* Debug support: pointer to the function used by debug print outs. 
  *
  * It can be set to point to other packages' own definition of
- * Value. For instance, entity_local_name() for PIPS.
+ * Value. For instance, entity_local_name() for Linear/C3 Library.
  *
  * For unit tests within linear, it should be set to point to
  * variable_default_name()
