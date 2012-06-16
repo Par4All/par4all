@@ -319,7 +319,6 @@ static const freia_api_t FREIA_AIPO_API[] = {
     TRPX_MS(2, 3, "GLOBAL_VOL"), OPCL("VOLUME")
   },
   // LINEAR
-  // not implemented by SPOC!
   // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height

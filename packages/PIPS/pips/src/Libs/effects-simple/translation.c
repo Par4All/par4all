@@ -169,16 +169,37 @@ void simple_cell_reference_with_address_of_cell_reference_translation
       expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
       if (!expression_equal_integer_p(first_input_remaining_exp, 0))
 	{
+	  /* FI->BC: A much better job could be done using a foucntion
+	     similar to source_to_sinks(). See for instance
+	     Pointers/properties03.c: if the analysis is performed at
+	     points-to level, the result is precise; if the very same
+	     analysis is performed by effects_with_points_to, an
+	     anywhere results. */
 	  pips_user_warning("potential memory overflow due to effect -> returning anywhere\n");
 	  free_reference(*output_ref);
+	  // FI->BC: conditionally to a property,
+	  // ALIASING_ACROSS_TYPES, a typed anywhere should be generated
 	  *output_ref = make_reference(entity_all_locations(), NIL);
 	  *exact_p = false;
 	}
     }
 
+  // FI->BC: something is missing here points-to
+  // If the target is an array, the first subscript at least should be
+  // replicated: if "p" in a pointer to an array "a", "p[0]" is "a[0]", not "a"
+  //
+  // This happens because "int * p;" defines implictly "p" as a
+  // pointer to an array
+
   if (! entity_all_locations_p(reference_variable(*output_ref)))
     {
-      FOREACH(EXPRESSION, input_ind, CDR(input_remaining_indices))
+      entity v = reference_variable(*output_ref);
+      type vt = entity_type(v); // FI: should probably be a concrete
+      // type, but hopefully this has been done earlier when computing
+      // points-to
+      list sl = (false && array_type_p(vt))? input_remaining_indices :
+	CDR(input_remaining_indices);
+      FOREACH(EXPRESSION, input_ind, sl)
 	{
 	  reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
 						     CONS(EXPRESSION,

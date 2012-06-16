@@ -48,6 +48,7 @@ int freia_dup_15(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dup_15" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -70,6 +71,7 @@ digraph "dag_0" {
   "in" -> "23 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_15" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -172,6 +174,7 @@ int freia_dup_15(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dup_15" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -194,6 +197,7 @@ digraph "dag_0" {
   "in" -> "23 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_15" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -214,6 +218,7 @@ digraph "dag_cleaned_0" {
   "in" -> "23 D8";
 }
 // graph for dag "freia_dup_15_spoc_helper_0_0" of module "freia_dup_15" in dot format
+// DAG "freia_dup_15_spoc_helper_0_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dup_15_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -460,6 +465,7 @@ int freia_dup_15(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dup_15" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -482,6 +488,7 @@ digraph "dag_0" {
   "in" -> "23 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_15" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -502,6 +509,7 @@ digraph "dag_cleaned_0" {
   "in" -> "23 D8";
 }
 // graph for dag "freia_dup_15_terapix_helper_0_0_0" of module "freia_dup_15" in dot format
+// DAG "freia_dup_15_terapix_helper_0_0_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dup_15_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -863,6 +871,7 @@ int freia_dup_15(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dup_15" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -885,6 +894,7 @@ digraph "dag_0" {
   "in" -> "23 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_15" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -905,6 +915,7 @@ digraph "dag_cleaned_0" {
   "in" -> "23 D8";
 }
 // graph for dag "freia_dup_15_opencl_helper_0_0" of module "freia_dup_15" in dot format
+// DAG "freia_dup_15_opencl_helper_0_0": #i=1 #o=2 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dup_15_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];

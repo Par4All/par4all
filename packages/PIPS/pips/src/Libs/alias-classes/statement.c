@@ -481,8 +481,10 @@ pt_map any_loop_to_points_to(statement b,
     }
   }
 
-  if(!fix_point_p)
+  if(!fix_point_p) {
+    print_points_to_set("Loop points-to set:\n", pt_out);
     pips_internal_error("Loop convergence not reached.\n");
+  }
 
   /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
      information is changed accordingly. */

@@ -49,6 +49,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "median_1" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -90,6 +91,7 @@ digraph "dag_0" {
   "i" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "median_1" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -222,6 +224,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "median_1" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -263,6 +266,7 @@ digraph "dag_0" {
   "i" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "median_1" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -304,6 +308,7 @@ digraph "dag_cleaned_0" {
   "i" -> "10 D8";
 }
 // graph for dag "median_1_spoc_helper_0_0" of module "median_1" in dot format
+// DAG "median_1_spoc_helper_0_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "median_1_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
@@ -765,6 +770,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "median_1" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -806,6 +812,7 @@ digraph "dag_0" {
   "i" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "median_1" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -847,6 +854,7 @@ digraph "dag_cleaned_0" {
   "i" -> "10 D8";
 }
 // graph for dag "median_1_terapix_helper_0_0_0" of module "median_1" in dot format
+// DAG "median_1_terapix_helper_0_0_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "median_1_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
@@ -1461,6 +1469,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "median_1" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -1502,6 +1511,7 @@ digraph "dag_0" {
   "i" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "median_1" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -1543,6 +1553,7 @@ digraph "dag_cleaned_0" {
   "i" -> "10 D8";
 }
 // graph for dag "median_1_opencl_helper_0_0" of module "median_1" in dot format
+// DAG "median_1_opencl_helper_0_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
 digraph "median_1_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
@@ -1584,6 +1595,7 @@ digraph "median_1_opencl_helper_0_0" {
   "i" -> "10 D8";
 }
 // graph for dag "median_1_opencl_helper_0_0_1" of module "median_1" in dot format
+// DAG "median_1_opencl_helper_0_0_1": #i=3 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "median_1_opencl_helper_0_0_1" {
   // inputs
   "t" [shape=circle];

@@ -15,6 +15,7 @@ freia_status my_log2(freia_data2d *o, freia_data2d *i0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_log2" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -28,6 +29,7 @@ digraph "dag_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "dag_cleaned_0" of module "my_log2" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -61,6 +63,7 @@ freia_status my_log2(freia_data2d *o, freia_data2d *i0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_log2" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -74,6 +77,7 @@ digraph "dag_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "dag_cleaned_0" of module "my_log2" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -87,6 +91,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "my_log2_spoc_helper_0_0" of module "my_log2" in dot format
+// DAG "my_log2_spoc_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_log2_spoc_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -198,6 +203,7 @@ freia_status my_log2(freia_data2d *o, freia_data2d *i0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_log2" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -211,6 +217,7 @@ digraph "dag_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "dag_cleaned_0" of module "my_log2" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -224,6 +231,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "my_log2_terapix_helper_0_0_0" of module "my_log2" in dot format
+// DAG "my_log2_terapix_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_log2_terapix_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -416,6 +424,7 @@ freia_status my_log2(freia_data2d *o, freia_data2d *i0)
 ! graphs
 
 // graph for dag "dag_0" of module "my_log2" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i0" [shape=circle];
@@ -429,6 +438,7 @@ digraph "dag_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "dag_cleaned_0" of module "my_log2" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i0" [shape=circle];
@@ -442,6 +452,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "my_log2_opencl_helper_0_0" of module "my_log2" in dot format
+// DAG "my_log2_opencl_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_log2_opencl_helper_0_0" {
   // inputs
   "i0" [shape=circle];
@@ -455,6 +466,7 @@ digraph "my_log2_opencl_helper_0_0" {
   "i0" -> "5 l2";
 }
 // graph for dag "my_log2_opencl_helper_0_0_0" of module "my_log2" in dot format
+// DAG "my_log2_opencl_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "my_log2_opencl_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];

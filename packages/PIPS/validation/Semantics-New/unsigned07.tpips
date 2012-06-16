@@ -23,31 +23,7 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
 echo
-echo Transformers for "foo"
-echo
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[foo]
-
-echo
 echo Preconditions for "main"
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[main]
-display PRINTED_FILE[foo]
-
-echo
-echo Transformers for "main" after transformer refining
-echo
-
-apply REFINE_TRANSFORMERS[main]
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[main]
-
-echo
-echo Preconditions for "main" after transformer refining
 echo
 
 activate PRINT_CODE_PRECONDITIONS

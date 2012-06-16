@@ -70,25 +70,34 @@ list variable_to_pointer_locations(entity e)
   if (entity_variable_p(e)) {
     /*AM: missing recursive descent on variable_dimensions. int a[*(q=p)]*/
 
-    type ut = ultimate_type(entity_type(e));
-    if(pointer_type_p(ut) || array_of_pointers_type_p(ut)) {
+    type t =  entity_basic_concrete_type(e);
+    if(pointer_type_p(t) || array_of_pointers_type_p(t)) {
       if (entity_array_p(e)) {
-	expression ind = make_unbounded_expression();
-	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
+	variable v = type_variable(t);
+	int d = (int) gen_length(variable_dimensions(v));
+	list sl = NIL;
+	int i;
+	for(i=0;i<d;i++) {
+	  expression ind = make_unbounded_expression();
+	  sl = CONS(EXPRESSION, ind, sl);
+	}
+	reference r = make_reference(e, sl);
 	cell c = make_cell_reference(r);
 	l = CONS(CELL, c, NIL);
       }
       else {
+	// FI: could be unified with previous case using d==0
 	reference r = make_reference(e, NIL);
 	cell c = make_cell_reference(r);
 	l = CONS(CELL, c, NIL);
       } 
     }
-    else if(struct_type_p(ut) || array_of_struct_type_p(ut)) {
-      basic b = variable_basic(type_variable(ut));
+    else if(struct_type_p(t) || array_of_struct_type_p(t)) {
+      basic b = variable_basic(type_variable(t));
       entity ee = basic_derived(b);
       l = struct_variable_to_pointer_locations(e, ee);
     }
+    //free_type(t); ee is used above
   }
 
   return l;

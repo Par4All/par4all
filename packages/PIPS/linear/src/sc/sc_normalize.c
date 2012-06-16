@@ -2,23 +2,23 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2012 MINES ParisTech
 
-  This file is part of PIPS.
+  This file is part of Linear/C3 Library.
 
-  PIPS is free software: you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
+  Linear/C3 Library is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
-  See the GNU General Public License for more details.
+  See the GNU Lesser General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -1757,7 +1757,7 @@ Psysteme add_bounding_box_constraints(Psysteme ps, Pbase cb, Pbase lb, Pbase ub,
  * matter that happens to the initial constraint. However, the
  * bounding box might be improved with the projections... Since the
  * bounding box computation is fast enough, the function was not split
- * and the transformer (see PIPS) projection uses it at each
+ * and the transformer (see Linear/C3 Library) projection uses it at each
  * stage. Note that the bouding box may also disappear via overflows
  * and redundancy detection. See for instance the disparition of
  * declaration constraints in convex array regions when the
@@ -2153,7 +2153,7 @@ Psysteme sc_normalize(Psysteme ps)
     Pcontrainte eq;
     bool is_sc_fais = true;
 
-    /* I do not want to disturb every pass of PIPS that uses directly
+    /* I do not want to disturb every pass of Linear/C3 Library that uses directly
      * or indirectly sc_normalize. Since sc_bounded_normalization()
      * has been developped specifically for transformer_projection(),
      * it is called directly from the function implementing

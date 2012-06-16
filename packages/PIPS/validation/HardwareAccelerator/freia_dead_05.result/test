@@ -17,6 +17,7 @@ freia_data2d * freia_dead_05(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dead_05" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -28,6 +29,7 @@ digraph "dag_0" {
   "7 C" -> "result";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_05" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -63,6 +65,7 @@ freia_data2d * freia_dead_05(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dead_05" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -74,6 +77,7 @@ digraph "dag_0" {
   "7 C" -> "result";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_05" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -85,6 +89,7 @@ digraph "dag_cleaned_0" {
   "7 C" -> "result";
 }
 // graph for dag "freia_dead_05_spoc_helper_0_0" of module "freia_dead_05" in dot format
+// DAG "freia_dead_05_spoc_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dead_05_spoc_helper_0_0" {
   // inputs
 
@@ -199,6 +204,7 @@ freia_data2d * freia_dead_05(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dead_05" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -210,6 +216,7 @@ digraph "dag_0" {
   "7 C" -> "result";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_05" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -221,6 +228,7 @@ digraph "dag_cleaned_0" {
   "7 C" -> "result";
 }
 // graph for dag "freia_dead_05_terapix_helper_0_0_0" of module "freia_dead_05" in dot format
+// DAG "freia_dead_05_terapix_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dead_05_terapix_helper_0_0_0" {
   // inputs
 
@@ -423,6 +431,7 @@ freia_data2d * freia_dead_05(void)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_dead_05" in dot format
+// DAG "dag_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
 
@@ -434,6 +443,7 @@ digraph "dag_0" {
   "7 C" -> "result";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_05" in dot format
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
 
@@ -445,6 +455,7 @@ digraph "dag_cleaned_0" {
   "7 C" -> "result";
 }
 // graph for dag "freia_dead_05_opencl_helper_0_0" of module "freia_dead_05" in dot format
+// DAG "freia_dead_05_opencl_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_dead_05_opencl_helper_0_0" {
   // inputs
 

@@ -86,6 +86,23 @@ bool points_to_cell_in_list_p(cell c, list L)
   return found_p;
 }
 
+/* Two cells are related if they are based on the same entity */
+bool related_points_to_cell_in_list_p(cell c, list L)
+{
+  bool found_p = false;
+  reference rc = cell_any_reference(c);
+  entity ec = reference_variable(rc);
+  FOREACH(CELL, lc, L) {
+    reference rlc = cell_any_reference(lc);
+    entity elc = reference_variable(rlc);
+    if(ec==elc) {
+      found_p =true;
+      break;
+    }
+  }
+  return found_p;
+}
+
  /* Debug: print a cell list for points-to. Parameter f is not useful
     in a debugging context. */
 void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)

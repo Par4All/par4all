@@ -1,0 +1,38 @@
+
+POINTS TO for assignment14
+
+
+// Points To IN:
+// _t1_1[0] -> *NULL_POINTER* , MAY
+// _t1_1[0] -> _t1_1_1[*] , MAY
+// _t2_2[0] -> *NULL_POINTER* , MAY
+// _t2_2[0] -> _t2_2_2[*] , MAY
+// _t2_2_2[*].ip2 -> *NULL_POINTER* , MAY
+// _t2_2_2[*].ip2 -> _t2_2_2_2[*] , MAY
+// t1 -> *NULL_POINTER* , MAY
+// t1 -> _t1_1 , MAY
+// t2 -> *NULL_POINTER* , MAY
+// t2 -> _t2_2 , MAY
+
+
+// Points To OUT:
+// _t1_1[0] -> *NULL_POINTER* , MAY
+// _t1_1[0] -> _t1_1_1[*] , MAY
+// _t1_1_1[*].ip1 -> *NULL_POINTER* , MAY
+// _t1_1_1[*].ip1 -> _t2_2_2_2[*] , MAY
+// _t2_2[0] -> *NULL_POINTER* , MAY
+// _t2_2[0] -> _t2_2_2[*] , MAY
+// _t2_2_2[*].ip2 -> *NULL_POINTER* , MAY
+// _t2_2_2[*].ip2 -> _t2_2_2_2[*] , MAY
+
+void assignment(struct foo **t1, struct foo **t2)
+{
+
+// Points To:
+// t1 -> *NULL_POINTER* , MAY
+// t1 -> _t1_1 , MAY
+// t2 -> *NULL_POINTER* , MAY
+// t2 -> _t2_2 , MAY
+
+   (**t1).ip1 = (**t2).ip2;
+}

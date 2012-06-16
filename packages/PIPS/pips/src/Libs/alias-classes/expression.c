@@ -996,6 +996,30 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   list L = expression_to_points_to_sources(lhs, pt_out);
 
+  /* Make sure all cells in L are pointers: l may be an array of pointers */
+  /* FI: I am not sure it is useful here because the conversion to an
+     array due to property POINTS_TO_STRICT_POINTER_TYPES may not have
+     occured yet */
+  FOREACH(CELL, l, L) {
+    bool to_be_freed;
+    type lt = points_to_cell_to_type(l, &to_be_freed);
+    if(array_type_p(lt)) {
+      cell nl = copy_cell(l);
+      // For Pointers/properties04.c, you want a zero subscript for
+      // the lhs
+      points_to_cell_add_zero_subscripts(l);
+      // FI: since it is an array, most of the pointers will be unchanged
+      // FI: this should be useless, but it has an impact because
+      // points-to stubs are computed on demand; see Pointers/assignment12.c
+      points_to_cell_add_unbounded_subscripts(nl);
+      list os = source_to_sinks(nl, pt_out, true);
+      list nll = CONS(CELL, nl, NIL);
+      pt_out = list_assignment_to_points_to(nll, os, pt_out);
+      gen_free_list(nll);
+    }
+    if(to_be_freed) free_type(lt);
+  }
+
   /* Retrieve the memory locations that might be reached by the rhs
    *
    * Update the calling context by adding new stubs linked directly or
@@ -1056,6 +1080,11 @@ pt_map pointer_assignment_to_points_to(expression lhs,
  *
  * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1}
  *
+ * If the freed location r is precisely known, any arc pointing
+ * from it can be removed:
+ *
+ * Kill_3 = {pts=(l,r,a) in in | l in R && |R|=1}
+ *
  * out = (in - Kill_1 - Kill_2) U Gen_1 U Gen_2
  *
  * Warnings for dangling pointers:
@@ -1105,7 +1134,7 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   /* Remove cells from R that do not belong to Heap: they cannot be
      freed */
   list nhl = NIL;
-  list inds = NIL;
+  // list inds = NIL;
   FOREACH(CELL, c, R) {
     /* FI->AM: Should be taken care of by the lattice...
      *
@@ -1118,19 +1147,19 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
        a non-legal free */
     if(heap_cell_p(c)) {
       reference r = cell_any_reference(c);
-      inds = reference_indices(r);
+      list inds = reference_indices(r);
       if(!ENDP(inds)) {
 	expression ind = EXPRESSION (CAR(inds));
 	if(!expression_null_p(ind))
 	  nhl = CONS(CELL, c, nhl);
       }
+      // gen_free_list(inds);
     }
     if(!heap_cell_p(c) && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);
   gen_free_list(nhl);
-  gen_free_list(inds);
   //pips_assert("R is not empty", !ENDP(R));
 
   if(ENDP(R)) {
@@ -1139,6 +1168,39 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     clear_pt_map(pt_out);
   }
   else {
+
+    /* Memory leak detection... Must be computed early, before pt_out
+       has been (too?) modified. Transitive closure not performed... */
+    if(gen_length(R)==1) {
+      FOREACH(CELL, c, R) {
+	bool to_be_freed;
+	type ct = points_to_cell_to_type(c, &to_be_freed);
+	if(pointer_type_p(ct) || struct_type_p(ct)
+	   || array_of_pointers_type_p(ct)
+	   || array_of_struct_type_p(ct)) {
+	  // FI: this might not work for arrays of pointers?
+	  // Many for of "source" can be developped when we are dealing
+	  // struct and arrays
+	  // FI: do we need a specific version of source_to_sinks()?
+	  entity v = reference_variable(cell_any_reference(c));
+	  //cell nc = make_cell_reference(make_reference(v, NIL));
+	  PML = variable_to_sinks(v, pt_out, true);
+	  FOREACH(CELL, m, PML) {
+	    if(heap_cell_p(m)) {
+	      entity b = reference_variable(cell_any_reference(m));
+	      pips_user_warning("Memory leak for bucket \"%s\".\n",
+				entity_name(b));
+	      // The impact of this memory leak should be computed
+	      // transitively and recursively
+	      // FI->AM: we could almost call recursively
+	      // freed_freed_pointer_to_points_to() with a reference to b...
+	    }
+	  }
+	  //free_cell(nc);
+	}
+	if(to_be_freed) free_type(ct);
+      }
+    }
 
     /* Remove Kill_1 if it is not empty by definition */
     if(gen_length(L)==1) {
@@ -1195,6 +1257,18 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
       }
     }
 
+    /* Remove Kill_3 if it is not empty by definition */
+    if(gen_length(R)==1) {
+      SET_FOREACH(points_to, pts, pt_out) {
+	cell l = points_to_source(pts);
+	if(related_points_to_cell_in_list_p(l, R)) {
+	  // Potentially memory leaked cell:
+	  //cell r = points_to_sink(pts);
+	  remove_arc_from_pt_map(pts, pt_out);
+	}
+      }
+    }
+
     /* Add Gen_1 - Not too late since pt_out has aready been modified? */
     pt_out = list_assignment_to_points_to(L, N, pt_out);
 
@@ -1216,17 +1290,6 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * Other pointers may or must now be dangling because their target
      * has been freed. Already detected at the level of Gen_2.
      */
-
-    FOREACH(CELL, c, R) {
-      PML = source_to_sinks(c, pt_out, true);
-      FOREACH(CELL, m, PML) {
-	if(heap_cell_p(m)) {
-	  entity b = reference_variable(cell_any_reference(m));
-	  pips_user_warning("Memory leak for bucket \"%s\".\n",
-			    entity_name(b));
-	}
-      }
-    }
   }
 
 // FI: memory leak(s) in this function?
@@ -1365,11 +1428,12 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   bool address_of_p = true;
   pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
   pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
-  pt_map kill = new_pt_map();
+  pt_map kill/* = new_pt_map()*/;
   // FI->AM: do we really want to keep the same arc with two different
   // approximations? The whole business of may/must does not seem
   // useful. 
-  union_of_pt_maps(kill, kill_may, kill_must);
+  // union_of_pt_maps(kill, kill_may, kill_must);
+  kill = kill_must;
   pt_map gen = new_pt_map();
   union_of_pt_maps(gen, gen_may, gen_must);
 
@@ -1385,10 +1449,23 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   difference_of_pt_maps(pt_out, pt_out, kill);
   union_of_pt_maps(pt_out, pt_out, gen);
 
+  // FI->AM: use kill_may to reduce the precision of these arcs
+  SET_FOREACH(points_to, pt, kill_may) {
+    approximation a = points_to_approximation(pt);
+    if(approximation_exact_p(a)) {
+      points_to npt = make_points_to(copy_cell(points_to_source(pt)),
+				     copy_cell(points_to_sink(pt)),
+				     make_approximation_may(),
+				     copy_descriptor(points_to_descriptor(pt)));
+      remove_arc_from_pt_map(pt, pt_out);
+      add_arc_to_pt_map(npt, pt_out);
+    }
+  }
+
   free_pt_maps(in_may, in_must,
 	       kill_may, kill_must,
 	       gen_may, gen_must,
-	       gen, kill, NULL);
+	       gen,/* kill,*/ NULL);
   // clear_pt_map(pt_out); // FI: why not free?
   }
 

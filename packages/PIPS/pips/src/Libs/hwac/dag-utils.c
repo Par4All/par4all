@@ -386,6 +386,20 @@ static void dagvtx_list_dot(
   fprintf(out, "\n");
 }
 
+static bool dagvtx_is_operator_p(const dagvtx v, const string opname)
+{
+  vtxcontent c = dagvtx_content(v);
+  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+  return same_string_p(cat(AIPO, opname), api->function_name);
+}
+
+/* returns whether the vertex is an image copy operation.
+ */
+static bool dagvtx_is_copy_p(const dagvtx v)
+{
+  return dagvtx_is_operator_p(v, "copy");
+}
+
 /* @brief output dag in dot format, for debug or show
  * @param out, append to this file
  * @param what, name of dag
@@ -394,6 +408,28 @@ static void dagvtx_list_dot(
 void dag_dot(FILE * out, const string what, const dag d,
              const list lb, const list la)
 {
+  // compute and show dag statistics
+  // count image, copy, scalar operations
+  int niops = 0, ncops = 0, nsops = 0;
+  FOREACH(dagvtx, op, dag_vertices(d))
+  {
+    if (dagvtx_is_copy_p(op)) ncops++;
+    else if (!gen_in_list_p(op, dag_inputs(d))) {
+      if (dagvtx_other_stuff_p(op)) nsops++;
+      else niops++;
+    }
+  }
+
+  fprintf(out, "// DAG \"%s\": "
+          // input, output, computation, scalar vertices
+          "#i=%d #o=%d #c=%d #s=%d "
+          // copies: internal, before, after
+          "#I=%d #B=%d #A=%d\n",
+          what,
+          (int) gen_length(dag_inputs(d)), (int) gen_length(dag_outputs(d)),
+          niops, nsops, ncops, (int) gen_length(lb), (int) gen_length(la));
+
+  // start graph
   fprintf(out, "digraph \"%s\" {\n", what);
 
   // collect set of input images
@@ -579,20 +615,6 @@ dagvtx copy_dagvtx_norec(dagvtx v)
   dagvtx copy = copy_dagvtx(v);
   dagvtx_succs(v) = lsave;
   return copy;
-}
-
-static bool dagvtx_is_operator_p(const dagvtx v, const string opname)
-{
-  vtxcontent c = dagvtx_content(v);
-  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
-  return same_string_p(cat(AIPO, opname), api->function_name);
-}
-
-/* returns whether the vertex is an image copy operation.
- */
-static bool dagvtx_is_copy_p(const dagvtx v)
-{
-  return dagvtx_is_operator_p(v, "copy");
 }
 
 /* returns whether the vertex is an image measurement operation.
@@ -2428,12 +2450,11 @@ dag freia_build_dag(
 }
 
 /* tell whether we have something to do with images
+   ??? hmmm... what about vol(cst_img()) ?
  */
 bool dag_no_image_operation(dag d)
 {
-  if (!dag_inputs(d) && !dag_outputs(d))
-    return true;
-  return false;
+  return !dag_inputs(d) && !dag_outputs(d);
 }
 
 /**************************************************** NEW INTERMEDIATE IMAGE */

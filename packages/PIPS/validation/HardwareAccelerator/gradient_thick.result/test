@@ -30,6 +30,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "gradient_thick" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -48,6 +49,7 @@ digraph "dag_0" {
   "in" -> "11 E8";
 }
 // graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -116,6 +118,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "gradient_thick" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -134,6 +137,7 @@ digraph "dag_0" {
   "in" -> "11 E8";
 }
 // graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -152,6 +156,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 E8";
 }
 // graph for dag "gradient_thick_spoc_helper_0_0" of module "gradient_thick" in dot format
+// DAG "gradient_thick_spoc_helper_0_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "gradient_thick_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -323,6 +328,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "gradient_thick" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -341,6 +347,7 @@ digraph "dag_0" {
   "in" -> "11 E8";
 }
 // graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -359,6 +366,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 E8";
 }
 // graph for dag "gradient_thick_terapix_helper_0_0_0" of module "gradient_thick" in dot format
+// DAG "gradient_thick_terapix_helper_0_0_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "gradient_thick_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -657,6 +665,7 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "gradient_thick" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -675,6 +684,7 @@ digraph "dag_0" {
   "in" -> "11 E8";
 }
 // graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -693,6 +703,7 @@ digraph "dag_cleaned_0" {
   "in" -> "11 E8";
 }
 // graph for dag "gradient_thick_opencl_helper_0_0" of module "gradient_thick" in dot format
+// DAG "gradient_thick_opencl_helper_0_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "gradient_thick_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];

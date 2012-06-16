@@ -1122,6 +1122,16 @@ static bool statement_scalarization(statement s,
     orl  = effects_store_effects(orl);
   }
 
+  /* List of entities forbidden in an array subscript,
+   * because modified in the statement
+   * or because declared deeper in the statement.
+   */
+  set declared_entities = get_declared_entities(s);
+  FOREACH(entity, e, transformer_arguments(tran)) {
+    set_add_element(declared_entities,declared_entities,e);
+  }
+  list forbiden_variables_in_subscript = set_to_list(declared_entities);
+  set_free(declared_entities);
 
   /* List of variables than shoud be privatized in s */
   list local_scalarized_variables = NIL;
@@ -1283,7 +1293,7 @@ static bool statement_scalarization(statement s,
               if (//constant_region_in_context_p(pru, tran)
                   statement_entity_references_constant_in_context_p(s,
                                                                 effect_entity(pru),
-                                                                transformer_arguments(tran))
+                                                                forbiden_variables_in_subscript )
                   && singleton_region_in_context_p(pru, prec,
                                                    loop_indices_b, strict_p)) {
                 /* The array references can be replaced a references to a
@@ -1319,6 +1329,7 @@ static bool statement_scalarization(statement s,
   if (!memory_effects_only_p) {
     gen_free_list(crwl);
   }
+  gen_free_list(forbiden_variables_in_subscript);
   return true;
 }
 

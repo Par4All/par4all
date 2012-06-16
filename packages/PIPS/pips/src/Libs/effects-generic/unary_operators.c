@@ -664,7 +664,10 @@ list filter_effects_with_declaration(list l_eff, entity decl)
 		{
 		  bool exact_p;
 		  // no need to keep the effect if there is no pointer in the path of the effect
-		  if (!effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p))
+		  // or if it's a FILE* - well the latter is a hack, but with constant path
+		  // effects this should not happen - BC
+		  if (!effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p)
+		      || FILE_star_effect_reference_p(eff_ref))
 		    {
 		      free_effect(eff);
 		    }

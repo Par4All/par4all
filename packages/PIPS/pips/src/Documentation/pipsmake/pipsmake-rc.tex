@@ -8403,6 +8403,50 @@ gpu_promote_sequential	> MODULE.code
 		< MODULE.code
 \end{PipsMake}
 
+
+\subsection{Task code generation for StarPU runtime}
+\label{subsection-stapu-taskify}
+
+\begin{PipsPass}{taskify}
+This pass outlines code parts so that every single piece of computation is 
+located in a function that makes no use of global or static variable. 
+Heuristic is trivial for now, this is an experimental work.
+\PipsPassRef{TASKIFY_TASK_PREFIX}.
+\end{PipsPass}
+\begin{PipsMake}
+taskify                        > MODULE.code
+                               > MODULE.callees
+                               > PROGRAM.entities
+               < PROGRAM.entities
+               < MODULE.code
+               < MODULE.cumulated_effects
+               < MODULE.privatized
+               < MODULE.regions
+\end{PipsMake}
+
+\begin{PipsProp}{TASKIFY_TASK_PREFIX}
+TASKIFY_TASK_PREFIX "P4A_task"
+\end{PipsProp}
+
+
+
+\begin{PipsPass}{generate_starpu_pragma}
+This pass generates pragmas for the StarPU GCC plugin. This is still 
+experimental, so is the GCC plugin.
+\end{PipsPass}
+\begin{PipsMake}
+generate_starpu_pragma         > MODULE.code
+                               > MODULE.callees
+                               > PROGRAM.entities
+               < PROGRAM.entities
+               < MODULE.code
+               < MODULE.cumulated_effects
+               < MODULE.privatized
+               < MODULE.regions
+\end{PipsMake}
+
+
+
 \subsection{SCALOPES: task code generation for the SCMP architecture with SESAM HAL}
 \label{subsection-scalopes-project}
 

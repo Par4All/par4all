@@ -898,8 +898,10 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 	  }
 	case is_type_functional:
 	  pips_debug(8, "functional case\n");
-	  pips_user_warning("possible effect through indirect call -> returning anywhere\n");
-
+	  pips_user_warning("possible effect through indirect call (type is: %s(%s)) -> returning anywhere\n",
+			    words_to_string(words_type(eff_type, NIL, false)),
+			    type_to_string(eff_type));
+	  pips_debug_effect(0, "", eff);
 	  l_res = make_anywhere_read_write_memory_effects();
 	  break;
 	case is_type_struct:
