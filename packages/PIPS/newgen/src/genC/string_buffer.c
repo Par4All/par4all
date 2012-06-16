@@ -34,7 +34,7 @@
    Fabien Coelho
 */
 #ifdef HAVE_CONFIG_H
-    #include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -172,47 +172,71 @@ void string_buffer_append_c_string_buffer(
   buffer[i++] = '"';
   bool in_string = true;
   STACK_MAP_X(s, string,
-              for (char * c = s; *c; c++)
-              {
-                if (i>BUFFER_SIZE-10-indent)
-                {
-                  buffer[i++] = '\0';
-                  string_buffer_append(sb, buffer);
-                  i = 0;
-                }
-                if (!in_string)
-                {
-                  buffer[i++] = '\n';
-                  for (j=0; j<indent; j++)
-                    buffer[i++] = ' ';
-                  buffer[i++] = '"';
-                  in_string = true;
-                }
-                switch (*c)
-                {
-                case '\n':
-                  buffer[i++] = '\\';
-                  buffer[i++] = 'n';
-                  // the string is closed on newlines
-                  buffer[i++] = '"';
-                  in_string = false;
-                  break;
-                case '\\':
-                  buffer[i++] = '\\';
-                  buffer[i++] = '\\';
-                  break;
-                case '\t':
-                  buffer[i++] = '\\';
-                  buffer[i++] = 't';
-                  break;
-                case '"':
-                  buffer[i++] = '\\';
-                  buffer[i++] = '"';
-                  break;
-                default:
-                  buffer[i++] = *c;
-                }
-              },
+    for (char * c = s; *c; c++)
+    {
+      if (i>BUFFER_SIZE-10-indent)
+      {
+        buffer[i++] = '\0';
+        string_buffer_append(sb, buffer);
+        i = 0;
+      }
+      if (!in_string)
+      {
+        buffer[i++] = '\n';
+        for (j=0; j<indent; j++)
+          buffer[i++] = ' ';
+        buffer[i++] = '"';
+        in_string = true;
+      }
+      switch (*c)
+      {
+      case '\n': // New line
+        buffer[i++] = '\\';
+        buffer[i++] = 'n';
+        // the string is closed on newlines anyway
+        buffer[i++] = '"';
+        in_string = false;
+        break;
+      case '\a': // Audible bell
+        buffer[i++] = '\\';
+        buffer[i++] = 'a';
+        break;
+      case '\b': // Backspace
+        buffer[i++] = '\\';
+        buffer[i++] = 'b';
+        break;
+      case '\f': // Form feed
+        buffer[i++] = '\\';
+        buffer[i++] = 'f';
+        break;
+      case '\r': // carriage Return
+        buffer[i++] = '\\';
+        buffer[i++] = 'r';
+        break;
+      case '\t': // horizontal tab
+        buffer[i++] = '\\';
+        buffer[i++] = 't';
+        break;
+      case '\v': // Vertical tab
+        buffer[i++] = '\\';
+        buffer[i++] = 'v';
+        break;
+      case '\0': // null character
+        buffer[i++] = '\\';
+        buffer[i++] = '0';
+        break;
+      case '\\': // backslash
+        buffer[i++] = '\\';
+        buffer[i++] = '\\';
+        break;
+      case '"': // double quote
+        buffer[i++] = '\\';
+        buffer[i++] = '"';
+        break;
+      default:
+        buffer[i++] = *c;
+      }
+    },
               src->ins, 0);
   // end string if needed
   if (in_string)
