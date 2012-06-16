@@ -738,6 +738,7 @@ void P4A_copy_to_accel(size_t element_size,
 					NULL,
 					&p4a_event);
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
+  // clFlush(p4a_queue); // Maybe required by some OpenCL implementation ?
 
   if(p4a_timing) {
     P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
