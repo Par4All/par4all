@@ -81,45 +81,76 @@ list written_pointers_set(list eff) {
 
 }
 
+/* For each stub cell e  find its formal corresponding parameter and add to it a dereferencing dimension */
+/* cell formal_access_paths(cell e, list args, set pt_in) */
+/* { */
+/*   cell f_a = cell_undefined; */
+/*   bool find_p = false; */
 
+/*   FOREACH(CELL, c, args) { */
+/*     SET_FOREACH(points_to, pt, pt_in) { */
+/*       if(points_to_cell_equal_p(c, points_to_source(pt)) && points_to_cell_equal_p(e, points_to_sink(pt))) */
+/* 	{ */
+/* 	  find_p = true; */
+/* 	  f_a = add_array_dimension(c); */
+/* 	  break ; */
+/* 	} */
+/*     } */
+/*     if(!find_p && points_to_cell_equal_p(e, points_to_sink(pt))) */
+/*       { */
+/* 	cell new_e = points_to_source(pt); */
+/* 	cell c  = formal_access_paths(new_e, args, pt_in); */
+/* 	f_a = add_array_dimension(c); */
+/* 	break ; */
+/*       } */
+/*     } */
 
-/* Translate each element of E into the caller's scope */
-list caller_addresses(cell c, list args, set pt_in, set pt_binded)
-{
   
-  cell c_f = formal_access_paths(c, args, pt_in);
-  list a_p = actual_access_paths(c_f, pt_binded);
-  return a_p;
-}
+/*   if(cell_undefined_p(f_a))  */
+/*     pips_user_error("Formal acces paths undefined \n"); */
 
+/*   return f_a; */
+/* } */
 
 /* For each stub cell e  find its formal corresponding parameter and add to it a dereferencing dimension */
 cell formal_access_paths(cell e, list args, set pt_in)
 {
+  int i;
   cell f_a = cell_undefined;
-  bool find_p = false;
-  SET_FOREACH(points_to, pt, pt_in) {
-    FOREACH(CELL, c, args) {
-      if(cell_equal_p(c, points_to_source(pt)) && cell_equal_p(e, points_to_sink(pt)))
-	{
-	  find_p = true;
-	  f_a = add_array_dimension(c);
-	}
-    }
-    if(!find_p && cell_equal_p(e, points_to_sink(pt)))
-      {
-	cell new_e = points_to_source(pt);
-	cell c  = formal_access_paths(new_e, args, pt_in);
-	f_a = add_array_dimension(c);
+  reference r1 = cell_any_reference(e);
+  reference r = reference_undefined;
+  entity v1 = reference_variable(r1);
+  const char * en1 = entity_local_name(v1);
+  list sl = NIL; 
+  bool change_p = false ;
+  while(!ENDP(args) && !change_p) {
+    cell c = CELL(CAR(args));
+    reference r2 = cell_to_reference(c);
+    entity v2 = reference_variable(r2);
+    const char * en2 = entity_local_name(v2);
+    char *cmp = strstr(en1, en2);
+    r = copy_reference(r2);
+    for(i = 0; cmp != NULL && cmp[i]!= '\0' ; i++) {
+      if(cmp[i]== '_') 	{
+	expression s =  int_to_expression(0);
+	sl = CONS(EXPRESSION, s, sl);
+	change_p = true;
       }
     }
-
-  
+    if(change_p) {
+      reference_indices(r) = gen_nconc(reference_indices(r), sl);
+      f_a = make_cell_reference(r);  
+      break ;
+    }
+    args = CDR(args);
+  }
+ 
   if(cell_undefined_p(f_a)) 
     pips_user_error("Formal acces paths undefined \n");
 
   return f_a;
 }
+
 
 /* Evalute c using points-to relation already computed */ 
 list actual_access_paths(cell c, set pt_binded)
@@ -135,6 +166,116 @@ list actual_access_paths(cell c, set pt_binded)
 }
 
 
+
+/* Translate each element of E into the caller's scope */
+list caller_addresses(cell c, list args, set pt_in, set pt_binded)
+{
+  
+  cell c_f = formal_access_paths(c, args, pt_in);
+  list a_p = actual_access_paths(c_f, pt_binded);
+  return a_p;
+}
+
+
+/* Add cells referencing a points-to stub found in parameter "s" are
+ * copied and added to list "osl".
+ *
+ * The stubs are returned as cells not as entities.
+ *
+ * New cells are allocated. No sharing is created between parameter
+ * "s" and result "sl".
+ */
+list points_to_set_to_stub_cell_list(pt_map s, list osl)
+{
+  list sl = osl;
+  SET_FOREACH(points_to, pt, s) {
+    cell sink = points_to_sink(pt);
+    reference r1 = cell_any_reference(sink);
+    entity e1 = reference_variable(r1);
+    if(entity_stub_sink_p(e1) && !points_to_cell_in_list_p(sink, sl))
+      sl = CONS(CELL, copy_cell(sink), sl);
+      
+    cell source = points_to_source(pt);
+    reference r2 = cell_any_reference(source);
+    entity e2 = reference_variable(r2);
+    if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, sl))
+      sl = CONS(CELL, copy_cell(source), sl);
+  }
+  
+  gen_sort_list(sl, (gen_cmp_func_t) points_to_compare_ptr_cell );
+  ifdebug(1) print_points_to_cells(sl);
+  return sl;
+}
+
+
+/* returns all the element of E, the set of stubs created when the callee is analyzed.
+ *
+ * E = {e in pt_in U pt_out|entity_stub_sink_p(e)}
+ *
+ * FI->AM: a[*][*] or p[next] really are elements of set E?
+ */
+list stubs_list(pt_map pt_in, pt_map pt_out)
+{
+  list sli = points_to_set_to_stub_cell_list(pt_in, NIL);
+  list slo = points_to_set_to_stub_cell_list(pt_out, sli);
+  return slo;
+}
+
+/* Check compatibility of points-to set pt_in of the callee and
+ * pt_binded of the call site in the caller.
+ *
+ * Parameter "stubs" is the set E in the intraprocedural and
+ * interprocedural analysis chapters of Amira Mensi's PhD
+ * dissertation. The list "stubs" contains all the stubs generated
+ * when the callee is analyzed.
+ *
+ * Parameter "args" is a list of cells. Each cell is a reference to a
+ * formal parameter of the callee.
+ */
+bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in, set pt_out)
+{
+  bool compatible_p = true;
+  list tmp = gen_full_copy_list(stubs);
+  gen_sort_list(args, (gen_cmp_func_t) points_to_compare_ptr_cell );
+  pt_map io = new_pt_map();
+  io = set_union(io, pt_in, pt_out);
+
+  while(!ENDP(stubs) && compatible_p) {
+    cell st = CELL(CAR(stubs));
+    FOREACH(CELL, c, tmp) {
+      if(! points_to_cell_equal_p(c, st)) {
+	list act1 = caller_addresses(c, args, io, pt_binded);
+	list act2 = caller_addresses(st, args, io, pt_binded);
+	points_to_cell_list_and(&act1, act2);
+	if(!ENDP(act1)) {
+	  entity ne = entity_null_locations();
+	  reference nr = make_reference(ne, NIL);
+	  cell nc = make_cell_reference(nr);
+	  entity he =  entity_all_heap_locations();
+	  reference hr = make_reference(he, NIL);
+	  cell hc = make_cell_reference(hr);
+	  
+	  if((int)gen_length(act1) == 1 && (!points_to_cell_in_list_p(nc, act1)|| !points_to_cell_in_list_p(hc, act1)))
+	    compatible_p = false;
+	  break;
+	}
+	gen_free_list(act1);
+	gen_free_list(act2);
+      }
+    }
+    stubs = CDR(stubs);
+  }
+  gen_full_free_list(tmp);
+  free_pt_map(io);
+  return compatible_p;
+
+}
+
+
+
+
+
+
 /* Translate the out set into the scope of the caller */ 
 set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in, set pt_binded)
 {
@@ -145,7 +286,8 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
   FOREACH(CELL, c, written) {
     reference r1 = cell_any_reference(c);
     list ind1 = reference_indices(r1);
-    reference_indices_(r1) = NIL;
+    /* no need to remove indices ? */
+    /* reference_indices_(r1) = NIL; */
     tmp = caller_addresses(c, args, pt_in, pt_binded);
     FOREACH(CELL, cel, tmp) {
       r1 = cell_any_reference(cel);
@@ -157,7 +299,7 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
 
   FOREACH(CELL, c, written_cs) {
     SET_FOREACH(points_to, pt, pt_caller) {
-      if(cell_equal_p(c, points_to_source(pt)))
+      if(points_to_cell_equal_p(c, points_to_source(pt)))
 	set_add_element(kill, kill, (void*)pt);
     }
   }
@@ -227,108 +369,4 @@ set compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded)
 
 
 
-/* /\* computing the points-to of a call, user_functions not yet implemented. *\/ */
-/* set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__unused__))) { */
-/*   entity e = call_function(c); */
-/*   cons* pc = call_arguments(c); */
-/*   tag tt; */
-/*   set pt_out = set_generic_make(set_private, points_to_equal_p, */
-/*                                 points_to_rank); */
-
-/*   set pt_in_callee = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set pt_out_callee = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*   set pts_binded = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*   set pt_written = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*   set pts_gen = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set pts_kill = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*  set pt_end = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-/*  set tmp = set_generic_make(set_private, points_to_equal_p, */
-/*   				points_to_rank); */
-
-/*   pt_in = points_to_init(s, pt_in); */
-/*   switch (tt = value_tag(entity_initial(e))) { */
-/*   case is_value_code:{ */
-    
-/*     /\* reset_current_module_entity(); *\/ */
-/*     /\* call to an external function; preliminary version*\/ */
-/*     pips_user_warning("The function call to \"%s\" is ignored\n" */
-/*                       "On going implementation...\n", entity_user_name(e)); */
-/*     set_assign(pt_out, pt_in); */
-    
-    
-/*     set_current_module_entity(e); */
-/*     const char* module_name = entity_module_name(e); */
-/*     type t = entity_type(e); */
-/*     if(type_functional_p(t)){ */
-/*       list dl = code_declarations(value_code(entity_initial(e))); */
-/*       FOREACH(ENTITY, fp, dl) { */
-/*     	if(formal_parameter_p(fp)) { */
-/*     	  reference r = make_reference(fp, NIL); */
-/*     	  cell c = make_cell_reference(r); */
-/*     	  formal_param = gen_nconc(CONS(CELL, c, NULL), formal_param); */
-/*     	} */
-/*       } */
-/*     } */
-/*     l_effect =  load_summary_effects(e); */
-/*     points_to_list pts_to_in = (points_to_list) */
-/*       db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(e), true); */
-/*     points_to_list pts_to_out = (points_to_list) */
-/*       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(e), true); */
-/*     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in)); */
-/*     pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in); */
-/*     list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out)); */
-/*     pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out); */
-/*     list effs = written_pointers(l_effect); */
-/*     pts_binded = pt_binded(e,pc , pt_in); */
-/*     print_points_to_set("pt_binded", pts_binded); */
-/*     pts_kill = pt_kill(effs, pt_in, formal_param, pt_in_callee, pts_binded); */
-/*     print_points_to_set("pt_kill", pts_kill); */
-/*     pts_gen = pt_gen(formal_param, pt_out_callee, pt_in_callee, pts_binded); */
-/*     print_points_to_set("pt_gen", pts_gen); */
-/*     tmp = set_difference(tmp,pt_in_callee, pts_kill); */
-/*     pt_end = set_union(pt_end, tmp, pts_gen); */
-/*     print_points_to_set("pt_end =",pt_end); */
-/*   } */
-/*     break; */
-/*   case is_value_symbolic:{ */
-/*     SET_FOREACH(points_to, pt, pt_in) { */
-/*       pt_out = set_add_element(pt_out, pt_out, (void*)pt); */
-/*     } */
-/*   } */
-/*     break; */
-/*   case is_value_constant:{ */
-/*     SET_FOREACH(points_to, pt, pt_in) { */
-/*       pt_out = set_add_element(pt_out, pt_out, (void*)pt); */
-/*     } */
-/*   } */
-/*     /\* pt_out = set_assign(pt_out, pt_in); *\/ */
-/*     break; */
-/*   case is_value_unknown: */
-/*     pips_internal_error("function %s has an unknown value\n", */
-/*                         entity_name(e)); */
-/*     break; */
-/*   case is_value_intrinsic: { */
-/*     set_methods_for_proper_simple_effects(); */
-/*     list el = call_to_proper_effects(c); */
-/*     generic_effects_reset_all_methods(); */
-/*     pips_debug(5, "intrinsic function %s\n", entity_name(e)); */
-/*     pt_out = points_to_intrinsic(s, c, e, pc, pt_in, el); */
-/*   } */
-/*     break; */
-/*   default: */
-/*     pips_internal_error("unknown tag %d\n", tt); */
-/*     break; */
-/*   } */
-
-/*   return pt_out; */
-/* } */
 

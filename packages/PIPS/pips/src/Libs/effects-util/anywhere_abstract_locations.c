@@ -372,7 +372,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
     string name = string_undefined;
     type ot = type_undefined;
 
-    asprintf(&name, "%s_b%d",xxx,count);
+    asprintf(&name, "%s_b%d", xxx, count);
     e = FindOrCreateEntity(ANY_MODULE_NAME, name);
     free(name);
     ot = entity_type(e);
@@ -387,7 +387,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
       entity_kind(e) = ABSTRACT_LOCATION;
       found_p = true;
     }
-    else if(type_equal_p(t, ot))
+    else if(type_equal_p(t, ot)) // FI: do we want to relax this test?
       found_p = true;
   }
 

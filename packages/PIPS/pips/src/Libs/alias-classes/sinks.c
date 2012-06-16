@@ -238,6 +238,16 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
     /* Finds what it is pointing to, memory(p) */
     FOREACH(CELL, c, cl) {
+      bool to_be_freed = false;
+      type ct = points_to_cell_to_type(c, &to_be_freed);
+      if(/* eval_p && */array_type_p(ct)) {
+	//reference r = cell_any_reference(c);
+	//reference_add_zero_subscripts(r, ct);
+	// FI: for assignment13.c and _t_2_2, we need a zero subscript
+	points_to_cell_add_zero_subscripts(c);
+	//points_to_cell_add_unbounded_subscripts(c);
+      }
+      if(to_be_freed) free_type(ct);
       /* Do we want to dereference c? */
       if( (null_dereferencing_p || !null_cell_p(c))
 	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
@@ -366,7 +376,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
-    list L = expression_to_points_to_sources(a1, in);
+    // FI: memory leak, but you need a copy to add the field
+    list L = gen_full_copy_list(expression_to_points_to_sources(a1, in));
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
@@ -411,13 +422,13 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   else if (ENTITY_REALLOC_SYSTEM_P(f)) { // REALLOC has two arguments
     // FI: see man realloc() for its complexity:-(
     // FI: we need a realloc_to_points_to_sinks() to exploit both arguments...
-    sinks = malloc_to_points_to_sinks(a1, in);
+    sinks = malloc_to_points_to_sinks(a2, in);
   }
   else if(ENTITY_FOPEN_P(f)) {
     /* Should be handled like a malloc, using the line number for malloc() */
     pips_user_warning("Fopen() not precisely implemented.\n");
     type rt = functional_result(type_functional(entity_type(f)));
-    type ct = type_to_pointed_type(rt);
+    type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedefs?
     sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
   }
   else {
@@ -591,7 +602,11 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
       // FI: eval_p is not used here...
       reference nr = simplified_reference(r);
       cell nc = make_cell_reference(nr);
-      sinks = CONS(CELL, nc, NIL);
+      if(eval_p) {
+	sinks = source_to_sinks(nc, in, true); // FI: allocate a new copy
+      }
+      else
+	sinks = CONS(CELL, nc, NIL);
     }
     else { // rd is too big
       // Could be a structure with field accesses expressed as indices
@@ -720,7 +735,7 @@ list cast_to_points_to_sinks(cast c, pt_map in)
   return sinks;
 }
 
-// FI: do we need eval_p?
+// FI: do we need eval_p? eval_p is assumed always true
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 {
   list sinks = NIL;
@@ -731,11 +746,16 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
     sinks = expression_to_points_to_sinks(ne, in);
   }
   if( sizeofexpression_type_p(soe) ){
-    type t = sizeofexpression_type(soe);
+    type t = compute_basic_concrete_type(sizeofexpression_type(soe));
     // FI: a better job could be done. A stub should be allocated in
     // the formal context of the procedure
-    cell c = make_anywhere_cell(t);
-    sinks = CONS(CELL, c, NIL);
+    if(pointer_type_p(t)) {
+      type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+      cell c = make_anywhere_cell(pt);
+      sinks = CONS(CELL, c, NIL);
+    }
+    else
+      pips_internal_error("Unexpected type.\n");
   }
   return sinks;
 }
@@ -810,8 +830,8 @@ list malloc_to_points_to_sinks(expression e,
 			       pt_map in __attribute__ ((unused)))
 {
   list sinks = NIL;
-  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  const char * opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   if(same_string_p(opt, "unique")) {
     sinks = unique_malloc_to_points_to_sinks(e);
@@ -954,7 +974,8 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
 
-  /* Add subscript when possible */
+  /* Add subscript when possible. For typing reason, typed anywhere
+     cell should be subscripted. */
   FOREACH(CELL, c, sources) {
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);

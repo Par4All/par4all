@@ -3232,6 +3232,30 @@ set get_referenced_entities(void* elem)
             entity_not_constant_or_intrinsic_p);
 
 }
+
+
+/* Helper for get_declared_entities()
+ * Add all locally declared entity to the set given in argument
+ */
+bool do_get_declared_entities(statement s, set declared_entities) {
+  FOREACH(entity,e,statement_declarations(s)) {
+    set_add_element(declared_entities,declared_entities,e);
+  }
+  return true;
+}
+
+/**
+ * retrieves the set of entities declared in @p elem
+ *
+ * @return set of referenced entities
+ */
+set get_declared_entities(void* elem) {
+  set the_set = set_make(set_pointer);
+  gen_context_recurse(elem, the_set, statement_domain, do_get_declared_entities,gen_null);
+  return the_set;
+}
+
+
 /**
  * Check if a variable "var" is local to a module "module".
  *

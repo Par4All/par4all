@@ -50,6 +50,22 @@
 
 /********************************************************************* UTILS */
 
+/* remove "register" qualifier from qualifier list
+ */
+static list remove_register(list lq)
+{
+  FOREACH(qualifier, q, lq)
+  {
+    if (qualifier_register_p(q))
+    {
+      gen_remove_once(&lq, q);
+      // register may be there once
+      return lq;
+    }
+  }
+  return lq;
+}
+
 // this should exists somewhere???
 // top-down so that it is in ascending order?
 // I'm not sure that it makes much sense, as
@@ -100,6 +116,21 @@ static bool variable_is_used(statement s, entity var)
 }
 
 /*********************************** UNROLL FREIA CONVERGENCE LOOPS FOR SPOC */
+
+/*
+  The purpose of this transformation is to unroll a special case of
+  while convergence loop by an appropriate amount in order to fill-in
+  the spoc pipeline.
+
+  The implementation is quick and dirty, could be improved if needed.
+
+  More could be done on these line if the pipeline before the while is not
+  full, some iterations could be moved there as well. However, the information
+  available when this transformation is applied is not sufficient to decide
+  to do so.
+
+  The two volumes to be compared are taken from the two last stages.
+ */
 
 typedef struct {
   int morpho;
@@ -152,6 +183,21 @@ static bool freia_convergence_sequence_p(sequence sq)
   return ctx.morpho==1 && ctx.comp==1 && ctx.vol==1 && !ctx.bad_stuff;
 }
 
+/* util defined somewhere ?????? */
+typedef struct { entity ovar, nvar; } subs_ctx;
+
+static void ref_rwt(reference r, subs_ctx * ctx)
+{
+  if (reference_variable(r)==ctx->ovar)
+    reference_variable(r)=ctx->nvar;
+}
+
+static void substitute_reference_variable(statement s, entity ovar, entity nvar)
+{
+  subs_ctx ctx = { ovar, nvar };
+  gen_context_recurse(s, &ctx, reference_domain, gen_true, ref_rwt);
+}
+
 static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
 {
   if (statement_sequence_p(whileloop_body(wl)))
@@ -169,8 +215,13 @@ static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
       pips_assert("s is an assignement", statement_call_p(first));
       gen_remove_once(&ol, first);
       list col = gen_copy_seq(ol), nl = NIL;
+      list lass = call_arguments(statement_call(first));
+      entity
+        previous = expression_variable(EXPRESSION(CAR(lass))),
+        current = expression_variable(EXPRESSION(CAR(CDR(lass))));
 
       // cleanup vol from col
+      statement vols = statement_undefined;
       FOREACH(statement, s, col)
       {
         call c = freia_statement_to_call(s);
@@ -178,16 +229,25 @@ static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
                                AIPO "global_vol"))
         {
           gen_remove_once(&col, s);
+          vols = copy_statement(s);
           break;
         }
       }
+      pips_assert("vol statement found", vols!=statement_undefined);
 
       // do factor-1
       while (--factor)
         nl = gen_nconc(gen_full_copy_list(col), nl);
 
+      // compute "previous" volume for comparison
+      substitute_reference_variable(vols, current, previous);
+
+      // swith off "register" on previous, if need be...
+      variable v = type_variable(entity_type(previous));
+      variable_qualifiers(v) = remove_register(variable_qualifiers(v));
+
       // then reuse initial list for the last one
-      sequence_statements(sq) = CONS(statement, first, gen_nconc(nl, ol));
+      sequence_statements(sq) = gen_nconc(nl, CONS(statement, vols, ol));
 
       // cleanup temporary list
       gen_free_list(col);
@@ -208,6 +268,15 @@ static bool freia_unroll_while_for_spoc(statement s)
 
 bool freia_unroll_while(const string module)
 {
+  // sanity check
+  int factor = get_int_property(spoc_depth_prop);
+  if (factor<=1)
+  {
+    pips_user_warning("cannot unroll with factor=%d\n", factor);
+    return true;
+  }
+
+  // else, do the job
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
 
@@ -228,6 +297,7 @@ bool freia_unroll_while(const string module)
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
   }
 
+  // cleanup
   reset_current_module_statement();
   reset_current_module_entity();
   debug_off();
@@ -287,20 +357,6 @@ static entity freia_reduction_variable(const statement s)
   }
   // not found!
   return NULL;
-}
-
-static list remove_register(list lq)
-{
-  FOREACH(qualifier, q, lq)
-  {
-    if (qualifier_register_p(q))
-    {
-      gen_remove_once(&lq, q);
-      // register may be there once
-      return lq;
-    }
-  }
-  return lq;
 }
 
 static void sww_seq_rwt(const sequence sq, bool * changed)

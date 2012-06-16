@@ -224,7 +224,7 @@ reference expression_to_reference(expression e)
  *
  * Used when array names are used to convert to the first array element
  */
-void reference_add_zero_subscripts(reference r, type t)
+void generic_reference_add_fixed_subscripts(reference r, type t, bool zero_p)
 {
   pips_assert("type is of kind variable", type_variable_p(t));
   variable v = type_variable(t);
@@ -236,11 +236,21 @@ void reference_add_zero_subscripts(reference r, type t)
   list dl = variable_dimensions(v);
   list sl = NIL; // subscript list
   FOREACH(DIMENSION, d, dl) {
-    expression s = int_to_expression(0);
+    expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
     // reference_indices(r) = CONS(EXPRESSION, s, reference_indices(r));
     sl = CONS(EXPRESSION, s, sl);
   }
   reference_indices(r) = gen_nconc(reference_indices(r), sl);
+}
+
+void reference_add_zero_subscripts(reference r, type t)
+{
+  generic_reference_add_fixed_subscripts(r, t, true);
+}
+
+void reference_add_unbounded_subscripts(reference r, type t)
+{
+  generic_reference_add_fixed_subscripts(r, t, false);
 }
 
 /* Build an expression that call a function or procedure.

@@ -567,9 +567,16 @@ static void do_linearize_prepatch_subscript(subscript s) {
 }
 
 /* transform some subscripts for generic handling later */
-static void do_linearize_prepatch_subscripts(statement s) {
+static void do_linearize_prepatch_subscripts(entity m,statement s) {
   gen_recurse(s,subscript_domain,gen_true,do_linearize_prepatch_subscript);
   cleanup_subscripts(s);
+  FOREACH(ENTITY,e,entity_declarations(m))
+    if(entity_variable_p(e)) {
+      gen_recurse(entity_initial(e),subscript_domain,gen_true,do_linearize_prepatch_subscript);
+      cleanup_subscripts(entity_initial(e));
+    }
+
+
 }
 
 static void do_linearize_prepatch(entity m,statement s) {
@@ -600,7 +607,7 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
   hash_table e2t = init_expression_is_pointer(s);
 
   /* step 0.25: hack some subscripts typically found in pips inputs */
-  do_linearize_prepatch_subscripts(s);
+  do_linearize_prepatch_subscripts(m,s);
 
   /* step 0.5: transform int (*a) [3] into int a[*][3] */
   do_linearize_prepatch(m,s);
@@ -940,6 +947,11 @@ bool linearize_array_generic (const char* module_name)
       if(c_module_p(get_current_module_entity())) {
         do_array_to_pointer(get_current_module_entity(),get_current_module_statement(),&param);
         cleanup_subscripts(get_current_module_statement());
+        FOREACH(ENTITY,e,entity_declarations(get_current_module_entity())) {
+          if(entity_variable_p(e)) {
+            cleanup_subscripts(entity_initial(e));
+          }
+        }
       }
       else pips_user_warning("no pointers in fortran !,LINEARIZE_ARRAY_USE_POINTERS ignored\n");
     }
