@@ -71,7 +71,7 @@ pipslibs.libs	= \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor effects-util ri-util step properties \
 	text-util misc reductions flint sac safescale phrase \
-	gpu scalopes newgen pocc-interface
+	gpu scalopes newgen pocc-interface taskify
 
 ifdef WITH_DYNAMIC_LIBRARIES
 pips.libs	= \

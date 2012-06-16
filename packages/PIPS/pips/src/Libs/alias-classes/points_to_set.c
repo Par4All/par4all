@@ -344,8 +344,14 @@ points_to find_arc_in_points_to_set(cell source, cell sink, pt_map s)
 }
 
 /* source is assumed to be either nowhere/undefined or anywhere, it
-   may be typed or not. */
-list anywhere_to_sinks(cell source)
+ * may be typed or not.
+ *
+ * Shouldn't we create NULL pointers if the corresponding property is set?
+ * Does it matter for anywhere/nowhere?
+ *
+ * pts must be updated with the new arc(s).
+ */
+list anywhere_to_sinks(cell source, pt_map pts)
 {
   list sinks = NIL;
   reference r = cell_any_reference(source);
@@ -361,8 +367,70 @@ list anywhere_to_sinks(cell source)
       type nt = type_to_pointed_type(vt);
       cell c = make_anywhere_points_to_cell(nt);
       sinks = CONS(CELL, c, NIL);
+      points_to pt = make_points_to(copy_cell(source), c,
+				    make_approximation_may(),
+				    make_descriptor_none());
+      pts = add_arc_to_pt_map(pt, pts);
+    }
+    else if(struct_type_p(vt)) {
+      variable vrt = type_variable(vt);
+      basic b = variable_basic(vrt);
+      entity se = basic_derived(b);
+      type st = entity_type(se);
+      pips_assert("se is an internal struct", type_struct_p(st));
+      list fl = type_struct(st);
+      FOREACH(ENTITY, f, fl) {
+	type ft = entity_type(f);
+	type uft = compute_basic_concrete_type(ft); // FI: to be freed...
+	if(pointer_type_p(uft)) {
+	  cell nsource = copy_cell(source); // FI: memory leak?
+	  nsource = points_to_cell_add_field_dimension(nsource, f);
+	  type nt = type_to_pointed_type(uft);
+	  cell nsink = make_anywhere_points_to_cell(nt);
+	  points_to pt = make_points_to(nsource, nsink, 
+					make_approximation_may(),
+					make_descriptor_none());
+	  pts = add_arc_to_pt_map(pt, pts);
+	  //sinks = source_to_sinks(source, pts, false);
+	  sinks = CONS(CELL, nsink, NIL);
+	}
+	else if(struct_type_p(uft)) {
+	  cell nsource = copy_cell(source); // FI: memory leak?
+	  nsource = points_to_cell_add_field_dimension(nsource, f);
+	  sinks = anywhere_to_sinks(nsource, pts);
+	  //pips_internal_error("Not implemented yet.\n");
+	}
+	else if(array_type_p(uft)) {
+	  variable uftv = type_variable(uft);
+	  basic uftb = variable_basic(uftv);
+	  if(basic_pointer_p(uftb)) {
+	    cell nsource = copy_cell(source); // FI: memory leak?
+	    reference r = cell_any_reference(nsource);
+	    reference_add_zero_subscripts(r, uft);
+	    type nt = ultimate_type(uft); // FI: get rid of the dimensions
+	    cell nsink = make_anywhere_points_to_cell(nt);
+	    points_to pt = make_points_to(nsource, nsink, 
+					  make_approximation_may(),
+					  make_descriptor_none());
+	    pts = add_arc_to_pt_map(pt, pts);
+	    sinks = CONS(CELL, nsink, NIL);
+	  }
+	}
+      }
+    }
+    else if(array_type_p(vt)) {
+      variable uftv = type_variable(vt);
+      basic uftb = variable_basic(uftv);
+      if(basic_pointer_p(uftb)) {
+	cell nsource = copy_cell(source); // FI: memory leak?
+	reference r = cell_any_reference(nsource);
+	reference_add_zero_subscripts(r, vt);
+      }
     }
     else
+      // FI: struct might be dereferenced?
+      // FI: should this be tested when entering this function rather
+      // than expecting that the caller is safe
       pips_internal_error("Unexpected dereferenced type.\n");
   }
   else if(type_area_p(vt)) {
@@ -372,6 +440,10 @@ list anywhere_to_sinks(cell source)
     reference r = make_reference(e, NIL);
     cell c = make_cell_reference(r);
     sinks = CONS(CELL, c, NIL);
+    points_to pt = make_points_to(copy_cell(source), c,
+				  make_approximation_may(),
+				  make_descriptor_none());
+    pts = add_arc_to_pt_map(pt, pts);
   }
   else {
     pips_internal_error("Unexpected dereferenced type.\n");
@@ -410,7 +482,7 @@ bool type_compatible_with_points_to_cell_p(type t, cell c)
   do {
     bool to_be_freed;
     type nct = cell_to_type(nc, &to_be_freed);
-    if(type_equal_p(t, nct)) {
+    if(concrete_array_pointer_type_equal_p(t, nct)) {
       compatible_p = true;
       if(to_be_freed) free_type(nct);
       break;
@@ -588,7 +660,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
 	// And restore p
 	CDR(np) = NIL;
 	gen_free_list(np);
-	if(!points_to_undefined_p(pt)) // Stop as soon as an arc has been created
+	if(!points_to_undefined_p(pt)) // Stop as soon as an arc has been created; FI->AM/FC: may not be correct...
 	  break;
       }
     }
@@ -661,6 +733,8 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
 
   /* 1. Try to find the source in the points-to information */
   SET_FOREACH(points_to, pt, pts) {
+    // FI: a more flexible test is needed as the sink cell may be
+    // either a, or a[0] or a[*] or a[*][*] or...
     if(cell_equal_p(nsink, points_to_sink(pt))) {
       cell sc = fresh_p? copy_cell(points_to_source(pt))
 	: points_to_source(pt);
@@ -669,6 +743,81 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
   }
   free_cell(nsink);
   return sources;
+}
+
+list stub_source_to_sinks(cell source, pt_map pts)
+{
+  list sinks = NIL;
+  reference r = cell_any_reference(source);
+  list sl = reference_indices(r);
+  if(ENDP(sl))
+    sinks = scalar_stub_source_to_sinks(source, pts);
+  else
+    sinks = array_stub_source_to_sinks(source, pts);
+  return sinks;
+}
+
+list scalar_stub_source_to_sinks(cell source, pt_map pts)
+{
+  list sinks = generic_stub_source_to_sinks(source, pts, false);
+  return sinks;
+}
+
+list array_stub_source_to_sinks(cell source, pt_map pts)
+{
+  list sinks = generic_stub_source_to_sinks(source, pts, true);
+  return sinks;
+}
+
+list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
+{
+  list sinks = NIL;
+  bool null_initialization_p =
+    get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+  //type ost = ultimate_type(entity_type(v));
+  bool to_be_freed; // FI: memory leak for the time being
+  type rt = cell_to_type(source, &to_be_freed); // reference type
+  if(pointer_type_p(rt)) {
+    // bool array_p = array_type_p(rt); FI: always false if pointer_type_P(rt)
+    type nst = type_to_pointed_type(rt);
+    points_to pt = create_k_limited_stub_points_to(source, nst, array_p, pts);
+    pts = add_arc_to_pt_map(pt, pts);
+    add_arc_to_points_to_context(copy_points_to(pt));
+    sinks = source_to_sinks(source, pts, false);
+    if(null_initialization_p) {
+      // FI: I'm lost here... both with the meaning of null
+      // initialization_p and with the insertion of a
+      // corresponding arc in "pts"
+      list ls = null_to_sinks(source, pts);
+      sinks = gen_nconc(ls, sinks);	 
+    }
+  }
+  else if(struct_type_p(rt)) {
+    // FI FI FI - to be really programmed with the field type
+    // FI->AM: I am really confused about what I am doing here...
+    variable vrt = type_variable(rt);
+    basic b = variable_basic(vrt);
+    entity se = basic_derived(b);
+    type st = entity_type(se);
+    pips_assert("se is an internal struct", type_struct_p(st));
+    list fl = type_struct(st);
+    FOREACH(ENTITY, f, fl) {
+      type ft = entity_type(f);
+      type uft = ultimate_type(ft);
+      bool array_p = array_type_p(ft); // not consistent with ultimate_type()
+      points_to pt = create_k_limited_stub_points_to(source, uft, array_p, pts);
+      pts = add_arc_to_pt_map(pt, pts);
+      add_arc_to_points_to_context(copy_points_to(pt));
+      sinks = source_to_sinks(source, pts, false);
+    }
+  }
+  else if(array_type_p(rt)) {
+    reference r = cell_any_reference(source);
+    entity v = reference_variable(r);
+    printf("Entity \"%s\"\n", entity_local_name(v));
+    pips_internal_error("Not implemented yet.\n");
+  }
+  return sinks;
 }
 
 
@@ -683,11 +832,12 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
  *
  * Function added by FI.
  */
-list source_to_sinks(cell source, set pts, bool fresh_p)
+list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   list sinks = NIL;
   // AM: Get the property POINTS_TO_NULL_POINTER_INITIALIZATION
-  bool null_initialization_p = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+  bool null_initialization_p =
+    get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
 
   /* Can we expect a sink? */
   if(nowhere_cell_p(source)) {
@@ -698,12 +848,14 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       entity v = reference_variable(r);
       pips_user_warning("Possibly undefined pointer \"%s\" is dereferenced.\n",
 			entity_local_name(v));
-      sinks = anywhere_to_sinks(source);
+      sinks = anywhere_to_sinks(source, pts);
     }
   }
-  else if(anywhere_cell_p(source)) {
+  else if(anywhere_cell_p(source) || cell_typed_anywhere_locations_p(source)) {
     /* FI: we should return an anywhere cell with the proper type */
-    sinks = anywhere_to_sinks(source);
+    /* FI: should we add the corresponding arcs in pts? */
+    /* FI: should we take care of typed anywhere as well? */
+    sinks = anywhere_to_sinks(source, pts);
   }
   // FI: the null pointer should also be checked here!
   else if(null_pointer_value_cell_p(source)) {
@@ -714,15 +866,36 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
       entity v = reference_variable(r);
       pips_user_warning("Possibly undefined pointer \"%s\" is dereferenced.\n",
 			entity_local_name(v));
-      sinks = anywhere_to_sinks(source);
+      sinks = anywhere_to_sinks(source, pts);
     }
   }
   else {
-    /* 1. Try to find the source in the points-to information */
-    SET_FOREACH( points_to, pt, pts) {
-      if(cell_equal_p(source, points_to_source(pt))) {
-	cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+    /* 0. Is the source a pointer? You would expect a yes, but C
+       pointer arithmetics requires some strange typing. We assume it
+       is an array of pointers. */
+    bool to_be_freed;
+    type ct = points_to_cell_to_type(source, &to_be_freed);
+    if(array_type_p(ct)) {
+      basic ctb = variable_basic(type_variable(ct));
+      // FI->AM: I am not happy at all with his
+      if(basic_pointer_p(ctb))
+	points_to_cell_add_unbounded_subscripts(source);
+      else {
+	// Pointers/dependence11.c: an array is a kind of constant pointer
+	// No need to eval more
+	cell sc = copy_cell(source);
 	sinks = CONS(CELL, sc, sinks);
+      }
+    }
+    if(to_be_freed) free_type(ct);
+
+    /* 1. Try to find the source in the points-to information */
+    if(ENDP(sinks)) {
+      SET_FOREACH( points_to, pt, pts) {
+	if(cell_equal_p(source, points_to_source(pt))) {
+	  cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+	  sinks = CONS(CELL, sc, sinks);
+	}
       }
     }
 
@@ -738,7 +911,8 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
     }
 
     /* The source may be an array field */
-    if(ENDP(sinks)) {
+    /* FI: I think this is all wrong */
+    if(false && ENDP(sinks)) {
       bool to_be_freed = false;
       type st = points_to_cell_to_type(source, &to_be_freed);
       if(array_type_p(st)) {
@@ -757,9 +931,7 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 
     /* 3. If the previous steps have failed, build a new sink if the
        source is a formal parameter, a global variable, a C file local
-       global variable (static) or a stub. */
-    // FI: you must generate sinks for formal parameters, global
-    // variables and stubs if nothing has been found
+       global variable (static) or a stub or an anywhere abstract location. */
     if(ENDP(sinks)) {
       reference r = cell_any_reference(source);
       entity v = reference_variable(r);
@@ -770,6 +942,10 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	// FI: This is not going to work with typedefs...
 	bool array_p = array_type_p(entity_type(v));
 	points_to pt = create_k_limited_stub_points_to(source, st, array_p, pts);
+	if(null_initialization_p) {
+	  free_approximation(points_to_approximation(pt));
+	  points_to_approximation(pt) = make_approximation_may();
+	}
 	pts = add_arc_to_pt_map(pt, pts);
 	add_arc_to_points_to_context(copy_points_to(pt));
 	sinks = source_to_sinks(source, pts, false);
@@ -811,6 +987,11 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	  bool array_p = array_type_p(st);
 	  pt = create_k_limited_stub_points_to(source, st, array_p, pts);
 
+	  // FI: cut-and-pasted from line 945
+	  if(null_initialization_p) {
+	    free_approximation(points_to_approximation(pt));
+	    points_to_approximation(pt) = make_approximation_may();
+	  }
 	  pts = add_arc_to_pt_map(pt, pts);
 	  add_arc_to_points_to_context(copy_points_to(pt));
 	  sinks = source_to_sinks(source, pts, false);
@@ -821,50 +1002,30 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
 	}
       }
       else if(entity_stub_sink_p(v)) {
-	//type ost = ultimate_type(entity_type(v));
-	bool to_be_freed; // FI: memory leak for the time being
-	type rt = cell_to_type(source, &to_be_freed); // reference type
-	if(pointer_type_p(rt)) {
-	  bool array_p = array_type_p(rt);
-	  type nst = type_to_pointed_type(rt);
-	  points_to pt = create_k_limited_stub_points_to(source, nst, array_p, pts);
+	sinks = stub_source_to_sinks(source, pts);
+      }
+      else if(entity_typed_anywhere_locations_p(v)) {
+	pips_internal_error("This case should have been handled above.\n");
+	type t = entity_type(v);
+	type ut = ultimate_type(t);
+	if(pointer_type_p(ut)) {
+	  type upt = ultimate_type(type_to_pointed_type(t));
+	  cell c = make_anywhere_points_to_cell(upt);
+	  sinks = CONS(CELL, c, NIL);
+	  points_to pt = make_points_to(copy_cell(source), c,
+					make_approximation_may(),
+					make_descriptor_none());
 	  pts = add_arc_to_pt_map(pt, pts);
-	  add_arc_to_points_to_context(copy_points_to(pt));
-	  sinks = source_to_sinks(source, pts, false);
-	  if(null_initialization_p) {
-	   list ls = null_to_sinks(source, pts);
-	   sinks = gen_nconc(ls, sinks);	 
-	  }
 	}
-	if(struct_type_p(rt)) {
-	  // FI FI FI - to be really programmed with the field type
-	  // FI->AM: I am really confused about what I am doing here...
-	  variable vrt = type_variable(rt);
-	  basic b = variable_basic(vrt);
-	  entity se = basic_derived(b);
-	  type st = entity_type(se);
-	  pips_assert("se is an internal struct", type_struct_p(st));
-	  list fl = type_struct(st);
-	  FOREACH(ENTITY, f, fl) {
-	    type ft = entity_type(f);
-	    type uft = ultimate_type(ft);
-	    bool array_p = array_type_p(ft); // not consistent with ultimate_type()
-	    points_to pt = create_k_limited_stub_points_to(source, uft, array_p, pts);
-	    pts = add_arc_to_pt_map(pt, pts);
-	    add_arc_to_points_to_context(copy_points_to(pt));
-	    sinks = source_to_sinks(source, pts, false);
-	  }
-	}
-	else if(array_type_p(rt)) {
-	  printf("Entity \"%s\"\n", entity_local_name(v));
-	  pips_internal_error("Not implemented yet.\n");
+	else {
+	  pips_internal_error("Should be a pointer type.\n");
 	}
       }
       if(ENDP(sinks)) {
 	/* We must be analyzing dead code... */
 	reference r = cell_any_reference(source);
 	print_reference(r);
-	pips_user_warning("Uninitialized or null pointer dereferenced: "
+	pips_user_warning("\nUninitialized or null pointer dereferenced: "
 			  "Sink missing for a source based on \"%s\".\n"
 			  "Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.\n",
 			  entity_user_name(v));
@@ -874,6 +1035,26 @@ list source_to_sinks(cell source, set pts, bool fresh_p)
   // FI: use gen_nreverse() to simplify debbugging? Not meaningful
   // with SET_FOREACH
   return sinks;
+}
+
+/* Return all cells in points-to set "pts" who source is based on entity "e". 
+ *
+ * Similar to source_to_sinks, but much easier and shorter.
+ */
+list variable_to_sinks(entity e, pt_map pts, bool fresh_p)
+{
+  list sinks = NIL;
+  SET_FOREACH( points_to, pt, pts) {
+    cell source = points_to_source(pt);
+    reference sr = cell_any_reference(source);
+    entity v = reference_variable(sr);
+    if(e==v) {
+      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+      sinks = CONS(CELL, sc, sinks);
+    }
+  }
+  return sinks;
+
 }
 
 /* Create a list of null sinks and add a new null points-to relation to pts.
@@ -998,6 +1179,7 @@ bool points_to_in_list_p(points_to pt, const list lx)
   return false; /* else no found */
 }
 
+/*  */
 bool points_to_compare_cell(cell c1, cell c2)
 {
   if(c1==c2)
@@ -1037,6 +1219,50 @@ bool points_to_compare_cell(cell c1, cell c2)
 
   return (i== 0 ? true: false) ;
 }
+
+/*  */
+bool points_to_compare_ptr_cell(const void * vcel1, const void * vcel2)
+{
+  int i = 0;
+  cell c1 = *((cell *)vcel1);
+  cell c2 = *((cell *)vcel2);
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+  list sl1 = NIL, sl2 = NIL;
+  extern const char* entity_minimal_user_name(entity);
+  string n1 =   entity_abstract_location_p(v1)?
+    (string) entity_local_name(v1) :  (string) entity_minimal_user_name(v1);
+  string n2 =   entity_abstract_location_p(v2)?
+    (string) entity_local_name(v2) : (string) entity_minimal_user_name(v2);
+  i = strcmp(n1, n2);
+  if(i==0) {
+    sl1 = reference_indices(r1);
+    sl2 = reference_indices(r2);
+    int i1 = gen_length(sl1);
+    int i2 = gen_length(sl2);
+
+    i = i2>i1? 1 : (i2<i1? -1 : 0);
+
+    for(;i==0 && !ENDP(sl1); POP(sl1), POP(sl2)){
+      expression se1 = EXPRESSION(CAR(sl1));
+      expression se2 = EXPRESSION(CAR(sl2));
+      if(expression_constant_p(se1) && expression_constant_p(se2)){
+	int i1 = expression_to_int(se1);
+	int i2 = expression_to_int(se2);
+	i = i2>i1? 1 : (i2<i1? -1 : 0);
+      }else{
+	string s1 = words_to_string(words_expression(se1, NIL));
+	string s2 = words_to_string(words_expression(se2, NIL));
+	i = strcmp(s1, s2);
+      }
+    }
+  }
+
+  return i;
+}
+
 
 /* Order the two points-to relations according to the alphabetical
  * order of the underlying variables. Return -1, 0, or 1.
@@ -1223,4 +1449,31 @@ void remove_points_to_arcs(cell source, cell sink, pt_map pt)
 			       make_descriptor_none());
   remove_arc_from_pt_map(a, pt);
   free_points_to(a);
+}
+
+
+bool points_to_cell_equal_p(cell c1, cell c2)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  return reference_equal_p(r1,r2);
+}
+
+
+/* Compute A = A inter B: complexity in O(n2) */
+void
+points_to_cell_list_and(list * a, const list b)
+{
+  if (ENDP(*a))
+    return ;
+  if (!points_to_cell_in_list_p(CELL(CAR(*a)),b)) {
+    /* This element of a is not in list b: delete it: */
+    cons *aux = *a;
+
+    *a = CDR(*a);
+    free(aux);
+    points_to_cell_list_and(a, b);
+  }
+  else
+    points_to_cell_list_and(&CDR(*a), b);
 }

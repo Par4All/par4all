@@ -228,7 +228,9 @@ static void limit_uninteresting_parallelism_statement_out(statement s,
 	      FOREACH(ENTITY, local, l_locals)
 		{
 		  if (local != index
-		      && gen_find_eq( local, previous_parallel_loop_locals ) == entity_undefined )
+		      && gen_find_eq( local, previous_parallel_loop_locals ) == entity_undefined
+		      // && we should check that local is not declared inside the embedding loop
+		      )
 		    to_add = CONS(ENTITY, local, to_add);
 		}
 	      loop_locals(previous_parallel_loop) = gen_append(previous_parallel_loop_locals, to_add);

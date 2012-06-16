@@ -414,6 +414,53 @@ bool ultimate_type_equal_p(type t1, type t2)
   return generic_type_equal_p(ut1, ut2, false);
 }
 
+/* Expand typedefs before the type comparison. */
+bool concrete_type_equal_p(type t1, type t2)
+{
+  type ct1 = compute_basic_concrete_type(t1);
+  type ct2 = compute_basic_concrete_type(t2);
+  bool equal_p = generic_type_equal_p(ct1, ct2, false);
+  free_type(ct1), free_type(ct2);
+  return equal_p;
+}
+
+/* assume that a pointer to type x is equal to a 1-D array of x */
+bool array_pointer_type_equal_p(type t1, type t2)
+{
+  bool equal_p = true;
+  if(!type_equal_p(t1,t2)) {
+    if(pointer_type_p(t1) && array_type_p(t2)) {
+      type pt = type_to_pointed_type(t1);
+      basic pb = variable_basic(type_variable(pt));
+      variable etv = type_variable(t2);
+      basic eb = variable_basic(etv);
+      int d = (int) gen_length(variable_dimensions(etv));
+      equal_p = (d==1 && basic_equal_p(pb, eb));
+    }
+    else if(pointer_type_p(t2) && array_type_p(t1)) {
+      type pt = type_to_pointed_type(t2);
+      basic pb = variable_basic(type_variable(pt));
+      variable etv = type_variable(t1);
+      basic eb = variable_basic(etv);
+      int d = (int) gen_length(variable_dimensions(etv));
+      equal_p = (d==1 && basic_equal_p(pb, eb));
+    }
+    else
+      equal_p = false;
+  }
+  return equal_p;
+}
+
+/* Same as above, but resolve typedefs first. */
+bool concrete_array_pointer_type_equal_p(type t1, type t2)
+{
+  type ct1 = compute_basic_concrete_type(t1);
+  type ct2 = compute_basic_concrete_type(t2);
+  bool equal_p = array_pointer_type_equal_p(ct1, ct2);
+  free_type(ct1), free_type(ct2);
+  return equal_p;
+}
+
 type make_scalar_integer_type(_int n)
 {
     type t = make_type(is_type_variable,
