@@ -180,6 +180,7 @@ int license_plate(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -331,6 +332,7 @@ digraph "dag_0" {
   "in" -> "53 E8";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -829,6 +831,7 @@ int license_plate(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -980,6 +983,7 @@ digraph "dag_0" {
   "in" -> "53 E8";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1131,6 +1135,7 @@ digraph "dag_cleaned_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_spoc_helper_0_0" of module "license_plate" in dot format
+// DAG "license_plate_spoc_helper_0_0": #i=1 #o=1 #c=68 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1279,6 +1284,7 @@ digraph "license_plate_spoc_helper_0_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_spoc_helper_0_1" of module "license_plate" in dot format
+// DAG "license_plate_spoc_helper_0_1": #i=2 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_spoc_helper_0_1" {
   // inputs
   "in" [shape=circle];
@@ -2744,6 +2750,7 @@ int license_plate(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -2895,6 +2902,7 @@ digraph "dag_0" {
   "in" -> "53 E8";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -3046,6 +3054,7 @@ digraph "dag_cleaned_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_terapix_helper_0_0_0" of module "license_plate" in dot format
+// DAG "license_plate_terapix_helper_0_0_0": #i=1 #o=2 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -3079,6 +3088,7 @@ digraph "license_plate_terapix_helper_0_0_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_terapix_helper_0_0_1" of module "license_plate" in dot format
+// DAG "license_plate_terapix_helper_0_0_1": #i=2 #o=2 #c=18 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_terapix_helper_0_0_1" {
   // inputs
   "imclose_11" [shape=circle];
@@ -3129,6 +3139,7 @@ digraph "license_plate_terapix_helper_0_0_1" {
   "imopen_25" -> "58 E8";
 }
 // graph for dag "license_plate_terapix_helper_0_0_2" of module "license_plate" in dot format
+// DAG "license_plate_terapix_helper_0_0_2": #i=2 #o=2 #c=12 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_terapix_helper_0_0_2" {
   // inputs
   "imclose_2" [shape=circle];
@@ -3167,6 +3178,7 @@ digraph "license_plate_terapix_helper_0_0_2" {
   "imopen_16" -> "67 E8";
 }
 // graph for dag "license_plate_terapix_helper_0_0_3" of module "license_plate" in dot format
+// DAG "license_plate_terapix_helper_0_0_3": #i=2 #o=1 #c=19 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_terapix_helper_0_0_3" {
   // inputs
   "imcloseth" [shape=circle];
@@ -3218,6 +3230,7 @@ digraph "license_plate_terapix_helper_0_0_3" {
   "imopen_7" -> "78 D8";
 }
 // graph for dag "license_plate_terapix_helper_0_0_4" of module "license_plate" in dot format
+// DAG "license_plate_terapix_helper_0_0_4": #i=2 #o=1 #c=10 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_terapix_helper_0_0_4" {
   // inputs
   "imout_6" [shape=circle];
@@ -6034,6 +6047,7 @@ int license_plate(void)
 ! graphs
 
 // graph for dag "dag_0" of module "license_plate" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -6185,6 +6199,7 @@ digraph "dag_0" {
   "in" -> "53 E8";
 }
 // graph for dag "dag_cleaned_0" of module "license_plate" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=69 #s=4 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -6336,6 +6351,7 @@ digraph "dag_cleaned_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_opencl_helper_0_0" of module "license_plate" in dot format
+// DAG "license_plate_opencl_helper_0_0": #i=1 #o=1 #c=69 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -6487,6 +6503,7 @@ digraph "license_plate_opencl_helper_0_0" {
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_opencl_helper_0_0_1" of module "license_plate" in dot format
+// DAG "license_plate_opencl_helper_0_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_opencl_helper_0_0_1" {
   // inputs
   "imclose" [shape=circle];

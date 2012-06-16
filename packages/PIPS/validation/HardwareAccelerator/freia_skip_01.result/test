@@ -23,6 +23,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_skip_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -43,6 +44,7 @@ digraph "dag_0" {
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -99,6 +101,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_skip_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -119,6 +122,7 @@ digraph "dag_0" {
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -139,6 +143,7 @@ digraph "dag_cleaned_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_spoc_helper_0_0" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_spoc_helper_0_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_spoc_helper_0_0" {
   // inputs
   "i" [shape=circle];
@@ -154,6 +159,7 @@ digraph "freia_skip_01_spoc_helper_0_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_spoc_helper_0_1" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_spoc_helper_0_1": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_spoc_helper_0_1" {
   // inputs
   "t" [shape=circle];
@@ -370,6 +376,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_skip_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -390,6 +397,7 @@ digraph "dag_0" {
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -410,6 +418,7 @@ digraph "dag_cleaned_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_terapix_helper_0_0_0" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_terapix_helper_0_0_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
@@ -425,6 +434,7 @@ digraph "freia_skip_01_terapix_helper_0_0_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_terapix_helper_0_1_0" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_terapix_helper_0_1_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_terapix_helper_0_1_0" {
   // inputs
   "t" [shape=circle];
@@ -892,6 +902,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_skip_01" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "i" [shape=circle];
@@ -912,6 +923,7 @@ digraph "dag_0" {
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=3 #s=1 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "i" [shape=circle];
@@ -932,6 +944,7 @@ digraph "dag_cleaned_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_opencl_helper_0_0" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_opencl_helper_0_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_opencl_helper_0_0" {
   // inputs
   "i" [shape=circle];
@@ -947,6 +960,7 @@ digraph "freia_skip_01_opencl_helper_0_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_opencl_helper_0_0_0" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_opencl_helper_0_0_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_opencl_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
@@ -962,6 +976,7 @@ digraph "freia_skip_01_opencl_helper_0_0_0" {
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_opencl_helper_0_1" of module "freia_skip_01" in dot format
+// DAG "freia_skip_01_opencl_helper_0_1": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_skip_01_opencl_helper_0_1" {
   // inputs
   "t" [shape=circle];

@@ -1,0 +1,29 @@
+# To explore the impact of points-to properties on effects_with_points_to
+
+# 
+
+# Unlike properties01.tpips
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+# setproperty POINTS_TO_NULL_POINTER_DEREFERENCING TRUE
+
+setenv WSPACE=properties02
+delete $WSPACE
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WSPACE $WSPACE.c
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Proper effects for "$WSPACE"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+close
+delete $WSPACE
+quit

@@ -34,6 +34,7 @@ int main()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
    fclose(pFile);
+   return 0;
 }
 
 POINTS-TO
@@ -92,4 +93,9 @@ int main()
 // pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
    fclose(pFile);
+
+// Points To:
+// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return 0;
 }

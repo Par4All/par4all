@@ -3,7 +3,7 @@ POINTS TO
 
 
 // Points To IN:
-// argv[*] -> _argv_2 , MAY
+// argv[*] -> _argv_2[*] , MAY
 
 
 // Points To OUT: none
@@ -12,25 +12,25 @@ int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> _argv_2 , MAY
+// argv[*] -> _argv_2[*] , MAY
 
    int *pi;
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    float *px;
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    float *pz;
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
    int (*pt)[30];
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *HEAP*_l_12 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
    px = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *HEAP*_l_12 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // px -> *HEAP*_l_13 , EXACT
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
    pz = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *HEAP*_l_12 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // px -> *HEAP*_l_13 , EXACT
@@ -75,9 +75,19 @@ int main(int argc, char *argv[])
    pt = (int (*)[30]) malloc(sizeof(*pt));
 
 // Points To:
-// argv[*] -> _argv_2 , EXACT
+// argv[*] -> _argv_2[*] , EXACT
 // pi -> *HEAP*_l_12 , EXACT
 // pt -> *HEAP*_l_15[0] , EXACT
+// px -> *HEAP*_l_13 , EXACT
+// pz -> *HEAP*_l_14 , EXACT
+
+
+   pt++;
+
+// Points To:
+// argv[*] -> _argv_2[*] , EXACT
+// pi -> *HEAP*_l_12 , EXACT
+// pt -> *HEAP*_l_15[1] , EXACT
 // px -> *HEAP*_l_13 , EXACT
 // pz -> *HEAP*_l_14 , EXACT
 

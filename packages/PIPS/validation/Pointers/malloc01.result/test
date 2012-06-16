@@ -6,7 +6,7 @@ POINTS TO for malloc01
 
 
 // Points To OUT:
-// malloc01 -> *ANY_MODULE*:*HEAP* , EXACT
+// malloc01 -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
 
 char * malloc01(unsigned int n)
 {
@@ -16,14 +16,14 @@ char * malloc01(unsigned int n)
    char *p = malloc(n);
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP* , EXACT
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
 
 
    return p;
 
 // Points To:
-// malloc01 -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
+// malloc01 -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
 
    int i;
 }

@@ -24,5 +24,7 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 
 close
+# Memory leak: the second allocated area is lost when the first one is freed
+shell cat $WS.database/Warnings
 delete $WS
 quit

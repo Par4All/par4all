@@ -109,6 +109,7 @@ int anr999(void)
 ! graphs
 
 // graph for dag "dag_0" of module "anr999" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -189,6 +190,7 @@ digraph "dag_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_cleaned_0" of module "anr999" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -444,6 +446,7 @@ int anr999(void)
 ! graphs
 
 // graph for dag "anr999_spoc_helper_0_0" of module "anr999" in dot format
+// DAG "anr999_spoc_helper_0_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "anr999_spoc_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -504,6 +507,7 @@ digraph "anr999_spoc_helper_0_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_0" of module "anr999" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -584,6 +588,7 @@ digraph "dag_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_cleaned_0" of module "anr999" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -1362,6 +1367,7 @@ int anr999(void)
 ! graphs
 
 // graph for dag "anr999_terapix_helper_0_0_0" of module "anr999" in dot format
+// DAG "anr999_terapix_helper_0_0_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "anr999_terapix_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1422,6 +1428,7 @@ digraph "anr999_terapix_helper_0_0_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_0" of module "anr999" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -1502,6 +1509,7 @@ digraph "dag_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_cleaned_0" of module "anr999" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];
@@ -2591,6 +2599,7 @@ int anr999(void)
 ! graphs
 
 // graph for dag "anr999_opencl_helper_0_0" of module "anr999" in dot format
+// DAG "anr999_opencl_helper_0_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "anr999_opencl_helper_0_0" {
   // inputs
   "in" [shape=circle];
@@ -2651,6 +2660,7 @@ digraph "anr999_opencl_helper_0_0" {
   "in" -> "38 min";
 }
 // graph for dag "anr999_opencl_helper_0_0_1" of module "anr999" in dot format
+// DAG "anr999_opencl_helper_0_0_1": #i=3 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "anr999_opencl_helper_0_0_1" {
   // inputs
   "in" [shape=circle];
@@ -2671,6 +2681,7 @@ digraph "anr999_opencl_helper_0_0_1" {
   "in" -> "38 min";
 }
 // graph for dag "dag_0" of module "anr999" in dot format
+// DAG "dag_0": #i=1 #o=2 #c=33 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "in" [shape=circle];
@@ -2751,6 +2762,7 @@ digraph "dag_0" {
   "in" -> "38 min";
 }
 // graph for dag "dag_cleaned_0" of module "anr999" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=2 #c=23 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "in" [shape=circle];

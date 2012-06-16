@@ -30,6 +30,7 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_58" in dot format
+// DAG "dag_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "out" [shape=circle];
@@ -41,6 +42,7 @@ digraph "dag_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
+// DAG "dag_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_1" {
   // inputs
   "in" [shape=circle];
@@ -62,6 +64,7 @@ digraph "dag_1" {
   "out" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
@@ -73,6 +76,7 @@ digraph "dag_cleaned_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+// DAG "dag_cleaned_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_cleaned_1" {
   // inputs
   "in" [shape=circle];
@@ -144,6 +148,7 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_58" in dot format
+// DAG "dag_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "out" [shape=circle];
@@ -155,6 +160,7 @@ digraph "dag_0" {
   "out" -> "2 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
+// DAG "dag_1": #i=2 #o=1 #c=18 #s=23 #I=0 #B=0 #A=0
 digraph "dag_1" {
   // inputs
   "in" [shape=circle];
@@ -166,346 +172,349 @@ digraph "dag_1" {
   // computation vertices
   "61 vol" [shape=diamond];
   "60 ?" [shape=none];
-  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "52 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "60 ?" [arrowhead=empty,label="m"];
   "59 ?" [shape=none];
   "59 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "53 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "46 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
   "58 <" -> "out'";
   "57 ?" [shape=none];
   "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "52 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "45 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "51 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "44 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "57 ?" [arrowhead=empty,label="j"];
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out"];
-  "53 ?" [shape=none];
-  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "53 vol" [shape=diamond];
   "52 ?" [shape=none];
-  "52 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "46 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "51 <" [shape=trapezium,orientation=270];
-  "51 <" -> "54 D8" [label="out"];
-  "50 ?" [shape=none];
-  "50 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "45 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "47 D8" [shape=box];
-  "47 D8" -> "51 <" [label="out"];
-  "46 ?" [shape=none];
-  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "52 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "51 ?" [shape=none];
+  "51 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "50 <" [shape=trapezium,orientation=270];
+  "50 <" -> "54 D8" [label="out"];
+  "50 <" -> "53 vol" [label="out"];
+  "49 ?" [shape=none];
+  "49 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "44 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "46 D8" [shape=box];
+  "46 D8" -> "50 <" [label="out"];
   "45 ?" [shape=none];
-  "45 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "44 <" [shape=trapezium,orientation=270];
-  "44 <" -> "47 D8" [label="out"];
-  "43 ?" [shape=none];
-  "43 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "40 D8" [shape=box];
-  "40 D8" -> "44 <" [label="out"];
-  "39 ?" [shape=none];
-  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "44 ?" [shape=none];
+  "44 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "43 <" [shape=trapezium,orientation=270];
+  "43 <" -> "46 D8" [label="out"];
+  "42 ?" [shape=none];
+  "42 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "39 D8" [shape=box];
+  "39 D8" -> "43 <" [label="out"];
   "38 ?" [shape=none];
-  "38 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "37 <" [shape=trapezium,orientation=270];
-  "37 <" -> "40 D8" [label="out"];
-  "36 ?" [shape=none];
-  "36 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "33 D8" [shape=box];
-  "33 D8" -> "37 <" [label="out"];
-  "32 ?" [shape=none];
-  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "37 ?" [shape=none];
+  "37 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "36 <" [shape=trapezium,orientation=270];
+  "36 <" -> "39 D8" [label="out"];
+  "35 ?" [shape=none];
+  "35 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "32 D8" [shape=box];
+  "32 D8" -> "36 <" [label="out"];
   "31 ?" [shape=none];
-  "31 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "30 <" [shape=trapezium,orientation=270];
-  "30 <" -> "33 D8" [label="out"];
-  "29 ?" [shape=none];
-  "29 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "26 D8" [shape=box];
-  "26 D8" -> "30 <" [label="out"];
-  "25 ?" [shape=none];
-  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "30 ?" [shape=none];
+  "30 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "29 <" [shape=trapezium,orientation=270];
+  "29 <" -> "32 D8" [label="out"];
+  "28 ?" [shape=none];
+  "28 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "25 D8" [shape=box];
+  "25 D8" -> "29 <" [label="out"];
   "24 ?" [shape=none];
-  "24 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "23 <" [shape=trapezium,orientation=270];
-  "23 <" -> "26 D8" [label="out"];
-  "22 ?" [shape=none];
-  "22 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "19 D8" [shape=box];
-  "19 D8" -> "23 <" [label="out"];
-  "18 ?" [shape=none];
-  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "23 ?" [shape=none];
+  "23 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "22 <" [shape=trapezium,orientation=270];
+  "22 <" -> "25 D8" [label="out"];
+  "21 ?" [shape=none];
+  "21 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "23 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "18 D8" [shape=box];
+  "18 D8" -> "22 <" [label="out"];
   "17 ?" [shape=none];
-  "17 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "19 D8" [label="out"];
-  "15 ?" [shape=none];
-  "15 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "12 D8" [shape=box];
-  "12 D8" -> "16 <" [label="out"];
-  "11 ?" [shape=none];
-  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "17 ?" [arrowhead=empty,label="m"];
+  "16 ?" [shape=none];
+  "16 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "18 D8" [label="out"];
+  "14 ?" [shape=none];
+  "14 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "23 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "16 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "14 ?" [arrowhead=empty,label="j"];
+  "11 D8" [shape=box];
+  "11 D8" -> "15 <" [label="out"];
   "10 ?" [shape=none];
-  "10 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "9 <" [shape=trapezium,orientation=270];
-  "9 <" -> "12 D8" [label="out"];
+  "10 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "17 ?" [arrowhead=empty,label="m"];
+  "9 ?" [shape=none];
+  "9 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "8 <" [shape=trapezium,orientation=270];
+  "8 <" -> "11 D8" [label="out"];
   "in" -> "58 <";
-  "in" -> "51 <";
-  "in" -> "44 <";
-  "in" -> "37 <";
-  "in" -> "30 <";
-  "in" -> "23 <";
-  "in" -> "16 <";
-  "in" -> "9 <";
-  "5 D8" [shape=box];
-  "5 D8" -> "9 <" [label="out"];
-  "out" -> "5 D8";
+  "in" -> "50 <";
+  "in" -> "43 <";
+  "in" -> "36 <";
+  "in" -> "29 <";
+  "in" -> "22 <";
+  "in" -> "15 <";
+  "in" -> "8 <";
+  "4 D8" [shape=box];
+  "4 D8" -> "8 <" [label="out"];
+  "out" -> "4 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
@@ -517,6 +526,7 @@ digraph "dag_cleaned_0" {
   "out" -> "2 vol";
 }
 // graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+// DAG "dag_cleaned_1": #i=2 #o=1 #c=18 #s=23 #I=0 #B=0 #A=0
 digraph "dag_cleaned_1" {
   // inputs
   "in" [shape=circle];
@@ -528,346 +538,349 @@ digraph "dag_cleaned_1" {
   // computation vertices
   "61 vol" [shape=diamond];
   "60 ?" [shape=none];
-  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "52 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "60 ?" [arrowhead=empty,label="m"];
   "59 ?" [shape=none];
   "59 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "53 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "46 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "59 ?" [arrowhead=empty,label="l"];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
   "58 <" -> "out'";
   "57 ?" [shape=none];
   "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "52 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "45 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "51 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "44 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "57 ?" [arrowhead=empty,label="j"];
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out"];
-  "53 ?" [shape=none];
-  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "53 vol" [shape=diamond];
   "52 ?" [shape=none];
-  "52 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "46 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "51 <" [shape=trapezium,orientation=270];
-  "51 <" -> "54 D8" [label="out"];
-  "50 ?" [shape=none];
-  "50 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "45 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "47 D8" [shape=box];
-  "47 D8" -> "51 <" [label="out"];
-  "46 ?" [shape=none];
-  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "52 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "51 ?" [shape=none];
+  "51 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "51 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "50 <" [shape=trapezium,orientation=270];
+  "50 <" -> "54 D8" [label="out"];
+  "50 <" -> "53 vol" [label="out"];
+  "49 ?" [shape=none];
+  "49 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "49 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "44 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "46 D8" [shape=box];
+  "46 D8" -> "50 <" [label="out"];
   "45 ?" [shape=none];
-  "45 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "39 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "44 <" [shape=trapezium,orientation=270];
-  "44 <" -> "47 D8" [label="out"];
-  "43 ?" [shape=none];
-  "43 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "38 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "40 D8" [shape=box];
-  "40 D8" -> "44 <" [label="out"];
-  "39 ?" [shape=none];
-  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "45 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "44 ?" [shape=none];
+  "44 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "44 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "43 <" [shape=trapezium,orientation=270];
+  "43 <" -> "46 D8" [label="out"];
+  "42 ?" [shape=none];
+  "42 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "42 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "37 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "39 D8" [shape=box];
+  "39 D8" -> "43 <" [label="out"];
   "38 ?" [shape=none];
-  "38 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "32 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "37 <" [shape=trapezium,orientation=270];
-  "37 <" -> "40 D8" [label="out"];
-  "36 ?" [shape=none];
-  "36 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "31 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "33 D8" [shape=box];
-  "33 D8" -> "37 <" [label="out"];
-  "32 ?" [shape=none];
-  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "38 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "37 ?" [shape=none];
+  "37 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "37 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "36 <" [shape=trapezium,orientation=270];
+  "36 <" -> "39 D8" [label="out"];
+  "35 ?" [shape=none];
+  "35 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "35 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "30 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "32 D8" [shape=box];
+  "32 D8" -> "36 <" [label="out"];
   "31 ?" [shape=none];
-  "31 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "25 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "30 <" [shape=trapezium,orientation=270];
-  "30 <" -> "33 D8" [label="out"];
-  "29 ?" [shape=none];
-  "29 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "24 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "26 D8" [shape=box];
-  "26 D8" -> "30 <" [label="out"];
-  "25 ?" [shape=none];
-  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "31 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "30 ?" [shape=none];
+  "30 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "30 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "29 <" [shape=trapezium,orientation=270];
+  "29 <" -> "32 D8" [label="out"];
+  "28 ?" [shape=none];
+  "28 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "28 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "23 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "25 D8" [shape=box];
+  "25 D8" -> "29 <" [label="out"];
   "24 ?" [shape=none];
-  "24 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "18 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "23 <" [shape=trapezium,orientation=270];
-  "23 <" -> "26 D8" [label="out"];
-  "22 ?" [shape=none];
-  "22 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "17 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "19 D8" [shape=box];
-  "19 D8" -> "23 <" [label="out"];
-  "18 ?" [shape=none];
-  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "24 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "23 ?" [shape=none];
+  "23 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "23 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "22 <" [shape=trapezium,orientation=270];
+  "22 <" -> "25 D8" [label="out"];
+  "21 ?" [shape=none];
+  "21 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "21 ?" -> "23 ?" [arrowhead=empty,label="j"];
+  "16 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "18 D8" [shape=box];
+  "18 D8" -> "22 <" [label="out"];
   "17 ?" [shape=none];
-  "17 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "11 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "19 D8" [label="out"];
-  "15 ?" [shape=none];
-  "15 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "10 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "12 D8" [shape=box];
-  "12 D8" -> "16 <" [label="out"];
-  "11 ?" [shape=none];
-  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "17 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "17 ?" [arrowhead=empty,label="m"];
+  "16 ?" [shape=none];
+  "16 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "16 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "18 D8" [label="out"];
+  "14 ?" [shape=none];
+  "14 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "51 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "49 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "44 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "42 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "37 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "35 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "30 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "28 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "23 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "21 ?" [arrowhead=empty,label="j"];
+  "14 ?" -> "16 ?" [arrowhead=empty,label="j"];
+  "9 ?" -> "14 ?" [arrowhead=empty,label="j"];
+  "11 D8" [shape=box];
+  "11 D8" -> "15 <" [label="out"];
   "10 ?" [shape=none];
-  "10 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "9 <" [shape=trapezium,orientation=270];
-  "9 <" -> "12 D8" [label="out"];
+  "10 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "52 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "45 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "38 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "31 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "24 ?" [arrowhead=empty,label="m"];
+  "10 ?" -> "17 ?" [arrowhead=empty,label="m"];
+  "9 ?" [shape=none];
+  "9 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "51 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "44 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "37 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "30 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "23 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "9 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "8 <" [shape=trapezium,orientation=270];
+  "8 <" -> "11 D8" [label="out"];
   "in" -> "58 <";
-  "in" -> "51 <";
-  "in" -> "44 <";
-  "in" -> "37 <";
-  "in" -> "30 <";
-  "in" -> "23 <";
-  "in" -> "16 <";
-  "in" -> "9 <";
-  "5 D8" [shape=box];
-  "5 D8" -> "9 <" [label="out"];
-  "out" -> "5 D8";
+  "in" -> "50 <";
+  "in" -> "43 <";
+  "in" -> "36 <";
+  "in" -> "29 <";
+  "in" -> "22 <";
+  "in" -> "15 <";
+  "in" -> "8 <";
+  "4 D8" [shape=box];
+  "4 D8" -> "8 <" [label="out"];
+  "out" -> "4 D8";
 }
 // graph for dag "freia_58_spoc_helper_0_0" of module "freia_58" in dot format
+// DAG "freia_58_spoc_helper_0_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_spoc_helper_0_0" {
   // inputs
   "out" [shape=circle];
@@ -879,6 +892,7 @@ digraph "freia_58_spoc_helper_0_0" {
   "out" -> "2 vol";
 }
 // graph for dag "freia_58_spoc_helper_1_0" of module "freia_58" in dot format
+// DAG "freia_58_spoc_helper_1_0": #i=2 #o=1 #c=18 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_spoc_helper_1_0" {
   // inputs
   "in" [shape=circle];
@@ -894,43 +908,45 @@ digraph "freia_58_spoc_helper_1_0" {
   "58 <" -> "out'";
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out_1"];
-  "51 <" [shape=trapezium,orientation=270];
-  "51 <" -> "54 D8" [label="out_2"];
-  "47 D8" [shape=box];
-  "47 D8" -> "51 <" [label="out_3"];
-  "44 <" [shape=trapezium,orientation=270];
-  "44 <" -> "47 D8" [label="out_4"];
-  "40 D8" [shape=box];
-  "40 D8" -> "44 <" [label="out_5"];
-  "37 <" [shape=trapezium,orientation=270];
-  "37 <" -> "40 D8" [label="out_6"];
-  "33 D8" [shape=box];
-  "33 D8" -> "37 <" [label="out_7"];
-  "30 <" [shape=trapezium,orientation=270];
-  "30 <" -> "33 D8" [label="out_8"];
-  "26 D8" [shape=box];
-  "26 D8" -> "30 <" [label="out_9"];
-  "23 <" [shape=trapezium,orientation=270];
-  "23 <" -> "26 D8" [label="out_10"];
-  "19 D8" [shape=box];
-  "19 D8" -> "23 <" [label="out_11"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "19 D8" [label="out_12"];
-  "12 D8" [shape=box];
-  "12 D8" -> "16 <" [label="out_13"];
-  "9 <" [shape=trapezium,orientation=270];
-  "9 <" -> "12 D8" [label="out_14"];
+  "53 vol" [shape=diamond];
+  "50 <" [shape=trapezium,orientation=270];
+  "50 <" -> "54 D8" [label="out_2"];
+  "50 <" -> "53 vol" [label="out_2"];
+  "46 D8" [shape=box];
+  "46 D8" -> "50 <" [label="out_3"];
+  "43 <" [shape=trapezium,orientation=270];
+  "43 <" -> "46 D8" [label="out_4"];
+  "39 D8" [shape=box];
+  "39 D8" -> "43 <" [label="out_5"];
+  "36 <" [shape=trapezium,orientation=270];
+  "36 <" -> "39 D8" [label="out_6"];
+  "32 D8" [shape=box];
+  "32 D8" -> "36 <" [label="out_7"];
+  "29 <" [shape=trapezium,orientation=270];
+  "29 <" -> "32 D8" [label="out_8"];
+  "25 D8" [shape=box];
+  "25 D8" -> "29 <" [label="out_9"];
+  "22 <" [shape=trapezium,orientation=270];
+  "22 <" -> "25 D8" [label="out_10"];
+  "18 D8" [shape=box];
+  "18 D8" -> "22 <" [label="out_11"];
+  "15 <" [shape=trapezium,orientation=270];
+  "15 <" -> "18 D8" [label="out_12"];
+  "11 D8" [shape=box];
+  "11 D8" -> "15 <" [label="out_13"];
+  "8 <" [shape=trapezium,orientation=270];
+  "8 <" -> "11 D8" [label="out_14"];
   "in" -> "58 <";
-  "in" -> "51 <";
-  "in" -> "44 <";
-  "in" -> "37 <";
-  "in" -> "30 <";
-  "in" -> "23 <";
-  "in" -> "16 <";
-  "in" -> "9 <";
-  "5 D8" [shape=box];
-  "5 D8" -> "9 <" [label="out_15"];
-  "out" -> "5 D8";
+  "in" -> "50 <";
+  "in" -> "43 <";
+  "in" -> "36 <";
+  "in" -> "29 <";
+  "in" -> "22 <";
+  "in" -> "15 <";
+  "in" -> "8 <";
+  "4 D8" [shape=box];
+  "4 D8" -> "8 <" [label="out_15"];
+  "out" -> "4 D8";
 }
 
 ! acceleration function
@@ -993,7 +1009,7 @@ freia_status freia_58_spoc_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 17 ops and 0 copies, optimized to 17 ops and 0+0+0 copies
+// dag 1: 18 ops and 0 copies, optimized to 18 ops and 0+0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -1003,7 +1019,8 @@ freia_status freia_58_spoc_helper_1_0_0(
   const freia_data2d * i0,
   const freia_data2d * i1,
   const int32_t * pi0,
-  int32_t * po1)
+  int32_t * po1,
+  int32_t * po2)
 {
   spoc_instr si;
   spoc_param sp;
@@ -1020,159 +1037,161 @@ freia_status freia_58_spoc_helper_1_0_0(
 
 
   // STAGE 0
-  // out [0 input 1] -> [0 poc 1] 5 dilate_8c
+  // out [0 input 1] -> [0 poc 1] 4 dilate_8c
   // nope
-  // poc 5 dilate_8c stage 0 side 1
+  // poc 4 dilate_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_DILATE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][1].kernel[i] = pi0[i];
 
-  // in [0 input 0] -> [0 alu] 9 inf
+  // in [0 input 0] -> [0 alu] 8 inf
   // nope
-  // out_15 [0 poc 1] -> [0 alu] 9 inf
+  // out_15 [0 poc 1] -> [0 alu] 8 inf
   // nope
-  // alu 9 inf stage 0
+  // alu 8 inf stage 0
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 1
-  // out_14 [0 alu] -> [1 poc 0] 12 dilate_8c
+  // out_14 [0 alu] -> [1 poc 0] 11 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // out_14 [1 input 0] -> [1 poc 0] 12 dilate_8c
+  // out_14 [1 input 0] -> [1 poc 0] 11 dilate_8c
   // nope
-  // poc 12 dilate_8c stage 1 side 0
+  // poc 11 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = pi0[i];
 
-  // in [0 input 0] -> [1 alu] 16 inf
+  // in [0 input 0] -> [1 alu] 15 inf
   si.mux[0][1].op = SPOC_MUX_IN0;
   si.mux[0][3].op = SPOC_MUX_IN0;
-  // in [1 input 1] -> [1 alu] 16 inf
+  // in [1 input 1] -> [1 alu] 15 inf
   // nope
-  // out_13 [1 poc 0] -> [1 alu] 16 inf
+  // out_13 [1 poc 0] -> [1 alu] 15 inf
   // nope
-  // alu 16 inf stage 1
+  // alu 15 inf stage 1
   si.alu[1][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 2
-  // out_12 [1 alu] -> [2 poc 0] 19 dilate_8c
+  // out_12 [1 alu] -> [2 poc 0] 18 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
-  // out_12 [2 input 0] -> [2 poc 0] 19 dilate_8c
+  // out_12 [2 input 0] -> [2 poc 0] 18 dilate_8c
   // nope
-  // poc 19 dilate_8c stage 2 side 0
+  // poc 18 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
   si.poc[2][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[2][0].kernel[i] = pi0[i];
 
-  // in [1 poc 1] -> [2 alu] 23 inf
+  // in [1 poc 1] -> [2 alu] 22 inf
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // in [2 input 1] -> [2 alu] 23 inf
+  // in [2 input 1] -> [2 alu] 22 inf
   // nope
-  // out_11 [2 poc 0] -> [2 alu] 23 inf
+  // out_11 [2 poc 0] -> [2 alu] 22 inf
   // nope
-  // alu 23 inf stage 2
+  // alu 22 inf stage 2
   si.alu[2][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 3
-  // out_10 [2 alu] -> [3 poc 0] 26 dilate_8c
+  // out_10 [2 alu] -> [3 poc 0] 25 dilate_8c
   si.mux[2][0].op = SPOC_MUX_IN1;
   si.mux[2][2].op = SPOC_MUX_IN0;
-  // out_10 [3 input 0] -> [3 poc 0] 26 dilate_8c
+  // out_10 [3 input 0] -> [3 poc 0] 25 dilate_8c
   // nope
-  // poc 26 dilate_8c stage 3 side 0
+  // poc 25 dilate_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_DILATE;
   si.poc[3][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[3][0].kernel[i] = pi0[i];
 
-  // in [2 poc 1] -> [3 alu] 30 inf
+  // in [2 poc 1] -> [3 alu] 29 inf
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // in [3 input 1] -> [3 alu] 30 inf
+  // in [3 input 1] -> [3 alu] 29 inf
   // nope
-  // out_9 [3 poc 0] -> [3 alu] 30 inf
+  // out_9 [3 poc 0] -> [3 alu] 29 inf
   // nope
-  // alu 30 inf stage 3
+  // alu 29 inf stage 3
   si.alu[3][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 4
-  // out_8 [3 alu] -> [4 poc 0] 33 dilate_8c
+  // out_8 [3 alu] -> [4 poc 0] 32 dilate_8c
   si.mux[3][0].op = SPOC_MUX_IN1;
   si.mux[3][2].op = SPOC_MUX_IN0;
-  // out_8 [4 input 0] -> [4 poc 0] 33 dilate_8c
+  // out_8 [4 input 0] -> [4 poc 0] 32 dilate_8c
   // nope
-  // poc 33 dilate_8c stage 4 side 0
+  // poc 32 dilate_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_DILATE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[4][0].kernel[i] = pi0[i];
 
-  // in [3 poc 1] -> [4 alu] 37 inf
+  // in [3 poc 1] -> [4 alu] 36 inf
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // in [4 input 1] -> [4 alu] 37 inf
+  // in [4 input 1] -> [4 alu] 36 inf
   // nope
-  // out_7 [4 poc 0] -> [4 alu] 37 inf
+  // out_7 [4 poc 0] -> [4 alu] 36 inf
   // nope
-  // alu 37 inf stage 4
+  // alu 36 inf stage 4
   si.alu[4][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 5
-  // out_6 [4 alu] -> [5 poc 0] 40 dilate_8c
+  // out_6 [4 alu] -> [5 poc 0] 39 dilate_8c
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // out_6 [5 input 0] -> [5 poc 0] 40 dilate_8c
+  // out_6 [5 input 0] -> [5 poc 0] 39 dilate_8c
   // nope
-  // poc 40 dilate_8c stage 5 side 0
+  // poc 39 dilate_8c stage 5 side 0
   si.poc[5][0].op = SPOC_POC_DILATE;
   si.poc[5][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[5][0].kernel[i] = pi0[i];
 
-  // in [4 poc 1] -> [5 alu] 44 inf
+  // in [4 poc 1] -> [5 alu] 43 inf
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // in [5 input 1] -> [5 alu] 44 inf
+  // in [5 input 1] -> [5 alu] 43 inf
   // nope
-  // out_5 [5 poc 0] -> [5 alu] 44 inf
+  // out_5 [5 poc 0] -> [5 alu] 43 inf
   // nope
-  // alu 44 inf stage 5
+  // alu 43 inf stage 5
   si.alu[5][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // STAGE 6
-  // out_4 [5 alu] -> [6 poc 0] 47 dilate_8c
+  // out_4 [5 alu] -> [6 poc 0] 46 dilate_8c
   si.mux[5][0].op = SPOC_MUX_IN1;
   si.mux[5][2].op = SPOC_MUX_IN0;
-  // out_4 [6 input 0] -> [6 poc 0] 47 dilate_8c
+  // out_4 [6 input 0] -> [6 poc 0] 46 dilate_8c
   // nope
-  // poc 47 dilate_8c stage 6 side 0
+  // poc 46 dilate_8c stage 6 side 0
   si.poc[6][0].op = SPOC_POC_DILATE;
   si.poc[6][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[6][0].kernel[i] = pi0[i];
 
-  // in [5 poc 1] -> [6 alu] 51 inf
+  // in [5 poc 1] -> [6 alu] 50 inf
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // in [6 input 1] -> [6 alu] 51 inf
+  // in [6 input 1] -> [6 alu] 50 inf
   // nope
-  // out_3 [6 poc 0] -> [6 alu] 51 inf
+  // out_3 [6 poc 0] -> [6 alu] 50 inf
   // nope
-  // alu 51 inf stage 6
+  // alu 50 inf stage 6
   si.alu[6][0].op = SPOC_ALU_INF_IN0_IN1;
+
+  // out_2 [6 alu] -> [6 measure 0] 50 inf
+  si.mux[6][0].op = SPOC_MUX_IN1;
+  si.mux[6][2].op = SPOC_MUX_IN0;
 
 
   // STAGE 7
-  // out_2 [6 alu] -> [7 poc 0] 54 dilate_8c
-  si.mux[6][0].op = SPOC_MUX_IN1;
-  si.mux[6][2].op = SPOC_MUX_IN0;
+  // out_2 [6 measure 0] -> [7 poc 0] 54 dilate_8c
   // out_2 [7 input 0] -> [7 poc 0] 54 dilate_8c
   // nope
   // poc 54 dilate_8c stage 7 side 0
@@ -1221,8 +1240,11 @@ freia_status freia_58_spoc_helper_1_0_0(
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
+  // measure 53 global_vol stage 6 side 0
+  *po1 = (int32_t) reduc.measure[6][0].volume;
+
   // measure 61 global_vol stage 7 side 0
-  *po1 = (int32_t) reduc.measure[7][0].volume;
+  *po2 = (int32_t) reduc.measure[7][0].volume;
 
   return ret;
 }
@@ -1234,45 +1256,44 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    int volprevious, volcurrent, i, j, k, l, m, n;                       /*0001*/
    freia_58_spoc_helper_0_0_0(out, &volcurrent);                        /*0002*/
    do {                                                                 /*0003*/
-      volprevious = volcurrent;                                         /*0004*/
-      i = 1;                                                            /*0006*/
-      k = 0;                                                            /*0007*/
-      j = 0;                                                            /*0008*/
-      i = 1;                                                            /*0013*/
-      k = 0;                                                            /*0014*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0005*/
+      k = 0;                                                            /*0006*/
+      j = 0;                                                            /*0007*/
+      i = 1;                                                            /*0012*/
+      k = 0;                                                            /*0013*/
+      i = 1;                                                            /*0019*/
+      k = 0;                                                            /*0020*/
+      i = 1;                                                            /*0026*/
+      k = 0;                                                            /*0027*/
+      i = 1;                                                            /*0033*/
+      k = 0;                                                            /*0034*/
+      i = 1;                                                            /*0040*/
+      k = 0;                                                            /*0041*/
+      i = 1;                                                            /*0047*/
+      k = 0;                                                            /*0048*/
       i = 1;                                                            /*0055*/
       k = 0;                                                            /*0056*/
-      freia_58_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);   /*0005*/
-      l = j;                                                            /*0010*/
-      m |= l;                                                           /*0011*/
-      j = 0;                                                            /*0015*/
-      l = j;                                                            /*0017*/
-      m |= l;                                                           /*0018*/
-      j = 0;                                                            /*0022*/
-      l = j;                                                            /*0024*/
-      m |= l;                                                           /*0025*/
-      j = 0;                                                            /*0029*/
-      l = j;                                                            /*0031*/
-      m |= l;                                                           /*0032*/
-      j = 0;                                                            /*0036*/
-      l = j;                                                            /*0038*/
-      m |= l;                                                           /*0039*/
-      j = 0;                                                            /*0043*/
-      l = j;                                                            /*0045*/
-      m |= l;                                                           /*0046*/
-      j = 0;                                                            /*0050*/
-      l = j;                                                            /*0052*/
-      m |= l;                                                           /*0053*/
+      freia_58_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volprevious, &volcurrent);    /*0004*/
+      l = j;                                                            /*0009*/
+      m |= l;                                                           /*0010*/
+      j = 0;                                                            /*0014*/
+      l = j;                                                            /*0016*/
+      m |= l;                                                           /*0017*/
+      j = 0;                                                            /*0021*/
+      l = j;                                                            /*0023*/
+      m |= l;                                                           /*0024*/
+      j = 0;                                                            /*0028*/
+      l = j;                                                            /*0030*/
+      m |= l;                                                           /*0031*/
+      j = 0;                                                            /*0035*/
+      l = j;                                                            /*0037*/
+      m |= l;                                                           /*0038*/
+      j = 0;                                                            /*0042*/
+      l = j;                                                            /*0044*/
+      m |= l;                                                           /*0045*/
+      j = 0;                                                            /*0049*/
+      l = j;                                                            /*0051*/
+      m |= l;                                                           /*0052*/
       j = 0;                                                            /*0057*/
       l = j;                                                            /*0059*/
       m |= l;                                                           /*0060*/
@@ -1289,44 +1310,43 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    int volprevious, volcurrent, i, j, k, l, m, n;                       /*0001*/
    freia_58_spoc_helper_0_0_0(out, &volcurrent);                        /*0002*/
    do {                                                                 /*0003*/
-      volprevious = volcurrent;                                         /*0004*/
-      i = 1;                                                            /*0006*/
-      k = 0;                                                            /*0007*/
-      j = 0;                                                            /*0008*/
-      i = 1;                                                            /*0013*/
-      k = 0;                                                            /*0014*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0005*/
+      k = 0;                                                            /*0006*/
+      j = 0;                                                            /*0007*/
+      i = 1;                                                            /*0012*/
+      k = 0;                                                            /*0013*/
+      i = 1;                                                            /*0019*/
+      k = 0;                                                            /*0020*/
+      i = 1;                                                            /*0026*/
+      k = 0;                                                            /*0027*/
+      i = 1;                                                            /*0033*/
+      k = 0;                                                            /*0034*/
+      i = 1;                                                            /*0040*/
+      k = 0;                                                            /*0041*/
+      i = 1;                                                            /*0047*/
+      k = 0;                                                            /*0048*/
       i = 1;                                                            /*0055*/
       k = 0;                                                            /*0056*/
-      freia_58_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);   /*0005*/
-      l = 0;                                                            /*0010*/
+      freia_58_spoc_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volprevious, &volcurrent);    /*0004*/
+      l = 0;                                                            /*0009*/
 
-      j = 0;                                                            /*0015*/
-      l = 0;                                                            /*0017*/
+      j = 0;                                                            /*0014*/
+      l = 0;                                                            /*0016*/
 
-      j = 0;                                                            /*0022*/
-      l = 0;                                                            /*0024*/
+      j = 0;                                                            /*0021*/
+      l = 0;                                                            /*0023*/
 
-      j = 0;                                                            /*0029*/
-      l = 0;                                                            /*0031*/
+      j = 0;                                                            /*0028*/
+      l = 0;                                                            /*0030*/
 
-      j = 0;                                                            /*0036*/
-      l = 0;                                                            /*0038*/
+      j = 0;                                                            /*0035*/
+      l = 0;                                                            /*0037*/
 
-      j = 0;                                                            /*0043*/
-      l = 0;                                                            /*0045*/
+      j = 0;                                                            /*0042*/
+      l = 0;                                                            /*0044*/
 
-      j = 0;                                                            /*0050*/
-      l = 0;                                                            /*0052*/
+      j = 0;                                                            /*0049*/
+      l = 0;                                                            /*0051*/
 
       j = 0;                                                            /*0057*/
       l = 0;                                                            /*0059*/
@@ -1365,6 +1385,7 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_58" in dot format
+// DAG "dag_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "out" [shape=circle];
@@ -1376,6 +1397,7 @@ digraph "dag_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
+// DAG "dag_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_1" {
   // inputs
   "in" [shape=circle];
@@ -1397,6 +1419,7 @@ digraph "dag_1" {
   "out" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
@@ -1408,6 +1431,7 @@ digraph "dag_cleaned_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+// DAG "dag_cleaned_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_cleaned_1" {
   // inputs
   "in" [shape=circle];
@@ -1429,6 +1453,7 @@ digraph "dag_cleaned_1" {
   "out" -> "10 D8";
 }
 // graph for dag "freia_58_terapix_helper_0_0_0" of module "freia_58" in dot format
+// DAG "freia_58_terapix_helper_0_0_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_terapix_helper_0_0_0" {
   // inputs
   "out" [shape=circle];
@@ -1440,6 +1465,7 @@ digraph "freia_58_terapix_helper_0_0_0" {
   "out" -> "7 vol";
 }
 // graph for dag "freia_58_terapix_helper_1_0_0" of module "freia_58" in dot format
+// DAG "freia_58_terapix_helper_1_0_0": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_terapix_helper_1_0_0" {
   // inputs
   "in" [shape=circle];
@@ -1995,6 +2021,7 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 ! graphs
 
 // graph for dag "dag_0" of module "freia_58" in dot format
+// DAG "dag_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "out" [shape=circle];
@@ -2006,6 +2033,7 @@ digraph "dag_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
+// DAG "dag_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_1" {
   // inputs
   "in" [shape=circle];
@@ -2027,6 +2055,7 @@ digraph "dag_1" {
   "out" -> "10 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
@@ -2038,6 +2067,7 @@ digraph "dag_cleaned_0" {
   "out" -> "7 vol";
 }
 // graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+// DAG "dag_cleaned_1": #i=2 #o=1 #c=3 #s=2 #I=0 #B=0 #A=0
 digraph "dag_cleaned_1" {
   // inputs
   "in" [shape=circle];
@@ -2059,6 +2089,7 @@ digraph "dag_cleaned_1" {
   "out" -> "10 D8";
 }
 // graph for dag "freia_58_opencl_helper_0_0" of module "freia_58" in dot format
+// DAG "freia_58_opencl_helper_0_0": #i=1 #o=0 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_opencl_helper_0_0" {
   // inputs
   "out" [shape=circle];
@@ -2070,6 +2101,7 @@ digraph "freia_58_opencl_helper_0_0" {
   "out" -> "7 vol";
 }
 // graph for dag "freia_58_opencl_helper_1_0" of module "freia_58" in dot format
+// DAG "freia_58_opencl_helper_1_0": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_opencl_helper_1_0" {
   // inputs
   "in" [shape=circle];
@@ -2089,6 +2121,7 @@ digraph "freia_58_opencl_helper_1_0" {
   "out" -> "10 D8";
 }
 // graph for dag "freia_58_opencl_helper_1_0_1" of module "freia_58" in dot format
+// DAG "freia_58_opencl_helper_1_0_1": #i=2 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "freia_58_opencl_helper_1_0_1" {
   // inputs
   "in" [shape=circle];

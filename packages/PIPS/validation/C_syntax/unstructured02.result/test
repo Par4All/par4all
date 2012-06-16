@@ -98,11 +98,12 @@ SKIP:      if (a2==a1) goto _break_2;
       goto l99997;
 l99999:      ;
 
-      if (lambda==0.)
+      if (lambda==0.) {
          if (1>a2)
             ;
          else if (1>b)
             ;
+      }
       else if (1>a2)
          ;
       else if (1>b)

@@ -6,7 +6,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
-setproperty POINTS_TO_PATH_LIMIT 10
+# Should be 10, but 2 is better for debugging
+setproperty POINTS_TO_PATH_LIMIT 2
 
 # Key property for this test case
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE

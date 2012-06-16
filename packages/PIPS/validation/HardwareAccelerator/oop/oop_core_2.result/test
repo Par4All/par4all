@@ -139,6 +139,7 @@ int oop_core(void)
 ! graphs
 
 // graph for dag "dag_0" of module "oop_core" in dot format
+// DAG "dag_0": #i=3 #o=1 #c=20 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "img0" [shape=circle];
@@ -203,6 +204,7 @@ digraph "dag_0" {
   "img0" -> "61 =";
 }
 // graph for dag "dag_cleaned_0" of module "oop_core" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "img0" [shape=circle];
@@ -513,6 +515,7 @@ int oop_core(void)
 ! graphs
 
 // graph for dag "dag_0" of module "oop_core" in dot format
+// DAG "dag_0": #i=3 #o=1 #c=20 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "img0" [shape=circle];
@@ -577,6 +580,7 @@ digraph "dag_0" {
   "img0" -> "61 =";
 }
 // graph for dag "dag_cleaned_0" of module "oop_core" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "img0" [shape=circle];
@@ -630,6 +634,7 @@ digraph "dag_cleaned_0" {
   "img0" -> "68 E8";
 }
 // graph for dag "oop_core_spoc_helper_0_0" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_0" {
   // inputs
   "img0" [shape=circle];
@@ -648,6 +653,7 @@ digraph "oop_core_spoc_helper_0_0" {
   "img0" -> "67 D8";
 }
 // graph for dag "oop_core_spoc_helper_0_1" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_1": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_1" {
   // inputs
   "imgtt2" [shape=circle];
@@ -666,6 +672,7 @@ digraph "oop_core_spoc_helper_0_1" {
   "imgtt2" -> "76 D8";
 }
 // graph for dag "oop_core_spoc_helper_0_2" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_2": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_2" {
   // inputs
   "img1_3" [shape=circle];
@@ -685,6 +692,7 @@ digraph "oop_core_spoc_helper_0_2" {
   "imgtmp" -> "81 -|";
 }
 // graph for dag "oop_core_spoc_helper_0_3" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_3": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_3" {
   // inputs
   "imgtt4" [shape=circle];
@@ -703,6 +711,7 @@ digraph "oop_core_spoc_helper_0_3" {
   "imgtt4" -> "95 D8";
 }
 // graph for dag "oop_core_spoc_helper_0_4" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_4": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_4" {
   // inputs
   "img1_3" [shape=circle];
@@ -722,6 +731,7 @@ digraph "oop_core_spoc_helper_0_4" {
   "img1_3" -> "100 -|";
 }
 // graph for dag "oop_core_spoc_helper_0_5" of module "oop_core" in dot format
+// DAG "oop_core_spoc_helper_0_5": #i=2 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_spoc_helper_0_5" {
   // inputs
   "img1" [shape=circle];
@@ -1593,6 +1603,7 @@ int oop_core(void)
 ! graphs
 
 // graph for dag "dag_0" of module "oop_core" in dot format
+// DAG "dag_0": #i=3 #o=1 #c=20 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "img0" [shape=circle];
@@ -1657,6 +1668,7 @@ digraph "dag_0" {
   "img0" -> "61 =";
 }
 // graph for dag "dag_cleaned_0" of module "oop_core" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "img0" [shape=circle];
@@ -1710,6 +1722,7 @@ digraph "dag_cleaned_0" {
   "img0" -> "68 E8";
 }
 // graph for dag "oop_core_terapix_helper_0_0_0" of module "oop_core" in dot format
+// DAG "oop_core_terapix_helper_0_0_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_terapix_helper_0_0_0" {
   // inputs
   "img0" [shape=circle];
@@ -2657,6 +2670,7 @@ int oop_core(void)
 ! graphs
 
 // graph for dag "dag_0" of module "oop_core" in dot format
+// DAG "dag_0": #i=3 #o=1 #c=20 #s=0 #I=2 #B=0 #A=0
 digraph "dag_0" {
   // inputs
   "img0" [shape=circle];
@@ -2721,6 +2735,7 @@ digraph "dag_0" {
   "img0" -> "61 =";
 }
 // graph for dag "dag_cleaned_0" of module "oop_core" in dot format
+// DAG "dag_cleaned_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
   "img0" [shape=circle];
@@ -2774,6 +2789,7 @@ digraph "dag_cleaned_0" {
   "img0" -> "68 E8";
 }
 // graph for dag "oop_core_opencl_helper_0_0" of module "oop_core" in dot format
+// DAG "oop_core_opencl_helper_0_0": #i=3 #o=1 #c=17 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_opencl_helper_0_0" {
   // inputs
   "img0" [shape=circle];
@@ -2827,6 +2843,7 @@ digraph "oop_core_opencl_helper_0_0" {
   "img0" -> "67 D8";
 }
 // graph for dag "oop_core_opencl_helper_0_0_1" of module "oop_core" in dot format
+// DAG "oop_core_opencl_helper_0_0_1": #i=6 #o=2 #c=5 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_opencl_helper_0_0_1" {
   // inputs
   "img1_4" [shape=circle];
@@ -2860,6 +2877,7 @@ digraph "oop_core_opencl_helper_0_0_1" {
   "imtmp_4" -> "69 -";
 }
 // graph for dag "oop_core_opencl_helper_0_0_3" of module "oop_core" in dot format
+// DAG "oop_core_opencl_helper_0_0_3": #i=2 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
 digraph "oop_core_opencl_helper_0_0_3" {
   // inputs
   "img1" [shape=circle];
