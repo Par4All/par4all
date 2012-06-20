@@ -1,0 +1,40 @@
+
+POINTS TO for assignment17
+
+
+// Points To IN:
+// _qq_1[*] -> *NULL_POINTER* , MAY
+// _qq_1[*] -> _qq_1_1[*] , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1 , MAY
+
+
+// Points To OUT:
+// _qq_1[*] -> *NULL_POINTER* , MAY
+// _qq_1[*] -> _qq_1_1[*] , MAY
+
+void assignment17(int **qq)
+{
+
+// Points To:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1 , MAY
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1 , MAY
+
+   p = *qq;
+
+// Points To:
+// _qq_1[*] -> *NULL_POINTER* , MAY
+// _qq_1[*] -> _qq_1_1[*] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _qq_1_1[0] , MAY
+// qq -> _qq_1 , EXACT
+
+   return;
+}

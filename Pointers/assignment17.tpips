@@ -1,0 +1,37 @@
+setenv WS=assignment17
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+# The test is much easier with this property set to true
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+echo
+echo POINTS TO for "$WS"
+echo
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+quit
+
+echo
+echo EFFECTS WITH POINTS-TO "$WS"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo EFFECTS WITH POINTS-TO "$WS"
+echo
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

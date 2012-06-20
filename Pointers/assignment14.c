@@ -6,4 +6,5 @@ struct foo {int * ip1; int * ip2;} ;
  void assignment(struct foo** t1, struct foo** t2) 
  {
    (**t1).ip1 =(**t2).ip2;
+   return;
  } 
