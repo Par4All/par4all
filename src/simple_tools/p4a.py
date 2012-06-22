@@ -374,8 +374,12 @@ def main():
             options.cuda_cc=2
         elif options.cuda_cc == "2.1":
             options.cuda_cc=2.1
+        elif options.cuda_cc == "3.0":
+            options.cuda_cc=3.0
+        elif options.cuda_cc == "3.5":
+            options.cuda_cc=3.5
         else:
-            p4a_util.die("Unknown CUDA compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0 2.1)")
+            p4a_util.die("Unknown CUDA compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0 2.1 3.0 3.5)")
 
         if options.simple and (options.cuda or options.opencl or options.openmp or options.scmp):
             p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp  and/or --opencl")

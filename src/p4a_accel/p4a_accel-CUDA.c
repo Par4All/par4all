@@ -15,7 +15,7 @@ static int computeCoresForDevice(struct cudacc cc, int multiproc) {
     return 32*multiproc;
   } else if (cc.major==2 and cc.minor==1) {
     return 48*multiproc;
-  } else if (cc.major==3 and cc.minor==0) {
+  } else if (cc.major==3) {
     return 192*multiproc;
   } else {
     P4A_dump_message("Unknown architecture for compute capability %d.%d, assume 32 cores per SM, please report to support@par4all.org\n",cc.major,cc.minor);
