@@ -484,6 +484,7 @@ struct p4a_cl_kernel *new_p4a_kernel(const char *kernel)
   strcpy(p4a_kernels_list[nKernel].name,kernel);
   p4a_kernels_list[nKernel].kernel = NULL;
   char* kernelFile;
+  int asprintf(char **strp, const char *fmt, ...);
   asprintf(&kernelFile,"./%s.cl",kernel);
   strcpy(p4a_kernels_list[nKernel].file_name,kernelFile);
   return &p4a_kernels_list[nKernel];
