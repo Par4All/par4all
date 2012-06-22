@@ -1,5 +1,5 @@
-Release notes for Par4All 1.4, 2012/05/01
-=========================================
+Release notes for Par4All 1.4.2, 2012/06/22
+===========================================
 
 Par4All is an open-source environment to do source-to-source
 transformations on C and Fortran programs for parallelizing, optimizing,
@@ -26,7 +26,7 @@ guide.
 More documentation and information is available on http://par4all.org.
 
 If you need more complex transformations, parallelizations and
-optimizations, you may contact HPC Project for professional support and
+optimizations, you may contact SILKAN for professional support and
 you can mail to: support@par4all.org
 
 
