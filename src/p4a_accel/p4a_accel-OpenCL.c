@@ -484,6 +484,7 @@ struct p4a_cl_kernel *new_p4a_kernel(const char *kernel)
   strcpy(p4a_kernels_list[nKernel].name,kernel);
   p4a_kernels_list[nKernel].kernel = NULL;
   char* kernelFile;
+  int asprintf(char **strp, const char *fmt, ...);
   asprintf(&kernelFile,"./%s.cl",kernel);
   strcpy(p4a_kernels_list[nKernel].file_name,kernelFile);
   return &p4a_kernels_list[nKernel];
@@ -738,6 +739,7 @@ void P4A_copy_to_accel(size_t element_size,
 					NULL,
 					&p4a_event);
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
+  // clFlush(p4a_queue); // Maybe required by some OpenCL implementation ?
 
   if(p4a_timing) {
     P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
