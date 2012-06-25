@@ -6,13 +6,17 @@ Named "Par4all," this platform will merge various open source developments. Par4
 
 HPC Project is committed to promote the technology CRI developed by maintaining a dedicated Internet portal, federating contributions and supporting the integration process of the platform's software components. With Par4all, HPC Project will offer the software industry new ways to address more easily intensive computation domains where parallelism is a determining factor.
 
+
 About CRI
 
 The "Centre de Recherche en Informatique, Mathématiques et systèmes, MINES ParisTech" (http://www.cri.mines-paristech.fr) is the Center for research in computing, mathematics and systems from the Ecole des Mines belonging to the ParisTech group. The CRI studies languages used in computer science such as programming, data description, or query languages. The CRI develops semantic analysis and automatic transformation of these languages to answer industrial needs (performance, development cost and time-to-market) as well as administrative and societal needs (coherent data sharing, data normalization, access to data and heritage protection).
 
-About HPC-Project
+
+About HPC Project
 
 HPC Project (http://www.hpc-project.com) was established in December 2007. HPC Project is a pioneer in developing tools and strategies for high performance computing and code optimization. HPC Project goal is to bring the power of supercomputer on the engineer's desk.
+
+In 2012, HPC Project is renamed SILKAN and is more focused on high-end simulation.
 
 
 Par4All is composed right now from the PIPS project.

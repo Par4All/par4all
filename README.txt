@@ -1,12 +1,12 @@
-Par4All version 1.3
-===================
+Par4All version 1.4.2
+=====================
 
 Par4all merges various free and open source developments. Par4All aims to
 achieve the migration of software to multi-core and other parallel
 processors, as well as to accelerating processors such as GPU. It is based
 on multiple components, including the source-to-source compiler framework
 PIPS (Inter Procedural Parallelization of scientific programs), and is
-developed by HPC Project, MINES ParisTech and Institut Télécom.
+developed by SILKAN, MINES ParisTech and Institut Télécom.
 
 With one command line, Par4All automatically transforms C and Fortran
 sequential programs to parallel ones. It will offer code execution
@@ -58,7 +58,9 @@ New features :
 - This version of Par4All can generate OpenCL host and kernel codes.
 - Generation codes for the SCMP dataflow architecture from CEA.
 - Some more options on ``p4a``, such as --atomic to use atomic operations
-  for parallelizing reductions on GPU.
+  for parallelizing reductions on GPU, --com-optimization to optimize
+  communications between the host and the GPU, --kernel-unroll=... to
+  unroll loops inside kernels...
 
 Look at the changelog file for more details.
 
@@ -74,7 +76,7 @@ refer to Par4All installation guide.
 Contact
 -------
 
-HPC Project
+SILKAN
 9, route du Colonel Marcel Moraine
 92360 Meudon La Forêt
 FRANCE

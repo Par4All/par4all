@@ -1,4 +1,4 @@
-2012-05-31 Ronan Keryell <Ronan.Keryell@wild-systems.com>
+2012-06-22 Ronan Keryell <Ronan.Keryell@wild-systems.com>
 
  * Par4All 1.4.2
 
@@ -15,6 +15,15 @@
      compute-intensive loops
 
    * Add a git-svn-switch script to ease upstream SVN URL changes
+
+   * Fix scalarization to avoid scalarizing a local variable used in an
+     array subscript
+
+   * New taskify phase to begin producing StarPU tasks
+
+   * Take into account CUDA 3.0 and 3.5 architecture
+
+   * Take into account the new name of HPC Project: SILKAN
 
 
 2012-05-17 Ronan Keryell <Ronan.Keryell@hpc-project.com>
