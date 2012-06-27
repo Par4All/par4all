@@ -84,7 +84,8 @@ int inc01(int *pi)
 //             <    is read   >: pi
 //             <    is written>: q
    q = pi;
-//             <may be read   >: _pi_1[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: _pi_1[0]
+//             <    is read   >: q
 //             <    is written>: i
    i = *q;
 //             <    is read   >: i q

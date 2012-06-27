@@ -19,6 +19,7 @@ int struct06()
 //             <    is read   >: i x[i].deux.second
 //             <    is written>: x[i].un.first
       x[i].un.first = x[i].deux.second;
+   return 0;
 }
 
 POINTS-TO
@@ -58,4 +59,8 @@ int struct06()
 // Points To: none
 
       x[i].un.first = x[i].deux.second;
+
+// Points To: none
+
+   return 0;
 }
