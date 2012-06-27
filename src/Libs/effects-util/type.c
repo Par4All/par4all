@@ -437,7 +437,12 @@ type cell_to_type(cell c, bool *to_be_freed)
   return cell_reference_to_type(ref, to_be_freed);
 }
 
-/* FI: I need more generality than is offered by cell_to_type() */
+/* FI: I need more generality than is offered by cell_to_type()
+ *
+ * Maybe because of fields.
+ *
+ * Surely because of implicit arrays linked to scalar pointers
+ */
 type points_to_reference_to_type(reference ref, bool *to_be_freed)
 {
   type t = type_undefined;

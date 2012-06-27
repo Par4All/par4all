@@ -201,6 +201,9 @@ pt_map reference_dereferencing_to_points_to(reference r,
 {
   reference nr = copy_reference(r);
   cell source = make_cell_reference(nr);
+  /* Remove store-dependent indices */
+  reference_indices(nr) =
+    subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
   list sinks = source_to_sinks(source, in, false);
   int n = (int) gen_length(sinks);
   FOREACH(CELL, sink, sinks) {

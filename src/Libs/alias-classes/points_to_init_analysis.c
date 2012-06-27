@@ -154,7 +154,7 @@ entity create_stub_entity(entity e, type t)
   // entity_undefined_p(stub));
 
   // Compute the pointed type
-  type pt = type_undefined;
+  type pt = type_undefined; // FI: should be copy_type(t)
   if(type_variable_p(t)){
     basic bb = variable_basic(type_variable(t));
     basic base = copy_basic(bb);
@@ -170,7 +170,8 @@ entity create_stub_entity(entity e, type t)
     //
     // To sum up, things are better if the typing is
     // strict... although most C programs are not strictly typed.
-    if(!type_strict_p && !struct_type_p(t)) {
+    // FI: this is dealt with at a much higher level
+    if(false && !type_strict_p && !struct_type_p(t)) {
       expression ex = make_unbounded_expression();
       dimension d = make_dimension(int_to_expression(0),ex);
       variable v = make_variable(base,
@@ -181,6 +182,9 @@ entity create_stub_entity(entity e, type t)
     else
       pt = copy_type(t);
   } 
+  else if (type_functional_p(t)){
+      pt = copy_type(t);
+  }
   else if (type_void_p(t)){
     pt = make_type_void(NIL);
   }
@@ -200,9 +204,19 @@ entity create_stub_entity(entity e, type t)
   return stub;
 }
 
+/* Create a stub entity "se" for entity "v" with type "t" and return a
+ * cell based on a reference to the stub entity "se" with "d"
+ * unbounded subscripts to account for the dimension of the source and
+ * a zero subscript for implicit array.
+ *
+ * It is not clear if type "t" already accounts for the extra "d"
+ * dimensions... Can we assert "t==points_to_cell_to_type(sink_cell)"?
+ */
 cell create_scalar_stub_sink_cell(entity v, type t, int d)
 {
-  entity formal_parameter = create_stub_entity(v, t);
+  // FI: "d" must already have been taken into account in "t" for the
+  // typing of "stub_entity" to be correct...
+  entity stub_entity = create_stub_entity(v, t);
   reference sink_ref = reference_undefined;
 
   /* Do we want to assume that "int * p;" defines a pointer to an
@@ -214,22 +228,32 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
      && !type_functional_p(t)
      && !array_type_p(t)) {
     //sink_ref =
-    //make_reference(formal_parameter,
+    //make_reference(stub_entity,
     //		     CONS(EXPRESSION, make_unbounded_expression(), NIL));
     //sink_ref =
-    //  make_reference(formal_parameter,
+    //  make_reference(stub_entity,
     //		     CONS(EXPRESSION, int_to_expression(0), NIL));
-    sink_ref = make_reference(formal_parameter,  NIL);
+    sink_ref = make_reference(stub_entity,  NIL);
   }
   else {
-    if(array_type_p(t)) {
-      // sink_ref =
-      // make_reference(formal_parameter,
-      // CONS(EXPRESSION, make_unbounded_expression(), NIL));
-      sink_ref = make_reference(formal_parameter,  NIL);
+    // FI: I do not think we can have a reliable test here to decide
+    // if a zero subscript must be added or not
+    if(array_type_p(t) && d==0) {
+      // For the initialization of pi in Pointers/inc01, a zero
+      // subscript is needed
+      // FI: to get p->_p_1[0]
+      // FI: why not a set of zero subscripts in some other cases?
+      sink_ref =
+	make_reference(stub_entity,
+		       CONS(EXPRESSION, make_zero_expression(), NIL));
+      // FI: to get p->_p_1
+      // sink_ref = make_reference(stub_entity,  NIL);
+      // FI: I may also want _argv_2[*] if the source is an array and I
+      // am in the initialization phase... See for instance malloc02()
+      // See also below the loop over d
     }
     else
-      sink_ref = make_reference(formal_parameter,  NIL);
+      sink_ref = make_reference(stub_entity,  NIL);
   }
 
   int i;
@@ -241,17 +265,58 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
     // sl = CONS(EXPRESSION, int_to_expression(0), sl);
     ;
   }
-  reference_indices(sink_ref) = sl;
+
+  reference_indices(sink_ref) = gen_nconc(sl, reference_indices(sink_ref));
 
   cell sink_cell = make_cell_reference(sink_ref);
   return sink_cell;
 }
+
+/* Count the number of array indices and ignore the field
+ * subscripts.
+ */
+int points_to_indices_to_array_index_number(list sl)
+{
+  int c = 0;
+  FOREACH(EXPRESSION, s, sl) {
+    if(!expression_reference_p(s))
+      c++;
+  }
+  return c;
+}
+
+/* FI: probably a duplicate... */
+void points_to_indices_to_unbounded_indices(list sl)
+{
+  list csl = NIL;
+  for(csl = sl; !ENDP(csl); POP(csl)) {
+    expression se = EXPRESSION(CAR(csl));
+    if(!expression_reference_p(se)) {
+      if(!unbounded_expression_p(se)) {
+	free_expression(se);
+	EXPRESSION_(CAR(csl)) = make_unbounded_expression();
+      }
+    }
+  }
+  return; // Useful for gdb?
+}
 
 
-/* To create the points-to between a formal parameter or a global
+/* To create the points-to "pt_to" between a cell "c" containing a
+ * constant path reference based on a formal parameter or a global
  * variable or another stub on one hand, and another new stub on the
- * other. Or to create a points-to for any reference to a formal
- * parameter, a global variable or a points-to stub.
+ * other. The type of the sink is argument "st".
+ *
+ * It is not clear why "st" is an argument. "st" is not modified by
+ * side effect to take into account dimensions implied by the
+ * reference in cell "c" because a copy, "nst" is used, but it may be
+ * embedded in the definition of the sink stub in the scalar case...
+ *
+ * Argument "exact_p" specifies the approximation of the generated
+ * points-to.
+ *
+ * Assumption: the reference in cell "c" is a constant memory
+ * path. Should it be checked?
  *
  * The type of cell c and the type of the sink that is generated must
  * fit in some complicated way:
@@ -268,23 +333,52 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
  * if the source is partially subscripted?
  *
  * This function must be consistent with type compatibility checks
- * used in points-to analysis.
+ * used in points-to analysis, points_to_cell_types_compatibility(nl, r).
  *
- * The sink name is a concatenation of the formal parameter and the
- * POINTS_TO_MODULE_NAME.
+ * The global sink name of the generated stub is a concatenation of
+ * the formal parameter, underscore, some number, and
+ * POINTS_TO_MODULE_NAME as module name.
  *
  * Also, we have a choice: either points to the first element of an
  * implicit array or points towards the array itself. To be consistent
  * with the interpretation of "p=a;" and "p=&a[0]", we chose to points
  * towards the object itself. But Pass effects_with_points_to seems to
  * expect pointers to the first array element. A normalization
- * function could be used.
+ * function could be used to switch from one convention to the
+ * other. The current idea is that, as much as possibke, points-to
+ * "c1->c2" implies that "c1==&c2;" holds.
  *
  * As regards Point 3, Beatrice Creusillet also suggests to check if
  * the source cell is an array and then to generate a special sink
- * with an unbounded expression to express the fact that several
- * targets are defined at once and that the set of arcs is between any
- * element of the source and any target.
+ * with a list of unbounded expressions as first dimension to express
+ * the fact that several targets are defined at once and that the set
+ * of arcs is between any element of the source and any target. Of
+ * course, several arrays may be used when structs of structs with
+ * array fields are defined.
+ *
+ * Here, we needs lots of examples with constant memory path
+ * references to prepare a precise specification of the desired
+ * function. Let c stands for the reference hidden in cell "c":
+ *
+ * assignment13.c: "c=_t2_2_2[0][ip2];": here we have an array of structs
+ * containing a pointer field. Beatrice would like us to infer
+ * _t2_2_2[*][ip2] -> _t2_2_2_2[*]... Imagine the general case with
+ * structs with arrays of structs with... We may also want an arc
+ * _t2_2_2[*][ip2] -> NULL (see property
+ * POINTS_TO_NULL_POINTER_INITIALIZATION), or even an arc
+ * _t2_2_2[*][ip2] -> UNDEFINED (not implemented).
+ * We may also want: _t2_2_2[*][ip2] -> _t2_2_2_2[*][0]
+ *
+ * * "void foo(int *p) c=p;": depending on property on strict typing,
+ * POINTS_TO_STRICT_POINTER_TYPES, we want either p -> _p_1
+ * or p -> _p_1[0]
+ *
+ * * "void foo(int * pa[10]) {int * c=pa[0];}": pa[*] -> NULL, pa[*]
+ * -> _pa_1[*] but c->_pa_1[0]
+ *
+ * ptr_to_array01.c: "int ptr_to_array01(int * (*p)[10]) {int a; (*p)[3] = &a;}"
+ * p->_p_1, p_1[3] -> a
+ *
  *
  * FI: if we single out the NULL pointer value, this has to be a may
  * points-to. Another discussion about stubs is based on the fact that
@@ -292,9 +386,15 @@ cell create_scalar_stub_sink_cell(entity v, type t, int d)
  * are only one cell at run-time and for any specific execution of the
  * called function.
  *
- * Singling out the NULL pointers is useful to exploit conditions in
- * tests and while loops. It may also lead to more precise
- * fix-points for the points-to graph.
+ * Singling out the NULL (and UNDEFINED?) pointer values is useful to
+ * exploit conditions in tests and while loops. It may also lead to
+ * more precise fix-points for the points-to graph. This issue is
+ * dealt with in many different places. It impacts the approximation
+ * of the generated points-to. The approximation itself is another
+ * issue as pointed out by Beatrice Creusillet because we may have an
+ * approximation on the source noce, on the sink node or on the
+ * arc. Currently, an exact approximation seems to indicate that no
+ * approximation at all is made.
  *
  * The cell "c" is not embedded in the generated points-to "pt_to". A
  * copy is allocated. The output has no sharing with the input
@@ -305,63 +405,89 @@ points_to create_stub_points_to(cell c, // source of the points-to
 				// or the sink cell reference...
 				bool exact_p)
 {
-  points_to pt_to = points_to_undefined;
+  //points_to pt_to = points_to_undefined;
   //reference sink_ref = reference_undefined;
   cell source_cell = copy_cell(c);
   reference r = cell_any_reference(source_cell);
   entity v = reference_variable(r);
-  //list sl = reference_indices(r); // They may include fields as well
+  list sl = reference_indices(r); // They may include fields as well
                                   // as usual array subscripts
-  //int rd = (int) gen_length(sl); // FI: To be used later
+  //int rd = (int) gen_length(sl); // FI: To be used later, too simple to handle fields
 
   // FI->AM: we do not resolve the typedef, nor the dimensions hidden by
   // the typedefs...
-  type vt = entity_type(v);
-  variable vv = type_variable(vt);
-  list dl = variable_dimensions(vv);
-  int vd = (int) gen_length(dl);
-
-  //pips_assert("source dimension is well known", source_dim==vd);
-
+  // type vt = entity_type(v);
+  bool to_be_freed;
+  type vt = points_to_cell_to_type(c, &to_be_freed);
   cell sink_cell = cell_undefined;
+  bool e_exact_p = true;
 
-  if(vd==0) {
-    // "st" can be an array type
-    // variable_entity_dimension();
-    // variable_dimension_number();
-    sink_cell = create_scalar_stub_sink_cell(v, st, vd);
-  }
-  else {
-    // The source is an array of pointers of you do not know what...
-    list ndl = gen_full_copy_list(dl);
-    // Add these dimensions to "st"
-    type nst = copy_type(st);
-    // FI: quid of arrays of functions, type equivalent to pointers to
-    // functions?
-    pips_assert("type_variable_p(nst)", type_variable_p(nst));
-    variable nstv = type_variable(st);
-    variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
-    sink_cell = create_scalar_stub_sink_cell(v, st, vd);
-    //reference r = cell_any_reference(sink_cell);
-    // Add the missing subscripts to the sink cell reference, if they
-    // are not added by create_scalar_stub_sink()
-    /*
-    int i;
-    for(i=0;i<vd;i++) {
-      expression use = make_unbounded_expression();
-      reference_indices(r) = gen_nconc(CONS(EXPRESSION, use, NIL),
-				       reference_indices(r));
+  if(type_variable_p(vt)) {
+    variable vv = type_variable(vt);
+    list dl = variable_dimensions(vv);
+    int vd = (int) gen_length(dl);
+
+    //pips_assert("source dimension is well known", source_dim==vd);
+
+    // Cell array dimension count (some subscripts are fields)
+    int cd = points_to_indices_to_array_index_number(sl);
+
+    if(cd==0 && vd==0) {
+      // "st" can be an array type
+      // variable_entity_dimension();
+      // variable_dimension_number();
+      sink_cell = create_scalar_stub_sink_cell(v, st, vd);
+      e_exact_p = exact_p;
     }
-    */
-
-    //pips_internal_error("Not implemented yet!\n");
+    else if(cd>0) {
+      // In case subscript indices have constant values, replace them
+      // with unbounded expressions
+      points_to_indices_to_unbounded_indices(sl);
+      // dimensions to be added to the dimensions of "st"
+      list ndl = make_unbounded_dimensions(cd);
+      type nst = copy_type(st);
+      pips_assert("type_variable_p(nst)", type_variable_p(nst));
+      variable nstv = type_variable(nst);
+      variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
+      sink_cell = create_scalar_stub_sink_cell(v, nst, vd);
+      // FI: this should be performed by the previous function
+      points_to_cell_add_unbounded_subscripts(sink_cell);
+      e_exact_p = false;
+    }
+    else { //cd==0 && vd>0
+      // The source is an array of pointers of you do not know what...
+      // The processing is almost identical to the one above
+      list ndl = gen_full_copy_list(dl);
+      // Add these dimensions to "st"
+      type nst = copy_type(st);
+      // FI: quid of arrays of functions, type equivalent to pointers to
+      // functions?
+      pips_assert("type_variable_p(nst)", type_variable_p(nst));
+      variable nstv = type_variable(nst);
+      variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
+      sink_cell = create_scalar_stub_sink_cell(v, nst, vd);
+      // Adapt the source cell
+      reference scr = cell_any_reference(source_cell);
+      reference_indices(scr) = NIL; // memory leak, free_expressions()
+      points_to_cell_add_unbounded_subscripts(source_cell);
+      e_exact_p = false;
+    }
   }
+  else if(type_functional_p(vt)) {
+    sink_cell = create_scalar_stub_sink_cell(v, copy_type(st), 0);
+    e_exact_p = true;
+  }
+  else
+    pips_internal_error("Unexpected case.\n");
 
-  approximation rel = exact_p? make_approximation_exact():
+  points_to_cell_types_compatibility(source_cell, sink_cell);
+  approximation rel = e_exact_p? make_approximation_exact():
     make_approximation_may();
-  pt_to = make_points_to(source_cell, sink_cell, rel,
+  points_to pt_to = make_points_to(source_cell, sink_cell, rel,
 			 make_descriptor_none());
   pointer_index ++;
+
+  if(to_be_freed) free_type(vt);
   
   return pt_to;
 }
@@ -414,7 +540,7 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t, bool exact_p)
   }
   
   string formal_name = strdup(concatenate(get_current_module_name() ,MODULE_SEP_STRING, s, NULL));
-  entity formal_parameter = gen_find_entity(formal_name);
+  entity stub_entity = gen_find_entity(formal_name);
   type pt = type_undefined;
   bool type_strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
   bb = variable_basic(type_variable(t));
@@ -437,7 +563,7 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t, bool exact_p)
   else
     pt = copy_type(t);    
 
-  if(entity_undefined_p(formal_parameter)) {
+  if(entity_undefined_p(stub_entity)) {
     entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,
 					    POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
     // FI->AM: weird, it is redone when the entity already exists
@@ -445,7 +571,7 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t, bool exact_p)
     storage rs = make_storage_ram(make_ram(get_current_module_entity(),
 					   DummyTarget,
 					   UNKNOWN_RAM_OFFSET, NIL));
-    formal_parameter = make_entity(formal_name,
+    stub_entity = make_entity(formal_name,
 				   pt,
 				   // FI->AM: if it is made rom, then
 				   // the entitY is no longer
@@ -456,14 +582,14 @@ points_to create_pointer_to_array_stub_points_to(cell c, type t, bool exact_p)
   }
 
   if(type_strict_p)
-    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+    sink_ref = make_reference(stub_entity, CONS(EXPRESSION, int_to_expression(0), NIL));
   else if((int)gen_length(l_dim)>1){
-    sink_ref = make_reference(formal_parameter,l_ind);
+    sink_ref = make_reference(stub_entity,l_ind);
   }
   else {
-    // sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+    // sink_ref = make_reference(stub_entity, CONS(EXPRESSION, int_to_expression(0), NIL));
     // FI: no reason to index an array; see "p = &a;"
-    sink_ref = make_reference(formal_parameter, NIL);
+    sink_ref = make_reference(stub_entity, NIL);
   }
 
   cell sink_cell = make_cell_reference(sink_ref);
@@ -778,45 +904,43 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
 }
 
 
-/* t is supposed to be a concrete type */
+/* Type "t" is supposed to be a concrete type.
+ *
+ * Type "t" may be modified: no.
+ *
+ * Cell "c" is copied.
+ *
+ * The dimensions of type "t" are forgotten. They are retrieved later
+ * from the type of the entity references in cell "c".
+ */
 set array_formal_parameter_to_stub_points_to(type t, cell c)
 {
   set pt_in = set_generic_make(set_private,
 			       points_to_equal_p,
 			       points_to_rank);
-  bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
   basic fpb = variable_basic(type_variable(t));
+
   if(basic_pointer_p(fpb)) {
     reference r = cell_any_reference(c);
     entity e = reference_variable(r);
-    //expression ind = make_unbounded_expression();
-    //reference ref = make_reference(e, CONS(EXPRESSION, ind, NULL));
     reference ref = make_reference(e, NULL);
     reference_consistent_p(ref);
     cell cel = make_cell_reference(ref);
     type pt = copy_type(basic_pointer(fpb));
-    list sl = NIL;
-    if(array_type_p(t)) {
-      // FI->BC: to follow Beatrice's idea that dimensions of the sources
-      // have to be replicated in the target
-      // I am afraid this is going to make typing and subscript analysis impossible
-      // I do not see the point of addind a unique extra-dimension
-      // The fun part: imagine a n-D array of pointers towards m-D arrays...
-      // The target stub is an n+m-D array...
-      list dl = variable_dimensions(type_variable(t));
-      list ndl = gen_full_copy_list(dl);
-      variable_dimensions(type_variable(pt))
-	= gen_nconc(ndl, variable_dimensions(type_variable(pt)));
-      int d = gen_length(dl), i;
-      for(i=0;i<d; i++) {
-	sl = CONS(EXPRESSION, make_unbounded_expression(), sl);
-      }
+
+    bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+    if(scalar_type_p(pt) && !strict_p) {
+      /* Add an artificial dimension for pointer arithmetic */
+      expression l = make_zero_expression();
+      expression u = make_unbounded_expression();
+      dimension d = make_dimension(l,u);
+      variable ptv = type_variable(pt);
+      variable_dimensions(ptv) = CONS(DIMENSION, d, NIL);
     }
-    // FI: d is recomputed below in the same way
+
+    bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
     points_to pt_to = create_stub_points_to(cel, pt, exact_p);
-    cell source = points_to_source(pt_to);
-    reference sr = cell_any_reference(source);
-    reference_indices(sr) = gen_nconc(sl, reference_indices(sr));
+    //cell source = points_to_source(pt_to);
     pt_in = set_add_element(pt_in, pt_in,
 			    (void*) pt_to );
   }
