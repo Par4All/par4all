@@ -1113,6 +1113,16 @@ expression int_to_expression(_int i)
     return exp;
 }
 
+/* Make a zero expression.
+ *
+ * It is useful compared to int_to_expression(0) because it is much
+ * easier to search in source text.
+ */
+expression make_zero_expression(void)
+{
+  return int_to_expression(0);
+}
+
 expression float_to_expression(float c)
 {
     entity e = float_to_entity(c);

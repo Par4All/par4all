@@ -5051,6 +5051,19 @@ type type_to_array_type(type t)
   return at;
 }
 
+/* Minimal information to build a d-dimensional array type. */
+list make_unbounded_dimensions(int d)
+{
+  list dl = NIL;
+  int i;
+  for(i=0; i<d;i++) {
+    dimension d = make_dimension(int_to_expression(0),
+				 make_unbounded_expression());
+    dl = CONS(DIMENSION, d, dl);
+  }
+  return dl;
+}
+
 /*
  *  that is all
  */
