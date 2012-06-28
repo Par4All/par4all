@@ -366,8 +366,14 @@ bool same_type_p(type t1, type t2)
 
    Francois Irigoin, 10 March 1992
 */
-/* If strict_p, a typedef type is not equal to its definition. */
-bool generic_type_equal_p(type t1, type t2, bool strict_p)
+/* If strict_p, a typedef type is not equal to its definition (default value).
+ *
+ * If qualifier_p, qualifiers must be equal (default value).
+ *
+ * This function should be static and used only indirectly via
+ * type_equal_p(), etc.
+ */
+bool generic_type_equal_p(type t1, type t2, bool strict_p, bool qualifier_p)
 {
   bool tequal = false;
 
@@ -387,10 +393,10 @@ bool generic_type_equal_p(type t1, type t2, bool strict_p)
   case is_type_area:
     return area_equal_p(type_area(t1), type_area(t2));
   case is_type_variable:
-    tequal = generic_variable_equal_p(type_variable(t1), type_variable(t2), strict_p);
+    tequal = generic_variable_equal_p(type_variable(t1), type_variable(t2), strict_p, qualifier_p);
     return tequal;
   case is_type_functional:
-    return generic_functional_equal_p(type_functional(t1), type_functional(t2), strict_p);
+    return generic_functional_equal_p(type_functional(t1), type_functional(t2), strict_p, qualifier_p);
   case is_type_unknown:
     return true;
   case is_type_void:
@@ -404,14 +410,19 @@ bool generic_type_equal_p(type t1, type t2, bool strict_p)
 
 bool type_equal_p(type t1, type t2)
 {
-  return generic_type_equal_p(t1, t2, true);
+  return generic_type_equal_p(t1, t2, true, true);
+}
+
+bool type_equal_up_to_qualifiers_p(type t1, type t2)
+{
+  return generic_type_equal_p(t1, t2, true, false);
 }
 
 bool ultimate_type_equal_p(type t1, type t2)
 {
   type ut1 = ultimate_type(t1);
   type ut2 = ultimate_type(t2);
-  return generic_type_equal_p(ut1, ut2, false);
+  return generic_type_equal_p(ut1, ut2, false, true);
 }
 
 /* Expand typedefs before the type comparison. */
@@ -419,7 +430,7 @@ bool concrete_type_equal_p(type t1, type t2)
 {
   type ct1 = compute_basic_concrete_type(t1);
   type ct2 = compute_basic_concrete_type(t2);
-  bool equal_p = generic_type_equal_p(ct1, ct2, false);
+  bool equal_p = generic_type_equal_p(ct1, ct2, false, true);
   free_type(ct1), free_type(ct2);
   return equal_p;
 }
@@ -428,7 +439,7 @@ bool concrete_type_equal_p(type t1, type t2)
 bool array_pointer_type_equal_p(type t1, type t2)
 {
   bool equal_p = true;
-  if(!type_equal_p(t1,t2)) {
+  if(!type_equal_up_to_qualifiers_p(t1,t2)) {
     if(pointer_type_p(t1) && array_type_p(t2)) {
       type pt = type_to_pointed_type(t1);
       basic pb = variable_basic(type_variable(pt));
@@ -504,7 +515,7 @@ bool qualifiers_equal_p(list dims1, list dims2) {
     return gen_equals(dims1,dims2,(gen_eq_func_t)qualifier_equal_p);
 }         
 
-bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
+bool generic_variable_equal_p(variable v1, variable v2, bool strict_p, bool qualifier_p)
 {
   if(v1 == v2)
       return true;
@@ -517,7 +528,7 @@ bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
       return 
 	generic_basic_equal_p(variable_basic(v1), variable_basic(v2), strict_p)
 	&& dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2))
-	&& qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
+	&& (!qualifier_p || qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2))) ;
 
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
@@ -551,7 +562,7 @@ bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
 
 bool variable_equal_p(variable v1, variable v2)
 {
-  return generic_variable_equal_p(v1, v2, true);
+  return generic_variable_equal_p(v1, v2, true, true);
 }
 
 bool generic_basic_equal_p(basic b1, basic b2, bool strict_p)
@@ -654,7 +665,8 @@ bool same_basic_p(basic b1, basic b2)
 
 }
 
-bool generic_functional_equal_p(functional f1, functional f2, bool strict_p)
+bool generic_functional_equal_p(functional f1, functional f2, bool strict_p,
+				bool qualifier_p)
 {
     if(f1 == f2)
 	return true;
@@ -673,20 +685,21 @@ bool generic_functional_equal_p(functional f1, functional f2, bool strict_p)
 	    parameter p1 = PARAMETER(CAR(lp1));
 	    parameter p2 = PARAMETER(CAR(lp2));
 
-	    if(!generic_parameter_equal_p(p1, p2, strict_p))
+	    if(!generic_parameter_equal_p(p1, p2, strict_p, qualifier_p))
 		return false;
 	}
 
-	return generic_type_equal_p(functional_result(f1), functional_result(f2), strict_p);
+	return generic_type_equal_p(functional_result(f1), functional_result(f2), strict_p, qualifier_p);
     }
 }
 
 bool functional_equal_p(functional f1, functional f2)
 {
-  return generic_functional_equal_p(f1, f2, true);
+  return generic_functional_equal_p(f1, f2, true, true);
 }
 
-bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p)
+bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p,
+			       bool qualifier_p)
 {
     if(p1 == p2)
 	return true;
@@ -695,13 +708,13 @@ bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p)
     else if (p1 != parameter_undefined && p2 == parameter_undefined)
 	return false;
     else
-      return generic_type_equal_p(parameter_type(p1), parameter_type(p2), strict_p)
+      return generic_type_equal_p(parameter_type(p1), parameter_type(p2), strict_p, qualifier_p)
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
 }
 
 bool parameter_equal_p(parameter p1, parameter p2)
 {
-  return generic_parameter_equal_p(p1, p2, true);
+  return generic_parameter_equal_p(p1, p2, true, true);
 }
 
 bool mode_equal_p(mode m1, mode m2)

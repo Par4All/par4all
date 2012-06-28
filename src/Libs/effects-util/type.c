@@ -976,7 +976,7 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    // reference lr = cell_any_reference(l);
 	    // reference_add_zero_subscripts(lr, ult);
 	    type pt = compute_basic_concrete_type(basic_pointer(ultb));
-	    if(generic_type_equal_p(pt, urt, false)) {
+	    if(generic_type_equal_p(pt, urt, false, false)) {
 	      // FI: subscripts must be added to the source reference lr
 	      // FI: implicit typing of pointers as array of pointers
 	      reference lr = cell_any_reference(l);
