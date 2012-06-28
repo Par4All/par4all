@@ -963,10 +963,17 @@ list global_source_to_sinks(cell source, pt_map pts)
   reference r = cell_any_reference(source);
   entity v = reference_variable(r);
   list sinks = NIL;
-  type st = type_to_pointed_type(ultimate_type(entity_type(v)));
-  // FI: the type retrieval must be improved for arrays & Co
-  //points_to pt = create_stub_points_to(source, st, basic_undefined);
+  type ist = type_to_pointed_type(ultimate_type(entity_type(v)));
+  type st = type_undefined;
   points_to pt = points_to_undefined;
+
+  bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(scalar_type_p(ist) && !strict_p) {
+    /* Add an implicit dimension for pointer arithmetic */
+    st = type_to_array_type(ist);
+  }
+  else
+    st = copy_type(ist);
 
   if(const_variable_p(v)) {
     expression init = variable_initial_expression(v);
