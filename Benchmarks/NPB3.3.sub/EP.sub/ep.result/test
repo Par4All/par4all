@@ -119,7 +119,7 @@ int main()
    
    vranlc(0, &dum[0], dum[1], &dum[2]);
    dum[0] = randlc(&dum[1], dum[2]);
-   for(i = 0; i <= 131071; i += 1)
+   for(i = 0; i <= 2*(1<<16)-1; i += 1)
       x[i] = -1.0e99;
    Mops = log(sqrt(fabs(1.0>1.0?1.0:1.0)));
 
@@ -194,7 +194,7 @@ _break_5:      ;
       if (timers_enabled)
          timer_start(1);
 
-      for(i = 0; i <= 65535; i += 1) {
+      for(i = 0; i <= (1<<16)-1; i += 1) {
          x1 = 2.0*x[2*i]-1.0;
          x2 = 2.0*x[2*i+1]-1.0;
          t1 = x1*x1+x2*x2;
