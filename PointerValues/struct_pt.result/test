@@ -37,28 +37,28 @@ int main()
    m = (my_str *) malloc(sizeof(my_str));
 
 // Pointer values:
-// m == &*HEAP*_l_10 (exact);
+// m == &*HEAP*_l_11 (exact);
 // n == *ANY_MODULE*:*UNDEFINED* (exact);
 
    m->i = 1;
 
 // Pointer values:
-// m == &*HEAP*_l_10 (exact);
+// m == &*HEAP*_l_11 (exact);
 // n == *ANY_MODULE*:*UNDEFINED* (exact);
 
    m->p = &j;
 
 // Pointer values:
-// *HEAP*_l_10.p == &j (exact);
-// m == &*HEAP*_l_10 (exact);
+// *HEAP*_l_11.p == &j (exact);
+// m == &*HEAP*_l_11 (exact);
 // m[0].p == &j (exact);
 // n == *ANY_MODULE*:*UNDEFINED* (exact);
 
    n = m;
 
 // Pointer values:
-// *HEAP*_l_10.p == &j (exact);
-// m == &*HEAP*_l_10 (exact);
+// *HEAP*_l_11.p == &j (exact);
+// m == &*HEAP*_l_11 (exact);
 // m[0].p == &j (exact);
 // n == m (exact);
 
