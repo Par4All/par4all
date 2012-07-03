@@ -264,6 +264,7 @@ pt_map points_to_interprocedural(call c, pt_map pt_in)
     /* We have to start by computing all the elements of E (stubs) */
     list stubs = stubs_list(pt_in_callee, pt_out_callee);
     bool compatible_p = sets_binded_and_in_compatibles_p(stubs, fpcl, pts_binded, pt_in_callee, pt_out_callee);
+    
     if(compatible_p) {
 
       pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
@@ -283,7 +284,7 @@ pt_map points_to_interprocedural(call c, pt_map pt_in)
     }
   }
   else {
-    pips_user_warning("Function has not a side effect on pointers variables");
+    pips_user_warning("Function has not a side effect on pointers variables \n");
   }
   return pt_out;
 }
