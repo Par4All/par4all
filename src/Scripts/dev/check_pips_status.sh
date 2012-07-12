@@ -53,10 +53,13 @@ do
   [ -d $valid ] || res 3 "$name no validation directory '$valid'"
   cd $valid || res 2 "$name cd '$valid'"
   check_file_age -w $warn -c $crit .svn > /dev/null || \
-    res $? "$name svn update '$valid'"
-  # check_file_age -w $warn -c $crit SUMMARY.short > /dev/null
-  [ -f SUMMARY.short.saved ] || res 2 "$name no SUMMARY.short.saved in '$valid'"
-  status=$(tail -1 SUMMARY.short.saved)
+    res $? "$name svn update in $valid"
+  summary=SUMMARY.short.saved
+  [ -f $summary ] || res 2 "$name no $summary in '$valid'"
+  # hmmm... .saved must be regenerated daily
+  check_file_age -w 100000 -c 200000 $summary > /dev/null || \
+    res $? "$name $summary in $valid"
+  status=$(tail -1 $summary)
   read n a v what remain <<EOF
 $status
 EOF
