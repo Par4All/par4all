@@ -55,8 +55,8 @@ do
   check_file_age -w $warn -c $crit .svn > /dev/null || \
     res $? "$name svn update '$valid'"
   # check_file_age -w $warn -c $crit SUMMARY.short > /dev/null
-  [ -f SUMMARY.short ] || res 2 "$name no SUMMARY.short in '$valid'"
-  status=$(tail -1 SUMMARY.short)
+  [ -f SUMMARY.short.saved ] || res 2 "$name no SUMMARY.short.saved in '$valid'"
+  status=$(tail -1 SUMMARY.short.saved)
   read n a v what remain <<EOF
 $status
 EOF
