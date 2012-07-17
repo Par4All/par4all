@@ -1,0 +1,17 @@
+void outline_struct(struct my_struct *a_struct)
+{
+   uint8 *v_struct = a_struct->v;
+
+outline:   v_struct[0]++;
+}
+void outline_struct(struct my_struct *a_struct)
+{
+   uint8 *v_struct = a_struct->v;
+outline:   outline(v_struct);
+}
+void outline(uint8 *v_struct)
+{
+
+outline:   v_struct[0]++;
+}
+
