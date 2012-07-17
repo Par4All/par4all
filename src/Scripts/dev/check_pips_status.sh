@@ -65,7 +65,7 @@ $status
 EOF
   case $what in
     SUCCESS) ;;
-    ISSUES) res 1 "$name validation failed '$valid'" ;;
+    ISSUES) res 1 "$name validation failed '$valid' $remain" ;;
     *)      res 3 "$name unexpected status $what in $valid" ;;
   esac
 done
