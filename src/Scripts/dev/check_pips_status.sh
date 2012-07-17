@@ -6,6 +6,12 @@
 # this scripts assumes a setup with pips_check_compile
 #
 # usage: $0 warn crit /path/to/prod [/path/to/validation...]
+#
+# status summary:
+# - UNKOWN: cannot conclude, error in running script
+# - WARNING/CRITICAL: if the compilation/validation are not up to date
+# - WARNING: pips validation is failing
+# - CRITICAL: pips compilation is failing
 
 # for nagios?
 PATH=/usr/lib/nagios/plugins:$PATH
