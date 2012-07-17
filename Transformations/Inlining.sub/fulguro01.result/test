@@ -33,13 +33,10 @@ void flgr_get_data_array_vector_fgUINT16(int *vector_array, int *data_array, int
       val = _return0;
       {
          //PIPS generated variable
-         int *array0;
-         //PIPS generated variable
          int pos0, value0;
-         array0 = vector_array;
          pos0 = k;
          value0 = val;
-         array0[pos0] = value0;
+         vector_array[pos0] = value0;
       }
       i++;
    }

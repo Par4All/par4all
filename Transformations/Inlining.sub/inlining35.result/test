@@ -15,12 +15,14 @@ l99999:   ;
    if (1) {
       {
          //PIPS generated variable
-         int *x0 = &xshift, *y0 = &yshift;
+         int *P_0, *P_1;
+         P_0 = &xshift;
+         P_1 = &yshift;
          {
             int i;
             for (i = 0;i<=9;i += 1)
                // commenting next lines makes unfolding work...
-               *x0 = 18;
+               *P_0 = 18;
             _return0 = 0;
             goto l99998;
 l99998:            ;
@@ -42,12 +44,14 @@ l99997:   ;
       
       /* This program loops forever on purpose */
       //PIPS generated variable
-      int *x0 = &xshift, *y0 = &yshift;
+      int *P_0, *P_1;
+      P_0 = &xshift;
+      P_1 = &yshift;
       {
          int i;
          for(i = 0; i <= 9; i += 1)
             // commenting next lines makes unfolding work...
-            *x0 = 18;
+            *P_0 = 18;
          _return0 = 0;
       }
    }
