@@ -12,6 +12,7 @@ endif
 # Common source file (for timing)
 COMMON := $(TOP)/common/timing.c
 ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA 
+OPENCL_ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENCL
 
 ifndef CUDACC
 ACCEL_FLAGS+=-arch=sm_20
@@ -20,6 +21,7 @@ P4A_FLAGS+=--cuda-cc=$(CUDACC)
 endif
 
 ACCEL_SRC := $(P4A_ACCEL_DIR)/p4a_accel.cu $(P4A_ACCEL_DIR)/p4a_communication_optimization_runtime.cpp
+OPENCL_ACCEL_SRC := $(P4A_ACCEL_DIR)/p4a_accel.c
 # Params for benchmarks
 NRUNS := `seq 1 5`
 
@@ -29,6 +31,7 @@ OMP_SOURCE := $(LOCAL_TARGET).openmp.c
 CUDA_SOURCE := $(LOCAL_TARGET).naive$(P4A_CUDA_SUFFIX)
 CUDA_OPT_SOURCE := $(LOCAL_TARGET).opt$(P4A_CUDA_SUFFIX)
 GENERATED_KERNELS = $(wildcard $(LOCAL_TARGET)_p4a.generated/*.cu)
+OPENCL_SOURCE := $(LOCAL_TARGET).opencl.c
 HMPP_SOURCE := hmpp/$(LOCAL_TARGET).hmpp.c
 PPCG_PRE_SOURCE :=$(LOCAL_TARGET).ppcg.c
 PPCG_GENERATED= *_host.cu *_kernel.cu
@@ -38,6 +41,7 @@ SEQ_TARGET := $(LOCAL_TARGET)_seq
 OMP_TARGET := $(LOCAL_TARGET)_openmp
 CUDA_TARGET := $(LOCAL_TARGET)_cuda
 CUDA_OPT_TARGET := $(LOCAL_TARGET)_cuda_opt
+OPENCL_TARGET := $(LOCAL_TARGET)_opencl
 PGI_TARGET := $(LOCAL_TARGET)_cuda_pgi
 HMPP_TARGET := $(LOCAL_TARGET)_cuda_hmpp
 PPCG_TARGET := $(LOCAL_TARGET)_ppcg
@@ -87,6 +91,12 @@ $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 cuda_opt_src:$(CUDA_OPT_SOURCE)
 
+$(OPENCL_SOURCE): $(SOURCE) $(COMMON)
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS) --opencl
+	mv $(<:%.c=%.p4a.c) $@
+opencl_src:$(OPENCL_SOURCE)
+
+
 $(PPCG_PRE_SOURCE):  $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS) -S -DPGCC
 	mv $(SOURCE:%.c=%.p4a.c) $@
@@ -112,6 +122,12 @@ $(CUDA_OPT_TARGET): $(CUDA_OPT_SOURCE) $(COMMON)
 	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS) $(SIZE_PARAMS)
 cuda_opt: $(CUDA_OPT_TARGET)
 $(LOCAL_TARGET)-cuda-opt:cuda_opt
+
+$(OPENCL_TARGET): $(OPENCL_SOURCE) $(COMMON)
+	@if [ -z "$(OPENCL_FLAGS)" ] ; then echo "It seems you didn't set $(OPENCL_FLAGS) variable" ; fi
+	gcc -std=gnu99 $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(OPENCL_ACCEL_FLAGS) $(OPENCL_ACCEL_SRC) $(SIZE_PARAMS) $(OPENCL_FLAGS)
+opencl: $(OPENCL_TARGET)
+$(LOCAL_TARGET)-opencl:opencl
 
 $(PGI_TARGET): $(SOURCE) $(COMMON)
 	pgcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(CFLAGS) -DPGI_ACC -ta=nvidia,cc13 $(PGI_FLAGS) $(SIZE_PARAMS)
@@ -141,6 +157,10 @@ run_cuda: $(CUDA_TARGET)
 		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(LOCAL_TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(LOCAL_TARGET)_$@.time`; \
 	done
 run_cuda_opt: $(CUDA_OPT_TARGET)
+	for run in $(NRUNS); do \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(LOCAL_TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(LOCAL_TARGET)_$@.time`; \
+	done
+run_opencl: $(OPENCL_TARGET)
 	for run in $(NRUNS); do \
 		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(LOCAL_TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(LOCAL_TARGET)_$@.time`; \
 	done

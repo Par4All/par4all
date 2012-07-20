@@ -154,7 +154,8 @@ def get_opencl_ld_flags(m64 = True):
             # "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
             "-L" + lib_opencl_path,
             "-L/usr/lib",
-            "-l OpenCL"
+            "-l OpenCL",
+            "-lm"
             ]
     else:
         flags = []

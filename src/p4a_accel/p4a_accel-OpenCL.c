@@ -1,5 +1,9 @@
 #ifdef P4A_ACCEL_OPENCL
 
+// FIXME, duplicate from CUDA backend
+int p4a_max_threads_per_block = P4A_OPENCL_THREAD_MAX;
+
+
 #include <string.h>
 
 /** @author Stéphanie Even
@@ -271,6 +275,22 @@ void p4a_opencl_init_devices(cl_platform_id platform_id) {
                                  p4a_queue_properties,
                                  &p4a_global_error);
   P4A_test_execution_with_message("clCreateCommandQueue");
+
+
+
+  // Threads per blocks
+  char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
+  if(env_p4a_max_tpb) {
+    errno = 0;
+    int tpb = strtol(env_p4a_max_tpb, NULL,10);
+    if(errno==0) {
+      P4A_dump_message("Setting max TPB to %d\n",tpb);
+      p4a_max_threads_per_block = tpb;
+    } else {
+      P4A_dump_message("Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
+    }
+  }
+
 
 
 }

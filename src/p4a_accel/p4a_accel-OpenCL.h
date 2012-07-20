@@ -97,6 +97,53 @@ void   p4a_clean(int exitCode);
 /** @} */
 
 
+
+
+/** @defgroup P4A_opencl_kernel_call Accelerator kernel call
+ *  FIXME duplicated from CUDA backend
+
+    @{
+*/
+
+/** Parameters used to choose thread allocation per blocks in CUDA
+
+    This allow to choose the size of the blocks of threads in 1,2 and 3D.
+
+    If there is not enough iterations to fill an expected block size in a
+    dimension, the block size is indeed the number of iteration in this
+    dimension to avoid spoling CUDA threads here.
+
+    It should be OK for big iteration spaces, but quite suboptimal for
+    small ones.
+
+    They can be redefined with the environment variable P4A_MAX_TPB at
+    runtime or at compilation time with definition options such
+    as -DP4A_CUDA_THREAD_MAX=128, or given in p4a with
+    --nvcc_flags=-DP4A_CUDA_THREAD_MAX=128 for example.
+
+    If you get arrors such as "P4A CUDA kernel execution failed : too many
+    resources requested for launch.", there is not enough registers to run
+    all the requested threads of your block. So try to reduce them with
+    -DP4A_CUDA_THREAD_MAX=384 or less at compile time, or with the environment
+    variable P4A_MAX_TPB at runtime. That may need some trimming.
+
+    There are unfortunately some hardware limits on the thread block size
+    that appear at the programming level, so we should add another level
+    of tiling.
+*/
+extern int p4a_max_threads_per_block;
+#ifndef P4A_OPENCL_THREAD_MAX
+/** The maximum number of threads in a block of thread */
+#define P4A_OPENCL_THREAD_MAX 256
+#endif
+
+#ifndef P4A_OPENCL_MIN_BLOCKS
+/** The minimum number of blocks */
+#define P4A_OPENCL_MIN_BLOCKS 28
+#endif
+
+
+
 /** @addtogroup P4A_time_measure Time measurement
 
     In OpenCL, the time is measured for single call of OpenCL
@@ -552,10 +599,26 @@ parameters types are resolved.
 #define P4A_create_2d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            n_x_iter, n_y_iter)    \
+           int p4a_block_x, p4a_block_y;           \
+           int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_OPENCL_MIN_BLOCKS)); \
+           tpb = tpb & ~31; /* Truncate so that we have a 32 multiple FIXME: very Nvidia oriented !*/ \
+           tpb = P4A_max(tpb,32); \
+           p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
+           p4a_block_x = P4A_min((int) n_x_iter,       \
+                                 (int) p4a_block_x);     \
+           p4a_block_y = P4A_min((int) n_y_iter,       \
+                                 tpb/(float)p4a_block_x);    \
+           p4a_block_x = P4A_max((int) p4a_block_x, \
+                                 tpb/(float)p4a_block_y); \
   cl_uint work_dim = 2;             \
-  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter),1}; \
-  size_t *block_descriptor_name = NULL; \
-  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
+  size_t round_n_x_iter = n_x_iter + p4a_block_x - n_x_iter%p4a_block_x; \
+  size_t round_n_y_iter = n_y_iter + p4a_block_y - n_y_iter%p4a_block_y; \
+  size_t grid_descriptor_name[]={(size_t)(round_n_x_iter),(size_t)(round_n_y_iter),1}; \
+  size_t block_descriptor_name[] = {(size_t)(p4a_block_x),(size_t)(p4a_block_y),1}; \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);); \
+  P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name););
+
+
 
 
 /** Allocate the descriptors for a 3D set of thread.
@@ -567,10 +630,24 @@ parameters types are resolved.
 #define P4A_create_3d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            n_x_iter, n_y_iter, n_z_iter)    \
+           int p4a_block_x, p4a_block_y;           \
+           int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_OPENCL_MIN_BLOCKS)); \
+           tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+           tpb = P4A_max(tpb,32); \
+           p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
+           p4a_block_x = P4A_min((int) n_x_iter,       \
+                                 (int) p4a_block_x);     \
+           p4a_block_y = P4A_min((int) n_y_iter,       \
+                                 tpb/(float)p4a_block_x);    \
+           p4a_block_x = P4A_max((int) p4a_block_x, \
+                                 tpb/(float)p4a_block_y); \
   cl_uint work_dim = 3; \
-  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter),(size_t)(n_z_iter)}; \
-  size_t *block_descriptor_name = NULL; \
-  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
+  size_t round_n_x_iter = n_x_iter + p4a_block_x - n_x_iter%p4a_block_x; \
+  size_t round_n_y_iter = n_y_iter + p4a_block_y - n_y_iter%p4a_block_y; \
+  size_t grid_descriptor_name[]={(size_t)(round_n_x_iter),(size_t)(round_n_y_iter),(size_t)(n_z_iter)}; \
+  size_t block_descriptor_name[] = {(size_t)(p4a_block_x),(size_t)(p4a_block_y),1}; \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);); \
+  P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name););
 
 /** Dump a CL dim2 descriptor with an introduction message */
 #define P4A_dump_descriptor(message, descriptor_name)     \
@@ -768,7 +845,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
       /* multiple of P4A_block_descriptor */ \
       P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
           (p4a_queue,p4a_kernel,work_dim,NULL,    \
-           P4A_grid_descriptor,NULL,  \
+           P4A_grid_descriptor,P4A_block_descriptor,  \
            0,NULL,&p4a_event), \
            #kernel,#__VA_ARGS__);       \
     }\
