@@ -1,0 +1,33 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline27"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[ing]
+
+
+echo
+echo Code after outlining
+echo
+
+
+setproperty OUTLINE_MODULE_NAME "ding"
+setproperty OUTLINE_LABEL "here"
+setproperty OUTLINE_INDEPENDENT_COMPILATION_UNIT TRUE
+
+apply OUTLINE[ing]
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+#apply UNSPLIT
+#shell gcc -fopenmp -c $WS.database/Src/$WS.c -o  $WS.database/Src/$WS.o
+
+close
+delete $WS
+quit
