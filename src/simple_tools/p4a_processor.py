@@ -25,7 +25,6 @@ import pypsex
 Par4All processing
 '''
 
-
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
@@ -793,7 +792,6 @@ class p4a_processor(object):
             #kernel_launchers.display("print_code_regions")
             #kernels.display("print_code_regions")
             #kernels.display("print_code_preconditions")
-            self.workspace.save("save")
             kernel_launchers.kernel_load_store(concurrent=True,
                                                ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
                                                )
