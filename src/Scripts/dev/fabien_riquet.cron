@@ -1,7 +1,6 @@
 # $Id$
 #
-# Debian Lenny i686
+# Debian Squeeze i686
 #
-# riquet is already svn & trac & redmine
-# so just force compilation & validation once a day
+# compilation & validation once a day
 25 2 * * * /home/fabien/INT32/pips_check_compile --force --report --source /home/fabien/INT32/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/INT32/prod /home/fabien/INT32/validation
