@@ -1007,53 +1007,55 @@ void outliner_independent(const char * module_name, statement body) {
         }
         outliner_independent_recursively(module_name_to_entity(module_name), cun, body);
 
-	// Get DBR_CODE for the compilation unit
-	if(!db_resource_required_or_available_p(DBR_PARSED_CODE,cun))
-        {
-            bool compilation_unit_parser(const char*);
-            entity tmp = get_current_module_entity();
-            statement stmt = get_current_module_statement();
-            reset_current_module_entity();
-            reset_current_module_statement();
-            compilation_unit_parser(cun);
-            if(!entity_undefined_p(tmp))
-                set_current_module_entity(tmp);
-            if(!statement_undefined_p(stmt))
-                set_current_module_statement(stmt);
-        }
-        if(!db_resource_required_or_available_p(DBR_CODE,cun))
-        {
-            bool controlizer(const char*);
-            entity tmp = get_current_module_entity();
-            statement stmt = get_current_module_statement();
-            reset_current_module_entity();
-            reset_current_module_statement();
-            controlizer(cun);
-            if(!entity_undefined_p(tmp))
-                set_current_module_entity(tmp);
-            if(!statement_undefined_p(stmt))
-                set_current_module_statement(stmt);
-        }
-        statement cun_s=(statement)db_get_memory_resource(DBR_CODE, cun, true);
+	if(c_module_p(get_current_module_entity()))
+	  {
+	    // Get DBR_CODE for the compilation unit
+	    if(!db_resource_required_or_available_p(DBR_PARSED_CODE,cun))
+	      {
+		bool compilation_unit_parser(const char*);
+		entity tmp = get_current_module_entity();
+		statement stmt = get_current_module_statement();
+		reset_current_module_entity();
+		reset_current_module_statement();
+		compilation_unit_parser(cun);
+		if(!entity_undefined_p(tmp))
+		  set_current_module_entity(tmp);
+		if(!statement_undefined_p(stmt))
+		  set_current_module_statement(stmt);
+	      }
+	    if(!db_resource_required_or_available_p(DBR_CODE,cun))
+	      {
+		bool controlizer(const char*);
+		entity tmp = get_current_module_entity();
+		statement stmt = get_current_module_statement();
+		reset_current_module_entity();
+		reset_current_module_statement();
+		controlizer(cun);
+		if(!entity_undefined_p(tmp))
+		  set_current_module_entity(tmp);
+		if(!statement_undefined_p(stmt))
+		  set_current_module_statement(stmt);
+	      }
+	    statement cun_s=(statement)db_get_memory_resource(DBR_CODE, cun, true);
 
-	// Update C_SOURCE_FILE from DBR_CODE
-	entity cu = FindEntity(TOP_LEVEL_MODULE_NAME,cun);
-	text code_text = text_named_module(cu, cu, cun_s);
-	string init_name = db_get_file_resource(DBR_C_SOURCE_FILE, cun, true);
-	char *dir_name = db_get_current_workspace_directory();
+	    // Update C_SOURCE_FILE from DBR_CODE
+	    entity cu = FindEntity(TOP_LEVEL_MODULE_NAME,cun);
+	    text code_text = text_named_module(cu, cu, cun_s);
+	    string init_name = db_get_file_resource(DBR_C_SOURCE_FILE, cun, true);
+	    char *dir_name = db_get_current_workspace_directory();
 
-	char *finit_name;
-	asprintf(&finit_name,"%s/%s" ,dir_name, init_name);
-	FILE *f = safe_fopen(finit_name, "w");
-	print_text(f, code_text);
-	safe_fclose(f, finit_name);
+	    char *finit_name;
+	    asprintf(&finit_name,"%s/%s" ,dir_name, init_name);
+	    FILE *f = safe_fopen(finit_name, "w");
+	    print_text(f, code_text);
+	    safe_fclose(f, finit_name);
 
-	db_touch_resource(DBR_C_SOURCE_FILE, cun);
-	db_touch_resource(DBR_USER_FILE, cun);
+	    db_touch_resource(DBR_C_SOURCE_FILE, cun);
+	    db_touch_resource(DBR_USER_FILE, cun);
 
-	// Remove DBR_DECLARATIONS to force parsing from pipsmake
-	db_delete_resource(DBR_DECLARATIONS, cun);
-
+	    // Remove DBR_DECLARATIONS to force parsing from pipsmake
+	    db_delete_resource(DBR_DECLARATIONS, cun);
+	  }
         free(cun);
     }
 }
