@@ -1,0 +1,51 @@
+void init_2D(int n, int m, int array[n][m])
+{
+   int i, j;
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= m-1; j += 1)
+         array[i][j] = i+j;
+}
+int main(void)
+{
+   int n, m;
+//             <may be exported>: m n
+//             <    is exported>: __IO_EFFECTS:LUNS[0]
+   scanf("%d%d", &n, &m);
+
+//             <    is exported>: size
+   int size = n*m;
+   int array_1D[size];
+//             <may be exported>: array_1D[*]
+
+   init_2D(n, m, array_1D);
+
+   display_1D(size, array_1D);
+
+   return 0;
+}
+void init_2D(int n, int m, int array[n][m])
+{
+   int i, j;
+
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= m-1; j += 1)
+         array[i][j] = i+j;
+}
+int main(void)
+{
+   int n, m;
+   scanf("%d%d", &n, &m);
+
+   int size = n*m;
+   int array_1D[size];
+
+//  <array_1D[PHI1]-OUT-MAY-{0<=PHI1, PHI1+1<=size}>
+
+
+   init_2D(n, m, array_1D);
+
+   display_1D(size, array_1D);
+
+   return 0;
+}
