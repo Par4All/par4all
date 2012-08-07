@@ -1,0 +1,24 @@
+
+//  <a[PHI1]-W-MAY-{N<=4PHI1+3, 12PHI1<=5N+9}>
+
+void foo(int N, int a[N], int randv[N])
+{
+   int x = N/4, y = 0;
+
+//  <a[PHI1]-W-MAY-{x<=PHI1+y, x+y<=PHI1, 3PHI1+3x<=3y+2N,
+//    8y+N<=4PHI1+3, N<=4PHI1+3, 12PHI1<=5N+9}>
+
+   while (x<=N/3) {
+
+//  <a[PHI1]-W-EXACT-{x+y==PHI1, 4y+N<=4x+3, 3x<=N, 0<=y}>
+
+      a[x+y] = x+y;
+
+//  <randv[PHI1]-R-EXACT-{PHI1+y==x, 4y+N<=4x+3, 3x<=N, 0<=y}>
+
+      if (randv[x-y])
+         x = x+2;
+      else
+         x++, y++;
+   }
+}
