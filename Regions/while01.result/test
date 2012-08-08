@@ -1,5 +1,6 @@
 
 //  <a[PHI1]-W-MAY-{N<=4PHI1+3, 12PHI1<=5N+9}>
+//  <randv[PHI1]-R-MAY-{3PHI1<=N, N<=4PHI1+3}>
 
 void foo(int N, int a[N], int randv[N])
 {
@@ -7,6 +8,7 @@ void foo(int N, int a[N], int randv[N])
 
 //  <a[PHI1]-W-MAY-{x<=PHI1+y, x+y<=PHI1, 3PHI1+3x<=3y+2N,
 //    8y+N<=4PHI1+3, N<=4PHI1+3, 12PHI1<=5N+9}>
+//  <randv[PHI1]-R-MAY-{x<=PHI1+y, 3PHI1+3y<=N, 3PHI1<=N, N<=4PHI1+3}>
 
    while (x<=N/3) {
 
