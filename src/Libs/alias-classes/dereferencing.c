@@ -106,8 +106,10 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
 	n--;
       }
     }
-    if(n==0)
+    if(n==0) {
       clear_pt_map(in);
+      points_to_graph_bottom(in) = true;
+    }
   }
   else {
       /* The issue will/might be taken care of later... */
@@ -218,10 +220,62 @@ pt_map reference_dereferencing_to_points_to(reference r,
   }
   if(n==0) {
     clear_pt_map(in);
+    points_to_graph_bottom(in) = true;
     pips_user_warning("Null or undefined pointer may be dereferenced.\n");
   }
 
   gen_free_list(sinks);
 
   return in;
+}
+
+/* Returns "sinks", the list of cells pointed to by expression "a"
+ * according to points-to graph "in".
+ *
+ * If eval_p is true, perform a second dereferencing on the cells
+ * obtained with the first dereferencing.
+ *
+ * Manage NULL and undefined (nowhere) cells.
+ *
+ * Possibly update the points-to graph when some arcs are incompatible
+ * with the request, assuming the analyzed code is correct.
+ */
+list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
+{
+  list sinks = NIL;
+  /* Locate the pointer, no dereferencing yet */
+  list cl = expression_to_points_to_sources(a, in);
+  bool null_dereferencing_p
+    = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+  bool nowhere_dereferencing_p
+    = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+
+  /* Finds what it is pointing to, memory(p) */
+  FOREACH(CELL, c, cl) {
+    /* Do we want to dereference c? */
+    if( (null_dereferencing_p || !null_cell_p(c))
+	&& (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+      /* Do not create sharing between elements of "in" and elements of
+	 "sinks". */
+      list pointed = source_to_sinks(c, in, true);
+      if(ENDP(pointed)) {
+	reference r = cell_any_reference(c);
+	entity v = reference_variable(r);
+	string words_to_string(list);
+	pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			  entity_user_name(v),
+			  words_to_string(words_reference(r, NIL)));
+	/* The sinks list is empty, whether eval_p is true or not... */
+      }
+      else {
+	if(eval_p) {
+	  list starpointed = extended_sources_to_sinks(pointed, in);
+	  sinks = gen_nconc(sinks, starpointed);
+	}
+	else
+	  sinks = gen_nconc(sinks, pointed);
+      }
+    }
+  }
+  return sinks;
 }

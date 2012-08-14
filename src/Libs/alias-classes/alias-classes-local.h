@@ -30,6 +30,7 @@
 // more efficient
 // For instance, set of points-to could be a type declared in
 // points_to_private.tex
+#if 0
 typedef set pt_map;
 #define pt_map_undefined set_undefined
 #define pt_map_undefined_p(pt) ((pt)==set_undefined)
@@ -54,3 +55,40 @@ typedef set pt_map;
 
 // A reminder:
 // full_copy_pt_map(pt_map m)
+#else
+typedef points_to_graph pt_map;
+#define pt_map_undefined points_to_graph_undefined
+#define pt_map_undefined_p(pt) ((pt)==points_to_graph_undefined)
+#define new_pt_map() make_points_to_graph(false, set_generic_make(set_private, points_to_equal_p, points_to_rank))
+#define new_simple_pt_map() set_generic_make(set_private, points_to_equal_p, points_to_rank)
+#define assign_pt_map(x,y) ((void) set_assign(points_to_graph_set(x), points_to_graph_set(y)), (x))
+#define clear_pt_map(pt) set_clear(points_to_graph_set(pt))
+// FI: free_set() is a shallow free, free_points_to_graph() is a deep free
+#define free_pt_map(pt) free_points_to_graph(pt)
+#define print_pt_map(pt) print_points_to_set("", points_to_graph_set(pt));
+// FI: varargs; probably OK with gcc preprocessor
+#define free_pt_maps free_points_to_graph_sets
+
+#define union_of_pt_maps(pt1, pt2, pt3) set_union(points_to_graph_set(pt1), \
+						  points_to_graph_set(pt2), \
+						  points_to_graph_set(pt3))
+#define difference_of_pt_maps(pt1, pt2, pt3) \
+  set_difference(points_to_graph_set(pt1), \
+		 points_to_graph_set(pt2), \
+		 points_to_graph_set(pt3))
+
+#define empty_pt_map_p(s) set_empty_p(points_to_graph_set(s))
+#define consistent_pt_map_p(s) consistent_points_to_set(points_to_graph_set(s))
+// FI: Not so sure we do not need a new name
+#define source_in_pt_map_p(cell,set) source_in_set_p(cell,points_to_graph_set(set))
+// Returns pt_map s after update via side-effect
+#define add_arc_to_pt_map(a, s) (set_add_element((set) points_to_graph_set(s), (set) points_to_graph_set(s), (void *) a), (s))
+#define add_arc_to_simple_pt_map(a, s) set_add_element((set) s, (set) s, (void *) a)
+
+// FI: useful to have a function for debugging
+#define remove_arc_from_pt_map(a, s) (set_del_element((set) points_to_graph_set(s), (set) points_to_graph_set(s), (void *) a), (s))
+#define remove_arc_from_simple_pt_map(a, s) set_del_element((set) s, (set) s, (void *) a)
+
+// A reminder:
+// full_copy_pt_map(pt_map m)
+#endif

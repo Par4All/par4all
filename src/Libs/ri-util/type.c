@@ -77,6 +77,10 @@ type MakeTypeVoid()
     return(make_type(is_type_void, NIL));
 }
 
+type MakeTypeOverloaded()
+{
+  return MakeTypeVariable(make_basic_overloaded(), NIL);
+}
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
@@ -2217,6 +2221,7 @@ type reference_to_type(reference ref)
 */
 type expression_to_type(expression exp)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   /* does not cover references to functions ...*/
   /* Could be more elaborated with array types for array expressions */
   type t = type_undefined;
@@ -2340,7 +2345,7 @@ type expression_to_type(expression exp)
     }
 
   pips_debug(9, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
-
+  debug_off();
   return t;
 }
 
@@ -2388,7 +2393,8 @@ type expression_to_user_type(expression e)
 
 
 /* Returns true if t is a variable type with a basic overloaded. And
-   false elsewhere. */
+ * false elsewhere. See MakeTypeOverloaded().
+ */
 bool overloaded_type_p(type t)
 {
   //pips_assert("type t is of kind variable", type_variable_p(t));
@@ -3225,7 +3231,7 @@ void entity_basic_concrete_types_reset()
 type compute_basic_concrete_type(type t)
 {
   type nt;
-
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   pips_debug(8, "Begin with type \"%s\"\n",
 	     words_to_string(words_type(t, NIL, false)));
 
@@ -3317,7 +3323,7 @@ type compute_basic_concrete_type(type t)
   /* pips_assert("nt is not a typedef",
 	      type_variable_p(nt)?
 	      !basic_typedef_p(variable_basic(type_variable(nt))) : true); */
-
+  debug_off();
   return nt;
 }
 
@@ -3331,6 +3337,7 @@ type compute_basic_concrete_type(type t)
  */
 type entity_basic_concrete_type(entity e)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   pips_assert("types_to_bctypes must be defined", !hash_table_undefined_p(entity_types_to_bctypes));
   type t = entity_type(e);
   type bct = (type) hash_get(entity_types_to_bctypes, (void *) t);
@@ -3340,6 +3347,7 @@ type entity_basic_concrete_type(entity e)
       bct = compute_basic_concrete_type(t);
       hash_put(entity_types_to_bctypes, t, bct);
     }
+  debug_off();
   return bct;
 }
 
@@ -4518,6 +4526,7 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   if(t==NULL)
     fprintf(stderr, "type is NULL.\n");
   else if(type_undefined_p(t))
@@ -4530,6 +4539,7 @@ void print_type(type t)
   list wl = words_type(t, NIL, false);
   dump_words(wl);
   }
+  debug_off();
 }
 
 static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
@@ -5043,24 +5053,33 @@ int variable_dimension_number(variable v)
   return d;
 }
 
-/* convert a scalar type "t" into a newly allocated array type "at"
- * whose elements are of type "t". The dimension is unbounded.
+/* convert a type "t" into a newly allocated array type "at" whose
+ * elements are of type "t", unless "t" is void. Then an array of
+ * overloaded elements is generated. The new dimension is unbounded.
  *
  * This useful when dealing with pointers that are not precisely
  * typed. In C you have often to assume they point towards an array
  * since pointer arithmetic is OK by default.
  *
  * The behavior of this function is not well defined when typedef are
- * used...
+ * used... t should be a concrete type.
  */
 type type_to_array_type(type t)
 {
-  pips_assert("t is not an array type", !array_type_p(t));
-  type at = copy_type(t);
+  type at = type_undefined;
+
+  if(type_void_p(t)) {
+    at = MakeTypeOverloaded();
+  }
+  else
+    at = copy_type(t);
+
   variable vt = type_variable(at);
   dimension d = make_dimension(int_to_expression(0),
 			       make_unbounded_expression());
-  variable_dimensions(vt) = CONS(DIMENSION, d, NIL);
+  // Add the new dimension as first dimension
+  variable_dimensions(vt) = CONS(DIMENSION, d, variable_dimensions(vt));
+
   return at;
 }
 

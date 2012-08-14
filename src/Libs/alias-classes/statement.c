@@ -62,9 +62,9 @@ This file contains functions used to compute points-to sets at statement level.
  * between sets. If elements are shared, it quickly becomes impossible
  * to deep free any set.
  */
-pt_map full_copy_pt_map(pt_map m)
+set full_copy_simple_pt_map(set m)
 {
-  pt_map out = new_pt_map();
+  set out = new_simple_pt_map();
   /*
   HASH_MAP(k, v, {
       points_to pt = (points_to) k;
@@ -76,7 +76,23 @@ pt_map full_copy_pt_map(pt_map m)
     points_to npt = copy_points_to(pt);
     set_add_element(out, out, (void *) npt);
   }
-return out;
+  return out;
+}
+
+pt_map full_copy_pt_map(pt_map in)
+{
+  // Dynamic type check
+  int n = points_to_graph_domain_number(in);
+  pips_assert("\"in\" is a points_to_graph", n==points_to_graph_domain);
+  pt_map out = new_pt_map();
+  set in_s = points_to_graph_set(in);
+  set out_s = points_to_graph_set(out);
+  SET_FOREACH(points_to, pt, in_s) {
+    points_to npt = copy_points_to(pt);
+    set_add_element(out_s, out_s, (void *) npt);
+  }
+  points_to_graph_bottom(out) = points_to_graph_bottom(in);
+  return out;
 }
 
 /* See points_to_statement()
@@ -90,23 +106,31 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   //assign_pt_map(pt_out, pt_in);
   pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
-
-  init_heap_model(s);
-
-  if(declaration_statement_p(s)) {
-    /* Process the declarations */
-    pt_out = declaration_statement_to_points_to(s, pt_out);
-    /* Go down recursively, although it is currently useless since a
-       declaration statement is a call to CONTINUE */
+  if(points_to_graph_bottom(pt_in)) {
+    // The information about dead code must be propagated downwards
     pt_out = instruction_to_points_to(i, pt_out);
+    pips_assert("The resulting points-to graph is bottom",
+		points_to_graph_bottom(pt_out));
   }
   else {
-    pt_out = instruction_to_points_to(i, pt_out);
+
+    init_heap_model(s);
+
+    if(declaration_statement_p(s)) {
+      /* Process the declarations */
+      pt_out = declaration_statement_to_points_to(s, pt_out);
+      /* Go down recursively, although it is currently useless since a
+	 declaration statement is a call to CONTINUE */
+      pt_out = instruction_to_points_to(i, pt_out);
+    }
+    else {
+      pt_out = instruction_to_points_to(i, pt_out);
+    }
+
+    pips_assert("pt_out is consistent", consistent_pt_map_p(pt_out));
+
+    reset_heap_model();
   }
-
-  pips_assert("pt_out is consistent", consistent_pt_map_p(pt_out));
-
-  reset_heap_model();
 
   /* Either pt_in or pt_out should be stored in the hash_table 
    *
@@ -118,9 +142,9 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     points_to_list ptl_prev = load_pt_to_list(s);
     list ptl_prev_l = gen_full_copy_list(points_to_list_list(ptl_prev));
     pt_map pt_prev = new_pt_map();
-    pt_prev = set_assign_list(pt_prev, ptl_prev_l);
+    pt_prev = graph_assign_list(pt_prev, ptl_prev_l);
     gen_free_list(ptl_prev_l);
-    pt_merged = merge_points_to_set(pt_in, pt_prev);
+    pt_merged = merge_points_to_graphs(pt_in, pt_prev);
   }
   else
     pt_merged = pt_in;
@@ -129,7 +153,8 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   /* Eliminate local information if you exit a block */
   if(statement_sequence_p(s)) {
     list dl = statement_declarations(s);
-    pt_out = points_to_block_projection(pt_out, dl);
+    points_to_graph_set(pt_out) =
+      points_to_block_projection(points_to_graph_set(pt_out), dl);
   }
 
   /* Because arc removals do not update the approximations of the
@@ -147,10 +172,10 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
    * find declarations in dead code...
    */
   // FI: a temporary fix to the problem, to run experiments...
-  if(empty_pt_map_p(pt_in) && !declaration_statement_p(s)
-     && s!=get_current_module_statement())
-    clear_pt_map(pt_out); // FI: memory leak?
-    
+  //if(empty_pt_map_p(pt_in) && !declaration_statement_p(s)
+  //   && s!=get_current_module_statement())
+  //  clear_pt_map(pt_out); // FI: memory leak?
+
   pips_assert("pt_out is consistent on exit", consistent_pt_map_p(pt_out));
 
   return pt_out;
@@ -244,7 +269,7 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_call: {
     call c = instruction_call(i);
-    if(empty_pt_map_p(pt_in))
+    if(points_to_graph_bottom(pt_in))
       pt_out = pt_in;
     else
       pt_out = call_to_points_to(c, pt_out);
@@ -266,7 +291,7 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
   }
   case is_instruction_expression: {
     expression e = instruction_expression(i);
-    if(empty_pt_map_p(pt_in))
+    if(points_to_graph_bottom(pt_in))
       pt_out = pt_in;
     else
       pt_out = expression_to_points_to(e, pt_in);
@@ -317,7 +342,6 @@ pt_map test_to_points_to(test t, pt_map pt_in)
 
   pt_map pt_in_t = full_copy_pt_map(pt_in);
   pt_map pt_in_f = full_copy_pt_map(pt_in);
-
   
   /* condition's side effect and information are taked into account, e.g.:
    *
@@ -330,13 +354,24 @@ pt_map test_to_points_to(test t, pt_map pt_in)
   if(!empty_pt_map_p(pt_in_f)) // FI: we are in dead code
     pt_in_f = condition_to_points_to(c, pt_in_f, false);
   pt_f = statement_to_points_to(fs, pt_in_f);
+
+  pips_assert("pt_t is consistent", points_to_graph_consistent_p(pt_t));
+  pips_assert("pt_f is consistent", points_to_graph_consistent_p(pt_f));
   
-  pt_out = merge_points_to_set(pt_t, pt_f);
+  pt_out = merge_points_to_graphs(pt_t, pt_f);
+
+  pips_assert("pt_out is consistent", points_to_graph_consistent_p(pt_out));
 
   // FI: we should take care of pt_t and pt_f to avoid memory leaks
   // In that specific case, clear_pt_map() and free_pt_map() should be ok
 
+  pips_assert("pt_out is consistent", points_to_graph_consistent_p(pt_out));
+
+  set_clear(points_to_graph_set(pt_t));
+  set_clear(points_to_graph_set(pt_f));
   free_pt_map(pt_t), free_pt_map(pt_f);
+
+  pips_assert("pt_out is consistent", points_to_graph_consistent_p(pt_out));
 
   return pt_out;
 }
@@ -401,11 +436,11 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
  * The do while loop must use an external special treatment for the
  * first iteration.
  *
- * Derived from points_to_forloop().
+ * Derived from points_to_forloop() and from Amira's work.
  *
  * pt_in is modified by side effects.
  */
-pt_map any_loop_to_points_to(statement b,
+pt_map old_any_loop_to_points_to(statement b,
 			     expression init, // can be undefined
 			     expression c, // can be undefined
 			     expression inc, // ca be undefined
@@ -446,9 +481,9 @@ pt_map any_loop_to_points_to(statement b,
   bool fix_point_p = false;
   for(i = 0; i<k+2 ; i++){
     /* prev receives the current points-to information, pt_out */
-    set_clear(prev);
-    prev = set_assign(prev, pt_out);
-    set_clear(pt_out);
+    clear_pt_map(prev);
+    prev = assign_pt_map(prev, pt_out);
+    clear_pt_map(pt_out);
 
     /* Depending on the kind of loops, execute the body and then
        possibly the incrementation and the condition */
@@ -465,10 +500,10 @@ pt_map any_loop_to_points_to(statement b,
 
     /* Merge the previous resut and the current result. */
     // FI: move to pt_map
-    pt_out = merge_points_to_set(prev, pt_out);
+    pt_out = merge_points_to_graphs(prev, pt_out);
 
     /* Check convergence */
-    if(set_equal_p(prev, pt_out)) {
+    if(set_equal_p(points_to_graph_set(prev), points_to_graph_set(pt_out))) {
       fix_point_p = true;
       /* Add the last iteration to obtain the pt_out holding when
 	 exiting the loop */
@@ -482,15 +517,125 @@ pt_map any_loop_to_points_to(statement b,
   }
 
   if(!fix_point_p) {
-    print_points_to_set("Loop points-to set:\n", pt_out);
+    print_points_to_set("Loop points-to set:\n", points_to_graph_set(pt_out));
     pips_internal_error("Loop convergence not reached.\n");
   }
 
   /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
      information is changed accordingly. */
-  pt_out = points_to_independent_store(pt_out);
+  points_to_graph_set(pt_out) = points_to_independent_store(points_to_graph_set(pt_out));
 
-  pt_out = merge_points_to_set(pt_out, pt_out_skip);
+  pt_out = merge_points_to_graphs(pt_out, pt_out_skip);
+
+  return pt_out;
+}
+
+/* Perform the same k-limiting scheme for all kinds of loops 
+ *
+ * The do while loop must use an external special treatment for the
+ * first iteration.
+ *
+ * Derived from old_any_loop_to_points_to(): the iteration scheme is
+ * slighlty different but we end up with the same final iteration with
+ * all unioned states. Seems problematic in the presence of calls to
+ * free().
+ *
+ * pt_in is modified by side effects.
+ */
+pt_map any_loop_to_points_to(statement b,
+			     expression init, // can be undefined
+			     expression c, // can be undefined
+			     expression inc, // ca be undefined
+			     pt_map pt_in)
+{
+  pt_map pt_out = pt_in;
+  int i = 0;
+  // FI: k is linked to the cycles in points-to graph, and should not
+  // be linked to the number of convergence iterations. I assume here
+  // that the minimal number of iterations is greater than the
+  // k-limiting factor
+  int k = get_int_property("POINTS_TO_PATH_LIMIT")
+    + get_int_property("POINTS_TO_SUBSCRIPT_LIMIT")
+    +10; // Safety margin: might be set to max of both properties + 1 or 2...
+
+  /* First, enter or skip the loop: initialization + condition check */
+  if(!expression_undefined_p(init))
+    pt_out = expression_to_points_to(init, pt_out);
+  pt_map pt_out_skip = full_copy_pt_map(pt_out);
+  if(!expression_undefined_p(c)) {
+    pt_out = condition_to_points_to(c, pt_out, true);
+    pt_out_skip = condition_to_points_to(c, pt_out_skip, false);
+  }
+
+  /* Compute pt_out as loop invariant: pt_out holds at the beginning of
+   * the loop body.
+   *
+   * pt_out(i) = pt_out(i-1) U pt_iter(i)
+   *
+   * pt_iter(i) = f(pt_iter(i-1))
+   *
+   * pt_prev == pt_iter(i-1), pt_out_prev == pt_out(i-1)
+   *
+   * Note: the pt_out variable is also used to carry the loop exit
+   * points-to set.
+   */
+  pt_map pt_out_prev = new_pt_map();
+  pt_map prev = new_pt_map();
+  pt_map pt_iter = new_pt_map();
+  pt_iter = assign_pt_map(pt_iter, pt_out);
+
+  // FI: it should be a while loop to reach convergence
+  // FI: I keep it a for loop for safety
+  bool fix_point_p = false;
+  for(i = 0; i<k+2 ; i++){
+    /* prev receives the current points-to information, pt_out */
+    clear_pt_map(prev);
+    prev = assign_pt_map(prev, pt_iter);
+    clear_pt_map(pt_iter);
+
+    /* Depending on the kind of loops, execute the body and then
+       possibly the incrementation and the condition */
+    // FI: here, storage_p would be useful to avoid unnecessary
+    // storage and update for each substatement at each iteration k
+    pt_iter = statement_to_points_to(b, prev);
+    if(!expression_undefined_p(inc))
+      pt_iter = expression_to_points_to(inc, pt_iter);
+    // FI: should be condition_to_points_to() for conditions such as
+    // while(p!=q);
+    // The condition is not always defined (do loops)
+    if(!expression_undefined_p(c))
+      pt_iter = condition_to_points_to(c, pt_iter, true);
+
+    /* Merge the previous resut and the current result. */
+    // FI: move to pt_map
+    pt_out_prev = assign_pt_map(pt_out_prev, pt_out);
+    pt_out = merge_points_to_graphs(pt_out, pt_iter);
+
+    /* Check convergence */
+    if(set_equal_p(points_to_graph_set(pt_out_prev), points_to_graph_set(pt_out))) {
+      fix_point_p = true;
+      /* Add the last iteration to obtain the pt_out holding when
+	 exiting the loop */
+      pt_out = statement_to_points_to(b, pt_out_prev);
+      if(!expression_undefined_p(inc))
+	pt_out = expression_to_points_to(inc, pt_out);
+      if(!expression_undefined_p(c))
+	pt_out = condition_to_points_to(c, pt_out, false);
+      break;
+    }
+  }
+
+  if(!fix_point_p) {
+    print_points_to_set("Loop points-to set:\n", points_to_graph_set(pt_out));
+    pips_internal_error("Loop convergence not reached.\n");
+  }
+
+  /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
+     information is changed accordingly. */
+  points_to_graph_set(pt_out) =
+    points_to_independent_store(points_to_graph_set(pt_out));
+
+  pt_out = merge_points_to_graphs(pt_out, pt_out_skip);
 
   return pt_out;
 }
@@ -499,8 +644,9 @@ pt_map k_limit_points_to(pt_map pt_out, int k)
 {
   //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   //entity anywhere = entity_undefined;
+  set pt_out_s = points_to_graph_set(pt_out);
 
-  SET_FOREACH(points_to, pt, pt_out){
+  SET_FOREACH(points_to, pt, pt_out_s){
     cell sc = points_to_source(pt);
     reference sr = cell_any_reference(sc);
     list sl = reference_indices(sr);
@@ -527,9 +673,8 @@ pt_map k_limit_points_to(pt_map pt_out, int k)
 				   copy_approximation(points_to_approximation(pt)),
 				   make_descriptor_none());
     if(!points_to_equal_p(npt,pt)){
-      // FI: should be moved to pt_map type...
-      pt_out = set_del_element(pt_out, pt_out, (void*)pt);
-      pt_out = set_add_element(pt_out, pt_out, (void*)npt);
+      pt_out = remove_arc_from_pt_map(pt, pt_out);
+      pt_out = remove_arc_from_pt_map(npt, pt_out);
     }
     else {
       // FI: memory leak

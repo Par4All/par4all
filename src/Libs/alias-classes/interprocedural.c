@@ -61,6 +61,11 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+// FI: this piece of code has been developed assuming that pt_map was
+// a synonym for the set type
+// FI: Not a good idea, to many interfaces with functions from other files
+// #define pt_map set
+
 /* Transform a list of parameters of type entity to a list of cells */
 list points_to_cells_parameters(list dl)
 {
@@ -75,9 +80,9 @@ list points_to_cells_parameters(list dl)
   return fpcl;
 }
 
-pt_map user_call_to_points_to(call c, pt_map pt_in)
+points_to_graph user_call_to_points_to(call c, points_to_graph pt_in)
 {
-  pt_map pt_out = pt_in;
+  points_to_graph pt_out = pt_in;
   entity f = call_function(c);
   list al = call_arguments(c);
 
@@ -108,13 +113,14 @@ pt_map user_call_to_points_to(call c, pt_map pt_in)
     /* intraprocedural phase */
     FOREACH(expression, arg, al) {
       list l_sink = expression_to_points_to_sources(arg, pt_out);
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	FOREACH(cell, cel, l_sink) {
 	  cell source = points_to_source(pts);
 	  if(cell_equal_p(source, cel)) {
 	    cell sink = points_to_sink(pts);
-	    if(source_in_set_p(sink, pt_out))
-	      remove_arcs_from_pt_map(pts, pt_out);
+	    if(source_in_graph_p(sink, pt_out))
+	      remove_arcs_from_pt_map(pts, pt_out_s);
 	  }
 	}
       }
@@ -141,7 +147,7 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)), bo
     points_to_list pts_to_out = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
     list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
-    pt_map pt_out_callee = new_pt_map();
+    set pt_out_callee = new_simple_pt_map();
     pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
     SET_FOREACH( points_to, pt, pt_out_callee) {
       cell s = points_to_source(pt);
@@ -172,7 +178,9 @@ list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)), bo
   return sinks;
 }
 
-void remove_arcs_from_pt_map(points_to pts, pt_map pt_out)
+// FI: why is this function located in interprocedural.c?
+// Because it is used only in this file...
+void remove_arcs_from_pt_map(points_to pts, set pt_out)
 {
   cell sink = points_to_sink(pts);
   cell source = points_to_source(pts);
@@ -180,14 +188,14 @@ void remove_arcs_from_pt_map(points_to pts, pt_map pt_out)
 
   SET_FOREACH(points_to, pt, pt_out) {
     if(cell_equal_p(points_to_source(pt), sink) ||cell_equal_p(points_to_source(pt), source) ) {
-      remove_arc_from_pt_map(pts, pt_out);
+      remove_arc_from_simple_pt_map(pts, pt_out);
       entity e = entity_anywhere_locations();
       reference r = make_reference(e, NIL);
       cell source = make_cell_reference(r);
       cell sink = copy_cell(source);
       approximation a = make_approximation_exact();
       points_to npt = make_points_to(source, sink, a, make_descriptor_none());
-      add_arc_to_pt_map(npt, pt_out);
+      add_arc_to_simple_pt_map(npt, pt_out);
       remove_arcs_from_pt_map(pt, pt_out);
     }
   }
@@ -196,6 +204,7 @@ void remove_arcs_from_pt_map(points_to pts, pt_map pt_out)
 /*Compute the points to relations in a fast interprocedural way*/
 pt_map points_to_fast_interprocedural(call c, pt_map pt_in) 
 {
+  set pt_in_s = points_to_graph_set(pt_in);
   pt_map pt_out = pt_in;
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -207,28 +216,28 @@ pt_map points_to_fast_interprocedural(call c, pt_map pt_in)
   points_to_list pts_to_in = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
   list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-  pt_map pt_in_callee = new_pt_map();
+  set pt_in_callee = new_simple_pt_map();
   pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
   // list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
   // pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
-  pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
+  set pts_binded = compute_points_to_binded_set(f, al, pt_in_s);
   ifdebug(8) print_points_to_set("pt_binded", pts_binded);
-  pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
-					       pt_in_callee, pts_binded);
+  set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, fpcl,
+					    pt_in_callee, pts_binded);
   ifdebug(8) print_points_to_set("pts_kill", pts_kill);
-  pt_map pts_gen = new_pt_map();
+  set pts_gen = new_simple_pt_map();
   SET_FOREACH(points_to, pt, pts_kill) {
     cell source = points_to_source(pt);
     cell nc = cell_to_nowhere_sink(source);
     approximation a = make_approximation_exact();
     points_to npt = make_points_to(source, nc, a, make_descriptor_none());
-    add_arc_to_pt_map(npt, pts_gen);
+    (void) add_arc_to_simple_pt_map(npt, pts_gen);
   }
-  pt_map pt_end = new_pt_map();
-  pt_end = set_difference(pt_end, pt_in, pts_kill);
+  set pt_end = new_simple_pt_map();
+  pt_end = set_difference(pt_end, pt_in_s, pts_kill);
   pt_end = set_union(pt_end, pt_end, pts_gen);
-  ifdebug(8) print_points_to_set("pt_end =",pt_end);
-  pt_out = pt_end;
+  ifdebug(8) print_points_to_set("pt_end =", pt_end);
+  points_to_graph_set(pt_out) = pt_end;
   return pt_out;
 }
 
@@ -249,16 +258,18 @@ pt_map points_to_interprocedural(call c, pt_map pt_in)
     extern list load_summary_effects(entity e);
     list el = load_summary_effects(f);
     list wpl = written_pointers_set(el);
+    set pt_in_s = points_to_graph_set(pt_in);
+
     points_to_list pts_to_in = (points_to_list)
       db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
    
     list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    pt_map pt_in_callee = new_pt_map();
+    set pt_in_callee = new_simple_pt_map();
     pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
-    pt_map pt_out_callee = new_pt_map();
+    set pt_out_callee = new_simple_pt_map();
     pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
     // FI: function name... set or list?
-    pt_map pts_binded = compute_points_to_binded_set(f, al, pt_in);
+    set pts_binded = compute_points_to_binded_set(f, al, pt_in_s);
     ifdebug(8) print_points_to_set("pt_binded", pts_binded);
     /* We have to test if pts_binded is compatible with pt_in_callee */
     /* We have to start by computing all the elements of E (stubs) */
@@ -267,16 +278,16 @@ pt_map points_to_interprocedural(call c, pt_map pt_in)
     
     if(compatible_p) {
 
-      pt_map pts_kill = compute_points_to_kill_set(wpl, pt_in, fpcl,
-						   pt_in_callee, pts_binded);
+      set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, fpcl,
+						pt_in_callee, pts_binded);
       ifdebug(8) print_points_to_set("pt_kill", pts_kill);
-      pt_map pt_end = new_pt_map();
-      pt_end = set_difference(pt_end, pt_in, pts_kill);
-      pt_map pts_gen = compute_points_to_gen_set(fpcl, pt_out_callee,
-						 pt_in_callee, pts_binded);
+      set pt_end = new_simple_pt_map();
+      pt_end = set_difference(pt_end, pt_in_s, pts_kill);
+      set pts_gen = compute_points_to_gen_set(fpcl, pt_out_callee,
+					      pt_in_callee, pts_binded);
       pt_end = set_union(pt_end, pt_end, pts_gen);
       ifdebug(8) print_points_to_set("pt_end =",pt_end);
-      pt_out = pt_end;
+      points_to_graph_set(pt_out) = pt_end;
     }
     else {
       pips_user_warning("Aliasing between arguments, we have to create a new context\n ");

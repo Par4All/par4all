@@ -136,7 +136,7 @@ list generic_eval_cell_with_points_to(
 	words_to_string(words_reference(input_ref, NIL)));
   ifdebug(8)
   {
-    points_to_list ptll = make_points_to_list(ptl);
+    points_to_list ptll = make_points_to_list(true, ptl);
     fprintf(stderr, "%s\n", words_to_string(words_points_to_list("", ptll)));
     points_to_list_list(ptll) = NIL;
     free_points_to_list(ptll);
@@ -223,7 +223,7 @@ list generic_eval_cell_with_points_to(
 
 	  ifdebug(8)
 	    {
-	      points_to_list ptll = make_points_to_list(matching_list);
+	      points_to_list ptll = make_points_to_list(true, matching_list);
 	      fprintf(stderr, "matching points-to list %s\n",
 		      words_to_string(words_points_to_list("", ptll)));
 	      points_to_list_list(ptll) = NIL;

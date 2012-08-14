@@ -41,6 +41,36 @@
 /***************************************/
 /* Function storing points to information attached to a statement
  */
+/* Generate a global variable holding a statement_points_to, a mapping
+ * from statements to lists of points-to arcs. The variable is called
+ * "pt_to_list_object".
+ *
+ * The macro also generates a set of functions used to deal with this global variables.
+ *
+ * The functions are defined in newgen_generic_function.h:
+ *
+ * pt_to_list_undefined_p()
+ *
+ * reset_pt_to_list()
+ *
+ * error_reset_pt_to_list()
+ *
+ * set_pt_to_list(o)
+ *
+ * get_pt_to_list()
+ *
+ * store_pt_to_list(k, v)
+ *
+ * update_pt_to_list(k, v)
+ *
+ * load_pt_to_list(k)
+ *
+ * delete_pt_to_list(k)
+ *
+ * bound_pt_to_list_p(k)
+ *
+ * store_or_update_pt_to_list(k, v)
+*/
 GENERIC_GLOBAL_FUNCTION(pt_to_list, statement_points_to)
 
 /* Functions specific to points-to analysis

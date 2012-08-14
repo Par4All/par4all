@@ -228,107 +228,9 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     sinks = expression_to_points_to_sources(a, in);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
-    // FI: this piece of code must be restructured using a function
-    // for computing an approximation of memory(p)
-    /* Locate the pointer, no dereferencing yet */
-    list cl = expression_to_points_to_sources(a, in);
-    bool null_dereferencing_p
-      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
-    bool nowhere_dereferencing_p
-      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
-    /* Finds what it is pointing to, memory(p) */
-    FOREACH(CELL, c, cl) {
-      {
-	bool to_be_freed = false;
-	type ct = points_to_cell_to_type(c, &to_be_freed);
-	if(/* eval_p && */array_type_p(ct)) {
-	  //reference r = cell_any_reference(c);
-	  //reference_add_zero_subscripts(r, ct);
-	  // FI: for assignment13.c and _t_2_2, we need a zero subscript
-	  points_to_cell_add_zero_subscripts(c);
-	  // FI: for assignment12.c, for _qq_2[0]? No this is not the
-	  // origin of the problem
-	  // points_to_cell_add_unbounded_subscripts(c);
-	}
-	if(to_be_freed) free_type(ct);
-      }
-      /* Do we want to dereference c? */
-      if( (null_dereferencing_p || !null_cell_p(c))
-	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
-	/* Do not create sharing between elements of "in" and elements of
-	   "sinks". */
-	list pointed = source_to_sinks(c, in, true);
-	if(ENDP(pointed)) {
-	  reference r = cell_any_reference(c);
-	  entity v = reference_variable(r);
-	  string words_to_string(list);
-	  pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
-			    entity_user_name(v),
-			    words_to_string(words_reference(r, NIL)));
-	  /* The sinks list is empty, whether eval_p is true or not... */
-	}
-	else {
-	  if(eval_p) {
-	    /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
-	    FOREACH(CELL, sc, pointed) {
-	      if( (null_dereferencing_p || !null_cell_p(sc))
-		  && (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
-		/* Do not create sharing between elements of "in" and elements of
-		   "sinks". */
-		bool to_be_freed = false;
-		type sct = points_to_cell_to_type(sc, &to_be_freed);
-		cell nsc = copy_cell(sc);
-		if(array_type_p(sct)) {
-		  // FI: for assignment12.c, I need an unbounded subscript here
-		  // qq_2[*] -> NULL_POINTER instead of qq_2[0] ->
-		  // FI: for assignment12.c, I need a zero subscript here
-		  // pp_1[0] -> qq_2_2[0] and not qq_2_2[*]
-		  // points_to_cell_add_zero_subscripts(nsc);
-		  // FI: The decision could be postponed and the
-		  // subscripts be added by the caller or the decision
-		  // could be modified when needed by the type
-		  // compatibility check...
-		  // Let's delay the decision
-		  // points_to_cell_add_unbounded_subscripts(nsc);
-		}
-		list starpointed = source_to_sinks(nsc, in, true);
-		free_cell(nsc);
-		// FI: this is not satisfying when a NULL pointer
-		// initialization is requested
-		// FI: tried on assignment17, but the result is worse
-		// The section below introduces fuzziness in precise
-		// result, while the problem with the initialization
-		// assumed with NULL pointers is not solved
-		list starpointed2 = NIL;
-		if(false && get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION")) {
-		  cell nsc = copy_cell(sc);
-		  if(array_type_p(sct)) {
-		    points_to_cell_add_unbounded_subscripts(nsc);
-		    starpointed2 = source_to_sinks(nsc, in, true);
-		  }
-		}
-		starpointed = gen_nconc(starpointed, starpointed2);
-		if(to_be_freed) free_type(sct);
-		if(ENDP(starpointed)) {
-		  reference sr = cell_any_reference(sc);
-		  entity sv = reference_variable(sr);
-		  string words_to_string(list);
-		  pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
-				      entity_user_name(sv),
-				      words_to_string(words_reference(sr, NIL)));
-		}
-		sinks = gen_nconc(sinks, starpointed);
-	      }
-	    }
-	  }
-	  else
-	    sinks = gen_nconc(sinks, pointed);
-	}
-      }
-    }
+    sinks = dereferencing_to_sinks(a, in, eval_p);
   }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
-    //sinks = expression_to_constant_paths(statement_undefined, a, in);
     sinks = expression_to_points_to_sinks(a, in);
     // FI: this has already been done when the side effects are exploited
     //expression one = int_to_expression(1);
@@ -336,7 +238,6 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     //free_expression(one);
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
-    //sinks = expression_to_constant_paths(statement_undefined, a, in);
     sinks = expression_to_points_to_sinks(a, in);
     //expression m_one = int_to_expression(-1);
     //offset_cells(sinks, m_one);
@@ -613,6 +514,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
   ifdebug(8) {
     pips_debug(8, "Reference r = ");
     print_reference(r);
+    fprintf(stderr, "\n");
   }
 
   // FI: to be checked otherwise?
@@ -749,6 +651,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");
     print_points_to_cells(sinks);
+    fprintf(stderr, "\n");
   }
 
   return sinks;
@@ -1017,7 +920,32 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);
       reference r = cell_any_reference(c);
-      reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+      // FI: the update depends on the sink model
+      // If [0] subscripts are always added, the last subscripts
+      // should be replaced
+      // reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+      int ncsl_n = (int) gen_length(ncsl);
+      int i_n = (int) gen_length(reference_indices(r));
+      if(i_n<ncsl_n) {
+	pips_internal_error("Too few reference indices for substitution\n");
+      }
+      else if(i_n==ncsl_n) {
+	gen_full_free_list(reference_indices(r));
+	reference_indices(r) = ncsl;
+      }
+      else { // i_n>ncsl_n
+	int i = 0;
+	list ci = reference_indices(r);
+	list nl = NIL;
+	for(i=0;i<i_n-ncsl_n;i++) {
+	  expression i = copy_expression(EXPRESSION(CAR(ci)));
+	  nl = CONS(EXPRESSION, i, nl);
+	}
+	nl = gen_nreverse(nl);
+	nl = gen_nconc(nl, ncsl);
+	gen_full_free_list(reference_indices(r));
+	reference_indices(r) = nl;
+      }
     }
   }
 

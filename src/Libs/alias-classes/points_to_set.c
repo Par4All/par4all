@@ -231,7 +231,7 @@ set points_to_source_projection(set pts, entity e)
   return pts;
 }
 
-/* FI: side-effects to be used in this function */
+/* FI: side-effects to be used explictly in this function */
 set points_to_function_projection(set pts)
 {
   set res = set_generic_make(set_private, points_to_equal_p,
@@ -256,12 +256,30 @@ set points_to_function_projection(set pts)
   return res;
 }
 
-/* Return true if a cell is out of scope */
+/* Return true if a cell is out of scope
+ *
+ * FI: I add formal parameters as in scope variables...
+ *
+ * FI: I remove formal parameters because this function is used to
+ * compute the OUT set. The modified or not values of formal parameter
+ * are not relevant. If they have not been modified, the useful
+ * information is already available in the IN set (oops, see next
+ * comment below). If they have been modified, they are no longer
+ * reachable and must be projected.
+ *
+ * FI: Unfortunately, some information gathered about the input
+ * parametrs during the function analysis is lost. For instance, a
+ * pointer must be different from NULL (e.g. see argv03.c). But if you
+ * do not know if the pointer has been written or not, you do not know
+ * if the information is usable or not. This is also an issue for
+ * interprocedural analysis: can the result always be trusted for any
+ * actual input context?
+ */
 bool cell_out_of_scope_p(cell c)
 {
   reference r = cell_to_reference(c);
   entity e = reference_variable(r);
-  return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e));
+  return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e) /*|| formal_parameter_p(e)*/ );
 }
 
 /* print a points-to arc for debug */
@@ -314,6 +332,11 @@ bool source_in_set_p(cell source, set s)
   return in_p;
 }
 
+bool source_in_graph_p(cell source, points_to_graph s)
+{
+  return source_in_set_p(source, points_to_graph_set(s));
+}
+
 /* test if a cell appear as a sink in a set of points-to */
 bool sink_in_set_p(cell sink, set s)
 {
@@ -330,8 +353,10 @@ bool sink_in_set_p(cell sink, set s)
  * It might be faster to look up the different points-to arcs that can
  * be made with source, sink and any approximation.
  */
-points_to find_arc_in_points_to_set(cell source, cell sink, pt_map s)
+points_to find_arc_in_points_to_set(cell source, cell sink, pt_map ptm)
 {
+  // FI: no longer compatible with definition of pt_map as set
+  set s = points_to_graph_set(ptm);
   points_to fpt = points_to_undefined;
   SET_FOREACH(points_to, pt, s) {
     if(cell_equal_p(points_to_source(pt), source)
@@ -508,8 +533,8 @@ bool type_compatible_with_points_to_cell_p(type t, cell c)
     type ct = cell_to_type(nc, &to_be_freed);
     pips_debug(8, "Cell of type \"%s\" is %s included in cell of type \"%s\"\n",
 	       type_to_full_string_definition(t),
-	       type_to_full_string_definition(ct),
-	       compatible_p? "":"not");
+	       compatible_p? "":"not",
+	       type_to_full_string_definition(ct));
       if(to_be_freed) free_type(ct);
   }
 
@@ -633,7 +658,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
 
   points_to pt = points_to_undefined;
   cell c = CELL(CAR(p));
-  list sources = sink_to_sources(c, in, false); // No duplication of cells
+  list sources = sink_to_sources(c, points_to_graph_set(in), false); // No duplication of cells
 
   if(ENDP(sources)) {
     /* The current path cannot be made any longer */
@@ -842,6 +867,14 @@ list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
       pips_internal_error("Not implemented yet.\n");
     }
   }
+  else {
+    /* The source type cannot contain a pointer field: for instance,
+       int or char */
+    fprintf(stderr, "Type of source: \"");
+    dprint((expression)rt);
+    fprintf(stderr, "\"\n");
+    pips_internal_error("Type of source is incompatible with a source\n");
+  }
   return sinks;
 }
 
@@ -928,19 +961,51 @@ list null_source_to_sinks(cell source, pt_map pts)
   return sinks;
 }
 
+/* Creation of a stub for a formal parameter or for a reference based
+ * on a formal parameter. The formal parameter may be a pointer, an
+ * array of something or a struct of something and so on recursively.
+ *
+ * New dimensions may have to be added to the sink type if the source
+ * entity type is an array or if the types are assumed not strict for
+ * pointer arithmetic. This is a general issue for stub generation and
+ * dealt with at a lower level.
+ *
+ * Because references must be considered, it is not clear that formal
+ * parameters must be handled differently from stubs or global
+ * variables. The initial decision was made, I believe, because they
+ * were assumed references in a very simple way, for instance as
+ * simple direct references.
+ *
+ * Test cases: argv03.c
+ */
 list formal_source_to_sinks(cell source, pt_map pts)
 {
+  list sinks = NIL;
+
   bool null_initialization_p =
     get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+  // bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+
   reference r = cell_any_reference(source);
   entity v = reference_variable(r);
-  list sinks = NIL;
-  // Find stub type
-  type st = type_to_pointed_type(ultimate_type(entity_type(v)));
+  type vt = compute_basic_concrete_type(entity_type(v));
+  bool to_be_freed;
+  type source_t =
+    compute_basic_concrete_type(points_to_cell_to_type(source, &to_be_freed));
+  pips_assert("The source type is a pointer type", pointer_type_p(source_t));
+  type st = compute_basic_concrete_type(type_to_pointed_type(source_t));
+
   // FI: the type retrieval must be improved for arrays & Co
   // FI: This is not going to work with typedefs...
-  bool array_p = array_type_p(entity_type(v));
+  // FI: You need array_p to depend on the dimensionality of the
+  // reference as it may have arrays at several level, intertwinned with
+  // structs.
+  bool array_p = array_type_p(vt);
+  // Should be points_to_cell_dimension(), counting the number of
+  // numerical or unbounded dimensions.
+
   points_to pt = create_k_limited_stub_points_to(source, st, array_p, pts);
+
   if(null_initialization_p) {
     free_approximation(points_to_approximation(pt));
     points_to_approximation(pt) = make_approximation_may();
@@ -962,6 +1027,7 @@ list global_source_to_sinks(cell source, pt_map pts)
     get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
   reference r = cell_any_reference(source);
   entity v = reference_variable(r);
+  type t = entity_type(v);
   list sinks = NIL;
   type ist = type_to_pointed_type(ultimate_type(entity_type(v)));
   type st = type_undefined;
@@ -1000,7 +1066,8 @@ list global_source_to_sinks(cell source, pt_map pts)
 			"because the \"const\" qualifier is not used.\n",
 
 			entity_user_name(v));
-    bool array_p = array_type_p(st);
+    //bool array_p = array_type_p(st);
+    bool array_p = array_type_p(t); // array_p is related to the source
     pt = create_k_limited_stub_points_to(source, st, array_p, pts);
 
     // FI: cut-and-pasted from line 945
@@ -1024,9 +1091,10 @@ list global_source_to_sinks(cell source, pt_map pts)
  * graphs. If "source" is not found in the graph, return an empty list
  * "sinks".
  */
-list points_to_source_to_sinks(cell source, pt_map pts, bool fresh_p)
+list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
 {
   list sinks = NIL;
+  set pts = points_to_graph_set(ptm);
 
   /* 1. See if cell "source" is the starting vertex of a points-to arc. */
   SET_FOREACH( points_to, pt, pts) {
@@ -1151,7 +1219,7 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	pips_internal_error("This case should have been handled above.\n");
       }
       if(ENDP(sinks)) {
-	/* We must be analyzing dead code... */
+	/* A bug somewhere up... */
 	reference r = cell_any_reference(source);
 	print_reference(r);
 	pips_user_warning("\nUninitialized or null pointer dereferenced: "
@@ -1166,13 +1234,48 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
   return sinks;
 }
 
+list extended_sources_to_sinks(list pointed, pt_map in)
+{
+  list sinks = NIL;
+  bool null_dereferencing_p
+    = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+  bool nowhere_dereferencing_p
+    = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
+  FOREACH(CELL, sc, pointed) {
+    if( (null_dereferencing_p || !null_cell_p(sc))
+	&& (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
+      /* Do not create sharing between elements of "in" and
+	 elements of "sinks". */
+      cell nsc = copy_cell(sc);
+      list starpointed = source_to_sinks(nsc, in, true);
+      free_cell(nsc);
+
+      if(ENDP(starpointed)) {
+	reference sr = cell_any_reference(sc);
+	entity sv = reference_variable(sr);
+	string words_to_string(list);
+	pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			    entity_user_name(sv),
+			    words_to_string(words_reference(sr, NIL)));
+      }
+      sinks = gen_nconc(sinks, starpointed);
+    }
+    // FI: I'd like a few else clauses to remove arcs that
+    // cannot exist if the code is correct. E.g. p->i, p->NULL
+    // if card(cl)==1, remove arc(c->sc)?
+  }
+  return sinks;
+}
+
 /* Return all cells in points-to set "pts" who source is based on entity "e". 
  *
  * Similar to points_to_source_to_sinks, but much easier and shorter.
  */
-list variable_to_sinks(entity e, pt_map pts, bool fresh_p)
+list variable_to_sinks(entity e, pt_map ptm, bool fresh_p)
 {
   list sinks = NIL;
+  set pts = points_to_graph_set(ptm);
   SET_FOREACH( points_to, pt, pts) {
     cell source = points_to_source(pt);
     reference sr = cell_any_reference(source);
@@ -1189,25 +1292,25 @@ list variable_to_sinks(entity e, pt_map pts, bool fresh_p)
 /* Create a list of null sinks and add a new null points-to relation to pts.
    pts is modified by side effect.
 */
-list null_to_sinks(cell source, set pts)
+list null_to_sinks(cell source, pt_map ptm)
 {
   cell nsource = copy_cell(source);
   cell nsink = make_null_pointer_value_cell();
   points_to npt = make_points_to(nsource, nsink,
 				 make_approximation_may(),
 				 make_descriptor_none());
-  pts = add_arc_to_pt_map(npt, pts);
+  ptm = add_arc_to_pt_map(npt, ptm);
   add_arc_to_points_to_context(copy_points_to(npt));
   list sinks = CONS(CELL, copy_cell(nsink), NIL);
   return sinks;
 }
 
 /* Same as source_to_sinks, but for a list of cells. */
-list sources_to_sinks(list sources, set pts, bool fresh_p)
+list sources_to_sinks(list sources, pt_map ptm, bool fresh_p)
 {
   list sinks = NIL;
   FOREACH(CELL, c, sources) {
-    list cl =  source_to_sinks(c, pts, fresh_p);
+    list cl =  source_to_sinks(c, ptm, fresh_p);
     sinks = gen_nconc(sinks, cl);
   }
   return sinks;
@@ -1539,15 +1642,16 @@ bool consistent_points_to_set(set s)
 /* because of points-to set implementation, you cannot change
  * approximations by side effects.
  */
-void upgrade_approximations_in_points_to_set(pt_map pts)
+void upgrade_approximations_in_points_to_set(pt_map ptm)
 {
+  set pts = points_to_graph_set(ptm);
   SET_FOREACH(points_to, pt, pts) {
     approximation a = points_to_approximation(pt);
     if(!approximation_exact_p(a)) {
       cell source = points_to_source(pt);
       if(!cell_abstract_location_p(source) // Represents may locations
 	 && !stub_points_to_cell_p(source)) { // May not exist...
-	list sinks = source_to_sinks(source, pts, false);
+	list sinks = source_to_sinks(source, ptm, false);
 	if(gen_length(sinks)==1) {
 	  cell sink = points_to_sink(pt);
 	  if(!cell_abstract_location_p(sink)) {
@@ -1555,8 +1659,8 @@ void upgrade_approximations_in_points_to_set(pt_map pts)
 					   copy_cell(sink),
 					   make_approximation_exact(),
 					   make_descriptor_none());
-	    remove_arc_from_pt_map(pt, pts);
-	    add_arc_to_pt_map(npt, pts);
+	    remove_arc_from_pt_map(pt, ptm);
+	    (void) add_arc_to_pt_map(npt, ptm);
 	  }
 	}
 	gen_free_list(sinks);
@@ -1605,4 +1709,54 @@ points_to_cell_list_and(list * a, const list b)
   }
   else
     points_to_cell_list_and(&CDR(*a), b);
+}
+/* Free several sets in one call. Useful when many sets are used
+   simultaneously. */
+void free_points_to_graph_sets(points_to_graph s,...)
+{
+  va_list args;
+
+  /* Analyze in args the variadic arguments that may be after t: */
+  va_start(args, s);
+  /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  do {
+    free_points_to_graph(s);
+    /* Get the next argument */
+    //s = va_arg(args, points_to_graph);
+    s = va_arg(args, pt_map);
+  } while(s!=NULL);
+  /* Release the variadic analysis */
+  va_end(args);
+}
+
+/* FI: I add functions dealing with points_to_graph variable, i.e. pt_map */
+
+pt_map graph_assign_list(pt_map ptm, list l)
+{
+  bool b = points_to_graph_bottom(ptm);
+  if(b) {
+    // FI: I am in trouble here; what should be the semantics?
+    pips_debug(1, "Impossible initialization of a bottom graph\n");
+    pips_internal_error("Mismanaged points-to graph\n");
+  }
+  else
+    set_assign_list(points_to_graph_set(ptm), l);
+  return ptm;
+}
+
+pt_map merge_points_to_graphs(pt_map s1, pt_map s2)
+{
+  set merged = merge_points_to_set(points_to_graph_set(s1),
+				   points_to_graph_set(s2));
+  pt_map pt_merged = new_pt_map();
+  points_to_graph_set(pt_merged) = merged;
+  return pt_merged;
+}
+
+pt_map points_to_graph_assign(pt_map out, pt_map in)
+{
+  points_to_graph_set(out) = set_assign(points_to_graph_set(out),
+					points_to_graph_set(in));
+  return out;
 }

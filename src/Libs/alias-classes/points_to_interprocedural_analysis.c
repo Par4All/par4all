@@ -53,7 +53,9 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
     expression lhs = entity_to_expression(pf);
     //statement stmt = make_assign_statement(lhs, rhs);
     //s = set_assign(s, points_to_assignment(stmt, lhs, rhs, s));	
-    s = set_assign(s, assignment_to_points_to(lhs, rhs, s));	
+    points_to_graph s_g = make_points_to_graph(false, s);
+      points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
+      s = set_assign(s, points_to_graph_set(a_g));
   }
 
   SET_FOREACH(points_to, pt, s) {
@@ -153,6 +155,9 @@ list points_to_backword_cell_translation(cell c, list params, set pt_in, set pt_
   list inds1 = NIL, inds2 = NIL;
   list inds = reference_indices(cell_any_reference(c));
   list tl = sink_to_sources(c, pt_in, true);
+  // FI: impedance problem and memory leak
+  points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
+
   FOREACH(cell, s , tl) {
     if(stub_points_to_cell_p(s)) {
       cell f_a = formal_access_paths(s, params, pt_in);
@@ -160,11 +165,11 @@ list points_to_backword_cell_translation(cell c, list params, set pt_in, set pt_
       inds2 = reference_indices(cell_any_reference(s));
       }
       cell pr = points_to_stub_prefix(s, params);
-      tl = source_to_sinks(pr, pt_binded, true);
+      tl = source_to_sinks(pr, pt_binded_g, true);
       for(i = 1; i <= (int) gen_length(inds1); i++) {
 	list tmp = gen_full_copy_list(tl);
 	FOREACH(cell, sk, tmp) {
-	  tl = source_to_sinks(sk, pt_binded, true);
+	  tl = source_to_sinks(sk, pt_binded_g, true);
 	}
 	gen_free_list(tmp);
       }
@@ -233,7 +238,7 @@ list points_to_cell_translation(cell sink, list args, set pt_in, set pt_binded)
  * New cells are allocated. No sharing is created between parameter
  * "s" and result "sl".
  */
-list points_to_set_to_stub_cell_list(pt_map s, list osl)
+list points_to_set_to_stub_cell_list(set s, list osl)
 {
   list sl = osl;
   SET_FOREACH(points_to, pt, s) {
@@ -262,7 +267,7 @@ list points_to_set_to_stub_cell_list(pt_map s, list osl)
  *
  * FI->AM: a[*][*] or p[next] really are elements of set E?
  */
-list stubs_list(pt_map pt_in, pt_map pt_out)
+list stubs_list(set pt_in, set pt_out)
 {
   list sli = points_to_set_to_stub_cell_list(pt_in, NIL);
   list slo = points_to_set_to_stub_cell_list(pt_out, sli);
@@ -283,8 +288,8 @@ list stubs_list(pt_map pt_in, pt_map pt_out)
 bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in, set pt_out)
 {
   bool compatible_p = true;
-  pt_map io = new_pt_map();
-  pt_map bm = new_pt_map();
+  set io = new_simple_pt_map();
+  set bm = new_simple_pt_map();
   list tmp = gen_full_copy_list(stubs);
   gen_sort_list(args, (gen_cmp_func_t) points_to_compare_ptr_cell );
   
@@ -293,9 +298,11 @@ bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set 
   while(!ENDP(stubs) && compatible_p) {
     cell st = CELL(CAR(stubs));
     FOREACH(CELL, c, tmp) {
-      if(! points_to_cell_equal_p(c, st)) {
-	list act1 = source_to_sinks(c, bm, false);
-	list act2 = source_to_sinks(st, bm, false);
+      if(!points_to_cell_equal_p(c, st)) {
+	// FI: impedance issue + memory leak
+	points_to_graph bm_g = make_points_to_graph(false, bm);
+	list act1 = source_to_sinks(c, bm_g, false);
+	list act2 = source_to_sinks(st, bm_g, false);
 	points_to_cell_list_and(&act1, act2);
 	if(!ENDP(act1)) {
 	  entity ne = entity_null_locations();
@@ -316,17 +323,17 @@ bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set 
     stubs = CDR(stubs);
   }
   gen_full_free_list(tmp);
-  free_pt_map(io);
+  set_free(io);
 
   return compatible_p;
 }
 
 /* Translate the out set into the scope of the caller */ 
-pt_map compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in, set pt_binded)
+set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in, set pt_binded)
 {
-  pt_map kill = new_pt_map(); 	
+  set kill = new_simple_pt_map(); 	
   list written_cs = NIL;
-  pt_map bm = new_pt_map();
+  set bm = new_simple_pt_map();
 
   bm = points_to_binding(args, pt_in, pt_binded); 
 
@@ -370,10 +377,10 @@ pt_map compute_points_to_kill_set(list written, set pt_caller, list args, set pt
 
 
 /* Translate the out set in the scope of the caller using the binding information */
-pt_map compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded)
+set compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded)
 {
-  set gen =new_pt_map(); 		
-  pt_map bm = new_pt_map();
+  set gen = new_simple_pt_map(); 		
+  set bm = new_simple_pt_map();
   bm = points_to_binding(args, pt_in, pt_binded);  
 
   SET_FOREACH(points_to, p, pt_out) {
@@ -445,15 +452,18 @@ pt_map compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded
    find all the arcs, aj, starting from the parameter c2 using pt_binded,
    map each node ai to its corresponding aj.
 */
-pt_map points_to_binding_arguments(cell c1, cell c2 , pt_map in, pt_map pt_binded)
+set points_to_binding_arguments(cell c1, cell c2 , set in, set pt_binded)
 {
-  pt_map bm = new_pt_map();
+  set bm = new_simple_pt_map();
   if(!source_in_set_p(c1, in)) {
     points_to pt = make_points_to(c1, c2, make_approximation_exact(), make_descriptor_none());
-    add_arc_to_pt_map(pt, bm);
+    add_arc_to_simple_pt_map(pt, bm);
   } else {
-    list sinks1 = source_to_sinks(c1, in, true);
-    list sinks2 = source_to_sinks(c2, pt_binded, true);
+    // FI: impedance problem... and memory leak
+    points_to_graph in_g = make_points_to_graph(false, in);
+    points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
+    list sinks1 = source_to_sinks(c1, in_g, true);
+    list sinks2 = source_to_sinks(c2, pt_binded_g, true);
     list tmp1 = gen_full_copy_list(sinks1);
     list tmp2 = gen_full_copy_list(sinks2);
 
@@ -467,7 +477,7 @@ pt_map points_to_binding_arguments(cell c1, cell c2 , pt_map in, pt_map pt_binde
 	cell sink1 = copy_cell(s1);
 	cell sink2 = copy_cell(s2);
 	points_to pt = make_points_to(sink1, sink2, a, make_descriptor_none());
-	add_arc_to_pt_map(pt, bm);
+	add_arc_to_simple_pt_map(pt, bm);
 	gen_remove(&sinks2, (void*)s2);
       }
       gen_remove(&sinks1, (void*)s1);
@@ -482,10 +492,9 @@ pt_map points_to_binding_arguments(cell c1, cell c2 , pt_map in, pt_map pt_binde
   return bm;
 }
 
-/* find for the source of p its corresponding alis, which means finding another source that points
-   to the same location.
-*/
-cell points_to_source_alias(points_to pt, pt_map pts)
+/* find for the source of p its corresponding alias, which means
+   finding another source that points to the same location.  */
+cell points_to_source_alias(points_to pt, set pts)
 {
   cell source = cell_undefined;
   cell sink1 = points_to_sink(pt);
@@ -506,11 +515,11 @@ cell points_to_source_alias(points_to pt, pt_map pts)
 /* Using the result of points_to_binding_arguments complete the process of binding each element of in to its corresponding at the call site.
    Necessery to translate fields structure.
  */
-pt_map points_to_binding(list args, pt_map in, pt_map pt_binded)
+set points_to_binding(list args, set in, set pt_binded)
 {
 
-  pt_map bm = new_pt_map();
-  pt_map bm1 = new_pt_map();
+  set bm = new_simple_pt_map();
+  set bm1 = new_simple_pt_map();
  
  SET_FOREACH(points_to, pt, pt_binded) {
     FOREACH(CELL, c1, args) {
@@ -519,7 +528,7 @@ pt_map points_to_binding(list args, pt_map in, pt_map pt_binded)
 	cell c2 = points_to_source_alias(pt, pt_binded);
 	approximation a = make_approximation_exact();
 	points_to pt = make_points_to(c1, c2, a, make_descriptor_none());
-	add_arc_to_pt_map(pt, bm);
+	add_arc_to_simple_pt_map(pt, bm);
 	bm = set_union(bm, bm, points_to_binding_arguments(c1 , c2,  in, pt_binded));
       }
     }
@@ -543,8 +552,8 @@ pt_map points_to_binding(list args, pt_map in, pt_map pt_binded)
 	  cell new_sk = make_cell_reference(r1);
 	  approximation a = points_to_approximation(pt);
 	  points_to pt = make_points_to(s, new_sk, a, make_descriptor_none());
-	  add_arc_to_pt_map(pt, bm);
-	  bm = set_union(bm,points_to_binding_arguments(s, new_sk, in, pt_binded), bm);
+	  add_arc_to_simple_pt_map(pt, bm);
+	  bm = set_union(bm, points_to_binding_arguments(s, new_sk, in, pt_binded), bm);
 	  break;
 	}
       }

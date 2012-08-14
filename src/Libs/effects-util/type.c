@@ -385,6 +385,7 @@ static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to
  */
 type cell_reference_to_type(reference ref, bool *to_be_freed)
 {
+  debug_on("EFFECTS-UTIL_DEBUG_LEVEL");
   type t = type_undefined;
   type ref_type = entity_basic_concrete_type(reference_variable(ref));
   *to_be_freed= false;
@@ -425,7 +426,7 @@ type cell_reference_to_type(reference ref, bool *to_be_freed)
 			      entity_name(reference_variable(ref)));
 	}
     }
-
+  debug_off();
   return t;
 }
 
@@ -794,6 +795,15 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
  * Maybe this function should be relocated in alias-classes
  *
  * Beware of possible side-effects on l
+ *
+ * FI, 10 August 2012: this function is a mess. No side effect should
+ * be applied. it should be redesigned to check compatibility cases
+ * one after the other and it should be renamed
+ * points_to_cell_types_compatibility_p()
+ *
+ * FI, 14 August 2012: the dimension of the sink entity and sink
+ * reference must be greater than the dimension of the source
+ * reference. This is not checked yet.
  */
 void points_to_cell_types_compatibility(cell l, cell r)
 {
@@ -827,14 +837,41 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	// FI->AM/FC/PJ: we need a trick to handle the casts or the
 	// typing of the points-to graph is not possible
 	else if(scalar_type_p(pt) && type_void_p(urt)) {
-	  // A void * pointer may be asigned to anything?
+	  // A void * pointer may be assigned to anything?
 	  ; // OK, they are compatible...
+	}
+	else if(type_void_p(pt) && overloaded_type_p(urt)) {
+	  // a void * is expected to point toward any type, which is
+	  // encoded with overloaded but could be anything when casts
+	  // are used. See fulguro03.c
+	  ;
+	}
+	else if(overloaded_type_p(urt)) {
+	  // This is compatible with any pointed type pt by definition
+	  // of overloaded. See fulguro03.c
+	  ;
+	}
+	else if(array_type_p(pt) && scalar_type_p(urt)) {
+	  /* The source points towards an array and the cell is an
+	     element of this array. */
+	  basic pb = variable_basic(type_variable(pt));
+	  basic rb = variable_basic(type_variable(urt));
+	  if(basic_equal_p(pb, rb)) {
+	    ; // OK
+	  }
+	  else {
+	    pips_internal_error();
+	  }
 	}
 	else if(array_type_p(urt)
 		&& !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
 	  /* Formal parameters and potentially stubs can be assumed to
 	   * points towards an array although they are declared as
-	   * pointers to a scalar. */
+	   * pointers to a scalar.
+	   *
+	   * This should never be a problem when sink cells are always
+	   * array elements and not arrays.
+	   */
 	  if(type_variable_p(pt)) {
 	    basic pb = variable_basic(type_variable(pt));
 	    basic rb = variable_basic(type_variable(urt));

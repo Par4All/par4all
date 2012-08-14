@@ -131,6 +131,9 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
   default:
     ;
   }
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
   return pt_out;
 }
 
@@ -357,7 +360,7 @@ pt_map range_to_points_to(range r, pt_map pt_in)
  */
 pt_map call_to_points_to(call c, pt_map pt_in)
 {
-   pt_map pt_out = pt_in;
+  pt_map pt_out = pt_in;
   tag tt;
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -426,7 +429,9 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Unexpected type.\n");
 
-
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
 
   return pt_out;
 }
@@ -520,8 +525,14 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     /* Is the dereferenced pointer null or undefined? */
     expression p = EXPRESSION(CAR(al));
     pt_out = dereferencing_to_points_to(p, pt_out);
-  }else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
-// FI: I needs this piece of code for assert();
+  }
+  else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
+    // FI: I needs this piece of code for assert();
+    // FI: why? it looks like the evaluation of a conditional expression...
+    // See assert01.c and its expansion?
+    // This piece of code seems completety wrong
+    // The actual arguments of __assert_fail() are two character
+    // strings, an integer and a NULL pointer for assert01.c
     expression c = EXPRESSION(CAR(al));
     pt_map in_t = full_copy_pt_map(pt_out);
     pt_map in_f = full_copy_pt_map(pt_out);
@@ -530,18 +541,18 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     pt_map out_t = pt_map_undefined;
-    if(!empty_pt_map_p(in_t))
+    if(!points_to_graph_bottom(in_t))
       out_t = expression_to_points_to(e1, in_t);
     pt_map out_f = pt_map_undefined;
     // FI: should be factored out in a more general merge function...
-    if(!empty_pt_map_p(in_f))
+    if(!points_to_graph_bottom(in_f))
       out_f = expression_to_points_to(e2, in_f);
-    if(empty_pt_map_p(in_t))
+    if(points_to_graph_bottom(in_t))
       pt_out = out_f;
-    else if(empty_pt_map_p(in_f))
+    else if(points_to_graph_bottom(in_f))
       pt_out = out_t;
     else
-      pt_out = merge_points_to_set(out_t, out_f);
+      pt_out = merge_points_to_graphs(out_t, out_f);
     // FI: this destroys pt_out for test case pointer02
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
@@ -588,19 +599,22 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     pt_map out_t = pt_map_undefined;
-    if(!empty_pt_map_p(in_t))
+
+    if(!points_to_graph_bottom(in_t))
       out_t = expression_to_points_to(e1, in_t);
+
     pt_map out_f = pt_map_undefined;
     // FI: should be factored out in a more general merge function...
-    if(!empty_pt_map_p(in_f))
+    if(!points_to_graph_bottom(in_f))
       out_f = expression_to_points_to(e2, in_f);
-    if(empty_pt_map_p(in_t))
+
+    if(points_to_graph_bottom(in_t))
       pt_out = out_f;
-    else if(empty_pt_map_p(in_f))
+    else if(points_to_graph_bottom(in_f))
       pt_out = out_t;
     else
-      pt_out = merge_points_to_set(out_t, out_f);
-    // FI: this destroys pt_out for test case pointer02
+      pt_out = merge_points_to_graphs(out_t, out_f);
+    // FI: this destroys pt_out for test case pointer02, Memory leaks...
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
   else {
@@ -614,6 +628,10 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     // pips_internal_error("Not implemented yet\n");
     pt_out = pt_in;
   }
+
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
 
   return pt_out;
 }
@@ -1143,19 +1161,23 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * cells that may be in the heap, i.e. abstract locations that are
      * greater then the heap abstract location.
      */
-    /* if c is a heap location with indices other than zero then we have bumped into 
-       a non-legal free */
-    if(heap_cell_p(c)) {
+    /* if c is a heap location with indices other than zero then we
+       have bumped into a non-legal free */
+    if(heap_cell_p(c) || stub_points_to_cell_p(c)) {
       reference r = cell_any_reference(c);
       list inds = reference_indices(r);
       if(!ENDP(inds)) {
 	expression ind = EXPRESSION (CAR(inds));
+	// No offset allowed for a free()
 	if(!expression_null_p(ind))
 	  nhl = CONS(CELL, c, nhl);
       }
       // gen_free_list(inds);
     }
-    if(!heap_cell_p(c) && !cell_typed_anywhere_locations_p(c))
+    // FI: wouldn'it be easier to use an else if()?
+    if(!heap_cell_p(c)
+       && !stub_points_to_cell_p(c)
+       && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);
@@ -1166,6 +1188,9 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     /* We have bumped into a non-legal free such as free(&i). See test
        case malloc10.c */
     clear_pt_map(pt_out);
+    pips_user_warning("Free of a non-heap allocated address.\n"
+		      "Or bug in the points-to analysis...\n");
+    points_to_graph_bottom(pt_out) = true;
   }
   else {
 
@@ -1204,7 +1229,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_1 if it is not empty by definition */
     if(gen_length(L)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell l = points_to_source(pts);
 	if(points_to_cell_in_list_p(l, L)) {
 	  // FI: assuming you can perform the removal inside the loop...
@@ -1215,7 +1241,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
     if(gen_length(R)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell r = points_to_sink(pts);
 	if(points_to_cell_in_list_p(r, R)) {
 	  if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
@@ -1259,7 +1286,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_3 if it is not empty by definition */
     if(gen_length(R)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell l = points_to_source(pts);
 	if(related_points_to_cell_in_list_p(l, R)) {
 	  // Potentially memory leaked cell:
@@ -1415,58 +1443,59 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     clear_pt_map(pt_out);
   }
   else {
-  /* Compute the data-flow equation for the may and the must edges...
-   *
-   * out = (in - kill) U gen ?
-   */
+    /* Compute the data-flow equation for the may and the must edges...
+     *
+     * out = (in - kill) U gen ?
+     */
 
- /* Extract MAY/MUST points to relations from the input set "pt_out"  */
-  pt_map in_may = points_to_may_filter(pt_out);
-  pt_map in_must = points_to_must_filter(pt_out);
-  pt_map kill_may = kill_may_set(L, in_may);
-  pt_map kill_must = kill_must_set(L, pt_out);
-  bool address_of_p = true;
-  pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
-  pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
-  pt_map kill/* = new_pt_map()*/;
-  // FI->AM: do we really want to keep the same arc with two different
-  // approximations? The whole business of may/must does not seem
-  // useful. 
-  // union_of_pt_maps(kill, kill_may, kill_must);
-  kill = kill_must;
-  pt_map gen = new_pt_map();
-  union_of_pt_maps(gen, gen_may, gen_must);
+    /* Extract MAY/MUST points to relations from the input set "pt_out"  */
+    set pt_out_s = points_to_graph_set(pt_out);
+    set in_may = points_to_may_filter(pt_out_s);
+    set in_must = points_to_must_filter(pt_out_s);
+    set kill_may = kill_may_set(L, in_may);
+    set kill_must = kill_must_set(L, pt_out_s);
+    bool address_of_p = true;
+    set gen_may = gen_may_set(L, R, in_may, &address_of_p);
+    set gen_must = gen_must_set(L, R, in_must, &address_of_p);
+    set kill/* = new_pt_map()*/;
+    // FI->AM: do we really want to keep the same arc with two different
+    // approximations? The whole business of may/must does not seem
+    // useful. 
+    // union_of_pt_maps(kill, kill_may, kill_must);
+    kill = kill_must;
+    set gen = new_simple_pt_map();
+    set_union(gen, gen_may, gen_must);
 
-  if(set_empty_p(gen)) {
-    bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-    if(type_sensitive_p)
-      gen = points_to_anywhere_typed(L, pt_out);
-    else
-      gen = points_to_anywhere(L, pt_out); 
-  }
-
-  // FI->AM: shouldn't it be a kill_must here?
-  difference_of_pt_maps(pt_out, pt_out, kill);
-  union_of_pt_maps(pt_out, pt_out, gen);
-
-  // FI->AM: use kill_may to reduce the precision of these arcs
-  SET_FOREACH(points_to, pt, kill_may) {
-    approximation a = points_to_approximation(pt);
-    if(approximation_exact_p(a)) {
-      points_to npt = make_points_to(copy_cell(points_to_source(pt)),
-				     copy_cell(points_to_sink(pt)),
-				     make_approximation_may(),
-				     copy_descriptor(points_to_descriptor(pt)));
-      remove_arc_from_pt_map(pt, pt_out);
-      add_arc_to_pt_map(npt, pt_out);
+    if(set_empty_p(gen)) {
+      bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+      if(type_sensitive_p)
+	gen = points_to_anywhere_typed(L, pt_out_s);
+      else
+	gen = points_to_anywhere(L, pt_out_s); 
     }
-  }
 
-  free_pt_maps(in_may, in_must,
-	       kill_may, kill_must,
-	       gen_may, gen_must,
-	       gen,/* kill,*/ NULL);
-  // clear_pt_map(pt_out); // FI: why not free?
+    // FI->AM: shouldn't it be a kill_must here?
+    set_difference(pt_out_s, pt_out_s, kill);
+    set_union(pt_out_s, pt_out_s, gen);
+
+    // FI->AM: use kill_may to reduce the precision of these arcs
+    SET_FOREACH(points_to, pt, kill_may) {
+      approximation a = points_to_approximation(pt);
+      if(approximation_exact_p(a)) {
+	points_to npt = make_points_to(copy_cell(points_to_source(pt)),
+				       copy_cell(points_to_sink(pt)),
+				       make_approximation_may(),
+				       copy_descriptor(points_to_descriptor(pt)));
+	remove_arc_from_pt_map(pt, pt_out);
+	add_arc_to_pt_map(npt, pt_out);
+      }
+    }
+
+    sets_free(in_may, in_must,
+	      kill_may, kill_must,
+	      gen_may, gen_must,
+	      gen,/* kill,*/ NULL);
+    // clear_pt_map(pt_out); // FI: why not free?
   }
 
   return pt_out;
@@ -1642,18 +1671,21 @@ pt_map application_to_points_to(application a, pt_map pt_in)
 pt_map condition_to_points_to(expression c, pt_map in, bool true_p)
 {
   pt_map out = in;
-  syntax cs = expression_syntax(c);
+  if(!points_to_graph_bottom(in)) {
+    syntax cs = expression_syntax(c);
 
-  if(syntax_reference_p(cs)) {
-    /* For instance, C short cut "if(p)" for "if(p!=NULL)" */
-    out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
+    if(syntax_reference_p(cs)) {
+      /* For instance, C short cut "if(p)" for "if(p!=NULL)" */
+      out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
+    }
+    else if(syntax_call_p(cs)) {
+      out = call_condition_to_points_to(syntax_call(cs), in, true_p);
+    }
+    else {
+      pips_internal_error("Not implemented yet.\n");
+    }
   }
-  else if(syntax_call_p(cs)) {
-    out = call_condition_to_points_to(syntax_call(cs), in, true_p);
-  }
-  else {
-    pips_internal_error("Not implemented yet.\n");
-  }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1662,7 +1694,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
 {
   pt_map out = in;
   entity v = reference_variable(r);
-  type vt = ultimate_type(entity_type(v));
+  type vt = entity_basic_concrete_type(v);
   list sl = reference_indices(r);
 
   /* Take care of side effects in references */
@@ -1677,6 +1709,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
 	// FI: memory leak with clear_pt?
 	pips_user_warning("Dead code detected.\n");
 	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
       }
       else {
 	/* Make a points-to NULL and remove the arc from the current out */
@@ -1690,7 +1723,8 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
     }
     else {
       /* remove any arc from v to anything and add an arc from p to NULL */
-      points_to_source_projection(in, v);
+      set in_s = points_to_graph_set(in);
+      points_to_source_projection(in_s, v);
       /* Make a points-to NULL and remove the arc from the current out */
       cell source = make_cell_reference(copy_reference(r));
       cell sink = make_null_pointer_value_cell();
@@ -1721,6 +1755,7 @@ pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
   else
     // FI: you might have an apply on a functional pointer?
     pips_internal_error("Not implemented yet.\n");
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1749,6 +1784,7 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     out = intrinsic_call_to_points_to(c, in);
     //pips_internal_error("Not implemented yet.\n");
   }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1787,12 +1823,14 @@ pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool tru
     expression nc2 = EXPRESSION(CAR(CDR(al)));
     pt_map out2 = condition_to_points_to(nc2, in2, true_p);
     // FI: memory leak? Does merge_points_to_set() allocated a new set?
-    out = merge_points_to_set(out1, out2);
+    out = merge_points_to_graphs(out1, out2);
+    clear_pt_map(out2); // FI: you do no want to free the arcs
     free_pt_map(out2);
   }
   else
     pips_internal_error("Not implemented yet for boolean operator \"%s\".\n",
 			entity_local_name(f));
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1943,7 +1981,8 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 	}
 	if(!cell_undefined_p(source)) {
 	  entity v = reference_variable(cell_any_reference(source));
-	  out = points_to_source_projection(out, v);
+	  set out_s = points_to_graph_set(out);
+	  out_s = points_to_source_projection(out_s, v);
 	  points_to a = make_points_to(source, sink, make_approximation_exact(),
 				     make_descriptor_none());
 	  add_arc_to_pt_map(a, out);
@@ -2032,15 +2071,20 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
       if(gen_length(L)==1) { // FI: one fixed bound
 	cell lc = CELL(CAR(L));
 	list RR = expression_to_points_to_sources(rhs, in);
-	SET_FOREACH(points_to, pt, out) {
+	set out_s = points_to_graph_set(out);
+	SET_FOREACH(points_to, pt, out_s) {
 	  cell source = points_to_source(pt);
 	  if(cell_in_list_p(source, RR)) {
 	    cell sink = points_to_sink(pt);
 	    if(cmp_function(lc, sink)) {
 	      approximation a = points_to_approximation(pt);
-	      if(approximation_exact_p(a)) 
+	      if(approximation_exact_p(a)) {
 		/* The condition cannot violate an exact arc. */
-		clear_pt_map(out);
+		// clear_pt_map(out);
+		points_to_graph_bottom(out) = true;
+		// Would be useless/different with a union
+		set_clear(points_to_graph_set(out));
+	      }
 	      else
 		remove_arc_from_pt_map(pt, out);
 	    }
@@ -2052,16 +2096,21 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 	if(gen_length(R)==1) { // FI: one fixed bound
 	  cell rc = CELL(CAR(R));
 	  list LL = expression_to_points_to_sources(lhs, in);
-	  SET_FOREACH(points_to, pt, out) {
+	  set out_s = points_to_graph_set(out);
+	  SET_FOREACH(points_to, pt, out_s) {
 	    cell source = points_to_source(pt);
 	    if(cell_in_list_p(source, LL)) {
 	      cell sink = points_to_sink(pt);
 	      if(cmp_function(sink, rc)) {
 		// FI: Oops in middle of the iterator...
 		approximation a = points_to_approximation(pt);
-		if(approximation_exact_p(a)) 
+		if(approximation_exact_p(a)) {
 		  /* The condition cannot violate an exact arc. */
-		  clear_pt_map(out);
+		  // clear_pt_map(out);
+		  points_to_graph_bottom(out) = true;
+		  // Would be useless/different with a union
+		  set_clear(points_to_graph_set(out));
+	      }
 		else
 		  remove_arc_from_pt_map(pt, out);
 	      }
@@ -2077,5 +2126,6 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
     // Do nothing for other relational operators such as ">"
     ; // pips_internal_error("Not implemented yet.\n");
   }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
