@@ -1,0 +1,127 @@
+
+PROPER EFFECTS
+
+int formal_parameter05(my_struct *p)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: s1.one[*]
+//             <    is written>: s1.two
+   my_struct s1 = *p;
+   my_struct s2;
+   my_struct s3;
+//             <may be read   >: s1.one[*]
+//             <may be written>: s2.one[*]
+//             <    is read   >: s1.two
+//             <    is written>: s2.two
+   s2 = s1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: s3.one[*]
+//             <    is written>: s3.two
+   s3 = *p;
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int formal_parameter05(my_struct *p)
+{
+//             <may be read   >: p[0].one[*]
+//             <may be written>: s1.one[*]
+//             <    is read   >: p p[0].two
+//             <    is written>: s1.two
+   my_struct s1 = *p;
+   my_struct s2;
+   my_struct s3;
+//             <may be read   >: s1.one[*]
+//             <may be written>: s2.one[*]
+//             <    is read   >: s1.two
+//             <    is written>: s2.two
+   s2 = s1;
+//             <may be read   >: p[0].one[*]
+//             <may be written>: s3.one[*]
+//             <    is read   >: p p[0].two
+//             <    is written>: s3.two
+   s3 = *p;
+   return 0;
+}
+
+POINTS TO
+
+
+// Points To IN:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+
+int formal_parameter05(my_struct *p)
+{
+
+// Points To: none
+
+   my_struct s1 = *p;
+
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+// s1.two -> *NULL_POINTER* , MAY
+// s1.two -> _p_1_1 , MAY
+
+   my_struct s2;
+
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+// s1.two -> *NULL_POINTER* , MAY
+// s1.two -> _p_1_1 , MAY
+// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   my_struct s3;
+
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+// s1.two -> *NULL_POINTER* , MAY
+// s1.two -> _p_1_1 , MAY
+// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   s2 = s1;
+
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+// s1.two -> *NULL_POINTER* , MAY
+// s1.two -> _p_1_1 , MAY
+// s2.two -> *NULL_POINTER* , MAY
+// s2.two -> _p_1_1 , MAY
+// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   s3 = *p;
+
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// s1.two -> *NULL_POINTER* , MAY
+// s1.two -> _p_1_1 , MAY
+// s2.two -> *NULL_POINTER* , MAY
+// s2.two -> _p_1_1 , MAY
+// s3.two -> *NULL_POINTER* , MAY
+// s3.two -> _p_1_1 , MAY
+
+   return 0;
+}

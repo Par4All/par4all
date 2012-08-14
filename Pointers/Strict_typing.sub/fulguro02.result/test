@@ -1,0 +1,529 @@
+
+PROPER EFFECTS
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc1
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc2
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: pdest
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: spp
+   int spp = datdest->spp;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: length
+   int length = datdest->length*spp;
+//             <    is read   >: length
+//             <    is written>: j
+   for(j = 0; j <= length-1; j += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: v1
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: v2
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+//             <    is read   >: length v1 v2
+//             <    is written>: result
+      result = flgr_defop_add_fgINT32(v1, v2);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j length pdest result
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}
+FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Ret ret;
+//             <    is read   >: data1 data2 datdest
+   if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      return FLGR_RET_NULL_OBJECT;
+   }
+//             <    is read   >: data1 datdest
+//             <    is written>: ret
+   if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
+//             <    is read   >: ret
+      return ret;
+//             <    is read   >: data1 data2
+//             <    is written>: ret
+   if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK)
+//             <    is read   >: ret
+      return ret;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   if (datdest->type==FLGR_BIT) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgBIT(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT8) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT16) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT32) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT8) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT16) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT32) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      flgr2d_arith_add_fgINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_FLOAT32) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_FLOAT64) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: pdest
+   FLGR_Data1D **pdest = datdest->row;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p1
+   FLGR_Data1D **p1 = data1->row;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p2
+   FLGR_Data1D **p2 = data2->row;
+   int i;
+//             <    is written>: i
+   i = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   while (i<data1->size_y) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
+//             <    is read   >: i p1 p2 pdest
+//             <    is written>: i p1 p2 pdest
+      i++, pdest++, p1++, p2++;
+   }
+   return;
+}
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return flgr_get_array_fgINT32(array, pos);
+}
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: array pos value
+   flgr_set_array_fgINT32(array, pos, value);
+}
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+//             <    is read   >: a b
+   return a+b;
+}
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return array[pos];
+}
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: array pos value
+   array[pos] = value;
+}
+int main()
+{
+   FLGR_Data2D d2d;
+   FLGR_Data2D d1;
+   FLGR_Data2D d2;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   flgr2d_arith_add_fgINT32(&d2d, &d1, &d2);
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d%d\n", d2d.size, ((d2d.row)[0]->array)[0]);
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   FLGR_Data2D d2d;
+   FLGR_Data2D d1;
+   FLGR_Data2D d2;
+//             <may be read   >: d1.row[0] d1.row[0][0].array 
+//                               d1.row[0][0].array[*] d2.row[0] 
+//                               d2.row[0][0].array 
+//                               d2.row[0][0].array[*] d2d.row[0] 
+//                               d2d.row[0][0].array 
+//                               d2d.row[0][0].length 
+//                               d2d.row[0][0].spp
+//             <may be written>: d2d.row[0][0].array[*]
+//             <    is read   >: d1.row d1.size_y d2.row d2d.row
+   flgr2d_arith_add_fgINT32(&d2d, &d1, &d2);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: d2d.row d2d.row[0] 
+//                               d2d.row[0][0].array 
+//                               d2d.row[0][0].array[0] d2d.size 
+//                               stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d%d\n", d2d.size, ((d2d.row)[0]->array)[0]);
+   return 0;
+}
+
+POINTS TO
+
+
+// Points To IN:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+
+
+// Points To OUT:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+
+// Points To: none
+
+   int j;
+
+// Points To: none
+
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   fgINT32 v1;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   fgINT32 v2;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   fgINT32 result;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   int spp = datdest->spp;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   int length = datdest->length*spp;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   for(j = 0; j <= length-1; j += 1) {
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+      result = flgr_defop_add_fgINT32(v1, v2);
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_2 , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_3 , MAY
+
+   return;
+}
