@@ -13,4 +13,5 @@ void pointer02(int n, float *p)
 
   for(i=0; i<n; i++)
     p[i] = r[i];
+  return;
 }
