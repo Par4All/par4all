@@ -119,6 +119,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     if(declaration_statement_p(s)) {
       /* Process the declarations */
       pt_out = declaration_statement_to_points_to(s, pt_out);
+      pips_assert("pt_out is consistent", consistent_pt_map_p(pt_out));
       /* Go down recursively, although it is currently useless since a
 	 declaration statement is a call to CONTINUE */
       pt_out = instruction_to_points_to(i, pt_out);
@@ -197,7 +198,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
   pips_debug(1, "declaration statement \n");
   
   FOREACH(ENTITY, e, l_decls) {
-    type et = ultimate_type(entity_type(e));
+    type et = entity_basic_concrete_type(e);
     if(pointer_type_p(et)
        || array_of_pointers_type_p(et)
        || struct_type_p(et)

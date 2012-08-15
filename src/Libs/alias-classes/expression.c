@@ -909,6 +909,8 @@ void offset_points_to_cell(cell sink, expression delta)
   if(nowhere_cell_p(sink))
     ; // user error: possible incrementation of an uninitialized pointer
   else if(null_cell_p(sink))
+    // FI: the operation requested is impossible; the condition should
+    // be checked above to update the pt_map and/or to signal a bug
     ; // Impossible: possible incrementation of a NULL pointer
   else if(anywhere_cell_p(sink))
     ; // It is already fuzzy no need to add more

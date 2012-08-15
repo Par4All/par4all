@@ -228,6 +228,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     sinks = expression_to_points_to_sources(a, in);
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
+    // FI: I do not understand why eval_p is only used for dereferencing...
     sinks = dereferencing_to_sinks(a, in, eval_p);
   }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
@@ -385,11 +386,17 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   type t2 = expression_to_type(a2);
   // FI: the first two cases should be unified with a=a1 or a2
   if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
-    sinks = expression_to_points_to_sinks(a1, in);
+    // expression_to_points_to_sinks() returns pointers to arcs in the
+    // points-to graph. No side effect is then possible.
+    list e_sinks = expression_to_points_to_sinks(a1, in);
+    sinks = gen_full_copy_list(e_sinks);
+    gen_free_list(e_sinks);
     offset_points_to_cells(sinks, a2);
   }
   else if(pointer_type_p(t2) && scalar_integer_type_p(t1)) {
-    sinks = expression_to_points_to_sinks(a2, in);
+    list e_sinks = expression_to_points_to_sinks(a2, in);
+    sinks = gen_full_copy_list(e_sinks);
+    gen_free_list(e_sinks);
     offset_points_to_cells(sinks, a1);
   }
   else
@@ -1042,6 +1049,10 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   return sinks;
 }
 
+/* The returned list contains cells use in "in". They should be copied
+ * if they must be changed by side effects of "in" will become
+ * nconsistent.
+ */
 list expression_to_points_to_sinks(expression e, pt_map in)
 {
   // FI: question, do we have to propagate eval_p downards or could we

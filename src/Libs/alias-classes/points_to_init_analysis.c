@@ -328,7 +328,7 @@ list points_to_indices_to_subscript_indices(list ptsl)
     // This dichotomy between references and calls may be too simple
     if(!expression_reference_p(se)) {
       if(!unbounded_expression_p(se)) {
-	if(integer_constant_expression_p(se))
+	if(extended_integer_constant_expression_p(se))
 	  sl = CONS(EXPRESSION, copy_expression(se), sl);
 	else
 	// do not propagate store-dependent information
