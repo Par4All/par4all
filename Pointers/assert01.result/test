@@ -1,13 +1,4 @@
 
-PROPER  EFFECTS
-
-void assert01()
-{
-   int i;
-//             <    is read   >: i
-   i>0?(void) 0:__assert_fail("i>0", "$VDIR/assert01.c", 15, (const char *) 0);
-}
-
 POINTS-TO
 
 
@@ -25,5 +16,5 @@ void assert01()
 
 // Points To: none
 
-   i>0?(void) 0:__assert_fail("i>0", "$VDIR/assert01.c", 15, (const char *) 0);
+   i>0?(void) 0:__assert_fail("i>0", "./assert01.c", 15, (const char *) 0);
 }

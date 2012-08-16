@@ -90,7 +90,7 @@ void assign04()
 
    **p = r;
 
-// Points To: none
+// Points To: unreachable
 
    ***p = 0;
 }

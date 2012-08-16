@@ -61,22 +61,22 @@ int main()
    fp = fopen("file.txt", "rb");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    n = fread(buf, 8, 50, fp);
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    if (n==-1)
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       printf("fread failed");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    fclose(fp);
 
