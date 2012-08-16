@@ -28,20 +28,20 @@ int main()
    a = (float *) malloc(10*sizeof(float));
 
 // Points To:
-// a -> *HEAP*_l_8[0] , EXACT
+// a -> *HEAP*_l_8[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    p = a, i = 0;
 
 // Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , EXACT
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[0] , MAY
 
    while (i<10) {
 
 // Points To:
-// a -> *HEAP*_l_8[0] , EXACT
+// a -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
 // p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[1] , MAY
@@ -59,7 +59,7 @@ int main()
       *p = 1.0;
 
 // Points To:
-// a -> *HEAP*_l_8[0] , EXACT
+// a -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
 // p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[1] , MAY
@@ -78,7 +78,7 @@ int main()
    }
 
 // Points To:
-// a -> *HEAP*_l_8[0] , EXACT
+// a -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[*] , MAY
 // p -> *HEAP*_l_8[0] , MAY
 // p -> *HEAP*_l_8[1] , MAY

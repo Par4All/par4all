@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// pi -> *HEAP*_l_12 , EXACT
+// pi -> *HEAP*_l_12 , MAY
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -50,35 +50,35 @@ int main(int argc, char *argv[])
    px = (float *) malloc(sizeof(float));
 
 // Points To:
-// pi -> *HEAP*_l_12 , EXACT
+// pi -> *HEAP*_l_12 , MAY
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// px -> *HEAP*_l_13 , EXACT
+// px -> *HEAP*_l_13 , MAY
 // pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    pz = (float *) malloc(sizeof(float));
 
 // Points To:
-// pi -> *HEAP*_l_12 , EXACT
+// pi -> *HEAP*_l_12 , MAY
 // pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// px -> *HEAP*_l_13 , EXACT
-// pz -> *HEAP*_l_14 , EXACT
+// px -> *HEAP*_l_13 , MAY
+// pz -> *HEAP*_l_14 , MAY
 
    pt = (int (*)[30]) malloc(sizeof(*pt));
 
 // Points To:
-// pi -> *HEAP*_l_12 , EXACT
-// pt -> *HEAP*_l_15[0] , EXACT
-// px -> *HEAP*_l_13 , EXACT
-// pz -> *HEAP*_l_14 , EXACT
+// pi -> *HEAP*_l_12 , MAY
+// pt -> *HEAP*_l_15[0] , MAY
+// px -> *HEAP*_l_13 , MAY
+// pz -> *HEAP*_l_14 , MAY
 
 
    pt++;
 
 // Points To:
-// pi -> *HEAP*_l_12 , EXACT
-// pt -> *HEAP*_l_15[1] , EXACT
-// px -> *HEAP*_l_13 , EXACT
-// pz -> *HEAP*_l_14 , EXACT
+// pi -> *HEAP*_l_12 , MAY
+// pt -> *HEAP*_l_15[1] , MAY
+// px -> *HEAP*_l_13 , MAY
+// pz -> *HEAP*_l_14 , MAY
 
 
    return 0;

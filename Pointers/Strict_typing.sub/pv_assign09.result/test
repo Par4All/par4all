@@ -56,7 +56,7 @@ int main()
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    return 0;
 }

@@ -1,3 +1,110 @@
 
 PROPER  EFFECTS
 
+int main(void)
+{
+//             <    is read   >: nil
+//             <    is written>: l
+   list l = nil;
+//             <    is written>: i
+   int n, i = 0;
+//             <may be read   >: stdin[0]
+//             <may be written>: n stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   fscanf(stdin, "%d", &n);
+//             <    is read   >: n
+   if (n>0)
+//             <    is read   >: n
+//             <    is written>: n
+      while (n--) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l n _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+         l = list_cons((double) n, l);
+//             <    is read   >: i
+//             <    is written>: i
+         /* Result? */
+         i++;
+      }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+   n = list_len(l);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i n stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   fprintf(stdout, "n=%d, i=%d\n", n, i);
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// nil -> *NULL_POINTER* , EXACT
+
+
+// Points To OUT:
+// nil -> *NULL_POINTER* , EXACT
+
+int main(void)
+{
+
+// Points To: none
+
+   list l = nil;
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   int n, i = 0;
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   fscanf(stdin, "%d", &n);
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   if (n>0)
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+      while (n--) {
+
+// Points To: none
+
+         l = list_cons((double) n, l);
+
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+         /* Result? */
+         i++;
+      }
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   n = list_len(l);
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   fprintf(stdout, "n=%d, i=%d\n", n, i);
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   return 0;
+}

@@ -65,7 +65,7 @@ int main(void)
    // should generate an error while analyzing?
    **pp = 0;
 
-// Points To: none
+// Points To: unreachable
 
    return 0;
 }

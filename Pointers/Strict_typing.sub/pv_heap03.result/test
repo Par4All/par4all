@@ -25,17 +25,17 @@ int main()
    p = (int *) malloc(2*sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_7[0] , MAY
 
    p[0] = 0;
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_7[0] , MAY
 
    p[1] = 1;
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_7[0] , MAY
 
    free(p);
 

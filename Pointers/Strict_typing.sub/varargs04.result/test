@@ -71,12 +71,12 @@ void f3(int n_ptrs, int f4_after, ...)
       array[ptr_no] = va_arg(ap, char *);
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       if (ptr_no==f4_after)
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
          va_copy(ap_save, ap);
    }
