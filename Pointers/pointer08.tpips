@@ -2,6 +2,10 @@ setenv WS=pointer08
 delete $WS
 create $WS $WS.c
 
+# setproperty MEMORY_EFFECTS_ONLY FALSE
+
+# Bug also if this property is not set
+setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 
 echo
 echo POINTS TO for "$WS"
