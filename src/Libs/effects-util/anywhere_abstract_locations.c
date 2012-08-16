@@ -394,8 +394,12 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
   // FI: the debug message should be improved with full information
   // about the type... See get_symbol_table() and isolate the code
   // used to prettyprint the type. Too bad it uses the buffer type...
-  pips_debug(8, "New abstract location entity \"%s\" found or created"
-	     " with type \"%s\"", entity_name(e), type_to_string(t));
+  ifdebug(8) {
+    pips_debug(8, "New abstract location entity \"%s\" found or created"
+	       " with type ", entity_name(e));
+    print_type(t);
+    fprintf(stderr, "\n");
+  }
 
   return e;
 }

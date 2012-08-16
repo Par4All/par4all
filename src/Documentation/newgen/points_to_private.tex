@@ -72,6 +72,13 @@ their values are constrained by the {\em descriptor}.
 Note: the domains {\em approximation} and {\em descriptor} are
 documented in ri.tex.
 
+Approximations are not yet well semantically defined because they can
+be related to the number of memory locations abstracted by the source,
+the number of memory locations abstracted by the sink, or to the
+number of arcs leaving a source. The current definition of an exact
+arc is an arc starting from a unique memory location with outdegree
+one and ending on a unique memory location.
+
 Different kinds of points-to abstractions may be built. They depend on
 the subsets of cells that are used, as well as on the descriptor
 kind.

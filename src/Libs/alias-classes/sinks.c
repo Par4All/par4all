@@ -319,10 +319,17 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     list L = gen_full_copy_list(expression_to_points_to_sources(a1, in));
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
+    type ft = entity_basic_concrete_type(f);
     FOREACH(CELL, pc, L) {
       (void) points_to_cell_add_field_dimension(pc, f);
+      /* FI: it might be better to integrate this update in
+       * points_to_cell_add_field_dimension() in order to exploit available
+       * information directly and to return a consistent cell.
+       * Anyway, seems useless here
+       */
+      points_to_cell_add_zero_subscripts(pc);
     }
-    if(eval_p) {
+    if(eval_p && !array_type_p(ft)) {
       FOREACH(CELL, pc, L) {
 	list LL = source_to_sinks(pc, in, true);
 	sinks = gen_nconc(sinks, LL);
@@ -924,7 +931,10 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   /* Add subscript when possible. For typing reason, typed anywhere
      cell should be subscripted. */
   FOREACH(CELL, c, sources) {
-    if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)) {
+    // FI: some other lattice abstract elements should be removed like
+    // STACK, SYNAMIC
+    if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
+       && !all_heap_locations_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);
       reference r = cell_any_reference(c);
       // FI: the update depends on the sink model

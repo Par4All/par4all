@@ -1351,6 +1351,38 @@ set gen_must_set(list L, list R, set in_must, bool *address_of_p)
   return gen_must2;
 }
 
+/* Does cell "c" represent a unique memory location or a set of memory
+ * locations?
+ *
+ * This is key to decide if a points-to arc is a must or a may arc.
+ *
+ * Is it always possible to decide when heap abstract locations are concerned?
+ *
+ * See also cell_abstract_location_p()
+ */
+bool unique_location_cell_p(cell c)
+{
+  bool unique_p = !anywhere_cell_p(c)
+    && !cell_typed_anywhere_locations_p(c)
+    // FI: typed or not?
+    // FI: how do you know when heap cells are unique and when they
+    // represent a set of cells?
+    && !heap_cell_p(c);
+
+  // FI: how do you deal with arrays of pointers?
+  if(unique_p) {
+    reference r = cell_any_reference(c);
+    list sl = reference_indices(r);
+    FOREACH(EXPRESSION, s, sl) {
+      if(unbounded_expression_p(s)) {
+	unique_p = false;
+	break;
+      }
+    }
+  }
+  return unique_p;
+}
+
 set gen_may_constant_paths(cell l,
 			   list R,
 			   set in_may,
@@ -1393,7 +1425,10 @@ set gen_may_constant_paths(cell l,
   else {
     int Rc = (int) gen_length(R);
     FOREACH(cell, r, R){
-      approximation a = (Lc+Rc>2) ?
+      // FI: check the unicity of the locations
+      approximation a = (Lc+Rc>2
+			 || !unique_location_cell_p(l)
+			 || !unique_location_cell_p(r)) ?
 	make_approximation_may() : make_approximation_exact();
       /* Should be replaced by opgen_constant_path(l,r) */
       //reference ref = cell_any_reference(r);
@@ -1469,7 +1504,9 @@ set gen_must_constant_paths(cell l,
       //reference ref = cell_any_reference(r);
       /* if(reference_unbounded_indices_p(ref)) */
       /* 	a = make_approximation_may(); */
-      approximation a = (Lc+Rc>2)?
+      approximation a = (Lc+Rc>2
+			 || !unique_location_cell_p(l)
+			 || !unique_location_cell_p(r))?
 	make_approximation_may(): make_approximation_exact();
       pt = make_points_to(l, r, a, make_descriptor_none());
       set_add_element(gen_must_cps, gen_must_cps, (void*)pt);

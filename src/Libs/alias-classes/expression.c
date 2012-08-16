@@ -1443,6 +1443,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   if(ENDP(L)) {
     /* The code cannot be executed */
     clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else {
     /* Compute the data-flow equation for the may and the must edges...

@@ -290,7 +290,10 @@ bool anywhere_effect_p(effect e)
   return anywhere_p;
 }
 
-/* Is it an anywhere cell? */
+/* Is it an anywhere cell?
+ *
+ * Are typed anywhere celles taken into account?
+ */
 bool anywhere_cell_p(cell c)
 {
   bool anywhere_p;
@@ -1273,6 +1276,9 @@ bool vect_contains_phi_p(Pvecteur v)
 /* Functions about points-to cells - There is no cell.c file */
 
 /* add a field to a cell if it is meaningful
+ *
+ * FI: should we also add the necessary zero subscripts when the field
+ * is an array?
  */
 cell points_to_cell_add_field_dimension(cell c, entity f)
 {
@@ -1321,7 +1327,7 @@ reference reference_add_field_dimension(reference r, entity f)
 
     if(struct_type_p(ut)) {
       entity ste = basic_derived(variable_basic(type_variable(t)));
-      type st = ultimate_type(entity_type(ste));
+      type st = ultimate_type(entity_type(ste)); // FI: should be concrete_basic_type
       list fl = list_undefined;
       /* FI: a problem due to typedefs apparently */
       if(type_struct_p(st))
@@ -1337,6 +1343,8 @@ reference reference_add_field_dimension(reference r, entity f)
 	expression s = entity_to_expression(f);
 	reference_indices(r) = gen_nconc(reference_indices(r),
 					 CONS(EXPRESSION, s, NIL));
+	// FI: in case the field is an array
+	reference_add_zero_subscripts(r, entity_basic_concrete_type(f));
       }
       else {
 	entity v = reference_variable(r);
@@ -1375,14 +1383,16 @@ reference reference_add_field_dimension(reference r, entity f)
     /* This kind of entity cannot support a concrete access path but
      * the type must be updated according to the field "f"
      */
-    type nt = entity_type(f); // ultimate_type()?
+    type nt = entity_type(f); // concrete/ultimate_type()?
     if(entity_typed_anywhere_locations_p(v)) {
       entity ne = entity_typed_anywhere_locations(nt);
       reference_variable(r) = ne;
+      reference_add_zero_subscripts(r, nt);
     }
     else if(entity_all_heap_locations_p(v)) {
       entity ne = entity_all_heap_locations_typed(nt);
       reference_variable(r) = ne;
+      reference_add_zero_subscripts(r, nt);
     }
   }
 
