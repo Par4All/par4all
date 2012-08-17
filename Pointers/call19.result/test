@@ -63,9 +63,7 @@ POINTS-TO
 int bla(int *p)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// Points To: none
 
    *p = 13;
 
@@ -85,28 +83,20 @@ int bla(int *p)
 int call19(int *q)
 {
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
    int i, k;
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
    something st;
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
    // bla(int *)
    i = bla(q);
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
    i += *q;
 

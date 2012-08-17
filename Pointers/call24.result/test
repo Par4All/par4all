@@ -2,15 +2,18 @@
 POINTS-TO
 
 
-// Points To IN:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
 
 void call24(int *p)
 {
+
+// Points To: none
+
+   // do nothing
+   return;
 }
 
 // Points To IN: none
