@@ -1,4 +1,4 @@
-setenv WSPACE=struct10
+setenv WSPACE=assert02
 delete $WSPACE
 create $WSPACE $WSPACE.c
 

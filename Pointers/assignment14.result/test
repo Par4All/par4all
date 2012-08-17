@@ -3,50 +3,46 @@ POINTS TO for assignment14
 
 
 // Points To IN:
-// _t1_1[0] -> *NULL_POINTER* , MAY
-// _t1_1[*] -> _t1_1_1[*] , MAY
-// _t2_2[0] -> *NULL_POINTER* , MAY
-// _t2_2[*] -> _t2_2_2[*] , MAY
-// _t2_2_2[0].ip2 -> *NULL_POINTER* , MAY
-// _t2_2_2[*].ip2 -> _t2_2_2_2[*] , MAY
-// t1 -> *NULL_POINTER* , MAY
-// t1 -> _t1_1 , MAY
-// t2 -> *NULL_POINTER* , MAY
-// t2 -> _t2_2 , MAY
+// _tx_1[0] -> *NULL_POINTER* , MAY
+// _tx_1[0] -> _tx_1_1[0][0] , MAY
+// _ty_2[0] -> *NULL_POINTER* , MAY
+// _ty_2[0] -> _ty_2_2[0][0] , MAY
+// _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
+// _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
+// tx -> *NULL_POINTER* , MAY
+// tx -> _tx_1[0] , MAY
+// ty -> *NULL_POINTER* , MAY
+// ty -> _ty_2[0] , MAY
 
 
 // Points To OUT:
-// _t1_1[0] -> *NULL_POINTER* , MAY
-// _t1_1[*] -> _t1_1_1[*] , MAY
-// _t1_1_1[0].ip1 -> *NULL_POINTER* , MAY
-// _t1_1_1[0].ip1 -> _t2_2_2_2[0] , MAY
-// _t2_2[0] -> *NULL_POINTER* , MAY
-// _t2_2[*] -> _t2_2_2[*] , MAY
-// _t2_2_2[0].ip2 -> *NULL_POINTER* , MAY
-// _t2_2_2[*].ip2 -> _t2_2_2_2[*] , MAY
+// _tx_1[0] -> *NULL_POINTER* , MAY
+// _tx_1[0] -> _tx_1_1[0][0] , MAY
+// _tx_1_1[0][0].ip1 -> *NULL_POINTER* , MAY
+// _tx_1_1[0][0].ip1 -> _ty_2_2_5__2[0][0][0] , MAY
+// _ty_2[0] -> *NULL_POINTER* , MAY
+// _ty_2[0] -> _ty_2_2[0][0] , MAY
+// _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
+// _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
 
-void assignment(struct foo **t1, struct foo **t2)
+void assignment14(struct foo **tx, struct foo **ty)
 {
 
-// Points To:
-// t1 -> *NULL_POINTER* , MAY
-// t1 -> _t1_1 , MAY
-// t2 -> *NULL_POINTER* , MAY
-// t2 -> _t2_2 , MAY
+// Points To: none
 
-   (**t1).ip1 = (**t2).ip2;
+   (**tx).ip1 = (**ty).ip2;
 
 // Points To:
-// _t1_1[0] -> *NULL_POINTER* , MAY
-// _t1_1[*] -> _t1_1_1[*] , MAY
-// _t1_1_1[0].ip1 -> *NULL_POINTER* , MAY
-// _t1_1_1[0].ip1 -> _t2_2_2_2[0] , MAY
-// _t2_2[0] -> *NULL_POINTER* , MAY
-// _t2_2[*] -> _t2_2_2[*] , MAY
-// _t2_2_2[0].ip2 -> *NULL_POINTER* , MAY
-// _t2_2_2[*].ip2 -> _t2_2_2_2[*] , MAY
-// t1 -> _t1_1 , EXACT
-// t2 -> _t2_2 , EXACT
+// _tx_1[0] -> *NULL_POINTER* , MAY
+// _tx_1[0] -> _tx_1_1[0][0] , MAY
+// _tx_1_1[0][0].ip1 -> *NULL_POINTER* , MAY
+// _tx_1_1[0][0].ip1 -> _ty_2_2_5__2[0][0][0] , MAY
+// _ty_2[0] -> *NULL_POINTER* , MAY
+// _ty_2[0] -> _ty_2_2[0][0] , MAY
+// _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
+// _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
+// tx -> _tx_1[0] , EXACT
+// ty -> _ty_2[0] , EXACT
 
    return;
 }

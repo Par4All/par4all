@@ -11,7 +11,7 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[array13]
+display PRINTED_FILE[$WSPACE]
 
 close
 delete $WSPACE

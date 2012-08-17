@@ -8,11 +8,11 @@ extern void __assert_fail (__const char *__assertion, __const char *__file,
      __THROW __attribute__ ((__noreturn__));
 */
 
-void assert01()
+void assert03(int * p, int * q)
 {
   int i;
 
-  assert(i>0);
+  assert(p&&q);
 
   return;
 }
