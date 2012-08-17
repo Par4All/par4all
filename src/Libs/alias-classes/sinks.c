@@ -532,6 +532,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   entity e = reference_variable(r);
+  type t = entity_basic_concrete_type(e);
   list sl = reference_indices(r);
 
   ifdebug(8) {
@@ -540,6 +541,17 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     fprintf(stderr, "\n");
   }
 
+  // FI: conditional01.c shows that the C parser does not generate the
+  // right construct, a subscript, when a scalar pointer is indexed
+  if(pointer_type_p(t) && !ENDP(sl)) {
+    // Let's build a subscript
+    expression tmp = entity_to_expression(e);
+    subscript tmp_s = make_subscript(tmp, sl);
+    sinks = subscript_to_points_to_sinks(tmp_s, in, eval_p);
+    subscript_indices(tmp_s) = NIL;
+    free_expression(tmp_s); // FI: should free tmp as well
+  }
+  else {
   // FI: to be checked otherwise?
   //expression rhs = expression_undefined;
   if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
@@ -580,9 +592,9 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 	if(eval_p) {
 	  sinks = source_to_sinks(nc, in, true);
 	  /*
-	  expression ze = int_to_expression(0);
-	  reference_indices(nr) = gen_nconc(reference_indices(nr),
-					    CONS(EXPRESSION, ze, NIL));
+	    expression ze = int_to_expression(0);
+	    reference_indices(nr) = gen_nconc(reference_indices(nr),
+	    CONS(EXPRESSION, ze, NIL));
 	  */
 	}
 	else
@@ -643,7 +655,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 	  free_cell(nc);
       }
       else {
-      // FI: without dereferencing
+	// FI: without dereferencing
 	sinks = CONS(CELL, nc, NIL);
       }
     }
@@ -670,7 +682,7 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
 			  "function assigned to a functional pointer.\n");
     }
   }
-
+  }
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");
     print_points_to_cells(sinks);
@@ -932,7 +944,8 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 {
   expression a = subscript_array(s);
-  list sources = expression_to_points_to_sources(a, in);
+  //list sources = expression_to_points_to_sources(a, in);
+  list sources = expression_to_points_to_sinks(a, in);
   list sl = subscript_indices(s);
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;

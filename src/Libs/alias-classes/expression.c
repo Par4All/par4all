@@ -1020,6 +1020,26 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   else if(struct_type_p(ut))
     pt_out = struct_assignment_to_points_to(lhs, rhs, pt_out);
   // FI: unions are not dealt with...
+  else if(array_of_pointers_type_p(ut)) {
+    /* Can occur in a declaration */
+    /* When more precision is needed, the BRACE_INTRINSIC arguments
+       will have to be analyzed... */
+    pips_assert("lhs is a reference", expression_reference_p(lhs));
+    reference r = expression_reference(lhs);
+    list sl = reference_indices(r);
+    pips_assert("The array reference has no indices", ENDP(sl));
+    cell source = make_cell_reference(copy_reference(r));
+    points_to_cell_add_unbounded_subscripts(source);
+    type pt = basic_pointer(variable_basic(type_variable(ut)));
+    cell sink = make_anywhere_points_to_cell(pt);
+    points_to a = make_points_to(source, sink, 
+				  make_approximation_may(),
+				  make_descriptor_none());
+    pt_out = add_arc_to_pt_map(a, pt_in);
+  }
+  else if(array_of_struct_type_p(ut)) {
+    pips_internal_error("Initialization of array of structs not implemented yet.\n");
+  }
   else
     pt_out = pt_in; // What else?
 
