@@ -70,6 +70,17 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
   switch(t) {
   case is_syntax_reference: {
     reference r = syntax_reference(s);
+    list sl = reference_indices(r);
+    entity v = reference_variable(r);
+    type vt = entity_basic_concrete_type(v);
+    // FI: call16.c shows that the C parser does not generate the
+    // right construct, a subscript, when a scalar pointer is indexed
+    if(pointer_type_p(vt) && !ENDP(sl)) {
+      expression tmp = entity_to_expression(v);
+      pt_out = dereferencing_to_points_to(tmp, pt_in);
+      pt_out = expressions_to_points_to(sl, pt_out);
+      free_expression(tmp);
+    }
     pt_out = reference_to_points_to(r, pt_in);
     break;
   }

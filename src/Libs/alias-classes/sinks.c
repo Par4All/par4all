@@ -443,10 +443,10 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     list sinks1 = NIL;
-    if(!empty_pt_map_p(in_t))
+    if(!points_to_graph_bottom(in_t))
       sinks1 = expression_to_points_to_cells(e1, in_t, eval_p);
     list sinks2 = NIL;
-    if(!empty_pt_map_p(in_f))
+    if(!points_to_graph_bottom(in_f))
       sinks2 = expression_to_points_to_cells(e2, in_f, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
     free_pt_map(in_t), free_pt_map(in_f);
