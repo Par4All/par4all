@@ -229,6 +229,17 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	}
       }
     }
+    /* Take care of expressions in array sizing (see array12.c) */
+    if(array_type_p(et)) {
+      variable ev = type_variable(et);
+      list dl = variable_dimensions(ev);
+      FOREACH(DIMENSION, d, dl) {
+	expression l = dimension_lower(d);
+	expression u = dimension_upper(d);
+	pt_out = expression_to_points_to(l, pt_out);
+	pt_out = expression_to_points_to(u, pt_out);
+      }
+    }
   }
   
   return pt_out;
@@ -549,6 +560,7 @@ pt_map any_loop_to_points_to(statement b,
 			     expression inc, // ca be undefined
 			     pt_map pt_in)
 {
+  // return old_any_loop_to_points_to(b, init, c, inc, pt_in);
   pt_map pt_out = pt_in;
   int i = 0;
   // FI: k is linked to the cycles in points-to graph, and should not

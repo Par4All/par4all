@@ -369,6 +369,7 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   if(type_functional_p(ft)) {
     functional ff = type_functional(ft);
     rt = functional_result(ff);
+
     /* points-to updates due to arguments */
     // FI: this cannot be delayed but it is unfortunately applied
     // again when going down? See arithmetic08 and 09?
@@ -376,7 +377,13 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     // recursive calls
     // FI: we are in trouble for post increment and post decrement...
     // We should update the target a second time in sinks.c!
-    pt_out = expressions_to_points_to(al, pt_in);
+    if(!ENTITY_CONDITIONAL_P(f)) {
+      // FI: This is OK only if all subsexpressions are always evaluated
+      pt_out = expressions_to_points_to(al, pt_in);
+    }
+    else
+      pt_out = expression_to_points_to(EXPRESSION(CAR(al)), pt_in);
+
     switch( tt = value_tag(entity_initial(f))) {
     case is_value_code:{
       pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
@@ -533,6 +540,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     // This piece of code seems completety wrong
     // The actual arguments of __assert_fail() are two character
     // strings, an integer and a NULL pointer for assert01.c
+#if 0
     expression c = EXPRESSION(CAR(al));
     pt_map in_t = full_copy_pt_map(pt_out);
     pt_map in_f = full_copy_pt_map(pt_out);
@@ -555,6 +563,10 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
       pt_out = merge_points_to_graphs(out_t, out_f);
     // FI: this destroys pt_out for test case pointer02
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
+#endif
+    // FI: no return from assert failure
+    clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      /* || ENTITY_ASSERT_FAIL_SYSTEM_P(f) */) {
@@ -594,8 +606,12 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression c = EXPRESSION(CAR(al));
     pt_map in_t = full_copy_pt_map(pt_out);
     pt_map in_f = full_copy_pt_map(pt_out);
+    // FI: issue with the notion of pt_in
+    // stubs created when computing in_t should also be added in in_f
+    // or they are going to seem to be reallocated ambiguously in
+    // create_stub_entity(). Same issue I guess for the "if" construct
     in_t = condition_to_points_to(c, in_t, true);
-    in_f = condition_to_points_to(c, in_f, true);
+    in_f = condition_to_points_to(c, in_f, false);
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     pt_map out_t = pt_map_undefined;

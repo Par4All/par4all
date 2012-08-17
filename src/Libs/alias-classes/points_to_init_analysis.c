@@ -174,7 +174,15 @@ entity create_stub_entity(entity e, string fs, type t)
      * wanted as it depends on field names in the reference. And the
      * reference is not available from this function.
      */
-    pips_internal_error("Ambiguous request...");
+    type st = entity_basic_concrete_type(stub);
+    if(type_equal_p(st, t)) {
+      // This may happen when evaluating conditions on demand because
+      // they are evaluated twice, once true and once false.
+      ;
+    }
+    else
+      // Should be an internal error...
+      pips_internal_error("Ambiguous request...");
   }
 
   return stub;
@@ -494,9 +502,9 @@ points_to create_stub_points_to(cell c, // source of the points-to
 
   if(type_variable_p(source_t)) {
     bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
-    variable source_tv = type_variable(source_t);
-    list source_dl = variable_dimensions(source_tv);
-    int source_vd = (int) gen_length(source_dl); // FI: seems useless
+    //variable source_tv = type_variable(source_t);
+    //list source_dl = variable_dimensions(source_tv);
+    //int source_vd = (int) gen_length(source_dl); // FI: seems useless
     int source_cd = points_to_indices_to_array_index_number(source_sl);
 
     if(source_cd==0 /* && vd==0*/ ) {
@@ -514,7 +522,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
       else {
       // In case subscript indices have non constant values, replace them
       // with unbounded expressions
-	points_to_indices_to_subscript_indices(sl);
+	sl = points_to_indices_to_subscript_indices(sl);
       }
       // dimensions to be added to the dimensions of "st"
       list ndl = make_unbounded_dimensions(source_cd);

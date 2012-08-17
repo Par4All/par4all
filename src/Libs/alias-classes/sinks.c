@@ -296,7 +296,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	  points_to_cell_add_zero_subscripts(npc);
 	(void) points_to_cell_add_field_dimension(npc, f);
 	// FI: does this call allocate a full new list?
-	if(eval_p) {
+	type ft = entity_basic_concrete_type(f);
+	if(eval_p && !array_type_p(ft)) {
 	  list dL = source_to_sinks(npc, in, true);
 	  free_cell(npc);
 	  if(ENDP(dL)) // FI: this might mean dead code...
@@ -321,13 +322,21 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     type ft = entity_basic_concrete_type(f);
     FOREACH(CELL, pc, L) {
-      (void) points_to_cell_add_field_dimension(pc, f);
-      /* FI: it might be better to integrate this update in
-       * points_to_cell_add_field_dimension() in order to exploit available
-       * information directly and to return a consistent cell.
-       * Anyway, seems useless here
-       */
-      points_to_cell_add_zero_subscripts(pc);
+      if(!null_cell_p(pc)) { // FI: there may be other cells that should
+	// not be processed, such as an anywhere non type
+	(void) points_to_cell_add_field_dimension(pc, f);
+	/* FI: it might be better to integrate this update in
+	 * points_to_cell_add_field_dimension() in order to exploit available
+	 * information directly and to return a consistent cell.
+	 * Anyway, seems useless here
+	 */
+	points_to_cell_add_zero_subscripts(pc);
+      }
+      else {
+	// FI: Should we removed the arc generating a NULL as it is
+	// incompatible with the program execution?
+	;
+      }
     }
     if(eval_p && !array_type_p(ft)) {
       FOREACH(CELL, pc, L) {
