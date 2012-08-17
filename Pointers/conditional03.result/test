@@ -1,0 +1,28 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// conditional03 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+char * conditional03(int i)
+{
+
+// Points To: none
+
+   char *p[3] = {x, y, z};
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   char *r = i<0||i>2?p[0]:p[i];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   return r;
+}

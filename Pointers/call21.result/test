@@ -61,23 +61,29 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    *q1 = *q2+*q3;
+   return;
 }
 void pointer_free(pointer p)
 {
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(p);
+   return;
 }
 int pointer_get(const pointer p)
 {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-   return *p;
+//             <    is written>: i
+   int i = *p;
+//             <    is read   >: i
+   return i;
 }
 void pointer_set(pointer p, int v)
 {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p v
    *p = v;
+   return;
 }
 
 POINTS-TO
@@ -87,7 +93,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// alloc_pointer -> *HEAP*_l_7 , EXACT
+// alloc_pointer -> *HEAP*_l_7 , MAY
 
 pointer alloc_pointer(int v)
 {
@@ -97,12 +103,12 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7 , EXACT
+// p -> *HEAP*_l_7 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_7 , EXACT
+// p -> *HEAP*_l_7 , MAY
 
    return p;
 }
@@ -213,15 +219,16 @@ int main(void)
 void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
 
-// Points To:
-// q1 -> *NULL_POINTER* , MAY
-// q1 -> _q1_1[0] , MAY
-// q2 -> *NULL_POINTER* , MAY
-// q2 -> _q2_2[0] , MAY
-// q3 -> *NULL_POINTER* , MAY
-// q3 -> _q3_3[0] , MAY
+// Points To: none
 
    *q1 = *q2+*q3;
+
+// Points To:
+// q1 -> _q1_1[0] , EXACT
+// q2 -> _q2_2[0] , EXACT
+// q3 -> _q3_3[0] , EXACT
+
+   return;
 }
 
 // Points To IN:
@@ -234,16 +241,17 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 void pointer_free(pointer p)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// Points To: none
 
    free(p);
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
 }
 
-// Points To IN:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -251,11 +259,13 @@ void pointer_free(pointer p)
 int pointer_get(const pointer p)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// Points To: none
 
-   return *p;
+   int i = *p;
+
+// Points To: none
+
+   return i;
 }
 
 // Points To IN:
@@ -268,9 +278,12 @@ int pointer_get(const pointer p)
 void pointer_set(pointer p, int v)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// Points To: none
 
    *p = v;
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   return;
 }

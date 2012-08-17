@@ -7,7 +7,10 @@ char * conditional01(int i)
    char *p[3] = {"a", "b", "c"};
 //             <may be read   >: p[0] p[*]
 //             <    is read   >: i
-   return i<0||i>2?p[0]:p[i];
+//             <    is written>: r
+   char *r = i<0||i>2?p[0]:p[i];
+//             <    is read   >: r
+   return r;
 }
 
 POINTS-TO
@@ -16,7 +19,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// conditional01 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
 char * conditional01(int i)
 {
@@ -25,7 +29,14 @@ char * conditional01(int i)
 
    char *p[3] = {"a", "b", "c"};
 
-// Points To: none
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
-   return i<0||i>2?p[0]:p[i];
+   char *r = i<0||i>2?p[0]:p[i];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   return r;
 }
