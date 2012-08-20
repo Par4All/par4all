@@ -1429,6 +1429,22 @@ cell reduce_cell_to_pointer_type(cell c)
   }
   return c;
 }
+
+/* Undo the extra eval performed when stubs are generated: 0
+ * subscripts are added when arrays are involved.
+ *
+ */
+list reduce_cells_to_pointer_type(list cl)
+{
+  FOREACH(CELL, c, cl) {
+    if(null_cell_p(c)) // There may be other exceptions...
+      ;
+    else
+      (void) reduce_cell_to_pointer_type(c);
+  }
+  return cl;
+}
+
 /* Update pt_out when any element of L can be assigned any element of R
  *
  * FI->AM: Potential and sure memory leaks are not (yet) detected.
@@ -1713,8 +1729,8 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		   e.g. a[0][0][0] */
 		reference_add_zero_subscripts(lr, lt);
 		reference_add_zero_subscripts(rr, rt);
-		reference_add_field_dimension(lr, f);
-		reference_add_field_dimension(rr, f);
+		simple_reference_add_field_dimension(lr, f);
+		simple_reference_add_field_dimension(rr, f);
 		expression nlhs = reference_to_expression(lr);
 		expression nrhs = reference_to_expression(rr);
 		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
@@ -1731,8 +1747,8 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		// Quite a special assign in C...
 		reference lr = copy_reference(cell_any_reference(lc));
 		reference rr = copy_reference(cell_any_reference(rc));
-		reference_add_field_dimension(lr, f);
-		reference_add_field_dimension(rr, f);
+		simple_reference_add_field_dimension(lr, f);
+		simple_reference_add_field_dimension(rr, f);
 		expression li = make_unbounded_expression();
 		expression ri = make_unbounded_expression();
 		reference_indices(lr) = gen_nconc(reference_indices(lr),
@@ -2118,8 +2134,15 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
     expression rhs = EXPRESSION(CAR(CDR(al)));
     type rhst = expression_to_type(rhs);
     if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+
+      // FI: this is dead wrong in general... Same for the above code
+      // A lot more thinking about filtering points-to graph via
+      // conditions is needed
+
       list L = expression_to_points_to_sources(lhs, in);
+      list LV = expression_to_points_to_sinks(lhs, in);
       list R = expression_to_points_to_sources(rhs, in);
+      list RV = expression_to_points_to_sinks(rhs, in);
       if(gen_length(L)==1 && gen_length(R)==1) {
 	cell l = CELL(CAR(L));
 	cell r = CELL(CAR(R));

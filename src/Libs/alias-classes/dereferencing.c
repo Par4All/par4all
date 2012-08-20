@@ -261,6 +261,29 @@ pt_map reference_dereferencing_to_points_to(reference r,
   return in;
 }
 
+/* Can expression e be reduced to a reference, without requiring an evaluation?
+ *
+ * For instance expression "p" can be reduced to reference "p".
+ *
+ * Expression "p+i" annot be reduced to a reference.
+ *
+ * Ad'hoc development for dereferencing_to_sinks.
+ */
+bool expression_to_points_to_cell_p(expression e)
+{
+  bool source_p = true;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s))
+    source_p = true;
+  else if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    if(ENTITY_PLUS_C_P(f))
+      source_p = false;
+  }
+  return source_p;
+}
+
 /* Returns "sinks", the list of cells pointed to by expression "a"
  * according to points-to graph "in".
  *
@@ -279,7 +302,9 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
   list cl = expression_to_points_to_sources(a, in);
   // The pointer may not be found: *(p+i)
   // list cl = expression_to_points_to_sinks(a, in);
-  if(true || eval_p) {
+  bool evaluated_p = !expression_to_points_to_cell_p(a);
+  // evaluated_p = false;
+  if(!evaluated_p || eval_p) {
     bool null_dereferencing_p
       = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
     bool nowhere_dereferencing_p
@@ -303,7 +328,7 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
 	  /* The sinks list is empty, whether eval_p is true or not... */
 	}
 	else {
-	  if(eval_p) {
+	  if(!evaluated_p && eval_p) {
 	    FOREACH(CELL, sc, pointed) {
 	      bool to_be_freed;
 	      type t = points_to_cell_to_type(sc, &to_be_freed);

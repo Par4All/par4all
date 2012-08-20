@@ -1159,7 +1159,32 @@ list expression_to_points_to_sinks(expression e, pt_map in)
 
 list expression_to_points_to_sources(expression e, pt_map in)
 {
-  return expression_to_points_to_cells(e, in, false);
+  list sinks = expression_to_points_to_cells(e, in, false);
+  /* Scalar pointers are expected but [0] subscript may have been added */
+  if(!expression_to_points_to_cell_p(e))
+    sinks = reduce_cells_to_pointer_type(sinks);
+  ifdebug(1) {
+    type et = compute_basic_concrete_type(expression_to_type(e));
+    FOREACH(CELL, c, sinks) {
+      if(!null_cell_p(c)) {
+	bool to_be_freed;
+	type ct = points_to_cell_to_type(c, &to_be_freed);
+	type cct = compute_basic_concrete_type(ct);
+	if(!type_equal_p(et, cct)) {
+	  /* A useless [0] may have been added, but it is supposed to
+	     be taken care of above... by callers of this function. */
+	  pips_debug(1, "Type mismatch for expression: "); print_expression(e);
+	  fprintf(stderr, " with type: "); print_type(et);
+	  fprintf(stderr, "\nand cell: "); print_points_to_cell(c);
+	  fprintf(stderr, " with type: "); print_type(ct);
+	  fprintf(stderr, "\n");
+	}
+	if(to_be_freed) free_type(ct);
+      }
+    }
+  }
+
+  return sinks;
 }
 
 bool reference_must_points_to_null_p(reference r, pt_map in)

@@ -1307,6 +1307,9 @@ cell points_to_cell_add_field_dimension(cell c, entity f)
  * This does not build a standard reference, but a reference used
  * within effects computation. Field accesses are replaced by
  * subscripts.
+ *
+ * Note that the reference generated may contain extra 0 subscripts to
+ * make it scalar...
  */
 reference reference_add_field_dimension(reference r, entity f)
 {
@@ -1396,6 +1399,18 @@ reference reference_add_field_dimension(reference r, entity f)
     }
   }
 
+  return r;
+}
+
+/* Do not check anything, just add f as a last subscript. 
+ *
+ * See above 
+*/
+reference simple_reference_add_field_dimension(reference r, entity f)
+{
+  expression s = entity_to_expression(f);
+  reference_indices(r) = gen_nconc(reference_indices(r),
+				   CONS(EXPRESSION, s, NIL));
   return r;
 }
 
