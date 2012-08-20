@@ -8,7 +8,7 @@ int assignment11()
   struct {
     int a[10][10];
   } s;
-  int *q=s.a[0];
+  int *q=s.a[5];
 
   return *q;
 }

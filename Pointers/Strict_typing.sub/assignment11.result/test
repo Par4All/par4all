@@ -7,7 +7,7 @@ int assignment11()
       int a[10][10];
    } s;
 //             <    is written>: q
-   int *q = (s.a)[0];
+   int *q = (s.a)[5];
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 
    return *q;
@@ -32,9 +32,10 @@ int assignment11()
 
 // Points To: none
 
-   int *q = (s.a)[0];
+   int *q = (s.a)[5];
 
-// Points To: none
+// Points To:
+// q -> s.a[0][5] , EXACT
 
 
    return *q;

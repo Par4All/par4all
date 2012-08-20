@@ -46,7 +46,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL_POINTER* , MAY
 
 int main(void)
 {
@@ -79,7 +79,8 @@ int main(void)
 
       while (n--) {
 
-// Points To: none
+// Points To:
+// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
          l = list_cons((double) n, l);
 
@@ -91,20 +92,23 @@ int main(void)
       }
 
 // Points To:
-// l -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , MAY
 
    n = list_len(l);
 
 // Points To:
-// l -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , MAY
 
    fprintf(stdout, "n=%d, i=%d\n", n, i);
 
 // Points To:
-// l -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
+// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// nil -> *NULL_POINTER* , MAY
 
    return 0;
 }

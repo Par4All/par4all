@@ -31,22 +31,16 @@ POINTS TO for "inc01"
 int inc01(int *pi)
 {
 
-// Points To:
-// pi -> *NULL_POINTER* , MAY
-// pi -> _pi_1[0] , MAY
+// Points To: none
 
    int *q;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
-// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int i = 0;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
-// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    q = pi;

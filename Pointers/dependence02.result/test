@@ -26,16 +26,12 @@ POINTS TO for "dependence02"
 void dependence02(int *b)
 {
 
-// Points To:
-// b -> *NULL_POINTER* , MAY
-// b -> _b_1[0] , MAY
+// Points To: none
 
    int *a;
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *NULL_POINTER* , MAY
-// b -> _b_1[0] , MAY
 
 
    a = b;

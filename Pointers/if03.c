@@ -1,5 +1,7 @@
 // Impact of conditions on points-to
 
+// Too bad this code is dead wrong
+
 #include <stdio.h>
 
 int main() {

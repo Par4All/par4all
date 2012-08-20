@@ -40,12 +40,8 @@ POINTS-TO
 
 
 // Points To IN:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
 // col -> *NULL_POINTER* , MAY
 // col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
 // nbout -> *NULL_POINTER* , MAY
 // nbout -> _nbout_6[0] , MAY
 
@@ -55,104 +51,52 @@ POINTS-TO
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// Points To: none
 
    if (c=='\n'||c=='\r')
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// Points To: none
 
       /* on change de ligne */
       
       *col = 0;
    else {
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// Points To: none
 
       /* indentation ok ? */
       
       while (*col<indent) {
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
 
          my_fputc(' ', _stream);
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
 
          (*nbout)++;
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
 // col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
 // nbout -> _nbout_6[0] , EXACT
 
          (*col)++;
       }
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// col -> _col_4[0] , EXACT
+// nbout -> _nbout_6[0] , EXACT
 
       (*col)++;
    }
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
 // col -> _col_4[0] , EXACT
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// nbout -> _nbout_6[0] , EXACT
 
    
    /* dans tous les cas il faut afficher le caractere passe */
@@ -160,13 +104,8 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    my_fputc(c, _stream);
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_2 , MAY
 // col -> _col_4[0] , EXACT
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_3 , MAY
-// nbout -> *NULL_POINTER* , MAY
-// nbout -> _nbout_6[0] , MAY
+// nbout -> _nbout_6[0] , EXACT
 
    (*nbout)++;
 }
