@@ -191,16 +191,48 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
   return in;
 }
 
+/* see if a points_to_reference includes a pointer dereferencing: this is impossible if the points-to reference is consistent. It must be a constant path. */
+bool pointer_points_to_reference_p(reference r)
+{
+  return false;
+}
+
+void pointer_reference_dereferencing_to_points_to(reference r, pt_map in)
+{
+  expression pae = pointer_reference_to_expression(r);
+  // FI: assume side effects are OK...
+  (void) expression_to_points_to(pae, in);
+  free_expression(pae);
+}
+
 /* Can we execute the reference r in points-to context "in" without
  * segfaulting?
  *
  * Do not go down in subscript expressions.
+ *
+ * See also reference_to_points_to_sinks(). Unfortunate cut-and-paste.
  */
 pt_map reference_dereferencing_to_points_to(reference r,
 					    pt_map in,
 					    bool nowhere_dereferencing_p,
 					    bool null_dereferencing_p)
 {
+  entity e = reference_variable(r);
+  type t = entity_basic_concrete_type(e);
+  list sl = reference_indices(r);
+
+  /* Does the reference implies some dereferencing itself? */
+  if(pointer_points_to_reference_p(r)) {
+    pointer_reference_dereferencing_to_points_to(r, in);
+  }
+  else if(pointer_type_p(t) && !ENDP(sl)) {
+    pointer_reference_dereferencing_to_points_to(r, in);
+  }
+  else if(array_of_pointers_type_p(t)
+	  && (int) gen_length(sl)>variable_dimension_number(type_variable(t))) {
+    pointer_reference_dereferencing_to_points_to(r, in);
+  }
+  else {
   reference nr = copy_reference(r);
   cell source = make_cell_reference(nr);
   /* Remove store-dependent indices */
@@ -225,7 +257,7 @@ pt_map reference_dereferencing_to_points_to(reference r,
   }
 
   gen_free_list(sinks);
-
+  }
   return in;
 }
 
@@ -245,37 +277,65 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
   list sinks = NIL;
   /* Locate the pointer, no dereferencing yet */
   list cl = expression_to_points_to_sources(a, in);
-  bool null_dereferencing_p
-    = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
-  bool nowhere_dereferencing_p
-    = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  // The pointer may not be found: *(p+i)
+  // list cl = expression_to_points_to_sinks(a, in);
+  if(true || eval_p) {
+    bool null_dereferencing_p
+      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+    bool nowhere_dereferencing_p
+      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
 
-  /* Finds what it is pointing to, memory(p) */
-  FOREACH(CELL, c, cl) {
-    /* Do we want to dereference c? */
-    if( (null_dereferencing_p || !null_cell_p(c))
-	&& (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
-      /* Do not create sharing between elements of "in" and elements of
-	 "sinks". */
-      list pointed = source_to_sinks(c, in, true);
-      if(ENDP(pointed)) {
-	reference r = cell_any_reference(c);
-	entity v = reference_variable(r);
-	string words_to_string(list);
-	pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
-			  entity_user_name(v),
-			  words_to_string(words_reference(r, NIL)));
-	/* The sinks list is empty, whether eval_p is true or not... */
-      }
-      else {
-	if(eval_p) {
-	  list starpointed = extended_sources_to_sinks(pointed, in);
-	  sinks = gen_nconc(sinks, starpointed);
+    /* Finds what it is pointing to, memory(p) */
+    FOREACH(CELL, c, cl) {
+      /* Do we want to dereference c? */
+      if( (null_dereferencing_p || !null_cell_p(c))
+	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+	/* Do not create sharing between elements of "in" and elements of
+	   "sinks". */
+	list pointed = source_to_sinks(c, in, true);
+	if(ENDP(pointed)) {
+	  reference r = cell_any_reference(c);
+	  entity v = reference_variable(r);
+	  string words_to_string(list);
+	  pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			    entity_user_name(v),
+			    words_to_string(words_reference(r, NIL)));
+	  /* The sinks list is empty, whether eval_p is true or not... */
 	}
-	else
-	  sinks = gen_nconc(sinks, pointed);
+	else {
+	  if(eval_p) {
+	    FOREACH(CELL, sc, pointed) {
+	      bool to_be_freed;
+	      type t = points_to_cell_to_type(sc, &to_be_freed);
+	      if(!pointer_type_p(t)) {
+		// FI: it might be necessary to allocate a new copy of sc
+		sinks = gen_nconc(sinks, CONS(CELL, sc, NIL));
+	      }
+	      else if(array_type_p(t) || struct_type_p(t)) {
+		/* FI: New cells have been allocated by
+		   source_to_sinks(): side-effects are OK. In
+		   theory... The source code of source_to_sinks() seems
+		   to show that fresh_p is not exploited in all
+		   situations. */
+		//cell nsc = copy_cell(sc);
+		//points_to_cell_add_zero_subscripts(nsc);
+		//sinks = gen_nconc(sinks, CONS(CELL, nsc, NIL));
+		pips_internal_error("sc assume saturated with 0 subscripts and/or field susbscripts.\n");
+	      }
+	      else {
+		list starpointed = extended_source_to_sinks(sc, in);
+		sinks = gen_nconc(sinks, starpointed);
+	      }
+	      if(to_be_freed) free_type(t);
+	    }
+	  }
+	  else
+	    sinks = gen_nconc(sinks, pointed);
+	}
       }
     }
   }
+  else
+    sinks = cl;
   return sinks;
 }

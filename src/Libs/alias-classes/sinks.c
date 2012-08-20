@@ -229,7 +229,13 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
     // FI: I do not understand why eval_p is only used for dereferencing...
-    sinks = dereferencing_to_sinks(a, in, eval_p);
+    // struct18.c sensitive to the test below
+    if(eval_p)
+      sinks = dereferencing_to_sinks(a, in, eval_p);
+    else {
+      sinks = dereferencing_to_sinks(a, in, eval_p);
+      // sinks = expression_to_points_to_sources(a, in);
+    }
   }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
     sinks = expression_to_points_to_sinks(a, in);
@@ -504,6 +510,37 @@ reference simplified_reference(reference r)
   return nr;
 }
 
+/* What to do when a pointer "p" is dereferenced within a reference "r".
+ *
+ * If p is a scalar pointer, p[i] is equivalent to *(p+i) and p[i][j]
+ * to *(*(p+i)+j).
+ *
+ * If p is a 2-D array of pointers, p[i], p[i][j] do not belong here.
+ * But, p[i][j][k] is equivalent to *(p[i][j]+k) and p[i][j][k][l]
+ * to *(*(p[i][j]+k)+l).
+ *
+ * The equivalent expression is fully allocated to be freed at the
+ * end. Which may cause problems if the points-to analysis re-use
+ * parts of the internal data structure...
+ *
+ * The normalization could have been performed by the parser, but PIPS
+ * is source-to-source for the benefit of its human user.
+ */
+list pointer_reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
+{
+  list sinks = NIL;
+  expression pae = pointer_reference_to_expression(r);
+
+  if(eval_p)
+    sinks = expression_to_points_to_sinks(pae, in);
+  else
+    sinks = expression_to_points_to_sources(pae, in);
+
+  free_expression(pae);
+
+  return sinks;
+}
+
  /* Returns a list of memory cells "sinks" possibly accessed by the evaluation
   * of reference "r". No sharing between the returned list "sinks" and
   * the reference "r" or the points-to set "in".
@@ -541,15 +578,15 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     fprintf(stderr, "\n");
   }
 
-  // FI: conditional01.c shows that the C parser does not generate the
-  // right construct, a subscript, when a scalar pointer is indexed
+  // FI: conditional01.c shows that the C parser may not generate the
+  // right construct when a scalar or an pointer is indexed.
+  // FI: maybe more difficult to guess of array of pointers...
   if(pointer_type_p(t) && !ENDP(sl)) {
-    // Let's build a subscript
-    expression tmp = entity_to_expression(e);
-    subscript tmp_s = make_subscript(tmp, sl);
-    sinks = subscript_to_points_to_sinks(tmp_s, in, eval_p);
-    subscript_indices(tmp_s) = NIL;
-    free_expression(tmp_s); // FI: should free tmp as well
+    sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
+  }
+  else if(array_of_pointers_type_p(t)
+	  && (int) gen_length(sl)>variable_dimension_number(type_variable(t))) {
+    sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
   }
   else {
   // FI: to be checked otherwise?
@@ -940,12 +977,21 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
  /* Generate the corresponding points-to reference(s). All access
   * operators such as ., ->, * are replaced by subscripts.
   *
+  * See Strict_typing.sub/assigment11.c: the index is not put back at
+  * the right place. It would be easy (?) to fix it in this specific
+  * case, not forgetting the field subscripts..., but I do not see how
+  * to handle general stubs with artificial dimensions...
   */
 list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 {
   expression a = subscript_array(s);
-  //list sources = expression_to_points_to_sources(a, in);
-  list sources = expression_to_points_to_sinks(a, in);
+
+  /* FI: I'm in trouble. Logically, I want sinks, but in practice
+   * sources seem to give better results...
+   */
+  list sources = expression_to_points_to_sources(a, in);
+  // list sources = expression_to_points_to_sinks(a, in);
+
   list sl = subscript_indices(s);
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
@@ -954,7 +1000,7 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
      cell should be subscripted. */
   FOREACH(CELL, c, sources) {
     // FI: some other lattice abstract elements should be removed like
-    // STACK, SYNAMIC
+    // STACK, DYNAMIC
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
        && !all_heap_locations_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);
@@ -979,9 +1025,11 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 	for(i=0;i<i_n-ncsl_n;i++) {
 	  expression i = copy_expression(EXPRESSION(CAR(ci)));
 	  nl = CONS(EXPRESSION, i, nl);
+	  POP(ci);
 	}
 	nl = gen_nreverse(nl);
 	nl = gen_nconc(nl, ncsl);
+	// nl = gen_nconc(ncsl, nl);
 	gen_full_free_list(reference_indices(r));
 	reference_indices(r) = nl;
       }
@@ -990,10 +1038,26 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 
   gen_full_free_list(csl);
 
-  if(eval_p)
-    sinks = sources_to_sinks(sources, in, true);
-  else
-    sinks = sources;
+  //  if(eval_p)
+  //sinks = sources_to_sinks(sources, in, true);
+  //else
+  //sinks = sources;
+
+  if(eval_p) {
+    FOREACH(CELL, source, sources) {
+      bool to_be_freed;
+      type t = points_to_cell_to_type(source, &to_be_freed);
+      if(pointer_type_p(t)) {
+	list pointed = source_to_sinks(source, in, true);
+	sinks = gen_nconc(sinks, pointed);
+      }
+      else {
+	// FI: Pretty bad wrt sharing and memory leaks
+	sinks = gen_nconc(sinks, CONS(CELL, source, NIL));
+      }
+      if(to_be_freed) free_type(t);
+    }
+  }
 
   return sinks;
 }

@@ -158,7 +158,7 @@ entity create_stub_entity(entity e, string fs, type t)
   // entity_undefined_p(stub));
  
   // If entity "stub" does not already exist, create it.
-  if(entity_undefined_p(stub)) {
+  if(entity_undefined_p(stub)) { // FI: the stubs could be allocated in the still non-existing FORMAL_AREA
     entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,
 					    POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
     entity_kind(DummyTarget) = ENTITY_POINTER_DUMMY_TARGETS_AREA;
@@ -249,6 +249,11 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
     int i;
     list tl = NIL;
     /* FI: use 0 for all proper target dimensions */
+    /* FI: adding 0 subscripts is similar to a dereferencing. We do
+       not know at this level if the dereferencing has been
+       requested. See pointer_reference02. The handling fo eval_p must
+       be modified correspondingly by adding 0 subscripts when the
+       source is an array. Or evaluation must be skipped. */
     for(i=d;i<td;i++) {
       tl = CONS(EXPRESSION, make_zero_expression(), tl);
     }
@@ -509,7 +514,8 @@ points_to create_stub_points_to(cell c, // source of the points-to
 
     if(source_cd==0 /* && vd==0*/ ) {
       type sink_t = type_to_pointed_type(source_t);
-      type stub_t = strict_p ? copy_type(sink_t) : type_to_array_type(sink_t);
+      type stub_t = (strict_p || !type_variable_p(sink_t))?
+		     copy_type(sink_t) : type_to_array_type(sink_t);
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, 0, NIL, fs);
       e_exact_p = exact_p;
     }
@@ -536,28 +542,6 @@ points_to create_stub_points_to(cell c, // source of the points-to
       // points_to_cell_add_unbounded_subscripts(sink_cell);
       e_exact_p = false;
     }
-    else { //cd==0 && vd>0
-      // FI: this alternative does not make sense to me anymore...
-#if 0
-      // The source is an array of pointers of you do not know what...
-      // The processing is almost identical to the one above
-      list ndl = gen_full_copy_list(dl);
-      // Add these dimensions to "st"
-      type nst = copy_type(st);
-      // FI: quid of arrays of functions, type equivalent to pointers to
-      // functions?
-      pips_assert("type_variable_p(nst)", type_variable_p(nst));
-      variable nstv = type_variable(nst);
-      variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
-      sink_cell = create_scalar_stub_sink_cell(v, nst, st, vd);
-      // Adapt the source cell
-      reference scr = cell_any_reference(source_cell);
-      reference_indices(scr) = NIL; // memory leak, free_expressions()
-      points_to_cell_add_unbounded_subscripts(source_cell);
-      e_exact_p = false;
-#endif
-      pips_internal_error("source_cd is always positive");
-    }
   }
   else if(type_functional_p(source_t)) {
     pips_internal_error("Unexpected case.\n");
@@ -572,7 +556,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
     make_approximation_may();
   points_to pt_to = make_points_to(source_cell, sink_cell, rel,
 			 make_descriptor_none());
-  pointer_index ++;
+  pointer_index ++; // FI: is not used for formal parameters, is this the right place for the increment
 
   if(to_be_freed) free_type(source_t);
   

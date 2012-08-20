@@ -381,6 +381,10 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     functional ff = type_functional(ft);
     rt = functional_result(ff);
 
+    // FI: we might have to handle here return?, exit, abort, (stop)
+    // if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)
+    // It is done somewhere else
+
     /* points-to updates due to arguments */
     // FI: this cannot be delayed but it is unfortunately applied
     // again when going down? See arithmetic08 and 09?
@@ -389,7 +393,7 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     // FI: we are in trouble for post increment and post decrement...
     // We should update the target a second time in sinks.c!
     if(!ENTITY_CONDITIONAL_P(f)) {
-      // FI: This is OK only if all subsexpressions are always evaluated
+      // FI: This is OK only if all subexpressions are always evaluated
       pt_out = expressions_to_points_to(al, pt_in);
     }
     else
@@ -1377,7 +1381,54 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   return pt_out;
 }
 
+/* Check if expression "e" is a reference to a struct field. */
+bool field_reference_expression_p(expression e)
+{
+  bool field_p = false;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    entity f = reference_variable(r);
+    field_p = entity_field_p(f);
+  }
+  return field_p;
+}
 
+/* Remove last subscripts of cell c till its type becomes a scalar
+ * pointer.
+ *
+ * This of course may fail.
+ */
+cell reduce_cell_to_pointer_type(cell c)
+{
+  bool to_be_freed;
+  type t = points_to_cell_to_type(c, &to_be_freed);
+  reference r = cell_any_reference(c);
+  list sl = reference_indices(r);
+  bool remove_p = !pointer_type_p(t);
+  if(to_be_freed) free_type(t);
+  while(remove_p) {
+    if(!ENDP(sl)) {
+      /* Remove the last subscript, hopefully 0 */
+      list ls = gen_last(sl); // last subscript
+      expression lse = EXPRESSION(CAR(ls));
+      if(field_reference_expression_p(lse))
+	break; // This subscript cannot be removed
+      gen_list_and_not(&sl, ls);
+      reference_indices(r) = sl;
+      // because sl is a sublist of ls, the chunk has already been freed
+      // gen_full_free_list(ls);
+      // gen_free_list(ls);
+      t = points_to_cell_to_type(c, &to_be_freed);
+      // remove_p = !pointer_type_p(t); we may end up with char[] instead of char*
+      remove_p = !C_pointer_type_p(t);
+      if(to_be_freed) free_type(t);
+    }
+    else
+      break; // FI: in fact, an internal error
+  }
+  return c;
+}
 /* Update pt_out when any element of L can be assigned any element of R
  *
  * FI->AM: Potential and sure memory leaks are not (yet) detected.
@@ -1443,6 +1494,21 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	pips_user_warning("Dereferencing of a null pointer.\n");
       else
 	pips_user_warning("Dereferencing of a null pointer.\n");
+    }
+    else {
+      /* For arrays, an extra eval has been applied by adding 0 subscripts */
+      cell nc = copy_cell(c); // FI: for debugging purpose
+      c = reduce_cell_to_pointer_type(c);
+      bool to_be_freed;
+      type t = points_to_cell_to_type(c, &to_be_freed);
+      type ct = compute_basic_concrete_type(t);
+      if(!C_pointer_type_p(ct)) {
+	print_points_to_cell(nc);
+	print_points_to_cell(c);
+	pips_internal_error("Source cell cannot really be a source cell\n");
+      }
+      if(to_be_freed) free_type(t);
+      free_cell(nc);
     }
   }
 
@@ -2081,6 +2147,8 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 			     make_descriptor_none());
 	  remove_arc_from_pt_map(a, out);
 	  free_points_to(a);
+	  if(empty_pt_map_p(out))
+	    points_to_graph_bottom(out) = true;
 	}
       }
     }

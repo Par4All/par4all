@@ -359,11 +359,11 @@ pt_map test_to_points_to(test t, pt_map pt_in)
    *
    * "if(p=q)" or "if(*p++)" or "if(p)" which implies p->NULL in the
    * else branch. FI: to be checked with test cases */
-  if(!empty_pt_map_p(pt_in_t)) // FI: we are in dead code
+  if(!points_to_graph_bottom(pt_in_t)) // FI: we are in dead code
     pt_in_t = condition_to_points_to(c, pt_in_t, true);
   pt_t = statement_to_points_to(ts, pt_in_t);
 
-  if(!empty_pt_map_p(pt_in_f)) // FI: we are in dead code
+  if(!points_to_graph_bottom(pt_in_f)) // FI: we are in dead code
     pt_in_f = condition_to_points_to(c, pt_in_f, false);
   pt_f = statement_to_points_to(fs, pt_in_f);
 

@@ -1140,6 +1140,8 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
  * "sinks" and reference "source" or points-to set "pts". Else, the
  * cells in list "sinks" are the cells in arcs of the points-to set.
  *
+ * FI: I am not sure the above paragraph is properly implemented.
+ *
  * This function is based on several other simpler functions:
  *
  * * points_to_source_to_sinks()
@@ -1179,17 +1181,9 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
       basic ctb = variable_basic(type_variable(ct));
       // FI->AM: I am not happy at all with his
       if(basic_pointer_p(ctb)) {
-	// FI: we need an unbounded for Pointers/assignment12.c
-	// The left hand side of a pointer to an array is a pointer to
-	// element zero or a pointer to all the array elements...
-	// For Pointers/assignment12, I need a zero here
-	// points_to_cell_add_zero_subscripts(source);
-	// points_to_cell_add_unbounded_subscripts(source);
 	;
       }
       else {
-	// Pointers/dependence11.c: an array is a kind of constant pointer
-	// No need to eval more
 	cell sc = copy_cell(source);
 	sinks = CONS(CELL, sc, sinks);
       }
@@ -1226,6 +1220,10 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 			  "Sink missing for a source based on \"%s\".\n"
 			  "Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.\n",
 			  entity_user_name(v));
+	clear_pt_map(pts);
+	points_to_graph_bottom(pts) = true;
+	// FI: it is not a pips error but a user error (in theory)
+	// pips_internal_error("Dereferencing of an unitialized pointer.\n");
       }
     }
   }
@@ -1234,36 +1232,44 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
   return sinks;
 }
 
-list extended_sources_to_sinks(list pointed, pt_map in)
+list extended_source_to_sinks(cell sc, pt_map in)
 {
   list sinks = NIL;
   bool null_dereferencing_p
     = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
   bool nowhere_dereferencing_p
     = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  if( (null_dereferencing_p || !null_cell_p(sc))
+      && (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
+    /* Do not create sharing between elements of "in" and
+       elements of "sinks". */
+    cell nsc = copy_cell(sc);
+    list starpointed = source_to_sinks(nsc, in, true);
+    free_cell(nsc);
+
+    if(ENDP(starpointed)) {
+      reference sr = cell_any_reference(sc);
+      entity sv = reference_variable(sr);
+      string words_to_string(list);
+      pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			  entity_user_name(sv),
+			  words_to_string(words_reference(sr, NIL)));
+    }
+    sinks = gen_nconc(sinks, starpointed);
+  }
+  // FI: I'd like a few else clauses to remove arcs that
+  // cannot exist if the code is correct. E.g. p->i, p->NULL
+  // if card(cl)==1, remove arc(c->sc)?
+  return sinks;
+}
+
+list extended_sources_to_sinks(list pointed, pt_map in)
+{
+  list sinks = NIL;
   /* Dereference the pointer(s) to find the sinks, memory(memory(p)) */
   FOREACH(CELL, sc, pointed) {
-    if( (null_dereferencing_p || !null_cell_p(sc))
-	&& (nowhere_dereferencing_p || !nowhere_cell_p(sc))) {
-      /* Do not create sharing between elements of "in" and
-	 elements of "sinks". */
-      cell nsc = copy_cell(sc);
-      list starpointed = source_to_sinks(nsc, in, true);
-      free_cell(nsc);
-
-      if(ENDP(starpointed)) {
-	reference sr = cell_any_reference(sc);
-	entity sv = reference_variable(sr);
-	string words_to_string(list);
-	pips_internal_error("No pointed location for variable \"%s\" and reference \"%s\"\n",
-			    entity_user_name(sv),
-			    words_to_string(words_reference(sr, NIL)));
-      }
-      sinks = gen_nconc(sinks, starpointed);
-    }
-    // FI: I'd like a few else clauses to remove arcs that
-    // cannot exist if the code is correct. E.g. p->i, p->NULL
-    // if card(cl)==1, remove arc(c->sc)?
+    list starpointed = extended_source_to_sinks(sc, in);
+    sinks = gen_nconc(sinks, starpointed);
   }
   return sinks;
 }
@@ -1751,6 +1757,8 @@ pt_map merge_points_to_graphs(pt_map s1, pt_map s2)
 				   points_to_graph_set(s2));
   pt_map pt_merged = new_pt_map();
   points_to_graph_set(pt_merged) = merged;
+  if(points_to_graph_bottom(s1) && points_to_graph_bottom(s2))
+    points_to_graph_bottom(pt_merged) = true;
   return pt_merged;
 }
 
