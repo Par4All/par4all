@@ -804,11 +804,16 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
  * FI, 14 August 2012: the dimension of the sink entity and sink
  * reference must be greater than the dimension of the source
  * reference. This is not checked yet.
+ *
+ * FI, 19 August 2012: all cells used in a points-to arc must be
+ * scalar, either pointers or basic types
  */
 void points_to_cell_types_compatibility(cell l, cell r)
 {
   if(points_to_source_cell_compatible_p(l)) {
-    if(points_to_sink_cell_compatible_p(r)) {
+    if(null_cell_p(r))
+      ;
+    else if(points_to_sink_cell_compatible_p(r)) {
       // FI: I'm not sure enought filtering has been performed... to
       // have here type information, especially with an anywhere or a
       // nowhere/undefined not typed
@@ -820,9 +825,35 @@ void points_to_cell_types_compatibility(cell l, cell r)
       type rt = points_to_cell_to_type(r, &r_to_be_freed);
       type ult = compute_basic_concrete_type(lt);
       type urt = compute_basic_concrete_type(rt);
-
-      if(pointer_type_p(ult)) {
-	type pt = compute_basic_concrete_type(type_to_pointed_type(ult));
+#if 0
+      /* We want to user constant strings as sinks... of type char */
+      if(type_functional_p(urt)) {
+	functional f = type_functional(urt);
+	list pl = functional_parameters(f);
+	type rt = functional_result(f);
+	bool success_p = false;
+	if(ENDP(pl)) {
+	  type crt = compute_basic_concrete_type(rt);
+	  if(string_type_p(crt)) {
+	    success_p = true;
+	    urt = crt; // FI: should it be reduced to char?
+	  }
+	  else if(pointer_type_p(crt)) {
+	    type prt = type_to_pointed_type(crt); // concrete type...
+	    if(char_type_p(prt)) {
+	      urt = prt;
+	      success_p = true;
+	    }
+	  }
+	}
+	if(!success_p)
+	  pips_internal_error("Type is not compatible with a sink points-to cell.\n");
+      }
+#endif
+      if(C_pointer_type_p(ult)) {
+	type pt = pointer_type_p(ult) ?
+	  copy_type(compute_basic_concrete_type(type_to_pointed_type(ult))) :
+	  array_type_to_element_type(ult);
 
 	// Several options are possible
 
