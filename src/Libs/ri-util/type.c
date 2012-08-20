@@ -2717,6 +2717,24 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
+/* Returns OK for "char[]" as well as for "char *".
+ * 
+ * Does not take care of typedef. Use compute_basic_concrete_type()
+ * first is necessary.
+ */
+bool C_pointer_type_p(type t)
+{
+  bool pointer_p = false;
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+    basic b = variable_basic(v);
+    pointer_p = (ENDP(dl) && basic_pointer_p(b))
+      || ((int)gen_length(dl)==1 && !basic_pointer_p(b));
+  }
+  return pointer_p;
+}
+
 bool array_of_pointers_type_p(type t)
 {
   return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
@@ -5081,6 +5099,27 @@ type type_to_array_type(type t)
   variable_dimensions(vt) = CONS(DIMENSION, d, variable_dimensions(vt));
 
   return at;
+}
+
+/* returns the type of the elements of an array type, as a newly allocated type.
+ *
+ * It is not clear if it should fail when the argument is not an array
+ * type, or if an undefined type should be returned.
+ *
+ * The qualifiers are dropped.
+ */
+type array_type_to_element_type(type t)
+{
+  type et = type_undefined;
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+    basic b = variable_basic(v);
+    et = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
+  }
+  else
+    pips_internal_error("Ill. arg.\n");
+  return et; 
 }
 
 /* Minimal information to build a d-dimensional array type. */
