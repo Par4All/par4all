@@ -314,7 +314,6 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    for(i = 0; i <= height-1; i += 1)
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b1[*] -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
@@ -327,7 +326,6 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
       ReadPGMrow(file, width, m[i]);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b1[*] -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
@@ -341,7 +339,6 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    fclose(file);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b1[*] -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
@@ -353,7 +350,6 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    free(buffer);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b1[*] -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
