@@ -1,0 +1,55 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT:
+// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
+// _p_1_1[3] -> "hello" , EXACT
+
+int pointer_reference04(char **p)
+{
+
+// Points To: none
+
+   char *q = p[3];
+
+// Points To:
+// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _p_1_1[3][0] , MAY
+
+   char *r = "hello";
+
+// Points To:
+// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _p_1_1[3][0] , MAY
+// r -> "hello" , EXACT
+
+   p[3] = r;
+
+// Points To:
+// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
+// _p_1_1[3] -> "hello" , EXACT
+// p -> _p_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _p_1_1[3][0] , MAY
+// r -> "hello" , EXACT
+
+   return 0;
+}

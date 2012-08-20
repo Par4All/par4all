@@ -1,0 +1,55 @@
+
+POINTS TO for inter06
+
+
+// Points To IN:
+// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[*] -> _ppp_1_1[0] , MAY
+// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[*] -> _qqq_2_2[0] , MAY
+// _qqq_2_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[*] -> _qqq_2_2_2[0] , MAY
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1 , MAY
+// qqq -> *NULL_POINTER* , MAY
+// qqq -> _qqq_2 , MAY
+
+
+// Points To OUT:
+// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[*] -> _ppp_1_1[0] , MAY
+// _ppp_1_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[0] -> _qqq_2_2_2[0] , MAY
+// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[*] -> _qqq_2_2[0] , MAY
+// _qqq_2_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[*] -> _qqq_2_2_2[0] , MAY
+
+void inter06(int ***ppp, int ***qqq)
+{
+
+// Points To:
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1 , MAY
+// qqq -> *NULL_POINTER* , MAY
+// qqq -> _qqq_2 , MAY
+
+   **ppp = **qqq;
+
+// Points To:
+// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[*] -> _ppp_1_1[0] , MAY
+// _ppp_1_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[0] -> _qqq_2_2_2[0] , MAY
+// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[*] -> _qqq_2_2[0] , MAY
+// _qqq_2_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[*] -> _qqq_2_2_2[0] , MAY
+// ppp -> _ppp_1 , EXACT
+// qqq -> _qqq_2 , EXACT
+
+   return;
+}
+INIT_POINTS_TO_ANALYSIS[inter06] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter06] (list_assignment_to_points_to) Dereferencing of a null pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter06] (list_assignment_to_points_to) Possible NULL pointer dereferencing.

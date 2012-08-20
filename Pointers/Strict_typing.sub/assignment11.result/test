@@ -35,7 +35,7 @@ int assignment11()
    int *q = (s.a)[5];
 
 // Points To:
-// q -> s.a[0][5] , EXACT
+// q -> s.a[5][0] , EXACT
 
 
    return *q;
