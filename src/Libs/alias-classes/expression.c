@@ -1381,19 +1381,6 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   return pt_out;
 }
 
-/* Check if expression "e" is a reference to a struct field. */
-bool field_reference_expression_p(expression e)
-{
-  bool field_p = false;
-  syntax s = expression_syntax(e);
-  if(syntax_reference_p(s)) {
-    reference r = syntax_reference(s);
-    entity f = reference_variable(r);
-    field_p = entity_field_p(f);
-  }
-  return field_p;
-}
-
 /* Remove last subscripts of cell c till its type becomes a scalar
  * pointer.
  *

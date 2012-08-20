@@ -533,6 +533,10 @@ points_to create_stub_points_to(cell c, // source of the points-to
       // dimensions to be added to the dimensions of "st"
       list ndl = make_unbounded_dimensions(source_cd);
       type sink_t = copy_type(type_to_pointed_type(source_t));
+      if(type_void_p(sink_t)) {
+	free_type(sink_t);
+	sink_t = make_type_variable(make_variable(make_basic_overloaded(), NIL, NIL));
+      }
       pips_assert("type_variable_p(sink_t)", type_variable_p(sink_t));
       variable nstv = type_variable(sink_t);
       variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));

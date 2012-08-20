@@ -172,3 +172,85 @@ void print_points_to_cells(list cl)
   }
   fprintf(stderr, "\n");
 }
+
+/* Check if expression "e" is a reference to a struct field. */
+bool field_reference_expression_p(expression e)
+{
+  bool field_p = false;
+  syntax s = expression_syntax(e);
+  if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    entity f = reference_variable(r);
+    field_p = entity_field_p(f);
+  }
+  return field_p;
+}
+
+/* Compute the number of array subscript at the end of a points_to_reference
+ *
+ * Look for the last field subscript and count the number of
+ * subscripts after it. If no field susbcript is found, then all
+ * subscripts are final array subscripts.
+ *
+ * To make thinks easier, the subscript list is reversed.
+ */
+int points_to_reference_to_final_dimension(reference r)
+{
+  list sl = reference_indices(r);
+  sl = gen_nreverse(sl);
+  int d = 0;
+  FOREACH(EXPRESSION, e, sl) {
+    if(field_reference_expression_p(e))
+      break;
+    else
+      d++;
+  }
+  sl = gen_nreverse(sl);
+  reference_indices(r) = sl;
+  return d;
+}
+
+/* Substitute the subscripts "sl" in points-to reference "r" just after the
+ * last field subscript by "nsl".
+ *
+ * "sl" must be broken into three parts, possibly empty:
+ *
+ *  1. The first part that ends up at the last field reference.
+ *
+ *  2. The second part that starts just after the last field reference
+ *  and that counts at most as many elements as the new subscript
+ *  list, "nsl". This part must be substituted.
+ *
+ *  3. The third part that is left unchanged after substitution.
+ */
+void points_to_reference_update_final_subscripts(reference r, list nsl)
+{
+  list sl = reference_indices(r);
+  list sl1 = NIL, sl3 = NIL, sl23 = NIL;
+
+  sl = gen_nreverse(sl); // sl1 and sl23 are built in the right order
+  bool found_p = false;
+  FOREACH(EXPRESSION, e, sl) {
+    if(field_reference_expression_p(e))
+      found_p = true;
+    if(found_p) {
+      /* build sl1 */
+      sl1 = CONS(EXPRESSION, e , sl1);
+    }
+    else
+      sl23 = CONS(EXPRESSION, e , sl23);
+  }
+  int n = (int) gen_length(nsl);
+  int i = 0;
+  FOREACH(EXPRESSION, e, sl23) {
+    if(i<n)
+      free_expression(e);
+    else
+      sl3 = gen_nconc(sl3, CONS(EXPRESSION, e, NIL));
+  }
+  sl = gen_nconc(sl1, nsl);
+  sl = gen_nconc(sl, sl3);
+  gen_free_list(sl23);
+  reference_indices(r) = sl;
+
+}

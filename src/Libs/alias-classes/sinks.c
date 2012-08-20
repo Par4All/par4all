@@ -1010,15 +1010,19 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
       // should be replaced
       // reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
       int ncsl_n = (int) gen_length(ncsl);
-      int i_n = (int) gen_length(reference_indices(r));
+      // int i_n = (int) gen_length(reference_indices(r));
+      int i_n = points_to_reference_to_final_dimension(r);
       if(i_n<ncsl_n) {
-	pips_internal_error("Too few reference indices for substitution\n");
+	points_to_reference_update_final_subscripts(r, ncsl);
       }
       else if(i_n==ncsl_n) {
-	gen_full_free_list(reference_indices(r));
-	reference_indices(r) = ncsl;
+	points_to_reference_update_final_subscripts(r, ncsl);
+	//gen_full_free_list(reference_indices(r));
+	//reference_indices(r) = ncsl;
       }
       else { // i_n>ncsl_n
+	points_to_reference_update_final_subscripts(r, ncsl);
+#if 0
 	int i = 0;
 	list ci = reference_indices(r);
 	list nl = NIL;
@@ -1032,6 +1036,7 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 	// nl = gen_nconc(ncsl, nl);
 	gen_full_free_list(reference_indices(r));
 	reference_indices(r) = nl;
+#endif
       }
     }
   }
