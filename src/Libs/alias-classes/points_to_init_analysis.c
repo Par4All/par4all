@@ -725,19 +725,22 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       switch(basic_tag(fpb)){
       case is_basic_int:{
 	// type st = type_undefined; // sink type
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	// pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_float:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_logical:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -750,13 +753,15 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_complex:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_pointer:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p); 
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p); 
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p); 
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	cell sink = points_to_sink(pt_to);
@@ -772,7 +777,8 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_derived:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -788,7 +794,8 @@ set pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_typedef:{
-	pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	//pt_to = create_advanced_stub_points_to(c, upt, !null_initialization_p);
+	pt_to = create_stub_points_to(c, upt, !null_initialization_p);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
