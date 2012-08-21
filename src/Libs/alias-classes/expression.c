@@ -514,7 +514,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_MINUS_UPDATE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression rhs = EXPRESSION(CAR(CDR(al)));
       entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
       expression delta = MakeUnaryCall(um, copy_expression(rhs));
@@ -526,7 +526,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_PRE_INCREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression delta = int_to_expression(1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -536,7 +536,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_POST_DECREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression delta = int_to_expression(-1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -834,6 +834,14 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
  * Since "sink" is used to compute the key in the hash table used to
  * represent set "in", it is not possible to perform a side effect on
  * "sink" without removing and reinserting the corresponding arc.
+ *
+ * FI: I am not sure we have the necessary information to know which
+ * subscript must be updated when more than one is available. This is
+ * bad for multidimensional arrays and worse for references to stub
+ * that may include fields (or not) as subscript as well as lots of
+ * articificial dimensions due to the source.
+ *
+ * I assumed gen_last() to start with, but it is unlikely in general!
  */
 points_to offset_cell(points_to pt, expression delta)
 {
@@ -863,25 +871,29 @@ points_to offset_cell(points_to pt, expression delta)
 	reference_indices(r) = CONS(EXPRESSION, se, NIL);
       }
       else {
-	expression lse = EXPRESSION(CAR(gen_last(sl)));
+	//expression lse = EXPRESSION(CAR(gen_last(sl)));
+	expression lse = EXPRESSION(CAR(sl));
 	value vlse = EvalExpression(lse);
 	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
 	  int ov =  constant_int(value_constant(vlse));
 	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
 	  if(-k <= ov && ov <= k) {
 	    expression nse = int_to_expression(dv+ov);
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    EXPRESSION_(CAR(sl)) = nse;
 	  }
 	  else {
 	    expression nse = make_unbounded_expression();
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    EXPRESSION_(CAR(sl)) = nse;
 	  }
 	  free_expression(lse);
 	}
 	else {
 	  // FI: assume * is used... UNBOUNDED_DIMENSION
 	  expression nse = make_unbounded_expression();
-	  EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(sl)) = nse;
 	  free_expression(lse);
 	}
       }
@@ -894,7 +906,8 @@ points_to offset_cell(points_to pt, expression delta)
       else {
 	expression ose = EXPRESSION(CAR(gen_last(sl)));
 	expression nse = make_unbounded_expression();
-	EXPRESSION_(CAR(gen_last(sl))) = nse;
+	//EXPRESSION_(CAR(gen_last(sl))) = nse;
+	EXPRESSION_(CAR(sl)) = nse;
 	free_expression(ose);
       }
     }
