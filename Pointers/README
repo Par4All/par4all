@@ -28,3 +28,15 @@ test01, 02, 03, 04: check handling of test statements (FI)
 decl06: check generation of nowhere in a pointer declaration
 
 pointerxy: copied from Rice
+-------------new validation for points-to analysis------------- 
+
+every test case added is either a bug to fixe either an enhancement of
+the points-to analysis, please add a comment about the bug when you
+add a test case.
+
+bc_inter01: est-ce que ca marche en intraprocedural?
+bc_inter02: idem
+bc_inter03: idem
+bc_inter04: ou est l'interprocedural
+
+beatrice01: problemes? objectifs?

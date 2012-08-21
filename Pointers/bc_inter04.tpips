@@ -8,29 +8,11 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 setproperty ALIASING_ACROSS_TYPES FALSE
 
-activate PRINT_CODE_PROPER_EFFECTS
-
-
-echo
-echo Proper effects for "main"
-echo
-display PRINTED_FILE[main]
-
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo POINTS TO for "main"
 echo
 display PRINTED_FILE[main]
-
-echo 
-echo Proper effects using points_to
-echo
-module main
-activate PROPER_EFFECTS_WITH_POINTS_TO
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
- 
 
 close
 delete bc_inter04

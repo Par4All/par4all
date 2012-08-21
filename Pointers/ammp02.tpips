@@ -1,7 +1,8 @@
-setenv WSPACE=ammp01
+setenv WSPACE=ammp02
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
+# FI: I am not sure what the purpose is
 # The purpose is to detect a user error...
 # setproperty ABORT_ON_USER_ERROR TRUE
 

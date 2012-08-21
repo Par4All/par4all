@@ -2,8 +2,6 @@ setenv WS=pointer08
 delete $WS
 create $WS $WS.c
 
-# setproperty MEMORY_EFFECTS_ONLY FALSE
-
 # Bug also if this property is not set
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 
@@ -16,49 +14,4 @@ display PRINTED_FILE[$WS]
 close
 shell cat $WS.database/Warnings
 delete $WS
-quit
-
-# tpips script used in Rice
-
-delete pointer08
-
-setproperty ABORT_ON_USER_ERROR TRUE
-
-create pointer08 pointer08.c
-
-setproperty MEMORY_EFFECTS_ONLY FALSE
-setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
-
-activate PROPER_EFFECTS
-
-activate PRINT_CODE_POINTS_TO_LIST
-
-echo
-echo POINTS TO
-echo
-
-display PRINTED_FILE
-
-echo
-echo Proper effects with points-to
-echo
-
-activate PROPER_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
-
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE
-
-
-echo
-echo Parallel code
-echo
-
-#activate PRINT_CODE_PROPER_EFFECTS
-display PARALLELPRINTED_FILE
-
-close
-delete pointer08
 quit
