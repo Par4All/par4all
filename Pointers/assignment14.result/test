@@ -46,3 +46,5 @@ void assignment14(struct foo **tx, struct foo **ty)
 
    return;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment14] (list_assignment_to_points_to) Dereferencing of a null pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment14] (list_assignment_to_points_to) Possible NULL pointer dereferencing.

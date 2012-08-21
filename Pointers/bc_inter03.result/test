@@ -1,137 +1,125 @@
 
-Proper effects for "exchange"
-
-void exchange(int **p, int **q)
-{
-   int *r;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: r
-
-   r = *p;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-   *p = *q;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: q r
-   *q = r;
-}
-
-Proper effects for "main"
-
-int main()
-{
-   int *pa, *pb, a, b;
-//               <must be written>: a
-
-   a = 1;
-//               <must be written>: b
-   b = 2;
-//               <must be written>: pa
-
-   pa = &a;
-//               <must be written>: pb
-   pb = &b;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-
-   printf("*pa = %d, *pb = %d\n", *pa, *pb);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-
-   exchange(&pa, &pb);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-
-   printf("*pa = %d, *pb = %d\n", *pa, *pb);
-   return 0;
-}
-
 POINTS TO for "exchange"
 
-//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
-//   -Exact-);(q,_q_3,-Exact-)}
+
+// Points To IN:
+// _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[0] -> _p_1_1[0][0] , MAY
+// _q_2[0] -> *NULL_POINTER* , MAY
+// _q_2[0] -> _q_2_2[0][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
+
+
+// Points To OUT:
+// _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[0] -> _q_2_2[0][0] , MAY
+// _q_2[0] -> *NULL_POINTER* , MAY
+// _q_2[0] -> _p_1_1[0][0] , MAY
+
 void exchange(int **p, int **q)
 {
-//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
-//   -Exact-);(q,_q_3,-Exact-)}
+
+// Points To: none
+
    int *r;
-//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
-//   -Exact-);(q,_q_3,-Exact-)}
+
+// Points To:
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    r = *p;
-//  {(_p_1,__p_1_2,-Exact-);(_q_3,__q_3_4,-Exact-);(p,_p_1,
-//   -Exact-);(q,_q_3,-Exact-);(r,__p_1_2,-Exact-)}
+
+// Points To:
+// _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[0] -> _p_1_1[0][0] , MAY
+// p -> _p_1[0] , EXACT
+// r -> *NULL_POINTER* , MAY
+// r -> _p_1_1[0][0] , MAY
+
    *p = *q;
-//  {(_p_1,__p_1_2,-Exact-);(_p_1,__q_3_4,-Exact-);(_q_3,__q_3_4,
-//   -Exact-);(p,_p_1,-Exact-);(q,_q_3,-Exact-);(r,__p_1_2,-Exact-)}
+
+// Points To:
+// _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[0] -> _q_2_2[0][0] , MAY
+// _q_2[0] -> *NULL_POINTER* , MAY
+// _q_2[0] -> _q_2_2[0][0] , MAY
+// p -> _p_1[0] , EXACT
+// q -> _q_2[0] , EXACT
+// r -> *NULL_POINTER* , MAY
+// r -> _p_1_1[0][0] , MAY
+
    *q = r;
 }
 
 POINTS TO for "main"
 
-//  {}
-int main()
-{
-//  points to = {}
-   int *pa, *pb, a, b;
-//  points to = {}
 
-   a = 1;
-//  points to = {}
-   b = 2;
-//  points to = {}
+// Points To IN: none
 
-   pa = &a;
-//  {(pa,a,-Exact-)}
-   pb = &b;
-//  {(pa,a,-Exact-);(pb,b,-Exact-)}
 
-   printf("*pa = %d, *pb = %d\n", *pa, *pb);
-//  {(pa,a,-Exact-);(pb,b,-Exact-)}
-
-   exchange(&pa, &pb);
-//  {(pa,a,-Exact-);(pb,b,-Exact-)}
-
-   printf("*pa = %d, *pb = %d\n", *pa, *pb);
-//  {(pa,a,-Exact-);(pb,b,-Exact-)}
-   return 0;
-}
-
-Proper effects using points_to
+// Points To OUT: none
 
 int main()
 {
+
+// Points To: none
+
    int *pa, *pb, a, b;
-//               <must be written>: a
+
+// Points To:
+// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    a = 1;
-//               <must be written>: b
+
+// Points To:
+// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    b = 2;
-//               <must be written>: pa
+
+// Points To:
+// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    pa = &a;
-//               <must be written>: pb
+
+// Points To:
+// pa -> a , EXACT
+// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    pb = &b;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a b pa
-//                                  pb
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+// Points To:
+// pa -> a , EXACT
+// pb -> b , EXACT
+
 
    printf("*pa = %d, *pb = %d\n", *pa, *pb);
+
+// Points To:
+// pa -> a , EXACT
+// pb -> b , EXACT
+
 
    exchange(&pa, &pb);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] a b pa
-//                                  pb
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+// Points To:
+// pa -> a , EXACT
+// pb -> b , EXACT
+
 
    printf("*pa = %d, *pb = %d\n", *pa, *pb);
+
+// Points To:
+// pa -> a , EXACT
+// pb -> b , EXACT
+
    return 0;
 }
 
