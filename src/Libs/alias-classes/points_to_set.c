@@ -992,7 +992,7 @@ list formal_source_to_sinks(cell source, pt_map pts)
   bool to_be_freed;
   type source_t =
     compute_basic_concrete_type(points_to_cell_to_type(source, &to_be_freed));
-  pips_assert("The source type is a pointer type", pointer_type_p(source_t));
+  pips_assert("The source type is a pointer type", C_pointer_type_p(source_t));
   type st = compute_basic_concrete_type(type_to_pointed_type(source_t));
 
   // FI: the type retrieval must be improved for arrays & Co

@@ -222,6 +222,10 @@ int points_to_reference_to_final_dimension(reference r)
  *  list, "nsl". This part must be substituted.
  *
  *  3. The third part that is left unchanged after substitution.
+ *
+ * Issue: how do you know that the initial array subscript must be
+ * preserved because it is an implicit dimension added for pointer
+ * arithmetics?
  */
 void points_to_reference_update_final_subscripts(reference r, list nsl)
 {
@@ -247,6 +251,7 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
       free_expression(e);
     else
       sl3 = gen_nconc(sl3, CONS(EXPRESSION, e, NIL));
+    i++;
   }
   sl = gen_nconc(sl1, nsl);
   sl = gen_nconc(sl, sl3);

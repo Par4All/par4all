@@ -2730,7 +2730,7 @@ bool C_pointer_type_p(type t)
     list dl = variable_dimensions(v);
     basic b = variable_basic(v);
     pointer_p = (ENDP(dl) && basic_pointer_p(b))
-      || ((int)gen_length(dl)==1 && !basic_pointer_p(b));
+      || ((int)gen_length(dl)==1 && unbounded_dimension_p(DIMENSION(CAR(dl))));
   }
   return pointer_p;
 }
