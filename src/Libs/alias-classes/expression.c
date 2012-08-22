@@ -1633,144 +1633,163 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   return pt_out;
 }
 
-/* pt_in is modified by side-effects and returned as pt_out */
+pt_map struct_initialization_to_points_to(expression lhs,
+					  expression rhs,
+					  pt_map in)
+{
+  pt_map out = in;
+  pips_internal_error("Not implemented yet.\n");
+  pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
+  return out;
+}
+
+/* pt_in is modified by side-effects and returned as pt_out
+ *
+ * This function is also used for declarations, although the syntax
+ * for declarations is reacher than the syntax for assignments which
+ * can use BRACE_INTRINSIC.
+ */
 pt_map struct_assignment_to_points_to(expression lhs,
 				      expression rhs,
 				      pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  list L = expression_to_points_to_sources(lhs, pt_out);
-  list R = expression_to_points_to_sources(rhs, pt_out);
-  FOREACH(CELL, lc, L) {
-    bool l_to_be_freed;
-    type lt = cell_to_type(lc, &l_to_be_freed);
-    entity le = reference_variable(cell_any_reference(lc));
-    if(!entity_abstract_location_p(le)) {
-      FOREACH(CELL, rc, R) {
-	bool r_to_be_freed;
-	type rt = cell_to_type(rc, &r_to_be_freed);
-	entity re = reference_variable(cell_any_reference(rc));
-	if(entity_abstract_location_p(le)) {
-	  if(entity_abstract_location_p(re)) {
-	    pips_internal_error("Not implemented yet.");
-	  }
-	  else {
-	    pips_internal_error("Not implemented yet.");
-	  }
-	}
-	else {
-	  if(entity_abstract_location_p(re)) {
-	    // FI: when re==NULL, we could generate a user warning or
-	    // ignore the dereferencement of NULL...
-
-	    // All fields are going to point to this abstract
-	    // location... or to the elements pointed by this abstract
-	    // location
-	    pips_assert("Left type is struct",
-			struct_type_p(lt));
-	    entity ste = basic_derived(variable_basic(type_variable(lt)));
-	    type st = entity_type(ste); // structure type
-	    list fl = type_struct(st); // field list
-	    FOREACH(ENTITY, f, fl) {
-	      type ft = entity_type(f); // field type
-	      if(pointer_type_p(ft)) {
-		reference lr = copy_reference(cell_any_reference(lc));
-		// reference rr = copy_reference(cell_any_reference(rc));
-		reference_add_field_dimension(lr, f);
-		cell lc = make_cell_reference(lr);
-		type p_t = type_to_pointed_type(ft);
-		cell rc = make_anywhere_cell(p_t);
-		// reference_add_field_dimension(rr, f);
-		// expression nlhs = reference_to_expression(lr);
-		// expression nrhs = reference_to_expression(rr);
-
-		// FI: too bad this cannot be reused because of an assert in normalize_reference()....
-		// pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-		points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
-		// FI: pt is allocated but not used...
-		add_arc_to_pt_map(pt, pt_out); // FI: I guess...
-		// FI->FC: it would be nice to have a Newgen free_xxxxs() to
-		// free a list of objects of type xxx with one call
-		// FI: why would we free these expressions?
-		// free_expression(lhs), free_expression(rhs);
-	      }
-	      else if(struct_type_p(ft)) {
-		pips_internal_error("Not implemented yet.\n");
-	      }
-	      else {
-		; // Do nothing
-	      }
+  if(C_initialization_expression_p(rhs))
+    pt_out = struct_initialization_to_points_to(lhs, rhs, pt_in);
+  else {
+    list L = expression_to_points_to_sources(lhs, pt_out);
+    list R = expression_to_points_to_sources(rhs, pt_out);
+    FOREACH(CELL, lc, L) {
+      bool l_to_be_freed;
+      type lt = cell_to_type(lc, &l_to_be_freed);
+      entity le = reference_variable(cell_any_reference(lc));
+      if(!entity_abstract_location_p(le)) {
+	FOREACH(CELL, rc, R) {
+	  bool r_to_be_freed;
+	  type rt = cell_to_type(rc, &r_to_be_freed);
+	  entity re = reference_variable(cell_any_reference(rc));
+	  if(entity_abstract_location_p(le)) {
+	    if(entity_abstract_location_p(re)) {
+	      pips_internal_error("Not implemented yet.");
+	    }
+	    else {
+	      pips_internal_error("Not implemented yet.");
 	    }
 	  }
 	  else {
-	    pips_assert("Both types are struct or array of struct",
-			(struct_type_p(lt) || array_of_struct_type_p(lt))
-			 && (struct_type_p(rt) || array_of_struct_type_p(rt)));
-	    /* We may have an implicit array of struct in the right or
-	     * left hand side
-	     */
-	    // pips_assert("Both type are equal", type_equal_p(lt, rt));
-	    basic ltb = variable_basic(type_variable(lt));
-	    basic rtb = variable_basic(type_variable(rt));
-	    pips_assert("Both type are somehow equal",
-			basic_equal_p(ltb, rtb));
-	    entity ste = basic_derived(variable_basic(type_variable(lt)));
-	    type st = entity_type(ste); // structure type
-	    list fl = type_struct(st); // field list
-	    FOREACH(ENTITY, f, fl) {
-	      type ft = entity_type(f); // field type
-	      type uft = ultimate_type(ft);
-	      bool array_p = array_type_p(ft) || array_type_p(uft);
-	      if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
-		reference lr = copy_reference(cell_any_reference(lc));
-		reference rr = copy_reference(cell_any_reference(rc));
-		/* FI: conditionally add zero subscripts necessary to
-		   move from an array "a" to its first element,
-		   e.g. a[0][0][0] */
-		reference_add_zero_subscripts(lr, lt);
-		reference_add_zero_subscripts(rr, rt);
-		simple_reference_add_field_dimension(lr, f);
-		simple_reference_add_field_dimension(rr, f);
-		expression nlhs = reference_to_expression(lr);
-		expression nrhs = reference_to_expression(rr);
-		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-		// FI->FC: it would be nice to have a Newgen free_xxxxs() to
-		// free a list of objects of type xxx with one call
-		// The references within the expressions are now part of pt_out
-		// free_expression(lhs), free_expression(rhs);
+	    if(entity_abstract_location_p(re)) {
+	      // FI: when re==NULL, we could generate a user warning or
+	      // ignore the dereferencement of NULL...
+
+	      // All fields are going to point to this abstract
+	      // location... or to the elements pointed by this abstract
+	      // location
+	      pips_assert("Left type is struct",
+			  struct_type_p(lt));
+	      entity ste = basic_derived(variable_basic(type_variable(lt)));
+	      type st = entity_type(ste); // structure type
+	      list fl = type_struct(st); // field list
+	      FOREACH(ENTITY, f, fl) {
+		type ft = entity_type(f); // field type
+		if(pointer_type_p(ft)) {
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  // reference rr = copy_reference(cell_any_reference(rc));
+		  reference_add_field_dimension(lr, f);
+		  cell lc = make_cell_reference(lr);
+		  type p_t = type_to_pointed_type(ft);
+		  cell rc = make_anywhere_cell(p_t);
+		  // reference_add_field_dimension(rr, f);
+		  // expression nlhs = reference_to_expression(lr);
+		  // expression nrhs = reference_to_expression(rr);
+
+		  // FI: too bad this cannot be reused because of an assert in normalize_reference()....
+		  // pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		  points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
+		  // FI: pt is allocated but not used...
+		  add_arc_to_pt_map(pt, pt_out); // FI: I guess...
+		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+		  // free a list of objects of type xxx with one call
+		  // FI: why would we free these expressions?
+		  // free_expression(lhs), free_expression(rhs);
+		}
+		else if(struct_type_p(ft)) {
+		  pips_internal_error("Not implemented yet.\n");
+		}
+		else {
+		  ; // Do nothing
+		}
 	      }
-	      else if(array_p && (array_of_pointers_type_p(uft)
-				  || pointer_type_p(uft)
-				  || array_of_struct_type_p(uft)
-				  || struct_type_p(uft))) {
-		// Same as above, but an unbounded subscript is added...
-		// Quite a special assign in C...
-		reference lr = copy_reference(cell_any_reference(lc));
-		reference rr = copy_reference(cell_any_reference(rc));
-		simple_reference_add_field_dimension(lr, f);
-		simple_reference_add_field_dimension(rr, f);
-		expression li = make_unbounded_expression();
-		expression ri = make_unbounded_expression();
-		reference_indices(lr) = gen_nconc(reference_indices(lr),
-						  CONS(EXPRESSION, li, NIL));
-		reference_indices(rr) = gen_nconc(reference_indices(rr),
-						  CONS(EXPRESSION, ri, NIL));
-		expression nlhs = reference_to_expression(lr);
-		expression nrhs = reference_to_expression(rr);
-		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-	      }
-	      else {
-		; // Do nothing
+	    }
+	    else {
+	      pips_assert("Both types are struct or array of struct",
+			  (struct_type_p(lt) || array_of_struct_type_p(lt))
+			  && (struct_type_p(rt) || array_of_struct_type_p(rt)));
+	      /* We may have an implicit array of struct in the right or
+	       * left hand side
+	       */
+	      // pips_assert("Both type are equal", type_equal_p(lt, rt));
+	      basic ltb = variable_basic(type_variable(lt));
+	      basic rtb = variable_basic(type_variable(rt));
+	      pips_assert("Both type are somehow equal",
+			  basic_equal_p(ltb, rtb));
+	      entity ste = basic_derived(variable_basic(type_variable(lt)));
+	      type st = entity_type(ste); // structure type
+	      list fl = type_struct(st); // field list
+	      FOREACH(ENTITY, f, fl) {
+		type ft = entity_type(f); // field type
+		type uft = ultimate_type(ft);
+		bool array_p = array_type_p(ft) || array_type_p(uft);
+		if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  reference rr = copy_reference(cell_any_reference(rc));
+		  /* FI: conditionally add zero subscripts necessary to
+		     move from an array "a" to its first element,
+		     e.g. a[0][0][0] */
+		  reference_add_zero_subscripts(lr, lt);
+		  reference_add_zero_subscripts(rr, rt);
+		  simple_reference_add_field_dimension(lr, f);
+		  simple_reference_add_field_dimension(rr, f);
+		  expression nlhs = reference_to_expression(lr);
+		  expression nrhs = reference_to_expression(rr);
+		  pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+		  // free a list of objects of type xxx with one call
+		  // The references within the expressions are now part of pt_out
+		  // free_expression(lhs), free_expression(rhs);
+		}
+		else if(array_p && (array_of_pointers_type_p(uft)
+				    || pointer_type_p(uft)
+				    || array_of_struct_type_p(uft)
+				    || struct_type_p(uft))) {
+		  // Same as above, but an unbounded subscript is added...
+		  // Quite a special assign in C...
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  reference rr = copy_reference(cell_any_reference(rc));
+		  simple_reference_add_field_dimension(lr, f);
+		  simple_reference_add_field_dimension(rr, f);
+		  expression li = make_unbounded_expression();
+		  expression ri = make_unbounded_expression();
+		  reference_indices(lr) = gen_nconc(reference_indices(lr),
+						    CONS(EXPRESSION, li, NIL));
+		  reference_indices(rr) = gen_nconc(reference_indices(rr),
+						    CONS(EXPRESSION, ri, NIL));
+		  expression nlhs = reference_to_expression(lr);
+		  expression nrhs = reference_to_expression(rr);
+		  pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		}
+		else {
+		  ; // Do nothing
+		}
 	      }
 	    }
 	  }
 	}
       }
-    }
-    else {
-      // FI: the lhs is an unknown struct allocated anywhere
-      // FI: we might have to generate new arcs. e.g. from HEAP to STACK...
-      pips_internal_error("Not implemented yet.\n");
+      else {
+	// FI: the lhs is an unknown struct allocated anywhere
+	// FI: we might have to generate new arcs. e.g. from HEAP to STACK...
+	pips_internal_error("Not implemented yet.\n");
+      }
     }
   }
   // pips_internal_error("Not implemented yet for lhs %p and rhs %p\n", lhs, rhs);
@@ -2140,9 +2159,11 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
       // conditions is needed
 
       list L = expression_to_points_to_sources(lhs, in);
-      list LV = expression_to_points_to_sinks(lhs, in);
+      //list LV = expression_to_points_to_sinks(lhs, in);
+      (void) expression_to_points_to_sinks(lhs, in);
       list R = expression_to_points_to_sources(rhs, in);
-      list RV = expression_to_points_to_sinks(rhs, in);
+      //list RV = expression_to_points_to_sinks(rhs, in);
+      (void) expression_to_points_to_sinks(rhs, in);
       if(gen_length(L)==1 && gen_length(R)==1) {
 	cell l = CELL(CAR(L));
 	cell r = CELL(CAR(R));

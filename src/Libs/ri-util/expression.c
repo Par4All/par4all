@@ -4174,3 +4174,16 @@ expression pointer_reference_to_expression(reference r)
 
   return pae;
 }
+
+bool C_initialization_expression_p(expression e)
+{
+  bool initialization_p = false;
+  syntax s = expression_syntax(e);
+  if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    if(ENTITY_BRACE_INTRINSIC_P(f))
+      initialization_p = true;
+  }
+  return initialization_p;
+}
