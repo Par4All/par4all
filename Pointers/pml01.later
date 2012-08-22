@@ -1,0 +1,5 @@
+Type mismatch because of sizeof(list *)
+
+Not detected by gcc.
+
+How do we deal with this? We should allocate a heap_xxx of type "list *" and detect a bug.

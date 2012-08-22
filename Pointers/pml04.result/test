@@ -12,25 +12,44 @@ int main()
 
 // Points To: none
 
-   int *p;
+   int *p, *q, *r;
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p = malloc(10*sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_5[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p++;
 
 // Points To:
-// p -> *HEAP*_l_5[1] , EXACT
+// p -> *HEAP*_l_8[1] , MAY
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q = p-1;
+
+// Points To:
+// p -> *HEAP*_l_8[1] , MAY
+// q -> *HEAP*_l_8[0] , MAY
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   r = p;
+
+// Points To:
+// p -> *HEAP*_l_8[1] , MAY
+// q -> *HEAP*_l_8[0] , MAY
+// r -> *HEAP*_l_8[1] , MAY
 
    free(p);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
    return 0;
 }
