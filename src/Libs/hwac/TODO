@@ -124,12 +124,14 @@
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
 + compilation benefit: only freia DAG optimizations
-- could use terapix-like tiling to help with cache?
-  if so, how to tell about the actual image "erosion"?
 + expensive memory accesses => aggregate computations would help?
 + could there be other benefits from a compiler?
 + use on-demand image transfers in "clever" runtime? (MB)
+- generate kernel-specialized erode/dilate/convol
+- merge one erode/dilate/convol with subsequent arith ops?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
+- could use terapix-like tiling to help with cache?
+  if so, how to tell about the actual image "erosion"?
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation?
