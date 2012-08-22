@@ -497,6 +497,14 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       // or it has no image effects
       (ls && (freia_skip_op_p(s) || !freia_some_effects_on_images(s)));
 
+    // quick fix for performance: stop on timer calls
+    if (keep_stat && statement_call_p(s))
+    {
+      entity called = call_function(statement_call(s));
+      if (same_string_p(entity_local_name(called), "gettimeofday"))
+        keep_stat = false;
+    }
+
     pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
 
