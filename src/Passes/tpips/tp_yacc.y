@@ -114,7 +114,7 @@ static void set_env_log_and_free(string var, string val)
 	string ival = getenv(var);
 	if (!ival || !same_string_p(val, ival)) {
 		putenv(strdup(concatenate(var, "=", val, NULL)));
-    }
+  }
 	user_log("setenv %s \"%s\"\n", var, val);
 	free(var); free(val);
 }
@@ -129,7 +129,7 @@ static void try_to_parse_everything_just_in_case(void)
 	res_or_rule * pr = (res_or_rule*) malloc(sizeof(res_or_rule));
 	pr->the_owners = modules;
 	pr->the_name = strdup(DBR_CALLEES);
-	perform(safe_make, pr); 
+	perform(safe_make, pr);
 	free(pr);
 }
 
@@ -634,6 +634,7 @@ i_getenv: TK_GET_ENVIRONMENT TK_NAME TK_ENDOFLINE
 	}
 	;
 
+// hmmm... not very convincing
 i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
 	{ set_env_log_and_free($2, $3);	}
 	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL TK_NAME TK_ENDOFLINE
