@@ -1,5 +1,5 @@
 
-POINTS TO for "pointer02"
+POINTS TO for pointer02
 
 
 // Points To IN:
@@ -12,15 +12,11 @@ POINTS TO for "pointer02"
 void pointer02(int n, float *p)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_2[0] , MAY
+// Points To: none
 
    int i;
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_2[0] , MAY
+// Points To: none
 
    p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer02.c", 11, (const char *) 0);
 
@@ -41,5 +37,10 @@ void pointer02(int n, float *p)
 // r -> _p_2[-1] , EXACT
 
       p[i] = r[i];
+
+// Points To:
+// p -> _p_2[0] , EXACT
+// r -> _p_2[-1] , EXACT
+
+   return;
 }
-INIT_POINTS_TO_ANALYSIS[pointer02] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
