@@ -1063,6 +1063,8 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
       if(to_be_freed) free_type(t);
     }
   }
+  else
+    sinks = sources;
 
   return sinks;
 }

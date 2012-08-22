@@ -234,12 +234,23 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
 
   sl = gen_nreverse(sl); // sl1 and sl23 are built in the right order
   bool found_p = false;
+  bool skip_one_p = false; // to skip indices added for pointer arithmetic
   FOREACH(EXPRESSION, e, sl) {
-    if(field_reference_expression_p(e))
+    if(field_reference_expression_p(e)) {
+      type et = expression_to_type(e);
+      if(pointer_type_p(et))
+	skip_one_p = true;
       found_p = true;
+      free_type(et);
+    }
     if(found_p) {
-      /* build sl1 */
-      sl1 = CONS(EXPRESSION, e , sl1);
+      if(skip_one_p) {
+	sl23 = CONS(EXPRESSION, e , sl23);
+	skip_one_p = false;
+      }
+      else
+	/* build sl1 */
+	sl1 = CONS(EXPRESSION, e , sl1);
     }
     else
       sl23 = CONS(EXPRESSION, e , sl23);
