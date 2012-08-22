@@ -501,7 +501,8 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
     if (keep_stat && statement_call_p(s))
     {
       entity called = call_function(statement_call(s));
-      if (same_string_p(entity_local_name(called), "gettimeofday"))
+      if (same_string_p(entity_local_name(called), "gettimeofday") ||
+          same_string_p(entity_local_name(called), "freia_common_wait"))
         keep_stat = false;
     }
 
