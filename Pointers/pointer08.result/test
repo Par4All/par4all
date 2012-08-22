@@ -1,3 +1,53 @@
 
 POINTS TO for pointer08
 
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+
+void pointer08()
+{
+
+// Points To: none
+
+   struct tree {
+      struct tree *tree_list[10];
+   };
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// t -> *HEAP*_l_10 , MAY
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+
+      (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+
+   // FI: without this statement, we do not get points-to information
+   // for "return"....
+   i++;
+
+// Points To:
+// *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+
+   return;
+}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer08] (points_to_block_projection) Memory leak for bucket "pointer08:*HEAP*_l_10".
