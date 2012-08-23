@@ -211,9 +211,20 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	if(value_expression_p(v_init)){
 	  expression exp_init = value_expression(v_init);
 	  expression lhs = entity_to_expression(e);
-	  pt_out = assignment_to_points_to(lhs,
-					   exp_init,
-					   pt_out);
+	  type it = compute_basic_concrete_type(expression_to_type(exp_init));
+	  // See C standard for type compatibility
+	  if(array_pointer_type_equal_p(et, it)
+	     || type_void_star_p(et) || type_void_star_p(it)
+	     || integer_type_p(it))
+	    pt_out = assignment_to_points_to(lhs,
+					     exp_init,
+					     pt_out);
+	  else {
+	    pips_user_warning("Type mismatch for initialization of \"\"\n",
+			      entity_user_name(e));
+	    clear_pt_map(pt_out);
+	    points_to_graph_bottom(pt_out) = true;
+	  }
 	  /* AM/FI: abnormal sharing (lhs); the reference may be
 	     reused in the cel... */
 	  /* free_expression(lhs); */

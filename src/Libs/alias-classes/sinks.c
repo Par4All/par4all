@@ -1191,14 +1191,18 @@ list expression_to_points_to_sources(expression e, pt_map in)
 	bool to_be_freed;
 	type ct = points_to_cell_to_type(c, &to_be_freed);
 	type cct = compute_basic_concrete_type(ct);
-	if(!type_equal_p(et, cct)) {
+	if(!array_pointer_type_equal_p(et, cct)) {
 	  /* A useless [0] may have been added, but it is supposed to
 	     be taken care of above... by callers of this function. */
-	  pips_debug(1, "Type mismatch for expression: "); print_expression(e);
-	  fprintf(stderr, " with type: "); print_type(et);
-	  fprintf(stderr, "\nand cell: "); print_points_to_cell(c);
-	  fprintf(stderr, " with type: "); print_type(ct);
-	  fprintf(stderr, "\n");
+	  ifdebug(1) {
+	    pips_debug(1, "Type mismatch for expression: "); print_expression(e);
+	    fprintf(stderr, " with type: "); print_type(et);
+	    fprintf(stderr, "\nand cell: "); print_points_to_cell(c);
+	    fprintf(stderr, " with type: "); print_type(ct);
+	    fprintf(stderr, "\n");
+	  }
+	  print_expression(e);
+	  pips_internal_error("Type error for an expression\n.");
 	}
 	if(to_be_freed) free_type(ct);
       }
