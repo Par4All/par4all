@@ -215,7 +215,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  // See C standard for type compatibility
 	  if(array_pointer_type_equal_p(et, it)
 	     || type_void_star_p(et) || type_void_star_p(it)
-	     || integer_type_p(it))
+	     || integer_type_p(it)
+	     || overloaded_type_p(it)) // PIPS own compatibility...
 	    pt_out = assignment_to_points_to(lhs,
 					     exp_init,
 					     pt_out);

@@ -5113,7 +5113,7 @@ type array_type_to_element_type(type t)
   type et = type_undefined;
   if(type_variable_p(t)) {
     variable v = type_variable(t);
-    list dl = variable_dimensions(v);
+    //list dl = variable_dimensions(v);
     basic b = variable_basic(v);
     et = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
   }
@@ -5133,6 +5133,14 @@ list make_unbounded_dimensions(int d)
     dl = CONS(DIMENSION, d, dl);
   }
   return dl;
+}
+
+bool type_void_star_p(type t)
+{
+  bool void_star_p = false;
+  if(pointer_type_p(t))
+    void_star_p = type_void_p(type_to_pointed_type(t));
+  return void_star_p;
 }
 
 /*
