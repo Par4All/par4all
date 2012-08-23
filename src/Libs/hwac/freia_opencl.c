@@ -354,41 +354,39 @@ static int opencl_compile_mergeable_dag(
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
       }
-
-      // skip to next operator
-      continue;
     }
-    // else...
-
-    // pixel t<vertex> = <op>(args...);
-    sb_cat(opencl_body,
-           "    " OPENCL_PIXEL "t", itoa((int) dagvtx_number(v)),
-           " = ", api->opencl.macro, "(");
-
-    FOREACH(dagvtx, p, preds)
+    else //  we are not compiling a reduction...
     {
-      if (dagvtx_number(p)==0)
-        sb_cat(opencl_body, nao++? ", ": "",
-               "in", itoa(gen_position(p, dag_inputs(d))-1));
-      else
-        sb_cat(opencl_body, nao++? ", ": "", "t", itoa(dagvtx_number(p)));
-    }
-    gen_free_list(preds), preds = NIL;
+      // pixel t<vertex> = <op>(args...);
+      sb_cat(opencl_body,
+             "    " OPENCL_PIXEL "t", itoa((int) dagvtx_number(v)),
+             " = ", api->opencl.macro, "(");
 
-    // other (scalar) input arguments
-    for (int i=0; i<(int) api->arg_misc_in; i++)
-    {
-      string sn = strdup(itoa(n_params));
-      sb_cat(helper, ",\n  ", api->arg_in_types[i], " c", sn);
-      sb_cat(opencl, ",\n  ", opencl_type(api->arg_in_types[i]), " c", sn);
-      sb_cat(helper_body, ", c", sn);
-      cl_args++;
-      sb_cat(opencl_body, nao++? ", ": "", "c", sn);
-      free(sn);
-      n_params++;
+      FOREACH(dagvtx, p, preds)
+      {
+        if (dagvtx_number(p)==0)
+          sb_cat(opencl_body, nao++? ", ": "",
+                 "in", itoa(gen_position(p, dag_inputs(d))-1));
+        else
+          sb_cat(opencl_body, nao++? ", ": "", "t", itoa(dagvtx_number(p)));
+      }
+      gen_free_list(preds), preds = NIL;
+
+      // other (scalar) input arguments
+      for (int i=0; i<(int) api->arg_misc_in; i++)
+      {
+        string sn = strdup(itoa(n_params));
+        sb_cat(helper, ",\n  ", api->arg_in_types[i], " c", sn);
+        sb_cat(opencl, ",\n  ", opencl_type(api->arg_in_types[i]), " c", sn);
+        sb_cat(helper_body, ", c", sn);
+        cl_args++;
+        sb_cat(opencl_body, nao++? ", ": "", "c", sn);
+        free(sn);
+        n_params++;
+      }
+      sb_cat(opencl_body, ");\n");
     }
-    sb_cat(opencl_body, ");\n");
-  }
+  } // end of FOREACH on operations
   gen_free_list(vertices), vertices = NIL;
 
   // tail
