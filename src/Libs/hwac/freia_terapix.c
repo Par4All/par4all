@@ -68,14 +68,11 @@ static void compute_dead_vertices
 static void erosion_optimization
   (dagvtx v, bool * north, bool * south, bool * west, bool * east)
 {
-  list largs = freia_get_vertex_params(v);
-  pips_assert("one kernel", gen_length(largs)==1);
   // default result
   *north = true, *south = true, *west = true, *east = true;
-  expression e = EXPRESSION(CAR(largs));
   intptr_t k00, k10, k20, k01, k11, k21, k02, k12, k22;
-  freia_extract_kernel(e, false,
-                       &k00, &k10, &k20, &k01, &k11, &k21, &k02, &k12, &k22);
+  freia_extract_kernel_vtx(v, false,
+    &k00, &k10, &k20, &k01, &k11, &k21, &k02, &k12, &k22);
   // summarize for each four directions
   *north = k00 || k10 || k20;
   *south = k02 || k12 || k22;

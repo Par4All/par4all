@@ -376,6 +376,11 @@ const freia_api_t * get_freia_api(int index)
   return &FREIA_AIPO_API[index];
 }
 
+const freia_api_t * get_freia_api_vtx(dagvtx v)
+{
+  return get_freia_api(vtxcontent_opid(dagvtx_content(v)));
+}
+
 /* @return new allocated variable name using provided prefix.
  * *params is incremented as a side effect.
  */
@@ -1674,7 +1679,7 @@ void freia_migrate_statements(sequence sq, const set stats, const set before)
  * return 9 values, expected to be 0/1 elsewhere...
  * @return whether it succeeded
  */
-bool freia_extract_kernel(
+static bool freia_extract_kernel(
   expression e,
   bool strict, // whether all values must be known, if not 1 is assumed
   intptr_t * k00, intptr_t * k10, intptr_t * k20,
@@ -1725,4 +1730,19 @@ bool freia_extract_kernel(
   iargs = CDR(iargs);
   pips_assert("end of list reached", iargs==NIL);
   return true;
+}
+
+/* vertex-based version
+ */
+bool freia_extract_kernel_vtx(
+  dagvtx v, bool strict,
+  intptr_t * k00, intptr_t * k10, intptr_t *k20,
+  intptr_t * k01, intptr_t * k11, intptr_t *k21,
+  intptr_t * k02, intptr_t * k12, intptr_t *k22)
+{
+  list largs = freia_get_vertex_params(v);
+  pips_assert("one kernel", gen_length(largs)==1);
+  expression e = EXPRESSION(CAR(largs));
+  return freia_extract_kernel(e, strict, k00, k10, k20,
+                              k01, k11, k21, k02, k12, k22);
 }
