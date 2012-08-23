@@ -13,15 +13,11 @@ Points-to for properties04
 int properties04(int **q)
 {
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
    int i;
 
-// Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// Points To: none
 
 
    *q = &i;
@@ -30,19 +26,6 @@ int properties04(int **q)
 // _q_1[0] -> i , EXACT
 // q -> _q_1[0] , EXACT
 
-
-   return 0;
-}
-
-Proper effects for properties04
-
-int properties04(int **q)
-{
-   int i;
-//             <may be written>: _q_1[0]
-//             <    is read   >: q
-
-   *q = &i;
 
    return 0;
 }
