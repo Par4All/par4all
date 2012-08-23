@@ -67,7 +67,7 @@ int main()
 // Points To:
 // p -> a , EXACT
 // pp -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *NULL_POINTER* , EXACT
 
       q = &b;
 
@@ -94,7 +94,7 @@ int main()
 // Points To:
 // pp -> *NULL_POINTER* , EXACT
 // r -> a , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> *NULL_POINTER* , EXACT
 
       s = &b;
 

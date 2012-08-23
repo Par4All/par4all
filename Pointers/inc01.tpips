@@ -6,6 +6,8 @@ create inc01 inc01.c
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+activate PRINT_CODE_POINTS_TO_LIST
+
 echo
 echo POINTS TO for "inc01"
 echo
