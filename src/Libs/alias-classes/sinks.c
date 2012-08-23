@@ -90,12 +90,26 @@ list entity_to_sinks(entity e)
   return sinks;
 }
 
+cell entity_to_cell(entity e)
+{
+  reference nr = make_reference(e, NIL);
+  cell nc = make_cell_reference(nr);
+  return nc;
+}
+
 list points_to_null_sinks()
 {
   /* The null location is not typed. The impact on dependence test is
      not clear. */
   entity ne = entity_null_locations();
   return entity_to_sinks(ne);
+}
+
+cell make_null_cell(void)
+{
+  entity ne = entity_null_locations();
+  cell c = entity_to_cell(ne);
+  return c;
 }
 
 list points_to_anywhere_sinks(type t)

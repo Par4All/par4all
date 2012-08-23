@@ -1638,8 +1638,32 @@ pt_map struct_initialization_to_points_to(expression lhs,
 					  pt_map in)
 {
   pt_map out = in;
-  pips_internal_error("Not implemented yet.\n");
-  pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
+  // Implementation 0:
+  // pips_internal_error("Not implemented yet.\n");
+  // pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
+
+  /* Temporary implementation: use anywhere as default initialization */
+  list L = expression_to_points_to_sources(lhs, in);
+  // ignore rhs
+  pips_assert("to please gcc, waiting for implementation", rhs==rhs);
+  // L must contain a unique cell, containing a non-index reference
+  pips_assert("One struct to initializze", (int) gen_length(L)==1);
+  cell c = CELL(CAR(L));
+  reference r = cell_any_reference(c);
+  entity e = reference_variable(r);
+  pips_assert("c is not indexed", ENDP(reference_indices(r)));
+  list l = variable_to_pointer_locations(e);
+  FOREACH(CELL, source, l) {
+    bool to_be_freed;
+    type t = points_to_cell_to_type(source, &to_be_freed); // hopefully, concrete
+    cell sink = make_anywhere_cell(t);
+    if(to_be_freed) free_type(t);
+    points_to pt = make_points_to(source, sink,
+				  make_approximation_exact(),
+				  make_descriptor_none());
+    add_arc_to_pt_map(pt, out);
+  }
+
   return out;
 }
 

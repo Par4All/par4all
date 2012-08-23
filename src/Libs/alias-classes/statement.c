@@ -220,12 +220,24 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	}
 	else {
 	  l = variable_to_pointer_locations(e);
-	  FOREACH(CELL, source, l) {
-	    cell sink = cell_to_nowhere_sink(source); 
+	  // C Standard: if e is a static pointer, it is implicly
+	  // initialized to NULL
+	  if(pointer_type_p(et) && variable_static_p(e)) {
+	    cell source = CELL(CAR(l));
+	    cell sink = make_null_cell(); 
 	    points_to pt = make_points_to(source, sink,
 					  make_approximation_exact(),
 					  make_descriptor_none());
 	    add_arc_to_pt_map(pt, pt_out);
+	  }
+	  else {
+	    FOREACH(CELL, source, l) {
+	      cell sink = cell_to_nowhere_sink(source); 
+	      points_to pt = make_points_to(source, sink,
+					    make_approximation_exact(),
+					    make_descriptor_none());
+	      add_arc_to_pt_map(pt, pt_out);
+	    }
 	  }
 	}
       }
