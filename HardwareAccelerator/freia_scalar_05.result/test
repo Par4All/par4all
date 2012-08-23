@@ -2351,10 +2351,10 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // hardware accelerator generated variable
    freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    freia_aipo_erode_8c(X_1, i, k);                                      /*0017*/
+   freia_aipo_global_min(X_1, &sB);                                     /*0018*/
    
    // look for order issues when reusing a temporary image
    freia_aipo_global_max(i, &sA);                                       /*0015*/
-   freia_aipo_global_min(X_1, &sB);                                     /*0018*/
    freia_scalar_05_opencl_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, false, sB-10, sB-1, false);      /*0016*/
    freia_aipo_dilate_8c(X, tB, k);                                      /*0021*/
    freia_aipo_global_vol(X, &sC);                                       /*0022*/
@@ -2381,10 +2381,10 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // hardware accelerator generated variable
    freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    freia_aipo_erode_8c(X_1, i, k);                                      /*0017*/
+   freia_aipo_global_min(X_1, &sB);                                     /*0018*/
    
    // look for order issues when reusing a temporary image
    freia_aipo_global_max(i, &sA);                                       /*0015*/
-   freia_aipo_global_min(X_1, &sB);                                     /*0018*/
    freia_scalar_05_opencl_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, 0, sB-10, sB-1, 0);              /*0016*/
    freia_aipo_dilate_8c(X, tB, k);                                      /*0021*/
    freia_aipo_global_vol(X, &sC);                                       /*0022*/

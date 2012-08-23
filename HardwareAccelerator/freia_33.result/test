@@ -2716,12 +2716,12 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0014*/
    // A
    freia_aipo_erode_8c(X0, i, k);                                       /*0022*/
+   // A
+   freia_aipo_global_min(X0, &sB);                                      /*0024*/
    
    // complex dag for split
    // A
    freia_aipo_global_max(i, &sA);                                       /*0018*/
-   // A
-   freia_aipo_global_min(X0, &sB);                                      /*0024*/
    // B
    freia_33_opencl_helper_0_1_0(tB, tC2, X0, i, sA-10, sA-1, false, sB-10, sB-1, false);              /*0020*/
    // C
@@ -2754,12 +2754,12 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0014*/
    // A
    freia_aipo_erode_8c(X0, i, k);                                       /*0022*/
+   // A
+   freia_aipo_global_min(X0, &sB);                                      /*0024*/
    
    // complex dag for split
    // A
    freia_aipo_global_max(i, &sA);                                       /*0018*/
-   // A
-   freia_aipo_global_min(X0, &sB);                                      /*0024*/
    // B
    freia_33_opencl_helper_0_1_0(tB, tC2, X0, i, sA-10, sA-1, 0, sB-10, sB-1, 0);       /*0020*/
    // C

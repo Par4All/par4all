@@ -2705,12 +2705,12 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    // A
    freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   // A
+   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
    
    // BUG: issue with X reuse...
    // A
    freia_aipo_global_max(i, &sA);                                       /*0017*/
-   // A
-   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
    // B
    freia_scalar_07_opencl_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, false, sB-10, sB-1, false);      /*0019*/
    // C with X from A
@@ -2744,12 +2744,12 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    // A
    freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   // A
+   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
    
    // BUG: issue with X reuse...
    // A
    freia_aipo_global_max(i, &sA);                                       /*0017*/
-   // A
-   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
    // B
    freia_scalar_07_opencl_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, 0, sB-10, sB-1, 0);              /*0019*/
    // C with X from A
