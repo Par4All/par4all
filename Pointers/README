@@ -1,17 +1,21 @@
 Information about the points-to validation suite:
 ------------------------------------------------
 
-statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
-
-if00, for00, while00, do_while : To illustrate points-to relations in control statements.
-
-struct00->struct04 : To illustrate fields of C stryct type which are pointers.
-
-malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, malloc_insensitive : To illustrate the use of HEAP_LOCATION  property.
-
 conditional_01 : To treat assignement like x = cond? &i : y.
 
 formal_parameter00 : To illustrate the treatement of formal parameter. 
+
+if00, for00, while00, do_while : To illustrate points-to relations in control statements.
+
+malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, malloc_insensitive : To illustrate the use of HEAP_LOCATION  property.
+
+statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
+
+static01: implicit initialization of static scalar pointer to NULL (C Standard)
+
+struct00->struct04 : To illustrate fields of C stryct type which are pointers.
+
+struct19: initialization of a struct containing pointers
 
 For compatibility with Effects validation:
 ------------------------------------------
@@ -28,6 +32,7 @@ test01, 02, 03, 04: check handling of test statements (FI)
 decl06: check generation of nowhere in a pointer declaration
 
 pointerxy: copied from Rice
+
 -------------new validation for points-to analysis------------- 
 
 every test case added is either a bug to fixe either an enhancement of
