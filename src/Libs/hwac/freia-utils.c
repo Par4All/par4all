@@ -55,12 +55,12 @@
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
 #define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, false, NULL }
-#define NOPE_OPCL { F, NULL }
+#define NOPE_OPCL { F, F, NULL, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
 #define NO_TRPX { 0, 0, 0, 0, 0, -1, false, false, NULL }
-#define NO_OPCL { F, NULL }
+#define NO_OPCL { F, F, NULL, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, false, "TERAPIX_UCODE_" op }
 #define TRPX_IO(c, op) { 0, 0, 0, 0, 0, c, true, true, "TERAPIX_UCODE_" op }
@@ -69,7 +69,8 @@
 // preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
-#define OPCL(op) { T, "PIXEL_" op }
+#define OPCL(op)       { T, F, "PIXEL_" op, NULL }
+#define OPCLK(op,init) { F, T, "PIXEL_" op, "PIXEL_" init }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -275,13 +276,13 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "ERODE_3_3"), NO_OPCL
+    TRPX_NG(15, "ERODE_3_3"), OPCLK("SUP", "MIN")
   },
   { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "DILATE_3_3"), NO_OPCL
+    TRPX_NG(15, "DILATE_3_3"), OPCLK("INF", "MAX")
   },
   // MEASURES
   { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
@@ -328,7 +329,8 @@ static const freia_api_t FREIA_AIPO_API[] = {
     },
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
-    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }, NO_OPCL
+    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" },
+    OPCLK("ADD", "ZERO")
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,

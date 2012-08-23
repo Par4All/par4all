@@ -52,8 +52,12 @@
 typedef struct {
   // whether it can be merged
   bool mergeable;
+  // special case for some kernel-based operations
+  bool mergeable_kernel;
   // if mergeable, the name of the pixel operation macro
   string macro;
+  // and maybe the initial value:
+  string init; // not needed?
 } opencl_hw_t;
 
 #endif // !HWAC_FREIA_OPENCL_H_
