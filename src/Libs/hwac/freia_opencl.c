@@ -145,6 +145,9 @@ static int opencl_compile_mergeable_dag(
   // runtime temporary limitation: one image is reduced
   entity reduced = NULL;
 
+  // whether there is a kernel computation in dag
+  bool has_kernel = false;
+
   sb_cat(helper,
          "\n"
          "// helper function ", cut_name, "\n"
@@ -182,6 +185,7 @@ static int opencl_compile_mergeable_dag(
   // count stuff in the generated code
   int nargs = 0, n_params = 0, n_misc = 0, cl_args = 1;
 
+  // output images
   if (n_outs)
     sb_cat(opencl_tail, "    // set output pixels\n");
   int i = 0;
@@ -206,6 +210,7 @@ static int opencl_compile_mergeable_dag(
     i++;
   }
 
+  // input images
   if (n_ins)
     sb_cat(opencl_body, "    // get input pixels\n");
   for (i = 0; i<n_ins; i++)
@@ -250,6 +255,9 @@ static int opencl_compile_mergeable_dag(
     // skip input nodes
     if (dagvtx_number(v)==0) continue;
 
+    // vertex v number as a string
+    string svn = strdup(itoa((int) dagvtx_number(v)));
+
     // get details...
     vtxcontent vc = dagvtx_content(v);
     pips_assert("there is a statement",
@@ -261,6 +269,7 @@ static int opencl_compile_mergeable_dag(
     pips_assert("freia api found", api!=NULL);
 
     bool is_a_reduction = api->arg_misc_out;
+    bool is_a_kernel = api->opencl.mergeable_kernel;
 
     // update for helper call arguments...
     lparams = gen_nconc(lparams,
@@ -281,7 +290,8 @@ static int opencl_compile_mergeable_dag(
 
       // get the reduced image
       entity img = ENTITY(CAR(li));
-      // we deal with only one image at the time... runtime limitation
+      // we deal with only one image at the time...
+      // it is a runtime limitation
       pips_assert("same image if any", !reduced ^ (img==reduced));
       if (!reduced)
       {
@@ -306,8 +316,7 @@ static int opencl_compile_mergeable_dag(
         n_misc = 1;
       }
       // inner loop reduction code
-      sb_cat(opencl_body, "    ", api->opencl.macro, "(red",
-             itoa((int) dagvtx_number(v)), ", ");
+      sb_cat(opencl_body, "    ", api->opencl.macro, "(red", svn, ", ");
       dagvtx pred = DAGVTX(CAR(preds));
       int npred = (int) dagvtx_number(pred);
       if (npred==0)
@@ -355,13 +364,58 @@ static int opencl_compile_mergeable_dag(
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
       }
     }
-    else //  we are not compiling a reduction...
+    else if (is_a_kernel)
+    {
+      // record for adding specific stuff later...
+      has_kernel = true;
+      pips_assert("one input", gen_length(preds)==1);
+
+      string sin =
+        strdup(itoa(gen_position(DAGVTX(CAR(preds)),dag_inputs(d))-1));
+      intptr_t k00, k01, k02, k10, k11, k12, k20, k21, k22;
+      bool extracted = freia_extract_kernel_vtx(v, true,
+                         &k00, &k01, &k02, &k10, &k11, &k12, &k20, &k21, &k22);
+
+      // simplistic hypothesis...
+      pips_assert("got kernel", extracted);
+      pips_assert("trivial kernel",
+           (k00==0 || k00==1) && (k01==0 || k01==1) && (k02==0 || k02==1) &&
+           (k10==0 || k10==1) && (k11==0 || k11==1) && (k12==0 || k12==1) &&
+           (k20==0 || k20==1) && (k21==0 || k21==1) && (k22==0 || k22==1));
+
+      sb_cat(opencl_body, "    // TODO: handle borders!\n");
+      // pixel t<vertex> = <init>;
+      sb_cat(opencl_body,
+             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
+      // t<vertex> = <op>(t<vertex>, j[i+<shift....>]);
+      if (k00) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1-X]);\n");
+      if (k01) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i-X]);\n");
+      if (k02) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1-X]);\n");
+      if (k10) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1]);\n");
+      if (k11) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", in", sin, ";\n");
+      if (k12) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1]);\n");
+      if (k20) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1+X]);\n");
+      if (k21) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i+X]);\n");
+      if (k22) sb_cat(opencl_body, "    t", svn, " = ",
+                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1+X]);\n");
+
+      free(sin), sin = NULL;
+    }
+    else //  we are compiling some pixel operation
     {
       // pixel t<vertex> = <op>(args...);
       sb_cat(opencl_body,
-             "    " OPENCL_PIXEL "t", itoa((int) dagvtx_number(v)),
-             " = ", api->opencl.macro, "(");
+             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.macro, "(");
 
+      // macro arguments
       FOREACH(dagvtx, p, preds)
       {
         if (dagvtx_number(p)==0)
@@ -384,8 +438,13 @@ static int opencl_compile_mergeable_dag(
         free(sn);
         n_params++;
       }
+
+      // end of macro call
       sb_cat(opencl_body, ");\n");
     }
+
+    // cleanup
+    free(svn), svn = NULL;
   } // end of FOREACH on operations
   gen_free_list(vertices), vertices = NIL;
 
@@ -419,6 +478,7 @@ static int opencl_compile_mergeable_dag(
          "  int i;\n"
          "  for (i=gid; i < (gid+width); i++)\n"
          "  {\n");
+  if (has_kernel) sb_cat(opencl, "    // TODO: border?\n");
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n");
@@ -516,17 +576,27 @@ static void opencl_merge_and_compile(
 
   int n_cut = 0;
 
-  // of vertices
-  set done = set_make(set_pointer), current = set_make(set_pointer);
-  // of statements
-  set stats = set_make(set_pointer), dones = set_make(set_pointer);
-  list lcurrent = NIL;
+  list // of vertices
+    lmergeable = NIL,
+    lnonmergeable = NIL;
+
+  set // of vertices
+    done = set_make(set_pointer),
+    mergeable = set_make(set_pointer),       // consistent with lmergeable
+    nonmergeable = set_make(set_pointer); // consistent with lnonmergeable
+
+  set // of statements
+    stats = set_make(set_pointer),
+    dones = set_make(set_pointer);
 
   // overall remaining statements to compile
   set global_remainings = set_make(set_pointer);
   set_assign_list(global_remainings, ls);
 
-  int stnb = -1, max_stnb = -1;
+  // statement number of merged stuff
+  int stnb = -1;
+  // statement number of last non mergeable vertex
+  int max_stnb = -1;
 
   while (true)
   {
@@ -536,18 +606,54 @@ static void opencl_merge_and_compile(
     set_assign_list(done, dag_inputs(d));
 
     // build an homogeneous sub dag
-    list computables;
-    bool again = true, mergeable = true;
-    bool merge_reductions = get_bool_property("HWAC_OPENCL_MERGE_REDUCTIONS");
-
+    list computables, initials;
+    bool
+      merge_reductions = get_bool_property("HWAC_OPENCL_MERGE_REDUCTIONS"),
+      merge_kernels = get_bool_property("HWAC_OPENCL_MERGE_KERNEL_OPERATIONS"),
+      compile_one_op = get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION");
     // hand manage reductions on one image only
     entity reduced = NULL;
 
+    // we eat up all computable vertices, following dependences
+    // we compute first a maximum set of non mergeable vertices
+    bool again = true;
     while (again &&
-           (computables = dag_computable_vertices(d, done, done, current)))
+           (computables = dag_computable_vertices(d, done, done, nonmergeable)))
     {
-      ifdebug(5)
+      ifdebug(5) {
+        pips_debug(5, "%d computables\n", (int) gen_length(computables));
+        gen_fprint(stderr, "computables", computables,
+                   (gen_string_func_t) dagvtx_number_str);
+      }
+
+      again = false;
+
+      FOREACH(dagvtx, v, computables)
       {
+        if (!opencl_mergeable_p(v) ||
+            (dagvtx_is_measurement_p(v) && !merge_reductions))
+        {
+          lnonmergeable = CONS(dagvtx, v, lnonmergeable);
+          set_add_element(done, done, v);
+          set_add_element(nonmergeable, nonmergeable, v);
+          again = true;
+        }
+      }
+
+      if (again)
+        gen_free_list(computables), computables = NIL;
+      // else loop exit
+    }
+
+    // save up for next phase with mergeables
+    initials = computables;
+
+    // then we keep on with extracting mergeable vertices
+    again = true;
+    while (again &&
+           (computables = dag_computable_vertices(d, done, done, mergeable)))
+    {
+      ifdebug(5) {
         pips_debug(5, "%d computables\n", (int) gen_length(computables));
         gen_fprint(stderr, "computables", computables,
                    (gen_string_func_t) dagvtx_number_str);
@@ -555,124 +661,185 @@ static void opencl_merge_and_compile(
 
       gen_sort_list(computables, (gen_cmp_func_t) dagvtx_opencl_priority);
       again = false;
-      // first, try to extract non mergeable nodes ahead
-      if (!lcurrent)
-      {
-        FOREACH(dagvtx, v, computables)
-        {
-          if (!opencl_mergeable_p(v) ||
-              (dagvtx_is_measurement_p(v) && !merge_reductions))
-          {
-            lcurrent = CONS(dagvtx, v, lcurrent);
-            set_add_element(done, done, v);
-            set_add_element(current, current, v);
-            again = true;
-            mergeable = false;
 
-            // keep track of previous which may have dependencies... hmmm...
-            int n = (int) dagvtx_number(v);
-            if (n>max_stnb) max_stnb = n;
-          }
-        }
-      }
-      // then accumulate current status
-      if (!again)
+      FOREACH(dagvtx, v, computables)
       {
-        FOREACH(dagvtx, v, computables)
+        // look for reductions
+        // ??? current runtime limitation, there is only ONE image
+        // with associated reductions, so the other one are kept out
+        if (dagvtx_is_measurement_p(v))
         {
-          // ??? current runtime limitation...
-          if (dagvtx_is_measurement_p(v) && merge_reductions)
+          // a measure is mergeable
+          if (merge_reductions)
           {
             list li = vtxcontent_inputs(dagvtx_content(v));
             pips_assert("one input image to reduction", gen_length(li)==1);
             entity image = ENTITY(CAR(li));
             if (reduced && reduced!=image)
-              // skip if reduction image is different from previous
-              continue;
-            else if (mergeable)
-              reduced = image;
-          }
-
-          bool v_mergeable = opencl_mergeable_p(v);
-          if (!merge_reductions && dagvtx_is_measurement_p(v))
-            v_mergeable = false;
-
-          if (v_mergeable==mergeable)
-          {
-            lcurrent = CONS(dagvtx, v, lcurrent);
-            set_add_element(done, done, v);
-            set_add_element(current, current, v);
-            again = true;
-
-            if (!mergeable) // deps hack
             {
-              int n = (int) dagvtx_number(v);
-              if (n>max_stnb) max_stnb = n;
+              // try to put it with the preceeding non mergeable...
+              // if it was computable with them in the previous round
+              if (gen_in_list_p(v, initials)) {
+                lnonmergeable = CONS(dagvtx, v, lnonmergeable);
+                set_add_element(done, done, v);
+                set_add_element(nonmergeable, nonmergeable, v);
+                again = true;
+              }
+              // else it will be dealt with later on...
+            }
+            else  // this is THE reduced image for this  subdag
+            {
+              reduced = image;
+              lmergeable = CONS(dagvtx, v, lmergeable);
+              set_add_element(done, done, v);
+              set_add_element(mergeable, mergeable, v);
+              again = true;
+            }
+          }
+          else // reduction are NOT merged
+          {
+            // try to put it with the preceeding non mergeable...
+            if (gen_in_list_p(v, initials)) {
+              lnonmergeable = CONS(dagvtx, v, lnonmergeable);
+              set_add_element(done, done, v);
+              set_add_element(nonmergeable, nonmergeable, v);
+              again = true;
             }
           }
         }
+        else if (opencl_mergeable_p(v))
+        {
+          // not a reduction, mergeable
+          lmergeable = CONS(dagvtx, v, lmergeable);
+          set_add_element(done, done, v);
+          set_add_element(mergeable, mergeable, v);
+          again = true;
+        }
       }
-      // cleanup
       gen_free_list(computables), computables = NIL;
     }
 
-    // nothing, this is the end
-    if (!lcurrent) break;
+    // cleanup list of remaining computables for nonmergeable
+    if (initials) gen_free_list(initials), initials = NIL;
 
-    // fix statement connexity...
-    set_clear(stats);
-    FOREACH(dagvtx, v, lcurrent)
-    {
-      statement s = dagvtx_statement(v);
-      if (s) set_add_element(stats, stats, s);
-    }
-    freia_migrate_statements(sq, stats, dones);
-    set_union(dones, dones, stats);
+    // nothing in both lists, this is the end...
+    if (!lmergeable && !lnonmergeable) break;
 
     // restore vertices order
-    lcurrent = gen_nreverse(lcurrent);
+    lmergeable = gen_nreverse(lmergeable);
 
-    pips_debug(4, "got %d %smergeable vertices\n",
-               (int) gen_length(lcurrent), mergeable? "": "non ");
-
-    if (mergeable && (gen_length(lcurrent)>1 ||
-                      get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION")))
+    // we try to aggregate some kernel ops to this task...
+    if (merge_kernels && lmergeable)
     {
-      // actually build subdag if something to merge
-      dag nd = make_dag(NIL, NIL, NIL);
-      FOREACH(dagvtx, v, lcurrent)
-        dag_append_vertex(nd, copy_dagvtx_norec(v));
-      dag_compute_outputs(nd, NULL, output_images, NIL, false);
-      dag_cleanup_other_statements(nd);
-
-      // ??? should not be needed?
-      freia_hack_fix_global_ins_outs(fulld, nd);
-
-      // ??? hack to ensure dependencies...
-      if (max_stnb>stnb) stnb = max_stnb;
-
-      // and compile!
-      stnb = opencl_compile_mergeable_dag
-        (module, nd, ls, split_name, n_cut, global_remainings,
-         signatures, helper_file, opencl, helpers, stnb);
+      pips_debug(3, "looking for kernel ops in predecessors...\n");
+      FOREACH(dagvtx, v, lmergeable)
+      {
+        list preds = dag_vertex_preds(d, v);
+        pips_debug(4, "%d predecessors to vertex %d\n",
+                   (int) gen_length(preds), (int) dagvtx_number(v));
+        FOREACH(dagvtx, p, preds)
+        {
+          if (set_belong_p(nonmergeable, p))
+          {
+            // it belongs to the previous set, we may consider merging it
+            const freia_api_t * api = get_freia_api_vtx(p);
+            pips_debug(5, "predecessor is vertex %d (%s)\n",
+                       (int) dagvtx_number(p), api->compact_name);
+            if (api->opencl.mergeable_kernel)
+            {
+              // change status of p
+              set_del_element(nonmergeable, nonmergeable, p);
+              gen_remove(&lnonmergeable, p);
+              set_add_element(mergeable, mergeable, p);
+              // now they are put ahead...
+              lmergeable = CONS(dagvtx, p, lmergeable);
+            }
+          }
+        }
+        gen_free_list(preds);
+      }
     }
 
-    // cleanup initial dag??
-    FOREACH(dagvtx, v, lcurrent)
-      dag_remove_vertex(d, v);
-    freia_hack_fix_global_ins_outs(fulld, d);
+    pips_debug(4, "got %d non-mergeables and %d mergeable vertices\n",
+               (int) gen_length(lnonmergeable), (int) gen_length(lmergeable));
 
-    // cleanup loop state
-    gen_free_list(lcurrent), lcurrent = NIL;
-    set_clear(current);
+    if (lnonmergeable)
+    {
+      // fix statement connexity...
+      set_clear(stats);
+      FOREACH(dagvtx, v, lnonmergeable)
+      {
+        // keep track of previous which may have dependencies... hmmm...
+        int n = (int) dagvtx_number(v);
+        if (n>max_stnb) max_stnb = n;
+        // statement to clean
+        statement s = dagvtx_statement(v);
+        if (s) set_add_element(stats, stats, s);
+      }
+      freia_migrate_statements(sq, stats, dones);
+      set_union(dones, dones, stats);
 
-    // next!
-    n_cut++;
+      // cleanup initial dag??
+      FOREACH(dagvtx, v, lnonmergeable)
+        dag_remove_vertex(d, v);
+      freia_hack_fix_global_ins_outs(fulld, d);
+
+      gen_free_list(lnonmergeable), lnonmergeable = NIL;
+      set_clear(nonmergeable);
+
+      n_cut++; // this was a cut, next cut...
+    }
+
+    // then mergeables
+    if (lmergeable)
+    {
+      // fix statement connexity
+      set_clear(stats);
+      FOREACH(dagvtx, v, lmergeable) {
+        statement s = dagvtx_statement(v);
+        if (s) set_add_element(stats, stats, s);
+      }
+      freia_migrate_statements(sq, stats, dones);
+      set_union(dones, dones, stats);
+
+      if (gen_length(lmergeable)>1 || compile_one_op)
+      {
+        // actually build subdag if something to merge
+        dag nd = make_dag(NIL, NIL, NIL);
+        FOREACH(dagvtx, v, lmergeable)
+          dag_append_vertex(nd, copy_dagvtx_norec(v));
+        dag_compute_outputs(nd, NULL, output_images, NIL, false);
+        dag_cleanup_other_statements(nd);
+
+        // ??? should not be needed?
+        freia_hack_fix_global_ins_outs(fulld, nd);
+
+        // ??? hack to ensure dependencies...
+        if (max_stnb>stnb) stnb = max_stnb;
+
+        // and compile!
+        stnb = opencl_compile_mergeable_dag
+          (module, nd, ls, split_name, n_cut, global_remainings,
+           signatures, helper_file, opencl, helpers, stnb);
+      }
+
+      // cleanup initial dag??
+      FOREACH(dagvtx, v, lmergeable)
+        dag_remove_vertex(d, v);
+      freia_hack_fix_global_ins_outs(fulld, d);
+
+      // cleanup loop state
+      gen_free_list(lmergeable), lmergeable = NIL;
+      set_clear(mergeable);
+
+      n_cut++; // next cut
+    }
   }
 
   // cleanup
   set_free(global_remainings);
-  set_free(current);
+  set_free(mergeable);
+  set_free(nonmergeable);
   set_free(done);
   set_free(stats);
   set_free(dones);
