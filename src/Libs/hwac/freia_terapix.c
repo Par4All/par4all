@@ -73,50 +73,14 @@ static void erosion_optimization
   // default result
   *north = true, *south = true, *west = true, *east = true;
   expression e = EXPRESSION(CAR(largs));
-  if (expression_reference_p(e))
-  {
-    entity var = expression_variable(e);
-    // ??? should check const...
-    value val = entity_initial(var);
-    if (value_expression_p(val))
-    {
-      expression ival = value_expression(val);
-      if (brace_expression_p(ival))
-      {
-        list iargs = call_arguments(syntax_call(expression_syntax(ival)));
-        pips_assert("must be a kernel...", gen_length(iargs)==9);
-
-        // tell whether each kernel element is zero. If in doubt, count as 1.
-        bool k00, k10, k20, k01, k21, k02, k12, k22;
-        intptr_t i = 0;
-        k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k10 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k20 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k01 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        //bool k11 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k21 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k02 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k12 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        k22 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
-        iargs = CDR(iargs);
-        pips_assert("end of list reached", iargs==NIL);
-
-        // summarize for each four directions
-        *north = !(k00 && k10 && k20);
-        *south = !(k02 && k12 && k22);
-        *west = !(k00 && k01 && k02);
-        *east = !(k20 && k21 && k22);
-      }
-    }
-  }
+  intptr_t k00, k10, k20, k01, k11, k21, k02, k12, k22;
+  freia_extract_kernel(e, false,
+                       &k00, &k10, &k20, &k01, &k11, &k21, &k02, &k12, &k22);
+  // summarize for each four directions
+  *north = k00 || k10 || k20;
+  *south = k02 || k12 || k22;
+  *west =  k00 || k01 || k02;
+  *east =  k20 || k21 || k22;
 }
 
 // stupid hack, to have only one hash table for the 4 directions:

@@ -1667,3 +1667,60 @@ void freia_migrate_statements(sequence sq, const set stats, const set before)
   lin = gen_nconc(gen_nreverse(lin), gen_nreverse(lend));
   sequence_statements(sq) = gen_nconc(gen_nreverse(lbefore), lin);
 }
+
+/* extract values from a kernel definition
+ * return 9 values, expected to be 0/1 elsewhere...
+ * @return whether it succeeded
+ */
+bool freia_extract_kernel(
+  expression e,
+  bool strict, // whether all values must be known, if not 1 is assumed
+  intptr_t * k00, intptr_t * k10, intptr_t * k20,
+  intptr_t * k01, intptr_t * k11, intptr_t * k21,
+  intptr_t * k02, intptr_t * k12, intptr_t * k22)
+{
+  // set default value anyway
+  *k00 = 1, *k10 = 1, *k20 = 1,
+  *k01 = 1, *k11 = 1, *k21 = 1,
+  *k02 = 1, *k12 = 1, *k22 = 1;
+
+  // analyse kernel
+  if (!expression_reference_p(e)) return !strict;
+  entity var = expression_variable(e);
+  // ??? should check const...
+  value val = entity_initial(var);
+  if (!value_expression_p(val)) return !strict;
+  expression ival = value_expression(val);
+  if (!brace_expression_p(ival)) return !strict;
+  list iargs = call_arguments(syntax_call(expression_syntax(ival)));
+  pips_assert("must be a kernel...", gen_length(iargs)==9);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k00) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k10) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k20) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k01) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k11) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k21) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k02) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k12) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k22) && strict)
+    return false;
+  iargs = CDR(iargs);
+  pips_assert("end of list reached", iargs==NIL);
+  return true;
+}
