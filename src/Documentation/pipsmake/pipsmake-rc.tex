@@ -11147,6 +11147,16 @@ no actual helper functions will be generated.
 HWAC_OPENCL_MERGE_OPERATIONS TRUE
 \end{PipsProp}
 
+Whether to merge OpenCL kernel-based operations.
+\begin{PipsProp}{HWAC_OPENCL_MERGE_KERNEL_OPERATIONS}
+HWAC_OPENCL_MERGE_KERNEL_OPERATIONS FALSE
+\end{PipsProp}
+
+Whether to generate OpenCL specialized kernel-based operations.
+\begin{PipsProp}{HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS}
+HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS FALSE
+\end{PipsProp}
+
 Whether merged OpenCL image operations should include reductions as well.
 Added to help debugging the code.
 \begin{PipsProp}{HWAC_OPENCL_MERGE_REDUCTIONS}
@@ -11160,6 +11170,8 @@ debug.
 \begin{PipsProp}{HWAC_OPENCL_COMPILE_ONE_OPERATION}
 HWAC_OPENCL_COMPILE_ONE_OPERATION FALSE
 \end{PipsProp}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 
