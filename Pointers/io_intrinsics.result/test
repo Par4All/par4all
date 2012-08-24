@@ -287,14 +287,13 @@ int main(char *fmt1, ...)
    
    
    fprintf(stderr, "The END\n");
+   return 0;
 }
 
 POINTS-TO
 
 
-// Points To IN:
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -302,54 +301,40 @@ POINTS-TO
 int main(char *fmt1, ...)
 {
 
-// Points To:
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// Points To: none
 
    FILE *fp;
 
 // Points To:
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    size_t n, nr;
 
 // Points To:
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char buf1[200];
 
 // Points To:
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *buf2 = malloc(200*sizeof(char));
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *fmt2;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *i_name;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -357,9 +342,7 @@ int main(char *fmt1, ...)
    int i, r, c, max;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -367,9 +350,7 @@ int main(char *fmt1, ...)
    fpos_t *fp_pos, pos;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -378,9 +359,7 @@ int main(char *fmt1, ...)
    long int fp_pos_indic;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -389,9 +368,7 @@ int main(char *fmt1, ...)
    va_list vl;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -403,9 +380,7 @@ int main(char *fmt1, ...)
    fmt2 = "%s%d";
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -414,9 +389,7 @@ int main(char *fmt1, ...)
    max = 100;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -425,9 +398,7 @@ int main(char *fmt1, ...)
    n = 200;
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -436,11 +407,9 @@ int main(char *fmt1, ...)
    fp = fopen("file.txt", "rb");
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -449,33 +418,27 @@ int main(char *fmt1, ...)
    (void) fread(buf1, 8, 50, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fscanf(fp, fmt2, i_name, &i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fprintf(fp, "%s%d", i_name, i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -483,66 +446,54 @@ int main(char *fmt1, ...)
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vfscanf(fp, fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vfprintf(fp, fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -550,22 +501,18 @@ int main(char *fmt1, ...)
    (void) scanf("%s%d", i_name, &i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) printf(fmt2, i_name, i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -573,66 +520,54 @@ int main(char *fmt1, ...)
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vscanf(fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vprintf(fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -641,33 +576,27 @@ int main(char *fmt1, ...)
    (void) sscanf(buf1, fmt2, i_name, &i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) sprintf(buf2, fmt2, i_name, i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) snprintf(buf2, 100, fmt2, i_name, i);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -675,99 +604,81 @@ int main(char *fmt1, ...)
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vsscanf(buf1, fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vsnprintf(buf2, 100, fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_start(vl, fmt1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) vsprintf(buf2, fmt1, vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_end(vl);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -777,44 +688,36 @@ int main(char *fmt1, ...)
    c = fgetc(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fgets(buf1, max, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fputc(c, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fputs(buf1, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -822,33 +725,27 @@ int main(char *fmt1, ...)
    c = _IO_getc(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) _IO_putc(c, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) ungetc(c, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -856,22 +753,18 @@ int main(char *fmt1, ...)
    c = getchar();
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) putchar(c);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -879,22 +772,18 @@ int main(char *fmt1, ...)
    (void) gets(buf1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) puts(buf1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -904,22 +793,18 @@ int main(char *fmt1, ...)
    nr = fread(buf2, sizeof(char), n, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    nr = fwrite(buf2, sizeof(char), n, fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -928,22 +813,18 @@ int main(char *fmt1, ...)
    (void) fgetpos(fp, fp_pos);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fgetpos(fp, &pos);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -951,11 +832,9 @@ int main(char *fmt1, ...)
    (void) fseek(fp, 0L, 0);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -963,11 +842,9 @@ int main(char *fmt1, ...)
    (void) fsetpos(fp, fp_pos);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -975,22 +852,18 @@ int main(char *fmt1, ...)
    fp_pos_indic = ftell(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    rewind(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -1000,44 +873,36 @@ int main(char *fmt1, ...)
    clearerr(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = feof(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = ferror(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    perror(buf1);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -1046,9 +911,7 @@ int main(char *fmt1, ...)
    fclose(fp);
 
 // Points To:
-// buf2 -> *HEAP*_l_10[0] , EXACT
-// fmt1 -> *NULL_POINTER* , MAY
-// fmt1 -> _fmt1_1[0] , MAY
+// buf2 -> *HEAP*_l_10[0] , MAY
 // fmt2 -> "%s%d" , EXACT
 // fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
@@ -1057,4 +920,13 @@ int main(char *fmt1, ...)
    
    
    fprintf(stderr, "The END\n");
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt2 -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   return 0;
 }

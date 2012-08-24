@@ -25,6 +25,14 @@ malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, mall
 
 pointer14: arrays of pointers toward arrays of pointers
 
+pointer_free
+
+pointer_modif01: scalar pointers updated, intraprocedural; effects required to observe real impact; C code is wrong and the bug is detected by gcc
+
+pointer_modif02: scalar pointers updated, interprocedural; effects required to observe real impact; C code is wrong and the bug is detected by gcc
+
+pointer_reference04: uses a pointer reference, such as p[3]
+
 statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
 
 static01: implicit initialization of static scalar pointer to NULL (C Standard)
