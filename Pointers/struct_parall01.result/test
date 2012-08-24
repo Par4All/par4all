@@ -93,16 +93,25 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       (e.champ)[i].p = malloc(10*sizeof(int));
 
-// Points To: none
+// Points To:
+// a.p -> *HEAP*_l_19[0] , MAY
+// b.p -> *HEAP*_l_19[0] , MAY
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       for(j = 0; j <= 9; j += 1)
 
-// Points To: none
+// Points To:
+// a.p -> *HEAP*_l_19[0] , MAY
+// b.p -> *HEAP*_l_19[0] , MAY
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
          ((e.champ)[i].p)[j] = i+j;
    }
@@ -110,7 +119,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
@@ -120,7 +130,9 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_31[0] , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    for(i = 0; i <= 4; i += 1)
@@ -128,7 +140,9 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_31[0] , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       for(j = 0; j <= 9; j += 1)
@@ -136,7 +150,9 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_31[0] , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
          ((f.champ)[i].p)[j] = i*j;
@@ -144,7 +160,9 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_19[0] , MAY
 // b.p -> *HEAP*_l_19[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_31[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_31[0] , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
 

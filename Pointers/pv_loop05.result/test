@@ -26,20 +26,20 @@ int main()
    p = (int *) malloc(10*sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_8[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = p;
 
 // Points To:
-// p -> *HEAP*_l_8[0] , EXACT
-// q -> *HEAP*_l_8[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
+// q -> *HEAP*_l_8[0] , MAY
 
 
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// p -> *HEAP*_l_8[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[*] , MAY
 // q -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[1] , MAY
@@ -57,7 +57,7 @@ int main()
       *q = i;
 
 // Points To:
-// p -> *HEAP*_l_8[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[*] , MAY
 // q -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[1] , MAY
@@ -76,7 +76,7 @@ int main()
    }
 
 // Points To:
-// p -> *HEAP*_l_8[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[*] , MAY
 // q -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[1] , MAY

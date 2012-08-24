@@ -77,13 +77,34 @@ pv_local_var03:
 
 pv_loop02:
 
+pv_loop05
+
+pv_whileloop02:
+
+recurence04: simple case with a list
+
+ret_val: useless, unless information about all dereferencing
+operations is taken into account
+
 statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
+
+statement01_dec: C code is wrong, bug found by gcc
 
 static01: implicit initialization of static scalar pointer to NULL (C Standard)
 
 struct00->struct04 : To illustrate fields of C stryct type which are pointers.
 
+struct10:
+
+struct13:
+
 struct19: initialization of a struct containing pointers
+
+struct_parall01: result to be validated by hand...
+
+undefined01:
+
+uninitialized01:
 
 For compatibility with Effects validation:
 ------------------------------------------

@@ -24,25 +24,22 @@ int main()
    int *q = tab[1];
 
 // Points To: unreachable
-// p -> j , EXACT
 
 
    k = 1;
 
 // Points To: unreachable
-// p -> j , EXACT
 
    j = k;
 
 // Points To: unreachable
-// p -> j , EXACT
 
    p = &k;
 
 // Points To: unreachable
-// p -> j , EXACT
 
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (declaration_statement_to_points_to) Type mismatch for initialization of ""
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "tab".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.

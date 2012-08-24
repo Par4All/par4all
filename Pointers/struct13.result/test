@@ -61,7 +61,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_20[0] , MAY
 // b.p -> *HEAP*_l_20[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       (e.champ)[i].p = malloc(10*sizeof(int));
@@ -69,7 +70,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_20[0] , MAY
 // b.p -> *HEAP*_l_20[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
@@ -79,7 +81,9 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_20[0] , MAY
 // b.p -> *HEAP*_l_20[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_27[0] , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
 

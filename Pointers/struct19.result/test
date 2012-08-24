@@ -1,3 +1,31 @@
 
 POINTS-TO
 
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+towns read_towns(const  char fname[])
+{
+
+// Points To: none
+
+   FILE *fd = fopen(fname, "r");
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   towns the_towns = {1, malloc(sizeof(town))};
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// the_towns.data -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+
+   return the_towns;
+}
+
+Warnings
+
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
