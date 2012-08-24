@@ -320,8 +320,14 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	if(eval_p && !array_type_p(ft)) {
 	  list dL = source_to_sinks(npc, in, true);
 	  free_cell(npc);
-	  if(ENDP(dL)) // FI: this might mean dead code...
-	    pips_internal_error("Dereferencing error.\n");
+	  if(ENDP(dL)) {// FI: this might mean dead code...
+	    pips_internal_error("Dereferencing error or user error?\n");
+	    if(ENDP(sinks)) {
+	      pips_user_warning("Some kind of execution error has been encountered.\n");
+	      clear_pt_map(in);
+	      points_to_graph_bottom(in) = true;
+  }
+	  }
 	  else {
 	    FOREACH(CELL, ec, dL) {
 	      // (void) cell_add_field_dimension(ec, f);
@@ -360,6 +366,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
     if(eval_p && !array_type_p(ft)) {
       FOREACH(CELL, pc, L) {
+	// No need to check that LL is not empty: NULL might be one of
+	// the cells in L, but there may be other cells
 	list LL = source_to_sinks(pc, in, true);
 	sinks = gen_nconc(sinks, LL);
       }
@@ -411,6 +419,11 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     // 2) raise an internal error to speed up developement... 
     // But do not let go as the caller will block...
     ; // Nothing to do
+  }
+  if(ENDP(sinks)) {
+    pips_user_warning("Some kind of execution error has been encountered.\n");
+    clear_pt_map(in);
+    points_to_graph_bottom(in) = true;
   }
   return sinks;
 }
@@ -734,6 +747,13 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     }
   }
   }
+
+  if(ENDP(sinks)) {
+    pips_user_warning("Some kind of execution error has been encountered.\n");
+    clear_pt_map(in);
+    points_to_graph_bottom(in) = true;
+  }
+
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");
     print_points_to_cells(sinks);
@@ -1079,6 +1099,12 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   }
   else
     sinks = sources;
+
+  if(ENDP(sinks)) {
+    pips_user_warning("Some kind of execution error has been encountered.\n");
+    clear_pt_map(in);
+    points_to_graph_bottom(in) = true;
+  }
 
   return sinks;
 }

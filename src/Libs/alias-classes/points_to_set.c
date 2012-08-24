@@ -1155,14 +1155,28 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
  *
  * * stub_source_to_sinks()
  *
+ * This function should never return an empty list. The caller should
+ * handle it as a bug in the analyzed code.
+ *
  * Function added by FI. It is recursive via...
  */
 list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   list sinks = NIL;
+  bool to_be_freed;
+  type source_t = points_to_cell_to_type(source, & to_be_freed);
+  type c_source_t = compute_basic_concrete_type(source_t);
+  bool ok_p = C_pointer_type_p(c_source_t) || null_cell_p(source);
+  if(to_be_freed) free_type(source_t);
 
   /* Can we expect a sink? */
-  if(nowhere_cell_p(source)) {
+  if(!ok_p) {
+    // Likely typing error in source code
+    entity v = reference_variable(cell_any_reference(source));
+    pips_user_warning("Typing error in a pointer assignment or a dereferencing with \"%s\".\n", entity_user_name(v));
+    // Return an empty list
+  }
+  else if(nowhere_cell_p(source)) {
     sinks = nowhere_source_to_sinks(source, pts);
   }
   else if(anywhere_cell_p(source) || cell_typed_anywhere_locations_p(source)) {
