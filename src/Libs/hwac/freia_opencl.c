@@ -400,7 +400,7 @@ static int opencl_compile_mergeable_dag(
       if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", j", sin, "[i-1]);\n");
       if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", in", sin, ";\n");
+                      "(t", svn, ", in", sin, ");\n");
       if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", j", sin, "[i+1]);\n");
       if (k20) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
