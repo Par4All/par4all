@@ -1039,48 +1039,13 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
        && !all_heap_locations_cell_p(c)) {
       list ncsl = gen_full_copy_list(csl);
       reference r = cell_any_reference(c);
+
       // FI: the update depends on the sink model
-      // If [0] subscripts are always added, the last subscripts
-      // should be replaced
-      // reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
-      int ncsl_n = (int) gen_length(ncsl);
-      // int i_n = (int) gen_length(reference_indices(r));
-      int i_n = points_to_reference_to_final_dimension(r);
-      if(i_n<ncsl_n) {
-	points_to_reference_update_final_subscripts(r, ncsl);
-      }
-      else if(i_n==ncsl_n) {
-	points_to_reference_update_final_subscripts(r, ncsl);
-	//gen_full_free_list(reference_indices(r));
-	//reference_indices(r) = ncsl;
-      }
-      else { // i_n>ncsl_n
-	points_to_reference_update_final_subscripts(r, ncsl);
-#if 0
-	int i = 0;
-	list ci = reference_indices(r);
-	list nl = NIL;
-	for(i=0;i<i_n-ncsl_n;i++) {
-	  expression i = copy_expression(EXPRESSION(CAR(ci)));
-	  nl = CONS(EXPRESSION, i, nl);
-	  POP(ci);
-	}
-	nl = gen_nreverse(nl);
-	nl = gen_nconc(nl, ncsl);
-	// nl = gen_nconc(ncsl, nl);
-	gen_full_free_list(reference_indices(r));
-	reference_indices(r) = nl;
-#endif
-      }
+      points_to_reference_update_final_subscripts(r, ncsl);
     }
   }
 
   gen_full_free_list(csl);
-
-  //  if(eval_p)
-  //sinks = sources_to_sinks(sources, in, true);
-  //else
-  //sinks = sources;
 
   if(eval_p) {
     FOREACH(CELL, source, sources) {
