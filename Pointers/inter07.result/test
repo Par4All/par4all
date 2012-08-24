@@ -2,8 +2,7 @@
 POINTS TO for inter07
 
 
-// Points To IN:
-// t.data -> _t_1 , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -11,35 +10,28 @@ POINTS TO for inter07
 void display(towns t, double xmin, double ymin, double xmax, double ymax, double step)
 {
 
-// Points To:
-// t.data -> _t_1 , MAY
+// Points To: none
 
    size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
 
-// Points To:
-// t.data -> _t_1 , EXACT
+// Points To: none
 
    size_t i, j;
 
-// Points To:
-// t.data -> _t_1 , EXACT
+// Points To: none
 
    for(i = 0; i < rangex; i += 1) {
 
-// Points To:
-// t.data -> _t_1 , EXACT
+// Points To: none
 
       for(j = 0; j < rangey; j += 1)
 
-// Points To:
-// t.data -> _t_1 , EXACT
+// Points To: none
 
          printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
 
-// Points To:
-// t.data -> _t_1 , EXACT
+// Points To: none
 
       printf("\n");
    }
 }
-INIT_POINTS_TO_ANALYSIS[display] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

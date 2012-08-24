@@ -30,10 +30,8 @@ POINTS-TO
 
 
 // Points To IN:
-// _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _pp_1_1[0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> *NULL_POINTER* , MAY
 // pp -> _pp_1[0] , MAY
 // qq -> *NULL_POINTER* , MAY
@@ -42,30 +40,22 @@ POINTS-TO
 
 // Points To OUT:
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _qq_2_2[0] , MAY
+// _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 
 void bar(int **pp, int **qq)
 {
 
-// Points To:
-// _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _pp_1_1[0] , MAY
-// _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[0] -> _qq_2_2[0] , MAY
-// pp -> *NULL_POINTER* , MAY
-// pp -> _pp_1[0] , MAY
-// qq -> *NULL_POINTER* , MAY
-// qq -> _qq_2[0] , MAY
+// Points To: none
 
    *pp = *qq;
 
 // Points To:
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _qq_2_2[0] , MAY
+// _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> _pp_1[0] , EXACT
 // qq -> _qq_2[0] , EXACT
 
@@ -73,9 +63,9 @@ void bar(int **pp, int **qq)
 
 // Points To:
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _qq_2_2[0] , MAY
+// _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[0] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> _pp_1[0] , EXACT
 // qq -> _qq_2[0] , EXACT
 
@@ -104,10 +94,7 @@ void foo()
    bar(pp, qq);
 
 // Points To:
-// p -> i , EXACT
-// pp -> p , EXACT
-// q -> j , EXACT
-// qq -> q , EXACT
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
 
    return;
 }

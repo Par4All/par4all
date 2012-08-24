@@ -21,16 +21,13 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: col
    *va_arg(pa, int *) = col;
+   return 0;
 }
 
 POINTS-TO
 
 
 // Points To IN:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
 // my_fputc -> *NULL_POINTER* , MAY
 // my_fputc -> _my_fputc_2 , MAY
 
@@ -40,91 +37,41 @@ POINTS-TO
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    int nbout;
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    int col = 0;
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    int indent = 0;
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    int ui32;
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    int i32;
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
    static char buffer[2000];
 
-// Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
-// my_fputc -> *NULL_POINTER* , MAY
-// my_fputc -> _my_fputc_2 , MAY
+// Points To: none
 
 
    if (!my_fputc)
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
 // my_fputc -> *NULL_POINTER* , EXACT
 
       return 0;
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
 // my_fputc -> *NULL_POINTER* , MAY
 // my_fputc -> _my_fputc_2 , MAY
 
@@ -132,12 +79,14 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 
 // Points To:
-// _stream -> *NULL_POINTER* , MAY
-// _stream -> __stream_3[0] , MAY
-// fmt -> *NULL_POINTER* , MAY
-// fmt -> _fmt_1[0] , MAY
 // my_fputc -> *NULL_POINTER* , MAY
 // my_fputc -> _my_fputc_2 , MAY
 
    *va_arg(pa, int *) = col;
+
+// Points To:
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
+
+   return 0;
 }

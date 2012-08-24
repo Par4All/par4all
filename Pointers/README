@@ -7,7 +7,23 @@ formal_parameter00 : To illustrate the treatement of formal parameter.
 
 if00, for00, while00, do_while : To illustrate points-to relations in control statements.
 
+inter04, 05, 06  and 07:
+
+intra01
+
+lhs06: va_arg
+
+list06:
+
+Lv:
+
+nowhere01:
+
+null_pointer01, 02:
+
 malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, malloc_insensitive : To illustrate the use of HEAP_LOCATION  property.
+
+pointer14: arrays of pointers toward arrays of pointers
 
 statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
 

@@ -4,7 +4,7 @@ POINTS TO for inter04
 
 // Points To IN:
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[*] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> *NULL_POINTER* , MAY
 // pp -> _pp_1[0] , MAY
 // qq -> *NULL_POINTER* , MAY
@@ -13,26 +13,22 @@ POINTS TO for inter04
 
 // Points To OUT:
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _qq_2_2[0] , MAY
+// _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[*] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 
 void bar(int **pp, int **qq)
 {
 
-// Points To:
-// pp -> *NULL_POINTER* , MAY
-// pp -> _pp_1[0] , MAY
-// qq -> *NULL_POINTER* , MAY
-// qq -> _qq_2[0] , MAY
+// Points To: none
 
    *pp = *qq;
 
 // Points To:
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[0] -> _qq_2_2[0] , MAY
+// _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
-// _qq_2[*] -> _qq_2_2[0] , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> _pp_1[0] , EXACT
 // qq -> _qq_2[0] , EXACT
 
@@ -65,7 +61,5 @@ void inter04()
 
    return;
 }
-INIT_POINTS_TO_ANALYSIS[bar] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 C_PARSER[inter04] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[inter04] (simplify_C_expression) Variable "j" is probably used before it is defined
-INIT_POINTS_TO_ANALYSIS[inter04] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
