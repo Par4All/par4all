@@ -94,7 +94,7 @@ static01: implicit initialization of static scalar pointer to NULL (C Standard)
 
 struct00->struct04 : To illustrate fields of C stryct type which are pointers.
 
-struct10:
+struct10: result not checked carefully
 
 struct13:
 
