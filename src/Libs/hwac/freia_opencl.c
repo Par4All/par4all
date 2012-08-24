@@ -388,24 +388,24 @@ static int opencl_compile_mergeable_dag(
       sb_cat(opencl_body,
              "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
       // t<vertex> = <op>(t<vertex>, j[i+<shift....>]);
-      if (k00) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1-X]);\n");
-      if (k01) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i-X]);\n");
-      if (k02) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1-X]);\n");
-      if (k10) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1]);\n");
-      if (k11) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", in", sin, ";\n");
-      if (k12) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1]);\n");
-      if (k20) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i-1+X]);\n");
-      if (k21) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i+X]);\n");
-      if (k22) sb_cat(opencl_body, "    t", svn, " = ",
-                      api->opencl.macro, "(t", svn, ", j", sin, "[i+1+X]);\n");
+      if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i-1-width]);\n");
+      if (k01) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i-width]);\n");
+      if (k02) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i+1-width]);\n");
+      if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i-1]);\n");
+      if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", in", sin, ";\n");
+      if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i+1]);\n");
+      if (k20) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i-1+width]);\n");
+      if (k21) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i+width]);\n");
+      if (k22) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", j", sin, "[i+1+width]);\n");
 
       free(sin), sin = NULL;
     }
@@ -732,6 +732,7 @@ static void opencl_merge_and_compile(
     if (merge_kernels && lmergeable)
     {
       pips_debug(3, "looking for kernel ops in predecessors...\n");
+      list added = NIL;
       FOREACH(dagvtx, v, lmergeable)
       {
         list preds = dag_vertex_preds(d, v);
@@ -741,20 +742,34 @@ static void opencl_merge_and_compile(
         {
           if (set_belong_p(nonmergeable, p))
           {
-            // it belongs to the previous set, we may consider merging it
+            // it belongs to the previous set
+            // we may consider merging it...
             const freia_api_t * api = get_freia_api_vtx(p);
             pips_debug(5, "predecessor is vertex %d (%s)\n",
                        (int) dagvtx_number(p), api->compact_name);
-            if (api->opencl.mergeable_kernel)
+            intptr_t val;
+            if (// this is a mergeable kernel
+                api->opencl.mergeable_kernel &&
+                // all it successors are arithmetic merged
+                list_in_set_p(dagvtx_succs(p), mergeable) &&
+                // and the kernel must be fully known
+                freia_extract_kernel_vtx(p, true, &val, &val, &val, &val,
+                                         &val, &val, &val, &val, &val))
             {
               // change status of p
               set_del_element(nonmergeable, nonmergeable, p);
               gen_remove(&lnonmergeable, p);
-              set_add_element(mergeable, mergeable, p);
-              // now they are put ahead...
-              lmergeable = CONS(dagvtx, p, lmergeable);
+              added = CONS(dagvtx, p, added);
             }
           }
+        }
+        // FIX mergeable DELAYED...
+        if (added)
+        {
+          FOREACH(dagvtx, v, added)
+            set_add_element(mergeable, mergeable, v);
+          // the added are put ahead in the initial order
+          lmergeable = gen_nconc(gen_nreverse(added), lmergeable), added = NIL;
         }
         gen_free_list(preds);
       }
