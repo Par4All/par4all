@@ -5143,6 +5143,15 @@ bool type_void_star_p(type t)
   return void_star_p;
 }
 
+/* Beware of typedefs. */
+bool char_star_type_p(type t)
+{
+  bool char_star_p = false;
+  if(pointer_type_p(t))
+    char_star_p = char_type_p(type_to_pointed_type(t));
+  return char_star_p;
+}
+
 /*
  *  that is all
  */

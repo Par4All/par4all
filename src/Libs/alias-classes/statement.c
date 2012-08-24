@@ -212,10 +212,12 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  expression exp_init = value_expression(v_init);
 	  expression lhs = entity_to_expression(e);
 	  type it = compute_basic_concrete_type(expression_to_type(exp_init));
-	  // See C standard for type compatibility
+	  // See C standard for type compatibility + PIPS idiosyncrasies
+	  // This should be extended to cope with the C type hierarchy
 	  if(array_pointer_type_equal_p(et, it)
 	     || type_void_star_p(et) || type_void_star_p(it)
 	     || integer_type_p(it)
+	     || (char_star_type_p(et) && string_type_p(it))
 	     || overloaded_type_p(it)) // PIPS own compatibility...
 	    pt_out = assignment_to_points_to(lhs,
 					     exp_init,
