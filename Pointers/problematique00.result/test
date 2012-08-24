@@ -9,8 +9,7 @@ int main()
 //             <    is written>: a
    /* S1 */
    a = &c;
-//             <    is read   >: d __IO_EFFECTS:LUNS[d]
-//             <    is written>: __IO_EFFECTS:LUNS[d]
+//             <    is read   >: d
    /* S2 */
    read(d);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*

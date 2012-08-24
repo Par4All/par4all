@@ -7,9 +7,11 @@ void point_to02()
       int a;
       int b[10];
    } c, *p;
+//             <    is written>: p
+
+   p = &c;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-
    p->a = 1;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
@@ -39,13 +41,20 @@ void point_to02()
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
+   p = &c;
+
+// Points To:
+// p -> c , EXACT
+
    p->a = 1;
 
-// Points To: none
+// Points To:
+// p -> c , EXACT
 
    (p->b)[2] = 3;
 
-// Points To: none
+// Points To:
+// p -> c , EXACT
 
    return;
 }

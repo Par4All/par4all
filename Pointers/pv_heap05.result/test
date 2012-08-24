@@ -32,8 +32,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_11 -> *HEAP*_l_9 , EXACT
-// *HEAP*_l_9 -> a , EXACT
+// *HEAP*_l_9 -> a , MAY
 
 int main()
 {
@@ -61,37 +60,36 @@ int main()
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *HEAP*_l_9 , EXACT
+// q -> *HEAP*_l_9 , MAY
 
    q[0] = &a;
 
 // Points To:
-// *HEAP*_l_9 -> a , EXACT
+// *HEAP*_l_9 -> a , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *HEAP*_l_9 , EXACT
+// q -> *HEAP*_l_9 , MAY
 
    p = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// *HEAP*_l_9 -> a , EXACT
-// p -> *HEAP*_l_11 , EXACT
-// q -> *HEAP*_l_9 , EXACT
+// *HEAP*_l_9 -> a , MAY
+// p -> *HEAP*_l_11 , MAY
+// q -> *HEAP*_l_9 , MAY
 
    p[0] = q;
 
 // Points To:
-// *HEAP*_l_11 -> *HEAP*_l_9 , EXACT
-// *HEAP*_l_9 -> a , EXACT
-// p -> *HEAP*_l_11 , EXACT
-// q -> *HEAP*_l_9 , EXACT
+// *HEAP*_l_11[0] -> *HEAP*_l_9 , MAY
+// *HEAP*_l_9 -> a , MAY
+// p -> *HEAP*_l_11 , MAY
+// q -> *HEAP*_l_9 , MAY
 
    free(p);
 
 // Points To:
-// *HEAP*_l_11 -> *HEAP*_l_9 , EXACT
-// *HEAP*_l_9 -> a , EXACT
+// *HEAP*_l_9 -> a , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *HEAP*_l_9 , EXACT
+// q -> *HEAP*_l_9 , MAY
 
    return 0;
 }

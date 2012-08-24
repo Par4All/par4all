@@ -3,7 +3,7 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> _p_1 , EXACT
+// p -> _p_1[0][0] , EXACT
 
 
 // Points To OUT: none
@@ -11,13 +11,12 @@ POINTS-TO
 int ptr_to_array03(int (*p)[10])
 {
 
-// Points To:
-// p -> _p_1 , EXACT
+// Points To: none
 
    (*p)[3] = 1;
 
 // Points To:
-// p -> _p_1 , EXACT
+// p -> _p_1[0][0] , EXACT
 
 
    return 0;

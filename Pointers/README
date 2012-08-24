@@ -33,6 +33,50 @@ pointer_modif02: scalar pointers updated, interprocedural; effects required to o
 
 pointer_reference04: uses a pointer reference, such as p[3]
 
+problematique00: Fortran instrinsics used in C code
+
+problematique: effects computation for heap-allocated arrays
+
+ptr_to_array01, 02 and 03:
+
+ptr_to_field02:
+
+ptr_to_field:
+
+putchar01:
+
+puts01:
+
+pv_abort01, 02:
+
+pv_assign04: struct assignments
+
+pv_assign08:
+
+pv_conditional_operator02: conditional struct assigment
+
+pv_decl_with_init02:
+
+pv_dowhileloop02:
+
+pv_forloop02:
+
+pv_heap01:
+
+pv_heap02:
+
+pv_heap04:
+
+pv_heap05:
+
+pv_heap06:
+
+pv_intrinsic01:
+
+pv_local_var03:
+
+pv_loop02:
+
 statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
 
 static01: implicit initialization of static scalar pointer to NULL (C Standard)
