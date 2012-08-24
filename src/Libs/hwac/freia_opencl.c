@@ -272,10 +272,13 @@ static int opencl_compile_mergeable_dag(
     bool is_a_kernel = api->opencl.mergeable_kernel;
 
     // update for helper call arguments...
-    lparams = gen_nconc(lparams,
-      freia_extract_params(opid, call_arguments(c),
-                           helper, is_a_reduction? NULL: opencl, NULL, &nargs));
-
+    // kernel operations are specialized, so there is no need to pass it.
+    if (!is_a_kernel)
+    {
+      lparams = gen_nconc(lparams,
+        freia_extract_params(opid, call_arguments(c), helper,
+                             is_a_reduction? NULL: opencl, NULL, &nargs));
+    }
     // input image arguments
     list preds = dag_vertex_preds(d, v);
     int nao = 0;
