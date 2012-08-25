@@ -1021,7 +1021,8 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   expression a = subscript_array(s);
 
   /* FI: I'm in trouble. Logically, I want sinks, but in practice
-   * sources seem to give better results...
+   * sources seem to give better results... maybe because some
+   * evaluation are performed implictly.
    */
   list sources = expression_to_points_to_sources(a, in);
   // list sources = expression_to_points_to_sinks(a, in);

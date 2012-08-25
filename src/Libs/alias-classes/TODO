@@ -1,0 +1,13 @@
+Points to improve in points-to analysis
+
+No priority order.
+
+1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough its code looks dead wrong...)
+
+2. C subscript construct analysis: see fulguro04.c
+
+3. Convergence detection: current implementation no longer works as it used to
+
+4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list.
+
+5. Connexion with effects_with_points_to: improve the points-to precondition or use a more powerful function in effects_with_points_to()? Or both?
