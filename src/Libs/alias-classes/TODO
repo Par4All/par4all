@@ -10,4 +10,8 @@ No priority order.
 
 4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list.
 
+Done:
+
 5. Connexion with effects_with_points_to: improve the points-to precondition or use a more powerful function in effects_with_points_to()? Or both?
+
+-> I have enriched the points-to information (not sure yet it is enough)

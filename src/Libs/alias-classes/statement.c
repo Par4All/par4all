@@ -94,7 +94,42 @@ pt_map full_copy_pt_map(pt_map in)
   points_to_graph_bottom(out) = points_to_graph_bottom(in);
   return out;
 }
+
+/* The input points-to information of a statement is updated by the
+ * analysis of the statement because of the on-demand approach. The
+ * formal context with its stubs is built onloy when necessary. 
+ */
+static stack statement_points_to_context = stack_undefined;
 
+void init_statement_points_to_context()
+{
+  pips_assert("statement_points_to_context is undefined",
+	      stack_undefined_p(statement_points_to_context));
+  statement_points_to_context = stack_make(points_to_graph_domain, 0, 0);
+}
+
+void push_statement_points_to_context(pt_map in)
+{
+  stack_push((void *) in, statement_points_to_context);
+}
+
+void add_arc_to_statement_points_to_context(points_to pt)
+{
+  pt_map in =  stack_head(statement_points_to_context);
+  add_arc_to_pt_map(pt, in);
+}
+
+pt_map pop_statement_points_to_context(void)
+{
+  return (pt_map) stack_pop(statement_points_to_context);
+}
+
+void reset_statement_points_to_context()
+{
+  stack_free(&statement_points_to_context);
+  statement_points_to_context = stack_undefined;
+}
+
 /* See points_to_statement()
  *
  *
@@ -104,7 +139,6 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   pips_assert("pt_in is consistent", consistent_pt_map_p(pt_in));
   upgrade_approximations_in_points_to_set(pt_in);
   pt_map pt_out = new_pt_map();
-  //assign_pt_map(pt_out, pt_in);
   pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
   if(points_to_graph_bottom(pt_in)) {
@@ -116,6 +150,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   else {
 
     init_heap_model(s);
+    push_statement_points_to_context(pt_in);
 
     if(declaration_statement_p(s)) {
       /* Process the declarations */
@@ -130,6 +165,11 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     }
 
     pips_assert("pt_out is consistent", consistent_pt_map_p(pt_out));
+
+    /* Get the current version of pt_in, updated by the analysis of s. */
+    pt_in = pop_statement_points_to_context();
+
+    pips_assert("pt_in is consistent", consistent_pt_map_p(pt_in));
 
     reset_heap_model();
   }

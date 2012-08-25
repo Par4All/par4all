@@ -181,9 +181,15 @@ void reset_points_to_context()
   points_to_context = pt_map_undefined;
 }
 
+/* FI: it should rather work the other way round, with
+ * add_arc_to_statement_points_to_context() calling
+ * add_arc_to_points_to_context().
+ */
 void add_arc_to_points_to_context(points_to pt)
 {
   (void) add_arc_to_pt_map(pt, points_to_context);
+  points_to npt = copy_points_to(pt);
+  add_arc_to_statement_points_to_context(npt);
 }
 
 pt_map get_points_to_context()
@@ -214,6 +220,9 @@ static bool generic_points_to_analysis(char * module_name) {
                                                                   module_name, true));
   module_stat = get_current_module_statement();
   
+  /* Stack for on-demand update of in points-to information */
+  init_statement_points_to_context();
+
   /*
     Get the init_points_to_list resource.
     This list contains formal paramters and their stub sinks
@@ -281,6 +290,7 @@ static bool generic_points_to_analysis(char * module_name) {
 
   reset_pt_to_list();
   reset_points_to_context();
+  reset_statement_points_to_context();
   // FI: the depth of the free depends on pt_map
   // free_pt_map(pts_to_out);
   // free_pt_map(pt_in);
