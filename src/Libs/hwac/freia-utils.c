@@ -923,6 +923,34 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
   return same;
 }
 
+entity freia_create_helper_function(const string function_name, list lparams)
+{
+  // build helper entity
+  entity example = local_name_to_top_level_entity("freia_aipo_add");
+  pips_assert("example is a function", entity_function_p(example));
+  entity helper = make_empty_function(function_name,
+        copy_type(functional_result(type_functional(entity_type(example)))),
+                                      make_language_c());
+
+  // update type of parameters
+  list larg_params = NIL;
+  FOREACH(expression, e, lparams)
+  {
+    debug_on("RI_UTILS_DEBUG_LEVEL");
+    type t = expression_to_user_type(e);
+    debug_off();
+    larg_params = CONS(parameter,
+                       make_parameter(t,
+                                      make_mode_value(),
+                                      make_dummy_unknown()),
+                       larg_params);
+  }
+  larg_params = gen_nreverse(larg_params);
+  module_functional_parameters(helper) = larg_params;
+
+  return helper;
+}
+
 /* substitute those statement in ls that are in dag d and accelerated
  * by a call to function_name(lparams)
  * also update sets of remainings and global_remainings
@@ -944,7 +972,7 @@ int freia_substitute_by_helper_call(
   set global_remainings,
   set remainings,
   list /* of statement */ ls,
-  string function_name,
+  const string function_name,
   list lparams,
   set helpers,    // for signatures
   int preceeding) // statement which stored the previous insert, -1 for none
@@ -970,7 +998,7 @@ int freia_substitute_by_helper_call(
   set_difference(global_remainings, global_remainings, dones);
 
   // replace first statement of dones in ls,
-  // which comes after the preceeding ones
+  // which comes after the preceeding ones.
   statement found = NULL, sos = NULL;
   FOREACH(statement, sc, ls)
   {
@@ -997,30 +1025,9 @@ int freia_substitute_by_helper_call(
 
   pips_assert("some statement found", found);
 
-  // build helper entity
-  entity example = local_name_to_top_level_entity("freia_aipo_add");
-  pips_assert("example is a function", entity_function_p(example));
-  entity helper = make_empty_function(function_name,
-        copy_type(functional_result(type_functional(entity_type(example)))),
-                                      make_language_c());
-  // record helper function
+  // create and record helper function
+  entity helper = freia_create_helper_function(function_name, lparams);
   set_add_element(helpers, helpers, helper);
-
-  // update type of parameters
-  list larg_params = NIL;
-  FOREACH(expression, e, lparams)
-  {
-    debug_on("RI_UTILS_DEBUG_LEVEL");
-    type t = expression_to_user_type(e);
-    debug_off();
-    larg_params = CONS(parameter,
-                       make_parameter(t,
-                                      make_mode_value(),
-                                      make_dummy_unknown()),
-                       larg_params);
-  }
-  larg_params = gen_nreverse(larg_params);
-  module_functional_parameters(helper) = larg_params;
 
   // substitute by call to helper
   call c = make_call(helper, lparams);
