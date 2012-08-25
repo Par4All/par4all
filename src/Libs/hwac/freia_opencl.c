@@ -618,7 +618,7 @@ static void opencl_generate_special_kernel_ops(
 
   pips_assert("specialized function found", specialized!=entity_undefined);
   // directly call the function...
-  call c = statement_call(dagvtx_statement(v));
+  call c = freia_statement_to_call(dagvtx_statement(v));
   list largs = call_arguments(c);
   fprintf(stderr, "%s args: %d\n",
           entity_name(call_function(c)), (int) gen_length(largs));
