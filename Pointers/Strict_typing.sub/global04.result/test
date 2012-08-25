@@ -73,6 +73,8 @@ int main()
    i = 1;
 
 // Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_0 , MAY
 // q -> *NULL_POINTER* , EXACT
 
    *p = &i;

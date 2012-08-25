@@ -62,7 +62,11 @@ POINTS TO
 int formal_parameter05(my_struct *p)
 {
 
-// Points To: none
+// Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_2__1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
 
    my_struct s1 = *p;
 

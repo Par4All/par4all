@@ -28,7 +28,17 @@ POINTS TO for assignment14
 void assignment14(struct foo **tx, struct foo **ty)
 {
 
-// Points To: none
+// Points To:
+// _tx_1[0] -> *NULL_POINTER* , MAY
+// _tx_1[0] -> _tx_1_1[0][0] , MAY
+// _ty_2[0] -> *NULL_POINTER* , MAY
+// _ty_2[0] -> _ty_2_2[0][0] , MAY
+// _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
+// _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
+// tx -> *NULL_POINTER* , MAY
+// tx -> _tx_1[0] , MAY
+// ty -> *NULL_POINTER* , MAY
+// ty -> _ty_2[0] , MAY
 
    (**tx).ip1 = (**ty).ip2;
 

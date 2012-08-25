@@ -40,7 +40,13 @@ POINTS TO
 int formal_parameter02(int ***ppp)
 {
 
-// Points To: none
+// Points To:
+// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[0][0] -> _ppp_1_1_1[0][0][0] , MAY
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1[0] , MAY
 
    int *q = **ppp;
 

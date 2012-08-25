@@ -17,7 +17,9 @@ int properties04(int **q)
 
    int i;
 
-// Points To: none
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
 
 
    *q = &i;

@@ -52,6 +52,8 @@ void global08()
 
 // Points To:
 // p -> i , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_44[0] , MAY
 
    q->one = 1;
 

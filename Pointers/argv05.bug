@@ -1,4 +1,0 @@
-pips error in formal_source_to_sinks: (/home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/points_to_set.c:995) assertion failed
-
- 'The source type is a pointer type' not verified
-

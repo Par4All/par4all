@@ -17,7 +17,9 @@ int ptr_to_array01(int *(*p)[10])
 
    int a;
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0][0] , MAY
 
    (*p)[3] = &a;
 

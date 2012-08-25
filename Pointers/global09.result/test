@@ -15,13 +15,16 @@ POINTS TO
 int global09()
 {
 
-// Points To: none
+// Points To:
+// pa -> a[0] , EXACT
 
    int *p = pa;
 
 // Points To:
 // p -> a[0] , EXACT
 // pa -> a[0] , EXACT
+// qa -> *NULL_POINTER* , MAY
+// qa -> _qa_48[0] , MAY
 
    qa++;
 

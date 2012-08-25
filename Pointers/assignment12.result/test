@@ -20,7 +20,13 @@ POINTS TO for assignment12
 void assignment12(int **pp, int **qq)
 {
 
-// Points To: none
+// Points To:
+// _qq_2[0] -> *NULL_POINTER* , MAY
+// _qq_2[0] -> _qq_2_2[0][0] , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1[0] , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2[0] , MAY
 
    *pp = *qq;
 

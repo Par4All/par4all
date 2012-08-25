@@ -20,7 +20,11 @@ POINTS-TO
 int pointer_reference03(char **p)
 {
 
-// Points To: none
+// Points To:
+// _p_1[1] -> *NULL_POINTER* , MAY
+// _p_1[1] -> _p_1_1[1][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    char *q = p[1];
 
@@ -36,7 +40,9 @@ int pointer_reference03(char **p)
 
 // Points To:
 // _p_1[1] -> *NULL_POINTER* , MAY
+// _p_1[3] -> *NULL_POINTER* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
+// _p_1[3] -> _p_1_1[3][0] , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1[0] , MAY
 // q -> *NULL_POINTER* , MAY

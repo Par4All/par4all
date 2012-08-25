@@ -22,6 +22,8 @@ int inc01(int *pi)
    int i = 0;
 
 // Points To:
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    q = pi;

@@ -61,6 +61,8 @@ void dependence10(int flag, int *a)
    if (flag)
 
 // Points To:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_2[0] , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       p = a;

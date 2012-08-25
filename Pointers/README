@@ -5,6 +5,8 @@ conditional_01 : To treat assignement like x = cond? &i : y.
 
 formal_parameter00 : To illustrate the treatement of formal parameter. 
 
+fulguro04: subscript construct in a rhs
+
 if00, for00, while00, do_while : To illustrate points-to relations in control statements.
 
 inter04, 05, 06  and 07:

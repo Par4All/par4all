@@ -115,7 +115,9 @@ int main(void)
 void pointer_free(pointer p)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    free(p);
 

@@ -20,7 +20,11 @@ int main(int argc, char **argv)
 
    int i = 0;
 
-// Points To: none
+// Points To:
+// _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[0] -> _argv_2_2[0][0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
    char *s0 = *argv;
 

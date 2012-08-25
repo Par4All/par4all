@@ -12,7 +12,9 @@ POINTS-TO
 int array12(int *p, int *q)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    int b[*(q = p)];
 

@@ -28,7 +28,17 @@ POINTS TO for inter05
 void bar(int ***ppp, int ***qqq)
 {
 
-// Points To: none
+// Points To:
+// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[0] -> _qqq_2_2[0][0] , MAY
+// _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1[0] , MAY
+// qqq -> *NULL_POINTER* , MAY
+// qqq -> _qqq_2[0] , MAY
 
    **ppp = **qqq;
 

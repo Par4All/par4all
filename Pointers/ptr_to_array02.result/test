@@ -12,7 +12,9 @@ POINTS-TO
 int ptr_to_array01(int (*p)[10])
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0][0] , MAY
 
    (*p)[3] = 1;
 

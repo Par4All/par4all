@@ -23,6 +23,14 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    double *w = (void *) 0;
 
 // Points To:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_1[0] , MAY
+// b -> *NULL_POINTER* , MAY
+// b -> _b_2[0] , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _c_3[0] , MAY
+// cnt -> *NULL_POINTER* , MAY
+// cnt -> _cnt_5[0] , MAY
 // w -> *NULL_POINTER* , EXACT
 
    /* w is the workspace */

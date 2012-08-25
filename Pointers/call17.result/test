@@ -27,7 +27,9 @@ void call17(int *x)
 {
    /* check aliases */
 
-// Points To: none
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
 
    int *y = x;
 

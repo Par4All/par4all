@@ -20,7 +20,11 @@ POINTS TO for "main"
 void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 {
 
-// Points To: none
+// Points To:
+// a1 -> *NULL_POINTER* , MAY
+// a1 -> _a1_1[0] , MAY
+// pa2 -> *NULL_POINTER* , MAY
+// pa2 -> _pa2_2[0] , MAY
 
 
    *pa2 = a1;
@@ -30,6 +34,8 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 // _pa2_2[0] -> _a1_1[0] , MAY
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
+// b2 -> *NULL_POINTER* , MAY
+// b2 -> _b2_3[0] , MAY
 // pa2 -> _pa2_2[0] , EXACT
 
    (*pa2)->q = b2;

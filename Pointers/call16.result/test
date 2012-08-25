@@ -52,7 +52,13 @@ POINTS TO
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 
-// Points To: none
+// Points To:
+// _a -> *NULL_POINTER* , MAY
+// _a -> __a_2[0] , MAY
+// _b -> *NULL_POINTER* , MAY
+// _b -> __b_3[0] , MAY
+// _c -> *NULL_POINTER* , MAY
+// _c -> __c_4[0] , MAY
 
    _a[_i] = _b[_i]+_c[_i];
 

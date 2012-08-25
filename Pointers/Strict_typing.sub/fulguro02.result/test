@@ -254,19 +254,13 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 
    int j;
 
-// Points To: none
-
-   fgINT32 *psrc1 = (fgINT32 *) data1->array;
-
 // Points To:
 // _data1_2.array -> *NULL_POINTER* , MAY
 // _data1_2.array -> _data1_2_1__2 , EXACT
 // data1 -> *NULL_POINTER* , MAY
 // data1 -> _data1_2 , MAY
-// psrc1 -> *NULL_POINTER* , MAY
-// psrc1 -> _data1_2_1__2 , MAY
 
-   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
 
 // Points To:
 // _data1_2.array -> *NULL_POINTER* , MAY
@@ -277,6 +271,24 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 // data1 -> _data1_2 , MAY
 // data2 -> *NULL_POINTER* , MAY
 // data2 -> _data2_3 , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2 , MAY
+
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+// Points To:
+// _data1_2.array -> *NULL_POINTER* , MAY
+// _data1_2.array -> _data1_2_1__2 , EXACT
+// _data2_3.array -> *NULL_POINTER* , MAY
+// _data2_3.array -> _data2_3_1__3 , EXACT
+// _datdest_1.array -> *NULL_POINTER* , MAY
+// _datdest_1.array -> _datdest_1_1__1 , EXACT
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2 , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3 , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1 , MAY
 // psrc1 -> *NULL_POINTER* , MAY
 // psrc1 -> _data1_2_1__2 , MAY
 // psrc2 -> *NULL_POINTER* , MAY

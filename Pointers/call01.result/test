@@ -14,7 +14,9 @@ POINTS TO
 void call01(int *pi, tf_t *q)
 {
 
-// Points To: none
+// Points To:
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 
    *pi = 1;
 
@@ -27,6 +29,8 @@ void call01(int *pi, tf_t *q)
 
 // Points To:
 // pi -> _pi_1[1] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
 
    q->one = 1;
 

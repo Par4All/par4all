@@ -27,6 +27,10 @@ void exchange(int **p, int **q)
    int *r;
 
 // Points To:
+// _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[0] -> _p_1_1[0][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 // r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
@@ -35,7 +39,11 @@ void exchange(int **p, int **q)
 // Points To:
 // _p_1[0] -> *NULL_POINTER* , MAY
 // _p_1[0] -> _p_1_1[0][0] , MAY
+// _q_2[0] -> *NULL_POINTER* , MAY
+// _q_2[0] -> _q_2_2[0][0] , MAY
 // p -> _p_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
 // r -> *NULL_POINTER* , MAY
 // r -> _p_1_1[0][0] , MAY
 

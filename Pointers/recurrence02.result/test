@@ -34,11 +34,15 @@ void recurrence02(list l)
 
    int i = 0;
 
-// Points To: none
+// Points To:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
 
    l->content = &i;
 
 // Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // _l_1[0].content -> i , EXACT
 // l -> _l_1[0] , EXACT
 
@@ -48,6 +52,8 @@ void recurrence02(list l)
 // _l_1[0].next -> *NULL_POINTER* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // _l_1[0].content -> i , EXACT
+// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
 // _l_1_2__1[0][0].content -> i , EXACT
 // l -> _l_1[0] , EXACT
 
@@ -60,6 +66,9 @@ void recurrence02(list l)
 // _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
 // _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
 // _l_1_2__1[0][0].content -> i , EXACT
+// _l_1_2__1_2__1[0][0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1_2__1_2__1[0][0][0][0]
+//     , MAY
 // _l_1_2__1_2__1[0][0][0].content -> i , EXACT
 // l -> _l_1[0] , EXACT
 

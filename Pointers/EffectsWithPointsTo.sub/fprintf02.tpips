@@ -1,0 +1,25 @@
+setenv WS=fprintf02
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo 
+echo PROPER EFFECTS WITH POINTS-TO
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+close
+delete $WS
+quit

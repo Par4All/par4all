@@ -91,6 +91,8 @@ int formal_parameter01(int **pi)
 
 // Points To:
 // i -> *NULL_POINTER* , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = pi;

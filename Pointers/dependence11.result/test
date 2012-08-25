@@ -56,10 +56,14 @@ void dependence11(struct my_struct *s)
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *NULL_POINTER* , MAY
+// s -> _s_1[0] , MAY
 
    a = s->a;
 
 // Points To:
+// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
 // b -> *ANY_MODULE*:*NOWHERE* , EXACT
 // s -> _s_1[0] , EXACT

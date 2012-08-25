@@ -16,7 +16,9 @@ void properties03(int n, int *p)
 
    int i;
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
 
    int *q = p+i;
 

@@ -61,7 +61,9 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 
    static char buffer[2000];
 
-// Points To: none
+// Points To:
+// my_fputc -> *NULL_POINTER* , MAY
+// my_fputc -> _my_fputc_2 , MAY
 
 
    if (!my_fputc)

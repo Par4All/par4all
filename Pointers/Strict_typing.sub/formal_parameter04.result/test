@@ -71,7 +71,9 @@ POINTS TO
 int formal_parameter04(my_struct *p)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
 
    (p->one)[0] = 0;
 
@@ -91,6 +93,12 @@ int formal_parameter04(my_struct *p)
    (p->two->two->two->one)[0] = 0;
 
 // Points To:
+// _p_1.two -> *NULL_POINTER* , MAY
+// _p_1.two -> _p_1_2__1 , EXACT
+// _p_1_2__1.two -> *NULL_POINTER* , MAY
+// _p_1_2__1.two -> _p_1_2__1_2__1 , EXACT
+// _p_1_2__1_2__1.two -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.two -> _p_1_2__1_2__1_2__1 , EXACT
 // p -> _p_1 , EXACT
 
    p->two->two->two->two = 0;

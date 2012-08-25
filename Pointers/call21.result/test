@@ -219,7 +219,13 @@ int main(void)
 void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
 
-// Points To: none
+// Points To:
+// q1 -> *NULL_POINTER* , MAY
+// q1 -> _q1_1[0] , MAY
+// q2 -> *NULL_POINTER* , MAY
+// q2 -> _q2_2[0] , MAY
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
 
    *q1 = *q2+*q3;
 
@@ -241,7 +247,9 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 void pointer_free(pointer p)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    free(p);
 
@@ -278,7 +286,9 @@ int pointer_get(const pointer p)
 void pointer_set(pointer p, int v)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    *p = v;
 

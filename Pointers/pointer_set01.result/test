@@ -12,7 +12,9 @@ POINTS-TO
 void pointer_set(pointer p, int v)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    *p = v;
 

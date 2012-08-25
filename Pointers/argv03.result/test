@@ -16,7 +16,11 @@ POINTS-TO
 int argv03(int argc, char *(*argv)[argc])
 {
 
-// Points To: none
+// Points To:
+// _argv_2[1][0] -> *NULL_POINTER* , MAY
+// _argv_2[1][0] -> _argv_2_2[1][0][0] , MAY
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0][0] , MAY
 
    char *p = (*argv)[1];
 

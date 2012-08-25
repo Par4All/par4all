@@ -250,6 +250,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
 
    
    //width  = atoi(readitem(file, buffer));
@@ -263,6 +265,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
 // nrl -> _nrl_2[0] , EXACT
 
    *nrh = height-1;
@@ -272,6 +276,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
 // nrh -> _nrh_3[0] , EXACT
 // nrl -> _nrl_2[0] , EXACT
 
@@ -282,6 +288,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // file -> *NULL_POINTER* , MAY
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
 // ncl -> _ncl_4[0] , EXACT
 // nrh -> _nrh_3[0] , EXACT
 // nrl -> _nrl_2[0] , EXACT
@@ -372,7 +380,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
 
-// Points To: none
+// Points To:
+// line -> *NULL_POINTER* , MAY
+// line -> _line_3[0] , MAY
 
    fread(&line[0], sizeof(byte), width, file);
 }

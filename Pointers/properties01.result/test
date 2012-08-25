@@ -21,6 +21,8 @@ void properties01(int n, int *p)
    int *q = &i;
 
 // Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
 // q -> i , EXACT
 
    p!=0?(void) 0:__assert_fail("p!=0", "./properties01.c", 12, (const char *) 0);

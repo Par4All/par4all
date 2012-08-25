@@ -89,7 +89,9 @@ POINTS TO for "count"
 int count(list *p)
 {
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
 
    list *q = p;
 

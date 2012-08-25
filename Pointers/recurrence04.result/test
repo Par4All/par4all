@@ -16,7 +16,11 @@ POINTS TO for "recurrence04"
 void recurrence04(list l, list m)
 {
 
-// Points To: none
+// Points To:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// m -> *NULL_POINTER* , MAY
+// m -> _m_2[0] , MAY
 
    l->next = m;
 
