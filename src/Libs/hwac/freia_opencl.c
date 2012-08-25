@@ -103,6 +103,7 @@ static string opencl_type(string t)
 
 /* @brief perform OpenCL compilation on mergeable dag
    the generated code relies on some freia-provided runtime
+   may be called on a one vertex dag for kernel operations
 */
 static int opencl_compile_mergeable_dag(
   string module,
@@ -513,23 +514,27 @@ static int opencl_compile_mergeable_dag(
          "  return err;\n"
          "}\n");
 
-  // cleanup compiled statements
-  FOREACH(dagvtx, v, dag_vertices(d))
+  if (ls)
   {
-    pstatement ps = vtxcontent_source(dagvtx_content(v));
-    if (pstatement_statement_p(ps))
-      hwac_kill_statement(pstatement_statement(ps));
+    // cleanup compiled statements
+    FOREACH(dagvtx, v, dag_vertices(d))
+    {
+      pstatement ps = vtxcontent_source(dagvtx_content(v));
+      if (pstatement_statement_p(ps))
+        hwac_kill_statement(pstatement_statement(ps));
+    }
+
+    // handle function image arguments
+    freia_add_image_arguments(limg, &lparams);
+
+    // - and substitute its call...
+    stnb = freia_substitute_by_helper_call(NULL, global_remainings, remainings,
+                                          ls, cut_name, lparams, helpers, stnb);
+
+    hash_put(signatures, local_name_to_top_level_entity(cut_name),
+             (void*) (_int) n_outs);
   }
-
-  // handle function image arguments
-  freia_add_image_arguments(limg, &lparams);
-
-  // - and substitute its call...
-  stnb = freia_substitute_by_helper_call(NULL, global_remainings, remainings,
-                                         ls, cut_name, lparams, helpers, stnb);
-
-  hash_put(signatures, local_name_to_top_level_entity(cut_name),
-           (void*) (_int) n_outs);
+  // else it is not subtituded
 
   // actual printing...
   string_buffer_to_file(compile, helper_file);
@@ -553,6 +558,77 @@ static int opencl_compile_mergeable_dag(
   free(cut_name);
 
   return stnb;
+}
+
+/* call and generate if necessary a specialized kernel, if possible
+ * the statement is bluntly modified "in place".
+ */
+static void opencl_generate_special_kernel_ops(
+  string module, dagvtx v, hash_table signatures,
+  FILE * helper_file, FILE * opencl_file)
+{
+  pips_debug(5, "considering statement %"_intFMT"\n", dagvtx_number(v));
+  const freia_api_t * api = get_freia_api_vtx(v);
+  intptr_t k00, k01, k02, k10, k11, k12, k20, k21, k22;
+  if (!api ||
+      !api->opencl.mergeable_kernel ||
+      !freia_extract_kernel_vtx(v, true, &k00, &k01, &k02,
+                                &k10, &k11, &k12, &k20, &k21, &k22))
+    // do nothing
+    return;
+
+  // build an id number for this specialized version
+  int number = (k00<<8) + (k01<<7) + (k02<<6) +
+               (k10<<5) + (k11<<4) + (k12<<3) +
+               (k20<<2) + (k21<<1) + k22;
+  pips_assert("non-zero kernel!", number);
+
+  // main_opencl_helper_<E8,D8,con>
+  string prefix = strdup(cat(module, "_opencl_helper_", api->compact_name));
+  // main_opencl_helper_E8_<0..511>
+  string func_name = strdup(cat(prefix, "_", itoa(number)));
+
+  entity specialized = local_name_to_top_level_entity(func_name);
+  if (specialized == entity_undefined)
+  {
+    pips_debug(5, "generating %s\n", func_name);
+
+    // we need to create the function
+    dag one = make_dag(NIL, NIL, NIL);
+    dagvtx vop = copy_dagvtx_norec(v);
+    dag_append_vertex(one, vop);
+    dag_outputs(one) = CONS(dagvtx, vop, NIL);
+    //dag_compute_outputs(one, NULL, output_images, NIL, false);
+    //dag_cleanup_other_statements(nd);
+
+    // we just generate the function
+    opencl_compile_mergeable_dag(module, one, NIL, prefix, number, NULL, NULL,
+                                 helper_file, opencl_file, NULL, 0);
+
+    // then create it... function name must be consistent with
+    // what is done within previous function
+    specialized = freia_create_helper_function(func_name, NIL);
+
+    // record #outs for this helper, needed for cleaning
+    hash_put(signatures, specialized, (void*) (_int) 1);
+
+    // cleanup
+    free_dag(one);
+  }
+
+  pips_assert("specialized function found", specialized!=entity_undefined);
+  // directly call the function...
+  call c = statement_call(dagvtx_statement(v));
+  list largs = call_arguments(c);
+  fprintf(stderr, "%s args: %d\n",
+          entity_name(call_function(c)), (int) gen_length(largs));
+
+  // NOTE: this is not true for convolution...
+  pips_assert("3 arguments to function", gen_length(largs)==3);
+  call_function(c) = specialized;
+  list third = CDR(CDR(largs));
+  CDR(CDR(largs)) = NIL;
+  gen_full_free_list(third);
 }
 
 /* extract subdags of merged operations and compile them
@@ -613,7 +689,9 @@ static void opencl_merge_and_compile(
     bool
       merge_reductions = get_bool_property("HWAC_OPENCL_MERGE_REDUCTIONS"),
       merge_kernels = get_bool_property("HWAC_OPENCL_MERGE_KERNEL_OPERATIONS"),
-      compile_one_op = get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION");
+      compile_one_op = get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION"),
+      generate_specialized_kernel =
+        get_bool_property("HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS");
     // hand manage reductions on one image only
     entity reduced = NULL;
 
@@ -796,6 +874,13 @@ static void opencl_merge_and_compile(
       }
       freia_migrate_statements(sq, stats, dones);
       set_union(dones, dones, stats);
+
+      if (generate_specialized_kernel)
+      {
+        FOREACH(dagvtx, v, lnonmergeable)
+          opencl_generate_special_kernel_ops(module, v, signatures,
+                                             helper_file, opencl);
+      }
 
       // cleanup initial dag??
       FOREACH(dagvtx, v, lnonmergeable)
