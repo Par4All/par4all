@@ -620,8 +620,8 @@ static void opencl_generate_special_kernel_ops(
   // directly call the function...
   call c = freia_statement_to_call(dagvtx_statement(v));
   list largs = call_arguments(c);
-  fprintf(stderr, "%s args: %d\n",
-          entity_name(call_function(c)), (int) gen_length(largs));
+  // fprintf(stderr, "%s args: %d\n",
+  // entity_name(call_function(c)), (int) gen_length(largs));
 
   // NOTE: this is not true for convolution...
   pips_assert("3 arguments to function", gen_length(largs)==3);
