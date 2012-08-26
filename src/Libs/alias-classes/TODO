@@ -10,9 +10,6 @@ No priority order.
 
 4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list.
 
-6. Be able to dereference constant pointers, a.k.a. arrays. See
-Pointers/array03.c, function foo2. Build a smaller test case.
-
 7. EffectsWithPointsTo: the fully subscripted sources and sinks
 require index substitution in EffectsWithPointsTo, or the parallelism
 detection is lost; also it is not clear if you want to preserver x[j]
@@ -47,8 +44,15 @@ account an implicit dimension.
 15. EffectsWithPointsTo: differences from global02 to varargs04 to be
 looked at.
 
+Next item will be 16.
+
 Done:
 
 5. Connexion with effects_with_points_to: improve the points-to precondition or use a more powerful function in effects_with_points_to()? Or both?
 
 -> I have enriched the points-to information (not sure yet it is enough)
+
+6. Be able to dereference constant pointers, a.k.a. arrays. See
+Pointers/array03.c, function foo2. Build a smaller test case.
+
+-> new test case array14.c

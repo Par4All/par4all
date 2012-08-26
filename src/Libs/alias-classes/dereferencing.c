@@ -88,34 +88,6 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
   // FI: we cannot use expression_to_points_to_sources or sinks
   // because side effects are taken into acount each time they are
   // called.
-#if 0
-  list sources = expression_to_points_to_sources(p, in);
-  if(gen_length(sources)==1
-     && !nowhere_dereferencing_p
-     && !null_dereferencing_p) {
-    list sinks = expression_to_points_to_sinks(p, in);
-    cell source = CELL(CAR(sources));
-    int n = (int) gen_length(sinks);
-    FOREACH(CELL, sink, sinks) {
-      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
-      }
-      if(!null_dereferencing_p && null_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
-      }
-    }
-    if(n==0) {
-      clear_pt_map(in);
-      points_to_graph_bottom(in) = true;
-    }
-  }
-  else {
-      /* The issue will/might be taken care of later... */
-      ;
-  }
-#endif
   if(!nowhere_dereferencing_p && !null_dereferencing_p) {
     syntax s = expression_syntax(p);
     tag t = syntax_tag(s);
@@ -134,8 +106,11 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       break;
     }
     case is_syntax_call: {
+      // FI: you do not want to apply side-effects twice...
       //call c = syntax_call(s);
-      //out = call_to_points_to(c, in);
+      //list al = call_arguments(c);
+      //in = expressions_to_points_to(al, in);
+      //in = call_to_points_to(c, in);
       break;
     }
     case is_syntax_cast: {
@@ -192,7 +167,7 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
 }
 
 /* see if a points_to_reference includes a pointer dereferencing: this is impossible if the points-to reference is consistent. It must be a constant path. */
-bool pointer_points_to_reference_p(reference r)
+bool pointer_points_to_reference_p(reference r __attribute__ ((unused)))
 {
   return false;
 }
@@ -232,31 +207,36 @@ pt_map reference_dereferencing_to_points_to(reference r,
 	  && (int) gen_length(sl)>variable_dimension_number(type_variable(t))) {
     pointer_reference_dereferencing_to_points_to(r, in);
   }
+  else if(array_type_p(t) && !array_of_pointers_type_p(t)) {
+    /* C syntactic sugar: *a is equivalent to a[0] when a is an
+       array. No real dereferencing needed. */
+    ;
+  }
   else {
-  reference nr = copy_reference(r);
-  cell source = make_cell_reference(nr);
-  /* Remove store-dependent indices */
-  reference_indices(nr) =
-    subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
-  list sinks = source_to_sinks(source, in, false);
-  int n = (int) gen_length(sinks);
-  FOREACH(CELL, sink, sinks) {
-    if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
-      remove_points_to_arcs(source, sink, in);
-      n--;
+    reference nr = copy_reference(r);
+    cell source = make_cell_reference(nr);
+    /* Remove store-dependent indices */
+    reference_indices(nr) =
+      subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
+    list sinks = source_to_sinks(source, in, false);
+    int n = (int) gen_length(sinks);
+    FOREACH(CELL, sink, sinks) {
+      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
+	remove_points_to_arcs(source, sink, in);
+	n--;
+      }
+      if(!null_dereferencing_p && null_cell_p(sink)) {
+	remove_points_to_arcs(source, sink, in);
+	n--;
+      }
     }
-    if(!null_dereferencing_p && null_cell_p(sink)) {
-      remove_points_to_arcs(source, sink, in);
-      n--;
+    if(n==0) {
+      clear_pt_map(in);
+      points_to_graph_bottom(in) = true;
+      pips_user_warning("Null or undefined pointer may be dereferenced.\n");
     }
-  }
-  if(n==0) {
-    clear_pt_map(in);
-    points_to_graph_bottom(in) = true;
-    pips_user_warning("Null or undefined pointer may be dereferenced.\n");
-  }
 
-  gen_free_list(sinks);
+    gen_free_list(sinks);
   }
   return in;
 }
