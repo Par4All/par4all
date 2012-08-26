@@ -595,15 +595,14 @@ static freia_status border_nse_opencl_helper_E8_219_compile(void)
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
+    "    // W not needed\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = PIXEL_MIN;\n"
+    "    PIXEL t8 = in0;\n"
     "    t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
     "    t8 = PIXEL_SUP(t8, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
-    "    t8 = PIXEL_SUP(t8, in0);\n"
     "    t8 = PIXEL_SUP(t8, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    t8 = PIXEL_SUP(t8, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
     "    t8 = PIXEL_SUP(t8, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
@@ -673,15 +672,14 @@ KERNEL void border_nse_opencl_helper_E8_219(
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
+    // W not needed
     int is_E = (i==(width-1));
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t8 = PIXEL_MIN;
+    PIXEL t8 = in0;
     t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);
     t8 = PIXEL_SUP(t8, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
-    t8 = PIXEL_SUP(t8, in0);
     t8 = PIXEL_SUP(t8, (is_E)? PIXEL_MIN: j0[i+1]);
     t8 = PIXEL_SUP(t8, (is_S)? PIXEL_MIN: j0[i+pitch]);
     t8 = PIXEL_SUP(t8, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);

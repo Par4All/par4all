@@ -6674,8 +6674,8 @@ static freia_status license_plate_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -6687,13 +6687,11 @@ static freia_status license_plate_opencl_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t53 = PIXEL_MIN;\n"
+    "    PIXEL t53 = in0;\n"
     "    t53 = PIXEL_SUP(t53, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t53 = PIXEL_SUP(t53, in0);\n"
     "    t53 = PIXEL_SUP(t53, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    PIXEL t89 = PIXEL_MAX;\n"
+    "    PIXEL t89 = in0;\n"
     "    t89 = PIXEL_INF(t89, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t89 = PIXEL_INF(t89, in0);\n"
     "    t89 = PIXEL_INF(t89, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t53;\n"
@@ -6761,8 +6759,8 @@ static freia_status license_plate_opencl_helper_D8_56_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -6774,9 +6772,8 @@ static freia_status license_plate_opencl_helper_D8_56_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t83 = PIXEL_MAX;\n"
+    "    PIXEL t83 = in0;\n"
     "    t83 = PIXEL_INF(t83, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t83 = PIXEL_INF(t83, in0);\n"
     "    t83 = PIXEL_INF(t83, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t83;\n"
@@ -6842,8 +6839,8 @@ static freia_status license_plate_opencl_helper_E8_56_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -6855,9 +6852,8 @@ static freia_status license_plate_opencl_helper_E8_56_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t67 = PIXEL_MIN;\n"
+    "    PIXEL t67 = in0;\n"
     "    t67 = PIXEL_SUP(t67, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t67 = PIXEL_SUP(t67, in0);\n"
     "    t67 = PIXEL_SUP(t67, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t67;\n"
@@ -6932,8 +6928,8 @@ static freia_status license_plate_opencl_helper_0_0_2_compile(void)
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -6946,13 +6942,11 @@ static freia_status license_plate_opencl_helper_0_0_2_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t106 = PIXEL_MIN;\n"
+    "    PIXEL t106 = in0;\n"
     "    t106 = PIXEL_SUP(t106, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t106 = PIXEL_SUP(t106, in0);\n"
     "    t106 = PIXEL_SUP(t106, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    PIXEL t84 = PIXEL_MAX;\n"
+    "    PIXEL t84 = in1;\n"
     "    t84 = PIXEL_INF(t84, (is_W)? PIXEL_MAX: j1[i-1]);\n"
-    "    t84 = PIXEL_INF(t84, in1);\n"
     "    t84 = PIXEL_INF(t84, (is_E)? PIXEL_MAX: j1[i+1]);\n"
     "    PIXEL t112 = PIXEL_THRESHOLD(t84, c0, c1, c2);\n"
     "    PIXEL t113 = PIXEL_THRESHOLD(t106, c3, c4, c5);\n"
@@ -7041,12 +7035,11 @@ static freia_status license_plate_opencl_helper_D8_511_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t146 = PIXEL_MAX;\n"
+    "    PIXEL t146 = in0;\n"
     "    t146 = PIXEL_INF(t146, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t146 = PIXEL_INF(t146, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t146 = PIXEL_INF(t146, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t146 = PIXEL_INF(t146, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t146 = PIXEL_INF(t146, in0);\n"
     "    t146 = PIXEL_INF(t146, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t146 = PIXEL_INF(t146, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t146 = PIXEL_INF(t146, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -7123,14 +7116,13 @@ static freia_status license_plate_opencl_helper_D8_146_compile(void)
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t126 = PIXEL_MAX;\n"
+    "    PIXEL t126 = in0;\n"
     "    t126 = PIXEL_INF(t126, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t126 = PIXEL_INF(t126, in0);\n"
     "    t126 = PIXEL_INF(t126, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
     "    // set output pixels\n"
     "    p0[i] = t126;\n"
@@ -7204,14 +7196,13 @@ static freia_status license_plate_opencl_helper_E8_146_compile(void)
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t120 = PIXEL_MIN;\n"
+    "    PIXEL t120 = in0;\n"
     "    t120 = PIXEL_SUP(t120, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t120 = PIXEL_SUP(t120, in0);\n"
     "    t120 = PIXEL_SUP(t120, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
     "    // set output pixels\n"
     "    p0[i] = t120;\n"
@@ -7294,12 +7285,11 @@ static freia_status license_plate_opencl_helper_0_0_4_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t147 = PIXEL_MAX;\n"
+    "    PIXEL t147 = in1;\n"
     "    t147 = PIXEL_INF(t147, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);\n"
     "    t147 = PIXEL_INF(t147, (is_N)? PIXEL_MAX: j1[i-pitch]);\n"
     "    t147 = PIXEL_INF(t147, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);\n"
     "    t147 = PIXEL_INF(t147, (is_W)? PIXEL_MAX: j1[i-1]);\n"
-    "    t147 = PIXEL_INF(t147, in1);\n"
     "    t147 = PIXEL_INF(t147, (is_E)? PIXEL_MAX: j1[i+1]);\n"
     "    t147 = PIXEL_INF(t147, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);\n"
     "    t147 = PIXEL_INF(t147, (is_S)? PIXEL_MAX: j1[i+pitch]);\n"
@@ -7367,8 +7357,8 @@ KERNEL void license_plate_opencl_helper_0_0_0(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -7380,13 +7370,11 @@ KERNEL void license_plate_opencl_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t53 = PIXEL_MIN;
+    PIXEL t53 = in0;
     t53 = PIXEL_SUP(t53, (is_W)? PIXEL_MIN: j0[i-1]);
-    t53 = PIXEL_SUP(t53, in0);
     t53 = PIXEL_SUP(t53, (is_E)? PIXEL_MIN: j0[i+1]);
-    PIXEL t89 = PIXEL_MAX;
+    PIXEL t89 = in0;
     t89 = PIXEL_INF(t89, (is_W)? PIXEL_MAX: j0[i-1]);
-    t89 = PIXEL_INF(t89, in0);
     t89 = PIXEL_INF(t89, (is_E)? PIXEL_MAX: j0[i+1]);
     // set output pixels
     p0[i] = t53;
@@ -7412,8 +7400,8 @@ KERNEL void license_plate_opencl_helper_D8_56(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -7425,9 +7413,8 @@ KERNEL void license_plate_opencl_helper_D8_56(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t83 = PIXEL_MAX;
+    PIXEL t83 = in0;
     t83 = PIXEL_INF(t83, (is_W)? PIXEL_MAX: j0[i-1]);
-    t83 = PIXEL_INF(t83, in0);
     t83 = PIXEL_INF(t83, (is_E)? PIXEL_MAX: j0[i+1]);
     // set output pixels
     p0[i] = t83;
@@ -7452,8 +7439,8 @@ KERNEL void license_plate_opencl_helper_E8_56(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -7465,9 +7452,8 @@ KERNEL void license_plate_opencl_helper_E8_56(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t67 = PIXEL_MIN;
+    PIXEL t67 = in0;
     t67 = PIXEL_SUP(t67, (is_W)? PIXEL_MIN: j0[i-1]);
-    t67 = PIXEL_SUP(t67, in0);
     t67 = PIXEL_SUP(t67, (is_E)? PIXEL_MIN: j0[i+1]);
     // set output pixels
     p0[i] = t67;
@@ -7501,8 +7487,8 @@ KERNEL void license_plate_opencl_helper_0_0_2(
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -7515,13 +7501,11 @@ KERNEL void license_plate_opencl_helper_0_0_2(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t106 = PIXEL_MIN;
+    PIXEL t106 = in0;
     t106 = PIXEL_SUP(t106, (is_W)? PIXEL_MIN: j0[i-1]);
-    t106 = PIXEL_SUP(t106, in0);
     t106 = PIXEL_SUP(t106, (is_E)? PIXEL_MIN: j0[i+1]);
-    PIXEL t84 = PIXEL_MAX;
+    PIXEL t84 = in1;
     t84 = PIXEL_INF(t84, (is_W)? PIXEL_MAX: j1[i-1]);
-    t84 = PIXEL_INF(t84, in1);
     t84 = PIXEL_INF(t84, (is_E)? PIXEL_MAX: j1[i+1]);
     PIXEL t112 = PIXEL_THRESHOLD(t84, c0, c1, c2);
     PIXEL t113 = PIXEL_THRESHOLD(t106, c3, c4, c5);
@@ -7562,12 +7546,11 @@ KERNEL void license_plate_opencl_helper_D8_511(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t146 = PIXEL_MAX;
+    PIXEL t146 = in0;
     t146 = PIXEL_INF(t146, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t146 = PIXEL_INF(t146, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t146 = PIXEL_INF(t146, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t146 = PIXEL_INF(t146, (is_W)? PIXEL_MAX: j0[i-1]);
-    t146 = PIXEL_INF(t146, in0);
     t146 = PIXEL_INF(t146, (is_E)? PIXEL_MAX: j0[i+1]);
     t146 = PIXEL_INF(t146, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t146 = PIXEL_INF(t146, (is_S)? PIXEL_MAX: j0[i+pitch]);
@@ -7603,14 +7586,13 @@ KERNEL void license_plate_opencl_helper_D8_146(
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // W not needed
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t126 = PIXEL_MAX;
+    PIXEL t126 = in0;
     t126 = PIXEL_INF(t126, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t126 = PIXEL_INF(t126, in0);
     t126 = PIXEL_INF(t126, (is_S)? PIXEL_MAX: j0[i+pitch]);
     // set output pixels
     p0[i] = t126;
@@ -7643,14 +7625,13 @@ KERNEL void license_plate_opencl_helper_E8_146(
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // W not needed
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t120 = PIXEL_MIN;
+    PIXEL t120 = in0;
     t120 = PIXEL_SUP(t120, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t120 = PIXEL_SUP(t120, in0);
     t120 = PIXEL_SUP(t120, (is_S)? PIXEL_MIN: j0[i+pitch]);
     // set output pixels
     p0[i] = t120;
@@ -7692,12 +7673,11 @@ KERNEL void license_plate_opencl_helper_0_0_4(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t147 = PIXEL_MAX;
+    PIXEL t147 = in1;
     t147 = PIXEL_INF(t147, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);
     t147 = PIXEL_INF(t147, (is_N)? PIXEL_MAX: j1[i-pitch]);
     t147 = PIXEL_INF(t147, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);
     t147 = PIXEL_INF(t147, (is_W)? PIXEL_MAX: j1[i-1]);
-    t147 = PIXEL_INF(t147, in1);
     t147 = PIXEL_INF(t147, (is_E)? PIXEL_MAX: j1[i+1]);
     t147 = PIXEL_INF(t147, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);
     t147 = PIXEL_INF(t147, (is_S)? PIXEL_MAX: j1[i+pitch]);

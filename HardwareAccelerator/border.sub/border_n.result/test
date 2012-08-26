@@ -588,21 +588,20 @@ static freia_status border_n_opencl_helper_E8_144_compile(void)
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
     "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = PIXEL_MIN;\n"
+    "    PIXEL t8 = in0;\n"
     "    t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t8 = PIXEL_SUP(t8, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
     "  }\n"
@@ -662,21 +661,20 @@ KERNEL void border_n_opencl_helper_E8_144(
 
   // detect N & S boundaries (assuming one thread per row)
   int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // S not needed
 
   // thread's pixel loop
   int i;
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // W not needed
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t8 = PIXEL_MIN;
+    PIXEL t8 = in0;
     t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t8 = PIXEL_SUP(t8, in0);
     // set output pixels
     p0[i] = t8;
   }

@@ -1113,12 +1113,11 @@ static freia_status freia_scalar_08_opencl_helper_D8_511_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t38 = PIXEL_MAX;\n"
+    "    PIXEL t38 = in0;\n"
     "    t38 = PIXEL_INF(t38, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t38 = PIXEL_INF(t38, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t38 = PIXEL_INF(t38, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t38 = PIXEL_INF(t38, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t38 = PIXEL_INF(t38, in0);\n"
     "    t38 = PIXEL_INF(t38, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t38 = PIXEL_INF(t38, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t38 = PIXEL_INF(t38, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -1194,12 +1193,11 @@ KERNEL void freia_scalar_08_opencl_helper_D8_511(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t38 = PIXEL_MAX;
+    PIXEL t38 = in0;
     t38 = PIXEL_INF(t38, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t38 = PIXEL_INF(t38, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t38 = PIXEL_INF(t38, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t38 = PIXEL_INF(t38, (is_W)? PIXEL_MAX: j0[i-1]);
-    t38 = PIXEL_INF(t38, in0);
     t38 = PIXEL_INF(t38, (is_E)? PIXEL_MAX: j0[i+1]);
     t38 = PIXEL_INF(t38, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t38 = PIXEL_INF(t38, (is_S)? PIXEL_MAX: j0[i+pitch]);

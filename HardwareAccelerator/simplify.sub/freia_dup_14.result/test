@@ -1121,8 +1121,8 @@ static freia_status freia_dup_14_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -1134,13 +1134,11 @@ static freia_status freia_dup_14_opencl_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t38 = PIXEL_MIN;\n"
+    "    PIXEL t38 = in0;\n"
     "    t38 = PIXEL_SUP(t38, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t38 = PIXEL_SUP(t38, in0);\n"
     "    t38 = PIXEL_SUP(t38, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    PIXEL t45 = PIXEL_MAX;\n"
+    "    PIXEL t45 = in0;\n"
     "    t45 = PIXEL_INF(t45, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t45 = PIXEL_INF(t45, in0);\n"
     "    t45 = PIXEL_INF(t45, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    PIXEL t49 = PIXEL_AND(t38, t45);\n"
     "    // set output pixels\n"
@@ -1201,8 +1199,8 @@ KERNEL void freia_dup_14_opencl_helper_0_0_0(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -1214,13 +1212,11 @@ KERNEL void freia_dup_14_opencl_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t38 = PIXEL_MIN;
+    PIXEL t38 = in0;
     t38 = PIXEL_SUP(t38, (is_W)? PIXEL_MIN: j0[i-1]);
-    t38 = PIXEL_SUP(t38, in0);
     t38 = PIXEL_SUP(t38, (is_E)? PIXEL_MIN: j0[i+1]);
-    PIXEL t45 = PIXEL_MAX;
+    PIXEL t45 = in0;
     t45 = PIXEL_INF(t45, (is_W)? PIXEL_MAX: j0[i-1]);
-    t45 = PIXEL_INF(t45, in0);
     t45 = PIXEL_INF(t45, (is_E)? PIXEL_MAX: j0[i+1]);
     PIXEL t49 = PIXEL_AND(t38, t45);
     // set output pixels

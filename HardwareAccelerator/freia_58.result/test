@@ -2204,12 +2204,11 @@ static freia_status freia_58_opencl_helper_1_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t10 = PIXEL_MAX;\n"
+    "    PIXEL t10 = in1;\n"
     "    t10 = PIXEL_INF(t10, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);\n"
     "    t10 = PIXEL_INF(t10, (is_N)? PIXEL_MAX: j1[i-pitch]);\n"
     "    t10 = PIXEL_INF(t10, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);\n"
     "    t10 = PIXEL_INF(t10, (is_W)? PIXEL_MAX: j1[i-1]);\n"
-    "    t10 = PIXEL_INF(t10, in1);\n"
     "    t10 = PIXEL_INF(t10, (is_E)? PIXEL_MAX: j1[i+1]);\n"
     "    t10 = PIXEL_INF(t10, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);\n"
     "    t10 = PIXEL_INF(t10, (is_S)? PIXEL_MAX: j1[i+pitch]);\n"
@@ -2310,12 +2309,11 @@ KERNEL void freia_58_opencl_helper_1_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t10 = PIXEL_MAX;
+    PIXEL t10 = in1;
     t10 = PIXEL_INF(t10, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);
     t10 = PIXEL_INF(t10, (is_N)? PIXEL_MAX: j1[i-pitch]);
     t10 = PIXEL_INF(t10, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);
     t10 = PIXEL_INF(t10, (is_W)? PIXEL_MAX: j1[i-1]);
-    t10 = PIXEL_INF(t10, in1);
     t10 = PIXEL_INF(t10, (is_E)? PIXEL_MAX: j1[i+1]);
     t10 = PIXEL_INF(t10, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);
     t10 = PIXEL_INF(t10, (is_S)? PIXEL_MAX: j1[i+pitch]);

@@ -34202,24 +34202,22 @@ static freia_status main_opencl_helper_1_0_0_compile(void)
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
     "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
+    "    // W not needed\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t54 = PIXEL_MAX;\n"
-    "    t54 = PIXEL_INF(t54, in0);\n"
+    "    PIXEL t54 = in0;\n"
     "    t54 = PIXEL_INF(t54, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    PIXEL t258 = PIXEL_MAX;\n"
+    "    PIXEL t258 = in0;\n"
     "    t258 = PIXEL_INF(t258, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t258 = PIXEL_INF(t258, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t54;\n"
     "    p1[i] = t258;\n"
@@ -34286,21 +34284,20 @@ static freia_status main_opencl_helper_D8_24_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
+    "    // W not needed\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t153 = PIXEL_MAX;\n"
-    "    t153 = PIXEL_INF(t153, in0);\n"
+    "    PIXEL t153 = in0;\n"
     "    t153 = PIXEL_INF(t153, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t153;\n"
@@ -34367,21 +34364,20 @@ static freia_status main_opencl_helper_D8_144_compile(void)
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
     "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t357 = PIXEL_MAX;\n"
+    "    PIXEL t357 = in0;\n"
     "    t357 = PIXEL_INF(t357, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t357 = PIXEL_INF(t357, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t357;\n"
     "  }\n"
@@ -34580,12 +34576,11 @@ static freia_status main_opencl_helper_D8_511_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t471 = PIXEL_MAX;\n"
+    "    PIXEL t471 = in0;\n"
     "    t471 = PIXEL_INF(t471, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t471 = PIXEL_INF(t471, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t471 = PIXEL_INF(t471, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t471 = PIXEL_INF(t471, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t471 = PIXEL_INF(t471, in0);\n"
     "    t471 = PIXEL_INF(t471, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t471 = PIXEL_INF(t471, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t471 = PIXEL_INF(t471, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -34673,12 +34668,11 @@ static freia_status main_opencl_helper_1_0_4_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t472 = PIXEL_MAX;\n"
+    "    PIXEL t472 = in0;\n"
     "    t472 = PIXEL_INF(t472, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t472 = PIXEL_INF(t472, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t472 = PIXEL_INF(t472, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t472 = PIXEL_INF(t472, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t472 = PIXEL_INF(t472, in0);\n"
     "    t472 = PIXEL_INF(t472, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t472 = PIXEL_INF(t472, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t472 = PIXEL_INF(t472, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -34783,12 +34777,11 @@ static freia_status main_opencl_helper_2_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t477 = PIXEL_MIN;\n"
+    "    PIXEL t477 = in1;\n"
     "    t477 = PIXEL_SUP(t477, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);\n"
     "    t477 = PIXEL_SUP(t477, (is_N)? PIXEL_MIN: j1[i-pitch]);\n"
     "    t477 = PIXEL_SUP(t477, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);\n"
     "    t477 = PIXEL_SUP(t477, (is_W)? PIXEL_MIN: j1[i-1]);\n"
-    "    t477 = PIXEL_SUP(t477, in1);\n"
     "    t477 = PIXEL_SUP(t477, (is_E)? PIXEL_MIN: j1[i+1]);\n"
     "    t477 = PIXEL_SUP(t477, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);\n"
     "    t477 = PIXEL_SUP(t477, (is_S)? PIXEL_MIN: j1[i+pitch]);\n"
@@ -34972,24 +34965,22 @@ KERNEL void main_opencl_helper_1_0_0(
 
   // detect N & S boundaries (assuming one thread per row)
   int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // S not needed
 
   // thread's pixel loop
   int i;
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
+    // W not needed
     int is_E = (i==(width-1));
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t54 = PIXEL_MAX;
-    t54 = PIXEL_INF(t54, in0);
+    PIXEL t54 = in0;
     t54 = PIXEL_INF(t54, (is_E)? PIXEL_MAX: j0[i+1]);
-    PIXEL t258 = PIXEL_MAX;
+    PIXEL t258 = in0;
     t258 = PIXEL_INF(t258, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t258 = PIXEL_INF(t258, in0);
     // set output pixels
     p0[i] = t54;
     p1[i] = t258;
@@ -35014,21 +35005,20 @@ KERNEL void main_opencl_helper_D8_24(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
+    // W not needed
     int is_E = (i==(width-1));
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t153 = PIXEL_MAX;
-    t153 = PIXEL_INF(t153, in0);
+    PIXEL t153 = in0;
     t153 = PIXEL_INF(t153, (is_E)? PIXEL_MAX: j0[i+1]);
     // set output pixels
     p0[i] = t153;
@@ -35054,21 +35044,20 @@ KERNEL void main_opencl_helper_D8_144(
 
   // detect N & S boundaries (assuming one thread per row)
   int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // S not needed
 
   // thread's pixel loop
   int i;
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // W not needed
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t357 = PIXEL_MAX;
+    PIXEL t357 = in0;
     t357 = PIXEL_INF(t357, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t357 = PIXEL_INF(t357, in0);
     // set output pixels
     p0[i] = t357;
   }
@@ -35171,12 +35160,11 @@ KERNEL void main_opencl_helper_D8_511(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t471 = PIXEL_MAX;
+    PIXEL t471 = in0;
     t471 = PIXEL_INF(t471, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t471 = PIXEL_INF(t471, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t471 = PIXEL_INF(t471, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t471 = PIXEL_INF(t471, (is_W)? PIXEL_MAX: j0[i-1]);
-    t471 = PIXEL_INF(t471, in0);
     t471 = PIXEL_INF(t471, (is_E)? PIXEL_MAX: j0[i+1]);
     t471 = PIXEL_INF(t471, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t471 = PIXEL_INF(t471, (is_S)? PIXEL_MAX: j0[i+pitch]);
@@ -35223,12 +35211,11 @@ KERNEL void main_opencl_helper_1_0_4(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t472 = PIXEL_MAX;
+    PIXEL t472 = in0;
     t472 = PIXEL_INF(t472, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t472 = PIXEL_INF(t472, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t472 = PIXEL_INF(t472, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t472 = PIXEL_INF(t472, (is_W)? PIXEL_MAX: j0[i-1]);
-    t472 = PIXEL_INF(t472, in0);
     t472 = PIXEL_INF(t472, (is_E)? PIXEL_MAX: j0[i+1]);
     t472 = PIXEL_INF(t472, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t472 = PIXEL_INF(t472, (is_S)? PIXEL_MAX: j0[i+pitch]);
@@ -35285,12 +35272,11 @@ KERNEL void main_opencl_helper_2_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t477 = PIXEL_MIN;
+    PIXEL t477 = in1;
     t477 = PIXEL_SUP(t477, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);
     t477 = PIXEL_SUP(t477, (is_N)? PIXEL_MIN: j1[i-pitch]);
     t477 = PIXEL_SUP(t477, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);
     t477 = PIXEL_SUP(t477, (is_W)? PIXEL_MIN: j1[i-1]);
-    t477 = PIXEL_SUP(t477, in1);
     t477 = PIXEL_SUP(t477, (is_E)? PIXEL_MIN: j1[i+1]);
     t477 = PIXEL_SUP(t477, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);
     t477 = PIXEL_SUP(t477, (is_S)? PIXEL_MIN: j1[i+pitch]);

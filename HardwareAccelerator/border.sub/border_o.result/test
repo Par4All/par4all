@@ -587,8 +587,8 @@ static freia_status border_o_opencl_helper_E8_48_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -596,13 +596,12 @@ static freia_status border_o_opencl_helper_E8_48_compile(void)
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
     "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = PIXEL_MIN;\n"
+    "    PIXEL t8 = in0;\n"
     "    t8 = PIXEL_SUP(t8, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t8 = PIXEL_SUP(t8, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
     "  }\n"
@@ -661,8 +660,8 @@ KERNEL void border_o_opencl_helper_E8_48(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -670,13 +669,12 @@ KERNEL void border_o_opencl_helper_E8_48(
   {
     // detect W & E boundaries (assuming one row per thread)
     int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t8 = PIXEL_MIN;
+    PIXEL t8 = in0;
     t8 = PIXEL_SUP(t8, (is_W)? PIXEL_MIN: j0[i-1]);
-    t8 = PIXEL_SUP(t8, in0);
     // set output pixels
     p0[i] = t8;
   }

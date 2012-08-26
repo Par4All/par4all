@@ -947,8 +947,8 @@ static freia_status freia_72_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -960,13 +960,11 @@ static freia_status freia_72_opencl_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t20 = PIXEL_MAX;\n"
+    "    PIXEL t20 = in0;\n"
     "    t20 = PIXEL_INF(t20, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t20 = PIXEL_INF(t20, in0);\n"
     "    t20 = PIXEL_INF(t20, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    PIXEL t15 = PIXEL_MIN;\n"
+    "    PIXEL t15 = in0;\n"
     "    t15 = PIXEL_SUP(t15, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t15 = PIXEL_SUP(t15, in0);\n"
     "    t15 = PIXEL_SUP(t15, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    PIXEL t21 = PIXEL_ADD(t15, c0);\n"
     "    PIXEL t22 = PIXEL_NOT(t20);\n"
@@ -1031,8 +1029,8 @@ KERNEL void freia_72_opencl_helper_0_0_0(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -1044,13 +1042,11 @@ KERNEL void freia_72_opencl_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t20 = PIXEL_MAX;
+    PIXEL t20 = in0;
     t20 = PIXEL_INF(t20, (is_W)? PIXEL_MAX: j0[i-1]);
-    t20 = PIXEL_INF(t20, in0);
     t20 = PIXEL_INF(t20, (is_E)? PIXEL_MAX: j0[i+1]);
-    PIXEL t15 = PIXEL_MIN;
+    PIXEL t15 = in0;
     t15 = PIXEL_SUP(t15, (is_W)? PIXEL_MIN: j0[i-1]);
-    t15 = PIXEL_SUP(t15, in0);
     t15 = PIXEL_SUP(t15, (is_E)? PIXEL_MIN: j0[i+1]);
     PIXEL t21 = PIXEL_ADD(t15, c0);
     PIXEL t22 = PIXEL_NOT(t20);

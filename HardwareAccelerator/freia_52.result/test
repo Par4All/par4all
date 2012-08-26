@@ -18775,30 +18775,24 @@ static freia_status freia_52_opencl_helper_0_0_1_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t267 = PIXEL_MAX;\n"
+    "    PIXEL t267 = in0;\n"
     "    t267 = PIXEL_INF(t267, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t267 = PIXEL_INF(t267, in0);\n"
     "    t267 = PIXEL_INF(t267, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    PIXEL t303 = PIXEL_MAX;\n"
+    "    PIXEL t303 = in0;\n"
     "    t303 = PIXEL_INF(t303, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t303 = PIXEL_INF(t303, in0);\n"
     "    t303 = PIXEL_INF(t303, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
-    "    PIXEL t339 = PIXEL_MAX;\n"
+    "    PIXEL t339 = in0;\n"
     "    t339 = PIXEL_INF(t339, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
-    "    t339 = PIXEL_INF(t339, in0);\n"
     "    t339 = PIXEL_INF(t339, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
-    "    PIXEL t375 = PIXEL_MAX;\n"
+    "    PIXEL t375 = in0;\n"
     "    t375 = PIXEL_INF(t375, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t375 = PIXEL_INF(t375, in0);\n"
     "    t375 = PIXEL_INF(t375, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    PIXEL t411 = PIXEL_MAX;\n"
+    "    PIXEL t411 = in0;\n"
     "    t411 = PIXEL_INF(t411, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t411 = PIXEL_INF(t411, in0);\n"
     "    t411 = PIXEL_INF(t411, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
-    "    PIXEL t447 = PIXEL_MAX;\n"
+    "    PIXEL t447 = in0;\n"
     "    t447 = PIXEL_INF(t447, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t447 = PIXEL_INF(t447, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t447 = PIXEL_INF(t447, in0);\n"
     "    PIXEL t483 = PIXEL_MAX;\n"
     "    t483 = PIXEL_INF(t483, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t483 = PIXEL_INF(t483, (is_W)? PIXEL_MAX: j0[i-1]);\n"
@@ -18885,8 +18879,8 @@ static freia_status freia_52_opencl_helper_D8_56_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -18898,9 +18892,8 @@ static freia_status freia_52_opencl_helper_D8_56_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t270 = PIXEL_MAX;\n"
+    "    PIXEL t270 = in0;\n"
     "    t270 = PIXEL_INF(t270, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t270 = PIXEL_INF(t270, in0);\n"
     "    t270 = PIXEL_INF(t270, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t270;\n"
@@ -18974,14 +18967,13 @@ static freia_status freia_52_opencl_helper_D8_146_compile(void)
     "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
-    "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t306 = PIXEL_MAX;\n"
+    "    PIXEL t306 = in0;\n"
     "    t306 = PIXEL_INF(t306, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t306 = PIXEL_INF(t306, in0);\n"
     "    t306 = PIXEL_INF(t306, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
     "    // set output pixels\n"
     "    p0[i] = t306;\n"
@@ -19060,9 +19052,8 @@ static freia_status freia_52_opencl_helper_D8_84_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t342 = PIXEL_MAX;\n"
+    "    PIXEL t342 = in0;\n"
     "    t342 = PIXEL_INF(t342, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
-    "    t342 = PIXEL_INF(t342, in0);\n"
     "    t342 = PIXEL_INF(t342, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t342;\n"
@@ -19129,7 +19120,7 @@ static freia_status freia_52_opencl_helper_D8_112_compile(void)
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
     "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -19141,10 +19132,9 @@ static freia_status freia_52_opencl_helper_D8_112_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t450 = PIXEL_MAX;\n"
+    "    PIXEL t450 = in0;\n"
     "    t450 = PIXEL_INF(t450, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t450 = PIXEL_INF(t450, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t450 = PIXEL_INF(t450, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t450;\n"
     "  }\n"
@@ -19210,7 +19200,7 @@ static freia_status freia_52_opencl_helper_D8_168_compile(void)
     "\n"
     "  // detect N & S boundaries (assuming one thread per row)\n"
     "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // S not needed\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -19299,7 +19289,7 @@ static freia_status freia_52_opencl_helper_D8_292_compile(void)
     "  {\n"
     "    // detect W & E boundaries (assuming one row per thread)\n"
     "    int is_W = (i==0);\n"
-    "    int is_E = (i==(width-1));\n"
+    "    // E not needed\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
@@ -19384,12 +19374,11 @@ static freia_status freia_52_opencl_helper_D8_511_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t266 = PIXEL_MAX;\n"
+    "    PIXEL t266 = in0;\n"
     "    t266 = PIXEL_INF(t266, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t266 = PIXEL_INF(t266, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t266 = PIXEL_INF(t266, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t266 = PIXEL_INF(t266, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t266 = PIXEL_INF(t266, in0);\n"
     "    t266 = PIXEL_INF(t266, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t266 = PIXEL_INF(t266, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t266 = PIXEL_INF(t266, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -19616,12 +19605,11 @@ static freia_status freia_52_opencl_helper_1_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t868 = PIXEL_MAX;\n"
+    "    PIXEL t868 = in0;\n"
     "    t868 = PIXEL_INF(t868, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
     "    t868 = PIXEL_INF(t868, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
     "    t868 = PIXEL_INF(t868, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
     "    t868 = PIXEL_INF(t868, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t868 = PIXEL_INF(t868, in0);\n"
     "    t868 = PIXEL_INF(t868, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    t868 = PIXEL_INF(t868, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
     "    t868 = PIXEL_INF(t868, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
@@ -19819,30 +19807,24 @@ KERNEL void freia_52_opencl_helper_0_0_1(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t267 = PIXEL_MAX;
+    PIXEL t267 = in0;
     t267 = PIXEL_INF(t267, (is_W)? PIXEL_MAX: j0[i-1]);
-    t267 = PIXEL_INF(t267, in0);
     t267 = PIXEL_INF(t267, (is_E)? PIXEL_MAX: j0[i+1]);
-    PIXEL t303 = PIXEL_MAX;
+    PIXEL t303 = in0;
     t303 = PIXEL_INF(t303, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t303 = PIXEL_INF(t303, in0);
     t303 = PIXEL_INF(t303, (is_S)? PIXEL_MAX: j0[i+pitch]);
-    PIXEL t339 = PIXEL_MAX;
+    PIXEL t339 = in0;
     t339 = PIXEL_INF(t339, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
-    t339 = PIXEL_INF(t339, in0);
     t339 = PIXEL_INF(t339, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
-    PIXEL t375 = PIXEL_MAX;
+    PIXEL t375 = in0;
     t375 = PIXEL_INF(t375, (is_W)? PIXEL_MAX: j0[i-1]);
-    t375 = PIXEL_INF(t375, in0);
     t375 = PIXEL_INF(t375, (is_E)? PIXEL_MAX: j0[i+1]);
-    PIXEL t411 = PIXEL_MAX;
+    PIXEL t411 = in0;
     t411 = PIXEL_INF(t411, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t411 = PIXEL_INF(t411, in0);
     t411 = PIXEL_INF(t411, (is_S)? PIXEL_MAX: j0[i+pitch]);
-    PIXEL t447 = PIXEL_MAX;
+    PIXEL t447 = in0;
     t447 = PIXEL_INF(t447, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t447 = PIXEL_INF(t447, (is_W)? PIXEL_MAX: j0[i-1]);
-    t447 = PIXEL_INF(t447, in0);
     PIXEL t483 = PIXEL_MAX;
     t483 = PIXEL_INF(t483, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t483 = PIXEL_INF(t483, (is_W)? PIXEL_MAX: j0[i-1]);
@@ -19881,8 +19863,8 @@ KERNEL void freia_52_opencl_helper_D8_56(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N not needed
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -19894,9 +19876,8 @@ KERNEL void freia_52_opencl_helper_D8_56(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t270 = PIXEL_MAX;
+    PIXEL t270 = in0;
     t270 = PIXEL_INF(t270, (is_W)? PIXEL_MAX: j0[i-1]);
-    t270 = PIXEL_INF(t270, in0);
     t270 = PIXEL_INF(t270, (is_E)? PIXEL_MAX: j0[i+1]);
     // set output pixels
     p0[i] = t270;
@@ -19929,14 +19910,13 @@ KERNEL void freia_52_opencl_helper_D8_146(
   for (i=0; i<width; i++)
   {
     // detect W & E boundaries (assuming one row per thread)
-    int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // W not needed
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t306 = PIXEL_MAX;
+    PIXEL t306 = in0;
     t306 = PIXEL_INF(t306, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t306 = PIXEL_INF(t306, in0);
     t306 = PIXEL_INF(t306, (is_S)? PIXEL_MAX: j0[i+pitch]);
     // set output pixels
     p0[i] = t306;
@@ -19974,9 +19954,8 @@ KERNEL void freia_52_opencl_helper_D8_84(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t342 = PIXEL_MAX;
+    PIXEL t342 = in0;
     t342 = PIXEL_INF(t342, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
-    t342 = PIXEL_INF(t342, in0);
     t342 = PIXEL_INF(t342, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     // set output pixels
     p0[i] = t342;
@@ -20002,7 +19981,7 @@ KERNEL void freia_52_opencl_helper_D8_112(
 
   // detect N & S boundaries (assuming one thread per row)
   int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -20014,10 +19993,9 @@ KERNEL void freia_52_opencl_helper_D8_112(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t450 = PIXEL_MAX;
+    PIXEL t450 = in0;
     t450 = PIXEL_INF(t450, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t450 = PIXEL_INF(t450, (is_W)? PIXEL_MAX: j0[i-1]);
-    t450 = PIXEL_INF(t450, in0);
     // set output pixels
     p0[i] = t450;
   }
@@ -20042,7 +20020,7 @@ KERNEL void freia_52_opencl_helper_D8_168(
 
   // detect N & S boundaries (assuming one thread per row)
   int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // S not needed
 
   // thread's pixel loop
   int i;
@@ -20090,7 +20068,7 @@ KERNEL void freia_52_opencl_helper_D8_292(
   {
     // detect W & E boundaries (assuming one row per thread)
     int is_W = (i==0);
-    int is_E = (i==(width-1));
+    // E not needed
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
@@ -20134,12 +20112,11 @@ KERNEL void freia_52_opencl_helper_D8_511(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t266 = PIXEL_MAX;
+    PIXEL t266 = in0;
     t266 = PIXEL_INF(t266, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t266 = PIXEL_INF(t266, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t266 = PIXEL_INF(t266, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t266 = PIXEL_INF(t266, (is_W)? PIXEL_MAX: j0[i-1]);
-    t266 = PIXEL_INF(t266, in0);
     t266 = PIXEL_INF(t266, (is_E)? PIXEL_MAX: j0[i+1]);
     t266 = PIXEL_INF(t266, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t266 = PIXEL_INF(t266, (is_S)? PIXEL_MAX: j0[i+pitch]);
@@ -20269,12 +20246,11 @@ KERNEL void freia_52_opencl_helper_1_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t868 = PIXEL_MAX;
+    PIXEL t868 = in0;
     t868 = PIXEL_INF(t868, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
     t868 = PIXEL_INF(t868, (is_N)? PIXEL_MAX: j0[i-pitch]);
     t868 = PIXEL_INF(t868, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
     t868 = PIXEL_INF(t868, (is_W)? PIXEL_MAX: j0[i-1]);
-    t868 = PIXEL_INF(t868, in0);
     t868 = PIXEL_INF(t868, (is_E)? PIXEL_MAX: j0[i+1]);
     t868 = PIXEL_INF(t868, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
     t868 = PIXEL_INF(t868, (is_S)? PIXEL_MAX: j0[i+pitch]);
