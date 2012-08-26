@@ -589,10 +589,11 @@ static int opencl_compile_mergeable_dag(
 
 /* call and generate if necessary a specialized kernel, if possible
  * the statement is bluntly modified "in place".
+ * @return whether a substition was performed
  */
 static void opencl_generate_special_kernel_ops(
   string module, dagvtx v, hash_table signatures,
-  FILE * helper_file, FILE * opencl_file)
+  FILE * helper_file, FILE * opencl_file, set helpers)
 {
   pips_debug(4, "considering statement %"_intFMT"\n", dagvtx_number(v));
   const freia_api_t * api = get_freia_api_vtx(v);
@@ -638,6 +639,7 @@ static void opencl_generate_special_kernel_ops(
 
     // record #outs for this helper, needed for cleaning
     hash_put(signatures, specialized, (void*) (_int) 1);
+    set_add_element(helpers, helpers, specialized);
 
     // cleanup
     free_dag(one);
@@ -1028,7 +1030,7 @@ static void opencl_merge_and_compile(
         FOREACH(dagvtx, v, lnonmergeable)
           if (!set_belong_p(merged, v))
             opencl_generate_special_kernel_ops(module, v, signatures,
-                                               helper_file, opencl);
+                                               helper_file, opencl, helpers);
       }
 
       // cleanup initial dag??
