@@ -790,7 +790,12 @@ static freia_status freia_76_opencl_helper_0_0_0_compile(void)
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
@@ -799,9 +804,8 @@ static freia_status freia_76_opencl_helper_0_0_0_compile(void)
     "  int idy = get_global_id(0);\n"
     "\n"
     "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=0; i<width; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
@@ -876,7 +880,12 @@ KERNEL void freia_76_opencl_helper_0_0_0(
   int pitch,
   GLOBAL TMeasure * redX)
 {
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // reduction stuff is currently hardcoded...
   int vol = 0;
@@ -885,9 +894,8 @@ KERNEL void freia_76_opencl_helper_0_0_0(
   int idy = get_global_id(0);
 
   // thread's pixel loop
-  int gid = pitch*get_global_id(0);
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=0; i<width; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
