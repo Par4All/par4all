@@ -594,7 +594,7 @@ static void opencl_generate_special_kernel_ops(
   string module, dagvtx v, hash_table signatures,
   FILE * helper_file, FILE * opencl_file)
 {
-  pips_debug(5, "considering statement %"_intFMT"\n", dagvtx_number(v));
+  pips_debug(4, "considering statement %"_intFMT"\n", dagvtx_number(v));
   const freia_api_t * api = get_freia_api_vtx(v);
   intptr_t k00, k01, k02, k10, k11, k12, k20, k21, k22;
   if (!api ||
@@ -655,6 +655,8 @@ static void opencl_generate_special_kernel_ops(
   list third = CDR(CDR(largs));
   CDR(CDR(largs)) = NIL;
   gen_full_free_list(third);
+
+  pips_debug(5, "statement %"_intFMT" specialized\n", dagvtx_number(v));
 }
 
 /* is v a constant kernel operation?
@@ -964,12 +966,10 @@ static void opencl_merge_and_compile(
             if (set_belong_p(nonmergeable, s) &&
                 dagvtx_constant_kernel_p(s))
               okays = CONS(dagvtx, s, okays);
-            /*
-            // backtrack reductions as well?
             else if (set_belong_p(mergeable, s) &&
                      dagvtx_is_measurement_p(s))
+              // try to backtrack reductions as well?
               okays = CONS(dagvtx, s, okays);
-            */
           }
 
           if (gen_length(okays)>1) // yep, something to do!
@@ -995,9 +995,16 @@ static void opencl_merge_and_compile(
               set_add_element(merged, merged, s);
               if (set_belong_p(mergeable, s))
               {
+                // dependency hack? is it needed?
+                // int n = (int) dagvtx_number(s);
+                // if (n>max_stnb) max_stnb = n;
+                // cleanup mergeable
                 set_del_element(mergeable, mergeable, s);
                 gen_remove(&lmergeable, s);
+                // also cleanup full dag
+                dag_remove_vertex(d, s);
               }
+              // non mergeable vertices will be removed later
             }
           }
           gen_free_list(okays);

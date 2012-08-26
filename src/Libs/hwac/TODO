@@ -132,7 +132,10 @@
 + merge one erode/dilate/convol with subsequent arith ops?
 + generate kernel-specialized erode/dilate/convol
 + merge two or more erode/dilate/convol on the same input?
-- merge reductions with same input kernel ops (anr999)?
++ merge reductions with same input kernel ops (anr999)?
+- above: should accept more reductions in mergeable?
+- mergeable: separate by connected components?
+  that would be where the place to deal with the one reduction constraint?
 - detect constant transposed kernels (retina, burner)?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 - could use terapix-like tiling to help with cache?
