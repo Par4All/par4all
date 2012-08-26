@@ -1172,7 +1172,31 @@ static expression constant_image_p(dagvtx v)
   }
   else if (api->arg_img_in==1)
   {
-    if (api->arg_misc_in==1)
+    bool
+      erosion = aipo_op_p(api, "erode_8c") || aipo_op_p(api, "erode_6c"),
+      dilatation = aipo_op_p(api, "dilate_8c") || aipo_op_p(api, "dilate_6c");
+    // aipo_op_p(api, "convolution") 3x3?
+    if (erosion || dilatation)
+    {
+      _int i00, i10, i20, i01, i11, i21, i02, i12, i22;
+      if (freia_extract_kernel_vtx(v, true, &i00, &i10, &i20,
+                                   &i01, &i11, &i21, &i02, &i12, &i22))
+      {
+        // zero boundary
+        if (i00==0 && i10==0 && i20==0 && i01==0 &&
+            i21==0 && i02==0 && i12==0 && i22==0)
+        {
+          if (i11==0)
+          {
+            if (erosion)
+              return int_to_expression(0);
+            else if (dilatation)
+              return int_to_expression(freia_max_pixel_value());
+          }
+        }
+      }
+    }
+    else if (api->arg_misc_in==1) // arith cst op
     {
       expression e1 = freia_get_nth_scalar_param(v, 1);
       _int val;
@@ -1225,7 +1249,25 @@ static entity copy_image_p(dagvtx v)
   }
   else if (api->arg_img_in==1)
   {
-    if (api->arg_misc_in==1)
+    if (aipo_op_p(api, "erode_8c") ||
+        aipo_op_p(api, "erode_6c") ||
+        aipo_op_p(api, "dilate_8c") ||
+        aipo_op_p(api, "dilate_6c"))
+        // aipo_op_p(api, "convolution") 3x3?
+    {
+      _int i00, i10, i20, i01, i11, i21, i02, i12, i22;
+      if (freia_extract_kernel_vtx(v, true, &i00, &i10, &i20,
+                                   &i01, &i11, &i21, &i02, &i12, &i22))
+      {
+        // zero boundary
+        if (i00==0 && i10==0 && i20==0 && i01==0 &&
+            i21==0 && i02==0 && i12==0 && i22==0)
+        {
+          if (i11==1) return ENTITY(CAR(vtxcontent_inputs(c)));
+        }
+      }
+    }
+    else if (api->arg_misc_in==1)
     {
       expression e1 = freia_get_nth_scalar_param(v, 1);
       _int val;
