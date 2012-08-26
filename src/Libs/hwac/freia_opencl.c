@@ -656,6 +656,65 @@ static void opencl_generate_special_kernel_ops(
   gen_full_free_list(third);
 }
 
+/* is v a constant kernel operation?
+ */
+static bool dagvtx_constant_kernel_p(const dagvtx v)
+{
+  const freia_api_t * api = get_freia_api_vtx(v);
+  intptr_t val;
+  return api->opencl.mergeable_kernel &&
+    freia_extract_kernel_vtx(v, true, &val, &val, &val, &val,
+                             &val, &val, &val, &val, &val);
+}
+
+static int compile_this_list(
+  string module,
+  list lvertices,
+  list ls,
+  string split_name,
+  int n_cut,
+  set global_remainings,
+  hash_table signatures,
+  FILE * helper_file, FILE * opencl,
+  set helpers,
+  set output_images,
+  dag fulld,
+  int stnb,
+  int max_stnb)
+{
+  // actually build subdag if something to merge
+  dag nd = make_dag(NIL, NIL, NIL);
+  FOREACH(dagvtx, v, lvertices)
+    dag_append_vertex(nd, copy_dagvtx_norec(v));
+  dag_compute_outputs(nd, NULL, output_images, NIL, false);
+  dag_cleanup_other_statements(nd);
+
+  // ??? should not be needed?
+  freia_hack_fix_global_ins_outs(fulld, nd);
+
+  // ??? hack to ensure dependencies...
+  if (max_stnb>stnb) stnb = max_stnb;
+
+  // and compile!
+  stnb = opencl_compile_mergeable_dag
+    (module, nd, ls, split_name, n_cut, global_remainings,
+     signatures, helper_file, opencl, helpers, stnb);
+
+  return stnb;
+}
+
+static void migrate_statements(list lvertices, sequence sq, set dones)
+{
+  set stats = set_make(set_pointer);
+  FOREACH(dagvtx, v, lvertices) {
+    statement s = dagvtx_statement(v);
+    if (s) set_add_element(stats, stats, s);
+  }
+  freia_migrate_statements(sq, stats, dones);
+  set_union(dones, dones, stats);
+  set_free(stats);
+}
+
 /* extract subdags of merged operations and compile them
  * @param d dag to compile, which is destroyed in the process...
  */
@@ -690,7 +749,6 @@ static void opencl_merge_and_compile(
     nonmergeable = set_make(set_pointer); // consistent with lnonmergeable
 
   set // of statements
-    stats = set_make(set_pointer),
     dones = set_make(set_pointer);
 
   // overall remaining statements to compile
@@ -834,7 +892,7 @@ static void opencl_merge_and_compile(
     // restore vertices order
     lmergeable = gen_nreverse(lmergeable);
 
-    // we try to aggregate some kernel ops to this task...
+    // we try to aggregate some kernel ops to this merged task...
     if (merge_kernels && lmergeable)
     {
       pips_debug(3, "looking for kernel ops in predecessors...\n");
@@ -856,7 +914,7 @@ static void opencl_merge_and_compile(
             intptr_t val;
             if (// this is a mergeable kernel
                 api->opencl.mergeable_kernel &&
-                // all it successors are arithmetic merged
+                // *all* its successors are arithmetic merged
                 list_in_set_p(dagvtx_succs(p), mergeable) &&
                 // and the kernel must be fully known
                 freia_extract_kernel_vtx(p, true, &val, &val, &val, &val,
@@ -884,27 +942,85 @@ static void opencl_merge_and_compile(
     pips_debug(4, "got %d non-mergeables and %d mergeable vertices\n",
                (int) gen_length(lnonmergeable), (int) gen_length(lmergeable));
 
+    set merged = set_make(set_pointer);
+
     if (lnonmergeable)
     {
-      // fix statement connexity...
-      set_clear(stats);
+      // merge kernel operations with a common input from nonmergeable
+      // hmmm... "nonmergeable" is really meant with arithmetic operations
+      if (merge_kernels)
+      {
+        // if starting from sinks, the complexity is not good because we have
+        // to rebuild predecessors over and over which requires scanning all
+        // vertices...
+        // it is a little better when starting the other way around...
+        FOREACH(dagvtx, v, dag_vertices(d))
+        {
+          // detect constant-kernels in nonmergeable with a common input
+          list okays = NIL;
+          FOREACH(dagvtx, s, dagvtx_succs(v))
+          {
+            if (set_belong_p(nonmergeable, s) &&
+                dagvtx_constant_kernel_p(s))
+              okays = CONS(dagvtx, s, okays);
+            /*
+            // backtrack reductions as well?
+            else if (set_belong_p(mergeable, s) &&
+                     dagvtx_is_measurement_p(s))
+              okays = CONS(dagvtx, s, okays);
+            */
+          }
+
+          if (gen_length(okays)>1) // yep, something to do!
+          {
+            pips_debug(5,
+                       "merging %d common input const kernels & reductions\n",
+                       (int) gen_length(okays));
+
+            // fix statement connexity
+            migrate_statements(okays, sq, dones);
+
+            // let us merge and compile these operations
+            stnb = compile_this_list(module, okays, ls, split_name, n_cut,
+                                     global_remainings, signatures,
+                                     helper_file, opencl, helpers,
+                                     output_images, fulld, stnb, max_stnb);
+            // this was another cut!
+            n_cut++;
+
+            // these are compiled, bye bye!
+            FOREACH(dagvtx, s, okays)
+            {
+              set_add_element(merged, merged, s);
+              if (set_belong_p(mergeable, s))
+              {
+                set_del_element(mergeable, mergeable, s);
+                gen_remove(&lmergeable, s);
+              }
+            }
+          }
+          gen_free_list(okays);
+        }
+      }
+
+      // BUG ??? this is too late for the just-aboved merged kernels
       FOREACH(dagvtx, v, lnonmergeable)
       {
         // keep track of previous which may have dependencies... hmmm...
         int n = (int) dagvtx_number(v);
         if (n>max_stnb) max_stnb = n;
-        // statement to clean
-        statement s = dagvtx_statement(v);
-        if (s) set_add_element(stats, stats, s);
       }
-      freia_migrate_statements(sq, stats, dones);
-      set_union(dones, dones, stats);
 
+      // fix statement connexity...
+      migrate_statements(lnonmergeable, sq, dones);
+
+      // possibly compile specialized kernels
       if (generate_specialized_kernel)
       {
         FOREACH(dagvtx, v, lnonmergeable)
-          opencl_generate_special_kernel_ops(module, v, signatures,
-                                             helper_file, opencl);
+          if (!set_belong_p(merged, v))
+            opencl_generate_special_kernel_ops(module, v, signatures,
+                                               helper_file, opencl);
       }
 
       // cleanup initial dag??
@@ -914,6 +1030,7 @@ static void opencl_merge_and_compile(
 
       gen_free_list(lnonmergeable), lnonmergeable = NIL;
       set_clear(nonmergeable);
+      set_free(merged);
 
       n_cut++; // this was a cut, next cut...
     }
@@ -922,33 +1039,15 @@ static void opencl_merge_and_compile(
     if (lmergeable)
     {
       // fix statement connexity
-      set_clear(stats);
-      FOREACH(dagvtx, v, lmergeable) {
-        statement s = dagvtx_statement(v);
-        if (s) set_add_element(stats, stats, s);
-      }
-      freia_migrate_statements(sq, stats, dones);
-      set_union(dones, dones, stats);
+      migrate_statements(lmergeable, sq, dones);
 
+      // possibly compile
       if (gen_length(lmergeable)>1 || compile_one_op)
       {
-        // actually build subdag if something to merge
-        dag nd = make_dag(NIL, NIL, NIL);
-        FOREACH(dagvtx, v, lmergeable)
-          dag_append_vertex(nd, copy_dagvtx_norec(v));
-        dag_compute_outputs(nd, NULL, output_images, NIL, false);
-        dag_cleanup_other_statements(nd);
-
-        // ??? should not be needed?
-        freia_hack_fix_global_ins_outs(fulld, nd);
-
-        // ??? hack to ensure dependencies...
-        if (max_stnb>stnb) stnb = max_stnb;
-
-        // and compile!
-        stnb = opencl_compile_mergeable_dag
-          (module, nd, ls, split_name, n_cut, global_remainings,
-           signatures, helper_file, opencl, helpers, stnb);
+        stnb = compile_this_list(module, lmergeable, ls, split_name, n_cut,
+                                 global_remainings, signatures,
+                                 helper_file, opencl, helpers,
+                                 output_images, fulld, stnb, max_stnb);
       }
 
       // cleanup initial dag??
@@ -969,7 +1068,6 @@ static void opencl_merge_and_compile(
   set_free(mergeable);
   set_free(nonmergeable);
   set_free(done);
-  set_free(stats);
   set_free(dones);
   free(split_name);
 }
