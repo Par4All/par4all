@@ -10,6 +10,43 @@ No priority order.
 
 4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list.
 
+6. Be able to dereference constant pointers, a.k.a. arrays. See
+Pointers/array03.c, function foo2. Build a smaller test case.
+
+7. EffectsWithPointsTo: the fully subscripted sources and sinks
+require index substitution in EffectsWithPointsTo, or the parallelism
+detection is lost; also it is not clear if you want to preserver x[j]
+instead of *(x+j)....; see for instance call05.c. See also call14.c.
+
+8. EffectsWithPointsTo: Also probably a
+interprocedural translation issue in call08 for _x_3 in the callee and
+y in the caller. Also, many returns are missing: they would be useful
+to debug the points-to analysis
+
+9. EffectsWithPointsTo/call09,c: duplicate effect on s.one. Same in call10.
+
+10. EffectsWithPointsTo/call15.c: understand the "may be written",
+probably due to NULL pointer initialization, but should have been
+automatically eliminated by the dereferencement. In fact call15 does
+not check its argument pi or q. Stricto sensu, it is really a may. But
+if summary information is linked to a function that returns, the
+information should be a must at the caller level...
+
+11. EffectsWithPointsTo/chap2_exp4: why do we get a maybe effect on
+*heap*? because the heap lattice is not precise enough to distinguish
+between exact heap references and abstract heap references.
+
+12. EffectsWithPointsTo/dereferencing06: improved results thanks to a
+better analysis of pointer arithmetics.
+
+13. EffectsWithPointsTo/fpointer01: result is now less precise.
+
+14. EffectsWithPointsTo/fulguro04: result modified to take into
+account an implicit dimension.
+
+15. EffectsWithPointsTo: differences from global02 to varargs04 to be
+looked at.
+
 Done:
 
 5. Connexion with effects_with_points_to: improve the points-to precondition or use a more powerful function in effects_with_points_to()? Or both?
