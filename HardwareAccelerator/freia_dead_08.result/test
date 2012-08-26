@@ -648,6 +648,23 @@ digraph "freia_dead_08_opencl_helper_0_0" {
   "in" -> "11 +";
   "in" -> "10 D8";
 }
+// graph for dag "freia_dead_08_opencl_helper_0_0_0" of module "freia_dead_08" in dot format
+// DAG "freia_dead_08_opencl_helper_0_0_0": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
+digraph "freia_dead_08_opencl_helper_0_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out1" [shape=circle];
+
+  // computation vertices
+  "11 +" [shape=trapezium,orientation=270];
+  "11 +" -> "out1";
+  "10 D8" [shape=box];
+  "10 D8" -> "11 +" [label="tmp"];
+  "in" -> "11 +";
+  "in" -> "10 D8";
+}
 
 ! acceleration function
 
@@ -658,23 +675,154 @@ digraph "freia_dead_08_opencl_helper_0_0" {
 
 
 // dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+0+1 copies
+
+// hold kernels for freia_dead_08_opencl_helper_0_0_0
+static cl_kernel freia_dead_08_opencl_helper_0_0_0_kernel[2];
+
+// compile kernels for freia_dead_08_opencl_helper_0_0_0
+static freia_status freia_dead_08_opencl_helper_0_0_0_compile(void)
+{
+  // OpenCL source for freia_dead_08_opencl_helper_0_0_0
+  const char * freia_dead_08_opencl_helper_0_0_0_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_dead_08_opencl_helper_0_0_0\n"
+    "KERNEL void freia_dead_08_opencl_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t10 = PIXEL_MAX;\n"
+    "    t10 = PIXEL_INF(t10, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
+    "    t10 = PIXEL_INF(t10, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t10 = PIXEL_INF(t10, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
+    "    t10 = PIXEL_INF(t10, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t10 = PIXEL_INF(t10, in0);\n"
+    "    t10 = PIXEL_INF(t10, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t10 = PIXEL_INF(t10, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
+    "    t10 = PIXEL_INF(t10, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    t10 = PIXEL_INF(t10, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    PIXEL t11 = PIXEL_ADD(t10, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t11;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(freia_dead_08_opencl_helper_0_0_0_source, "freia_dead_08_opencl_helper_0_0_0", "-DPIXEL8", &freia_dead_08_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_dead_08_opencl_helper_0_0_0_source, "freia_dead_08_opencl_helper_0_0_0", "-DPIXEL16", &freia_dead_08_opencl_helper_0_0_0_kernel[1]);
+  return err;
+}
+
+// helper function freia_dead_08_opencl_helper_0_0_0
+freia_status freia_dead_08_opencl_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= freia_dead_08_opencl_helper_0_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = freia_dead_08_opencl_helper_0_0_0_kernel[bpp];
+
+  // call kernel freia_dead_08_opencl_helper_0_0_0
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_dead_08
 
 // opencl for dag 0
 
+// opencl function freia_dead_08_opencl_helper_0_0_0
+KERNEL void freia_dead_08_opencl_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t10 = PIXEL_MAX;
+    t10 = PIXEL_INF(t10, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
+    t10 = PIXEL_INF(t10, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t10 = PIXEL_INF(t10, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
+    t10 = PIXEL_INF(t10, (is_W)? PIXEL_MAX: j0[i-1]);
+    t10 = PIXEL_INF(t10, in0);
+    t10 = PIXEL_INF(t10, (is_E)? PIXEL_MAX: j0[i+1]);
+    t10 = PIXEL_INF(t10, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
+    t10 = PIXEL_INF(t10, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    t10 = PIXEL_INF(t10, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    PIXEL t11 = PIXEL_ADD(t10, in0);
+    // set output pixels
+    p0[i] = t11;
+  }
+}
+
 ! updated function
 
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
-   freia_data2d *tmp;                                                   /*0007*/
-   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
-   freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
-   freia_aipo_add(out1, tmp, in);                                       /*0011*/
+   freia_dead_08_opencl_helper_0_0_0(out1, in);                         /*0010*/
    freia_aipo_copy(out0, out1);
 
-   freia_common_destruct_data(tmp);                                     /*0014*/
    return 0;                                                            /*0015*/
 }
 
@@ -682,14 +830,10 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
 
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
-   freia_data2d *tmp;                                                   /*0007*/
-   tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
-   freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
-   freia_aipo_add(out1, tmp, in);                                       /*0011*/
+   freia_dead_08_opencl_helper_0_0_0(out1, in);                         /*0010*/
    freia_aipo_copy(out0, out1);
 
-   freia_common_destruct_data(tmp);                                     /*0014*/
    return 0;                                                            /*0015*/
 }
 #

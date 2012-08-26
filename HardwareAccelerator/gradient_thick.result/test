@@ -721,6 +721,25 @@ digraph "gradient_thick_opencl_helper_0_0" {
   "in" -> "12 D8";
   "in" -> "11 E8";
 }
+// graph for dag "gradient_thick_opencl_helper_0_0_0" of module "gradient_thick" in dot format
+// DAG "gradient_thick_opencl_helper_0_0_0": #i=1 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
+digraph "gradient_thick_opencl_helper_0_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "in" -> "11 E8";
+  "in" -> "12 D8";
+}
 
 ! acceleration function
 
@@ -731,10 +750,165 @@ digraph "gradient_thick_opencl_helper_0_0" {
 
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
+
+// hold kernels for gradient_thick_opencl_helper_0_0_0
+static cl_kernel gradient_thick_opencl_helper_0_0_0_kernel[2];
+
+// compile kernels for gradient_thick_opencl_helper_0_0_0
+static freia_status gradient_thick_opencl_helper_0_0_0_compile(void)
+{
+  // OpenCL source for gradient_thick_opencl_helper_0_0_0
+  const char * gradient_thick_opencl_helper_0_0_0_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function gradient_thick_opencl_helper_0_0_0\n"
+    "KERNEL void gradient_thick_opencl_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t12 = PIXEL_MAX;\n"
+    "    t12 = PIXEL_INF(t12, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
+    "    t12 = PIXEL_INF(t12, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t12 = PIXEL_INF(t12, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
+    "    t12 = PIXEL_INF(t12, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t12 = PIXEL_INF(t12, in0);\n"
+    "    t12 = PIXEL_INF(t12, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t12 = PIXEL_INF(t12, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
+    "    t12 = PIXEL_INF(t12, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    t12 = PIXEL_INF(t12, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    PIXEL t11 = PIXEL_MIN;\n"
+    "    t11 = PIXEL_SUP(t11, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t11 = PIXEL_SUP(t11, in0);\n"
+    "    t11 = PIXEL_SUP(t11, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
+    "    t11 = PIXEL_SUP(t11, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
+    "    PIXEL t13 = PIXEL_SUB(t12, t11);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t13;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(gradient_thick_opencl_helper_0_0_0_source, "gradient_thick_opencl_helper_0_0_0", "-DPIXEL8", &gradient_thick_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(gradient_thick_opencl_helper_0_0_0_source, "gradient_thick_opencl_helper_0_0_0", "-DPIXEL16", &gradient_thick_opencl_helper_0_0_0_kernel[1]);
+  return err;
+}
+
+// helper function gradient_thick_opencl_helper_0_0_0
+freia_status gradient_thick_opencl_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= gradient_thick_opencl_helper_0_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = gradient_thick_opencl_helper_0_0_0_kernel[bpp];
+
+  // call kernel gradient_thick_opencl_helper_0_0_0
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function gradient_thick
 
 // opencl for dag 0
+
+// opencl function gradient_thick_opencl_helper_0_0_0
+KERNEL void gradient_thick_opencl_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t12 = PIXEL_MAX;
+    t12 = PIXEL_INF(t12, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
+    t12 = PIXEL_INF(t12, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t12 = PIXEL_INF(t12, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
+    t12 = PIXEL_INF(t12, (is_W)? PIXEL_MAX: j0[i-1]);
+    t12 = PIXEL_INF(t12, in0);
+    t12 = PIXEL_INF(t12, (is_E)? PIXEL_MAX: j0[i+1]);
+    t12 = PIXEL_INF(t12, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
+    t12 = PIXEL_INF(t12, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    t12 = PIXEL_INF(t12, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    PIXEL t11 = PIXEL_MIN;
+    t11 = PIXEL_SUP(t11, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
+    t11 = PIXEL_SUP(t11, (is_N)? PIXEL_MIN: j0[i-pitch]);
+    t11 = PIXEL_SUP(t11, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
+    t11 = PIXEL_SUP(t11, (is_W)? PIXEL_MIN: j0[i-1]);
+    t11 = PIXEL_SUP(t11, in0);
+    t11 = PIXEL_SUP(t11, (is_E)? PIXEL_MIN: j0[i+1]);
+    t11 = PIXEL_SUP(t11, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
+    t11 = PIXEL_SUP(t11, (is_S)? PIXEL_MIN: j0[i+pitch]);
+    t11 = PIXEL_SUP(t11, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
+    PIXEL t13 = PIXEL_SUB(t12, t11);
+    // set output pixels
+    p0[i] = t13;
+  }
+}
 
 ! updated function
 
@@ -742,19 +916,13 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 {
    
    
-   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
-   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
-   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
-   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   gradient_thick_opencl_helper_0_0_0(out, in);                         /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
-   freia_common_destruct_data(erode);                                   /*0017*/
-   freia_common_destruct_data(dilate);                                  /*0018*/
-
+   
    return FREIA_OK;                                                     /*0020*/
 }
 
@@ -764,19 +932,13 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
 {
    
    
-   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
-   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
    
    /* gradient thick using aipo calls*/
-   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
-   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
-   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   gradient_thick_opencl_helper_0_0_0(out, in);                         /*0011*/
    // freia_aipo_not(imout, imin);
    
    /* images destruction */
-   freia_common_destruct_data(erode);                                   /*0017*/
-   freia_common_destruct_data(dilate);                                  /*0018*/
-
+   
    return 0;                                                            /*0020*/
 }
 #

@@ -8108,12 +8108,30 @@ digraph "license_plate_copies_opencl_helper_0_0" {
   "in" -> "136 D8";
   "in" -> "64 E8";
 }
-// graph for dag "license_plate_copies_opencl_helper_0_0_1" of module "license_plate_copies" in dot format
-// DAG "license_plate_copies_opencl_helper_0_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
-digraph "license_plate_copies_opencl_helper_0_0_1" {
+// graph for dag "license_plate_copies_opencl_helper_0_0_0" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_0_0_0": #i=1 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_0_0_0" {
   // inputs
-  "imclose" [shape=circle];
-  "imopen" [shape=circle];
+  "in" [shape=circle];
+
+  // outputs
+  "imopen_29" [shape=circle];
+  "imclose_15" [shape=circle];
+
+  // computation vertices
+  "136 D8" [shape=box];
+  "136 D8" -> "imclose_15";
+  "64 E8" [shape=box];
+  "64 E8" -> "imopen_29";
+  "in" -> "136 D8";
+  "in" -> "64 E8";
+}
+// graph for dag "license_plate_copies_opencl_helper_0_0_2" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_0_0_2": #i=2 #o=1 #c=5 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_0_0_2" {
+  // inputs
+  "imclose_1" [shape=circle];
+  "imopen_1" [shape=circle];
 
   // outputs
   "imand" [shape=circle];
@@ -8123,10 +8141,102 @@ digraph "license_plate_copies_opencl_helper_0_0_1" {
   "179 &" -> "imand";
   "177 thr" [shape=parallelogram];
   "177 thr" -> "179 &" [label="imcloseth"];
-  "imclose" -> "177 thr";
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "imopen" -> "176 thr";
+  "124 D8" [shape=box];
+  "124 D8" -> "176 thr" [label="imopen"];
+  "imopen_1" -> "124 D8";
+  "168 E8" [shape=box];
+  "168 E8" -> "177 thr" [label="imclose"];
+  "imclose_1" -> "168 E8";
+}
+// graph for dag "license_plate_copies_opencl_helper_0_0_4" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_0_0_4": #i=2 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_0_0_4" {
+  // inputs
+  "in" [shape=circle];
+  "out_2" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "244 &" [shape=trapezium,orientation=270];
+  "244 &" -> "out";
+  "in" -> "244 &";
+  "239 D8" [shape=box];
+  "239 D8" -> "244 &" [label="out_1"];
+  "out_2" -> "239 D8";
+}
+// graph for dag "license_plate_copies_opencl_helper_D8_146" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_D8_146": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_D8_146" {
+  // inputs
+  "imfilt_1" [shape=circle];
+
+  // outputs
+  "imfilt" [shape=circle];
+
+  // computation vertices
+  "201 D8" [shape=box];
+  "201 D8" -> "imfilt";
+  "imfilt_1" -> "201 D8";
+}
+// graph for dag "license_plate_copies_opencl_helper_D8_511" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_D8_511": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_D8_511" {
+  // inputs
+  "out_3" [shape=circle];
+
+  // outputs
+  "out_2" [shape=circle];
+
+  // computation vertices
+  "238 D8" [shape=box];
+  "238 D8" -> "out_2";
+  "out_3" -> "238 D8";
+}
+// graph for dag "license_plate_copies_opencl_helper_D8_56" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_D8_56": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_D8_56" {
+  // inputs
+  "imopen_2" [shape=circle];
+
+  // outputs
+  "imopen_1" [shape=circle];
+
+  // computation vertices
+  "122 D8" [shape=box];
+  "122 D8" -> "imopen_1";
+  "imopen_2" -> "122 D8";
+}
+// graph for dag "license_plate_copies_opencl_helper_E8_146" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_E8_146": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_E8_146" {
+  // inputs
+  "imfilt_5" [shape=circle];
+
+  // outputs
+  "imfilt_4" [shape=circle];
+
+  // computation vertices
+  "191 E8" [shape=box];
+  "191 E8" -> "imfilt_4";
+  "imfilt_5" -> "191 E8";
+}
+// graph for dag "license_plate_copies_opencl_helper_E8_56" of module "license_plate_copies" in dot format
+// DAG "license_plate_copies_opencl_helper_E8_56": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "license_plate_copies_opencl_helper_E8_56" {
+  // inputs
+  "imopen_16" [shape=circle];
+
+  // outputs
+  "imopen_15" [shape=circle];
+
+  // computation vertices
+  "92 E8" [shape=box];
+  "92 E8" -> "imopen_15";
+  "imopen_16" -> "92 E8";
 }
 
 ! acceleration function
@@ -8139,18 +8249,270 @@ digraph "license_plate_copies_opencl_helper_0_0_1" {
 
 // dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0+0 copies
 
-// hold kernels for license_plate_copies_opencl_helper_0_0_1
-static cl_kernel license_plate_copies_opencl_helper_0_0_1_kernel[2];
+// hold kernels for license_plate_copies_opencl_helper_0_0_0
+static cl_kernel license_plate_copies_opencl_helper_0_0_0_kernel[2];
 
-// compile kernels for license_plate_copies_opencl_helper_0_0_1
-static freia_status license_plate_copies_opencl_helper_0_0_1_compile(void)
+// compile kernels for license_plate_copies_opencl_helper_0_0_0
+static freia_status license_plate_copies_opencl_helper_0_0_0_compile(void)
 {
-  // OpenCL source for license_plate_copies_opencl_helper_0_0_1
-  const char * license_plate_copies_opencl_helper_0_0_1_source =
+  // OpenCL source for license_plate_copies_opencl_helper_0_0_0
+  const char * license_plate_copies_opencl_helper_0_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function license_plate_copies_opencl_helper_0_0_1\n"
-    "KERNEL void license_plate_copies_opencl_helper_0_0_1(\n"
+    "// opencl function license_plate_copies_opencl_helper_0_0_0\n"
+    "KERNEL void license_plate_copies_opencl_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * o1,\n"
+    "  int ofs_o1,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t64 = PIXEL_MIN;\n"
+    "    t64 = PIXEL_SUP(t64, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t64 = PIXEL_SUP(t64, in0);\n"
+    "    t64 = PIXEL_SUP(t64, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    PIXEL t136 = PIXEL_MAX;\n"
+    "    t136 = PIXEL_INF(t136, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t136 = PIXEL_INF(t136, in0);\n"
+    "    t136 = PIXEL_INF(t136, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t64;\n"
+    "    p1[i] = t136;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_0_source, "license_plate_copies_opencl_helper_0_0_0", "-DPIXEL8", &license_plate_copies_opencl_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_0_source, "license_plate_copies_opencl_helper_0_0_0", "-DPIXEL16", &license_plate_copies_opencl_helper_0_0_0_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_0_0_0
+freia_status license_plate_copies_opencl_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_0_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_0_0_0_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_0_0_0
+  err |= freia_op_call_kernel(kernel, 2, 1, 0, 0, o0, o1, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_D8_56
+static cl_kernel license_plate_copies_opencl_helper_D8_56_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_D8_56
+static freia_status license_plate_copies_opencl_helper_D8_56_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_D8_56
+  const char * license_plate_copies_opencl_helper_D8_56_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_D8_56\n"
+    "KERNEL void license_plate_copies_opencl_helper_D8_56(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t122 = PIXEL_MAX;\n"
+    "    t122 = PIXEL_INF(t122, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t122 = PIXEL_INF(t122, in0);\n"
+    "    t122 = PIXEL_INF(t122, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t122;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_56_source, "license_plate_copies_opencl_helper_D8_56", "-DPIXEL8", &license_plate_copies_opencl_helper_D8_56_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_56_source, "license_plate_copies_opencl_helper_D8_56", "-DPIXEL16", &license_plate_copies_opencl_helper_D8_56_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_D8_56
+freia_status license_plate_copies_opencl_helper_D8_56(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_D8_56_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_D8_56_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_D8_56
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_E8_56
+static cl_kernel license_plate_copies_opencl_helper_E8_56_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_E8_56
+static freia_status license_plate_copies_opencl_helper_E8_56_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_E8_56
+  const char * license_plate_copies_opencl_helper_E8_56_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_E8_56\n"
+    "KERNEL void license_plate_copies_opencl_helper_E8_56(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t92 = PIXEL_MIN;\n"
+    "    t92 = PIXEL_SUP(t92, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t92 = PIXEL_SUP(t92, in0);\n"
+    "    t92 = PIXEL_SUP(t92, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t92;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_E8_56_source, "license_plate_copies_opencl_helper_E8_56", "-DPIXEL8", &license_plate_copies_opencl_helper_E8_56_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_E8_56_source, "license_plate_copies_opencl_helper_E8_56", "-DPIXEL16", &license_plate_copies_opencl_helper_E8_56_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_E8_56
+freia_status license_plate_copies_opencl_helper_E8_56(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_E8_56_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_E8_56_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_E8_56
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_0_0_2
+static cl_kernel license_plate_copies_opencl_helper_0_0_2_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_0_0_2
+static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_0_0_2
+  const char * license_plate_copies_opencl_helper_0_0_2_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_0_0_2\n"
+    "KERNEL void license_plate_copies_opencl_helper_0_0_2(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -8175,29 +8537,44 @@ static freia_status license_plate_copies_opencl_helper_0_0_1_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
     "  for (i=0; i<width; i++)\n"
     "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t176 = PIXEL_THRESHOLD(in1, c0, c1, c2);\n"
-    "    PIXEL t177 = PIXEL_THRESHOLD(in0, c3, c4, c5);\n"
+    "    PIXEL t168 = PIXEL_MIN;\n"
+    "    t168 = PIXEL_SUP(t168, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t168 = PIXEL_SUP(t168, in0);\n"
+    "    t168 = PIXEL_SUP(t168, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    PIXEL t124 = PIXEL_MAX;\n"
+    "    t124 = PIXEL_INF(t124, (is_W)? PIXEL_MAX: j1[i-1]);\n"
+    "    t124 = PIXEL_INF(t124, in1);\n"
+    "    t124 = PIXEL_INF(t124, (is_E)? PIXEL_MAX: j1[i+1]);\n"
+    "    PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);\n"
+    "    PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);\n"
     "    PIXEL t179 = PIXEL_AND(t176, t177);\n"
     "    // set output pixels\n"
     "    p0[i] = t179;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_1_source, "license_plate_copies_opencl_helper_0_0_1", "-DPIXEL8", &license_plate_copies_opencl_helper_0_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_1_source, "license_plate_copies_opencl_helper_0_0_1", "-DPIXEL16", &license_plate_copies_opencl_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_2_source, "license_plate_copies_opencl_helper_0_0_2", "-DPIXEL8", &license_plate_copies_opencl_helper_0_0_2_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_2_source, "license_plate_copies_opencl_helper_0_0_2", "-DPIXEL16", &license_plate_copies_opencl_helper_0_0_2_kernel[1]);
   return err;
 }
 
-// helper function license_plate_copies_opencl_helper_0_0_1
-freia_status license_plate_copies_opencl_helper_0_0_1(
+// helper function license_plate_copies_opencl_helper_0_0_2
+freia_status license_plate_copies_opencl_helper_0_0_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -8213,7 +8590,7 @@ freia_status license_plate_copies_opencl_helper_0_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= license_plate_copies_opencl_helper_0_0_1_compile();
+    err |= license_plate_copies_opencl_helper_0_0_2_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -8221,10 +8598,352 @@ freia_status license_plate_copies_opencl_helper_0_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = license_plate_copies_opencl_helper_0_0_1_kernel[bpp];
+  cl_kernel kernel = license_plate_copies_opencl_helper_0_0_2_kernel[bpp];
 
-  // call kernel license_plate_copies_opencl_helper_0_0_1
+  // call kernel license_plate_copies_opencl_helper_0_0_2
   err |= freia_op_call_kernel(kernel, 1, 2, 6, 0, o0, i0, i1, c0, c1, c2, c3, c4, c5);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_D8_511
+static cl_kernel license_plate_copies_opencl_helper_D8_511_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_D8_511
+static freia_status license_plate_copies_opencl_helper_D8_511_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_D8_511
+  const char * license_plate_copies_opencl_helper_D8_511_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_D8_511\n"
+    "KERNEL void license_plate_copies_opencl_helper_D8_511(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t238 = PIXEL_MAX;\n"
+    "    t238 = PIXEL_INF(t238, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
+    "    t238 = PIXEL_INF(t238, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t238 = PIXEL_INF(t238, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
+    "    t238 = PIXEL_INF(t238, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t238 = PIXEL_INF(t238, in0);\n"
+    "    t238 = PIXEL_INF(t238, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t238 = PIXEL_INF(t238, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
+    "    t238 = PIXEL_INF(t238, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    t238 = PIXEL_INF(t238, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t238;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_511_source, "license_plate_copies_opencl_helper_D8_511", "-DPIXEL8", &license_plate_copies_opencl_helper_D8_511_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_511_source, "license_plate_copies_opencl_helper_D8_511", "-DPIXEL16", &license_plate_copies_opencl_helper_D8_511_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_D8_511
+freia_status license_plate_copies_opencl_helper_D8_511(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_D8_511_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_D8_511_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_D8_511
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_D8_146
+static cl_kernel license_plate_copies_opencl_helper_D8_146_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_D8_146
+static freia_status license_plate_copies_opencl_helper_D8_146_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_D8_146
+  const char * license_plate_copies_opencl_helper_D8_146_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_D8_146\n"
+    "KERNEL void license_plate_copies_opencl_helper_D8_146(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t201 = PIXEL_MAX;\n"
+    "    t201 = PIXEL_INF(t201, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t201 = PIXEL_INF(t201, in0);\n"
+    "    t201 = PIXEL_INF(t201, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t201;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_146_source, "license_plate_copies_opencl_helper_D8_146", "-DPIXEL8", &license_plate_copies_opencl_helper_D8_146_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_D8_146_source, "license_plate_copies_opencl_helper_D8_146", "-DPIXEL16", &license_plate_copies_opencl_helper_D8_146_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_D8_146
+freia_status license_plate_copies_opencl_helper_D8_146(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_D8_146_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_D8_146_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_D8_146
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_E8_146
+static cl_kernel license_plate_copies_opencl_helper_E8_146_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_E8_146
+static freia_status license_plate_copies_opencl_helper_E8_146_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_E8_146
+  const char * license_plate_copies_opencl_helper_E8_146_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_E8_146\n"
+    "KERNEL void license_plate_copies_opencl_helper_E8_146(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t191 = PIXEL_MIN;\n"
+    "    t191 = PIXEL_SUP(t191, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
+    "    t191 = PIXEL_SUP(t191, in0);\n"
+    "    t191 = PIXEL_SUP(t191, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t191;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_E8_146_source, "license_plate_copies_opencl_helper_E8_146", "-DPIXEL8", &license_plate_copies_opencl_helper_E8_146_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_E8_146_source, "license_plate_copies_opencl_helper_E8_146", "-DPIXEL16", &license_plate_copies_opencl_helper_E8_146_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_E8_146
+freia_status license_plate_copies_opencl_helper_E8_146(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_E8_146_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_E8_146_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_E8_146
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for license_plate_copies_opencl_helper_0_0_4
+static cl_kernel license_plate_copies_opencl_helper_0_0_4_kernel[2];
+
+// compile kernels for license_plate_copies_opencl_helper_0_0_4
+static freia_status license_plate_copies_opencl_helper_0_0_4_compile(void)
+{
+  // OpenCL source for license_plate_copies_opencl_helper_0_0_4
+  const char * license_plate_copies_opencl_helper_0_0_4_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function license_plate_copies_opencl_helper_0_0_4\n"
+    "KERNEL void license_plate_copies_opencl_helper_0_0_4(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t239 = PIXEL_MAX;\n"
+    "    t239 = PIXEL_INF(t239, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);\n"
+    "    t239 = PIXEL_INF(t239, (is_N)? PIXEL_MAX: j1[i-pitch]);\n"
+    "    t239 = PIXEL_INF(t239, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);\n"
+    "    t239 = PIXEL_INF(t239, (is_W)? PIXEL_MAX: j1[i-1]);\n"
+    "    t239 = PIXEL_INF(t239, in1);\n"
+    "    t239 = PIXEL_INF(t239, (is_E)? PIXEL_MAX: j1[i+1]);\n"
+    "    t239 = PIXEL_INF(t239, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);\n"
+    "    t239 = PIXEL_INF(t239, (is_S)? PIXEL_MAX: j1[i+pitch]);\n"
+    "    t239 = PIXEL_INF(t239, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);\n"
+    "    PIXEL t244 = PIXEL_AND(t239, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t244;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_4_source, "license_plate_copies_opencl_helper_0_0_4", "-DPIXEL8", &license_plate_copies_opencl_helper_0_0_4_kernel[0]);
+  err |= freia_op_compile_kernel(license_plate_copies_opencl_helper_0_0_4_source, "license_plate_copies_opencl_helper_0_0_4", "-DPIXEL16", &license_plate_copies_opencl_helper_0_0_4_kernel[1]);
+  return err;
+}
+
+// helper function license_plate_copies_opencl_helper_0_0_4
+freia_status license_plate_copies_opencl_helper_0_0_4(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= license_plate_copies_opencl_helper_0_0_4_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = license_plate_copies_opencl_helper_0_0_4_kernel[bpp];
+
+  // call kernel license_plate_copies_opencl_helper_0_0_4
+  err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1);
 
   return err;
 }
@@ -8233,8 +8952,136 @@ freia_status license_plate_copies_opencl_helper_0_0_1(
 
 // opencl for dag 0
 
-// opencl function license_plate_copies_opencl_helper_0_0_1
-KERNEL void license_plate_copies_opencl_helper_0_0_1(
+// opencl function license_plate_copies_opencl_helper_0_0_0
+KERNEL void license_plate_copies_opencl_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * o1,
+  int ofs_o1,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t64 = PIXEL_MIN;
+    t64 = PIXEL_SUP(t64, (is_W)? PIXEL_MIN: j0[i-1]);
+    t64 = PIXEL_SUP(t64, in0);
+    t64 = PIXEL_SUP(t64, (is_E)? PIXEL_MIN: j0[i+1]);
+    PIXEL t136 = PIXEL_MAX;
+    t136 = PIXEL_INF(t136, (is_W)? PIXEL_MAX: j0[i-1]);
+    t136 = PIXEL_INF(t136, in0);
+    t136 = PIXEL_INF(t136, (is_E)? PIXEL_MAX: j0[i+1]);
+    // set output pixels
+    p0[i] = t64;
+    p1[i] = t136;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_D8_56
+KERNEL void license_plate_copies_opencl_helper_D8_56(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t122 = PIXEL_MAX;
+    t122 = PIXEL_INF(t122, (is_W)? PIXEL_MAX: j0[i-1]);
+    t122 = PIXEL_INF(t122, in0);
+    t122 = PIXEL_INF(t122, (is_E)? PIXEL_MAX: j0[i+1]);
+    // set output pixels
+    p0[i] = t122;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_E8_56
+KERNEL void license_plate_copies_opencl_helper_E8_56(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t92 = PIXEL_MIN;
+    t92 = PIXEL_SUP(t92, (is_W)? PIXEL_MIN: j0[i-1]);
+    t92 = PIXEL_SUP(t92, in0);
+    t92 = PIXEL_SUP(t92, (is_E)? PIXEL_MIN: j0[i+1]);
+    // set output pixels
+    p0[i] = t92;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_0_0_2
+KERNEL void license_plate_copies_opencl_helper_0_0_2(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -8259,19 +9106,211 @@ KERNEL void license_plate_copies_opencl_helper_0_0_1(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
   // thread's pixel loop
   int i;
   for (i=0; i<width; i++)
   {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
     // get input pixels
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t176 = PIXEL_THRESHOLD(in1, c0, c1, c2);
-    PIXEL t177 = PIXEL_THRESHOLD(in0, c3, c4, c5);
+    PIXEL t168 = PIXEL_MIN;
+    t168 = PIXEL_SUP(t168, (is_W)? PIXEL_MIN: j0[i-1]);
+    t168 = PIXEL_SUP(t168, in0);
+    t168 = PIXEL_SUP(t168, (is_E)? PIXEL_MIN: j0[i+1]);
+    PIXEL t124 = PIXEL_MAX;
+    t124 = PIXEL_INF(t124, (is_W)? PIXEL_MAX: j1[i-1]);
+    t124 = PIXEL_INF(t124, in1);
+    t124 = PIXEL_INF(t124, (is_E)? PIXEL_MAX: j1[i+1]);
+    PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);
+    PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);
     PIXEL t179 = PIXEL_AND(t176, t177);
     // set output pixels
     p0[i] = t179;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_D8_511
+KERNEL void license_plate_copies_opencl_helper_D8_511(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t238 = PIXEL_MAX;
+    t238 = PIXEL_INF(t238, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
+    t238 = PIXEL_INF(t238, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t238 = PIXEL_INF(t238, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
+    t238 = PIXEL_INF(t238, (is_W)? PIXEL_MAX: j0[i-1]);
+    t238 = PIXEL_INF(t238, in0);
+    t238 = PIXEL_INF(t238, (is_E)? PIXEL_MAX: j0[i+1]);
+    t238 = PIXEL_INF(t238, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
+    t238 = PIXEL_INF(t238, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    t238 = PIXEL_INF(t238, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    // set output pixels
+    p0[i] = t238;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_D8_146
+KERNEL void license_plate_copies_opencl_helper_D8_146(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t201 = PIXEL_MAX;
+    t201 = PIXEL_INF(t201, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t201 = PIXEL_INF(t201, in0);
+    t201 = PIXEL_INF(t201, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    // set output pixels
+    p0[i] = t201;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_E8_146
+KERNEL void license_plate_copies_opencl_helper_E8_146(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t191 = PIXEL_MIN;
+    t191 = PIXEL_SUP(t191, (is_N)? PIXEL_MIN: j0[i-pitch]);
+    t191 = PIXEL_SUP(t191, in0);
+    t191 = PIXEL_SUP(t191, (is_S)? PIXEL_MIN: j0[i+pitch]);
+    // set output pixels
+    p0[i] = t191;
+  }
+}
+
+// opencl function license_plate_copies_opencl_helper_0_0_4
+KERNEL void license_plate_copies_opencl_helper_0_0_4(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  GLOBAL PIXEL * i1, // const?
+  int ofs_i1,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    PIXEL in1 = j1[i];
+    // pixel computations
+    PIXEL t239 = PIXEL_MAX;
+    t239 = PIXEL_INF(t239, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);
+    t239 = PIXEL_INF(t239, (is_N)? PIXEL_MAX: j1[i-pitch]);
+    t239 = PIXEL_INF(t239, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);
+    t239 = PIXEL_INF(t239, (is_W)? PIXEL_MAX: j1[i-1]);
+    t239 = PIXEL_INF(t239, in1);
+    t239 = PIXEL_INF(t239, (is_E)? PIXEL_MAX: j1[i+1]);
+    t239 = PIXEL_INF(t239, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);
+    t239 = PIXEL_INF(t239, (is_S)? PIXEL_MAX: j1[i+pitch]);
+    t239 = PIXEL_INF(t239, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);
+    PIXEL t244 = PIXEL_AND(t239, in0);
+    // set output pixels
+    p0[i] = t244;
   }
 }
 
@@ -8289,10 +9328,8 @@ int license_plate_copies(void)
    freia_data2d *imfilt;                                                /*0020*/
    freia_data2d *imout;                                                 /*0021*/
    freia_data2d *out;                                                   /*0022*/
-
-   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
-   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
-
+   
+   
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
    freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
@@ -8302,6 +9339,8 @@ int license_plate_copies(void)
    int i_2;                                                             /*0036*/
    freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
+   // hardware accelerator generated variable
+   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0042*/
@@ -8310,7 +9349,9 @@ int license_plate_copies(void)
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
@@ -8336,85 +9377,81 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0064*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0068*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0070*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0072*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0074*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0076*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0078*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0080*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0082*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0084*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0086*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0088*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0090*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0092*/
+   license_plate_copies_opencl_helper_0_0_0(imopen, imclose_15, in);    /*0064*/
 
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0096*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0098*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0100*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0102*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0104*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0106*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0108*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0110*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0112*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0114*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0116*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0118*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0120*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0122*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0124*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0066*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0068*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0070*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0072*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0074*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0076*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0078*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0080*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0082*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0084*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0086*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0088*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0090*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0092*/
 
-   freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0136*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0138*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0140*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0142*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0144*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0146*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0148*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0150*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0096*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0098*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0100*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0102*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0104*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0106*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0108*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0110*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0112*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0114*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0116*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0118*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0120*/
+   license_plate_copies_opencl_helper_D8_56(imopen_1, imopen);          /*0122*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose_15);       /*0138*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0140*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0142*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0144*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0146*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0148*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0150*/
 
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0154*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0156*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0158*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0160*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0162*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0164*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
-
-   license_plate_copies_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0176*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0154*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0156*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0158*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0160*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0162*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0164*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0166*/
+   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);         /*0168*/
    
    
-   freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0187*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0189*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0191*/
+   
+   license_plate_copies_opencl_helper_E8_146(imfilt, imand);            /*0185*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0187*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0189*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0191*/
 
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0195*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0197*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0199*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0201*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0195*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0197*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0199*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0201*/
 
-   freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0213*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0215*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0217*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0219*/
+   license_plate_copies_opencl_helper_E8_56(imout, imfilt);             /*0213*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0215*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0217*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0219*/
 
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0223*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0225*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0227*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0229*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0223*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0225*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0227*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0229*/
 
-   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
-
-   freia_aipo_and(out, out, in);                                        /*0244*/
-
+   license_plate_copies_opencl_helper_D8_511(out, imout);               /*0237*/
+   license_plate_copies_opencl_helper_D8_511(out, out);                 /*0238*/
+   license_plate_copies_opencl_helper_0_0_4(out, in, out);              /*0239*/
+   
+   
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
@@ -8437,7 +9474,9 @@ int license_plate_copies(void)
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0248*/
    freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0254*/
    freia_common_destruct_data(imfilt);                                  /*0255*/
    freia_common_destruct_data(imout);                                   /*0256*/
@@ -8464,10 +9503,8 @@ int license_plate_copies(void)
    freia_data2d *imfilt;                                                /*0020*/
    freia_data2d *imout;                                                 /*0021*/
    freia_data2d *out;                                                   /*0022*/
-
-   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
-   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
-
+   
+   
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
    freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
@@ -8477,6 +9514,8 @@ int license_plate_copies(void)
    int i_2;                                                             /*0036*/
    freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
+   // hardware accelerator generated variable
+   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0042*/
@@ -8485,7 +9524,9 @@ int license_plate_copies(void)
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
@@ -8511,85 +9552,81 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0064*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0068*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0070*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0072*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0074*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0076*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0078*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0080*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0082*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0084*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0086*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0088*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0090*/
-   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0092*/
+   license_plate_copies_opencl_helper_0_0_0(imopen, imclose_15, in);    /*0064*/
 
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0096*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0098*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0100*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0102*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0104*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0106*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0108*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0110*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0112*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0114*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0116*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0118*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0120*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0122*/
-   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0124*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0066*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0068*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0070*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0072*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0074*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0076*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0078*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0080*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0082*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0084*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0086*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0088*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0090*/
+   license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0092*/
 
-   freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0136*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0138*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0140*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0142*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0144*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0146*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0148*/
-   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0150*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0096*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0098*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0100*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0102*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0104*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0106*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0108*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0110*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0112*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0114*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0116*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0118*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0120*/
+   license_plate_copies_opencl_helper_D8_56(imopen_1, imopen);          /*0122*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose_15);       /*0138*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0140*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0142*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0144*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0146*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0148*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0150*/
 
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0154*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0156*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0158*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0160*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0162*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0164*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
-   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
-
-   license_plate_copies_opencl_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0176*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0154*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0156*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0158*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0160*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0162*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0164*/
+   license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0166*/
+   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);         /*0168*/
    
    
-   freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0187*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0189*/
-   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0191*/
+   
+   license_plate_copies_opencl_helper_E8_146(imfilt, imand);            /*0185*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0187*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0189*/
+   license_plate_copies_opencl_helper_E8_146(imfilt, imfilt);           /*0191*/
 
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0195*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0197*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0199*/
-   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0201*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0195*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0197*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0199*/
+   license_plate_copies_opencl_helper_D8_146(imfilt, imfilt);           /*0201*/
 
-   freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0213*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0215*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0217*/
-   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0219*/
+   license_plate_copies_opencl_helper_E8_56(imout, imfilt);             /*0213*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0215*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0217*/
+   license_plate_copies_opencl_helper_E8_56(imout, imout);              /*0219*/
 
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0223*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0225*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0227*/
-   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0229*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0223*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0225*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0227*/
+   license_plate_copies_opencl_helper_D8_56(imout, imout);              /*0229*/
 
-   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
-
-   freia_aipo_and(out, out, in);                                        /*0244*/
-
+   license_plate_copies_opencl_helper_D8_511(out, imout);               /*0237*/
+   license_plate_copies_opencl_helper_D8_511(out, out);                 /*0238*/
+   license_plate_copies_opencl_helper_0_0_4(out, in, out);              /*0239*/
+   
+   
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
@@ -8612,7 +9649,9 @@ int license_plate_copies(void)
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0248*/
    freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0254*/
    freia_common_destruct_data(imfilt);                                  /*0255*/
    freia_common_destruct_data(imout);                                   /*0256*/

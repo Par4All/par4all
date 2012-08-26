@@ -506,6 +506,20 @@ digraph "border_oe_opencl_helper_0_0" {
   "8 E8" -> "out";
   "in" -> "8 E8";
 }
+// graph for dag "border_oe_opencl_helper_E8_56" of module "border_oe" in dot format
+// DAG "border_oe_opencl_helper_E8_56": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "border_oe_opencl_helper_E8_56" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
 // graph for dag "dag_0" of module "border_oe" in dot format
 // DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_0" {
@@ -544,10 +558,131 @@ digraph "dag_cleaned_0" {
 
 
 // dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
+
+// hold kernels for border_oe_opencl_helper_E8_56
+static cl_kernel border_oe_opencl_helper_E8_56_kernel[2];
+
+// compile kernels for border_oe_opencl_helper_E8_56
+static freia_status border_oe_opencl_helper_E8_56_compile(void)
+{
+  // OpenCL source for border_oe_opencl_helper_E8_56
+  const char * border_oe_opencl_helper_E8_56_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function border_oe_opencl_helper_E8_56\n"
+    "KERNEL void border_oe_opencl_helper_E8_56(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int threadid = get_global_id(0);\n"
+    "  int shift = pitch*threadid;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // detect N & S boundaries (assuming one thread per row)\n"
+    "  int is_N = (threadid==0);\n"
+    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int i;\n"
+    "  for (i=0; i<width; i++)\n"
+    "  {\n"
+    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t8 = PIXEL_MIN;\n"
+    "    t8 = PIXEL_SUP(t8, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t8 = PIXEL_SUP(t8, in0);\n"
+    "    t8 = PIXEL_SUP(t8, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t8;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(border_oe_opencl_helper_E8_56_source, "border_oe_opencl_helper_E8_56", "-DPIXEL8", &border_oe_opencl_helper_E8_56_kernel[0]);
+  err |= freia_op_compile_kernel(border_oe_opencl_helper_E8_56_source, "border_oe_opencl_helper_E8_56", "-DPIXEL16", &border_oe_opencl_helper_E8_56_kernel[1]);
+  return err;
+}
+
+// helper function border_oe_opencl_helper_E8_56
+freia_status border_oe_opencl_helper_E8_56(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= border_oe_opencl_helper_E8_56_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = border_oe_opencl_helper_E8_56_kernel[bpp];
+
+  // call kernel border_oe_opencl_helper_E8_56
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function border_oe
 
 // opencl for dag 0
+
+// opencl function border_oe_opencl_helper_E8_56
+KERNEL void border_oe_opencl_helper_E8_56(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int threadid = get_global_id(0);
+  int shift = pitch*threadid;
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // detect N & S boundaries (assuming one thread per row)
+  int is_N = (threadid==0);
+  int is_S = (threadid==(get_global_size(0)-1));
+
+  // thread's pixel loop
+  int i;
+  for (i=0; i<width; i++)
+  {
+    // detect W & E boundaries (assuming one row per thread)
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t8 = PIXEL_MIN;
+    t8 = PIXEL_SUP(t8, (is_W)? PIXEL_MIN: j0[i-1]);
+    t8 = PIXEL_SUP(t8, in0);
+    t8 = PIXEL_SUP(t8, (is_E)? PIXEL_MIN: j0[i+1]);
+    // set output pixels
+    p0[i] = t8;
+  }
+}
 
 ! updated function
 
@@ -555,8 +690,7 @@ void border_oe(freia_data2d *out, freia_data2d *in)
 {
    
    
-   const int32_t kernel = {0, 0, 0, 1, 1, 1, 0, 0, 0};                  /*0007*/
-   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+   border_oe_opencl_helper_E8_56(out, in);                              /*0008*/
 }
 
 ! cleaned up function
@@ -565,8 +699,7 @@ void border_oe(freia_data2d *out, freia_data2d *in)
 {
    
    
-   const int32_t kernel = {0, 0, 0, 1, 1, 1, 0, 0, 0};                  /*0007*/
-   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+   border_oe_opencl_helper_E8_56(out, in);                              /*0008*/
 }
 #
 # FREIA COMPILATION DONE
