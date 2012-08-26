@@ -130,8 +130,10 @@
 + could there be other benefits from a compiler?
 + use on-demand image transfers in "clever" runtime? (MB)
 + merge one erode/dilate/convol with subsequent arith ops?
-- generate kernel-specialized erode/dilate/convol
-- merge two or more erode/dilate/convol on the same input?
++ generate kernel-specialized erode/dilate/convol
++ merge two or more erode/dilate/convol on the same input?
+- merge reductions with same input kernel ops (anr999)?
+- constant kernels for transpositions (retina)?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
