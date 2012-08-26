@@ -37,6 +37,7 @@
 - should keep AIPO/software calls if accelerator calls are slower?
   I would I know that?
 - erode/dilate/convol {000 010 000} -> copy
+- erode/dilate/convol {000 000 000} -> cst(?)
 - copy(a,a) -> nope
 
 * code
