@@ -1707,7 +1707,7 @@ static bool freia_extract_kernel(
   expression ival = value_expression(val);
   if (!brace_expression_p(ival)) return !strict;
   list iargs = call_arguments(syntax_call(expression_syntax(ival)));
-  pips_assert("must be a kernel...", gen_length(iargs)==9);
+  pips_assert("must be a 3x3 kernel...", gen_length(iargs)==9);
   if (!expression_integer_value(EXPRESSION(CAR(iargs)), k00) && strict)
     return false;
   iargs = CDR(iargs);
@@ -1748,7 +1748,8 @@ bool freia_extract_kernel_vtx(
   intptr_t * k02, intptr_t * k12, intptr_t *k22)
 {
   list largs = freia_get_vertex_params(v);
-  pips_assert("one kernel", gen_length(largs)==1);
+  // for convolution there is one kernel & two args
+  // pips_assert("one kernel", gen_length(largs)==1);
   expression e = EXPRESSION(CAR(largs));
   return freia_extract_kernel(e, strict, k00, k10, k20,
                               k01, k11, k21, k02, k12, k22);

@@ -648,8 +648,9 @@ static void opencl_generate_special_kernel_ops(
   call c = freia_statement_to_call(dagvtx_statement(v));
   list largs = call_arguments(c);
 
-  // NOTE: this is not true for convolution...
-  pips_assert("3 arguments to function", gen_length(largs)==3);
+  int nargs = (int) gen_length(largs);
+  pips_assert("3/5 arguments to function", nargs==3 || nargs==5);
+  // for convolution, should check that we have a 3x3 kernel...
   call_function(c) = specialized;
   list third = CDR(CDR(largs));
   CDR(CDR(largs)) = NIL;
