@@ -129,8 +129,8 @@
 + expensive memory accesses => aggregate computations would help?
 + could there be other benefits from a compiler?
 + use on-demand image transfers in "clever" runtime? (MB)
++ merge one erode/dilate/convol with subsequent arith ops?
 - generate kernel-specialized erode/dilate/convol
-- merge one erode/dilate/convol with subsequent arith ops?
 - merge two or more erode/dilate/convol on the same input?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 - could use terapix-like tiling to help with cache?
