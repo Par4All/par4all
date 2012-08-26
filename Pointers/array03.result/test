@@ -2,6 +2,167 @@
 POINTS-TO
 
 
+// Points To IN:
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0][0] , MAY
+
+
+// Points To OUT: none
+
+int foo(float (*b)[3])
+{
+
+// Points To: none
+
+   float c;
+
+// Points To:
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0][0] , MAY
+
+   (*b)[3] = 2.0;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   c = (*b)[3];
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   b[1][3] = 2.0;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   c = b[1][3];
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   (*b)[3]++;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   (*b)[3] += 5.0;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   b[1][3]++;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   b[1][3] += 5.0;
+
+// Points To:
+// b -> _b_1[0][0] , EXACT
+
+   return 1;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo2(float b[5][3])
+{
+
+// Points To: none
+
+   float c;
+
+// Points To: none
+
+   (*b)[3] = 2.0;
+
+// Points To: none
+
+   c = (*b)[3];
+
+// Points To: none
+
+   b[1][3] = 2.0;
+
+// Points To: none
+
+   c = b[1][3];
+
+// Points To: none
+
+   (*b)[3]++;
+
+// Points To: none
+
+   (*b)[3] += 5.0;
+
+// Points To: none
+
+   b[1][3]++;
+
+// Points To: none
+
+   b[1][3] += 5.0;
+
+// Points To: none
+
+
+   return 1;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo3()
+{
+
+// Points To: none
+
+   float c;
+
+// Points To: none
+
+   (*d)[3] = 2.0;
+
+// Points To: none
+
+   c = (*d)[3];
+
+// Points To: none
+
+   d[1][3] = 2.0;
+
+// Points To: none
+
+   c = d[1][3];
+
+// Points To: none
+
+   (*d)[3]++;
+
+// Points To: none
+
+   (*d)[3] += 5.0;
+
+// Points To: none
+
+   d[1][3]++;
+
+// Points To: none
+
+   d[1][3] += 5.0;
+
+// Points To: none
+
+
+   return 1;
+}
+
 // Points To IN: none
 
 
