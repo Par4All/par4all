@@ -148,7 +148,8 @@ static int opencl_compile_mergeable_dag(
   entity reduced = NULL;
 
   // whether there is a kernel computation in dag
-  bool has_kernel = false;
+  bool has_kernel = false,
+    need_N = false, need_S = false, need_W = false, need_E = false;
 
   sb_cat(helper,
          "\n"
@@ -399,9 +400,18 @@ static int opencl_compile_mergeable_dag(
            (k10==0 || k10==1) && (k11==0 || k11==1) && (k12==0 || k12==1) &&
            (k20==0 || k20==1) && (k21==0 || k21==1) && (k22==0 || k22==1));
 
+      need_N = need_N || k00 || k01 || k02;
+      need_W = need_W || k00 || k10 || k20;
+      need_E = need_E || k02 || k12 || k22;
+      need_S = need_S || k20 || k21 || k22;
+
       // pixel t<vertex> = <init>;
-      sb_cat(opencl_body,
-             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
+      if (k11) // most likely to be non null
+        sb_cat(opencl_body,
+               "    " OPENCL_PIXEL "t", svn, " = in", sin, ";\n");
+      else
+        sb_cat(opencl_body,
+               "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
       // t<vertex> = <op>(t<vertex>, boundary?init:j[i+<shift....>]);
       if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_N|is_W)? ", api->opencl.init,
@@ -415,8 +425,6 @@ static int opencl_compile_mergeable_dag(
       if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_W)? ", api->opencl.init,
                       ": j", sin, "[i-1]);\n");
-      if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", in", sin, ");\n");
       if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_E)? ", api->opencl.init,
                       ": j", sin, "[i+1]);\n");
@@ -493,23 +501,36 @@ static int opencl_compile_mergeable_dag(
   string_buffer_append_sb(opencl, opencl_2);
   sb_cat(opencl, ")\n{\n");
   string_buffer_append_sb(opencl, opencl_head);
-  if (has_kernel)
+  if (has_kernel) {
     sb_cat(opencl,
            "\n"
-           "  // detect N & S boundaries (assuming one thread per row)\n"
-           "  int is_N = (threadid==0);\n"
-           "  int is_S = (threadid==(get_global_size(0)-1));\n");
+           "  // detect N & S boundaries (assuming one thread per row)\n");
+    if (need_N)
+      sb_cat(opencl, "  int is_N = (threadid==0);\n");
+    else
+      sb_cat(opencl, "  // N not needed\n");
+    if (need_S)
+      sb_cat(opencl, "  int is_S = (threadid==(get_global_size(0)-1));\n");
+    else sb_cat(opencl, "  // S not needed\n");
+  }
   sb_cat(opencl,
          "\n"
          "  // thread's pixel loop\n"
          "  int i;\n"
          "  for (i=0; i<width; i++)\n"
          "  {\n");
-  if (has_kernel)
+  if (has_kernel) {
     sb_cat(opencl,
-           "    // detect W & E boundaries (assuming one row per thread)\n"
-           "    int is_W = (i==0);\n"
-           "    int is_E = (i==(width-1));\n");
+           "    // detect W & E boundaries (assuming one row per thread)\n");
+    if (need_W)
+      sb_cat(opencl, "    int is_W = (i==0);\n");
+    else
+      sb_cat(opencl, "    // W not needed\n");
+    if (need_E)
+      sb_cat(opencl, "    int is_E = (i==(width-1));\n");
+    else
+      sb_cat(opencl, "    // E not needed\n");
+  }
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n");
