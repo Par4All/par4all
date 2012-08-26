@@ -516,7 +516,7 @@ static freia_status my_global_min_opencl_helper_0_0_0_compile(void)
     "KERNEL void my_global_min_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
@@ -531,7 +531,6 @@ static freia_status my_global_min_opencl_helper_0_0_0_compile(void)
     "  int vol = 0;\n"
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
-    "  int idy = get_global_id(0);\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -544,7 +543,7 @@ static freia_status my_global_min_opencl_helper_0_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[idy].min = mmin.x;\n"
+    "  redX[threadid].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(my_global_min_opencl_helper_0_0_0_source, "my_global_min_opencl_helper_0_0_0", "-DPIXEL8", &my_global_min_opencl_helper_0_0_0_kernel[0]);
@@ -592,7 +591,7 @@ freia_status my_global_min_opencl_helper_0_0_0(
 KERNEL void my_global_min_opencl_helper_0_0_0(
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   GLOBAL TMeasure * redX)
 {
@@ -607,7 +606,6 @@ KERNEL void my_global_min_opencl_helper_0_0_0(
   int vol = 0;
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
-  int idy = get_global_id(0);
 
   // thread's pixel loop
   int i;
@@ -620,7 +618,7 @@ KERNEL void my_global_min_opencl_helper_0_0_0(
   }
 
   // reduction copy out
-  redX[idy].min = mmin.x;
+  redX[threadid].min = mmin.x;
 }
 
 ! updated function

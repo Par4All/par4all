@@ -711,7 +711,7 @@ static freia_status sub_00_opencl_helper_0_0_0_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
     "  int ofs_o1,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -787,7 +787,7 @@ KERNEL void sub_00_opencl_helper_0_0_0(
   int ofs_o0,
   GLOBAL PIXEL * o1,
   int ofs_o1,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,

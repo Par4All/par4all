@@ -1731,7 +1731,7 @@ static freia_status freia_70_opencl_helper_0_0_2_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0)\n"
     "{\n"
@@ -1810,7 +1810,7 @@ KERNEL void freia_70_opencl_helper_0_0_2(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0)
 {

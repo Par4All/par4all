@@ -2933,7 +2933,7 @@ static freia_status oop_core_opencl_helper_0_0_1_compile(void)
     "  int ofs_i4,\n"
     "  GLOBAL PIXEL * i5, // const?\n"
     "  int ofs_i5,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
@@ -3028,7 +3028,7 @@ static freia_status oop_core_opencl_helper_0_0_3_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -3115,7 +3115,7 @@ KERNEL void oop_core_opencl_helper_0_0_1(
   int ofs_i4,
   GLOBAL PIXEL * i5, // const?
   int ofs_i5,
-  int width,
+  int width, // of the working area, vs image below
   int pitch)
 {
   // get id & compute global image shift
@@ -3163,7 +3163,7 @@ KERNEL void oop_core_opencl_helper_0_0_3(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,

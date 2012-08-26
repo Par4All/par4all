@@ -34118,7 +34118,7 @@ static freia_status main_opencl_helper_1_0_1_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -34233,7 +34233,7 @@ static freia_status main_opencl_helper_2_0_1_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
@@ -34250,7 +34250,6 @@ static freia_status main_opencl_helper_2_0_1_compile(void)
     "  int vol = 0;\n"
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
-    "  int idy = get_global_id(0);\n"
     "\n"
     "  // thread's pixel loop\n"
     "  int i;\n"
@@ -34267,7 +34266,7 @@ static freia_status main_opencl_helper_2_0_1_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[idy].vol = vol;\n"
+    "  redX[threadid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_2_0_1_source, "main_opencl_helper_2_0_1", "-DPIXEL8", &main_opencl_helper_2_0_1_kernel[0]);
@@ -34333,7 +34332,7 @@ static freia_status main_opencl_helper_3_0_0_compile(void)
     "  int ofs_i2,\n"
     "  GLOBAL PIXEL * i3, // const?\n"
     "  int ofs_i3,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -34433,7 +34432,7 @@ KERNEL void main_opencl_helper_1_0_1(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
@@ -34493,7 +34492,7 @@ KERNEL void main_opencl_helper_2_0_1(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   GLOBAL TMeasure * redX)
 {
@@ -34510,7 +34509,6 @@ KERNEL void main_opencl_helper_2_0_1(
   int vol = 0;
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
-  int idy = get_global_id(0);
 
   // thread's pixel loop
   int i;
@@ -34527,7 +34525,7 @@ KERNEL void main_opencl_helper_2_0_1(
   }
 
   // reduction copy out
-  redX[idy].vol = vol;
+  redX[threadid].vol = vol;
 }
 
 // opencl for dag 3
@@ -34544,7 +34542,7 @@ KERNEL void main_opencl_helper_3_0_0(
   int ofs_i2,
   GLOBAL PIXEL * i3, // const?
   int ofs_i3,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
