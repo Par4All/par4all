@@ -119,6 +119,7 @@ static int opencl_compile_mergeable_dag(
 
   dag_dot_dump(module, cut_name, d, NIL, NIL);
 
+  // I could handle a closed dag, such as volume(cst(12))...
   pips_assert("some input or output images", dag_inputs(d) || dag_outputs(d));
 
   set remainings = set_make(set_pointer);
@@ -186,6 +187,16 @@ static int opencl_compile_mergeable_dag(
   // count stuff in the generated code
   int nargs = 0, n_params = 0, n_misc = 0, cl_args = 1;
 
+  // get worksize identifiers...
+  sb_cat(opencl_head,
+         "  // get id & compute global image shift\n"
+         // here we assume a 1D worksize
+         "  int threadid = get_global_id(0);\n"
+         // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
+         "  int shift = pitch*threadid;\n"
+         "\n"
+         "  // get input & output image pointers\n");
+
   // output images
   if (n_outs)
     sb_cat(opencl_tail, "    // set output pixels\n");
@@ -197,9 +208,9 @@ static int opencl_compile_mergeable_dag(
     sb_cat(opencl, nargs? ",": "",
            "\n  " OPENCL_IMAGE "o", si,
            ",\n  int ofs_o", si);
-    // image p<out> = o<out> + ofs_o<out>;
+    // image p<out> = o<out> + ofs_o<out> + shift;
     sb_cat(opencl_head,
-           "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, ";\n");
+      "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, " + shift;\n");
     // , o<out>
     sb_cat(helper_body, ", o", si);
     // p<out>[i] = t<n>;
@@ -220,9 +231,9 @@ static int opencl_compile_mergeable_dag(
     sb_cat(helper, nargs? ",": "", "\n  const " FREIA_IMAGE "i", si);
     sb_cat(opencl, nargs? ",": "",
            "\n  " OPENCL_IMAGE "i", si, ", // const?\n  int ofs_i", si);
-    // image j<in> = i<in> + ofs_i<out>;
+    // image j<in> = i<in> + ofs_i<out> + shift;
     sb_cat(opencl_head,
-           "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, ";\n");
+      "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, " + shift;\n");
     // , i<in>
     sb_cat(helper_body, ", i", si);
     // pixel in<in> = j<in>[i];
@@ -387,33 +398,40 @@ static int opencl_compile_mergeable_dag(
            (k10==0 || k10==1) && (k11==0 || k11==1) && (k12==0 || k12==1) &&
            (k20==0 || k20==1) && (k21==0 || k21==1) && (k22==0 || k22==1));
 
-      sb_cat(opencl_body, "    // TODO: handle borders!\n");
       // pixel t<vertex> = <init>;
       sb_cat(opencl_body,
              "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
-      // t<vertex> = <op>(t<vertex>, j[i+<shift....>]);
+      // t<vertex> = <op>(t<vertex>, border?init:j[i+<shift....>]);
       if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i-1-width]);\n");
+                      "(t", svn, ", (is_N|is_W)?", api->opencl.init,
+                      ":j", sin, "[i-1-width]);\n");
       if (k01) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i-width]);\n");
+                      "(t", svn, ", (is_N)?", api->opencl.init,
+                      ":j", sin, "[i-width]);\n");
       if (k02) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i+1-width]);\n");
+                      "(t", svn, ", (is_N|is_E)?", api->opencl.init,
+                      ":j", sin, "[i+1-width]);\n");
       if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i-1]);\n");
+                      "(t", svn, ", (is_W)?", api->opencl.init,
+                      ":j", sin, "[i-1]);\n");
       if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", in", sin, ");\n");
       if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i+1]);\n");
+                      "(t", svn, ", (is_E)?", api->opencl.init,
+                      ":j", sin, "[i+1]);\n");
       if (k20) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i-1+width]);\n");
+                      "(t", svn, ", (is_W|is_S)?", api->opencl.init,
+                      ":j", sin, "[i-1+width]);\n");
       if (k21) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i+width]);\n");
+                      "(t", svn, ", (is_S)?", api->opencl.init,
+                      ":j", sin, "[i+width]);\n");
       if (k22) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", j", sin, "[i+1+width]);\n");
+                      "(t", svn, ", (is_E|is_S)?", api->opencl.init,
+                      ":j", sin, "[i+1+width]);\n");
 
       free(sin), sin = NULL;
     }
-    else //  we are compiling some pixel operation
+    else //  we are compiling an arithmetic pixel operation
     {
       // pixel t<vertex> = <op>(args...);
       sb_cat(opencl_body,
@@ -474,15 +492,24 @@ static int opencl_compile_mergeable_dag(
   string_buffer_append_sb(opencl, opencl_2);
   sb_cat(opencl, ")\n{\n");
   string_buffer_append_sb(opencl, opencl_head);
+  if (has_kernel)
+    sb_cat(opencl,
+           "\n"
+           "  // detect N & S borders\n"
+           "  int is_N = (threadid==0);\n"
+           "  // I need the image size?\n"
+           "  int is_S = 0;\n");
   sb_cat(opencl,
-         // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
          "\n"
          "  // thread's pixel loop\n"
-         "  int gid = pitch*get_global_id(0);\n"
          "  int i;\n"
-         "  for (i=gid; i < (gid+width); i++)\n"
+         "  for (i=0; i<width; i++)\n"
          "  {\n");
-  if (has_kernel) sb_cat(opencl, "    // TODO: border?\n");
+  if (has_kernel)
+    sb_cat(opencl,
+           "    // detect W & E borders\n"
+           "    int is_W = (i==0);\n"
+           "    int is_E = (i==width-1);\n");
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n");
