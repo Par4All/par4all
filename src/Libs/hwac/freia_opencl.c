@@ -245,7 +245,9 @@ static int opencl_compile_mergeable_dag(
   }
 
   // size parameters to handle an image row
-  sb_cat(opencl, ",\n  int width,\n  int pitch");
+  sb_cat(opencl, ",\n"
+         "  int width, // of the working area, vs image below\n"
+         "  int pitch");
   cl_args+=2;
 
   // there are possibly other kernel arguments yet to come...
@@ -325,8 +327,7 @@ static int opencl_compile_mergeable_dag(
                "  // reduction stuff is currently hardcoded...\n"
                "  int vol = 0;\n"
                "  int2 mmin = { PIXEL_MAX, 0 };\n"
-               "  int2 mmax = { PIXEL_MIN, 0 };\n"
-               "  int idy = get_global_id(0);\n");
+               "  int2 mmax = { PIXEL_MIN, 0 };\n");
         sb_cat(opencl_end, "\n  // reduction copy out\n");
         n_misc = 1;
       }
@@ -345,25 +346,25 @@ static int opencl_compile_mergeable_dag(
       // tail code to copy back stuff in OpenCL. ??? HARDCODED for now...
       if (same_string_p(api->compact_name, "max"))
       {
-        sb_cat(opencl_end,  "  redX[idy].max = mmax.x;\n");
+        sb_cat(opencl_end,  "  redX[threadid].max = mmax.x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "maximum;\n");
       }
       else if (same_string_p(api->compact_name, "min"))
       {
-        sb_cat(opencl_end, "  redX[idy].min = mmin.x;\n");
+        sb_cat(opencl_end, "  redX[threadid].min = mmin.x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "minimum;\n");
       }
       else if (same_string_p(api->compact_name, "vol"))
       {
-        sb_cat(opencl_end, "  redX[idy].vol = vol;\n");
+        sb_cat(opencl_end, "  redX[threadid].vol = vol;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "volume;\n");
       }
       else if (same_string_p(api->compact_name, "max!"))
       {
         sb_cat(opencl_end,
-               "  redX[idy].max = mmax.x;\n"
-               "  redX[idy].max_x = (uint) mmax.y;\n"
-               "  redX[idy].max_y = idy;\n");
+               "  redX[threadid].max = mmax.x;\n"
+               "  redX[threadid].max_x = (uint) mmax.y;\n"
+               "  redX[threadid].max_y = threadid;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "maximum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "max_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "max_coord_y;\n");
@@ -371,9 +372,9 @@ static int opencl_compile_mergeable_dag(
       else if (same_string_p(api->compact_name, "min!"))
       {
         sb_cat(opencl_end,
-               "  redX[idy].min = mmin.x;\n"
-               "  redX[idy].min_x = (uint) mmin.y;\n"
-               "  redX[idy].min_y = idy;\n");
+               "  redX[threadid].min = mmin.x;\n"
+               "  redX[threadid].min_x = (uint) mmin.y;\n"
+               "  redX[threadid].min_y = threadid;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
@@ -401,33 +402,33 @@ static int opencl_compile_mergeable_dag(
       // pixel t<vertex> = <init>;
       sb_cat(opencl_body,
              "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
-      // t<vertex> = <op>(t<vertex>, border?init:j[i+<shift....>]);
+      // t<vertex> = <op>(t<vertex>, boundary?init:j[i+<shift....>]);
       if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N|is_W)?", api->opencl.init,
-                      ":j", sin, "[i-1-width]);\n");
+                      "(t", svn, ", (is_N|is_W)? ", api->opencl.init,
+                      ": j", sin, "[i-pitch-1]);\n");
       if (k01) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N)?", api->opencl.init,
-                      ":j", sin, "[i-width]);\n");
+                      "(t", svn, ", (is_N)? ", api->opencl.init,
+                      ": j", sin, "[i-pitch]);\n");
       if (k02) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N|is_E)?", api->opencl.init,
-                      ":j", sin, "[i+1-width]);\n");
+                      "(t", svn, ", (is_N|is_E)? ", api->opencl.init,
+                      ": j", sin, "[i-pitch+1]);\n");
       if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_W)?", api->opencl.init,
-                      ":j", sin, "[i-1]);\n");
+                      "(t", svn, ", (is_W)? ", api->opencl.init,
+                      ": j", sin, "[i-1]);\n");
       if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", in", sin, ");\n");
       if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_E)?", api->opencl.init,
-                      ":j", sin, "[i+1]);\n");
+                      "(t", svn, ", (is_E)? ", api->opencl.init,
+                      ": j", sin, "[i+1]);\n");
       if (k20) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_W|is_S)?", api->opencl.init,
-                      ":j", sin, "[i-1+width]);\n");
+                      "(t", svn, ", (is_W|is_S)? ", api->opencl.init,
+                      ": j", sin, "[i+pitch-1]);\n");
       if (k21) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_S)?", api->opencl.init,
-                      ":j", sin, "[i+width]);\n");
+                      "(t", svn, ", (is_S)? ", api->opencl.init,
+                      ": j", sin, "[i+pitch]);\n");
       if (k22) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_E|is_S)?", api->opencl.init,
-                      ":j", sin, "[i+1+width]);\n");
+                      "(t", svn, ", (is_E|is_S)? ", api->opencl.init,
+                      ": j", sin, "[i+pitch+1]);\n");
 
       free(sin), sin = NULL;
     }
@@ -495,10 +496,9 @@ static int opencl_compile_mergeable_dag(
   if (has_kernel)
     sb_cat(opencl,
            "\n"
-           "  // detect N & S borders\n"
+           "  // detect N & S boundaries (assuming one thread per row)\n"
            "  int is_N = (threadid==0);\n"
-           "  // I need the image size?\n"
-           "  int is_S = 0;\n");
+           "  int is_S = (threadid==(get_global_size(0)-1));\n");
   sb_cat(opencl,
          "\n"
          "  // thread's pixel loop\n"
@@ -507,9 +507,9 @@ static int opencl_compile_mergeable_dag(
          "  {\n");
   if (has_kernel)
     sb_cat(opencl,
-           "    // detect W & E borders\n"
+           "    // detect W & E boundaries (assuming one row per thread)\n"
            "    int is_W = (i==0);\n"
-           "    int is_E = (i==width-1);\n");
+           "    int is_E = (i==(width-1));\n");
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n");
