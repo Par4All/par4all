@@ -600,9 +600,9 @@ static freia_status border_n_opencl_helper_E8_144_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = PIXEL_MIN;\n"
-    "    t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t8 = PIXEL_SUP(t8, in0);\n"
+    "    PIXEL t8 = PIXEL_MAX;\n"
+    "    t8 = PIXEL_INF(t8, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t8 = PIXEL_INF(t8, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
     "  }\n"
@@ -674,9 +674,9 @@ KERNEL void border_n_opencl_helper_E8_144(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t8 = PIXEL_MIN;
-    t8 = PIXEL_SUP(t8, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t8 = PIXEL_SUP(t8, in0);
+    PIXEL t8 = PIXEL_MAX;
+    t8 = PIXEL_INF(t8, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t8 = PIXEL_INF(t8, in0);
     // set output pixels
     p0[i] = t8;
   }

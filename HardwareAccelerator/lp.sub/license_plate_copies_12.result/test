@@ -9085,14 +9085,14 @@ static freia_status license_plate_copies_opencl_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t64 = PIXEL_MIN;\n"
-    "    t64 = PIXEL_SUP(t64, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t64 = PIXEL_SUP(t64, in0);\n"
-    "    t64 = PIXEL_SUP(t64, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    PIXEL t136 = PIXEL_MAX;\n"
-    "    t136 = PIXEL_INF(t136, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t136 = PIXEL_INF(t136, in0);\n"
-    "    t136 = PIXEL_INF(t136, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL t64 = PIXEL_MAX;\n"
+    "    t64 = PIXEL_INF(t64, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t64 = PIXEL_INF(t64, in0);\n"
+    "    t64 = PIXEL_INF(t64, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL t136 = PIXEL_MIN;\n"
+    "    t136 = PIXEL_SUP(t136, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t136 = PIXEL_SUP(t136, in0);\n"
+    "    t136 = PIXEL_SUP(t136, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t64;\n"
     "    p1[i] = t136;\n"
@@ -9172,10 +9172,10 @@ static freia_status license_plate_copies_opencl_helper_D8_56_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t122 = PIXEL_MAX;\n"
-    "    t122 = PIXEL_INF(t122, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t122 = PIXEL_INF(t122, in0);\n"
-    "    t122 = PIXEL_INF(t122, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL t122 = PIXEL_MIN;\n"
+    "    t122 = PIXEL_SUP(t122, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t122 = PIXEL_SUP(t122, in0);\n"
+    "    t122 = PIXEL_SUP(t122, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t122;\n"
     "  }\n"
@@ -9253,10 +9253,10 @@ static freia_status license_plate_copies_opencl_helper_E8_56_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t92 = PIXEL_MIN;\n"
-    "    t92 = PIXEL_SUP(t92, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t92 = PIXEL_SUP(t92, in0);\n"
-    "    t92 = PIXEL_SUP(t92, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    PIXEL t92 = PIXEL_MAX;\n"
+    "    t92 = PIXEL_INF(t92, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t92 = PIXEL_INF(t92, in0);\n"
+    "    t92 = PIXEL_INF(t92, (is_E)? PIXEL_MAX: j0[i+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t92;\n"
     "  }\n"
@@ -9344,14 +9344,14 @@ static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t168 = PIXEL_MIN;\n"
-    "    t168 = PIXEL_SUP(t168, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t168 = PIXEL_SUP(t168, in0);\n"
-    "    t168 = PIXEL_SUP(t168, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    PIXEL t124 = PIXEL_MAX;\n"
-    "    t124 = PIXEL_INF(t124, (is_W)? PIXEL_MAX: j1[i-1]);\n"
-    "    t124 = PIXEL_INF(t124, in1);\n"
-    "    t124 = PIXEL_INF(t124, (is_E)? PIXEL_MAX: j1[i+1]);\n"
+    "    PIXEL t168 = PIXEL_MAX;\n"
+    "    t168 = PIXEL_INF(t168, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t168 = PIXEL_INF(t168, in0);\n"
+    "    t168 = PIXEL_INF(t168, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL t124 = PIXEL_MIN;\n"
+    "    t124 = PIXEL_SUP(t124, (is_W)? PIXEL_MIN: j1[i-1]);\n"
+    "    t124 = PIXEL_SUP(t124, in1);\n"
+    "    t124 = PIXEL_SUP(t124, (is_E)? PIXEL_MIN: j1[i+1]);\n"
     "    PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);\n"
     "    PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);\n"
     "    PIXEL t179 = PIXEL_AND(t176, t177);\n"
@@ -9439,16 +9439,16 @@ static freia_status license_plate_copies_opencl_helper_D8_511_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t238 = PIXEL_MAX;\n"
-    "    t238 = PIXEL_INF(t238, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
-    "    t238 = PIXEL_INF(t238, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t238 = PIXEL_INF(t238, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
-    "    t238 = PIXEL_INF(t238, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t238 = PIXEL_INF(t238, in0);\n"
-    "    t238 = PIXEL_INF(t238, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    t238 = PIXEL_INF(t238, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
-    "    t238 = PIXEL_INF(t238, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
-    "    t238 = PIXEL_INF(t238, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    PIXEL t238 = PIXEL_MIN;\n"
+    "    t238 = PIXEL_SUP(t238, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t238 = PIXEL_SUP(t238, in0);\n"
+    "    t238 = PIXEL_SUP(t238, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
+    "    t238 = PIXEL_SUP(t238, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
     "    // set output pixels\n"
     "    p0[i] = t238;\n"
     "  }\n"
@@ -9526,10 +9526,10 @@ static freia_status license_plate_copies_opencl_helper_D8_146_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t201 = PIXEL_MAX;\n"
-    "    t201 = PIXEL_INF(t201, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t201 = PIXEL_INF(t201, in0);\n"
-    "    t201 = PIXEL_INF(t201, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    PIXEL t201 = PIXEL_MIN;\n"
+    "    t201 = PIXEL_SUP(t201, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
+    "    t201 = PIXEL_SUP(t201, in0);\n"
+    "    t201 = PIXEL_SUP(t201, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
     "    // set output pixels\n"
     "    p0[i] = t201;\n"
     "  }\n"
@@ -9607,10 +9607,10 @@ static freia_status license_plate_copies_opencl_helper_E8_146_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t191 = PIXEL_MIN;\n"
-    "    t191 = PIXEL_SUP(t191, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t191 = PIXEL_SUP(t191, in0);\n"
-    "    t191 = PIXEL_SUP(t191, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
+    "    PIXEL t191 = PIXEL_MAX;\n"
+    "    t191 = PIXEL_INF(t191, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t191 = PIXEL_INF(t191, in0);\n"
+    "    t191 = PIXEL_INF(t191, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
     "    // set output pixels\n"
     "    p0[i] = t191;\n"
     "  }\n"
@@ -9692,16 +9692,16 @@ static freia_status license_plate_copies_opencl_helper_0_0_4_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t239 = PIXEL_MAX;\n"
-    "    t239 = PIXEL_INF(t239, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);\n"
-    "    t239 = PIXEL_INF(t239, (is_N)? PIXEL_MAX: j1[i-pitch]);\n"
-    "    t239 = PIXEL_INF(t239, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);\n"
-    "    t239 = PIXEL_INF(t239, (is_W)? PIXEL_MAX: j1[i-1]);\n"
-    "    t239 = PIXEL_INF(t239, in1);\n"
-    "    t239 = PIXEL_INF(t239, (is_E)? PIXEL_MAX: j1[i+1]);\n"
-    "    t239 = PIXEL_INF(t239, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);\n"
-    "    t239 = PIXEL_INF(t239, (is_S)? PIXEL_MAX: j1[i+pitch]);\n"
-    "    t239 = PIXEL_INF(t239, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);\n"
+    "    PIXEL t239 = PIXEL_MIN;\n"
+    "    t239 = PIXEL_SUP(t239, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_N)? PIXEL_MIN: j1[i-pitch]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_W)? PIXEL_MIN: j1[i-1]);\n"
+    "    t239 = PIXEL_SUP(t239, in1);\n"
+    "    t239 = PIXEL_SUP(t239, (is_E)? PIXEL_MIN: j1[i+1]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_S)? PIXEL_MIN: j1[i+pitch]);\n"
+    "    t239 = PIXEL_SUP(t239, (is_E|is_S)? PIXEL_MIN: j1[i+pitch+1]);\n"
     "    PIXEL t244 = PIXEL_AND(t239, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t244;\n"
@@ -9778,14 +9778,14 @@ KERNEL void license_plate_copies_opencl_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t64 = PIXEL_MIN;
-    t64 = PIXEL_SUP(t64, (is_W)? PIXEL_MIN: j0[i-1]);
-    t64 = PIXEL_SUP(t64, in0);
-    t64 = PIXEL_SUP(t64, (is_E)? PIXEL_MIN: j0[i+1]);
-    PIXEL t136 = PIXEL_MAX;
-    t136 = PIXEL_INF(t136, (is_W)? PIXEL_MAX: j0[i-1]);
-    t136 = PIXEL_INF(t136, in0);
-    t136 = PIXEL_INF(t136, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL t64 = PIXEL_MAX;
+    t64 = PIXEL_INF(t64, (is_W)? PIXEL_MAX: j0[i-1]);
+    t64 = PIXEL_INF(t64, in0);
+    t64 = PIXEL_INF(t64, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL t136 = PIXEL_MIN;
+    t136 = PIXEL_SUP(t136, (is_W)? PIXEL_MIN: j0[i-1]);
+    t136 = PIXEL_SUP(t136, in0);
+    t136 = PIXEL_SUP(t136, (is_E)? PIXEL_MIN: j0[i+1]);
     // set output pixels
     p0[i] = t64;
     p1[i] = t136;
@@ -9823,10 +9823,10 @@ KERNEL void license_plate_copies_opencl_helper_D8_56(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t122 = PIXEL_MAX;
-    t122 = PIXEL_INF(t122, (is_W)? PIXEL_MAX: j0[i-1]);
-    t122 = PIXEL_INF(t122, in0);
-    t122 = PIXEL_INF(t122, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL t122 = PIXEL_MIN;
+    t122 = PIXEL_SUP(t122, (is_W)? PIXEL_MIN: j0[i-1]);
+    t122 = PIXEL_SUP(t122, in0);
+    t122 = PIXEL_SUP(t122, (is_E)? PIXEL_MIN: j0[i+1]);
     // set output pixels
     p0[i] = t122;
   }
@@ -9863,10 +9863,10 @@ KERNEL void license_plate_copies_opencl_helper_E8_56(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t92 = PIXEL_MIN;
-    t92 = PIXEL_SUP(t92, (is_W)? PIXEL_MIN: j0[i-1]);
-    t92 = PIXEL_SUP(t92, in0);
-    t92 = PIXEL_SUP(t92, (is_E)? PIXEL_MIN: j0[i+1]);
+    PIXEL t92 = PIXEL_MAX;
+    t92 = PIXEL_INF(t92, (is_W)? PIXEL_MAX: j0[i-1]);
+    t92 = PIXEL_INF(t92, in0);
+    t92 = PIXEL_INF(t92, (is_E)? PIXEL_MAX: j0[i+1]);
     // set output pixels
     p0[i] = t92;
   }
@@ -9913,14 +9913,14 @@ KERNEL void license_plate_copies_opencl_helper_0_0_2(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t168 = PIXEL_MIN;
-    t168 = PIXEL_SUP(t168, (is_W)? PIXEL_MIN: j0[i-1]);
-    t168 = PIXEL_SUP(t168, in0);
-    t168 = PIXEL_SUP(t168, (is_E)? PIXEL_MIN: j0[i+1]);
-    PIXEL t124 = PIXEL_MAX;
-    t124 = PIXEL_INF(t124, (is_W)? PIXEL_MAX: j1[i-1]);
-    t124 = PIXEL_INF(t124, in1);
-    t124 = PIXEL_INF(t124, (is_E)? PIXEL_MAX: j1[i+1]);
+    PIXEL t168 = PIXEL_MAX;
+    t168 = PIXEL_INF(t168, (is_W)? PIXEL_MAX: j0[i-1]);
+    t168 = PIXEL_INF(t168, in0);
+    t168 = PIXEL_INF(t168, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL t124 = PIXEL_MIN;
+    t124 = PIXEL_SUP(t124, (is_W)? PIXEL_MIN: j1[i-1]);
+    t124 = PIXEL_SUP(t124, in1);
+    t124 = PIXEL_SUP(t124, (is_E)? PIXEL_MIN: j1[i+1]);
     PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);
     PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);
     PIXEL t179 = PIXEL_AND(t176, t177);
@@ -9960,16 +9960,16 @@ KERNEL void license_plate_copies_opencl_helper_D8_511(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t238 = PIXEL_MAX;
-    t238 = PIXEL_INF(t238, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
-    t238 = PIXEL_INF(t238, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t238 = PIXEL_INF(t238, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
-    t238 = PIXEL_INF(t238, (is_W)? PIXEL_MAX: j0[i-1]);
-    t238 = PIXEL_INF(t238, in0);
-    t238 = PIXEL_INF(t238, (is_E)? PIXEL_MAX: j0[i+1]);
-    t238 = PIXEL_INF(t238, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
-    t238 = PIXEL_INF(t238, (is_S)? PIXEL_MAX: j0[i+pitch]);
-    t238 = PIXEL_INF(t238, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    PIXEL t238 = PIXEL_MIN;
+    t238 = PIXEL_SUP(t238, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
+    t238 = PIXEL_SUP(t238, (is_N)? PIXEL_MIN: j0[i-pitch]);
+    t238 = PIXEL_SUP(t238, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
+    t238 = PIXEL_SUP(t238, (is_W)? PIXEL_MIN: j0[i-1]);
+    t238 = PIXEL_SUP(t238, in0);
+    t238 = PIXEL_SUP(t238, (is_E)? PIXEL_MIN: j0[i+1]);
+    t238 = PIXEL_SUP(t238, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
+    t238 = PIXEL_SUP(t238, (is_S)? PIXEL_MIN: j0[i+pitch]);
+    t238 = PIXEL_SUP(t238, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
     // set output pixels
     p0[i] = t238;
   }
@@ -10006,10 +10006,10 @@ KERNEL void license_plate_copies_opencl_helper_D8_146(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t201 = PIXEL_MAX;
-    t201 = PIXEL_INF(t201, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t201 = PIXEL_INF(t201, in0);
-    t201 = PIXEL_INF(t201, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    PIXEL t201 = PIXEL_MIN;
+    t201 = PIXEL_SUP(t201, (is_N)? PIXEL_MIN: j0[i-pitch]);
+    t201 = PIXEL_SUP(t201, in0);
+    t201 = PIXEL_SUP(t201, (is_S)? PIXEL_MIN: j0[i+pitch]);
     // set output pixels
     p0[i] = t201;
   }
@@ -10046,10 +10046,10 @@ KERNEL void license_plate_copies_opencl_helper_E8_146(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t191 = PIXEL_MIN;
-    t191 = PIXEL_SUP(t191, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t191 = PIXEL_SUP(t191, in0);
-    t191 = PIXEL_SUP(t191, (is_S)? PIXEL_MIN: j0[i+pitch]);
+    PIXEL t191 = PIXEL_MAX;
+    t191 = PIXEL_INF(t191, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t191 = PIXEL_INF(t191, in0);
+    t191 = PIXEL_INF(t191, (is_S)? PIXEL_MAX: j0[i+pitch]);
     // set output pixels
     p0[i] = t191;
   }
@@ -10090,16 +10090,16 @@ KERNEL void license_plate_copies_opencl_helper_0_0_4(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t239 = PIXEL_MAX;
-    t239 = PIXEL_INF(t239, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);
-    t239 = PIXEL_INF(t239, (is_N)? PIXEL_MAX: j1[i-pitch]);
-    t239 = PIXEL_INF(t239, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);
-    t239 = PIXEL_INF(t239, (is_W)? PIXEL_MAX: j1[i-1]);
-    t239 = PIXEL_INF(t239, in1);
-    t239 = PIXEL_INF(t239, (is_E)? PIXEL_MAX: j1[i+1]);
-    t239 = PIXEL_INF(t239, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);
-    t239 = PIXEL_INF(t239, (is_S)? PIXEL_MAX: j1[i+pitch]);
-    t239 = PIXEL_INF(t239, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);
+    PIXEL t239 = PIXEL_MIN;
+    t239 = PIXEL_SUP(t239, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);
+    t239 = PIXEL_SUP(t239, (is_N)? PIXEL_MIN: j1[i-pitch]);
+    t239 = PIXEL_SUP(t239, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);
+    t239 = PIXEL_SUP(t239, (is_W)? PIXEL_MIN: j1[i-1]);
+    t239 = PIXEL_SUP(t239, in1);
+    t239 = PIXEL_SUP(t239, (is_E)? PIXEL_MIN: j1[i+1]);
+    t239 = PIXEL_SUP(t239, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);
+    t239 = PIXEL_SUP(t239, (is_S)? PIXEL_MIN: j1[i+pitch]);
+    t239 = PIXEL_SUP(t239, (is_E|is_S)? PIXEL_MIN: j1[i+pitch+1]);
     PIXEL t244 = PIXEL_AND(t239, in0);
     // set output pixels
     p0[i] = t244;
