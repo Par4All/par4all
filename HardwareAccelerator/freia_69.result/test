@@ -129,8 +129,6 @@ digraph "dag_cleaned_0" {
 int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
    freia_data2d *t1, *t2;                                               /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
    t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
 
@@ -145,13 +143,12 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
    freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
    freia_aipo_sub(o0, in, o0);                                          /*0018*/
    freia_aipo_not(t1, in);                                              /*0019*/
-   freia_aipo_inf_const(o1_1, t1, 255);                                 /*0020*/
+   freia_aipo_inf_const(o1, t1, 255);                                   /*0020*/
    freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
-   freia_aipo_inf(o1, o1_1, t2);                                        /*0022*/
+   freia_aipo_inf(o1, o1, t2);                                          /*0022*/
 
    freia_common_destruct_data(t1);                                      /*0024*/
    freia_common_destruct_data(t2);                                      /*0025*/
-   freia_common_destruct_data(o1_1);
    return 0;                                                            /*0026*/
 }
 #
@@ -2226,16 +2223,13 @@ KERNEL void freia_69_opencl_helper_0_0_2(
 int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
    freia_data2d *t1;                                                    /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
 
-   freia_69_opencl_helper_0_0_0(t1, o0, o1_1, in, 1, 1, 255, 1, 1, 1, 1, 1);           /*0009*/
+   freia_69_opencl_helper_0_0_0(t1, o0, o1, in, 1, 1, 255, 1, 1, 1, 1, 1);             /*0009*/
    freia_69_opencl_helper_E8_511(o0, o0);                               /*0016*/
-   freia_69_opencl_helper_0_0_2(o0, o1, t1, in, o0, o1_1);              /*0017*/
+   freia_69_opencl_helper_0_0_2(o0, o1, t1, in, o0, o1);                /*0017*/
 
    freia_common_destruct_data(t1);                                      /*0024*/
-   freia_common_destruct_data(o1_1);
    return 0;                                                            /*0026*/
 }
 
@@ -2244,16 +2238,13 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
    freia_data2d *t1;                                                    /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
 
-   freia_69_opencl_helper_0_0_0(t1, o0, o1_1, in, 1, 1, 255, 1, 1, 1, 1, 1);           /*0009*/
+   freia_69_opencl_helper_0_0_0(t1, o0, o1, in, 1, 1, 255, 1, 1, 1, 1, 1);             /*0009*/
    freia_69_opencl_helper_E8_511(o0, o0);                               /*0016*/
-   freia_69_opencl_helper_0_0_2(o0, o1, t1, in, o0, o1_1);              /*0017*/
+   freia_69_opencl_helper_0_0_2(o0, o1, t1, in, o0, o1);                /*0017*/
 
    freia_common_destruct_data(t1);                                      /*0024*/
-   freia_common_destruct_data(o1_1);
    return 0;                                                            /*0026*/
 }
 #

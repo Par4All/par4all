@@ -8422,8 +8422,6 @@ int main(int argc, char *argv[])
    freia_data2d *imand, *imfilt, *imout, *out;                          /*0009*/
 
    freia_status ret = 0;                                                /*0014*/
-   // hardware accelerator generated variable
-   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0016*/
 
@@ -8432,9 +8430,7 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0021*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0023*/
-   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0024*/
-   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0027*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0028*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0029*/
@@ -8448,7 +8444,7 @@ int main(int argc, char *argv[])
    
    ret = 0;                                                             /*0036*/
 
-   main_opencl_helper_0_0_0(imopen, imclose_15, in);                    /*0038*/
+   main_opencl_helper_0_0_0(imopen, imclose, in);                       /*0038*/
 
    main_opencl_helper_E8_56(imopen, imopen);                            /*0040*/
    main_opencl_helper_E8_56(imopen, imopen);                            /*0042*/
@@ -8478,8 +8474,8 @@ int main(int argc, char *argv[])
    main_opencl_helper_D8_56(imopen, imopen);                            /*0089*/
    main_opencl_helper_D8_56(imopen, imopen);                            /*0091*/
    main_opencl_helper_D8_56(imopen, imopen);                            /*0093*/
-   main_opencl_helper_D8_56(imopen_1, imopen);                          /*0095*/
-   main_opencl_helper_D8_56(imclose, imclose_15);                       /*0108*/
+   main_opencl_helper_D8_56(imopen, imopen);                            /*0095*/
+   main_opencl_helper_D8_56(imclose, imclose);                          /*0108*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0110*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0112*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0114*/
@@ -8494,7 +8490,7 @@ int main(int argc, char *argv[])
    main_opencl_helper_E8_56(imclose, imclose);                          /*0131*/
    main_opencl_helper_E8_56(imclose, imclose);                          /*0133*/
    main_opencl_helper_E8_56(imclose, imclose);                          /*0135*/
-   main_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);          /*0137*/
+   main_opencl_helper_0_0_2(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);            /*0137*/
    
    
    main_opencl_helper_E8_146(imfilt, imand);                            /*0150*/
@@ -8532,9 +8528,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0201*/
    freia_common_destruct_data(imopen);                                  /*0203*/
-   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0204*/
-   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0207*/
    freia_common_destruct_data(imfilt);                                  /*0208*/
    freia_common_destruct_data(imout);                                   /*0209*/
@@ -8557,8 +8551,6 @@ int main(int argc, char *argv[])
    freia_data2d *imand, *imfilt, *imout, *out;                          /*0009*/
 
    freia_status ret = 0;                                                /*0014*/
-   // hardware accelerator generated variable
-   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0016*/
 
@@ -8567,9 +8559,7 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0021*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0023*/
-   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0024*/
-   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0027*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0028*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0029*/
@@ -8583,7 +8573,7 @@ int main(int argc, char *argv[])
    
    ret = 0;                                                             /*0036*/
 
-   main_opencl_helper_0_0_0(imopen, imclose_15, in);                    /*0038*/
+   main_opencl_helper_0_0_0(imopen, imclose, in);                       /*0038*/
 
    main_opencl_helper_E8_56(imopen, imopen);                            /*0040*/
    main_opencl_helper_E8_56(imopen, imopen);                            /*0042*/
@@ -8613,8 +8603,8 @@ int main(int argc, char *argv[])
    main_opencl_helper_D8_56(imopen, imopen);                            /*0089*/
    main_opencl_helper_D8_56(imopen, imopen);                            /*0091*/
    main_opencl_helper_D8_56(imopen, imopen);                            /*0093*/
-   main_opencl_helper_D8_56(imopen_1, imopen);                          /*0095*/
-   main_opencl_helper_D8_56(imclose, imclose_15);                       /*0108*/
+   main_opencl_helper_D8_56(imopen, imopen);                            /*0095*/
+   main_opencl_helper_D8_56(imclose, imclose);                          /*0108*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0110*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0112*/
    main_opencl_helper_D8_56(imclose, imclose);                          /*0114*/
@@ -8629,7 +8619,7 @@ int main(int argc, char *argv[])
    main_opencl_helper_E8_56(imclose, imclose);                          /*0131*/
    main_opencl_helper_E8_56(imclose, imclose);                          /*0133*/
    main_opencl_helper_E8_56(imclose, imclose);                          /*0135*/
-   main_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);          /*0137*/
+   main_opencl_helper_0_0_2(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);            /*0137*/
    
    
    main_opencl_helper_E8_146(imfilt, imand);                            /*0150*/
@@ -8667,9 +8657,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0201*/
    freia_common_destruct_data(imopen);                                  /*0203*/
-   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0204*/
-   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0207*/
    freia_common_destruct_data(imfilt);                                  /*0208*/
    freia_common_destruct_data(imout);                                   /*0209*/

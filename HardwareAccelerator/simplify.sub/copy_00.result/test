@@ -116,33 +116,28 @@ digraph "dag_cleaned_0" {
 int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    freia_data2d *a, *b, *c, *d;                                         /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *c_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *d_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *a_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
    d = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0009*/
    
    // 1
-   freia_aipo_dilate_8c(a_1, in, freia_morpho_kernel_8c);               /*0012*/
+   freia_aipo_dilate_8c(a, in, freia_morpho_kernel_8c);                 /*0012*/
    freia_aipo_erode_8c(c, in, freia_morpho_kernel_8c);                  /*0013*/
    
    // 2
-   freia_aipo_dilate_8c(d_1, c, freia_morpho_kernel_8c);                /*0016*/
-   freia_aipo_erode_8c(c_1, c, freia_morpho_kernel_8c);                 /*0017*/
-   freia_aipo_dilate_8c(b, a_1, freia_morpho_kernel_8c);                /*0018*/
-   freia_aipo_erode_8c(a, a_1, freia_morpho_kernel_8c);                 /*0019*/
+   freia_aipo_dilate_8c(d, c, freia_morpho_kernel_8c);                  /*0016*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0017*/
+   freia_aipo_dilate_8c(b, a, freia_morpho_kernel_8c);                  /*0018*/
+   freia_aipo_erode_8c(a, a, freia_morpho_kernel_8c);                   /*0019*/
    
    // 3
    freia_aipo_sub(o0, b, a);                                            /*0022*/
-   freia_aipo_dilate_8c(d, d_1, freia_morpho_kernel_8c);                /*0023*/
-   freia_aipo_erode_8c(c, c_1, freia_morpho_kernel_8c);                 /*0024*/
+   freia_aipo_dilate_8c(d, d, freia_morpho_kernel_8c);                  /*0023*/
+   freia_aipo_erode_8c(c, c, freia_morpho_kernel_8c);                   /*0024*/
    
    // 4
    freia_aipo_sub(o1, d, c);                                            /*0027*/
-   freia_common_destruct_data(c_1);
-   freia_common_destruct_data(d_1);
-   freia_common_destruct_data(a_1);
 
    return 0;                                                            /*0029*/
 }
@@ -1921,9 +1916,8 @@ KERNEL void copy_00_opencl_helper_0_0_3(
 
 int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
-   freia_data2d *c, *d;                                                 /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *a_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+   freia_data2d *a, *c, *d;                                             /*0005*/
+   a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
    d = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0009*/
    
@@ -1931,14 +1925,13 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    copy_00_opencl_helper_0_0_0(d, c, c);                                /*0016*/
    
    // 1
-   copy_00_opencl_helper_0_0_1(a_1, c, in);                             /*0012*/
-   copy_00_opencl_helper_0_0_3(o0, o1, a_1, c, d);                      /*0018*/
+   copy_00_opencl_helper_0_0_1(a, c, in);                               /*0012*/
+   copy_00_opencl_helper_0_0_3(o0, o1, a, c, d);                        /*0018*/
    
    // 3
    
    // 4
-   freia_common_destruct_data(a_1);
-
+   
    return 0;                                                            /*0029*/
 }
 
@@ -1946,9 +1939,8 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 
 int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
-   freia_data2d *c, *d;                                                 /*0005*/
-   // hardware accelerator generated variable
-   freia_data2d *a_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+   freia_data2d *a, *c, *d;                                             /*0005*/
+   a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
    d = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0009*/
    
@@ -1956,14 +1948,13 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    copy_00_opencl_helper_0_0_0(d, c, c);                                /*0016*/
    
    // 1
-   copy_00_opencl_helper_0_0_1(a_1, c, in);                             /*0012*/
-   copy_00_opencl_helper_0_0_3(o0, o1, a_1, c, d);                      /*0018*/
+   copy_00_opencl_helper_0_0_1(a, c, in);                               /*0012*/
+   copy_00_opencl_helper_0_0_3(o0, o1, a, c, d);                        /*0018*/
    
    // 3
    
    // 4
-   freia_common_destruct_data(a_1);
-
+   
    return 0;                                                            /*0029*/
 }
 #

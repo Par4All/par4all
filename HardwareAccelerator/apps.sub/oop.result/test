@@ -3911,8 +3911,6 @@ int main(int argc, char *argv[])
    register int32_t dx;                                                 /*0138*/
    uint32_t *tabeqt;                                                    /*0139*/
    register freia_status end = 0;                                       /*0140*/
-   // hardware accelerator generated variable
-   freia_data2d *i2_2 = 0, *i1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0143*/
 
@@ -3923,9 +3921,7 @@ int main(int argc, char *argv[])
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
    freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
    i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
-   i1_1 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
    i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
-   i2_2 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
    i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
 
    t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
@@ -3966,12 +3962,12 @@ int main(int argc, char *argv[])
       
       
       freia_aipo_copy(t0, i0);
-      main_opencl_helper_0_0_0(i1, i2_2, i0, t2, t4);                   /*0197*/
+      main_opencl_helper_0_0_0(i1, i2, i0, t2, t4);                     /*0197*/
       
       
-      main_opencl_helper_E8_511(i1_1, i1);                              /*0209*/
-      main_opencl_helper_E8_511(i2, i2_2);                              /*0226*/
-      main_opencl_helper_0_0_2(i3, i1_1, i2, 15, 255, 1);               /*0227*/
+      main_opencl_helper_E8_511(i1, i1);                                /*0209*/
+      main_opencl_helper_E8_511(i2, i2);                                /*0226*/
+      main_opencl_helper_0_0_2(i3, i1, i2, 15, 255, 1);                 /*0227*/
       
       
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
@@ -4014,9 +4010,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(i0);                                      /*0270*/
    freia_common_destruct_data(i1);                                      /*0271*/
-   freia_common_destruct_data(i1_1);
    freia_common_destruct_data(i2);                                      /*0272*/
-   freia_common_destruct_data(i2_2);
    freia_common_destruct_data(i3);                                      /*0273*/
    freia_common_destruct_data(t0);                                      /*0275*/
    freia_common_destruct_data(t1);                                      /*0276*/
@@ -4051,8 +4045,6 @@ int main(int argc, char *argv[])
    register int32_t dx;                                                 /*0138*/
    uint32_t *tabeqt;                                                    /*0139*/
    register freia_status end = 0;                                       /*0140*/
-   // hardware accelerator generated variable
-   freia_data2d *i2_2 = 0, *i1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0143*/
 
@@ -4063,9 +4055,7 @@ int main(int argc, char *argv[])
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
    freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
    i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
-   i1_1 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
    i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
-   i2_2 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
    i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
 
    t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
@@ -4106,12 +4096,12 @@ int main(int argc, char *argv[])
       
       
       freia_aipo_copy(t0, i0);
-      main_opencl_helper_0_0_0(i1, i2_2, i0, t2, t4);                   /*0197*/
+      main_opencl_helper_0_0_0(i1, i2, i0, t2, t4);                     /*0197*/
       
       
-      main_opencl_helper_E8_511(i1_1, i1);                              /*0209*/
-      main_opencl_helper_E8_511(i2, i2_2);                              /*0226*/
-      main_opencl_helper_0_0_2(i3, i1_1, i2, 15, 255, 1);               /*0227*/
+      main_opencl_helper_E8_511(i1, i1);                                /*0209*/
+      main_opencl_helper_E8_511(i2, i2);                                /*0226*/
+      main_opencl_helper_0_0_2(i3, i1, i2, 15, 255, 1);                 /*0227*/
       
       
       valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
@@ -4154,9 +4144,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(i0);                                      /*0270*/
    freia_common_destruct_data(i1);                                      /*0271*/
-   freia_common_destruct_data(i1_1);
    freia_common_destruct_data(i2);                                      /*0272*/
-   freia_common_destruct_data(i2_2);
    freia_common_destruct_data(i3);                                      /*0273*/
    freia_common_destruct_data(t0);                                      /*0275*/
    freia_common_destruct_data(t1);                                      /*0276*/

@@ -2003,7 +2003,7 @@ int freia_52(void)
    //PIPS generated variable
    int i_52;                                                            /*0171*/
    // hardware accelerator generated variable
-   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w2_1_7 = 0, *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
+   freia_data2d *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0173*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0174*/
@@ -2021,13 +2021,6 @@ int freia_52(void)
    w1_0_12 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_8 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_7 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_2 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    
    // input
    freia_common_rx_image(imin, &fdin);                                  /*0186*/
@@ -2492,7 +2485,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0592*/
-   freia_aipo_inf_const(w2_1_7, w1_1, 255);                             /*0600*/
+   freia_aipo_inf_const(w2_1, w1_1, 255);                               /*0600*/
    
    
    
@@ -2503,7 +2496,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0628*/
    err_3 |= _return28;                                                  /*0635*/
-   freia_aipo_inf(w2_1_6, w2_1_7, w1_1);                                /*0636*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0636*/
    
    
    
@@ -2514,7 +2507,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0663*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0664*/
    err_3 |= _return29;                                                  /*0671*/
-   freia_aipo_inf(w2_1_5, w2_1_6, w1_1);                                /*0672*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0672*/
    
    
    
@@ -2525,7 +2518,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0699*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0700*/
    err_3 |= _return25;                                                  /*0707*/
-   freia_aipo_inf(w2_1_4, w2_1_5, w1_1);                                /*0708*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0708*/
    
    
    
@@ -2536,7 +2529,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0735*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0736*/
    err_3 |= _return26;                                                  /*0743*/
-   freia_aipo_inf(w2_1_3, w2_1_4, w1_1);                                /*0744*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0744*/
    
    
    
@@ -2547,7 +2540,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0771*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0772*/
    err_3 |= _return22;                                                  /*0779*/
-   freia_aipo_inf(w2_1_2, w2_1_3, w1_1);                                /*0780*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0780*/
    
    
    
@@ -2558,7 +2551,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0807*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0808*/
    err_3 |= _return23;                                                  /*0815*/
-   freia_aipo_inf(w2_1_1, w2_1_2, w1_1);                                /*0816*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0816*/
    
    
    
@@ -2569,7 +2562,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0843*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
    err_3 |= _return24;                                                  /*0851*/
-   freia_aipo_inf(w2_1, w2_1_1, w1_1);                                  /*0852*/
+   freia_aipo_inf(w2_1, w2_1, w1_1);                                    /*0852*/
    
    
    
@@ -2590,13 +2583,6 @@ int freia_52(void)
    freia_common_destruct_data(w1_0_32);
    freia_common_destruct_data(w1_1);                                    /*0855*/
    freia_common_destruct_data(w2_1);                                    /*0856*/
-   freia_common_destruct_data(w2_1_1);
-   freia_common_destruct_data(w2_1_2);
-   freia_common_destruct_data(w2_1_3);
-   freia_common_destruct_data(w2_1_4);
-   freia_common_destruct_data(w2_1_5);
-   freia_common_destruct_data(w2_1_6);
-   freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0882*/
       i_52 = 1;                                                         /*0869*/
       
@@ -7756,6 +7742,7 @@ int freia_52(void)
    //PIPS generated variable
    freia_status err_0 = 0;                                              /*0008*/
    //PIPS generated variable
+   freia_data2d *w1_0;                                                  /*0009*/
    //PIPS generated variable
    freia_status err_1 = 0, ret_3;                                       /*0010*/
    //PIPS generated variable
@@ -7865,7 +7852,7 @@ int freia_52(void)
    //PIPS generated variable
    int i_52;                                                            /*0079*/
    // hardware accelerator generated variable
-   freia_data2d *w1_1_5 = 0, *w1_1_6 = 0, *w2_1_3 = 0, *w1_1_15 = 0, *w1_1_16 = 0, *w2_1_5 = 0, *w1_1_25 = 0, *w1_1_26 = 0, *w2_1_7 = 0, *w1_0_32 = 0;
+   freia_data2d *w1_1_5 = 0, *w1_1_6 = 0, *w1_1_15 = 0, *w1_1_16 = 0, *w1_1_25 = 0, *w1_1_26 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0080*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0081*/
@@ -7874,14 +7861,10 @@ int freia_52(void)
    // for opencl freia_op_init_opencl(0xffffffff, 2, false, fdin.framewidth, fdin.frameheight);
    imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0082*/
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0086*/
-   w1_0_32 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_7 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_26 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_25 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_16 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_15 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    
@@ -8232,6 +8215,7 @@ int freia_52(void)
    _return24 = ret_18;                                                  /*0535*/
    
    
+   w1_0 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);                /*0122*/
    
    
    w1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);                /*0335*/
@@ -8253,12 +8237,12 @@ int freia_52(void)
    // for display
    
    // 2nd tophat
-   freia_52_spoc_helper_0_0_0(w1_0_32, w1_1, imin, freia_morpho_kernel_8c, freia_morpho_k8_0, neighborTransposed_8);                /*0121*/
+   freia_52_spoc_helper_0_0_0(w1_0, w1_1, imin, freia_morpho_kernel_8c, freia_morpho_k8_0, neighborTransposed_8);    /*0121*/
    
    
    
    
-   freia_52_spoc_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);                /*0355*/
+   freia_52_spoc_helper_0_0_1(w2_1, w1_1, neighborTransposed_8, 255);   /*0355*/
    
    
    
@@ -8266,7 +8250,7 @@ int freia_52(void)
    
    
    
-   freia_52_spoc_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);          /*0379*/
+   freia_52_spoc_helper_0_1_0(w1_1, w1_1_26, w1_0, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);             /*0379*/
    freia_52_spoc_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);            /*0383*/
    
    
@@ -8280,11 +8264,11 @@ int freia_52(void)
    err_1 |= _return21;                                                  /*0198*/
    
    
-   freia_52_spoc_helper_0_2_0(w2_1, w1_1, w2_1_7);                      /*0387*/
-   freia_52_spoc_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                   /*0412*/
+   freia_52_spoc_helper_0_2_0(w2_1, w1_1, w2_1);                        /*0387*/
+   freia_52_spoc_helper_0_3_0(w2_1, w1_1_25, w2_1);                     /*0412*/
    
    
-   freia_52_spoc_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);         /*0429*/
+   freia_52_spoc_helper_0_4_0(w1_1, w1_1_16, w1_0, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);            /*0429*/
    freia_52_spoc_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);           /*0433*/
    
    
@@ -8298,11 +8282,11 @@ int freia_52(void)
    err_1 |= _return18;                                                  /*0248*/
    
    
-   freia_52_spoc_helper_0_5_0(w2_1, w1_1, w2_1_5);                      /*0437*/
-   freia_52_spoc_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                   /*0462*/
+   freia_52_spoc_helper_0_5_0(w2_1, w1_1, w2_1);                        /*0437*/
+   freia_52_spoc_helper_0_6_0(w2_1, w1_1_15, w2_1);                     /*0462*/
    
    
-   freia_52_spoc_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);          /*0479*/
+   freia_52_spoc_helper_0_7_0(w1_1, w1_1_6, w1_0, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);             /*0479*/
    freia_52_spoc_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);             /*0483*/
    
    
@@ -8316,11 +8300,11 @@ int freia_52(void)
    err_1 |= _return15;                                                  /*0298*/
    
    
-   freia_52_spoc_helper_0_8_0(w2_1, w1_1, w2_1_3);                      /*0487*/
+   freia_52_spoc_helper_0_8_0(w2_1, w1_1, w2_1);                        /*0487*/
    freia_52_spoc_helper_0_9_0(w2_1, w1_1_5, w2_1);                      /*0512*/
    
    
-   freia_52_spoc_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);        /*0529*/
+   freia_52_spoc_helper_0_10_0(w1_1, w1_0, w2_1, freia_morpho_k6_2, neighborTransposed_15);           /*0529*/
    freia_52_spoc_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);              /*0533*/
 
    ret_19 = 0;                                                          /*0545*/
@@ -8367,7 +8351,7 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0541*/
    err_2 |= _return10;                                                  /*0542*/
    _return4 = err_2;                                                    /*0544*/
-   freia_common_destruct_data(w1_0_32);
+   freia_common_destruct_data(w1_0);                                    /*0326*/
    freia_common_destruct_data(w1_1);                                    /*0539*/
    freia_common_destruct_data(w1_1_5);
    freia_common_destruct_data(w1_1_6);
@@ -8376,9 +8360,6 @@ int freia_52(void)
    freia_common_destruct_data(w1_1_25);
    freia_common_destruct_data(w1_1_26);
    freia_common_destruct_data(w2_1);                                    /*0540*/
-   freia_common_destruct_data(w2_1_3);
-   freia_common_destruct_data(w2_1_5);
-   freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0546*/
       i_52 = 1;                                                         /*0547*/
       
@@ -8510,6 +8491,7 @@ int freia_52(void)
    //PIPS generated variable
    freia_status err_0 = 0;                                              /*0008*/
    //PIPS generated variable
+   freia_data2d *w1_0;                                                  /*0009*/
    //PIPS generated variable
    freia_status err_1 = 0, ret_3;                                       /*0010*/
    //PIPS generated variable
@@ -8619,7 +8601,7 @@ int freia_52(void)
    //PIPS generated variable
    int i_52;                                                            /*0079*/
    // hardware accelerator generated variable
-   freia_data2d *w1_1_5 = 0, *w1_1_6 = 0, *w2_1_3 = 0, *w1_1_15 = 0, *w1_1_16 = 0, *w2_1_5 = 0, *w1_1_25 = 0, *w1_1_26 = 0, *w2_1_7 = 0, *w1_0_32 = 0;
+   freia_data2d *w1_1_5 = 0, *w1_1_6 = 0, *w1_1_15 = 0, *w1_1_16 = 0, *w1_1_25 = 0, *w1_1_26 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0080*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0081*/
@@ -8628,14 +8610,10 @@ int freia_52(void)
    // for opencl freia_op_init_opencl(0xffffffff, 2, false, fdin.framewidth, fdin.frameheight);
    imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0082*/
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0086*/
-   w1_0_32 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_7 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_26 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_25 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_16 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_15 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w2_1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    
@@ -8986,6 +8964,7 @@ int freia_52(void)
    _return24 = ret_18;                                                  /*0535*/
    
    
+   w1_0 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);                /*0122*/
    
    
    w1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);                /*0335*/
@@ -9007,12 +8986,12 @@ int freia_52(void)
    // for display
    
    // 2nd tophat
-   freia_52_spoc_helper_0_0_0(w1_0_32, w1_1, imin, freia_morpho_kernel_8c, freia_morpho_k8_0, neighborTransposed_8);                /*0121*/
+   freia_52_spoc_helper_0_0_0(w1_0, w1_1, imin, freia_morpho_kernel_8c, freia_morpho_k8_0, neighborTransposed_8);    /*0121*/
    
    
    
    
-   freia_52_spoc_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);                /*0355*/
+   freia_52_spoc_helper_0_0_1(w2_1, w1_1, neighborTransposed_8, 255);   /*0355*/
    
    
    
@@ -9020,7 +8999,7 @@ int freia_52(void)
    
    
    
-   freia_52_spoc_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);          /*0379*/
+   freia_52_spoc_helper_0_1_0(w1_1, w1_1_26, w1_0, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);             /*0379*/
    freia_52_spoc_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);            /*0383*/
    
    
@@ -9034,11 +9013,11 @@ int freia_52(void)
    err_1 |= _return21;                                                  /*0198*/
    
    
-   freia_52_spoc_helper_0_2_0(w2_1, w1_1, w2_1_7);                      /*0387*/
-   freia_52_spoc_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                   /*0412*/
+   freia_52_spoc_helper_0_2_0(w2_1, w1_1, w2_1);                        /*0387*/
+   freia_52_spoc_helper_0_3_0(w2_1, w1_1_25, w2_1);                     /*0412*/
    
    
-   freia_52_spoc_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);         /*0429*/
+   freia_52_spoc_helper_0_4_0(w1_1, w1_1_16, w1_0, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);            /*0429*/
    freia_52_spoc_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);           /*0433*/
    
    
@@ -9052,11 +9031,11 @@ int freia_52(void)
    err_1 |= _return18;                                                  /*0248*/
    
    
-   freia_52_spoc_helper_0_5_0(w2_1, w1_1, w2_1_5);                      /*0437*/
-   freia_52_spoc_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                   /*0462*/
+   freia_52_spoc_helper_0_5_0(w2_1, w1_1, w2_1);                        /*0437*/
+   freia_52_spoc_helper_0_6_0(w2_1, w1_1_15, w2_1);                     /*0462*/
    
    
-   freia_52_spoc_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);          /*0479*/
+   freia_52_spoc_helper_0_7_0(w1_1, w1_1_6, w1_0, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);             /*0479*/
    freia_52_spoc_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);             /*0483*/
    
    
@@ -9070,11 +9049,11 @@ int freia_52(void)
    err_1 |= _return15;                                                  /*0298*/
    
    
-   freia_52_spoc_helper_0_8_0(w2_1, w1_1, w2_1_3);                      /*0487*/
+   freia_52_spoc_helper_0_8_0(w2_1, w1_1, w2_1);                        /*0487*/
    freia_52_spoc_helper_0_9_0(w2_1, w1_1_5, w2_1);                      /*0512*/
    
    
-   freia_52_spoc_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);        /*0529*/
+   freia_52_spoc_helper_0_10_0(w1_1, w1_0, w2_1, freia_morpho_k6_2, neighborTransposed_15);           /*0529*/
    freia_52_spoc_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);              /*0533*/
 
    ret_19 = 0;                                                          /*0545*/
@@ -9121,7 +9100,7 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0541*/
    err_2 |= _return10;                                                  /*0542*/
    _return4 = err_2;                                                    /*0544*/
-   freia_common_destruct_data(w1_0_32);
+   freia_common_destruct_data(w1_0);                                    /*0326*/
    freia_common_destruct_data(w1_1);                                    /*0539*/
    freia_common_destruct_data(w1_1_5);
    freia_common_destruct_data(w1_1_6);
@@ -9130,9 +9109,6 @@ int freia_52(void)
    freia_common_destruct_data(w1_1_25);
    freia_common_destruct_data(w1_1_26);
    freia_common_destruct_data(w2_1);                                    /*0540*/
-   freia_common_destruct_data(w2_1_3);
-   freia_common_destruct_data(w2_1_5);
-   freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0546*/
       i_52 = 1;                                                         /*0547*/
       

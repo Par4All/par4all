@@ -116,14 +116,11 @@ digraph "dag_cleaned_0" {
 int freia_60(freia_dataio *in, freia_dataio *out)
 {
    freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *im3_1 = 0;
    
    // allocate
    im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
    im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
    im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
-   im3_1 = freia_common_create_data(im3->bpp, im3->widthWa, im3->heightWa);
    im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
    
    // read images
@@ -134,9 +131,9 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    // computation
    freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
    freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
-   freia_aipo_inf_const(im3_1, im3, 250);                               /*0022*/
+   freia_aipo_inf_const(im3, im3, 250);                                 /*0022*/
    freia_aipo_sup(im4, im2, im1);                                       /*0023*/
-   freia_aipo_sup(im3, im3_1, im4);                                     /*0024*/
+   freia_aipo_sup(im3, im3, im4);                                       /*0024*/
    
    // output images
    freia_common_tx_image(im1, out);                                     /*0027*/
@@ -148,7 +145,6 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    freia_common_destruct_data(im1);                                     /*0033*/
    freia_common_destruct_data(im2);                                     /*0034*/
    freia_common_destruct_data(im3);                                     /*0035*/
-   freia_common_destruct_data(im3_1);
    freia_common_destruct_data(im4);                                     /*0036*/
 
    return 0;                                                            /*0038*/

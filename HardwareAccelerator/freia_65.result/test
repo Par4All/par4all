@@ -105,20 +105,17 @@ digraph "dag_cleaned_1" {
 freia_status freia_65(freia_data2d *o, const freia_data2d *i, int n)
 {
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *o_1 = freia_common_create_data(o->bpp, o->widthWa, o->heightWa);
    freia_aipo_copy(t, i);
    {
       int i;                                                            /*0008*/
       for(i = 0; i <= n-1; i += 1) {                                    /*0008*/
          // loop carried dep on t
-         freia_aipo_sub(o_1, o, t);                                     /*0011*/
+         freia_aipo_sub(o, o, t);                                       /*0011*/
          freia_aipo_add_const(t, t, 1);                                 /*0012*/
-         freia_aipo_xor_const(o, o_1, 17);                              /*0013*/
+         freia_aipo_xor_const(o, o, 17);                                /*0013*/
       }
    }
    freia_common_destruct_data(t);                                       /*0015*/
-   freia_common_destruct_data(o_1);
    return FREIA_OK;                                                     /*0016*/
 }
 #

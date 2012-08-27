@@ -923,7 +923,7 @@ int freia_42(void)
    freia_data2d *i6;                                                    /*0014*/
    freia_data2d *i7;                                                    /*0015*/
    // hardware accelerator generated variable
-   freia_data2d *i6_2 = 0, *i1_1 = 0;
+   freia_data2d *i1_1 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0018*/
 
@@ -934,7 +934,6 @@ int freia_42(void)
    i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0023*/
    i4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
    i6 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0026*/
-   i6_2 = freia_common_create_data(i6->bpp, i6->widthWa, i6->heightWa);
    i7 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0027*/
 
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0029*/
@@ -942,11 +941,11 @@ int freia_42(void)
    freia_common_rx_image(i0, &fdin);                                    /*0031*/
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
-   freia_42_spoc_helper_0_0_0(i1, i6_2, i0, i4, freia_morpho_kernel_8c);               /*0036*/
+   freia_42_spoc_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);  /*0036*/
 
    freia_42_spoc_helper_0_1_0(i3, i1_1, i0, i1, freia_morpho_kernel_8c);               /*0037*/
    freia_42_spoc_helper_0_2_0(i1, i1_1, i2);                            /*0038*/
-   freia_42_spoc_helper_0_3_0(i6, i3, i6_2);                            /*0043*/
+   freia_42_spoc_helper_0_3_0(i6, i3, i6);                              /*0043*/
    freia_42_spoc_helper_0_4_0(i6, i1_1, i6);                            /*0044*/
    freia_42_spoc_helper_0_5_0(i7, i1, i6);                              /*0045*/
 
@@ -959,7 +958,6 @@ int freia_42(void)
    freia_common_destruct_data(i3);                                      /*0052*/
    freia_common_destruct_data(i4);                                      /*0053*/
    freia_common_destruct_data(i6);                                      /*0055*/
-   freia_common_destruct_data(i6_2);
    freia_common_destruct_data(i7);                                      /*0056*/
 
    freia_common_close_input(&fdin);                                     /*0058*/
@@ -982,7 +980,7 @@ int freia_42(void)
    freia_data2d *i6;                                                    /*0014*/
    freia_data2d *i7;                                                    /*0015*/
    // hardware accelerator generated variable
-   freia_data2d *i6_2 = 0, *i1_1 = 0;
+   freia_data2d *i1_1 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0018*/
 
@@ -993,7 +991,6 @@ int freia_42(void)
    i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0023*/
    i4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
    i6 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0026*/
-   i6_2 = freia_common_create_data(i6->bpp, i6->widthWa, i6->heightWa);
    i7 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0027*/
 
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0029*/
@@ -1001,11 +998,11 @@ int freia_42(void)
    freia_common_rx_image(i0, &fdin);                                    /*0031*/
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
-   freia_42_spoc_helper_0_0_0(i1, i6_2, i0, i4, freia_morpho_kernel_8c);               /*0036*/
+   freia_42_spoc_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);  /*0036*/
 
    freia_42_spoc_helper_0_1_0(i3, i1_1, i0, i1, freia_morpho_kernel_8c);               /*0037*/
    freia_42_spoc_helper_0_2_0(i1, i1_1, i2);                            /*0038*/
-   freia_42_spoc_helper_0_3_0(i6, i3, i6_2);                            /*0043*/
+   freia_42_spoc_helper_0_3_0(i6, i3, i6);                              /*0043*/
    freia_42_spoc_helper_0_4_0(i6, i1_1, i6);                            /*0044*/
    freia_42_spoc_helper_0_5_0(i7, i1, i6);                              /*0045*/
 
@@ -1018,7 +1015,6 @@ int freia_42(void)
    freia_common_destruct_data(i3);                                      /*0052*/
    freia_common_destruct_data(i4);                                      /*0053*/
    freia_common_destruct_data(i6);                                      /*0055*/
-   freia_common_destruct_data(i6_2);
    freia_common_destruct_data(i7);                                      /*0056*/
 
    freia_common_close_input(&fdin);                                     /*0058*/

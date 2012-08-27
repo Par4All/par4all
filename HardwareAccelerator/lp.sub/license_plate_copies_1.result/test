@@ -9919,8 +9919,6 @@ int license_plate_copies(void)
    int i_2;                                                             /*0036*/
    freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
-   // hardware accelerator generated variable
-   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0042*/
@@ -9929,9 +9927,7 @@ int license_plate_copies(void)
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
-   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
-   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
@@ -9957,7 +9953,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_opencl_helper_0_0_0(imopen, imclose_15, in);    /*0064*/
+   license_plate_copies_opencl_helper_0_0_0(imopen, imclose, in);       /*0064*/
 
    license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0066*/
    license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0068*/
@@ -9987,8 +9983,8 @@ int license_plate_copies(void)
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0116*/
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0118*/
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0120*/
-   license_plate_copies_opencl_helper_D8_56(imopen_1, imopen);          /*0122*/
-   license_plate_copies_opencl_helper_D8_56(imclose, imclose_15);       /*0138*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0122*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0138*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0140*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0142*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0144*/
@@ -10003,7 +9999,7 @@ int license_plate_copies(void)
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0162*/
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0164*/
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0166*/
-   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);         /*0168*/
+   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0168*/
    
    
    
@@ -10054,9 +10050,7 @@ int license_plate_copies(void)
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0248*/
    freia_common_destruct_data(imopen);                                  /*0250*/
-   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0251*/
-   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0254*/
    freia_common_destruct_data(imfilt);                                  /*0255*/
    freia_common_destruct_data(imout);                                   /*0256*/
@@ -10094,8 +10088,6 @@ int license_plate_copies(void)
    int i_2;                                                             /*0036*/
    freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
-   // hardware accelerator generated variable
-   freia_data2d *imclose_15 = 0, *imopen_1 = 0;
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0042*/
@@ -10104,9 +10096,7 @@ int license_plate_copies(void)
    /* images creation */
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
-   imopen_1 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
-   imclose_15 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
@@ -10132,7 +10122,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   license_plate_copies_opencl_helper_0_0_0(imopen, imclose_15, in);    /*0064*/
+   license_plate_copies_opencl_helper_0_0_0(imopen, imclose, in);       /*0064*/
 
    license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0066*/
    license_plate_copies_opencl_helper_E8_56(imopen, imopen);            /*0068*/
@@ -10162,8 +10152,8 @@ int license_plate_copies(void)
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0116*/
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0118*/
    license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0120*/
-   license_plate_copies_opencl_helper_D8_56(imopen_1, imopen);          /*0122*/
-   license_plate_copies_opencl_helper_D8_56(imclose, imclose_15);       /*0138*/
+   license_plate_copies_opencl_helper_D8_56(imopen, imopen);            /*0122*/
+   license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0138*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0140*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0142*/
    license_plate_copies_opencl_helper_D8_56(imclose, imclose);          /*0144*/
@@ -10178,7 +10168,7 @@ int license_plate_copies(void)
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0162*/
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0164*/
    license_plate_copies_opencl_helper_E8_56(imclose, imclose);          /*0166*/
-   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen_1, 1, 50, 1, 150, 255, 1);         /*0168*/
+   license_plate_copies_opencl_helper_0_0_2(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);           /*0168*/
    
    
    
@@ -10229,9 +10219,7 @@ int license_plate_copies(void)
    /* images destruction */
    freia_common_destruct_data(in);                                      /*0248*/
    freia_common_destruct_data(imopen);                                  /*0250*/
-   freia_common_destruct_data(imopen_1);
    freia_common_destruct_data(imclose);                                 /*0251*/
-   freia_common_destruct_data(imclose_15);
    freia_common_destruct_data(imand);                                   /*0254*/
    freia_common_destruct_data(imfilt);                                  /*0255*/
    freia_common_destruct_data(imout);                                   /*0256*/

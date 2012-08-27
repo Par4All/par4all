@@ -3436,8 +3436,6 @@ int main(int argc, char *argv[])
    freia_dataio fdin, fdout;                                            /*0005*/
    freia_data2d *in, *og, *od;                                          /*0006*/
    int32_t measure_max, measure_vol;                                    /*0007*/
-   // hardware accelerator generated variable
-   freia_data2d *og_10 = 0, *od_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0010*/
 
@@ -3446,14 +3444,12 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0015*/
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0016*/
-   od_1 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
-   og_10 = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);
 
    freia_common_rx_image(in, &fdin);                                    /*0019*/
    
    
-   main_opencl_helper_0_0_0(od, og_10, in, &measure_max, &measure_vol);                /*0021*/
+   main_opencl_helper_0_0_0(od, og, in, &measure_max, &measure_vol);    /*0021*/
    
    
    main_opencl_helper_D8_511(od, od);                                   /*0025*/
@@ -3463,8 +3459,8 @@ int main(int argc, char *argv[])
    main_opencl_helper_D8_511(od, od);                                   /*0029*/
    main_opencl_helper_D8_511(od, od);                                   /*0030*/
    main_opencl_helper_D8_511(od, od);                                   /*0031*/
-   main_opencl_helper_D8_511(od_1, od);                                 /*0032*/
-   main_opencl_helper_E8_511(og, og_10);                                /*0049*/
+   main_opencl_helper_D8_511(od, od);                                   /*0032*/
+   main_opencl_helper_E8_511(og, og);                                   /*0049*/
    main_opencl_helper_E8_511(og, og);                                   /*0050*/
    main_opencl_helper_E8_511(og, og);                                   /*0051*/
    main_opencl_helper_E8_511(og, og);                                   /*0052*/
@@ -3472,7 +3468,7 @@ int main(int argc, char *argv[])
    main_opencl_helper_E8_511(og, og);                                   /*0054*/
    main_opencl_helper_E8_511(og, og);                                   /*0055*/
    main_opencl_helper_E8_511(og, og);                                   /*0056*/
-   main_opencl_helper_0_0_2(od, og, od_1, og);                          /*0057*/
+   main_opencl_helper_0_0_2(od, og, od, og);                            /*0057*/
    
    
    
@@ -3486,9 +3482,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0070*/
    freia_common_destruct_data(od);                                      /*0071*/
-   freia_common_destruct_data(od_1);
    freia_common_destruct_data(og);                                      /*0072*/
-   freia_common_destruct_data(og_10);
 
    freia_common_close_input(&fdin);                                     /*0074*/
    freia_common_close_output(&fdout);                                   /*0075*/
@@ -3505,8 +3499,6 @@ int main(int argc, char *argv[])
    freia_dataio fdin, fdout;                                            /*0005*/
    freia_data2d *in, *og, *od;                                          /*0006*/
    int32_t measure_max, measure_vol;                                    /*0007*/
-   // hardware accelerator generated variable
-   freia_data2d *og_10 = 0, *od_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0010*/
 
@@ -3515,14 +3507,12 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0015*/
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0016*/
-   od_1 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
-   og_10 = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);
 
    freia_common_rx_image(in, &fdin);                                    /*0019*/
    
    
-   main_opencl_helper_0_0_0(od, og_10, in, &measure_max, &measure_vol);                /*0021*/
+   main_opencl_helper_0_0_0(od, og, in, &measure_max, &measure_vol);    /*0021*/
    
    
    main_opencl_helper_D8_511(od, od);                                   /*0025*/
@@ -3532,8 +3522,8 @@ int main(int argc, char *argv[])
    main_opencl_helper_D8_511(od, od);                                   /*0029*/
    main_opencl_helper_D8_511(od, od);                                   /*0030*/
    main_opencl_helper_D8_511(od, od);                                   /*0031*/
-   main_opencl_helper_D8_511(od_1, od);                                 /*0032*/
-   main_opencl_helper_E8_511(og, og_10);                                /*0049*/
+   main_opencl_helper_D8_511(od, od);                                   /*0032*/
+   main_opencl_helper_E8_511(og, og);                                   /*0049*/
    main_opencl_helper_E8_511(og, og);                                   /*0050*/
    main_opencl_helper_E8_511(og, og);                                   /*0051*/
    main_opencl_helper_E8_511(og, og);                                   /*0052*/
@@ -3541,7 +3531,7 @@ int main(int argc, char *argv[])
    main_opencl_helper_E8_511(og, og);                                   /*0054*/
    main_opencl_helper_E8_511(og, og);                                   /*0055*/
    main_opencl_helper_E8_511(og, og);                                   /*0056*/
-   main_opencl_helper_0_0_2(od, og, od_1, og);                          /*0057*/
+   main_opencl_helper_0_0_2(od, og, od, og);                            /*0057*/
    
    
    
@@ -3555,9 +3545,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0070*/
    freia_common_destruct_data(od);                                      /*0071*/
-   freia_common_destruct_data(od_1);
    freia_common_destruct_data(og);                                      /*0072*/
-   freia_common_destruct_data(og_10);
 
    freia_common_close_input(&fdin);                                     /*0074*/
    freia_common_close_output(&fdout);                                   /*0075*/

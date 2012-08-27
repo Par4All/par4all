@@ -180,8 +180,6 @@ int main(int argc, char *argv[])
    freia_data2d *in, *imWork1, *imWork2, *out;                          /*0007*/
    int32_t measure_vol;                                                 /*0009*/
    freia_data2d *mask, *work2, *work1;                                  /*0010*/
-   // hardware accelerator generated variable
-   freia_data2d *work1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0012*/
 
@@ -189,7 +187,6 @@ int main(int argc, char *argv[])
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0015*/
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
-   work1_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0018*/
    imWork2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0019*/
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0020*/
@@ -208,11 +205,11 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0029*/
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0030*/
 
-   freia_aipo_sub(work1_1, imWork1, in);                                /*0036*/
+   freia_aipo_sub(work1, imWork1, in);                                  /*0036*/
    freia_aipo_sub(work2, in, imWork2);                                  /*0037*/
 
-   freia_aipo_sup(mask, work1_1, work2);                                /*0039*/
-   freia_aipo_sub(mask, work1_1, mask);                                 /*0040*/
+   freia_aipo_sup(mask, work1, work2);                                  /*0039*/
+   freia_aipo_sub(mask, work1, mask);                                   /*0040*/
    freia_aipo_threshold(mask, mask, 1, 255, 1);                         /*0041*/
 
    freia_aipo_replace_const(work1, mask, imWork1, 255);                 /*0043*/
@@ -222,7 +219,6 @@ int main(int argc, char *argv[])
    freia_aipo_global_vol(out, &measure_vol);                            /*0051*/
 
    freia_common_destruct_data(work1);                                   /*0047*/
-   freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
@@ -1117,8 +1113,6 @@ int main(int argc, char *argv[])
    freia_data2d *in, *imWork1, *imWork2, *out;                          /*0007*/
    int32_t measure_vol;                                                 /*0009*/
    freia_data2d *mask, *work2, *work1;                                  /*0010*/
-   // hardware accelerator generated variable
-   freia_data2d *work1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0012*/
 
@@ -1126,7 +1120,6 @@ int main(int argc, char *argv[])
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0015*/
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
-   work1_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0018*/
    imWork2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0019*/
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0020*/
@@ -1140,10 +1133,10 @@ int main(int argc, char *argv[])
    main_spoc_helper_0_0_0(imWork1, imWork2, in, freia_morpho_kernel_8c);               /*0024*/
    
    
-   main_spoc_helper_0_1_0(work1_1, imWork1, in);                        /*0036*/
+   main_spoc_helper_0_1_0(work1, imWork1, in);                          /*0036*/
    main_spoc_helper_0_2_0(work2, imWork2, in);                          /*0037*/
 
-   main_spoc_helper_0_3_0(mask, work1_1, work2, 1, 255, 1);             /*0039*/
+   main_spoc_helper_0_3_0(mask, work1, work2, 1, 255, 1);               /*0039*/
 
    main_spoc_helper_0_4_0(work1, imWork1, mask, 255);                   /*0043*/
    main_spoc_helper_0_5_0(work2, imWork2, mask, 0);                     /*0044*/
@@ -1151,7 +1144,6 @@ int main(int argc, char *argv[])
    
    
    freia_common_destruct_data(work1);                                   /*0047*/
-   freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
@@ -1178,8 +1170,6 @@ int main(int argc, char *argv[])
    freia_data2d *in, *imWork1, *imWork2, *out;                          /*0007*/
    int32_t measure_vol;                                                 /*0009*/
    freia_data2d *mask, *work2, *work1;                                  /*0010*/
-   // hardware accelerator generated variable
-   freia_data2d *work1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0012*/
 
@@ -1187,7 +1177,6 @@ int main(int argc, char *argv[])
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0015*/
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
-   work1_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0018*/
    imWork2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0019*/
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0020*/
@@ -1201,10 +1190,10 @@ int main(int argc, char *argv[])
    main_spoc_helper_0_0_0(imWork1, imWork2, in, freia_morpho_kernel_8c);               /*0024*/
    
    
-   main_spoc_helper_0_1_0(work1_1, imWork1, in);                        /*0036*/
+   main_spoc_helper_0_1_0(work1, imWork1, in);                          /*0036*/
    main_spoc_helper_0_2_0(work2, imWork2, in);                          /*0037*/
 
-   main_spoc_helper_0_3_0(mask, work1_1, work2, 1, 255, 1);             /*0039*/
+   main_spoc_helper_0_3_0(mask, work1, work2, 1, 255, 1);               /*0039*/
 
    main_spoc_helper_0_4_0(work1, imWork1, mask, 255);                   /*0043*/
    main_spoc_helper_0_5_0(work2, imWork2, mask, 0);                     /*0044*/
@@ -1212,7 +1201,6 @@ int main(int argc, char *argv[])
    
    
    freia_common_destruct_data(work1);                                   /*0047*/
-   freia_common_destruct_data(work1_1);
    freia_common_destruct_data(work2);                                   /*0048*/
    freia_common_destruct_data(mask);                                    /*0049*/
    printf("volume %d area %g\n", measure_vol, measure_vol/(fdin.framewidth*fdin.frameheight*1.0));    /*0054*/
@@ -3153,8 +3141,6 @@ int main(int argc, char *argv[])
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *imWork1, *imWork2, *out;                          /*0007*/
    int32_t measure_vol;                                                 /*0009*/
-   // hardware accelerator generated variable
-   freia_data2d *imWork2_2 = 0, *imWork1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0012*/
 
@@ -3163,19 +3149,17 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0018*/
-   imWork1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    imWork2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0019*/
-   imWork2_2 = freia_common_create_data(imWork2->bpp, imWork2->widthWa, imWork2->heightWa);
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0020*/
 
    freia_common_rx_image(in, &fdin);                                    /*0022*/
    
    
-   main_opencl_helper_0_0_0(imWork1, imWork2_2, in);                    /*0024*/
+   main_opencl_helper_0_0_0(imWork1, imWork2, in);                      /*0024*/
 
-   main_opencl_helper_D8_511(imWork1_1, imWork1);                       /*0025*/
-   main_opencl_helper_E8_511(imWork2, imWork2_2);                       /*0029*/
-   main_opencl_helper_0_0_2(out, imWork1_1, imWork2, in, 1, 255, 1, 255, 0, &measure_vol);            /*0030*/
+   main_opencl_helper_D8_511(imWork1, imWork1);                         /*0025*/
+   main_opencl_helper_E8_511(imWork2, imWork2);                         /*0029*/
+   main_opencl_helper_0_0_2(out, imWork1, imWork2, in, 1, 255, 1, 255, 0, &measure_vol);              /*0030*/
    
    
    
@@ -3187,9 +3171,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0058*/
    freia_common_destruct_data(imWork1);                                 /*0059*/
-   freia_common_destruct_data(imWork1_1);
    freia_common_destruct_data(imWork2);                                 /*0060*/
-   freia_common_destruct_data(imWork2_2);
    freia_common_destruct_data(out);                                     /*0061*/
 
    freia_common_close_input(&fdin);                                     /*0063*/
@@ -3206,8 +3188,6 @@ int main(int argc, char *argv[])
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *imWork1, *imWork2, *out;                          /*0007*/
    int32_t measure_vol;                                                 /*0009*/
-   // hardware accelerator generated variable
-   freia_data2d *imWork2_2 = 0, *imWork1_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0012*/
 
@@ -3216,19 +3196,17 @@ int main(int argc, char *argv[])
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0017*/
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0018*/
-   imWork1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    imWork2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0019*/
-   imWork2_2 = freia_common_create_data(imWork2->bpp, imWork2->widthWa, imWork2->heightWa);
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0020*/
 
    freia_common_rx_image(in, &fdin);                                    /*0022*/
    
    
-   main_opencl_helper_0_0_0(imWork1, imWork2_2, in);                    /*0024*/
+   main_opencl_helper_0_0_0(imWork1, imWork2, in);                      /*0024*/
 
-   main_opencl_helper_D8_511(imWork1_1, imWork1);                       /*0025*/
-   main_opencl_helper_E8_511(imWork2, imWork2_2);                       /*0029*/
-   main_opencl_helper_0_0_2(out, imWork1_1, imWork2, in, 1, 255, 1, 255, 0, &measure_vol);            /*0030*/
+   main_opencl_helper_D8_511(imWork1, imWork1);                         /*0025*/
+   main_opencl_helper_E8_511(imWork2, imWork2);                         /*0029*/
+   main_opencl_helper_0_0_2(out, imWork1, imWork2, in, 1, 255, 1, 255, 0, &measure_vol);              /*0030*/
    
    
    
@@ -3240,9 +3218,7 @@ int main(int argc, char *argv[])
 
    freia_common_destruct_data(in);                                      /*0058*/
    freia_common_destruct_data(imWork1);                                 /*0059*/
-   freia_common_destruct_data(imWork1_1);
    freia_common_destruct_data(imWork2);                                 /*0060*/
-   freia_common_destruct_data(imWork2_2);
    freia_common_destruct_data(out);                                     /*0061*/
 
    freia_common_close_input(&fdin);                                     /*0063*/

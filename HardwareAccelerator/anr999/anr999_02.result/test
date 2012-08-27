@@ -2705,7 +2705,7 @@ int anr999_02(void)
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
    // hardware accelerator generated variable
-   freia_data2d *og_4 = 0, *od_2 = 0;
+   freia_data2d *od_2 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0029*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
@@ -2714,7 +2714,6 @@ int anr999_02(void)
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
    od_2 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
-   og_4 = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    i_0 = 10;                                                            /*0047*/
@@ -2733,7 +2732,7 @@ int anr999_02(void)
    I_13 = 0;                                                            /*0074*/
    I_13;                                                                /*0075*/
 
-   anr999_02_opencl_helper_0_0_0(od, og_4, in, &measure_min, &measure_vol);            /*0038*/
+   anr999_02_opencl_helper_0_0_0(od, og, in, &measure_min, &measure_vol);              /*0038*/
    
    
    anr999_02_opencl_helper_D8_511(od, od);                              /*0042*/
@@ -2741,7 +2740,7 @@ int anr999_02(void)
    anr999_02_opencl_helper_D8_511(od_2, od);                            /*0044*/
    anr999_02_opencl_helper_D8_511(od, od_2);                            /*0045*/
    anr999_02_opencl_helper_D8_511(od, od);                              /*0046*/
-   anr999_02_opencl_helper_E8_511(og, og_4);                            /*0064*/
+   anr999_02_opencl_helper_E8_511(og, og);                              /*0064*/
    anr999_02_opencl_helper_E8_511(og, og);                              /*0065*/
    anr999_02_opencl_helper_0_0_2(og, od_2, og);                         /*0066*/
    
@@ -2758,7 +2757,6 @@ int anr999_02(void)
    freia_common_destruct_data(od);                                      /*0085*/
    freia_common_destruct_data(od_2);
    freia_common_destruct_data(og);                                      /*0086*/
-   freia_common_destruct_data(og_4);
 
    freia_common_close_input(&fdin);                                     /*0088*/
    freia_common_close_output(&fdout);                                   /*0089*/
@@ -2786,7 +2784,7 @@ int anr999_02(void)
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
    // hardware accelerator generated variable
-   freia_data2d *og_4 = 0, *od_2 = 0;
+   freia_data2d *od_2 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0029*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
@@ -2795,7 +2793,6 @@ int anr999_02(void)
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
    od_2 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
-   og_4 = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    i_0 = 10;                                                            /*0047*/
@@ -2814,7 +2811,7 @@ int anr999_02(void)
    I_13 = 0;                                                            /*0074*/
    0;                                                                   /*0075*/
 
-   anr999_02_opencl_helper_0_0_0(od, og_4, in, &measure_min, &measure_vol);            /*0038*/
+   anr999_02_opencl_helper_0_0_0(od, og, in, &measure_min, &measure_vol);              /*0038*/
    
    
    anr999_02_opencl_helper_D8_511(od, od);                              /*0042*/
@@ -2822,7 +2819,7 @@ int anr999_02(void)
    anr999_02_opencl_helper_D8_511(od_2, od);                            /*0044*/
    anr999_02_opencl_helper_D8_511(od, od_2);                            /*0045*/
    anr999_02_opencl_helper_D8_511(od, od);                              /*0046*/
-   anr999_02_opencl_helper_E8_511(og, og_4);                            /*0064*/
+   anr999_02_opencl_helper_E8_511(og, og);                              /*0064*/
    anr999_02_opencl_helper_E8_511(og, og);                              /*0065*/
    anr999_02_opencl_helper_0_0_2(og, od_2, og);                         /*0066*/
    
@@ -2839,7 +2836,6 @@ int anr999_02(void)
    freia_common_destruct_data(od);                                      /*0085*/
    freia_common_destruct_data(od_2);
    freia_common_destruct_data(og);                                      /*0086*/
-   freia_common_destruct_data(og_4);
 
    freia_common_close_input(&fdin);                                     /*0088*/
    freia_common_close_output(&fdout);                                   /*0089*/

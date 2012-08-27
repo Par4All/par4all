@@ -387,9 +387,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   // hardware accelerator generated variable
-   freia_data2d *immotion_6 = 0;
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -397,7 +395,6 @@ int vs_core_loop(void)
    imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
 
    imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
-   immotion_6 = freia_common_create_data(imstab->bpp, imstab->widthWa, imstab->heightWa);
    imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
 
    imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);               /*0046*/
@@ -439,7 +436,7 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   freia_aipo_absdiff(immotion_6, imstab, imbg);                        /*0087*/
+   freia_aipo_absdiff(immotion, imstab, imbg);                          /*0087*/
    
    // background update
    freia_aipo_mul_const(imtmp3, imstab, 10);                            /*0091*/
@@ -448,14 +445,14 @@ l99979:   ;                                                                    /
    freia_aipo_div_const(imbg16, imbg16, 100);                           /*0094*/
    
    // measures
-   freia_aipo_global_max(immotion_6, &maxmotion);                       /*0098*/
-   freia_aipo_global_min(immotion_6, &minmotion);                       /*0099*/
+   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
+   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
 
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   freia_aipo_threshold(immotion, immotion_6, binvalue, 255, 1);        /*0105*/
+   freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);          /*0105*/
    freia_aipo_erode_8c(imtmp2, immotion, freia_morpho_kernel_8c);       /*0106*/
    freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
 
@@ -486,7 +483,6 @@ l99980:   ;
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/
-   freia_common_destruct_data(immotion_6);
 
    freia_common_close_input(&fdin);                                     /*0141*/
    freia_common_close_output(&fdmotion);                                /*0142*/
@@ -1459,9 +1455,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   // hardware accelerator generated variable
-   freia_data2d *immotion_6 = 0;
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -1469,7 +1463,6 @@ int vs_core_loop(void)
    imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
 
    imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
-   immotion_6 = freia_common_create_data(imstab->bpp, imstab->widthWa, imstab->heightWa);
 
    imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);               /*0046*/
    imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
@@ -1509,7 +1502,7 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_spoc_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);      /*0087*/
+   vs_core_loop_spoc_helper_3_0_0(immotion, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);        /*0087*/
    
    // measures
    
@@ -1520,7 +1513,7 @@ l99979:   ;                                                                    /
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_spoc_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);            /*0105*/
+   vs_core_loop_spoc_helper_3_2_0(immotion, immotion, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);              /*0105*/
    
    
    // save contrast motion detection
@@ -1542,7 +1535,6 @@ l99980:   ;
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/
-   freia_common_destruct_data(immotion_6);
 
    freia_common_close_input(&fdin);                                     /*0141*/
    freia_common_close_output(&fdmotion);                                /*0142*/
@@ -1570,9 +1562,7 @@ int vs_core_loop(void)
 
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
-   
-   // hardware accelerator generated variable
-   freia_data2d *immotion_6 = 0;
+
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -1580,7 +1570,6 @@ int vs_core_loop(void)
    imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
 
    imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
-   immotion_6 = freia_common_create_data(imstab->bpp, imstab->widthWa, imstab->heightWa);
 
    imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);               /*0046*/
    imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
@@ -1620,7 +1609,7 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_spoc_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);      /*0087*/
+   vs_core_loop_spoc_helper_3_0_0(immotion, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);        /*0087*/
    
    // measures
    
@@ -1631,7 +1620,7 @@ l99979:   ;                                                                    /
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_spoc_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);            /*0105*/
+   vs_core_loop_spoc_helper_3_2_0(immotion, immotion, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);              /*0105*/
    
    
    // save contrast motion detection
@@ -1653,7 +1642,6 @@ l99980:   ;
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/
-   freia_common_destruct_data(immotion_6);
 
    freia_common_close_input(&fdin);                                     /*0141*/
    freia_common_close_output(&fdmotion);                                /*0142*/
