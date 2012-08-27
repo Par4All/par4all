@@ -276,13 +276,13 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "ERODE_3_3"), OPCLK("SUP", "MIN")
+    TRPX_NG(15, "ERODE_3_3"), OPCLK("INF", "MAX")
   },
   { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "DILATE_3_3"), OPCLK("INF", "MAX")
+    TRPX_NG(15, "DILATE_3_3"), OPCLK("SUP", "MIN")
   },
   // MEASURES
   { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
