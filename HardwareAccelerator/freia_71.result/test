@@ -851,8 +851,9 @@ static freia_status freia_71_opencl_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t13 = in0;\n"
+    "    PIXEL t13 = PIXEL_MIN;\n"
     "    t13 = PIXEL_SUP(t13, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t13 = PIXEL_SUP(t13, in0);\n"
     "    t13 = PIXEL_SUP(t13, (is_E)? PIXEL_MIN: j0[i+1]);\n"
     "    PIXEL t14 = PIXEL_ADD(t13, c0);\n"
     "    PIXEL t15 = PIXEL_NOT(in0);\n"
@@ -930,8 +931,9 @@ KERNEL void freia_71_opencl_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t13 = in0;
+    PIXEL t13 = PIXEL_MIN;
     t13 = PIXEL_SUP(t13, (is_W)? PIXEL_MIN: j0[i-1]);
+    t13 = PIXEL_SUP(t13, in0);
     t13 = PIXEL_SUP(t13, (is_E)? PIXEL_MIN: j0[i+1]);
     PIXEL t14 = PIXEL_ADD(t13, c0);
     PIXEL t15 = PIXEL_NOT(in0);
