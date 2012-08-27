@@ -854,6 +854,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // some more code cleanup
   if (get_bool_property("FREIA_CLEANUP_STATUS"))
+    // remove err = or err |= freia & helper functions
     freia_cleanup_status(mod_stat, helpers);
 
   // cleanup
