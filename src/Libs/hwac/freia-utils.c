@@ -1355,7 +1355,14 @@ static statement image_free(entity v)
 /* tell whether there is no image processing statements between s1 and l2
  */
 static bool only_minor_statements_in_between(
-  list ls, statement s1, list l2, set image_occurences)
+  // list of statements being considered (within a sequence)
+  list ls,
+  // image production statement
+  statement s1,
+  // list of "use" statements
+  list l2,
+  // set of statements with image occurences
+  set image_occurences)
 {
   bool s1_seen = false, in_sequence = false;
   pips_assert("consistent statement & list", !gen_in_list_p(s1, l2));
@@ -1369,10 +1376,14 @@ static bool only_minor_statements_in_between(
     else if (in_sequence && gen_in_list_p(s, l2))
     {
       n2--;
+      // stop when we have seen all intermediate statements
       if (!n2) return true;
     }
     else if (in_sequence && set_belong_p(image_occurences, s))
+    {
+      pips_debug(8, "%s used in stat %"_intFMT"\n",
       return false;
+    }
   }
 
   // ??? should really be an error...
@@ -1400,8 +1411,10 @@ static bool only_minor_statements_in_between(
 list freia_allocate_new_images_if_needed
 (list ls,
  list images,
+ // R(entity) and W(entity) -> set of statements
  const hash_table occs,
  const hash_table init,
+ // entity -> # out image
  const hash_table signatures)
 {
   // check for used images
@@ -1425,7 +1438,7 @@ list freia_allocate_new_images_if_needed
       set where_read = (set) hash_get(newoccs, E_READ(v));
       int nw = set_size(where_write), nr = set_size(where_read);
 
-      pips_debug(8, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
+      pips_debug(6, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
 
       // ??? should be used once only in the statement if written!
       // how to I know about W/R for helper functions?
@@ -1445,9 +1458,6 @@ list freia_allocate_new_images_if_needed
         statement s1 = STATEMENT(CAR(l1));
         gen_free_list(l1), l1 = NIL;
 
-        pips_debug(8, "testing for %s -> %s\n",
-                   entity_local_name(v), entity_local_name(old));
-
         // does not interact with possibly used old
         // if we could differentiate read & write, we could do better,
         // but the information is not currently available.
@@ -1466,6 +1476,10 @@ list freia_allocate_new_images_if_needed
           }
           // note that we can handle a read in s1 and a write in s2
         }
+
+        pips_debug(7, "testing for %s -> %s: %s\n",
+                   entity_local_name(v), entity_local_name(old),
+                   skip?"skip":"ok");
 
         // do we want to switch back?
         if (!skip && only_minor_statements_in_between(ls, s1, l2, img_stats))
