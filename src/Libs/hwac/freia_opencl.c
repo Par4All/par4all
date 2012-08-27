@@ -481,8 +481,11 @@ static int opencl_compile_mergeable_dag(
   // tail
   sb_cat(helper, ")\n{\n");
   string_buffer_append_sb(helper, helper_decls);
-  sb_cat(helper,
-         "\n"
+  if (get_bool_property("HWAC_OPENCL_SYNCHRONIZE_KERNELS"))
+    sb_cat(helper, "\n"
+           "  // synchronize...\n"
+           "  freia_common_wait();\n");
+  sb_cat(helper, "\n"
          "  // call kernel ", cut_name, "\n",
          "  err |= freia_op_call_kernel(kernel");
   // tell about number of coming kernel parameters
