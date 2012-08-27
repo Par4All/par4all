@@ -770,7 +770,7 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, "%s", FREIA_OPENCL_INCLUDES);
 
   // hmmm... should rely on use-defs
-  hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
+  hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL, NULL);
   set output_images = freia_compute_current_output_images();
   // hmmm... panic mode
   set_union(output_images, output_images, shuffled);

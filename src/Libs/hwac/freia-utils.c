@@ -1205,9 +1205,12 @@ typedef struct {
   hash_table occs;
   // enclosing statement for inner recursion
   statement enclosing;
-  // set of statements, to record statements with image occurences
+  // set of statements with image operations
   set image_occs_stats;
-  // helper entity -> number of written args
+  // statement -> set of W images
+  // statement+1 -> set of R images
+  hash_table image_stats;
+  // helper entity -> number of written image args
   const hash_table signatures;
 } occs_ctx;
 
@@ -1218,7 +1221,7 @@ typedef struct {
  * contain image allocations so there should be no problem.
  */
 
-static void check_ref(reference r, occs_ctx * ctx)
+static bool check_ref(reference r, occs_ctx * ctx)
 {
   entity v = reference_variable(r);
   if (freia_image_variable_p(v))
@@ -1236,6 +1239,11 @@ static void check_ref(reference r, occs_ctx * ctx)
       (statement) gen_get_ancestor(statement_domain, r);
     // which MUST exist?
     pips_assert("some containing statement", up);
+    if (ctx->image_stats) {
+      set sop = (set) hash_get(ctx->image_stats,
+                               written? E_WRITE(up): E_READ(up));
+      set_add_element(sop, sop, (void*) v);
+    }
     // store result
     set_add_element(stats, stats, (void*) up);
     if (ctx->image_occs_stats)
@@ -1244,15 +1252,24 @@ static void check_ref(reference r, occs_ctx * ctx)
     pips_debug(9, "entity %s in statement %"_intFMT"\n",
                entity_name(v), statement_number(up));
   }
+  return true;
 }
 
-static void check_stmt(statement s, occs_ctx * ctx)
+static bool check_stmt(statement s, occs_ctx * ctx)
 {
+  // ensure existing set
+  if (ctx->image_stats) {
+    pips_debug(8, "creating for statement %"_intFMT"\n",
+               statement_number(s));
+    hash_put(ctx->image_stats, E_WRITE(s), set_make(set_pointer));
+    hash_put(ctx->image_stats, E_READ(s), set_make(set_pointer));
+  }
   ctx->enclosing = s;
   FOREACH(entity, var, statement_declarations(s))
     gen_context_recurse(entity_initial(var), ctx,
                         reference_domain, gen_true, check_ref);
   ctx->enclosing = NULL;
+  return true;
 }
 
 /* @param image_occs_stats set of statements with image occurences (may be NULL)
@@ -1262,14 +1279,17 @@ static void check_stmt(statement s, occs_ctx * ctx)
 hash_table freia_build_image_occurrences(
   statement s,
   set image_occs_stats,
+  hash_table image_stats,
   const hash_table signatures)
 {
+  pips_debug(7, "entering\n");
   occs_ctx ctx = { hash_table_make(hash_pointer, 0), NULL,
-                   image_occs_stats, signatures };
+                   image_occs_stats, image_stats, signatures };
   gen_context_multi_recurse(s, &ctx,
-                            statement_domain, gen_true, check_stmt,
-                            reference_domain, gen_true, check_ref,
+                            statement_domain, check_stmt, gen_null,
+                            reference_domain, check_ref, gen_null,
                             NULL);
+  pips_debug(7, "done\n");
   return ctx.occs;
 }
 
@@ -1331,6 +1351,13 @@ bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
   return bw && bh;
 }
 
+static void clean_stats_to_image(hash_table s2i)
+{
+  HASH_FOREACH(statement, st, set, imgs, s2i)
+    set_free(imgs);
+  hash_table_free(s2i);
+}
+
 /****************************************************** NEW IMAGE ALLOCATION */
 
 /*
@@ -1352,9 +1379,91 @@ static statement image_free(entity v)
               CONS(expression, entity_to_expression(v), NIL)));
 }
 
+struct related_ctx {
+  const entity img;
+  const hash_table new_images;
+  const hash_table image_stats;
+  bool write_only;
+  bool some_effect;
+};
+
+/* is there an effect to this image or related images in the statement?
+ */
+
+/* are img1 and img2 related?
+ */
+static bool related_images_p(const entity img1, const entity img2,
+                             const hash_table new_images)
+{
+  entity oimg1 = NULL, oimg2 = NULL;
+  if (img1==img2) return true;
+  if (hash_defined_p(new_images, img1))
+    oimg1 = (entity) hash_get(new_images, img1);
+  if (hash_defined_p(new_images, img2))
+    oimg2 = (entity) hash_get(new_images, img2);
+
+  pips_debug(9, "images: %s -> %s / %s -> %s\n",
+             entity_local_name(img1), oimg1? entity_local_name(oimg1): "NONE",
+             entity_local_name(img2), oimg2? entity_local_name(oimg2): "NONE");
+
+  if (oimg1 && oimg1==img2) return true;
+  if (oimg2 && img1==oimg2) return true;
+  // this is really the one which should be triggered?
+  return oimg1 && oimg2 && oimg1==oimg2;
+}
+
+static bool related_effect(statement s, struct related_ctx * ctx)
+{
+  pips_debug(8, "on statement %"_intFMT"\n", statement_number(s));
+  SET_FOREACH(entity, w, (set) hash_get(ctx->image_stats, E_WRITE(s)))
+  {
+    if (related_images_p(ctx->img, w, ctx->new_images))
+    {
+      pips_debug(8, "W relation for %s & %s\n",
+                 entity_local_name(ctx->img), entity_local_name(w));
+      ctx->some_effect = true;
+      gen_recurse_stop(NULL);
+      return false;
+    }
+  }
+  if (!ctx->write_only)
+  {
+    SET_FOREACH(entity, r, (set) hash_get(ctx->image_stats, E_READ(s)))
+    {
+      if (related_images_p(ctx->img, r, ctx->new_images))
+      {
+        pips_debug(8, "R relation for %s & %s\n",
+                   entity_local_name(ctx->img), entity_local_name(w));
+        ctx->some_effect = true;
+        gen_recurse_stop(NULL);
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+static bool some_related_image_effect(
+  statement s,
+  entity img,
+  hash_table new_images,
+  hash_table image_stats,
+  bool write_only)
+{
+  struct related_ctx ctx = { img, new_images, image_stats, write_only, false };
+  gen_context_recurse(s, &ctx, statement_domain, related_effect, gen_null);
+  return ctx.some_effect;
+}
+
 /* tell whether there is no image processing statements between s1 and l2
  */
 static bool only_minor_statements_in_between(
+  // the new image we are interrested in
+  entity image,
+  // new to old image mapping
+  hash_table new_images,
+  // [RW](stats) -> sets
+  hash_table image_stats,
   // list of statements being considered (within a sequence)
   list ls,
   // image production statement
@@ -1368,6 +1477,15 @@ static bool only_minor_statements_in_between(
   pips_assert("consistent statement & list", !gen_in_list_p(s1, l2));
   int n2 = gen_length(l2);
 
+  ifdebug(8) {
+    pips_debug(8, "img=%s s=%"_intFMT"\nls = (\n",
+               entity_local_name(image), statement_number(s1));
+    FOREACH(statement, sls, ls)
+      pips_debug(8, " - %"_intFMT" %s\n", statement_number(sls),
+                 sls==s1? "!": gen_in_list_p(sls, l2)? "*": "");
+    pips_debug(8, ")\n");
+  }
+
   // scan the sequence list, looking for s1 & l2 statements
   FOREACH(statement, s, ls)
   {
@@ -1376,13 +1494,22 @@ static bool only_minor_statements_in_between(
     else if (in_sequence && gen_in_list_p(s, l2))
     {
       n2--;
-      // stop when we have seen all intermediate statements
-      if (!n2) return true;
+      if (n2) {
+        // we are still going on, BUT we must check that this statement
+        // does not rewrite the image we are interested in and may change back.
+        if (some_related_image_effect(s, image, new_images, image_stats, true))
+          return false;
+      }
+      // we stop when we have seen all intermediate statements
+      else
+        return true;
     }
     else if (in_sequence && set_belong_p(image_occurences, s))
     {
-      pips_debug(8, "%s used in stat %"_intFMT"\n",
-      return false;
+      // let us try to do something intelligent here...
+      // if images are unrelated to "image", then there will be no interaction
+      if (some_related_image_effect(s, image, new_images, image_stats, false))
+        return false;
     }
   }
 
@@ -1413,15 +1540,18 @@ list freia_allocate_new_images_if_needed
  list images,
  // R(entity) and W(entity) -> set of statements
  const hash_table occs,
+ // entity -> entity
  const hash_table init,
  // entity -> # out image
  const hash_table signatures)
 {
   // check for used images
   set img_stats = set_make(set_pointer);
+  hash_table image_stats_detailed = hash_table_make(hash_pointer, 0);
   sequence sq = make_sequence(ls);
   hash_table newoccs =
-    freia_build_image_occurrences((statement) sq, img_stats, signatures);
+    freia_build_image_occurrences((statement) sq, img_stats,
+                                  image_stats_detailed, signatures);
   sequence_statements(sq) = NIL;
   free_sequence(sq);
 
@@ -1482,7 +1612,9 @@ list freia_allocate_new_images_if_needed
                    skip?"skip":"ok");
 
         // do we want to switch back?
-        if (!skip && only_minor_statements_in_between(ls, s1, l2, img_stats))
+        if (!skip &&
+            only_minor_statements_in_between(v, init, image_stats_detailed,
+                                             ls, s1, l2, img_stats))
         {
           // yes, they are successive, just remove?? Am I that sure???
           // ??? hmmm, maybe we could have :
@@ -1523,6 +1655,8 @@ list freia_allocate_new_images_if_needed
     else
       allocated = CONS(entity, v, allocated);
   }
+
+  clean_stats_to_image(image_stats_detailed);
   freia_clean_image_occurrences(newoccs);
   set_free(img_stats);
 
