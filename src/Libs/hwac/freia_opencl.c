@@ -406,12 +406,8 @@ static int opencl_compile_mergeable_dag(
       need_S = need_S || k20 || k21 || k22;
 
       // pixel t<vertex> = <init>;
-      if (k11) // most likely to be non null
-        sb_cat(opencl_body,
-               "    " OPENCL_PIXEL "t", svn, " = in", sin, ";\n");
-      else
-        sb_cat(opencl_body,
-               "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
+      sb_cat(opencl_body,
+             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
       // t<vertex> = <op>(t<vertex>, boundary?init:j[i+<shift....>]);
       if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_N|is_W)? ", api->opencl.init,
@@ -425,6 +421,9 @@ static int opencl_compile_mergeable_dag(
       if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_W)? ", api->opencl.init,
                       ": j", sin, "[i-1]);\n");
+      // most likely to be non null
+      if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+                      "(t", svn, ", in", sin, ");\n");
       if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
                       "(t", svn, ", (is_E)? ", api->opencl.init,
                       ": j", sin, "[i+1]);\n");
