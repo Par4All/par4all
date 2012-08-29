@@ -102,6 +102,8 @@ struct13:
 
 struct19: initialization of a struct containing pointers
 
+struct21.c: excerpt from struct13.c, subscript and struct assignment
+
 struct_parall01: result to be validated by hand...
 
 undefined01:
