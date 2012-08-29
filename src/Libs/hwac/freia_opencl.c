@@ -383,6 +383,12 @@ static int opencl_compile_mergeable_dag(
     }
     else if (is_a_kernel)
     {
+      // NOTE about ILP: many intra sequence dependencies are generated...
+      // - for 2 full morpho ops on the same input with few threads,
+      //   5% perf won by loading all values, then intermixing operations.
+      // - moving gards out does not change anything much wrt "?:" ops
+      //   e.g. "if (is_X|is_Y) { op1 op2 }
+
       // record for adding specific stuff later...
       has_kernel = true;
       pips_assert("one input", gen_length(preds)==1);
