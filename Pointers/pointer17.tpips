@@ -1,4 +1,4 @@
-setenv WS=pointer02
+setenv WS=pointer03
 delete $WS
 create $WS $WS.c
 
