@@ -1,4 +1,4 @@
-setenv WS=struct13
+setenv WS=struct21
 delete $WS
 create $WS $WS.c
 
