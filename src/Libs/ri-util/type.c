@@ -466,6 +466,22 @@ bool array_pointer_type_equal_p(type t1, type t2)
   return equal_p;
 }
 
+/* is "et" the type of an element of an array of type "at"? */
+bool array_element_type_p(type at, type et)
+{
+  bool equal_p = false;
+
+  if(array_type_p(at)) {
+    if(type_variable_p(et)) {
+      basic ab = variable_basic(type_variable(at));
+      basic eb = variable_basic(type_variable(et));
+      equal_p = basic_equal_p(ab, eb);
+    }
+  }
+
+  return equal_p;
+}
+
 /* Same as above, but resolve typedefs first. */
 bool concrete_array_pointer_type_equal_p(type t1, type t2)
 {

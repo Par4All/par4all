@@ -501,7 +501,8 @@ points_to create_stub_points_to(cell c, // source of the points-to
   // usual array subscripts
   list sl = gen_full_copy_list(reference_indices(source_r));
   bool to_be_freed;
-  type source_t = points_to_cell_to_type(c, &to_be_freed);
+  type c_t = points_to_cell_to_type(c, &to_be_freed);
+  type source_t = compute_basic_concrete_type(c_t);
   cell sink_cell = cell_undefined;
   bool e_exact_p = true;
 
@@ -562,7 +563,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
 			 make_descriptor_none());
   pointer_index ++; // FI: is not used for formal parameters, is this the right place for the increment
 
-  if(to_be_freed) free_type(source_t);
+  if(to_be_freed) free_type(c_t);
   
   return pt_to;
 }

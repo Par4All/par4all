@@ -1030,6 +1030,7 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
   list sl = subscript_indices(s);
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
+  list i_sources = NIL;
 
   /* Add subscript when possible. For typing reason, typed anywhere
      cell should be subscripted. */
@@ -1038,18 +1039,54 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
     // STACK, DYNAMIC
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
        && !all_heap_locations_cell_p(c)) {
-      list ncsl = gen_full_copy_list(csl);
-      reference r = cell_any_reference(c);
+      bool to_be_freed;
+      type t = points_to_cell_to_type(c, &to_be_freed);
+      if(true || array_type_p(t)) { // Just add the subscript, old version
+	list ncsl = gen_full_copy_list(csl);
+	reference r = cell_any_reference(c);
 
-      // FI: the update depends on the sink model
-      points_to_reference_update_final_subscripts(r, ncsl);
+	// FI: the update depends on the sink model
+	points_to_reference_update_final_subscripts(r, ncsl);
+	i_sources = CONS(CELL, c, i_sources);
+      }
+      else if(pointer_type_p(t)) {
+	// FI: I chose true as last argument because it's less risky for
+	// the execution, but probably pretty bad for memory leaks
+	list new_sources = source_to_sinks(c, in, true);
+	FOREACH(CELL, nc, new_sources) {
+	  if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
+	     && !all_heap_locations_cell_p(c)) {
+	    bool n_to_be_freed;
+	    type nt = points_to_cell_to_type(c, &n_to_be_freed);
+	    // It has to be an array, since pointers always point to arrays
+	    if(array_type_p(nt)) {
+	      list ncsl = gen_full_copy_list(csl);
+	      reference nr = cell_any_reference(nc);
+
+	      // FI: the update depends on the sink model
+	      points_to_reference_update_final_subscripts(nr, ncsl);
+	      i_sources = CONS(CELL, nc, i_sources);
+	    }
+	    else {
+	      pips_internal_error("Unexpected case.\n");
+	    }
+	    if(n_to_be_freed) free_type(nt);
+	  } // FI: "in" should be updated by removing wrong NULL pointers...
+	}
+	gen_free_list(new_sources);
+      }
+      else {
+	pips_internal_error("Unexpected case.\n");
+      }
+      if(to_be_freed) free_type(t);
     }
   }
 
   gen_full_free_list(csl);
+  gen_free_list(sources);
 
   if(eval_p) {
-    FOREACH(CELL, source, sources) {
+    FOREACH(CELL, source, i_sources) {
       bool to_be_freed;
       type t = points_to_cell_to_type(source, &to_be_freed);
       if(pointer_type_p(t)) {
@@ -1064,7 +1101,7 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
     }
   }
   else
-    sinks = sources;
+    sinks = i_sources;
 
   if(ENDP(sinks)) {
     pips_user_warning("Some kind of execution error has been encountered.\n");
@@ -1177,13 +1214,16 @@ list expression_to_points_to_sources(expression e, pt_map in)
   if(!expression_to_points_to_cell_p(e))
     sinks = reduce_cells_to_pointer_type(sinks);
   ifdebug(1) {
-    type et = compute_basic_concrete_type(expression_to_type(e));
+    bool to_be_freed;
+    type tmp_t = points_to_expression_to_type(e, &to_be_freed);
+    type et = compute_basic_concrete_type(tmp_t);
     FOREACH(CELL, c, sinks) {
       if(!null_cell_p(c)) {
-	bool to_be_freed;
-	type ct = points_to_cell_to_type(c, &to_be_freed);
+	bool to_be_freed2;
+	type ct = points_to_cell_to_type(c, &to_be_freed2);
 	type cct = compute_basic_concrete_type(ct);
-	if(!array_pointer_type_equal_p(et, cct)) {
+	if(!array_pointer_type_equal_p(et, cct)
+	   && !array_element_type_p(et, cct)) {
 	  /* A useless [0] may have been added, but it is supposed to
 	     be taken care of above... by callers of this function. */
 	  ifdebug(1) {
@@ -1196,9 +1236,10 @@ list expression_to_points_to_sources(expression e, pt_map in)
 	  print_expression(e);
 	  pips_internal_error("Type error for an expression\n.");
 	}
-	if(to_be_freed) free_type(ct);
+	if(to_be_freed2) free_type(ct);
       }
     }
+    if(to_be_freed) free_type(tmp_t);
   }
 
   return sinks;

@@ -4,7 +4,23 @@ No priority order.
 
 1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough its code looks dead wrong...)
 
-2. C subscript construct analysis: see fulguro04.c
+2. C subscript construct analysis: see fulguro04.c for instance and some others:
+
+argv03:   char *p = (*argv)[1];
+fulguro03
+fulguro04:     (dat->array)[row]
+Lv
+pointer08:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+pointer16:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+ptr_to_array01:   (*p)[3] = &a;
+pv_assign05:   s1.b[0] = &j; (?) several occurences
+pv_assign06:   s2->b[0] = &i;
+struct10:      a.p[i] = i;
+struct13:      e.champ[i].p = malloc(10*sizeof(int));
+               (e.champ)[i].p = malloc(10*sizeof(int));
+struct21:      simplified version of struct13	       
+struct_parall01: a.p[i] = i;
+
 
 3. Convergence detection: current implementation no longer works as it used to
 
@@ -15,10 +31,11 @@ require index substitution in EffectsWithPointsTo, or the parallelism
 detection is lost; also it is not clear if you want to preserver x[j]
 instead of *(x+j)....; see for instance call05.c. See also call14.c.
 
-8. EffectsWithPointsTo: Also probably a
+8. EffectsWithPointsTo: Also in call14 or call05, probably an
 interprocedural translation issue in call08 for _x_3 in the callee and
-y in the caller. Also, many returns are missing: they would be useful
-to debug the points-to analysis
+y in the caller. Also, many returns are missing in the source codes of
+EffectsWithPointsTo: they would be useful to debug the points-to
+analysis
 
 9. EffectsWithPointsTo/call09,c: duplicate effect on s.one. Same in call10.
 
@@ -44,7 +61,9 @@ account an implicit dimension.
 15. EffectsWithPointsTo: differences from global02 to varargs04 to be
 looked at.
 
-Next item will be 16.
+16. Mixed up indices, for instance in argv03.
+
+Next item will be 17.
 
 Done:
 

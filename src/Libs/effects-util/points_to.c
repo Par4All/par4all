@@ -38,6 +38,8 @@
 #include "effects-util.h"
 #include "text-util.h"
 
+#include "misc.h"
+
 /***************************************/
 /* Function storing points to information attached to a statement
  */
@@ -215,7 +217,8 @@ int points_to_reference_to_final_dimension(reference r)
  *
  * "sl" must be broken into three parts, possibly empty:
  *
- *  1. The first part that ends up at the last field reference.
+ *  1. The first part that ends up at the last field reference. It may
+ *  be empty when no field is referenced.
  *
  *  2. The second part that starts just after the last field reference
  *  and that counts at most as many elements as the new subscript
@@ -244,29 +247,42 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
       free_type(et);
     }
     if(found_p) {
-      if(skip_one_p) {
-	sl23 = CONS(EXPRESSION, e , sl23);
-	skip_one_p = false;
-      }
-      else
 	/* build sl1 */
 	sl1 = CONS(EXPRESSION, e , sl1);
     }
     else
       sl23 = CONS(EXPRESSION, e , sl23);
   }
+
+  if(skip_one_p && ENDP(sl23) && !ENDP(nsl)) {
+    pips_internal_error("We are not generating a memory access constant path.\n");
+  }
+
   int n = (int) gen_length(nsl);
   int i = 0;
   FOREACH(EXPRESSION, e, sl23) {
+    if(skip_one_p) {
+      sl1 = gen_nconc(sl1, CONS(EXPRESSION, e , NIL));
+      skip_one_p = false;
+    }
+    else {
     if(i<n)
       free_expression(e);
     else
       sl3 = gen_nconc(sl3, CONS(EXPRESSION, e, NIL));
     i++;
+    }
   }
   sl = gen_nconc(sl1, nsl);
   sl = gen_nconc(sl, sl3);
   gen_free_list(sl23);
   reference_indices(r) = sl;
 
+  // We do not want to generate indirection in the reference
+  // The exactitude information is not relevant here
+  // bool exact_p;
+  // pips_assert("The reference is a constant memory access path",
+  //             !effect_reference_dereferencing_p( r, &exact_p));
+  // Might only work for standard references and not for points-to
+  // references.
 }
