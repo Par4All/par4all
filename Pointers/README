@@ -27,6 +27,8 @@ malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, mall
 
 pointer14: arrays of pointers toward arrays of pointers
 
+pointer17: triple pointer and pointer subscripts
+
 pointer_free
 
 pointer_modif01: scalar pointers updated, intraprocedural; effects required to observe real impact; C code is wrong and the bug is detected by gcc

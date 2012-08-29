@@ -1,6 +1,6 @@
 /* Example for pointer subscripts */
 
-void pointer03(float ***p)
+void pointer17(float ***p)
 {
   float z = 0;
 
