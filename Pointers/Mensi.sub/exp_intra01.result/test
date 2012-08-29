@@ -1,0 +1,77 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 0, *p, *q;
+//             <    is written>: p
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0, *p, *q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   q = p;
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0, *p, *q;
+//             <    is written>: p
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+   return 0;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0, *p, *q;
+//             <    is written>: p
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+   return 0;
+}
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

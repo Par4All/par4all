@@ -1,0 +1,110 @@
+
+PROPER  EFFECTS 
+
+int use_def_elim01()
+{
+   int i, *x, *y;                                                       /*0005*/
+//             <    is written>: i
+
+   i = 2;                                                               /*0007*/
+//             <    is written>: x
+   x = &i;                                                              /*0008*/
+//             <    is read   >: x
+//             <    is written>: y
+   y = x;                                                               /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: y
+   *y = 1;                                                              /*0010*/
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   return *y;                                                           /*0012*/
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int use_def_elim01()
+{
+
+// Points To: none
+
+   int i, *x, *y;                                                       /*0005*/
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   i = 2;                                                               /*0007*/
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   x = &i;                                                              /*0008*/
+
+// Points To:
+// x -> i , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   y = x;                                                               /*0009*/
+
+// Points To:
+// x -> i , EXACT
+// y -> i , EXACT
+
+   *y = 1;                                                              /*0010*/
+
+// Points To:
+// x -> i , EXACT
+// y -> i , EXACT
+
+
+   return *y;                                                           /*0012*/
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int use_def_elim01()
+{
+   int i, *x, *y;                                                       /*0005*/
+//             <    is written>: i
+
+   i = 2;                                                               /*0007*/
+//             <    is written>: x
+   x = &i;                                                              /*0008*/
+//             <    is read   >: x
+//             <    is written>: y
+   y = x;                                                               /*0009*/
+//             <    is read   >: y
+//             <    is written>: i
+   *y = 1;                                                              /*0010*/
+//             <    is read   >: i y
+
+   return *y;                                                           /*0012*/
+}
+int use_def_elim01()
+{
+
+
+//             <    is written>: x
+//             <    is referenced>: i x
+   x = &i;                                                              /*0008*/
+//             <    is read   >: x
+//             <    is written>: y
+//             <    is referenced>: x y
+   y = x;                                                               /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: y
+//             <    is referenced>: y
+   *y = 1;                                                              /*0010*/
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is referenced>: y
+
+   return *y;                                                           /*0012*/
+}

@@ -1,0 +1,80 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *pi, *qi;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+
+   pi = (int *) malloc(sizeof(int));
+//             <    is read   >: pi
+//             <    is written>: qi
+S:   qi = pi;
+//             <    is read   >: pi _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(pi);
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *pi, *qi;
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   pi = (int *) malloc(sizeof(int));
+
+// Points To:
+// pi -> *HEAP*_l_6 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+S:   qi = pi;
+
+// Points To:
+// pi -> *HEAP*_l_6 , EXACT
+// qi -> *HEAP*_l_6 , EXACT
+
+   free(pi);
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *pi, *qi;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+
+   pi = (int *) malloc(sizeof(int));
+//             <    is read   >: pi
+//             <    is written>: qi
+S:   qi = pi;
+//             <    is read   >: pi _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(pi);
+
+   return 0;
+}

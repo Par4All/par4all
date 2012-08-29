@@ -1,0 +1,75 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p[5];
+   int q[10][5];
+//             <    is read   >: q[0][0]
+//             <    is written>: p[3]
+   p[3] = q[0][0];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p[5];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   int q[10][5];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p[3] = q[0][0];
+
+// Points To: none
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *p[5];
+   int q[10][5];
+//             <    is read   >: q[0][0]
+//             <    is written>: p[3]
+   p[3] = q[0][0];
+
+   return 0;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+int main()
+{
+   int *p[5];
+   int q[10][5];
+//             <    is read   >: q[0][0]
+//             <    is written>: p[3]
+   p[3] = q[0][0];
+
+   return 0;
+}
+INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "q".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.

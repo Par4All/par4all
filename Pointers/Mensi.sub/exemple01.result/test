@@ -1,0 +1,65 @@
+
+PROPER  EFFECTS 
+
+int exemple01()
+{
+   int a;
+   int *b;
+//             <    is written>: b
+   b = &a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b
+   *b = 2;
+//             <    is read   >: a
+   return a;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int exemple01()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int *b;
+
+// Points To:
+// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   b = &a;
+
+// Points To:
+// b -> a , EXACT
+
+   *b = 2;
+
+// Points To:
+// b -> a , EXACT
+
+   return a;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int exemple01()
+{
+   int a;
+   int *b;
+//             <    is written>: b
+   b = &a;
+//             <    is read   >: b
+//             <    is written>: a
+   *b = 2;
+//             <    is read   >: a
+   return a;
+}

@@ -1,0 +1,69 @@
+delete pointer01
+create pointer01 pointer01.c 
+
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRINT_DOTDG_NODE_FONT_SIZE "10"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+#setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[pointer01]
+#shell dot -Tpng pointer01.database/pointer01/pointer01.dot >pointer01_dg.png
+#shell gqview pointer01_dg.png
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[pointer01]
+#shell dot -Tpng pointer01.database/pointer01/pointer01.dot >pointer01_dg.png
+#shell gqview pointer01_dg.png
+
+
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[pointer01]
+#shell dot -Tpng pointer01.database/pointer01/pointer01.dot >pointer02_dg.png
+#shell gqview pointer01_dg.png
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Parallel code
+echo
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE
+
+close
+delete pointer01
+quit
