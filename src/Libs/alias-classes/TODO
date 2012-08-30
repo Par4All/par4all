@@ -37,7 +37,7 @@ y in the caller. Also, many returns are missing in the source codes of
 EffectsWithPointsTo: they would be useful to debug the points-to
 analysis
 
-9. EffectsWithPointsTo/call09,c: duplicate effect on s.one. Same in call10.
+9. EffectsWithPointsTo/call09.c: duplicate effect on s.one. Same in call10.
 
 10. EffectsWithPointsTo/call15.c: understand the "may be written",
 probably due to NULL pointer initialization, but should have been
@@ -61,9 +61,12 @@ account an implicit dimension.
 15. EffectsWithPointsTo: differences from global02 to varargs04 to be
 looked at.
 
-16. Mixed up indices, for instance in argv03.
+17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
 
-Next item will be 17.
+18. dereferencing02: a variable, w, is used uninitialized and this is
+not detected.
+
+Next item will be 19.
 
 Done:
 
@@ -75,3 +78,7 @@ Done:
 Pointers/array03.c, function foo2. Build a smaller test case.
 
 -> new test case array14.c
+
+16. Mixed up indices, for instance in argv03.
+
+-> seems now OK for argv03. FI: I do not know about the other cases.

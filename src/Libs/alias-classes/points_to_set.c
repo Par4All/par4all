@@ -151,7 +151,7 @@ _uint points_to_rank( const void *  vpt, size_t size)
  *
  * Side-effects on argument "pts".
  */
-set points_to_block_projection(set pts, list  l)
+set points_to_block_projection(set pts, list  l, bool main_p)
 {
   list pls = NIL; // Possibly lost sinks
   FOREACH(ENTITY, e, l) {
@@ -187,13 +187,15 @@ set points_to_block_projection(set pts, list  l)
       }
     }
   }
-  /* Any memory leak? */
-  FOREACH(CELL, c, pls) {
-    if(!sink_in_set_p(c, pts)) {
-      reference r = cell_any_reference(c);
-      entity b = reference_variable(r);
-      pips_user_warning("Memory leak for bucket \"%s\".\n",
-			entity_name(b));
+  if(!main_p) {
+    /* Any memory leak? */
+    FOREACH(CELL, c, pls) {
+      if(!sink_in_set_p(c, pts)) {
+	reference r = cell_any_reference(c);
+	entity b = reference_variable(r);
+	pips_user_warning("Memory leak for bucket \"%s\".\n",
+			  entity_name(b));
+      }
     }
   }
   return pts;

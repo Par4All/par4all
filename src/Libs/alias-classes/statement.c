@@ -194,9 +194,12 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
 
   /* Eliminate local information if you exit a block */
   if(statement_sequence_p(s)) {
+    statement ms = get_current_module_statement();
+    entity m = get_current_module_entity();
+    bool main_p = ms==s && entity_main_module_p(m);
     list dl = statement_declarations(s);
     points_to_graph_set(pt_out) =
-      points_to_block_projection(points_to_graph_set(pt_out), dl);
+      points_to_block_projection(points_to_graph_set(pt_out), dl, main_p);
   }
 
   /* Because arc removals do not update the approximations of the
