@@ -10357,8 +10357,9 @@ static freia_status main_opencl_helper_0_0_0_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -10369,15 +10370,17 @@ static freia_status main_opencl_helper_0_0_0_compile(void)
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -10399,7 +10402,7 @@ static freia_status main_opencl_helper_0_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_0_0_0_source, "main_opencl_helper_0_0_0", "-DPIXEL8", &main_opencl_helper_0_0_0_kernel[0]);
@@ -10460,22 +10463,25 @@ static freia_status main_opencl_helper_E8_511_compile(void)
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -10547,22 +10553,25 @@ static freia_status main_opencl_helper_D8_511_compile(void)
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -10639,8 +10648,9 @@ static freia_status main_opencl_helper_1_0_0_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -10652,15 +10662,17 @@ static freia_status main_opencl_helper_1_0_0_compile(void)
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -10684,7 +10696,7 @@ static freia_status main_opencl_helper_1_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_1_0_0_source, "main_opencl_helper_1_0_0", "-DPIXEL8", &main_opencl_helper_1_0_0_kernel[0]);
@@ -10753,8 +10765,9 @@ static freia_status main_opencl_helper_3_0_0_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -10766,15 +10779,17 @@ static freia_status main_opencl_helper_3_0_0_compile(void)
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -10798,7 +10813,7 @@ static freia_status main_opencl_helper_3_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_3_0_0_source, "main_opencl_helper_3_0_0", "-DPIXEL8", &main_opencl_helper_3_0_0_kernel[0]);
@@ -10874,8 +10889,9 @@ static freia_status main_opencl_helper_4_0_0_compile(void)
     "  int c5)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -10884,9 +10900,11 @@ static freia_status main_opencl_helper_4_0_0_compile(void)
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
@@ -10967,8 +10985,9 @@ static freia_status main_opencl_helper_4_0_1_compile(void)
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -10976,15 +10995,17 @@ static freia_status main_opencl_helper_4_0_1_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -11066,8 +11087,9 @@ static freia_status main_opencl_helper_4_0_3_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -11078,15 +11100,17 @@ static freia_status main_opencl_helper_4_0_3_compile(void)
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -11110,7 +11134,7 @@ static freia_status main_opencl_helper_4_0_3_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_4_0_3_source, "main_opencl_helper_4_0_3", "-DPIXEL8", &main_opencl_helper_4_0_3_kernel[0]);
@@ -11182,8 +11206,9 @@ static freia_status main_opencl_helper_5_0_0_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -11196,15 +11221,17 @@ static freia_status main_opencl_helper_5_0_0_compile(void)
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -11229,7 +11256,7 @@ static freia_status main_opencl_helper_5_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_5_0_0_source, "main_opencl_helper_5_0_0", "-DPIXEL8", &main_opencl_helper_5_0_0_kernel[0]);
@@ -11297,23 +11324,26 @@ static freia_status main_opencl_helper_6_0_2_compile(void)
     "  int c0)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
-    "  // detect N & S boundaries (assuming one thread per row)\n"
-    "  int is_N = (threadid==0);\n"
-    "  int is_S = (threadid==(get_global_size(0)-1));\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
-    "    // detect W & E boundaries (assuming one row per thread)\n"
+    "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
@@ -11385,8 +11415,9 @@ KERNEL void main_opencl_helper_0_0_0(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11397,15 +11428,17 @@ KERNEL void main_opencl_helper_0_0_0(
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11427,7 +11460,7 @@ KERNEL void main_opencl_helper_0_0_0(
   }
 
   // reduction copy out
-  redX[threadid].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl function main_opencl_helper_E8_511
@@ -11440,22 +11473,25 @@ KERNEL void main_opencl_helper_E8_511(
   int pitch)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11486,22 +11522,25 @@ KERNEL void main_opencl_helper_D8_511(
   int pitch)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11537,8 +11576,9 @@ KERNEL void main_opencl_helper_1_0_0(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11550,15 +11590,17 @@ KERNEL void main_opencl_helper_1_0_0(
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11582,7 +11624,7 @@ KERNEL void main_opencl_helper_1_0_0(
   }
 
   // reduction copy out
-  redX[threadid].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 2
@@ -11602,8 +11644,9 @@ KERNEL void main_opencl_helper_3_0_0(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11615,15 +11658,17 @@ KERNEL void main_opencl_helper_3_0_0(
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11647,7 +11692,7 @@ KERNEL void main_opencl_helper_3_0_0(
   }
 
   // reduction copy out
-  redX[threadid].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 4
@@ -11674,8 +11719,9 @@ KERNEL void main_opencl_helper_4_0_0(
   int c5)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11684,9 +11730,11 @@ KERNEL void main_opencl_helper_4_0_0(
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
   GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
@@ -11717,8 +11765,9 @@ KERNEL void main_opencl_helper_4_0_1(
   int pitch)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11726,15 +11775,17 @@ KERNEL void main_opencl_helper_4_0_1(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11773,8 +11824,9 @@ KERNEL void main_opencl_helper_4_0_3(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11785,15 +11837,17 @@ KERNEL void main_opencl_helper_4_0_3(
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11817,7 +11871,7 @@ KERNEL void main_opencl_helper_4_0_3(
   }
 
   // reduction copy out
-  redX[threadid].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 5
@@ -11837,8 +11891,9 @@ KERNEL void main_opencl_helper_5_0_0(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -11851,15 +11906,17 @@ KERNEL void main_opencl_helper_5_0_0(
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
@@ -11884,7 +11941,7 @@ KERNEL void main_opencl_helper_5_0_0(
   }
 
   // reduction copy out
-  redX[threadid].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 6
@@ -11902,23 +11959,26 @@ KERNEL void main_opencl_helper_6_0_2(
   int c0)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
-  // detect N & S boundaries (assuming one thread per row)
-  int is_N = (threadid==0);
-  int is_S = (threadid==(get_global_size(0)-1));
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
-    // detect W & E boundaries (assuming one row per thread)
+    // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels

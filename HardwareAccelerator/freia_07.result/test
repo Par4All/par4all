@@ -1191,8 +1191,9 @@ static freia_status freia_07_opencl_helper_0_0_0_compile(void)
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int threadid = get_global_id(0);\n"
-    "  int shift = pitch*threadid;\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
@@ -1202,9 +1203,11 @@ static freia_status freia_07_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
     "  GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;\n"
     "\n"
-    "  // thread's pixel loop\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=0; i<width; i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
@@ -1281,8 +1284,9 @@ KERNEL void freia_07_opencl_helper_0_0_0(
   int pitch)
 {
   // get id & compute global image shift
-  int threadid = get_global_id(0);
-  int shift = pitch*threadid;
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
@@ -1292,9 +1296,11 @@ KERNEL void freia_07_opencl_helper_0_0_0(
   GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
   GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;
 
-  // thread's pixel loop
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=0; i<width; i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
