@@ -379,9 +379,9 @@ static int opencl_compile_mergeable_dag(
       else if (same_string_p(api->compact_name, "min!"))
       {
         sb_cat(opencl_end,
-               "  redX[threadid].min = mmin.x;\n"
-               "  redX[threadid].min_x = (uint) mmin.y;\n"
-               "  redX[threadid].min_y = get_global_id(0);\n");
+               "  redX[thrid].min = mmin.x;\n"
+               "  redX[thrid].min_x = (uint) mmin.y;\n"
+               "  redX[thrid].min_y = get_global_id(0);\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
