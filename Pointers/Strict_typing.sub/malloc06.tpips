@@ -1,9 +1,8 @@
-setenv WS=malloc03
+setenv WS=malloc06
 delete $WS
 create $WS $WS.c
 
-# The code is bugged pt++ moves pt out of an allocated area
-# setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE

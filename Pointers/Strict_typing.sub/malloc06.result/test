@@ -1,0 +1,119 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To: none
+
+   int *pi;
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   float *px;
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   float *pz;
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int (*pt)[30];
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+
+   pi = (int *) malloc(sizeof(int));
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   px = (float *) malloc(sizeof(float));
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// px -> *HEAP*_l_16 , MAY
+// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   pz = (float *) malloc(sizeof(float));
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+   pt = (int (*)[30]) malloc(10*sizeof(*pt));
+
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+   long long int i = (long long int) pt;
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+   printf("%p\n", pt);
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+
+   pt++;
+
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[1] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+   long long int j = (long long int) pt;
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[1] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+   printf("%p, j-i=%d\n", pt, (int) (j-i));
+
+// Points To:
+// pi -> *HEAP*_l_15 , MAY
+// pt -> *HEAP*_l_18[1] , MAY
+// px -> *HEAP*_l_16 , MAY
+// pz -> *HEAP*_l_17 , MAY
+
+
+   return 0;
+}
