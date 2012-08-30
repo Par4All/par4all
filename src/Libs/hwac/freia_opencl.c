@@ -101,6 +101,59 @@ static string opencl_type(string t)
   return NULL;
 }
 
+static string border_condition[9] = {
+  "is_N|is_W", "is_N", "is_N|is_E",
+  "is_W", NULL, "is_E",
+  "is_S|is_W", "is_S", "is_S|is_E"
+};
+
+/* generate a load if needed for an input variable
+ * return the holding variable name in a statically allocated array
+ */
+static string pixel_name(
+  dagvtx v,           // source vertex
+  int shft,           // -4 -3 -2 / -1 0 1 / 2 3 4
+  set loaded,         // those already loaded
+  string_buffer load, // append load code there if needed
+  list inputs)        // list of input vertices
+{
+  // build name
+  static char name[20];
+  int in = -1; // input number
+  static string suffix[9] =
+    { "NW", "N", "NE", "W", "", "E", "SW", "S", "SE" };
+  bool is_input = dagvtx_number(v)==0;
+  if (is_input) {
+    in = gen_position(v, inputs)-1;
+    sprintf(name, "in%d%s", in, suffix[shft+4]);
+  }
+  else // else temporary variable
+    sprintf(name, "t%d", (int) dagvtx_number(v));
+
+  // generate code if needed
+  static string shift[9] = {
+    "-pitch-1", "-pitch", "-pitch+1",
+    "-1", "", "+1",
+    "+pitch-1", "+pitch", "+pitch+1"
+  };
+
+#define VARSHIFT(v,n) (((char*)v)+(n))
+
+  if (is_input && !set_belong_p(loaded, VARSHIFT(v, shft)))
+  {
+    // we declare and load
+    sb_cat(load, "    " OPENCL_PIXEL, name, " = ");
+    if (border_condition[shft+4])
+      sb_cat(load, "(", border_condition[shft+4], ")? 0: ");
+    sb_cat(load, "j", itoa(in), "[i", shift[shft+4], "];\n");
+
+    // done!
+    set_add_element(loaded, loaded, VARSHIFT(v, shft));
+  }
+
+  return name;
+}
+
 /* @brief perform OpenCL compilation on mergeable dag
    the generated code relies on some freia-provided runtime
    may be called on a one vertex dag for kernel operations
@@ -122,7 +175,7 @@ static int opencl_compile_mergeable_dag(
   // I could handle a closed dag, such as volume(cst(12))...
   pips_assert("some input or output images", dag_inputs(d) || dag_outputs(d));
 
-  set remainings = set_make(set_pointer);
+  set remainings = set_make(set_pointer), loaded = set_make(set_pointer);
   set_append_vertex_statements(remainings, dag_vertices(d));
 
   list lparams = NIL;
@@ -135,12 +188,13 @@ static int opencl_compile_mergeable_dag(
     helper_body_2 = string_buffer_make(true),
     helper_tail = string_buffer_make(true),
     // opencl function
-    opencl = string_buffer_make(true),
-    opencl_2 = string_buffer_make(true),
-    opencl_head = string_buffer_make(true),
-    opencl_body = string_buffer_make(true),
-    opencl_tail = string_buffer_make(true),
-    opencl_end = string_buffer_make(true),
+    opencl = string_buffer_make(true),      // function signature
+    opencl_2 = string_buffer_make(true),    // last "reduction" argument
+    opencl_head = string_buffer_make(true), // setup & declarations & loop
+    opencl_load = string_buffer_make(true), // load variables
+    opencl_body = string_buffer_make(true), // actual operations
+    opencl_tail = string_buffer_make(true), // end of body, store variables
+    opencl_end = string_buffer_make(true),  // after the loop
     // compilation function
     compile = string_buffer_make(true);
 
@@ -227,25 +281,26 @@ static int opencl_compile_mergeable_dag(
 
   // input images
   if (n_ins)
-    sb_cat(opencl_body, "    // get input pixels\n");
+    sb_cat(opencl_load, "    // get input pixels\n");
   for (i = 0; i<n_ins; i++)
   {
     string si = strdup(itoa(i));
     sb_cat(helper, nargs? ",": "", "\n  const " FREIA_IMAGE "i", si);
     sb_cat(opencl, nargs? ",": "",
            "\n  " OPENCL_IMAGE "i", si, ", // const?\n  int ofs_i", si);
+    cl_args+=2;
     // image j<in> = i<in> + ofs_i<out> + shift;
     sb_cat(opencl_head,
       "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, " + shift;\n");
     // , i<in>
     sb_cat(helper_body, ", i", si);
-    // pixel in<in> = j<in>[i];
-    sb_cat(opencl_body,
-           "    " OPENCL_PIXEL "in", si, " = j", si, "[i];\n");
-    cl_args+=2;
     nargs++;
     free(si);
   }
+
+  // pixel in<in> = j<in>[i];
+  //sb_cat(opencl_load,
+  // "    " OPENCL_PIXEL "in", si, " = j", si, "[i];\n");
 
   // size parameters to handle an image row
   sb_cat(opencl, ",\n"
@@ -337,14 +392,9 @@ static int opencl_compile_mergeable_dag(
         n_misc = 1;
       }
       // inner loop reduction code
-      sb_cat(opencl_body, "    ", api->opencl.macro, "(red", svn, ", ");
       dagvtx pred = DAGVTX(CAR(preds));
-      int npred = (int) dagvtx_number(pred);
-      if (npred==0)
-        sb_cat(opencl_body, "in", itoa(gen_position(pred, dag_inputs(d))-1));
-      else
-        sb_cat(opencl_body, "t", itoa(npred));
-      sb_cat(opencl_body, ");\n");
+      sb_cat(opencl_body, "    ", api->opencl.macro, "(red", svn, ", ",
+             pixel_name(pred, 0, loaded, opencl_load, dag_inputs(d)), ");\n");
 
 #define RED " = redres." // for a small code compaction
 
@@ -390,8 +440,8 @@ static int opencl_compile_mergeable_dag(
     else if (is_a_kernel)
     {
       // NOTE about ILP: many intra sequence dependencies are generated...
-      // - for 2 full morpho ops on the same input with few threads,
-      //   5% perf won by loading all values, then intermixing operations.
+      // - the loaded are issued ahead, then the operations are performed.
+      // - some more operation intermixing could be possible in some cases.
       // - moving gards out does not change anything much wrt "?:" ops
       //   e.g. "if (is_X|is_Y) { op1 op2 }
 
@@ -399,8 +449,7 @@ static int opencl_compile_mergeable_dag(
       has_kernel = true;
       pips_assert("one input", gen_length(preds)==1);
 
-      string sin =
-        strdup(itoa(gen_position(DAGVTX(CAR(preds)),dag_inputs(d))-1));
+      dagvtx input = DAGVTX(CAR(preds));
       intptr_t k00, k01, k02, k10, k11, k12, k20, k21, k22;
       bool extracted = freia_extract_kernel_vtx(v, true,
                          &k00, &k01, &k02, &k10, &k11, &k12, &k20, &k21, &k22);
@@ -418,38 +467,63 @@ static int opencl_compile_mergeable_dag(
       need_S = need_S || k20 || k21 || k22;
 
       // pixel t<vertex> = <init>;
-      sb_cat(opencl_body,
+      sb_cat(opencl_load,
              "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
       // t<vertex> = <op>(t<vertex>, boundary?init:j[i+<shift....>]);
-      if (k00) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N|is_W)? ", api->opencl.init,
-                      ": j", sin, "[i-pitch-1]);\n");
-      if (k01) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N)? ", api->opencl.init,
-                      ": j", sin, "[i-pitch]);\n");
-      if (k02) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_N|is_E)? ", api->opencl.init,
-                      ": j", sin, "[i-pitch+1]);\n");
-      if (k10) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_W)? ", api->opencl.init,
-                      ": j", sin, "[i-1]);\n");
+      if (k00)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4-4], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, -4, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k01)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4-3], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, -3, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k02)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4-2], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, -2, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k10)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4-1], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, -1, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
       // most likely to be non null
-      if (k11) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", in", sin, ");\n");
-      if (k12) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_E)? ", api->opencl.init,
-                      ": j", sin, "[i+1]);\n");
-      if (k20) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_W|is_S)? ", api->opencl.init,
-                      ": j", sin, "[i+pitch-1]);\n");
-      if (k21) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_S)? ", api->opencl.init,
-                      ": j", sin, "[i+pitch]);\n");
-      if (k22) sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
-                      "(t", svn, ", (is_E|is_S)? ", api->opencl.init,
-                      ": j", sin, "[i+pitch+1]);\n");
-
-      free(sin), sin = NULL;
+      if (k11)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", ",
+               pixel_name(input, 0, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k12)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4+1], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, +1, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k20)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4+2], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, +2, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k21)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4+3], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, +3, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
+      if (k22)
+        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+               "(t", svn, ", (", border_condition[4+4], ")? ",
+               api->opencl.init, ": ",
+               pixel_name(input, +4, loaded, opencl_load, dag_inputs(d)),
+               ");\n");
     }
     else //  we are compiling an arithmetic pixel operation
     {
@@ -459,13 +533,9 @@ static int opencl_compile_mergeable_dag(
 
       // macro arguments
       FOREACH(dagvtx, p, preds)
-      {
-        if (dagvtx_number(p)==0)
-          sb_cat(opencl_body, nao++? ", ": "",
-                 "in", itoa(gen_position(p, dag_inputs(d))-1));
-        else
-          sb_cat(opencl_body, nao++? ", ": "", "t", itoa(dagvtx_number(p)));
-      }
+        sb_cat(opencl_body, nao++? ", ": "",
+               pixel_name(p, 0, loaded, opencl_load, dag_inputs(d)));
+
       gen_free_list(preds), preds = NIL;
 
       // other (scalar) input arguments
@@ -551,6 +621,7 @@ static int opencl_compile_mergeable_dag(
     else
       sb_cat(opencl, "    // E not needed\n");
   }
+  string_buffer_append_sb(opencl, opencl_load);
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n");
@@ -619,11 +690,13 @@ static int opencl_compile_mergeable_dag(
   string_buffer_free(&opencl);
   string_buffer_free(&opencl_2);
   string_buffer_free(&opencl_head);
+  string_buffer_free(&opencl_load);
   string_buffer_free(&opencl_body);
   string_buffer_free(&opencl_tail);
   string_buffer_free(&opencl_end);
 
   free(cut_name);
+  set_free(loaded);
 
   return stnb;
 }
