@@ -337,6 +337,7 @@ list points_to_reference_to_typed_index(reference r, type t)
       nl = gen_nconc(nl, CONS(EXPRESSION,
 			      copy_expression(EXPRESSION(gen_nth(i, rsl))),
 			      NIL));
+      reference_indices(nr) = nl;
       rt = points_to_reference_to_type(nr, &to_be_freed);
       if(array_pointer_type_equal_p(rt, pt)) {
 	found_p = true;
@@ -348,8 +349,18 @@ list points_to_reference_to_typed_index(reference r, type t)
 
     if(found_p)
       psl = gen_nthcdr(i, rsl);
-    else
-      pips_internal_error("Type not found.\n");
+    else {
+      // The issue may be due to a user bug, as was the case in
+      // Strict_typing.sub/malloc03.c
+      if(entity_heap_location_p(v)) {
+	// It would be nice to have a current statement stack...
+	pips_user_error("The dynamic allocation of \"%s\" is likely "
+			"to be inadequate with its use in the current "
+			"statement.\n", entity_local_name(v));
+      }
+      else
+	pips_internal_error("Type not found.\n");
+    }
   }
 
   free_type(pt);
