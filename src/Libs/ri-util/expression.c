@@ -4130,7 +4130,7 @@ list subscript_expressions_to_constant_subscript_expressions(list sl)
 
 
 /* Assume p is a pointer. Compute expression "*(p+i)" from reference
-   "p[i]". */
+   r = "p[i]". */
 expression pointer_reference_to_expression(reference r)
 {
   entity p = reference_variable(r);

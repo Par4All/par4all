@@ -774,6 +774,8 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 {
   pt_map pt_out = pt_in;
   list sources = expression_to_points_to_sources(lhs, pt_out);
+  bool to_be_freed;
+  type et = points_to_expression_to_type(lhs, &to_be_freed);
   FOREACH(CELL, source, sources) {
     list sinks = source_to_sinks(source, pt_out, false);
     if(ENDP(sinks)) {
@@ -786,7 +788,7 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 	// The code cannot be executed
 	clear_pt_map(pt_out);
     }
-    offset_cells(source, sinks, delta, pt_out);
+    offset_cells(source, sinks, delta, et, pt_out);
     // FI: we could perform some filtering out of pt_in
     // If an arc points from source to nowehere/undefined or to the
     // null location, this arc should be removed from pt_in as it
@@ -802,6 +804,67 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
   return pt_out;
 }
 
+/* Side effect on reference "r".
+ *
+ * r is assumed to be a reference to an array.
+ *
+ * The offset is applied to the last suscript.
+ */
+void offset_array_reference(reference r, expression delta, type et)
+{
+  value v = EvalExpression(delta);
+  list rsl = reference_indices(r);
+  if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+    int dv =  constant_int(value_constant(v));
+    if(ENDP(rsl)) {
+      // FI: oops, we are in trouble; assume 0...
+      expression se = int_to_expression(dv);
+      reference_indices(r) = CONS(EXPRESSION, se, NIL);
+    }
+    else {
+      // Select the index that should be subscripted
+      list sl = points_to_reference_to_typed_index(r, et);
+      expression lse = EXPRESSION(CAR(sl));
+      value vlse = EvalExpression(lse);
+      if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
+	int ov =  constant_int(value_constant(vlse));
+	int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	if(-k <= ov && ov <= k) {
+	  expression nse = int_to_expression(dv+ov);
+	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(sl)) = nse;
+	}
+	else {
+	  expression nse = make_unbounded_expression();
+	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(sl)) = nse;
+	}
+	free_expression(lse);
+      }
+      else {
+	// FI: assume * is used... UNBOUNDED_DIMENSION
+	expression nse = make_unbounded_expression();
+	//EXPRESSION_(CAR(gen_last(sl))) = nse;
+	EXPRESSION_(CAR(sl)) = nse;
+	free_expression(lse);
+      }
+    }
+  }
+  else {
+    if(ENDP(rsl)) {
+      expression nse = make_unbounded_expression();
+      reference_indices(r) = CONS(EXPRESSION, nse, NIL);
+    }
+    else {
+      list sl = points_to_reference_to_typed_index(r, et);
+      expression ose = EXPRESSION(CAR(sl));
+      expression nse = make_unbounded_expression();
+      EXPRESSION_(CAR(sl)) = nse;
+      free_expression(ose);
+    }
+  }
+}
+
 /* Each cell in sinks is replaced by a cell located "delta" elements
  * further up in the memory. In some cases, the same points-to are
  * removed and added. For instance, t[0],t[1] -> t[1],t[2] because of
@@ -810,14 +873,14 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
  * This procedure must be used when cells in "sinks" are components of
  * points-to arcs stored in a points-to set.
  */
-void offset_cells(cell source, list sinks, expression delta, pt_map in)
+void offset_cells(cell source, list sinks, expression delta, type et, pt_map in)
 {
   pt_map old = new_pt_map();
   pt_map new = new_pt_map();
   FOREACH(CELL, sink, sinks) {
     points_to pt = find_arc_in_points_to_set(source, sink, in);
     add_arc_to_pt_map(pt, old);
-    points_to npt = offset_cell(pt, delta);
+    points_to npt = offset_cell(pt, delta, et);
     add_arc_to_pt_map(npt, new);
   }
   difference_of_pt_maps(in, in, old);
@@ -825,7 +888,8 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
 }
 
 /* Allocate and return a new points-to "npt", copy of "pt", with an
- * offset of "delta" on the sink.
+ * offset of "delta" on the sink. "et" is used to determine which
+ * index should be offseted.
  *
  * Some kind of k-limiting should be performed here to avoid creating
  * too many new nodes in the points-to graph, such as t[0], t[1],... A
@@ -843,14 +907,14 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
  *
  * I assumed gen_last() to start with, but it is unlikely in general!
  */
-points_to offset_cell(points_to pt, expression delta)
+points_to offset_cell(points_to pt, expression delta, type et)
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
   points_to npt = copy_points_to(pt);
-  reference r = cell_any_reference(points_to_sink(npt));
-  entity v = reference_variable(r);
   cell sink = points_to_sink(npt);
+  reference r = cell_any_reference(sink);
+  entity v = reference_variable(r);
   if(nowhere_cell_p(sink))
     ; // user error: possible incrementation of an uninitialized pointer
   else if(null_cell_p(sink))
@@ -859,66 +923,25 @@ points_to offset_cell(points_to pt, expression delta)
     ; // It is already fuzzy no need to add more
   // FI: it might be necessary to exclude *HEAP* too when a minimal
   // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
-  else if(entity_array_p(v)
-     || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
-    value v = EvalExpression(delta);
-    list sl = reference_indices(r);
-    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
-      int dv =  constant_int(value_constant(v));
-      if(ENDP(sl)) {
-	// FI: oops, we are in trouble; assume 0...
-	expression se = int_to_expression(dv);
-	reference_indices(r) = CONS(EXPRESSION, se, NIL);
-      }
-      else {
-	//expression lse = EXPRESSION(CAR(gen_last(sl)));
-	expression lse = EXPRESSION(CAR(sl));
-	value vlse = EvalExpression(lse);
-	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
-	  int ov =  constant_int(value_constant(vlse));
-	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
-	  if(-k <= ov && ov <= k) {
-	    expression nse = int_to_expression(dv+ov);
-	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	    EXPRESSION_(CAR(sl)) = nse;
-	  }
-	  else {
-	    expression nse = make_unbounded_expression();
-	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	    EXPRESSION_(CAR(sl)) = nse;
-	  }
-	  free_expression(lse);
-	}
-	else {
-	  // FI: assume * is used... UNBOUNDED_DIMENSION
-	  expression nse = make_unbounded_expression();
-	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  EXPRESSION_(CAR(sl)) = nse;
-	  free_expression(lse);
-	}
-      }
-    }
-    else {
-      if(ENDP(sl)) {
-	expression nse = make_unbounded_expression();
-	reference_indices(r) = CONS(EXPRESSION, nse, NIL);
-      }
-      else {
-	expression ose = EXPRESSION(CAR(gen_last(sl)));
-	expression nse = make_unbounded_expression();
-	//EXPRESSION_(CAR(gen_last(sl))) = nse;
-	EXPRESSION_(CAR(sl)) = nse;
-	free_expression(ose);
-      }
-    }
-  }
-  // FI to be extended to pointers and points-to stubs
   else {
-    pips_user_error("Use of pointer arithmetic on %s is not "
-		    "standard-compliant.\n"
-		    "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
-		    " for usual non-standard compliant C code.\n",
-		    entity_user_name(v));
+    type vt = entity_basic_concrete_type(v);
+    if(array_type_p(vt)
+       || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+      offset_array_reference(r, delta, et);
+    }
+    else if(struct_type_p(vt)) {
+      // The struct may contain an array field.
+      // FI: should we check the existence of the field in the subscripts?
+      offset_array_reference(r, delta, et);
+    }
+    // FI to be extended to pointers and points-to stubs
+    else {
+      pips_user_error("Use of pointer arithmetic on %s is not "
+		      "standard-compliant.\n"
+		      "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
+		      " for usual non-standard compliant C code.\n",
+		      entity_user_name(v));
+    }
   }
   return npt;
 }

@@ -514,11 +514,13 @@ points_to create_stub_points_to(cell c, // source of the points-to
     int source_cd = points_to_indices_to_array_index_number(source_sl);
 
     if(source_cd==0 /* && vd==0*/ ) {
-      type sink_t = type_to_pointed_type(source_t);
+      /* You may have a pointer or an unbounded array for source_t... */
+      type sink_t = C_type_to_pointed_type(source_t);
       type stub_t = (strict_p || !type_variable_p(sink_t))?
 		     copy_type(sink_t) : type_to_array_type(sink_t);
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, 0, NIL, fs);
       e_exact_p = exact_p;
+      free_type(sink_t);
     }
     else if(source_cd>0) {
       // If called for a formal parameter, the reference may not

@@ -247,8 +247,8 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
       free_type(et);
     }
     if(found_p) {
-	/* build sl1 */
-	sl1 = CONS(EXPRESSION, e , sl1);
+      /* build sl1 */
+      sl1 = CONS(EXPRESSION, e , sl1);
     }
     else
       sl23 = CONS(EXPRESSION, e , sl23);
@@ -258,6 +258,8 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
     pips_internal_error("We are not generating a memory access constant path.\n");
   }
 
+  // FI: place the new indices as early as possible
+#if 0
   int n = (int) gen_length(nsl);
   int i = 0;
   FOREACH(EXPRESSION, e, sl23) {
@@ -266,15 +268,33 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
       skip_one_p = false;
     }
     else {
-    if(i<n)
+      if(i<n)
+	free_expression(e);
+      else
+	sl3 = gen_nconc(sl3, CONS(EXPRESSION, e, NIL));
+      i++;
+    }
+  }
+
+  sl = gen_nconc(sl1, nsl);
+  sl = gen_nconc(sl, sl3);
+#endif
+
+  // FI: place the new indices as late as possible
+  int n = (int) gen_length(nsl);
+  int n23 = (int) gen_length(sl23);
+  int i = 0;
+  FOREACH(EXPRESSION, e, sl23) {
+    if(i>=n23-n)
       free_expression(e);
     else
       sl3 = gen_nconc(sl3, CONS(EXPRESSION, e, NIL));
     i++;
-    }
   }
-  sl = gen_nconc(sl1, nsl);
-  sl = gen_nconc(sl, sl3);
+
+  sl = gen_nconc(sl1, sl3);
+  sl = gen_nconc(sl, nsl);
+
   gen_free_list(sl23);
   reference_indices(r) = sl;
 
@@ -284,5 +304,55 @@ void points_to_reference_update_final_subscripts(reference r, list nsl)
   // pips_assert("The reference is a constant memory access path",
   //             !effect_reference_dereferencing_p( r, &exact_p));
   // Might only work for standard references and not for points-to
-  // references.
+  // references: core dumps with points-to references.
+}
+
+/* Look for the index in "r" that corresponds to a pointer of type "t"
+ * and return the corresponding element list. In other words, the type
+ * of "&r" is "t".
+ *
+ * It is done in a very inefficient way
+ */
+list points_to_reference_to_typed_index(reference r, type t)
+{
+  bool to_be_freed;
+  type rt = points_to_reference_to_type(r, &to_be_freed);
+  list rsl = reference_indices(r); // reference subscript list
+  pips_assert("t is a pointer type", C_pointer_type_p(t));
+  type pt = C_type_to_pointed_type(t);
+  list psl = list_undefined; // pointed subscript list
+
+  if(array_pointer_type_equal_p(rt, pt))
+    psl = gen_last(rsl);
+  else {
+    if(to_be_freed) free_type(rt);
+    entity v = reference_variable(r);
+    list nl = NIL;
+    int i;
+    int n = (int) gen_length(rsl);
+    reference nr = make_reference(v, nl);
+    bool found_p = false;
+
+    for(i=0;i<n;i++) {
+      nl = gen_nconc(nl, CONS(EXPRESSION,
+			      copy_expression(EXPRESSION(gen_nth(i, rsl))),
+			      NIL));
+      rt = points_to_reference_to_type(nr, &to_be_freed);
+      if(array_pointer_type_equal_p(rt, pt)) {
+	found_p = true;
+	break;
+      }
+    }
+
+    free_reference(nr);
+
+    if(found_p)
+      psl = gen_nthcdr(i, rsl);
+    else
+      pips_internal_error("Type not found.\n");
+  }
+
+  free_type(pt);
+
+  return psl;
 }

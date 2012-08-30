@@ -446,19 +446,33 @@ bool array_pointer_type_equal_p(type t1, type t2)
   if(!type_equal_up_to_qualifiers_p(t1,t2)) {
     if(pointer_type_p(t1) && array_type_p(t2)) {
       type pt = type_to_pointed_type(t1);
-      basic pb = variable_basic(type_variable(pt));
-      variable etv = type_variable(t2);
-      basic eb = variable_basic(etv);
-      int d = (int) gen_length(variable_dimensions(etv));
-      equal_p = (d==1 && basic_equal_p(pb, eb));
+      if(type_void_p(pt)) {
+	// Conventionally, you should have an array of overloaded elements...
+	//array_element_type();
+	equal_p = false;
+      }
+      else {
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(t2);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	equal_p = (d==1 && basic_equal_p(pb, eb));
+      }
     }
     else if(pointer_type_p(t2) && array_type_p(t1)) {
       type pt = type_to_pointed_type(t2);
-      basic pb = variable_basic(type_variable(pt));
-      variable etv = type_variable(t1);
-      basic eb = variable_basic(etv);
-      int d = (int) gen_length(variable_dimensions(etv));
-      equal_p = (d==1 && basic_equal_p(pb, eb));
+      if(type_void_p(pt)) {
+	// Conventionally, you should have an array of overloaded elements...
+	//array_element_type();
+	equal_p = false;
+      }
+      else {
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(t1);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	equal_p = (d==1 && basic_equal_p(pb, eb));
+      }
     }
     else
       equal_p = false;
@@ -4803,6 +4817,37 @@ type type_to_pointed_type(type t)
 
     if(pointer_type_p(ut))
       pt = basic_pointer(variable_basic(type_variable(ut)));
+
+    if(!type_undefined_p(pt))
+      upt = ultimate_type(pt);
+  }
+  return upt;
+}
+
+/* returns a copy of t if t is not a pointer type, and the pointed type if t is
+ * a pointer type or. Type definitions are replaced. If t is undefined,
+ * returns a type_undefined.
+ *
+ * A new type is always allocated.
+ */
+type C_type_to_pointed_type(type t)
+{
+  type upt = type_undefined;
+
+  if(!type_undefined_p(t)) {
+    type ut = ultimate_type(t);
+    type pt = ut;
+
+    if(pointer_type_p(ut))
+      pt = copy_type(basic_pointer(variable_basic(type_variable(ut))));
+    else if(array_type_p(ut)) {
+      variable v = type_variable(t);
+      list dl = variable_dimensions(v);
+      basic b = variable_basic(v);
+      if((int)gen_length(dl)==1 && unbounded_dimension_p(DIMENSION(CAR(dl)))) {
+	pt = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
+      }
+    }
 
     if(!type_undefined_p(pt))
       upt = ultimate_type(pt);

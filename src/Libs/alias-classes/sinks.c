@@ -434,7 +434,7 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
   type t1 = expression_to_type(a1);
   type t2 = expression_to_type(a2);
   // FI: the first two cases should be unified with a=a1 or a2
-  if(pointer_type_p(t1) && scalar_integer_type_p(t2)) {
+  if(pointer_type_p(t1) && (scalar_integer_type_p(t2) || unbounded_expression_p(a2))) {
     // expression_to_points_to_sinks() returns pointers to arcs in the
     // points-to graph. No side effect is then possible.
     list e_sinks = expression_to_points_to_sinks(a1, in);
@@ -442,7 +442,7 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
     gen_free_list(e_sinks);
     offset_points_to_cells(sinks, a2);
   }
-  else if(pointer_type_p(t2) && scalar_integer_type_p(t1)) {
+  else if(pointer_type_p(t2) && (scalar_integer_type_p(t1) || unbounded_expression_p(a1))) {
     list e_sinks = expression_to_points_to_sinks(a2, in);
     sinks = gen_full_copy_list(e_sinks);
     gen_free_list(e_sinks);
@@ -1007,6 +1007,56 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
   return sinks;
 }
 */
+
+ /* Allocate a new expression based on the reference in "c" and the
+  * subscript list "csl". No sharing with the arguments. The pointer
+  * subscripts are transformed into pointer arithmetic and
+  * dereferencements.
+  */
+expression pointer_subscript_to_expression(cell c, list csl)
+{
+  reference r = copy_reference(cell_any_reference(c));
+  expression pae = reference_to_expression(r);
+
+  FOREACH(EXPRESSION, pse, csl) {
+    expression npse = copy_expression(pse);
+    pae = binary_intrinsic_expression(PLUS_C_OPERATOR_NAME, pae, npse);
+    pae = unary_intrinsic_expression(DEREFERENCING_OPERATOR_NAME, pae);
+  }
+  return pae;
+}
+
+/* FI: a really stupid function... Why do we add zero subscript right
+ *  away when building the sink cell to remoce them later? Let's now
+ * remove the excessive subscriptsof "r" with respect to type
+ * "at"...
+ */
+void adapt_reference_to_type(reference r, type et)
+{
+  bool to_be_freed;
+  type at = compute_basic_concrete_type(et);
+  type rt = points_to_reference_to_type(r, &to_be_freed);
+  type t = compute_basic_concrete_type(rt);
+  while(!array_pointer_type_equal_p(at, t) && !ENDP(reference_indices(r))) {
+    if(to_be_freed) free_type(t);
+    list sl = reference_indices(r);
+    list last = gen_last(sl);
+    expression e = EXPRESSION(CAR(last));
+    if(expression_field_p(e))
+      break;
+    int l1 = (int) gen_length(sl);
+    gen_remove_once(&sl, (void *) e);
+    int l2 = (int) gen_length(sl);
+    if(l1==l2)
+      pips_internal_error("gen_remove() is ineffective.\n");
+    reference_indices(r) = sl;
+    type nrt = points_to_reference_to_type(r, &to_be_freed);
+    t = compute_basic_concrete_type(nrt);
+  }
+  if(!type_equal_p(at, t))
+    pips_internal_error("Cell type mismatch.");
+  if(to_be_freed) free_type(t);
+}
 
  /* Generate the corresponding points-to reference(s). All access
   * operators such as ., ->, * are replaced by subscripts.
@@ -1019,18 +1069,34 @@ list sizeofexpression_to_points_to_sinks(sizeofexpression soe, pt_map in)
 list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
 {
   expression a = subscript_array(s);
+  bool to_be_freed;
+  // If ever a pointer is deferenced somewhere, at is not going to
+  // take into account the extra dimensions needed for pointer arithmetics
+  type at = points_to_expression_to_type(a, &to_be_freed);
 
-  /* FI: I'm in trouble. Logically, I want sinks, but in practice
-   * sources seem to give better results... maybe because some
-   * evaluation are performed implictly.
+  /* FI: In many cases, you do need the source. However, you have
+   * different kind of sources because "x" and "&x[0]" are synonyms
+   * and because you sometimes need "x" and some other times "&x[0]".
    */
   list sources = expression_to_points_to_sources(a, in);
-  // list sources = expression_to_points_to_sinks(a, in);
 
   list sl = subscript_indices(s);
   list csl = subscript_expressions_to_constant_subscript_expressions(sl);
   list sinks = NIL;
   list i_sources = NIL;
+
+  /* If the first dimension is unbounded, it has (probably) be added
+     because of a pointer. A zero subscript is also added. */
+  bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(array_type_p(at) && !strict_p) {
+    variable v = type_variable(at);
+    dimension d1 = DIMENSION(CAR(variable_dimensions(v)));
+    if(unbounded_dimension_p(d1)) {
+      /* Add a zero subscript */
+      expression z = make_zero_expression();
+      csl = CONS(EXPRESSION, z, csl);
+    }
+  }
 
   /* Add subscript when possible. For typing reason, typed anywhere
      cell should be subscripted. */
@@ -1039,51 +1105,70 @@ list subscript_to_points_to_sinks(subscript s, pt_map in, bool eval_p)
     // STACK, DYNAMIC
     if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
        && !all_heap_locations_cell_p(c)) {
-      bool to_be_freed;
-      type t = points_to_cell_to_type(c, &to_be_freed);
-      if(true || array_type_p(t)) { // Just add the subscript, old version
-	list ncsl = gen_full_copy_list(csl);
-	reference r = cell_any_reference(c);
+      bool to_be_freed2;
+      type t = points_to_cell_to_type(c, &to_be_freed2);
+      reference r = cell_any_reference(c);
+      entity v = reference_variable(r);
 
-	// FI: the update depends on the sink model
-	points_to_reference_update_final_subscripts(r, ncsl);
+      if(array_type_p(at)) {
+	list ncsl = gen_full_copy_list(csl);
+	if(entity_stub_sink_p(v)) {
+	  // argv03
+	  reference r = cell_any_reference(c);
+
+	  // FI: an horror... fixing a design mistake by a kludge...
+	  // useful for argv03
+	  adapt_reference_to_type(r, at);
+
+	  // FI: the update depends on the sink model
+	  // points_to_reference_update_final_subscripts(r, ncsl);
+	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+
+	  // FI: let's add the zero subscripts again...
+	  points_to_cell_add_zero_subscripts(c);
+	}
+	else {
+	  // Expression "a" does not require any dereferencing, add
+	  // the new indices (Strict_typing.sub/assignment11.c
+
+	  // FI: an horror... fixing a design mistake by a kludge...
+	  adapt_reference_to_type(r, at);
+	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+	}
+
 	i_sources = CONS(CELL, c, i_sources);
       }
-      else if(pointer_type_p(t)) {
-	// FI: I chose true as last argument because it's less risky for
-	// the execution, but probably pretty bad for memory leaks
-	list new_sources = source_to_sinks(c, in, true);
-	FOREACH(CELL, nc, new_sources) {
-	  if(!nowhere_cell_p(c) && !null_cell_p(c) && !anywhere_cell_p(c)
-	     && !all_heap_locations_cell_p(c)) {
-	    bool n_to_be_freed;
-	    type nt = points_to_cell_to_type(c, &n_to_be_freed);
-	    // It has to be an array, since pointers always point to arrays
-	    if(array_type_p(nt)) {
-	      list ncsl = gen_full_copy_list(csl);
-	      reference nr = cell_any_reference(nc);
-
-	      // FI: the update depends on the sink model
-	      points_to_reference_update_final_subscripts(nr, ncsl);
-	      i_sources = CONS(CELL, nc, i_sources);
-	    }
-	    else {
-	      pips_internal_error("Unexpected case.\n");
-	    }
-	    if(n_to_be_freed) free_type(nt);
-	  } // FI: "in" should be updated by removing wrong NULL pointers...
+      else if(struct_type_p(at)) { // Just add the subscript, old version
+	list ncsl = gen_full_copy_list(csl);
+	if(entity_stub_sink_p(v)) {
+	  reference r = cell_any_reference(c);
+	  // FI: the update depends on the sink model
+	  points_to_reference_update_final_subscripts(r, ncsl);
 	}
-	gen_free_list(new_sources);
+	else {
+	  // Expression "a" does not require any dereferencing, add
+	  // the new indices (Strict_typing.sub/assignment11.c
+	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
+	}
+	i_sources = CONS(CELL, c, i_sources);
+      }
+      else if(pointer_type_p(at)) {
+	/* The reference p[i][j] is transformed into an expression
+	   *(*(p+i)+j) */
+	expression pae = pointer_subscript_to_expression(c, csl);
+	i_sources = expression_to_points_to_sources(pae, in);
+	free_expression(pae);
       }
       else {
 	pips_internal_error("Unexpected case.\n");
       }
-      if(to_be_freed) free_type(t);
+      if(to_be_freed2) free_type(t);
     }
   }
 
   gen_full_free_list(csl);
   gen_free_list(sources);
+  if(to_be_freed) free_type(at);
 
   if(eval_p) {
     FOREACH(CELL, source, i_sources) {
