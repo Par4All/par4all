@@ -1995,8 +1995,8 @@ static freia_status freia_24_opencl_helper_0_1_0_compile(void)
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
     "    PIXEL t16 = PIXEL_THRESHOLD(in1, c0, c1, c2);\n"
     "    PIXEL t19 = PIXEL_THRESHOLD(in0, c3, c4, c5);\n"
@@ -2172,8 +2172,8 @@ KERNEL void freia_24_opencl_helper_0_1_0(
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
-    PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+    PIXEL in0 = j0[i];
     // pixel computations
     PIXEL t16 = PIXEL_THRESHOLD(in1, c0, c1, c2);
     PIXEL t19 = PIXEL_THRESHOLD(in0, c3, c4, c5);

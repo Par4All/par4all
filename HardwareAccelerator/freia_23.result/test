@@ -826,8 +826,8 @@ static freia_status freia_23_opencl_helper_0_0_0_compile(void)
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
     "    PIXEL t10 = PIXEL_XOR(in1, in0);\n"
     "    PIXEL t11 = PIXEL_SUB(t10, in1);\n"
@@ -906,8 +906,8 @@ KERNEL void freia_23_opencl_helper_0_0_0(
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
-    PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+    PIXEL in0 = j0[i];
     // pixel computations
     PIXEL t10 = PIXEL_XOR(in1, in0);
     PIXEL t11 = PIXEL_SUB(t10, in1);

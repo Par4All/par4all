@@ -3318,29 +3318,37 @@ static freia_status anr999_opencl_helper_0_0_0_compile(void)
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
+    "    PIXEL t41 = PIXEL_MIN;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    PIXEL t73 = PIXEL_MAX;\n"
     "    // pixel computations\n"
     "    PIXEL_MINIMUM(red38, in0);\n"
     "    PIXEL_VOLUME(red39, in0);\n"
-    "    PIXEL t41 = PIXEL_MIN;\n"
-    "    t41 = PIXEL_SUP(t41, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    t41 = PIXEL_SUP(t41, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t41 = PIXEL_SUP(t41, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t41 = PIXEL_SUP(t41, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t41 = PIXEL_SUP(t41, (is_W)? PIXEL_MIN: in0W);\n"
     "    t41 = PIXEL_SUP(t41, in0);\n"
-    "    t41 = PIXEL_SUP(t41, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
-    "    t41 = PIXEL_SUP(t41, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
-    "    PIXEL t73 = PIXEL_MAX;\n"
-    "    t73 = PIXEL_INF(t73, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
-    "    t73 = PIXEL_INF(t73, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t73 = PIXEL_INF(t73, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
-    "    t73 = PIXEL_INF(t73, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t41 = PIXEL_SUP(t41, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t41 = PIXEL_SUP(t41, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t41 = PIXEL_SUP(t41, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t41 = PIXEL_SUP(t41, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    t73 = PIXEL_INF(t73, (is_N|is_W)? PIXEL_MAX: in0NW);\n"
+    "    t73 = PIXEL_INF(t73, (is_N)? PIXEL_MAX: in0N);\n"
+    "    t73 = PIXEL_INF(t73, (is_N|is_E)? PIXEL_MAX: in0NE);\n"
+    "    t73 = PIXEL_INF(t73, (is_W)? PIXEL_MAX: in0W);\n"
     "    t73 = PIXEL_INF(t73, in0);\n"
-    "    t73 = PIXEL_INF(t73, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    t73 = PIXEL_INF(t73, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
-    "    t73 = PIXEL_INF(t73, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
-    "    t73 = PIXEL_INF(t73, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    t73 = PIXEL_INF(t73, (is_E)? PIXEL_MAX: in0E);\n"
+    "    t73 = PIXEL_INF(t73, (is_S|is_W)? PIXEL_MAX: in0SW);\n"
+    "    t73 = PIXEL_INF(t73, (is_S)? PIXEL_MAX: in0S);\n"
+    "    t73 = PIXEL_INF(t73, (is_S|is_E)? PIXEL_MAX: in0SE);\n"
     "    // set output pixels\n"
     "    p0[i] = t41;\n"
     "    p1[i] = t73;\n"
@@ -3434,18 +3442,26 @@ static freia_status anr999_opencl_helper_D8_511_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t49 = PIXEL_MIN;\n"
-    "    t49 = PIXEL_SUP(t49, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t49 = PIXEL_SUP(t49, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t49 = PIXEL_SUP(t49, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t49 = PIXEL_SUP(t49, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t49 = PIXEL_SUP(t49, (is_W)? PIXEL_MIN: in0W);\n"
     "    t49 = PIXEL_SUP(t49, in0);\n"
-    "    t49 = PIXEL_SUP(t49, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
-    "    t49 = PIXEL_SUP(t49, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
+    "    t49 = PIXEL_SUP(t49, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t49 = PIXEL_SUP(t49, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t49 = PIXEL_SUP(t49, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t49 = PIXEL_SUP(t49, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
     "    // set output pixels\n"
     "    p0[i] = t49;\n"
     "  }\n"
@@ -3524,18 +3540,26 @@ static freia_status anr999_opencl_helper_E8_511_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t81 = PIXEL_MAX;\n"
-    "    t81 = PIXEL_INF(t81, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
-    "    t81 = PIXEL_INF(t81, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
-    "    t81 = PIXEL_INF(t81, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
-    "    t81 = PIXEL_INF(t81, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t81 = PIXEL_INF(t81, (is_N|is_W)? PIXEL_MAX: in0NW);\n"
+    "    t81 = PIXEL_INF(t81, (is_N)? PIXEL_MAX: in0N);\n"
+    "    t81 = PIXEL_INF(t81, (is_N|is_E)? PIXEL_MAX: in0NE);\n"
+    "    t81 = PIXEL_INF(t81, (is_W)? PIXEL_MAX: in0W);\n"
     "    t81 = PIXEL_INF(t81, in0);\n"
-    "    t81 = PIXEL_INF(t81, (is_E)? PIXEL_MAX: j0[i+1]);\n"
-    "    t81 = PIXEL_INF(t81, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
-    "    t81 = PIXEL_INF(t81, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
-    "    t81 = PIXEL_INF(t81, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    t81 = PIXEL_INF(t81, (is_E)? PIXEL_MAX: in0E);\n"
+    "    t81 = PIXEL_INF(t81, (is_S|is_W)? PIXEL_MAX: in0SW);\n"
+    "    t81 = PIXEL_INF(t81, (is_S)? PIXEL_MAX: in0S);\n"
+    "    t81 = PIXEL_INF(t81, (is_S|is_E)? PIXEL_MAX: in0SE);\n"
     "    // set output pixels\n"
     "    p0[i] = t81;\n"
     "  }\n"
@@ -3620,29 +3644,45 @@ static freia_status anr999_opencl_helper_0_0_2_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    PIXEL in1 = j1[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t50 = PIXEL_MIN;\n"
-    "    t50 = PIXEL_SUP(t50, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t50 = PIXEL_SUP(t50, in0);\n"
-    "    t50 = PIXEL_SUP(t50, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
-    "    t50 = PIXEL_SUP(t50, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
     "    PIXEL t82 = PIXEL_MAX;\n"
-    "    t82 = PIXEL_INF(t82, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);\n"
-    "    t82 = PIXEL_INF(t82, (is_N)? PIXEL_MAX: j1[i-pitch]);\n"
-    "    t82 = PIXEL_INF(t82, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);\n"
-    "    t82 = PIXEL_INF(t82, (is_W)? PIXEL_MAX: j1[i-1]);\n"
+    "    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];\n"
+    "    PIXEL in1N = (is_N)? 0: j1[i-pitch];\n"
+    "    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];\n"
+    "    PIXEL in1W = (is_W)? 0: j1[i-1];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in1E = (is_E)? 0: j1[i+1];\n"
+    "    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];\n"
+    "    PIXEL in1S = (is_S)? 0: j1[i+pitch];\n"
+    "    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t50 = PIXEL_SUP(t50, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t50 = PIXEL_SUP(t50, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t50 = PIXEL_SUP(t50, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t50 = PIXEL_SUP(t50, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t50 = PIXEL_SUP(t50, in0);\n"
+    "    t50 = PIXEL_SUP(t50, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t50 = PIXEL_SUP(t50, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t50 = PIXEL_SUP(t50, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t50 = PIXEL_SUP(t50, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    t82 = PIXEL_INF(t82, (is_N|is_W)? PIXEL_MAX: in1NW);\n"
+    "    t82 = PIXEL_INF(t82, (is_N)? PIXEL_MAX: in1N);\n"
+    "    t82 = PIXEL_INF(t82, (is_N|is_E)? PIXEL_MAX: in1NE);\n"
+    "    t82 = PIXEL_INF(t82, (is_W)? PIXEL_MAX: in1W);\n"
     "    t82 = PIXEL_INF(t82, in1);\n"
-    "    t82 = PIXEL_INF(t82, (is_E)? PIXEL_MAX: j1[i+1]);\n"
-    "    t82 = PIXEL_INF(t82, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);\n"
-    "    t82 = PIXEL_INF(t82, (is_S)? PIXEL_MAX: j1[i+pitch]);\n"
-    "    t82 = PIXEL_INF(t82, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);\n"
+    "    t82 = PIXEL_INF(t82, (is_E)? PIXEL_MAX: in1E);\n"
+    "    t82 = PIXEL_INF(t82, (is_S|is_W)? PIXEL_MAX: in1SW);\n"
+    "    t82 = PIXEL_INF(t82, (is_S)? PIXEL_MAX: in1S);\n"
+    "    t82 = PIXEL_INF(t82, (is_S|is_E)? PIXEL_MAX: in1SE);\n"
     "    PIXEL t87 = PIXEL_SUB(t50, t82);\n"
     "    // set output pixels\n"
     "    p0[i] = t50;\n"
@@ -3729,29 +3769,37 @@ KERNEL void anr999_opencl_helper_0_0_0(
     int is_E = (i==(width-1));
     // get input pixels
     PIXEL in0 = j0[i];
+    PIXEL t41 = PIXEL_MIN;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    PIXEL t73 = PIXEL_MAX;
     // pixel computations
     PIXEL_MINIMUM(red38, in0);
     PIXEL_VOLUME(red39, in0);
-    PIXEL t41 = PIXEL_MIN;
-    t41 = PIXEL_SUP(t41, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
-    t41 = PIXEL_SUP(t41, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t41 = PIXEL_SUP(t41, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
-    t41 = PIXEL_SUP(t41, (is_W)? PIXEL_MIN: j0[i-1]);
+    t41 = PIXEL_SUP(t41, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t41 = PIXEL_SUP(t41, (is_N)? PIXEL_MIN: in0N);
+    t41 = PIXEL_SUP(t41, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t41 = PIXEL_SUP(t41, (is_W)? PIXEL_MIN: in0W);
     t41 = PIXEL_SUP(t41, in0);
-    t41 = PIXEL_SUP(t41, (is_E)? PIXEL_MIN: j0[i+1]);
-    t41 = PIXEL_SUP(t41, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
-    t41 = PIXEL_SUP(t41, (is_S)? PIXEL_MIN: j0[i+pitch]);
-    t41 = PIXEL_SUP(t41, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
-    PIXEL t73 = PIXEL_MAX;
-    t73 = PIXEL_INF(t73, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
-    t73 = PIXEL_INF(t73, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t73 = PIXEL_INF(t73, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
-    t73 = PIXEL_INF(t73, (is_W)? PIXEL_MAX: j0[i-1]);
+    t41 = PIXEL_SUP(t41, (is_E)? PIXEL_MIN: in0E);
+    t41 = PIXEL_SUP(t41, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t41 = PIXEL_SUP(t41, (is_S)? PIXEL_MIN: in0S);
+    t41 = PIXEL_SUP(t41, (is_S|is_E)? PIXEL_MIN: in0SE);
+    t73 = PIXEL_INF(t73, (is_N|is_W)? PIXEL_MAX: in0NW);
+    t73 = PIXEL_INF(t73, (is_N)? PIXEL_MAX: in0N);
+    t73 = PIXEL_INF(t73, (is_N|is_E)? PIXEL_MAX: in0NE);
+    t73 = PIXEL_INF(t73, (is_W)? PIXEL_MAX: in0W);
     t73 = PIXEL_INF(t73, in0);
-    t73 = PIXEL_INF(t73, (is_E)? PIXEL_MAX: j0[i+1]);
-    t73 = PIXEL_INF(t73, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
-    t73 = PIXEL_INF(t73, (is_S)? PIXEL_MAX: j0[i+pitch]);
-    t73 = PIXEL_INF(t73, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    t73 = PIXEL_INF(t73, (is_E)? PIXEL_MAX: in0E);
+    t73 = PIXEL_INF(t73, (is_S|is_W)? PIXEL_MAX: in0SW);
+    t73 = PIXEL_INF(t73, (is_S)? PIXEL_MAX: in0S);
+    t73 = PIXEL_INF(t73, (is_S|is_E)? PIXEL_MAX: in0SE);
     // set output pixels
     p0[i] = t41;
     p1[i] = t73;
@@ -3794,18 +3842,26 @@ KERNEL void anr999_opencl_helper_D8_511(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t49 = PIXEL_MIN;
-    t49 = PIXEL_SUP(t49, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
-    t49 = PIXEL_SUP(t49, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t49 = PIXEL_SUP(t49, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
-    t49 = PIXEL_SUP(t49, (is_W)? PIXEL_MIN: j0[i-1]);
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t49 = PIXEL_SUP(t49, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t49 = PIXEL_SUP(t49, (is_N)? PIXEL_MIN: in0N);
+    t49 = PIXEL_SUP(t49, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t49 = PIXEL_SUP(t49, (is_W)? PIXEL_MIN: in0W);
     t49 = PIXEL_SUP(t49, in0);
-    t49 = PIXEL_SUP(t49, (is_E)? PIXEL_MIN: j0[i+1]);
-    t49 = PIXEL_SUP(t49, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
-    t49 = PIXEL_SUP(t49, (is_S)? PIXEL_MIN: j0[i+pitch]);
-    t49 = PIXEL_SUP(t49, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
+    t49 = PIXEL_SUP(t49, (is_E)? PIXEL_MIN: in0E);
+    t49 = PIXEL_SUP(t49, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t49 = PIXEL_SUP(t49, (is_S)? PIXEL_MIN: in0S);
+    t49 = PIXEL_SUP(t49, (is_S|is_E)? PIXEL_MIN: in0SE);
     // set output pixels
     p0[i] = t49;
   }
@@ -3843,18 +3899,26 @@ KERNEL void anr999_opencl_helper_E8_511(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t81 = PIXEL_MAX;
-    t81 = PIXEL_INF(t81, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
-    t81 = PIXEL_INF(t81, (is_N)? PIXEL_MAX: j0[i-pitch]);
-    t81 = PIXEL_INF(t81, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
-    t81 = PIXEL_INF(t81, (is_W)? PIXEL_MAX: j0[i-1]);
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t81 = PIXEL_INF(t81, (is_N|is_W)? PIXEL_MAX: in0NW);
+    t81 = PIXEL_INF(t81, (is_N)? PIXEL_MAX: in0N);
+    t81 = PIXEL_INF(t81, (is_N|is_E)? PIXEL_MAX: in0NE);
+    t81 = PIXEL_INF(t81, (is_W)? PIXEL_MAX: in0W);
     t81 = PIXEL_INF(t81, in0);
-    t81 = PIXEL_INF(t81, (is_E)? PIXEL_MAX: j0[i+1]);
-    t81 = PIXEL_INF(t81, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
-    t81 = PIXEL_INF(t81, (is_S)? PIXEL_MAX: j0[i+pitch]);
-    t81 = PIXEL_INF(t81, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    t81 = PIXEL_INF(t81, (is_E)? PIXEL_MAX: in0E);
+    t81 = PIXEL_INF(t81, (is_S|is_W)? PIXEL_MAX: in0SW);
+    t81 = PIXEL_INF(t81, (is_S)? PIXEL_MAX: in0S);
+    t81 = PIXEL_INF(t81, (is_S|is_E)? PIXEL_MAX: in0SE);
     // set output pixels
     p0[i] = t81;
   }
@@ -3898,29 +3962,45 @@ KERNEL void anr999_opencl_helper_0_0_2(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
     PIXEL t50 = PIXEL_MIN;
-    t50 = PIXEL_SUP(t50, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
-    t50 = PIXEL_SUP(t50, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t50 = PIXEL_SUP(t50, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
-    t50 = PIXEL_SUP(t50, (is_W)? PIXEL_MIN: j0[i-1]);
-    t50 = PIXEL_SUP(t50, in0);
-    t50 = PIXEL_SUP(t50, (is_E)? PIXEL_MIN: j0[i+1]);
-    t50 = PIXEL_SUP(t50, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
-    t50 = PIXEL_SUP(t50, (is_S)? PIXEL_MIN: j0[i+pitch]);
-    t50 = PIXEL_SUP(t50, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
     PIXEL t82 = PIXEL_MAX;
-    t82 = PIXEL_INF(t82, (is_N|is_W)? PIXEL_MAX: j1[i-pitch-1]);
-    t82 = PIXEL_INF(t82, (is_N)? PIXEL_MAX: j1[i-pitch]);
-    t82 = PIXEL_INF(t82, (is_N|is_E)? PIXEL_MAX: j1[i-pitch+1]);
-    t82 = PIXEL_INF(t82, (is_W)? PIXEL_MAX: j1[i-1]);
+    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];
+    PIXEL in1N = (is_N)? 0: j1[i-pitch];
+    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];
+    PIXEL in1W = (is_W)? 0: j1[i-1];
+    PIXEL in1 = j1[i];
+    PIXEL in1E = (is_E)? 0: j1[i+1];
+    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];
+    PIXEL in1S = (is_S)? 0: j1[i+pitch];
+    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];
+    // pixel computations
+    t50 = PIXEL_SUP(t50, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t50 = PIXEL_SUP(t50, (is_N)? PIXEL_MIN: in0N);
+    t50 = PIXEL_SUP(t50, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t50 = PIXEL_SUP(t50, (is_W)? PIXEL_MIN: in0W);
+    t50 = PIXEL_SUP(t50, in0);
+    t50 = PIXEL_SUP(t50, (is_E)? PIXEL_MIN: in0E);
+    t50 = PIXEL_SUP(t50, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t50 = PIXEL_SUP(t50, (is_S)? PIXEL_MIN: in0S);
+    t50 = PIXEL_SUP(t50, (is_S|is_E)? PIXEL_MIN: in0SE);
+    t82 = PIXEL_INF(t82, (is_N|is_W)? PIXEL_MAX: in1NW);
+    t82 = PIXEL_INF(t82, (is_N)? PIXEL_MAX: in1N);
+    t82 = PIXEL_INF(t82, (is_N|is_E)? PIXEL_MAX: in1NE);
+    t82 = PIXEL_INF(t82, (is_W)? PIXEL_MAX: in1W);
     t82 = PIXEL_INF(t82, in1);
-    t82 = PIXEL_INF(t82, (is_E)? PIXEL_MAX: j1[i+1]);
-    t82 = PIXEL_INF(t82, (is_W|is_S)? PIXEL_MAX: j1[i+pitch-1]);
-    t82 = PIXEL_INF(t82, (is_S)? PIXEL_MAX: j1[i+pitch]);
-    t82 = PIXEL_INF(t82, (is_E|is_S)? PIXEL_MAX: j1[i+pitch+1]);
+    t82 = PIXEL_INF(t82, (is_E)? PIXEL_MAX: in1E);
+    t82 = PIXEL_INF(t82, (is_S|is_W)? PIXEL_MAX: in1SW);
+    t82 = PIXEL_INF(t82, (is_S)? PIXEL_MAX: in1S);
+    t82 = PIXEL_INF(t82, (is_S|is_E)? PIXEL_MAX: in1SE);
     PIXEL t87 = PIXEL_SUB(t50, t82);
     // set output pixels
     p0[i] = t50;

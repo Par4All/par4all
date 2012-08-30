@@ -2355,8 +2355,8 @@ static freia_status freia_scalar_07_opencl_helper_0_1_0_compile(void)
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
     "    PIXEL t19 = PIXEL_THRESHOLD(in1, c0, c1, c2);\n"
     "    PIXEL t25 = PIXEL_THRESHOLD(in0, c3, c4, c5);\n"
@@ -2450,8 +2450,8 @@ static freia_status freia_scalar_07_opencl_helper_0_1_2_compile(void)
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
     "    PIXEL t29 = PIXEL_ADD(in1, in0);\n"
     "    PIXEL_VOLUME(red30, t29);\n"
@@ -2629,8 +2629,8 @@ KERNEL void freia_scalar_07_opencl_helper_0_1_0(
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
-    PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+    PIXEL in0 = j0[i];
     // pixel computations
     PIXEL t19 = PIXEL_THRESHOLD(in1, c0, c1, c2);
     PIXEL t25 = PIXEL_THRESHOLD(in0, c3, c4, c5);
@@ -2675,8 +2675,8 @@ KERNEL void freia_scalar_07_opencl_helper_0_1_2(
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
-    PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+    PIXEL in0 = j0[i];
     // pixel computations
     PIXEL t29 = PIXEL_ADD(in1, in0);
     PIXEL_VOLUME(red30, t29);

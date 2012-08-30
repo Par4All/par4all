@@ -6033,16 +6033,18 @@ static freia_status license_plate_opencl_helper_0_0_0_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t53 = PIXEL_MAX;\n"
-    "    t53 = PIXEL_INF(t53, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t53 = PIXEL_INF(t53, in0);\n"
-    "    t53 = PIXEL_INF(t53, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
     "    PIXEL t89 = PIXEL_MIN;\n"
-    "    t89 = PIXEL_SUP(t89, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    // pixel computations\n"
+    "    t53 = PIXEL_INF(t53, (is_W)? PIXEL_MAX: in0W);\n"
+    "    t53 = PIXEL_INF(t53, in0);\n"
+    "    t53 = PIXEL_INF(t53, (is_E)? PIXEL_MAX: in0E);\n"
+    "    t89 = PIXEL_SUP(t89, (is_W)? PIXEL_MIN: in0W);\n"
     "    t89 = PIXEL_SUP(t89, in0);\n"
-    "    t89 = PIXEL_SUP(t89, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    t89 = PIXEL_SUP(t89, (is_E)? PIXEL_MIN: in0E);\n"
     "    // set output pixels\n"
     "    p0[i] = t53;\n"
     "    p1[i] = t89;\n"
@@ -6123,12 +6125,14 @@ static freia_status license_plate_opencl_helper_D8_56_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t83 = PIXEL_MIN;\n"
-    "    t83 = PIXEL_SUP(t83, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    // pixel computations\n"
+    "    t83 = PIXEL_SUP(t83, (is_W)? PIXEL_MIN: in0W);\n"
     "    t83 = PIXEL_SUP(t83, in0);\n"
-    "    t83 = PIXEL_SUP(t83, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    t83 = PIXEL_SUP(t83, (is_E)? PIXEL_MIN: in0E);\n"
     "    // set output pixels\n"
     "    p0[i] = t83;\n"
     "  }\n"
@@ -6207,12 +6211,14 @@ static freia_status license_plate_opencl_helper_E8_56_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t67 = PIXEL_MAX;\n"
-    "    t67 = PIXEL_INF(t67, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    // pixel computations\n"
+    "    t67 = PIXEL_INF(t67, (is_W)? PIXEL_MAX: in0W);\n"
     "    t67 = PIXEL_INF(t67, in0);\n"
-    "    t67 = PIXEL_INF(t67, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t67 = PIXEL_INF(t67, (is_E)? PIXEL_MAX: in0E);\n"
     "    // set output pixels\n"
     "    p0[i] = t67;\n"
     "  }\n"
@@ -6300,17 +6306,21 @@ static freia_status license_plate_opencl_helper_0_0_2_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    PIXEL in1 = j1[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t106 = PIXEL_MAX;\n"
-    "    t106 = PIXEL_INF(t106, (is_W)? PIXEL_MAX: j0[i-1]);\n"
-    "    t106 = PIXEL_INF(t106, in0);\n"
-    "    t106 = PIXEL_INF(t106, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
     "    PIXEL t84 = PIXEL_MIN;\n"
-    "    t84 = PIXEL_SUP(t84, (is_W)? PIXEL_MIN: j1[i-1]);\n"
+    "    PIXEL in1W = (is_W)? 0: j1[i-1];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in1E = (is_E)? 0: j1[i+1];\n"
+    "    // pixel computations\n"
+    "    t106 = PIXEL_INF(t106, (is_W)? PIXEL_MAX: in0W);\n"
+    "    t106 = PIXEL_INF(t106, in0);\n"
+    "    t106 = PIXEL_INF(t106, (is_E)? PIXEL_MAX: in0E);\n"
+    "    t84 = PIXEL_SUP(t84, (is_W)? PIXEL_MIN: in1W);\n"
     "    t84 = PIXEL_SUP(t84, in1);\n"
-    "    t84 = PIXEL_SUP(t84, (is_E)? PIXEL_MIN: j1[i+1]);\n"
+    "    t84 = PIXEL_SUP(t84, (is_E)? PIXEL_MIN: in1E);\n"
     "    PIXEL t112 = PIXEL_THRESHOLD(t84, c0, c1, c2);\n"
     "    PIXEL t113 = PIXEL_THRESHOLD(t106, c3, c4, c5);\n"
     "    PIXEL t115 = PIXEL_AND(t112, t113);\n"
@@ -6399,18 +6409,26 @@ static freia_status license_plate_opencl_helper_D8_511_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t146 = PIXEL_MIN;\n"
-    "    t146 = PIXEL_SUP(t146, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_W)? PIXEL_MIN: j0[i-1]);\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t146 = PIXEL_SUP(t146, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t146 = PIXEL_SUP(t146, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t146 = PIXEL_SUP(t146, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t146 = PIXEL_SUP(t146, (is_W)? PIXEL_MIN: in0W);\n"
     "    t146 = PIXEL_SUP(t146, in0);\n"
-    "    t146 = PIXEL_SUP(t146, (is_E)? PIXEL_MIN: j0[i+1]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
-    "    t146 = PIXEL_SUP(t146, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);\n"
+    "    t146 = PIXEL_SUP(t146, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t146 = PIXEL_SUP(t146, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t146 = PIXEL_SUP(t146, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t146 = PIXEL_SUP(t146, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
     "    // set output pixels\n"
     "    p0[i] = t146;\n"
     "  }\n"
@@ -6489,12 +6507,14 @@ static freia_status license_plate_opencl_helper_D8_146_compile(void)
     "    // W not needed\n"
     "    // E not needed\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t126 = PIXEL_MIN;\n"
-    "    t126 = PIXEL_SUP(t126, (is_N)? PIXEL_MIN: j0[i-pitch]);\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    // pixel computations\n"
+    "    t126 = PIXEL_SUP(t126, (is_N)? PIXEL_MIN: in0N);\n"
     "    t126 = PIXEL_SUP(t126, in0);\n"
-    "    t126 = PIXEL_SUP(t126, (is_S)? PIXEL_MIN: j0[i+pitch]);\n"
+    "    t126 = PIXEL_SUP(t126, (is_S)? PIXEL_MIN: in0S);\n"
     "    // set output pixels\n"
     "    p0[i] = t126;\n"
     "  }\n"
@@ -6573,12 +6593,14 @@ static freia_status license_plate_opencl_helper_E8_146_compile(void)
     "    // W not needed\n"
     "    // E not needed\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t120 = PIXEL_MAX;\n"
-    "    t120 = PIXEL_INF(t120, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    // pixel computations\n"
+    "    t120 = PIXEL_INF(t120, (is_N)? PIXEL_MAX: in0N);\n"
     "    t120 = PIXEL_INF(t120, in0);\n"
-    "    t120 = PIXEL_INF(t120, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    t120 = PIXEL_INF(t120, (is_S)? PIXEL_MAX: in0S);\n"
     "    // set output pixels\n"
     "    p0[i] = t120;\n"
     "  }\n"
@@ -6660,19 +6682,27 @@ static freia_status license_plate_opencl_helper_0_0_4_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    PIXEL in1 = j1[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t147 = PIXEL_MIN;\n"
-    "    t147 = PIXEL_SUP(t147, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_N)? PIXEL_MIN: j1[i-pitch]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_W)? PIXEL_MIN: j1[i-1]);\n"
+    "    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];\n"
+    "    PIXEL in1N = (is_N)? 0: j1[i-pitch];\n"
+    "    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];\n"
+    "    PIXEL in1W = (is_W)? 0: j1[i-1];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in1E = (is_E)? 0: j1[i+1];\n"
+    "    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];\n"
+    "    PIXEL in1S = (is_S)? 0: j1[i+pitch];\n"
+    "    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    t147 = PIXEL_SUP(t147, (is_N|is_W)? PIXEL_MIN: in1NW);\n"
+    "    t147 = PIXEL_SUP(t147, (is_N)? PIXEL_MIN: in1N);\n"
+    "    t147 = PIXEL_SUP(t147, (is_N|is_E)? PIXEL_MIN: in1NE);\n"
+    "    t147 = PIXEL_SUP(t147, (is_W)? PIXEL_MIN: in1W);\n"
     "    t147 = PIXEL_SUP(t147, in1);\n"
-    "    t147 = PIXEL_SUP(t147, (is_E)? PIXEL_MIN: j1[i+1]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_S)? PIXEL_MIN: j1[i+pitch]);\n"
-    "    t147 = PIXEL_SUP(t147, (is_E|is_S)? PIXEL_MIN: j1[i+pitch+1]);\n"
+    "    t147 = PIXEL_SUP(t147, (is_E)? PIXEL_MIN: in1E);\n"
+    "    t147 = PIXEL_SUP(t147, (is_S|is_W)? PIXEL_MIN: in1SW);\n"
+    "    t147 = PIXEL_SUP(t147, (is_S)? PIXEL_MIN: in1S);\n"
+    "    t147 = PIXEL_SUP(t147, (is_S|is_E)? PIXEL_MIN: in1SE);\n"
     "    PIXEL t152 = PIXEL_AND(t147, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t152;\n"
@@ -6750,16 +6780,18 @@ KERNEL void license_plate_opencl_helper_0_0_0(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t53 = PIXEL_MAX;
-    t53 = PIXEL_INF(t53, (is_W)? PIXEL_MAX: j0[i-1]);
-    t53 = PIXEL_INF(t53, in0);
-    t53 = PIXEL_INF(t53, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
     PIXEL t89 = PIXEL_MIN;
-    t89 = PIXEL_SUP(t89, (is_W)? PIXEL_MIN: j0[i-1]);
+    // pixel computations
+    t53 = PIXEL_INF(t53, (is_W)? PIXEL_MAX: in0W);
+    t53 = PIXEL_INF(t53, in0);
+    t53 = PIXEL_INF(t53, (is_E)? PIXEL_MAX: in0E);
+    t89 = PIXEL_SUP(t89, (is_W)? PIXEL_MIN: in0W);
     t89 = PIXEL_SUP(t89, in0);
-    t89 = PIXEL_SUP(t89, (is_E)? PIXEL_MIN: j0[i+1]);
+    t89 = PIXEL_SUP(t89, (is_E)? PIXEL_MIN: in0E);
     // set output pixels
     p0[i] = t53;
     p1[i] = t89;
@@ -6798,12 +6830,14 @@ KERNEL void license_plate_opencl_helper_D8_56(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t83 = PIXEL_MIN;
-    t83 = PIXEL_SUP(t83, (is_W)? PIXEL_MIN: j0[i-1]);
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    // pixel computations
+    t83 = PIXEL_SUP(t83, (is_W)? PIXEL_MIN: in0W);
     t83 = PIXEL_SUP(t83, in0);
-    t83 = PIXEL_SUP(t83, (is_E)? PIXEL_MIN: j0[i+1]);
+    t83 = PIXEL_SUP(t83, (is_E)? PIXEL_MIN: in0E);
     // set output pixels
     p0[i] = t83;
   }
@@ -6841,12 +6875,14 @@ KERNEL void license_plate_opencl_helper_E8_56(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t67 = PIXEL_MAX;
-    t67 = PIXEL_INF(t67, (is_W)? PIXEL_MAX: j0[i-1]);
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    // pixel computations
+    t67 = PIXEL_INF(t67, (is_W)? PIXEL_MAX: in0W);
     t67 = PIXEL_INF(t67, in0);
-    t67 = PIXEL_INF(t67, (is_E)? PIXEL_MAX: j0[i+1]);
+    t67 = PIXEL_INF(t67, (is_E)? PIXEL_MAX: in0E);
     // set output pixels
     p0[i] = t67;
   }
@@ -6893,17 +6929,21 @@ KERNEL void license_plate_opencl_helper_0_0_2(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
     PIXEL t106 = PIXEL_MAX;
-    t106 = PIXEL_INF(t106, (is_W)? PIXEL_MAX: j0[i-1]);
-    t106 = PIXEL_INF(t106, in0);
-    t106 = PIXEL_INF(t106, (is_E)? PIXEL_MAX: j0[i+1]);
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
     PIXEL t84 = PIXEL_MIN;
-    t84 = PIXEL_SUP(t84, (is_W)? PIXEL_MIN: j1[i-1]);
+    PIXEL in1W = (is_W)? 0: j1[i-1];
+    PIXEL in1 = j1[i];
+    PIXEL in1E = (is_E)? 0: j1[i+1];
+    // pixel computations
+    t106 = PIXEL_INF(t106, (is_W)? PIXEL_MAX: in0W);
+    t106 = PIXEL_INF(t106, in0);
+    t106 = PIXEL_INF(t106, (is_E)? PIXEL_MAX: in0E);
+    t84 = PIXEL_SUP(t84, (is_W)? PIXEL_MIN: in1W);
     t84 = PIXEL_SUP(t84, in1);
-    t84 = PIXEL_SUP(t84, (is_E)? PIXEL_MIN: j1[i+1]);
+    t84 = PIXEL_SUP(t84, (is_E)? PIXEL_MIN: in1E);
     PIXEL t112 = PIXEL_THRESHOLD(t84, c0, c1, c2);
     PIXEL t113 = PIXEL_THRESHOLD(t106, c3, c4, c5);
     PIXEL t115 = PIXEL_AND(t112, t113);
@@ -6944,18 +6984,26 @@ KERNEL void license_plate_opencl_helper_D8_511(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t146 = PIXEL_MIN;
-    t146 = PIXEL_SUP(t146, (is_N|is_W)? PIXEL_MIN: j0[i-pitch-1]);
-    t146 = PIXEL_SUP(t146, (is_N)? PIXEL_MIN: j0[i-pitch]);
-    t146 = PIXEL_SUP(t146, (is_N|is_E)? PIXEL_MIN: j0[i-pitch+1]);
-    t146 = PIXEL_SUP(t146, (is_W)? PIXEL_MIN: j0[i-1]);
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t146 = PIXEL_SUP(t146, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t146 = PIXEL_SUP(t146, (is_N)? PIXEL_MIN: in0N);
+    t146 = PIXEL_SUP(t146, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t146 = PIXEL_SUP(t146, (is_W)? PIXEL_MIN: in0W);
     t146 = PIXEL_SUP(t146, in0);
-    t146 = PIXEL_SUP(t146, (is_E)? PIXEL_MIN: j0[i+1]);
-    t146 = PIXEL_SUP(t146, (is_W|is_S)? PIXEL_MIN: j0[i+pitch-1]);
-    t146 = PIXEL_SUP(t146, (is_S)? PIXEL_MIN: j0[i+pitch]);
-    t146 = PIXEL_SUP(t146, (is_E|is_S)? PIXEL_MIN: j0[i+pitch+1]);
+    t146 = PIXEL_SUP(t146, (is_E)? PIXEL_MIN: in0E);
+    t146 = PIXEL_SUP(t146, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t146 = PIXEL_SUP(t146, (is_S)? PIXEL_MIN: in0S);
+    t146 = PIXEL_SUP(t146, (is_S|is_E)? PIXEL_MIN: in0SE);
     // set output pixels
     p0[i] = t146;
   }
@@ -6993,12 +7041,14 @@ KERNEL void license_plate_opencl_helper_D8_146(
     // W not needed
     // E not needed
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t126 = PIXEL_MIN;
-    t126 = PIXEL_SUP(t126, (is_N)? PIXEL_MIN: j0[i-pitch]);
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0 = j0[i];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    // pixel computations
+    t126 = PIXEL_SUP(t126, (is_N)? PIXEL_MIN: in0N);
     t126 = PIXEL_SUP(t126, in0);
-    t126 = PIXEL_SUP(t126, (is_S)? PIXEL_MIN: j0[i+pitch]);
+    t126 = PIXEL_SUP(t126, (is_S)? PIXEL_MIN: in0S);
     // set output pixels
     p0[i] = t126;
   }
@@ -7036,12 +7086,14 @@ KERNEL void license_plate_opencl_helper_E8_146(
     // W not needed
     // E not needed
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t120 = PIXEL_MAX;
-    t120 = PIXEL_INF(t120, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0 = j0[i];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    // pixel computations
+    t120 = PIXEL_INF(t120, (is_N)? PIXEL_MAX: in0N);
     t120 = PIXEL_INF(t120, in0);
-    t120 = PIXEL_INF(t120, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    t120 = PIXEL_INF(t120, (is_S)? PIXEL_MAX: in0S);
     // set output pixels
     p0[i] = t120;
   }
@@ -7082,19 +7134,27 @@ KERNEL void license_plate_opencl_helper_0_0_4(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
     PIXEL t147 = PIXEL_MIN;
-    t147 = PIXEL_SUP(t147, (is_N|is_W)? PIXEL_MIN: j1[i-pitch-1]);
-    t147 = PIXEL_SUP(t147, (is_N)? PIXEL_MIN: j1[i-pitch]);
-    t147 = PIXEL_SUP(t147, (is_N|is_E)? PIXEL_MIN: j1[i-pitch+1]);
-    t147 = PIXEL_SUP(t147, (is_W)? PIXEL_MIN: j1[i-1]);
+    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];
+    PIXEL in1N = (is_N)? 0: j1[i-pitch];
+    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];
+    PIXEL in1W = (is_W)? 0: j1[i-1];
+    PIXEL in1 = j1[i];
+    PIXEL in1E = (is_E)? 0: j1[i+1];
+    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];
+    PIXEL in1S = (is_S)? 0: j1[i+pitch];
+    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];
+    PIXEL in0 = j0[i];
+    // pixel computations
+    t147 = PIXEL_SUP(t147, (is_N|is_W)? PIXEL_MIN: in1NW);
+    t147 = PIXEL_SUP(t147, (is_N)? PIXEL_MIN: in1N);
+    t147 = PIXEL_SUP(t147, (is_N|is_E)? PIXEL_MIN: in1NE);
+    t147 = PIXEL_SUP(t147, (is_W)? PIXEL_MIN: in1W);
     t147 = PIXEL_SUP(t147, in1);
-    t147 = PIXEL_SUP(t147, (is_E)? PIXEL_MIN: j1[i+1]);
-    t147 = PIXEL_SUP(t147, (is_W|is_S)? PIXEL_MIN: j1[i+pitch-1]);
-    t147 = PIXEL_SUP(t147, (is_S)? PIXEL_MIN: j1[i+pitch]);
-    t147 = PIXEL_SUP(t147, (is_E|is_S)? PIXEL_MIN: j1[i+pitch+1]);
+    t147 = PIXEL_SUP(t147, (is_E)? PIXEL_MIN: in1E);
+    t147 = PIXEL_SUP(t147, (is_S|is_W)? PIXEL_MIN: in1SW);
+    t147 = PIXEL_SUP(t147, (is_S)? PIXEL_MIN: in1S);
+    t147 = PIXEL_SUP(t147, (is_S|is_E)? PIXEL_MIN: in1SE);
     PIXEL t152 = PIXEL_AND(t147, in0);
     // set output pixels
     p0[i] = t152;

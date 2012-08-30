@@ -961,16 +961,18 @@ static freia_status freia_72_opencl_helper_0_0_0_compile(void)
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
-    "    // pixel computations\n"
     "    PIXEL t20 = PIXEL_MIN;\n"
-    "    t20 = PIXEL_SUP(t20, (is_W)? PIXEL_MIN: j0[i-1]);\n"
-    "    t20 = PIXEL_SUP(t20, in0);\n"
-    "    t20 = PIXEL_SUP(t20, (is_E)? PIXEL_MIN: j0[i+1]);\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
     "    PIXEL t15 = PIXEL_MAX;\n"
-    "    t15 = PIXEL_INF(t15, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    // pixel computations\n"
+    "    t20 = PIXEL_SUP(t20, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t20 = PIXEL_SUP(t20, in0);\n"
+    "    t20 = PIXEL_SUP(t20, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t15 = PIXEL_INF(t15, (is_W)? PIXEL_MAX: in0W);\n"
     "    t15 = PIXEL_INF(t15, in0);\n"
-    "    t15 = PIXEL_INF(t15, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t15 = PIXEL_INF(t15, (is_E)? PIXEL_MAX: in0E);\n"
     "    PIXEL t21 = PIXEL_ADD(t15, c0);\n"
     "    PIXEL t22 = PIXEL_NOT(t20);\n"
     "    PIXEL t23 = PIXEL_AND(t21, t22);\n"
@@ -1048,16 +1050,18 @@ KERNEL void freia_72_opencl_helper_0_0_0(
     int is_W = (i==0);
     int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
-    // pixel computations
     PIXEL t20 = PIXEL_MIN;
-    t20 = PIXEL_SUP(t20, (is_W)? PIXEL_MIN: j0[i-1]);
-    t20 = PIXEL_SUP(t20, in0);
-    t20 = PIXEL_SUP(t20, (is_E)? PIXEL_MIN: j0[i+1]);
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
     PIXEL t15 = PIXEL_MAX;
-    t15 = PIXEL_INF(t15, (is_W)? PIXEL_MAX: j0[i-1]);
+    // pixel computations
+    t20 = PIXEL_SUP(t20, (is_W)? PIXEL_MIN: in0W);
+    t20 = PIXEL_SUP(t20, in0);
+    t20 = PIXEL_SUP(t20, (is_E)? PIXEL_MIN: in0E);
+    t15 = PIXEL_INF(t15, (is_W)? PIXEL_MAX: in0W);
     t15 = PIXEL_INF(t15, in0);
-    t15 = PIXEL_INF(t15, (is_E)? PIXEL_MAX: j0[i+1]);
+    t15 = PIXEL_INF(t15, (is_E)? PIXEL_MAX: in0E);
     PIXEL t21 = PIXEL_ADD(t15, c0);
     PIXEL t22 = PIXEL_NOT(t20);
     PIXEL t23 = PIXEL_AND(t21, t22);

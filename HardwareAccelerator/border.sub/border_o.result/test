@@ -601,10 +601,11 @@ static freia_status border_o_opencl_helper_E8_48_compile(void)
     "    int is_W = (i==0);\n"
     "    // E not needed\n"
     "    // get input pixels\n"
+    "    PIXEL t8 = PIXEL_MAX;\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = PIXEL_MAX;\n"
-    "    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: in0W);\n"
     "    t8 = PIXEL_INF(t8, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
@@ -678,10 +679,11 @@ KERNEL void border_o_opencl_helper_E8_48(
     int is_W = (i==0);
     // E not needed
     // get input pixels
+    PIXEL t8 = PIXEL_MAX;
+    PIXEL in0W = (is_W)? 0: j0[i-1];
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t8 = PIXEL_MAX;
-    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: j0[i-1]);
+    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: in0W);
     t8 = PIXEL_INF(t8, in0);
     // set output pixels
     p0[i] = t8;
