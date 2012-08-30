@@ -191,10 +191,12 @@ static int opencl_compile_mergeable_dag(
   // get worksize identifiers...
   sb_cat(opencl_head,
          "  // get id & compute global image shift\n"
-         // here we assume a 1D worksize
-         "  int threadid = get_global_id(0);\n"
-         // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
-         "  int shift = pitch*threadid;\n"
+         // we assume that the image height is on the first thread dimension
+         "  int height = get_global_size(0);\n"
+         // here we assume a 2D worksize
+         "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+         // compute start of the working area row
+         "  int shift = pitch*get_global_id(0);\n"
          "\n"
          "  // get input & output image pointers\n");
 
@@ -248,6 +250,8 @@ static int opencl_compile_mergeable_dag(
   // size parameters to handle an image row
   sb_cat(opencl, ",\n"
          "  int width, // of the working area, vs image below\n"
+         // the pitch is shared by all images
+         // which thus must be declared of the same size
          "  int pitch");
   cl_args+=2;
 
@@ -344,28 +348,30 @@ static int opencl_compile_mergeable_dag(
 
 #define RED " = redres." // for a small code compaction
 
-      // tail code to copy back stuff in OpenCL. ??? HARDCODED for now...
+      // tail code to copy back stuff in OpenCL.
+      // the runtime will have to finish the reduction
+      // ??? HARDCODED for now...
       if (same_string_p(api->compact_name, "max"))
       {
-        sb_cat(opencl_end,  "  redX[threadid].max = mmax.x;\n");
+        sb_cat(opencl_end,  "  redX[thrid].max = mmax.x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "maximum;\n");
       }
       else if (same_string_p(api->compact_name, "min"))
       {
-        sb_cat(opencl_end, "  redX[threadid].min = mmin.x;\n");
+        sb_cat(opencl_end, "  redX[thrid].min = mmin.x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "minimum;\n");
       }
       else if (same_string_p(api->compact_name, "vol"))
       {
-        sb_cat(opencl_end, "  redX[threadid].vol = vol;\n");
+        sb_cat(opencl_end, "  redX[thrid].vol = vol;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "volume;\n");
       }
       else if (same_string_p(api->compact_name, "max!"))
       {
         sb_cat(opencl_end,
-               "  redX[threadid].max = mmax.x;\n"
-               "  redX[threadid].max_x = (uint) mmax.y;\n"
-               "  redX[threadid].max_y = threadid;\n");
+               "  redX[thrid].max = mmax.x;\n"
+               "  redX[thrid].max_x = (uint) mmax.y;\n"
+               "  redX[thrid].max_y = get_global_id(0);\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "maximum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "max_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "max_coord_y;\n");
@@ -375,7 +381,7 @@ static int opencl_compile_mergeable_dag(
         sb_cat(opencl_end,
                "  redX[threadid].min = mmin.x;\n"
                "  redX[threadid].min_x = (uint) mmin.y;\n"
-               "  redX[threadid].min_y = threadid;\n");
+               "  redX[threadid].min_y = get_global_id(0);\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
@@ -487,6 +493,8 @@ static int opencl_compile_mergeable_dag(
   // tail
   sb_cat(helper, ")\n{\n");
   string_buffer_append_sb(helper, helper_decls);
+
+  // this is really for debug, and should not be needed.
   if (get_bool_property("HWAC_OPENCL_SYNCHRONIZE_KERNELS"))
     sb_cat(helper, "\n"
            "  // synchronize...\n"
@@ -510,26 +518,30 @@ static int opencl_compile_mergeable_dag(
   sb_cat(opencl, ")\n{\n");
   string_buffer_append_sb(opencl, opencl_head);
   if (has_kernel) {
-    sb_cat(opencl,
-           "\n"
-           "  // detect N & S boundaries (assuming one thread per row)\n");
+    sb_cat(opencl, "\n"
+           "  // N & S boundaries, one thread on first dimension per row\n");
     if (need_N)
-      sb_cat(opencl, "  int is_N = (threadid==0);\n");
+      sb_cat(opencl, "  int is_N = (get_global_id(0)==0);\n");
     else
       sb_cat(opencl, "  // N not needed\n");
     if (need_S)
-      sb_cat(opencl, "  int is_S = (threadid==(get_global_size(0)-1));\n");
+      sb_cat(opencl, "  int is_S = (get_global_id(0)==(height-1));\n");
     else sb_cat(opencl, "  // S not needed\n");
   }
   sb_cat(opencl,
          "\n"
-         "  // thread's pixel loop\n"
+         // work per thread so that all pixes are processed
+         "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+         // last index in the row for this thread
+         "  int last = (get_global_id(1)+1)*workshare;\n"
+         "  if (last>width) last = width;\n"
+         // thread's pixel loop
          "  int i;\n"
-         "  for (i=0; i<width; i++)\n"
+         "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
          "  {\n");
   if (has_kernel) {
     sb_cat(opencl,
-           "    // detect W & E boundaries (assuming one row per thread)\n");
+           "    // W & E boundaries, assuming i global index\n");
     if (need_W)
       sb_cat(opencl, "    int is_W = (i==0);\n");
     else
