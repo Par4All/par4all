@@ -2,29 +2,11 @@ Points to improve in points-to analysis
 
 No priority order.
 
-1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough its code looks dead wrong...)
-
-2. C subscript construct analysis: see fulguro04.c for instance and some others:
-
-argv03:   char *p = (*argv)[1];
-fulguro03
-fulguro04:     (dat->array)[row]
-Lv
-pointer08:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
-pointer16:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
-ptr_to_array01:   (*p)[3] = &a;
-pv_assign05:   s1.b[0] = &j; (?) several occurences
-pv_assign06:   s2->b[0] = &i;
-struct10:      a.p[i] = i;
-struct13:      e.champ[i].p = malloc(10*sizeof(int));
-               (e.champ)[i].p = malloc(10*sizeof(int));
-struct21:      simplified version of struct13	       
-struct_parall01: a.p[i] = i;
-
+1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough this piece of code looks dead wrong...)
 
 3. Convergence detection: current implementation no longer works as it used to
 
-4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list.
+4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list (see list05).
 
 7. EffectsWithPointsTo: the fully subscripted sources and sinks
 require index substitution in EffectsWithPointsTo, or the parallelism
@@ -79,6 +61,24 @@ Pointers/array03.c, function foo2. Build a smaller test case.
 
 -> new test case array14.c
 
-16. Mixed up indices, for instance in argv03.
+2. C subscript construct analysis: see fulguro04.c for instance and some others:
+
+argv03:   char *p = (*argv)[1];
+fulguro03
+fulguro04:     (dat->array)[row]
+Lv
+pointer08:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+pointer16:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+ptr_to_array01:   (*p)[3] = &a;
+pv_assign05:   s1.b[0] = &j; (?) several occurences
+pv_assign06:   s2->b[0] = &i;
+struct10:      a.p[i] = i;
+struct13:      e.champ[i].p = malloc(10*sizeof(int));
+               (e.champ)[i].p = malloc(10*sizeof(int));
+struct21:      simplified version of struct13	       
+struct_parall01: a.p[i] = i;
+
+
+16. Mixed up indices, for instance in argv03. Also pointer15, struct09
 
 -> seems now OK for argv03. FI: I do not know about the other cases.
