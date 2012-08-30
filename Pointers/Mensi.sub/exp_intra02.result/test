@@ -89,4 +89,3 @@ int main()
 
    return 0;
 }
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored

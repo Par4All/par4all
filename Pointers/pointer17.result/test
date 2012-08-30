@@ -1,5 +1,5 @@
 
-POINTS TO for pointer03
+POINTS TO for pointer17
 
 
 // Points To IN:
@@ -14,7 +14,7 @@ POINTS TO for pointer03
 // _p_1[1] -> _p_1_1[1][0] , MAY
 // _p_1_1[1][2] -> z , EXACT
 
-void pointer03(float ***p)
+void pointer17(float ***p)
 {
 
 // Points To: none
@@ -39,5 +39,5 @@ void pointer03(float ***p)
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer03] (list_assignment_to_points_to) Dereferencing of a null pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer03] (list_assignment_to_points_to) Possible NULL pointer dereferencing.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (list_assignment_to_points_to) Dereferencing of a null pointer.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (list_assignment_to_points_to) Possible NULL pointer dereferencing.

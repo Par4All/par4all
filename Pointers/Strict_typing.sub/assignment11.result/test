@@ -1,18 +1,4 @@
 
-PROPER  EFFECTS
-
-int assignment11()
-{
-   struct {
-      int a[10][10];
-   } s;
-//             <    is written>: q
-   int *q = (s.a)[5];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-
-   return *q;
-}
-
 POINTS-TO
 
 
