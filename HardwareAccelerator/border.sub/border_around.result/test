@@ -1,0 +1,723 @@
+#
+# AIPO
+#
+#
+# compile generated border_around
+#
+
+! initial function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "border_around" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_around" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! updated function for
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_around_spoc_helper_0_0" of module "border_around" in dot format
+// DAG "border_around_spoc_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "border_around_spoc_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_around" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_around" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
+// split 0: 1 cut
+// # SPOC calls: 1
+
+// FREIA-SPoC helper function for module border_around
+freia_status border_around_spoc_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // in [0 input 0] -> [0 poc 0] 8 erode_8c
+  // nope
+  // poc 8 erode_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = pi0[i];
+
+
+  // output image out on 0
+  // out [0 poc 0] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // out [0 output 0] -> [7 output 0] 0 null
+  // out [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // out [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // out [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // out [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // out [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // out [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // out [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+! updated function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   border_around_spoc_helper_0_0_0(out, in, kernel);                    /*0008*/
+}
+
+! cleaned up function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   border_around_spoc_helper_0_0_0(out, in, kernel);                    /*0008*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_around_terapix_helper_0_0_0" of module "border_around" in dot format
+// DAG "border_around_terapix_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "border_around_terapix_helper_0_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_around" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_around" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+// freia terapix includes
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
+
+/* FREIA terapix helper function for module border_around
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
+ * 1 input image, 1 output image
+ * 1 image operations in dag
+ * dag length is 2, dag width is 1
+ * costs in cycles per imagelet row:
+ * - computation: 15
+ * - communication: 64
+ */
+freia_status border_around_terapix_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi2)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][2];
+  terapix_tile_info tile_in[2][1];
+  terapix_tile_info tile_out[2][1];
+  // imagelets definitions:
+  // - 2 computation imagelets
+  // - 1 double buffer imagelets
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 1;
+  int image_height = i0->heightWa;
+  int max_computed_size = 339;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
+  int imagelet_1 = 0;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_3;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: E8(1) -> 2
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_2;
+  mcu_macro[1][0].xmin2 = imagelet_2;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi2[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // output copy 2 -> 1
+  mcu_macro[0][1].xmin1 = imagelet_2;
+  mcu_macro[1][1].xmin1 = imagelet_2;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_COPY;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_COPY;
+
+
+  // inputs:
+  // - imagelet 1 is i0 for in
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+
+  // outputs:
+  // - imagelet 1 is o0 for out
+  tile_out[0][0].x = imagelet_io_1_0;
+  tile_out[0][0].y = 0;
+  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].y = 0;
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 1;
+  mcu_instr.borderBottom = 1;
+  mcu_instr.borderLeft   = 1;
+  mcu_instr.borderRight  = 1;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 1;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
+
+  // inputs
+  mcu_instr.nbin = 1;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 2;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
+
+  // extract measures
+
+  return ret;
+}
+
+
+! updated function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   border_around_terapix_helper_0_0_0(out, in, kernel);                 /*0008*/
+}
+
+! cleaned up function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   border_around_terapix_helper_0_0_0(out, in, kernel);                 /*0008*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {1, 1, 1, 1, 0, 1, 1, 1, 1};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_around_opencl_helper_0_0" of module "border_around" in dot format
+// DAG "border_around_opencl_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "border_around_opencl_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "border_around_opencl_helper_E8_495" of module "border_around" in dot format
+// DAG "border_around_opencl_helper_E8_495": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "border_around_opencl_helper_E8_495" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_around" in dot format
+// DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_around" in dot format
+// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0+0 copies
+
+// hold kernels for border_around_opencl_helper_E8_495
+static cl_kernel border_around_opencl_helper_E8_495_kernel[2];
+
+// compile kernels for border_around_opencl_helper_E8_495
+static freia_status border_around_opencl_helper_E8_495_compile(void)
+{
+  // OpenCL source for border_around_opencl_helper_E8_495
+  const char * border_around_opencl_helper_E8_495_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function border_around_opencl_helper_E8_495\n"
+    "KERNEL void border_around_opencl_helper_E8_495(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t8 = PIXEL_MAX;\n"
+    "    t8 = PIXEL_INF(t8, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_N)? PIXEL_MAX: j0[i-pitch]);\n"
+    "    t8 = PIXEL_INF(t8, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: j0[i-1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_E)? PIXEL_MAX: j0[i+1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);\n"
+    "    t8 = PIXEL_INF(t8, (is_S)? PIXEL_MAX: j0[i+pitch]);\n"
+    "    t8 = PIXEL_INF(t8, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t8;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(border_around_opencl_helper_E8_495_source, "border_around_opencl_helper_E8_495", "-DPIXEL8", &border_around_opencl_helper_E8_495_kernel[0]);
+  err |= freia_op_compile_kernel(border_around_opencl_helper_E8_495_source, "border_around_opencl_helper_E8_495", "-DPIXEL16", &border_around_opencl_helper_E8_495_kernel[1]);
+  return err;
+}
+
+// helper function border_around_opencl_helper_E8_495
+freia_status border_around_opencl_helper_E8_495(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= border_around_opencl_helper_E8_495_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = border_around_opencl_helper_E8_495_kernel[bpp];
+
+  // call kernel border_around_opencl_helper_E8_495
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function border_around
+
+// opencl for dag 0
+
+// opencl function border_around_opencl_helper_E8_495
+KERNEL void border_around_opencl_helper_E8_495(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL t8 = PIXEL_MAX;
+    t8 = PIXEL_INF(t8, (is_N|is_W)? PIXEL_MAX: j0[i-pitch-1]);
+    t8 = PIXEL_INF(t8, (is_N)? PIXEL_MAX: j0[i-pitch]);
+    t8 = PIXEL_INF(t8, (is_N|is_E)? PIXEL_MAX: j0[i-pitch+1]);
+    t8 = PIXEL_INF(t8, (is_W)? PIXEL_MAX: j0[i-1]);
+    t8 = PIXEL_INF(t8, (is_E)? PIXEL_MAX: j0[i+1]);
+    t8 = PIXEL_INF(t8, (is_W|is_S)? PIXEL_MAX: j0[i+pitch-1]);
+    t8 = PIXEL_INF(t8, (is_S)? PIXEL_MAX: j0[i+pitch]);
+    t8 = PIXEL_INF(t8, (is_E|is_S)? PIXEL_MAX: j0[i+pitch+1]);
+    // set output pixels
+    p0[i] = t8;
+  }
+}
+
+! updated function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   border_around_opencl_helper_E8_495(out, in);                         /*0008*/
+}
+
+! cleaned up function
+
+void border_around(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   border_around_opencl_helper_E8_495(out, in);                         /*0008*/
+}
+#
+# FREIA COMPILATION DONE
+#
+
