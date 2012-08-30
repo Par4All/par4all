@@ -118,7 +118,7 @@ static string pixel_name(
   list inputs)        // list of input vertices
 {
   // build name
-  static char name[20];
+  static char name[30];
   int in = -1; // input number
   static string suffix[9] =
     { "NW", "N", "NE", "W", "", "E", "SW", "S", "SE" };
@@ -141,14 +141,20 @@ static string pixel_name(
 
   if (is_input && !set_belong_p(loaded, VARSHIFT(v, shft)))
   {
-    // we declare and load
-    sb_cat(load, "    " OPENCL_PIXEL, name, " = ");
-    if (border_condition[shft+4])
-      sb_cat(load, "(", border_condition[shft+4], ")? 0: ");
-    sb_cat(load, "j", itoa(in), "[i", shift[shft+4], "];\n");
+    if (get_bool_property("HWAC_OPENCL_PRELOAD_PIXELS"))
+    {
+      // we declare and load
+      sb_cat(load, "    " OPENCL_PIXEL, name, " = ");
+      if (border_condition[shft+4])
+        sb_cat(load, "(", border_condition[shft+4], ")? 0: ");
+      sb_cat(load, "j", itoa(in), "[i", shift[shft+4], "];\n");
 
-    // done!
-    set_add_element(loaded, loaded, VARSHIFT(v, shft));
+      // done!
+      set_add_element(loaded, loaded, VARSHIFT(v, shft));
+    }
+    else
+      // directly reference the initial array
+      sprintf(name, "j%d[i%s]", in, shift[shft+4]);
   }
 
   return name;

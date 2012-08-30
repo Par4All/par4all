@@ -11172,9 +11172,15 @@ HWAC_OPENCL_COMPILE_ONE_OPERATION FALSE
 \end{PipsProp}
 
 Whether to add an explicit synchronization in the generated codes,
-before calling a kernel.
+before calling a kernel. This property was added for debug.
 \begin{PipsProp}{HWAC_OPENCL_SYNCHRONIZE_KERNELS}
 HWAC_OPENCL_SYNCHRONIZE_KERNELS FALSE
+\end{PipsProp}
+
+Whether to preload pixels before using them in generated kernels.
+Should be better for GPGPU, but not necessarily for CPU implementations.
+\begin{PipsProp}{HWAC_OPENCL_PRELOAD_PIXELS}
+HWAC_OPENCL_PRELOAD_PIXELS TRUE
 \end{PipsProp}
 
 
