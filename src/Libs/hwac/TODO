@@ -135,7 +135,9 @@
 + generate kernel-specialized erode/dilate/convol
 + merge two or more erode/dilate/convol on the same input?
 + merge reductions with same input kernel ops (anr999)?
-- above: should accept more reductions in mergeable?
+- generate some ILP: load before use?
+- borders: one int & masks?
+- above: should accept more reductions in mergeable? need fixing runtime
 - mergeable: separate by connected components?
   that would be where the place to deal with the one reduction constraint?
 - detect constant transposed kernels (retina, burner)?
