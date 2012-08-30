@@ -582,9 +582,9 @@ static freia_status my_global_min_coord_opencl_helper_0_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[threadid].min = mmin.x;\n"
-    "  redX[threadid].min_x = (uint) mmin.y;\n"
-    "  redX[threadid].min_y = get_global_id(0);\n"
+    "  redX[thrid].min = mmin.x;\n"
+    "  redX[thrid].min_x = (uint) mmin.y;\n"
+    "  redX[thrid].min_y = get_global_id(0);\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(my_global_min_coord_opencl_helper_0_0_0_source, "my_global_min_coord_opencl_helper_0_0_0", "-DPIXEL8", &my_global_min_coord_opencl_helper_0_0_0_kernel[0]);
@@ -666,9 +666,9 @@ KERNEL void my_global_min_coord_opencl_helper_0_0_0(
   }
 
   // reduction copy out
-  redX[threadid].min = mmin.x;
-  redX[threadid].min_x = (uint) mmin.y;
-  redX[threadid].min_y = get_global_id(0);
+  redX[thrid].min = mmin.x;
+  redX[thrid].min_x = (uint) mmin.y;
+  redX[thrid].min_y = get_global_id(0);
 }
 
 ! updated function

@@ -820,9 +820,9 @@ static freia_status freia_76_opencl_helper_0_0_0_compile(void)
     "  // reduction copy out\n"
     "  redX[thrid].max = mmax.x;\n"
     "  redX[thrid].vol = vol;\n"
-    "  redX[threadid].min = mmin.x;\n"
-    "  redX[threadid].min_x = (uint) mmin.y;\n"
-    "  redX[threadid].min_y = get_global_id(0);\n"
+    "  redX[thrid].min = mmin.x;\n"
+    "  redX[thrid].min_x = (uint) mmin.y;\n"
+    "  redX[thrid].min_y = get_global_id(0);\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_76_opencl_helper_0_0_0_source, "freia_76_opencl_helper_0_0_0", "-DPIXEL8", &freia_76_opencl_helper_0_0_0_kernel[0]);
@@ -912,9 +912,9 @@ KERNEL void freia_76_opencl_helper_0_0_0(
   // reduction copy out
   redX[thrid].max = mmax.x;
   redX[thrid].vol = vol;
-  redX[threadid].min = mmin.x;
-  redX[threadid].min_x = (uint) mmin.y;
-  redX[threadid].min_y = get_global_id(0);
+  redX[thrid].min = mmin.x;
+  redX[thrid].min_x = (uint) mmin.y;
+  redX[thrid].min_y = get_global_id(0);
 }
 
 ! updated function
