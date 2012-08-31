@@ -1,0 +1,6 @@
+<Task name="gpufunc" kernel="p4a_wrapper_gpufunc" nbParallelLoops="2">
+<Arg type="param" name="i"  typeData="int" value="0"/>
+<Arg type="param" name="j"  typeData="int" value="0"/>
+<Arg type="param" name="a"  typeData="int[10][10]"/>
+</task>
+

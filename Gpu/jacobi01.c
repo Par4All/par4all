@@ -79,7 +79,7 @@ void write_data(char filename[]) {
 }
 
 
-void iteration(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
+void iteration(__attribute__ ((output)) float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   int i, j;
 
   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
