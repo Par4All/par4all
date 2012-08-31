@@ -26,14 +26,16 @@ int main()
 // q -> i , EXACT
 
 
-   if (p!=q)
+   if (p==q)
 
-// Points To: unreachable
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
 
       p = (void *) 0;
 
 // Points To:
-// p -> i , EXACT
+// p -> *NULL_POINTER* , EXACT
 // q -> i , EXACT
 
 
