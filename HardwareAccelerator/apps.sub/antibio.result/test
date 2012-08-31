@@ -12208,7 +12208,7 @@ int main(int argc, char *argv[])
    register freia_status ret_5;                                         /*0064*/
    //PIPS generated variable
    // hardware accelerator generated variable
-   freia_data2d *w4_2 = 0, *w1_0_8 = 0, *imOut_4 = 0, *imOut_5 = 0, *imOut_6 = 0, *imOut_7 = 0, *imOut_8 = 0, *imOut_9 = 0, *imOut_10 = 0, *imOut_11 = 0;
+   freia_data2d *w1_0_8 = 0;
 
    freia_initialize(argc, argv);                                        /*0068*/
 
@@ -12217,16 +12217,7 @@ int main(int argc, char *argv[])
 
    imIn = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0073*/
    w1_0_8 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
-   w4_2 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
    imOut = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0074*/
-   imOut_11 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_10 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_9 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_8 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_7 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_6 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_5 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_4 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
    
    // input
    freia_common_rx_image(imIn, &fdin);                                  /*0077*/
@@ -12335,11 +12326,11 @@ int main(int argc, char *argv[])
    // 2nd detect halos
    
    
-   main_opencl_helper_4_0_1(w1_0, w4_2, w1_0_8, w3);                    /*0167*/
+   main_opencl_helper_4_0_1(w1_0, w4, w1_0_8, w3);                      /*0167*/
    
    
    
-   main_opencl_helper_D8_511(w4, w4_2);                                 /*0181*/
+   main_opencl_helper_D8_511(w4, w4);                                   /*0181*/
    
    
    main_opencl_helper_4_0_3(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);           /*0189*/
@@ -12370,15 +12361,15 @@ int main(int argc, char *argv[])
    freia_aipo_inf(w4, w3, w1_0);                                        /*0228*/
    
    
-   main_opencl_helper_D8_511(imOut_11, w4);                             /*0231*/
-   main_opencl_helper_D8_511(imOut_10, imOut_11);                       /*0232*/
-   main_opencl_helper_D8_511(imOut_9, imOut_10);                        /*0233*/
-   main_opencl_helper_D8_511(imOut_8, imOut_9);                         /*0234*/
-   main_opencl_helper_D8_511(imOut_7, imOut_8);                         /*0235*/
-   main_opencl_helper_D8_511(imOut_6, imOut_7);                         /*0236*/
-   main_opencl_helper_D8_511(imOut_5, imOut_6);                         /*0237*/
-   main_opencl_helper_D8_511(imOut_4, imOut_5);                         /*0238*/
-   main_opencl_helper_D8_511(imOut, imOut_4);                           /*0239*/
+   main_opencl_helper_D8_511(imOut, w4);                                /*0231*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0232*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0233*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0234*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0235*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0236*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0237*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0238*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0239*/
    main_opencl_helper_6_0_2(imOut, imOut, w1_0, 4);                     /*0240*/
    
    // rearrange for display
@@ -12392,7 +12383,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(w2_0);                                    /*0252*/
    freia_common_destruct_data(w3);                                      /*0253*/
    freia_common_destruct_data(w4);                                      /*0254*/
-   freia_common_destruct_data(w4_2);
    // For display
    
    // Write images
@@ -12403,14 +12393,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(imIn);                                    /*0265*/
 
    freia_common_destruct_data(imOut);                                   /*0267*/
-   freia_common_destruct_data(imOut_4);
-   freia_common_destruct_data(imOut_5);
-   freia_common_destruct_data(imOut_6);
-   freia_common_destruct_data(imOut_7);
-   freia_common_destruct_data(imOut_8);
-   freia_common_destruct_data(imOut_9);
-   freia_common_destruct_data(imOut_10);
-   freia_common_destruct_data(imOut_11);
    freia_common_close_input(&fdin);                                     /*0268*/
    freia_common_close_output(&fdout);                                   /*0269*/
    freia_shutdown();                                                    /*0270*/
@@ -12480,7 +12462,7 @@ int main(int argc, char *argv[])
    register freia_status ret_5;                                         /*0064*/
    //PIPS generated variable
    // hardware accelerator generated variable
-   freia_data2d *w4_2 = 0, *w1_0_8 = 0, *imOut_4 = 0, *imOut_5 = 0, *imOut_6 = 0, *imOut_7 = 0, *imOut_8 = 0, *imOut_9 = 0, *imOut_10 = 0, *imOut_11 = 0;
+   freia_data2d *w1_0_8 = 0;
 
    freia_initialize(argc, argv);                                        /*0068*/
 
@@ -12489,16 +12471,7 @@ int main(int argc, char *argv[])
 
    imIn = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0073*/
    w1_0_8 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
-   w4_2 = freia_common_create_data(imIn->bpp, imIn->widthWa, imIn->heightWa);
    imOut = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0074*/
-   imOut_11 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_10 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_9 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_8 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_7 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_6 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_5 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
-   imOut_4 = freia_common_create_data(imOut->bpp, imOut->widthWa, imOut->heightWa);
    
    // input
    freia_common_rx_image(imIn, &fdin);                                  /*0077*/
@@ -12607,11 +12580,11 @@ int main(int argc, char *argv[])
    // 2nd detect halos
    
    
-   main_opencl_helper_4_0_1(w1_0, w4_2, w1_0_8, w3);                    /*0167*/
+   main_opencl_helper_4_0_1(w1_0, w4, w1_0_8, w3);                      /*0167*/
    
    
    
-   main_opencl_helper_D8_511(w4, w4_2);                                 /*0181*/
+   main_opencl_helper_D8_511(w4, w4);                                   /*0181*/
    
    
    main_opencl_helper_4_0_3(w1_1, w4, 1, w4->bpp==16?32767:255, 1, &measure_vol, w1_1->bpp==16?32766:254);           /*0189*/
@@ -12642,15 +12615,15 @@ int main(int argc, char *argv[])
    freia_aipo_inf(w4, w3, w1_0);                                        /*0228*/
    
    
-   main_opencl_helper_D8_511(imOut_11, w4);                             /*0231*/
-   main_opencl_helper_D8_511(imOut_10, imOut_11);                       /*0232*/
-   main_opencl_helper_D8_511(imOut_9, imOut_10);                        /*0233*/
-   main_opencl_helper_D8_511(imOut_8, imOut_9);                         /*0234*/
-   main_opencl_helper_D8_511(imOut_7, imOut_8);                         /*0235*/
-   main_opencl_helper_D8_511(imOut_6, imOut_7);                         /*0236*/
-   main_opencl_helper_D8_511(imOut_5, imOut_6);                         /*0237*/
-   main_opencl_helper_D8_511(imOut_4, imOut_5);                         /*0238*/
-   main_opencl_helper_D8_511(imOut, imOut_4);                           /*0239*/
+   main_opencl_helper_D8_511(imOut, w4);                                /*0231*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0232*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0233*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0234*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0235*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0236*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0237*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0238*/
+   main_opencl_helper_D8_511(imOut, imOut);                             /*0239*/
    main_opencl_helper_6_0_2(imOut, imOut, w1_0, 4);                     /*0240*/
    
    // rearrange for display
@@ -12664,7 +12637,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(w2_0);                                    /*0252*/
    freia_common_destruct_data(w3);                                      /*0253*/
    freia_common_destruct_data(w4);                                      /*0254*/
-   freia_common_destruct_data(w4_2);
    // For display
    
    // Write images
@@ -12675,14 +12647,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(imIn);                                    /*0265*/
 
    freia_common_destruct_data(imOut);                                   /*0267*/
-   freia_common_destruct_data(imOut_4);
-   freia_common_destruct_data(imOut_5);
-   freia_common_destruct_data(imOut_6);
-   freia_common_destruct_data(imOut_7);
-   freia_common_destruct_data(imOut_8);
-   freia_common_destruct_data(imOut_9);
-   freia_common_destruct_data(imOut_10);
-   freia_common_destruct_data(imOut_11);
    freia_common_close_input(&fdin);                                     /*0268*/
    freia_common_close_output(&fdout);                                   /*0269*/
    freia_shutdown();                                                    /*0270*/
