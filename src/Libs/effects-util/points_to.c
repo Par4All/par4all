@@ -367,3 +367,49 @@ list points_to_reference_to_typed_index(reference r, type t)
 
   return psl;
 }
+
+/* Is it a unique concrete memory location? */
+bool atomic_points_to_cell_p(cell c)
+{
+  reference r = cell_any_reference(c);
+  bool atomic_p = atomic_points_to_reference_p(r);
+
+  return atomic_p;
+}
+
+/* Is it a unique concrete memory location?
+ *
+ * No, if it is a reference to an abstract location.
+ *
+ * No, if the subscripts included an unbounded expression.
+ *
+ * Very preliminary version. One of the keys to Amira mensi's work.
+ *
+ * More about stubs...
+ *
+ * Note: it is assumed that the reference is a points-to
+ * reference. All subscripts are constants, field references or
+ * unbounded expressions.
+ */
+bool atomic_points_to_reference_p(reference r)
+{
+  bool atomic_p = false;
+  entity v = reference_variable(r);
+
+  if(!entity_null_locations_p(v)
+     && !entity_typed_nowhere_locations_p(v)
+     && !entity_typed_anywhere_locations_p(v)
+     && !entity_anywhere_locations_p(v)
+     && !entity_heap_location_p(v)) {
+    list sl = reference_indices(r);
+    atomic_p = true;
+    FOREACH(EXPRESSION, se, sl) {
+      if(unbounded_expression_p(se)) {
+	atomic_p = false;
+	break;
+      }
+    }
+  }
+
+  return atomic_p;
+}

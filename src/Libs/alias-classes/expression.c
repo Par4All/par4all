@@ -2142,25 +2142,150 @@ bool cell_is_greater_than_p(cell c1, cell c2)
   return cell_is_xxx_p(c1, c2, GREATER_THAN);
 }
 
-/* Update the points-to information "in" according to the validity of
- * the condition.
+/* The condition is e==NULL
  *
- * FI: It is not clear what should be done. We can remove the arcs or
- * some of the arcs that violate the condition or decide that the
- * condition cannot be true... I've put a first attempt at resolving
- * the issue for pointer comparisons, using the approximation exact or
- * not.
+ * e==NULL may be true if exists c in sinks(e) s.t. {NULL} is included in c.
+ * else e==NULL must be false.
+ *
+ * Some arcs in in may be removed: forall c in sources(e):
+ *
+ * out = in - {pt=(a,b) in in | a in sources(e) and b=NULL} 
  */
-pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+pt_map null_equal_condition_to_points_to(expression e, pt_map in)
 {
   pt_map out = in;
-  entity f = call_function(c);
-  list al = call_arguments(c);
-  if((ENTITY_EQUAL_P(f) && true_p)
-     || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
-    expression lhs = EXPRESSION(CAR(al));
+  type et = expression_to_type(e);
+  if(pointer_type_p(et)) {
+    list R = expression_to_points_to_sinks(e, in);
+
+    if(ENDP(R)) {
+      // Maybe, a dereferencement user error occured?
+      pips_internal_error("A dereferencement should always succeed.\n");
+    }
+
+    /* May the condition be true under "in"? */
+    bool found_p = false;
+    FOREACH(CELL, c, R) {
+      if(null_cell_p(c)
+	 || anywhere_cell_p(c)
+	 || cell_typed_anywhere_locations_p(c)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      clear_pt_map(out);
+      points_to_graph_bottom(out) = true;
+    }
+    else {
+      /* Remove arcs incompatible with the condition e==NULL and add
+	 the arc e->NULL */
+      list L = expression_to_points_to_sources(e, in);
+      pips_assert("A lhs expression has at least one source", !ENDP(L));
+      int nL = (int) gen_length(L);
+      cell fc = CELL(CAR(L));
+      if(nL==1 && atomic_points_to_cell_p(fc)) {
+	/* All arcs starting from fc can be removed and replaced by
+	   one arc from fc to NULL. */
+	out = points_to_cell_source_projection(out, fc);
+	points_to pt = make_points_to(copy_cell(fc),
+				      make_null_cell(),
+				      make_approximation_exact(),
+				      make_descriptor_none());
+	add_arc_to_pt_map(pt, out);
+      }
+      else {
+	SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	  cell source = points_to_source(pt);
+	  if(cell_in_list_p(source, L)) {
+	    cell sink = points_to_sink(pt);
+	    if(!(null_cell_p(sink)
+		 || anywhere_cell_p(sink)
+		 || cell_typed_anywhere_locations_p(sink))) {
+	      out = remove_arc_from_pt_map(pt, out);
+	    }
+	  }
+	}
+      }
+    }
+  gen_free_list(R); // FI: should be full?
+  }
+  return out;
+}
+
+/* The condition is e!=NULL
+ *
+ * e!=NULL may be true if exists c in sinks(e) s.t. c != {NULL}
+ *
+ * e!=NULL is false if forall c in sinks(e) c is included in {NULL}
+ *
+ * Arcs that can be removed:
+ *
+ * FI: I decided not to merge this function with the previous one till
+ * they are both fully defined and tested.
+ */
+pt_map null_non_equal_condition_to_points_to(expression e, pt_map in)
+{
+  pt_map out = in;
+  type et = expression_to_type(e);
+  if(pointer_type_p(et)) {
+    list L = expression_to_points_to_sinks(e, in);
+
+    if(ENDP(L)) {
+      // Maybe, a dereferencement user error occured?
+      pips_internal_error("A dereferencement should always succeed.\n");
+    }
+
+    /* May the condition be true under "in"? */
+    bool found_p = false;
+    FOREACH(CELL, c, L) {
+      if(!null_cell_p(c)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      clear_pt_map(out);
+      points_to_graph_bottom(out) = true;
+    }
+    else {
+      /* Remove arcs incompatible with the condition e!=NULL */
+      list L = expression_to_points_to_sources(e, in);
+      SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	cell source = points_to_source(pt);
+	if(cell_in_list_p(source, L)) {
+	  cell sink = points_to_sink(pt);
+	  if(null_cell_p(sink)) {
+	    out = remove_arc_from_pt_map(pt, out);
+	  }
+	}
+      }
+    }
+  }
+  return out;
+}
+
+/* The expression list "al" contains exactly two arguments. 
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "out" is returned.
+ *
+ * "out" is "in", modified by side-effects.
+ */
+pt_map equal_condition_to_points_to(list al, pt_map in)
+{
+  pt_map out = in;
+  expression lhs = EXPRESSION(CAR(al));
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+
+  // FI: in fact, any integer could be used in a pointer comparison...
+  if(expression_null_p(lhs))
+    out = null_equal_condition_to_points_to(rhs, in);
+  else if(expression_null_p(rhs))
+    out = null_equal_condition_to_points_to(lhs, in);
+  else {
     type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
     type rhst = expression_to_type(rhs);
     if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
       list L = expression_to_points_to_sources(lhs, in);
@@ -2182,22 +2307,40 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 	  set out_s = points_to_graph_set(out);
 	  out_s = points_to_source_projection(out_s, v);
 	  points_to a = make_points_to(source, sink, make_approximation_exact(),
-				     make_descriptor_none());
+				       make_descriptor_none());
 	  add_arc_to_pt_map(a, out);
 	}
       }
     }
     free_type(lhst), free_type(rhst);
-    ; //FI FI FI
   }
-  else if((ENTITY_EQUAL_P(f) && !true_p)
-     || (ENTITY_NON_EQUAL_P(f) && true_p)) {
-    // FI: this code is almost identical to the code above
-    // It should be shared with a more general test first and then a
-    // precise test to decide if you add or remove arcs
-    expression lhs = EXPRESSION(CAR(al));
+  return out;
+}
+
+/* The expression list "al" contains exactly two arguments. 
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "in" is returned.
+ *
+ * "out" is "in", modified by side-effects.
+ */
+pt_map non_equal_condition_to_points_to(list al, pt_map in)
+{
+  // FI: this code is almost identical to the code above
+  // It should be shared with a more general test first and then a
+  // precise test to decide if you add or remove arcs
+  pt_map out = in;
+  expression lhs = EXPRESSION(CAR(al));
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+
+  // FI: in fact, any integer could be used in a pointer comparison...
+  if(expression_null_p(lhs))
+    out = null_non_equal_condition_to_points_to(rhs, in);
+  else if(expression_null_p(rhs))
+    out = null_non_equal_condition_to_points_to(lhs, in);
+  else {
     type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
     type rhst = expression_to_type(rhs);
     if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
 
@@ -2244,48 +2387,86 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
       }
     }
     free_type(lhst), free_type(rhst);
-    ;//FI FI FI
   }
-  if(ENTITY_LESS_OR_EQUAL_P(f)
-     || ENTITY_GREATER_THAN_P(f)
-     || ENTITY_GREATER_THAN_P(f)
-     || ENTITY_GREATER_THAN_P(f)) {
-    bool (*cmp_function)(cell, cell);
-    if((ENTITY_LESS_OR_EQUAL_P(f) && true_p)
-       || (ENTITY_GREATER_THAN_P(f) && !true_p)) {
-      // cmp_function = cell_is_less_than_or_equal_to_p;
-      cmp_function = cell_is_greater_than_p;
+  return in;
+}
+
+/* The expression list "al" contains exactly two arguments. 
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "in" is returned.
+ *
+ * "out" is "in", modified by side-effects.
+ */
+pt_map order_condition_to_points_to(entity f, list al, bool true_p, pt_map in)
+{
+  pt_map out = in;
+  bool (*cmp_function)(cell, cell);
+  if((ENTITY_LESS_OR_EQUAL_P(f) && true_p)
+     || (ENTITY_GREATER_THAN_P(f) && !true_p)) {
+    // cmp_function = cell_is_less_than_or_equal_to_p;
+    cmp_function = cell_is_greater_than_p;
+  }
+  else if((ENTITY_LESS_OR_EQUAL_P(f) && !true_p)
+	  || (ENTITY_GREATER_THAN_P(f) && true_p)) {
+    // cmp_function = cell_is_greater_than_p;
+    cmp_function = cell_is_less_than_or_equal_to_p;
+  }
+  else if((ENTITY_GREATER_OR_EQUAL_P(f) && true_p)
+	  || (ENTITY_LESS_THAN_P(f) && !true_p)) {
+    // cmp_function = cell_is_greater_than_or_equal_to_p;
+    cmp_function = cell_is_less_than_p;
+  }
+  else if((ENTITY_GREATER_OR_EQUAL_P(f) && !true_p)
+	  || (ENTITY_LESS_THAN_P(f) && true_p)) {
+    //cmp_function = cell_is_less_than_p;
+    cmp_function = cell_is_greater_than_or_equal_to_p;
+  }
+  else 
+    pips_internal_error("Unexpected relational operator.\n");
+
+  expression lhs = EXPRESSION(CAR(al));
+  type lhst = expression_to_type(lhs);
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+  type rhst = expression_to_type(rhs);
+  if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+    list L = expression_to_points_to_sinks(lhs, in);
+    if(gen_length(L)==1) { // FI: one fixed bound
+      cell lc = CELL(CAR(L));
+      list RR = expression_to_points_to_sources(rhs, in);
+      set out_s = points_to_graph_set(out);
+      SET_FOREACH(points_to, pt, out_s) {
+	cell source = points_to_source(pt);
+	if(cell_in_list_p(source, RR)) {
+	  cell sink = points_to_sink(pt);
+	  if(cmp_function(lc, sink)) {
+	    approximation a = points_to_approximation(pt);
+	    if(approximation_exact_p(a)) {
+	      /* The condition cannot violate an exact arc. */
+	      // clear_pt_map(out);
+	      points_to_graph_bottom(out) = true;
+	      // Would be useless/different with a union
+	      set_clear(points_to_graph_set(out));
+	    }
+	    else
+	      remove_arc_from_pt_map(pt, out);
+	  }
+	}
+      }
     }
-    if((ENTITY_LESS_OR_EQUAL_P(f) && !true_p)
-       || (ENTITY_GREATER_THAN_P(f) && true_p)) {
-      // cmp_function = cell_is_greater_than_p;
-      cmp_function = cell_is_less_than_or_equal_to_p;
-    }
-    if((ENTITY_GREATER_OR_EQUAL_P(f) && true_p)
-       || (ENTITY_LESS_THAN_P(f) && !true_p)) {
-      // cmp_function = cell_is_greater_than_or_equal_to_p;
-      cmp_function = cell_is_less_than_p;
-    }
-    if((ENTITY_GREATER_OR_EQUAL_P(f) && !true_p)
-       || (ENTITY_LESS_THAN_P(f) && true_p)) {
-      //cmp_function = cell_is_less_than_p;
-      cmp_function = cell_is_greater_than_or_equal_to_p;
-    }
-    expression lhs = EXPRESSION(CAR(al));
-    type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-      list L = expression_to_points_to_sinks(lhs, in);
-      if(gen_length(L)==1) { // FI: one fixed bound
-	cell lc = CELL(CAR(L));
-	list RR = expression_to_points_to_sources(rhs, in);
+    else {
+      list R = expression_to_points_to_sinks(rhs, in);
+      if(gen_length(R)==1) { // FI: one fixed bound
+	cell rc = CELL(CAR(R));
+	list LL = expression_to_points_to_sources(lhs, in);
 	set out_s = points_to_graph_set(out);
 	SET_FOREACH(points_to, pt, out_s) {
 	  cell source = points_to_source(pt);
-	  if(cell_in_list_p(source, RR)) {
+	  if(cell_in_list_p(source, LL)) {
 	    cell sink = points_to_sink(pt);
-	    if(cmp_function(lc, sink)) {
+	    if(cmp_function(sink, rc)) {
+	      // FI: Oops in middle of the iterator...
 	      approximation a = points_to_approximation(pt);
 	      if(approximation_exact_p(a)) {
 		/* The condition cannot violate an exact arc. */
@@ -2300,40 +2481,41 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
 	  }
 	}
       }
-      else {
-	list R = expression_to_points_to_sinks(rhs, in);
-	if(gen_length(R)==1) { // FI: one fixed bound
-	  cell rc = CELL(CAR(R));
-	  list LL = expression_to_points_to_sources(lhs, in);
-	  set out_s = points_to_graph_set(out);
-	  SET_FOREACH(points_to, pt, out_s) {
-	    cell source = points_to_source(pt);
-	    if(cell_in_list_p(source, LL)) {
-	      cell sink = points_to_sink(pt);
-	      if(cmp_function(sink, rc)) {
-		// FI: Oops in middle of the iterator...
-		approximation a = points_to_approximation(pt);
-		if(approximation_exact_p(a)) {
-		  /* The condition cannot violate an exact arc. */
-		  // clear_pt_map(out);
-		  points_to_graph_bottom(out) = true;
-		  // Would be useless/different with a union
-		  set_clear(points_to_graph_set(out));
-	      }
-		else
-		  remove_arc_from_pt_map(pt, out);
-	      }
-	    }
-	  }
-	}
-      }
     }
-    free_type(lhst), free_type(rhst);
-    ; //FI FI FI
+  }
+  free_type(lhst), free_type(rhst);
+
+  return in;
+}
+
+/* Update the points-to information "in" according to the validity of
+ * the condition.
+ *
+ * We can remove the arcs that violate the condition or decide that the
+ * condition cannot be true.
+ */
+pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity f = call_function(c);
+  list al = call_arguments(c);
+
+  if((ENTITY_EQUAL_P(f) && true_p)
+     || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
+    out = equal_condition_to_points_to(al, in);
+  }
+  else if((ENTITY_EQUAL_P(f) && !true_p)
+     || (ENTITY_NON_EQUAL_P(f) && true_p)) {
+    out = non_equal_condition_to_points_to(al, in);
+  }
+  else if(ENTITY_LESS_OR_EQUAL_P(f)
+     || ENTITY_GREATER_OR_EQUAL_P(f)
+     || ENTITY_GREATER_THAN_P(f)
+     || ENTITY_LESS_THAN_P(f)) {
+    out = order_condition_to_points_to(f, al, true_p, in);
   }
   else {
-    // Do nothing for other relational operators such as ">"
-    ; // pips_internal_error("Not implemented yet.\n");
+    pips_internal_error("Not implemented yet.\n");
   }
   pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;

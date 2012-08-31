@@ -48,7 +48,9 @@ looked at.
 18. dereferencing02: a variable, w, is used uninitialized and this is
 not detected.
 
-Next item will be 19.
+19. Improve heap model. Add an extra first dimension to model the different intraprocedural dynamic occurences of a malloc?
+
+Next item will be 20.
 
 Done:
 

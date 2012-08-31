@@ -233,6 +233,22 @@ set points_to_source_projection(set pts, entity e)
   return pts;
 }
 
+/* Remove all arcs in "ptg" starting from "c" */
+points_to_graph points_to_cell_source_projection(points_to_graph ptg, cell c)
+{
+  set pts = points_to_graph_set(ptg);
+
+  SET_FOREACH(points_to, pt, pts) {
+    cell source = points_to_source(pt);
+
+    if(cell_equal_p(source, c)) {
+      set_del_element(pts, pts, (void*)pt);
+    }
+  }
+
+  return ptg;
+}
+
 /* FI: side-effects to be used explictly in this function */
 set points_to_function_projection(set pts)
 {
