@@ -22,7 +22,8 @@
 TARGET	= gpu
 
 LIB_CFILES =	\
-		gpu-ify.c\
+		gpu-ify.c \
+		xml_output.c \
 		loop_nest_annotate.c
 
 INC_TARGET =    $(TARGET).h
