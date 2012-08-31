@@ -1,13 +1,27 @@
 Information about the points-to validation suite:
 ------------------------------------------------
 
-conditional_01 : To treat assignement like x = cond? &i : y.
+conditional_01, 01, 02, 03, 04 : To treat assignements like x = cond? &i : y.
+
+do_while : To illustrate points-to relations in control statements.
+
+for00:
 
 formal_parameter00 : To illustrate the treatement of formal parameter. 
 
 fulguro04: subscript construct in a rhs
 
-if00, for00, while00, do_while : To illustrate points-to relations in control statements.
+if01, if02, if03, if04, if05: join of the true and false branches (see also test01, 02, 03)
+
+if06: impact of a condition with a side-effect
+
+if07: impact of condition p!=(void *)0
+
+if08: impact of condition p!=q
+
+if09: impact of condition *p: it implies that p cannot be NULL
+
+if002: join of the false and true branches
 
 inter04, 05, 06  and 07:
 
@@ -108,9 +122,13 @@ struct21.c: excerpt from struct13.c, subscript and struct assignment
 
 struct_parall01: result to be validated by hand...
 
+test01, 02, 03: check handling of condition and join of true/false branches
+
 undefined01:
 
 uninitialized01:
+
+while00:
 
 For compatibility with Effects validation:
 ------------------------------------------

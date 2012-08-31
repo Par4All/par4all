@@ -18,6 +18,13 @@ activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PROPER_EFFECTS_WITH_POINTS_TO
 
 echo
+echo Points-to "$WSPACE"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WSPACE]
+
+echo
 echo Proper effects for "$WSPACE"
 echo
 

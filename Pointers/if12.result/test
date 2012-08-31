@@ -1,0 +1,40 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void if12(char *filename)
+{
+
+// Points To: none
+
+   FILE *file;
+
+// Points To:
+// file -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   file = fopen(filename, "rb");
+
+// Points To:
+// file -> *ANY_MODULE*:*ANYWHERE* , MAY
+
+   if (file==(void *) 0)
+
+// Points To:
+// file -> *NULL_POINTER* , EXACT
+
+      printf("ouverture du fichier impossible\n");
+
+// Points To:
+// file -> *ANY_MODULE*:*ANYWHERE* , MAY
+// file -> *NULL_POINTER* , MAY
+
+
+   return;
+}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[if12] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
