@@ -413,3 +413,29 @@ bool atomic_points_to_reference_p(reference r)
 
   return atomic_p;
 }
+
+/* points-to cells use abstract addresses, hence the proper comparison
+ * is an intersection. simple references are considered to be
+ * singleton.
+ *
+ * Assume no aliasing between variables and within data structures.
+ *
+ * It is safe to assume intersection...
+ */
+bool points_to_cells_intersect_p(cell lc, cell rc)
+{
+  bool intersect_p = false;
+  if(cell_equal_p(lc, rc))
+    intersect_p = true;
+  else {
+    // Look for abstract domains
+    // Probably pretty complex...
+    // Simple first version...
+    reference lr = cell_any_reference(lc);
+    entity le = cell_any_reference(lr);
+    reference rr = cell_any_reference(rc);
+    entity re = cell_any_reference(rr);
+    intersect_p = entities_may_conflict_p(le, re);
+  }
+  return intersect_p;
+}
