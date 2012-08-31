@@ -124,6 +124,8 @@
 + dynamic optimal tile size computation instead of static?
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
+- cleanup bug for antibio
+- wrong placement of tmp images under REPEAT for antibio
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
