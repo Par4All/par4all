@@ -789,6 +789,9 @@ string freia_compile(string module, statement mod_stat, string target)
   gen_free_list(lsi), lsi = NIL;
 
   list lcurrent = ldags;
+  // signatures definition must be cross-dag because of
+  // dilate/erode helper reuse with OpenCL
+  hash_table signatures = hash_table_make(hash_pointer, 0);
   n_dags = 0;
   bool compile_lone = get_bool_property("FREIA_COMPILE_LONE_OPERATIONS");
   FOREACH(list, ls, fsi.seqs)
@@ -822,7 +825,7 @@ string freia_compile(string module, statement mod_stat, string target)
                                        output_images, helper, helpers, n_dags);
     else if (freia_opencl_p(target))
       allocated = freia_opencl_compile_calls(module, d, sq, ls, occs, exchanges,
-                                       output_images, helper, helpers, n_dags);
+                           output_images, helper, helpers, n_dags, signatures);
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,
                                            n_dags);
@@ -866,6 +869,7 @@ string freia_compile(string module, statement mod_stat, string target)
   gen_free_list(fsi.seqs);
   set_free(fsi.in_loops);
   hash_table_free(fsi.sequence);
+  hash_table_free(signatures);
   gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 

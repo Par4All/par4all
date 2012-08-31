@@ -758,7 +758,10 @@ static void opencl_generate_special_kernel_ops(
     specialized = freia_create_helper_function(func_name, NIL);
 
     // record #outs for this helper, needed for cleaning
-    hash_put(signatures, specialized, (void*) (_int) 1);
+    pips_debug(7, "sig: %s (%p) = %d\n", func_name, specialized, 1);
+    hash_put(signatures, specialized, (void *) (_int) 1);
+    fprintf(stderr, "%p: %p -> %p\n", signatures, specialized,
+            hash_get(signatures, specialized));
     set_add_element(helpers, helpers, specialized);
 
     // cleanup
@@ -1222,7 +1225,8 @@ list freia_opencl_compile_calls
  const set output_images,
  FILE * helper_file,
  set helpers,
- int number)
+ int number,
+ hash_table signatures)
 {
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
@@ -1292,7 +1296,7 @@ list freia_opencl_compile_calls
 
       opencl_merge_and_compile(module, sq, ls, d, fname_fulldag, n_split,
                                fulld, output_images, helper_file, opencl,
-                               helpers, init);
+                               helpers, signatures);
 
       n_split++;
     }
@@ -1303,7 +1307,7 @@ list freia_opencl_compile_calls
 
   // now may put actual allocations, which messes up statement numbers
   list reals =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, signatures);
 
   // hmmm... is this too late?
   freia_insert_added_stats(ls, added_before, true);
