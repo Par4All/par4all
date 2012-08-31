@@ -2287,29 +2287,28 @@ pt_map equal_condition_to_points_to(list al, pt_map in)
   else {
     type lhst = expression_to_type(lhs);
     type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-      list L = expression_to_points_to_sources(lhs, in);
-      list R = expression_to_points_to_sources(rhs, in);
-      if(gen_length(L)==1 && gen_length(R)==1) {
-	cell l = CELL(CAR(L));
-	cell r = CELL(CAR(R));
-	cell source = cell_undefined, sink = cell_undefined;
-	if(null_cell_p(l)) {
-	  source = r;
-	  sink = l;
+    if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sinks(lhs, in);
+      list R = expression_to_points_to_sinks(rhs, in);
+      bool equal_p = false;
+      FOREACH(CELL, cl, L) {
+	FOREACH(CELL, cr, R) {
+	  if(points_to_cells_intersect_p(cl, cr)) {
+	    equal_p = true;
+	    break;
+	  }
 	}
-	else if(null_cell_p(r)) {
-	  source = l;
-	  sink = r;
-	}
-	if(!cell_undefined_p(source)) {
-	  entity v = reference_variable(cell_any_reference(source));
-	  set out_s = points_to_graph_set(out);
-	  out_s = points_to_source_projection(out_s, v);
-	  points_to a = make_points_to(source, sink, make_approximation_exact(),
-				       make_descriptor_none());
-	  add_arc_to_pt_map(a, out);
-	}
+	if(equal_p)
+	  break;
+      }
+      if(!equal_p) {
+	// lhs==rhs is impossible
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+      }
+      else {
+	// It is possible to remove some arcs?
+	;
       }
     }
     free_type(lhst), free_type(rhst);
@@ -2342,48 +2341,27 @@ pt_map non_equal_condition_to_points_to(list al, pt_map in)
   else {
     type lhst = expression_to_type(lhs);
     type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-
-      // FI: this is dead wrong in general... Same for the above code
-      // A lot more thinking about filtering points-to graph via
-      // conditions is needed
-
-      list L = expression_to_points_to_sources(lhs, in);
-      //list LV = expression_to_points_to_sinks(lhs, in);
-      (void) expression_to_points_to_sinks(lhs, in);
-      list R = expression_to_points_to_sources(rhs, in);
-      //list RV = expression_to_points_to_sinks(rhs, in);
-      (void) expression_to_points_to_sinks(rhs, in);
-      if(gen_length(L)==1 && gen_length(R)==1) {
-	cell l = CELL(CAR(L));
-	cell r = CELL(CAR(R));
-	cell source = cell_undefined, sink = cell_undefined;
-	if(null_cell_p(l)) {
-	  source = r;
-	  sink = l;
+    if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sinks(lhs, in);
+      list R = expression_to_points_to_sinks(rhs, in);
+      bool equal_p = false;
+      int nL = (int) gen_length(L);
+      int nR = (int) gen_length(R);
+      pips_assert("The two expressions can be dereferenced", nL>=1 && nR>=1);
+      if(nL==1 && nR==1) {
+	cell cl = CELL(CAR(L));
+	cell cr = CELL(CAR(R));
+	if(atomic_points_to_cell_p(cl)
+	   && atomic_points_to_cell_p(cr)
+	   && points_to_cell_equal_p(cl, cr)) {
+	  // The condition is not feasible
+	  clear_pt_map(out);
+	  points_to_graph_bottom(out) = true;
 	}
-	else if(null_cell_p(r)) {
-	  source = l;
-	  sink = r;
-	}
-	if(!cell_undefined_p(source)) {
-	  // FI: we should be able to remove an arc regardless of its
-	  // approximation... Not so simple as it's part of the key
-	  // used by the hash table!
-	  points_to a = make_points_to(copy_cell(source),
-				       copy_cell(sink),
-				       make_approximation_exact(),
-				       make_descriptor_none());
-	  remove_arc_from_pt_map(a, out);
-	  free_points_to(a);
-	  a = make_points_to(copy_cell(source), copy_cell(sink),
-			     make_approximation_may(),
-			     make_descriptor_none());
-	  remove_arc_from_pt_map(a, out);
-	  free_points_to(a);
-	  if(empty_pt_map_p(out))
-	    points_to_graph_bottom(out) = true;
-	}
+      }
+      else {
+	// It is possible to remove some arcs?
+	;
       }
     }
     free_type(lhst), free_type(rhst);
