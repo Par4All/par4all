@@ -829,6 +829,9 @@ static int compile_this_list(
   return stnb;
 }
 
+/* migrate the statements corresponding to the vertices
+ * so that they are one next to the other in the sequence.
+ */
 static void migrate_statements(list lvertices, sequence sq, set dones)
 {
   set stats = set_make(set_pointer);
@@ -839,6 +842,24 @@ static void migrate_statements(list lvertices, sequence sq, set dones)
   freia_migrate_statements(sq, stats, dones);
   set_union(dones, dones, stats);
   set_free(stats);
+}
+
+/* return if the vertex can be merged in the set
+ * - the answer is "no" if there is already a reduction on another input
+ */
+static bool vertex_mergeable_p(const dagvtx v, const set s, const dag d)
+{
+  if (dagvtx_is_measurement_p(v))
+  {
+    list preds = dag_vertex_preds(d, v);
+    pips_assert("one predecessor to reduction", gen_length(preds)==1);
+    dagvtx pred = DAGVTX(CAR(preds));
+    gen_free_list(preds), preds = NIL;
+    SET_FOREACH(dagvtx, o, s)
+      if (dagvtx_is_measurement_p(o) && !gen_in_list_p(o, dagvtx_succs(pred)))
+        return false;
+  }
+  return true;
 }
 
 /* extract subdags of merged operations and compile them
@@ -901,8 +922,6 @@ static void opencl_merge_and_compile(
       compile_one_op = get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION"),
       generate_specialized_kernel =
         get_bool_property("HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS");
-    // hand manage reductions on one image only
-    entity reduced = NULL;
 
     // we eat up all computable vertices, following dependences
     // we compute first a maximum set of non mergeable vertices
@@ -962,34 +981,16 @@ static void opencl_merge_and_compile(
           // a measure is mergeable
           if (merge_reductions)
           {
-            list li = vtxcontent_inputs(dagvtx_content(v));
-            pips_assert("one input image to reduction", gen_length(li)==1);
-            entity image = ENTITY(CAR(li));
-            if (reduced && reduced!=image)
-            {
-              // try to put it with the preceeding non mergeable...
-              // if it was computable with them in the previous round
-              if (gen_in_list_p(v, initials)) {
-                lnonmergeable = CONS(dagvtx, v, lnonmergeable);
-                set_add_element(done, done, v);
-                set_add_element(nonmergeable, nonmergeable, v);
-                again = true;
-              }
-              // else it will be dealt with later on...
-            }
-            else  // this is THE reduced image for this  subdag
-            {
-              reduced = image;
-              lmergeable = CONS(dagvtx, v, lmergeable);
-              set_add_element(done, done, v);
-              set_add_element(mergeable, mergeable, v);
-              again = true;
-            }
+            lmergeable = CONS(dagvtx, v, lmergeable);
+            set_add_element(done, done, v);
+            set_add_element(mergeable, mergeable, v);
+            again = true;
           }
           else // reduction are NOT merged
           {
             // try to put it with the preceeding non mergeable...
-            if (gen_in_list_p(v, initials)) {
+            if (gen_in_list_p(v, initials))
+            {
               lnonmergeable = CONS(dagvtx, v, lnonmergeable);
               set_add_element(done, done, v);
               set_add_element(nonmergeable, nonmergeable, v);
@@ -1167,31 +1168,34 @@ static void opencl_merge_and_compile(
     }
 
     // then mergeables
-    if (lmergeable)
+    while (lmergeable)
     {
+      list lconnected =
+        dag_connected_component(d, &lmergeable, vertex_mergeable_p);
+
       // fix statement connexity
-      migrate_statements(lmergeable, sq, dones);
+      migrate_statements(lconnected, sq, dones);
 
       // possibly compile
-      if (gen_length(lmergeable)>1 || compile_one_op)
+      if (gen_length(lconnected)>1 || compile_one_op)
       {
-        stnb = compile_this_list(module, lmergeable, ls, split_name, n_cut,
+        stnb = compile_this_list(module, lconnected, ls, split_name, n_cut,
                                  global_remainings, signatures,
                                  helper_file, opencl, helpers,
                                  output_images, fulld, stnb, max_stnb);
       }
 
       // cleanup initial dag??
-      FOREACH(dagvtx, v, lmergeable)
+      FOREACH(dagvtx, v, lconnected)
         dag_remove_vertex(d, v);
       freia_hack_fix_global_ins_outs(fulld, d);
 
       // cleanup loop state
-      gen_free_list(lmergeable), lmergeable = NIL;
-      set_clear(mergeable);
-
+      gen_free_list(lconnected), lconnected = NIL;
       n_cut++; // next cut
     }
+
+    set_clear(mergeable);
   }
 
   // cleanup

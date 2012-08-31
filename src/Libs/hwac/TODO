@@ -124,8 +124,8 @@
 + dynamic optimal tile size computation instead of static?
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
-- cleanup bug for antibio
 - wrong placement of tmp images under REPEAT for antibio
+- split along connected components?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
@@ -140,12 +140,14 @@
 - generate some ILP: load before use?
 - borders: one int & masks?
 - above: should accept more reductions in mergeable? need fixing runtime
-- mergeable: separate by connected components?
-  that would be where the place to deal with the one reduction constraint?
++ mergeable: separate by connected components?
++ that is the place to deal with the one reduction constraint
 - detect constant transposed kernels (retina, burner)?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
+- merge: E+min (freia_24 ?)
+- BUG: min/max position in deblocking (introduced earlier)
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation?
