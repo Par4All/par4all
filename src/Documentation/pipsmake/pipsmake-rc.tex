@@ -7739,6 +7739,21 @@ behaviour by setting the following property:
 ISOLATE_STATEMENT_EVEN_NON_LOCAL FALSE
 \end{PipsProp}
 
+
+\subsubsection{GPU XML Output}
+\begin{PipsPass}{gpu_xml_dump}
+Dump XML for a function, intended to be used for SPEAR. Track back the 
+parameters that are used for the iteration space.
+\end{PipsPass}
+
+
+\begin{PipsMake}
+gpu_xml_dump > MODULE.gpu_xml_file
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
+
 \subsubsection{Delay Communications}
 \begin{PipsPass}{delay_communications_inter}
 Optimize the load/store dma by delaying the stores and
