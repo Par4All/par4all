@@ -758,10 +758,8 @@ static void opencl_generate_special_kernel_ops(
     specialized = freia_create_helper_function(func_name, NIL);
 
     // record #outs for this helper, needed for cleaning
-    pips_debug(7, "sig: %s (%p) = %d\n", func_name, specialized, 1);
+    pips_debug(9, "sig: %s (%p) = %d\n", func_name, specialized, 1);
     hash_put(signatures, specialized, (void *) (_int) 1);
-    fprintf(stderr, "%p: %p -> %p\n", signatures, specialized,
-            hash_get(signatures, specialized));
     set_add_element(helpers, helpers, specialized);
 
     // cleanup
