@@ -753,7 +753,6 @@ class p4a_processor(object):
 								 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
 								 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
 								 concurrent=True)
-
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
         kernel_prefix = self.get_kernel_prefix ()
@@ -784,7 +783,9 @@ class p4a_processor(object):
         wrappers.clean_declarations()
         kernel_launchers.clean_declarations()
 
-
+        if hasattr(self, 'spear') and self.spear:
+            # No communication for Spear mode
+            pass
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
