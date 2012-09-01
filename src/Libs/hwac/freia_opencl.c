@@ -350,6 +350,8 @@ static int opencl_compile_mergeable_dag(
 
     bool is_a_reduction = api->arg_misc_out;
     bool is_a_kernel = api->opencl.mergeable_kernel;
+    bool is_a_convolution =
+      is_a_kernel && same_string_p(api->compact_name, "conv");
 
     // update for helper call arguments...
     // kernel operations are specialized, so there is no need to pass it.
@@ -530,6 +532,46 @@ static int opencl_compile_mergeable_dag(
                api->opencl.init, ": ",
                pixel_name(input, +4, loaded, opencl_load, dag_inputs(d)),
                ");\n");
+
+      if (is_a_convolution)
+      {
+        // compute norm depending on border...
+        sb_cat(opencl_body,
+               "    // compute norm\n"
+               "    " OPENCL_PIXEL "n", svn, ";\n");
+        // corner first
+        sb_cat(opencl_body,
+               "    if (", border_condition[1], ")\n"
+               "      if (", border_condition[3], ") n", svn,
+               " = ", itoa(k11+k12+k21+k22), ";\n"); // NW
+        sb_cat(opencl_body,
+               "      else if (", border_condition[5], ") n", svn,
+               " = ", itoa(k10+k11+k20+k21), ";\n"); // NE
+        sb_cat(opencl_body,
+               "      else n", svn,
+                 " = ", itoa(k10+k11+k12+k20+k21+k22), ";\n"); // N
+        sb_cat(opencl_body,
+               "    else if (", border_condition[7], ")\n"
+               "      if (", border_condition[3], ") n", svn,
+               " = ", itoa(k11+k12+k01+k02), ";\n"); // SW
+        sb_cat(opencl_body,
+               "      else if (", border_condition[5], ") n", svn,
+               " = ", itoa(k10+k11+k00+k01), ";\n"); // SE
+        sb_cat(opencl_body,
+               "      else n", svn,
+                 " = ", itoa(k00+k01+k02+k10+k11+k12), ";\n"); // S
+        sb_cat(opencl_body,
+               "    else if (", border_condition[3], ") n", svn,
+               " = ", itoa(k01+k11+k12+k02+k21+k22), ";\n"); // W
+        sb_cat(opencl_body,
+               "    else if (", border_condition[5], ") n", svn,
+               " = ", itoa(k00+k01+k10+k11+k20+k21), ";\n"); // E
+        sb_cat(opencl_body, "    else n", svn,
+               " = ", itoa(k00+k01+k02+k10+k11+k12+k20+k21+k22), ";\n"); // C
+        sb_cat(opencl_body, "    t", svn, " = "
+               "PIXEL_DIV(t", svn, ", n", svn, ");\n");
+      }
+
     }
     else //  we are compiling an arithmetic pixel operation
     {

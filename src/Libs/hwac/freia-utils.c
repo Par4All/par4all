@@ -330,6 +330,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
     { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" },
+    // missing at tail: / norm
     OPCLK("ADD", "ZERO")
   },
   // not implemented by SPOC! nor by TERAPIX!
