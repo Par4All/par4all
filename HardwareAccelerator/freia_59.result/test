@@ -1512,6 +1512,19 @@ static freia_status freia_59_opencl_helper_conv_511_compile(void)
     "    t29 = PIXEL_ADD(t29, (is_S|is_W)? PIXEL_ZERO: in0SW);\n"
     "    t29 = PIXEL_ADD(t29, (is_S)? PIXEL_ZERO: in0S);\n"
     "    t29 = PIXEL_ADD(t29, (is_S|is_E)? PIXEL_ZERO: in0SE);\n"
+    "    PIXEL n29;\n"
+    "    if (is_N)\n"
+    "      if (is_W) n29 = 4;\n"
+    "      else if (is_E) n29 = 4;\n"
+    "      else n29 = 6;\n"
+    "    else if (is_S)\n"
+    "      if (is_W) n29 = 4;\n"
+    "      else if (is_E) n29 = 4;\n"
+    "      else n29 = 6;\n"
+    "    else if (is_W) n29 = 6;\n"
+    "    else if (is_E) n29 = 6;\n"
+    "    else n29 = 9;\n"
+    "    t29 = PIXEL_DIV(t29, n29);\n"
     "    // set output pixels\n"
     "    p0[i] = t29;\n"
     "  }\n"
@@ -1713,6 +1726,19 @@ KERNEL void freia_59_opencl_helper_conv_511(
     t29 = PIXEL_ADD(t29, (is_S|is_W)? PIXEL_ZERO: in0SW);
     t29 = PIXEL_ADD(t29, (is_S)? PIXEL_ZERO: in0S);
     t29 = PIXEL_ADD(t29, (is_S|is_E)? PIXEL_ZERO: in0SE);
+    PIXEL n29;
+    if (is_N)
+      if (is_W) n29 = 4;
+      else if (is_E) n29 = 4;
+      else n29 = 6;
+    else if (is_S)
+      if (is_W) n29 = 4;
+      else if (is_E) n29 = 4;
+      else n29 = 6;
+    else if (is_W) n29 = 6;
+    else if (is_E) n29 = 6;
+    else n29 = 9;
+    t29 = PIXEL_DIV(t29, n29);
     // set output pixels
     p0[i] = t29;
   }

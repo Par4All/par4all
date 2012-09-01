@@ -5844,6 +5844,19 @@ static freia_status main_opencl_helper_conv_511_compile(void)
     "    t95 = PIXEL_ADD(t95, (is_S|is_W)? PIXEL_ZERO: in0SW);\n"
     "    t95 = PIXEL_ADD(t95, (is_S)? PIXEL_ZERO: in0S);\n"
     "    t95 = PIXEL_ADD(t95, (is_S|is_E)? PIXEL_ZERO: in0SE);\n"
+    "    PIXEL n95;\n"
+    "    if (is_N)\n"
+    "      if (is_W) n95 = 4;\n"
+    "      else if (is_E) n95 = 4;\n"
+    "      else n95 = 6;\n"
+    "    else if (is_S)\n"
+    "      if (is_W) n95 = 4;\n"
+    "      else if (is_E) n95 = 4;\n"
+    "      else n95 = 6;\n"
+    "    else if (is_W) n95 = 6;\n"
+    "    else if (is_E) n95 = 6;\n"
+    "    else n95 = 9;\n"
+    "    t95 = PIXEL_DIV(t95, n95);\n"
     "    // set output pixels\n"
     "    p0[i] = t95;\n"
     "  }\n"
@@ -6223,6 +6236,19 @@ KERNEL void main_opencl_helper_conv_511(
     t95 = PIXEL_ADD(t95, (is_S|is_W)? PIXEL_ZERO: in0SW);
     t95 = PIXEL_ADD(t95, (is_S)? PIXEL_ZERO: in0S);
     t95 = PIXEL_ADD(t95, (is_S|is_E)? PIXEL_ZERO: in0SE);
+    PIXEL n95;
+    if (is_N)
+      if (is_W) n95 = 4;
+      else if (is_E) n95 = 4;
+      else n95 = 6;
+    else if (is_S)
+      if (is_W) n95 = 4;
+      else if (is_E) n95 = 4;
+      else n95 = 6;
+    else if (is_W) n95 = 6;
+    else if (is_E) n95 = 6;
+    else n95 = 9;
+    t95 = PIXEL_DIV(t95, n95);
     // set output pixels
     p0[i] = t95;
   }
