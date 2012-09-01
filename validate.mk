@@ -17,12 +17,16 @@
 # - DO_PYPS: pyps must be available
 # - DO_F95: gfc2pips must be available
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
+# - OK: actions taken after validation, set to empty to keep err file
 #
 # example to do only later cases:
 #   sh> make DO_DEFAULT= DO_SLOW= DO_LATER=1 validate-test
 # special useful targets include:
 #   sh> make later-validate-test
 #   sh> make bug-validate-out
+# validate one test case:
+#   sh> make test-case.validate
+#
 
 # what special cases are included
 DO_BUG	=
