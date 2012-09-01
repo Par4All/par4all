@@ -907,7 +907,8 @@ static void opencl_merge_and_compile(
   // statement number of last non mergeable vertex
   int max_stnb = -1;
 
-  while (true)
+  bool keepon = true;
+  while (keepon)
   {
     pips_debug(3, "%s cut %d\n", split_name, n_cut);
 
@@ -986,7 +987,7 @@ static void opencl_merge_and_compile(
             set_add_element(mergeable, mergeable, v);
             again = true;
           }
-          else // reduction are NOT merged
+          else // reduction are NOT merged by choice
           {
             // try to put it with the preceeding non mergeable...
             if (gen_in_list_p(v, initials))
@@ -1009,12 +1010,6 @@ static void opencl_merge_and_compile(
       }
       gen_free_list(computables), computables = NIL;
     }
-
-    // cleanup list of remaining computables for nonmergeable
-    if (initials) gen_free_list(initials), initials = NIL;
-
-    // nothing in both lists, this is the end...
-    if (!lmergeable && !lnonmergeable) break;
 
     // restore vertices order
     lmergeable = gen_nreverse(lmergeable);
@@ -1066,6 +1061,9 @@ static void opencl_merge_and_compile(
       }
     }
 
+    // whether to try again later
+    keepon = lnonmergeable || lmergeable;
+
     pips_debug(4, "got %d non-mergeables and %d mergeable vertices\n",
                (int) gen_length(lnonmergeable), (int) gen_length(lmergeable));
 
@@ -1085,18 +1083,20 @@ static void opencl_merge_and_compile(
         {
           // detect constant-kernels in nonmergeable with a common input
           list okays = NIL;
+          bool some_real_stuff = false;
           FOREACH(dagvtx, s, dagvtx_succs(v))
           {
             if (set_belong_p(nonmergeable, s) &&
                 dagvtx_constant_kernel_p(s))
-              okays = CONS(dagvtx, s, okays);
+              okays = CONS(dagvtx, s, okays), some_real_stuff = true;
             else if (set_belong_p(mergeable, s) &&
-                     dagvtx_is_measurement_p(s))
+                     dagvtx_is_measurement_p(s) &&
+                     gen_in_list_p(s, initials))
               // try to backtrack reductions as well?
               okays = CONS(dagvtx, s, okays);
           }
 
-          if (gen_length(okays)>1) // yep, something to do!
+          if (some_real_stuff && gen_length(okays)>1) // yep, something to do!
           {
             pips_debug(5,
                        "merging %d common input const kernels & reductions\n",
@@ -1160,6 +1160,7 @@ static void opencl_merge_and_compile(
         dag_remove_vertex(d, v);
       freia_hack_fix_global_ins_outs(fulld, d);
 
+      // cleanup list of remaining computables for nonmergeable
       gen_free_list(lnonmergeable), lnonmergeable = NIL;
       set_clear(nonmergeable);
       set_free(merged);
@@ -1195,6 +1196,7 @@ static void opencl_merge_and_compile(
       n_cut++; // next cut
     }
 
+    gen_free_list(initials), initials = NIL;
     set_clear(mergeable);
   }
 
