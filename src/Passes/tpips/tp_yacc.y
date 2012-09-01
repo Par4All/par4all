@@ -100,6 +100,7 @@ extern bool tpips_execution_mode;
 #define YYERROR_VERBOSE 1 /* MUCH better error messages with bison */
 
 extern void tpips_set_line_to_parse(string);
+extern void tpips_lex_print_pos(FILE *);
 extern int yylex(void);
 extern void yyerror(const char *);
 
