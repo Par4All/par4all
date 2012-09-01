@@ -2307,7 +2307,30 @@ pt_map equal_condition_to_points_to(list al, pt_map in)
 	points_to_graph_bottom(out) = true;
       }
       else {
-	// It is possible to remove some arcs?
+	// It is possible to remove some arcs? if18.c
+	int nL = (int) gen_length(L);
+	int nR = (int) gen_length(R);
+	cell c = cell_undefined;
+	list O = list_undefined;
+	if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+	  c = CELL(CAR(L));
+	  O = expression_to_points_to_sources(rhs, out);
+	}
+	else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
+	  c = CELL(CAR(R));
+	  O = expression_to_points_to_sources(lhs, out);
+	}
+	if(!cell_undefined_p(c)) {
+	  if((int) gen_length(O)==1) {
+	    cell oc = CELL(CAR(O));
+	    out = points_to_cell_source_projection(out, oc);
+	    points_to pt = make_points_to(copy_cell(oc),
+					  copy_cell(c),
+					  make_approximation_exact(),
+					  make_descriptor_none());
+	    add_arc_to_pt_map(pt, out);
+	  }
+	}
 	;
       }
     }

@@ -425,8 +425,13 @@ bool atomic_points_to_reference_p(reference r)
 bool points_to_cells_intersect_p(cell lc, cell rc)
 {
   bool intersect_p = false;
-  if(cell_equal_p(lc, rc))
+  if(cell_equal_p(lc, rc)) {
+    // FI: too simple... All the subscript should be checked.
+    // unbounded expressions should be used to decide about a possible
+    // intersection... Unless this is guarded by
+    // atomic_points_to_reference_p(). To be investigated.
     intersect_p = true;
+  }
   else {
     // Look for abstract domains
     // Probably pretty complex...
