@@ -1,20 +1,4 @@
 
-PROPER  EFFECTS
-
-void sort01()
-{
-   int a[10];
-   int *p, *q;
-//             <    is read   >: p q
-   if (p==q)
-//             <    is written>: p
-      p = &a[4];
-   else
-//             <    is written>: p
-      p = &a[2];
-   return;
-}
-
 POINTS-TO
 
 
@@ -32,31 +16,31 @@ void sort01()
 
 // Points To: none
 
-   int *p, *q;
+   int *p = foo(), *q = foo();
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    if (p==q)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       p = &a[4];
    else
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       p = &a[2];
 
 // Points To:
 // p -> a[2] , MAY
 // p -> a[4] , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    return;
 }
