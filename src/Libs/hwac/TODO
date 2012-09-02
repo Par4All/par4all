@@ -138,7 +138,7 @@
 + merge two or more erode/dilate/convol on the same input?
 + merge reductions with same input kernel ops (anr999)?
 - generate some ILP: load before use?
-- borders: one int & masks?
+- borders: one int & masks? would also help convolution with an associated constant array?
 - above: should accept more reductions in mergeable? need fixing runtime
 + mergeable: separate by connected components?
 + that is the place to deal with the one reduction constraint
