@@ -2383,8 +2383,30 @@ pt_map non_equal_condition_to_points_to(list al, pt_map in)
 	}
       }
       else {
-	// It is possible to remove some arcs?
-	;
+	// It is possible to remove some arcs? if18.c
+	int nL = (int) gen_length(L);
+	int nR = (int) gen_length(R);
+	cell c = cell_undefined;
+	list O = list_undefined;
+	if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+	  c = CELL(CAR(L));
+	  O = expression_to_points_to_sources(rhs, out);
+	}
+	else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
+	  c = CELL(CAR(R));
+	  O = expression_to_points_to_sources(lhs, out);
+	}
+	if(!cell_undefined_p(c)) {
+	  if((int) gen_length(O)==1) {
+	    cell oc = CELL(CAR(O));
+	    points_to pt = make_points_to(copy_cell(oc),
+					  copy_cell(c),
+					  make_approximation_may(),
+					  make_descriptor_none());
+	    remove_arc_from_pt_map(pt, out);
+	    // Should we free pt? Or is it done by remove_arc_from_pt_map()?
+	  }
+	}
       }
     }
     free_type(lhst), free_type(rhst);
