@@ -146,7 +146,7 @@
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
-- merge: E+min (freia_24 ?)
++ merge: E+min (freia_24? no - kernel is unknown)
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation?
