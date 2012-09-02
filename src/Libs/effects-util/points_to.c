@@ -385,7 +385,11 @@ bool atomic_points_to_cell_p(cell c)
  *
  * Very preliminary version. One of the keys to Amira mensi's work.
  *
- * More about stubs...
+ * More about stubs: a stub is not NULL but there is no information to
+ * know if they represent one address or a set of addresses. Unless
+ * the intraprocedural points-to analysis is performed for each
+ * combination of atomic/non-atomic stub, safety implies that
+ * stub-based references are not atomic.
  *
  * Note: it is assumed that the reference is a points-to
  * reference. All subscripts are constants, field references or
@@ -402,11 +406,14 @@ bool atomic_points_to_reference_p(reference r)
      && !entity_anywhere_locations_p(v)
      && !entity_heap_location_p(v)) {
     list sl = reference_indices(r);
-    atomic_p = true;
-    FOREACH(EXPRESSION, se, sl) {
-      if(unbounded_expression_p(se)) {
-	atomic_p = false;
-	break;
+    entity v = reference_variable(r);
+    if(!entity_stub_sink_p(v)) {
+      atomic_p = true;
+      FOREACH(EXPRESSION, se, sl) {
+	if(unbounded_expression_p(se)) {
+	  atomic_p = false;
+	  break;
+	}
       }
     }
   }

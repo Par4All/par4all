@@ -2265,13 +2265,23 @@ pt_map null_non_equal_condition_to_points_to(expression e, pt_map in)
   return out;
 }
 
-/* The expression list "al" contains exactly two arguments. 
+/* The expression list "al" contains exactly two arguments, "lhs" and
+ * "rhs". Check if "lhs==rhs" may return true.
  *
  * If these expressions are pointers, "in" is modified by removing
  * arcs that are not compatible with the equality. If no arc is left, a
  * bottom "out" is returned.
  *
+ * If one of these two expressions cannot be evaluated according to
+ * the C standard, i.e. its value is undefined, a bottom graph is
+ * returned.
+ *
  * "out" is "in", modified by side-effects.
+ *
+ * This function has many commonalities with
+ * non_equal_condition_to_points_to(). They were developped
+ * independently to avoid mistakes when dealing with negations of
+ * quantifiers. They could now be unified.
  */
 pt_map equal_condition_to_points_to(list al, pt_map in)
 {
@@ -2289,49 +2299,73 @@ pt_map equal_condition_to_points_to(list al, pt_map in)
     type rhst = expression_to_type(rhs);
     if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
       list L = expression_to_points_to_sinks(lhs, in);
-      list R = expression_to_points_to_sinks(rhs, in);
-      bool equal_p = false;
-      FOREACH(CELL, cl, L) {
-	FOREACH(CELL, cr, R) {
-	  if(points_to_cells_intersect_p(cl, cr)) {
-	    equal_p = true;
-	    break;
-	  }
-	}
-	if(equal_p)
-	  break;
-      }
-      if(!equal_p) {
-	// lhs==rhs is impossible
+      int nL = (int) gen_length(L);
+      /* Is it impossible to evaluate lhs? 
+       *
+       * The check is too low. The message will be emitted twice
+       * because conditions are often evaluated as true and false.
+       */
+      if(nL==1 && nowhere_cell_p(CELL(CAR(L)))) {
 	clear_pt_map(out);
 	points_to_graph_bottom(out) = true;
+	pips_user_warning("Unitialized pointer is used to evaluate expression"
+			  " \"%s\"\n.", expression_to_string(lhs));
       }
       else {
-	// It is possible to remove some arcs? if18.c
-	int nL = (int) gen_length(L);
+	/* Is it impossible to evaluate rhs? */
+	list R = expression_to_points_to_sinks(rhs, in);
 	int nR = (int) gen_length(R);
-	cell c = cell_undefined;
-	list O = list_undefined;
-	if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
-	  c = CELL(CAR(L));
-	  O = expression_to_points_to_sources(rhs, out);
+	if(nR==1 && nowhere_cell_p(CELL(CAR(R)))) {
+	  clear_pt_map(out);
+	  points_to_graph_bottom(out) = true;
+	  pips_user_warning("Unitialized pointer is used to evaluate expression"
+			    " \"%s\".\n", expression_to_string(rhs));
 	}
-	else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
-	  c = CELL(CAR(R));
-	  O = expression_to_points_to_sources(lhs, out);
-	}
-	if(!cell_undefined_p(c)) {
-	  if((int) gen_length(O)==1) {
-	    cell oc = CELL(CAR(O));
-	    out = points_to_cell_source_projection(out, oc);
-	    points_to pt = make_points_to(copy_cell(oc),
-					  copy_cell(c),
-					  make_approximation_exact(),
-					  make_descriptor_none());
-	    add_arc_to_pt_map(pt, out);
+	else {
+	  /* Is the condition feasible? */
+	  bool equal_p = false;
+	  FOREACH(CELL, cl, L) {
+	    FOREACH(CELL, cr, R) {
+	      if(points_to_cells_intersect_p(cl, cr)) {
+		equal_p = true;
+		break;
+	      }
+	    }
+	    if(equal_p)
+	      break;
+	  }
+	  if(!equal_p) {
+	    // lhs==rhs is impossible
+	    clear_pt_map(out);
+	    points_to_graph_bottom(out) = true;
+	  }
+	  else {
+	    // It is possible to remove some arcs? if18.c
+	    int nL = (int) gen_length(L);
+	    int nR = (int) gen_length(R);
+	    cell c = cell_undefined;
+	    list O = list_undefined;
+	    if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+	      c = CELL(CAR(L));
+	      O = expression_to_points_to_sources(rhs, out);
+	    }
+	    else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
+	      c = CELL(CAR(R));
+	      O = expression_to_points_to_sources(lhs, out);
+	    }
+	    if(!cell_undefined_p(c)) {
+	      if((int) gen_length(O)==1) {
+		cell oc = CELL(CAR(O));
+		out = points_to_cell_source_projection(out, oc);
+		points_to pt = make_points_to(copy_cell(oc),
+					      copy_cell(c),
+					      make_approximation_exact(),
+					      make_descriptor_none());
+		add_arc_to_pt_map(pt, out);
+	      }
+	    }
 	  }
 	}
-	;
       }
     }
     free_type(lhst), free_type(rhst);
@@ -2367,19 +2401,30 @@ pt_map non_equal_condition_to_points_to(list al, pt_map in)
     if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
       list L = expression_to_points_to_sinks(lhs, in);
       list R = expression_to_points_to_sinks(rhs, in);
-      bool equal_p = false;
+      //bool equal_p = false;
       int nL = (int) gen_length(L);
       int nR = (int) gen_length(R);
       pips_assert("The two expressions can be dereferenced", nL>=1 && nR>=1);
       if(nL==1 && nR==1) {
 	cell cl = CELL(CAR(L));
 	cell cr = CELL(CAR(R));
-	if(atomic_points_to_cell_p(cl)
-	   && atomic_points_to_cell_p(cr)
-	   && points_to_cell_equal_p(cl, cr)) {
-	  // The condition is not feasible
+	/* Is the condition lhs!=rhs certainly impossible to evaluate?
+	 * If not, is it always false? */
+	if((atomic_points_to_cell_p(cl)
+	    && atomic_points_to_cell_p(cr)
+	    && points_to_cell_equal_p(cl, cr))
+	   || nowhere_cell_p(cl)
+	   || nowhere_cell_p(cr)) {
+	  // one or more expressions is not evaluable or the condition
+	  // is not feasible
 	  clear_pt_map(out);
 	  points_to_graph_bottom(out) = true;
+	  if(nowhere_cell_p(cl))
+	    pips_user_warning("Unitialized pointer is used to evaluate expression"
+			      " \"%s\".\n", expression_to_string(lhs));
+	  if(nowhere_cell_p(cr))
+	    pips_user_warning("Unitialized pointer is used to evaluate expression"
+			      " \"%s\".\n", expression_to_string(rhs));
 	}
       }
       else {
