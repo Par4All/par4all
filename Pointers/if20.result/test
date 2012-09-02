@@ -44,11 +44,11 @@ int main()
 // r -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
-   if (p==q)
+   if (p!=q)
 
 // Points To:
 // p -> i , EXACT
-// q -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , MAY
 // r -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       r = q;
@@ -56,7 +56,7 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// q -> i , EXACT
 // r -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       r = &i;
@@ -65,7 +65,8 @@ int main()
 // p -> i , EXACT
 // q -> *ANY_MODULE*:*NOWHERE* , MAY
 // q -> i , MAY
-// r -> i , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , MAY
+// r -> i , MAY
 
 
    return 0;

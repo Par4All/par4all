@@ -21,6 +21,12 @@ if08: impact of condition p!=q
 
 if09: impact of condition *p: it implies that p cannot be NULL
 
+if18: arc removal by p==q
+
+if19: detection of undefined pointers
+
+if20: arc removal by p!=q
+
 if002: join of the false and true branches
 
 inter04, 05, 06  and 07:
