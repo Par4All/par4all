@@ -147,7 +147,6 @@
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
 - merge: E+min (freia_24 ?)
-- BUG: min/max position in deblocking (introduced earlier)
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation?
