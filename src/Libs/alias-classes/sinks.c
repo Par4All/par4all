@@ -326,7 +326,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	      pips_user_warning("Some kind of execution error has been encountered.\n");
 	      clear_pt_map(in);
 	      points_to_graph_bottom(in) = true;
-  }
+	    }
 	  }
 	  else {
 	    FOREACH(CELL, ec, dL) {

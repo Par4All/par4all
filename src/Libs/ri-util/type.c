@@ -520,6 +520,13 @@ type make_scalar_complex_type(_int n)
     return t;
 }
 
+type make_scalar_overloaded_type()
+{
+    type t = make_type(is_type_variable,
+		       make_variable(make_basic_overloaded(), NIL,NIL));
+    return t;
+}
+
 bool area_equal_p(area a1, area a2)
 {
     if(a1 == a2)

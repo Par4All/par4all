@@ -159,9 +159,16 @@ entity create_stub_entity(entity e, string fs, type t)
  
   // If entity "stub" does not already exist, create it.
   if(entity_undefined_p(stub)) { // FI: the stubs could be allocated in the still non-existing FORMAL_AREA
-    entity DummyTarget = FindOrCreateEntity(POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME,
-					    POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME);
-    entity_kind(DummyTarget) = ENTITY_POINTER_DUMMY_TARGETS_AREA;
+    entity DummyTarget = FindOrCreateEntity(get_current_module_name(),
+					    FORMAL_AREA_LOCAL_NAME);
+    if(type_undefined_p(entity_type(DummyTarget))) {
+      entity_type(DummyTarget) = make_type(is_type_area, make_area(0, NIL));
+      entity_storage(DummyTarget) = make_storage(is_storage_rom, UU);
+      entity_initial(DummyTarget) = make_value(is_value_unknown, UU);
+      // FI: DO we want to declare it abstract location?
+      entity_kind(DummyTarget) = ABSTRACT_LOCATION | ENTITY_FORMAL_AREA;
+      //entity_kind(DummyTarget) = ENTITY_FORMAL_AREA;
+    }
     stub = make_entity(formal_name,
 		       copy_type(t),
 		       make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),

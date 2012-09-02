@@ -743,19 +743,34 @@ points_to create_k_limited_stub_points_to(cell source, type t, bool array_p, pt_
 {
   int k = get_int_property("POINTS_TO_PATH_LIMIT");
   pips_assert("k is greater than one", k>=1);
+  int odl = get_int_property("POINTS_TO_OUT_DEGREE_LIMIT");
+  pips_assert("k is greater than one", k>=1);
   points_to pt = points_to_undefined;
-  list p = CONS(CELL, source, NIL); // points-to path...
 
-  // FI: not to sure about he possible memory leaks...
-  pt = points_to_path_to_k_limited_points_to_path(p, k, t, array_p, in);
+  // FI: the vertex with an excessive out-degree does not have to be
+  // source and is not source in list05 case... The test below is useless
 
-  /* No cycle could be created, the paths can safely be made longer. */
-  if(points_to_undefined_p(pt))
-    // exact or not?
-    pt = create_stub_points_to(source, t, true);
+  // We should check the out-degree of each source in "in" and see if
+  // any is beyond limit.
 
-  gen_free_list(p);
+  list sink_l = points_to_source_to_sinks(source, in, false);
+  int od = (int) gen_length(sink_l);
+  if(od>=odl) {
+    pt = fuse_points_to_sink_cells(source, sink_l, in);
+  }
+  else {
+    list p = CONS(CELL, source, NIL); // points-to path...
 
+    // FI: not to sure about he possible memory leaks...
+    pt = points_to_path_to_k_limited_points_to_path(p, k, t, array_p, in);
+
+    /* No cycle could be created, the paths can safely be made longer. */
+    if(points_to_undefined_p(pt))
+      // exact or not?
+      pt = create_stub_points_to(source, t, true);
+
+    gen_free_list(p);
+  }
   return pt;
 }
 
@@ -1107,7 +1122,12 @@ list global_source_to_sinks(cell source, pt_map pts)
 
 /* Build the sinks of source "source" according to the points-to
  * graphs. If "source" is not found in the graph, return an empty list
- * "sinks".
+ * "sinks". If "fresh_p", allocate copies. If not, return pointers to
+ * the destination vertices in "ptm".
+ *
+ * It is not clear how much the abstract address lattice must be used
+ * to retrieve sinks... If source = a[34], clearly a[*] is an OK
+ * equivalent source if a[34] is not a vertex of "ptm".
  */
 list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
 {
@@ -1143,6 +1163,47 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
   }
 
   return sinks;
+}
+
+/* Build the union of the sinks of cells in "sources" according to the
+ * points-to graphs "ptm". Allocate new cells if "fresh_p". No
+ * specific order in the returned list.
+ */
+list points_to_sources_to_sinks(list sources, pt_map ptm, bool fresh_p)
+{
+  list sinks = NIL;
+  FOREACH(CELL, source, sources) {
+    list subl = points_to_source_to_sinks(source, ptm, fresh_p);
+    sinks = gen_nconc(sinks, subl); // to ease debugging... Could be CONS
+  }
+
+  return sinks;
+}
+
+/* Build the list of arcs whose source is "source" according to the points-to
+ * graphs "ptm". If "source" is not found in the graph, return an empty list
+ * "sinks". If "fresh_p", allocate copies. If not, return pointers to
+ * the arcs in "ptm".
+ *
+ * It is not clear how much the abstract address lattice must be used
+ * to retrieve sinks... If source = a[34], clearly a[*] is an OK
+ * equivalent source if a[34] is not a vertex of "ptm". Currently, we
+ * assume that the origin vertex must be exactly "source".
+ */
+list points_to_source_to_arcs(cell source, pt_map ptm, bool fresh_p)
+{
+  list arcs = NIL;
+  set pts = points_to_graph_set(ptm);
+
+  /* See when the cell "source" is the starting vertex of a points-to arc. */
+  SET_FOREACH( points_to, pt, pts) {
+    if(cell_equal_p(source, points_to_source(pt))) {
+      points_to pta = fresh_p? copy_points_to(pt) : pt;
+      arcs = CONS(POINTS_TO, pta, arcs);
+    }
+  }
+
+  return arcs;
 }
 
 
@@ -1799,4 +1860,62 @@ pt_map points_to_graph_assign(pt_map out, pt_map in)
   points_to_graph_set(out) = set_assign(points_to_graph_set(out),
 					points_to_graph_set(in));
   return out;
+}
+
+/* All vertices in "sink_l" are assumed to be sinks of vertex "source"
+ * in points-to graph "in".
+ *
+ * These vertices must be replaced by a unique vertex, their minimum
+ * upper bound in the abstract address lattice. And their own
+ * out-going arcs must also be rearranged.
+ *
+ * Clearly, some abstract addresses high in the lattice should be
+ * allowed large out-degree numbers.
+ *
+ * A newly allocated points-to arc is returned. It could be integrated
+ * directly in "in", but the integration is performed by a caller.
+ */
+points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
+{
+  pt_map out = in;
+
+  pips_assert("\"in\" is consistent", consistent_pt_map_p(in));
+
+  /* Find the minimal upper bound */
+  cell mupc = points_to_cells_minimal_upper_bound(sink_l);
+
+  /* Compute the sinks of the vertex "mup" as the union of the sinks
+   * of cells in "sink_l" and add the corresponding arcs to "out".
+   */
+  list iptl = points_to_sources_to_sinks(sink_l, in, true); // indirect points-to
+  FOREACH(CELL, sink, iptl) {
+    cell mupcc = copy_cell(mupc);
+    points_to pta = make_points_to(mupcc, sink,
+				  make_approximation_may(),
+				  make_descriptor_none());
+    add_arc_to_pt_map(pta, in);
+  }
+  gen_free_list(iptl);
+
+  /* Find the incoming arcs on cells of sink_l. replaces them by arcs
+     towards copies of mupc. */
+  pips_internal_error("not implemented yet.\n");
+
+  /* Find the set of points-to arcs to destroy and remove them from
+   * the points-to graph "in".
+   */
+  list ptal = points_to_source_to_arcs(source, in, false);
+  FOREACH(POINTS_TO, pta, ptal)
+    remove_arc_from_pt_map(pta, in);
+  gen_free_list(ptal);
+
+  /* Create an arc from "source" to "mupc" */
+  points_to pta = make_points_to(source, mupc,
+				 make_approximation_may(),
+				 make_descriptor_none());
+  // add_arc_to_pt_map(pta, in); Might be done by the calller?
+
+  pips_assert("\"out\" is consistent", consistent_pt_map_p(out));
+
+  return pta;
 }

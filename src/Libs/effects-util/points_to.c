@@ -444,10 +444,51 @@ bool points_to_cells_intersect_p(cell lc, cell rc)
     // Probably pretty complex...
     // Simple first version...
     reference lr = cell_any_reference(lc);
-    entity le = cell_any_reference(lr);
+    entity le = reference_variable(lr);
     reference rr = cell_any_reference(rc);
-    entity re = cell_any_reference(rr);
+    entity re = reference_variable(rr);
     intersect_p = entities_may_conflict_p(le, re);
   }
   return intersect_p;
+}
+
+/* Allocate a cell that is the minimal upper bound of the cells in
+ * list "cl" according to the points-to cell lattice...
+ *
+ * An over-approximation is always safe. So, an anywhere cell, typed
+ * or not, can be returned in a first drat implementation.
+ *
+ * The points-to cell lattice is the product of three lattices, the
+ * module lattice, the type lattice and the abstracct reference
+ * lattice...
+ */
+cell points_to_cells_minimal_upper_bound(list cl __attribute__ ((unused)))
+{
+#if 0
+  entity m = points_to_cells_minimal_module_upper_bound(cl);
+  type t = points_to_cells_minimal_type_upper_bound(cl);
+  reference r = points_to_cells_minimal_reference_upper_bound(m, t, cl);
+  cell c = make_cell_reference(r);
+#endif
+  type t = make_scalar_overloaded_type();
+  cell c = make_anywhere_points_to_cell(t);
+  return c;
+}
+
+entity points_to_cells_minimal_module_upper_bound(list cl __attribute__ ((unused)))
+{
+  entity m = entity_undefined;
+  return m;
+}
+
+entity points_to_cells_minimal_type_upper_bound(list cl __attribute__ ((unused)))
+{
+  type t = type_undefined;
+  return t;
+}
+
+entity points_to_cells_minimal_reference_upper_bound(entity m __attribute__ ((unused)), type t __attribute__ ((unused)), list cl __attribute__ ((unused)))
+{
+  reference r = reference_undefined;
+  return r;
 }

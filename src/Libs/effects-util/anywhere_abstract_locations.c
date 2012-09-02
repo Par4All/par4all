@@ -558,8 +558,10 @@ bool entity_stub_sink_p(entity e)
   bool dummy_target_p = false;
   const char * en = entity_local_name(e);
   storage s = entity_storage(e);
-  if(storage_ram_p(s))
-    dummy_target_p = pointer_dummy_targets_area_p(ram_section(storage_ram(s)));
+  if(storage_ram_p(s)) {
+    // dummy_target_p = pointer_dummy_targets_area_p(ram_section(storage_ram(s)));
+    dummy_target_p = formal_area_p(ram_section(storage_ram(s)));
+  }
   char first = en[0];
   char penultimate = en[strlen(en) - 2];
   if(dummy_target_p && first == '_' && penultimate == '_')
@@ -579,6 +581,7 @@ bool entity_abstract_location_p(entity al)
                 ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
                 ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
                 ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, FORMAL_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
                 ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
                 )
             ;
@@ -626,9 +629,7 @@ entity variable_to_abstract_location(entity v)
       else
 	al = entity_all_locations();
 
-
-
-    else { // must be a standard variable
+    else { // must be a standard variable, or a stub
       storage s = entity_storage(v);
       ram r = storage_ram(s);
       entity f = ram_function(r);
@@ -645,8 +646,10 @@ entity variable_to_abstract_location(entity v)
 	ln = STACK_AREA_LOCAL_NAME;
       else if(heap_area_p(a))
 	ln = HEAP_AREA_LOCAL_NAME;
+      else if(formal_area_p(a))
+	ln = FORMAL_AREA_LOCAL_NAME;
       else
-	pips_internal_error("unexpected area");
+	pips_internal_error("Unexpected area\n");
 
       if(typed_p) {
 	const char* fn = entity_local_name(f);
