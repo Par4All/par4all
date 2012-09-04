@@ -73,39 +73,33 @@ Ppolynome new_polynome()
     return pp;
 }
 
-/* Pmonome make_monome(float coeff, Variable var, Value exp)
+/* Pmonome make_monome(float coeff, Variable var, Value expo)
  *  PRIVATE
- *  allocates space for, and creates, the monome "coeff*var^exp" 
+ *  allocates space for, and creates, the monome "coeff*var^expo" 
  */
-Pmonome make_monome(coeff, var, exp)
-float coeff;
-Variable var;
-Value exp;
+Pmonome make_monome(float coeff, Variable var, Value expo)
 {
     if (coeff == 0)
 	return (MONOME_NUL);
     else {
 	Pmonome pm = new_monome();
 	monome_coeff(pm) = coeff;
-	if (value_zero_p(exp))
+	if (value_zero_p(expo))
 	    monome_term(pm) = vect_new(TCST, VALUE_ONE);
 	else
-	    monome_term(pm) = vect_new(var, exp);
+	    monome_term(pm) = vect_new(var, expo);
 
 	return(pm);
     }
 }
 
-/* Ppolynome make_polynome(float coeff, Variable var, Value exp)
+/* Ppolynome make_polynome(float coeff, Variable var, Value expo)
  *  PRIVATE
- *  allocates space for, and creates, the polynome "coeff*var^exp"
+ *  allocates space for, and creates, the polynome "coeff*var^expo"
  */
-Ppolynome make_polynome(coeff, var, exp)
-float coeff;
-Variable var;
-Value exp;
+Ppolynome make_polynome(float coeff, Variable var, Value expo)
 {
-    Pmonome m = make_monome(coeff, var, exp);
+    Pmonome m = make_monome(coeff, var, expo);
     Ppolynome p = monome_to_new_polynome(m);
     return p;
 }

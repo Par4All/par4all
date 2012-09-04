@@ -92,6 +92,8 @@ bool FM_timeout = false;
 bool J_timeout = false;
 bool S_timeout = false;
 
+extern char *default_variable_to_string(Variable);
+
 /* 
  * INTERFACES
  */
