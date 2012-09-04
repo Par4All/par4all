@@ -56,7 +56,7 @@ parallelizer that is based on the \Apips source-to-source language
 transformation workbench. But we think that these coding rules can be
 useful with other tools as interesting guidelines too.
 
-This document gives advices to write programs that are compliant with the
+This document gives advice to write programs that are compliant with the
 current state of \Apips and that maximize the precision of analyses and
 thus help the tool in generating efficient code. As a preliminary clue,
 and not surprisingly, let us say that the more structured a program is,
@@ -107,7 +107,7 @@ void * my_malloc(size_t size, int err_code,
   void * res = malloc(size);
   if (res == NULL) {
     // This IO is an issue since it prevent parallelization:
-    fprinf(stderr, err_mess);
+    fputs(err_mess, stderr);
     /* This exit is transformed as an unstructured control graph, reducing
        parallelization opportunities... */
     exit(err_code);
@@ -448,7 +448,7 @@ Lising~\ref{fig:bad_flip_flop}.
 \label{sec:fortran-language}
 
 
-\section{Directives (OpenMP...)}
+\section{Directives and pragma (OpenMP...)}
 \label{sec:directives}
 
 
@@ -493,18 +493,9 @@ modernization, independently of \Apips or \Apfa.
 
 \end{document}
 
-do loops => simple for, without complex expressions -> done (BC, 2012-05-02)
-
 Keep the algorithmic attitude non offuscated contest
 
-
-#pragma
-
-No union -> added (BC, 2012-05-02)
-
 comments
-
-cast -> section added (BC, 2012-05-02)
 
 compléter linearization
 
@@ -520,16 +511,12 @@ Commentaires de François :
 * pas d'appels recursifs (c'est actuellement detecte a posteriori par
 pipsmake)
 
-* pas d'arithmetique sur pointeurs -> updated (BC, 2012-05-02)
-
 * pas d'affectation multiples a un pointeur (ca doit faire sauter les
 codes exploitant des structures de donnees recursives) (BC: already
 done in the pointer subsection); pour Ter@ops: assignation dynamique
 unique a chaque execution de la fonction
 
 * pas de tableaux de pointeurs
-
-* pas de pointeurs sur des fonctions -> added (BC, 2012-05-02)
 
 * verification des intrinsics utilises: je ne sais comment traiter ce
 probleme
