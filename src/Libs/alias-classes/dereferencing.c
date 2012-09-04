@@ -278,7 +278,9 @@ bool expression_to_points_to_cell_p(expression e)
 list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
 {
   list sinks = NIL;
-  /* Locate the pointer, no dereferencing yet */
+  /* Locate the pointer, no dereferencing yet... unless no pointer can
+     be found as in *(p+2) in which case an evaluation occurs in
+     expression_to_points_to_sources(). */
   list cl = expression_to_points_to_sources(a, in);
   // The pointer may not be found: *(p+i)
   // list cl = expression_to_points_to_sinks(a, in);

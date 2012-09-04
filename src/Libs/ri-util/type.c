@@ -5215,8 +5215,24 @@ bool type_void_star_p(type t)
 bool char_star_type_p(type t)
 {
   bool char_star_p = false;
-  if(pointer_type_p(t))
-    char_star_p = char_type_p(type_to_pointed_type(t));
+  if(pointer_type_p(t)) {
+    type pt = type_to_pointed_type(t);
+    char_star_p = char_type_p(pt);
+  }
+  return char_star_p;
+}
+
+/* Beware of typedefs. Beware of string_type_p()...  Strictly
+ * speaking, string_type_p() should not be taken into acount.
+ */
+bool char_star_constant_function_type_p(type t)
+{
+  bool char_star_p = false;
+  if(type_functional_p(t)) {
+    functional f = type_functional(t);
+    type rt = functional_result(f);
+    char_star_p = char_star_type_p(rt) || string_type_p(rt);
+  }
   return char_star_p;
 }
 

@@ -1130,6 +1130,18 @@ expression make_zero_expression(void)
   return int_to_expression(0);
 }
 
+bool zero_expression_p(expression e)
+{
+  bool zero_p = false;
+  if(expression_call_p(e)) {
+    call c = expression_call(e);
+    entity f = call_function(c);
+    if(f==int_to_entity(0))
+      zero_p = true;
+  }
+  return zero_p;
+}
+
 expression float_to_expression(float c)
 {
     entity e = float_to_entity(c);

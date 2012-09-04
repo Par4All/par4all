@@ -50,7 +50,12 @@ not detected.
 
 19. Improve heap model. Add an extra first dimension to model the different intraprocedural dynamic occurences of a malloc?
 
-Next item will be 20.
+20. Pre-decrement and pre-increment are likely to be evaluated
+twice. See the post case in
+unary_intrinsic_call_to_points_to_sinks(). No test case yet I'm
+afraid.
+
+Next item will be 21.
 
 Done:
 

@@ -487,6 +487,25 @@ type points_to_reference_to_type(reference ref, bool *to_be_freed)
   return t;
 }
 
+static void substitute_unbounded_call(call c)
+{
+  entity f = call_function(c);
+  const char* fn = entity_local_name(f);
+  if (same_string_p(fn, UNBOUNDED_DIMENSION_NAME)) {
+    entity z = int_to_entity(0);
+    call_function(c) = z;
+  }
+}
+
+/* Allocate a copy of expression "e" where calls to the unbounded
+ * function are replaced by calls to the zero function so that typing
+ * can be performed.
+ */
+static expression eliminate_calls_to_unbounded(expression e)
+{
+  gen_recurse(e, call_domain, gen_true, substitute_unbounded_call);
+}
+
 /* FI: I need more generality than is offered by expression_to_type()
    because fields are assimilated to subscripts. */
 type points_to_expression_to_type(expression e, bool * to_be_freed)
@@ -498,8 +517,12 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
     t = points_to_reference_to_type(r, to_be_freed);
   }
   else {
+    /* In order to type t[*] as well as t[0]... */
+    expression ne = copy_expression(e);
+    eliminate_calls_to_unbounded(ne);
     *to_be_freed = true;
-    t = expression_to_type(e);
+    t = expression_to_type(ne);
+    free_expression(ne);
   }
 
   return t;

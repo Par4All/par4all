@@ -136,7 +136,45 @@ _uint points_to_rank( const void *  vpt, size_t size)
 				  s2,
 				  s,
 				  NULL));
-  return hash_string_rank(key,size);
+  _uint rank = hash_string_rank(key,size); 
+  free(key);
+  return rank;
+}
+
+/* create a string which is a concatenation of the source's name, the
+ * sink's name and the approximation of their relation(may or exact).
+ *
+ * The same string is used by the function points_to_rank()
+ */
+string points_to_name(const points_to pt)
+{
+  cell source = points_to_source(pt);
+  cell sink = points_to_sink(pt);
+  approximation rel = points_to_approximation(pt);
+  tag rel_tag = approximation_tag(rel);
+  string s = strdup(i2a(rel_tag));
+  reference sro = cell_to_reference(source);
+  reference sri = cell_to_reference(sink);
+  string s1 = strdup(words_to_string(words_reference(sro, NIL)));
+  string s2 = strdup(words_to_string(words_reference(sri, NIL)));
+  string key = strdup(concatenate(s1,
+				  " ",
+				  s2,
+				  s,
+				  NULL));
+  return key;
+}
+
+/* Create a string which is the cell reference in C syntax.
+ *
+ * A new string is allocated.
+ */
+string points_to_cell_name(cell source)
+{
+  reference sro = cell_to_reference(source);
+  string key = strdup(words_to_string(words_reference(sro, NIL)));
+
+  return key;
 }
 
 /* Remove from "pts" arcs based on at least one local entity in list
@@ -714,7 +752,7 @@ points_to points_to_path_to_k_limited_points_to_path(list p,
   }
   return pt;
 }
-
+
 
 /* Create a new node "sink" of type "t" and a new arc "pt" starting
  * from node "source", if no path starting from any node and ending in
@@ -743,8 +781,6 @@ points_to create_k_limited_stub_points_to(cell source, type t, bool array_p, pt_
 {
   int k = get_int_property("POINTS_TO_PATH_LIMIT");
   pips_assert("k is greater than one", k>=1);
-  int odl = get_int_property("POINTS_TO_OUT_DEGREE_LIMIT");
-  pips_assert("k is greater than one", k>=1);
   points_to pt = points_to_undefined;
 
   // FI: the vertex with an excessive out-degree does not have to be
@@ -753,10 +789,17 @@ points_to create_k_limited_stub_points_to(cell source, type t, bool array_p, pt_
   // We should check the out-degree of each source in "in" and see if
   // any is beyond limit.
 
-  list sink_l = points_to_source_to_sinks(source, in, false);
-  int od = (int) gen_length(sink_l);
-  if(od>=odl) {
-    pt = fuse_points_to_sink_cells(source, sink_l, in);
+  //list sink_l = points_to_source_to_sinks(source, in, false);
+  //int od = (int) gen_length(sink_l);
+  //string mod_cell_name = string_undefined; // maximum out-degree cell
+  //int od = maximal_out_degree_of_points_to_graph(&mod_cell_name, in);
+  // list sink_l = points_to_source_to_sinks(mod_cell_name, in, false);
+  //list sink_l = points_to_source_name_to_sinks(mod_cell_name, in, false);
+  if(false /*&& od>=odl*/ ) {
+    // FI: not too sure about argument "true"
+    //cell mod_cell = points_to_source_name_to_source_cell(mod_cell_name, in, true);
+    //pt = fuse_points_to_sink_cells(mod_cell, sink_l, in);
+    ;
   }
   else {
     list p = CONS(CELL, source, NIL); // points-to path...
@@ -1163,6 +1206,47 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
   }
 
   return sinks;
+}
+
+/* Use "sn" as a source name to derive a list of sink cells according
+ * to the points-to graph ptm.
+ *
+ * Allocate copies of the sink cells if "fresh_p".
+ */
+list points_to_source_name_to_sinks(string sn, pt_map ptm, bool fresh_p)
+{
+  list sinks = NIL;
+  set pts = points_to_graph_set(ptm);
+
+  SET_FOREACH( points_to, pt, pts) {
+    cell c = points_to_source(pt);
+    string cn = points_to_cell_name(c);
+    if(strcmp(sn, cn)==0) {
+      cell sc = fresh_p? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+      sinks = CONS(CELL, sc, sinks);
+    }
+    free(cn);
+  }
+
+  return sinks;
+}
+
+cell points_to_source_name_to_source_cell(string sn, pt_map ptm, bool fresh_p)
+{
+  cell rc = cell_undefined;
+  set pts = points_to_graph_set(ptm);
+
+  SET_FOREACH(points_to, pt, pts) {
+    cell c = points_to_source(pt);
+    string cn = points_to_cell_name(c);
+    if(strcmp(sn, cn)==0) {
+      rc = fresh_p? copy_cell(c) : c;
+      break;
+    }
+    free(cn);
+  }
+
+  return rc;
 }
 
 /* Build the union of the sinks of cells in "sources" according to the
@@ -1881,10 +1965,10 @@ points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
 
   pips_assert("\"in\" is consistent", consistent_pt_map_p(in));
 
-  /* Find the minimal upper bound */
+  /* Find the minimal upper bound of "sink_l" */
   cell mupc = points_to_cells_minimal_upper_bound(sink_l);
 
-  /* Compute the sinks of the vertex "mup" as the union of the sinks
+  /* Compute the sinks of the vertex "mupc" as the union of the sinks
    * of cells in "sink_l" and add the corresponding arcs to "out".
    */
   list iptl = points_to_sources_to_sinks(sink_l, in, true); // indirect points-to
@@ -1897,16 +1981,36 @@ points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
   }
   gen_free_list(iptl);
 
-  /* Find the incoming arcs on cells of sink_l. replaces them by arcs
+  /* Find the incoming arcs on cells of "sink_l" and replace them by arcs
      towards copies of mupc. */
-  pips_internal_error("not implemented yet.\n");
+  FOREACH(CELL, sink, sink_l) {
+    if(!null_cell_p(sink) && !nowhere_cell_p(sink)) {
+      /* Finds it sources */
+      SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	cell oc = points_to_source(pt);
+	cell dc = points_to_sink(pt);
+	if(points_to_cell_equal_p(dc, sink)) {
+	  points_to npt = make_points_to(copy_cell(oc), copy_cell(mupc),
+					 make_approximation_may(),
+					 make_descriptor_none());
+	  add_arc_to_pt_map(npt, in);
+	  remove_arc_from_pt_map(pt, in);
+	}
+      }
+    }
+  }
+  // pips_internal_error("not implemented yet.\n");
 
   /* Find the set of points-to arcs to destroy and remove them from
    * the points-to graph "in".
    */
   list ptal = points_to_source_to_arcs(source, in, false);
-  FOREACH(POINTS_TO, pta, ptal)
-    remove_arc_from_pt_map(pta, in);
+  FOREACH(POINTS_TO, pta, ptal) {
+    cell sink = points_to_sink(pta);
+    if(!null_cell_p(sink) && !nowhere_cell_p(sink))
+      if(!points_to_cell_equal_p(sink, mupc))
+	remove_arc_from_pt_map(pta, in);
+  }
   gen_free_list(ptal);
 
   /* Create an arc from "source" to "mupc" */
@@ -1918,4 +2022,81 @@ points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
   pips_assert("\"out\" is consistent", consistent_pt_map_p(out));
 
   return pta;
+}
+
+/* returns the cell vertex "mod_cell" with the maximal out_degree in
+ * graph "in", and its out-degree.
+ *
+ * When several cells have the same maximal out-degree, return any of
+ * them.
+ */
+int maximal_out_degree_of_points_to_graph(string * mod_cell, pt_map in)
+{
+  hash_table cell_out_degree = hash_table_make(hash_string, 0);
+
+  SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+    cell source = points_to_source(pt);
+    string name = points_to_cell_name(source);
+    long long int i =
+      (long long int) hash_get(cell_out_degree, (void *) name);
+    if(i== (long long int) HASH_UNDEFINED_VALUE) {
+      i = 1;
+      hash_put(cell_out_degree, (void *) name, (void *) i);
+    }
+    else {
+      i++;
+      hash_update(cell_out_degree, (void *) name, (void *) i);
+    }
+  }
+
+  long long int m = 0;
+  HASH_MAP(k, v, {
+      if((long long int) v > m) {
+	m = (long long int) v;
+	*mod_cell = strdup((string) k);
+      }
+    }, cell_out_degree);
+  hash_table_free(cell_out_degree);
+  return (int) m;
+}
+
+/* For the time being, control the out-degree
+ *
+ */
+pt_map normalize_points_to_graph(pt_map ptg)
+{
+  int odl = get_int_property("POINTS_TO_OUT_DEGREE_LIMIT");
+  int sl = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+
+  /* The out-degree limit must take the subscript limit sl into
+     account as well as possible NULL and NOWHERE values (+2). The
+     unbounded susbcript must also be added because it does not
+     necessarily subsume all integer subscripts (+1). The subscript
+     limit will kick in anyway later. Subscripts are limited to the
+     range [-sl,sl], which contains 2*sl+1 values. */
+  if(odl<2*sl+1+2) odl = 2*sl+1+2+1;
+
+  pips_assert("odl is greater than one", odl>=1);
+  string mod_cell_name = string_undefined; // maximum out-degree cell
+  int od = maximal_out_degree_of_points_to_graph(&mod_cell_name, ptg);
+  if(od>odl) {
+    ifdebug(1) {
+      pips_debug(1, "Normalization takes place for graph \"ptg\" with \"od\"=%d and \"odl\"=%d:\n", od, odl);
+      print_points_to_set("Loop points-to set ptg:\n",
+			      points_to_graph_set(ptg));
+    }
+    // FI: not too sure about argument "true"
+    cell mod_cell = points_to_source_name_to_source_cell(mod_cell_name, ptg, true);
+    if(cell_undefined_p(mod_cell))
+      pips_internal_error("Inconsistent result for ptg.\n");
+    list sink_l = points_to_source_name_to_sinks(mod_cell_name, ptg, false);
+    points_to pt = fuse_points_to_sink_cells(mod_cell, sink_l, ptg);
+    add_arc_to_pt_map(pt, ptg);
+    ifdebug(1) {
+      pips_debug(1, "After normalization, \"ptg\":\n");
+      print_points_to_set("Loop points-to set ptg:\n",
+			      points_to_graph_set(ptg));
+    }
+  }
+  return ptg;
 }

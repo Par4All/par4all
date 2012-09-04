@@ -239,7 +239,15 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   }
   else if(ENTITY_ADDRESS_OF_P(f)) {
     // sinks = expression_to_constant_paths(statement_undefined, a, in);
-    sinks = expression_to_points_to_sources(a, in);
+    if(eval_p) {
+      sinks = expression_to_points_to_sources(a, in);
+    }
+    else {
+      // It is not possible in general to associate a reference to &e
+      // However, we might think of transforming &a[i][j] into a[i]
+      // and &a[0] into a...
+      sinks=NIL;
+    }
    }
   else if(ENTITY_DEREFERENCING_P(f)) {
     // FI: I do not understand why eval_p is only used for dereferencing...
@@ -252,17 +260,22 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
   }
   else if(ENTITY_PRE_INCREMENT_P(f)) {
-    sinks = expression_to_points_to_sinks(a, in);
-    // FI: this has already been done when the side effects are exploited
-    //expression one = int_to_expression(1);
-    //offset_cells(sinks, one);
-    //free_expression(one);
+    if(eval_p) {
+      sinks = expression_to_points_to_sinks(a, in);
+      // FI: this has already been done when the side effects are exploited
+      //expression one = int_to_expression(1);
+      //offset_cells(sinks, one);
+      //free_expression(one);
+    }
    }
   else if(ENTITY_PRE_DECREMENT_P(f)) {
-    sinks = expression_to_points_to_sinks(a, in);
-    //expression m_one = int_to_expression(-1);
-    //offset_cells(sinks, m_one);
-    //free_expression(m_one);
+    if(eval_p) 
+{
+      sinks = expression_to_points_to_sinks(a, in);
+      //expression m_one = int_to_expression(-1);
+      //offset_cells(sinks, m_one);
+      //free_expression(m_one);
+    }
    }
   else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)) {
     //sinks = expression_to_constant_paths(statement_undefined, a, in);
@@ -270,15 +283,17 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     //list sources = expression_to_points_to_sinks(a, in);
     //if(gen_length(sources)==1) {
     //cell source = CELL(CAR(sources));
-    sinks = expression_to_points_to_sinks(a, in);
-    /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
-    expression delta = expression_undefined;
-    if(ENTITY_POST_INCREMENT_P(f))
-      delta = int_to_expression(-1);
-    else
-      delta = int_to_expression(1);
-    offset_points_to_cells(sinks, delta);
-    free_expression(delta);
+    if(eval_p) {
+      sinks = expression_to_points_to_sinks(a, in);
+      /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
+      expression delta = expression_undefined;
+      if(ENTITY_POST_INCREMENT_P(f))
+	delta = int_to_expression(-1);
+      else
+	delta = int_to_expression(1);
+      offset_points_to_cells(sinks, delta);
+      free_expression(delta);
+    }
   }
   else {
   // FI: to be continued
@@ -377,7 +392,20 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       sinks = L;
   }
   else if(ENTITY_PLUS_C_P(f)) { // p+1
-    sinks = expression_to_points_to_sinks_with_offset(a1, a2, in);
+    // FI: this should be conditioned by eval_p==true; else, no sink exists...
+    // FI: but we do need something for our lhs expressions, not
+    // matter what eval specifies
+    if(true || eval_p)
+      sinks = expression_to_points_to_sinks_with_offset(a1, a2, in);
+    else {
+      // pips_internal_error("The request cannot be satisfied.\n");
+      if(false && zero_expression_p(a2)) {
+	sinks = expression_to_points_to_sources(a1, in);
+      }
+      else { //FI: an exception or an error code should be raised
+	sinks = NIL;
+      }
+    }
   }
   else if(ENTITY_MINUS_C_P(f)) {
     entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
@@ -482,6 +510,10 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
     if(!points_to_graph_bottom(in_f))
       sinks2 = expression_to_points_to_cells(e2, in_f, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
+    // The free is too deep. References from points-to arcs in in_t
+    // and in_f may have been integrated in sinks1 and/or sinks2
+    // See conditional05
+    clear_pt_map(in_t), clear_pt_map(in_f);
     free_pt_map(in_t), free_pt_map(in_f);
   }
   // FI: any other ternary intrinsics?
@@ -1307,16 +1339,26 @@ list expression_to_points_to_sources(expression e, pt_map in)
 	bool to_be_freed2;
 	type ct = points_to_cell_to_type(c, &to_be_freed2);
 	type cct = compute_basic_concrete_type(ct);
+	// Type compatibility check. To be improved with integer used
+	// as pointer values...
 	if(!array_pointer_type_equal_p(et, cct)
-	   && !array_element_type_p(et, cct)) {
+	   // Dereferencement via a subscript
+	   && !array_element_type_p(et, cct)
+	   // Constant strings such as "hello"
+	   && !((char_star_type_p(et) || string_type_p(et))
+		&& char_star_constant_function_type_p(cct))
+	   // Dereferencement forced by the syntax of the expression
+	   && !(pointer_type_p(et)
+		&& array_pointer_type_equal_p(type_to_pointed_type(et), cct))) {
 	  /* A useless [0] may have been added, but it is supposed to
 	     be taken care of above... by callers of this function. */
 	  ifdebug(1) {
 	    pips_debug(1, "Type mismatch for expression: "); print_expression(e);
 	    fprintf(stderr, " with type: "); print_type(et);
 	    fprintf(stderr, "\nand cell: "); print_points_to_cell(c);
-	    fprintf(stderr, " with type: "); print_type(ct);
+	    fprintf(stderr, " with type: "); print_type(cct);
 	    fprintf(stderr, "\n");
+
 	  }
 	  print_expression(e);
 	  pips_internal_error("Type error for an expression\n.");
