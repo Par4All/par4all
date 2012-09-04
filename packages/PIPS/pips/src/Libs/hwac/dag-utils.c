@@ -1172,7 +1172,31 @@ static expression constant_image_p(dagvtx v)
   }
   else if (api->arg_img_in==1)
   {
-    if (api->arg_misc_in==1)
+    bool
+      erosion = aipo_op_p(api, "erode_8c") || aipo_op_p(api, "erode_6c"),
+      dilatation = aipo_op_p(api, "dilate_8c") || aipo_op_p(api, "dilate_6c");
+    // aipo_op_p(api, "convolution") 3x3?
+    if (erosion || dilatation)
+    {
+      _int i00, i10, i20, i01, i11, i21, i02, i12, i22;
+      if (freia_extract_kernel_vtx(v, true, &i00, &i10, &i20,
+                                   &i01, &i11, &i21, &i02, &i12, &i22))
+      {
+        // zero boundary
+        if (i00==0 && i10==0 && i20==0 && i01==0 &&
+            i21==0 && i02==0 && i12==0 && i22==0)
+        {
+          if (i11==0)
+          {
+            if (erosion)
+              return int_to_expression(0);
+            else if (dilatation)
+              return int_to_expression(freia_max_pixel_value());
+          }
+        }
+      }
+    }
+    else if (api->arg_misc_in==1) // arith cst op
     {
       expression e1 = freia_get_nth_scalar_param(v, 1);
       _int val;
@@ -1225,7 +1249,25 @@ static entity copy_image_p(dagvtx v)
   }
   else if (api->arg_img_in==1)
   {
-    if (api->arg_misc_in==1)
+    if (aipo_op_p(api, "erode_8c") ||
+        aipo_op_p(api, "erode_6c") ||
+        aipo_op_p(api, "dilate_8c") ||
+        aipo_op_p(api, "dilate_6c"))
+        // aipo_op_p(api, "convolution") 3x3?
+    {
+      _int i00, i10, i20, i01, i11, i21, i02, i12, i22;
+      if (freia_extract_kernel_vtx(v, true, &i00, &i10, &i20,
+                                   &i01, &i11, &i21, &i02, &i12, &i22))
+      {
+        // zero boundary
+        if (i00==0 && i10==0 && i20==0 && i01==0 &&
+            i21==0 && i02==0 && i12==0 && i22==0)
+        {
+          if (i11==1) return ENTITY(CAR(vtxcontent_inputs(c)));
+        }
+      }
+    }
+    else if (api->arg_misc_in==1)
     {
       expression e1 = freia_get_nth_scalar_param(v, 1);
       _int val;
@@ -2878,4 +2920,100 @@ dag_split_on_scalars(const dag initial,
 
   free_dag(dall);
   return gen_nreverse(ld);
+}
+
+/*********************************************** BUILD A CONNECTED COMPOTENT */
+
+// debug
+static string dagvtx_nb(const void * s) {
+  return itoa((int) dagvtx_number((dagvtx) s));
+}
+
+/* extract a sublist of lv which is a connected component.
+ * update lv so that the extracted vertices are not there.
+ * the extracted list must keep the order of the initial list!
+ */
+list dag_connected_component(
+  dag d, list *plv, bool (*compat)(const dagvtx, const set, const dag))
+{
+  ifdebug(7) {
+    pips_debug(7, "entering\n");
+    gen_fprint(stderr, "initial list", *plv, dagvtx_nb);
+  }
+
+  set connected = set_make(set_pointer);
+  set extracted = set_make(set_pointer);
+
+  // boostrap.
+  dagvtx first = DAGVTX(CAR(*plv));
+  set_add_element(extracted, extracted, first);
+  set_add_element(connected, connected, first);
+  set_append_list(connected, dagvtx_succs(first));
+
+  bool stable = false;
+  while (!stable)
+  {
+    stable = true;
+
+    // expand thru common dag inputs
+    FOREACH(dagvtx, i, dag_inputs(d))
+    {
+      bool merge = false;
+      FOREACH(dagvtx, v, dagvtx_succs(i)) {
+        if (set_belong_p(extracted, v)) {
+          merge = true;
+          break;
+        }
+      }
+      if (merge)
+        set_append_list(connected, dagvtx_succs(i));
+    }
+
+    // expand with new vertices from the list
+    FOREACH(dagvtx, v, *plv)
+    {
+      if (!set_belong_p(extracted, v) && (!compat || compat(v, extracted, d)))
+      {
+        // do we need to extract v?
+        bool connect =  set_belong_p(connected, v);
+        if (!connect) {
+          FOREACH(dagvtx, s, dagvtx_succs(v))
+            if (set_belong_p(extracted, s)) {
+              connect = true;
+              break;
+            }
+        }
+        if (connect) {
+          stable = false;
+          set_add_element(extracted, extracted, v);
+          set_add_element(connected, connected, v);
+          set_append_list(connected, dagvtx_succs(v));
+        }
+      }
+    }
+  }
+
+  // split initial list
+  list lnew = NIL, lold = NIL;
+  FOREACH(dagvtx, v, *plv)
+  {
+    if (set_belong_p(extracted, v))
+      lnew = CONS(dagvtx, v, lnew);
+    else
+      lold = CONS(dagvtx, v, lold);
+  }
+  lnew = gen_nreverse(lnew);
+  gen_free_list(*plv);
+  *plv = gen_nreverse(lold);
+
+  set_free(connected);
+  set_free(extracted);
+
+  ifdebug(7) {
+    pips_debug(7, "exiting\n");
+    gen_fprint(stderr, "final list", *plv, dagvtx_nb);
+    gen_fprint(stderr, "returned", lnew, dagvtx_nb);
+  }
+
+  return lnew;
 }

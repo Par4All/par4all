@@ -182,7 +182,9 @@ static char unk[2]; /* one char lines are not implicit shells */
 <LIT,INITIAL,SPC>(\n|\r|\r\n|;)  { RESTART(TK_ENDOFLINE); }
 <LIT,INITIAL><<EOF>>         { RESTART(TK_ENDOFLINE); }
 
-<STR>[^\"]*\"    {
+<STR>[^\"]*\"  {
+  // string contents without surrounding double quotes
+  // no attempt at managing escaping double quotes
   yylval.name = strdup(yytext);
   yylval.name[strlen(yytext)-1] = '\0';
   BEGIN INITIAL; RETURN(TK_A_STRING);}

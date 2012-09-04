@@ -497,6 +497,15 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       // or it has no image effects
       (ls && (freia_skip_op_p(s) || !freia_some_effects_on_images(s)));
 
+    // quick fix for performance: stop on timer calls
+    if (keep_stat && statement_call_p(s))
+    {
+      entity called = call_function(statement_call(s));
+      if (same_string_p(entity_local_name(called), "gettimeofday") ||
+          same_string_p(entity_local_name(called), "freia_common_wait"))
+        keep_stat = false;
+    }
+
     pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
 
@@ -761,7 +770,7 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, "%s", FREIA_OPENCL_INCLUDES);
 
   // hmmm... should rely on use-defs
-  hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
+  hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL, NULL);
   set output_images = freia_compute_current_output_images();
   // hmmm... panic mode
   set_union(output_images, output_images, shuffled);
@@ -780,6 +789,9 @@ string freia_compile(string module, statement mod_stat, string target)
   gen_free_list(lsi), lsi = NIL;
 
   list lcurrent = ldags;
+  // signatures definition must be cross-dag because of
+  // dilate/erode helper reuse with OpenCL
+  hash_table signatures = hash_table_make(hash_pointer, 0);
   n_dags = 0;
   bool compile_lone = get_bool_property("FREIA_COMPILE_LONE_OPERATIONS");
   FOREACH(list, ls, fsi.seqs)
@@ -813,7 +825,7 @@ string freia_compile(string module, statement mod_stat, string target)
                                        output_images, helper, helpers, n_dags);
     else if (freia_opencl_p(target))
       allocated = freia_opencl_compile_calls(module, d, sq, ls, occs, exchanges,
-                                       output_images, helper, helpers, n_dags);
+                           output_images, helper, helpers, n_dags, signatures);
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,
                                            n_dags);
@@ -845,6 +857,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // some more code cleanup
   if (get_bool_property("FREIA_CLEANUP_STATUS"))
+    // remove err = or err |= freia & helper functions
     freia_cleanup_status(mod_stat, helpers);
 
   // cleanup
@@ -856,6 +869,7 @@ string freia_compile(string module, statement mod_stat, string target)
   gen_free_list(fsi.seqs);
   set_free(fsi.in_loops);
   hash_table_free(fsi.sequence);
+  hash_table_free(signatures);
   gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 

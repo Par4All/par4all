@@ -77,6 +77,10 @@ type MakeTypeVoid()
     return(make_type(is_type_void, NIL));
 }
 
+type MakeTypeOverloaded()
+{
+  return MakeTypeVariable(make_basic_overloaded(), NIL);
+}
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
@@ -366,8 +370,14 @@ bool same_type_p(type t1, type t2)
 
    Francois Irigoin, 10 March 1992
 */
-/* If strict_p, a typedef type is not equal to its definition. */
-bool generic_type_equal_p(type t1, type t2, bool strict_p)
+/* If strict_p, a typedef type is not equal to its definition (default value).
+ *
+ * If qualifier_p, qualifiers must be equal (default value).
+ *
+ * This function should be static and used only indirectly via
+ * type_equal_p(), etc.
+ */
+bool generic_type_equal_p(type t1, type t2, bool strict_p, bool qualifier_p)
 {
   bool tequal = false;
 
@@ -387,10 +397,10 @@ bool generic_type_equal_p(type t1, type t2, bool strict_p)
   case is_type_area:
     return area_equal_p(type_area(t1), type_area(t2));
   case is_type_variable:
-    tequal = generic_variable_equal_p(type_variable(t1), type_variable(t2), strict_p);
+    tequal = generic_variable_equal_p(type_variable(t1), type_variable(t2), strict_p, qualifier_p);
     return tequal;
   case is_type_functional:
-    return generic_functional_equal_p(type_functional(t1), type_functional(t2), strict_p);
+    return generic_functional_equal_p(type_functional(t1), type_functional(t2), strict_p, qualifier_p);
   case is_type_unknown:
     return true;
   case is_type_void:
@@ -404,14 +414,19 @@ bool generic_type_equal_p(type t1, type t2, bool strict_p)
 
 bool type_equal_p(type t1, type t2)
 {
-  return generic_type_equal_p(t1, t2, true);
+  return generic_type_equal_p(t1, t2, true, true);
+}
+
+bool type_equal_up_to_qualifiers_p(type t1, type t2)
+{
+  return generic_type_equal_p(t1, t2, true, false);
 }
 
 bool ultimate_type_equal_p(type t1, type t2)
 {
   type ut1 = ultimate_type(t1);
   type ut2 = ultimate_type(t2);
-  return generic_type_equal_p(ut1, ut2, false);
+  return generic_type_equal_p(ut1, ut2, false, true);
 }
 
 /* Expand typedefs before the type comparison. */
@@ -419,7 +434,7 @@ bool concrete_type_equal_p(type t1, type t2)
 {
   type ct1 = compute_basic_concrete_type(t1);
   type ct2 = compute_basic_concrete_type(t2);
-  bool equal_p = generic_type_equal_p(ct1, ct2, false);
+  bool equal_p = generic_type_equal_p(ct1, ct2, false, true);
   free_type(ct1), free_type(ct2);
   return equal_p;
 }
@@ -428,26 +443,56 @@ bool concrete_type_equal_p(type t1, type t2)
 bool array_pointer_type_equal_p(type t1, type t2)
 {
   bool equal_p = true;
-  if(!type_equal_p(t1,t2)) {
+  if(!type_equal_up_to_qualifiers_p(t1,t2)) {
     if(pointer_type_p(t1) && array_type_p(t2)) {
       type pt = type_to_pointed_type(t1);
-      basic pb = variable_basic(type_variable(pt));
-      variable etv = type_variable(t2);
-      basic eb = variable_basic(etv);
-      int d = (int) gen_length(variable_dimensions(etv));
-      equal_p = (d==1 && basic_equal_p(pb, eb));
+      if(type_void_p(pt)) {
+	// Conventionally, you should have an array of overloaded elements...
+	//array_element_type();
+	equal_p = false;
+      }
+      else {
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(t2);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	equal_p = (d==1 && basic_equal_p(pb, eb));
+      }
     }
     else if(pointer_type_p(t2) && array_type_p(t1)) {
       type pt = type_to_pointed_type(t2);
-      basic pb = variable_basic(type_variable(pt));
-      variable etv = type_variable(t1);
-      basic eb = variable_basic(etv);
-      int d = (int) gen_length(variable_dimensions(etv));
-      equal_p = (d==1 && basic_equal_p(pb, eb));
+      if(type_void_p(pt)) {
+	// Conventionally, you should have an array of overloaded elements...
+	//array_element_type();
+	equal_p = false;
+      }
+      else {
+	basic pb = variable_basic(type_variable(pt));
+	variable etv = type_variable(t1);
+	basic eb = variable_basic(etv);
+	int d = (int) gen_length(variable_dimensions(etv));
+	equal_p = (d==1 && basic_equal_p(pb, eb));
+      }
     }
     else
       equal_p = false;
   }
+  return equal_p;
+}
+
+/* is "et" the type of an element of an array of type "at"? */
+bool array_element_type_p(type at, type et)
+{
+  bool equal_p = false;
+
+  if(array_type_p(at)) {
+    if(type_variable_p(et)) {
+      basic ab = variable_basic(type_variable(at));
+      basic eb = variable_basic(type_variable(et));
+      equal_p = basic_equal_p(ab, eb);
+    }
+  }
+
   return equal_p;
 }
 
@@ -475,6 +520,13 @@ type make_scalar_complex_type(_int n)
     return t;
 }
 
+type make_scalar_overloaded_type()
+{
+    type t = make_type(is_type_variable,
+		       make_variable(make_basic_overloaded(), NIL,NIL));
+    return t;
+}
+
 bool area_equal_p(area a1, area a2)
 {
     if(a1 == a2)
@@ -504,7 +556,7 @@ bool qualifiers_equal_p(list dims1, list dims2) {
     return gen_equals(dims1,dims2,(gen_eq_func_t)qualifier_equal_p);
 }         
 
-bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
+bool generic_variable_equal_p(variable v1, variable v2, bool strict_p, bool qualifier_p)
 {
   if(v1 == v2)
       return true;
@@ -517,7 +569,7 @@ bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
       return 
 	generic_basic_equal_p(variable_basic(v1), variable_basic(v2), strict_p)
 	&& dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2))
-	&& qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
+	&& (!qualifier_p || qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2))) ;
 
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
@@ -551,7 +603,7 @@ bool generic_variable_equal_p(variable v1, variable v2, bool strict_p)
 
 bool variable_equal_p(variable v1, variable v2)
 {
-  return generic_variable_equal_p(v1, v2, true);
+  return generic_variable_equal_p(v1, v2, true, true);
 }
 
 bool generic_basic_equal_p(basic b1, basic b2, bool strict_p)
@@ -654,7 +706,8 @@ bool same_basic_p(basic b1, basic b2)
 
 }
 
-bool generic_functional_equal_p(functional f1, functional f2, bool strict_p)
+bool generic_functional_equal_p(functional f1, functional f2, bool strict_p,
+				bool qualifier_p)
 {
     if(f1 == f2)
 	return true;
@@ -673,20 +726,21 @@ bool generic_functional_equal_p(functional f1, functional f2, bool strict_p)
 	    parameter p1 = PARAMETER(CAR(lp1));
 	    parameter p2 = PARAMETER(CAR(lp2));
 
-	    if(!generic_parameter_equal_p(p1, p2, strict_p))
+	    if(!generic_parameter_equal_p(p1, p2, strict_p, qualifier_p))
 		return false;
 	}
 
-	return generic_type_equal_p(functional_result(f1), functional_result(f2), strict_p);
+	return generic_type_equal_p(functional_result(f1), functional_result(f2), strict_p, qualifier_p);
     }
 }
 
 bool functional_equal_p(functional f1, functional f2)
 {
-  return generic_functional_equal_p(f1, f2, true);
+  return generic_functional_equal_p(f1, f2, true, true);
 }
 
-bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p)
+bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p,
+			       bool qualifier_p)
 {
     if(p1 == p2)
 	return true;
@@ -695,13 +749,13 @@ bool generic_parameter_equal_p(parameter p1, parameter p2, bool strict_p)
     else if (p1 != parameter_undefined && p2 == parameter_undefined)
 	return false;
     else
-      return generic_type_equal_p(parameter_type(p1), parameter_type(p2), strict_p)
+      return generic_type_equal_p(parameter_type(p1), parameter_type(p2), strict_p, qualifier_p)
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
 }
 
 bool parameter_equal_p(parameter p1, parameter p2)
 {
-  return generic_parameter_equal_p(p1, p2, true);
+  return generic_parameter_equal_p(p1, p2, true, true);
 }
 
 bool mode_equal_p(mode m1, mode m2)
@@ -2204,6 +2258,7 @@ type reference_to_type(reference ref)
 */
 type expression_to_type(expression exp)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   /* does not cover references to functions ...*/
   /* Could be more elaborated with array types for array expressions */
   type t = type_undefined;
@@ -2327,7 +2382,7 @@ type expression_to_type(expression exp)
     }
 
   pips_debug(9, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
-
+  debug_off();
   return t;
 }
 
@@ -2375,7 +2430,8 @@ type expression_to_user_type(expression e)
 
 
 /* Returns true if t is a variable type with a basic overloaded. And
-   false elsewhere. */
+ * false elsewhere. See MakeTypeOverloaded().
+ */
 bool overloaded_type_p(type t)
 {
   //pips_assert("type t is of kind variable", type_variable_p(t));
@@ -2696,6 +2752,24 @@ bool pointer_type_p(type t)
 {
   return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns OK for "char[]" as well as for "char *".
+ * 
+ * Does not take care of typedef. Use compute_basic_concrete_type()
+ * first is necessary.
+ */
+bool C_pointer_type_p(type t)
+{
+  bool pointer_p = false;
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+    basic b = variable_basic(v);
+    pointer_p = (ENDP(dl) && basic_pointer_p(b))
+      || ((int)gen_length(dl)==1 && unbounded_dimension_p(DIMENSION(CAR(dl))));
+  }
+  return pointer_p;
 }
 
 bool array_of_pointers_type_p(type t)
@@ -3212,7 +3286,7 @@ void entity_basic_concrete_types_reset()
 type compute_basic_concrete_type(type t)
 {
   type nt;
-
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   pips_debug(8, "Begin with type \"%s\"\n",
 	     words_to_string(words_type(t, NIL, false)));
 
@@ -3304,7 +3378,7 @@ type compute_basic_concrete_type(type t)
   /* pips_assert("nt is not a typedef",
 	      type_variable_p(nt)?
 	      !basic_typedef_p(variable_basic(type_variable(nt))) : true); */
-
+  debug_off();
   return nt;
 }
 
@@ -3318,6 +3392,7 @@ type compute_basic_concrete_type(type t)
  */
 type entity_basic_concrete_type(entity e)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   pips_assert("types_to_bctypes must be defined", !hash_table_undefined_p(entity_types_to_bctypes));
   type t = entity_type(e);
   type bct = (type) hash_get(entity_types_to_bctypes, (void *) t);
@@ -3327,6 +3402,7 @@ type entity_basic_concrete_type(entity e)
       bct = compute_basic_concrete_type(t);
       hash_put(entity_types_to_bctypes, t, bct);
     }
+  debug_off();
   return bct;
 }
 
@@ -4505,6 +4581,7 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
+  debug_on("RI-UTIL_DEBUG_LEVEL");
   if(t==NULL)
     fprintf(stderr, "type is NULL.\n");
   else if(type_undefined_p(t))
@@ -4517,6 +4594,7 @@ void print_type(type t)
   list wl = words_type(t, NIL, false);
   dump_words(wl);
   }
+  debug_off();
 }
 
 static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
@@ -4746,6 +4824,37 @@ type type_to_pointed_type(type t)
 
     if(pointer_type_p(ut))
       pt = basic_pointer(variable_basic(type_variable(ut)));
+
+    if(!type_undefined_p(pt))
+      upt = ultimate_type(pt);
+  }
+  return upt;
+}
+
+/* returns a copy of t if t is not a pointer type, and the pointed type if t is
+ * a pointer type or. Type definitions are replaced. If t is undefined,
+ * returns a type_undefined.
+ *
+ * A new type is always allocated.
+ */
+type C_type_to_pointed_type(type t)
+{
+  type upt = type_undefined;
+
+  if(!type_undefined_p(t)) {
+    type ut = ultimate_type(t);
+    type pt = ut;
+
+    if(pointer_type_p(ut))
+      pt = copy_type(basic_pointer(variable_basic(type_variable(ut))));
+    else if(array_type_p(ut)) {
+      variable v = type_variable(t);
+      list dl = variable_dimensions(v);
+      basic b = variable_basic(v);
+      if((int)gen_length(dl)==1 && unbounded_dimension_p(DIMENSION(CAR(dl)))) {
+	pt = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
+      }
+    }
 
     if(!type_undefined_p(pt))
       upt = ultimate_type(pt);
@@ -5030,25 +5139,101 @@ int variable_dimension_number(variable v)
   return d;
 }
 
-/* convert a scalar type "t" into a newly allocated array type "at"
- * whose elements are of type "t". The dimension is unbounded.
+/* convert a type "t" into a newly allocated array type "at" whose
+ * elements are of type "t", unless "t" is void. Then an array of
+ * overloaded elements is generated. The new dimension is unbounded.
  *
  * This useful when dealing with pointers that are not precisely
  * typed. In C you have often to assume they point towards an array
  * since pointer arithmetic is OK by default.
  *
  * The behavior of this function is not well defined when typedef are
- * used...
+ * used... t should be a concrete type.
  */
 type type_to_array_type(type t)
 {
-  pips_assert("t is not an array type", !array_type_p(t));
-  type at = copy_type(t);
+  type at = type_undefined;
+
+  if(type_void_p(t)) {
+    at = MakeTypeOverloaded();
+  }
+  else
+    at = copy_type(t);
+
   variable vt = type_variable(at);
   dimension d = make_dimension(int_to_expression(0),
 			       make_unbounded_expression());
-  variable_dimensions(vt) = CONS(DIMENSION, d, NIL);
+  // Add the new dimension as first dimension
+  variable_dimensions(vt) = CONS(DIMENSION, d, variable_dimensions(vt));
+
   return at;
+}
+
+/* returns the type of the elements of an array type, as a newly allocated type.
+ *
+ * It is not clear if it should fail when the argument is not an array
+ * type, or if an undefined type should be returned.
+ *
+ * The qualifiers are dropped.
+ */
+type array_type_to_element_type(type t)
+{
+  type et = type_undefined;
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    //list dl = variable_dimensions(v);
+    basic b = variable_basic(v);
+    et = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
+  }
+  else
+    pips_internal_error("Ill. arg.\n");
+  return et; 
+}
+
+/* Minimal information to build a d-dimensional array type. */
+list make_unbounded_dimensions(int d)
+{
+  list dl = NIL;
+  int i;
+  for(i=0; i<d;i++) {
+    dimension d = make_dimension(int_to_expression(0),
+				 make_unbounded_expression());
+    dl = CONS(DIMENSION, d, dl);
+  }
+  return dl;
+}
+
+bool type_void_star_p(type t)
+{
+  bool void_star_p = false;
+  if(pointer_type_p(t))
+    void_star_p = type_void_p(type_to_pointed_type(t));
+  return void_star_p;
+}
+
+/* Beware of typedefs. */
+bool char_star_type_p(type t)
+{
+  bool char_star_p = false;
+  if(pointer_type_p(t)) {
+    type pt = type_to_pointed_type(t);
+    char_star_p = char_type_p(pt);
+  }
+  return char_star_p;
+}
+
+/* Beware of typedefs. Beware of string_type_p()...  Strictly
+ * speaking, string_type_p() should not be taken into acount.
+ */
+bool char_star_constant_function_type_p(type t)
+{
+  bool char_star_p = false;
+  if(type_functional_p(t)) {
+    functional f = type_functional(t);
+    type rt = functional_result(f);
+    char_star_p = char_star_type_p(rt) || string_type_p(rt);
+  }
+  return char_star_p;
 }
 
 /*

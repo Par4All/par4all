@@ -5476,7 +5476,6 @@ intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_in
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.init_points_to_list
         < CALLEES.points_to_out
         < CALLEES.points_to_in
 \end{PipsMake}
@@ -5776,6 +5775,19 @@ it must be turned to {\tt FALSE}.
 POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
 \end{PipsProp}
 \subsubsection{Limits of Points-to Analyses}
+
+The integer property \PipsPropRef{POINTS_TO_OUT_DEGREE_LIMIT}
+specifies the maximum number of arcs exiting a given vertex of a
+poins-to graph. When the maximum out degree is reached for a given
+source vertex, all the corresponding sink vertices are fused into one
+new vertex, the minimal upper bound of the initial vertices according
+to the abstract address lattice, and the points-to graph is updated
+accordingly. New nodes are created as long as the limit is not
+reached. The freeing of a list spine can generate an unbounded out
+degree (see for instance Pointers/list05.c).
+\begin{PipsProp}{POINTS_TO_OUT_DEGREE_LIMIT}
+POINTS_TO_OUT_DEGREE_LIMIT 5
+\end{PipsProp}
 
 The integer property \PipsPropRef{POINTS_TO_PATH_LIMIT} specifies the
 maximum number of occurences of an object of a given type in a
@@ -7739,6 +7751,21 @@ behaviour by setting the following property:
 \begin{PipsProp}{ISOLATE_STATEMENT_EVEN_NON_LOCAL}
 ISOLATE_STATEMENT_EVEN_NON_LOCAL FALSE
 \end{PipsProp}
+
+
+\subsubsection{GPU XML Output}
+\begin{PipsPass}{gpu_xml_dump}
+Dump XML for a function, intended to be used for SPEAR. Track back the 
+parameters that are used for the iteration space.
+\end{PipsPass}
+
+
+\begin{PipsMake}
+gpu_xml_dump > MODULE.gpu_xml_file
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
 
 \subsubsection{Delay Communications}
 \begin{PipsPass}{delay_communications_inter}
@@ -11148,6 +11175,16 @@ no actual helper functions will be generated.
 HWAC_OPENCL_MERGE_OPERATIONS TRUE
 \end{PipsProp}
 
+Whether to merge OpenCL constant-kernel operations.
+\begin{PipsProp}{HWAC_OPENCL_MERGE_KERNEL_OPERATIONS}
+HWAC_OPENCL_MERGE_KERNEL_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to generate OpenCL specialized constant-kernel operations.
+\begin{PipsProp}{HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS}
+HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS TRUE
+\end{PipsProp}
+
 Whether merged OpenCL image operations should include reductions as well.
 Added to help debugging the code.
 \begin{PipsProp}{HWAC_OPENCL_MERGE_REDUCTIONS}
@@ -11161,6 +11198,19 @@ debug.
 \begin{PipsProp}{HWAC_OPENCL_COMPILE_ONE_OPERATION}
 HWAC_OPENCL_COMPILE_ONE_OPERATION FALSE
 \end{PipsProp}
+
+Whether to add an explicit synchronization in the generated codes,
+before calling a kernel. This property was added for debug.
+\begin{PipsProp}{HWAC_OPENCL_SYNCHRONIZE_KERNELS}
+HWAC_OPENCL_SYNCHRONIZE_KERNELS FALSE
+\end{PipsProp}
+
+Whether to preload pixels before using them in generated kernels.
+Should be better for GPGPU, but not necessarily for CPU implementations.
+\begin{PipsProp}{HWAC_OPENCL_PRELOAD_PIXELS}
+HWAC_OPENCL_PRELOAD_PIXELS TRUE
+\end{PipsProp}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 
@@ -13579,7 +13629,6 @@ Display the code decorated with the points to information.
 print_code_points_to_list      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.init_points_to_list
         < MODULE.points_to
 \end{PipsMake}
 
@@ -15924,9 +15973,9 @@ print_xml_application      > MODULE.xml_printed_file
     < PROGRAM.entities
     < MODULE.code
     < MODULE.proper_effects
-    < MODULE.cumulated_effects
-    < MODULE.summary_effects
+    < MODULE.preconditions
     < MODULE.regions
+    < CALLEES.code
     < CALLEES.summary_effects
 \end{PipsMake}
 

@@ -345,6 +345,13 @@ make_assign_expression(expression lhs,
   return MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), lhs, rhs);
 }
 
+expression make_subscript_expression(expression a, list sl)
+{
+  subscript i = make_subscript(a, sl);
+  syntax s = make_syntax_subscript(i);
+  expression e = syntax_to_expression(s);
+  return e;
+}
 
 /* predicates and short cut accessors on expressions */
 
@@ -1111,6 +1118,28 @@ expression int_to_expression(_int i)
     if(negative_p)
         exp = MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),exp);
     return exp;
+}
+
+/* Make a zero expression.
+ *
+ * It is useful compared to int_to_expression(0) because it is much
+ * easier to search in source text.
+ */
+expression make_zero_expression(void)
+{
+  return int_to_expression(0);
+}
+
+bool zero_expression_p(expression e)
+{
+  bool zero_p = false;
+  if(expression_call_p(e)) {
+    call c = expression_call(e);
+    entity f = call_function(c);
+    if(f==int_to_entity(0))
+      zero_p = true;
+  }
+  return zero_p;
 }
 
 expression float_to_expression(float c)
@@ -4109,4 +4138,64 @@ list subscript_expressions_to_constant_subscript_expressions(list sl)
   }
   nsl = gen_nreverse(nsl);
   return nsl;
+}
+
+
+/* Assume p is a pointer. Compute expression "*(p+i)" from reference
+   r = "p[i]". */
+expression pointer_reference_to_expression(reference r)
+{
+  entity p = reference_variable(r);
+  type t = entity_basic_concrete_type(p);
+  list rsl = reference_indices(r);
+  int p_d = variable_dimension_number(type_variable(t)); // pointer dimension
+  int r_d = (int) gen_length(rsl); // reference dimension
+
+  pips_assert("The reference dimension is strictly greater than "
+	      "the array of pointers dimension", r_d>p_d);
+
+  /* rsl is fully copied into two sub-lists: the effective array
+     indices and then the pointer indices. */
+  list esl = NIL;
+  list psl = NIL;
+  list crsl = rsl;
+  int i;
+  for(i = 0; i<r_d; i++) {
+    expression se = EXPRESSION(CAR(crsl));
+    i<p_d? (esl = CONS(EXPRESSION, copy_expression(se), esl))
+      :  (psl = CONS(EXPRESSION, copy_expression(se), psl));
+    POP(crsl);
+  }
+  esl = gen_nreverse(esl), psl = gen_nreverse(psl);
+
+  pips_assert("The pointer index list is not empty", !ENDP(psl));
+
+  /* We build a proper reference to an element of p */
+  reference nr = make_reference(p, esl);
+  expression nre = reference_to_expression(nr);
+
+  /* We build the equivalent pointer arithmetic expression */
+  expression pae = nre;
+  // FI: would be better to compute the two operators before entering the loop
+  // entity plus = ;
+  // entity indirection = ;
+  FOREACH(EXPRESSION, pse, psl) {
+    pae = binary_intrinsic_expression(PLUS_C_OPERATOR_NAME, pae, pse);
+    pae = unary_intrinsic_expression(DEREFERENCING_OPERATOR_NAME, pae);
+  }
+
+  return pae;
+}
+
+bool C_initialization_expression_p(expression e)
+{
+  bool initialization_p = false;
+  syntax s = expression_syntax(e);
+  if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    if(ENTITY_BRACE_INTRINSIC_P(f))
+      initialization_p = true;
+  }
+  return initialization_p;
 }

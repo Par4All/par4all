@@ -36,6 +36,10 @@
   there is no tree rewriting in the dag, just simple operation optimizations
 - should keep AIPO/software calls if accelerator calls are slower?
   I would I know that?
++ erode/dilate {000 010 000} -> copy
++ erode/dilate {000 000 000} -> cst(?)
+- convol 3x3 or others? copy/cst
+- copy(a,a) -> nope
 
 * code
 + cleanup data structures?
@@ -120,16 +124,29 @@
 + dynamic optimal tile size computation instead of static?
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
+- wrong placement of tmp images under REPEAT for antibio
+- split along connected components?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
 + compilation benefit: only freia DAG optimizations
-- could use terapix-like tiling to help with cache?
-  if so, how to tell about the actual image "erosion"?
 + expensive memory accesses => aggregate computations would help?
 + could there be other benefits from a compiler?
 + use on-demand image transfers in "clever" runtime? (MB)
++ merge one erode/dilate/convol with subsequent arith ops?
++ generate kernel-specialized erode/dilate/convol
++ merge two or more erode/dilate/convol on the same input?
++ merge reductions with same input kernel ops (anr999)?
+- generate some ILP: load before use?
+- borders: one int & masks? would also help convolution with an associated constant array?
+- above: should accept more reductions in mergeable? need fixing runtime
++ mergeable: separate by connected components?
++ that is the place to deal with the one reduction constraint
+- detect constant transposed kernels (retina, burner)?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
+- could use terapix-like tiling to help with cache?
+  if so, how to tell about the actual image "erosion"?
++ merge: E+min (freia_24? no - kernel is unknown)
 
 * hardware generation target
 - use optimized expression DAG(s) for hardware generation?

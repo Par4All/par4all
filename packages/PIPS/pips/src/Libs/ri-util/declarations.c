@@ -2091,7 +2091,7 @@ list words_type(type obj, list pdl, bool argument_p)
 	break;
       }
     default:
-      pips_internal_error("unexpected tag");
+      pips_internal_error("unexpected tag %d", type_tag(obj));
     }
   pips_debug(8, "End: \"\%s\"\n", list_to_string(pc));
   return pc;
