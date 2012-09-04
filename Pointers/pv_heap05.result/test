@@ -1,30 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int ***p;
-   int **q;
-//             <    is written>: a
-   int a = 0;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
-   q = (int **) malloc(sizeof(int *));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   q[0] = &a;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   p = (int ***) malloc(sizeof(int * *));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p q
-   p[0] = q;
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(p);
-   return 0;
-}
-
 POINTS-TO
 
 

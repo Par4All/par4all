@@ -1,22 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int *p, *q, *r;
-   int a;
-   void *s;
-//             <    is written>: p
-   p = (int *) calloc(2, sizeof(int));
-//             <    is written>: q
-   q = (int *) calloc(2, sizeof(a));
-//             <    is written>: r
-   r = (int *) calloc(1, sizeof(int));
-//             <    is written>: s
-   s = calloc(1, 15);
-   return 0;
-}
-
 POINTS-TO
 
 
