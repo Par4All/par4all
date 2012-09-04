@@ -1,0 +1,46 @@
+delete cse01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+create cse_wpt01 cse_wpt01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[cse_wpt01]
+
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after CSE
+echo
+setproperty MEMORY_EFFECTS_ONLY  TRUE
+apply COMMON_SUBEXPRESSION_ELIMINATION[cse_wpt01]
+apply RESTRUCTURE_CONTROL[cse_wpt01]
+activate PRINT_CODE
+display PRINTED_FILE[cse_wpt01]
+
+close
+delete cse_wpt01
+quit
+

@@ -6,6 +6,7 @@ void call15(int * pi, tf_t *q)
 {
   *pi = 1;
   q->one = 1;
+  return;
 }
 
 int main()

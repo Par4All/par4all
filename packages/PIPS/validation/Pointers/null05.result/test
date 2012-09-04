@@ -40,7 +40,7 @@ int main()
 
    *p = 1;
 
-// Points To: none
+// Points To: unreachable
 
 
    return 0;

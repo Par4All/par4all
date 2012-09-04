@@ -8,6 +8,7 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    putchar01();
+   return 0;
 }
 
 POINTS-TO
@@ -24,4 +25,8 @@ int main()
 // Points To: none
 
    putchar01();
+
+// Points To: none
+
+   return 0;
 }

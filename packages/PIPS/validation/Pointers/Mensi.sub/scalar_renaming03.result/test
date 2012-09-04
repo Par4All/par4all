@@ -1,0 +1,204 @@
+
+PROPER  EFFECTS 
+
+int scalar_renaming03()
+{
+   int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
+//             <    is written>: p
+   p = &T;                                                              /*0005*/
+//             <    is written>: i
+   for(i = 0; i <= 99; i += 1) {                                        /*0006*/
+//             <    is read   >: A[i] B[i] i
+//             <    is written>: T
+      T = A[i]+B[i];                                                    /*0007*/
+//             <    is read   >: T i
+//             <    is written>: C[i]
+      C[i] = T+T;                                                       /*0008*/
+//             <    is read   >: B[i] D[i] i
+//             <    is written>: T
+      T = D[i]-B[i];                                                    /*0009*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+      *p = 1;                                                           /*0010*/
+//             <    is read   >: T i
+//             <    is written>: A[i]
+      A[i] = T*T;                                                       /*0011*/
+   }
+//             <    is read   >: T
+
+   return T;                                                            /*0014*/
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int scalar_renaming03()
+{
+
+// Points To: none
+
+   int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &T;                                                              /*0005*/
+
+// Points To:
+// p -> T , EXACT
+
+   for(i = 0; i <= 99; i += 1) {                                        /*0006*/
+
+// Points To:
+// p -> T , EXACT
+
+      T = A[i]+B[i];                                                    /*0007*/
+
+// Points To:
+// p -> T , EXACT
+
+      C[i] = T+T;                                                       /*0008*/
+
+// Points To:
+// p -> T , EXACT
+
+      T = D[i]-B[i];                                                    /*0009*/
+
+// Points To:
+// p -> T , EXACT
+
+      *p = 1;                                                           /*0010*/
+
+// Points To:
+// p -> T , EXACT
+
+      A[i] = T*T;                                                       /*0011*/
+   }
+
+// Points To:
+// p -> T , EXACT
+
+
+   return T;                                                            /*0014*/
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int scalar_renaming03()
+{
+   int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
+//             <    is written>: p
+   p = &T;                                                              /*0005*/
+//             <    is written>: i
+   for(i = 0; i <= 99; i += 1) {                                        /*0006*/
+//             <    is read   >: A[i] B[i] i
+//             <    is written>: T
+      T = A[i]+B[i];                                                    /*0007*/
+//             <    is read   >: T i
+//             <    is written>: C[i]
+      C[i] = T+T;                                                       /*0008*/
+//             <    is read   >: B[i] D[i] i
+//             <    is written>: T
+      T = D[i]-B[i];                                                    /*0009*/
+//             <    is read   >: p
+//             <    is written>: T
+      *p = 1;                                                           /*0010*/
+//             <    is read   >: T i
+//             <    is written>: A[i]
+      A[i] = T*T;                                                       /*0011*/
+   }
+//             <    is read   >: T
+
+   return T;                                                            /*0014*/
+}
+int scalar_renaming03()
+{
+   int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
+//             <    is written>: p
+   p = &T;                                                              /*0005*/
+//             <    is written>: i
+   for(i = 0; i <= 99; i += 1) {                                        /*0006*/
+//             <    is read   >: A[i] B[i] i
+//             <    is written>: T
+      T = A[i]+B[i];                                                    /*0007*/
+//             <    is read   >: T i
+//             <    is written>: C[i]
+      C[i] = T+T;                                                       /*0008*/
+//             <    is read   >: B[i] D[i] i
+//             <    is written>: T
+      T = D[i]-B[i];                                                    /*0009*/
+//             <    is read   >: p
+//             <    is written>: T
+      *p = 1;                                                           /*0010*/
+//             <    is read   >: T i
+//             <    is written>: A[i]
+      A[i] = T*T;                                                       /*0011*/
+   }
+//             <    is read   >: T
+
+   return T;                                                            /*0014*/
+}
+int scalar_renaming03()
+{
+//             <    is declared>: A B C D T p
+   int *p, T, A[100], B[100], C[100], D[100];                           /*0004*/
+   //PIPS generated variable
+//             <    is declared>: T0 T1 T2 i0
+   int i0, T0, T1, T2;
+//             <    is written>: p
+//             <    is referenced>: T p
+   p = &T;                                                              /*0005*/
+//             <    is written>: i0
+//             <    is referenced>: i0
+   for(i0 = 0; i0 <= 99; i0 += 1) {                                     /*0006*/
+//             <    is read   >: A[i0] B[i0] i0
+//             <    is written>: T0
+//             <    is referenced>: A B T0 i0
+      T0 = A[i0]+B[i0];                                                 /*0007*/
+//             <    is read   >: T0 i0
+//             <    is written>: C[i0]
+//             <    is referenced>: C T0 i0
+      C[i0] = T0+T0;                                                    /*0008*/
+//             <    is read   >: B[i0] D[i0] i0
+//             <    is written>: T1
+//             <    is referenced>: B D T1 i0
+      T1 = D[i0]-B[i0];                                                 /*0009*/
+//             <    is read   >: p
+//             <    is written>: T
+//             <    is referenced>: p
+      *p = 1;                                                           /*0010*/
+//             <    is read   >: T2 i0
+//             <    is written>: A[i0]
+//             <    is referenced>: A T2 i0
+      A[i0] = T2*T2;                                                    /*0011*/
+   }
+//             <    is read   >: T2
+//             <    is referenced>: T2
+
+   return T2;                                                           /*0014*/
+}
+int scalar_renaming03()
+{
+   int *p, T, A[100], B[100], C[100], D[100];                           /*0004*/
+   //PIPS generated variable
+   int i0, T0, T1, T2;
+   p = &T;                                                              /*0005*/
+   for(i0 = 0; i0 <= 99; i0 += 1) {                                     /*0006*/
+      T0 = A[i0]+B[i0];                                                 /*0007*/
+      C[i0] = T0+T0;                                                    /*0008*/
+   }
+#pragma omp parallel for 
+   for(i0 = 0; i0 <= 99; i0 += 1)                                       /*0006*/
+      A[i0] = T2*T2;                                                    /*0011*/
+   for(i0 = 0; i0 <= 99; i0 += 1)                                       /*0006*/
+      T1 = D[i0]-B[i0];                                                 /*0009*/
+   for(i0 = 0; i0 <= 99; i0 += 1)                                       /*0006*/
+      *p = 1;                                                           /*0010*/
+
+   return T2;                                                           /*0014*/
+}

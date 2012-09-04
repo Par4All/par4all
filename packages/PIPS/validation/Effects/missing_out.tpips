@@ -1,0 +1,39 @@
+setenv WS=missing_out
+delete $WS
+create $WS $WS.c
+
+
+apply OUT_EFFECTS[main]
+
+setenv OUT_EFFECTS_DEBUG_LEVEL 3
+setenv EFFECTS_OPERATORS_DEBUG_LEVEL 1
+
+apply OUT_SUMMARY_EFFECTS [init_2D]
+
+setenv OUT_EFFECTS_DEBUG_LEVEL 0
+setenv EFFECTS_OPERATORS_DEBUG_LEVEL 0
+
+activate PRINT_CODE_OUT_EFFECTS
+display PRINTED_FILE[init_2D, main]
+
+
+
+activate MUST_REGIONS
+
+apply OUT_REGIONS[main]
+
+setenv OUT_EFFECTS_DEBUG_LEVEL 3
+setenv EFFECTS_OPERATORS_DEBUG_LEVEL 1
+
+apply OUT_SUMMARY_REGIONS [init_2D]
+
+setenv OUT_EFFECTS_DEBUG_LEVEL 0
+setenv EFFECTS_OPERATORS_DEBUG_LEVEL 0
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[init_2D, main]
+
+close
+delete $WS
+quit
+

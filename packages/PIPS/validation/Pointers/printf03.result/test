@@ -19,6 +19,7 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
+   return 0;
 }
 
 POINTS-TO
@@ -62,4 +63,9 @@ int main()
 // fmt -> "i=%d, %d, %f\n" , EXACT
 
    printf(fmt, i, i+j, x);
+
+// Points To:
+// fmt -> "i=%d, %d, %f\n" , EXACT
+
+   return 0;
 }

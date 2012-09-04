@@ -1,27 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: j
-   int j = 0, k, tab[5];
-//             <    is written>: p
-   int *p = &j;
-//             <    is read   >: tab[1]
-//             <    is written>: q
-   int *q = tab[1];
-//             <    is written>: k
-
-   k = 1;
-//             <    is read   >: k
-//             <    is written>: j
-   j = k;
-//             <    is written>: p
-   p = &k;
-
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -46,29 +23,23 @@ int main()
 
    int *q = tab[1];
 
-// Points To:
-// p -> j , EXACT
-// q -> tab[1] , EXACT
+// Points To: unreachable
 
 
    k = 1;
 
-// Points To:
-// p -> j , EXACT
-// q -> tab[1] , EXACT
+// Points To: unreachable
 
    j = k;
 
-// Points To:
-// p -> j , EXACT
-// q -> tab[1] , EXACT
+// Points To: unreachable
 
    p = &k;
 
-// Points To:
-// p -> k , EXACT
-// q -> tab[1] , EXACT
+// Points To: unreachable
 
 
    return 0;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "tab".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.

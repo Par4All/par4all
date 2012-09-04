@@ -6,30 +6,12 @@ create recurrence04 recurrence04.c
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-
-activate PRINT_CODE_PROPER_EFFECTS
-
-echo
-echo Proper effects for "recurrence04"
-echo
-display PRINTED_FILE[recurrence04]
-
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo
 echo POINTS TO for "recurrence04"
 echo
 display PRINTED_FILE[recurrence04]
-
-echo 
-echo Proper effects using points_to
-echo
-module recurrence04
-activate PROPER_EFFECTS_WITH_POINTS_TO
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
- 
 
 close
 delete recurrence04

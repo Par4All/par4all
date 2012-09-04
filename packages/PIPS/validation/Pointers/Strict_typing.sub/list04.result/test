@@ -1,0 +1,27 @@
+
+PROPER  EFFECTS
+
+void list_free(list l)
+{
+//             <    is read   >: l
+//             <    is written>: n p
+   list n = l, p = l;
+//             <    is read   >: n
+   //while (n!=nil) {
+   // FI: to simplify the analysis...
+   while (n) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+      n = n->next;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: n
+//             <    is written>: p
+      p = n;
+   }
+   return;
+}
+
+POINTS-TO
+

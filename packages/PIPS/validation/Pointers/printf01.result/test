@@ -10,6 +10,7 @@ int main()
 //             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i=%d", i);
+   return 0;
 }
 
 POINTS-TO
@@ -30,4 +31,8 @@ int main()
 // Points To: none
 
    printf("i=%d", i);
+
+// Points To: none
+
+   return 0;
 }

@@ -1,0 +1,26 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int array13(int *p)
+{
+
+// Points To: none
+
+   int b[100];
+
+// Points To: none
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+
+
+   return 0;
+}

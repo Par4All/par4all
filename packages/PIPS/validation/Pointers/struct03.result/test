@@ -23,6 +23,7 @@ int struct03()
 //             <    is written>: x[i].deux.second
       x[i].deux.second = 0;
    }
+   return 0;
 }
 
 POINTS-TO
@@ -67,4 +68,8 @@ int struct03()
 
       x[i].deux.second = 0;
    }
+
+// Points To: none
+
+   return 0;
 }

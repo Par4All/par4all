@@ -1,0 +1,37 @@
+
+POINTS TO for inter07
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void display(towns t, double xmin, double ymin, double xmax, double ymax, double step)
+{
+
+// Points To: none
+
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+
+// Points To: none
+
+   size_t i, j;
+
+// Points To: none
+
+   for(i = 0; i < rangex; i += 1) {
+
+// Points To: none
+
+      for(j = 0; j < rangey; j += 1)
+
+// Points To: none
+
+         printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
+
+// Points To: none
+
+      printf("\n");
+   }
+}

@@ -5585,11 +5585,10 @@ digraph "main_opencl_helper_0_0" {
   "in" -> "61 D8";
 }
 // graph for dag "main_opencl_helper_0_0_1" of module "main" in dot format
-// DAG "main_opencl_helper_0_0_1": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
+// DAG "main_opencl_helper_0_0_1": #i=1 #o=1 #c=5 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_0_0_1" {
   // inputs
-  "immap_6" [shape=circle];
-  "imtmp" [shape=circle];
+  "in" [shape=circle];
 
   // outputs
   "immap_5" [shape=circle];
@@ -5601,8 +5600,12 @@ digraph "main_opencl_helper_0_0_1" {
   "74 -" -> "81 min" [label="immap_5"];
   "74 -" -> "80 max" [label="immap_5"];
   "74 -" -> "immap_5";
-  "immap_6" -> "74 -";
-  "imtmp" -> "74 -";
+  "69 E8" [shape=box];
+  "69 E8" -> "74 -" [label="immap_6"];
+  "61 D8" [shape=box];
+  "61 D8" -> "74 -" [label="imtmp"];
+  "in" -> "69 E8";
+  "in" -> "61 D8";
 }
 // graph for dag "main_opencl_helper_0_1" of module "main" in dot format
 // DAG "main_opencl_helper_0_1": #i=9 #o=1 #c=20 #s=0 #I=0 #B=0 #A=0
@@ -5754,6 +5757,20 @@ digraph "main_opencl_helper_0_1_0" {
   "82 +_" -> "83 *_" [label="immap_4"];
   "immap_5" -> "82 +_";
 }
+// graph for dag "main_opencl_helper_conv_511" of module "main" in dot format
+// DAG "main_opencl_helper_conv_511": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_conv_511" {
+  // inputs
+  "filter7" [shape=circle];
+
+  // outputs
+  "filter8" [shape=circle];
+
+  // computation vertices
+  "95 conv" [shape=box];
+  "95 conv" -> "filter8";
+  "filter7" -> "95 conv";
+}
 
 ! acceleration function
 
@@ -5764,6 +5781,117 @@ digraph "main_opencl_helper_0_1_0" {
 
 
 // dag 0: 34 ops and 2 copies, optimized to 32 ops and 0+0+0 copies
+
+// hold kernels for main_opencl_helper_conv_511
+static cl_kernel main_opencl_helper_conv_511_kernel[2];
+
+// compile kernels for main_opencl_helper_conv_511
+static freia_status main_opencl_helper_conv_511_compile(void)
+{
+  // OpenCL source for main_opencl_helper_conv_511
+  const char * main_opencl_helper_conv_511_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_conv_511\n"
+    "KERNEL void main_opencl_helper_conv_511(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t95 = PIXEL_ZERO;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t95 = PIXEL_ADD(t95, (is_N|is_W)? PIXEL_ZERO: in0NW);\n"
+    "    t95 = PIXEL_ADD(t95, (is_N)? PIXEL_ZERO: in0N);\n"
+    "    t95 = PIXEL_ADD(t95, (is_N|is_E)? PIXEL_ZERO: in0NE);\n"
+    "    t95 = PIXEL_ADD(t95, (is_W)? PIXEL_ZERO: in0W);\n"
+    "    t95 = PIXEL_ADD(t95, in0);\n"
+    "    t95 = PIXEL_ADD(t95, (is_E)? PIXEL_ZERO: in0E);\n"
+    "    t95 = PIXEL_ADD(t95, (is_S|is_W)? PIXEL_ZERO: in0SW);\n"
+    "    t95 = PIXEL_ADD(t95, (is_S)? PIXEL_ZERO: in0S);\n"
+    "    t95 = PIXEL_ADD(t95, (is_S|is_E)? PIXEL_ZERO: in0SE);\n"
+    "    PIXEL n95;\n"
+    "    if (is_N)\n"
+    "      if (is_W) n95 = 4;\n"
+    "      else if (is_E) n95 = 4;\n"
+    "      else n95 = 6;\n"
+    "    else if (is_S)\n"
+    "      if (is_W) n95 = 4;\n"
+    "      else if (is_E) n95 = 4;\n"
+    "      else n95 = 6;\n"
+    "    else if (is_W) n95 = 6;\n"
+    "    else if (is_E) n95 = 6;\n"
+    "    else n95 = 9;\n"
+    "    t95 = PIXEL_DIV(t95, n95);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t95;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_conv_511_source, "main_opencl_helper_conv_511", "-DPIXEL8", &main_opencl_helper_conv_511_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_conv_511_source, "main_opencl_helper_conv_511", "-DPIXEL16", &main_opencl_helper_conv_511_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_conv_511
+freia_status main_opencl_helper_conv_511(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_conv_511_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_conv_511_kernel[bpp];
+
+  // call kernel main_opencl_helper_conv_511
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
 
 // hold kernels for main_opencl_helper_0_0_1
 static cl_kernel main_opencl_helper_0_0_1_kernel[2];
@@ -5781,32 +5909,69 @@ static freia_status main_opencl_helper_0_0_1_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  GLOBAL PIXEL * i1, // const?\n"
-    "  int ofs_i1,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
-    "  int idy = get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
+    "    PIXEL t61 = PIXEL_MIN;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
     "    PIXEL in0 = j0[i];\n"
-    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    PIXEL t69 = PIXEL_MAX;\n"
     "    // pixel computations\n"
-    "    PIXEL t74 = PIXEL_SUB(in1, in0);\n"
+    "    t61 = PIXEL_SUP(t61, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t61 = PIXEL_SUP(t61, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t61 = PIXEL_SUP(t61, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t61 = PIXEL_SUP(t61, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t61 = PIXEL_SUP(t61, in0);\n"
+    "    t61 = PIXEL_SUP(t61, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t61 = PIXEL_SUP(t61, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t61 = PIXEL_SUP(t61, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t61 = PIXEL_SUP(t61, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    t69 = PIXEL_INF(t69, (is_N|is_W)? PIXEL_MAX: in0NW);\n"
+    "    t69 = PIXEL_INF(t69, (is_N)? PIXEL_MAX: in0N);\n"
+    "    t69 = PIXEL_INF(t69, (is_N|is_E)? PIXEL_MAX: in0NE);\n"
+    "    t69 = PIXEL_INF(t69, (is_W)? PIXEL_MAX: in0W);\n"
+    "    t69 = PIXEL_INF(t69, in0);\n"
+    "    t69 = PIXEL_INF(t69, (is_E)? PIXEL_MAX: in0E);\n"
+    "    t69 = PIXEL_INF(t69, (is_S|is_W)? PIXEL_MAX: in0SW);\n"
+    "    t69 = PIXEL_INF(t69, (is_S)? PIXEL_MAX: in0S);\n"
+    "    t69 = PIXEL_INF(t69, (is_S|is_E)? PIXEL_MAX: in0SE);\n"
+    "    PIXEL t74 = PIXEL_SUB(t61, t69);\n"
     "    PIXEL_MAXIMUM(red80, t74);\n"
     "    PIXEL_MINIMUM(red81, t74);\n"
     "    // set output pixels\n"
@@ -5814,8 +5979,8 @@ static freia_status main_opencl_helper_0_0_1_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[idy].max = mmax.x;\n"
-    "  redX[idy].min = mmin.x;\n"
+    "  redX[thrid].max = mmax.x;\n"
+    "  redX[thrid].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_opencl_helper_0_0_1_source, "main_opencl_helper_0_0_1", "-DPIXEL8", &main_opencl_helper_0_0_1_kernel[0]);
@@ -5827,9 +5992,8 @@ static freia_status main_opencl_helper_0_0_1_compile(void)
 freia_status main_opencl_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
-  const freia_data2d * i1,
-  int32_t * po3,
-  int32_t * po4)
+  int32_t * po2,
+  int32_t * po3)
 {
   freia_status err = FREIA_OK;
 
@@ -5850,11 +6014,11 @@ freia_status main_opencl_helper_0_0_1(
   freia_opencl_measure_status redres;
 
   // call kernel main_opencl_helper_0_0_1
-  err |= freia_op_call_kernel(kernel, 1, 2, 0, 1, o0, i0, i1, &redres);
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 1, o0, i0, &redres);
 
   // return reduction results
-  *po3 = redres.maximum;
-  *po4 = redres.minimum;
+  *po2 = redres.maximum;
+  *po3 = redres.minimum;
 
   return err;
 }
@@ -5891,7 +6055,7 @@ static freia_status main_opencl_helper_0_1_0_compile(void)
     "  int ofs_i7,\n"
     "  GLOBAL PIXEL * i8, // const?\n"
     "  int ofs_i8,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -5906,23 +6070,32 @@ static freia_status main_opencl_helper_0_1_0_compile(void)
     "  int c10,\n"
     "  int c11)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
-    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
-    "  GLOBAL PIXEL * j3 = i3 + ofs_i3;\n"
-    "  GLOBAL PIXEL * j4 = i4 + ofs_i4;\n"
-    "  GLOBAL PIXEL * j5 = i5 + ofs_i5;\n"
-    "  GLOBAL PIXEL * j6 = i6 + ofs_i6;\n"
-    "  GLOBAL PIXEL * j7 = i7 + ofs_i7;\n"
-    "  GLOBAL PIXEL * j8 = i8 + ofs_i8;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "  GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;\n"
+    "  GLOBAL PIXEL * j4 = i4 + ofs_i4 + shift;\n"
+    "  GLOBAL PIXEL * j5 = i5 + ofs_i5 + shift;\n"
+    "  GLOBAL PIXEL * j6 = i6 + ofs_i6 + shift;\n"
+    "  GLOBAL PIXEL * j7 = i7 + ofs_i7 + shift;\n"
+    "  GLOBAL PIXEL * j8 = i8 + ofs_i8 + shift;\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
+    "    PIXEL in7 = j7[i];\n"
+    "    PIXEL in8 = j8[i];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
@@ -5930,8 +6103,6 @@ static freia_status main_opencl_helper_0_1_0_compile(void)
     "    PIXEL in4 = j4[i];\n"
     "    PIXEL in5 = j5[i];\n"
     "    PIXEL in6 = j6[i];\n"
-    "    PIXEL in7 = j7[i];\n"
-    "    PIXEL in8 = j8[i];\n"
     "    // pixel computations\n"
     "    PIXEL t82 = PIXEL_ADD(in7, c0);\n"
     "    PIXEL t83 = PIXEL_MUL(t82, c1);\n"
@@ -6013,38 +6184,145 @@ freia_status main_opencl_helper_0_1_0(
 
 // opencl for dag 0
 
+// opencl function main_opencl_helper_conv_511
+KERNEL void main_opencl_helper_conv_511(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t95 = PIXEL_ZERO;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t95 = PIXEL_ADD(t95, (is_N|is_W)? PIXEL_ZERO: in0NW);
+    t95 = PIXEL_ADD(t95, (is_N)? PIXEL_ZERO: in0N);
+    t95 = PIXEL_ADD(t95, (is_N|is_E)? PIXEL_ZERO: in0NE);
+    t95 = PIXEL_ADD(t95, (is_W)? PIXEL_ZERO: in0W);
+    t95 = PIXEL_ADD(t95, in0);
+    t95 = PIXEL_ADD(t95, (is_E)? PIXEL_ZERO: in0E);
+    t95 = PIXEL_ADD(t95, (is_S|is_W)? PIXEL_ZERO: in0SW);
+    t95 = PIXEL_ADD(t95, (is_S)? PIXEL_ZERO: in0S);
+    t95 = PIXEL_ADD(t95, (is_S|is_E)? PIXEL_ZERO: in0SE);
+    PIXEL n95;
+    if (is_N)
+      if (is_W) n95 = 4;
+      else if (is_E) n95 = 4;
+      else n95 = 6;
+    else if (is_S)
+      if (is_W) n95 = 4;
+      else if (is_E) n95 = 4;
+      else n95 = 6;
+    else if (is_W) n95 = 6;
+    else if (is_E) n95 = 6;
+    else n95 = 9;
+    t95 = PIXEL_DIV(t95, n95);
+    // set output pixels
+    p0[i] = t95;
+  }
+}
+
 // opencl function main_opencl_helper_0_0_1
 KERNEL void main_opencl_helper_0_0_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   GLOBAL TMeasure * redX)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
   // reduction stuff is currently hardcoded...
   int vol = 0;
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
-  int idy = get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
     // get input pixels
+    PIXEL t61 = PIXEL_MIN;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
     PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    PIXEL t69 = PIXEL_MAX;
     // pixel computations
-    PIXEL t74 = PIXEL_SUB(in1, in0);
+    t61 = PIXEL_SUP(t61, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t61 = PIXEL_SUP(t61, (is_N)? PIXEL_MIN: in0N);
+    t61 = PIXEL_SUP(t61, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t61 = PIXEL_SUP(t61, (is_W)? PIXEL_MIN: in0W);
+    t61 = PIXEL_SUP(t61, in0);
+    t61 = PIXEL_SUP(t61, (is_E)? PIXEL_MIN: in0E);
+    t61 = PIXEL_SUP(t61, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t61 = PIXEL_SUP(t61, (is_S)? PIXEL_MIN: in0S);
+    t61 = PIXEL_SUP(t61, (is_S|is_E)? PIXEL_MIN: in0SE);
+    t69 = PIXEL_INF(t69, (is_N|is_W)? PIXEL_MAX: in0NW);
+    t69 = PIXEL_INF(t69, (is_N)? PIXEL_MAX: in0N);
+    t69 = PIXEL_INF(t69, (is_N|is_E)? PIXEL_MAX: in0NE);
+    t69 = PIXEL_INF(t69, (is_W)? PIXEL_MAX: in0W);
+    t69 = PIXEL_INF(t69, in0);
+    t69 = PIXEL_INF(t69, (is_E)? PIXEL_MAX: in0E);
+    t69 = PIXEL_INF(t69, (is_S|is_W)? PIXEL_MAX: in0SW);
+    t69 = PIXEL_INF(t69, (is_S)? PIXEL_MAX: in0S);
+    t69 = PIXEL_INF(t69, (is_S|is_E)? PIXEL_MAX: in0SE);
+    PIXEL t74 = PIXEL_SUB(t61, t69);
     PIXEL_MAXIMUM(red80, t74);
     PIXEL_MINIMUM(red81, t74);
     // set output pixels
@@ -6052,8 +6330,8 @@ KERNEL void main_opencl_helper_0_0_1(
   }
 
   // reduction copy out
-  redX[idy].max = mmax.x;
-  redX[idy].min = mmin.x;
+  redX[thrid].max = mmax.x;
+  redX[thrid].min = mmin.x;
 }
 
 // opencl function main_opencl_helper_0_1_0
@@ -6078,7 +6356,7 @@ KERNEL void main_opencl_helper_0_1_0(
   int ofs_i7,
   GLOBAL PIXEL * i8, // const?
   int ofs_i8,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
@@ -6093,23 +6371,32 @@ KERNEL void main_opencl_helper_0_1_0(
   int c10,
   int c11)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
-  GLOBAL PIXEL * j3 = i3 + ofs_i3;
-  GLOBAL PIXEL * j4 = i4 + ofs_i4;
-  GLOBAL PIXEL * j5 = i5 + ofs_i5;
-  GLOBAL PIXEL * j6 = i6 + ofs_i6;
-  GLOBAL PIXEL * j7 = i7 + ofs_i7;
-  GLOBAL PIXEL * j8 = i8 + ofs_i8;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+  GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;
+  GLOBAL PIXEL * j4 = i4 + ofs_i4 + shift;
+  GLOBAL PIXEL * j5 = i5 + ofs_i5 + shift;
+  GLOBAL PIXEL * j6 = i6 + ofs_i6 + shift;
+  GLOBAL PIXEL * j7 = i7 + ofs_i7 + shift;
+  GLOBAL PIXEL * j8 = i8 + ofs_i8 + shift;
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
+    PIXEL in7 = j7[i];
+    PIXEL in8 = j8[i];
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
@@ -6117,8 +6404,6 @@ KERNEL void main_opencl_helper_0_1_0(
     PIXEL in4 = j4[i];
     PIXEL in5 = j5[i];
     PIXEL in6 = j6[i];
-    PIXEL in7 = j7[i];
-    PIXEL in8 = j8[i];
     // pixel computations
     PIXEL t82 = PIXEL_ADD(in7, c0);
     PIXEL t83 = PIXEL_MUL(t82, c1);
@@ -6155,13 +6440,11 @@ int main(int argc, char **argv)
    freia_data2d *filter5, *filter6, *filter7, *filter8;                 /*0008*/
    int32_t max;                                                         /*0011*/
    int32_t min;                                                         /*0012*/
-   int32_t kernel[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                      /*0013*/
    //PIPS generated variable
    register freia_status _return0, _return1, _return2;                  /*0015*/
    //PIPS generated variable
-   register freia_status ret = 0;                                       /*0017*/
+   register freia_status ret;                                           /*0017*/
    //PIPS generated variable
-   freia_data2d *imtmp;                                                 /*0019*/
    //PIPS generated variable
    register int i_0, i_1;                                               /*0021*/
 
@@ -6186,7 +6469,6 @@ int main(int argc, char **argv)
    
    // map elaboration
    
-   imtmp = freia_common_create_data(immap->bpp, immap->widthWa, immap->heightWa);      /*0058*/
    i_0 = 1;                                                             /*0062*/
    
    
@@ -6199,20 +6481,18 @@ int main(int argc, char **argv)
    _return0 = 0;                                                        /*0077*/
    
    // const elaboration
+   main_opencl_helper_conv_511(filter2, in);                            /*0089*/
+   main_opencl_helper_conv_511(filter3, filter2);                       /*0090*/
+   main_opencl_helper_conv_511(filter4, filter3);                       /*0091*/
+   main_opencl_helper_conv_511(filter5, filter4);                       /*0092*/
+   main_opencl_helper_conv_511(filter6, filter5);                       /*0093*/
+   main_opencl_helper_conv_511(filter7, filter6);                       /*0094*/
+   main_opencl_helper_conv_511(filter8, filter7);                       /*0095*/
    
    
-   freia_aipo_dilate_8c(imtmp, in, freia_morpho_kernel_8c);             /*0061*/
+   main_opencl_helper_0_0_1(immap, in, &max, &min);                     /*0061*/
    
    
-   freia_aipo_erode_8c(immap, in, freia_morpho_kernel_8c);              /*0069*/
-   freia_aipo_convolution(filter2, in, kernel, 3, 3);                   /*0089*/
-   freia_aipo_convolution(filter3, filter2, kernel, 3, 3);              /*0090*/
-   freia_aipo_convolution(filter4, filter3, kernel, 3, 3);              /*0091*/
-   freia_aipo_convolution(filter5, filter4, kernel, 3, 3);              /*0092*/
-   freia_aipo_convolution(filter6, filter5, kernel, 3, 3);              /*0093*/
-   freia_aipo_convolution(filter7, filter6, kernel, 3, 3);              /*0094*/
-   freia_aipo_convolution(filter8, filter7, kernel, 3, 3);              /*0095*/
-   main_opencl_helper_0_0_1(immap, immap, imtmp, &max, &min);           /*0074*/
    
    //freia_aipo_not(immap, immap);
    main_opencl_helper_0_1_0(out, filter2, filter3, filter4, filter5, filter6, filter7, filter8, immap, in, -min, 32767/(max-min), 128, 0+7, 0, 1, 2, 3, 4, 5, 6, 7);             /*0082*/
@@ -6222,8 +6502,7 @@ int main(int argc, char **argv)
    
    // merge results
    
-   freia_common_destruct_data(imtmp);                                   /*0076*/
-
+   
    freia_common_tx_image(in, &fdout);                                   /*0117*/
    freia_common_tx_image(out, &fdout);                                  /*0118*/
    
@@ -6259,13 +6538,11 @@ int main(int argc, char **argv)
    freia_data2d *filter5, *filter6, *filter7, *filter8;                 /*0008*/
    int32_t max;                                                         /*0011*/
    int32_t min;                                                         /*0012*/
-   int32_t kernel[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                      /*0013*/
    //PIPS generated variable
    register freia_status _return0, _return1, _return2;                  /*0015*/
    //PIPS generated variable
-   register freia_status ret = 0;                                       /*0017*/
+   register freia_status ret;                                           /*0017*/
    //PIPS generated variable
-   freia_data2d *imtmp;                                                 /*0019*/
    //PIPS generated variable
    register int i_0, i_1;                                               /*0021*/
 
@@ -6290,7 +6567,6 @@ int main(int argc, char **argv)
    
    // map elaboration
    
-   imtmp = freia_common_create_data(immap->bpp, immap->widthWa, immap->heightWa);      /*0058*/
    i_0 = 1;                                                             /*0062*/
    
    
@@ -6303,20 +6579,18 @@ int main(int argc, char **argv)
    _return0 = 0;                                                        /*0077*/
    
    // const elaboration
+   main_opencl_helper_conv_511(filter2, in);                            /*0089*/
+   main_opencl_helper_conv_511(filter3, filter2);                       /*0090*/
+   main_opencl_helper_conv_511(filter4, filter3);                       /*0091*/
+   main_opencl_helper_conv_511(filter5, filter4);                       /*0092*/
+   main_opencl_helper_conv_511(filter6, filter5);                       /*0093*/
+   main_opencl_helper_conv_511(filter7, filter6);                       /*0094*/
+   main_opencl_helper_conv_511(filter8, filter7);                       /*0095*/
    
    
-   freia_aipo_dilate_8c(imtmp, in, freia_morpho_kernel_8c);             /*0061*/
+   main_opencl_helper_0_0_1(immap, in, &max, &min);                     /*0061*/
    
    
-   freia_aipo_erode_8c(immap, in, freia_morpho_kernel_8c);              /*0069*/
-   freia_aipo_convolution(filter2, in, kernel, 3, 3);                   /*0089*/
-   freia_aipo_convolution(filter3, filter2, kernel, 3, 3);              /*0090*/
-   freia_aipo_convolution(filter4, filter3, kernel, 3, 3);              /*0091*/
-   freia_aipo_convolution(filter5, filter4, kernel, 3, 3);              /*0092*/
-   freia_aipo_convolution(filter6, filter5, kernel, 3, 3);              /*0093*/
-   freia_aipo_convolution(filter7, filter6, kernel, 3, 3);              /*0094*/
-   freia_aipo_convolution(filter8, filter7, kernel, 3, 3);              /*0095*/
-   main_opencl_helper_0_0_1(immap, immap, imtmp, &max, &min);           /*0074*/
    
    //freia_aipo_not(immap, immap);
    main_opencl_helper_0_1_0(out, filter2, filter3, filter4, filter5, filter6, filter7, filter8, immap, in, -min, 32767/(max-min), 128, 7, 0, 1, 2, 3, 4, 5, 6, 7);               /*0082*/
@@ -6326,8 +6600,7 @@ int main(int argc, char **argv)
    
    // merge results
    
-   freia_common_destruct_data(imtmp);                                   /*0076*/
-
+   
    freia_common_tx_image(in, &fdout);                                   /*0117*/
    freia_common_tx_image(out, &fdout);                                  /*0118*/
    

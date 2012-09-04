@@ -1,102 +1,57 @@
 
-PROPER  EFFECTS
-
-int main(int argc, char *argv[])
-{
-//             <    is written>: i
-   int ***ppp, i = 1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: ppp _MALLOC_EFFECTS:_MALLOC_
-
-   ppp = (int ***) malloc(sizeof(int * * *));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: ppp _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   *ppp = (int **) malloc(sizeof(int * *));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   **ppp = (int *) malloc(sizeof(int *));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   ***ppp = i;
-//             <    is read   >: ppp _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-
-   free(ppp);
-
-   return 0;
-}
-
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT:
-// *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
-// *HEAP*_l_22 -> *HEAP*_l_23 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 
 int main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[0] , MAY
+// Points To: none
 
    int ***ppp, i = 1;
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
 // ppp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
-   ppp = (int ***) malloc(sizeof(int * * *));
+   ppp = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
-// ppp -> *HEAP*_l_21 , EXACT
+// ppp -> *HEAP*_l_23 , MAY
 
-   *ppp = (int **) malloc(sizeof(int * *));
-
-// Points To:
-// *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
-// argv[*] -> _argv_2[0] , EXACT
-// ppp -> *HEAP*_l_21 , EXACT
-
-   **ppp = (int *) malloc(sizeof(int *));
+   *ppp = (int **) malloc(sizeof(int *));
 
 // Points To:
-// *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
-// *HEAP*_l_22 -> *HEAP*_l_23 , EXACT
-// argv[*] -> _argv_2[0] , EXACT
-// ppp -> *HEAP*_l_21 , EXACT
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// ppp -> *HEAP*_l_23 , MAY
+
+   **ppp = (int *) malloc(sizeof(int));
+
+// Points To:
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// ppp -> *HEAP*_l_23 , MAY
 
    ***ppp = i;
 
 // Points To:
-// *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
-// *HEAP*_l_22 -> *HEAP*_l_23 , EXACT
-// argv[*] -> _argv_2[0] , EXACT
-// ppp -> *HEAP*_l_21 , EXACT
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// ppp -> *HEAP*_l_23 , MAY
 
 
    free(ppp);
 
 // Points To:
-// *HEAP*_l_21 -> *HEAP*_l_22 , EXACT
-// *HEAP*_l_22 -> *HEAP*_l_23 , EXACT
-// argv[*] -> _argv_2[0] , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // ppp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_21".
-PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
-PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
-PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
-PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
-PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".

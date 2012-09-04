@@ -3,7 +3,6 @@ POINTS TO for inter04
 
 
 // Points To IN:
-// _pp_1 -> _pp_1_1 , EXACT
 // _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
@@ -17,8 +16,6 @@ void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1 -> _pp_1_1 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
@@ -55,10 +52,7 @@ void inter04()
    bar(pp, qq);
 
 // Points To:
-// p -> i , EXACT
-// pp -> p , EXACT
-// q -> j , EXACT
-// qq -> q , EXACT
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
 
    return;
 }
@@ -131,7 +125,6 @@ POINTS TO for inter04
 
 
 // Points To IN:
-// _pp_1 -> _pp_1_1 , EXACT
 // _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
@@ -145,8 +138,6 @@ void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1 -> _pp_1_1 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
@@ -194,10 +185,4 @@ INIT_POINTS_TO_ANALYSIS[bar] (init_points_to_analysis) Property ALIASING_ACROSS_
 C_PARSER[inter04] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[inter04] (simplify_C_expression) Variable "j" is probably used before it is defined
 INIT_POINTS_TO_ANALYSIS[inter04] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
-On going implementation...
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
-On going implementation...
 INIT_POINTS_TO_ANALYSIS[inter04!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter04] (user_call_to_points_to) The function call to "bar" is still ignored
-On going implementation...

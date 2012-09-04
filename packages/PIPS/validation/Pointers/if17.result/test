@@ -1,0 +1,43 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p, *q, i;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   p = q = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+
+
+   if (p==q)
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+
+      p = (void *) 0;
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+// q -> i , EXACT
+
+
+   return 0;
+}

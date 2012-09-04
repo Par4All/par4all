@@ -12,7 +12,6 @@ display PRINTED_FILE[foo]
 echo
 echo POINTS TO for "$WS"
 echo
-activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[$WS]
 
 close

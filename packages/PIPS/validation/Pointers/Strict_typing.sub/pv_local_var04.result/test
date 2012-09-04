@@ -1,0 +1,117 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: pp
+   int *pp = (void *) 0;
+//             <    is read   >: a
+   // FI: to manage an empty points-to set
+   if (a>1) {
+      static int *p = &a;
+      static int *q;
+//             <    is written>: q
+      q = &b;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a-1;
+   }
+   else {
+      static int *r = &a;
+      static int *s;
+//             <    is written>: s
+      s = &b;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a+2;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> a , EXACT
+// q -> b , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
+
+int main()
+{
+
+// Points To: none
+
+   int *pp = (void *) 0;
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+
+   // FI: to manage an empty points-to set
+   if (a>1) {
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+
+      static int *p = &a;
+
+// Points To:
+// p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
+
+      static int *q;
+
+// Points To:
+// p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
+
+      q = &b;
+
+// Points To:
+// p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
+// q -> b , EXACT
+
+      a = a-1;
+   }
+   else {
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+
+      static int *r = &a;
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+// r -> a , EXACT
+
+      static int *s;
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+// r -> a , EXACT
+// s -> *NULL_POINTER* , EXACT
+
+      s = &b;
+
+// Points To:
+// pp -> *NULL_POINTER* , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
+
+      a = a+2;
+   }
+
+// Points To:
+// p -> a , EXACT
+// pp -> *NULL_POINTER* , EXACT
+// q -> b , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
+
+   return 0;
+}

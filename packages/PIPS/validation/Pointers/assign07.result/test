@@ -92,7 +92,7 @@ void assign07()
    **p = r;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
 // p -> q , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // r -> i , EXACT
@@ -100,7 +100,7 @@ void assign07()
    ***p = 0;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
 // p -> q , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // r -> i , EXACT

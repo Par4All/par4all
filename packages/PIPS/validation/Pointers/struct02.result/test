@@ -28,6 +28,7 @@ int struct02()
 //             <    is written>: x[i].second
          x[i].second = 1;
       }
+   return 0;
 }
 
 POINTS-TO
@@ -79,4 +80,8 @@ int struct02()
 
          x[i].second = 1;
       }
+
+// Points To: none
+
+   return 0;
 }

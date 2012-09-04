@@ -1,0 +1,11 @@
+
+POINTS TO
+
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global05] (global_source_to_sinks) Initialization of global variable "pi" is ignored because the "const" qualifier is not used.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global05] (offset_cell) user error
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global05] (offset_cell) Use of pointer arithmetic on _pi_84 is not standard-compliant.
+Reset property "POINTS_TO_STRICT_POINTER_TYPES" for usual non-standard compliant C code.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global05] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module global05.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

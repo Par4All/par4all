@@ -1,0 +1,53 @@
+
+PROPER  EFFECTS
+
+int foo()
+{
+//             <    is written>: i
+   int *p, i = 1;
+//             <    is written>: p
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo()
+{
+
+// Points To: none
+
+   int *p, i = 1;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   p++;
+
+// Points To:
+// p -> i[1] , EXACT
+
+   p++;
+
+// Points To:
+// p -> i[2] , EXACT
+
+   return 0;
+}

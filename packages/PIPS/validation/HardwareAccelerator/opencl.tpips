@@ -1,4 +1,6 @@
-# WSPACE=foo FILE=foo.c tpips terapix.tpips
+# WSPACE=foo FILE=foo.c tpips opencl.tpips
 # setenv PIPS_HWAC_DEBUG_LEVEL=7
 setenv FREIA_TARGET=OPENCL
+setproperty HWAC_OPENCL_MERGE_KERNEL_OPERATIONS TRUE
+setproperty HWAC_OPENCL_GENERATE_SPECIAL_KERNEL_OPS TRUE
 source target.tpips

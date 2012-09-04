@@ -5,6 +5,7 @@ void point_to02()
     int b[10];
   } c, *p;
 
+  p = &c;
   p->a = 1;
   p->b[2] = 3;
   return;

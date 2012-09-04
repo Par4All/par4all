@@ -10,6 +10,7 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(s);
+   return 0;
 }
 
 POINTS-TO
@@ -31,4 +32,9 @@ int main()
 // s -> "sortie de puts" , EXACT
 
    puts(s);
+
+// Points To:
+// s -> "sortie de puts" , EXACT
+
+   return 0;
 }
