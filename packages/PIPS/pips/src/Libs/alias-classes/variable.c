@@ -73,16 +73,18 @@ list variable_to_pointer_locations(entity e)
     type t =  entity_basic_concrete_type(e);
     if(pointer_type_p(t) || array_of_pointers_type_p(t)) {
       if (entity_array_p(e)) {
-	variable v = type_variable(t);
-	int d = (int) gen_length(variable_dimensions(v));
-	list sl = NIL;
-	int i;
-	for(i=0;i<d;i++) {
-	  expression ind = make_unbounded_expression();
-	  sl = CONS(EXPRESSION, ind, sl);
-	}
-	reference r = make_reference(e, sl);
+	/* variable v = type_variable(t); */
+	/* int d = (int) gen_length(variable_dimensions(v)); */
+	/* list sl = NIL; */
+	/* int i; */
+	/* for(i=0;i<d;i++) { */
+	/*   expression ind = make_unbounded_expression(); */
+	/*   sl = CONS(EXPRESSION, ind, sl); */
+	/* } */
+	/* reference r = make_reference(e, sl); */
+	reference r = make_reference(e, NIL);
 	cell c = make_cell_reference(r);
+	points_to_cell_add_unbounded_subscripts(c);
 	l = CONS(CELL, c, NIL);
       }
       else {

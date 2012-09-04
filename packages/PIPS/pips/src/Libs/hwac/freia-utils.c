@@ -55,12 +55,12 @@
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
 #define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, false, NULL }
-#define NOPE_OPCL { F, NULL }
+#define NOPE_OPCL { F, F, NULL, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
 #define NO_TRPX { 0, 0, 0, 0, 0, -1, false, false, NULL }
-#define NO_OPCL { F, NULL }
+#define NO_OPCL { F, F, NULL, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, false, "TERAPIX_UCODE_" op }
 #define TRPX_IO(c, op) { 0, 0, 0, 0, 0, c, true, true, "TERAPIX_UCODE_" op }
@@ -69,7 +69,8 @@
 // preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
-#define OPCL(op) { T, "PIXEL_" op }
+#define OPCL(op)       { T, F, "PIXEL_" op, NULL }
+#define OPCLK(op,init) { F, T, "PIXEL_" op, "PIXEL_" init }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -275,13 +276,13 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "ERODE_3_3"), NO_OPCL
+    TRPX_NG(15, "ERODE_3_3"), OPCLK("INF", "MAX")
   },
   { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "DILATE_3_3"), NO_OPCL
+    TRPX_NG(15, "DILATE_3_3"), OPCLK("SUP", "MIN")
   },
   // MEASURES
   { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
@@ -328,7 +329,9 @@ static const freia_api_t FREIA_AIPO_API[] = {
     },
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
-    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }, NO_OPCL
+    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" },
+    // missing at tail: / norm
+    OPCLK("ADD", "ZERO")
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
@@ -372,6 +375,11 @@ const freia_api_t * get_freia_api(int index)
 {
   // pips_assert("index exists", index>=0 && index<(int) FREIA_AIPO_API_SIZE);
   return &FREIA_AIPO_API[index];
+}
+
+const freia_api_t * get_freia_api_vtx(dagvtx v)
+{
+  return get_freia_api(vtxcontent_opid(dagvtx_content(v)));
 }
 
 /* @return new allocated variable name using provided prefix.
@@ -916,6 +924,34 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
   return same;
 }
 
+entity freia_create_helper_function(const string function_name, list lparams)
+{
+  // build helper entity
+  entity example = local_name_to_top_level_entity("freia_aipo_add");
+  pips_assert("example is a function", entity_function_p(example));
+  entity helper = make_empty_function(function_name,
+        copy_type(functional_result(type_functional(entity_type(example)))),
+                                      make_language_c());
+
+  // update type of parameters
+  list larg_params = NIL;
+  FOREACH(expression, e, lparams)
+  {
+    debug_on("RI_UTILS_DEBUG_LEVEL");
+    type t = expression_to_user_type(e);
+    debug_off();
+    larg_params = CONS(parameter,
+                       make_parameter(t,
+                                      make_mode_value(),
+                                      make_dummy_unknown()),
+                       larg_params);
+  }
+  larg_params = gen_nreverse(larg_params);
+  module_functional_parameters(helper) = larg_params;
+
+  return helper;
+}
+
 /* substitute those statement in ls that are in dag d and accelerated
  * by a call to function_name(lparams)
  * also update sets of remainings and global_remainings
@@ -937,7 +973,7 @@ int freia_substitute_by_helper_call(
   set global_remainings,
   set remainings,
   list /* of statement */ ls,
-  string function_name,
+  const string function_name,
   list lparams,
   set helpers,    // for signatures
   int preceeding) // statement which stored the previous insert, -1 for none
@@ -963,7 +999,7 @@ int freia_substitute_by_helper_call(
   set_difference(global_remainings, global_remainings, dones);
 
   // replace first statement of dones in ls,
-  // which comes after the preceeding ones
+  // which comes after the preceeding ones.
   statement found = NULL, sos = NULL;
   FOREACH(statement, sc, ls)
   {
@@ -990,30 +1026,9 @@ int freia_substitute_by_helper_call(
 
   pips_assert("some statement found", found);
 
-  // build helper entity
-  entity example = local_name_to_top_level_entity("freia_aipo_add");
-  pips_assert("example is a function", entity_function_p(example));
-  entity helper = make_empty_function(function_name,
-        copy_type(functional_result(type_functional(entity_type(example)))),
-                                      make_language_c());
-  // record helper function
+  // create and record helper function
+  entity helper = freia_create_helper_function(function_name, lparams);
   set_add_element(helpers, helpers, helper);
-
-  // update type of parameters
-  list larg_params = NIL;
-  FOREACH(expression, e, lparams)
-  {
-    debug_on("RI_UTILS_DEBUG_LEVEL");
-    type t = expression_to_user_type(e);
-    debug_off();
-    larg_params = CONS(parameter,
-                       make_parameter(t,
-                                      make_mode_value(),
-                                      make_dummy_unknown()),
-                       larg_params);
-  }
-  larg_params = gen_nreverse(larg_params);
-  module_functional_parameters(helper) = larg_params;
 
   // substitute by call to helper
   call c = make_call(helper, lparams);
@@ -1191,9 +1206,12 @@ typedef struct {
   hash_table occs;
   // enclosing statement for inner recursion
   statement enclosing;
-  // set of statements, to record statements with image occurences
+  // set of statements with image operations
   set image_occs_stats;
-  // helper entity -> number of written args
+  // statement -> set of W images
+  // statement+1 -> set of R images
+  hash_table image_stats;
+  // helper entity -> number of written image args
   const hash_table signatures;
 } occs_ctx;
 
@@ -1204,7 +1222,7 @@ typedef struct {
  * contain image allocations so there should be no problem.
  */
 
-static void check_ref(reference r, occs_ctx * ctx)
+static bool check_ref(reference r, occs_ctx * ctx)
 {
   entity v = reference_variable(r);
   if (freia_image_variable_p(v))
@@ -1222,6 +1240,11 @@ static void check_ref(reference r, occs_ctx * ctx)
       (statement) gen_get_ancestor(statement_domain, r);
     // which MUST exist?
     pips_assert("some containing statement", up);
+    if (ctx->image_stats) {
+      set sop = (set) hash_get(ctx->image_stats,
+                               written? E_WRITE(up): E_READ(up));
+      set_add_element(sop, sop, (void*) v);
+    }
     // store result
     set_add_element(stats, stats, (void*) up);
     if (ctx->image_occs_stats)
@@ -1230,15 +1253,24 @@ static void check_ref(reference r, occs_ctx * ctx)
     pips_debug(9, "entity %s in statement %"_intFMT"\n",
                entity_name(v), statement_number(up));
   }
+  return true;
 }
 
-static void check_stmt(statement s, occs_ctx * ctx)
+static bool check_stmt(statement s, occs_ctx * ctx)
 {
+  // ensure existing set
+  if (ctx->image_stats) {
+    pips_debug(8, "creating for statement %"_intFMT"\n",
+               statement_number(s));
+    hash_put(ctx->image_stats, E_WRITE(s), set_make(set_pointer));
+    hash_put(ctx->image_stats, E_READ(s), set_make(set_pointer));
+  }
   ctx->enclosing = s;
   FOREACH(entity, var, statement_declarations(s))
     gen_context_recurse(entity_initial(var), ctx,
                         reference_domain, gen_true, check_ref);
   ctx->enclosing = NULL;
+  return true;
 }
 
 /* @param image_occs_stats set of statements with image occurences (may be NULL)
@@ -1248,14 +1280,17 @@ static void check_stmt(statement s, occs_ctx * ctx)
 hash_table freia_build_image_occurrences(
   statement s,
   set image_occs_stats,
+  hash_table image_stats,
   const hash_table signatures)
 {
+  pips_debug(7, "entering\n");
   occs_ctx ctx = { hash_table_make(hash_pointer, 0), NULL,
-                   image_occs_stats, signatures };
+                   image_occs_stats, image_stats, signatures };
   gen_context_multi_recurse(s, &ctx,
-                            statement_domain, gen_true, check_stmt,
-                            reference_domain, gen_true, check_ref,
+                            statement_domain, check_stmt, gen_null,
+                            reference_domain, check_ref, gen_null,
                             NULL);
+  pips_debug(7, "done\n");
   return ctx.occs;
 }
 
@@ -1317,6 +1352,13 @@ bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
   return bw && bh;
 }
 
+static void clean_stats_to_image(hash_table s2i)
+{
+  HASH_FOREACH(statement, st, set, imgs, s2i)
+    set_free(imgs);
+  hash_table_free(s2i);
+}
+
 /****************************************************** NEW IMAGE ALLOCATION */
 
 /*
@@ -1338,14 +1380,112 @@ static statement image_free(entity v)
               CONS(expression, entity_to_expression(v), NIL)));
 }
 
+struct related_ctx {
+  const entity img;
+  const hash_table new_images;
+  const hash_table image_stats;
+  bool write_only;
+  bool some_effect;
+};
+
+/* is there an effect to this image or related images in the statement?
+ */
+
+/* are img1 and img2 related?
+ */
+static bool related_images_p(const entity img1, const entity img2,
+                             const hash_table new_images)
+{
+  entity oimg1 = NULL, oimg2 = NULL;
+  if (img1==img2) return true;
+  if (hash_defined_p(new_images, img1))
+    oimg1 = (entity) hash_get(new_images, img1);
+  if (hash_defined_p(new_images, img2))
+    oimg2 = (entity) hash_get(new_images, img2);
+
+  pips_debug(9, "images: %s -> %s / %s -> %s\n",
+             entity_local_name(img1), oimg1? entity_local_name(oimg1): "NONE",
+             entity_local_name(img2), oimg2? entity_local_name(oimg2): "NONE");
+
+  if (oimg1 && oimg1==img2) return true;
+  if (oimg2 && img1==oimg2) return true;
+  // this is really the one which should be triggered?
+  return oimg1 && oimg2 && oimg1==oimg2;
+}
+
+static bool related_effect(statement s, struct related_ctx * ctx)
+{
+  pips_debug(8, "on statement %"_intFMT"\n", statement_number(s));
+  SET_FOREACH(entity, w, (set) hash_get(ctx->image_stats, E_WRITE(s)))
+  {
+    if (related_images_p(ctx->img, w, ctx->new_images))
+    {
+      pips_debug(8, "W relation for %s & %s\n",
+                 entity_local_name(ctx->img), entity_local_name(w));
+      ctx->some_effect = true;
+      gen_recurse_stop(NULL);
+      return false;
+    }
+  }
+  if (!ctx->write_only)
+  {
+    SET_FOREACH(entity, r, (set) hash_get(ctx->image_stats, E_READ(s)))
+    {
+      if (related_images_p(ctx->img, r, ctx->new_images))
+      {
+        pips_debug(8, "R relation for %s & %s\n",
+                   entity_local_name(ctx->img), entity_local_name(w));
+        ctx->some_effect = true;
+        gen_recurse_stop(NULL);
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+static bool some_related_image_effect(
+  statement s,
+  entity img,
+  hash_table new_images,
+  hash_table image_stats,
+  bool write_only)
+{
+  struct related_ctx ctx = { img, new_images, image_stats, write_only, false };
+  gen_context_recurse(s, &ctx, statement_domain, related_effect, gen_null);
+  return ctx.some_effect;
+}
+
 /* tell whether there is no image processing statements between s1 and l2
  */
 static bool only_minor_statements_in_between(
-  list ls, statement s1, list l2, set image_occurences)
+  // the new image we are interrested in
+  entity image,
+  // new to old image mapping
+  hash_table new_images,
+  // [RW](stats) -> sets
+  hash_table image_stats,
+  // list of statements being considered (within a sequence)
+  list ls,
+  // image production statement
+  statement s1,
+  // list of "use" statements
+  list l2,
+  // set of statements with image occurences
+  set image_occurences)
 {
   bool s1_seen = false, in_sequence = false;
   pips_assert("consistent statement & list", !gen_in_list_p(s1, l2));
   int n2 = gen_length(l2);
+
+  ifdebug(8) {
+    pips_debug(8, "img=%s s=%"_intFMT"\nls = (\n",
+               entity_local_name(image), statement_number(s1));
+    FOREACH(statement, sls, ls)
+      pips_debug(8, " - %"_intFMT" %s\n", statement_number(sls),
+                 sls==s1? "!": gen_in_list_p(sls, l2)? "*": "");
+    pips_debug(8, ")\n");
+  }
 
   // scan the sequence list, looking for s1 & l2 statements
   FOREACH(statement, s, ls)
@@ -1355,10 +1495,23 @@ static bool only_minor_statements_in_between(
     else if (in_sequence && gen_in_list_p(s, l2))
     {
       n2--;
-      if (!n2) return true;
+      if (n2) {
+        // we are still going on, BUT we must check that this statement
+        // does not rewrite the image we are interested in and may change back.
+        if (some_related_image_effect(s, image, new_images, image_stats, true))
+          return false;
+      }
+      // we stop when we have seen all intermediate statements
+      else
+        return true;
     }
     else if (in_sequence && set_belong_p(image_occurences, s))
-      return false;
+    {
+      // let us try to do something intelligent here...
+      // if images are unrelated to "image", then there will be no interaction
+      if (some_related_image_effect(s, image, new_images, image_stats, false))
+        return false;
+    }
   }
 
   // ??? should really be an error...
@@ -1386,15 +1539,20 @@ static bool only_minor_statements_in_between(
 list freia_allocate_new_images_if_needed
 (list ls,
  list images,
+ // R(entity) and W(entity) -> set of statements
  const hash_table occs,
+ // entity -> entity
  const hash_table init,
+ // entity -> # out image
  const hash_table signatures)
 {
   // check for used images
   set img_stats = set_make(set_pointer);
+  hash_table image_stats_detailed = hash_table_make(hash_pointer, 0);
   sequence sq = make_sequence(ls);
   hash_table newoccs =
-    freia_build_image_occurrences((statement) sq, img_stats, signatures);
+    freia_build_image_occurrences((statement) sq, img_stats,
+                                  image_stats_detailed, signatures);
   sequence_statements(sq) = NIL;
   free_sequence(sq);
 
@@ -1411,7 +1569,7 @@ list freia_allocate_new_images_if_needed
       set where_read = (set) hash_get(newoccs, E_READ(v));
       int nw = set_size(where_write), nr = set_size(where_read);
 
-      pips_debug(8, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
+      pips_debug(6, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
 
       // ??? should be used once only in the statement if written!
       // how to I know about W/R for helper functions?
@@ -1430,9 +1588,6 @@ list freia_allocate_new_images_if_needed
         list l1 = set_to_list(where_write), l2 = set_to_list(where_read);
         statement s1 = STATEMENT(CAR(l1));
         gen_free_list(l1), l1 = NIL;
-
-        pips_debug(8, "testing for %s -> %s\n",
-                   entity_local_name(v), entity_local_name(old));
 
         // does not interact with possibly used old
         // if we could differentiate read & write, we could do better,
@@ -1453,8 +1608,14 @@ list freia_allocate_new_images_if_needed
           // note that we can handle a read in s1 and a write in s2
         }
 
+        pips_debug(7, "testing for %s -> %s: %s\n",
+                   entity_local_name(v), entity_local_name(old),
+                   skip?"skip":"ok");
+
         // do we want to switch back?
-        if (!skip && only_minor_statements_in_between(ls, s1, l2, img_stats))
+        if (!skip &&
+            only_minor_statements_in_between(v, init, image_stats_detailed,
+                                             ls, s1, l2, img_stats))
         {
           // yes, they are successive, just remove?? Am I that sure???
           // ??? hmmm, maybe we could have :
@@ -1495,6 +1656,8 @@ list freia_allocate_new_images_if_needed
     else
       allocated = CONS(entity, v, allocated);
   }
+
+  clean_stats_to_image(image_stats_detailed);
   freia_clean_image_occurrences(newoccs);
   set_free(img_stats);
 
@@ -1666,4 +1829,77 @@ void freia_migrate_statements(sequence sq, const set stats, const set before)
   gen_free_list(sequence_statements(sq));
   lin = gen_nconc(gen_nreverse(lin), gen_nreverse(lend));
   sequence_statements(sq) = gen_nconc(gen_nreverse(lbefore), lin);
+}
+
+/* extract values from a kernel definition
+ * return 9 values, expected to be 0/1 elsewhere...
+ * @return whether it succeeded
+ */
+static bool freia_extract_kernel(
+  expression e,
+  bool strict, // whether all values must be known, if not 1 is assumed
+  intptr_t * k00, intptr_t * k10, intptr_t * k20,
+  intptr_t * k01, intptr_t * k11, intptr_t * k21,
+  intptr_t * k02, intptr_t * k12, intptr_t * k22)
+{
+  // set default value anyway
+  *k00 = 1, *k10 = 1, *k20 = 1,
+  *k01 = 1, *k11 = 1, *k21 = 1,
+  *k02 = 1, *k12 = 1, *k22 = 1;
+
+  // analyse kernel
+  if (!expression_reference_p(e)) return !strict;
+  entity var = expression_variable(e);
+  // ??? should check const...
+  value val = entity_initial(var);
+  if (!value_expression_p(val)) return !strict;
+  expression ival = value_expression(val);
+  if (!brace_expression_p(ival)) return !strict;
+  list iargs = call_arguments(syntax_call(expression_syntax(ival)));
+  pips_assert("must be a 3x3 kernel...", gen_length(iargs)==9);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k00) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k10) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k20) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k01) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k11) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k21) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k02) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k12) && strict)
+    return false;
+  iargs = CDR(iargs);
+  if (!expression_integer_value(EXPRESSION(CAR(iargs)), k22) && strict)
+    return false;
+  iargs = CDR(iargs);
+  pips_assert("end of list reached", iargs==NIL);
+  return true;
+}
+
+/* vertex-based version
+ */
+bool freia_extract_kernel_vtx(
+  dagvtx v, bool strict,
+  intptr_t * k00, intptr_t * k10, intptr_t *k20,
+  intptr_t * k01, intptr_t * k11, intptr_t *k21,
+  intptr_t * k02, intptr_t * k12, intptr_t *k22)
+{
+  list largs = freia_get_vertex_params(v);
+  // for convolution there is one kernel & two args
+  // pips_assert("one kernel", gen_length(largs)==1);
+  expression e = EXPRESSION(CAR(largs));
+  return freia_extract_kernel(e, strict, k00, k10, k20,
+                              k01, k11, k21, k02, k12, k22);
 }

@@ -53,8 +53,7 @@ typedef struct {
     CHECKER check_function;
 } methods;
 
-/* default do-nothing methods.
- */
+// default do-nothing methods.
 #define no_read (READER) abort
 #define no_write (WRITER) abort
 static void no_free(void * p) { pips_debug(2, "memory leak (%p)\n", p); }
@@ -62,8 +61,14 @@ static void writeln_string(FILE * f, void * p) {fprintf(f, "%s\n", (char*)p);}
 static void unexpected(void)
 { pips_internal_error("unexpected pipsdbm method");}
 
-/* all methods are stored in this separate file. as an array.
- */
+// from external.c
+extern void pipsdbm_write_statement_mapping(FILE *, statement_mapping);
+extern hash_table pipsdbm_read_statement_mapping(FILE *);
+extern bool pipsdbm_check_statement_mapping(statement_mapping);
+extern void pipsdbm_free_statement_mapping(statement_mapping);
+extern void free_static_control_mapping(statement_mapping);
+
+// all methods are stored in this separate file. as an array.
 static methods all_methods[] = {
 #include "methods.h"
 };

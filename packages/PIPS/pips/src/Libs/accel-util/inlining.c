@@ -153,9 +153,9 @@ bool find_write_effect_on_entity(statement s, entity e)
 	{
 		reference r = effect_any_reference(eff);
 		entity re = reference_variable(r);
-		if( entities_may_conflict_p(e,re) )
+		if( action_write_p(effect_action(eff)) && entities_may_conflict_p(e,re) )
 		{
-			if( ENDP( reference_indices(r) ) && action_write_p(effect_action(eff) ) ) {
+		  if( !entity_pointer_p(e) && (entity_scalar_p(e) || derived_entity_p(e)) ) {
 			  ifdebug(6) {
 			    pips_debug(0,"Found conflict on %s with effect : ",entity_name(e));
 			    void print_effect(effect e);

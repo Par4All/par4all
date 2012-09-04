@@ -99,6 +99,9 @@
 #define HEAP_AREA_LOCAL_NAME             "*HEAP*"
 #define STACK_AREA_LOCAL_NAME            "*STACK*"
 #define ALLOCATABLE_AREA_LOCAL_NAME      "*ALLOCATABLE*"
+// The formal area could have been used for formal parameters
+// It is used for the formal context of a function in points-to analysis
+#define FORMAL_AREA_LOCAL_NAME           "*FORMAL*"
 #define POINTER_DUMMY_TARGETS_AREA_LOCAL_NAME "*POINTER_DUMMY_TARGETS*"
 
 /* The set of all memory areas. FI: this macro is now obsolete and
@@ -2201,6 +2204,7 @@ enum {
     ENTITY_DYNAMIC_AREA = 16,
     ENTITY_STATIC_AREA = 32,
     ENTITY_POINTER_DUMMY_TARGETS_AREA = 64,
+    ENTITY_FORMAL_AREA = 128,
 };
 
 #define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)

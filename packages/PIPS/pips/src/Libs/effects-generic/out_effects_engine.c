@@ -164,6 +164,14 @@ out_effects_from_call_site_to_callee(call c)
 					      call_arguments(c), l_out,
 					      context);
 
+    set pre_out_set = set_make(set_pointer);
+    FOREACH(EFFECT, eff, l_tmp)
+      {
+	entity e = reference_variable(effect_any_reference(eff));
+	if (!entity_pointer_p(e))
+	  set_add_element(pre_out_set, pre_out_set, e);
+      }
+
     list l_sum_rw_eff = (*db_get_summary_rw_effects_func)(module_local_name(current_callee));
 
     /* It's necessary to take the intersection with the summary regions of the
@@ -184,6 +192,34 @@ out_effects_from_call_site_to_callee(call c)
     l_tmp = (*effects_intersection_op)(l_tmp, effects_dup(l_sum_rw_eff),
 					  effects_same_action_p);
     pips_debug_effects(2, "l_tmp after intersection : \n", l_tmp);
+
+    /*
+      AM : Trying to handle Effects/missing_out.tpips
+      effects WRITE <array[PHI1]-write-MAY-{0<=PHI1}> and "pre" OUT <array[PHI1][PHI2]-write-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=m}>
+      are not combinable (same entity but different dims). Over-approximate OUT by WRITE
+    */
+    set out_set = set_make(set_pointer);
+    FOREACH(EFFECT, eff, l_tmp)
+      {
+	entity e = reference_variable(effect_any_reference(eff));
+	set_add_element(out_set, out_set, e);
+      }
+    FOREACH(EFFECT, eff, l_sum_rw_eff)
+      {
+	if(action_write_p(effect_action(eff)))
+	  {
+	    entity e = reference_variable(effect_any_reference(eff));
+
+	    if(!set_belong_p(out_set, e) && set_belong_p(pre_out_set, e))
+	      {
+		effect new = copy_effect(eff);
+		effect_approximation_tag(new) = is_approximation_may;
+		l_tmp = CONS(EFFECT, new, l_tmp);
+	      }
+	  }
+      }
+    set_free(pre_out_set);
+    set_free(out_set);
 
     update_out_summary_effects_list(l_tmp);
 }

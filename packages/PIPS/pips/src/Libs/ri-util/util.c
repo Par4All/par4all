@@ -421,6 +421,15 @@ bool heap_area_p(entity aire)
   return entity_kind(aire) & ENTITY_HEAP_AREA;
 }
 
+bool formal_area_p(entity aire)
+{
+#ifndef NDEBUG
+    bool result = same_string_p(module_local_name(aire), FORMAL_AREA_LOCAL_NAME);
+    pips_assert("entity_kind is consistent", result == ( (entity_kind(aire) & ENTITY_FORMAL_AREA) == ENTITY_FORMAL_AREA));
+#endif
+  return entity_kind(aire) & ENTITY_FORMAL_AREA;
+}
+
 bool stack_area_p(entity aire)
 {
 #ifndef NDEBUG
@@ -441,7 +450,7 @@ bool pointer_dummy_targets_area_p(entity aire)
 
 
 
-/* Returns the heap area a associated to module f.Area a is always a
+/* Returns the heap area "a" associated to module "f". Area "a" is always a
    defined entity.
 
    Assumes that f is defined, as well as its heap area.
@@ -460,6 +469,7 @@ bool entity_area_p(entity e)
 {
   return !type_undefined_p(entity_type(e)) && type_area_p(entity_type(e));//static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e);
 }
+
 bool entity_special_area_p(entity e)
 {
   return entity_area_p(e) &&
