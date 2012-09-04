@@ -48,11 +48,11 @@ void dereferencing05()
 
    *p-- = 0.;
 
-// Points To: none
+// Points To: unreachable
 
    *++p = 0.;
 
-// Points To: none
+// Points To: unreachable
 
    *--p = 0.;
 }

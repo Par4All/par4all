@@ -1,44 +1,36 @@
 
-Proper effects for "recurrence04"
-
-void recurrence04(list l, list m)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: l m
-   l->next = m;
-   return;
-}
-
 POINTS TO for "recurrence04"
 
 
-// Points To:
-// l -> &_l_1[0] , EXACT
-// m -> &_m_2[0] , EXACT
+// Points To IN:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// m -> *NULL_POINTER* , MAY
+// m -> _m_2[0] , MAY
+
+
+// Points To OUT:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _m_2[0] , MAY
 
 void recurrence04(list l, list m)
 {
 
 // Points To:
-// l -> &_l_1[0] , EXACT
-// m -> &_m_2[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// m -> *NULL_POINTER* , MAY
+// m -> _m_2[0] , MAY
 
    l->next = m;
 
 // Points To:
-// l -> &_l_1[0] , EXACT
-// m -> &_m_2[0] , EXACT
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _m_2[0] , MAY
+// l -> _l_1[0] , EXACT
+// m -> *NULL_POINTER* , MAY
+// m -> _m_2[0] , MAY
 
-   return;
-}
-
-Proper effects using points_to
-
-void recurrence04(list l, list m)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: l m
-   l->next = m;
    return;
 }
 

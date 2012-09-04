@@ -1,3 +1,91 @@
 
 POINTS-TO
 
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   s_with_pointer a, b;
+
+// Points To:
+// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   s_with_array_of_struct_with_pointer e, f;
+
+// Points To:
+// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i, j;
+
+// Points To:
+// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   /* definition of a */
+   a.p = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// a.p -> *HEAP*_l_20[0] , MAY
+// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   /* definition of b */
+   b = a;
+
+// Points To:
+// a.p -> *HEAP*_l_20[0] , MAY
+// b.p -> *HEAP*_l_20[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   /* definition of e */
+   for(i = 0; i <= 4; i += 1)
+
+// Points To:
+// a.p -> *HEAP*_l_20[0] , MAY
+// b.p -> *HEAP*_l_20[0] , MAY
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      (e.champ)[i].p = malloc(10*sizeof(int));
+
+// Points To:
+// a.p -> *HEAP*_l_20[0] , MAY
+// b.p -> *HEAP*_l_20[0] , MAY
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   /* definition of f, also modifies e */
+   f = e;
+
+// Points To:
+// a.p -> *HEAP*_l_20[0] , MAY
+// b.p -> *HEAP*_l_20[0] , MAY
+// e.champ[*].p -> *HEAP*_l_27[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> *HEAP*_l_27[0] , MAY
+// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+
+   return 0;
+}

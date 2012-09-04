@@ -60,16 +60,16 @@ int main()
 
    **q = 0;
 
-// Points To: none
+// Points To: unreachable
 
 
    *p = 1;
 
-// Points To: none
+// Points To: unreachable
 
    *q = &i;
 
-// Points To: none
+// Points To: unreachable
 
 
    return 0;

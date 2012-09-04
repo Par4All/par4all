@@ -33,18 +33,16 @@ digraph "dag_0" {
   "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_dead" in dot format
-// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 
 ! updated function for
@@ -54,8 +52,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_set_constant(out, 0);                                     /*0009*/
 }
 #
 # SPOC
@@ -75,18 +72,16 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_dead_spoc_helper_0_0" of module "border_dead" in dot format
-// DAG "border_dead_spoc_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "border_dead_spoc_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_dead_spoc_helper_0_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 // graph for dag "dag_0" of module "border_dead" in dot format
 // DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
@@ -103,18 +98,16 @@ digraph "dag_0" {
   "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_dead" in dot format
-// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 
 ! acceleration function
@@ -131,8 +124,7 @@ digraph "dag_cleaned_0" {
 // FREIA-SPoC helper function for module border_dead
 freia_status border_dead_spoc_helper_0_0_0(
   freia_data2d * o0,
-  const freia_data2d * i0,
-  const int32_t * pi0)
+  int32_t pi0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -140,25 +132,21 @@ freia_status border_dead_spoc_helper_0_0_0(
   freia_dynamic_param dynparam;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
 
   // STAGE 0
-  // in [0 input 0] -> [0 poc 0] 9 erode_8c
-  // nope
-  // poc 9 erode_8c stage 0 side 0
-  si.poc[0][0].op = SPOC_POC_ERODE;
-  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = pi0[i];
+  // alu 9 set_constant stage 0
+  si.alu[0][0].op = SPOC_ALU_COPY_CONST;
+  sp.alu[0][0].constant = pi0;
 
 
   // output image out on 0
-  // out [0 poc 0] -> [0 output 0] 0 null
-  si.mux[0][0].op = SPOC_MUX_IN0;
+  // out [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
   // out [0 output 0] -> [7 output 0] 0 null
@@ -187,7 +175,7 @@ freia_status border_dead_spoc_helper_0_0_0(
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(&param, o0, NULL, NULL, NULL);
 
   return ret;
 }
@@ -199,8 +187,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_spoc_helper_0_0_0(out, in, kernel);                      /*0009*/
+   border_dead_spoc_helper_0_0_0(out, 0);                               /*0009*/
 }
 
 ! cleaned up function
@@ -210,8 +197,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_spoc_helper_0_0_0(out, in, kernel);                      /*0009*/
+   border_dead_spoc_helper_0_0_0(out, 0);                               /*0009*/
 }
 #
 # TERAPIX
@@ -231,18 +217,16 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_dead_terapix_helper_0_0_0" of module "border_dead" in dot format
-// DAG "border_dead_terapix_helper_0_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "border_dead_terapix_helper_0_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_dead_terapix_helper_0_0_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 // graph for dag "dag_0" of module "border_dead" in dot format
 // DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
@@ -259,18 +243,16 @@ digraph "dag_0" {
   "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_dead" in dot format
-// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 
 ! acceleration function
@@ -296,17 +278,16 @@ digraph "dag_cleaned_0" {
  * IMAGE H  = 0
  * MAX SIZE = 0
  *
- * 1 input image, 1 output image
+ * 0 input image, 1 output image
  * 1 image operations in dag
- * dag length is 2, dag width is 1
+ * dag length is 1, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 15
- * - communication: 64
+ * - computation: 2
+ * - communication: 32
  */
 freia_status border_dead_terapix_helper_0_0_0(
   freia_data2d * o0,
-  const freia_data2d * i0,
-  const int32_t * pi2)
+  int32_t pi1)
 {
   // declarations:
   freia_microcode mcode;
@@ -322,31 +303,29 @@ freia_status border_dead_terapix_helper_0_0_0(
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
-  int16_t p_0[9];
+  int16_t p_0[1];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][2];
-  terapix_tile_info tile_in[2][1];
+  terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_out[2][1];
   // imagelets definitions:
-  // - 2 computation imagelets
+  // - 1 computation imagelets
   // - 1 double buffer imagelets
   // dynamic optimal imagelet size computation
   // this formula must match what the scheduler does!
   int vertical_border = 0;
-  int image_height = i0->heightWa;
-  int max_computed_size = 341;
+  int image_height = o0->heightWa;
+  int max_computed_size = 512;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
   int imagelet_size =
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
-  int imagelet_2 = 341;
-  int imagelet_3 = 682;
+  int imagelet_2 = 512;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_3;
+  int imagelet_io_1_1 = imagelet_2;
 
   // body:
   // mcode param
@@ -362,22 +341,17 @@ freia_status border_dead_terapix_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: E8(1) -> 2
+  // 0: C() -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_2;
-  mcu_macro[1][0].xmin2 = imagelet_2;
-  mcu_macro[0][0].ymin2 = 0;
-  mcu_macro[1][0].ymin2 = 0;
   // copy of operation 0 parameters
-  for(i=0; i<9; i++)
-    p_0[i] = pi2[i];
+  p_0[0] = pi1;
   gram.xoffset = x_0;
   gram.yoffset = y_0;
-  gram.width = 3;
-  gram.height = 3;
+  gram.width = 1;
+  gram.height = 1;
   gram.params = p_0;
   freia_mg_write_dynamic_param(&dyn_param);
   mcu_macro[0][0].xmin3 = x_0;
@@ -392,35 +366,11 @@ freia_status border_dead_terapix_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // output copy 2 -> 1
-  mcu_macro[0][1].xmin1 = imagelet_2;
-  mcu_macro[1][1].xmin1 = imagelet_2;
-  mcu_macro[0][1].ymin1 = 0;
-  mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
-  mcu_macro[0][1].ymin2 = 0;
-  mcu_macro[1][1].ymin2 = 0;
-  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][1].iter2 = imagelet_size;
-  mcu_macro[1][1].iter2 = imagelet_size;
-  mcu_macro[0][1].iter3 = 0;
-  mcu_macro[1][1].iter3 = 0;
-  mcu_macro[0][1].iter4 = 0;
-  mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_COPY;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_COPY;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_SET_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_SET_CONST;
 
 
-  // inputs:
-  // - imagelet 1 is i0 for in
-  tile_in[0][0].x = imagelet_io_1_0;
-  tile_in[0][0].y = 0;
-  tile_in[1][0].x = imagelet_io_1_1;
-  tile_in[1][0].y = 0;
+  // no input
 
   // outputs:
   // - imagelet 1 is o0 for out
@@ -443,19 +393,19 @@ freia_status border_dead_terapix_helper_0_0_0(
   mcu_instr.out1 = tile_out[1];
 
   // inputs
-  mcu_instr.nbin = 1;
-  mcu_instr.in0 = tile_in[0];
-  mcu_instr.in1 = tile_in[1];
+  mcu_instr.nbin = 0;
+  mcu_instr.in0 = NULL;
+  mcu_instr.in1 = NULL;
 
   // actual instructions
-  mcu_instr.nbinstr = 2;
+  mcu_instr.nbinstr = 1;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, o0, i0);
+  ret |= freia_cg_template_process(&param, o0);
 
   // extract measures
 
@@ -470,8 +420,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_terapix_helper_0_0_0(out, in, kernel);                   /*0009*/
+   border_dead_terapix_helper_0_0_0(out, 0);                            /*0009*/
 }
 
 ! cleaned up function
@@ -481,8 +430,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   border_dead_terapix_helper_0_0_0(out, in, kernel);                   /*0009*/
+   border_dead_terapix_helper_0_0_0(out, 0);                            /*0009*/
 }
 #
 # OPENCL
@@ -502,18 +450,16 @@ void border_dead(freia_data2d *out, freia_data2d *in)
 ! graphs
 
 // graph for dag "border_dead_opencl_helper_0_0" of module "border_dead" in dot format
-// DAG "border_dead_opencl_helper_0_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "border_dead_opencl_helper_0_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "border_dead_opencl_helper_0_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 // graph for dag "dag_0" of module "border_dead" in dot format
 // DAG "dag_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
@@ -530,18 +476,16 @@ digraph "dag_0" {
   "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "border_dead" in dot format
-// DAG "dag_cleaned_0": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+// DAG "dag_cleaned_0": #i=0 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
 digraph "dag_cleaned_0" {
   // inputs
-  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "9 E8" [shape=box];
-  "9 E8" -> "out";
-  "in" -> "9 E8";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "out";
 }
 
 ! acceleration function
@@ -565,8 +509,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_set_constant(out, 0);                                     /*0009*/
 }
 
 ! cleaned up function
@@ -576,8 +519,7 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    // this kernel is not very useful...
    
    
-   const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
-   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_set_constant(out, 0);                                     /*0009*/
 }
 #
 # FREIA COMPILATION DONE

@@ -1,0 +1,15 @@
+setenv WS=if18
+delete $WS
+create $WS $WS.c
+
+
+echo
+echo POINTS TO for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

@@ -36,7 +36,7 @@ void uninitialized01()
 
    *pp = &i;
 
-// Points To: none
+// Points To: unreachable
 
    return;
 }

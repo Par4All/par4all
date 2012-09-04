@@ -8,10 +8,9 @@ int main(int argc, char **argv)
    int tab3[10][10];
    int **tab4;
    int tab5[15];
-
-   int i;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
+   
+   
    foo(tab);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -94,11 +93,7 @@ int main(int argc, char **argv)
 POINTS-TO
 
 
-// Points To IN:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -106,97 +101,51 @@ POINTS-TO
 int main(int argc, char **argv)
 {
 
-// Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
+// Points To: none
 
    int tab[10];
 
-// Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
+// Points To: none
 
    int *tab2[10];
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int tab3[10][10];
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int **tab4;
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    int tab5[15];
 
-
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
-   int i;
-
-// Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
-// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-
+   
+   
    foo(tab);
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    printf("%s\n", "tab");
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    myprint(tab);
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -205,75 +154,67 @@ int main(int argc, char **argv)
    foo(tab2[4]);
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(tab3[5]);
 
 // Points To:
-// _argv_2[0] -> *NULL_POINTER* , MAY
-// _argv_2[0] -> _argv_2_2[0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
 // tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    foo(tab4[6]);
 
-// Points To: none
+// Points To: unreachable
 
    foo(&tab[0]);
 
-// Points To: none
+// Points To: unreachable
 
    foo(&tab5[3]);
 
-// Points To: none
+// Points To: unreachable
 
 
    printf("%s:\n", "tab2[4]");
 
-// Points To: none
+// Points To: unreachable
 
    myprint(tab2[4]);
 
-// Points To: none
+// Points To: unreachable
 
    printf("%s\n", "tab3[5]");
 
-// Points To: none
+// Points To: unreachable
 
    myprint(tab3[5]);
 
-// Points To: none
+// Points To: unreachable
 
    printf("%s\n", "tab4[6]");
 
-// Points To: none
+// Points To: unreachable
 
    myprint(tab4[6]);
 
-// Points To: none
+// Points To: unreachable
 
    printf("%s\n", "tab");
 
-// Points To: none
+// Points To: unreachable
 
    myprint(&tab[0]);
 
-// Points To: none
+// Points To: unreachable
 
    printf("%s\n", "tab5");
 
-// Points To: none
+// Points To: unreachable
 
    myprint(&tab5[3]);
 
-// Points To: none
+// Points To: unreachable
 
    return 1;
 }

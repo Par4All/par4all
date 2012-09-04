@@ -1,0 +1,17 @@
+setenv WS=inter06
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+
+echo
+echo POINTS TO for "$WS"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

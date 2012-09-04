@@ -1,3 +1,37 @@
 
 POINTS TO for pointer15
 
+
+// Points To IN:
+// t[0][0] -> *NULL_POINTER* , MAY
+// t[0][0] -> _t_1[0][0][0][0][0][0] , MAY
+
+
+// Points To OUT:
+// _t_1[0][0][0][1][2][3] -> z , EXACT
+
+void pointer15(double *(*t[3][4])[5][6][7])
+{
+
+// Points To: none
+
+   double z;
+
+// Points To:
+// t[0][0] -> *NULL_POINTER* , MAY
+// t[0][0] -> _t_1[0][0][0][0][0][0] , MAY
+
+   (((*t[0][0])[1])[2])[3] = &z;
+
+// Points To:
+// _t_1[0][0][0][1][2][3] -> z , EXACT
+// t[0][0] -> _t_1[0][0][0][0][0][0] , EXACT
+
+   *(((*t[0][0])[1])[2])[3] = 2.5;
+
+// Points To:
+// _t_1[0][0][0][1][2][3] -> z , EXACT
+// t[0][0] -> _t_1[0][0][0][0][0][0] , EXACT
+
+   return;
+}

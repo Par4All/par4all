@@ -38,11 +38,11 @@ int main()
 
    *x = y;
 
-// Points To: none
+// Points To: unreachable
 
    printf("x = %p \n", x);
 
-// Points To: none
+// Points To: unreachable
 
    return 0;
 }

@@ -26,7 +26,7 @@ int main()
       p = &i;
    else
 
-// Points To: none
+// Points To: unreachable
 
       *p = 1;
 
@@ -36,5 +36,4 @@ int main()
 
    return 0;
 }
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_condition_to_points_to) Dead code detected.

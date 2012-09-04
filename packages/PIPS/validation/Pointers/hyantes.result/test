@@ -451,19 +451,19 @@ _break_2:         ;
 
 // Points To:
 // fd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// the_towns.data -> *HEAP*_l_52[0] , EXACT
+// the_towns.data -> *HEAP*_l_52[0] , MAY
 
    the_towns.nb = curr;
 
 // Points To:
 // fd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// the_towns.data -> *HEAP*_l_52[0] , EXACT
+// the_towns.data -> *HEAP*_l_52[0] , MAY
 
    fprintf(stderr, "parsed %d towns\n", curr);
 
 // Points To:
 // fd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// the_towns.data -> *HEAP*_l_52[0] , EXACT
+// the_towns.data -> *HEAP*_l_52[0] , MAY
 
    /*
        for(curr=0;curr<the_towns.nb;curr++)
@@ -481,48 +481,39 @@ _break_2:         ;
 towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
 {
 
-// Points To:
-// t.data -> _t_1[0] , MAY
+// Points To: none
 
    size_t i, j;
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    size_t k;
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    int nb = 1+rangex*rangey;
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    towns tout = {nb, malloc(sizeof(town)*nb)};
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    fprintf(stderr, "begin computation ...\n");
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, rangex);
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
    fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, rangey);
 
-// Points To:
-// t.data -> _t_1[0] , EXACT
+// Points To: none
 
 
    for(i = 0; i < rangex; i += 1)

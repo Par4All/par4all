@@ -30,7 +30,7 @@ int main()
    int i = 1, *p = foo();
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
 
    free(p);

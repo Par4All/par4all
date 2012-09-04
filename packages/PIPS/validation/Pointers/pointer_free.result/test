@@ -45,7 +45,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// alloc_pointer -> *HEAP*_l_7 , EXACT
+// alloc_pointer -> *HEAP*_l_7 , MAY
 
 pointer alloc_pointer(int v)
 {
@@ -55,12 +55,12 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7 , EXACT
+// p -> *HEAP*_l_7 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_7 , EXACT
+// p -> *HEAP*_l_7 , MAY
 
    return p;
 }
@@ -86,20 +86,20 @@ int main(void)
    p1 = alloc_pointer(13);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p2 = p1;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    pointer_free(p1);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
 
    return;

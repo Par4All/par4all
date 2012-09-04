@@ -44,18 +44,18 @@ int main()
    p = (int *) malloc(10*sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 
       p[i] = i;
 
 // Points To:
-// p -> *HEAP*_l_7[0] , EXACT
+// p -> *HEAP*_l_8[0] , MAY
 
    return 0;
 }

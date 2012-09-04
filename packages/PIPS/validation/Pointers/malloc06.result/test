@@ -19,8 +19,7 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[*] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -28,27 +27,23 @@ POINTS-TO
 int main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[*] , MAY
+// Points To: none
 
    int *pi;
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
-// pi -> *HEAP*_l_9 , EXACT
+// pi -> *HEAP*_l_9 , MAY
 
 
    free(pi);
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 

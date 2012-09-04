@@ -1,0 +1,22 @@
+setenv WSPACE=ammp02
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+# FI: I am not sure what the purpose is
+# The purpose is to detect a user error...
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_PATH_LIMIT 10
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+close
+shell cat $WSPACE.database/Warnings
+delete $WSPACE
+quit

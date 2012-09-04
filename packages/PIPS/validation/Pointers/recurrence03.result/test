@@ -1,42 +1,46 @@
 
-Proper effects for "recurrence03"
-
-void recurrence03(list l)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   l->next->next->next = l->next;
-   return;
-}
-
 POINTS TO for "recurrence03"
 
 
-// Points To:
-// l -> &_l_1[0] , EXACT
+// Points To IN:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+
+
+// Points To OUT:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
+// _l_1_2__1_2__1[0][0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1[0][0] , MAY
 
 void recurrence03(list l)
 {
 
 // Points To:
-// l -> &_l_1[0] , EXACT
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
 
    l->next->next->next = l->next;
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// l -> &_l_1[0] , EXACT
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
+// _l_1_2__1_2__1[0][0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1[0][0] , MAY
+// l -> _l_1[0] , EXACT
 
-   return;
-}
-
-Proper effects using points_to
-
-void recurrence03(list l)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   l->next->next->next = l->next;
    return;
 }
 

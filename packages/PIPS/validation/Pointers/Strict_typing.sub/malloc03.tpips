@@ -1,0 +1,29 @@
+setenv WS=malloc03
+delete $WS
+create $WS $WS.c
+
+# The code is bugged pt++ moves pt out of an allocated area
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+#echo
+#echo Warnings
+#echo
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

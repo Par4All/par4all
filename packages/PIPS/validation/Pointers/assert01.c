@@ -13,4 +13,6 @@ void assert01()
   int i;
 
   assert(i>0);
+
+  return;
 }

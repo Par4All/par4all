@@ -1,0 +1,1 @@
+arguments of printf are not exploited to generate points-to information

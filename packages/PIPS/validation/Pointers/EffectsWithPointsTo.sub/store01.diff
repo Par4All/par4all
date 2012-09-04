@@ -1,0 +1,40 @@
+Index: store01.result/test
+===================================================================
+--- store01.result/test	(revision 0)
++++ store01.result/test	(revision 0)
+@@ -0,0 +1,35 @@
++
++POINTS-TO
++
++
++// Points To IN:
++// p -> *NULL_POINTER* , MAY
++// p -> _p_1[0] , MAY
++
++
++// Points To OUT: none
++
++int store01(int *p, int i)
++{
++
++// Points To:
++// p -> *NULL_POINTER* , MAY
++// p -> _p_1[0] , MAY
++
++   *p = i;
++
++// Points To:
++// p -> _p_1[0] , EXACT
++
++   return;
++}
++
++PROPER EFFECTS
++
++int store01(int *p, int i)
++{
++//             <may be written>: _p_1[0]
++//             <    is read   >: i p
++   *p = i;
++   return;
++}

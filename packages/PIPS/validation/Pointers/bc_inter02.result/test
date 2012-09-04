@@ -1,139 +1,115 @@
 
-Proper effects for "main"
-
-int main()
-{
-   struct2 *p1, *p2;
-   struct1 *q1, *q2;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ q1
-
-   q1 = (struct1 *) malloc(sizeof(struct1));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ q2
-   q2 = (struct1 *) malloc(sizeof(struct1));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: q1
-
-   q1->r = 10;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: q2
-   q2->r = 20;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p1
-
-   p1 = (struct2 *) malloc(sizeof(struct2));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p1 q1
-
-   p1->q = q1;
-//               <must be read   >: p1
-//               <must be written>: p2
-
-   p2 = p1;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-
-   foo2(&p2, q2);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-
-   printf("%d\n", p1->q->r);
-   return 0;
-}
-
 POINTS TO for "main"
 
-//  {}
-int main()
-{
-//  points to = {}
-   struct2 *p1, *p2;
-//  points to = {}
-   struct1 *q1, *q2;
-//  points to = {}
 
-   q1 = (struct1 *) malloc(sizeof(struct1));
-//  {(q1,*HEAP*_l_21,-Exact-)}
-   q2 = (struct1 *) malloc(sizeof(struct1));
-//  {(q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
+// Points To IN: none
 
-   q1->r = 10;
-//  {(q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
-   q2->r = 20;
-//  {(q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
 
-   p1 = (struct2 *) malloc(sizeof(struct2));
-//  {(p1,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
-//   (q2,*HEAP*_l_22,-Exact-)}
-
-   p1->q = q1;
-//  {(p1[0][.q],*HEAP*_l_21,-Exact-);(p1,*HEAP*_l_27,-Exact-);
-//   (q1,*HEAP*_l_21,-Exact-);(q2,*HEAP*_l_22,-Exact-)}
-
-   p2 = p1;
-//  {(p1[0][.q],*HEAP*_l_21,-Exact-);(p1,*HEAP*_l_27,-Exact-);
-//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
-//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_21,-Exact-);}
-
-   foo2(&p2, q2);
-//  {(p1[0][.q],,*HEAP*_l_22,-Exact-);(p1,*HEAP*_l_27,-Exact-);
-//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
-//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_22,-Exact-)}
-
-   printf("%d\n", p1->q->r);
-//  {(p1[0][.q],,*HEAP*_l_22,-Exact-);(p1,*HEAP*_l_27,-Exact-);
-//   (p2,*HEAP*_l_27,-Exact-);(q1,*HEAP*_l_21,-Exact-);
-//   (q2,*HEAP*_l_22,-Exact-);(p2[0][.q],*HEAP*_l_22,-Exact-)}
-
-   return 0;
-}
-
-Proper effects using points_to
+// Points To OUT:
+// *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
 
 int main()
 {
+
+// Points To: none
+
    struct2 *p1, *p2;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    struct1 *q1, *q2;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ q1
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    q1 = (struct1 *) malloc(sizeof(struct1));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ q2
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    q2 = (struct1 *) malloc(sizeof(struct1));
-//               <must be read   >: q1
-//               <must be written>: *HEAP*_l_21[.r]
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    q1->r = 10;
-//               <must be read   >: q2
-//               <must be written>: *HEAP*_l_22[.r]
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
    q2->r = 20;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p1
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    p1 = (struct2 *) malloc(sizeof(struct2));
-//               <must be read   >: p1 q1
-//               <must be written>: *HEAP*_l_27[.q]
+
+// Points To:
+// p1 -> *HEAP*_l_27 , MAY
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    p1->q = q1;
-//               <must be read   >: p1
-//               <must be written>: p2
+
+// Points To:
+// *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
+// p1 -> *HEAP*_l_27 , MAY
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    p2 = p1;
-//               <must be read   >: p2 q2 
-//               <must be written>: *HEAP*_l_27[.q]
+
+// Points To:
+// *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
+// p1 -> *HEAP*_l_27 , MAY
+// p2 -> *HEAP*_l_27 , MAY
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    foo2(&p2, q2);
-//               <may be read    >: stdout[0] 
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  *HEAP*_l_27[.q] p1 *HEAP*_l_22[.r]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+// Points To:
+// *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
+// p1 -> *HEAP*_l_27 , MAY
+// p2 -> *HEAP*_l_27 , MAY
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
 
    printf("%d\n", p1->q->r);
+
+// Points To:
+// *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
+// p1 -> *HEAP*_l_27 , MAY
+// p2 -> *HEAP*_l_27 , MAY
+// q1 -> *HEAP*_l_21 , MAY
+// q2 -> *HEAP*_l_22 , MAY
+
    return 0;
 }
 

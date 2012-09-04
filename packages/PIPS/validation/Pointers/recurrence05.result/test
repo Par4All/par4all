@@ -1,0 +1,39 @@
+
+POINTS TO for "recurrence05"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void recurrence05(void)
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   list l = (list) malloc(sizeof(list *));
+
+// Points To:
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   l->content = &i;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   l->next = (void *) 0;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
+// *ANY_MODULE*:*ANYWHERE*_b1 -> *NULL_POINTER* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   return;
+}
+

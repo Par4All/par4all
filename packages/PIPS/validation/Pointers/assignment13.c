@@ -8,4 +8,5 @@ struct foo {int * ip1; int * ip2;} ;
    int *p;
    p = (**t2).ip2;
    (**t1).ip1 = p;
-  } 
+   return;
+ } 

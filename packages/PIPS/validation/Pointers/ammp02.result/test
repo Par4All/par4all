@@ -1,0 +1,56 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _first_8[0].next -> *NULL_POINTER* , MAY
+// _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8[0] , MAY
+
+
+// Points To OUT:
+// _first_8[0].next -> *NULL_POINTER* , MAY
+// _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8[0] , MAY
+
+int a_number()
+{
+
+// Points To: none
+
+   ATOM *ap;
+
+// Points To:
+// _first_8[0].next -> *NULL_POINTER* , MAY
+// _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8[0] , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8[0] , MAY
+
+l:   ap = first;
+
+// Points To:
+// _first_8[0].next -> *NULL_POINTER* , MAY
+// _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8[0] , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8[0] , MAY
+
+   if (ap->next==(void *) 0) goto l;
+
+// Points To:
+// _first_8[0].next -> *NULL_POINTER* , MAY
+// _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> *NULL_POINTER* , MAY
+// ap -> _first_8[0] , MAY
+// first -> *NULL_POINTER* , MAY
+// first -> _first_8[0] , MAY
+
+
+   return atomNUMBER;
+}

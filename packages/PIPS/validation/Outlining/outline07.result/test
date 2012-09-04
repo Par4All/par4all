@@ -21,20 +21,24 @@ int foo(int c)
 {
    int force;
    struct a of = {{c}};
-pas_trop:   kernel(of);
+pas_trop:   kernel(&of);
    return of.the.jedi;
 }
-void kernel(struct a of)
+void kernel(struct a of_0[1])
 {
    //PIPS generated variable
    int force;
+   //PIPS generated variable
+   struct a of;
+   of = *of_0;
 pas_trop:
    for(force = 1; force <= 17; force += 2)
       of.the.jedi += force;
+   *of_0 = of;
 }
 struct a {
    struct b {int jedi;} the;
 };
 int foo(int c);
 //PIPS generated variable
-void kernel(struct a of);
+void kernel(struct a of_0[1]);

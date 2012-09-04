@@ -1,1 +1,0 @@
-Points-to information about global variables is not computed. This impacts the preconditions and then the complexity analyses.

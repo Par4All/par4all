@@ -15,7 +15,8 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
 # avoid typing issue due to extra-dimension... but this is not
 # compatible with the source code
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
 echo 
 echo PROPER EFFECTS

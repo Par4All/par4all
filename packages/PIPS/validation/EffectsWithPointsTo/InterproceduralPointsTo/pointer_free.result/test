@@ -340,5 +340,5 @@ INIT_POINTS_TO_ANALYSIS[alloc_pointer] (init_points_to_analysis) Property ALIASI
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[pointer_free] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[pointer_free!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_7".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variablesINTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_7".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "alloc_pointer:*HEAP*_l_7".

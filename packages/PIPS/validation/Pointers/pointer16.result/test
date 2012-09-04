@@ -1,0 +1,54 @@
+
+POINTS TO for pointer16
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void pointer16()
+{
+
+// Points To: none
+
+   struct tree {
+      struct tree *tree_list[10];
+   };
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+      (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   // FI: without this statement, we do not get points-to information
+   // for "return"....
+   i++;
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+   return;
+}

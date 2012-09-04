@@ -22,8 +22,7 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[*] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -31,19 +30,16 @@ POINTS-TO
 int main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[*] , MAY
+// Points To: none
 
    int *pi;
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int *qi;
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -51,23 +47,20 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
-// pi -> *HEAP*_l_10 , EXACT
+// pi -> *HEAP*_l_10 , MAY
 // qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    qi = pi;
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
-// pi -> *HEAP*_l_10 , EXACT
-// qi -> *HEAP*_l_10 , EXACT
+// pi -> *HEAP*_l_10 , MAY
+// qi -> *HEAP*_l_10 , MAY
 
    free(pi);
 
 // Points To:
-// argv[*] -> _argv_2[*] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
 
    return 0;

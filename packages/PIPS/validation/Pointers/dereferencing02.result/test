@@ -1,14 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   dereferencing02();
-   return 1;
-}
-
 POINTS-TO
 
 
@@ -17,14 +7,92 @@ POINTS-TO
 
 // Points To OUT: none
 
-int main()
+double dereferencing02()
 {
 
 // Points To: none
 
-   dereferencing02();
+   double x = 1.;
 
 // Points To: none
 
-   return 1;
+   double *p = &x;
+
+// Points To:
+// p -> x , EXACT
+
+   double **q = &p;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+
+   double **w;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i = 1;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   **q = 2.;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   **(q+(i = 0)) = 3.;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   // w is used unitialized and this is not detected by the points-to analysis
+   **(w+(i = 2)) = 4.;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   x = **q;
+
+// Points To:
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   // Since p is not an array, this incrementation is undefined
+   q++;
+   // *q++;
+
+// Points To:
+// p -> x , EXACT
+// q -> p[1] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   double *z1 = *q++;
+
+// Points To: none
+
+   double *z2;
+
+// Points To:
+// z2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   z2 = *q++;
+
+// Points To: unreachable
+
+   return *z2-**w;
 }

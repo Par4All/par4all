@@ -4,23 +4,16 @@
          MPI_Reduce
          MPI_Bcast
      sum_vprod
-         MPI_Reduce
-         MPI_Bcast
      cmat_vec_dble
      mulc_vadd
-void sum_vprod(int n)
-{
-   int i;
-   if (4*8*8*4>1) {
-      MPI_Reduce((double *) cs1, (double *) cs2, 2*n, 1, 1, 0, 1);
-      MPI_Bcast((double *) cs2, 2*n, 1, 0, 1);
-   }
-   else
-      for(i = 0; i <= n-1; i += 1)
-         cs2[i] = cs1[i];
-}
 
-// Points To: none
+Points-to for "cmat_vec_dble"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void cmat_vec_dble(int n, double _Complex a[n][n], double _Complex v[n], double _Complex w[n])
 {
@@ -47,244 +40,109 @@ void cmat_vec_dble(int n, double _Complex a[n][n], double _Complex v[n], double 
          w[i] += a[i][j]*v[j];
    }
 }
-//             <may be read   >: a[*][*] v[*] w[*]
-//             <may be written>: w[*]
-//             <    is read   >: n
-void cmat_vec_dble(int n, double _Complex a[n][n], double _Complex v[n], double _Complex w[n])
-{
-   int i, j;
-//             <may be read   >: a[*][*] i j v[*] w[*]
-//             <may be written>: j w[*]
-//             <    is read   >: n
-//             <    is written>: i
 
-   for(i = 0; i <= n-1; i += 1) {
-//             <may be written>: w[*]
-//             <    is read   >: i n
-      w[i] = 0.0;
-//             <may be read   >: a[*][*] i j v[*] w[*]
-//             <may be written>: w[*]
-//             <    is read   >: n
-//             <    is written>: j
-      for(j = 0; j <= n-1; j += 1)
-//             <may be read   >: a[*][*] v[*] w[*]
-//             <may be written>: w[*]
-//             <    is read   >: i j n
-         w[i] += a[i][j]*v[j];
-   }
-}
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-void Lv(_Complex v[nms])
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   if (1) {
-      int nm, nvh, i;
-      _Complex z;
-//             <    is read   >: nms
-//             <    is written>: nm
-
-      nm = nms;
-//             <    is read   >: nvhs
-//             <    is written>: nvh
-      nvh = nvhs;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-      for(i = 0; i <= nm-1; i += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: z
-         z = vprod(nvh, 0, (*vs)[i], v);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i nm z cs1
-         cs1[i] = (double _Complex) z;
-      }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-      sum_vprod(nm);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      cmat_vec_dble(nm, *avd, cs2, cs1);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: v[*] z
-//             <    is written>: i
-
-      for(i = 0; i <= nm-1; i += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: z
-         z = -((float) cs1[i]);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: v[*]
-         mulc_vadd(nvh, v, (*zvs)[i], z);
-      }
-   }
-}
-
-//  P() {}
-
-void cmat_vec_dble(int n, double _Complex a[n][n], double _Complex v[n], double _Complex w[n])
-{
-
-//  P() {0<=n}
-
-   int i, j;
-
-//  P(i,j) {0<=n}
+Points-to for "Lv"
 
 
-   for(i = 0; i <= n-1; i += 1) {
+// Points To IN:
+// avd -> *NULL_POINTER* , MAY
+// avd -> _avd_320072[0][0][0] , MAY
+// cs1 -> *NULL_POINTER* , MAY
+// cs1 -> _cs1_320080[0] , MAY
+// vs -> *NULL_POINTER* , MAY
+// vs -> _vs_320040[0][0][0] , MAY
+// zvs -> *NULL_POINTER* , MAY
+// zvs -> _zvs_320048[0][0][0] , MAY
 
-//  P(i,j) {0<=i, i+1<=n, 0<=n}
 
-      w[i] = 0.0;
-
-//  P(i,j) {0<=i, i+1<=n, 0<=n}
-
-      for(j = 0; j <= n-1; j += 1)
-
-//  P(i,j) {0<=i, i+1<=n, 0<=j, j+1<=n, 0<=n}
-
-         w[i] += a[i][j]*v[j];
-   }
-}
-
-//  P() {}
-
-void sum_vprod(int n)
-{
-
-//  P() {}
-
-   int i;
-
-//  P(i) {}
-
-   if (4*8*8*4>1) {
-
-//  P(i) {}
-
-      MPI_Reduce((double *) cs1, (double *) cs2, 2*n, 1, 1, 0, 1);
-
-//  P(i) {}
-
-      MPI_Bcast((double *) cs2, 2*n, 1, 0, 1);
-   }
-   else
-
-//  P() {0==-1}
-
-      for(i = 0; i <= n-1; i += 1)
-
-//  P() {0==-1}
-
-         cs2[i] = cs1[i];
-}
-
-//  P() {}
+// Points To OUT:
+// avd -> _avd_320072[0][0][0] , EXACT
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
+// zvs -> _zvs_320048[0][0][0] , EXACT
 
 void Lv(_Complex v[nms])
 {
 
-//  P() {}
+// Points To: none
 
    if (1) {
 
-//  P() {}
+// Points To: none
 
       int nm, nvh, i;
 
-//  P(i,nm,nvh) {}
+// Points To: none
 
       _Complex z;
 
-//  P(i,nm,nvh) {}
+// Points To: none
 
 
       nm = nms;
 
-//  P(i,nm,nvh) {}
+// Points To: none
 
       nvh = nvhs;
 
-//  P(i,nm,nvh) {}
+// Points To: none
 
 
       for(i = 0; i <= nm-1; i += 1) {
 
-//  P(i,nm,nvh) {0<=i, i+1<=nm}
+// Points To:
+// cs1 -> _cs1_320080[0] , MAY
+// vs -> *NULL_POINTER* , MAY
+// vs -> _vs_320040[0][0][0] , MAY
 
          z = vprod(nvh, 0, (*vs)[i], v);
 
-//  P(i,nm,nvh) {0<=i, i+1<=nm}
+// Points To:
+// cs1 -> *NULL_POINTER* , MAY
+// cs1 -> _cs1_320080[0] , MAY
+// vs -> _vs_320040[0][0][0] , EXACT
 
          cs1[i] = (double _Complex) z;
       }
 
-//  P(i,nm,nvh) {0<=i, nm<=i}
+// Points To:
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
 
 
       sum_vprod(nm);
 
-//  P(i,nm,nvh) {0<=i, nm<=i}
+// Points To:
+// avd -> *NULL_POINTER* , MAY
+// avd -> _avd_320072[0][0][0] , MAY
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
 
       cmat_vec_dble(nm, *avd, cs2, cs1);
 
-//  P(i,nm,nvh) {0<=i, nm<=i}
+// Points To:
+// avd -> _avd_320072[0][0][0] , EXACT
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
 
 
       for(i = 0; i <= nm-1; i += 1) {
 
-//  P(i,nm,nvh) {0<=i, i+1<=nm}
+// Points To:
+// avd -> _avd_320072[0][0][0] , EXACT
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
+// zvs -> _zvs_320048[0][0][0] , MAY
 
          z = -((float) cs1[i]);
 
-//  P(i,nm,nvh) {0<=i, i+1<=nm}
+// Points To:
+// avd -> _avd_320072[0][0][0] , EXACT
+// cs1 -> _cs1_320080[0] , EXACT
+// vs -> _vs_320040[0][0][0] , EXACT
+// zvs -> *NULL_POINTER* , MAY
+// zvs -> _zvs_320048[0][0][0] , MAY
 
-         mulc_vadd(nvh, v, (*zvs)[i], z);
-      }
-   }
-}
-void sum_vprod(int n)
-{
-   int i;
-   MPI_Reduce((double *) cs1, (double *) cs2, 2*n, 1, 1, 0, 1);
-   MPI_Bcast((double *) cs2, 2*n, 1, 0, 1);
-}
-//     4*COMPLEXITY:UNKNOWN_VARIABLE2.COMPLEXITY:UNKNOWN_VARIABLE4 + 5.50*COMPLEXITY:UNKNOWN_VARIABLE3^2 + 4.50*COMPLEXITY:UNKNOWN_VARIABLE5.COMPLEXITY:UNKNOWN_VARIABLE6 + 3*COMPLEXITY:UNKNOWN_VARIABLE3 + 4.50*COMPLEXITY:UNKNOWN_VARIABLE4 + 11.25*COMPLEXITY:UNKNOWN_VARIABLE6 + 6.50 (SUMMARY)
-void Lv(_Complex v[nms])
-{
-//     4*COMPLEXITY:UNKNOWN_VARIABLE2.COMPLEXITY:UNKNOWN_VARIABLE4 + 5.50*COMPLEXITY:UNKNOWN_VARIABLE3^2 + 4.50*COMPLEXITY:UNKNOWN_VARIABLE5.COMPLEXITY:UNKNOWN_VARIABLE6 + 3*COMPLEXITY:UNKNOWN_VARIABLE3 + 4.50*COMPLEXITY:UNKNOWN_VARIABLE4 + 11.25*COMPLEXITY:UNKNOWN_VARIABLE6 + 6.50 (TEST)
-   if (1) {
-//                                                                    0 (STMT)
-      int nm, nvh, i;
-//                                                                    0 (STMT)
-      _Complex z;
-//                                                                    2 (STMT)
-
-      nm = nms;
-//                                                                    2 (STMT)
-      nvh = nvhs;
-//                                              9*nm.nvh + 22.50*nm + 3 (DO)
-
-      for(i = 0; i <= nm-1; i += 1) {
-//                                                        9*nvh + 17.50 (STMT)
-         z = vprod(nvh, 0, (*vs)[i], v);
-//                                                                    4 (STMT)
-         cs1[i] = (double _Complex) z;
-      }
-//                                                                    0 (STMT)
-
-      sum_vprod(nm);
-//                                                   11*nm^2 + 6*nm + 3 (STMT)
-      cmat_vec_dble(nm, *avd, cs2, cs1);
-//                                                  8*nm.nvh + 9*nm + 3 (DO)
-
-      for(i = 0; i <= nm-1; i += 1) {
-//                                                                    5 (STMT)
-         z = -((float) cs1[i]);
-//                                                            8*nvh + 3 (STMT)
          mulc_vadd(nvh, v, (*zvs)[i], z);
       }
    }

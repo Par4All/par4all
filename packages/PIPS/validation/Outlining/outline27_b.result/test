@@ -1,0 +1,111 @@
+
+Initial code
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+float ing(int i)
+{
+   int b[100];
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+here:   if (1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      assign(b, i);
+}
+
+Code after outlining
+
+
+//  <b-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void assign(int *b, int i)
+{
+
+//  <b-R-EXACT-{}>
+//  <cola.pepsi-W-EXACT-{}>
+
+   coca cola = {b};
+
+//  <cola.pepsi-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   do_assign(cola.pepsi, i);
+}
+
+//  <i_0[PHI1]-R-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void ding(int b[100], int i_0[1])
+{
+   //PIPS generated variable
+   int i;
+
+//  <i_0[PHI1]-R-EXACT-{PHI1==0}>
+
+   i = *i_0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+here:   if (1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      assign(b, i);
+
+//  <i_0[PHI1]-W-EXACT-{PHI1==0}>
+
+   *i_0 = i;
+}
+
+//  <b-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+static void assign(int *b, int i)
+{
+
+//  <b-R-EXACT-{}>
+//  <cola.pepsi-W-EXACT-{}>
+
+   coca cola = {b};
+
+//  <cola.pepsi-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   do_assign(cola.pepsi, i);
+}
+
+//  <b[PHI1]-W-MAY-{PHI1==i}>
+
+static void do_assign(int b[1], int i)
+{
+
+//  <b[PHI1]-W-EXACT-{PHI1==i}>
+
+   b[i] = i;
+}
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+float ing(int i)
+{
+   int b[100];
+
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+here:   ding(b, &i);
+}
+
+//  <b[PHI1]-W-MAY-{PHI1==i}>
+
+static void do_assign(int b[1], int i)
+{
+
+//  <b[PHI1]-W-EXACT-{PHI1==i}>
+
+   b[i] = i;
+}

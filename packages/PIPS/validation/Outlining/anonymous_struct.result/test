@@ -1,7 +1,10 @@
-void kernel(struct struct_0 a)
+void kernel(struct struct_0 a_0[1])
 {
    //PIPS generated variable
    int i, j, k;
+   //PIPS generated variable
+   struct struct_0 a;
+   a = *a_0;
 kernel:
    for(i = 0; i <= 16; i += 1)
       for(j = 0; j <= 12; j += 1)
@@ -9,12 +12,13 @@ kernel:
             (((a.x)[i])[j])[k] = 3*i+100+5*j-7*k;
             (((a.y)[i])[j])[k] = 3*i-100+5*j-7*k;
          }
+   *a_0 = a;
 }
 int main()
 {
    int i, j, k;
    struct struct_0 a;
-kernel:   kernel(a);
+kernel:   kernel(&a);
 
    for(i = 0; i <= 16; i += 1)
       for(j = 0; j <= 12; j += 1)

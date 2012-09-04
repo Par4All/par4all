@@ -22,38 +22,32 @@ POINTS-TO
 
 
 // Points To IN:
-// _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_1 , MAY
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
+// l -> _l_1[0] , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 
 // Points To OUT:
-// _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_1 , MAY
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 void list06(list l)
 {
 
-// Points To:
-// l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
+// Points To: none
 
    list n = nil;
 
 // Points To:
-// l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
 // n -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
 
    list p;
 
 // Points To:
-// l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
 // n -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -61,8 +55,6 @@ void list06(list l)
    p = nil;
 
 // Points To:
-// l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
 // n -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // p -> *NULL_POINTER* , EXACT
@@ -70,8 +62,6 @@ void list06(list l)
    if (n!=nil)
 
 // Points To:
-// l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
 // n -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // p -> *NULL_POINTER* , EXACT
@@ -79,11 +69,10 @@ void list06(list l)
       l = l->next;
 
 // Points To:
-// _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_1 , MAY
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // l -> *NULL_POINTER* , MAY
-// l -> _l_1 , MAY
-// l -> _l_1_1 , MAY
+// l -> _l_1_2__1[0][0] , MAY
 // n -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // p -> *NULL_POINTER* , EXACT

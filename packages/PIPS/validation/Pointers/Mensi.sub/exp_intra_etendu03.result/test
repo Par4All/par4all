@@ -1,0 +1,90 @@
+
+PROPER  EFFECTS 
+
+int count(list *p)
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is read   >: p
+   while (p!=(void *) 0) {
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
+      p = p->next;
+   }
+//             <    is read   >: i
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _p_1.next -> _p_1_1 , EXACT
+// _p_1_1.next -> _p_1_1 , MAY
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// _p_1.next -> _p_1_1 , MAY
+// _p_1_1.next -> _p_1_1 , MAY
+
+int count(list *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   int i = 0;
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   while (p!=(void *) 0) {
+
+// Points To:
+// _p_1.next -> _p_1_1 , MAY
+// _p_1_1.next -> _p_1_1 , MAY
+// p -> _p_1 , MAY
+// p -> _p_1_1 , MAY
+
+      i++;
+
+// Points To:
+// _p_1.next -> _p_1_1 , MAY
+// _p_1_1.next -> _p_1_1 , MAY
+// p -> _p_1 , MAY
+// p -> _p_1_1 , MAY
+
+      p = p->next;
+   }
+
+// Points To:
+// _p_1.next -> _p_1_1 , MAY
+// _p_1_1.next -> _p_1_1 , MAY
+// p -> *NULL_POINTER* , EXACT
+
+   return i;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int count(list *p)
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is read   >: p
+   while (p!=(void *) 0) {
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <may be read   >: _p_1.next _p_1_1.next
+//             <    is read   >: p
+//             <    is written>: p
+      p = p->next;
+   }
+//             <    is read   >: i
+   return i;
+}

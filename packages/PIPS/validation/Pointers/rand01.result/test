@@ -18,6 +18,7 @@ int main()
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: entier _RANDOM_EFFECTS:GEN_SEED
    entier = 1+rand();
+   return 0;
 }
 
 POINTS-TO
@@ -59,4 +60,8 @@ int main()
 // Points To: none
 
    entier = 1+rand();
+
+// Points To: none
+
+   return 0;
 }

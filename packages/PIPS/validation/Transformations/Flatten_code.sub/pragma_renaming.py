@@ -15,6 +15,8 @@ with vworkspace() as w:
     m.display()
     w.props.flatten_code_unroll=False
     m.flatten_code()
+    m.coarse_grain_parallelization()
+
     m.display()
 
 

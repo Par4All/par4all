@@ -1,23 +1,4 @@
 
-Proper effects for "inc01"
-
-int inc01(int *pi)
-{
-   int *q;
-//             <    is written>: i
-   int i = 0;
-//             <    is read   >: pi
-//             <    is written>: q
-   q = pi;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: i
-   i = *q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i q
-   *q = i++;
-   return 0;
-}
-
 POINTS TO for "inc01"
 
 
@@ -31,15 +12,11 @@ POINTS TO for "inc01"
 int inc01(int *pi)
 {
 
-// Points To:
-// pi -> *NULL_POINTER* , MAY
-// pi -> _pi_1[0] , MAY
+// Points To: none
 
    int *q;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
-// pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int i = 0;
@@ -71,25 +48,6 @@ int inc01(int *pi)
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[0] , EXACT
 
-   return 0;
-}
-
-Proper effects using points_to
-
-int inc01(int *pi)
-{
-   int *q;
-//             <    is written>: i
-   int i = 0;
-//             <    is read   >: pi
-//             <    is written>: q
-   q = pi;
-//             <may be read   >: _pi_1[0] *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: i
-   i = *q;
-//             <    is read   >: i q
-//             <    is written>: _pi_1[0] i
-   *q = i++;
    return 0;
 }
 

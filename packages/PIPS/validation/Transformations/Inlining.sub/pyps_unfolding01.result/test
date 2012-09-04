@@ -51,19 +51,15 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
       result = _return2;
       {
          //PIPS generated variable
-         fgINT32 *array0 = pdest;
-         //PIPS generated variable
          int pos0 = j;
          //PIPS generated variable
          fgINT32 value0 = result;
          {
             //PIPS generated variable
-            fgINT32 *array1 = array0;
-            //PIPS generated variable
             int pos1 = pos0;
             //PIPS generated variable
             fgINT32 value1 = value0;
-            array1[pos1] = value1;
+            pdest[pos1] = value1;
          }
       }
    }

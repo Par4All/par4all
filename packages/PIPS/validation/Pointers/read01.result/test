@@ -13,6 +13,7 @@ int main()
 //             <    is read   >: fd nbytes __IO_EFFECTS:LUNS[fd]
 //             <    is written>: bytes_read __IO_EFFECTS:LUNS[fd]
    bytes_read = read(fd, buf, nbytes);
+   return 0;
 }
 
 POINTS-TO
@@ -49,4 +50,8 @@ int main()
 // Points To: none
 
    bytes_read = read(fd, buf, nbytes);
+
+// Points To: none
+
+   return 0;
 }

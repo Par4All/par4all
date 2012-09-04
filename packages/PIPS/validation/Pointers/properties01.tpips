@@ -1,10 +1,6 @@
-# To explore the impact of points-to properties on effects_with_points_to
-
-# 
-
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-# setproperty POINTS_TO_NULL_POINTER_DEREFERENCING TRUE
+# To explore the impact of points-to properties on
+# effects_with_points_to (used to be the motivation, but not here:
+# points-to are enough)
 
 setenv WSPACE=properties01
 delete $WSPACE
@@ -13,14 +9,10 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create $WSPACE $WSPACE.c
 
-activate CUMULATED_EFFECTS_WITH_POINTS_TO
-activate PROPER_EFFECTS_WITH_POINTS_TO
-
 echo
-echo Proper effects for "$WSPACE"
+echo POINTS TO for "$WSPACE"
 echo
-
-activate PRINT_CODE_PROPER_EFFECTS
+activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[$WSPACE]
 
 close

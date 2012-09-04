@@ -18,38 +18,20 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 #setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
 
-# Pointers are not needed... Yes, they are needed because of static
-# declarations but they do not work interprocdeurally
-
-#activate CUMULATED_EFFECTS_WITH_POINTS_TO
-#activate PROPER_EFFECTS_WITH_POINTS_TO
-
 display CALLGRAPH_FILE[Lv]
-
-display PRINTED_FILE[sum_vprod]
 
 activate PRINT_CODE_POINTS_TO_LIST
 
-display PRINTED_FILE[cmat_vec_dble]
-
-activate PRINT_CODE_CUMULATED_EFFECTS
-
-display PRINTED_FILE[cmat_vec_dble]
-display PRINTED_FILE[Lv]
-
-activate PRINT_CODE_PRECONDITIONS
+echo
+echo Points-to for "cmat_vec_dble"
+echo
 
 display PRINTED_FILE[cmat_vec_dble]
-display PRINTED_FILE[sum_vprod]
-display PRINTED_FILE[Lv]
 
-apply SIMPLIFY_CONTROL[sum_vprod]
-activate PRINT_CODE
-display PRINTED_FILE[sum_vprod]
+echo
+echo Points-to for "Lv"
+echo
 
-activate PRINT_CODE_COMPLEXITIES
-
-#display PRINTED_FILE[cmat_vec_dble]
 display PRINTED_FILE[Lv]
 
 close

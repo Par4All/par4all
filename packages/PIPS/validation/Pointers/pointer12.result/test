@@ -2,8 +2,7 @@
 POINTS TO for "pointer12"
 
 
-// Points To IN:
-// a.array -> _a_1[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -11,39 +10,34 @@ POINTS TO for "pointer12"
 void pointer12(array_2D a)
 {
 
-// Points To:
-// a.array -> _a_1[0] , MAY
+// Points To: none
 
    int i, j;
 
-// Points To:
-// a.array -> _a_1[0] , EXACT
+// Points To: none
 
    a.d1 = 5;
 
-// Points To:
-// a.array -> _a_1[0] , EXACT
+// Points To: none
 
    a.d2 = 4;
 
-// Points To:
-// a.array -> _a_1[0] , EXACT
+// Points To: none
 
    a.array = malloc(a.d1+a.d2*sizeof(double));
 
 // Points To:
-// a.array -> *ANY_MODULE*:*HEAP* , EXACT
+// a.array -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    for(i = 0; i <= a.d1-1; i += 1)
 
 // Points To:
-// a.array -> *ANY_MODULE*:*HEAP* , EXACT
+// a.array -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
       for(j = 0; j <= a.d2-1; j += 1)
 
 // Points To:
-// a.array -> *ANY_MODULE*:*HEAP* , EXACT
+// a.array -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
          (a.array)[a.d2*i+j] = 0.;
 }
-INIT_POINTS_TO_ANALYSIS[pointer12] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
