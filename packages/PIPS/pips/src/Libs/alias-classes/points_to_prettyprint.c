@@ -153,12 +153,12 @@ bool print_code_points_to(const char* module_name,
   /* Load IN  pts-to */
   points_to_list pts_to_in = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_IN, module_name, true);
-  list l_pt_to_in = points_to_list_list(pts_to_in);
+  //list l_pt_to_in = points_to_list_list(pts_to_in);
 
  /* Load OUT  pts-to */
   points_to_list pts_to_out = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_OUT, module_name, true);
-  list l_pt_to_out = points_to_list_list(pts_to_out);
+  //list l_pt_to_out = points_to_list_list(pts_to_out);
 
   pips_debug(1, "considering module %s \n",
 	     module_name);
@@ -175,8 +175,8 @@ bool print_code_points_to(const char* module_name,
 
   init_prettyprint(text_pt_to);
   /* text sum_tex = text_points_to_relations(l_sum_pt_to, "Points To:"); */
-  text in_tex = text_points_to_relations(l_pt_to_in, "Points To IN:");
-  text out_tex = text_points_to_relations(l_pt_to_out, "Points To OUT:");
+  text in_tex = text_points_to_relations(pts_to_in, "Points To IN:");
+  text out_tex = text_points_to_relations(pts_to_out, "Points To OUT:");
   text t = make_text(NIL);
   /* MERGE_TEXTS( t, sum_tex ); */
   MERGE_TEXTS( t, in_tex );
@@ -192,6 +192,23 @@ bool print_code_points_to(const char* module_name,
   return res;
 }
 
+void print_points_to_list(points_to_list ptl)
+{
+  text t = text_points_to_relations(ptl, "");
+  print_text(stderr, t);
+  free_text(t);
+}
+
+void print_points_to_graph(points_to_graph ptg)
+{
+  bool ok = !points_to_graph_bottom(ptg);
+  if(!ok)
+    fprintf(stderr, "Points-to graph does not exist, dead code\n");
+  else {
+    set s = points_to_graph_set(ptg);
+    print_points_to_set("", s);
+  }
+}
 
 //Handlers for PIPSMAKE
 bool print_code_points_to_list(const char* module_name)
@@ -325,8 +342,11 @@ text text_points_to_relation(points_to pt_to)
 }
 
 text
-text_points_to_relations(list l_pt_to, string header)
+text_points_to_relations(points_to_list ptl, string header)
 {
+  list l_pt_to = points_to_list_list(ptl);
+  bool bottom_p = points_to_list_bottom(ptl);
+
     text tpt_to = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
     bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
@@ -348,7 +368,9 @@ text_points_to_relations(list l_pt_to, string header)
 	}
       append(" ");
       append(header);
-      if(ENDP(l_pt_to))
+      if(bottom_p)
+	append(" unreachable\n");
+      else if(ENDP(l_pt_to))
 	append(" none\n");
       else
 	append("\n");
@@ -369,12 +391,15 @@ text_points_to_relations(list l_pt_to, string header)
     return tpt_to;
 }
 
+/* print a points-to arc, print_points_to() or print_points_to_arc() */
 void print_points_to_relation(points_to pt_to)
 {
   text t = text_points_to_relation(pt_to);
   print_text(stderr, t);
   free_text(t);
 }
+
+/* print a list of points-to arcs */
 void print_points_to_relations(list l_pt_to)
 {
   fprintf(stderr,"\n");
@@ -392,8 +417,8 @@ void print_points_to_relations(list l_pt_to)
 
 text text_pt_to(entity __attribute__ ((unused)) module_name, int __attribute__ ((unused)) margin, statement s)
 {
-  list l_pt_to = points_to_list_list(load_printed_points_to_list(s));
-  return(text_points_to_relations(l_pt_to, "Points To:"));
-
+  points_to_list ptl = load_printed_points_to_list(s);
+  text t = text_points_to_relations(ptl, "Points To:");
+  return t;
 }
 

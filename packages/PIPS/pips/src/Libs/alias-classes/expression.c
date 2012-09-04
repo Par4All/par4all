@@ -70,6 +70,17 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
   switch(t) {
   case is_syntax_reference: {
     reference r = syntax_reference(s);
+    list sl = reference_indices(r);
+    entity v = reference_variable(r);
+    type vt = entity_basic_concrete_type(v);
+    // FI: call16.c shows that the C parser does not generate the
+    // right construct, a subscript, when a scalar pointer is indexed
+    if(pointer_type_p(vt) && !ENDP(sl)) {
+      expression tmp = entity_to_expression(v);
+      pt_out = dereferencing_to_points_to(tmp, pt_in);
+      pt_out = expressions_to_points_to(sl, pt_out);
+      free_expression(tmp);
+    }
     pt_out = reference_to_points_to(r, pt_in);
     break;
   }
@@ -131,6 +142,9 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
   default:
     ;
   }
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
   return pt_out;
 }
 
@@ -357,7 +371,7 @@ pt_map range_to_points_to(range r, pt_map pt_in)
  */
 pt_map call_to_points_to(call c, pt_map pt_in)
 {
-   pt_map pt_out = pt_in;
+  pt_map pt_out = pt_in;
   tag tt;
   entity f = call_function(c);
   list al = call_arguments(c);
@@ -366,6 +380,11 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   if(type_functional_p(ft)) {
     functional ff = type_functional(ft);
     rt = functional_result(ff);
+
+    // FI: we might have to handle here return?, exit, abort, (stop)
+    // if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)
+    // It is done somewhere else
+
     /* points-to updates due to arguments */
     // FI: this cannot be delayed but it is unfortunately applied
     // again when going down? See arithmetic08 and 09?
@@ -373,7 +392,13 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     // recursive calls
     // FI: we are in trouble for post increment and post decrement...
     // We should update the target a second time in sinks.c!
-    pt_out = expressions_to_points_to(al, pt_in);
+    if(!ENTITY_CONDITIONAL_P(f)) {
+      // FI: This is OK only if all subexpressions are always evaluated
+      pt_out = expressions_to_points_to(al, pt_in);
+    }
+    else
+      pt_out = expression_to_points_to(EXPRESSION(CAR(al)), pt_in);
+
     switch( tt = value_tag(entity_initial(f))) {
     case is_value_code:{
       pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
@@ -426,7 +451,9 @@ pt_map call_to_points_to(call c, pt_map pt_in)
   else
     pips_internal_error("Unexpected type.\n");
 
-
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
 
   return pt_out;
 }
@@ -487,7 +514,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_MINUS_UPDATE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression rhs = EXPRESSION(CAR(CDR(al)));
       entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
       expression delta = MakeUnaryCall(um, copy_expression(rhs));
@@ -499,7 +526,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_PRE_INCREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression delta = int_to_expression(1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -509,7 +536,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_POST_DECREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
     type lhst = expression_to_type(lhs);
-    if(pointer_type_p(lhst)) {
+    if(C_pointer_type_p(lhst)) {
       expression delta = int_to_expression(-1);
       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out);
       free_expression(delta);
@@ -520,8 +547,15 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     /* Is the dereferenced pointer null or undefined? */
     expression p = EXPRESSION(CAR(al));
     pt_out = dereferencing_to_points_to(p, pt_out);
-  }else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
-// FI: I needs this piece of code for assert();
+  }
+  else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
+    // FI: I needs this piece of code for assert();
+    // FI: why? it looks like the evaluation of a conditional expression...
+    // See assert01.c and its expansion?
+    // This piece of code seems completety wrong
+    // The actual arguments of __assert_fail() are two character
+    // strings, an integer and a NULL pointer for assert01.c
+#if 0
     expression c = EXPRESSION(CAR(al));
     pt_map in_t = full_copy_pt_map(pt_out);
     pt_map in_f = full_copy_pt_map(pt_out);
@@ -530,20 +564,24 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     pt_map out_t = pt_map_undefined;
-    if(!empty_pt_map_p(in_t))
+    if(!points_to_graph_bottom(in_t))
       out_t = expression_to_points_to(e1, in_t);
     pt_map out_f = pt_map_undefined;
     // FI: should be factored out in a more general merge function...
-    if(!empty_pt_map_p(in_f))
+    if(!points_to_graph_bottom(in_f))
       out_f = expression_to_points_to(e2, in_f);
-    if(empty_pt_map_p(in_t))
+    if(points_to_graph_bottom(in_t))
       pt_out = out_f;
-    else if(empty_pt_map_p(in_f))
+    else if(points_to_graph_bottom(in_f))
       pt_out = out_t;
     else
-      pt_out = merge_points_to_set(out_t, out_f);
+      pt_out = merge_points_to_graphs(out_t, out_f);
     // FI: this destroys pt_out for test case pointer02
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
+#endif
+    // FI: no return from assert failure
+    clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      /* || ENTITY_ASSERT_FAIL_SYSTEM_P(f) */) {
@@ -583,24 +621,31 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     expression c = EXPRESSION(CAR(al));
     pt_map in_t = full_copy_pt_map(pt_out);
     pt_map in_f = full_copy_pt_map(pt_out);
+    // FI: issue with the notion of pt_in
+    // stubs created when computing in_t should also be added in in_f
+    // or they are going to seem to be reallocated ambiguously in
+    // create_stub_entity(). Same issue I guess for the "if" construct
     in_t = condition_to_points_to(c, in_t, true);
-    in_f = condition_to_points_to(c, in_f, true);
+    in_f = condition_to_points_to(c, in_f, false);
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     pt_map out_t = pt_map_undefined;
-    if(!empty_pt_map_p(in_t))
+
+    if(!points_to_graph_bottom(in_t))
       out_t = expression_to_points_to(e1, in_t);
+
     pt_map out_f = pt_map_undefined;
     // FI: should be factored out in a more general merge function...
-    if(!empty_pt_map_p(in_f))
+    if(!points_to_graph_bottom(in_f))
       out_f = expression_to_points_to(e2, in_f);
-    if(empty_pt_map_p(in_t))
+
+    if(points_to_graph_bottom(in_t))
       pt_out = out_f;
-    else if(empty_pt_map_p(in_f))
+    else if(points_to_graph_bottom(in_f))
       pt_out = out_t;
     else
-      pt_out = merge_points_to_set(out_t, out_f);
-    // FI: this destroys pt_out for test case pointer02
+      pt_out = merge_points_to_graphs(out_t, out_f);
+    // FI: this destroys pt_out for test case pointer02, Memory leaks...
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
   else {
@@ -614,6 +659,10 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
     // pips_internal_error("Not implemented yet\n");
     pt_out = pt_in;
   }
+
+  pips_assert("pt_out is consistent and defined",
+	      points_to_graph_consistent_p(pt_out)
+	      && !points_to_graph_undefined_p(pt_out));
 
   return pt_out;
 }
@@ -725,6 +774,8 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 {
   pt_map pt_out = pt_in;
   list sources = expression_to_points_to_sources(lhs, pt_out);
+  bool to_be_freed;
+  type et = points_to_expression_to_type(lhs, &to_be_freed);
   FOREACH(CELL, source, sources) {
     list sinks = source_to_sinks(source, pt_out, false);
     if(ENDP(sinks)) {
@@ -737,7 +788,7 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
 	// The code cannot be executed
 	clear_pt_map(pt_out);
     }
-    offset_cells(source, sinks, delta, pt_out);
+    offset_cells(source, sinks, delta, et, pt_out);
     // FI: we could perform some filtering out of pt_in
     // If an arc points from source to nowehere/undefined or to the
     // null location, this arc should be removed from pt_in as it
@@ -753,6 +804,67 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
   return pt_out;
 }
 
+/* Side effect on reference "r".
+ *
+ * r is assumed to be a reference to an array.
+ *
+ * The offset is applied to the last suscript.
+ */
+void offset_array_reference(reference r, expression delta, type et)
+{
+  value v = EvalExpression(delta);
+  list rsl = reference_indices(r);
+  if(value_constant_p(v) && constant_int_p(value_constant(v))) {
+    int dv =  constant_int(value_constant(v));
+    if(ENDP(rsl)) {
+      // FI: oops, we are in trouble; assume 0...
+      expression se = int_to_expression(dv);
+      reference_indices(r) = CONS(EXPRESSION, se, NIL);
+    }
+    else {
+      // Select the index that should be subscripted
+      list sl = points_to_reference_to_typed_index(r, et);
+      expression lse = EXPRESSION(CAR(sl));
+      value vlse = EvalExpression(lse);
+      if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
+	int ov =  constant_int(value_constant(vlse));
+	int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	if(-k <= ov && ov <= k) {
+	  expression nse = int_to_expression(dv+ov);
+	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(sl)) = nse;
+	}
+	else {
+	  expression nse = make_unbounded_expression();
+	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(sl)) = nse;
+	}
+	free_expression(lse);
+      }
+      else {
+	// FI: assume * is used... UNBOUNDED_DIMENSION
+	expression nse = make_unbounded_expression();
+	//EXPRESSION_(CAR(gen_last(sl))) = nse;
+	EXPRESSION_(CAR(sl)) = nse;
+	free_expression(lse);
+      }
+    }
+  }
+  else {
+    if(ENDP(rsl)) {
+      expression nse = make_unbounded_expression();
+      reference_indices(r) = CONS(EXPRESSION, nse, NIL);
+    }
+    else {
+      list sl = points_to_reference_to_typed_index(r, et);
+      expression ose = EXPRESSION(CAR(sl));
+      expression nse = make_unbounded_expression();
+      EXPRESSION_(CAR(sl)) = nse;
+      free_expression(ose);
+    }
+  }
+}
+
 /* Each cell in sinks is replaced by a cell located "delta" elements
  * further up in the memory. In some cases, the same points-to are
  * removed and added. For instance, t[0],t[1] -> t[1],t[2] because of
@@ -761,14 +873,14 @@ pt_map pointer_arithmetic_to_points_to(expression lhs,
  * This procedure must be used when cells in "sinks" are components of
  * points-to arcs stored in a points-to set.
  */
-void offset_cells(cell source, list sinks, expression delta, pt_map in)
+void offset_cells(cell source, list sinks, expression delta, type et, pt_map in)
 {
   pt_map old = new_pt_map();
   pt_map new = new_pt_map();
   FOREACH(CELL, sink, sinks) {
     points_to pt = find_arc_in_points_to_set(source, sink, in);
     add_arc_to_pt_map(pt, old);
-    points_to npt = offset_cell(pt, delta);
+    points_to npt = offset_cell(pt, delta, et);
     add_arc_to_pt_map(npt, new);
   }
   difference_of_pt_maps(in, in, old);
@@ -776,7 +888,8 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
 }
 
 /* Allocate and return a new points-to "npt", copy of "pt", with an
- * offset of "delta" on the sink.
+ * offset of "delta" on the sink. "et" is used to determine which
+ * index should be offseted.
  *
  * Some kind of k-limiting should be performed here to avoid creating
  * too many new nodes in the points-to graph, such as t[0], t[1],... A
@@ -785,15 +898,23 @@ void offset_cells(cell source, list sinks, expression delta, pt_map in)
  * Since "sink" is used to compute the key in the hash table used to
  * represent set "in", it is not possible to perform a side effect on
  * "sink" without removing and reinserting the corresponding arc.
+ *
+ * FI: I am not sure we have the necessary information to know which
+ * subscript must be updated when more than one is available. This is
+ * bad for multidimensional arrays and worse for references to stub
+ * that may include fields (or not) as subscript as well as lots of
+ * articificial dimensions due to the source.
+ *
+ * I assumed gen_last() to start with, but it is unlikely in general!
  */
-points_to offset_cell(points_to pt, expression delta)
+points_to offset_cell(points_to pt, expression delta, type et)
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
   points_to npt = copy_points_to(pt);
-  reference r = cell_any_reference(points_to_sink(npt));
-  entity v = reference_variable(r);
   cell sink = points_to_sink(npt);
+  reference r = cell_any_reference(sink);
+  entity v = reference_variable(r);
   if(nowhere_cell_p(sink))
     ; // user error: possible incrementation of an uninitialized pointer
   else if(null_cell_p(sink))
@@ -802,61 +923,25 @@ points_to offset_cell(points_to pt, expression delta)
     ; // It is already fuzzy no need to add more
   // FI: it might be necessary to exclude *HEAP* too when a minimal
   // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
-  else if(entity_array_p(v)
-     || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
-    value v = EvalExpression(delta);
-    list sl = reference_indices(r);
-    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
-      int dv =  constant_int(value_constant(v));
-      if(ENDP(sl)) {
-	// FI: oops, we are in trouble; assume 0...
-	expression se = int_to_expression(dv);
-	reference_indices(r) = CONS(EXPRESSION, se, NIL);
-      }
-      else {
-	expression lse = EXPRESSION(CAR(gen_last(sl)));
-	value vlse = EvalExpression(lse);
-	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
-	  int ov =  constant_int(value_constant(vlse));
-	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
-	  if(-k <= ov && ov <= k) {
-	    expression nse = int_to_expression(dv+ov);
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  }
-	  else {
-	    expression nse = make_unbounded_expression();
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  }
-	  free_expression(lse);
-	}
-	else {
-	  // FI: assume * is used... UNBOUNDED_DIMENSION
-	  expression nse = make_unbounded_expression();
-	  EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  free_expression(lse);
-	}
-      }
-    }
-    else {
-      if(ENDP(sl)) {
-	expression nse = make_unbounded_expression();
-	reference_indices(r) = CONS(EXPRESSION, nse, NIL);
-      }
-      else {
-	expression ose = EXPRESSION(CAR(gen_last(sl)));
-	expression nse = make_unbounded_expression();
-	EXPRESSION_(CAR(gen_last(sl))) = nse;
-	free_expression(ose);
-      }
-    }
-  }
-  // FI to be extended to pointers and points-to stubs
   else {
-    pips_user_error("Use of pointer arithmetic on %s is not "
-		    "standard-compliant.\n"
-		    "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
-		    " for usual non-standard compliant C code.\n",
-		    entity_user_name(v));
+    type vt = entity_basic_concrete_type(v);
+    if(array_type_p(vt)
+       || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+      offset_array_reference(r, delta, et);
+    }
+    else if(struct_type_p(vt)) {
+      // The struct may contain an array field.
+      // FI: should we check the existence of the field in the subscripts?
+      offset_array_reference(r, delta, et);
+    }
+    // FI to be extended to pointers and points-to stubs
+    else {
+      pips_user_error("Use of pointer arithmetic on %s is not "
+		      "standard-compliant.\n"
+		      "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
+		      " for usual non-standard compliant C code.\n",
+		      entity_user_name(v));
+    }
   }
   return npt;
 }
@@ -891,6 +976,8 @@ void offset_points_to_cell(cell sink, expression delta)
   if(nowhere_cell_p(sink))
     ; // user error: possible incrementation of an uninitialized pointer
   else if(null_cell_p(sink))
+    // FI: the operation requested is impossible; the condition should
+    // be checked above to update the pt_map and/or to signal a bug
     ; // Impossible: possible incrementation of a NULL pointer
   else if(anywhere_cell_p(sink))
     ; // It is already fuzzy no need to add more
@@ -973,6 +1060,26 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   else if(struct_type_p(ut))
     pt_out = struct_assignment_to_points_to(lhs, rhs, pt_out);
   // FI: unions are not dealt with...
+  else if(array_of_pointers_type_p(ut)) {
+    /* Can occur in a declaration */
+    /* When more precision is needed, the BRACE_INTRINSIC arguments
+       will have to be analyzed... */
+    pips_assert("lhs is a reference", expression_reference_p(lhs));
+    reference r = expression_reference(lhs);
+    list sl = reference_indices(r);
+    pips_assert("The array reference has no indices", ENDP(sl));
+    cell source = make_cell_reference(copy_reference(r));
+    points_to_cell_add_unbounded_subscripts(source);
+    type pt = basic_pointer(variable_basic(type_variable(ut)));
+    cell sink = make_anywhere_points_to_cell(pt);
+    points_to a = make_points_to(source, sink, 
+				  make_approximation_may(),
+				  make_descriptor_none());
+    pt_out = add_arc_to_pt_map(a, pt_in);
+  }
+  else if(array_of_struct_type_p(ut)) {
+    pips_internal_error("Initialization of array of structs not implemented yet.\n");
+  }
   else
     pt_out = pt_in; // What else?
 
@@ -1143,19 +1250,23 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
      * cells that may be in the heap, i.e. abstract locations that are
      * greater then the heap abstract location.
      */
-    /* if c is a heap location with indices other than zero then we have bumped into 
-       a non-legal free */
-    if(heap_cell_p(c)) {
+    /* if c is a heap location with indices other than zero then we
+       have bumped into a non-legal free */
+    if(heap_cell_p(c) || stub_points_to_cell_p(c)) {
       reference r = cell_any_reference(c);
       list inds = reference_indices(r);
       if(!ENDP(inds)) {
 	expression ind = EXPRESSION (CAR(inds));
+	// No offset allowed for a free()
 	if(!expression_null_p(ind))
 	  nhl = CONS(CELL, c, nhl);
       }
       // gen_free_list(inds);
     }
-    if(!heap_cell_p(c) && !cell_typed_anywhere_locations_p(c))
+    // FI: wouldn'it be easier to use an else if()?
+    if(!heap_cell_p(c)
+       && !stub_points_to_cell_p(c)
+       && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);
@@ -1166,6 +1277,9 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
     /* We have bumped into a non-legal free such as free(&i). See test
        case malloc10.c */
     clear_pt_map(pt_out);
+    pips_user_warning("Free of a non-heap allocated address.\n"
+		      "Or bug in the points-to analysis...\n");
+    points_to_graph_bottom(pt_out) = true;
   }
   else {
 
@@ -1204,7 +1318,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_1 if it is not empty by definition */
     if(gen_length(L)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell l = points_to_source(pts);
 	if(points_to_cell_in_list_p(l, L)) {
 	  // FI: assuming you can perform the removal inside the loop...
@@ -1215,7 +1330,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
     if(gen_length(R)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell r = points_to_sink(pts);
 	if(points_to_cell_in_list_p(r, R)) {
 	  if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
@@ -1259,7 +1375,8 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
 
     /* Remove Kill_3 if it is not empty by definition */
     if(gen_length(R)==1) {
-      SET_FOREACH(points_to, pts, pt_out) {
+      set pt_out_s = points_to_graph_set(pt_out);
+      SET_FOREACH(points_to, pts, pt_out_s) {
 	cell l = points_to_source(pts);
 	if(related_points_to_cell_in_list_p(l, R)) {
 	  // Potentially memory leaked cell:
@@ -1300,6 +1417,56 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in)
   return pt_out;
 }
 
+/* Remove last subscripts of cell c till its type becomes a scalar
+ * pointer.
+ *
+ * This of course may fail.
+ */
+cell reduce_cell_to_pointer_type(cell c)
+{
+  bool to_be_freed;
+  type t = points_to_cell_to_type(c, &to_be_freed);
+  reference r = cell_any_reference(c);
+  list sl = reference_indices(r);
+  bool remove_p = !pointer_type_p(t);
+  if(to_be_freed) free_type(t);
+  while(remove_p) {
+    if(!ENDP(sl)) {
+      /* Remove the last subscript, hopefully 0 */
+      list ls = gen_last(sl); // last subscript
+      expression lse = EXPRESSION(CAR(ls));
+      if(field_reference_expression_p(lse))
+	break; // This subscript cannot be removed
+      gen_list_and_not(&sl, ls);
+      reference_indices(r) = sl;
+      // because sl is a sublist of ls, the chunk has already been freed
+      // gen_full_free_list(ls);
+      // gen_free_list(ls);
+      t = points_to_cell_to_type(c, &to_be_freed);
+      // remove_p = !pointer_type_p(t); we may end up with char[] instead of char*
+      remove_p = !C_pointer_type_p(t);
+      if(to_be_freed) free_type(t);
+    }
+    else
+      break; // FI: in fact, an internal error
+  }
+  return c;
+}
+
+/* Undo the extra eval performed when stubs are generated: 0
+ * subscripts are added when arrays are involved.
+ *
+ */
+list reduce_cells_to_pointer_type(list cl)
+{
+  FOREACH(CELL, c, cl) {
+    if(null_cell_p(c)) // There may be other exceptions...
+      ;
+    else
+      (void) reduce_cell_to_pointer_type(c);
+  }
+  return cl;
+}
 
 /* Update pt_out when any element of L can be assigned any element of R
  *
@@ -1367,6 +1534,21 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       else
 	pips_user_warning("Dereferencing of a null pointer.\n");
     }
+    else {
+      /* For arrays, an extra eval has been applied by adding 0 subscripts */
+      cell nc = copy_cell(c); // FI: for debugging purpose
+      c = reduce_cell_to_pointer_type(c);
+      bool to_be_freed;
+      type t = points_to_cell_to_type(c, &to_be_freed);
+      type ct = compute_basic_concrete_type(t);
+      if(!C_pointer_type_p(ct)) {
+	print_points_to_cell(nc);
+	print_points_to_cell(c);
+	pips_internal_error("Source cell cannot really be a source cell\n");
+      }
+      if(to_be_freed) free_type(t);
+      free_cell(nc);
+    }
   }
 
   if(!ENDP(ndl) || !ENDP(udl)) {
@@ -1413,203 +1595,248 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   if(ENDP(L)) {
     /* The code cannot be executed */
     clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else {
-  /* Compute the data-flow equation for the may and the must edges...
-   *
-   * out = (in - kill) U gen ?
-   */
+    /* Compute the data-flow equation for the may and the must edges...
+     *
+     * out = (in - kill) U gen ?
+     */
 
- /* Extract MAY/MUST points to relations from the input set "pt_out"  */
-  pt_map in_may = points_to_may_filter(pt_out);
-  pt_map in_must = points_to_must_filter(pt_out);
-  pt_map kill_may = kill_may_set(L, in_may);
-  pt_map kill_must = kill_must_set(L, pt_out);
-  bool address_of_p = true;
-  pt_map gen_may = gen_may_set(L, R, in_may, &address_of_p);
-  pt_map gen_must = gen_must_set(L, R, in_must, &address_of_p);
-  pt_map kill/* = new_pt_map()*/;
-  // FI->AM: do we really want to keep the same arc with two different
-  // approximations? The whole business of may/must does not seem
-  // useful. 
-  // union_of_pt_maps(kill, kill_may, kill_must);
-  kill = kill_must;
-  pt_map gen = new_pt_map();
-  union_of_pt_maps(gen, gen_may, gen_must);
+    /* Extract MAY/MUST points to relations from the input set "pt_out"  */
+    set pt_out_s = points_to_graph_set(pt_out);
+    set in_may = points_to_may_filter(pt_out_s);
+    set in_must = points_to_must_filter(pt_out_s);
+    set kill_may = kill_may_set(L, in_may);
+    set kill_must = kill_must_set(L, pt_out_s);
+    bool address_of_p = true;
+    set gen_may = gen_may_set(L, R, in_may, &address_of_p);
+    set gen_must = gen_must_set(L, R, in_must, &address_of_p);
+    set kill/* = new_pt_map()*/;
+    // FI->AM: do we really want to keep the same arc with two different
+    // approximations? The whole business of may/must does not seem
+    // useful. 
+    // union_of_pt_maps(kill, kill_may, kill_must);
+    kill = kill_must;
+    set gen = new_simple_pt_map();
+    set_union(gen, gen_may, gen_must);
 
-  if(set_empty_p(gen)) {
-    bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-    if(type_sensitive_p)
-      gen = points_to_anywhere_typed(L, pt_out);
-    else
-      gen = points_to_anywhere(L, pt_out); 
-  }
-
-  // FI->AM: shouldn't it be a kill_must here?
-  difference_of_pt_maps(pt_out, pt_out, kill);
-  union_of_pt_maps(pt_out, pt_out, gen);
-
-  // FI->AM: use kill_may to reduce the precision of these arcs
-  SET_FOREACH(points_to, pt, kill_may) {
-    approximation a = points_to_approximation(pt);
-    if(approximation_exact_p(a)) {
-      points_to npt = make_points_to(copy_cell(points_to_source(pt)),
-				     copy_cell(points_to_sink(pt)),
-				     make_approximation_may(),
-				     copy_descriptor(points_to_descriptor(pt)));
-      remove_arc_from_pt_map(pt, pt_out);
-      add_arc_to_pt_map(npt, pt_out);
+    if(set_empty_p(gen)) {
+      bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+      if(type_sensitive_p)
+	gen = points_to_anywhere_typed(L, pt_out_s);
+      else
+	gen = points_to_anywhere(L, pt_out_s); 
     }
-  }
 
-  free_pt_maps(in_may, in_must,
-	       kill_may, kill_must,
-	       gen_may, gen_must,
-	       gen,/* kill,*/ NULL);
-  // clear_pt_map(pt_out); // FI: why not free?
+    // FI->AM: shouldn't it be a kill_must here?
+    set_difference(pt_out_s, pt_out_s, kill);
+    set_union(pt_out_s, pt_out_s, gen);
+
+    // FI->AM: use kill_may to reduce the precision of these arcs
+    SET_FOREACH(points_to, pt, kill_may) {
+      approximation a = points_to_approximation(pt);
+      if(approximation_exact_p(a)) {
+	points_to npt = make_points_to(copy_cell(points_to_source(pt)),
+				       copy_cell(points_to_sink(pt)),
+				       make_approximation_may(),
+				       copy_descriptor(points_to_descriptor(pt)));
+	remove_arc_from_pt_map(pt, pt_out);
+	add_arc_to_pt_map(npt, pt_out);
+      }
+    }
+
+    sets_free(in_may, in_must,
+	      kill_may, kill_must,
+	      gen_may, gen_must,
+	      gen,/* kill,*/ NULL);
+    // clear_pt_map(pt_out); // FI: why not free?
   }
 
   return pt_out;
 }
 
-/* pt_in is modified by side-effects and returned as pt_out */
+pt_map struct_initialization_to_points_to(expression lhs,
+					  expression rhs,
+					  pt_map in)
+{
+  pt_map out = in;
+  // Implementation 0:
+  // pips_internal_error("Not implemented yet.\n");
+  // pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
+
+  /* Temporary implementation: use anywhere as default initialization */
+  list L = expression_to_points_to_sources(lhs, in);
+  // ignore rhs
+  pips_assert("to please gcc, waiting for implementation", rhs==rhs);
+  // L must contain a unique cell, containing a non-index reference
+  pips_assert("One struct to initializze", (int) gen_length(L)==1);
+  cell c = CELL(CAR(L));
+  reference r = cell_any_reference(c);
+  entity e = reference_variable(r);
+  pips_assert("c is not indexed", ENDP(reference_indices(r)));
+  list l = variable_to_pointer_locations(e);
+  FOREACH(CELL, source, l) {
+    bool to_be_freed;
+    type t = points_to_cell_to_type(source, &to_be_freed); // hopefully, concrete
+    cell sink = make_anywhere_cell(t);
+    if(to_be_freed) free_type(t);
+    points_to pt = make_points_to(source, sink,
+				  make_approximation_exact(),
+				  make_descriptor_none());
+    add_arc_to_pt_map(pt, out);
+  }
+
+  return out;
+}
+
+/* pt_in is modified by side-effects and returned as pt_out
+ *
+ * This function is also used for declarations, although the syntax
+ * for declarations is reacher than the syntax for assignments which
+ * can use BRACE_INTRINSIC.
+ */
 pt_map struct_assignment_to_points_to(expression lhs,
 				      expression rhs,
 				      pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  list L = expression_to_points_to_sources(lhs, pt_out);
-  list R = expression_to_points_to_sources(rhs, pt_out);
-  FOREACH(CELL, lc, L) {
-    bool l_to_be_freed;
-    type lt = cell_to_type(lc, &l_to_be_freed);
-    entity le = reference_variable(cell_any_reference(lc));
-    if(!entity_abstract_location_p(le)) {
-      FOREACH(CELL, rc, R) {
-	bool r_to_be_freed;
-	type rt = cell_to_type(rc, &r_to_be_freed);
-	entity re = reference_variable(cell_any_reference(rc));
-	if(entity_abstract_location_p(le)) {
-	  if(entity_abstract_location_p(re)) {
-	    pips_internal_error("Not implemented yet.");
-	  }
-	  else {
-	    pips_internal_error("Not implemented yet.");
-	  }
-	}
-	else {
-	  if(entity_abstract_location_p(re)) {
-	    // FI: when re==NULL, we could generate a user warning or
-	    // ignore the dereferencement of NULL...
-
-	    // All fields are going to point to this abstract
-	    // location... or to the elements pointed by this abstract
-	    // location
-	    pips_assert("Left type is struct",
-			struct_type_p(lt));
-	    entity ste = basic_derived(variable_basic(type_variable(lt)));
-	    type st = entity_type(ste); // structure type
-	    list fl = type_struct(st); // field list
-	    FOREACH(ENTITY, f, fl) {
-	      type ft = entity_type(f); // field type
-	      if(pointer_type_p(ft)) {
-		reference lr = copy_reference(cell_any_reference(lc));
-		// reference rr = copy_reference(cell_any_reference(rc));
-		reference_add_field_dimension(lr, f);
-		cell lc = make_cell_reference(lr);
-		type p_t = type_to_pointed_type(ft);
-		cell rc = make_anywhere_cell(p_t);
-		// reference_add_field_dimension(rr, f);
-		// expression nlhs = reference_to_expression(lr);
-		// expression nrhs = reference_to_expression(rr);
-
-		// FI: too bad this cannot be reused because of an assert in normalize_reference()....
-		// pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-		points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
-		// FI: pt is allocated but not used...
-		add_arc_to_pt_map(pt, pt_out); // FI: I guess...
-		// FI->FC: it would be nice to have a Newgen free_xxxxs() to
-		// free a list of objects of type xxx with one call
-		// FI: why would we free these expressions?
-		// free_expression(lhs), free_expression(rhs);
-	      }
-	      else if(struct_type_p(ft)) {
-		pips_internal_error("Not implemented yet.\n");
-	      }
-	      else {
-		; // Do nothing
-	      }
+  if(C_initialization_expression_p(rhs))
+    pt_out = struct_initialization_to_points_to(lhs, rhs, pt_in);
+  else {
+    list L = expression_to_points_to_sources(lhs, pt_out);
+    list R = expression_to_points_to_sources(rhs, pt_out);
+    FOREACH(CELL, lc, L) {
+      bool l_to_be_freed;
+      type lt = cell_to_type(lc, &l_to_be_freed);
+      entity le = reference_variable(cell_any_reference(lc));
+      if(!entity_abstract_location_p(le)) {
+	FOREACH(CELL, rc, R) {
+	  bool r_to_be_freed;
+	  type rt = cell_to_type(rc, &r_to_be_freed);
+	  entity re = reference_variable(cell_any_reference(rc));
+	  if(entity_abstract_location_p(le)) {
+	    if(entity_abstract_location_p(re)) {
+	      pips_internal_error("Not implemented yet.");
+	    }
+	    else {
+	      pips_internal_error("Not implemented yet.");
 	    }
 	  }
 	  else {
-	    pips_assert("Both types are struct or array of struct",
-			(struct_type_p(lt) || array_of_struct_type_p(lt))
-			 && (struct_type_p(rt) || array_of_struct_type_p(rt)));
-	    /* We may have an implicit array of struct in the right or
-	     * left hand side
-	     */
-	    // pips_assert("Both type are equal", type_equal_p(lt, rt));
-	    basic ltb = variable_basic(type_variable(lt));
-	    basic rtb = variable_basic(type_variable(rt));
-	    pips_assert("Both type are somehow equal",
-			basic_equal_p(ltb, rtb));
-	    entity ste = basic_derived(variable_basic(type_variable(lt)));
-	    type st = entity_type(ste); // structure type
-	    list fl = type_struct(st); // field list
-	    FOREACH(ENTITY, f, fl) {
-	      type ft = entity_type(f); // field type
-	      type uft = ultimate_type(ft);
-	      bool array_p = array_type_p(ft) || array_type_p(uft);
-	      if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
-		reference lr = copy_reference(cell_any_reference(lc));
-		reference rr = copy_reference(cell_any_reference(rc));
-		/* FI: conditionally add zero subscripts necessary to
-		   move from an array "a" to its first element,
-		   e.g. a[0][0][0] */
-		reference_add_zero_subscripts(lr, lt);
-		reference_add_zero_subscripts(rr, rt);
-		reference_add_field_dimension(lr, f);
-		reference_add_field_dimension(rr, f);
-		expression nlhs = reference_to_expression(lr);
-		expression nrhs = reference_to_expression(rr);
-		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-		// FI->FC: it would be nice to have a Newgen free_xxxxs() to
-		// free a list of objects of type xxx with one call
-		// The references within the expressions are now part of pt_out
-		// free_expression(lhs), free_expression(rhs);
+	    if(entity_abstract_location_p(re)) {
+	      // FI: when re==NULL, we could generate a user warning or
+	      // ignore the dereferencement of NULL...
+
+	      // All fields are going to point to this abstract
+	      // location... or to the elements pointed by this abstract
+	      // location
+	      pips_assert("Left type is struct",
+			  struct_type_p(lt));
+	      entity ste = basic_derived(variable_basic(type_variable(lt)));
+	      type st = entity_type(ste); // structure type
+	      list fl = type_struct(st); // field list
+	      FOREACH(ENTITY, f, fl) {
+		type ft = entity_type(f); // field type
+		if(pointer_type_p(ft)) {
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  // reference rr = copy_reference(cell_any_reference(rc));
+		  reference_add_field_dimension(lr, f);
+		  cell lc = make_cell_reference(lr);
+		  type p_t = type_to_pointed_type(ft);
+		  cell rc = make_anywhere_cell(p_t);
+		  // reference_add_field_dimension(rr, f);
+		  // expression nlhs = reference_to_expression(lr);
+		  // expression nrhs = reference_to_expression(rr);
+
+		  // FI: too bad this cannot be reused because of an assert in normalize_reference()....
+		  // pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		  points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
+		  // FI: pt is allocated but not used...
+		  add_arc_to_pt_map(pt, pt_out); // FI: I guess...
+		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+		  // free a list of objects of type xxx with one call
+		  // FI: why would we free these expressions?
+		  // free_expression(lhs), free_expression(rhs);
+		}
+		else if(struct_type_p(ft)) {
+		  pips_internal_error("Not implemented yet.\n");
+		}
+		else {
+		  ; // Do nothing
+		}
 	      }
-	      else if(array_p && (array_of_pointers_type_p(uft)
-				  || pointer_type_p(uft)
-				  || array_of_struct_type_p(uft)
-				  || struct_type_p(uft))) {
-		// Same as above, but an unbounded subscript is added...
-		// Quite a special assign in C...
-		reference lr = copy_reference(cell_any_reference(lc));
-		reference rr = copy_reference(cell_any_reference(rc));
-		reference_add_field_dimension(lr, f);
-		reference_add_field_dimension(rr, f);
-		expression li = make_unbounded_expression();
-		expression ri = make_unbounded_expression();
-		reference_indices(lr) = gen_nconc(reference_indices(lr),
-						  CONS(EXPRESSION, li, NIL));
-		reference_indices(rr) = gen_nconc(reference_indices(rr),
-						  CONS(EXPRESSION, ri, NIL));
-		expression nlhs = reference_to_expression(lr);
-		expression nrhs = reference_to_expression(rr);
-		pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
-	      }
-	      else {
-		; // Do nothing
+	    }
+	    else {
+	      pips_assert("Both types are struct or array of struct",
+			  (struct_type_p(lt) || array_of_struct_type_p(lt))
+			  && (struct_type_p(rt) || array_of_struct_type_p(rt)));
+	      /* We may have an implicit array of struct in the right or
+	       * left hand side
+	       */
+	      // pips_assert("Both type are equal", type_equal_p(lt, rt));
+	      basic ltb = variable_basic(type_variable(lt));
+	      basic rtb = variable_basic(type_variable(rt));
+	      pips_assert("Both type are somehow equal",
+			  basic_equal_p(ltb, rtb));
+	      entity ste = basic_derived(variable_basic(type_variable(lt)));
+	      type st = entity_type(ste); // structure type
+	      list fl = type_struct(st); // field list
+	      FOREACH(ENTITY, f, fl) {
+		type ft = entity_type(f); // field type
+		type uft = ultimate_type(ft);
+		bool array_p = array_type_p(ft) || array_type_p(uft);
+		if(!array_p && (pointer_type_p(uft) || struct_type_p(uft))) {
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  reference rr = copy_reference(cell_any_reference(rc));
+		  /* FI: conditionally add zero subscripts necessary to
+		     move from an array "a" to its first element,
+		     e.g. a[0][0][0] */
+		  reference_add_zero_subscripts(lr, lt);
+		  reference_add_zero_subscripts(rr, rt);
+		  simple_reference_add_field_dimension(lr, f);
+		  simple_reference_add_field_dimension(rr, f);
+		  expression nlhs = reference_to_expression(lr);
+		  expression nrhs = reference_to_expression(rr);
+		  pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
+		  // free a list of objects of type xxx with one call
+		  // The references within the expressions are now part of pt_out
+		  // free_expression(lhs), free_expression(rhs);
+		}
+		else if(array_p && (array_of_pointers_type_p(uft)
+				    || pointer_type_p(uft)
+				    || array_of_struct_type_p(uft)
+				    || struct_type_p(uft))) {
+		  // Same as above, but an unbounded subscript is added...
+		  // Quite a special assign in C...
+		  reference lr = copy_reference(cell_any_reference(lc));
+		  reference rr = copy_reference(cell_any_reference(rc));
+		  simple_reference_add_field_dimension(lr, f);
+		  simple_reference_add_field_dimension(rr, f);
+		  expression li = make_unbounded_expression();
+		  expression ri = make_unbounded_expression();
+		  reference_indices(lr) = gen_nconc(reference_indices(lr),
+						    CONS(EXPRESSION, li, NIL));
+		  reference_indices(rr) = gen_nconc(reference_indices(rr),
+						    CONS(EXPRESSION, ri, NIL));
+		  expression nlhs = reference_to_expression(lr);
+		  expression nrhs = reference_to_expression(rr);
+		  pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
+		}
+		else {
+		  ; // Do nothing
+		}
 	      }
 	    }
 	  }
 	}
       }
-    }
-    else {
-      // FI: the lhs is an unknown struct allocated anywhere
-      // FI: we might have to generate new arcs. e.g. from HEAP to STACK...
-      pips_internal_error("Not implemented yet.\n");
+      else {
+	// FI: the lhs is an unknown struct allocated anywhere
+	// FI: we might have to generate new arcs. e.g. from HEAP to STACK...
+	pips_internal_error("Not implemented yet.\n");
+      }
     }
   }
   // pips_internal_error("Not implemented yet for lhs %p and rhs %p\n", lhs, rhs);
@@ -1642,18 +1869,21 @@ pt_map application_to_points_to(application a, pt_map pt_in)
 pt_map condition_to_points_to(expression c, pt_map in, bool true_p)
 {
   pt_map out = in;
-  syntax cs = expression_syntax(c);
+  if(!points_to_graph_bottom(in)) {
+    syntax cs = expression_syntax(c);
 
-  if(syntax_reference_p(cs)) {
-    /* For instance, C short cut "if(p)" for "if(p!=NULL)" */
-    out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
+    if(syntax_reference_p(cs)) {
+      /* For instance, C short cut "if(p)" for "if(p!=NULL)" */
+      out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
+    }
+    else if(syntax_call_p(cs)) {
+      out = call_condition_to_points_to(syntax_call(cs), in, true_p);
+    }
+    else {
+      pips_internal_error("Not implemented yet.\n");
+    }
   }
-  else if(syntax_call_p(cs)) {
-    out = call_condition_to_points_to(syntax_call(cs), in, true_p);
-  }
-  else {
-    pips_internal_error("Not implemented yet.\n");
-  }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1662,7 +1892,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
 {
   pt_map out = in;
   entity v = reference_variable(r);
-  type vt = ultimate_type(entity_type(v));
+  type vt = entity_basic_concrete_type(v);
   list sl = reference_indices(r);
 
   /* Take care of side effects in references */
@@ -1677,6 +1907,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
 	// FI: memory leak with clear_pt?
 	pips_user_warning("Dead code detected.\n");
 	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
       }
       else {
 	/* Make a points-to NULL and remove the arc from the current out */
@@ -1690,7 +1921,8 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
     }
     else {
       /* remove any arc from v to anything and add an arc from p to NULL */
-      points_to_source_projection(in, v);
+      set in_s = points_to_graph_set(in);
+      points_to_source_projection(in_s, v);
       /* Make a points-to NULL and remove the arc from the current out */
       cell source = make_cell_reference(copy_reference(r));
       cell sink = make_null_pointer_value_cell();
@@ -1721,6 +1953,7 @@ pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
   else
     // FI: you might have an apply on a functional pointer?
     pips_internal_error("Not implemented yet.\n");
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1749,6 +1982,7 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     out = intrinsic_call_to_points_to(c, in);
     //pips_internal_error("Not implemented yet.\n");
   }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1787,12 +2021,14 @@ pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool tru
     expression nc2 = EXPRESSION(CAR(CDR(al)));
     pt_map out2 = condition_to_points_to(nc2, in2, true_p);
     // FI: memory leak? Does merge_points_to_set() allocated a new set?
-    out = merge_points_to_set(out1, out2);
+    out = merge_points_to_graphs(out1, out2);
+    clear_pt_map(out2); // FI: you do no want to free the arcs
     free_pt_map(out2);
   }
   else
     pips_internal_error("Not implemented yet for boolean operator \"%s\".\n",
 			entity_local_name(f));
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }
 
@@ -1906,164 +2142,226 @@ bool cell_is_greater_than_p(cell c1, cell c2)
   return cell_is_xxx_p(c1, c2, GREATER_THAN);
 }
 
-/* Update the points-to information "in" according to the validity of
- * the condition.
+/* The condition is e==NULL
  *
- * FI: It is not clear what should be done. We can remove the arcs or
- * some of the arcs that violate the condition or decide that the
- * condition cannot be true... I've put a first attempt at resolving
- * the issue for pointer comparisons, using the approximation exact or
- * not.
+ * e==NULL may be true if exists c in sinks(e) s.t. {NULL} is included in c.
+ * else e==NULL must be false.
+ *
+ * Some arcs in in may be removed: forall c in sources(e):
+ *
+ * out = in - {pt=(a,b) in in | a in sources(e) and b=NULL} 
  */
-pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+pt_map null_equal_condition_to_points_to(expression e, pt_map in)
 {
   pt_map out = in;
-  entity f = call_function(c);
-  list al = call_arguments(c);
-  if((ENTITY_EQUAL_P(f) && true_p)
-     || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
-    expression lhs = EXPRESSION(CAR(al));
-    type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-      list L = expression_to_points_to_sources(lhs, in);
-      list R = expression_to_points_to_sources(rhs, in);
-      if(gen_length(L)==1 && gen_length(R)==1) {
-	cell l = CELL(CAR(L));
-	cell r = CELL(CAR(R));
-	cell source = cell_undefined, sink = cell_undefined;
-	if(null_cell_p(l)) {
-	  source = r;
-	  sink = l;
-	}
-	else if(null_cell_p(r)) {
-	  source = l;
-	  sink = r;
-	}
-	if(!cell_undefined_p(source)) {
-	  entity v = reference_variable(cell_any_reference(source));
-	  out = points_to_source_projection(out, v);
-	  points_to a = make_points_to(source, sink, make_approximation_exact(),
-				     make_descriptor_none());
-	  add_arc_to_pt_map(a, out);
-	}
+  type et = expression_to_type(e);
+  if(pointer_type_p(et)) {
+    list R = expression_to_points_to_sinks(e, in);
+
+    if(ENDP(R)) {
+      // Maybe, a dereferencement user error occured?
+      pips_internal_error("A dereferencement should always succeed.\n");
+    }
+
+    /* May the condition be true under "in"? */
+    bool found_p = false;
+    FOREACH(CELL, c, R) {
+      if(null_cell_p(c)
+	 || anywhere_cell_p(c)
+	 || cell_typed_anywhere_locations_p(c)) {
+	found_p = true;
+	break;
       }
     }
-    free_type(lhst), free_type(rhst);
-    ; //FI FI FI
-  }
-  else if((ENTITY_EQUAL_P(f) && !true_p)
-     || (ENTITY_NON_EQUAL_P(f) && true_p)) {
-    // FI: this code is almost identical to the code above
-    // It should be shared with a more general test first and then a
-    // precise test to decide if you add or remove arcs
-    expression lhs = EXPRESSION(CAR(al));
-    type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-      list L = expression_to_points_to_sources(lhs, in);
-      list R = expression_to_points_to_sources(rhs, in);
-      if(gen_length(L)==1 && gen_length(R)==1) {
-	cell l = CELL(CAR(L));
-	cell r = CELL(CAR(R));
-	cell source = cell_undefined, sink = cell_undefined;
-	if(null_cell_p(l)) {
-	  source = r;
-	  sink = l;
-	}
-	else if(null_cell_p(r)) {
-	  source = l;
-	  sink = r;
-	}
-	if(!cell_undefined_p(source)) {
-	  // FI: we should be able to remove an arc regardless of its
-	  // approximation... Not so simple as it's part of the key
-	  // used by the hash table!
-	  points_to a = make_points_to(copy_cell(source),
-				       copy_cell(sink),
-				       make_approximation_exact(),
-				       make_descriptor_none());
-	  remove_arc_from_pt_map(a, out);
-	  free_points_to(a);
-	  a = make_points_to(copy_cell(source), copy_cell(sink),
-			     make_approximation_may(),
-			     make_descriptor_none());
-	  remove_arc_from_pt_map(a, out);
-	  free_points_to(a);
-	}
+    if(!found_p) {
+      clear_pt_map(out);
+      points_to_graph_bottom(out) = true;
+    }
+    else {
+      /* Remove arcs incompatible with the condition e==NULL and add
+	 the arc e->NULL */
+      list L = expression_to_points_to_sources(e, in);
+      pips_assert("A lhs expression has at least one source", !ENDP(L));
+      int nL = (int) gen_length(L);
+      cell fc = CELL(CAR(L));
+      if(nL==1 && atomic_points_to_cell_p(fc)) {
+	/* All arcs starting from fc can be removed and replaced by
+	   one arc from fc to NULL. */
+	out = points_to_cell_source_projection(out, fc);
+	points_to pt = make_points_to(copy_cell(fc),
+				      make_null_cell(),
+				      make_approximation_exact(),
+				      make_descriptor_none());
+	add_arc_to_pt_map(pt, out);
       }
-    }
-    free_type(lhst), free_type(rhst);
-    ;//FI FI FI
-  }
-  if(ENTITY_LESS_OR_EQUAL_P(f)
-     || ENTITY_GREATER_THAN_P(f)
-     || ENTITY_GREATER_THAN_P(f)
-     || ENTITY_GREATER_THAN_P(f)) {
-    bool (*cmp_function)(cell, cell);
-    if((ENTITY_LESS_OR_EQUAL_P(f) && true_p)
-       || (ENTITY_GREATER_THAN_P(f) && !true_p)) {
-      // cmp_function = cell_is_less_than_or_equal_to_p;
-      cmp_function = cell_is_greater_than_p;
-    }
-    if((ENTITY_LESS_OR_EQUAL_P(f) && !true_p)
-       || (ENTITY_GREATER_THAN_P(f) && true_p)) {
-      // cmp_function = cell_is_greater_than_p;
-      cmp_function = cell_is_less_than_or_equal_to_p;
-    }
-    if((ENTITY_GREATER_OR_EQUAL_P(f) && true_p)
-       || (ENTITY_LESS_THAN_P(f) && !true_p)) {
-      // cmp_function = cell_is_greater_than_or_equal_to_p;
-      cmp_function = cell_is_less_than_p;
-    }
-    if((ENTITY_GREATER_OR_EQUAL_P(f) && !true_p)
-       || (ENTITY_LESS_THAN_P(f) && true_p)) {
-      //cmp_function = cell_is_less_than_p;
-      cmp_function = cell_is_greater_than_or_equal_to_p;
-    }
-    expression lhs = EXPRESSION(CAR(al));
-    type lhst = expression_to_type(lhs);
-    expression rhs = EXPRESSION(CAR(CDR(al)));
-    type rhst = expression_to_type(rhs);
-    if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
-      list L = expression_to_points_to_sinks(lhs, in);
-      if(gen_length(L)==1) { // FI: one fixed bound
-	cell lc = CELL(CAR(L));
-	list RR = expression_to_points_to_sources(rhs, in);
-	SET_FOREACH(points_to, pt, out) {
+      else {
+	SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
 	  cell source = points_to_source(pt);
-	  if(cell_in_list_p(source, RR)) {
+	  if(cell_in_list_p(source, L)) {
 	    cell sink = points_to_sink(pt);
-	    if(cmp_function(lc, sink)) {
-	      approximation a = points_to_approximation(pt);
-	      if(approximation_exact_p(a)) 
-		/* The condition cannot violate an exact arc. */
-		clear_pt_map(out);
-	      else
-		remove_arc_from_pt_map(pt, out);
+	    if(!(null_cell_p(sink)
+		 || anywhere_cell_p(sink)
+		 || cell_typed_anywhere_locations_p(sink))) {
+	      out = remove_arc_from_pt_map(pt, out);
 	    }
 	  }
 	}
       }
+    }
+  gen_free_list(R); // FI: should be full?
+  }
+  return out;
+}
+
+/* The condition is e!=NULL
+ *
+ * e!=NULL may be true if exists c in sinks(e) s.t. c != {NULL}
+ *
+ * e!=NULL is false if forall c in sinks(e) c is included in {NULL}
+ *
+ * Arcs that can be removed:
+ *
+ * FI: I decided not to merge this function with the previous one till
+ * they are both fully defined and tested.
+ */
+pt_map null_non_equal_condition_to_points_to(expression e, pt_map in)
+{
+  pt_map out = in;
+  type et = expression_to_type(e);
+  if(pointer_type_p(et)) {
+    list L = expression_to_points_to_sinks(e, in);
+
+    if(ENDP(L)) {
+      // Maybe, a dereferencement user error occured?
+      pips_internal_error("A dereferencement should always succeed.\n");
+    }
+
+    /* May the condition be true under "in"? */
+    bool found_p = false;
+    FOREACH(CELL, c, L) {
+      if(!null_cell_p(c)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      clear_pt_map(out);
+      points_to_graph_bottom(out) = true;
+    }
+    else {
+      /* Remove arcs incompatible with the condition e!=NULL */
+      list L = expression_to_points_to_sources(e, in);
+      SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	cell source = points_to_source(pt);
+	if(cell_in_list_p(source, L)) {
+	  cell sink = points_to_sink(pt);
+	  if(null_cell_p(sink)) {
+	    out = remove_arc_from_pt_map(pt, out);
+	  }
+	}
+      }
+    }
+  }
+  return out;
+}
+
+/* The expression list "al" contains exactly two arguments, "lhs" and
+ * "rhs". Check if "lhs==rhs" may return true.
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "out" is returned.
+ *
+ * If one of these two expressions cannot be evaluated according to
+ * the C standard, i.e. its value is undefined, a bottom graph is
+ * returned.
+ *
+ * "out" is "in", modified by side-effects.
+ *
+ * This function has many commonalities with
+ * non_equal_condition_to_points_to(). They were developped
+ * independently to avoid mistakes when dealing with negations of
+ * quantifiers. They could now be unified.
+ */
+pt_map equal_condition_to_points_to(list al, pt_map in)
+{
+  pt_map out = in;
+  expression lhs = EXPRESSION(CAR(al));
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+
+  // FI: in fact, any integer could be used in a pointer comparison...
+  if(expression_null_p(lhs))
+    out = null_equal_condition_to_points_to(rhs, in);
+  else if(expression_null_p(rhs))
+    out = null_equal_condition_to_points_to(lhs, in);
+  else {
+    type lhst = expression_to_type(lhs);
+    type rhst = expression_to_type(rhs);
+    if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sinks(lhs, in);
+      int nL = (int) gen_length(L);
+      /* Is it impossible to evaluate lhs? 
+       *
+       * The check is too low. The message will be emitted twice
+       * because conditions are often evaluated as true and false.
+       */
+      if(nL==1 && nowhere_cell_p(CELL(CAR(L)))) {
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+	pips_user_warning("Unitialized pointer is used to evaluate expression"
+			  " \"%s\"\n.", expression_to_string(lhs));
+      }
       else {
+	/* Is it impossible to evaluate rhs? */
 	list R = expression_to_points_to_sinks(rhs, in);
-	if(gen_length(R)==1) { // FI: one fixed bound
-	  cell rc = CELL(CAR(R));
-	  list LL = expression_to_points_to_sources(lhs, in);
-	  SET_FOREACH(points_to, pt, out) {
-	    cell source = points_to_source(pt);
-	    if(cell_in_list_p(source, LL)) {
-	      cell sink = points_to_sink(pt);
-	      if(cmp_function(sink, rc)) {
-		// FI: Oops in middle of the iterator...
-		approximation a = points_to_approximation(pt);
-		if(approximation_exact_p(a)) 
-		  /* The condition cannot violate an exact arc. */
-		  clear_pt_map(out);
-		else
-		  remove_arc_from_pt_map(pt, out);
+	int nR = (int) gen_length(R);
+	if(nR==1 && nowhere_cell_p(CELL(CAR(R)))) {
+	  clear_pt_map(out);
+	  points_to_graph_bottom(out) = true;
+	  pips_user_warning("Unitialized pointer is used to evaluate expression"
+			    " \"%s\".\n", expression_to_string(rhs));
+	}
+	else {
+	  /* Is the condition feasible? */
+	  bool equal_p = false;
+	  FOREACH(CELL, cl, L) {
+	    FOREACH(CELL, cr, R) {
+	      if(points_to_cells_intersect_p(cl, cr)) {
+		equal_p = true;
+		break;
+	      }
+	    }
+	    if(equal_p)
+	      break;
+	  }
+	  if(!equal_p) {
+	    // lhs==rhs is impossible
+	    clear_pt_map(out);
+	    points_to_graph_bottom(out) = true;
+	  }
+	  else {
+	    // It is possible to remove some arcs? if18.c
+	    int nL = (int) gen_length(L);
+	    int nR = (int) gen_length(R);
+	    cell c = cell_undefined;
+	    list O = list_undefined;
+	    if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+	      c = CELL(CAR(L));
+	      O = expression_to_points_to_sources(rhs, out);
+	    }
+	    else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
+	      c = CELL(CAR(R));
+	      O = expression_to_points_to_sources(lhs, out);
+	    }
+	    if(!cell_undefined_p(c)) {
+	      if((int) gen_length(O)==1) {
+		cell oc = CELL(CAR(O));
+		out = points_to_cell_source_projection(out, oc);
+		points_to pt = make_points_to(copy_cell(oc),
+					      copy_cell(c),
+					      make_approximation_exact(),
+					      make_descriptor_none());
+		add_arc_to_pt_map(pt, out);
 	      }
 	    }
 	  }
@@ -2071,11 +2369,222 @@ pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool 
       }
     }
     free_type(lhst), free_type(rhst);
-    ; //FI FI FI
+  }
+  return out;
+}
+
+/* The expression list "al" contains exactly two arguments. 
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "in" is returned.
+ *
+ * "out" is "in", modified by side-effects.
+ */
+pt_map non_equal_condition_to_points_to(list al, pt_map in)
+{
+  // FI: this code is almost identical to the code above
+  // It should be shared with a more general test first and then a
+  // precise test to decide if you add or remove arcs
+  pt_map out = in;
+  expression lhs = EXPRESSION(CAR(al));
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+
+  // FI: in fact, any integer could be used in a pointer comparison...
+  if(expression_null_p(lhs))
+    out = null_non_equal_condition_to_points_to(rhs, in);
+  else if(expression_null_p(rhs))
+    out = null_non_equal_condition_to_points_to(lhs, in);
+  else {
+    type lhst = expression_to_type(lhs);
+    type rhst = expression_to_type(rhs);
+    if(pointer_type_p(lhst) && pointer_type_p(rhst)) {
+      list L = expression_to_points_to_sinks(lhs, in);
+      list R = expression_to_points_to_sinks(rhs, in);
+      //bool equal_p = false;
+      int nL = (int) gen_length(L);
+      int nR = (int) gen_length(R);
+      pips_assert("The two expressions can be dereferenced", nL>=1 && nR>=1);
+      if(nL==1 && nR==1) {
+	cell cl = CELL(CAR(L));
+	cell cr = CELL(CAR(R));
+	/* Is the condition lhs!=rhs certainly impossible to evaluate?
+	 * If not, is it always false? */
+	if((atomic_points_to_cell_p(cl)
+	    && atomic_points_to_cell_p(cr)
+	    && points_to_cell_equal_p(cl, cr))
+	   || nowhere_cell_p(cl)
+	   || nowhere_cell_p(cr)) {
+	  // one or more expressions is not evaluable or the condition
+	  // is not feasible
+	  clear_pt_map(out);
+	  points_to_graph_bottom(out) = true;
+	  if(nowhere_cell_p(cl))
+	    pips_user_warning("Unitialized pointer is used to evaluate expression"
+			      " \"%s\".\n", expression_to_string(lhs));
+	  if(nowhere_cell_p(cr))
+	    pips_user_warning("Unitialized pointer is used to evaluate expression"
+			      " \"%s\".\n", expression_to_string(rhs));
+	}
+      }
+      else {
+	// It is possible to remove some arcs? if18.c
+	int nL = (int) gen_length(L);
+	int nR = (int) gen_length(R);
+	cell c = cell_undefined;
+	list O = list_undefined;
+	if(nL==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+	  c = CELL(CAR(L));
+	  O = expression_to_points_to_sources(rhs, out);
+	}
+	else if(nR==1 && atomic_points_to_cell_p(CELL(CAR(R)))) {
+	  c = CELL(CAR(R));
+	  O = expression_to_points_to_sources(lhs, out);
+	}
+	if(!cell_undefined_p(c)) {
+	  if((int) gen_length(O)==1) {
+	    cell oc = CELL(CAR(O));
+	    points_to pt = make_points_to(copy_cell(oc),
+					  copy_cell(c),
+					  make_approximation_may(),
+					  make_descriptor_none());
+	    remove_arc_from_pt_map(pt, out);
+	    // Should we free pt? Or is it done by remove_arc_from_pt_map()?
+	  }
+	}
+      }
+    }
+    free_type(lhst), free_type(rhst);
+  }
+  return in;
+}
+
+/* The expression list "al" contains exactly two arguments. 
+ *
+ * If these expressions are pointers, "in" is modified by removing
+ * arcs that are not compatible with the equality. If no arc is left, a
+ * bottom "in" is returned.
+ *
+ * "out" is "in", modified by side-effects.
+ */
+pt_map order_condition_to_points_to(entity f, list al, bool true_p, pt_map in)
+{
+  pt_map out = in;
+  bool (*cmp_function)(cell, cell);
+  if((ENTITY_LESS_OR_EQUAL_P(f) && true_p)
+     || (ENTITY_GREATER_THAN_P(f) && !true_p)) {
+    // cmp_function = cell_is_less_than_or_equal_to_p;
+    cmp_function = cell_is_greater_than_p;
+  }
+  else if((ENTITY_LESS_OR_EQUAL_P(f) && !true_p)
+	  || (ENTITY_GREATER_THAN_P(f) && true_p)) {
+    // cmp_function = cell_is_greater_than_p;
+    cmp_function = cell_is_less_than_or_equal_to_p;
+  }
+  else if((ENTITY_GREATER_OR_EQUAL_P(f) && true_p)
+	  || (ENTITY_LESS_THAN_P(f) && !true_p)) {
+    // cmp_function = cell_is_greater_than_or_equal_to_p;
+    cmp_function = cell_is_less_than_p;
+  }
+  else if((ENTITY_GREATER_OR_EQUAL_P(f) && !true_p)
+	  || (ENTITY_LESS_THAN_P(f) && true_p)) {
+    //cmp_function = cell_is_less_than_p;
+    cmp_function = cell_is_greater_than_or_equal_to_p;
+  }
+  else 
+    pips_internal_error("Unexpected relational operator.\n");
+
+  expression lhs = EXPRESSION(CAR(al));
+  type lhst = expression_to_type(lhs);
+  expression rhs = EXPRESSION(CAR(CDR(al)));
+  type rhst = expression_to_type(rhs);
+  if(pointer_type_p(lhst) || pointer_type_p(rhst)) {
+    list L = expression_to_points_to_sinks(lhs, in);
+    if(gen_length(L)==1) { // FI: one fixed bound
+      cell lc = CELL(CAR(L));
+      list RR = expression_to_points_to_sources(rhs, in);
+      set out_s = points_to_graph_set(out);
+      SET_FOREACH(points_to, pt, out_s) {
+	cell source = points_to_source(pt);
+	if(cell_in_list_p(source, RR)) {
+	  cell sink = points_to_sink(pt);
+	  if(cmp_function(lc, sink)) {
+	    approximation a = points_to_approximation(pt);
+	    if(approximation_exact_p(a)) {
+	      /* The condition cannot violate an exact arc. */
+	      // clear_pt_map(out);
+	      points_to_graph_bottom(out) = true;
+	      // Would be useless/different with a union
+	      set_clear(points_to_graph_set(out));
+	    }
+	    else
+	      remove_arc_from_pt_map(pt, out);
+	  }
+	}
+      }
+    }
+    else {
+      list R = expression_to_points_to_sinks(rhs, in);
+      if(gen_length(R)==1) { // FI: one fixed bound
+	cell rc = CELL(CAR(R));
+	list LL = expression_to_points_to_sources(lhs, in);
+	set out_s = points_to_graph_set(out);
+	SET_FOREACH(points_to, pt, out_s) {
+	  cell source = points_to_source(pt);
+	  if(cell_in_list_p(source, LL)) {
+	    cell sink = points_to_sink(pt);
+	    if(cmp_function(sink, rc)) {
+	      // FI: Oops in middle of the iterator...
+	      approximation a = points_to_approximation(pt);
+	      if(approximation_exact_p(a)) {
+		/* The condition cannot violate an exact arc. */
+		// clear_pt_map(out);
+		points_to_graph_bottom(out) = true;
+		// Would be useless/different with a union
+		set_clear(points_to_graph_set(out));
+	      }
+	      else
+		remove_arc_from_pt_map(pt, out);
+	    }
+	  }
+	}
+      }
+    }
+  }
+  free_type(lhst), free_type(rhst);
+
+  return in;
+}
+
+/* Update the points-to information "in" according to the validity of
+ * the condition.
+ *
+ * We can remove the arcs that violate the condition or decide that the
+ * condition cannot be true.
+ */
+pt_map relational_intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
+{
+  pt_map out = in;
+  entity f = call_function(c);
+  list al = call_arguments(c);
+
+  if((ENTITY_EQUAL_P(f) && true_p)
+     || (ENTITY_NON_EQUAL_P(f) && !true_p)) {
+    out = equal_condition_to_points_to(al, in);
+  }
+  else if((ENTITY_EQUAL_P(f) && !true_p)
+     || (ENTITY_NON_EQUAL_P(f) && true_p)) {
+    out = non_equal_condition_to_points_to(al, in);
+  }
+  else if(ENTITY_LESS_OR_EQUAL_P(f)
+     || ENTITY_GREATER_OR_EQUAL_P(f)
+     || ENTITY_GREATER_THAN_P(f)
+     || ENTITY_LESS_THAN_P(f)) {
+    out = order_condition_to_points_to(f, al, true_p, in);
   }
   else {
-    // Do nothing for other relational operators such as ">"
-    ; // pips_internal_error("Not implemented yet.\n");
+    pips_internal_error("Not implemented yet.\n");
   }
+  pips_assert("out is consistent", points_to_graph_consistent_p(out));
   return out;
 }

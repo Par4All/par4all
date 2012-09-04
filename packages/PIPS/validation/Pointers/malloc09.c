@@ -1,6 +1,8 @@
 /* Check detection of memory leaks due to a free of an object
  * containing a pointer.
  *
+ * Issue: the source code was bugged 
+ *
  * Bug: a non-constant source is generated, *HEAP*_l_10[0], instead of
  * *HEAP*_l_11
  *
@@ -18,9 +20,9 @@ int main(int argc, char *argv[])
 {
   int *** ppp, i=1;
 
-  ppp = (int ***) malloc(sizeof(int ***));
-  *ppp = (int **) malloc(sizeof(int **));
-  **ppp = (int *) malloc(sizeof(int *));
+  ppp = (int ***) malloc(sizeof(int **));
+  *ppp = (int **) malloc(sizeof(int *));
+  **ppp = (int *) malloc(sizeof(int));
   ***ppp = i;
 
   free(ppp);

@@ -25,6 +25,19 @@ int main(int argc, char *argv[])
    int a[10], b[10];
    //PIPS generated variable
    int i_0, i_1;
+   for(i_0 = 0; i_0 <= 10; i_0 += 1)
+      a[i_0] = 0;
+   for(i_1 = 0; i_1 <= 10; i_1 += 1)
+      b[i_1] = a[i_1];
+}
+#
+# Code after coarse_grain_parallelization for module main
+#
+int main(int argc, char *argv[])
+{
+   int a[10], b[10];
+   //PIPS generated variable
+   int i_0, i_1;
 #pragma omp parallel for 
    for(i_0 = 0; i_0 <= 10; i_0 += 1)
       a[i_0] = 0;

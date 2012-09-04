@@ -57,7 +57,7 @@ create pointer03 pointer03.c
 #
 # Let's try again with points-to information
 #
-
+activate FAST_INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PROPER_EFFECTS_WITH_POINTS_TO
 

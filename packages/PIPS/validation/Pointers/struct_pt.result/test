@@ -34,7 +34,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_10.p -> j , EXACT
+// *HEAP*_l_11.p -> j , MAY
 
 int main()
 {
@@ -69,28 +69,28 @@ int main()
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> *HEAP*_l_10 , EXACT
+// m -> *HEAP*_l_11 , MAY
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m->i = 1;
 
 // Points To:
-// m -> *HEAP*_l_10 , EXACT
+// m -> *HEAP*_l_11 , MAY
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m->p = &j;
 
 // Points To:
-// *HEAP*_l_10.p -> j , EXACT
-// m -> *HEAP*_l_10 , EXACT
+// *HEAP*_l_11.p -> j , MAY
+// m -> *HEAP*_l_11 , MAY
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    n = m;
 
 // Points To:
-// *HEAP*_l_10.p -> j , EXACT
-// m -> *HEAP*_l_10 , EXACT
-// n -> *HEAP*_l_10 , EXACT
+// *HEAP*_l_11.p -> j , MAY
+// m -> *HEAP*_l_11 , MAY
+// n -> *HEAP*_l_11 , MAY
 
 
    return 0;

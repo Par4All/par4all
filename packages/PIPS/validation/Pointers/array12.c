@@ -1,9 +1,16 @@
-/* FI looking for recursive calls */
+/* FI looking for recursive calls
+ *
+ * Plus pointer information hidden in array declaration.
+ *
+ * Bug: The dereferencing of "p" should remove the arc p->NULL before
+ * "return 0;"
+ */
+
 /* AM: missing recursive descent in points_to_init_variable()*/
 
-int foo(int *p, int *q) {
+int array12(int *p, int *q) {
   int b[*(q=p)];
-  return 0;
+  return b[0];
 }
 
 

@@ -116,14 +116,11 @@ digraph "dag_cleaned_0" {
 int freia_60(freia_dataio *in, freia_dataio *out)
 {
    freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *im3_1 = 0;
    
    // allocate
    im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
    im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
    im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
-   im3_1 = freia_common_create_data(im3->bpp, im3->widthWa, im3->heightWa);
    im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
    
    // read images
@@ -134,9 +131,9 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    // computation
    freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
    freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
-   freia_aipo_inf_const(im3_1, im3, 250);                               /*0022*/
+   freia_aipo_inf_const(im3, im3, 250);                                 /*0022*/
    freia_aipo_sup(im4, im2, im1);                                       /*0023*/
-   freia_aipo_sup(im3, im3_1, im4);                                     /*0024*/
+   freia_aipo_sup(im3, im3, im4);                                       /*0024*/
    
    // output images
    freia_common_tx_image(im1, out);                                     /*0027*/
@@ -148,7 +145,6 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    freia_common_destruct_data(im1);                                     /*0033*/
    freia_common_destruct_data(im2);                                     /*0034*/
    freia_common_destruct_data(im3);                                     /*0035*/
-   freia_common_destruct_data(im3_1);
    freia_common_destruct_data(im4);                                     /*0036*/
 
    return 0;                                                            /*0038*/
@@ -1384,24 +1380,31 @@ static freia_status freia_60_opencl_helper_0_0_0_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
     "  int c2)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
-    "  GLOBAL PIXEL * p2 = o2 + ofs_o2;\n"
-    "  GLOBAL PIXEL * p3 = o3 + ofs_o3;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
-    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
+    "  GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;\n"
+    "  GLOBAL PIXEL * p3 = o3 + ofs_o3 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
@@ -1480,24 +1483,31 @@ KERNEL void freia_60_opencl_helper_0_0_0(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
   int c2)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1;
-  GLOBAL PIXEL * p2 = o2 + ofs_o2;
-  GLOBAL PIXEL * p3 = o3 + ofs_o3;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
+  GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;
+  GLOBAL PIXEL * p3 = o3 + ofs_o3 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];

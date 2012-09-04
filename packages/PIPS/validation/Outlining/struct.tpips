@@ -9,4 +9,5 @@ setproperty OUTLINE_MODULE_NAME "outline"
 setproperty OUTLINE_LABEL "outline"
 apply OUTLINE[outline_struct]
 display PRINTED_FILE[outline_struct]
+display PRINTED_FILE[outline]
 

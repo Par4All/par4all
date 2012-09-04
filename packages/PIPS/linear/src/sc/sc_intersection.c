@@ -297,7 +297,7 @@ Psysteme s2;
     b = s1->base;
     for(coord = s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	Variable v = vecteur_var(coord);
-	b = vect_add_variable(b, v);
+	b = base_add_variable(b, v);
     }
     s1->base = b;
     s1->dimension = vect_size(b);

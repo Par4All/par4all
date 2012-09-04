@@ -2349,8 +2349,6 @@ int main(int argc, char *argv[])
    int32_t neighborTransposed_1[9];                                     /*0024*/
    register int32_t volprevious;                                        /*0025*/
    int32_t volcurrent;                                                  /*0026*/
-   // hardware accelerator generated variable
-   freia_data2d *imWork1_3 = 0, *out_203 = 0;
    
    // there should be a freia_initialize()? yup we should have one for opencl
    // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
@@ -2367,9 +2365,7 @@ int main(int argc, char *argv[])
    imZone3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0040*/
 
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0042*/
-   imWork1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0043*/
-   out_203 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
    
    // input
    freia_common_rx_image(imin, &fdin);                                  /*0046*/
@@ -2582,7 +2578,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0251*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0252*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0253*/
-   freia_aipo_erode_8c(imWork1_3, imWork1, neighborTransposed_0);       /*0254*/
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0254*/
 
    freia_aipo_dilate_8c(out, in, freia_morpho_k8_center_north);         /*0258*/
    freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0259*/
@@ -2786,7 +2782,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0457*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0458*/
 
-   freia_aipo_inf(imClose, imWork1_3, out);                             /*0460*/
+   freia_aipo_inf(imClose, imWork1, out);                               /*0460*/
    freia_aipo_sub(imTophat, imClose, imin);                             /*0461*/
 
    freia_aipo_threshold(imZone1, imTophat, 105, 255, 1);                /*0463*/
@@ -2813,11 +2809,11 @@ int main(int argc, char *argv[])
    freia_aipo_inf_const(imZone1, imZone1, 40);                          /*0484*/
    freia_aipo_inf_const(imZone2, imZone2, 100);                         /*0485*/
    freia_aipo_inf_const(imZone3, imZone3, 170);                         /*0486*/
-   freia_aipo_inf_const(out_203, out, 250);                             /*0487*/
+   freia_aipo_inf_const(out, out, 250);                                 /*0487*/
 
    freia_aipo_sup(imWork1, imZone2, imZone1);                           /*0489*/
    freia_aipo_sup(imWork1, imZone3, imWork1);                           /*0490*/
-   freia_aipo_sup(out, out_203, imWork1);                               /*0491*/
+   freia_aipo_sup(out, out, imWork1);                                   /*0491*/
    
    // output
    freia_common_tx_image(imin, &fdout);                                 /*0494*/
@@ -2832,9 +2828,7 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(imZone2);                                 /*0503*/
    freia_common_destruct_data(imZone3);                                 /*0504*/
    freia_common_destruct_data(imWork1);                                 /*0505*/
-   freia_common_destruct_data(imWork1_3);
    freia_common_destruct_data(out);                                     /*0506*/
-   freia_common_destruct_data(out_203);
 
    freia_common_close_input(&fdin);                                     /*0508*/
    freia_common_close_output(&fdout);                                   /*0509*/
@@ -33937,9 +33931,27 @@ digraph "main_opencl_helper_1_0" {
   "in" -> "258 D8";
   "in" -> "54 D8";
 }
-// graph for dag "main_opencl_helper_1_0_1" of module "main" in dot format
-// DAG "main_opencl_helper_1_0_1": #i=3 #o=4 #c=8 #s=0 #I=0 #B=0 #A=0
-digraph "main_opencl_helper_1_0_1" {
+// graph for dag "main_opencl_helper_1_0_0" of module "main" in dot format
+// DAG "main_opencl_helper_1_0_0": #i=1 #o=2 #c=2 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_1_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "imWork1_202" [shape=circle];
+  "out_201" [shape=circle];
+
+  // computation vertices
+  "258 D8" [shape=box];
+  "258 D8" -> "out_201";
+  "54 D8" [shape=box];
+  "54 D8" -> "imWork1_202";
+  "in" -> "258 D8";
+  "in" -> "54 D8";
+}
+// graph for dag "main_opencl_helper_1_0_2" of module "main" in dot format
+// DAG "main_opencl_helper_1_0_2": #i=3 #o=4 #c=8 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_1_0_2" {
   // inputs
   "imWork1_3" [shape=circle];
   "imin" [shape=circle];
@@ -33977,6 +33989,22 @@ digraph "main_opencl_helper_1_0_1" {
   "out_2" -> "460 <";
   "imWork1_3" -> "460 <";
 }
+// graph for dag "main_opencl_helper_1_0_4" of module "main" in dot format
+// DAG "main_opencl_helper_1_0_4": #i=1 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_1_0_4" {
+  // inputs
+  "out_1" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "474 vol" [shape=diamond];
+  "472 D8" [shape=box];
+  "472 D8" -> "474 vol" [label="out"];
+  "472 D8" -> "out";
+  "out_1" -> "472 D8";
+}
 // graph for dag "main_opencl_helper_2_0" of module "main" in dot format
 // DAG "main_opencl_helper_2_0": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
 digraph "main_opencl_helper_2_0" {
@@ -33997,23 +34025,25 @@ digraph "main_opencl_helper_2_0" {
   "477 E8" -> "478 >" [label="out_202"];
   "out" -> "477 E8";
 }
-// graph for dag "main_opencl_helper_2_0_1" of module "main" in dot format
-// DAG "main_opencl_helper_2_0_1": #i=2 #o=1 #c=2 #s=0 #I=0 #B=0 #A=0
-digraph "main_opencl_helper_2_0_1" {
+// graph for dag "main_opencl_helper_2_0_0" of module "main" in dot format
+// DAG "main_opencl_helper_2_0_0": #i=2 #o=1 #c=3 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_2_0_0" {
   // inputs
   "imWork1" [shape=circle];
-  "out_202" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "479 vol" [shape=diamond];
   "478 >" [shape=trapezium,orientation=270];
   "478 >" -> "479 vol" [label="out"];
-  "478 >" -> "out";
+  "478 >" -> "out'";
   "imWork1" -> "478 >";
-  "out_202" -> "478 >";
+  "477 E8" [shape=box];
+  "477 E8" -> "478 >" [label="out_202"];
+  "out" -> "477 E8";
 }
 // graph for dag "main_opencl_helper_3_0" of module "main" in dot format
 // DAG "main_opencl_helper_3_0": #i=4 #o=1 #c=7 #s=0 #I=0 #B=0 #A=0
@@ -34079,6 +34109,48 @@ digraph "main_opencl_helper_3_0_0" {
   "484 <_" -> "489 >" [label="imZone1"];
   "imZone1" -> "484 <_";
 }
+// graph for dag "main_opencl_helper_D8_144" of module "main" in dot format
+// DAG "main_opencl_helper_D8_144": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_D8_144" {
+  // inputs
+  "out_103" [shape=circle];
+
+  // outputs
+  "out_102" [shape=circle];
+
+  // computation vertices
+  "357 D8" [shape=box];
+  "357 D8" -> "out_102";
+  "out_103" -> "357 D8";
+}
+// graph for dag "main_opencl_helper_D8_24" of module "main" in dot format
+// DAG "main_opencl_helper_D8_24": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_D8_24" {
+  // inputs
+  "imWork1_104" [shape=circle];
+
+  // outputs
+  "imWork1_103" [shape=circle];
+
+  // computation vertices
+  "153 D8" [shape=box];
+  "153 D8" -> "imWork1_103";
+  "imWork1_104" -> "153 D8";
+}
+// graph for dag "main_opencl_helper_D8_511" of module "main" in dot format
+// DAG "main_opencl_helper_D8_511": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "main_opencl_helper_D8_511" {
+  // inputs
+  "imWork1" [shape=circle];
+
+  // outputs
+  "out_1" [shape=circle];
+
+  // computation vertices
+  "471 D8" [shape=box];
+  "471 D8" -> "out_1";
+  "imWork1" -> "471 D8";
+}
 
 ! acceleration function
 
@@ -34092,18 +34164,279 @@ digraph "main_opencl_helper_3_0_0" {
 
 // dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0+0 copies
 
-// hold kernels for main_opencl_helper_1_0_1
-static cl_kernel main_opencl_helper_1_0_1_kernel[2];
+// hold kernels for main_opencl_helper_1_0_0
+static cl_kernel main_opencl_helper_1_0_0_kernel[2];
 
-// compile kernels for main_opencl_helper_1_0_1
-static freia_status main_opencl_helper_1_0_1_compile(void)
+// compile kernels for main_opencl_helper_1_0_0
+static freia_status main_opencl_helper_1_0_0_compile(void)
 {
-  // OpenCL source for main_opencl_helper_1_0_1
-  const char * main_opencl_helper_1_0_1_source =
+  // OpenCL source for main_opencl_helper_1_0_0
+  const char * main_opencl_helper_1_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function main_opencl_helper_1_0_1\n"
-    "KERNEL void main_opencl_helper_1_0_1(\n"
+    "// opencl function main_opencl_helper_1_0_0\n"
+    "KERNEL void main_opencl_helper_1_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * o1,\n"
+    "  int ofs_o1,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  // S not needed\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    // W not needed\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t54 = PIXEL_MIN;\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL t258 = PIXEL_MIN;\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    // pixel computations\n"
+    "    t54 = PIXEL_SUP(t54, in0);\n"
+    "    t54 = PIXEL_SUP(t54, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t258 = PIXEL_SUP(t258, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t258 = PIXEL_SUP(t258, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t54;\n"
+    "    p1[i] = t258;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_0_source, "main_opencl_helper_1_0_0", "-DPIXEL8", &main_opencl_helper_1_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_0_source, "main_opencl_helper_1_0_0", "-DPIXEL16", &main_opencl_helper_1_0_0_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_1_0_0
+freia_status main_opencl_helper_1_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_1_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_1_0_0_kernel[bpp];
+
+  // call kernel main_opencl_helper_1_0_0
+  err |= freia_op_call_kernel(kernel, 2, 1, 0, 0, o0, o1, i0);
+
+  return err;
+}
+
+// hold kernels for main_opencl_helper_D8_24
+static cl_kernel main_opencl_helper_D8_24_kernel[2];
+
+// compile kernels for main_opencl_helper_D8_24
+static freia_status main_opencl_helper_D8_24_compile(void)
+{
+  // OpenCL source for main_opencl_helper_D8_24
+  const char * main_opencl_helper_D8_24_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_D8_24\n"
+    "KERNEL void main_opencl_helper_D8_24(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  // N not needed\n"
+    "  // S not needed\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    // W not needed\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t153 = PIXEL_MIN;\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    // pixel computations\n"
+    "    t153 = PIXEL_SUP(t153, in0);\n"
+    "    t153 = PIXEL_SUP(t153, (is_E)? PIXEL_MIN: in0E);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t153;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_24_source, "main_opencl_helper_D8_24", "-DPIXEL8", &main_opencl_helper_D8_24_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_24_source, "main_opencl_helper_D8_24", "-DPIXEL16", &main_opencl_helper_D8_24_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_D8_24
+freia_status main_opencl_helper_D8_24(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_D8_24_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_D8_24_kernel[bpp];
+
+  // call kernel main_opencl_helper_D8_24
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for main_opencl_helper_D8_144
+static cl_kernel main_opencl_helper_D8_144_kernel[2];
+
+// compile kernels for main_opencl_helper_D8_144
+static freia_status main_opencl_helper_D8_144_compile(void)
+{
+  // OpenCL source for main_opencl_helper_D8_144
+  const char * main_opencl_helper_D8_144_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_D8_144\n"
+    "KERNEL void main_opencl_helper_D8_144(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  // S not needed\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    // W not needed\n"
+    "    // E not needed\n"
+    "    // get input pixels\n"
+    "    PIXEL t357 = PIXEL_MIN;\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    t357 = PIXEL_SUP(t357, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t357 = PIXEL_SUP(t357, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t357;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_144_source, "main_opencl_helper_D8_144", "-DPIXEL8", &main_opencl_helper_D8_144_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_144_source, "main_opencl_helper_D8_144", "-DPIXEL16", &main_opencl_helper_D8_144_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_D8_144
+freia_status main_opencl_helper_D8_144(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_D8_144_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_D8_144_kernel[bpp];
+
+  // call kernel main_opencl_helper_D8_144
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for main_opencl_helper_1_0_2
+static cl_kernel main_opencl_helper_1_0_2_kernel[2];
+
+// compile kernels for main_opencl_helper_1_0_2
+static freia_status main_opencl_helper_1_0_2_compile(void)
+{
+  // OpenCL source for main_opencl_helper_1_0_2
+  const char * main_opencl_helper_1_0_2_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_1_0_2\n"
+    "KERNEL void main_opencl_helper_1_0_2(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * o1,\n"
@@ -34118,7 +34451,7 @@ static freia_status main_opencl_helper_1_0_1_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -34130,23 +34463,30 @@ static freia_status main_opencl_helper_1_0_1_compile(void)
     "  int c7,\n"
     "  int c8)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
-    "  GLOBAL PIXEL * p2 = o2 + ofs_o2;\n"
-    "  GLOBAL PIXEL * p3 = o3 + ofs_o3;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
-    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
+    "  GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;\n"
+    "  GLOBAL PIXEL * p3 = o3 + ofs_o3 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
-    "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
+    "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
     "    PIXEL t460 = PIXEL_INF(in0, in2);\n"
     "    PIXEL t461 = PIXEL_SUB(t460, in1);\n"
@@ -34164,13 +34504,13 @@ static freia_status main_opencl_helper_1_0_1_compile(void)
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(main_opencl_helper_1_0_1_source, "main_opencl_helper_1_0_1", "-DPIXEL8", &main_opencl_helper_1_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(main_opencl_helper_1_0_1_source, "main_opencl_helper_1_0_1", "-DPIXEL16", &main_opencl_helper_1_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_2_source, "main_opencl_helper_1_0_2", "-DPIXEL8", &main_opencl_helper_1_0_2_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_2_source, "main_opencl_helper_1_0_2", "-DPIXEL16", &main_opencl_helper_1_0_2_kernel[1]);
   return err;
 }
 
-// helper function main_opencl_helper_1_0_1
-freia_status main_opencl_helper_1_0_1(
+// helper function main_opencl_helper_1_0_2
+freia_status main_opencl_helper_1_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -34193,7 +34533,7 @@ freia_status main_opencl_helper_1_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= main_opencl_helper_1_0_1_compile();
+    err |= main_opencl_helper_1_0_2_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -34201,74 +34541,318 @@ freia_status main_opencl_helper_1_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = main_opencl_helper_1_0_1_kernel[bpp];
+  cl_kernel kernel = main_opencl_helper_1_0_2_kernel[bpp];
 
-  // call kernel main_opencl_helper_1_0_1
+  // call kernel main_opencl_helper_1_0_2
   err |= freia_op_call_kernel(kernel, 4, 3, 9, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2, c3, c4, c5, c6, c7, c8);
+
+  return err;
+}
+
+// hold kernels for main_opencl_helper_D8_511
+static cl_kernel main_opencl_helper_D8_511_kernel[2];
+
+// compile kernels for main_opencl_helper_D8_511
+static freia_status main_opencl_helper_D8_511_compile(void)
+{
+  // OpenCL source for main_opencl_helper_D8_511
+  const char * main_opencl_helper_D8_511_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_D8_511\n"
+    "KERNEL void main_opencl_helper_D8_511(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t471 = PIXEL_MIN;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t471 = PIXEL_SUP(t471, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t471 = PIXEL_SUP(t471, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t471 = PIXEL_SUP(t471, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t471 = PIXEL_SUP(t471, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t471 = PIXEL_SUP(t471, in0);\n"
+    "    t471 = PIXEL_SUP(t471, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t471 = PIXEL_SUP(t471, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t471 = PIXEL_SUP(t471, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t471 = PIXEL_SUP(t471, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t471;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_511_source, "main_opencl_helper_D8_511", "-DPIXEL8", &main_opencl_helper_D8_511_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_D8_511_source, "main_opencl_helper_D8_511", "-DPIXEL16", &main_opencl_helper_D8_511_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_D8_511
+freia_status main_opencl_helper_D8_511(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_D8_511_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_D8_511_kernel[bpp];
+
+  // call kernel main_opencl_helper_D8_511
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
+
+// hold kernels for main_opencl_helper_1_0_4
+static cl_kernel main_opencl_helper_1_0_4_kernel[2];
+
+// compile kernels for main_opencl_helper_1_0_4
+static freia_status main_opencl_helper_1_0_4_compile(void)
+{
+  // OpenCL source for main_opencl_helper_1_0_4
+  const char * main_opencl_helper_1_0_4_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_opencl_helper_1_0_4\n"
+    "KERNEL void main_opencl_helper_1_0_4(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch,\n"
+    "  GLOBAL TMeasure * redX)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t472 = PIXEL_MIN;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t472 = PIXEL_SUP(t472, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t472 = PIXEL_SUP(t472, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t472 = PIXEL_SUP(t472, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t472 = PIXEL_SUP(t472, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t472 = PIXEL_SUP(t472, in0);\n"
+    "    t472 = PIXEL_SUP(t472, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t472 = PIXEL_SUP(t472, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t472 = PIXEL_SUP(t472, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t472 = PIXEL_SUP(t472, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    PIXEL_VOLUME(red474, t472);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t472;\n"
+    "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[thrid].vol = vol;\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_4_source, "main_opencl_helper_1_0_4", "-DPIXEL8", &main_opencl_helper_1_0_4_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_1_0_4_source, "main_opencl_helper_1_0_4", "-DPIXEL16", &main_opencl_helper_1_0_4_kernel[1]);
+  return err;
+}
+
+// helper function main_opencl_helper_1_0_4
+freia_status main_opencl_helper_1_0_4(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  int32_t * po2)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_opencl_helper_1_0_4_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_opencl_helper_1_0_4_kernel[bpp];
+
+  // currently only one reduction structure...
+  freia_opencl_measure_status redres;
+
+  // call kernel main_opencl_helper_1_0_4
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 1, o0, i0, &redres);
+
+  // return reduction results
+  *po2 = redres.volume;
 
   return err;
 }
 
 // dag 2: 3 ops and 0 copies, optimized to 3 ops and 0+0+0 copies
 
-// hold kernels for main_opencl_helper_2_0_1
-static cl_kernel main_opencl_helper_2_0_1_kernel[2];
+// hold kernels for main_opencl_helper_2_0_0
+static cl_kernel main_opencl_helper_2_0_0_kernel[2];
 
-// compile kernels for main_opencl_helper_2_0_1
-static freia_status main_opencl_helper_2_0_1_compile(void)
+// compile kernels for main_opencl_helper_2_0_0
+static freia_status main_opencl_helper_2_0_0_compile(void)
 {
-  // OpenCL source for main_opencl_helper_2_0_1
-  const char * main_opencl_helper_2_0_1_source =
+  // OpenCL source for main_opencl_helper_2_0_0
+  const char * main_opencl_helper_2_0_0_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function main_opencl_helper_2_0_1\n"
-    "KERNEL void main_opencl_helper_2_0_1(\n"
+    "// opencl function main_opencl_helper_2_0_0\n"
+    "KERNEL void main_opencl_helper_2_0_0(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
-    "  int idy = get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
     "    // get input pixels\n"
-    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL t477 = PIXEL_MAX;\n"
+    "    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];\n"
+    "    PIXEL in1N = (is_N)? 0: j1[i-pitch];\n"
+    "    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];\n"
+    "    PIXEL in1W = (is_W)? 0: j1[i-1];\n"
     "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in1E = (is_E)? 0: j1[i+1];\n"
+    "    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];\n"
+    "    PIXEL in1S = (is_S)? 0: j1[i+pitch];\n"
+    "    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];\n"
+    "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t478 = PIXEL_SUP(in1, in0);\n"
+    "    t477 = PIXEL_INF(t477, (is_N|is_W)? PIXEL_MAX: in1NW);\n"
+    "    t477 = PIXEL_INF(t477, (is_N)? PIXEL_MAX: in1N);\n"
+    "    t477 = PIXEL_INF(t477, (is_N|is_E)? PIXEL_MAX: in1NE);\n"
+    "    t477 = PIXEL_INF(t477, (is_W)? PIXEL_MAX: in1W);\n"
+    "    t477 = PIXEL_INF(t477, in1);\n"
+    "    t477 = PIXEL_INF(t477, (is_E)? PIXEL_MAX: in1E);\n"
+    "    t477 = PIXEL_INF(t477, (is_S|is_W)? PIXEL_MAX: in1SW);\n"
+    "    t477 = PIXEL_INF(t477, (is_S)? PIXEL_MAX: in1S);\n"
+    "    t477 = PIXEL_INF(t477, (is_S|is_E)? PIXEL_MAX: in1SE);\n"
+    "    PIXEL t478 = PIXEL_SUP(t477, in0);\n"
     "    PIXEL_VOLUME(red479, t478);\n"
     "    // set output pixels\n"
     "    p0[i] = t478;\n"
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[idy].vol = vol;\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(main_opencl_helper_2_0_1_source, "main_opencl_helper_2_0_1", "-DPIXEL8", &main_opencl_helper_2_0_1_kernel[0]);
-  err |= freia_op_compile_kernel(main_opencl_helper_2_0_1_source, "main_opencl_helper_2_0_1", "-DPIXEL16", &main_opencl_helper_2_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(main_opencl_helper_2_0_0_source, "main_opencl_helper_2_0_0", "-DPIXEL8", &main_opencl_helper_2_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(main_opencl_helper_2_0_0_source, "main_opencl_helper_2_0_0", "-DPIXEL16", &main_opencl_helper_2_0_0_kernel[1]);
   return err;
 }
 
-// helper function main_opencl_helper_2_0_1
-freia_status main_opencl_helper_2_0_1(
+// helper function main_opencl_helper_2_0_0
+freia_status main_opencl_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -34279,7 +34863,7 @@ freia_status main_opencl_helper_2_0_1(
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    err |= main_opencl_helper_2_0_1_compile();
+    err |= main_opencl_helper_2_0_0_compile();
     // compilation may have failed
     if (err) return err;
     to_compile = 0;
@@ -34287,12 +34871,12 @@ freia_status main_opencl_helper_2_0_1(
 
   // now get kernel, which must be have be compiled
   uint32_t bpp = i0->bpp>>4;
-  cl_kernel kernel = main_opencl_helper_2_0_1_kernel[bpp];
+  cl_kernel kernel = main_opencl_helper_2_0_0_kernel[bpp];
 
   // currently only one reduction structure...
   freia_opencl_measure_status redres;
 
-  // call kernel main_opencl_helper_2_0_1
+  // call kernel main_opencl_helper_2_0_0
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 1, o0, i0, i1, &redres);
 
   // return reduction results
@@ -34325,23 +34909,30 @@ static freia_status main_opencl_helper_3_0_0_compile(void)
     "  int ofs_i2,\n"
     "  GLOBAL PIXEL * i3, // const?\n"
     "  int ofs_i3,\n"
-    "  int width,\n"
+    "  int width, // of the working area, vs image below\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
     "  int c2,\n"
     "  int c3)\n"
     "{\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
-    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
-    "  GLOBAL PIXEL * j3 = i3 + ofs_i3;\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
     "\n"
-    "  // thread's pixel loop\n"
-    "  int gid = pitch*get_global_id(0);\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "  GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=gid; i < (gid+width); i++)\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
@@ -34405,8 +34996,145 @@ freia_status main_opencl_helper_3_0_0(
 
 // opencl for dag 1
 
-// opencl function main_opencl_helper_1_0_1
-KERNEL void main_opencl_helper_1_0_1(
+// opencl function main_opencl_helper_1_0_0
+KERNEL void main_opencl_helper_1_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * o1,
+  int ofs_o1,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  // S not needed
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    // W not needed
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t54 = PIXEL_MIN;
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL t258 = PIXEL_MIN;
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    // pixel computations
+    t54 = PIXEL_SUP(t54, in0);
+    t54 = PIXEL_SUP(t54, (is_E)? PIXEL_MIN: in0E);
+    t258 = PIXEL_SUP(t258, (is_N)? PIXEL_MIN: in0N);
+    t258 = PIXEL_SUP(t258, in0);
+    // set output pixels
+    p0[i] = t54;
+    p1[i] = t258;
+  }
+}
+
+// opencl function main_opencl_helper_D8_24
+KERNEL void main_opencl_helper_D8_24(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  // N not needed
+  // S not needed
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    // W not needed
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t153 = PIXEL_MIN;
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    // pixel computations
+    t153 = PIXEL_SUP(t153, in0);
+    t153 = PIXEL_SUP(t153, (is_E)? PIXEL_MIN: in0E);
+    // set output pixels
+    p0[i] = t153;
+  }
+}
+
+// opencl function main_opencl_helper_D8_144
+KERNEL void main_opencl_helper_D8_144(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  // S not needed
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    // W not needed
+    // E not needed
+    // get input pixels
+    PIXEL t357 = PIXEL_MIN;
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0 = j0[i];
+    // pixel computations
+    t357 = PIXEL_SUP(t357, (is_N)? PIXEL_MIN: in0N);
+    t357 = PIXEL_SUP(t357, in0);
+    // set output pixels
+    p0[i] = t357;
+  }
+}
+
+// opencl function main_opencl_helper_1_0_2
+KERNEL void main_opencl_helper_1_0_2(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -34421,7 +35149,7 @@ KERNEL void main_opencl_helper_1_0_1(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
@@ -34433,23 +35161,30 @@ KERNEL void main_opencl_helper_1_0_1(
   int c7,
   int c8)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1;
-  GLOBAL PIXEL * p2 = o2 + ofs_o2;
-  GLOBAL PIXEL * p3 = o3 + ofs_o3;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
+  GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;
+  GLOBAL PIXEL * p3 = o3 + ofs_o3 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
+    PIXEL in1 = j1[i];
     // pixel computations
     PIXEL t460 = PIXEL_INF(in0, in2);
     PIXEL t461 = PIXEL_SUB(t460, in1);
@@ -34467,47 +35202,202 @@ KERNEL void main_opencl_helper_1_0_1(
   }
 }
 
+// opencl function main_opencl_helper_D8_511
+KERNEL void main_opencl_helper_D8_511(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t471 = PIXEL_MIN;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t471 = PIXEL_SUP(t471, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t471 = PIXEL_SUP(t471, (is_N)? PIXEL_MIN: in0N);
+    t471 = PIXEL_SUP(t471, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t471 = PIXEL_SUP(t471, (is_W)? PIXEL_MIN: in0W);
+    t471 = PIXEL_SUP(t471, in0);
+    t471 = PIXEL_SUP(t471, (is_E)? PIXEL_MIN: in0E);
+    t471 = PIXEL_SUP(t471, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t471 = PIXEL_SUP(t471, (is_S)? PIXEL_MIN: in0S);
+    t471 = PIXEL_SUP(t471, (is_S|is_E)? PIXEL_MIN: in0SE);
+    // set output pixels
+    p0[i] = t471;
+  }
+}
+
+// opencl function main_opencl_helper_1_0_4
+KERNEL void main_opencl_helper_1_0_4(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch,
+  GLOBAL TMeasure * redX)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t472 = PIXEL_MIN;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t472 = PIXEL_SUP(t472, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t472 = PIXEL_SUP(t472, (is_N)? PIXEL_MIN: in0N);
+    t472 = PIXEL_SUP(t472, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t472 = PIXEL_SUP(t472, (is_W)? PIXEL_MIN: in0W);
+    t472 = PIXEL_SUP(t472, in0);
+    t472 = PIXEL_SUP(t472, (is_E)? PIXEL_MIN: in0E);
+    t472 = PIXEL_SUP(t472, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t472 = PIXEL_SUP(t472, (is_S)? PIXEL_MIN: in0S);
+    t472 = PIXEL_SUP(t472, (is_S|is_E)? PIXEL_MIN: in0SE);
+    PIXEL_VOLUME(red474, t472);
+    // set output pixels
+    p0[i] = t472;
+  }
+
+  // reduction copy out
+  redX[thrid].vol = vol;
+}
+
 // opencl for dag 2
 
-// opencl function main_opencl_helper_2_0_1
-KERNEL void main_opencl_helper_2_0_1(
+// opencl function main_opencl_helper_2_0_0
+KERNEL void main_opencl_helper_2_0_0(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   GLOBAL TMeasure * redX)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
   // reduction stuff is currently hardcoded...
   int vol = 0;
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
-  int idy = get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
     // get input pixels
-    PIXEL in0 = j0[i];
+    PIXEL t477 = PIXEL_MAX;
+    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];
+    PIXEL in1N = (is_N)? 0: j1[i-pitch];
+    PIXEL in1NE = (is_N|is_E)? 0: j1[i-pitch+1];
+    PIXEL in1W = (is_W)? 0: j1[i-1];
     PIXEL in1 = j1[i];
+    PIXEL in1E = (is_E)? 0: j1[i+1];
+    PIXEL in1SW = (is_S|is_W)? 0: j1[i+pitch-1];
+    PIXEL in1S = (is_S)? 0: j1[i+pitch];
+    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];
+    PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t478 = PIXEL_SUP(in1, in0);
+    t477 = PIXEL_INF(t477, (is_N|is_W)? PIXEL_MAX: in1NW);
+    t477 = PIXEL_INF(t477, (is_N)? PIXEL_MAX: in1N);
+    t477 = PIXEL_INF(t477, (is_N|is_E)? PIXEL_MAX: in1NE);
+    t477 = PIXEL_INF(t477, (is_W)? PIXEL_MAX: in1W);
+    t477 = PIXEL_INF(t477, in1);
+    t477 = PIXEL_INF(t477, (is_E)? PIXEL_MAX: in1E);
+    t477 = PIXEL_INF(t477, (is_S|is_W)? PIXEL_MAX: in1SW);
+    t477 = PIXEL_INF(t477, (is_S)? PIXEL_MAX: in1S);
+    t477 = PIXEL_INF(t477, (is_S|is_E)? PIXEL_MAX: in1SE);
+    PIXEL t478 = PIXEL_SUP(t477, in0);
     PIXEL_VOLUME(red479, t478);
     // set output pixels
     p0[i] = t478;
   }
 
   // reduction copy out
-  redX[idy].vol = vol;
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 3
@@ -34524,23 +35414,30 @@ KERNEL void main_opencl_helper_3_0_0(
   int ofs_i2,
   GLOBAL PIXEL * i3, // const?
   int ofs_i3,
-  int width,
+  int width, // of the working area, vs image below
   int pitch,
   int c0,
   int c1,
   int c2,
   int c3)
 {
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
-  GLOBAL PIXEL * j3 = i3 + ofs_i3;
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
 
-  // thread's pixel loop
-  int gid = pitch*get_global_id(0);
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+  GLOBAL PIXEL * j3 = i3 + ofs_i3 + shift;
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
   int i;
-  for (i=gid; i < (gid+width); i++)
+  for (i=get_global_id(1)*workshare; i<last; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
@@ -34573,8 +35470,6 @@ int main(int argc, char *argv[])
    int32_t neighborTransposed_1[9];                                     /*0024*/
    register int32_t volprevious;                                        /*0025*/
    int32_t volcurrent;                                                  /*0026*/
-   // hardware accelerator generated variable
-   freia_data2d *imWork1_3 = 0;
    
    // there should be a freia_initialize()? yup we should have one for opencl
    // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
@@ -34589,7 +35484,6 @@ int main(int argc, char *argv[])
    imZone3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0040*/
 
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0042*/
-   imWork1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0043*/
    
    // input
@@ -34603,106 +35497,107 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
-   freia_aipo_dilate_8c(imWork1, in, freia_morpho_k8_center_east);      /*0054*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0055*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0056*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0057*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0058*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0059*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0060*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0061*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0062*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0063*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0064*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0065*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0066*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0067*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0068*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0069*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0070*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0071*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0072*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0073*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0074*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0075*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0076*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0077*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0078*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0079*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0080*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0081*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0082*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0083*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0084*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0085*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0086*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0087*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0088*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0089*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0090*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0091*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0092*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0093*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0094*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0095*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0096*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0097*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0098*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0099*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0100*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0101*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0102*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0103*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0104*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0105*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0106*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0107*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0108*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0109*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0110*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0111*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0112*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0113*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0114*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0115*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0116*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0117*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0118*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0119*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0120*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0121*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0122*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0123*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0124*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0125*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0126*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0127*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0128*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0129*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0130*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0131*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0132*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0133*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0134*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0135*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0136*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0137*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0138*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0139*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0140*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0141*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0142*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0143*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0144*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0145*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0146*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0147*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0148*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0149*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0150*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0151*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0152*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0153*/
+   main_opencl_helper_1_0_0(imWork1, out, in);                          /*0054*/
+
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0055*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0056*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0057*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0058*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0059*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0060*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0061*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0062*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0063*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0064*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0065*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0066*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0067*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0068*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0069*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0070*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0071*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0072*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0073*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0074*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0075*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0076*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0077*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0078*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0079*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0080*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0081*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0082*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0083*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0084*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0085*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0086*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0087*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0088*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0089*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0090*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0091*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0092*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0093*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0094*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0095*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0096*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0097*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0098*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0099*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0100*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0101*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0102*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0103*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0104*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0105*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0106*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0107*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0108*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0109*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0110*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0111*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0112*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0113*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0114*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0115*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0116*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0117*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0118*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0119*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0120*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0121*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0122*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0123*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0124*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0125*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0126*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0127*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0128*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0129*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0130*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0131*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0132*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0133*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0134*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0135*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0136*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0137*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0138*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0139*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0140*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0141*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0142*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0143*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0144*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0145*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0146*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0147*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0148*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0149*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0150*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0151*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0152*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0153*/
 
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0155*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0156*/
@@ -34803,108 +35698,106 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0251*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0252*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0253*/
-   freia_aipo_erode_8c(imWork1_3, imWork1, neighborTransposed_0);       /*0254*/
-
-   freia_aipo_dilate_8c(out, in, freia_morpho_k8_center_north);         /*0258*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0259*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0260*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0261*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0262*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0263*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0264*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0265*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0266*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0267*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0268*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0269*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0270*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0271*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0272*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0273*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0274*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0275*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0276*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0277*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0278*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0279*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0280*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0281*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0282*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0283*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0284*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0285*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0286*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0287*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0288*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0289*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0290*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0291*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0292*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0293*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0294*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0295*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0296*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0297*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0298*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0299*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0300*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0301*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0302*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0303*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0304*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0305*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0306*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0307*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0308*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0309*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0310*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0311*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0312*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0313*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0314*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0315*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0316*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0317*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0318*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0319*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0320*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0321*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0322*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0323*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0324*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0325*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0326*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0327*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0328*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0329*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0330*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0331*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0332*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0333*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0334*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0335*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0336*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0337*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0338*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0339*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0340*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0341*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0342*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0343*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0344*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0345*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0346*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0347*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0348*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0349*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0350*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0351*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0352*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0353*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0354*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0355*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0356*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0357*/
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0254*/
+   main_opencl_helper_D8_144(out, out);                                 /*0259*/
+   main_opencl_helper_D8_144(out, out);                                 /*0260*/
+   main_opencl_helper_D8_144(out, out);                                 /*0261*/
+   main_opencl_helper_D8_144(out, out);                                 /*0262*/
+   main_opencl_helper_D8_144(out, out);                                 /*0263*/
+   main_opencl_helper_D8_144(out, out);                                 /*0264*/
+   main_opencl_helper_D8_144(out, out);                                 /*0265*/
+   main_opencl_helper_D8_144(out, out);                                 /*0266*/
+   main_opencl_helper_D8_144(out, out);                                 /*0267*/
+   main_opencl_helper_D8_144(out, out);                                 /*0268*/
+   main_opencl_helper_D8_144(out, out);                                 /*0269*/
+   main_opencl_helper_D8_144(out, out);                                 /*0270*/
+   main_opencl_helper_D8_144(out, out);                                 /*0271*/
+   main_opencl_helper_D8_144(out, out);                                 /*0272*/
+   main_opencl_helper_D8_144(out, out);                                 /*0273*/
+   main_opencl_helper_D8_144(out, out);                                 /*0274*/
+   main_opencl_helper_D8_144(out, out);                                 /*0275*/
+   main_opencl_helper_D8_144(out, out);                                 /*0276*/
+   main_opencl_helper_D8_144(out, out);                                 /*0277*/
+   main_opencl_helper_D8_144(out, out);                                 /*0278*/
+   main_opencl_helper_D8_144(out, out);                                 /*0279*/
+   main_opencl_helper_D8_144(out, out);                                 /*0280*/
+   main_opencl_helper_D8_144(out, out);                                 /*0281*/
+   main_opencl_helper_D8_144(out, out);                                 /*0282*/
+   main_opencl_helper_D8_144(out, out);                                 /*0283*/
+   main_opencl_helper_D8_144(out, out);                                 /*0284*/
+   main_opencl_helper_D8_144(out, out);                                 /*0285*/
+   main_opencl_helper_D8_144(out, out);                                 /*0286*/
+   main_opencl_helper_D8_144(out, out);                                 /*0287*/
+   main_opencl_helper_D8_144(out, out);                                 /*0288*/
+   main_opencl_helper_D8_144(out, out);                                 /*0289*/
+   main_opencl_helper_D8_144(out, out);                                 /*0290*/
+   main_opencl_helper_D8_144(out, out);                                 /*0291*/
+   main_opencl_helper_D8_144(out, out);                                 /*0292*/
+   main_opencl_helper_D8_144(out, out);                                 /*0293*/
+   main_opencl_helper_D8_144(out, out);                                 /*0294*/
+   main_opencl_helper_D8_144(out, out);                                 /*0295*/
+   main_opencl_helper_D8_144(out, out);                                 /*0296*/
+   main_opencl_helper_D8_144(out, out);                                 /*0297*/
+   main_opencl_helper_D8_144(out, out);                                 /*0298*/
+   main_opencl_helper_D8_144(out, out);                                 /*0299*/
+   main_opencl_helper_D8_144(out, out);                                 /*0300*/
+   main_opencl_helper_D8_144(out, out);                                 /*0301*/
+   main_opencl_helper_D8_144(out, out);                                 /*0302*/
+   main_opencl_helper_D8_144(out, out);                                 /*0303*/
+   main_opencl_helper_D8_144(out, out);                                 /*0304*/
+   main_opencl_helper_D8_144(out, out);                                 /*0305*/
+   main_opencl_helper_D8_144(out, out);                                 /*0306*/
+   main_opencl_helper_D8_144(out, out);                                 /*0307*/
+   main_opencl_helper_D8_144(out, out);                                 /*0308*/
+   main_opencl_helper_D8_144(out, out);                                 /*0309*/
+   main_opencl_helper_D8_144(out, out);                                 /*0310*/
+   main_opencl_helper_D8_144(out, out);                                 /*0311*/
+   main_opencl_helper_D8_144(out, out);                                 /*0312*/
+   main_opencl_helper_D8_144(out, out);                                 /*0313*/
+   main_opencl_helper_D8_144(out, out);                                 /*0314*/
+   main_opencl_helper_D8_144(out, out);                                 /*0315*/
+   main_opencl_helper_D8_144(out, out);                                 /*0316*/
+   main_opencl_helper_D8_144(out, out);                                 /*0317*/
+   main_opencl_helper_D8_144(out, out);                                 /*0318*/
+   main_opencl_helper_D8_144(out, out);                                 /*0319*/
+   main_opencl_helper_D8_144(out, out);                                 /*0320*/
+   main_opencl_helper_D8_144(out, out);                                 /*0321*/
+   main_opencl_helper_D8_144(out, out);                                 /*0322*/
+   main_opencl_helper_D8_144(out, out);                                 /*0323*/
+   main_opencl_helper_D8_144(out, out);                                 /*0324*/
+   main_opencl_helper_D8_144(out, out);                                 /*0325*/
+   main_opencl_helper_D8_144(out, out);                                 /*0326*/
+   main_opencl_helper_D8_144(out, out);                                 /*0327*/
+   main_opencl_helper_D8_144(out, out);                                 /*0328*/
+   main_opencl_helper_D8_144(out, out);                                 /*0329*/
+   main_opencl_helper_D8_144(out, out);                                 /*0330*/
+   main_opencl_helper_D8_144(out, out);                                 /*0331*/
+   main_opencl_helper_D8_144(out, out);                                 /*0332*/
+   main_opencl_helper_D8_144(out, out);                                 /*0333*/
+   main_opencl_helper_D8_144(out, out);                                 /*0334*/
+   main_opencl_helper_D8_144(out, out);                                 /*0335*/
+   main_opencl_helper_D8_144(out, out);                                 /*0336*/
+   main_opencl_helper_D8_144(out, out);                                 /*0337*/
+   main_opencl_helper_D8_144(out, out);                                 /*0338*/
+   main_opencl_helper_D8_144(out, out);                                 /*0339*/
+   main_opencl_helper_D8_144(out, out);                                 /*0340*/
+   main_opencl_helper_D8_144(out, out);                                 /*0341*/
+   main_opencl_helper_D8_144(out, out);                                 /*0342*/
+   main_opencl_helper_D8_144(out, out);                                 /*0343*/
+   main_opencl_helper_D8_144(out, out);                                 /*0344*/
+   main_opencl_helper_D8_144(out, out);                                 /*0345*/
+   main_opencl_helper_D8_144(out, out);                                 /*0346*/
+   main_opencl_helper_D8_144(out, out);                                 /*0347*/
+   main_opencl_helper_D8_144(out, out);                                 /*0348*/
+   main_opencl_helper_D8_144(out, out);                                 /*0349*/
+   main_opencl_helper_D8_144(out, out);                                 /*0350*/
+   main_opencl_helper_D8_144(out, out);                                 /*0351*/
+   main_opencl_helper_D8_144(out, out);                                 /*0352*/
+   main_opencl_helper_D8_144(out, out);                                 /*0353*/
+   main_opencl_helper_D8_144(out, out);                                 /*0354*/
+   main_opencl_helper_D8_144(out, out);                                 /*0355*/
+   main_opencl_helper_D8_144(out, out);                                 /*0356*/
+   main_opencl_helper_D8_144(out, out);                                 /*0357*/
 
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0359*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0360*/
@@ -35007,18 +35900,16 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0457*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0458*/
 
-   main_opencl_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);        /*0460*/
+   main_opencl_helper_1_0_2(imZone3, imZone1, imZone2, imWork1, imWork1, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);          /*0460*/
    
    
    
-   freia_aipo_dilate_8c(out, imWork1, freia_morpho_kernel_8c);          /*0471*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0472*/
+   main_opencl_helper_D8_511(out, imWork1);                             /*0471*/
+   main_opencl_helper_1_0_4(out, out, &volcurrent);                     /*0472*/
 
-   freia_aipo_global_vol(out, &volcurrent);                             /*0474*/
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
-      freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);            /*0477*/
-      main_opencl_helper_2_0_1(out, imWork1, out, &volcurrent);         /*0478*/
+      main_opencl_helper_2_0_0(out, imWork1, out, &volcurrent);         /*0477*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
@@ -35037,7 +35928,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(imZone2);                                 /*0503*/
    freia_common_destruct_data(imZone3);                                 /*0504*/
    freia_common_destruct_data(imWork1);                                 /*0505*/
-   freia_common_destruct_data(imWork1_3);
    freia_common_destruct_data(out);                                     /*0506*/
 
    freia_common_close_input(&fdin);                                     /*0508*/
@@ -35060,8 +35950,6 @@ int main(int argc, char *argv[])
    int32_t neighborTransposed_1[9];                                     /*0024*/
    register int32_t volprevious;                                        /*0025*/
    int32_t volcurrent;                                                  /*0026*/
-   // hardware accelerator generated variable
-   freia_data2d *imWork1_3 = 0;
    
    // there should be a freia_initialize()? yup we should have one for opencl
    // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
@@ -35076,7 +35964,6 @@ int main(int argc, char *argv[])
    imZone3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0040*/
 
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0042*/
-   imWork1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0043*/
    
    // input
@@ -35090,106 +35977,107 @@ int main(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
-   freia_aipo_dilate_8c(imWork1, in, freia_morpho_k8_center_east);      /*0054*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0055*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0056*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0057*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0058*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0059*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0060*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0061*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0062*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0063*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0064*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0065*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0066*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0067*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0068*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0069*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0070*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0071*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0072*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0073*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0074*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0075*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0076*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0077*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0078*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0079*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0080*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0081*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0082*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0083*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0084*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0085*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0086*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0087*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0088*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0089*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0090*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0091*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0092*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0093*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0094*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0095*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0096*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0097*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0098*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0099*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0100*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0101*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0102*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0103*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0104*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0105*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0106*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0107*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0108*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0109*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0110*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0111*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0112*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0113*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0114*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0115*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0116*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0117*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0118*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0119*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0120*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0121*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0122*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0123*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0124*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0125*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0126*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0127*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0128*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0129*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0130*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0131*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0132*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0133*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0134*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0135*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0136*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0137*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0138*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0139*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0140*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0141*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0142*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0143*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0144*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0145*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0146*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0147*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0148*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0149*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0150*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0151*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0152*/
-   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);                /*0153*/
+   main_opencl_helper_1_0_0(imWork1, out, in);                          /*0054*/
+
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0055*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0056*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0057*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0058*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0059*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0060*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0061*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0062*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0063*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0064*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0065*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0066*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0067*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0068*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0069*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0070*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0071*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0072*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0073*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0074*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0075*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0076*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0077*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0078*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0079*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0080*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0081*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0082*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0083*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0084*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0085*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0086*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0087*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0088*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0089*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0090*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0091*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0092*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0093*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0094*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0095*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0096*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0097*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0098*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0099*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0100*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0101*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0102*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0103*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0104*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0105*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0106*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0107*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0108*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0109*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0110*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0111*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0112*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0113*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0114*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0115*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0116*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0117*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0118*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0119*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0120*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0121*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0122*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0123*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0124*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0125*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0126*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0127*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0128*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0129*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0130*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0131*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0132*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0133*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0134*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0135*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0136*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0137*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0138*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0139*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0140*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0141*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0142*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0143*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0144*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0145*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0146*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0147*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0148*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0149*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0150*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0151*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0152*/
+   main_opencl_helper_D8_24(imWork1, imWork1);                          /*0153*/
 
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0155*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0156*/
@@ -35290,108 +36178,106 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0251*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0252*/
    freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0253*/
-   freia_aipo_erode_8c(imWork1_3, imWork1, neighborTransposed_0);       /*0254*/
-
-   freia_aipo_dilate_8c(out, in, freia_morpho_k8_center_north);         /*0258*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0259*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0260*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0261*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0262*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0263*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0264*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0265*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0266*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0267*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0268*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0269*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0270*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0271*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0272*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0273*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0274*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0275*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0276*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0277*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0278*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0279*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0280*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0281*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0282*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0283*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0284*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0285*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0286*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0287*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0288*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0289*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0290*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0291*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0292*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0293*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0294*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0295*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0296*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0297*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0298*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0299*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0300*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0301*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0302*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0303*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0304*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0305*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0306*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0307*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0308*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0309*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0310*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0311*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0312*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0313*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0314*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0315*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0316*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0317*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0318*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0319*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0320*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0321*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0322*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0323*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0324*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0325*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0326*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0327*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0328*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0329*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0330*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0331*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0332*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0333*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0334*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0335*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0336*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0337*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0338*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0339*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0340*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0341*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0342*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0343*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0344*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0345*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0346*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0347*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0348*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0349*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0350*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0351*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0352*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0353*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0354*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0355*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0356*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);        /*0357*/
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);         /*0254*/
+   main_opencl_helper_D8_144(out, out);                                 /*0259*/
+   main_opencl_helper_D8_144(out, out);                                 /*0260*/
+   main_opencl_helper_D8_144(out, out);                                 /*0261*/
+   main_opencl_helper_D8_144(out, out);                                 /*0262*/
+   main_opencl_helper_D8_144(out, out);                                 /*0263*/
+   main_opencl_helper_D8_144(out, out);                                 /*0264*/
+   main_opencl_helper_D8_144(out, out);                                 /*0265*/
+   main_opencl_helper_D8_144(out, out);                                 /*0266*/
+   main_opencl_helper_D8_144(out, out);                                 /*0267*/
+   main_opencl_helper_D8_144(out, out);                                 /*0268*/
+   main_opencl_helper_D8_144(out, out);                                 /*0269*/
+   main_opencl_helper_D8_144(out, out);                                 /*0270*/
+   main_opencl_helper_D8_144(out, out);                                 /*0271*/
+   main_opencl_helper_D8_144(out, out);                                 /*0272*/
+   main_opencl_helper_D8_144(out, out);                                 /*0273*/
+   main_opencl_helper_D8_144(out, out);                                 /*0274*/
+   main_opencl_helper_D8_144(out, out);                                 /*0275*/
+   main_opencl_helper_D8_144(out, out);                                 /*0276*/
+   main_opencl_helper_D8_144(out, out);                                 /*0277*/
+   main_opencl_helper_D8_144(out, out);                                 /*0278*/
+   main_opencl_helper_D8_144(out, out);                                 /*0279*/
+   main_opencl_helper_D8_144(out, out);                                 /*0280*/
+   main_opencl_helper_D8_144(out, out);                                 /*0281*/
+   main_opencl_helper_D8_144(out, out);                                 /*0282*/
+   main_opencl_helper_D8_144(out, out);                                 /*0283*/
+   main_opencl_helper_D8_144(out, out);                                 /*0284*/
+   main_opencl_helper_D8_144(out, out);                                 /*0285*/
+   main_opencl_helper_D8_144(out, out);                                 /*0286*/
+   main_opencl_helper_D8_144(out, out);                                 /*0287*/
+   main_opencl_helper_D8_144(out, out);                                 /*0288*/
+   main_opencl_helper_D8_144(out, out);                                 /*0289*/
+   main_opencl_helper_D8_144(out, out);                                 /*0290*/
+   main_opencl_helper_D8_144(out, out);                                 /*0291*/
+   main_opencl_helper_D8_144(out, out);                                 /*0292*/
+   main_opencl_helper_D8_144(out, out);                                 /*0293*/
+   main_opencl_helper_D8_144(out, out);                                 /*0294*/
+   main_opencl_helper_D8_144(out, out);                                 /*0295*/
+   main_opencl_helper_D8_144(out, out);                                 /*0296*/
+   main_opencl_helper_D8_144(out, out);                                 /*0297*/
+   main_opencl_helper_D8_144(out, out);                                 /*0298*/
+   main_opencl_helper_D8_144(out, out);                                 /*0299*/
+   main_opencl_helper_D8_144(out, out);                                 /*0300*/
+   main_opencl_helper_D8_144(out, out);                                 /*0301*/
+   main_opencl_helper_D8_144(out, out);                                 /*0302*/
+   main_opencl_helper_D8_144(out, out);                                 /*0303*/
+   main_opencl_helper_D8_144(out, out);                                 /*0304*/
+   main_opencl_helper_D8_144(out, out);                                 /*0305*/
+   main_opencl_helper_D8_144(out, out);                                 /*0306*/
+   main_opencl_helper_D8_144(out, out);                                 /*0307*/
+   main_opencl_helper_D8_144(out, out);                                 /*0308*/
+   main_opencl_helper_D8_144(out, out);                                 /*0309*/
+   main_opencl_helper_D8_144(out, out);                                 /*0310*/
+   main_opencl_helper_D8_144(out, out);                                 /*0311*/
+   main_opencl_helper_D8_144(out, out);                                 /*0312*/
+   main_opencl_helper_D8_144(out, out);                                 /*0313*/
+   main_opencl_helper_D8_144(out, out);                                 /*0314*/
+   main_opencl_helper_D8_144(out, out);                                 /*0315*/
+   main_opencl_helper_D8_144(out, out);                                 /*0316*/
+   main_opencl_helper_D8_144(out, out);                                 /*0317*/
+   main_opencl_helper_D8_144(out, out);                                 /*0318*/
+   main_opencl_helper_D8_144(out, out);                                 /*0319*/
+   main_opencl_helper_D8_144(out, out);                                 /*0320*/
+   main_opencl_helper_D8_144(out, out);                                 /*0321*/
+   main_opencl_helper_D8_144(out, out);                                 /*0322*/
+   main_opencl_helper_D8_144(out, out);                                 /*0323*/
+   main_opencl_helper_D8_144(out, out);                                 /*0324*/
+   main_opencl_helper_D8_144(out, out);                                 /*0325*/
+   main_opencl_helper_D8_144(out, out);                                 /*0326*/
+   main_opencl_helper_D8_144(out, out);                                 /*0327*/
+   main_opencl_helper_D8_144(out, out);                                 /*0328*/
+   main_opencl_helper_D8_144(out, out);                                 /*0329*/
+   main_opencl_helper_D8_144(out, out);                                 /*0330*/
+   main_opencl_helper_D8_144(out, out);                                 /*0331*/
+   main_opencl_helper_D8_144(out, out);                                 /*0332*/
+   main_opencl_helper_D8_144(out, out);                                 /*0333*/
+   main_opencl_helper_D8_144(out, out);                                 /*0334*/
+   main_opencl_helper_D8_144(out, out);                                 /*0335*/
+   main_opencl_helper_D8_144(out, out);                                 /*0336*/
+   main_opencl_helper_D8_144(out, out);                                 /*0337*/
+   main_opencl_helper_D8_144(out, out);                                 /*0338*/
+   main_opencl_helper_D8_144(out, out);                                 /*0339*/
+   main_opencl_helper_D8_144(out, out);                                 /*0340*/
+   main_opencl_helper_D8_144(out, out);                                 /*0341*/
+   main_opencl_helper_D8_144(out, out);                                 /*0342*/
+   main_opencl_helper_D8_144(out, out);                                 /*0343*/
+   main_opencl_helper_D8_144(out, out);                                 /*0344*/
+   main_opencl_helper_D8_144(out, out);                                 /*0345*/
+   main_opencl_helper_D8_144(out, out);                                 /*0346*/
+   main_opencl_helper_D8_144(out, out);                                 /*0347*/
+   main_opencl_helper_D8_144(out, out);                                 /*0348*/
+   main_opencl_helper_D8_144(out, out);                                 /*0349*/
+   main_opencl_helper_D8_144(out, out);                                 /*0350*/
+   main_opencl_helper_D8_144(out, out);                                 /*0351*/
+   main_opencl_helper_D8_144(out, out);                                 /*0352*/
+   main_opencl_helper_D8_144(out, out);                                 /*0353*/
+   main_opencl_helper_D8_144(out, out);                                 /*0354*/
+   main_opencl_helper_D8_144(out, out);                                 /*0355*/
+   main_opencl_helper_D8_144(out, out);                                 /*0356*/
+   main_opencl_helper_D8_144(out, out);                                 /*0357*/
 
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0359*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0360*/
@@ -35494,18 +36380,16 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0457*/
    freia_aipo_erode_8c(out, out, neighborTransposed_1);                 /*0458*/
 
-   main_opencl_helper_1_0_1(imZone3, imZone1, imZone2, imWork1, imWork1_3, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);        /*0460*/
+   main_opencl_helper_1_0_2(imZone3, imZone1, imZone2, imWork1, imWork1, imin, out, 100, 150, 1, 105, 255, 1, 60, 105, 1);          /*0460*/
    
    
    
-   freia_aipo_dilate_8c(out, imWork1, freia_morpho_kernel_8c);          /*0471*/
-   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0472*/
+   main_opencl_helper_D8_511(out, imWork1);                             /*0471*/
+   main_opencl_helper_1_0_4(out, out, &volcurrent);                     /*0472*/
 
-   freia_aipo_global_vol(out, &volcurrent);                             /*0474*/
    do {                                                                 /*0481*/
       volprevious = volcurrent;                                         /*0476*/
-      freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);            /*0477*/
-      main_opencl_helper_2_0_1(out, imWork1, out, &volcurrent);         /*0478*/
+      main_opencl_helper_2_0_0(out, imWork1, out, &volcurrent);         /*0477*/
    }
    while (volcurrent!=volprevious);                                     /*0481*/
    
@@ -35524,7 +36408,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(imZone2);                                 /*0503*/
    freia_common_destruct_data(imZone3);                                 /*0504*/
    freia_common_destruct_data(imWork1);                                 /*0505*/
-   freia_common_destruct_data(imWork1_3);
    freia_common_destruct_data(out);                                     /*0506*/
 
    freia_common_close_input(&fdin);                                     /*0508*/

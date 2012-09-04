@@ -13,6 +13,7 @@ int main()
 //             <    is read   >: i j stdout x __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i=%d, %d, %f\n", i, i+j, x);
+   return 0;
 }
 
 POINTS-TO
@@ -41,4 +42,8 @@ int main()
 // Points To: none
 
    printf("i=%d, %d, %f\n", i, i+j, x);
+
+// Points To: none
+
+   return 0;
 }

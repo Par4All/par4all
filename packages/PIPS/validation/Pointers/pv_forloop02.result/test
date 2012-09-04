@@ -56,34 +56,34 @@ int main()
    a = (float *) malloc(10*sizeof(float));
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
 
    t = 1.0;
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
    while (t<2.0) {
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
       for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
          a[i] = a[i]+t*0, 5;
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
       t+0, 01;
    }
 
 // Points To:
-// a -> *HEAP*_l_9[0] , EXACT
+// a -> *HEAP*_l_9[0] , MAY
 
    return 0;
 }

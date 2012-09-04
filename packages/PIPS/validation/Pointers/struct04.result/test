@@ -17,6 +17,7 @@ int struct04()
    //y[0] = 1;
    
    x.first = x.second+1;
+   return 0;
 }
 
 POINTS-TO
@@ -50,4 +51,8 @@ int struct04()
    //y[0] = 1;
    
    x.first = x.second+1;
+
+// Points To: none
+
+   return 0;
 }

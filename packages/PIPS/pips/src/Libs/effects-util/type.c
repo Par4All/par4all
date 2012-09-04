@@ -385,6 +385,7 @@ static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to
  */
 type cell_reference_to_type(reference ref, bool *to_be_freed)
 {
+  debug_on("EFFECTS-UTIL_DEBUG_LEVEL");
   type t = type_undefined;
   type ref_type = entity_basic_concrete_type(reference_variable(ref));
   *to_be_freed= false;
@@ -425,7 +426,7 @@ type cell_reference_to_type(reference ref, bool *to_be_freed)
 			      entity_name(reference_variable(ref)));
 	}
     }
-
+  debug_off();
   return t;
 }
 
@@ -437,7 +438,12 @@ type cell_to_type(cell c, bool *to_be_freed)
   return cell_reference_to_type(ref, to_be_freed);
 }
 
-/* FI: I need more generality than is offered by cell_to_type() */
+/* FI: I need more generality than is offered by cell_to_type()
+ *
+ * Maybe because of fields.
+ *
+ * Surely because of implicit arrays linked to scalar pointers
+ */
 type points_to_reference_to_type(reference ref, bool *to_be_freed)
 {
   type t = type_undefined;
@@ -481,6 +487,25 @@ type points_to_reference_to_type(reference ref, bool *to_be_freed)
   return t;
 }
 
+static void substitute_unbounded_call(call c)
+{
+  entity f = call_function(c);
+  const char* fn = entity_local_name(f);
+  if (same_string_p(fn, UNBOUNDED_DIMENSION_NAME)) {
+    entity z = int_to_entity(0);
+    call_function(c) = z;
+  }
+}
+
+/* Allocate a copy of expression "e" where calls to the unbounded
+ * function are replaced by calls to the zero function so that typing
+ * can be performed.
+ */
+static expression eliminate_calls_to_unbounded(expression e)
+{
+  gen_recurse(e, call_domain, gen_true, substitute_unbounded_call);
+}
+
 /* FI: I need more generality than is offered by expression_to_type()
    because fields are assimilated to subscripts. */
 type points_to_expression_to_type(expression e, bool * to_be_freed)
@@ -492,8 +517,12 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
     t = points_to_reference_to_type(r, to_be_freed);
   }
   else {
+    /* In order to type t[*] as well as t[0]... */
+    expression ne = copy_expression(e);
+    eliminate_calls_to_unbounded(ne);
     *to_be_freed = true;
-    t = expression_to_type(e);
+    t = expression_to_type(ne);
+    free_expression(ne);
   }
 
   return t;
@@ -789,11 +818,25 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
  * Maybe this function should be relocated in alias-classes
  *
  * Beware of possible side-effects on l
+ *
+ * FI, 10 August 2012: this function is a mess. No side effect should
+ * be applied. it should be redesigned to check compatibility cases
+ * one after the other and it should be renamed
+ * points_to_cell_types_compatibility_p()
+ *
+ * FI, 14 August 2012: the dimension of the sink entity and sink
+ * reference must be greater than the dimension of the source
+ * reference. This is not checked yet.
+ *
+ * FI, 19 August 2012: all cells used in a points-to arc must be
+ * scalar, either pointers or basic types
  */
 void points_to_cell_types_compatibility(cell l, cell r)
 {
   if(points_to_source_cell_compatible_p(l)) {
-    if(points_to_sink_cell_compatible_p(r)) {
+    if(null_cell_p(r))
+      ;
+    else if(points_to_sink_cell_compatible_p(r)) {
       // FI: I'm not sure enought filtering has been performed... to
       // have here type information, especially with an anywhere or a
       // nowhere/undefined not typed
@@ -805,9 +848,35 @@ void points_to_cell_types_compatibility(cell l, cell r)
       type rt = points_to_cell_to_type(r, &r_to_be_freed);
       type ult = compute_basic_concrete_type(lt);
       type urt = compute_basic_concrete_type(rt);
-
-      if(pointer_type_p(ult)) {
-	type pt = compute_basic_concrete_type(type_to_pointed_type(ult));
+#if 0
+      /* We want to user constant strings as sinks... of type char */
+      if(type_functional_p(urt)) {
+	functional f = type_functional(urt);
+	list pl = functional_parameters(f);
+	type rt = functional_result(f);
+	bool success_p = false;
+	if(ENDP(pl)) {
+	  type crt = compute_basic_concrete_type(rt);
+	  if(string_type_p(crt)) {
+	    success_p = true;
+	    urt = crt; // FI: should it be reduced to char?
+	  }
+	  else if(pointer_type_p(crt)) {
+	    type prt = type_to_pointed_type(crt); // concrete type...
+	    if(char_type_p(prt)) {
+	      urt = prt;
+	      success_p = true;
+	    }
+	  }
+	}
+	if(!success_p)
+	  pips_internal_error("Type is not compatible with a sink points-to cell.\n");
+      }
+#endif
+      if(C_pointer_type_p(ult)) {
+	type pt = pointer_type_p(ult) ?
+	  copy_type(compute_basic_concrete_type(type_to_pointed_type(ult))) :
+	  array_type_to_element_type(ult);
 
 	// Several options are possible
 
@@ -822,14 +891,41 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	// FI->AM/FC/PJ: we need a trick to handle the casts or the
 	// typing of the points-to graph is not possible
 	else if(scalar_type_p(pt) && type_void_p(urt)) {
-	  // A void * pointer may be asigned to anything?
+	  // A void * pointer may be assigned to anything?
 	  ; // OK, they are compatible...
+	}
+	else if(type_void_p(pt) && overloaded_type_p(urt)) {
+	  // a void * is expected to point toward any type, which is
+	  // encoded with overloaded but could be anything when casts
+	  // are used. See fulguro03.c
+	  ;
+	}
+	else if(overloaded_type_p(urt)) {
+	  // This is compatible with any pointed type pt by definition
+	  // of overloaded. See fulguro03.c
+	  ;
+	}
+	else if(array_type_p(pt) && scalar_type_p(urt)) {
+	  /* The source points towards an array and the cell is an
+	     element of this array. */
+	  basic pb = variable_basic(type_variable(pt));
+	  basic rb = variable_basic(type_variable(urt));
+	  if(basic_equal_p(pb, rb)) {
+	    ; // OK
+	  }
+	  else {
+	    pips_internal_error();
+	  }
 	}
 	else if(array_type_p(urt)
 		&& !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
 	  /* Formal parameters and potentially stubs can be assumed to
 	   * points towards an array although they are declared as
-	   * pointers to a scalar. */
+	   * pointers to a scalar.
+	   *
+	   * This should never be a problem when sink cells are always
+	   * array elements and not arrays.
+	   */
 	  if(type_variable_p(pt)) {
 	    basic pb = variable_basic(type_variable(pt));
 	    basic rb = variable_basic(type_variable(urt));
@@ -971,7 +1067,7 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    // reference lr = cell_any_reference(l);
 	    // reference_add_zero_subscripts(lr, ult);
 	    type pt = compute_basic_concrete_type(basic_pointer(ultb));
-	    if(generic_type_equal_p(pt, urt, false)) {
+	    if(generic_type_equal_p(pt, urt, false, false)) {
 	      // FI: subscripts must be added to the source reference lr
 	      // FI: implicit typing of pointers as array of pointers
 	      reference lr = cell_any_reference(l);

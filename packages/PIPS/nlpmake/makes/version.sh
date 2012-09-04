@@ -33,9 +33,9 @@ do
     export LANG=C
     repos=$(svn info | sed -n -e 's/^URL: //p')
     revision=$(svnversion)
-    committed=$(svnversion -c)
+    #committed=$(svnversion -c)
     author=$(svn info | sed -n -e 's/^Last Changed Author: //p')
-    echo "$repos@$revision ($committed) [$author]"
+    echo "$repos@$revision [$author]"
   elif git describe --long --always --all > /dev/null 2>&1
   then
     # generate something for git or git-svn users

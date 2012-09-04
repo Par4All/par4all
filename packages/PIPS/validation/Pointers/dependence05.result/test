@@ -47,7 +47,7 @@ POINTS TO for "dependence05"
 
 
 // Points To OUT:
-// dependence05 -> *HEAP*_l_10[0] , EXACT
+// dependence05 -> *HEAP*_l_10[0] , MAY
 
 int * dependence05()
 {
@@ -77,56 +77,56 @@ int * dependence05()
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
+// b -> *HEAP*_l_10[0] , MAY
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    c = (int *) malloc(10*sizeof(int));
 
 // Points To:
 // a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
+// b -> *HEAP*_l_10[0] , MAY
+// c -> *HEAP*_l_11[0] , MAY
 
 
    a = b;
 
 // Points To:
-// a -> *HEAP*_l_10[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
+// a -> *HEAP*_l_10[0] , MAY
+// b -> *HEAP*_l_10[0] , MAY
+// c -> *HEAP*_l_11[0] , MAY
 
    // a and b are aliased, a points_to b[0]
    *a = 0;
 
 // Points To:
-// a -> *HEAP*_l_10[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
+// a -> *HEAP*_l_10[0] , MAY
+// b -> *HEAP*_l_10[0] , MAY
+// c -> *HEAP*_l_11[0] , MAY
 
    // write effect on *a may be visible from caller, because b escape
    
    a = c;
 
 // Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
+// a -> *HEAP*_l_11[0] , MAY
+// b -> *HEAP*_l_10[0] , MAY
+// c -> *HEAP*_l_11[0] , MAY
 
    // a and b are aliased, a points_to b[0]
    *a = 0;
 
 // Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
+// a -> *HEAP*_l_11[0] , MAY
+// b -> *HEAP*_l_10[0] , MAY
+// c -> *HEAP*_l_11[0] , MAY
 
    // write effect won't be visible from caller, because c doesn't escape
    
    free(c);
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// b -> *HEAP*_l_10[0] , MAY
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 

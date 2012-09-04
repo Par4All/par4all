@@ -69,28 +69,28 @@ int main()
    pFile = fopen("myfile.txt", "w");
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    for(n = 0; n <= 2; n += 1) {
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       puts("please, enter a name: ");
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       gets(name);
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    fclose(pFile);
 

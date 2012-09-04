@@ -1,0 +1,25 @@
+
+POINTS-TO "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To: none
+
+   towns t = read_towns(argv[1]);
+
+// Points To:
+// t.data -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+
+   return 0;
+}
+
+Warnings
+
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.

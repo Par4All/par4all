@@ -1,0 +1,95 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i j
+   int *p, i = 1, j = 2;
+//             <    is read   >: i j
+
+   if (i>j)
+//             <    is written>: p
+      p = &i;
+   else
+//             <    is written>: p
+      p = &j;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p, i = 1, j = 2;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   if (i>j)
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &i;
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &j;
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i j
+   int *p, i = 1, j = 2;
+//             <    is read   >: i j
+
+   if (i>j)
+//             <    is written>: p
+      p = &i;
+   else
+//             <    is written>: p
+      p = &j;
+
+   return 0;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i j
+   int *p, i = 1, j = 2;
+//             <    is read   >: i j
+//             <    is written>: p
+
+   if (i>j)
+//             <    is written>: p
+      p = &i;
+   else
+//             <    is written>: p
+      p = &j;
+
+   return 0;
+}

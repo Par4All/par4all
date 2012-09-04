@@ -1,0 +1,91 @@
+Points to improve in points-to analysis
+
+No priority order.
+
+1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough this piece of code looks dead wrong...)
+
+3. Convergence detection: current implementation no longer works as it used to
+
+4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list (see list05).
+
+7. EffectsWithPointsTo: the fully subscripted sources and sinks
+require index substitution in EffectsWithPointsTo, or the parallelism
+detection is lost; also it is not clear if you want to preserver x[j]
+instead of *(x+j)....; see for instance call05.c. See also call14.c.
+
+8. EffectsWithPointsTo: Also in call14 or call05, probably an
+interprocedural translation issue in call08 for _x_3 in the callee and
+y in the caller. Also, many returns are missing in the source codes of
+EffectsWithPointsTo: they would be useful to debug the points-to
+analysis
+
+9. EffectsWithPointsTo/call09.c: duplicate effect on s.one. Same in call10.
+
+10. EffectsWithPointsTo/call15.c: understand the "may be written",
+probably due to NULL pointer initialization, but should have been
+automatically eliminated by the dereferencement. In fact call15 does
+not check its argument pi or q. Stricto sensu, it is really a may. But
+if summary information is linked to a function that returns, the
+information should be a must at the caller level...
+
+11. EffectsWithPointsTo/chap2_exp4: why do we get a maybe effect on
+*heap*? because the heap lattice is not precise enough to distinguish
+between exact heap references and abstract heap references.
+
+12. EffectsWithPointsTo/dereferencing06: improved results thanks to a
+better analysis of pointer arithmetics.
+
+13. EffectsWithPointsTo/fpointer01: result is now less precise.
+
+14. EffectsWithPointsTo/fulguro04: result modified to take into
+account an implicit dimension.
+
+15. EffectsWithPointsTo: differences from global02 to varargs04 to be
+looked at.
+
+17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
+
+18. dereferencing02: a variable, w, is used uninitialized and this is
+not detected.
+
+19. Improve heap model. Add an extra first dimension to model the different intraprocedural dynamic occurences of a malloc?
+
+20. Pre-decrement and pre-increment are likely to be evaluated
+twice. See the post case in
+unary_intrinsic_call_to_points_to_sinks(). No test case yet I'm
+afraid.
+
+Next item will be 21.
+
+Done:
+
+5. Connexion with effects_with_points_to: improve the points-to precondition or use a more powerful function in effects_with_points_to()? Or both?
+
+-> I have enriched the points-to information (not sure yet it is enough)
+
+6. Be able to dereference constant pointers, a.k.a. arrays. See
+Pointers/array03.c, function foo2. Build a smaller test case.
+
+-> new test case array14.c
+
+2. C subscript construct analysis: see fulguro04.c for instance and some others:
+
+argv03:   char *p = (*argv)[1];
+fulguro03
+fulguro04:     (dat->array)[row]
+Lv
+pointer08:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+pointer16:     t->tree_list[i] = (struct tree*) malloc(sizeof(struct tree));
+ptr_to_array01:   (*p)[3] = &a;
+pv_assign05:   s1.b[0] = &j; (?) several occurences
+pv_assign06:   s2->b[0] = &i;
+struct10:      a.p[i] = i;
+struct13:      e.champ[i].p = malloc(10*sizeof(int));
+               (e.champ)[i].p = malloc(10*sizeof(int));
+struct21:      simplified version of struct13	       
+struct_parall01: a.p[i] = i;
+
+
+16. Mixed up indices, for instance in argv03. Also pointer15, struct09
+
+-> seems now OK for argv03. FI: I do not know about the other cases.

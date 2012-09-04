@@ -23,8 +23,7 @@ float main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[*] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -32,35 +31,29 @@ POINTS-TO
 float main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[*] , MAY
+// Points To: none
 
    int i, j, k;
 
-// Points To:
-// argv[*] -> _argv_2[*] , EXACT
+// Points To: none
 
 
    for(i = 0; i <= 8; i += 1)
 
-// Points To:
-// argv[*] -> _argv_2[*] , EXACT
+// Points To: none
 
       for(j = 0; j <= 8; j += 1) {
 
-// Points To:
-// argv[*] -> _argv_2[*] , EXACT
+// Points To: none
 
          imagein[i][j].re = 0.0;
 
-// Points To:
-// argv[*] -> _argv_2[*] , EXACT
+// Points To: none
 
          imagein[i][j].im = 0.0;
       }
 
-// Points To:
-// argv[*] -> _argv_2[*] , EXACT
+// Points To: none
 
    return imagein[2][1].re;
 }

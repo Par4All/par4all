@@ -354,7 +354,7 @@ void dprint(expression x)
     else if(ot==reference_domain)
       print_reference((reference) x);
     else if(ot==points_to_domain)
-      print_points_to((points_to) x);
+      print_points_to((points_to) x); // See also print_points_to_relation
     else if(ot==cell_domain)
       print_points_to_cell((cell) x);
     else if(ot==type_domain)
@@ -363,6 +363,12 @@ void dprint(expression x)
       print_statement((statement) x);
     else if(ot==effect_domain)
       print_effect((effect) x);
+    else if(ot==points_to_list_domain)
+      print_points_to_list((points_to_list) x);
+    else if(ot==points_to_graph_domain)
+      print_points_to_graph((points_to_graph) x);
+    else if(ot==text_domain)
+      print_text(stderr, (text) x);
     else if(0<=ot && ot<1000)
       (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d", ot);
     else if(ot>1000 || ot<=0) {
@@ -376,10 +382,6 @@ void dprint(expression x)
 	print_expressions((list) x);
       else if(cot==reference_domain)
 	print_references((list) x);
-      else if(cot==points_to_domain) {
-	// print_points_to_list((list) x); FI: not found?
-	fprintf(stderr, "No function found to print a list of points-to.\n");
-      }
       else if(cot==cell_domain)
 	print_points_to_cells((list) x);
       else if(cot==type_domain)
@@ -388,6 +390,10 @@ void dprint(expression x)
 	print_statements((list) x);
       else if(cot==effect_domain)
 	print_effects((list) x);
+      else if(cot==points_to_domain)
+	print_points_to_relations((list) x);
+      else
+	(void) fprintf(stderr, "If a list, a list of unknown objects: tag=%d\n", (int) cot);
     }
   }
 }

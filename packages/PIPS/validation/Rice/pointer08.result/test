@@ -26,19 +26,19 @@ void pointer08()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// t -> *HEAP*_l_10 , EXACT
+// t -> *HEAP*_l_10 , MAY
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
 // *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
-// t -> *HEAP*_l_10 , EXACT
+// t -> *HEAP*_l_10 , MAY
 
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
 // *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
-// t -> *HEAP*_l_10 , EXACT
+// t -> *HEAP*_l_10 , MAY
 
    // FI: without this statement, we do not get points-to information
    // for "return"....
@@ -46,7 +46,7 @@ void pointer08()
 
 // Points To:
 // *HEAP*_l_10.tree_list[*] -> *HEAP*_l_12 , MAY
-// t -> *HEAP*_l_10 , EXACT
+// t -> *HEAP*_l_10 , MAY
 
    return;
 }
@@ -69,9 +69,9 @@ void pointer08()
 //             <    is written>: i
 //             <    is referenced>: i
    for(i = 0; i <= 9; i += 1)
+//             <may be written>: *HEAP*_l_10.tree_list[i]
 //             <    is read   >: i t _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: *HEAP*_l_10.tree_list[i] 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: i t
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 //             <    is read   >: i
@@ -102,7 +102,7 @@ void pointer08()
 		from <i-W-EXACT> to <i-R-EXACT>
 	12 --> 12 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <*HEAP*_l_10.tree_list[i]-W-EXACT> to <*HEAP*_l_10.tree_list[i]-W-EXACT>
+		from <*HEAP*_l_10.tree_list[i]-W-MAY> to <*HEAP*_l_10.tree_list[i]-W-MAY>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	12 --> 16 with conflicts

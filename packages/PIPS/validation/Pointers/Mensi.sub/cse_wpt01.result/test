@@ -1,0 +1,117 @@
+
+Initial code
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+   int i = 0;
+   int j = 1;
+   int k;
+   int *p = &j;
+   int *q = &k;
+   i = 2*(j+2);
+   *p = *q;
+   k = 3*(j+2);
+   // END BLOCK
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int cse_wpt01()
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int j = 1;
+
+// Points To: none
+
+   int k;
+
+// Points To: none
+
+   int *p = &j;
+
+// Points To:
+// p -> j , EXACT
+
+   int *q = &k;
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   i = 2*(j+2);
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   *p = *q;
+
+// Points To:
+// p -> j , EXACT
+// q -> k , EXACT
+
+   k = 3*(j+2);
+   // END BLOCK
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: j
+   int j = 1;
+   int k;
+//             <    is written>: p
+   int *p = &j;
+//             <    is written>: q
+   int *q = &k;
+//             <    is read   >: j
+//             <    is written>: i
+   i = 2*(j+2);
+//             <    is read   >: k p q
+//             <    is written>: j
+   *p = *q;
+//             <    is read   >: j
+//             <    is written>: k
+   k = 3*(j+2);
+   // END BLOCK
+}
+
+Code after CSE
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+   int i = 0;
+   int j = 1;
+   int k;
+   int *p = &j;
+   int *q = &k;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3;
+   I_0 = j+2;
+   i = 2*I_0;
+   *p = *q;
+   k = 3*I_0;
+   // END BLOCK
+}

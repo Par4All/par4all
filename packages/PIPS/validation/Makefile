@@ -189,6 +189,7 @@ SUMMARY.short: # SUMMARY
 	  echo ; \
 	  grep -v '^passed: ' SUMMARY ; \
 	} > $@
+	cp $@ $@.saved
 
 # cleanup case duration before diffing
 NOTIME	= perl -p -e 's/^((passed|failed|changed|timeout): .*) [0-9]+$$/$$1/'

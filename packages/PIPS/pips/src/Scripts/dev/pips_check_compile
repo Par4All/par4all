@@ -2,7 +2,7 @@
 #
 # $Id$
 #
-# Copyright 1989-2011 MINES ParisTech
+# Copyright 1989-2012 MINES ParisTech
 #
 # This file is part of PIPS.
 #
@@ -146,7 +146,9 @@ then
   # compute load & jobs depending on the available hardware
   # note that the reported hardware can be somehow virtual with hyperthreading
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
-  load=$(($nproc + 2)) jobs=$nproc
+  load=$(($nproc - 2))
+  [ $load -lt 1 ] && load=1
+  jobs=$nproc
   make+=" -j $jobs -l $load --no-print-directory"
   tail=$((30 + 20 * $nproc))
 else

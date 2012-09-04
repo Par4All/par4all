@@ -8,29 +8,12 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 setproperty POINTS_TO_PATH_LIMIT 10
 
-activate PRINT_CODE_PROPER_EFFECTS
-
-echo
-echo Proper effects for "dependence12"
-echo
-display PRINTED_FILE[dependence12]
-
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo
 echo POINTS TO for "dependence12"
 echo
 display PRINTED_FILE[dependence12]
-
-#echo 
-#echo Proper effects using points_to
-#echo
-#module dependence12
-#activate PROPER_EFFECTS_WITH_POINTS_TO
-#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-#activate PRINT_CODE_PROPER_EFFECTS
-#display PRINTED_FILE
- 
 
 close
 delete dependence12

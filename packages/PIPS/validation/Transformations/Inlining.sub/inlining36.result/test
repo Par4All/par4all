@@ -1,10 +1,6 @@
 void mehdi(int *b)
 {
    *b = *b;
-   {
-      //inlined by pips from ``idhem''
-      //PIPS generated variable
-      int *a0 = b;
-      *a0 = *a0;
-   }
+   //inlined by pips from ``idhem''
+   *b = *b;
 }

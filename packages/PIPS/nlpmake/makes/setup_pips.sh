@@ -85,7 +85,8 @@ prod=$destination/prod
 
 echo
 echo "### checking needed softwares"
-for exe in svn wget tar gunzip $make cproto flex bison gcc perl sed tr
+# ed is used within the "newgen" script
+for exe in svn wget tar gunzip $make cproto flex bison gcc perl sed tr ed
 do
   type $exe || error "no such executable, please install: $exe"
 done

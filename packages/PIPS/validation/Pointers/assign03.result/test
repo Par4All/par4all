@@ -51,12 +51,12 @@ void assign03()
    double *p = (double *) malloc(10*sizeof(double));
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    int j = 2;
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , EXACT
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
 
    p[j] = 1.;

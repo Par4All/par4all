@@ -354,4 +354,4 @@ int main()
 }
 INIT_POINTS_TO_ANALYSIS[assignment] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to) Function has not a side effect on pointers variables
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variables

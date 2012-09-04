@@ -20,6 +20,7 @@ int struct05()
 //             <    is read   >: i x[i].first
 //             <    is written>: x[i].second
          x[i].second = x[i].first;
+   return 0;
 }
 
 POINTS-TO
@@ -61,4 +62,8 @@ int struct05()
 // Points To: none
 
          x[i].second = x[i].first;
+
+// Points To: none
+
+   return 0;
 }

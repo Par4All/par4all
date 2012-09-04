@@ -1,5 +1,3 @@
-# Several problems, including for parsing of a_m_serial() and a_next()
-
 setenv WSPACE=ammp01
 delete $WSPACE
 create $WSPACE $WSPACE.c
@@ -10,20 +8,6 @@ create $WSPACE $WSPACE.c
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 setproperty POINTS_TO_PATH_LIMIT 10
-
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-
 
 echo 
 echo POINTS-TO

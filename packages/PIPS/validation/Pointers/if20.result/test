@@ -1,0 +1,73 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p, *q, *r, i, j;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   if (i>0)
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      q = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// q -> i , MAY
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   if (p!=q)
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      r = q;
+   else
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      r = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// q -> i , MAY
+// r -> *ANY_MODULE*:*NOWHERE* , MAY
+// r -> i , MAY
+
+
+   return 0;
+}

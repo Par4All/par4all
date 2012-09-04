@@ -18,8 +18,7 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -27,25 +26,21 @@ POINTS-TO
 int main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[0] , MAY
+// Points To: none
 
    int t;
 
-// Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// Points To: none
 
    
    
    for(t = 0; t <= 63; t += 1)
 
-// Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// Points To: none
 
       compute();
 
-// Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// Points To: none
 
    
    

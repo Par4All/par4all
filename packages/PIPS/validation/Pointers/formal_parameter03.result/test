@@ -6,9 +6,10 @@ int formal_parameter03(int ppp[10][10][10])
 //             <    is written>: q
    int *q = ppp[0][0];
 //             <    is written>: qq
-   int **qq = ppp[0];
+   int (*qq)[10] = ppp[0];
 //             <    is written>: qqq
-   int ***qqq = ppp;
+   int (*qqq)[10][10] = ppp;
+
    return 0;
 }
 
@@ -19,9 +20,10 @@ int formal_parameter03(int ppp[10][10][10])
 //             <    is written>: q
    int *q = ppp[0][0];
 //             <    is written>: qq
-   int **qq = ppp[0];
+   int (*qq)[10] = ppp[0];
 //             <    is written>: qqq
-   int ***qqq = ppp;
+   int (*qqq)[10][10] = ppp;
+
    return 0;
 }
 
@@ -43,18 +45,19 @@ int formal_parameter03(int ppp[10][10][10])
 // Points To:
 // q -> ppp[0][0][0] , EXACT
 
-   int **qq = ppp[0];
+   int (*qq)[10] = ppp[0];
 
 // Points To:
 // q -> ppp[0][0][0] , EXACT
 // qq -> ppp[0][0] , EXACT
 
-   int ***qqq = ppp;
+   int (*qqq)[10][10] = ppp;
 
 // Points To:
 // q -> ppp[0][0][0] , EXACT
 // qq -> ppp[0][0] , EXACT
 // qqq -> ppp[0] , EXACT
+
 
    return 0;
 }

@@ -117,17 +117,17 @@ s_t make_s(int i, float x)
    p = (s_t *) malloc(sizeof(s_t));
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP*_b0 , EXACT
+// p -> *ANY_MODULE*:*HEAP*_b0 , MAY
 
    p->entier = i;
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP*_b0 , EXACT
+// p -> *ANY_MODULE*:*HEAP*_b0 , MAY
 
    p->reel = x;
 
 // Points To:
-// p -> *ANY_MODULE*:*HEAP*_b0 , EXACT
+// p -> *ANY_MODULE*:*HEAP*_b0 , MAY
 
    return *p;
 }

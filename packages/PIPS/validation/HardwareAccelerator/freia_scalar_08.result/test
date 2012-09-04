@@ -111,6 +111,8 @@ int freia_scalar_08(int argc, char *argv[])
    static const  int32_t k8_ce[9] = {0, 0, 0, 0, 1, 1, 0, 0, 0};        /*0017*/
    static const  int32_t k8_cn[9] = {0, 1, 0, 0, 1, 0, 0, 0, 0};        /*0018*/
    int32_t neighborTransposed_0[9], neighborTransposed_1[9];            /*0019*/
+   // hardware accelerator generated variable
+   freia_data2d *imw_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0021*/
    freia_common_open_input(&fdin, 0);                                   /*0022*/
@@ -123,6 +125,7 @@ int freia_scalar_08(int argc, char *argv[])
    imc = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0029*/
 
    imw = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0031*/
+   imw_1 = freia_common_create_data(imw->bpp, imw->widthWa, imw->heightWa);
 
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0033*/
 
@@ -130,9 +133,9 @@ int freia_scalar_08(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
-   freia_aipo_dilate_8c(imw, in, freia_morpho_kernel_8c);               /*0038*/
-   freia_aipo_erode_8c(imw, imw, neighborTransposed_0);                 /*0039*/
-   freia_aipo_erode_8c(out, imw, neighborTransposed_1);                 /*0042*/
+   freia_aipo_dilate_8c(imw_1, in, freia_morpho_kernel_8c);             /*0038*/
+   freia_aipo_erode_8c(imw, imw_1, neighborTransposed_0);               /*0039*/
+   freia_aipo_erode_8c(out, imw_1, neighborTransposed_1);               /*0042*/
    freia_aipo_inf(imc, imw, out);                                       /*0043*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
@@ -140,6 +143,7 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_destruct_data(in);                                      /*0047*/
    freia_common_destruct_data(imc);                                     /*0048*/
    freia_common_destruct_data(imw);                                     /*0049*/
+   freia_common_destruct_data(imw_1);
    freia_common_destruct_data(out);                                     /*0050*/
 
    freia_common_close_input(&fdin);                                     /*0052*/
@@ -1047,6 +1051,20 @@ digraph "freia_scalar_08_opencl_helper_0_0" {
   "38 D8" -> "39 E8" [label="imw_1"];
   "in" -> "38 D8";
 }
+// graph for dag "freia_scalar_08_opencl_helper_D8_511" of module "freia_scalar_08" in dot format
+// DAG "freia_scalar_08_opencl_helper_D8_511": #i=1 #o=1 #c=1 #s=0 #I=0 #B=0 #A=0
+digraph "freia_scalar_08_opencl_helper_D8_511" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "imw_1" [shape=circle];
+
+  // computation vertices
+  "38 D8" [shape=box];
+  "38 D8" -> "imw_1";
+  "in" -> "38 D8";
+}
 
 ! acceleration function
 
@@ -1057,10 +1075,165 @@ digraph "freia_scalar_08_opencl_helper_0_0" {
 
 
 // dag 0: 5 ops and 0 copies, optimized to 4 ops and 0+0+0 copies
+
+// hold kernels for freia_scalar_08_opencl_helper_D8_511
+static cl_kernel freia_scalar_08_opencl_helper_D8_511_kernel[2];
+
+// compile kernels for freia_scalar_08_opencl_helper_D8_511
+static freia_status freia_scalar_08_opencl_helper_D8_511_compile(void)
+{
+  // OpenCL source for freia_scalar_08_opencl_helper_D8_511
+  const char * freia_scalar_08_opencl_helper_D8_511_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_scalar_08_opencl_helper_D8_511\n"
+    "KERNEL void freia_scalar_08_opencl_helper_D8_511(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width, // of the working area, vs image below\n"
+    "  int pitch)\n"
+    "{\n"
+    "  // get id & compute global image shift\n"
+    "  int height = get_global_size(0);\n"
+    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  int shift = pitch*get_global_id(0);\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
+    "  // N & S boundaries, one thread on first dimension per row\n"
+    "  int is_N = (get_global_id(0)==0);\n"
+    "  int is_S = (get_global_id(0)==(height-1));\n"
+    "\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "  int i;\n"
+    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  {\n"
+    "    // W & E boundaries, assuming i global index\n"
+    "    int is_W = (i==0);\n"
+    "    int is_E = (i==(width-1));\n"
+    "    // get input pixels\n"
+    "    PIXEL t38 = PIXEL_MIN;\n"
+    "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
+    "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
+    "    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];\n"
+    "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
+    "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "    // pixel computations\n"
+    "    t38 = PIXEL_SUP(t38, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
+    "    t38 = PIXEL_SUP(t38, (is_N)? PIXEL_MIN: in0N);\n"
+    "    t38 = PIXEL_SUP(t38, (is_N|is_E)? PIXEL_MIN: in0NE);\n"
+    "    t38 = PIXEL_SUP(t38, (is_W)? PIXEL_MIN: in0W);\n"
+    "    t38 = PIXEL_SUP(t38, in0);\n"
+    "    t38 = PIXEL_SUP(t38, (is_E)? PIXEL_MIN: in0E);\n"
+    "    t38 = PIXEL_SUP(t38, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
+    "    t38 = PIXEL_SUP(t38, (is_S)? PIXEL_MIN: in0S);\n"
+    "    t38 = PIXEL_SUP(t38, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t38;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(freia_scalar_08_opencl_helper_D8_511_source, "freia_scalar_08_opencl_helper_D8_511", "-DPIXEL8", &freia_scalar_08_opencl_helper_D8_511_kernel[0]);
+  err |= freia_op_compile_kernel(freia_scalar_08_opencl_helper_D8_511_source, "freia_scalar_08_opencl_helper_D8_511", "-DPIXEL16", &freia_scalar_08_opencl_helper_D8_511_kernel[1]);
+  return err;
+}
+
+// helper function freia_scalar_08_opencl_helper_D8_511
+freia_status freia_scalar_08_opencl_helper_D8_511(
+  freia_data2d * o0,
+  const freia_data2d * i0)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= freia_scalar_08_opencl_helper_D8_511_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = freia_scalar_08_opencl_helper_D8_511_kernel[bpp];
+
+  // call kernel freia_scalar_08_opencl_helper_D8_511
+  err |= freia_op_call_kernel(kernel, 1, 1, 0, 0, o0, i0);
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_scalar_08
 
 // opencl for dag 0
+
+// opencl function freia_scalar_08_opencl_helper_D8_511
+KERNEL void freia_scalar_08_opencl_helper_D8_511(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width, // of the working area, vs image below
+  int pitch)
+{
+  // get id & compute global image shift
+  int height = get_global_size(0);
+  int thrid = get_global_id(0) + height*get_global_id(1);
+  int shift = pitch*get_global_id(0);
+
+  // get input & output image pointers
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
+  // N & S boundaries, one thread on first dimension per row
+  int is_N = (get_global_id(0)==0);
+  int is_S = (get_global_id(0)==(height-1));
+
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+  int i;
+  for (i=get_global_id(1)*workshare; i<last; i++)
+  {
+    // W & E boundaries, assuming i global index
+    int is_W = (i==0);
+    int is_E = (i==(width-1));
+    // get input pixels
+    PIXEL t38 = PIXEL_MIN;
+    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
+    PIXEL in0N = (is_N)? 0: j0[i-pitch];
+    PIXEL in0NE = (is_N|is_E)? 0: j0[i-pitch+1];
+    PIXEL in0W = (is_W)? 0: j0[i-1];
+    PIXEL in0 = j0[i];
+    PIXEL in0E = (is_E)? 0: j0[i+1];
+    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
+    PIXEL in0S = (is_S)? 0: j0[i+pitch];
+    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+    // pixel computations
+    t38 = PIXEL_SUP(t38, (is_N|is_W)? PIXEL_MIN: in0NW);
+    t38 = PIXEL_SUP(t38, (is_N)? PIXEL_MIN: in0N);
+    t38 = PIXEL_SUP(t38, (is_N|is_E)? PIXEL_MIN: in0NE);
+    t38 = PIXEL_SUP(t38, (is_W)? PIXEL_MIN: in0W);
+    t38 = PIXEL_SUP(t38, in0);
+    t38 = PIXEL_SUP(t38, (is_E)? PIXEL_MIN: in0E);
+    t38 = PIXEL_SUP(t38, (is_S|is_W)? PIXEL_MIN: in0SW);
+    t38 = PIXEL_SUP(t38, (is_S)? PIXEL_MIN: in0S);
+    t38 = PIXEL_SUP(t38, (is_S|is_E)? PIXEL_MIN: in0SE);
+    // set output pixels
+    p0[i] = t38;
+  }
+}
 
 ! updated function
 
@@ -1072,6 +1245,8 @@ int freia_scalar_08(int argc, char *argv[])
    static const  int32_t k8_ce[9] = {0, 0, 0, 0, 1, 1, 0, 0, 0};        /*0017*/
    static const  int32_t k8_cn[9] = {0, 1, 0, 0, 1, 0, 0, 0, 0};        /*0018*/
    int32_t neighborTransposed_0[9], neighborTransposed_1[9];            /*0019*/
+   // hardware accelerator generated variable
+   freia_data2d *imw_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0021*/
    freia_common_open_input(&fdin, 0);                                   /*0022*/
@@ -1084,6 +1259,7 @@ int freia_scalar_08(int argc, char *argv[])
    imc = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0029*/
 
    imw = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0031*/
+   imw_1 = freia_common_create_data(imw->bpp, imw->widthWa, imw->heightWa);
 
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0033*/
 
@@ -1091,9 +1267,9 @@ int freia_scalar_08(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
-   freia_aipo_dilate_8c(imw, in, freia_morpho_kernel_8c);               /*0038*/
-   freia_aipo_erode_8c(imw, imw, neighborTransposed_0);                 /*0039*/
-   freia_aipo_erode_8c(out, imw, neighborTransposed_1);                 /*0042*/
+   freia_scalar_08_opencl_helper_D8_511(imw_1, in);                     /*0038*/
+   freia_aipo_erode_8c(imw, imw_1, neighborTransposed_0);               /*0039*/
+   freia_aipo_erode_8c(out, imw_1, neighborTransposed_1);               /*0042*/
    freia_aipo_inf(imc, imw, out);                                       /*0043*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
@@ -1101,6 +1277,7 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_destruct_data(in);                                      /*0047*/
    freia_common_destruct_data(imc);                                     /*0048*/
    freia_common_destruct_data(imw);                                     /*0049*/
+   freia_common_destruct_data(imw_1);
    freia_common_destruct_data(out);                                     /*0050*/
 
    freia_common_close_input(&fdin);                                     /*0052*/
@@ -1120,6 +1297,8 @@ int freia_scalar_08(int argc, char *argv[])
    static const  int32_t k8_ce[9] = {0, 0, 0, 0, 1, 1, 0, 0, 0};        /*0017*/
    static const  int32_t k8_cn[9] = {0, 1, 0, 0, 1, 0, 0, 0, 0};        /*0018*/
    int32_t neighborTransposed_0[9], neighborTransposed_1[9];            /*0019*/
+   // hardware accelerator generated variable
+   freia_data2d *imw_1 = 0;
 
    freia_initialize(argc, argv);                                        /*0021*/
    freia_common_open_input(&fdin, 0);                                   /*0022*/
@@ -1132,6 +1311,7 @@ int freia_scalar_08(int argc, char *argv[])
    imc = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0029*/
 
    imw = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0031*/
+   imw_1 = freia_common_create_data(imw->bpp, imw->widthWa, imw->heightWa);
 
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0033*/
 
@@ -1139,9 +1319,9 @@ int freia_scalar_08(int argc, char *argv[])
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
-   freia_aipo_dilate_8c(imw, in, freia_morpho_kernel_8c);               /*0038*/
-   freia_aipo_erode_8c(imw, imw, neighborTransposed_0);                 /*0039*/
-   freia_aipo_erode_8c(out, imw, neighborTransposed_1);                 /*0042*/
+   freia_scalar_08_opencl_helper_D8_511(imw_1, in);                     /*0038*/
+   freia_aipo_erode_8c(imw, imw_1, neighborTransposed_0);               /*0039*/
+   freia_aipo_erode_8c(out, imw_1, neighborTransposed_1);               /*0042*/
    freia_aipo_inf(imc, imw, out);                                       /*0043*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
@@ -1149,6 +1329,7 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_destruct_data(in);                                      /*0047*/
    freia_common_destruct_data(imc);                                     /*0048*/
    freia_common_destruct_data(imw);                                     /*0049*/
+   freia_common_destruct_data(imw_1);
    freia_common_destruct_data(out);                                     /*0050*/
 
    freia_common_close_input(&fdin);                                     /*0052*/

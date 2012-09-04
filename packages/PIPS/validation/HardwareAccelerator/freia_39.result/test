@@ -85,23 +85,19 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *d_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *e_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
    
    // preschedule example for terapix tests
    
-   freia_aipo_erode_8c(e_1, i, kern);                                   /*0010*/
-   freia_aipo_dilate_8c(d_1, i, kern);                                  /*0011*/
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
 
-   freia_aipo_erode_8c(e, e_1, kern);                                   /*0013*/
-   freia_aipo_dilate_8c(d, d_1, kern);                                  /*0014*/
+   freia_aipo_erode_8c(e, e, kern);                                     /*0013*/
+   freia_aipo_dilate_8c(d, d, kern);                                    /*0014*/
 
    freia_aipo_sub(o, d, e);                                             /*0016*/
 
    freia_common_destruct_data(e);                                       /*0018*/
-   freia_common_destruct_data(e_1);
    freia_common_destruct_data(d);                                       /*0019*/
-   freia_common_destruct_data(d_1);
 
    return FREIA_OK;                                                     /*0021*/
 }
@@ -867,23 +863,19 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *d_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *e_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
    
    // preschedule example for terapix tests
    
-   freia_aipo_erode_8c(e_1, i, kern);                                   /*0010*/
-   freia_aipo_dilate_8c(d_1, i, kern);                                  /*0011*/
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
 
-   freia_aipo_erode_8c(e, e_1, kern);                                   /*0013*/
-   freia_aipo_dilate_8c(d, d_1, kern);                                  /*0014*/
+   freia_aipo_erode_8c(e, e, kern);                                     /*0013*/
+   freia_aipo_dilate_8c(d, d, kern);                                    /*0014*/
 
    freia_aipo_sub(o, d, e);                                             /*0016*/
 
    freia_common_destruct_data(e);                                       /*0018*/
-   freia_common_destruct_data(e_1);
    freia_common_destruct_data(d);                                       /*0019*/
-   freia_common_destruct_data(d_1);
 
    return FREIA_OK;                                                     /*0021*/
 }
@@ -895,23 +887,19 @@ freia_status freia_39(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    
    freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *d_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *e_1 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
    
    // preschedule example for terapix tests
    
-   freia_aipo_erode_8c(e_1, i, kern);                                   /*0010*/
-   freia_aipo_dilate_8c(d_1, i, kern);                                  /*0011*/
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
 
-   freia_aipo_erode_8c(e, e_1, kern);                                   /*0013*/
-   freia_aipo_dilate_8c(d, d_1, kern);                                  /*0014*/
+   freia_aipo_erode_8c(e, e, kern);                                     /*0013*/
+   freia_aipo_dilate_8c(d, d, kern);                                    /*0014*/
 
    freia_aipo_sub(o, d, e);                                             /*0016*/
 
    freia_common_destruct_data(e);                                       /*0018*/
-   freia_common_destruct_data(e_1);
    freia_common_destruct_data(d);                                       /*0019*/
-   freia_common_destruct_data(d_1);
 
    return 0;                                                            /*0021*/
 }

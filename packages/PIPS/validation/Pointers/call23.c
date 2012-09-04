@@ -5,6 +5,7 @@ int i, j;
 void call23(int * p)
 {
   ; // do nothing
+  return;
 }
 
 main()

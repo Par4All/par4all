@@ -99,8 +99,7 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// Points To OUT: none
 
 int main()
 {
@@ -168,86 +167,86 @@ int main()
 // Points To:
 // b -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 // z -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    b = (struct q_s *) malloc(sizeof(struct q_s ));
 
 // Points To:
-// b -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 // z -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p = (struct p_s *) malloc(sizeof(struct p_s ));
 
 // Points To:
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 // z -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    x = b;
 
 // Points To:
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // z -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p->q = x;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // z -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    z = &p->q;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
-// z -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// z -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    p->q = b;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
-// z -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// z -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    z = &u;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // z -> u , EXACT
 
 
    p->q->r = a;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// b -> *ANY_MODULE*:*HEAP* , EXACT
-// p -> *ANY_MODULE*:*HEAP* , EXACT
-// u -> *ANY_MODULE*:*HEAP* , EXACT
-// x -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // z -> u , EXACT
 
    return 0;

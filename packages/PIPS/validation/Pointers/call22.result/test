@@ -5,7 +5,9 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// call22 -> i , MAY
+// call22 -> j , MAY
 
 int * call22(int k)
 {
@@ -14,7 +16,9 @@ int * call22(int k)
 
    int *p = k?&i:&j;
 
-// Points To: none
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
 
    return p;
 }
@@ -38,7 +42,7 @@ int main()
    q = call22(1);
 
 // Points To:
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    return 0;
 }

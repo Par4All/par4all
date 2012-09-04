@@ -1,0 +1,85 @@
+
+PROPER  EFFECTS 
+
+void pointer01(int n, float *p, float *q)
+{
+   int i;                                                               /*0007*/
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)                                         /*0009*/
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      p[i] = q[i];                                                      /*0010*/
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
+
+
+// Points To OUT: none
+
+void pointer01(int n, float *p, float *q)
+{
+
+// Points To: none
+
+   int i;                                                               /*0007*/
+
+// Points To: none
+
+
+   for(i = 0; i <= n-1; i += 1)                                         /*0009*/
+
+// Points To:
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
+
+      p[i] = q[i];                                                      /*0010*/
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void pointer01(int n, float *p, float *q)
+{
+   int i;                                                               /*0007*/
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)                                         /*0009*/
+//             <    is read   >: _q_3[i] i n p q
+//             <    is written>: _p_2[i]
+      p[i] = q[i];                                                      /*0010*/
+}
+//             <may be read   >: _q_3[*] p q
+//             <may be written>: _p_2[*]
+//             <    is read   >: n
+void pointer01(int n, float *p, float *q)
+{
+   int i;                                                               /*0007*/
+//             <may be read   >: _q_3[*] i p q
+//             <may be written>: _p_2[*]
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)                                         /*0009*/
+//             <may be read   >: _q_3[*]
+//             <may be written>: _p_2[*]
+//             <    is read   >: i n p q
+      p[i] = q[i];                                                      /*0010*/
+}
+
+Parallel code
+
+void pointer01(int n, float *p, float *q)
+{
+   int i;                                                               /*0007*/
+
+#pragma omp parallel for 
+   for(i = 0; i <= n-1; i += 1)                                         /*0009*/
+      p[i] = q[i];                                                      /*0010*/
+}

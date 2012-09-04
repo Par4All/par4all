@@ -6,7 +6,7 @@ POINTS TO
 
 
 // Points To OUT:
-// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , MAY
 
 int main()
 {
@@ -40,14 +40,14 @@ int main()
    p = (struct p_s *) malloc(sizeof(struct p_s ));
 
 // Points To:
-// p -> *HEAP*_l_18 , EXACT
+// p -> *HEAP*_l_18 , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p->q = x;
 
 // Points To:
-// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *HEAP*_l_18 , EXACT
+// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , MAY
+// p -> *HEAP*_l_18 , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 

@@ -1,17 +1,140 @@
 Information about the points-to validation suite:
 ------------------------------------------------
 
-statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
+conditional_01, 01, 02, 03, 04 : To treat assignements like x = cond? &i : y.
 
-if00, for00, while00, do_while : To illustrate points-to relations in control statements.
+do_while : To illustrate points-to relations in control statements.
 
-struct00->struct04 : To illustrate fields of C stryct type which are pointers.
+for00:
+
+formal_parameter00 : To illustrate the treatement of formal parameter. 
+
+fulguro04: subscript construct in a rhs
+
+if01, if02, if03, if04, if05: join of the true and false branches (see also test01, 02, 03)
+
+if06: impact of a condition with a side-effect
+
+if07: impact of condition p!=(void *)0
+
+if08: impact of condition p!=q
+
+if09: impact of condition *p: it implies that p cannot be NULL
+
+if18: arc removal by p==q
+
+if19: detection of undefined pointers
+
+if20: arc removal by p!=q
+
+if002: join of the false and true branches
+
+inter04, 05, 06  and 07:
+
+intra01
+
+lhs06: va_arg
+
+list06:
+
+Lv:
+
+nowhere01:
+
+null_pointer01, 02:
 
 malloc01, malloc_anywhere, malloc_context_sensitive, malloc_flow_sensitive, malloc_insensitive : To illustrate the use of HEAP_LOCATION  property.
 
-conditional_01 : To treat assignement like x = cond? &i : y.
+pointer14: arrays of pointers toward arrays of pointers
 
-formal_parameter00 : To illustrate the treatement of formal parameter. 
+pointer17: triple pointer and pointer subscripts
+
+pointer_free
+
+pointer_modif01: scalar pointers updated, intraprocedural; effects required to observe real impact; C code is wrong and the bug is detected by gcc
+
+pointer_modif02: scalar pointers updated, interprocedural; effects required to observe real impact; C code is wrong and the bug is detected by gcc
+
+pointer_reference04: uses a pointer reference, such as p[3]
+
+problematique00: Fortran instrinsics used in C code
+
+problematique: effects computation for heap-allocated arrays
+
+ptr_to_array01, 02 and 03:
+
+ptr_to_field02:
+
+ptr_to_field:
+
+putchar01:
+
+puts01:
+
+pv_abort01, 02:
+
+pv_assign04: struct assignments
+
+pv_assign08:
+
+pv_conditional_operator02: conditional struct assigment
+
+pv_decl_with_init02:
+
+pv_dowhileloop02:
+
+pv_forloop02:
+
+pv_heap01:
+
+pv_heap02:
+
+pv_heap04:
+
+pv_heap05:
+
+pv_heap06:
+
+pv_intrinsic01:
+
+pv_local_var03:
+
+pv_loop02:
+
+pv_loop05
+
+pv_whileloop02:
+
+recurence04: simple case with a list
+
+ret_val: useless, unless information about all dereferencing
+operations is taken into account
+
+statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
+
+statement01_dec: C code is wrong, bug found by gcc
+
+static01: implicit initialization of static scalar pointer to NULL (C Standard)
+
+struct00->struct04 : To illustrate fields of C stryct type which are pointers.
+
+struct10: result not checked carefully
+
+struct13:
+
+struct19: initialization of a struct containing pointers
+
+struct21.c: excerpt from struct13.c, subscript and struct assignment
+
+struct_parall01: result to be validated by hand...
+
+test01, 02, 03: check handling of condition and join of true/false branches
+
+undefined01:
+
+uninitialized01:
+
+while00:
 
 For compatibility with Effects validation:
 ------------------------------------------
@@ -28,3 +151,16 @@ test01, 02, 03, 04: check handling of test statements (FI)
 decl06: check generation of nowhere in a pointer declaration
 
 pointerxy: copied from Rice
+
+-------------new validation for points-to analysis------------- 
+
+every test case added is either a bug to fixe either an enhancement of
+the points-to analysis, please add a comment about the bug when you
+add a test case.
+
+bc_inter01: est-ce que ca marche en intraprocedural?
+bc_inter02: idem
+bc_inter03: idem
+bc_inter04: ou est l'interprocedural
+
+beatrice01: problemes? objectifs?

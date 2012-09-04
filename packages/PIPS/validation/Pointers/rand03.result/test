@@ -6,7 +6,8 @@ int main()
 //             <    is written>: nx ny
    int ny = 10, nx = 10;
    Cplfloat pt_in[ny][nx];
-   float Sigma2;
+//             <    is written>: Sigma2
+   float Sigma2 = 0.;
    Cplfloat pt_out[ny][nx];
 //             <may be read   >: pt_in[*][*].im pt_in[*][*].re 
 //                               _RANDOM_EFFECTS:GEN_SEED
@@ -15,6 +16,7 @@ int main()
 //             <    is read   >: Sigma2 nx ny
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+   return 0;
 }
 
 POINTS-TO
@@ -38,7 +40,7 @@ int main()
 
 // Points To: none
 
-   float Sigma2;
+   float Sigma2 = 0.;
 
 // Points To: none
 
@@ -48,4 +50,8 @@ int main()
 
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+
+// Points To: none
+
+   return 0;
 }

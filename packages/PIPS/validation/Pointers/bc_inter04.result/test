@@ -1,228 +1,181 @@
-
-Proper effects for "main"
-
-int main()
-{
-   int ***a1;
-   int ***a2;
-
-   int **b3;
-   int *c4;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a1
-
-   a1 = (int ***) malloc(sizeof(int * *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a1
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
-   *a1 = (int **) malloc(sizeof(int *));
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
-   **a1 = (int *) malloc(sizeof(int));
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-
-   ***a1 = 1;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a2
-
-   a2 = (int ***) malloc(sizeof(int * *));
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-   *a2 = *a1;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b3
-
-   b3 = (int **) malloc(sizeof(int *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ b3
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
-   *b3 = (int *) malloc(sizeof(int));
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-   **b3 = 3;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c4
-
-   c4 = (int *) malloc(sizeof(int));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: c4
-   *c4 = 4;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-
-   foo(a1, a2, b3, c4);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-
-   printf("%d\n", ***a1);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-   printf("%d\n", ***a2);
-
-   return 0;
-}
 POINTS TO for "main"
 
-//  {}
-int main()
-{
-//  points to = {}
-   int ***a1;
-//  points to = {}
-   int ***a2;
 
-//  points to = {}
-   int **b3;
-//  points to = {}
-   int *c4;
-//  points to = {}
+// Points To IN: none
 
-   a1 = (int ***) malloc(sizeof(int * *));
-//  {(a1,*HEAP*_l_22,-Exact-)}
-   *a1 = (int **) malloc(sizeof(int *));
-//  {(a1[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-)}
-   **a1 = (int *) malloc(sizeof(int));
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-)}
 
-   ***a1 = 1;
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-)}
-
-   a2 = (int ***) malloc(sizeof(int * *));
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-)}
-   *a2 = *a1;
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-)}
-
-   b3 = (int **) malloc(sizeof(int *));
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3,*HEAP*_l_31,-Exact-)}
-   *b3 = (int *) malloc(sizeof(int));
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-)}
-   **b3 = 3;
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-)}
-
-   c4 = (int *) malloc(sizeof(int));
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-);(c4,*HEAP*_l_35,-Exact-)}
-   *c4 = 4;
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-);(c4,*HEAP*_l_35,-Exact-)}
-
-   foo(a1, a2, b3, c4);
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-);(c4,*HEAP*_l_35,-Exact-)}
-
-   printf("%d\n", ***a1);
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-);(c4,*HEAP*_l_35,-Exact-)}
-   printf("%d\n", ***a2);
-//  {(a1[0][0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(a1[0],
-//   *ANY_MODULE*:*ANYWHERE*,-MAY-);(a1,*HEAP*_l_22,-Exact-);(a2,
-//   *HEAP*_l_28,-Exact-);(b3[0],*ANY_MODULE*:*ANYWHERE*,-MAY-);(b3,
-//   *HEAP*_l_31,-Exact-);(c4,*HEAP*_l_35,-Exact-)}
-
-   return 0;
-}
-
-Proper effects using points_to
+// Points To OUT: none
 
 int main()
 {
+
+// Points To: none
+
    int ***a1;
+
+// Points To:
+// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    int ***a2;
 
+
+// Points To:
+// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    int **b3;
+
+// Points To:
+// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int *c4;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a1
+
+// Points To:
+// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    a1 = (int ***) malloc(sizeof(int * *));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a1
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  *HEAP*_l_22
+
+// Points To:
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    *a1 = (int **) malloc(sizeof(int *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  *HEAP*_l_22
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  *HEAP*_l_22 a1
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    **a1 = (int *) malloc(sizeof(int));
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  *HEAP*_l_22
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: *HEAP*_l_22 a1
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    ***a1 = 1;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a2
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    a2 = (int ***) malloc(sizeof(int * *));
-//               <must be read   >: *HEAP*_l_22 a1 a2
-//               <must be written>: *HEAP*_l_28
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    *a2 = *a1;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b3
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    b3 = (int **) malloc(sizeof(int *));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ b3
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                                  *HEAP*_l_31
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    *b3 = (int *) malloc(sizeof(int));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: *HEAP*_l_31 b3
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    **b3 = 3;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c4
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    c4 = (int *) malloc(sizeof(int));
-//               <must be read   >: c4
-//               <must be written>: *HEAP*_l_35
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
+// c4 -> *HEAP*_l_35 , MAY
+
    *c4 = 4;
-//               <must be read   >: a1 a2 b3 c4
+
+// Points To:
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
+// c4 -> *HEAP*_l_35 , MAY
+
 
    foo(a1, a2, b3, c4);
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  *ANY_MODULE*:*ANYWHERE* stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  *HEAP*_l_22 a1
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// c4 -> *HEAP*_l_35 , MAY
+
 
    printf("%d\n", ***a1);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                                  *HEAP*_l_28 *HEAP*_l_28[0] 
-//                                  *HEAP*_l_28[0][0] a2
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+// Points To: unreachable
+
    printf("%d\n", ***a2);
+
+// Points To: unreachable
+
 
    return 0;
 }

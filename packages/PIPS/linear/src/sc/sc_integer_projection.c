@@ -168,12 +168,12 @@ sc_integer_fourier_motzkin_variable_elimination(
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
 		(sci, posit, negat, v, &integer_comb_p, OFL_CTRL);
 	    ineg_stay[i1] = ineg_stay[i1] && integer_comb_p;
+	    if(!integer_comb_p) non_equivalent_projections = true;
  
 	  
 	    if (contrainte_constante_p(ineg)) {
 		if (contrainte_verifiee(ineg,false)) {
 		    vect_rm(ineg->vecteur);
-		    ineg->vecteur = NULL;
 		    /* combinaison => 1 termcst >= 0 */
 		    /* inutile de la garder          */
 		}
@@ -194,7 +194,6 @@ sc_integer_fourier_motzkin_variable_elimination(
 		if(!integer_comb_p) {
 		    vect_rm(ineg->vecteur);
 		    ineg->vecteur = vect_dup(negat->vecteur);
-		    non_equivalent_projections = true;
 		}
 	    
 		ineg->succ = rtri.cnul;

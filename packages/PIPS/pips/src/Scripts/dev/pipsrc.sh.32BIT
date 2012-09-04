@@ -4,10 +4,6 @@
 # default architecture is not necessary
 #export PIPS_ARCH=LINUXI86LL
 
-# for manually installed gcc
-PATH=/usr/local/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/lib
-
 # subversion repositories
 export NEWGEN_SVN=https://svn.cri.ensmp.fr/svn/newgen
 export LINEAR_SVN=https://svn.cri.ensmp.fr/svn/linear

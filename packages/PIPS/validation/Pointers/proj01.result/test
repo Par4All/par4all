@@ -1,32 +1,4 @@
 
-PROPER  EFFECTS
-
-int main(void)
-{
-   int i, j;
-   int **pp;
-   {
-//             <    is written>: pi
-      int *pi = &i;
-//             <    is written>: pp
-      pp = &pi;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      **pp = 1;
-   }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // pp points to a dead value in the stack
-   // should generate an error
-   **pp = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pp
-   // segfault?
-   *pp = &j;
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -73,12 +45,12 @@ int main(void)
    // should generate an error
    **pp = 0;
 
-// Points To: none
+// Points To: unreachable
 
    // segfault?
    *pp = &j;
 
-// Points To: none
+// Points To: unreachable
 
    return 0;
 }

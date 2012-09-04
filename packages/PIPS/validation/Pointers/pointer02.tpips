@@ -1,14 +1,14 @@
-delete pointer02
-create pointer02 pointer02.c
-
+setenv WS=pointer02
+delete $WS
+create $WS $WS.c
 
 echo
-echo POINTS TO for "pointer02"
+echo POINTS TO for "$WS"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[pointer02]
+display PRINTED_FILE[$WS]
 
 close
-shell cat pointer02.database/Warnings
-delete pointer02
+shell cat $WS.database/Warnings
+delete $WS
 quit

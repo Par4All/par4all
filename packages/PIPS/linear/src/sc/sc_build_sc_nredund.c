@@ -448,6 +448,8 @@ int n __attribute__ ((unused));
     Value coeff;
     int sign;
 
+    if (SC_UNDEFINED_P(ps) || SC_EMPTY_P(ps) || sc_empty_p(ps) )
+      return ps;
     sc->base = base_copy(ps->base);
     sc->dimension = ps->dimension; 
     sc->inegalites = contrainte_copy(ps->inegalites);
