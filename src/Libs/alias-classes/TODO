@@ -2,12 +2,6 @@ Points to improve in points-to analysis
 
 No priority order.
 
-1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough this piece of code looks dead wrong...)
-
-3. Convergence detection: current implementation no longer works as it used to
-
-4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list (see list05).
-
 7. EffectsWithPointsTo: the fully subscripted sources and sinks
 require index substitution in EffectsWithPointsTo, or the parallelism
 detection is lost; also it is not clear if you want to preserver x[j]
@@ -46,16 +40,40 @@ looked at.
 17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
 
 18. dereferencing02: a variable, w, is used uninitialized and this is
-not detected.
+not detected. And there is a bug for "double * z1=*q++".
 
-19. Improve heap model. Add an extra first dimension to model the different intraprocedural dynamic occurences of a malloc?
+19. Improve heap model. Add an extra first dimension to model the
+different intraprocedural dynamic occurences of a malloc?
 
 20. Pre-decrement and pre-increment are likely to be evaluated
 twice. See the post case in
 unary_intrinsic_call_to_points_to_sinks(). No test case yet I'm
 afraid.
 
-Next item will be 21.
+22. Handling of >, >=, <, <= in pointer conditions. No test case yet.
+
+23. When iterating the analysis of a loop, the points-to graph are
+accumulated when they should be merged. The accumulation does not
+update the approximations. See Strict_typing.sub/linked_list01.c for
+instance.
+
+24. The consistency check does not check that arcs starting from a
+vertex of out-degree strictly greater than 1 must be may arcs.
+
+25. Strict_typing.sub/fabien03: bug detected by or in a type check.
+
+26. The consistency check does not check that the set is empty when bottom is true.
+
+27. In Strict_typing.sub/list02, in "main", the points-to obtained on exit of the while loop is declared "unreachable". Same in list03.
+
+28. pv_local_var03: issue with declaration and assignment of array of
+structs; the generated arcs do not seem added to the current "in"
+points-to environment; it is not clear if index * should or not
+susbsumes indices 0 and 1. The test case is not good because the rhs
+struct are not initialized, hence only exact nowhere information is
+propagated.
+
+Next item will be 28.
 
 Done:
 
@@ -89,3 +107,16 @@ struct_parall01: a.p[i] = i;
 16. Mixed up indices, for instance in argv03. Also pointer15, struct09
 
 -> seems now OK for argv03. FI: I do not know about the other cases.
+
+1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough this piece of code looks dead wrong...)
+
+3. Convergence detection: current implementation no longer works as it used to
+
+4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list (see list05).
+
+21. Conditional operator: arcs created in "in_t" or "in_t" do not
+appear in "out". See conditional06.
+
+-> fixed with a call to merge_points_to_graphs()
+
+-> hopefully, approximations are taken a good care of

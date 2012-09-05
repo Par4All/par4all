@@ -263,10 +263,16 @@ static bool generic_points_to_analysis(char * module_name) {
   /* Store the points-to relations */
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO, module_name, get_pt_to_list());
 
-  /* Filter OUT points-to by deleting local variables */
+  /* Remove dangling stubs... before the formal parameters are
+     projected as the projection will create lots of dangling
+     stubs. In fact, they are not dangling from a formal context view
+     point. */
+  // pts_to_out = remove_unreachable_vertices_in_points_to_graph(pts_to_out);
+  /* Filter OUT points-to by deleting local variables, including the
+     formal paprameters */
   points_to_graph_set(pts_to_out) =
     points_to_function_projection(points_to_graph_set(pts_to_out));
-    
+
   /* Save IN points-to relations */
 #if !FRANCOIS
   list  l_in = set_to_list(pt_in);
