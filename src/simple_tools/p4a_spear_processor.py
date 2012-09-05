@@ -81,7 +81,8 @@ class p4a_spear_processor(p4a_processor):
         f.write('<!DOCTYPE Tasks SYSTEM "p4a_output.dtd">\n<Tasks>\n'+tasks_xml+'</Tasks>\n')
         f.close()
 		# install the file to its final dest
-        print "copy " + xml_src + " to " + xml_dst
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         shutil.copyfile(xml_src, xml_dst)
         return ret
             
