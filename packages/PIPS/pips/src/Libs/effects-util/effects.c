@@ -1148,13 +1148,33 @@ bool points_to_reference_included_p(reference r1, reference r2)
   return included_p;
 }
 
-/* Check that all memory locations denoted by cell1 are included in cell2 */
+/* Check that all memory locations denoted by cell "c1" are included
+   in cell "c2". */
 bool cell_included_p(cell c1, cell c2)
 {
   /* Has to be extended for GAPs */
-  reference r1 = cell_to_reference(c1);
-  reference r2 = cell_to_reference(c2);
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
   return points_to_reference_included_p(r1, r2);
+}
+
+/* Check that memory locations denoted by cell "c1" can be reached by knowing
+ * cell "c2" and by using pointer arithmetic or subscripting.
+ *
+ * In other words, the two cells only differ by their
+ * subscripts... Which might be reducible to "based on the same
+ * entity".
+ *
+ * FI: experimental...
+ */
+bool cell_equivalent_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+  return v1==v2;
 }
 
 

@@ -372,7 +372,7 @@ list points_to_reference_to_typed_index(reference r, type t)
 bool atomic_points_to_cell_p(cell c)
 {
   reference r = cell_any_reference(c);
-  bool atomic_p = atomic_points_to_reference_p(r);
+  bool atomic_p = null_cell_p(c) || atomic_points_to_reference_p(r);
 
   return atomic_p;
 }
@@ -400,7 +400,7 @@ bool atomic_points_to_reference_p(reference r)
   bool atomic_p = false;
   entity v = reference_variable(r);
 
-  if(!entity_null_locations_p(v)
+  if(!entity_null_locations_p(v) // FI: NULL is considered atomic
      && !entity_typed_nowhere_locations_p(v)
      && !entity_typed_anywhere_locations_p(v)
      && !entity_anywhere_locations_p(v)

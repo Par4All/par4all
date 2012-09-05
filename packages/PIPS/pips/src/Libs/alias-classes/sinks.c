@@ -500,7 +500,7 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
     pt_map in_t = full_copy_pt_map(in);
     pt_map in_f = full_copy_pt_map(in);
     in_t = condition_to_points_to(c, in_t, true);
-    in_f = condition_to_points_to(c, in_f, true);
+    in_f = condition_to_points_to(c, in_f, false);
     expression e1 = EXPRESSION(CAR(CDR(al)));
     expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
     list sinks1 = NIL;
@@ -510,6 +510,13 @@ list ternary_intrinsic_call_to_points_to_sinks(call c,
     if(!points_to_graph_bottom(in_f))
       sinks2 = expression_to_points_to_cells(e2, in_f, eval_p);
     sinks = gen_nconc(sinks1, sinks2);
+    // The "in" points-to graph may be enriched by both sub-graphs
+    //
+    // side-effects on in? memory leak...
+    points_to_graph_set(in) = merge_points_to_set(points_to_graph_set(in_t),
+						  points_to_graph_set(in_f));
+    if(points_to_graph_bottom(in_t) && points_to_graph_bottom(in_f))
+      points_to_graph_bottom(in) = true;
     // The free is too deep. References from points-to arcs in in_t
     // and in_f may have been integrated in sinks1 and/or sinks2
     // See conditional05
