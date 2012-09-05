@@ -3283,7 +3283,6 @@ static void xml_Transposed_Matrix(reference rout, reference rin, int a[7], int A
 	MATRIX_ELEM(mat,i,j)=1;
     }
   }
-  matrix_fprint(stdout,mat); 
   xml_Matrix(mat,ArrayDim1,ArrayDim2,sb_result);
   global_margin--;
   string_buffer_append_word("/Transposition",sb_result);
@@ -3782,7 +3781,7 @@ void insert_xml_callees(const char* module_name) {
   string xml_module_name = strdup(concatenate(dir, "/", sm, NULL));
   callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, true);
   out = safe_fopen(xml_module_name, "a");
-  string xml_callee_name;
+  string xml_callee_name,xml_callee_name1,xml_callee_name2 ;
   char * stmp1 = (char *) malloc(strlen(dir)+7);
   char * stmp2 = strdup(concatenate("-Task.database/",NULL));
   int code_tag;
@@ -3793,16 +3792,21 @@ void insert_xml_callees(const char* module_name) {
   MAP(STRING, callee_name, {
       string sc=(string) db_get_memory_resource(DBR_XML_PRINTED_FILE,
 						callee_name, true);
-      code_tag = find_code_status(callee_name);
-      if ((code_tag == code_is_a_te) && strstr(dir,"Task") ==NULL) {
-	xml_callee_name=strdup(concatenate(stmp1,sc, NULL));
+      code_tag = find_code_status(callee_name);  
+      xml_callee_name1 = strdup(concatenate(stmp1,sc, NULL));
+      xml_callee_name2 = strdup(concatenate(dir, "/", sc, NULL));
+
+      if ((code_tag == code_is_a_te) && strstr(dir,"Task") ==NULL 
+	  && ((ftest = fopen(xml_callee_name1, "r")) != (FILE *) NULL)) {
+	xml_callee_name=xml_callee_name1;
       }
-      else xml_callee_name = strdup(concatenate(dir, "/", sc, NULL));
+      else xml_callee_name = xml_callee_name2;
       if((ftest = fopen(xml_callee_name, "r")) == (FILE *) NULL)
 	fprintf(stdout,"fopen failed on file %s\n", xml_callee_name);
       else
 	safe_append(out, xml_callee_name,0, true);
-      free(xml_callee_name);
+      free(xml_callee_name1);
+      free(xml_callee_name2);
     },
     callees_callees(callers));
   safe_fclose(out, xml_module_name);
