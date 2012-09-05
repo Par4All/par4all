@@ -70,7 +70,7 @@ def add_own_options(parser):
         help = "Parallelize with SCMP output.")
 
     proc_group.add_option("--spear-xml", action = "store", default = "",
-        help = "Options to pass to PoCC.")
+        help = "XML Input file from SPEAR, an output XML file will also be produced.")
 
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
