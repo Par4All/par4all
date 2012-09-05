@@ -62,7 +62,7 @@ POINTS TO
 
 
 // Points To OUT:
-// _pi_1[1] -> j , EXACT
+// _pi_1[1] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 int formal_parameter01(int **pi)
 {

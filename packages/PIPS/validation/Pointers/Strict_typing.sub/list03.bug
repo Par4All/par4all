@@ -1,1 +1,3 @@
-pips error in any_loop_to_points_to: (/home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/statement.c:631) Loop convergence not reached.
+26. The consistency check does not check that the set is empty when bottom is true.
+
+27. In Strict_typing.sub/list02, in "main", the points-to obtained on exit of the while loop is declared "unreachable".

@@ -40,10 +40,10 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_13.q -> i , MAY
-// *HEAP*_l_13.p -> j , MAY
-// *HEAP*_l_14.p -> i , MAY
-// *HEAP*_l_14.q -> j , MAY
+// *HEAP*_l_13.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// *HEAP*_l_13.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// *HEAP*_l_14.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// *HEAP*_l_14.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 
 int ptr_to_field()
 {
