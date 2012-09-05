@@ -233,7 +233,8 @@ pt_map reference_dereferencing_to_points_to(reference r,
     if(n==0) {
       clear_pt_map(in);
       points_to_graph_bottom(in) = true;
-      pips_user_warning("Null or undefined pointer may be dereferenced.\n");
+      pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
+			effect_reference_to_string(r));
     }
 
     gen_free_list(sinks);

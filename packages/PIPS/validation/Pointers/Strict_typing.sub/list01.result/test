@@ -51,7 +51,8 @@ POINTS-TO
 int main(void)
 {
 
-// Points To: none
+// Points To:
+// nil -> *NULL_POINTER* , EXACT
 
    list l = nil;
 

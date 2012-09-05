@@ -1,0 +1,8 @@
+# $Id$
+setenv PIPS_HWAC_DEBUG_LEVEL 8
+delete pointer01
+create pointer01 pointer01.c
+apply REMOVE_SIMPLE_SCALAR_POINTERS[pointer01]
+display PRINTED_FILE[pointer01]
+close
+delete pointer01

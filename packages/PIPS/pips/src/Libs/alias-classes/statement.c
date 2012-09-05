@@ -150,6 +150,8 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   else {
 
     init_heap_model(s);
+    // FI: it would be nice to stack the current statement in order to
+    // provide more helpful error messages
     push_statement_points_to_context(pt_in);
 
     if(declaration_statement_p(s)) {
@@ -594,6 +596,7 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = merge_points_to_graphs(prev, pt_out);
 
       pt_out = normalize_points_to_graph(pt_out);
+      pt_out = remove_unreachable_vertices_in_points_to_graph(pt_out);
 
       /* Check convergence */
       if(set_equal_p(points_to_graph_set(prev), points_to_graph_set(pt_out))) {

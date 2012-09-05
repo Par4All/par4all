@@ -11649,6 +11649,17 @@ Whether to allow formal parameters to be qualified as registers:
 FORCE_REGISTER_FORMAL TRUE
 \end{PipsProp}
 
+
+\begin{PipsPass}{remove_simple_scalar_pointers}
+Remove some simple cases of pointers used on scalars.
+\end{PipsPass}
+\begin{PipsMake}
+remove_simple_scalar_pointers > MODULE.code
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
+
 \subsection{Array Resizing}
 \label{subsubsection-array-resizing}
 
@@ -15977,6 +15988,7 @@ print_xml_application      > MODULE.xml_printed_file
     < MODULE.regions
     < CALLEES.code
     < CALLEES.summary_effects
+    < CALLEES.xml_printed_file
 \end{PipsMake}
 
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}

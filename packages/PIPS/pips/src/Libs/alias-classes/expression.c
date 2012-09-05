@@ -1990,9 +1990,9 @@ pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
 {
   pt_map out = in;
   // FI: a call site to handle like any other user call site...
+  // Althgouh you'd like to know if true or false is returned...
   pips_user_warning("Interprocedural points-to not implemented yet. "
-		    "Call site ignored. %p %p %p.\n",
-		    c, in , true_p);
+		    "Call site fully ignored.\n");
   return out;
 }
 

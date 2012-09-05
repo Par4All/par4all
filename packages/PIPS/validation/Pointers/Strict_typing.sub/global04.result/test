@@ -48,7 +48,7 @@ POINTS TO
 
 
 // Points To OUT:
-// _p_0 -> i , EXACT
+// _p_0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> _p_0 , EXACT
 
 int main()

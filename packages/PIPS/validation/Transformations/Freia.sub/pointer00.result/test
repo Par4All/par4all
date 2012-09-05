@@ -1,0 +1,25 @@
+#
+# initial main
+#
+int main(freia_data2d *img)
+{
+   int vol, bla;
+   int *p;
+   p = &bla;
+   freia_aipo_global_vol(img, &vol);
+   *p = vol;
+}
+#
+# processed main
+#
+int main(freia_data2d *img)
+{
+   int vol, bla;
+   int *p;
+   0;
+   freia_aipo_global_vol(img, &vol);
+   bla = vol;
+}
+#
+# compile generated pointer00
+#

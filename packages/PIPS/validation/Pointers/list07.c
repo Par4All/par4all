@@ -39,7 +39,7 @@ int list_len(list l)
   list c = l;
   while (c!=nil)
   {
-    // we know that c!=nil...
+    // we know that c!=nil... and this has no impact as c->next might be NULL!
     c = (c==nil)? nil: c->next;
     n++;
   }

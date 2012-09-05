@@ -32,9 +32,9 @@ POINTS-TO
 
 
 // Points To OUT:
-// _x_1__0 -> y[5] , EXACT
-// _x_2__0 -> z[6] , EXACT
-// _x_3__0 -> v[7] , EXACT
+// _x_1__0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _x_2__0 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// _x_3__0 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
 // x.first -> *NULL_POINTER* , MAY
 // x.second -> *NULL_POINTER* , MAY
 // x.third -> *NULL_POINTER* , MAY

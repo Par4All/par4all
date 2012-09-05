@@ -193,34 +193,53 @@ set points_to_block_projection(set pts, list  l, bool main_p)
 {
   list pls = NIL; // Possibly lost sinks
   FOREACH(ENTITY, e, l) {
-    type uet = ultimate_type(entity_type(e));
-    if(pointer_type_p(uet)) {
-      SET_FOREACH(points_to, pt, pts){
-	cell source = points_to_source(pt);
-	cell sink = points_to_sink(pt);
-	entity e_sr = reference_variable(cell_to_reference(source));
-	entity e_sk = reference_variable(cell_to_reference(sink));
+    type uet = entity_basic_concrete_type(e);
+    // The use of "sink_p" is only an optimization
+    bool sink_p = pointer_type_p(uet)
+      || array_of_pointers_type_p(uet)
+      || struct_type_p(uet)
+      || array_of_struct_type_p(uet);
 
-	if(e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
-	  set_del_element(pts, pts, (void*)pt);
-	  if(heap_cell_p(sink)) {
-	    /* Check for memory leaks */
-	    pls = CONS(CELL, sink, pls);
-	  }
+    SET_FOREACH(points_to, pt, pts){
+      cell source = points_to_source(pt);
+      cell sink = points_to_sink(pt);
+      entity e_sr = reference_variable(cell_to_reference(source));
+      entity e_sk = reference_variable(cell_to_reference(sink));
+
+      if(sink_p && e == e_sr && (!(variable_static_p(e_sr) || top_level_entity_p(e_sr) || heap_cell_p(source)))) {
+	set_del_element(pts, pts, (void*)pt);
+	if(heap_cell_p(sink)) {
+	  /* Check for memory leaks */
+	  pls = CONS(CELL, sink, pls);
 	}
-	else if(e == e_sk
-		&& (!(variable_static_p(e_sk)
-		      || top_level_entity_p(e_sk)
-		      || heap_cell_p(sink)))) {
-	  if(gen_in_list_p(e_sr, l)) {
-	    /* Both the sink and the source disappear: the arc is removed */
-	    set_del_element(pts, pts, (void*)pt);
-	  }
-	  else {
-	    pips_user_warning("Dangling pointer %s \n", entity_user_name(e_sr));
-	    list lhs = CONS(CELL, source, NIL);
-	    pts = points_to_nowhere_typed(lhs, pts);
-	  }
+	// FI: memory leak? sink should be copied and pt be freed...
+      }
+      else if(e == e_sk
+	      && (!(variable_static_p(e_sk)
+		    || top_level_entity_p(e_sk)
+		    || heap_cell_p(sink)))) {
+	if(gen_in_list_p(e_sr, l)) {
+	  /* Both the sink and the source disappear: the arc is removed */
+	  set_del_element(pts, pts, (void*)pt);
+	}
+	else {
+	  pips_user_warning("Dangling pointer \"%s\" towards \"%s\".\n",
+			    entity_user_name(e_sr),
+			    entity_user_name(e_sk));
+	  // list lhs = CONS(CELL, source, NIL);
+	  // pts = points_to_nowhere_typed(lhs, pts);
+	  bool to_be_freed;
+	  type sink_t = points_to_cell_to_type(sink, &to_be_freed);
+	  type n_sink_t = copy_type(sink_t);
+	  if(to_be_freed) free_type(sink_t);
+	  approximation a = points_to_approximation(pt);
+	  points_to npt = make_points_to(copy_cell(source),
+					 make_typed_nowhere_cell(n_sink_t),
+					 copy_approximation(a),
+					 make_descriptor_none());
+	  // Although we are looping on pts...
+	  add_arc_to_simple_pt_map(npt, pts);
+	  remove_arc_from_simple_pt_map(pt, pts);
 	}
       }
     }
@@ -1208,6 +1227,51 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
   return sinks;
 }
 
+/* Build the sources of sink "sink" according to the points-to
+ * graphs. If "sink" is not found in the graph, return an empty list
+ * "sources". If "fresh_p", allocate copies. If not, return pointers to
+ * the destination vertices in "ptm".
+ *
+ * It is not clear how much the abstract address lattice must be used
+ * to retrieve sources... If source = a[34], clearly a[*] is an OK
+ * equivalent source if a[34] is not a vertex of "ptm".
+ */
+list points_to_sink_to_sources(cell sink, pt_map ptm, bool fresh_p)
+{
+  list sources = NIL;
+  set pts = points_to_graph_set(ptm);
+
+  /* 1. See if cell "sink" is the destination vertex of a points-to arc. */
+  SET_FOREACH( points_to, pt, pts) {
+    if(cell_equal_p(sink, points_to_sink(pt))) {
+      cell sc = fresh_p? copy_cell(points_to_source(pt)) : points_to_source(pt);
+      sources = CONS(CELL, sc, sources);
+    }
+  }
+
+
+  /* 2. Much harder... See if sink is contained in one of the many
+     abstract sinks or if its address can be obtained from the address
+     of another sink cell thanks to pointer arithmetic or
+     indexing. Step 1 is subsumed by Step 2... but is much faster.  */
+  if(ENDP(sources)) {
+    SET_FOREACH(points_to, pt, pts) {
+      if(cell_included_p(sink, points_to_sink(pt))
+	 /* FI: I am not sure that using pointer arithmetics to
+	    declare equivalence is a good idea. */
+	 || cell_equivalent_p(sink, points_to_sink(pt))) {
+	// FI: memory leak forced because of refine_points_to_cell_subscripts
+	cell sc = (true||fresh_p)? copy_cell(points_to_source(pt)) : points_to_source(pt);
+	// FI: I do not remember what this is for...
+	refine_points_to_cell_subscripts(sc, sink, points_to_sink(pt));
+	sources = CONS(CELL, sc, sources);
+      }
+    }
+  }
+
+  return sources;
+}
+
 /* Use "sn" as a source name to derive a list of sink cells according
  * to the points-to graph ptm.
  *
@@ -2060,8 +2124,11 @@ int maximal_out_degree_of_points_to_graph(string * mod_cell, pt_map in)
   return (int) m;
 }
 
-/* For the time being, control the out-degree
+/* For the time being, control the out-degree of the vertices in
+ * points-to graph "ptg" and fuse the vertex with the maximal
+ * out-degree to reduce it if it is greater than an expected limit.
  *
+ * Points-to graph "ptg" i modified by side-effects and returned.
  */
 pt_map normalize_points_to_graph(pt_map ptg)
 {
@@ -2098,5 +2165,53 @@ pt_map normalize_points_to_graph(pt_map ptg)
 			      points_to_graph_set(ptg));
     }
   }
+  return ptg;
+}
+
+/* Remove arcs in points-to graph "ptg" when they start from a stub
+ * cell that is not reachable.
+ *
+ * Points-to graph "ptg" i modified by side-effects and returned.
+ *
+ * This clean-up should be performed each time a projection is
+ * performed, and even potentially, each time an arc is removed.
+ *
+ * Note: see also freed_pointer_to_points_to() for a recursive
+ * implementation of the arc elimination. The current clean-up is
+ * *not* recursive. This function should be called repeatedly till the
+ * results converge to a fix point...
+ */
+pt_map remove_unreachable_vertices_in_points_to_graph(pt_map ptg)
+{
+  set ptg_s = points_to_graph_set(ptg);
+  list ual = NIL; // unreachable arc list
+
+  pips_assert("pts is consistent before unreachable arc removal",
+	      consistent_pt_map_p(ptg));
+
+  /* Find arcs whose origin vertex is an unreachable stub. */
+  SET_FOREACH(points_to, pt, ptg_s) {
+    cell source = points_to_source(pt);
+    reference r = cell_any_reference(source);
+    entity e = reference_variable(r);
+    if(entity_stub_sink_p(e)) {
+      // list S = points_to_source_to_sinks(source, ptg);
+      list S = points_to_sink_to_sources(source, ptg, false);
+      if(ENDP(S))
+	ual = CONS(POINTS_TO, pt, ual);
+      gen_free_list(S);
+    }
+  }
+
+  /* Remove arcs in ual. */
+  FOREACH(POINTS_TO, pt, ual) {
+    remove_arc_from_pt_map(pt, ptg);
+  }
+
+  //gen_full_free_list(ual);
+
+  pips_assert("pts is consistent after unreachable arc removal",
+	      consistent_pt_map_p(ptg));
+  
   return ptg;
 }

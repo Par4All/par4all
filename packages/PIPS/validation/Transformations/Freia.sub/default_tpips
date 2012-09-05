@@ -77,6 +77,9 @@ apply SIMPLIFY_CONTROL[main]
 # help enlarge sequences
 apply DOWHILE_TO_WHILE[main]
 
+# cleanup some pointer uses introduced by inlining
+apply REMOVE_SIMPLE_SCALAR_POINTERS[main]
+
 # then structures
 setproperty FULL_LOOP_UNROLL_EXCEPTIONS "freia_common_set_wa"
 apply FLATTEN_CODE[main]
