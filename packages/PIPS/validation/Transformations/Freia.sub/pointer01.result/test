@@ -1,0 +1,15 @@
+int pointer01(void)
+{
+   int vol, bla;
+   int *p;
+   int *q = 0;
+   int *r = &vol;
+   r = &bla;
+   0;
+   vol = 12;
+   bla = vol;
+   bla = vol+1;
+   *r = vol+2;
+   return bla;
+}
+

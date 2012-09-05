@@ -8,21 +8,6 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-##TODO: explain
-
-#echo 
-#echo PROPER EFFECTS
-#echo
-#
-#activate PRINT_CODE_PROPER_EFFECTS
-#display PRINTED_FILE[%ALLFUNC]
-#
-#echo 
-#echo PROPER POINTER EFFECTS
-#echo
-#activate PRINT_CODE_PROPER_POINTER_EFFECTS
-#display PRINTED_FILE
-
 echo
 echo POINTS TO
 echo
@@ -35,6 +20,6 @@ echo Warnings
 echo
 
 close
-#shell cat $WS.database/Warnings
+shell cat $WS.database/Warnings
 delete $WS
 quit
