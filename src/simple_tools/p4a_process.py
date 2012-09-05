@@ -14,6 +14,7 @@ import re
 import shutil
 import p4a_processor
 import p4a_scmp_compiler
+import p4a_spear_processor
 
 '''
 Par4All processing
@@ -47,9 +48,24 @@ def process(input):
 
     try:
 
-        if not input.scmp:
+        if input.scmp:
+            # scmp case
+            processor = p4a_scmp_compiler.p4a_scmp_compiler(
+                project_name = input.project_name,
+                verbose = True,
+                files = input.files
+            )
+            output.database_dir = processor.get_database_directory()
+            processor.go()
+            output.files = processor.get_generated_files()
+        else:
             # Create a workspace with PIPS:
-            processor = p4a_processor.p4a_processor(
+            if input.spear:
+                processor_class=p4a_spear_processor.p4a_spear_processor
+            else:
+                processor_class=p4a_processor.p4a_processor
+            
+            processor = processor_class(
                 project_name = input.project_name,
                 cpp_flags = input.cpp_flags,
                 verbose = True,
@@ -62,6 +78,7 @@ def process(input):
                 cuda = input.cuda,
                 opencl = input.opencl,
                 openmp=input.openmp,
+                spear=input.spear,
                 com_optimization = input.com_optimization,
                 cuda_cc = input.cuda_cc,
                 fftw3 = input.fftw3,
@@ -109,16 +126,6 @@ def process(input):
             output.files = processor.save(input.output_dir,
                                           input.output_prefix,
                                           input.output_suffix)
-        else:
-            # scmp case
-            processor = p4a_scmp_compiler.p4a_scmp_compiler(
-                project_name = input.project_name,
-                verbose = True,
-                files = input.files
-            )
-            output.database_dir = processor.get_database_directory()
-            processor.go()
-            output.files = processor.get_generated_files()
 
     except:
         # Get the exception description:

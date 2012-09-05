@@ -25,7 +25,6 @@ import pypsex
 Par4All processing
 '''
 
-
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
@@ -214,7 +213,8 @@ class p4a_processor(object):
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, pocc_options = "", 
                  atomic = False, kernel_unroll=0, brokers="",
-                 properties = {}, apply_phases={}, activates = []):
+                 properties = {}, apply_phases={}, activates = []
+                 , **unused_kwords):
 
         self.noalias = noalias
         self.pointer_analysis = pointer_analysis
@@ -754,7 +754,6 @@ class p4a_processor(object):
 								 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
 								 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
 								 concurrent=True)
-
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
         kernel_prefix = self.get_kernel_prefix ()
@@ -785,7 +784,9 @@ class p4a_processor(object):
         wrappers.clean_declarations()
         kernel_launchers.clean_declarations()
 
-
+        if hasattr(self, 'spear') and self.spear:
+            # No communication for Spear mode
+            pass
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
@@ -793,7 +794,6 @@ class p4a_processor(object):
             #kernel_launchers.display("print_code_regions")
             #kernels.display("print_code_regions")
             #kernels.display("print_code_preconditions")
-            self.workspace.save("save")
             kernel_launchers.kernel_load_store(concurrent=True,
                                                ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
                                                )

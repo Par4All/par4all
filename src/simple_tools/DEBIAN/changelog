@@ -1,3 +1,15 @@
+2012-09-05 Ronan Keryell <Ronan.Keryell@wild-systems.com>
+
+ * Par4All 1.4.3
+
+   * XML output of some memory access information for OpenGPU Project.
+
+     New --spear-xml option taking as input an XML description of
+     functions to transform and generate XML descriptors
+
+   * Improve outlining
+
+
 2012-06-22 Ronan Keryell <Ronan.Keryell@wild-systems.com>
 
  * Par4All 1.4.2
@@ -19,11 +31,16 @@
    * Fix scalarization to avoid scalarizing a local variable used in an
      array subscript
 
-   * New taskify phase to begin producing StarPU tasks
+   * New taskify phase to begin producing StarPU tasks for MediaGPU project
 
    * Take into account CUDA 3.0 and 3.5 architecture
 
    * Take into account the new name of HPC Project: SILKAN
+
+   * Add an OpenCL target to the benchmarks for time measurements in Mehdi
+     Amini's PhD thesis
+
+   * Choose OpenCL workgroup allocation instead of the vendors
 
 
 2012-05-17 Ronan Keryell <Ronan.Keryell@hpc-project.com>
@@ -31,7 +48,7 @@
  * Par4All 1.4.1
 
    * Update package dependencies for Ubuntu 12.04 and Debian/testing
-	 & /unstable.
+     & /unstable.
 
    * Make Par4All relocatable after compile-time (.deb package and .tar.gz)
 
