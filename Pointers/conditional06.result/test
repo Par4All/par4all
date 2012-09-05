@@ -11,6 +11,8 @@ POINTS-TO
 
 
 // Points To OUT:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 int list_len(list l)
@@ -39,16 +41,18 @@ int list_len(list l)
 // Points To:
 // _l_1[0].next -> *NULL_POINTER* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// c -> *NULL_POINTER* , MAY
-// c -> _l_1[0] , MAY
+// c -> _l_1[0] , EXACT
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1[0] , MAY
 // nil -> *NULL_POINTER* , EXACT
 
-      // we know that c!=nil...
+      // We know that c!=nil...
+      // but this does not impact the result... as c->next may be NULL!
       c = c==nil?nil:c->next;
 
 // Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // c -> *NULL_POINTER* , MAY
 // c -> _l_1_2__1[0][0] , MAY
 // l -> *NULL_POINTER* , MAY
@@ -59,8 +63,9 @@ int list_len(list l)
    }
 
 // Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
 // c -> *NULL_POINTER* , MAY
-// c -> _l_1[0] , MAY
 // c -> _l_1_2__1[0][0] , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1[0] , MAY

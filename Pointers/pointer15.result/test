@@ -8,7 +8,7 @@ POINTS TO for pointer15
 
 
 // Points To OUT:
-// _t_1[0][0][0][1][2][3] -> z , EXACT
+// _t_1[0][0][0][1][2][3] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 void pointer15(double *(*t[3][4])[5][6][7])
 {
@@ -35,3 +35,4 @@ void pointer15(double *(*t[3][4])[5][6][7])
 
    return;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer15] (points_to_block_projection) Dangling pointer "_t_1" towards "z".
