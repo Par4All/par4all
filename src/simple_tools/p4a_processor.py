@@ -213,7 +213,8 @@ class p4a_processor(object):
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, pocc_options = "", 
                  atomic = False, kernel_unroll=0, brokers="",
-                 properties = {}, apply_phases={}, activates = []):
+                 properties = {}, apply_phases={}, activates = []
+                 , **unused_kwords):
 
         self.noalias = noalias
         self.pointer_analysis = pointer_analysis
