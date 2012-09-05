@@ -453,3 +453,222 @@ bool freia_remove_scalar_ww_deps(const string module)
   debug_off();
   return true;
 }
+
+/********************************************** CLEANUP SOME SCALAR POINTERS */
+/*
+  // this break assumptions about "simple" deps made in the freia compiler
+  int * foo;  // declaration
+  foo = &bla; // only definition
+  *foo = XXX; // only use
+
+  // remove declaration & definition, and replace assign by
+  bla = XXX;
+*/
+
+typedef struct {
+  // entity -> entity
+  hash_table points_to;
+  // entity -> statement
+  // hash_table declared;
+  // entity -> call
+  hash_table defined;
+  // entity -> expression
+  hash_table dereferenced;
+  // of entities
+  set candidates;
+  set invalidated;
+} rssp_ctx;
+
+/* "&v"? return v, else return NULL
+ */
+static entity address_of_scalar(expression e)
+{
+  if (!expression_call_p(e)) return NULL;
+  call c = expression_call(e);
+  if (!ENTITY_ADDRESS_OF_P(call_function(c))) return NULL;
+  list la = call_arguments(c);
+  pips_assert("one argument to &", gen_length(la)==1);
+  expression a = EXPRESSION(CAR(la));
+  if (!expression_reference_p(a)) return NULL;
+  reference r = expression_reference(a);
+  if (reference_indices(r)) return NULL;
+  entity v = reference_variable(r);
+  if (entity_scalar_p(v))
+    return v;
+  return NULL;
+}
+
+static bool pointer_candidate_p(entity var)
+{
+  // other checks?
+  pips_debug(5, "entity %s %d\n", entity_name(var), entity_pointer_p(var));
+  return entity_pointer_p(var);
+}
+
+static void rssp_ref(reference r, rssp_ctx * ctx)
+{
+  string what = "unknown";
+  entity var = reference_variable(r);
+  pips_debug(8, "reference %p to %s\n", r, entity_name(var));
+  if (pointer_candidate_p(var) && !reference_indices(r))
+    set_add_element(ctx->candidates, ctx->candidates, var);
+  if (set_belong_p(ctx->candidates, var))
+  {
+    expression enc = (expression) gen_get_ancestor(expression_domain, r);
+    if (enc && expression_reference_p(enc) && expression_reference(enc)==r)
+    {
+      call called = (call) gen_get_ancestor(call_domain, enc);
+
+      pips_debug(8, "called=%p %s\n", called, called?
+                 entity_name(call_function(called)): "<nope>");
+
+      if (called &&
+          ENTITY_ASSIGN_P(call_function(called)) &&
+          EXPRESSION(CAR(call_arguments(called)))==enc)
+      {
+        // is it a definition: var = ...
+        list args = call_arguments(called);
+        pips_assert("2 args to assign", gen_length(args)==2);
+        entity v2 =
+          address_of_scalar(EXPRESSION(CAR(CDR(call_arguments(called)))));
+        if (v2)
+        {
+          if (!hash_defined_p(ctx->points_to, var))
+            hash_put(ctx->points_to, var, v2),
+              hash_put(ctx->defined, var, called),
+              what="! var = &YYY";
+          else
+            set_add_element(ctx->invalidated, ctx->invalidated, var),
+              what="already defined";
+        }
+        else
+          set_add_element(ctx->invalidated, ctx->invalidated, var),
+            what="no v2";
+      }
+      else if (called && ENTITY_DEREFERENCING_P(call_function(called)))
+      {
+        // *var ...
+        call upper = (call) gen_get_ancestor(call_domain, called);
+        expression first = (upper && call_arguments(upper))?
+          EXPRESSION(CAR(call_arguments(upper))): NULL;
+
+        pips_debug(8, "upper=%p first=%p %s\n", upper, first, upper?
+                   entity_name(call_function(upper)): "<nope>");
+
+        if (upper && first &&
+            ENTITY_ASSIGN_P(call_function(upper)) &&
+            expression_call_p(first) &&
+            expression_call(first) == called &&
+            !hash_defined_p(ctx->dereferenced, var))
+          // *var = XXX
+          hash_put(ctx->dereferenced, var, first),
+            what="! *var = XXX";
+        else
+          set_add_element(ctx->invalidated, ctx->invalidated, var),
+            what="not *var = ...";
+      }
+      else
+        set_add_element(ctx->invalidated, ctx->invalidated, var),
+          what="not = or *";
+    }
+    else
+      set_add_element(ctx->invalidated, ctx->invalidated, var),
+        what="not enc";
+  }
+  else
+    what="not candidate";
+  pips_debug(5, "candidate %s: %s\n", entity_name(var), what);
+  //return true;
+}
+
+bool remove_simple_scalar_pointers(const string module)
+{
+  debug_on("PIPS_HWAC_DEBUG_LEVEL");
+  pips_debug(1, "considering module %s\n", module);
+
+  // else do the stuff
+  statement mod_stat =
+    (statement) db_get_memory_resource(DBR_CODE, module, true);
+  set_current_module_statement(mod_stat);
+  set_current_module_entity(module_name_to_entity(module));
+
+  rssp_ctx ctx;
+  ctx.candidates = set_make(set_pointer);
+  ctx.points_to = hash_table_make(hash_pointer, 0);
+  ctx.defined = hash_table_make(hash_pointer, 0);
+  ctx.dereferenced = hash_table_make(hash_pointer, 0);
+  ctx.invalidated = set_make(set_pointer);
+
+  // get candidates
+  FOREACH(entity, var, entity_declarations(get_current_module_entity()))
+  {
+    if (pointer_candidate_p(var))
+    {
+      set_add_element(ctx.candidates, ctx.candidates, var);
+      if (value_expression_p(entity_initial(var)))
+      {
+        expression e = value_expression(entity_initial(var));
+        entity v2 = address_of_scalar(e);
+        if (v2)
+        {
+          hash_put(ctx.points_to, var, v2);
+          hash_put(ctx.defined, var, expression_call(e));
+        }
+      }
+    }
+  }
+
+
+  // check condition
+  gen_context_multi_recurse
+    (mod_stat, &ctx,
+     reference_domain, gen_true, rssp_ref,
+     // ignore sizeof
+     sizeofexpression_domain, gen_false, gen_null,
+     NULL);
+
+  bool changed = false;
+  // apply transformation
+  SET_FOREACH(entity, var, ctx.candidates)
+  {
+    pips_debug(2, "considering entity %s inv=%d dr=%d def=%d pt=%d\n",
+               entity_name(var), set_belong_p(ctx.invalidated, var),
+               hash_defined_p(ctx.dereferenced, var),
+               hash_defined_p(ctx.defined, var),
+               hash_defined_p(ctx.points_to, var));
+
+    if (!set_belong_p(ctx.invalidated, var) &&
+        hash_defined_p(ctx.dereferenced, var) &&
+        hash_defined_p(ctx.defined, var) &&
+        hash_defined_p(ctx.points_to, var))
+    {
+      changed = true;
+      // replace use
+      expression deref = (expression) hash_get(ctx.dereferenced, var);
+      expression_syntax(deref) = make_syntax_reference
+        (make_reference((entity) hash_get(ctx.points_to, var), NIL));
+      // drop definition
+      call definition = (call) hash_get(ctx.defined, var);
+      gen_free_list(call_arguments(definition)),
+        call_arguments(definition) = NIL;
+      call_function(definition) = make_integer_constant_entity(0);
+      // declaration cleanup?
+    }
+  }
+
+  // result
+  if (changed)
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
+
+  // cleanup
+  set_free(ctx.candidates);
+  set_free(ctx.invalidated);
+  hash_table_free(ctx.points_to);
+  hash_table_free(ctx.dereferenced);
+  hash_table_free(ctx.defined);
+  reset_current_module_statement();
+  reset_current_module_entity();
+  debug_off();
+
+  return true;
+}
