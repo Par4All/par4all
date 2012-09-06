@@ -1,0 +1,78 @@
+
+Symbol table for pml03
+
+pml03
+
+Declarations for module "pml03" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "pml03!:*STATIC*" with type "area" with size 0
+	Declared entity "pml03:*DYNAMIC*" with type "area" with size 20
+	Declared entity "pml03:*HEAP*" with type "area" with size 0
+	Declared entity "pml03:*STACK*" with type "area" with size 0
+	Declared entity "pml03:*STATIC*" with type "area" with size 0
+	Declared entity "pml03:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "pml03:0`__func__" with type "variable" "char *"
+	Declared entity "pml03:0`root" with type "variable" "list *"
+	Declared entity "pml03:pml03" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "pml03:pml03"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pml03!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pml03:*DYNAMIC*" of size 20:
+	Variable "pml03:0`root"	offset = 12	size = 8
+	Variable "pml03:0`__func__"	offset = 0	size = 6
+	Variable "pml03:0`__FUNCTION__"	offset = 6	size = 6
+
+
+Layout for memory area "pml03:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pml03:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pml03:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module pml03
+
+
+Parsed printed file
+
+int pml03()
+{
+   list *root;
+   root = malloc(sizeof(list));
+   root->next = malloc(sizeof(list));
+   free(root);
+   return 0;
+}
+
+Printed file
+
+int pml03()
+{
+   list *root;
+   root = malloc(sizeof(list));
+   root->next = malloc(sizeof(list));
+   free(root);
+   return 0;
+}
