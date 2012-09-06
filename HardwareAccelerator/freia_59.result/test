@@ -1512,6 +1512,7 @@ static freia_status freia_59_opencl_helper_conv_511_compile(void)
     "    t29 = PIXEL_ADD(t29, (is_S|is_W)? PIXEL_ZERO: in0SW);\n"
     "    t29 = PIXEL_ADD(t29, (is_S)? PIXEL_ZERO: in0S);\n"
     "    t29 = PIXEL_ADD(t29, (is_S|is_E)? PIXEL_ZERO: in0SE);\n"
+    "    // compute norm\n"
     "    PIXEL n29;\n"
     "    if (is_N)\n"
     "      if (is_W) n29 = 4;\n"
@@ -1726,6 +1727,7 @@ KERNEL void freia_59_opencl_helper_conv_511(
     t29 = PIXEL_ADD(t29, (is_S|is_W)? PIXEL_ZERO: in0SW);
     t29 = PIXEL_ADD(t29, (is_S)? PIXEL_ZERO: in0S);
     t29 = PIXEL_ADD(t29, (is_S|is_E)? PIXEL_ZERO: in0SE);
+    // compute norm
     PIXEL n29;
     if (is_N)
       if (is_W) n29 = 4;
