@@ -1380,15 +1380,17 @@ static freia_status freia_60_opencl_helper_0_0_0_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
     "  int c2)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  // no tiling on first dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
@@ -1400,9 +1402,11 @@ static freia_status freia_60_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
     "\n"
+    "  // loop i upper bound\n"
     "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
     "  int last = (get_global_id(1)+1)*workshare;\n"
     "  if (last>width) last = width;\n"
+    "\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
@@ -1483,15 +1487,17 @@ KERNEL void freia_60_opencl_helper_0_0_0(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1,
   int c2)
 {
   // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
+  // no tiling on first dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
   int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
@@ -1503,9 +1509,11 @@ KERNEL void freia_60_opencl_helper_0_0_0(
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
   GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
 
+  // loop i upper bound
   int workshare = (width+get_global_size(1)-1)/get_global_size(1);
   int last = (get_global_id(1)+1)*workshare;
   if (last>width) last = width;
+
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
   {

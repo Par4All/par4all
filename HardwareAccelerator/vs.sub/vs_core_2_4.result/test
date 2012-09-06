@@ -2658,7 +2658,8 @@ static freia_status vs_core_2_opencl_helper_0_0_0_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -2666,8 +2667,9 @@ static freia_status vs_core_2_opencl_helper_0_0_0_compile(void)
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  // no tiling on first dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
@@ -2676,14 +2678,16 @@ static freia_status vs_core_2_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
+    "  // loop i upper bound\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
     "  int2 mmin = { PIXEL_MAX, 0 };\n"
     "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
@@ -2704,8 +2708,8 @@ static freia_status vs_core_2_opencl_helper_0_0_0_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[thrid].max = mmax.x;\n"
-    "  redX[thrid].min = mmin.x;\n"
+    "  redX[j].max = mmax.x;\n"
+    "  redX[j].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(vs_core_2_opencl_helper_0_0_0_source, "vs_core_2_opencl_helper_0_0_0", "-DPIXEL8", &vs_core_2_opencl_helper_0_0_0_kernel[0]);
@@ -2769,25 +2773,29 @@ static freia_status vs_core_2_opencl_helper_D8_511_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  // no tiling on first dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
+    "  // loop i upper bound\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
@@ -2867,25 +2875,29 @@ static freia_status vs_core_2_opencl_helper_E8_511_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  // no tiling on first dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
+    "  // loop i upper bound\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
@@ -2967,14 +2979,16 @@ static freia_status vs_core_2_opencl_helper_0_1_2_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1)\n"
     "{\n"
     "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
+    "  // no tiling on first dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "  int shift = pitch*get_global_id(0);\n"
     "\n"
     "  // get input & output image pointers\n"
@@ -2982,13 +2996,15 @@ static freia_status vs_core_2_opencl_helper_0_1_2_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
+    "  // loop i upper bound\n"
+    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int last = (get_global_id(1)+1)*workshare;\n"
+    "  if (last>width) last = width;\n"
+    "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
     "  {\n"
@@ -3084,7 +3100,8 @@ KERNEL void vs_core_2_opencl_helper_0_0_0(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1,
@@ -3092,8 +3109,9 @@ KERNEL void vs_core_2_opencl_helper_0_0_0(
   GLOBAL TMeasure * redX)
 {
   // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
+  // no tiling on first dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
   int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
@@ -3102,14 +3120,16 @@ KERNEL void vs_core_2_opencl_helper_0_0_0(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
+  // loop i upper bound
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+
   // reduction stuff is currently hardcoded...
   int vol = 0;
   int2 mmin = { PIXEL_MAX, 0 };
   int2 mmax = { PIXEL_MIN, 0 };
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
@@ -3130,8 +3150,8 @@ KERNEL void vs_core_2_opencl_helper_0_0_0(
   }
 
   // reduction copy out
-  redX[thrid].max = mmax.x;
-  redX[thrid].min = mmin.x;
+  redX[j].max = mmax.x;
+  redX[j].min = mmin.x;
 }
 
 // opencl function vs_core_2_opencl_helper_D8_511
@@ -3140,25 +3160,29 @@ KERNEL void vs_core_2_opencl_helper_D8_511(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
   // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
+  // no tiling on first dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
   int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
+  // loop i upper bound
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
@@ -3197,25 +3221,29 @@ KERNEL void vs_core_2_opencl_helper_E8_511(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
   // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
+  // no tiling on first dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
   int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
+  // loop i upper bound
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
   {
@@ -3256,14 +3284,16 @@ KERNEL void vs_core_2_opencl_helper_0_1_2(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1)
 {
   // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
+  // no tiling on first dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
   int shift = pitch*get_global_id(0);
 
   // get input & output image pointers
@@ -3271,13 +3301,15 @@ KERNEL void vs_core_2_opencl_helper_0_1_2(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
+  // loop i upper bound
+  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
+  int last = (get_global_id(1)+1)*workshare;
+  if (last>width) last = width;
+
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
   {

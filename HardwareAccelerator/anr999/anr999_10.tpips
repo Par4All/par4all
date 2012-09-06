@@ -3,4 +3,5 @@ setenv NAME anr999
 setenv FILE $NAME.c
 setproperty HWAC_SPOC_DEPTH 10
 setproperty HWAC_TERAPIX_DMABW 8
+setenv HWAC_OPENCL_TILING TRUE
 source default_tpips
