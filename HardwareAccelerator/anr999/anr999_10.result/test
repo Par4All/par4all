@@ -4631,7 +4631,7 @@ static freia_status anr999_opencl_helper_0_0_0_compile(void)
     "      // set output pixels\n"
     "      p0[i] = t41;\n"
     "      p1[i] = t73;\n"
-    "  }\n"
+    "    }\n"
     "    // next line\n"
     "    j0 += pitch;\n"
     "    p0 += pitch;\n"
@@ -4758,7 +4758,7 @@ static freia_status anr999_opencl_helper_D8_511_compile(void)
     "      t49 = PIXEL_SUP(t49, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
     "      // set output pixels\n"
     "      p0[i] = t49;\n"
-    "  }\n"
+    "    }\n"
     "    // next line\n"
     "    j0 += pitch;\n"
     "    p0 += pitch;\n"
@@ -4870,7 +4870,7 @@ static freia_status anr999_opencl_helper_E8_511_compile(void)
     "      t81 = PIXEL_INF(t81, (is_S|is_E)? PIXEL_MAX: in0SE);\n"
     "      // set output pixels\n"
     "      p0[i] = t81;\n"
-    "  }\n"
+    "    }\n"
     "    // next line\n"
     "    j0 += pitch;\n"
     "    p0 += pitch;\n"
@@ -5009,7 +5009,7 @@ static freia_status anr999_opencl_helper_0_0_2_compile(void)
     "      // set output pixels\n"
     "      p0[i] = t50;\n"
     "      p1[i] = t87;\n"
-    "  }\n"
+    "    }\n"
     "    // next line\n"
     "    j0 += pitch;\n"
     "    j1 += pitch;\n"
@@ -5141,7 +5141,7 @@ KERNEL void anr999_opencl_helper_0_0_0(
       // set output pixels
       p0[i] = t41;
       p1[i] = t73;
-  }
+    }
     // next line
     j0 += pitch;
     p0 += pitch;
@@ -5217,7 +5217,7 @@ KERNEL void anr999_opencl_helper_D8_511(
       t49 = PIXEL_SUP(t49, (is_S|is_E)? PIXEL_MIN: in0SE);
       // set output pixels
       p0[i] = t49;
-  }
+    }
     // next line
     j0 += pitch;
     p0 += pitch;
@@ -5288,7 +5288,7 @@ KERNEL void anr999_opencl_helper_E8_511(
       t81 = PIXEL_INF(t81, (is_S|is_E)? PIXEL_MAX: in0SE);
       // set output pixels
       p0[i] = t81;
-  }
+    }
     // next line
     j0 += pitch;
     p0 += pitch;
@@ -5386,7 +5386,7 @@ KERNEL void anr999_opencl_helper_0_0_2(
       // set output pixels
       p0[i] = t50;
       p1[i] = t87;
-  }
+    }
     // next line
     j0 += pitch;
     j1 += pitch;
