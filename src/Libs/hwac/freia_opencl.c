@@ -717,7 +717,7 @@ static int opencl_compile_mergeable_dag(
   string_buffer_append_sb(opencl, opencl_load);
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
-  sb_cat(opencl, "  }\n"); // close i loop
+  sb_cat(opencl, BOD1, "}\n"); // close i loop
   if (tiling) {
     sb_cat(opencl,
            "    // next line\n");
