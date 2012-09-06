@@ -683,7 +683,6 @@ static int opencl_compile_mergeable_dag(
 
   string_buffer_append_sb(opencl, opencl_star);
 
-
   if (has_kernel) {
     sb_cat(opencl, "\n", BOD1,
            "// N & S boundaries, one thread on first dimension per row\n");
@@ -794,6 +793,7 @@ static int opencl_compile_mergeable_dag(
   string_buffer_free(&opencl);
   string_buffer_free(&opencl_2);
   string_buffer_free(&opencl_head);
+  string_buffer_free(&opencl_star);
   string_buffer_free(&opencl_load);
   string_buffer_free(&opencl_body);
   string_buffer_free(&opencl_tail);
