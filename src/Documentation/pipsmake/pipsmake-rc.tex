@@ -11211,6 +11211,12 @@ Should be better for GPGPU, but not necessarily for CPU implementations.
 HWAC_OPENCL_PRELOAD_PIXELS TRUE
 \end{PipsProp}
 
+Whether to generate \emph{tiled} kernels on the first thread dimension,
+which deal with the image height in Freia.
+\begin{PipsProp}{HWAC_OPENCL_TILING}
+HWAC_OPENCL_TILING FALSE
+\end{PipsProp}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 
