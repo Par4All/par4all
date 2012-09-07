@@ -11211,8 +11211,19 @@ Should be better for GPGPU, but not necessarily for CPU implementations.
 HWAC_OPENCL_PRELOAD_PIXELS TRUE
 \end{PipsProp}
 
+Tell which image dimension is handled by the first OpenCL thread dimension.
+Value is either \emph{height} or \emph{width}.
+\begin{PipsProp}{HWAC_OPENCL_FIRST_THREAD_DIMENSION}
+HWAC_OPENCL_FIRST_THREAD_DIMENSION "height"
+\end{PipsProp}
+
+Tell which is the first loop in the kernel code: either on the image
+\emph{height} or \emph{width}.
+\begin{PipsProp}{HWAC_OPENCL_FIRST_KERNEL_LOOP}
+HWAC_OPENCL_FIRST_KERNEL_LOOP "height"
+\end{PipsProp}
+
 Whether to generate \emph{tiled} kernels on the first thread dimension,
-which deal with the image height in Freia.
 \begin{PipsProp}{HWAC_OPENCL_TILING}
 HWAC_OPENCL_TILING FALSE
 \end{PipsProp}
