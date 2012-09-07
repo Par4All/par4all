@@ -203,12 +203,12 @@ static int opencl_compile_mergeable_dag(
     opencl = string_buffer_make(true),      // function signature
     opencl_2 = string_buffer_make(true),    // last "reduction" argument
     opencl_head = string_buffer_make(true), // setup & declarations & loop
-    opencl_star = string_buffer_make(true), // before i loop (in j loop)
     // body
     opencl_load = string_buffer_make(true), // load variables
     opencl_body = string_buffer_make(true), // actual operations
     opencl_tail = string_buffer_make(true), // store variables
-    opencl_end = string_buffer_make(true),  // after i loop (in j loop)
+    // end of code
+    opencl_end = string_buffer_make(true),  // after loops
     // compilation function
     compile = string_buffer_make(true);
 
@@ -408,13 +408,19 @@ static int opencl_compile_mergeable_dag(
         sb_cat(helper_tail, "\n  // return reduction results\n");
         sb_cat(opencl_2, ",\n  GLOBAL TMeasure * redX");
         // declare them all
-        sb_cat(opencl_star,
+        sb_cat(opencl_head,
                "\n",
-               BOD1, "// reduction stuff is currently hardcoded...\n",
-               BOD1, "int vol = 0;\n",
-               BOD1, "int2 mmin = { PIXEL_MAX, 0 };\n",
-               BOD1, "int2 mmax = { PIXEL_MIN, 0 };\n");
-        sb_cat(opencl_end, "\n", BOD1, "// reduction copy out\n");
+               "  // reduction stuff is currently hardcoded...\n",
+               "  int vol = 0;\n",
+               "  PIXEL minv = PIXEL_MAX;\n"
+               "  int2 minpos = { 0, 0 };\n"
+               "  PIXEL maxv = PIXEL_MIN;\n"
+               "  int2 maxpos = { 0, 0 };\n");
+        sb_cat(opencl_end, "\n"
+               "  // reduction copy out\n"
+               // assume a 2D worksize. any linearization would do.
+               "  int thrid = "
+                 "get_global_id(0)*get_global_size(1)+get_global_id(1);\n");
         n_misc = 1;
       }
       // inner loop reduction code
@@ -430,25 +436,25 @@ static int opencl_compile_mergeable_dag(
       // ??? HARDCODED for now...
       if (same_string_p(api->compact_name, "max"))
       {
-        sb_cat(opencl_end,  BOD1, "redX[j].max = mmax.x;\n");
+        sb_cat(opencl_end, "  redX[thrid].max = maxv;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "maximum;\n");
       }
       else if (same_string_p(api->compact_name, "min"))
       {
-        sb_cat(opencl_end, BOD1, "redX[j].min = mmin.x;\n");
+        sb_cat(opencl_end, "  redX[thrid].min = minv;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "minimum;\n");
       }
       else if (same_string_p(api->compact_name, "vol"))
       {
-        sb_cat(opencl_end, BOD1, "redX[j].vol = vol;\n");
+        sb_cat(opencl_end, BOD1, "redX[thrid].vol = vol;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "volume;\n");
       }
       else if (same_string_p(api->compact_name, "max!"))
       {
         sb_cat(opencl_end,
-               BOD1, "redX[j].max = mmax.x;\n",
-               BOD1, "redX[j].max_x = (uint) mmax.y;\n",
-               BOD1, "redX[j].max_y = get_global_id(0);\n");
+               "  redX[thrid].max = maxv;\n",
+               "  redX[thrid].max_x = (uint) maxpos.x;\n",
+               "  redX[thrid].max_y = (uint) maxpos.y;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "maximum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "max_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "max_coord_y;\n");
@@ -456,9 +462,9 @@ static int opencl_compile_mergeable_dag(
       else if (same_string_p(api->compact_name, "min!"))
       {
         sb_cat(opencl_end,
-               BOD1, "redX[j].min = mmin.x;\n",
-               BOD1, "redX[j].min_x = (uint) mmin.y;\n",
-               BOD1, "redX[j].min_y = get_global_id(0);\n");
+               "  redX[thrid].min = minv;\n",
+               "  redX[thrid].min_x = (uint) minpos.x;\n",
+               "  redX[thrid].min_y = (uint) minpos.y;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
@@ -681,8 +687,6 @@ static int opencl_compile_mergeable_dag(
            "  for (j=tile*get_global_id(0); j<lastj; j++)\n"
            "  {\n");
 
-  string_buffer_append_sb(opencl, opencl_star);
-
   if (has_kernel) {
     sb_cat(opencl, "\n", BOD1,
            "// N & S boundaries, one thread on first dimension per row\n");
@@ -726,9 +730,9 @@ static int opencl_compile_mergeable_dag(
     for (i = 0; i<n_outs; i++)
       sb_cat(opencl, "    p", itoa(i), " += pitch;\n");
   }
-  string_buffer_append_sb(opencl, opencl_end);
   if (tiling)
     sb_cat(opencl, "  }\n"); // close j loop
+  string_buffer_append_sb(opencl, opencl_end);
   sb_cat(opencl, "}\n"); // close function
 
   // OpenCL compilation
@@ -793,7 +797,6 @@ static int opencl_compile_mergeable_dag(
   string_buffer_free(&opencl);
   string_buffer_free(&opencl_2);
   string_buffer_free(&opencl_head);
-  string_buffer_free(&opencl_star);
   string_buffer_free(&opencl_load);
   string_buffer_free(&opencl_body);
   string_buffer_free(&opencl_tail);
