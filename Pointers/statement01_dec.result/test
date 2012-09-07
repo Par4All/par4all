@@ -1,45 +1,8 @@
 
 POINTS-TO
 
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int j = 0, k, tab[5];
-
-// Points To: none
-
-   int *p = &j;
-
-// Points To:
-// p -> j , EXACT
-
-   int *q = tab[1];
-
-// Points To: unreachable
-
-
-   k = 1;
-
-// Points To: unreachable
-
-   j = k;
-
-// Points To: unreachable
-
-   p = &k;
-
-// Points To: unreachable
-
-
-   return 0;
-}
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "tab".
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) user error
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Type mmismatch for reference "tab[1]" at line 9.INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

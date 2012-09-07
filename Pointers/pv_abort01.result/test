@@ -45,3 +45,4 @@ Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or P
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "a[0]" could not be dereferenced at line 5.
