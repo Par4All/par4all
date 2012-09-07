@@ -1126,16 +1126,9 @@ static freia_status freia_scalar_04_opencl_helper_0_0_0_compile(void)
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  // no tiling on first dimension\n"
+    "  // no tiling on height dimension\n"
     "  // assert(height==get_global_size(0));\n"
     "  int j = get_global_id(0);\n"
-    "  int shift = pitch*get_global_id(0);\n"
-    "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
@@ -1145,19 +1138,27 @@ static freia_status freia_scalar_04_opencl_helper_0_0_0_compile(void)
     "  int2 maxpos = { 0, 0 };\n"
     "\n"
     "  // loop i upper bound\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    PIXEL t14 = PIXEL_ADD(in0, in1);\n"
     "    PIXEL_MAXIMUM(red15, t14);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t14;\n"
     "  }\n"
@@ -1223,16 +1224,9 @@ KERNEL void freia_scalar_04_opencl_helper_0_0_0(
   int pitch,
   GLOBAL TMeasure * redX)
 {
-  // get id & compute global image shift
-  // no tiling on first dimension
+  // no tiling on height dimension
   // assert(height==get_global_size(0));
   int j = get_global_id(0);
-  int shift = pitch*get_global_id(0);
-
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
   // reduction stuff is currently hardcoded...
   int vol = 0;
@@ -1242,19 +1236,27 @@ KERNEL void freia_scalar_04_opencl_helper_0_0_0(
   int2 maxpos = { 0, 0 };
 
   // loop i upper bound
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
+
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+
     // pixel computations
     PIXEL t14 = PIXEL_ADD(in0, in1);
     PIXEL_MAXIMUM(red15, t14);
+
     // set output pixels
     p0[i] = t14;
   }
