@@ -953,10 +953,10 @@ points_to offset_cell(points_to pt, expression delta, type et)
  * used with points-to cells that are part of a points-to belonging to
  * a points-to set.
  */
-void offset_points_to_cells(list sinks, expression delta)
+void offset_points_to_cells(list sinks, expression delta, type t)
 {
   FOREACH(CELL, sink, sinks) {
-    offset_points_to_cell(sink, delta);
+    offset_points_to_cell(sink, delta, t);
   }
 }
 
@@ -966,13 +966,15 @@ void offset_points_to_cells(list sinks, expression delta)
  * The naming is all wrong: offset_points_to_cell() can operate on a
  * cell, while offset_cell() is designed to operate on a cell
  * component of a points-to.
+ *
+ * Type "t" is used to decide which subscript should be updated by delta.
  */
-void offset_points_to_cell(cell sink, expression delta)
+void offset_points_to_cell(cell sink, expression delta, type t)
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
   reference r = cell_any_reference(sink);
-  entity v = reference_variable(r);
+  entity rv = reference_variable(r);
   if(nowhere_cell_p(sink))
     ; // user error: possible incrementation of an uninitialized pointer
   else if(null_cell_p(sink))
@@ -983,37 +985,50 @@ void offset_points_to_cell(cell sink, expression delta)
     ; // It is already fuzzy no need to add more
   // FI: it might be necessary to exclude *HEAP* too when a minimal
   // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
-  else if(entity_array_p(v)
+  else if(entity_array_p(rv)
      || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
-    value v = EvalExpression(delta);
+    value val = EvalExpression(delta);
     list sl = reference_indices(r);
-    if(value_constant_p(v) && constant_int_p(value_constant(v))) {
-      int dv =  constant_int(value_constant(v));
+    if(value_constant_p(val) && constant_int_p(value_constant(val))) {
+      int dv =  constant_int(value_constant(val));
       if(ENDP(sl)) {
+	if(entity_array_p(rv)) {
 	// FI: oops, we are in trouble; assume 0...
 	expression se = int_to_expression(dv);
 	reference_indices(r) = CONS(EXPRESSION, se, NIL);
+	}
+	else {
+	  ; // FI: No need to add a zero subscript to a scalar variable
+	}
       }
       else {
-	expression lse = EXPRESSION(CAR(gen_last(sl)));
+	// FI: this is wrong, there is no reason to update the last
+	// subscript; the type of the offset should be passed as an
+	// argument. See for instance dereferencing08.c
+	list tsl = find_points_to_subscript_for_type(sink, t);
+	// expression lse = EXPRESSION(CAR(gen_last(sl)));
+	expression lse = EXPRESSION(CAR(tsl));
 	value vlse = EvalExpression(lse);
 	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
 	  int ov =  constant_int(value_constant(vlse));
 	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
 	  if(-k <= ov && ov <= k) {
 	    expression nse = int_to_expression(dv+ov);
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    EXPRESSION_(CAR(tsl)) = nse;
 	  }
 	  else {
 	    expression nse = make_unbounded_expression();
-	    EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	    EXPRESSION_(CAR(tsl)) = nse;
 	  }
 	  free_expression(lse);
 	}
 	else {
 	  // If the index cannot be computed, used the unbounded expression
 	  expression nse = make_unbounded_expression();
-	  EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	  EXPRESSION_(CAR(tsl)) = nse;
 	  free_expression(lse);
 	}
       }
@@ -1024,9 +1039,12 @@ void offset_points_to_cell(cell sink, expression delta)
 	reference_indices(r) = CONS(EXPRESSION, nse, NIL);
       }
       else {
-	expression ose = EXPRESSION(CAR(gen_last(sl)));
+	list tsl = find_points_to_subscript_for_type(sink, t);
+	//expression ose = EXPRESSION(CAR(gen_last(sl)));
+	expression ose = EXPRESSION(CAR(tsl));
 	expression nse = make_unbounded_expression();
-	EXPRESSION_(CAR(gen_last(sl))) = nse;
+	//EXPRESSION_(CAR(gen_last(sl))) = nse;
+	EXPRESSION_(CAR(tsl)) = nse;
 	free_expression(ose);
       }
     }
@@ -1037,7 +1055,7 @@ void offset_points_to_cell(cell sink, expression delta)
 		    "standard-compliant.\n"
 		    "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
 		    " for usual non-standard compliant C code.\n",
-		    entity_user_name(v));
+		    entity_user_name(rv));
   }
 }
 
@@ -1054,7 +1072,7 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   bool to_be_freed = false;
   type t = points_to_expression_to_type(lhs, &to_be_freed);
 
-  type ut = ultimate_type(t);
+  type ut = compute_basic_concrete_type(t);
   if(pointer_type_p(ut))
     pt_out = pointer_assignment_to_points_to(lhs, rhs, pt_out);
   else if(struct_type_p(ut))
@@ -1088,6 +1106,70 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
 
   return pt_out;
 }
+
+
+/* Check that the cells in list "sinks" have types compatible with the
+ * expression on the left-hand side, lhs.
+ *
+ * List "sinks" is assumed to have been derived from the "rhs" expression.
+ */
+void check_rhs_value_types(expression lhs, expression rhs, list sinks)
+{
+  // Some expression are synthesized to reuse existing functions.
+  bool to_be_freed;
+  type t = points_to_expression_to_type(lhs, &to_be_freed);
+  type ct = compute_basic_concrete_type(t);
+  type st = type_undefined;
+  if(pointer_type_p(ct)) {
+    st = compute_basic_concrete_type(type_to_pointed_type(ct));
+  }
+  else if(array_type_p(ct)) {
+    st = compute_basic_concrete_type(array_type_to_element_type(ct));
+  }
+  else if(scalar_integer_type_p(ct)) {
+    /* At least for the NULL pointer... */
+    st = ct;
+  }
+  else
+    pips_internal_error("Unexpected type for value.\n");
+
+  if(!type_void_star_p(ct)) { // void * is compatible with all types...
+    FOREACH(CELL, c, sinks) {
+      if(!null_cell_p(c)
+	 && !anywhere_cell_p(c)
+	 && !cell_typed_anywhere_locations_p(c)
+	 && !nowhere_cell_p(c)) {
+	bool to_be_freed;
+	type est = points_to_cell_to_type(c, &to_be_freed);
+	type cest = compute_basic_concrete_type(est);
+	if(!array_pointer_type_equal_p(cest, st)
+	  /* Adding the zero subscripts may muddle the type issue
+	     because "&a[0]" has not the same type as "a" although we
+	     normalize every cell into "a[0]". */
+	   && !(array_type_p(st)
+		&& array_pointer_type_equal_p(cest,
+					      array_type_to_element_type(st)))
+	   /* Take care of the constant strings like "hello" */
+	   && !(char_type_p(st) && char_star_constant_function_type_p(cest))
+	   ) {
+	    pips_user_warning("Maybe an issue with a dynamic memory allocation.\n");
+	    pips_user_error("At line %d, "
+			    "the type returned for the value of expression \"%s\"="
+			    "\"%s\", "
+			    "\"%s\", is not the expected type, \"%s\".\n",
+			    points_to_context_statement_line_number(),
+			    expression_to_string(rhs),
+			    effect_reference_to_string(cell_any_reference(c)),
+			    // copied from ri-util/type.c, print_type()
+			    words_to_string(words_type(cest, NIL, false)),
+			    words_to_string(words_type(st, NIL, false)));
+	  }
+      }
+    }
+  }
+  // Late free, to be able to see "t" under gdb...
+  if(to_be_freed) free_type(t);
+}
 
 /* Any abstract location of the lhs in L is going to point to any sink of
  * any abstract location of the rhs in R.
@@ -1101,7 +1183,13 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 {
   pt_map pt_out = pt_in;
 
+  pips_assert("pt_out is consistent on entry",
+	      consistent_points_to_graph_p(pt_out));
+
   list L = expression_to_points_to_sources(lhs, pt_out);
+
+  pips_assert("pt_out is consistent after computing L",
+	      consistent_points_to_graph_p(pt_out));
 
   /* Make sure all cells in L are pointers: l may be an array of pointers */
   /* FI: I am not sure it is useful here because the conversion to an
@@ -1127,13 +1215,21 @@ pt_map pointer_assignment_to_points_to(expression lhs,
     if(to_be_freed) free_type(lt);
   }
 
+  pips_assert("pt_out is consistent after cells are dangerously updated",
+	      consistent_points_to_graph_p(pt_out));
+
   /* Retrieve the memory locations that might be reached by the rhs
    *
    * Update the calling context by adding new stubs linked directly or
    * indirectly to the formal parameters and global variables if
    * necessary.
    */
-  list R = expression_to_points_to_sinks(rhs,pt_out);
+  list R = expression_to_points_to_sinks(rhs, pt_out);
+
+  check_rhs_value_types(lhs, rhs, R);
+
+  pips_assert("pt_out is consistent after computing R",
+	      consistent_points_to_graph_p(pt_out));
 
   if(ENDP(L) || ENDP(R)) {
     //pips_assert("Left hand side reference list is not empty.\n", !ENDP(L));
@@ -1144,12 +1240,25 @@ pt_map pointer_assignment_to_points_to(expression lhs,
   // list_assignment_to_points_to?
 
     /* We must be in a dead-code portion. If not pleased, adjust properties... */
+    if(ENDP(L)) {
+      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			expression_to_string(lhs),
+			points_to_context_statement_line_number());
+    }
+    if(ENDP(R)) {
+      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			expression_to_string(rhs),
+			points_to_context_statement_line_number());
+    }
     clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else
     pt_out = list_assignment_to_points_to(L, R, pt_out);
 
   // FI: memory leak(s)?
+
+  pips_assert("pt_out is consistent", consistent_points_to_graph_p(pt_out));
 
   return pt_out;
 }
@@ -1511,6 +1620,12 @@ list reduce_cells_to_pointer_type(list cl)
  */
 pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 {
+  pips_assert("This function is not called with a bottom points-to",
+	      !points_to_graph_bottom(pt_out));
+
+  pips_assert("pt_out is consistent on entry",
+	      consistent_points_to_graph_p(pt_out));
+
   /* Check possible dereferencing errors */
   list ndl = NIL; // null dereferencing error list
   list udl = NIL; // undefined dereferencing error list
@@ -1521,7 +1636,9 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
-	pips_user_warning("Dereferencing of an undefined pointer.\n");
+	pips_user_warning("Dereferencing of an undefined pointer \"%s\" at line %d.\n",
+			  effect_reference_to_string(cell_any_reference(c)),
+			  points_to_context_statement_line_number());
       else
 	pips_user_warning("Dereferencing of an undefined pointer.\n");
     }
@@ -1550,6 +1667,8 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       free_cell(nc);
     }
   }
+
+  pips_assert("pt_out is consistent", consistent_points_to_graph_p(pt_out));
 
   if(!ENDP(ndl) || !ENDP(udl)) {
     if(!ENDP(ndl))
@@ -1621,6 +1740,8 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     set gen = new_simple_pt_map();
     set_union(gen, gen_may, gen_must);
 
+    pips_assert("\"gen\" is consistent", consistent_points_to_set(gen));
+
     if(set_empty_p(gen)) {
       bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
       if(type_sensitive_p)
@@ -1631,7 +1752,12 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 
     // FI->AM: shouldn't it be a kill_must here?
     set_difference(pt_out_s, pt_out_s, kill);
+
+    pips_assert("", consistent_points_to_graph_p(pt_out));
+    
     set_union(pt_out_s, pt_out_s, gen);
+
+    pips_assert("", consistent_points_to_graph_p(pt_out));
 
     // FI->AM: use kill_may to reduce the precision of these arcs
     SET_FOREACH(points_to, pt, kill_may) {
@@ -1645,6 +1771,8 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	add_arc_to_pt_map(npt, pt_out);
       }
     }
+
+    pips_assert("", consistent_points_to_graph_p(pt_out));
 
     sets_free(in_may, in_must,
 	      kill_may, kill_must,
@@ -1991,8 +2119,13 @@ pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
   pt_map out = in;
   // FI: a call site to handle like any other user call site...
   // Althgouh you'd like to know if true or false is returned...
-  pips_user_warning("Interprocedural points-to not implemented yet. "
-		    "Call site fully ignored.\n");
+  //pips_user_warning("Interprocedural points-to not implemented yet. "
+  //		    "Call site fully ignored.\n");
+  //
+  if(true_p) // Analyze the call only once?
+    out = user_call_to_points_to(c, in);
+  else // No, because side-effects must be taken into account for both branches
+    out = user_call_to_points_to(c, in);
   return out;
 }
 
@@ -2309,7 +2442,8 @@ pt_map equal_condition_to_points_to(list al, pt_map in)
 	clear_pt_map(out);
 	points_to_graph_bottom(out) = true;
 	pips_user_warning("Unitialized pointer is used to evaluate expression"
-			  " \"%s\"\n.", expression_to_string(lhs));
+			  " \"%s\" at line %d.\n", expression_to_string(lhs),
+			  points_to_context_statement_line_number());
       }
       else {
 	/* Is it impossible to evaluate rhs? */
@@ -2319,7 +2453,8 @@ pt_map equal_condition_to_points_to(list al, pt_map in)
 	  clear_pt_map(out);
 	  points_to_graph_bottom(out) = true;
 	  pips_user_warning("Unitialized pointer is used to evaluate expression"
-			    " \"%s\".\n", expression_to_string(rhs));
+			    " \"%s\".\n", expression_to_string(rhs),
+			    points_to_context_statement_line_number());
 	}
 	else {
 	  /* Is the condition feasible? */
@@ -2421,10 +2556,14 @@ pt_map non_equal_condition_to_points_to(list al, pt_map in)
 	  points_to_graph_bottom(out) = true;
 	  if(nowhere_cell_p(cl))
 	    pips_user_warning("Unitialized pointer is used to evaluate expression"
-			      " \"%s\".\n", expression_to_string(lhs));
+			      " \"%s\" at line %d.\n",
+			      expression_to_string(lhs),
+			      points_to_context_statement_line_number());
 	  if(nowhere_cell_p(cr))
 	    pips_user_warning("Unitialized pointer is used to evaluate expression"
-			      " \"%s\".\n", expression_to_string(rhs));
+			      " \"%s\" at line %d.\n",
+			      expression_to_string(rhs),
+			      points_to_context_statement_line_number());
 	}
       }
       else {
