@@ -4567,6 +4567,13 @@ static freia_status anr999_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  PIXEL minv = PIXEL_MAX;\n"
+    "  int2 minpos = { 0, 0 };\n"
+    "  PIXEL maxv = PIXEL_MIN;\n"
+    "  int2 maxpos = { 0, 0 };\n"
+    "\n"
     "  // loop j upper bound\n"
     "  int lastj = tile*(get_global_id(0)+1);\n"
     "  if (lastj>height) lastj = height;\n"
@@ -4579,11 +4586,6 @@ static freia_status anr999_opencl_helper_0_0_0_compile(void)
     "  int j;\n"
     "  for (j=tile*get_global_id(0); j<lastj; j++)\n"
     "  {\n"
-    "\n"
-    "    // reduction stuff is currently hardcoded...\n"
-    "    int vol = 0;\n"
-    "    int2 mmin = { PIXEL_MAX, 0 };\n"
-    "    int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
     "    // N & S boundaries, one thread on first dimension per row\n"
     "    int is_N = (j==0);\n"
@@ -4636,11 +4638,12 @@ static freia_status anr999_opencl_helper_0_0_0_compile(void)
     "    j0 += pitch;\n"
     "    p0 += pitch;\n"
     "    p1 += pitch;\n"
-    "\n"
-    "    // reduction copy out\n"
-    "    redX[j].min = mmin.x;\n"
-    "    redX[j].vol = vol;\n"
     "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);\n"
+    "  redX[thrid].min = minv;\n"
+    "    redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(anr999_opencl_helper_0_0_0_source, "anr999_opencl_helper_0_0_0", "-DPIXEL8", &anr999_opencl_helper_0_0_0_kernel[0]);
@@ -5077,6 +5080,13 @@ KERNEL void anr999_opencl_helper_0_0_0(
   GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  PIXEL minv = PIXEL_MAX;
+  int2 minpos = { 0, 0 };
+  PIXEL maxv = PIXEL_MIN;
+  int2 maxpos = { 0, 0 };
+
   // loop j upper bound
   int lastj = tile*(get_global_id(0)+1);
   if (lastj>height) lastj = height;
@@ -5089,11 +5099,6 @@ KERNEL void anr999_opencl_helper_0_0_0(
   int j;
   for (j=tile*get_global_id(0); j<lastj; j++)
   {
-
-    // reduction stuff is currently hardcoded...
-    int vol = 0;
-    int2 mmin = { PIXEL_MAX, 0 };
-    int2 mmax = { PIXEL_MIN, 0 };
 
     // N & S boundaries, one thread on first dimension per row
     int is_N = (j==0);
@@ -5146,11 +5151,12 @@ KERNEL void anr999_opencl_helper_0_0_0(
     j0 += pitch;
     p0 += pitch;
     p1 += pitch;
-
-    // reduction copy out
-    redX[j].min = mmin.x;
-    redX[j].vol = vol;
   }
+
+  // reduction copy out
+  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);
+  redX[thrid].min = minv;
+    redX[thrid].vol = vol;
 }
 
 // opencl function anr999_opencl_helper_D8_511

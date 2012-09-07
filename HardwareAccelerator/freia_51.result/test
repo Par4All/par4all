@@ -2741,15 +2741,17 @@ static freia_status freia_51_opencl_helper_0_0_4_compile(void)
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  PIXEL minv = PIXEL_MAX;\n"
+    "  int2 minpos = { 0, 0 };\n"
+    "  PIXEL maxv = PIXEL_MIN;\n"
+    "  int2 maxpos = { 0, 0 };\n"
+    "\n"
     "  // loop i upper bound\n"
     "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
     "  int last = (get_global_id(1)+1)*workshare;\n"
     "  if (last>width) last = width;\n"
-    "\n"
-    "  // reduction stuff is currently hardcoded...\n"
-    "  int vol = 0;\n"
-    "  int2 mmin = { PIXEL_MAX, 0 };\n"
-    "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
@@ -2765,7 +2767,8 @@ static freia_status freia_51_opencl_helper_0_0_4_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[j].vol = vol;\n"
+    "  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_51_opencl_helper_0_0_4_source, "freia_51_opencl_helper_0_0_4", "-DPIXEL8", &freia_51_opencl_helper_0_0_4_kernel[0]);
@@ -2843,15 +2846,17 @@ static freia_status freia_51_opencl_helper_1_0_1_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  PIXEL minv = PIXEL_MAX;\n"
+    "  int2 minpos = { 0, 0 };\n"
+    "  PIXEL maxv = PIXEL_MIN;\n"
+    "  int2 maxpos = { 0, 0 };\n"
+    "\n"
     "  // loop i upper bound\n"
     "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
     "  int last = (get_global_id(1)+1)*workshare;\n"
     "  if (last>width) last = width;\n"
-    "\n"
-    "  // reduction stuff is currently hardcoded...\n"
-    "  int vol = 0;\n"
-    "  int2 mmin = { PIXEL_MAX, 0 };\n"
-    "  int2 mmax = { PIXEL_MIN, 0 };\n"
     "\n"
     "  int i;\n"
     "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
@@ -2867,7 +2872,8 @@ static freia_status freia_51_opencl_helper_1_0_1_compile(void)
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[j].vol = vol;\n"
+    "  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);\n"
+    "  redX[thrid].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_51_opencl_helper_1_0_1_source, "freia_51_opencl_helper_1_0_1", "-DPIXEL8", &freia_51_opencl_helper_1_0_1_kernel[0]);
@@ -3023,15 +3029,17 @@ KERNEL void freia_51_opencl_helper_0_0_4(
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  PIXEL minv = PIXEL_MAX;
+  int2 minpos = { 0, 0 };
+  PIXEL maxv = PIXEL_MIN;
+  int2 maxpos = { 0, 0 };
+
   // loop i upper bound
   int workshare = (width+get_global_size(1)-1)/get_global_size(1);
   int last = (get_global_id(1)+1)*workshare;
   if (last>width) last = width;
-
-  // reduction stuff is currently hardcoded...
-  int vol = 0;
-  int2 mmin = { PIXEL_MAX, 0 };
-  int2 mmax = { PIXEL_MIN, 0 };
 
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
@@ -3047,7 +3055,8 @@ KERNEL void freia_51_opencl_helper_0_0_4(
   }
 
   // reduction copy out
-  redX[j].vol = vol;
+  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 1
@@ -3076,15 +3085,17 @@ KERNEL void freia_51_opencl_helper_1_0_1(
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
 
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  PIXEL minv = PIXEL_MAX;
+  int2 minpos = { 0, 0 };
+  PIXEL maxv = PIXEL_MIN;
+  int2 maxpos = { 0, 0 };
+
   // loop i upper bound
   int workshare = (width+get_global_size(1)-1)/get_global_size(1);
   int last = (get_global_id(1)+1)*workshare;
   if (last>width) last = width;
-
-  // reduction stuff is currently hardcoded...
-  int vol = 0;
-  int2 mmin = { PIXEL_MAX, 0 };
-  int2 mmax = { PIXEL_MIN, 0 };
 
   int i;
   for (i=get_global_id(1)*workshare; i<last; i++)
@@ -3100,7 +3111,8 @@ KERNEL void freia_51_opencl_helper_1_0_1(
   }
 
   // reduction copy out
-  redX[j].vol = vol;
+  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);
+  redX[thrid].vol = vol;
 }
 
 // opencl for dag 2
