@@ -4,7 +4,7 @@
 
 # Subdirectory where there is some documentation to build or publish:
 # doc/organization and doc/simple_tools/p4a_article are deprecated now...
-doc_dirs="doc/developer_guide doc/installation_guide doc/organization doc/p4a_coding_rules doc/simple_tools/p4a_article doc/simple_tools/p4a_slides doc/user_guide src/p4a_accel"
+doc_dirs="doc/developer_guide doc/installation_guide doc/p4a_coding_rules doc/simple_tools/p4a_article doc/simple_tools/p4a_slides doc/user_guide src/p4a_accel"
 
 
 
