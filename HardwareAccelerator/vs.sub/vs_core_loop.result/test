@@ -2106,7 +2106,7 @@ digraph "vs_core_loop_terapix_helper_3_1_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 23
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -2119,7 +2119,7 @@ digraph "vs_core_loop_terapix_helper_3_1_0" {
  * dag length is 1, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 2
- * - communication: 23
+ * - communication: 24
  */
 freia_status vs_core_loop_terapix_helper_0_0_0(
   freia_data2d * o0,
@@ -2259,7 +2259,7 @@ freia_status vs_core_loop_terapix_helper_0_0_0(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 23
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -2272,7 +2272,7 @@ freia_status vs_core_loop_terapix_helper_0_0_0(
  * dag length is 4, dag width is 3
  * costs in cycles per imagelet row:
  * - computation: 23
- * - communication: 115
+ * - communication: 120
  */
 freia_status vs_core_loop_terapix_helper_3_0_0(
   freia_data2d * o0,
@@ -2707,7 +2707,7 @@ freia_status vs_core_loop_terapix_helper_3_0_0(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 23
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -2720,7 +2720,7 @@ freia_status vs_core_loop_terapix_helper_3_0_0(
  * dag length is 9, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 79
- * - communication: 69
+ * - communication: 72
  */
 freia_status vs_core_loop_terapix_helper_3_1_0(
   freia_data2d * o0,
