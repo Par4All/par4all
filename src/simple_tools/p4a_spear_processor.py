@@ -38,7 +38,7 @@ class p4a_spear_processor(p4a_processor):
         self.tasks = []
         for task in tree.getroot().findall("Task"):
             warn("Filtering Spear Task " + task.attrib['name'])
-            self.tasks.append(task.attrib['name'])
+            self.tasks.append(task)
             filter+=sep+".*"+task.attrib['name']+"$"
             sep="|"
         warn("Filter is : "+filter)
@@ -49,8 +49,19 @@ class p4a_spear_processor(p4a_processor):
         #selected_modules.unfold()
         #selected_modules.display()
         #self.workspace.fun.main_segment_P2012.display("print_code_regions")
-        #sys.exit() 
-        p4a_processor.parallelize(self,fine_grain = True,  *args, **kwargs)
+        #sys.exit()
+        for task in self.tasks:
+            parallelLoops = int(task.attrib['nbParallelLoops'])
+            warn("Parallelizing Task {0} with {1} nested parallel loops".format(task.attrib['name'],parallelLoops))
+            loops = self.workspace[task.attrib['name']].loops()
+            while parallelLoops > 0:
+                if len(loops)>1:
+                    raise Exception("Expect {0} perfectly nested loop but got only %{1}".format(task.attrib['nbParallelLoops'],int(task.attrib['nbParallelLoops'])-parallelLoops))
+                # Schedule as parallel
+                loops[0].parallel=True
+                parallelLoops=parallelLoops-1
+                loops=loops[0].loops()
+        #p4a_processor.parallelize(self,fine_grain = True,  *args, **kwargs)
         
     def save_generated (self, output_dir, subs_dir):
     	ret = p4a_processor.save_generated(self,output_dir,subs_dir)
@@ -58,7 +69,7 @@ class p4a_spear_processor(p4a_processor):
         warn("XML Post processing " + output_dir + " " + subs_dir)
         tasks_xml = ""
         for task in self.tasks:
-            wrapper = "p4a_wrapper_"+task
+            wrapper = "p4a_wrapper_"+task.attrib['name']
             
             warn("Looking for " + wrapper)
             try:
@@ -78,7 +89,7 @@ class p4a_spear_processor(p4a_processor):
         xml_src = os.path.join(self.workspace.dirname,"P4A","p4a_kernels.xml")
         xml_dst = os.path.join(output_dir,"p4a_kernels.xml")
         f = open(xml_src,mode="w")
-        f.write('<!DOCTYPE Tasks SYSTEM "p4a_output.dtd">\n<Tasks>\n'+tasks_xml+'</Tasks>\n')
+        f.write('<!DOCTYPE Tasks SYSTEM "p4a_kernels.dtd">\n<Tasks>\n'+tasks_xml+'</Tasks>\n')
         f.close()
 		# install the file to its final dest
         if not os.path.exists(output_dir):
