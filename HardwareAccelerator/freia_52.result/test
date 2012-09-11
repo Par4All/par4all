@@ -11403,7 +11403,7 @@ digraph "freia_52_terapix_helper_2_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -11416,7 +11416,7 @@ digraph "freia_52_terapix_helper_2_0_0" {
  * dag length is 5, dag width is 8
  * costs in cycles per imagelet row:
  * - computation: 259
- * - communication: 288
+ * - communication: 207
  */
 freia_status freia_52_terapix_helper_0_0_0(
   freia_data2d * o0,
@@ -12132,7 +12132,7 @@ freia_status freia_52_terapix_helper_0_0_0(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -12145,7 +12145,7 @@ freia_status freia_52_terapix_helper_0_0_0(
  * dag length is 4, dag width is 8
  * costs in cycles per imagelet row:
  * - computation: 360
- * - communication: 512
+ * - communication: 368
  */
 freia_status freia_52_terapix_helper_0_0_1(
   freia_data2d * o0,
@@ -13162,7 +13162,7 @@ freia_status freia_52_terapix_helper_0_0_1(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -13175,7 +13175,7 @@ freia_status freia_52_terapix_helper_0_0_1(
  * dag length is 15, dag width is 8
  * costs in cycles per imagelet row:
  * - computation: 518
- * - communication: 288
+ * - communication: 207
  */
 freia_status freia_52_terapix_helper_0_0_2(
   freia_data2d * o0,
@@ -14495,7 +14495,7 @@ freia_status freia_52_terapix_helper_0_0_2(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -14508,7 +14508,7 @@ freia_status freia_52_terapix_helper_0_0_2(
  * dag length is 4, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 22
- * - communication: 96
+ * - communication: 69
  */
 freia_status freia_52_terapix_helper_1_0_0(
   freia_data2d * o0,
@@ -14764,7 +14764,7 @@ freia_status freia_52_terapix_helper_1_0_0(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -14777,7 +14777,7 @@ freia_status freia_52_terapix_helper_1_0_0(
  * dag length is 4, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 12
- * - communication: 96
+ * - communication: 69
  */
 freia_status freia_52_terapix_helper_2_0_0(
   freia_data2d * o0,

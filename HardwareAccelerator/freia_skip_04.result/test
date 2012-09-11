@@ -475,7 +475,7 @@ digraph "freia_skip_04_terapix_helper_0_1_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -488,7 +488,7 @@ digraph "freia_skip_04_terapix_helper_0_1_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 6
- * - communication: 64
+ * - communication: 46
  */
 freia_status freia_skip_04_terapix_helper_0_0_0(
   freia_data2d * o0,
@@ -707,7 +707,7 @@ freia_status freia_skip_04_terapix_helper_0_0_0(
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -720,7 +720,7 @@ freia_status freia_skip_04_terapix_helper_0_0_0(
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 5
- * - communication: 64
+ * - communication: 46
  */
 freia_status freia_skip_04_terapix_helper_0_1_0(
   freia_data2d * o0,

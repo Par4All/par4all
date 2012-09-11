@@ -348,7 +348,7 @@ digraph "dag_cleaned_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -361,7 +361,7 @@ digraph "dag_cleaned_0" {
  * dag length is 4, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 11
- * - communication: 32
+ * - communication: 23
  */
 freia_status cst_03_terapix_helper_0_0_0(
   freia_data2d * o0,

@@ -3359,7 +3359,7 @@ digraph "license_plate_terapix_helper_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 23
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = none
@@ -3372,7 +3372,7 @@ digraph "license_plate_terapix_helper_0_0" {
  * dag length is 53, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 993
- * - communication: 64
+ * - communication: 46
  */
 freia_status license_plate_terapix_helper_0_0(
   freia_data2d * o0,
