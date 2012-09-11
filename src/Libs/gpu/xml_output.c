@@ -244,7 +244,7 @@ bool gpu_xml_dump(string mod_name) {
   }
 
   //xml_print_statement(module_statement);
-  xml_print("</task>" NL);
+  xml_print("</Task>" NL);
 
   // Reset output file
   xml_set_output(0);
