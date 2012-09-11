@@ -95,6 +95,32 @@ class p4a_spear_processor(p4a_processor):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         shutil.copyfile(xml_src, xml_dst)
+        
+        # Add a DTD
+        f = open(os.path.join(output_dir,"p4a_kernels.dtd"),mode="w")
+        f.write('''<?xml encoding="UTF-8"?>
+
+<!ELEMENT Tasks (Task)+>
+<!ATTLIST Tasks
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT Task (Arg)+>
+<!ATTLIST Task
+  xmlns CDATA #FIXED ''
+  function NMTOKEN #REQUIRED
+  kernel NMTOKEN #REQUIRED
+  name NMTOKEN #REQUIRED
+  nbParallelLoops CDATA #REQUIRED>
+
+<!ELEMENT Arg EMPTY>
+<!ATTLIST Arg
+  xmlns CDATA #FIXED ''
+  name NMTOKEN #REQUIRED
+  type NMTOKEN #REQUIRED
+  typeData CDATA #REQUIRED
+  value CDATA #IMPLIED>
+''')
+        f.close()
         return ret
             
 
