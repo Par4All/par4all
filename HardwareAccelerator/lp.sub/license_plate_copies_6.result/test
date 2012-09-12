@@ -4013,19 +4013,21 @@ digraph "license_plate_copies_terapix_helper_0_0_0" {
   "in" -> "64 E8";
 }
 // graph for dag "license_plate_copies_terapix_helper_0_0_1" of module "license_plate_copies" in dot format
-// DAG "license_plate_copies_terapix_helper_0_0_1": #i=2 #o=2 #c=25 #s=0 #I=0 #B=0 #A=0
+// DAG "license_plate_copies_terapix_helper_0_0_1": #i=2 #o=2 #c=26 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_terapix_helper_0_0_1" {
   // inputs
   "imclose_8" [shape=circle];
   "imopen_22" [shape=circle];
 
   // outputs
-  "imopen_6" [shape=circle];
+  "imopen_5" [shape=circle];
   "imcloseth" [shape=circle];
 
   // computation vertices
+  "114 D8" [shape=box];
+  "114 D8" -> "imopen_5";
   "112 D8" [shape=box];
-  "112 D8" -> "imopen_6";
+  "112 D8" -> "114 D8" [label="imopen_6"];
   "110 D8" [shape=box];
   "110 D8" -> "112 D8" [label="imopen_7"];
   "108 D8" [shape=box];
@@ -4078,18 +4080,18 @@ digraph "license_plate_copies_terapix_helper_0_0_1" {
   "imopen_22" -> "80 E8";
 }
 // graph for dag "license_plate_copies_terapix_helper_0_0_2" of module "license_plate_copies" in dot format
-// DAG "license_plate_copies_terapix_helper_0_0_2": #i=3 #o=1 #c=28 #s=0 #I=0 #B=0 #A=0
+// DAG "license_plate_copies_terapix_helper_0_0_2": #i=3 #o=1 #c=27 #s=0 #I=0 #B=0 #A=0
 digraph "license_plate_copies_terapix_helper_0_0_2" {
   // inputs
   "imcloseth" [shape=circle];
-  "imopen_6" [shape=circle];
+  "imopen_5" [shape=circle];
   "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "imopen_6" -> "114 D8";
+  "imopen_5" -> "116 D8";
   "imcloseth" -> "179 &";
   "244 &" [shape=trapezium,orientation=270];
   "244 &" -> "out";
@@ -4145,8 +4147,6 @@ digraph "license_plate_copies_terapix_helper_0_0_2" {
   "118 D8" -> "120 D8" [label="imopen_3"];
   "116 D8" [shape=box];
   "116 D8" -> "118 D8" [label="imopen_4"];
-  "114 D8" [shape=box];
-  "114 D8" -> "116 D8" [label="imopen_5"];
   "in" -> "244 &";
 }
 
@@ -4689,10 +4689,10 @@ freia_status license_plate_copies_terapix_helper_0_0_0(
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
- * 25 image operations in dag
- * dag length is 17, dag width is 2
+ * 26 image operations in dag
+ * dag length is 18, dag width is 2
  * costs in cycles per imagelet row:
- * - computation: 365
+ * - computation: 380
  * - communication: 192
  */
 freia_status license_plate_copies_terapix_helper_0_0_1(
@@ -5361,7 +5361,7 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   mcu_macro[1][24].iter4 = 0;
   mcu_macro[0][24].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][24].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // output copy 3 -> 2
+  // 25: D8(3) -> 2
   mcu_macro[0][25].xmin1 = imagelet_3;
   mcu_macro[1][25].xmin1 = imagelet_3;
   mcu_macro[0][25].ymin1 = 0;
@@ -5370,6 +5370,10 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   mcu_macro[1][25].xmin2 = imagelet_io_2_1;
   mcu_macro[0][25].ymin2 = 0;
   mcu_macro[1][25].ymin2 = 0;
+  mcu_macro[0][25].xmin3 = x_0;
+  mcu_macro[1][25].xmin3 = x_0;
+  mcu_macro[0][25].ymin3 = y_0;
+  mcu_macro[1][25].ymin3 = y_0;
   mcu_macro[0][25].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][25].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][25].iter2 = imagelet_size;
@@ -5378,8 +5382,8 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   mcu_macro[1][25].iter3 = 0;
   mcu_macro[0][25].iter4 = 0;
   mcu_macro[1][25].iter4 = 0;
-  mcu_macro[0][25].addrStart = TERAPIX_UCODE_COPY;
-  mcu_macro[1][25].addrStart = TERAPIX_UCODE_COPY;
+  mcu_macro[0][25].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][25].addrStart = TERAPIX_UCODE_DILATE_3_3;
 
 
   // inputs:
@@ -5395,7 +5399,7 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for imopen_6
+  // - imagelet 2 is o0 for imopen_5
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
@@ -5409,8 +5413,8 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
   mcu_instr.borderBottom = 0;
-  mcu_instr.borderLeft   = 16;
-  mcu_instr.borderRight  = 16;
+  mcu_instr.borderLeft   = 17;
+  mcu_instr.borderRight  = 17;
   mcu_instr.imagelet_height = imagelet_size;
   mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
@@ -5453,10 +5457,10 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
  * MAX SIZE = 0
  *
  * 3 input images, 1 output image
- * 28 image operations in dag
- * dag length is 29, dag width is 3
+ * 27 image operations in dag
+ * dag length is 28, dag width is 3
  * costs in cycles per imagelet row:
- * - computation: 388
+ * - computation: 373
  * - communication: 192
  */
 freia_status license_plate_copies_terapix_helper_0_0_2(
@@ -5488,20 +5492,20 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
-  // operation 6 parameters
-  int16_t p_6[3];
-  const int32_t x_6 = 3;
-  const int32_t y_6 = 0;
-  // operation 8 parameters
-  int16_t p_8[9];
-  const int32_t x_8 = 6;
-  const int32_t y_8 = 0;
-  // operation 24 parameters
-  int16_t p_24[9];
-  const int32_t x_24 = 9;
-  const int32_t y_24 = 0;
+  // operation 5 parameters
+  int16_t p_5[3];
+  const int32_t x_5 = 3;
+  const int32_t y_5 = 0;
+  // operation 7 parameters
+  int16_t p_7[9];
+  const int32_t x_7 = 6;
+  const int32_t y_7 = 0;
+  // operation 23 parameters
+  int16_t p_23[9];
+  const int32_t x_23 = 9;
+  const int32_t y_23 = 0;
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][28];
+  terapix_mcu_macrocode mcu_macro[2][27];
   terapix_tile_info tile_in[2][3];
   terapix_tile_info tile_out[2][1];
   // imagelets definitions:
@@ -5669,19 +5673,29 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][4].iter4 = 0;
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 5: D8(4) -> 2
+  // 5: thr(4) -> 4
   mcu_macro[0][5].xmin1 = imagelet_4;
   mcu_macro[1][5].xmin1 = imagelet_4;
   mcu_macro[0][5].ymin1 = 0;
   mcu_macro[1][5].ymin1 = 0;
-  mcu_macro[0][5].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][5].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][5].xmin2 = imagelet_4;
+  mcu_macro[1][5].xmin2 = imagelet_4;
   mcu_macro[0][5].ymin2 = 0;
   mcu_macro[1][5].ymin2 = 0;
-  mcu_macro[0][5].xmin3 = x_0;
-  mcu_macro[1][5].xmin3 = x_0;
-  mcu_macro[0][5].ymin3 = y_0;
-  mcu_macro[1][5].ymin3 = y_0;
+  // copy of operation 5 parameters
+  p_5[0] = pi5;
+  p_5[1] = pi6;
+  p_5[2] = pi7;
+  gram.xoffset = x_5;
+  gram.yoffset = y_5;
+  gram.width = 3;
+  gram.height = 1;
+  gram.params = p_5;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][5].xmin3 = x_5;
+  mcu_macro[1][5].xmin3 = x_5;
+  mcu_macro[0][5].ymin3 = y_5;
+  mcu_macro[1][5].ymin3 = y_5;
   mcu_macro[0][5].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][5].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][5].iter2 = imagelet_size;
@@ -5690,31 +5704,21 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][5].iter3 = 0;
   mcu_macro[0][5].iter4 = 0;
   mcu_macro[1][5].iter4 = 0;
-  mcu_macro[0][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 6: thr(2) -> 4
-  mcu_macro[0][6].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][6].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][5].addrStart = TERAPIX_UCODE_THRESHOLD;
+  mcu_macro[1][5].addrStart = TERAPIX_UCODE_THRESHOLD;
+  // 6: &(4,1) -> 4
+  mcu_macro[0][6].xmin1 = imagelet_4;
+  mcu_macro[1][6].xmin1 = imagelet_4;
   mcu_macro[0][6].ymin1 = 0;
   mcu_macro[1][6].ymin1 = 0;
-  mcu_macro[0][6].xmin2 = imagelet_4;
-  mcu_macro[1][6].xmin2 = imagelet_4;
+  mcu_macro[0][6].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin2 = imagelet_io_1_1;
   mcu_macro[0][6].ymin2 = 0;
   mcu_macro[1][6].ymin2 = 0;
-  // copy of operation 6 parameters
-  p_6[0] = pi5;
-  p_6[1] = pi6;
-  p_6[2] = pi7;
-  gram.xoffset = x_6;
-  gram.yoffset = y_6;
-  gram.width = 3;
-  gram.height = 1;
-  gram.params = p_6;
-  freia_mg_write_dynamic_param(&dyn_param);
-  mcu_macro[0][6].xmin3 = x_6;
-  mcu_macro[1][6].xmin3 = x_6;
-  mcu_macro[0][6].ymin3 = y_6;
-  mcu_macro[1][6].ymin3 = y_6;
+  mcu_macro[0][6].xmin3 = imagelet_4;
+  mcu_macro[1][6].xmin3 = imagelet_4;
+  mcu_macro[0][6].ymin3 = 0;
+  mcu_macro[1][6].ymin3 = 0;
   mcu_macro[0][6].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][6].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][6].iter2 = imagelet_size;
@@ -5723,21 +5727,30 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][6].iter3 = 0;
   mcu_macro[0][6].iter4 = 0;
   mcu_macro[1][6].iter4 = 0;
-  mcu_macro[0][6].addrStart = TERAPIX_UCODE_THRESHOLD;
-  mcu_macro[1][6].addrStart = TERAPIX_UCODE_THRESHOLD;
-  // 7: &(4,1) -> 4
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_AND3;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_AND3;
+  // 7: E8(4) -> 2
   mcu_macro[0][7].xmin1 = imagelet_4;
   mcu_macro[1][7].xmin1 = imagelet_4;
   mcu_macro[0][7].ymin1 = 0;
   mcu_macro[1][7].ymin1 = 0;
-  mcu_macro[0][7].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][7].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][7].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][7].xmin2 = imagelet_io_2_1;
   mcu_macro[0][7].ymin2 = 0;
   mcu_macro[1][7].ymin2 = 0;
-  mcu_macro[0][7].xmin3 = imagelet_4;
-  mcu_macro[1][7].xmin3 = imagelet_4;
-  mcu_macro[0][7].ymin3 = 0;
-  mcu_macro[1][7].ymin3 = 0;
+  // copy of operation 7 parameters
+  for(i=0; i<9; i++)
+    p_7[i] = pi8[i];
+  gram.xoffset = x_7;
+  gram.yoffset = y_7;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_7;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][7].xmin3 = x_7;
+  mcu_macro[1][7].xmin3 = x_7;
+  mcu_macro[0][7].ymin3 = y_7;
+  mcu_macro[1][7].ymin3 = y_7;
   mcu_macro[0][7].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][7].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][7].iter2 = imagelet_size;
@@ -5746,30 +5759,21 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][7].iter3 = 0;
   mcu_macro[0][7].iter4 = 0;
   mcu_macro[1][7].iter4 = 0;
-  mcu_macro[0][7].addrStart = TERAPIX_UCODE_AND3;
-  mcu_macro[1][7].addrStart = TERAPIX_UCODE_AND3;
-  // 8: E8(4) -> 2
-  mcu_macro[0][8].xmin1 = imagelet_4;
-  mcu_macro[1][8].xmin1 = imagelet_4;
+  mcu_macro[0][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 8: E8(2) -> 4
+  mcu_macro[0][8].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][8].xmin1 = imagelet_io_2_1;
   mcu_macro[0][8].ymin1 = 0;
   mcu_macro[1][8].ymin1 = 0;
-  mcu_macro[0][8].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][8].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][8].xmin2 = imagelet_4;
+  mcu_macro[1][8].xmin2 = imagelet_4;
   mcu_macro[0][8].ymin2 = 0;
   mcu_macro[1][8].ymin2 = 0;
-  // copy of operation 8 parameters
-  for(i=0; i<9; i++)
-    p_8[i] = pi8[i];
-  gram.xoffset = x_8;
-  gram.yoffset = y_8;
-  gram.width = 3;
-  gram.height = 3;
-  gram.params = p_8;
-  freia_mg_write_dynamic_param(&dyn_param);
-  mcu_macro[0][8].xmin3 = x_8;
-  mcu_macro[1][8].xmin3 = x_8;
-  mcu_macro[0][8].ymin3 = y_8;
-  mcu_macro[1][8].ymin3 = y_8;
+  mcu_macro[0][8].xmin3 = x_7;
+  mcu_macro[1][8].xmin3 = x_7;
+  mcu_macro[0][8].ymin3 = y_7;
+  mcu_macro[1][8].ymin3 = y_7;
   mcu_macro[0][8].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][8].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][8].iter2 = imagelet_size;
@@ -5780,19 +5784,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][8].iter4 = 0;
   mcu_macro[0][8].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][8].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 9: E8(2) -> 4
-  mcu_macro[0][9].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][9].xmin1 = imagelet_io_2_1;
+  // 9: E8(4) -> 2
+  mcu_macro[0][9].xmin1 = imagelet_4;
+  mcu_macro[1][9].xmin1 = imagelet_4;
   mcu_macro[0][9].ymin1 = 0;
   mcu_macro[1][9].ymin1 = 0;
-  mcu_macro[0][9].xmin2 = imagelet_4;
-  mcu_macro[1][9].xmin2 = imagelet_4;
+  mcu_macro[0][9].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][9].xmin2 = imagelet_io_2_1;
   mcu_macro[0][9].ymin2 = 0;
   mcu_macro[1][9].ymin2 = 0;
-  mcu_macro[0][9].xmin3 = x_8;
-  mcu_macro[1][9].xmin3 = x_8;
-  mcu_macro[0][9].ymin3 = y_8;
-  mcu_macro[1][9].ymin3 = y_8;
+  mcu_macro[0][9].xmin3 = x_7;
+  mcu_macro[1][9].xmin3 = x_7;
+  mcu_macro[0][9].ymin3 = y_7;
+  mcu_macro[1][9].ymin3 = y_7;
   mcu_macro[0][9].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][9].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][9].iter2 = imagelet_size;
@@ -5803,19 +5807,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][9].iter4 = 0;
   mcu_macro[0][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 10: E8(4) -> 2
-  mcu_macro[0][10].xmin1 = imagelet_4;
-  mcu_macro[1][10].xmin1 = imagelet_4;
+  // 10: E8(2) -> 4
+  mcu_macro[0][10].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][10].xmin1 = imagelet_io_2_1;
   mcu_macro[0][10].ymin1 = 0;
   mcu_macro[1][10].ymin1 = 0;
-  mcu_macro[0][10].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][10].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][10].xmin2 = imagelet_4;
+  mcu_macro[1][10].xmin2 = imagelet_4;
   mcu_macro[0][10].ymin2 = 0;
   mcu_macro[1][10].ymin2 = 0;
-  mcu_macro[0][10].xmin3 = x_8;
-  mcu_macro[1][10].xmin3 = x_8;
-  mcu_macro[0][10].ymin3 = y_8;
-  mcu_macro[1][10].ymin3 = y_8;
+  mcu_macro[0][10].xmin3 = x_7;
+  mcu_macro[1][10].xmin3 = x_7;
+  mcu_macro[0][10].ymin3 = y_7;
+  mcu_macro[1][10].ymin3 = y_7;
   mcu_macro[0][10].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][10].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][10].iter2 = imagelet_size;
@@ -5826,19 +5830,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][10].iter4 = 0;
   mcu_macro[0][10].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][10].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 11: E8(2) -> 4
-  mcu_macro[0][11].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][11].xmin1 = imagelet_io_2_1;
+  // 11: D8(4) -> 2
+  mcu_macro[0][11].xmin1 = imagelet_4;
+  mcu_macro[1][11].xmin1 = imagelet_4;
   mcu_macro[0][11].ymin1 = 0;
   mcu_macro[1][11].ymin1 = 0;
-  mcu_macro[0][11].xmin2 = imagelet_4;
-  mcu_macro[1][11].xmin2 = imagelet_4;
+  mcu_macro[0][11].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][11].xmin2 = imagelet_io_2_1;
   mcu_macro[0][11].ymin2 = 0;
   mcu_macro[1][11].ymin2 = 0;
-  mcu_macro[0][11].xmin3 = x_8;
-  mcu_macro[1][11].xmin3 = x_8;
-  mcu_macro[0][11].ymin3 = y_8;
-  mcu_macro[1][11].ymin3 = y_8;
+  mcu_macro[0][11].xmin3 = x_7;
+  mcu_macro[1][11].xmin3 = x_7;
+  mcu_macro[0][11].ymin3 = y_7;
+  mcu_macro[1][11].ymin3 = y_7;
   mcu_macro[0][11].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][11].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][11].iter2 = imagelet_size;
@@ -5847,21 +5851,21 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][11].iter3 = 0;
   mcu_macro[0][11].iter4 = 0;
   mcu_macro[1][11].iter4 = 0;
-  mcu_macro[0][11].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][11].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 12: D8(4) -> 2
-  mcu_macro[0][12].xmin1 = imagelet_4;
-  mcu_macro[1][12].xmin1 = imagelet_4;
+  mcu_macro[0][11].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][11].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 12: D8(2) -> 4
+  mcu_macro[0][12].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][12].xmin1 = imagelet_io_2_1;
   mcu_macro[0][12].ymin1 = 0;
   mcu_macro[1][12].ymin1 = 0;
-  mcu_macro[0][12].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][12].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][12].xmin2 = imagelet_4;
+  mcu_macro[1][12].xmin2 = imagelet_4;
   mcu_macro[0][12].ymin2 = 0;
   mcu_macro[1][12].ymin2 = 0;
-  mcu_macro[0][12].xmin3 = x_8;
-  mcu_macro[1][12].xmin3 = x_8;
-  mcu_macro[0][12].ymin3 = y_8;
-  mcu_macro[1][12].ymin3 = y_8;
+  mcu_macro[0][12].xmin3 = x_7;
+  mcu_macro[1][12].xmin3 = x_7;
+  mcu_macro[0][12].ymin3 = y_7;
+  mcu_macro[1][12].ymin3 = y_7;
   mcu_macro[0][12].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][12].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][12].iter2 = imagelet_size;
@@ -5872,19 +5876,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][12].iter4 = 0;
   mcu_macro[0][12].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][12].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 13: D8(2) -> 4
-  mcu_macro[0][13].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][13].xmin1 = imagelet_io_2_1;
+  // 13: D8(4) -> 2
+  mcu_macro[0][13].xmin1 = imagelet_4;
+  mcu_macro[1][13].xmin1 = imagelet_4;
   mcu_macro[0][13].ymin1 = 0;
   mcu_macro[1][13].ymin1 = 0;
-  mcu_macro[0][13].xmin2 = imagelet_4;
-  mcu_macro[1][13].xmin2 = imagelet_4;
+  mcu_macro[0][13].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][13].xmin2 = imagelet_io_2_1;
   mcu_macro[0][13].ymin2 = 0;
   mcu_macro[1][13].ymin2 = 0;
-  mcu_macro[0][13].xmin3 = x_8;
-  mcu_macro[1][13].xmin3 = x_8;
-  mcu_macro[0][13].ymin3 = y_8;
-  mcu_macro[1][13].ymin3 = y_8;
+  mcu_macro[0][13].xmin3 = x_7;
+  mcu_macro[1][13].xmin3 = x_7;
+  mcu_macro[0][13].ymin3 = y_7;
+  mcu_macro[1][13].ymin3 = y_7;
   mcu_macro[0][13].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][13].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][13].iter2 = imagelet_size;
@@ -5895,19 +5899,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][13].iter4 = 0;
   mcu_macro[0][13].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][13].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 14: D8(4) -> 2
-  mcu_macro[0][14].xmin1 = imagelet_4;
-  mcu_macro[1][14].xmin1 = imagelet_4;
+  // 14: D8(2) -> 4
+  mcu_macro[0][14].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][14].xmin1 = imagelet_io_2_1;
   mcu_macro[0][14].ymin1 = 0;
   mcu_macro[1][14].ymin1 = 0;
-  mcu_macro[0][14].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][14].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][14].xmin2 = imagelet_4;
+  mcu_macro[1][14].xmin2 = imagelet_4;
   mcu_macro[0][14].ymin2 = 0;
   mcu_macro[1][14].ymin2 = 0;
-  mcu_macro[0][14].xmin3 = x_8;
-  mcu_macro[1][14].xmin3 = x_8;
-  mcu_macro[0][14].ymin3 = y_8;
-  mcu_macro[1][14].ymin3 = y_8;
+  mcu_macro[0][14].xmin3 = x_7;
+  mcu_macro[1][14].xmin3 = x_7;
+  mcu_macro[0][14].ymin3 = y_7;
+  mcu_macro[1][14].ymin3 = y_7;
   mcu_macro[0][14].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][14].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][14].iter2 = imagelet_size;
@@ -5918,19 +5922,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][14].iter4 = 0;
   mcu_macro[0][14].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][14].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 15: D8(2) -> 4
-  mcu_macro[0][15].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][15].xmin1 = imagelet_io_2_1;
+  // 15: E8(4) -> 2
+  mcu_macro[0][15].xmin1 = imagelet_4;
+  mcu_macro[1][15].xmin1 = imagelet_4;
   mcu_macro[0][15].ymin1 = 0;
   mcu_macro[1][15].ymin1 = 0;
-  mcu_macro[0][15].xmin2 = imagelet_4;
-  mcu_macro[1][15].xmin2 = imagelet_4;
+  mcu_macro[0][15].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][15].xmin2 = imagelet_io_2_1;
   mcu_macro[0][15].ymin2 = 0;
   mcu_macro[1][15].ymin2 = 0;
-  mcu_macro[0][15].xmin3 = x_8;
-  mcu_macro[1][15].xmin3 = x_8;
-  mcu_macro[0][15].ymin3 = y_8;
-  mcu_macro[1][15].ymin3 = y_8;
+  mcu_macro[0][15].xmin3 = x_0;
+  mcu_macro[1][15].xmin3 = x_0;
+  mcu_macro[0][15].ymin3 = y_0;
+  mcu_macro[1][15].ymin3 = y_0;
   mcu_macro[0][15].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][15].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][15].iter2 = imagelet_size;
@@ -5939,15 +5943,15 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][15].iter3 = 0;
   mcu_macro[0][15].iter4 = 0;
   mcu_macro[1][15].iter4 = 0;
-  mcu_macro[0][15].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][15].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 16: E8(4) -> 2
-  mcu_macro[0][16].xmin1 = imagelet_4;
-  mcu_macro[1][16].xmin1 = imagelet_4;
+  mcu_macro[0][15].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][15].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 16: E8(2) -> 4
+  mcu_macro[0][16].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][16].xmin1 = imagelet_io_2_1;
   mcu_macro[0][16].ymin1 = 0;
   mcu_macro[1][16].ymin1 = 0;
-  mcu_macro[0][16].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][16].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][16].xmin2 = imagelet_4;
+  mcu_macro[1][16].xmin2 = imagelet_4;
   mcu_macro[0][16].ymin2 = 0;
   mcu_macro[1][16].ymin2 = 0;
   mcu_macro[0][16].xmin3 = x_0;
@@ -5964,13 +5968,13 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][16].iter4 = 0;
   mcu_macro[0][16].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][16].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 17: E8(2) -> 4
-  mcu_macro[0][17].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][17].xmin1 = imagelet_io_2_1;
+  // 17: E8(4) -> 2
+  mcu_macro[0][17].xmin1 = imagelet_4;
+  mcu_macro[1][17].xmin1 = imagelet_4;
   mcu_macro[0][17].ymin1 = 0;
   mcu_macro[1][17].ymin1 = 0;
-  mcu_macro[0][17].xmin2 = imagelet_4;
-  mcu_macro[1][17].xmin2 = imagelet_4;
+  mcu_macro[0][17].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][17].xmin2 = imagelet_io_2_1;
   mcu_macro[0][17].ymin2 = 0;
   mcu_macro[1][17].ymin2 = 0;
   mcu_macro[0][17].xmin3 = x_0;
@@ -5987,13 +5991,13 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][17].iter4 = 0;
   mcu_macro[0][17].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][17].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 18: E8(4) -> 2
-  mcu_macro[0][18].xmin1 = imagelet_4;
-  mcu_macro[1][18].xmin1 = imagelet_4;
+  // 18: E8(2) -> 4
+  mcu_macro[0][18].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][18].xmin1 = imagelet_io_2_1;
   mcu_macro[0][18].ymin1 = 0;
   mcu_macro[1][18].ymin1 = 0;
-  mcu_macro[0][18].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][18].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][18].xmin2 = imagelet_4;
+  mcu_macro[1][18].xmin2 = imagelet_4;
   mcu_macro[0][18].ymin2 = 0;
   mcu_macro[1][18].ymin2 = 0;
   mcu_macro[0][18].xmin3 = x_0;
@@ -6010,13 +6014,13 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][18].iter4 = 0;
   mcu_macro[0][18].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][18].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 19: E8(2) -> 4
-  mcu_macro[0][19].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][19].xmin1 = imagelet_io_2_1;
+  // 19: D8(4) -> 2
+  mcu_macro[0][19].xmin1 = imagelet_4;
+  mcu_macro[1][19].xmin1 = imagelet_4;
   mcu_macro[0][19].ymin1 = 0;
   mcu_macro[1][19].ymin1 = 0;
-  mcu_macro[0][19].xmin2 = imagelet_4;
-  mcu_macro[1][19].xmin2 = imagelet_4;
+  mcu_macro[0][19].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][19].xmin2 = imagelet_io_2_1;
   mcu_macro[0][19].ymin2 = 0;
   mcu_macro[1][19].ymin2 = 0;
   mcu_macro[0][19].xmin3 = x_0;
@@ -6031,15 +6035,15 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][19].iter3 = 0;
   mcu_macro[0][19].iter4 = 0;
   mcu_macro[1][19].iter4 = 0;
-  mcu_macro[0][19].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][19].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 20: D8(4) -> 2
-  mcu_macro[0][20].xmin1 = imagelet_4;
-  mcu_macro[1][20].xmin1 = imagelet_4;
+  mcu_macro[0][19].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][19].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 20: D8(2) -> 4
+  mcu_macro[0][20].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][20].xmin1 = imagelet_io_2_1;
   mcu_macro[0][20].ymin1 = 0;
   mcu_macro[1][20].ymin1 = 0;
-  mcu_macro[0][20].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][20].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][20].xmin2 = imagelet_4;
+  mcu_macro[1][20].xmin2 = imagelet_4;
   mcu_macro[0][20].ymin2 = 0;
   mcu_macro[1][20].ymin2 = 0;
   mcu_macro[0][20].xmin3 = x_0;
@@ -6056,13 +6060,13 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][20].iter4 = 0;
   mcu_macro[0][20].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][20].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 21: D8(2) -> 4
-  mcu_macro[0][21].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][21].xmin1 = imagelet_io_2_1;
+  // 21: D8(4) -> 2
+  mcu_macro[0][21].xmin1 = imagelet_4;
+  mcu_macro[1][21].xmin1 = imagelet_4;
   mcu_macro[0][21].ymin1 = 0;
   mcu_macro[1][21].ymin1 = 0;
-  mcu_macro[0][21].xmin2 = imagelet_4;
-  mcu_macro[1][21].xmin2 = imagelet_4;
+  mcu_macro[0][21].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][21].xmin2 = imagelet_io_2_1;
   mcu_macro[0][21].ymin2 = 0;
   mcu_macro[1][21].ymin2 = 0;
   mcu_macro[0][21].xmin3 = x_0;
@@ -6079,13 +6083,13 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][21].iter4 = 0;
   mcu_macro[0][21].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][21].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 22: D8(4) -> 2
-  mcu_macro[0][22].xmin1 = imagelet_4;
-  mcu_macro[1][22].xmin1 = imagelet_4;
+  // 22: D8(2) -> 4
+  mcu_macro[0][22].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][22].xmin1 = imagelet_io_2_1;
   mcu_macro[0][22].ymin1 = 0;
   mcu_macro[1][22].ymin1 = 0;
-  mcu_macro[0][22].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][22].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][22].xmin2 = imagelet_4;
+  mcu_macro[1][22].xmin2 = imagelet_4;
   mcu_macro[0][22].ymin2 = 0;
   mcu_macro[1][22].ymin2 = 0;
   mcu_macro[0][22].xmin3 = x_0;
@@ -6102,19 +6106,28 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][22].iter4 = 0;
   mcu_macro[0][22].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][22].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 23: D8(2) -> 4
-  mcu_macro[0][23].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][23].xmin1 = imagelet_io_2_1;
+  // 23: D8(4) -> 2
+  mcu_macro[0][23].xmin1 = imagelet_4;
+  mcu_macro[1][23].xmin1 = imagelet_4;
   mcu_macro[0][23].ymin1 = 0;
   mcu_macro[1][23].ymin1 = 0;
-  mcu_macro[0][23].xmin2 = imagelet_4;
-  mcu_macro[1][23].xmin2 = imagelet_4;
+  mcu_macro[0][23].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][23].xmin2 = imagelet_io_2_1;
   mcu_macro[0][23].ymin2 = 0;
   mcu_macro[1][23].ymin2 = 0;
-  mcu_macro[0][23].xmin3 = x_0;
-  mcu_macro[1][23].xmin3 = x_0;
-  mcu_macro[0][23].ymin3 = y_0;
-  mcu_macro[1][23].ymin3 = y_0;
+  // copy of operation 23 parameters
+  for(i=0; i<9; i++)
+    p_23[i] = pi9[i];
+  gram.xoffset = x_23;
+  gram.yoffset = y_23;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_23;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][23].xmin3 = x_23;
+  mcu_macro[1][23].xmin3 = x_23;
+  mcu_macro[0][23].ymin3 = y_23;
+  mcu_macro[1][23].ymin3 = y_23;
   mcu_macro[0][23].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][23].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][23].iter2 = imagelet_size;
@@ -6125,28 +6138,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][23].iter4 = 0;
   mcu_macro[0][23].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][23].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 24: D8(4) -> 2
-  mcu_macro[0][24].xmin1 = imagelet_4;
-  mcu_macro[1][24].xmin1 = imagelet_4;
+  // 24: D8(2) -> 4
+  mcu_macro[0][24].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][24].xmin1 = imagelet_io_2_1;
   mcu_macro[0][24].ymin1 = 0;
   mcu_macro[1][24].ymin1 = 0;
-  mcu_macro[0][24].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][24].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][24].xmin2 = imagelet_4;
+  mcu_macro[1][24].xmin2 = imagelet_4;
   mcu_macro[0][24].ymin2 = 0;
   mcu_macro[1][24].ymin2 = 0;
-  // copy of operation 24 parameters
-  for(i=0; i<9; i++)
-    p_24[i] = pi9[i];
-  gram.xoffset = x_24;
-  gram.yoffset = y_24;
-  gram.width = 3;
-  gram.height = 3;
-  gram.params = p_24;
-  freia_mg_write_dynamic_param(&dyn_param);
-  mcu_macro[0][24].xmin3 = x_24;
-  mcu_macro[1][24].xmin3 = x_24;
-  mcu_macro[0][24].ymin3 = y_24;
-  mcu_macro[1][24].ymin3 = y_24;
+  mcu_macro[0][24].xmin3 = x_23;
+  mcu_macro[1][24].xmin3 = x_23;
+  mcu_macro[0][24].ymin3 = y_23;
+  mcu_macro[1][24].ymin3 = y_23;
   mcu_macro[0][24].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][24].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][24].iter2 = imagelet_size;
@@ -6157,19 +6161,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][24].iter4 = 0;
   mcu_macro[0][24].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][24].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 25: D8(2) -> 4
-  mcu_macro[0][25].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][25].xmin1 = imagelet_io_2_1;
+  // 25: D8(4) -> 2
+  mcu_macro[0][25].xmin1 = imagelet_4;
+  mcu_macro[1][25].xmin1 = imagelet_4;
   mcu_macro[0][25].ymin1 = 0;
   mcu_macro[1][25].ymin1 = 0;
-  mcu_macro[0][25].xmin2 = imagelet_4;
-  mcu_macro[1][25].xmin2 = imagelet_4;
+  mcu_macro[0][25].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][25].xmin2 = imagelet_io_2_1;
   mcu_macro[0][25].ymin2 = 0;
   mcu_macro[1][25].ymin2 = 0;
-  mcu_macro[0][25].xmin3 = x_24;
-  mcu_macro[1][25].xmin3 = x_24;
-  mcu_macro[0][25].ymin3 = y_24;
-  mcu_macro[1][25].ymin3 = y_24;
+  mcu_macro[0][25].xmin3 = x_23;
+  mcu_macro[1][25].xmin3 = x_23;
+  mcu_macro[0][25].ymin3 = y_23;
+  mcu_macro[1][25].ymin3 = y_23;
   mcu_macro[0][25].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][25].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][25].iter2 = imagelet_size;
@@ -6180,19 +6184,19 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][25].iter4 = 0;
   mcu_macro[0][25].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][25].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 26: D8(4) -> 2
-  mcu_macro[0][26].xmin1 = imagelet_4;
-  mcu_macro[1][26].xmin1 = imagelet_4;
+  // 26: &(2,3) -> 1
+  mcu_macro[0][26].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][26].xmin1 = imagelet_io_2_1;
   mcu_macro[0][26].ymin1 = 0;
   mcu_macro[1][26].ymin1 = 0;
-  mcu_macro[0][26].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][26].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][26].xmin2 = imagelet_io_3_0;
+  mcu_macro[1][26].xmin2 = imagelet_io_3_1;
   mcu_macro[0][26].ymin2 = 0;
   mcu_macro[1][26].ymin2 = 0;
-  mcu_macro[0][26].xmin3 = x_24;
-  mcu_macro[1][26].xmin3 = x_24;
-  mcu_macro[0][26].ymin3 = y_24;
-  mcu_macro[1][26].ymin3 = y_24;
+  mcu_macro[0][26].xmin3 = imagelet_io_1_0;
+  mcu_macro[1][26].xmin3 = imagelet_io_1_1;
+  mcu_macro[0][26].ymin3 = 0;
+  mcu_macro[1][26].ymin3 = 0;
   mcu_macro[0][26].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][26].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][26].iter2 = imagelet_size;
@@ -6201,31 +6205,8 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_macro[1][26].iter3 = 0;
   mcu_macro[0][26].iter4 = 0;
   mcu_macro[1][26].iter4 = 0;
-  mcu_macro[0][26].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][26].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 27: &(2,3) -> 1
-  mcu_macro[0][27].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][27].xmin1 = imagelet_io_2_1;
-  mcu_macro[0][27].ymin1 = 0;
-  mcu_macro[1][27].ymin1 = 0;
-  mcu_macro[0][27].xmin2 = imagelet_io_3_0;
-  mcu_macro[1][27].xmin2 = imagelet_io_3_1;
-  mcu_macro[0][27].ymin2 = 0;
-  mcu_macro[1][27].ymin2 = 0;
-  mcu_macro[0][27].xmin3 = imagelet_io_1_0;
-  mcu_macro[1][27].xmin3 = imagelet_io_1_1;
-  mcu_macro[0][27].ymin3 = 0;
-  mcu_macro[1][27].ymin3 = 0;
-  mcu_macro[0][27].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][27].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][27].iter2 = imagelet_size;
-  mcu_macro[1][27].iter2 = imagelet_size;
-  mcu_macro[0][27].iter3 = 0;
-  mcu_macro[1][27].iter3 = 0;
-  mcu_macro[0][27].iter4 = 0;
-  mcu_macro[1][27].iter4 = 0;
-  mcu_macro[0][27].addrStart = TERAPIX_UCODE_AND3;
-  mcu_macro[1][27].addrStart = TERAPIX_UCODE_AND3;
+  mcu_macro[0][26].addrStart = TERAPIX_UCODE_AND3;
+  mcu_macro[1][26].addrStart = TERAPIX_UCODE_AND3;
 
 
   // inputs:
@@ -6234,7 +6215,7 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for imopen_6
+  // - imagelet 2 is i1 for imopen_5
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
@@ -6255,8 +6236,8 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 11;
   mcu_instr.borderBottom = 11;
-  mcu_instr.borderLeft   = 17;
-  mcu_instr.borderRight  = 17;
+  mcu_instr.borderLeft   = 16;
+  mcu_instr.borderRight  = 16;
   mcu_instr.imagelet_height = imagelet_size;
   mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
@@ -6271,7 +6252,7 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 28;
+  mcu_instr.nbinstr = 27;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
@@ -6348,7 +6329,7 @@ int license_plate_copies(void)
    license_plate_copies_terapix_helper_0_0_1(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);            /*0080*/
    
    
-   license_plate_copies_terapix_helper_0_0_2(out, imcloseth, imopen, in, kernel1x3, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0114*/
+   license_plate_copies_terapix_helper_0_0_2(out, imcloseth, imopen, in, kernel1x3, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0116*/
    
    
    
@@ -6453,7 +6434,7 @@ int license_plate_copies(void)
    license_plate_copies_terapix_helper_0_0_1(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);            /*0080*/
    
    
-   license_plate_copies_terapix_helper_0_0_2(out, imcloseth, imopen, in, kernel1x3, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0114*/
+   license_plate_copies_terapix_helper_0_0_2(out, imcloseth, imopen, in, kernel1x3, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0116*/
    
    
    

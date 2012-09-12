@@ -812,17 +812,19 @@ digraph "freia_20_terapix_helper_0_0_0" {
   "i" -> "21 E8";
 }
 // graph for dag "freia_20_terapix_helper_0_0_1" of module "freia_20" in dot format
-// DAG "freia_20_terapix_helper_0_0_1": #i=1 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
+// DAG "freia_20_terapix_helper_0_0_1": #i=1 #o=1 #c=5 #s=0 #I=0 #B=0 #A=0
 digraph "freia_20_terapix_helper_0_0_1" {
   // inputs
   "t3" [shape=circle];
 
   // outputs
-  "t7" [shape=circle];
+  "t8" [shape=circle];
 
   // computation vertices
+  "30 E8" [shape=box];
+  "30 E8" -> "t8";
   "28 D6" [shape=box];
-  "28 D6" -> "t7";
+  "28 D6" -> "30 E8" [label="t7"];
   "27 D8" [shape=box];
   "27 D8" -> "28 D6" [label="t6"];
   "26 E6" [shape=box];
@@ -832,16 +834,16 @@ digraph "freia_20_terapix_helper_0_0_1" {
   "t3" -> "25 E8";
 }
 // graph for dag "freia_20_terapix_helper_0_0_2" of module "freia_20" in dot format
-// DAG "freia_20_terapix_helper_0_0_2": #i=1 #o=1 #c=5 #s=0 #I=0 #B=0 #A=0
+// DAG "freia_20_terapix_helper_0_0_2": #i=1 #o=1 #c=4 #s=0 #I=0 #B=0 #A=0
 digraph "freia_20_terapix_helper_0_0_2" {
   // inputs
-  "t7" [shape=circle];
+  "t8" [shape=circle];
 
   // outputs
   "o" [shape=circle];
 
   // computation vertices
-  "t7" -> "30 E8";
+  "t8" -> "31 E6";
   "34 E8" [shape=box];
   "34 E8" -> "o";
   "33 D6" [shape=box];
@@ -850,8 +852,6 @@ digraph "freia_20_terapix_helper_0_0_2" {
   "32 D8" -> "33 D6" [label="ta"];
   "31 E6" [shape=box];
   "31 E6" -> "32 D8" [label="t9"];
-  "30 E8" [shape=box];
-  "30 E8" -> "31 E6" [label="t8"];
 }
 
 ! acceleration function
@@ -1107,242 +1107,13 @@ freia_status freia_20_terapix_helper_0_0_0(
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
- * 4 image operations in dag
- * dag length is 5, dag width is 1
- * costs in cycles per imagelet row:
- * - computation: 50
- * - communication: 48
- */
-freia_status freia_20_terapix_helper_0_0_1(
-  freia_data2d * o0,
-  const freia_data2d * i0,
-  const int32_t * pi2)
-{
-  // declarations:
-  freia_microcode mcode;
-  freia_op_param param;
-  freia_dynamic_param dyn_param;
-  terapix_gram gram;
-  int i;
-  freia_status ret = FREIA_OK;
-  // data structures for reductions
-  terapix_mcu_macrocode mem_init;
-  freia_reduction_results redres;
-  terapix_reduction redter;
-  // overall structure which describes the computation
-  terapix_mcu_instr mcu_instr;
-  // operation 0 parameters
-  int16_t p_0[9];
-  const int32_t x_0 = 0;
-  const int32_t y_0 = 0;
-  // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][4];
-  terapix_tile_info tile_in[2][1];
-  terapix_tile_info tile_out[2][1];
-  // imagelets definitions:
-  // - 2 computation imagelets
-  // - 1 double buffer imagelets
-  // dynamic optimal imagelet size computation
-  // this formula must match what the scheduler does!
-  int vertical_border = 4;
-  int image_height = i0->heightWa;
-  int max_computed_size = 333;
-  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
-        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
-  int imagelet_1 = 0;
-  int imagelet_2 = 341;
-  int imagelet_3 = 682;
-
-  // double buffer assignment
-  int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_3;
-
-  // body:
-  // mcode param
-  mcode.raw = (void*) terapix_ucode_array;
-  mcode.size = TERAPIX_UCODE_SIZE_T;
-  freia_mg_write_microcode(&mcode);
-
-  // dyn_param contents
-  dyn_param.raw = &gram;
-  dyn_param.size = sizeof(terapix_gram);
-
-  // redres contents
-  redres.raw = (void*) &redter;
-  redres.size = sizeof(terapix_reduction);
-
-  // 0: E8(1) -> 2
-  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin1 = 0;
-  mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_2;
-  mcu_macro[1][0].xmin2 = imagelet_2;
-  mcu_macro[0][0].ymin2 = 0;
-  mcu_macro[1][0].ymin2 = 0;
-  // copy of operation 0 parameters
-  for(i=0; i<9; i++)
-    p_0[i] = pi2[i];
-  gram.xoffset = x_0;
-  gram.yoffset = y_0;
-  gram.width = 3;
-  gram.height = 3;
-  gram.params = p_0;
-  freia_mg_write_dynamic_param(&dyn_param);
-  mcu_macro[0][0].xmin3 = x_0;
-  mcu_macro[1][0].xmin3 = x_0;
-  mcu_macro[0][0].ymin3 = y_0;
-  mcu_macro[1][0].ymin3 = y_0;
-  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].iter2 = imagelet_size;
-  mcu_macro[1][0].iter2 = imagelet_size;
-  mcu_macro[0][0].iter3 = 0;
-  mcu_macro[1][0].iter3 = 0;
-  mcu_macro[0][0].iter4 = 0;
-  mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 1: E6(2) -> 1
-  mcu_macro[0][1].xmin1 = imagelet_2;
-  mcu_macro[1][1].xmin1 = imagelet_2;
-  mcu_macro[0][1].ymin1 = 0;
-  mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
-  mcu_macro[0][1].ymin2 = 0;
-  mcu_macro[1][1].ymin2 = 0;
-  mcu_macro[0][1].xmin3 = x_0;
-  mcu_macro[1][1].xmin3 = x_0;
-  mcu_macro[0][1].ymin3 = y_0;
-  mcu_macro[1][1].ymin3 = y_0;
-  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][1].iter2 = imagelet_size;
-  mcu_macro[1][1].iter2 = imagelet_size;
-  mcu_macro[0][1].iter3 = 0;
-  mcu_macro[1][1].iter3 = 0;
-  mcu_macro[0][1].iter4 = 0;
-  mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3?;
-  // 2: D8(1) -> 2
-  mcu_macro[0][2].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][2].xmin1 = imagelet_io_1_1;
-  mcu_macro[0][2].ymin1 = 0;
-  mcu_macro[1][2].ymin1 = 0;
-  mcu_macro[0][2].xmin2 = imagelet_2;
-  mcu_macro[1][2].xmin2 = imagelet_2;
-  mcu_macro[0][2].ymin2 = 0;
-  mcu_macro[1][2].ymin2 = 0;
-  mcu_macro[0][2].xmin3 = x_0;
-  mcu_macro[1][2].xmin3 = x_0;
-  mcu_macro[0][2].ymin3 = y_0;
-  mcu_macro[1][2].ymin3 = y_0;
-  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][2].iter2 = imagelet_size;
-  mcu_macro[1][2].iter2 = imagelet_size;
-  mcu_macro[0][2].iter3 = 0;
-  mcu_macro[1][2].iter3 = 0;
-  mcu_macro[0][2].iter4 = 0;
-  mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 3: D6(2) -> 1
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
-  mcu_macro[0][3].ymin1 = 0;
-  mcu_macro[1][3].ymin1 = 0;
-  mcu_macro[0][3].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][3].xmin2 = imagelet_io_1_1;
-  mcu_macro[0][3].ymin2 = 0;
-  mcu_macro[1][3].ymin2 = 0;
-  mcu_macro[0][3].xmin3 = x_0;
-  mcu_macro[1][3].xmin3 = x_0;
-  mcu_macro[0][3].ymin3 = y_0;
-  mcu_macro[1][3].ymin3 = y_0;
-  mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][3].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][3].iter2 = imagelet_size;
-  mcu_macro[1][3].iter2 = imagelet_size;
-  mcu_macro[0][3].iter3 = 0;
-  mcu_macro[1][3].iter3 = 0;
-  mcu_macro[0][3].iter4 = 0;
-  mcu_macro[1][3].iter4 = 0;
-  mcu_macro[0][3].addrStart = TERAPIX_UCODE_DILATE_3_3?;
-  mcu_macro[1][3].addrStart = TERAPIX_UCODE_DILATE_3_3?;
-
-
-  // inputs:
-  // - imagelet 1 is i0 for t3
-  tile_in[0][0].x = imagelet_io_1_0;
-  tile_in[0][0].y = 0;
-  tile_in[1][0].x = imagelet_io_1_1;
-  tile_in[1][0].y = 0;
-
-  // outputs:
-  // - imagelet 1 is o0 for t7
-  tile_out[0][0].x = imagelet_io_1_0;
-  tile_out[0][0].y = 0;
-  tile_out[1][0].x = imagelet_io_1_1;
-  tile_out[1][0].y = 0;
-
-  // imagelet erosion for the computation
-  mcu_instr.borderTop    = 4;
-  mcu_instr.borderBottom = 4;
-  mcu_instr.borderLeft   = 4;
-  mcu_instr.borderRight  = 4;
-  mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
-
-  // outputs
-  mcu_instr.nbout = 1;
-  mcu_instr.out0 = tile_out[0];
-  mcu_instr.out1 = tile_out[1];
-
-  // inputs
-  mcu_instr.nbin = 1;
-  mcu_instr.in0 = tile_in[0];
-  mcu_instr.in1 = tile_in[1];
-
-  // actual instructions
-  mcu_instr.nbinstr = 4;
-  mcu_instr.instr0   = mcu_macro[0];
-  mcu_instr.instr1   = mcu_macro[1];
-
-  // call terapix runtime
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, o0, i0);
-
-  // extract measures
-
-  return ret;
-}
-
-
-/* FREIA terapix helper function for module freia_20
- *
- * RAMPE    = 1024
- * NPE      = 128
- * DMA BW   = 24
- * GRAM W   = 64
- * GRAM H   = 32
- * DAG CUT  = compute
- * OVERLAP  = false
- * IMAGE H  = 0
- * MAX SIZE = 0
- *
- * 1 input image, 1 output image
  * 5 image operations in dag
  * dag length is 6, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 65
  * - communication: 48
  */
-freia_status freia_20_terapix_helper_0_0_2(
+freia_status freia_20_terapix_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const int32_t * pi2)
@@ -1547,14 +1318,14 @@ freia_status freia_20_terapix_helper_0_0_2(
 
 
   // inputs:
-  // - imagelet 1 is i0 for t7
+  // - imagelet 1 is i0 for t3
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for o
+  // - imagelet 1 is o0 for t8
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
@@ -1594,6 +1365,235 @@ freia_status freia_20_terapix_helper_0_0_2(
 }
 
 
+/* FREIA terapix helper function for module freia_20
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 24
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
+ * 1 input image, 1 output image
+ * 4 image operations in dag
+ * dag length is 5, dag width is 1
+ * costs in cycles per imagelet row:
+ * - computation: 50
+ * - communication: 48
+ */
+freia_status freia_20_terapix_helper_0_0_2(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi2)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][4];
+  terapix_tile_info tile_in[2][1];
+  terapix_tile_info tile_out[2][1];
+  // imagelets definitions:
+  // - 2 computation imagelets
+  // - 1 double buffer imagelets
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 4;
+  int image_height = i0->heightWa;
+  int max_computed_size = 333;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
+  int imagelet_1 = 0;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_3;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: E6(1) -> 2
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_2;
+  mcu_macro[1][0].xmin2 = imagelet_2;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi2[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3?;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3?;
+  // 1: D8(2) -> 1
+  mcu_macro[0][1].xmin1 = imagelet_2;
+  mcu_macro[1][1].xmin1 = imagelet_2;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = x_0;
+  mcu_macro[1][1].xmin3 = x_0;
+  mcu_macro[0][1].ymin3 = y_0;
+  mcu_macro[1][1].ymin3 = y_0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 2: D6(1) -> 2
+  mcu_macro[0][2].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].xmin2 = imagelet_2;
+  mcu_macro[1][2].xmin2 = imagelet_2;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].xmin3 = x_0;
+  mcu_macro[1][2].xmin3 = x_0;
+  mcu_macro[0][2].ymin3 = y_0;
+  mcu_macro[1][2].ymin3 = y_0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3?;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3?;
+  // 3: E8(2) -> 1
+  mcu_macro[0][3].xmin1 = imagelet_2;
+  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].ymin1 = 0;
+  mcu_macro[1][3].ymin1 = 0;
+  mcu_macro[0][3].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][3].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][3].ymin2 = 0;
+  mcu_macro[1][3].ymin2 = 0;
+  mcu_macro[0][3].xmin3 = x_0;
+  mcu_macro[1][3].xmin3 = x_0;
+  mcu_macro[0][3].ymin3 = y_0;
+  mcu_macro[1][3].ymin3 = y_0;
+  mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][3].iter2 = imagelet_size;
+  mcu_macro[1][3].iter2 = imagelet_size;
+  mcu_macro[0][3].iter3 = 0;
+  mcu_macro[1][3].iter3 = 0;
+  mcu_macro[0][3].iter4 = 0;
+  mcu_macro[1][3].iter4 = 0;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+
+
+  // inputs:
+  // - imagelet 1 is i0 for t8
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+  tile_out[0][0].x = imagelet_io_1_0;
+  tile_out[0][0].y = 0;
+  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].y = 0;
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 4;
+  mcu_instr.borderBottom = 4;
+  mcu_instr.borderLeft   = 4;
+  mcu_instr.borderRight  = 4;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 1;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
+
+  // inputs
+  mcu_instr.nbin = 1;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 4;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
+
+  // extract measures
+
+  return ret;
+}
+
+
 ! updated function
 
 freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
@@ -1610,16 +1610,16 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    
    
    
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128);          /*0018*/
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t8 = freia_common_create_data(16, 128, 128);          /*0018*/
    
    // long pipeline that must be cut
    freia_20_terapix_helper_0_0_0(t3, i, k);                             /*0021*/
-   freia_20_terapix_helper_0_0_1(t7, t3, k);                            /*0025*/
+   freia_20_terapix_helper_0_0_1(t8, t3, k);                            /*0025*/
    // should cut here
-   freia_20_terapix_helper_0_0_2(o, t7, k);                             /*0030*/
+   freia_20_terapix_helper_0_0_2(o, t8, k);                             /*0031*/
 
    freia_common_destruct_data(t3);                                      /*0039*/
-   freia_common_destruct_data(t7);                                      /*0043*/
+   freia_common_destruct_data(t8);                                      /*0044*/
 
    return FREIA_OK;                                                     /*0049*/
 }
@@ -1640,16 +1640,16 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    
    
    
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128);          /*0018*/
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128), *t8 = freia_common_create_data(16, 128, 128);          /*0018*/
    
    // long pipeline that must be cut
    freia_20_terapix_helper_0_0_0(t3, i, k);                             /*0021*/
-   freia_20_terapix_helper_0_0_1(t7, t3, k);                            /*0025*/
+   freia_20_terapix_helper_0_0_1(t8, t3, k);                            /*0025*/
    // should cut here
-   freia_20_terapix_helper_0_0_2(o, t7, k);                             /*0030*/
+   freia_20_terapix_helper_0_0_2(o, t8, k);                             /*0031*/
 
    freia_common_destruct_data(t3);                                      /*0039*/
-   freia_common_destruct_data(t7);                                      /*0043*/
+   freia_common_destruct_data(t8);                                      /*0044*/
 
    return 0;                                                            /*0049*/
 }
