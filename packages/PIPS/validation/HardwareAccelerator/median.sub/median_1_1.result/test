@@ -1214,34 +1214,21 @@ digraph "dag_cleaned_0" {
   "i" -> "10 D8";
 }
 // graph for dag "median_1_terapix_helper_0_0_0" of module "median_1" in dot format
-// DAG "median_1_terapix_helper_0_0_0": #i=1 #o=1 #c=14 #s=0 #I=0 #B=0 #A=0
+// DAG "median_1_terapix_helper_0_0_0": #i=1 #o=2 #c=7 #s=0 #I=0 #B=0 #A=0
 digraph "median_1_terapix_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "t_6" [shape=circle];
+  "o_1" [shape=circle];
 
   // computation vertices
-  "35 >" [shape=trapezium,orientation=270];
-  "35 >" -> "o";
   "21 <" [shape=trapezium,orientation=270];
-  "21 <" -> "35 >" [label="o_1"];
-  "33 D8" [shape=box];
-  "33 D8" -> "35 >" [label="t"];
-  "32 E8" [shape=box];
-  "32 E8" -> "33 D8" [label="t_1"];
-  "29 E8" [shape=box];
-  "29 E8" -> "32 E8" [label="t_2"];
-  "28 D8" [shape=box];
-  "28 D8" -> "29 E8" [label="t_3"];
-  "25 D8" [shape=box];
-  "25 D8" -> "28 D8" [label="t_4"];
-  "24 E8" [shape=box];
-  "24 E8" -> "25 D8" [label="t_5"];
+  "21 <" -> "o_1";
   "19 E8" [shape=box];
   "19 E8" -> "21 <" [label="t_6"];
-  "19 E8" -> "24 E8" [label="t_6"];
+  "19 E8" -> "t_6";
   "18 D8" [shape=box];
   "18 D8" -> "19 E8" [label="t_7"];
   "15 D8" [shape=box];
@@ -1254,6 +1241,34 @@ digraph "median_1_terapix_helper_0_0_0" {
   "10 D8" -> "11 E8" [label="t_11"];
   "i" -> "21 <";
   "i" -> "10 D8";
+}
+// graph for dag "median_1_terapix_helper_0_0_1" of module "median_1" in dot format
+// DAG "median_1_terapix_helper_0_0_1": #i=2 #o=1 #c=7 #s=0 #I=0 #B=0 #A=0
+digraph "median_1_terapix_helper_0_0_1" {
+  // inputs
+  "t_6" [shape=circle];
+  "o_1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "o_1" -> "35 >";
+  "t_6" -> "24 E8";
+  "35 >" [shape=trapezium,orientation=270];
+  "35 >" -> "o";
+  "33 D8" [shape=box];
+  "33 D8" -> "35 >" [label="t"];
+  "32 E8" [shape=box];
+  "32 E8" -> "33 D8" [label="t_1"];
+  "29 E8" [shape=box];
+  "29 E8" -> "32 E8" [label="t_2"];
+  "28 D8" [shape=box];
+  "28 D8" -> "29 E8" [label="t_3"];
+  "25 D8" [shape=box];
+  "25 D8" -> "28 D8" [label="t_4"];
+  "24 E8" [shape=box];
+  "24 E8" -> "25 D8" [label="t_5"];
 }
 
 ! acceleration function
@@ -1271,7 +1286,7 @@ digraph "median_1_terapix_helper_0_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -1279,17 +1294,18 @@ digraph "median_1_terapix_helper_0_0_0" {
  * IMAGE H  = 0
  * MAX SIZE = 0
  *
- * 1 input image, 1 output image
- * 14 image operations in dag
- * dag length is 14, dag width is 2
+ * 1 input image, 2 output images
+ * 7 image operations in dag
+ * dag length is 8, dag width is 2
  * costs in cycles per imagelet row:
- * - computation: 188
- * - communication: 64
+ * - computation: 94
+ * - communication: 72
  */
 freia_status median_1_terapix_helper_0_0_0(
   freia_data2d * o0,
+  freia_data2d * o1,
   const freia_data2d * i0,
-  const int32_t * pi2)
+  const int32_t * pi3)
 {
   // declarations:
   freia_microcode mcode;
@@ -1309,17 +1325,17 @@ freia_status median_1_terapix_helper_0_0_0(
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][14];
+  terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][1];
-  terapix_tile_info tile_out[2][1];
+  terapix_tile_info tile_out[2][2];
   // imagelets definitions:
-  // - 4 computation imagelets
-  // - 1 double buffer imagelets
+  // - 3 computation imagelets
+  // - 2 double buffer imagelets
   // dynamic optimal imagelet size computation
   // this formula must match what the scheduler does!
-  int vertical_border = 12;
+  int vertical_border = 6;
   int image_height = i0->heightWa;
-  int max_computed_size = 180;
+  int max_computed_size = 192;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
   int imagelet_size =
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
@@ -1331,7 +1347,9 @@ freia_status median_1_terapix_helper_0_0_0(
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_5;
+  int imagelet_io_1_1 = imagelet_4;
+  int imagelet_io_2_0 = imagelet_2;
+  int imagelet_io_2_1 = imagelet_5;
 
   // body:
   // mcode param
@@ -1352,13 +1370,13 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_2;
-  mcu_macro[1][0].xmin2 = imagelet_2;
+  mcu_macro[0][0].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][0].xmin2 = imagelet_io_2_1;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   // copy of operation 0 parameters
   for(i=0; i<9; i++)
-    p_0[i] = pi2[i];
+    p_0[i] = pi3[i];
   gram.xoffset = x_0;
   gram.yoffset = y_0;
   gram.width = 3;
@@ -1380,8 +1398,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 1: E8(2) -> 3
-  mcu_macro[0][1].xmin1 = imagelet_2;
-  mcu_macro[1][1].xmin1 = imagelet_2;
+  mcu_macro[0][1].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
   mcu_macro[0][1].xmin2 = imagelet_3;
@@ -1407,8 +1425,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][2].xmin1 = imagelet_3;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
-  mcu_macro[0][2].xmin2 = imagelet_2;
-  mcu_macro[1][2].xmin2 = imagelet_2;
+  mcu_macro[0][2].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_2_1;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   mcu_macro[0][2].xmin3 = x_0;
@@ -1426,8 +1444,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: D8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -1453,8 +1471,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][4].xmin1 = imagelet_3;
   mcu_macro[0][4].ymin1 = 0;
   mcu_macro[1][4].ymin1 = 0;
-  mcu_macro[0][4].xmin2 = imagelet_2;
-  mcu_macro[1][4].xmin2 = imagelet_2;
+  mcu_macro[0][4].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][4].xmin2 = imagelet_io_2_1;
   mcu_macro[0][4].ymin2 = 0;
   mcu_macro[1][4].ymin2 = 0;
   mcu_macro[0][4].xmin3 = x_0;
@@ -1472,8 +1490,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 5: E8(2) -> 3
-  mcu_macro[0][5].xmin1 = imagelet_2;
-  mcu_macro[1][5].xmin1 = imagelet_2;
+  mcu_macro[0][5].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][5].xmin1 = imagelet_io_2_1;
   mcu_macro[0][5].ymin1 = 0;
   mcu_macro[1][5].ymin1 = 0;
   mcu_macro[0][5].xmin2 = imagelet_3;
@@ -1494,19 +1512,19 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][5].iter4 = 0;
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 6: E8(3) -> 2
+  // 6: <(3,1) -> 1
   mcu_macro[0][6].xmin1 = imagelet_3;
   mcu_macro[1][6].xmin1 = imagelet_3;
   mcu_macro[0][6].ymin1 = 0;
   mcu_macro[1][6].ymin1 = 0;
-  mcu_macro[0][6].xmin2 = imagelet_2;
-  mcu_macro[1][6].xmin2 = imagelet_2;
+  mcu_macro[0][6].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin2 = imagelet_io_1_1;
   mcu_macro[0][6].ymin2 = 0;
   mcu_macro[1][6].ymin2 = 0;
-  mcu_macro[0][6].xmin3 = x_0;
-  mcu_macro[1][6].xmin3 = x_0;
-  mcu_macro[0][6].ymin3 = y_0;
-  mcu_macro[1][6].ymin3 = y_0;
+  mcu_macro[0][6].xmin3 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin3 = imagelet_io_1_1;
+  mcu_macro[0][6].ymin3 = 0;
+  mcu_macro[1][6].ymin3 = 0;
   mcu_macro[0][6].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][6].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][6].iter2 = imagelet_size;
@@ -1515,21 +1533,17 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][6].iter3 = 0;
   mcu_macro[0][6].iter4 = 0;
   mcu_macro[1][6].iter4 = 0;
-  mcu_macro[0][6].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][6].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 7: D8(2) -> 4
-  mcu_macro[0][7].xmin1 = imagelet_2;
-  mcu_macro[1][7].xmin1 = imagelet_2;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_INF3;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_INF3;
+  // output copy 3 -> 2
+  mcu_macro[0][7].xmin1 = imagelet_3;
+  mcu_macro[1][7].xmin1 = imagelet_3;
   mcu_macro[0][7].ymin1 = 0;
   mcu_macro[1][7].ymin1 = 0;
-  mcu_macro[0][7].xmin2 = imagelet_4;
-  mcu_macro[1][7].xmin2 = imagelet_4;
+  mcu_macro[0][7].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][7].xmin2 = imagelet_io_2_1;
   mcu_macro[0][7].ymin2 = 0;
   mcu_macro[1][7].ymin2 = 0;
-  mcu_macro[0][7].xmin3 = x_0;
-  mcu_macro[1][7].xmin3 = x_0;
-  mcu_macro[0][7].ymin3 = y_0;
-  mcu_macro[1][7].ymin3 = y_0;
   mcu_macro[0][7].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][7].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][7].iter2 = imagelet_size;
@@ -1538,146 +1552,8 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_macro[1][7].iter3 = 0;
   mcu_macro[0][7].iter4 = 0;
   mcu_macro[1][7].iter4 = 0;
-  mcu_macro[0][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 8: D8(4) -> 2
-  mcu_macro[0][8].xmin1 = imagelet_4;
-  mcu_macro[1][8].xmin1 = imagelet_4;
-  mcu_macro[0][8].ymin1 = 0;
-  mcu_macro[1][8].ymin1 = 0;
-  mcu_macro[0][8].xmin2 = imagelet_2;
-  mcu_macro[1][8].xmin2 = imagelet_2;
-  mcu_macro[0][8].ymin2 = 0;
-  mcu_macro[1][8].ymin2 = 0;
-  mcu_macro[0][8].xmin3 = x_0;
-  mcu_macro[1][8].xmin3 = x_0;
-  mcu_macro[0][8].ymin3 = y_0;
-  mcu_macro[1][8].ymin3 = y_0;
-  mcu_macro[0][8].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][8].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][8].iter2 = imagelet_size;
-  mcu_macro[1][8].iter2 = imagelet_size;
-  mcu_macro[0][8].iter3 = 0;
-  mcu_macro[1][8].iter3 = 0;
-  mcu_macro[0][8].iter4 = 0;
-  mcu_macro[1][8].iter4 = 0;
-  mcu_macro[0][8].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][8].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 9: E8(2) -> 4
-  mcu_macro[0][9].xmin1 = imagelet_2;
-  mcu_macro[1][9].xmin1 = imagelet_2;
-  mcu_macro[0][9].ymin1 = 0;
-  mcu_macro[1][9].ymin1 = 0;
-  mcu_macro[0][9].xmin2 = imagelet_4;
-  mcu_macro[1][9].xmin2 = imagelet_4;
-  mcu_macro[0][9].ymin2 = 0;
-  mcu_macro[1][9].ymin2 = 0;
-  mcu_macro[0][9].xmin3 = x_0;
-  mcu_macro[1][9].xmin3 = x_0;
-  mcu_macro[0][9].ymin3 = y_0;
-  mcu_macro[1][9].ymin3 = y_0;
-  mcu_macro[0][9].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][9].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][9].iter2 = imagelet_size;
-  mcu_macro[1][9].iter2 = imagelet_size;
-  mcu_macro[0][9].iter3 = 0;
-  mcu_macro[1][9].iter3 = 0;
-  mcu_macro[0][9].iter4 = 0;
-  mcu_macro[1][9].iter4 = 0;
-  mcu_macro[0][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 10: E8(4) -> 2
-  mcu_macro[0][10].xmin1 = imagelet_4;
-  mcu_macro[1][10].xmin1 = imagelet_4;
-  mcu_macro[0][10].ymin1 = 0;
-  mcu_macro[1][10].ymin1 = 0;
-  mcu_macro[0][10].xmin2 = imagelet_2;
-  mcu_macro[1][10].xmin2 = imagelet_2;
-  mcu_macro[0][10].ymin2 = 0;
-  mcu_macro[1][10].ymin2 = 0;
-  mcu_macro[0][10].xmin3 = x_0;
-  mcu_macro[1][10].xmin3 = x_0;
-  mcu_macro[0][10].ymin3 = y_0;
-  mcu_macro[1][10].ymin3 = y_0;
-  mcu_macro[0][10].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][10].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][10].iter2 = imagelet_size;
-  mcu_macro[1][10].iter2 = imagelet_size;
-  mcu_macro[0][10].iter3 = 0;
-  mcu_macro[1][10].iter3 = 0;
-  mcu_macro[0][10].iter4 = 0;
-  mcu_macro[1][10].iter4 = 0;
-  mcu_macro[0][10].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  mcu_macro[1][10].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 11: D8(2) -> 4
-  mcu_macro[0][11].xmin1 = imagelet_2;
-  mcu_macro[1][11].xmin1 = imagelet_2;
-  mcu_macro[0][11].ymin1 = 0;
-  mcu_macro[1][11].ymin1 = 0;
-  mcu_macro[0][11].xmin2 = imagelet_4;
-  mcu_macro[1][11].xmin2 = imagelet_4;
-  mcu_macro[0][11].ymin2 = 0;
-  mcu_macro[1][11].ymin2 = 0;
-  mcu_macro[0][11].xmin3 = x_0;
-  mcu_macro[1][11].xmin3 = x_0;
-  mcu_macro[0][11].ymin3 = y_0;
-  mcu_macro[1][11].ymin3 = y_0;
-  mcu_macro[0][11].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][11].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][11].iter2 = imagelet_size;
-  mcu_macro[1][11].iter2 = imagelet_size;
-  mcu_macro[0][11].iter3 = 0;
-  mcu_macro[1][11].iter3 = 0;
-  mcu_macro[0][11].iter4 = 0;
-  mcu_macro[1][11].iter4 = 0;
-  mcu_macro[0][11].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  mcu_macro[1][11].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 12: <(3,1) -> 3
-  mcu_macro[0][12].xmin1 = imagelet_3;
-  mcu_macro[1][12].xmin1 = imagelet_3;
-  mcu_macro[0][12].ymin1 = 0;
-  mcu_macro[1][12].ymin1 = 0;
-  mcu_macro[0][12].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][12].xmin2 = imagelet_io_1_1;
-  mcu_macro[0][12].ymin2 = 0;
-  mcu_macro[1][12].ymin2 = 0;
-  mcu_macro[0][12].xmin3 = imagelet_3;
-  mcu_macro[1][12].xmin3 = imagelet_3;
-  mcu_macro[0][12].ymin3 = 0;
-  mcu_macro[1][12].ymin3 = 0;
-  mcu_macro[0][12].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][12].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][12].iter2 = imagelet_size;
-  mcu_macro[1][12].iter2 = imagelet_size;
-  mcu_macro[0][12].iter3 = 0;
-  mcu_macro[1][12].iter3 = 0;
-  mcu_macro[0][12].iter4 = 0;
-  mcu_macro[1][12].iter4 = 0;
-  mcu_macro[0][12].addrStart = TERAPIX_UCODE_INF3;
-  mcu_macro[1][12].addrStart = TERAPIX_UCODE_INF3;
-  // 13: >(3,4) -> 1
-  mcu_macro[0][13].xmin1 = imagelet_3;
-  mcu_macro[1][13].xmin1 = imagelet_3;
-  mcu_macro[0][13].ymin1 = 0;
-  mcu_macro[1][13].ymin1 = 0;
-  mcu_macro[0][13].xmin2 = imagelet_4;
-  mcu_macro[1][13].xmin2 = imagelet_4;
-  mcu_macro[0][13].ymin2 = 0;
-  mcu_macro[1][13].ymin2 = 0;
-  mcu_macro[0][13].xmin3 = imagelet_io_1_0;
-  mcu_macro[1][13].xmin3 = imagelet_io_1_1;
-  mcu_macro[0][13].ymin3 = 0;
-  mcu_macro[1][13].ymin3 = 0;
-  mcu_macro[0][13].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][13].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][13].iter2 = imagelet_size;
-  mcu_macro[1][13].iter2 = imagelet_size;
-  mcu_macro[0][13].iter3 = 0;
-  mcu_macro[1][13].iter3 = 0;
-  mcu_macro[0][13].iter4 = 0;
-  mcu_macro[1][13].iter4 = 0;
-  mcu_macro[0][13].addrStart = TERAPIX_UCODE_SUP3;
-  mcu_macro[1][13].addrStart = TERAPIX_UCODE_SUP3;
+  mcu_macro[0][7].addrStart = TERAPIX_UCODE_COPY;
+  mcu_macro[1][7].addrStart = TERAPIX_UCODE_COPY;
 
 
   // inputs:
@@ -1688,22 +1564,27 @@ freia_status median_1_terapix_helper_0_0_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for o
-  tile_out[0][0].x = imagelet_io_1_0;
+  // - imagelet 2 is o0 for t_6
+  tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
-  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
+  // - imagelet 1 is o1 for o_1
+  tile_out[0][1].x = imagelet_io_1_0;
+  tile_out[0][1].y = 0;
+  tile_out[1][1].x = imagelet_io_1_1;
+  tile_out[1][1].y = 0;
 
   // imagelet erosion for the computation
-  mcu_instr.borderTop    = 12;
-  mcu_instr.borderBottom = 12;
-  mcu_instr.borderLeft   = 12;
-  mcu_instr.borderRight  = 12;
+  mcu_instr.borderTop    = 6;
+  mcu_instr.borderBottom = 6;
+  mcu_instr.borderLeft   = 6;
+  mcu_instr.borderRight  = 6;
   mcu_instr.imagelet_height = imagelet_size;
   mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
-  mcu_instr.nbout = 1;
+  mcu_instr.nbout = 2;
   mcu_instr.out0 = tile_out[0];
   mcu_instr.out1 = tile_out[1];
 
@@ -1713,14 +1594,322 @@ freia_status median_1_terapix_helper_0_0_0(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 14;
+  mcu_instr.nbinstr = 8;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, o0, i0);
+  ret |= freia_cg_template_process(&param, o0, o1, i0);
+
+  // extract measures
+
+  return ret;
+}
+
+
+/* FREIA terapix helper function for module median_1
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 24
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
+ * 2 input images, 1 output image
+ * 7 image operations in dag
+ * dag length is 8, dag width is 2
+ * costs in cycles per imagelet row:
+ * - computation: 94
+ * - communication: 72
+ */
+freia_status median_1_terapix_helper_0_0_1(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const int32_t * pi3)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][7];
+  terapix_tile_info tile_in[2][2];
+  terapix_tile_info tile_out[2][1];
+  // imagelets definitions:
+  // - 3 computation imagelets
+  // - 2 double buffer imagelets
+  // dynamic optimal imagelet size computation
+  // this formula must match what the scheduler does!
+  int vertical_border = 6;
+  int image_height = i0->heightWa;
+  int max_computed_size = 192;
+  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
+  int imagelet_size =
+        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
+  int imagelet_1 = 0;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_4;
+  int imagelet_io_2_0 = imagelet_2;
+  int imagelet_io_2_1 = imagelet_5;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: E8(1) -> 3
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_3;
+  mcu_macro[1][0].xmin2 = imagelet_3;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi3[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 1: D8(3) -> 1
+  mcu_macro[0][1].xmin1 = imagelet_3;
+  mcu_macro[1][1].xmin1 = imagelet_3;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = x_0;
+  mcu_macro[1][1].xmin3 = x_0;
+  mcu_macro[0][1].ymin3 = y_0;
+  mcu_macro[1][1].ymin3 = y_0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 2: D8(1) -> 3
+  mcu_macro[0][2].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].xmin2 = imagelet_3;
+  mcu_macro[1][2].xmin2 = imagelet_3;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].xmin3 = x_0;
+  mcu_macro[1][2].xmin3 = x_0;
+  mcu_macro[0][2].ymin3 = y_0;
+  mcu_macro[1][2].ymin3 = y_0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 3: E8(3) -> 1
+  mcu_macro[0][3].xmin1 = imagelet_3;
+  mcu_macro[1][3].xmin1 = imagelet_3;
+  mcu_macro[0][3].ymin1 = 0;
+  mcu_macro[1][3].ymin1 = 0;
+  mcu_macro[0][3].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][3].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][3].ymin2 = 0;
+  mcu_macro[1][3].ymin2 = 0;
+  mcu_macro[0][3].xmin3 = x_0;
+  mcu_macro[1][3].xmin3 = x_0;
+  mcu_macro[0][3].ymin3 = y_0;
+  mcu_macro[1][3].ymin3 = y_0;
+  mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][3].iter2 = imagelet_size;
+  mcu_macro[1][3].iter2 = imagelet_size;
+  mcu_macro[0][3].iter3 = 0;
+  mcu_macro[1][3].iter3 = 0;
+  mcu_macro[0][3].iter4 = 0;
+  mcu_macro[1][3].iter4 = 0;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 4: E8(1) -> 3
+  mcu_macro[0][4].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][4].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][4].ymin1 = 0;
+  mcu_macro[1][4].ymin1 = 0;
+  mcu_macro[0][4].xmin2 = imagelet_3;
+  mcu_macro[1][4].xmin2 = imagelet_3;
+  mcu_macro[0][4].ymin2 = 0;
+  mcu_macro[1][4].ymin2 = 0;
+  mcu_macro[0][4].xmin3 = x_0;
+  mcu_macro[1][4].xmin3 = x_0;
+  mcu_macro[0][4].ymin3 = y_0;
+  mcu_macro[1][4].ymin3 = y_0;
+  mcu_macro[0][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][4].iter2 = imagelet_size;
+  mcu_macro[1][4].iter2 = imagelet_size;
+  mcu_macro[0][4].iter3 = 0;
+  mcu_macro[1][4].iter3 = 0;
+  mcu_macro[0][4].iter4 = 0;
+  mcu_macro[1][4].iter4 = 0;
+  mcu_macro[0][4].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][4].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 5: D8(3) -> 1
+  mcu_macro[0][5].xmin1 = imagelet_3;
+  mcu_macro[1][5].xmin1 = imagelet_3;
+  mcu_macro[0][5].ymin1 = 0;
+  mcu_macro[1][5].ymin1 = 0;
+  mcu_macro[0][5].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][5].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][5].ymin2 = 0;
+  mcu_macro[1][5].ymin2 = 0;
+  mcu_macro[0][5].xmin3 = x_0;
+  mcu_macro[1][5].xmin3 = x_0;
+  mcu_macro[0][5].ymin3 = y_0;
+  mcu_macro[1][5].ymin3 = y_0;
+  mcu_macro[0][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][5].iter2 = imagelet_size;
+  mcu_macro[1][5].iter2 = imagelet_size;
+  mcu_macro[0][5].iter3 = 0;
+  mcu_macro[1][5].iter3 = 0;
+  mcu_macro[0][5].iter4 = 0;
+  mcu_macro[1][5].iter4 = 0;
+  mcu_macro[0][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 6: >(2,1) -> 1
+  mcu_macro[0][6].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][6].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][6].ymin1 = 0;
+  mcu_macro[1][6].ymin1 = 0;
+  mcu_macro[0][6].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][6].ymin2 = 0;
+  mcu_macro[1][6].ymin2 = 0;
+  mcu_macro[0][6].xmin3 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin3 = imagelet_io_1_1;
+  mcu_macro[0][6].ymin3 = 0;
+  mcu_macro[1][6].ymin3 = 0;
+  mcu_macro[0][6].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][6].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][6].iter2 = imagelet_size;
+  mcu_macro[1][6].iter2 = imagelet_size;
+  mcu_macro[0][6].iter3 = 0;
+  mcu_macro[1][6].iter3 = 0;
+  mcu_macro[0][6].iter4 = 0;
+  mcu_macro[1][6].iter4 = 0;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_SUP3;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_SUP3;
+
+
+  // inputs:
+  // - imagelet 1 is i0 for t_6
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+  // - imagelet 2 is i1 for o_1
+  tile_in[0][1].x = imagelet_io_2_0;
+  tile_in[0][1].y = 0;
+  tile_in[1][1].x = imagelet_io_2_1;
+  tile_in[1][1].y = 0;
+
+  // outputs:
+  // - imagelet 1 is o0 for o
+  tile_out[0][0].x = imagelet_io_1_0;
+  tile_out[0][0].y = 0;
+  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].y = 0;
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 6;
+  mcu_instr.borderBottom = 6;
+  mcu_instr.borderLeft   = 6;
+  mcu_instr.borderRight  = 6;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 1;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
+
+  // inputs
+  mcu_instr.nbin = 2;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 7;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
 
@@ -1733,10 +1922,11 @@ freia_status median_1_terapix_helper_0_0_0(
 freia_status median_1(freia_data2d *o, freia_data2d *i)
 {
    freia_status ret = 0;                                                /*0005*/
+   freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);        /*0006*/
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   median_1_terapix_helper_0_0_0(o, i, freia_morpho_kernel_8c);         /*0010*/
+   median_1_terapix_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);      /*0010*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
@@ -1744,6 +1934,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // ret |= freia_cipo_open(t, i, c, 1);
+   median_1_terapix_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);      /*0024*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
    
@@ -1751,7 +1942,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // cleanup
-   ret |= 0;                                                            /*0038*/
+   ret |= freia_common_destruct_data(t);                                /*0038*/
    return ret;                                                          /*0039*/
 }
 
@@ -1760,10 +1951,11 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 freia_status median_1(freia_data2d *o, freia_data2d *i)
 {
    freia_status ret = 0;                                                /*0005*/
+   freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);        /*0006*/
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   median_1_terapix_helper_0_0_0(o, i, freia_morpho_kernel_8c);         /*0010*/
+   median_1_terapix_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);      /*0010*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
@@ -1771,6 +1963,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // ret |= freia_cipo_open(t, i, c, 1);
+   median_1_terapix_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);      /*0024*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
    
@@ -1778,7 +1971,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // cleanup
-   ;                                                                    /*0038*/
+   ret |= freia_common_destruct_data(t);                                /*0038*/
    return ret;                                                          /*0039*/
 }
 #
@@ -2031,31 +2224,35 @@ static freia_status median_1_opencl_helper_E8_511_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t32 = PIXEL_MAX;\n"
     "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
@@ -2067,6 +2264,7 @@ static freia_status median_1_opencl_helper_E8_511_compile(void)
     "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
     "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
     "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t32 = PIXEL_INF(t32, (is_N|is_W)? PIXEL_MAX: in0NW);\n"
     "    t32 = PIXEL_INF(t32, (is_N)? PIXEL_MAX: in0N);\n"
@@ -2077,6 +2275,7 @@ static freia_status median_1_opencl_helper_E8_511_compile(void)
     "    t32 = PIXEL_INF(t32, (is_S|is_W)? PIXEL_MAX: in0SW);\n"
     "    t32 = PIXEL_INF(t32, (is_S)? PIXEL_MAX: in0S);\n"
     "    t32 = PIXEL_INF(t32, (is_S|is_E)? PIXEL_MAX: in0SE);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t32;\n"
     "  }\n"
@@ -2129,31 +2328,35 @@ static freia_status median_1_opencl_helper_D8_511_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t28 = PIXEL_MIN;\n"
     "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
@@ -2165,6 +2368,7 @@ static freia_status median_1_opencl_helper_D8_511_compile(void)
     "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
     "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
     "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t28 = PIXEL_SUP(t28, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
     "    t28 = PIXEL_SUP(t28, (is_N)? PIXEL_MIN: in0N);\n"
@@ -2175,6 +2379,7 @@ static freia_status median_1_opencl_helper_D8_511_compile(void)
     "    t28 = PIXEL_SUP(t28, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
     "    t28 = PIXEL_SUP(t28, (is_S)? PIXEL_MIN: in0S);\n"
     "    t28 = PIXEL_SUP(t28, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t28;\n"
     "  }\n"
@@ -2231,33 +2436,37 @@ static freia_status median_1_opencl_helper_0_0_1_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
-    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t33 = PIXEL_MIN;\n"
     "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
@@ -2271,6 +2480,7 @@ static freia_status median_1_opencl_helper_0_0_1_compile(void)
     "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    t33 = PIXEL_SUP(t33, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
     "    t33 = PIXEL_SUP(t33, (is_N)? PIXEL_MIN: in0N);\n"
@@ -2283,6 +2493,7 @@ static freia_status median_1_opencl_helper_0_0_1_compile(void)
     "    t33 = PIXEL_SUP(t33, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
     "    PIXEL t21 = PIXEL_INF(in1, in2);\n"
     "    PIXEL t35 = PIXEL_SUP(t21, t33);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t35;\n"
     "  }\n"
@@ -2331,31 +2542,35 @@ KERNEL void median_1_opencl_helper_E8_511(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t32 = PIXEL_MAX;
     PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
@@ -2367,6 +2582,7 @@ KERNEL void median_1_opencl_helper_E8_511(
     PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
     PIXEL in0S = (is_S)? 0: j0[i+pitch];
     PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+
     // pixel computations
     t32 = PIXEL_INF(t32, (is_N|is_W)? PIXEL_MAX: in0NW);
     t32 = PIXEL_INF(t32, (is_N)? PIXEL_MAX: in0N);
@@ -2377,6 +2593,7 @@ KERNEL void median_1_opencl_helper_E8_511(
     t32 = PIXEL_INF(t32, (is_S|is_W)? PIXEL_MAX: in0SW);
     t32 = PIXEL_INF(t32, (is_S)? PIXEL_MAX: in0S);
     t32 = PIXEL_INF(t32, (is_S|is_E)? PIXEL_MAX: in0SE);
+
     // set output pixels
     p0[i] = t32;
   }
@@ -2388,31 +2605,35 @@ KERNEL void median_1_opencl_helper_D8_511(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t28 = PIXEL_MIN;
     PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
@@ -2424,6 +2645,7 @@ KERNEL void median_1_opencl_helper_D8_511(
     PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
     PIXEL in0S = (is_S)? 0: j0[i+pitch];
     PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+
     // pixel computations
     t28 = PIXEL_SUP(t28, (is_N|is_W)? PIXEL_MIN: in0NW);
     t28 = PIXEL_SUP(t28, (is_N)? PIXEL_MIN: in0N);
@@ -2434,6 +2656,7 @@ KERNEL void median_1_opencl_helper_D8_511(
     t28 = PIXEL_SUP(t28, (is_S|is_W)? PIXEL_MIN: in0SW);
     t28 = PIXEL_SUP(t28, (is_S)? PIXEL_MIN: in0S);
     t28 = PIXEL_SUP(t28, (is_S|is_E)? PIXEL_MIN: in0SE);
+
     // set output pixels
     p0[i] = t28;
   }
@@ -2449,33 +2672,37 @@ KERNEL void median_1_opencl_helper_0_0_1(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t33 = PIXEL_MIN;
     PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
@@ -2489,6 +2716,7 @@ KERNEL void median_1_opencl_helper_0_0_1(
     PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
+
     // pixel computations
     t33 = PIXEL_SUP(t33, (is_N|is_W)? PIXEL_MIN: in0NW);
     t33 = PIXEL_SUP(t33, (is_N)? PIXEL_MIN: in0N);
@@ -2501,6 +2729,7 @@ KERNEL void median_1_opencl_helper_0_0_1(
     t33 = PIXEL_SUP(t33, (is_S|is_E)? PIXEL_MIN: in0SE);
     PIXEL t21 = PIXEL_INF(in1, in2);
     PIXEL t35 = PIXEL_SUP(t21, t33);
+
     // set output pixels
     p0[i] = t35;
   }

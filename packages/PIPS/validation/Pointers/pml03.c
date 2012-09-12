@@ -2,7 +2,15 @@
 
 #include<stdlib.h>
 
-typedef struct {
+// FI: the parser does not generate the proper internal representation
+// according to the points-to analysis. The anonymous struct is
+// implicitly called "struct list"
+
+//typedef struct {
+//  struct list* next;
+// } list;
+
+typedef struct list {
   struct list* next;
 } list;
 

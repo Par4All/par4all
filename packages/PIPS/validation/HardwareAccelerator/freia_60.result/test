@@ -787,7 +787,7 @@ digraph "freia_60_terapix_helper_0_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -800,7 +800,7 @@ digraph "freia_60_terapix_helper_0_0_0" {
  * dag length is 4, dag width is 4
  * costs in cycles per imagelet row:
  * - computation: 17
- * - communication: 224
+ * - communication: 168
  */
 freia_status freia_60_terapix_helper_0_0_0(
   freia_data2d * o0,
@@ -1380,18 +1380,24 @@ static freia_status freia_60_opencl_helper_0_0_0_compile(void)
     "  int ofs_i1,\n"
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
     "  int c2)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
+    "\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
     "  GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;\n"
@@ -1400,22 +1406,21 @@ static freia_status freia_60_opencl_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    PIXEL t20 = PIXEL_INF(in0, c0);\n"
     "    PIXEL t21 = PIXEL_INF(in1, c1);\n"
     "    PIXEL t22 = PIXEL_INF(in2, c2);\n"
     "    PIXEL t23 = PIXEL_SUP(t21, t20);\n"
     "    PIXEL t24 = PIXEL_SUP(t22, t23);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t20;\n"
     "    p1[i] = t21;\n"
@@ -1483,18 +1488,24 @@ KERNEL void freia_60_opencl_helper_0_0_0(
   int ofs_i1,
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1,
   int c2)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
+
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // get input & output image pointers
+  int shift = pitch*j;
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
   GLOBAL PIXEL * p2 = o2 + ofs_o2 + shift;
@@ -1503,22 +1514,21 @@ KERNEL void freia_60_opencl_helper_0_0_0(
   GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
   GLOBAL PIXEL * j2 = i2 + ofs_i2 + shift;
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
+
     // pixel computations
     PIXEL t20 = PIXEL_INF(in0, c0);
     PIXEL t21 = PIXEL_INF(in1, c1);
     PIXEL t22 = PIXEL_INF(in2, c2);
     PIXEL t23 = PIXEL_SUP(t21, t20);
     PIXEL t24 = PIXEL_SUP(t22, t23);
+
     // set output pixels
     p0[i] = t20;
     p1[i] = t21;

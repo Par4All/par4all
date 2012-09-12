@@ -456,7 +456,7 @@ digraph "dag_cleaned_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -469,7 +469,7 @@ digraph "dag_cleaned_0" {
  * dag length is 3, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 10
- * - communication: 64
+ * - communication: 48
  */
 freia_status copy_04_terapix_helper_0_0_0(
   freia_data2d * o0,
@@ -849,32 +849,37 @@ static freia_status copy_04_opencl_helper_0_0_0_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
+    "\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    PIXEL t18 = PIXEL_ADD(in0, c0);\n"
     "    PIXEL t19 = PIXEL_ADD(in0, c1);\n"
     "    PIXEL t20 = PIXEL_MUL(t18, t19);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t20;\n"
     "  }\n"
@@ -923,32 +928,37 @@ KERNEL void copy_04_opencl_helper_0_0_0(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
+
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // get input & output image pointers
+  int shift = pitch*j;
   GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
   GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
+
     // pixel computations
     PIXEL t18 = PIXEL_ADD(in0, c0);
     PIXEL t19 = PIXEL_ADD(in0, c1);
     PIXEL t20 = PIXEL_MUL(t18, t19);
+
     // set output pixels
     p0[i] = t20;
   }

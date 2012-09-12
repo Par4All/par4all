@@ -1,0 +1,27 @@
+setenv WS=pml03
+delete $WS
+create $WS $WS.c
+
+echo
+echo Symbol table for "$WS"
+echo
+
+display SYMBOL_TABLE_FILE[$WS]
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[$WS]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[$WS]
+
+
+close
+delete $WS
+
+quit

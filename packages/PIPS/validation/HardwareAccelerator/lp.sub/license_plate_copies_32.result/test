@@ -11279,38 +11279,43 @@ static freia_status license_plate_copies_opencl_helper_0_0_0_compile(void)
     "  int ofs_o1,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  // N not needed\n"
     "  // S not needed\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t64 = PIXEL_MAX;\n"
     "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
     "    PIXEL t136 = PIXEL_MIN;\n"
+    "\n"
     "    // pixel computations\n"
     "    t64 = PIXEL_INF(t64, (is_W)? PIXEL_MAX: in0W);\n"
     "    t64 = PIXEL_INF(t64, in0);\n"
@@ -11318,6 +11323,7 @@ static freia_status license_plate_copies_opencl_helper_0_0_0_compile(void)
     "    t136 = PIXEL_SUP(t136, (is_W)? PIXEL_MIN: in0W);\n"
     "    t136 = PIXEL_SUP(t136, in0);\n"
     "    t136 = PIXEL_SUP(t136, (is_E)? PIXEL_MIN: in0E);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t64;\n"
     "    p1[i] = t136;\n"
@@ -11372,40 +11378,46 @@ static freia_status license_plate_copies_opencl_helper_D8_56_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  // N not needed\n"
     "  // S not needed\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t122 = PIXEL_MIN;\n"
     "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t122 = PIXEL_SUP(t122, (is_W)? PIXEL_MIN: in0W);\n"
     "    t122 = PIXEL_SUP(t122, in0);\n"
     "    t122 = PIXEL_SUP(t122, (is_E)? PIXEL_MIN: in0E);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t122;\n"
     "  }\n"
@@ -11458,40 +11470,46 @@ static freia_status license_plate_copies_opencl_helper_E8_56_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  // N not needed\n"
     "  // S not needed\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t92 = PIXEL_MAX;\n"
     "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in0E = (is_E)? 0: j0[i+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t92 = PIXEL_INF(t92, (is_W)? PIXEL_MAX: in0W);\n"
     "    t92 = PIXEL_INF(t92, in0);\n"
     "    t92 = PIXEL_INF(t92, (is_E)? PIXEL_MAX: in0E);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t92;\n"
     "  }\n"
@@ -11546,7 +11564,8 @@ static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
@@ -11555,29 +11574,32 @@ static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
     "  int c4,\n"
     "  int c5)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  // N not needed\n"
     "  // S not needed\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t168 = PIXEL_MAX;\n"
     "    PIXEL in0W = (is_W)? 0: j0[i-1];\n"
@@ -11587,6 +11609,7 @@ static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
     "    PIXEL in1W = (is_W)? 0: j1[i-1];\n"
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in1E = (is_E)? 0: j1[i+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t168 = PIXEL_INF(t168, (is_W)? PIXEL_MAX: in0W);\n"
     "    t168 = PIXEL_INF(t168, in0);\n"
@@ -11597,6 +11620,7 @@ static freia_status license_plate_copies_opencl_helper_0_0_2_compile(void)
     "    PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);\n"
     "    PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);\n"
     "    PIXEL t179 = PIXEL_AND(t176, t177);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t179;\n"
     "  }\n"
@@ -11656,31 +11680,35 @@ static freia_status license_plate_copies_opencl_helper_D8_511_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t238 = PIXEL_MIN;\n"
     "    PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];\n"
@@ -11692,6 +11720,7 @@ static freia_status license_plate_copies_opencl_helper_D8_511_compile(void)
     "    PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];\n"
     "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
     "    PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];\n"
+    "\n"
     "    // pixel computations\n"
     "    t238 = PIXEL_SUP(t238, (is_N|is_W)? PIXEL_MIN: in0NW);\n"
     "    t238 = PIXEL_SUP(t238, (is_N)? PIXEL_MIN: in0N);\n"
@@ -11702,6 +11731,7 @@ static freia_status license_plate_copies_opencl_helper_D8_511_compile(void)
     "    t238 = PIXEL_SUP(t238, (is_S|is_W)? PIXEL_MIN: in0SW);\n"
     "    t238 = PIXEL_SUP(t238, (is_S)? PIXEL_MIN: in0S);\n"
     "    t238 = PIXEL_SUP(t238, (is_S|is_E)? PIXEL_MIN: in0SE);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t238;\n"
     "  }\n"
@@ -11754,40 +11784,46 @@ static freia_status license_plate_copies_opencl_helper_D8_146_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    // W not needed\n"
     "    // E not needed\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t201 = PIXEL_MIN;\n"
     "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "\n"
     "    // pixel computations\n"
     "    t201 = PIXEL_SUP(t201, (is_N)? PIXEL_MIN: in0N);\n"
     "    t201 = PIXEL_SUP(t201, in0);\n"
     "    t201 = PIXEL_SUP(t201, (is_S)? PIXEL_MIN: in0S);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t201;\n"
     "  }\n"
@@ -11840,40 +11876,46 @@ static freia_status license_plate_copies_opencl_helper_E8_146_compile(void)
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    // W not needed\n"
     "    // E not needed\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t191 = PIXEL_MAX;\n"
     "    PIXEL in0N = (is_N)? 0: j0[i-pitch];\n"
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in0S = (is_S)? 0: j0[i+pitch];\n"
+    "\n"
     "    // pixel computations\n"
     "    t191 = PIXEL_INF(t191, (is_N)? PIXEL_MAX: in0N);\n"
     "    t191 = PIXEL_INF(t191, in0);\n"
     "    t191 = PIXEL_INF(t191, (is_S)? PIXEL_MAX: in0S);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t191;\n"
     "  }\n"
@@ -11928,32 +11970,36 @@ static freia_status license_plate_copies_opencl_helper_0_0_4_compile(void)
     "  int ofs_i0,\n"
     "  GLOBAL PIXEL * i1, // const?\n"
     "  int ofs_i1,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
-    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
     "\n"
     "  // N & S boundaries, one thread on first dimension per row\n"
     "  int is_N = (get_global_id(0)==0);\n"
     "  int is_S = (get_global_id(0)==(height-1));\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // W & E boundaries, assuming i global index\n"
     "    int is_W = (i==0);\n"
     "    int is_E = (i==(width-1));\n"
+    "\n"
     "    // get input pixels\n"
     "    PIXEL t239 = PIXEL_MIN;\n"
     "    PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];\n"
@@ -11966,6 +12012,7 @@ static freia_status license_plate_copies_opencl_helper_0_0_4_compile(void)
     "    PIXEL in1S = (is_S)? 0: j1[i+pitch];\n"
     "    PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];\n"
     "    PIXEL in0 = j0[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    t239 = PIXEL_SUP(t239, (is_N|is_W)? PIXEL_MIN: in1NW);\n"
     "    t239 = PIXEL_SUP(t239, (is_N)? PIXEL_MIN: in1N);\n"
@@ -11977,6 +12024,7 @@ static freia_status license_plate_copies_opencl_helper_0_0_4_compile(void)
     "    t239 = PIXEL_SUP(t239, (is_S)? PIXEL_MIN: in1S);\n"
     "    t239 = PIXEL_SUP(t239, (is_S|is_E)? PIXEL_MIN: in1SE);\n"
     "    PIXEL t244 = PIXEL_AND(t239, in0);\n"
+    "\n"
     "    // set output pixels\n"
     "    p0[i] = t244;\n"
     "  }\n"
@@ -12026,38 +12074,43 @@ KERNEL void license_plate_copies_opencl_helper_0_0_0(
   int ofs_o1,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   // N not needed
   // S not needed
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t64 = PIXEL_MAX;
     PIXEL in0W = (is_W)? 0: j0[i-1];
     PIXEL in0 = j0[i];
     PIXEL in0E = (is_E)? 0: j0[i+1];
     PIXEL t136 = PIXEL_MIN;
+
     // pixel computations
     t64 = PIXEL_INF(t64, (is_W)? PIXEL_MAX: in0W);
     t64 = PIXEL_INF(t64, in0);
@@ -12065,6 +12118,7 @@ KERNEL void license_plate_copies_opencl_helper_0_0_0(
     t136 = PIXEL_SUP(t136, (is_W)? PIXEL_MIN: in0W);
     t136 = PIXEL_SUP(t136, in0);
     t136 = PIXEL_SUP(t136, (is_E)? PIXEL_MIN: in0E);
+
     // set output pixels
     p0[i] = t64;
     p1[i] = t136;
@@ -12077,40 +12131,46 @@ KERNEL void license_plate_copies_opencl_helper_D8_56(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   // N not needed
   // S not needed
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t122 = PIXEL_MIN;
     PIXEL in0W = (is_W)? 0: j0[i-1];
     PIXEL in0 = j0[i];
     PIXEL in0E = (is_E)? 0: j0[i+1];
+
     // pixel computations
     t122 = PIXEL_SUP(t122, (is_W)? PIXEL_MIN: in0W);
     t122 = PIXEL_SUP(t122, in0);
     t122 = PIXEL_SUP(t122, (is_E)? PIXEL_MIN: in0E);
+
     // set output pixels
     p0[i] = t122;
   }
@@ -12122,40 +12182,46 @@ KERNEL void license_plate_copies_opencl_helper_E8_56(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   // N not needed
   // S not needed
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t92 = PIXEL_MAX;
     PIXEL in0W = (is_W)? 0: j0[i-1];
     PIXEL in0 = j0[i];
     PIXEL in0E = (is_E)? 0: j0[i+1];
+
     // pixel computations
     t92 = PIXEL_INF(t92, (is_W)? PIXEL_MAX: in0W);
     t92 = PIXEL_INF(t92, in0);
     t92 = PIXEL_INF(t92, (is_E)? PIXEL_MAX: in0E);
+
     // set output pixels
     p0[i] = t92;
   }
@@ -12169,7 +12235,8 @@ KERNEL void license_plate_copies_opencl_helper_0_0_2(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   int c0,
   int c1,
@@ -12178,29 +12245,32 @@ KERNEL void license_plate_copies_opencl_helper_0_0_2(
   int c4,
   int c5)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   // N not needed
   // S not needed
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t168 = PIXEL_MAX;
     PIXEL in0W = (is_W)? 0: j0[i-1];
@@ -12210,6 +12280,7 @@ KERNEL void license_plate_copies_opencl_helper_0_0_2(
     PIXEL in1W = (is_W)? 0: j1[i-1];
     PIXEL in1 = j1[i];
     PIXEL in1E = (is_E)? 0: j1[i+1];
+
     // pixel computations
     t168 = PIXEL_INF(t168, (is_W)? PIXEL_MAX: in0W);
     t168 = PIXEL_INF(t168, in0);
@@ -12220,6 +12291,7 @@ KERNEL void license_plate_copies_opencl_helper_0_0_2(
     PIXEL t176 = PIXEL_THRESHOLD(t124, c0, c1, c2);
     PIXEL t177 = PIXEL_THRESHOLD(t168, c3, c4, c5);
     PIXEL t179 = PIXEL_AND(t176, t177);
+
     // set output pixels
     p0[i] = t179;
   }
@@ -12231,31 +12303,35 @@ KERNEL void license_plate_copies_opencl_helper_D8_511(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t238 = PIXEL_MIN;
     PIXEL in0NW = (is_N|is_W)? 0: j0[i-pitch-1];
@@ -12267,6 +12343,7 @@ KERNEL void license_plate_copies_opencl_helper_D8_511(
     PIXEL in0SW = (is_S|is_W)? 0: j0[i+pitch-1];
     PIXEL in0S = (is_S)? 0: j0[i+pitch];
     PIXEL in0SE = (is_S|is_E)? 0: j0[i+pitch+1];
+
     // pixel computations
     t238 = PIXEL_SUP(t238, (is_N|is_W)? PIXEL_MIN: in0NW);
     t238 = PIXEL_SUP(t238, (is_N)? PIXEL_MIN: in0N);
@@ -12277,6 +12354,7 @@ KERNEL void license_plate_copies_opencl_helper_D8_511(
     t238 = PIXEL_SUP(t238, (is_S|is_W)? PIXEL_MIN: in0SW);
     t238 = PIXEL_SUP(t238, (is_S)? PIXEL_MIN: in0S);
     t238 = PIXEL_SUP(t238, (is_S|is_E)? PIXEL_MIN: in0SE);
+
     // set output pixels
     p0[i] = t238;
   }
@@ -12288,40 +12366,46 @@ KERNEL void license_plate_copies_opencl_helper_D8_146(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     // W not needed
     // E not needed
+
     // get input pixels
     PIXEL t201 = PIXEL_MIN;
     PIXEL in0N = (is_N)? 0: j0[i-pitch];
     PIXEL in0 = j0[i];
     PIXEL in0S = (is_S)? 0: j0[i+pitch];
+
     // pixel computations
     t201 = PIXEL_SUP(t201, (is_N)? PIXEL_MIN: in0N);
     t201 = PIXEL_SUP(t201, in0);
     t201 = PIXEL_SUP(t201, (is_S)? PIXEL_MIN: in0S);
+
     // set output pixels
     p0[i] = t201;
   }
@@ -12333,40 +12417,46 @@ KERNEL void license_plate_copies_opencl_helper_E8_146(
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     // W not needed
     // E not needed
+
     // get input pixels
     PIXEL t191 = PIXEL_MAX;
     PIXEL in0N = (is_N)? 0: j0[i-pitch];
     PIXEL in0 = j0[i];
     PIXEL in0S = (is_S)? 0: j0[i+pitch];
+
     // pixel computations
     t191 = PIXEL_INF(t191, (is_N)? PIXEL_MAX: in0N);
     t191 = PIXEL_INF(t191, in0);
     t191 = PIXEL_INF(t191, (is_S)? PIXEL_MAX: in0S);
+
     // set output pixels
     p0[i] = t191;
   }
@@ -12380,32 +12470,36 @@ KERNEL void license_plate_copies_opencl_helper_0_0_4(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
-  // get input & output image pointers
-  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
 
   // N & S boundaries, one thread on first dimension per row
   int is_N = (get_global_id(0)==0);
   int is_S = (get_global_id(0)==(height-1));
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * p0 = o0 + ofs_o0 + shift;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // W & E boundaries, assuming i global index
     int is_W = (i==0);
     int is_E = (i==(width-1));
+
     // get input pixels
     PIXEL t239 = PIXEL_MIN;
     PIXEL in1NW = (is_N|is_W)? 0: j1[i-pitch-1];
@@ -12418,6 +12512,7 @@ KERNEL void license_plate_copies_opencl_helper_0_0_4(
     PIXEL in1S = (is_S)? 0: j1[i+pitch];
     PIXEL in1SE = (is_S|is_E)? 0: j1[i+pitch+1];
     PIXEL in0 = j0[i];
+
     // pixel computations
     t239 = PIXEL_SUP(t239, (is_N|is_W)? PIXEL_MIN: in1NW);
     t239 = PIXEL_SUP(t239, (is_N)? PIXEL_MIN: in1N);
@@ -12429,6 +12524,7 @@ KERNEL void license_plate_copies_opencl_helper_0_0_4(
     t239 = PIXEL_SUP(t239, (is_S)? PIXEL_MIN: in1S);
     t239 = PIXEL_SUP(t239, (is_S|is_E)? PIXEL_MIN: in1SE);
     PIXEL t244 = PIXEL_AND(t239, in0);
+
     // set output pixels
     p0[i] = t244;
   }

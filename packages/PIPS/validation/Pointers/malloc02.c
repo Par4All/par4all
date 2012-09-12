@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
   float * px;
 
   pi = (int *) malloc(sizeof(int));
-  px = (float *) malloc(sizeof(int));
+  px = (float *) malloc(sizeof(float));
 
   return 0;
 }

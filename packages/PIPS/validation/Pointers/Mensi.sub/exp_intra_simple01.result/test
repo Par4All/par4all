@@ -1,0 +1,118 @@
+
+PROPER  EFFECTS 
+
+int foo(int **p, int *q)
+{
+//             <    is written>: j
+   int *i, j = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: i
+
+   i = *p;
+//             <    is written>: p
+   p = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: j
+   j = *q;
+//             <    is written>: i
+   i = &j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: q
+   q = *p;
+//             <    is read   >: j
+
+   return j;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _p_1 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+
+
+// Points To OUT:
+// _p_1 -> _p_1_1 , EXACT
+
+int foo(int **p, int *q)
+{
+
+// Points To: none
+
+   int *i, j = 0;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> _p_1 , EXACT
+
+
+   i = *p;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+
+   p = &i;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> _p_1_1 , EXACT
+// p -> i , EXACT
+// q -> _q_2 , EXACT
+
+   j = *q;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> _p_1_1 , EXACT
+// p -> i , EXACT
+// q -> _q_2 , EXACT
+
+   i = &j;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> j , EXACT
+// p -> i , EXACT
+// q -> _q_2 , EXACT
+
+   q = *p;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// i -> j , EXACT
+// p -> i , EXACT
+// q -> j , EXACT
+
+
+   return j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int foo(int **p, int *q)
+{
+//             <    is written>: j
+   int *i, j = 0;
+//             <    is read   >: _p_1 p
+//             <    is written>: i
+
+   i = *p;
+//             <    is written>: p
+   p = &i;
+//             <    is read   >: _q_2 q
+//             <    is written>: j
+   j = *q;
+//             <    is written>: i
+   i = &j;
+//             <    is read   >: i p
+//             <    is written>: q
+   q = *p;
+//             <    is read   >: j
+
+   return j;
+}

@@ -9,20 +9,6 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # Should be 10, but 2 is better for debugging
 setproperty POINTS_TO_PATH_LIMIT 2
 
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
-
-
-
 echo 
 echo POINTS-TO
 echo
@@ -30,5 +16,6 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 
 close
+shell cat $WSPACE.database/Warnings
 delete $WSPACE
 quit

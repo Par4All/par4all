@@ -1,8 +1,8 @@
 /* Check pointer arithmetic
  *
+ * The correct answer before return is p->a[1] and not p->a[1][0]
+ *
  */
-
-#include <stdio.h>
 
 int main()
 {

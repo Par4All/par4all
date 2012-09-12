@@ -717,7 +717,7 @@ digraph "freia_66_terapix_helper_1_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -730,7 +730,7 @@ digraph "freia_66_terapix_helper_1_0_0" {
  * dag length is 5, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 38
- * - communication: 128
+ * - communication: 96
  */
 freia_status freia_66_terapix_helper_1_0_0(
   freia_data2d * o0,

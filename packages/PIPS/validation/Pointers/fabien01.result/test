@@ -1,75 +1,4 @@
 
-PROPER  EFFECTS
-
-int main(void)
-{
-   recursive p, q;
-//             <    is written>: p
-   p = (void *) 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   p = cons(1, p);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   p = cons(2, p);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   p = cons(3, p);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   
-   
-   
-   
-   
-   
-   
-   fprintf(stdout, "# p 3 items\n""p->i: %d\n""p->n->i: %d\n""p->n->n->i: %d\n""p->n->n->n: %p\n", p->i, p->n->i, p->n->n->i, p->n->n->n);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
-//                               _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               _MALLOC_EFFECTS:_MALLOC_
-   
-   // copie inverse de la liste
-   q = revcopy(p);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   
-   
-   
-   
-   
-   
-   
-   fprintf(stdout, "# q=revcopy(p)\n""q->i: %d\n""q->n->i: %d\n""q->n->n->i: %d\n""q->n->n->n: %p\n", q->i, q->n->i, q->n->n->i, q->n->n->n);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // inverse de la liste
-   q = reverse(q);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   
-   
-   
-   
-   
-   
-   
-   fprintf(stdout, "# q=reverse(q)\n""q->i: %d\n""q->n->i: %d\n""q->n->n->i: %d\n""q->n->n->n: %p\n", q->i, q->n->i, q->n->n->i, q->n->n->n);
-
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -98,19 +27,19 @@ int main(void)
    p = cons(1, p);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p = cons(2, p);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p = cons(3, p);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
@@ -123,7 +52,7 @@ int main(void)
    fprintf(stdout, "# p 3 items\n""p->i: %d\n""p->n->i: %d\n""p->n->n->i: %d\n""p->n->n->n: %p\n", p->i, p->n->i, p->n->n->i, p->n->n->n);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
@@ -131,8 +60,8 @@ int main(void)
    q = revcopy(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 
    
    
@@ -144,16 +73,16 @@ int main(void)
    fprintf(stdout, "# q=revcopy(p)\n""q->i: %d\n""q->n->i: %d\n""q->n->n->i: %d\n""q->n->n->n: %p\n", q->i, q->n->i, q->n->n->i, q->n->n->n);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 
    
    // inverse de la liste
    q = reverse(q);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 
    
    
@@ -165,8 +94,8 @@ int main(void)
    fprintf(stdout, "# q=reverse(q)\n""q->i: %d\n""q->n->i: %d\n""q->n->n->i: %d\n""q->n->n->n: %p\n", q->i, q->n->i, q->n->n->i, q->n->n->n);
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b2 , EXACT
-// q -> *ANY_MODULE*:*ANYWHERE*_b3 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+// q -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 
 
    return 0;

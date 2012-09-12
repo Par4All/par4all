@@ -4,10 +4,15 @@
 
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-   /* proper effects are not precise here for loulou because 
-      of the internal representation of the expression */
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+  // Here the array "fifi" is cast into an int *, and then an offset is computed
+  // zaza points towards fifi[0][3]
+  int *zaza = (int *) fifi+(3-1-0+1)*1;
+  // zizi points to fifi[3][0]
+  int *zizi = ((fifi+(3-1-0+1)*1)[0]);
+  //foo(fifi+(3-1-0+1)*1);
+  /* proper effects are not precise here for loulou because 
+     of the internal representation of the expression */
+  return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])

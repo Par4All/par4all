@@ -303,7 +303,7 @@ digraph "freia_76_terapix_helper_0_0_0" {
  *
  * RAMPE    = 1024
  * NPE      = 128
- * DMA BW   = 32
+ * DMA BW   = 24
  * GRAM W   = 64
  * GRAM H   = 32
  * DAG CUT  = compute
@@ -316,7 +316,7 @@ digraph "freia_76_terapix_helper_0_0_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 9
- * - communication: 32
+ * - communication: 24
  */
 freia_status freia_76_terapix_helper_0_0_0(
   const freia_data2d * i0,
@@ -786,43 +786,51 @@ static freia_status freia_76_opencl_helper_0_0_0_compile(void)
     "KERNEL void freia_76_opencl_helper_0_0_0(\n"
     "  GLOBAL PIXEL * i0, // const?\n"
     "  int ofs_i0,\n"
-    "  int width, // of the working area, vs image below\n"
+    "  int width, // of the working area, vs image pitch below\n"
+    "  int height, // of the working area\n"
     "  int pitch,\n"
     "  GLOBAL TMeasure * redX)\n"
     "{\n"
-    "  // get id & compute global image shift\n"
-    "  int height = get_global_size(0);\n"
-    "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-    "  int shift = pitch*get_global_id(0);\n"
-    "\n"
-    "  // get input & output image pointers\n"
-    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "  // no tiling on height dimension\n"
+    "  // assert(height==get_global_size(0));\n"
+    "  int j = get_global_id(0);\n"
     "\n"
     "  // reduction stuff is currently hardcoded...\n"
     "  int vol = 0;\n"
-    "  int2 mmin = { PIXEL_MAX, 0 };\n"
-    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  PIXEL minv = PIXEL_MAX;\n"
+    "  int2 minpos = { 0, 0 };\n"
+    "  PIXEL maxv = PIXEL_MIN;\n"
+    "  int2 maxpos = { 0, 0 };\n"
     "\n"
-    "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-    "  int last = (get_global_id(1)+1)*workshare;\n"
-    "  if (last>width) last = width;\n"
+    "  // loop i upper bound\n"
+    "  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);\n"
+    "  int Wlast = Wtile*(get_global_id(1)+1);\n"
+    "  if (Wlast>width) Wlast = width;\n"
+    "\n"
+    "  // get input & output image pointers\n"
+    "  int shift = pitch*j;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;\n"
+    "\n"
     "  int i;\n"
-    "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
+    "  for (i=Wtile*get_global_id(1); i<Wlast; i++)\n"
     "  {\n"
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
+    "\n"
     "    // pixel computations\n"
     "    PIXEL_MAXIMUM(red7, in0);\n"
     "    PIXEL_VOLUME(red8, in0);\n"
     "    PIXEL_MIN_COORD(red9, in0);\n"
+    "\n"
     "  }\n"
     "\n"
     "  // reduction copy out\n"
-    "  redX[thrid].max = mmax.x;\n"
+    "  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);\n"
+    "  redX[thrid].max = maxv;\n"
     "  redX[thrid].vol = vol;\n"
-    "  redX[thrid].min = mmin.x;\n"
-    "  redX[thrid].min_x = (uint) mmin.y;\n"
-    "  redX[thrid].min_y = get_global_id(0);\n"
+    "  redX[thrid].min = minv;\n"
+    "  redX[thrid].min_x = (uint) minpos.x;\n"
+    "  redX[thrid].min_y = (uint) minpos.y;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_76_opencl_helper_0_0_0_source, "freia_76_opencl_helper_0_0_0", "-DPIXEL8", &freia_76_opencl_helper_0_0_0_kernel[0]);
@@ -878,43 +886,51 @@ freia_status freia_76_opencl_helper_0_0_0(
 KERNEL void freia_76_opencl_helper_0_0_0(
   GLOBAL PIXEL * i0, // const?
   int ofs_i0,
-  int width, // of the working area, vs image below
+  int width, // of the working area, vs image pitch below
+  int height, // of the working area
   int pitch,
   GLOBAL TMeasure * redX)
 {
-  // get id & compute global image shift
-  int height = get_global_size(0);
-  int thrid = get_global_id(0) + height*get_global_id(1);
-  int shift = pitch*get_global_id(0);
-
-  // get input & output image pointers
-  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+  // no tiling on height dimension
+  // assert(height==get_global_size(0));
+  int j = get_global_id(0);
 
   // reduction stuff is currently hardcoded...
   int vol = 0;
-  int2 mmin = { PIXEL_MAX, 0 };
-  int2 mmax = { PIXEL_MIN, 0 };
+  PIXEL minv = PIXEL_MAX;
+  int2 minpos = { 0, 0 };
+  PIXEL maxv = PIXEL_MIN;
+  int2 maxpos = { 0, 0 };
 
-  int workshare = (width+get_global_size(1)-1)/get_global_size(1);
-  int last = (get_global_id(1)+1)*workshare;
-  if (last>width) last = width;
+  // loop i upper bound
+  int Wtile = (width+get_global_size(1)-1)/get_global_size(1);
+  int Wlast = Wtile*(get_global_id(1)+1);
+  if (Wlast>width) Wlast = width;
+
+  // get input & output image pointers
+  int shift = pitch*j;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0 + shift;
+
   int i;
-  for (i=get_global_id(1)*workshare; i<last; i++)
+  for (i=Wtile*get_global_id(1); i<Wlast; i++)
   {
     // get input pixels
     PIXEL in0 = j0[i];
+
     // pixel computations
     PIXEL_MAXIMUM(red7, in0);
     PIXEL_VOLUME(red8, in0);
     PIXEL_MIN_COORD(red9, in0);
+
   }
 
   // reduction copy out
-  redX[thrid].max = mmax.x;
+  int thrid = get_global_id(0)*get_global_size(1)+get_global_id(1);
+  redX[thrid].max = maxv;
   redX[thrid].vol = vol;
-  redX[thrid].min = mmin.x;
-  redX[thrid].min_x = (uint) mmin.y;
-  redX[thrid].min_y = get_global_id(0);
+  redX[thrid].min = minv;
+  redX[thrid].min_x = (uint) minpos.x;
+  redX[thrid].min_y = (uint) minpos.y;
 }
 
 ! updated function
