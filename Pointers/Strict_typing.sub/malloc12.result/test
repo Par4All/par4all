@@ -1,8 +1,8 @@
 
-POINTS-TO
+POINTS TO
 
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_cell) user error
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_cell) Use of pointer arithmetic on "j" at line 10 via reference "i" is not standard-compliant.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_cell) Use of pointer arithmetic on "*HEAP*_l_24" at line 28 via reference "pt" is not standard-compliant.
 Reset property "POINTS_TO_STRICT_POINTER_TYPES" for usual non-standard compliant C code.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (set_debug_stack_pointer) debug level stack is set to 2
 unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.

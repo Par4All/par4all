@@ -1,40 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: d1
-   int d1 = 4;
-//             <    is written>: d2
-   int d2 = 4;
-   int y[d1][d2];
-   int i, j;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: d1 d2
-
-   call14(d1, d2, (int *) y);
-//             <    is read   >: d1
-//             <    is written>: i
-
-   for(i = 0; i <= d1-1; i += 1) {
-//             <    is read   >: d1 d2
-//             <    is written>: j
-      for(j = 0; j <= d2-1; j += 1)
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: d1 d2 i j stdout y[i][j] 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: d1 stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-      printf("\n");
-   }
-   return 0;
-}
-
 POINTS-TO
 
 

@@ -1,4 +1,4 @@
-setenv WSPACE=dereferencing08
+setenv WSPACE=pv_heap09
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -10,8 +10,7 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
-#display PRINTED_FILE[duck1]
+display PRINTED_FILE
 
 close
 delete $WSPACE

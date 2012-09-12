@@ -1,13 +1,9 @@
-setenv WSPACE=address_of01
-
+setenv WSPACE=pv_heap10
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
-# An error must be detected if the property about strict typing  is set to true
+# The source code is intentionally wrong
 # setproperty ABORT_ON_USER_ERROR TRUE
-
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
@@ -16,7 +12,7 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE
 
 close
 
@@ -25,5 +21,6 @@ echo Warnings
 echo
 
 shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

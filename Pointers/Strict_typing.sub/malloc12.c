@@ -1,9 +1,9 @@
-/* Check type sensitivity. Extension of malloc02.c
+/* Check type sensitivity. Extension of malloc03.c
  *
  * FI: I changed the initialization and the type of pt
  *
- * The initialization was wrong: the allocatedis not compatible with "pt++"
- * which add 120 to pt (30 four-byte elements).
+ * The initialization was wrong: the allocated bucket is not
+ * compatible with "pt++" which add 120 to pt (30 four-byte elements).
  *
  * Currently, the bug is not detected...
  */
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
   printf("%p\n", pt);
 
-  // pt++; Let's avoid this bug to preserve the remainder of the test case
+  pt++;
 
   printf("%p\n", pt);
 

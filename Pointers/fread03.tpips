@@ -15,26 +15,13 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 
 ##TODO: explain
 
-echo 
-echo PROPER EFFECTS
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-echo 
-echo PROPER POINTER EFFECTS
-echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
-
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
-
+#display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[bmatrix]
 
 close
 delete fread03
