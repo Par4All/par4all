@@ -100,27 +100,37 @@ pt_map full_copy_pt_map(pt_map in)
  * formal context with its stubs is built onloy when necessary. 
  */
 static stack statement_points_to_context = stack_undefined;
+static stack current_statement_points_to_context = stack_undefined;
 
 void init_statement_points_to_context()
 {
   pips_assert("statement_points_to_context is undefined",
 	      stack_undefined_p(statement_points_to_context));
   statement_points_to_context = stack_make(points_to_graph_domain, 0, 0);
+  current_statement_points_to_context = stack_make(statement_domain, 0, 0);
 }
 
-void push_statement_points_to_context(pt_map in)
+void push_statement_points_to_context(statement s, pt_map in)
 {
   stack_push((void *) in, statement_points_to_context);
+  stack_push((void *) s, current_statement_points_to_context);
 }
 
 void add_arc_to_statement_points_to_context(points_to pt)
 {
-  pt_map in =  stack_head(statement_points_to_context);
+  pt_map in = stack_head(statement_points_to_context);
   add_arc_to_pt_map(pt, in);
+}
+
+int points_to_context_statement_line_number()
+{
+  statement s = stack_head(current_statement_points_to_context);
+  return statement_number(s);
 }
 
 pt_map pop_statement_points_to_context(void)
 {
+  (void) stack_pop(current_statement_points_to_context);
   return (pt_map) stack_pop(statement_points_to_context);
 }
 
@@ -152,7 +162,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     init_heap_model(s);
     // FI: it would be nice to stack the current statement in order to
     // provide more helpful error messages
-    push_statement_points_to_context(pt_in);
+    push_statement_points_to_context(s, pt_in);
 
     if(declaration_statement_p(s)) {
       /* Process the declarations */
@@ -514,6 +524,8 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
   //if(declaration_statement_p(ws) && !ENDP(dl))
   //  pt_out = points_to_block_projection(pt_out, dl);
 
+      pips_assert("", consistent_points_to_graph_p(pt_out));
+
   return pt_out;
 }
 
@@ -598,21 +610,28 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = normalize_points_to_graph(pt_out);
       pt_out = remove_unreachable_vertices_in_points_to_graph(pt_out);
 
+      // pips_assert("", consistent_points_to_graph_p(pt_out));
+
       /* Check convergence */
       if(set_equal_p(points_to_graph_set(prev), points_to_graph_set(pt_out))) {
 	fix_point_p = true;
 	/* Add the last iteration to obtain the pt_out holding when
 	   exiting the loop */
 	pt_out = statement_to_points_to(b, prev);
+
+      pips_assert("", consistent_points_to_graph_p(pt_out));
 	if(!expression_undefined_p(inc))
 	  pt_out = expression_to_points_to(inc, pt_out);
+
+      pips_assert("", consistent_points_to_graph_p(pt_out));
 	if(!expression_undefined_p(c))
 	  pt_out = condition_to_points_to(c, pt_out, false);
+
+      pips_assert("", consistent_points_to_graph_p(pt_out));
 	break;
       }
       else {
-	//ifdebug(1) {
-	if(true) {
+	ifdebug(1) {
 	  pips_debug(1, "\n\nAt iteration i=%d:\n\n", i);
 	  print_points_to_set("Loop points-to set prev:\n",
 			      points_to_graph_set(prev));
@@ -631,8 +650,12 @@ pt_map any_loop_to_points_to(statement b,
        information is changed accordingly. */
     points_to_graph_set(pt_out) = points_to_independent_store(points_to_graph_set(pt_out));
 
+    // pips_assert("", consistent_points_to_graph_p(pt_out));
+
     pt_out = merge_points_to_graphs(pt_out, pt_out_skip);
   }
+
+  // pips_assert("", consistent_points_to_graph_p(pt_out));
 
   return pt_out;
 }

@@ -182,14 +182,14 @@ entity create_stub_entity(entity e, string fs, type t)
      * reference is not available from this function.
      */
     type st = entity_basic_concrete_type(stub);
-    if(type_equal_p(st, t)) {
+    if(array_pointer_type_equal_p(st, t)) {
       // This may happen when evaluating conditions on demand because
       // they are evaluated twice, once true and once false.
       ;
     }
     else
       // Should be an internal error...
-      pips_internal_error("Ambiguous request...");
+      pips_internal_error("Type incompatible request for a stub.\n");
   }
 
   return stub;
@@ -276,7 +276,8 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
   ifdebug(1) {
     bool to_be_freed;
     type ept = points_to_cell_to_type(sink_cell, & to_be_freed);
-    if(!type_equal_p(pt, ept) && !(type_void_p(pt) && overloaded_type_p(ept))) {
+    if(!array_pointer_type_equal_p(pt, ept)
+       && !(type_void_p(pt) && overloaded_type_p(ept))) {
       bool ok_p = false;
       if(array_type_p(pt)) {
 	if(!array_type_p(ept)) {

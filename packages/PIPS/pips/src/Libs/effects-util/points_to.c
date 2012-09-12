@@ -481,13 +481,13 @@ entity points_to_cells_minimal_module_upper_bound(list cl __attribute__ ((unused
   return m;
 }
 
-entity points_to_cells_minimal_type_upper_bound(list cl __attribute__ ((unused)))
+type points_to_cells_minimal_type_upper_bound(list cl __attribute__ ((unused)))
 {
   type t = type_undefined;
   return t;
 }
 
-entity points_to_cells_minimal_reference_upper_bound(entity m __attribute__ ((unused)), type t __attribute__ ((unused)), list cl __attribute__ ((unused)))
+reference points_to_cells_minimal_reference_upper_bound(entity m __attribute__ ((unused)), type t __attribute__ ((unused)), list cl __attribute__ ((unused)))
 {
   reference r = reference_undefined;
   return r;

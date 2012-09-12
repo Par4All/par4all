@@ -827,10 +827,12 @@ points_to create_k_limited_stub_points_to(cell source, type t, bool array_p, pt_
     pt = points_to_path_to_k_limited_points_to_path(p, k, t, array_p, in);
 
     /* No cycle could be created, the paths can safely be made longer. */
-    if(points_to_undefined_p(pt))
+    if(points_to_undefined_p(pt)) {
       // exact or not?
-      pt = create_stub_points_to(source, t, true);
-
+      // FI: the points-to towards NULL will be added later by a caller...
+      bool exact_p = !get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
+      pt = create_stub_points_to(source, t, exact_p);
+    }
     gen_free_list(p);
   }
   return pt;
@@ -1581,6 +1583,10 @@ list reference_to_sinks(reference r, pt_map in, bool fresh_p)
 set merge_points_to_set(set s1, set s2) {
   set Merge_set = set_generic_make(set_private, points_to_equal_p,
 				   points_to_rank);
+
+  pips_assert("Consistent set s1", consistent_points_to_set(s1));
+  pips_assert("Consistent set s2", consistent_points_to_set(s2));
+
   if(set_empty_p(s1))
     set_assign(Merge_set, s2);
   else if(set_empty_p(s2)) 
@@ -1626,6 +1632,9 @@ set merge_points_to_set(set s1, set s2) {
     set_free(Intersection_set);
     set_free(Union_set);
   }
+
+  pips_assert("Consistent merged set", consistent_points_to_set(Merge_set));
+
   return Merge_set;
 }
 
@@ -1835,12 +1844,21 @@ bool consistent_points_to_set(set s)
   }
 
   SET_FOREACH(points_to, pt1, s) {
+    approximation a1 = points_to_approximation(pt1);
     SET_FOREACH(points_to, pt2, s) {
       if(pt1!=pt2) {
 	//same source
 	cell c1 = points_to_source(pt1);
 	cell c2 = points_to_source(pt2);
 	bool cmp1 = locations_equal_p(c1,c2);
+
+	if(cmp1 && approximation_exact_p(a1)) {
+	  fprintf(stderr,
+		  "Contradictory points-to arcs: incompatible approximation\n");
+	  print_points_to(pt1);
+	  print_points_to(pt2);
+	  consistent_p = false;
+	}
 
 	// same sink
 	cell c3 = points_to_sink(pt1);
@@ -2214,4 +2232,19 @@ pt_map remove_unreachable_vertices_in_points_to_graph(pt_map ptg)
 	      consistent_pt_map_p(ptg));
   
   return ptg;
+}
+
+bool consistent_points_to_graph_p(points_to_graph ptg)
+{
+  bool consistent_p;
+    set ptg_s = points_to_graph_set(ptg);
+  if(points_to_graph_bottom(ptg)) {
+    consistent_p = set_empty_p(ptg_s);
+    if(!consistent_p)
+      pips_internal_error("Bottom graph is not empty.\n");
+  }
+  else {
+    consistent_p = consistent_points_to_set(ptg_s);
+  }
+  return consistent_p;
 }

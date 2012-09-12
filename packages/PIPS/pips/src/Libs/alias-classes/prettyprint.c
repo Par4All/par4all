@@ -369,6 +369,8 @@ void dprint(expression x)
       print_points_to_graph((points_to_graph) x);
     else if(ot==text_domain)
       print_text(stderr, (text) x);
+    else if(ot==entity_domain)
+      fprintf(stderr, "%s\n", entity_name((entity) x));
     else if(0<=ot && ot<1000)
       (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d", ot);
     else if(ot>1000 || ot<=0) {
@@ -392,6 +394,8 @@ void dprint(expression x)
 	print_effects((list) x);
       else if(cot==points_to_domain)
 	print_points_to_relations((list) x);
+      else if(cot==entity_domain)
+	print_entities((list) x);
       else
 	(void) fprintf(stderr, "If a list, a list of unknown objects: tag=%d\n", (int) cot);
     }

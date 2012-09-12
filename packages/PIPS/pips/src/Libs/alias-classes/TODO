@@ -62,9 +62,8 @@ vertex of out-degree strictly greater than 1 must be may arcs.
 
 25. Strict_typing.sub/fabien03: bug detected by or in a type check.
 
-26. The consistency check does not check that the set is empty when bottom is true.
-
-27. In Strict_typing.sub/list02, in "main", the points-to obtained on exit of the while loop is declared "unreachable". Same in list03.
+27. In Strict_typing.sub/list02, in "main", the points-to obtained on
+exit of the while loop is declared "unreachable". Same in list03.
 
 28. pv_local_var03: issue with declaration and assignment of array of
 structs; the generated arcs do not seem added to the current "in"
@@ -73,7 +72,18 @@ susbsumes indices 0 and 1. The test case is not good because the rhs
 struct are not initialized, hence only exact nowhere information is
 propagated.
 
-Next item will be 28.
+29. offset_points_to_cell(): the type should be passed in order to
+update the proper subscript. See dereferencing08.c
+
+30. address_of01: the code is wrong, but gcc does not provide any
+warning. Neither does PIPS, but it generates a wrong and meaningless
+reference to i[1].
+
+31. arithmetic11: type error. One too many [0] subscript... Core dumps.
+
+Next item will be 32.
+
+----------------------------------------------------------
 
 Done:
 
@@ -108,11 +118,15 @@ struct_parall01: a.p[i] = i;
 
 -> seems now OK for argv03. FI: I do not know about the other cases.
 
-1. Serious handling of conditions, starting with equality and disequality; see list06.c (altough this piece of code looks dead wrong...)
+1. Serious handling of conditions, starting with equality and
+disequality; see list06.c (altough this piece of code looks dead
+wrong...)
 
 3. Convergence detection: current implementation no longer works as it used to
 
-4. Add a new dimension to the graph expansion control: outgoing degree, shown in one of the list functions, the freeing of a list (see list05).
+4. Add a new dimension to the graph expansion control: outgoing
+degree, shown in one of the list functions, the freeing of a list (see
+list05).
 
 21. Conditional operator: arcs created in "in_t" or "in_t" do not
 appear in "out". See conditional06.
@@ -120,3 +134,6 @@ appear in "out". See conditional06.
 -> fixed with a call to merge_points_to_graphs()
 
 -> hopefully, approximations are taken a good care of
+
+26. The consistency check does not check that the set is empty when
+bottom is true.
