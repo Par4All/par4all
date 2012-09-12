@@ -80,7 +80,8 @@ list points_to_cells_parameters(list dl)
   return fpcl;
 }
 
-points_to_graph user_call_to_points_to(call c, points_to_graph pt_in)
+points_to_graph user_call_to_points_to(call c,
+				       points_to_graph pt_in)
 {
   points_to_graph pt_out = pt_in;
   entity f = call_function(c);
@@ -132,7 +133,10 @@ points_to_graph user_call_to_points_to(call c, points_to_graph pt_in)
 }
 
 // FI: I assume we do not need the eval_p parameter here
-list user_call_to_points_to_sinks(call c, pt_map in __attribute__ ((unused)), bool eval_p)
+list user_call_to_points_to_sinks(call c,
+				  type et __attribute__ ((unused)),
+				  pt_map in __attribute__ ((unused)),
+				  bool eval_p)
 {
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
   type t = ultimate_type(entity_type(call_function(c)));

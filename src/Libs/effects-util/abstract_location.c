@@ -189,9 +189,15 @@ type malloc_arg_to_type(expression e)
 
   if (syntax_sizeofexpression_p(s))
     {
-      scalar_p = true;
+      scalar_p = true; // Not necessarily! An array type may be argument
       sizeof_exp = syntax_sizeofexpression(s);
     }
+  else if(syntax_cast_p(s)) {
+    cast c = syntax_cast(s);
+    expression ce = cast_expression(c);
+    t = malloc_arg_to_type(ce);
+    return t; // FI: I hate doing this...
+  }
   else if (syntax_call_p(s))
     {
       call c = syntax_call(s);

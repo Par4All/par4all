@@ -72,16 +72,19 @@ susbsumes indices 0 and 1. The test case is not good because the rhs
 struct are not initialized, hence only exact nowhere information is
 propagated.
 
-29. offset_points_to_cell(): the type should be passed in order to
-update the proper subscript. See dereferencing08.c
+32. statement01_dec: should we generate a NOWHERE rather than a bottom
+graph? Should this be a property?
 
-30. address_of01: the code is wrong, but gcc does not provide any
-warning. Neither does PIPS, but it generates a wrong and meaningless
-reference to i[1].
+33. cast must be exploited to avoid further bugs when pointer
+arithmetic is used.
 
-31. arithmetic11: type error. One too many [0] subscript... Core dumps.
+34. Strict_typing.sub/malloc03: "pt++" is not properly interpreted
+because the sink is not large enough.
 
-Next item will be 32.
+35. Heap model: malloc can return a NULL pointer. This is not the
+usual case, but it should be controlled by a property...
+
+Next item will be 36.
 
 ----------------------------------------------------------
 
@@ -137,3 +140,12 @@ appear in "out". See conditional06.
 
 26. The consistency check does not check that the set is empty when
 bottom is true.
+
+29. offset_points_to_cell(): the type should be passed in order to
+update the proper subscript. See dereferencing08.c
+
+30. address_of01: the code is wrong, but gcc does not provide any
+warning. Neither does PIPS, but it generates a wrong and meaningless
+reference to i[1].
+
+31. arithmetic11: type error. One too many [0] subscript... Core dumps.

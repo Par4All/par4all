@@ -492,3 +492,94 @@ reference points_to_cells_minimal_reference_upper_bound(entity m __attribute__ (
   reference r = reference_undefined;
   return r;
 }
+
+/* Is this a reference to an array or a reference to a pointer? This
+   is not linked to the type of the reference, as a reference may be a
+   pointer, such as "a[10]" when "a" is declared int "a[10][20]".*/
+bool points_to_array_reference_p(reference r)
+{
+  bool array_p = false;
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+
+  if(ENDP(sl)) {
+    type t = entity_basic_concrete_type(v);
+    array_p = array_type_p(t);
+  }
+  else {
+    /* Look for the last field among the subscript */
+    list rsl = gen_nreverse(sl);
+    type t = type_undefined;
+    int i = 0;
+    FOREACH(EXPRESSION, se, rsl) {
+      if(field_reference_expression_p(se)) {
+	entity f = reference_variable(expression_reference(se));
+	t = entity_basic_concrete_type(f);
+	break;
+      }
+      i++;
+    }
+    if(type_undefined_p(t)) {
+      t = entity_basic_concrete_type(v);
+      variable vt = type_variable(t);
+      list dl = variable_dimensions(vt);
+      int d = (int) gen_length(dl);
+      int i = (int) gen_length(rsl);
+      if(i<d)
+	array_p = true;
+    }
+    else {
+      if(i==0) { // FI: could be merged with the "else if" clause
+	array_p = array_type_p(t);
+      }
+      else if(array_type_p(t)) {
+	variable vt = type_variable(t);
+	list dl = variable_dimensions(vt);
+	int d = (int) gen_length(dl);
+	if(i<d)
+	  array_p = true;
+      }
+    }
+    reference_indices(r) = gen_nreverse(rsl);
+  }
+  return array_p;
+}
+
+/* If this is an array reference, what is the type of the underlying array type?
+ *
+ * This information cannot be obtained by direct type information
+ * because subarrays are typed as pointers to even smaller arrays.
+ *
+ * If it is not an array reference, the returned type is undefined.
+ *
+ * No new type is allocated.
+ */
+type points_to_array_reference_to_type(reference r)
+{
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+  type t = type_undefined;
+
+  if(ENDP(sl)) {
+    t = entity_basic_concrete_type(v);
+  }
+  else {
+    /* Look for the last field among the subscript */
+    list rsl = gen_nreverse(sl);
+    FOREACH(EXPRESSION, se, rsl) {
+      if(field_reference_expression_p(se)) {
+	entity f = reference_variable(expression_reference(se));
+	t = entity_basic_concrete_type(f);
+	break;
+      }
+    }
+    if(type_undefined_p(t)) {
+      t = entity_basic_concrete_type(v);
+    }
+    else {
+      ;
+    }
+    reference_indices(r) = gen_nreverse(rsl);
+  }
+  return t;
+}
