@@ -284,6 +284,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     //if(gen_length(sources)==1) {
     //cell source = CELL(CAR(sources));
     if(eval_p) {
+      type dt = points_to_expression_to_pointed_type(a);
       sinks = expression_to_points_to_sinks(a, in);
       /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
       expression delta = expression_undefined;
@@ -291,7 +292,7 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	delta = int_to_expression(-1);
       else
 	delta = int_to_expression(1);
-      offset_points_to_cells(sinks, delta);
+      offset_points_to_cells(sinks, delta, dt);
       free_expression(delta);
     }
   }
@@ -313,6 +314,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   expression a2 = EXPRESSION(CAR(CDR(al)));
   list sinks = NIL;
 
+  pips_assert("in is consistent on entry", consistent_points_to_graph_p(in));
+
   if(ENTITY_ASSIGN_P(f)) {
     // FI: you need to dereference this according to in...
     // See assignment01.c
@@ -321,6 +324,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   else if(ENTITY_POINT_TO_P(f)) { // p->a
     // FI: allocation of a fully fresh list? Theroretically...
     list L = expression_to_points_to_sinks(a1, in);
+    pips_assert("in is consistent after computing L",
+		consistent_points_to_graph_p(in));
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     FOREACH(CELL, pc, L) {
@@ -334,11 +339,13 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
 	type ft = entity_basic_concrete_type(f);
 	if(eval_p && !array_type_p(ft)) {
 	  list dL = source_to_sinks(npc, in, true);
+	  pips_assert("in is consistent after computing dL",
+		      consistent_points_to_graph_p(in));
 	  free_cell(npc);
 	  if(ENDP(dL)) {// FI: this might mean dead code...
 	    pips_internal_error("Dereferencing error or user error?\n");
 	    if(ENDP(sinks)) {
-	      pips_user_warning("Some kind of execution error has been encountered.\n");
+	      pips_user_warning("Some kind of execution error has been encountered at line %d.\n", points_to_context_statement_line_number());
 	      clear_pt_map(in);
 	      points_to_graph_bottom(in) = true;
 	    }
@@ -391,7 +398,9 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     else
       sinks = L;
   }
-  else if(ENTITY_PLUS_C_P(f)) { // p+1
+  // The internal conversion from PLUS_C to PLUS pays attention to
+  // pointers but not to arrays
+  else if(ENTITY_PLUS_C_P(f) || ENTITY_PLUS_P(f)) { // p+1, a+1
     // FI: this should be conditioned by eval_p==true; else, no sink exists...
     // FI: but we do need something for our lhs expressions, not
     // matter what eval specifies
@@ -407,7 +416,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
       }
     }
   }
-  else if(ENTITY_MINUS_C_P(f)) {
+  else if(ENTITY_MINUS_C_P(f) || ENTITY_MINUS_P(f)) {
     entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME);
     expression ma2 = MakeUnaryCall(um, copy_expression(a2));
     sinks = expression_to_points_to_sinks_with_offset(a1, ma2, in);
@@ -428,7 +437,11 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   }
   else if (ENTITY_CALLOC_SYSTEM_P(f)) { // CALLOC has two arguments
     // FI: we need a calloc_to_points_to_sinks() to exploit both arguments...
-    sinks = malloc_to_points_to_sinks(a1, in);
+    expression e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,
+					       copy_expression(a1),
+					       copy_expression(a2));
+    sinks = malloc_to_points_to_sinks(e, in);
+    free_expression(e);
   }
   else if (ENTITY_REALLOC_SYSTEM_P(f)) { // REALLOC has two arguments
     // FI: see man realloc() for its complexity:-(
@@ -446,6 +459,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     // FI: two options, 1) generate an anywhere as sink to be always safe,
     // 2) raise an internal error to speed up developement... 
     // But do not let go as the caller will block...
+    pips_internal_error("Unrecognized operator or function.\n");
     ; // Nothing to do
   }
   if(ENDP(sinks)) {
@@ -453,6 +467,8 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     clear_pt_map(in);
     points_to_graph_bottom(in) = true;
   }
+  pips_assert("in is consistent when returning",
+	      consistent_points_to_graph_p(in));
   return sinks;
 }
 
@@ -468,13 +484,29 @@ list expression_to_points_to_sinks_with_offset(expression a1, expression a2, pt_
     list e_sinks = expression_to_points_to_sinks(a1, in);
     sinks = gen_full_copy_list(e_sinks);
     gen_free_list(e_sinks);
-    offset_points_to_cells(sinks, a2);
+    type t = points_to_expression_to_pointed_type(a1);
+    offset_points_to_cells(sinks, a2, t);
   }
   else if(pointer_type_p(t2) && (scalar_integer_type_p(t1) || unbounded_expression_p(a1))) {
     list e_sinks = expression_to_points_to_sinks(a2, in);
     sinks = gen_full_copy_list(e_sinks);
     gen_free_list(e_sinks);
-    offset_points_to_cells(sinks, a1);
+    type t = points_to_expression_to_pointed_type(a2);
+    offset_points_to_cells(sinks, a1, t);
+  }
+  else if(array_type_p(t1) && scalar_integer_type_p(t2)) {
+    list e_sinks = expression_to_points_to_sources(a1, in);
+    sinks = gen_full_copy_list(e_sinks);
+    gen_free_list(e_sinks);
+    type t = points_to_expression_to_pointed_type(a1);
+    offset_points_to_cells(sinks, a2, t);
+  }
+  else if(array_type_p(t2) && scalar_integer_type_p(t1)) {
+    list e_sinks = expression_to_points_to_sources(a2, in);
+    sinks = gen_full_copy_list(e_sinks);
+    gen_free_list(e_sinks);
+    type t = points_to_expression_to_pointed_type(a2);
+    offset_points_to_cells(sinks, a1, t);
   }
   else
     pips_internal_error("Not implemented for %p and %p and %p\n", a1, a2, in);
@@ -644,154 +676,170 @@ list reference_to_points_to_sinks(reference r, pt_map in, bool eval_p)
     fprintf(stderr, "\n");
   }
 
-  // FI: conditional01.c shows that the C parser may not generate the
-  // right construct when a scalar or an pointer is indexed.
-  // FI: maybe more difficult to guess of array of pointers...
-  if(pointer_type_p(t) && !ENDP(sl)) {
-    sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
-  }
-  else if(array_of_pointers_type_p(t)
-	  && (int) gen_length(sl)>variable_dimension_number(type_variable(t))) {
-    sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
+  bool to_be_freed;
+  type rt = points_to_reference_to_type(r, &to_be_freed);
+  if(false && eval_p && !pointer_type_p(rt)) {
+    // There must be a type mismatch
+    pips_user_error("Type mmismatch for reference \"%s\" at line %d.",
+		    effect_reference_to_string(r),
+		    points_to_context_statement_line_number());
   }
   else {
-  // FI: to be checked otherwise?
-  //expression rhs = expression_undefined;
-  if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
-    /* Two proper possibilities: an array of pointers fully subscribed
-       or any other kind of array partially subscribed. And an
-       unsuitable one: an integer value... */
-    int nd = NumberOfDimension(e);
-    int rd = (int) gen_length(sl);
-    if(nd>rd) {
-      /* No matter what, the target is obtained by adding a 0 subscript */
-      reference nr = copy_reference(r);
-      cell nc = make_cell_reference(nr);
-      for(int i=rd; eval_p && i<nd; i++) { // FI: not efficient
-	expression ze = int_to_expression(0);
-	reference_indices(nr) = gen_nconc(reference_indices(nr),
-					  CONS(EXPRESSION, ze, NIL));
-	i = nd; // to be type compatible
-      }
-      sinks = CONS(CELL, nc, NIL);
-    }
-    else if(nd==rd) {
-      // FI: eval_p is not used here...
-      reference nr = simplified_reference(r);
-      cell nc = make_cell_reference(nr);
-      if(eval_p) {
-	sinks = source_to_sinks(nc, in, true); // FI: allocate a new copy
-      }
-      else
-	sinks = CONS(CELL, nc, NIL);
-    }
-    else { // rd is too big
-      // Could be a structure with field accesses expressed as indices
-      // Can be a dereferenced pointer, "p[0]" instead of "*p"
-      type et = ultimate_type(entity_type(e));
-      if(struct_type_p(et)) {
-	reference nr = copy_reference(r);
-	cell nc = make_cell_reference(nr);
-	if(eval_p) {
-	  sinks = source_to_sinks(nc, in, true);
-	  /*
-	    expression ze = int_to_expression(0);
-	    reference_indices(nr) = gen_nconc(reference_indices(nr),
-	    CONS(EXPRESSION, ze, NIL));
-	  */
-	}
-	else
-	  sinks = CONS(CELL, nc, NIL);
-      }
-      else if(pointer_type_p(et)) {
-	pips_assert("One subscript", rd==1 && nd==0);
-	/* What is the value of the subscript expression? */
-	//expression sub = EXPRESSION(CAR(reference_indices(r)));
-	// FI: should we try to evaluate the subscript statically?
-	// If the expression is not zero, the target is unchanged but
-	// * must be used as subscript in sinks
 
-	entity v = reference_variable(r);
-	reference nr = make_reference(v, NIL);
-	cell nc = make_cell_reference(nr);
-	if(eval_p) {
-	  // FI: two rounds of source_to_sinks() I guess
-	  list sinks_1 = source_to_sinks(nc, in, true);
-	  FOREACH(CELL, c, sinks_1) {
-	    list sinks_2 = source_to_sinks(c, in, true);
-	    sinks = gen_nconc(sinks, sinks_2);
-	  }
-	}
-	else {
-	  // FI: what's going to happen with subscript expressions?
-	  // FI: strict typing?
-	  sinks = source_to_sinks(nc, in, true);
-	}
-	// FI FI FI
-	;
-      }
-      else {
-	// FI: you may have an array of struct to begin with, and of
-	// structs including other structs
-	// Handle it just like a struct
-	//pips_user_error("Too many subscript expressions for array \"%s\".\n",
-	//		entity_user_name(e));
-	reference nr = copy_reference(r);
-	cell nc = make_cell_reference(nr);
-	if(eval_p) {
-	  sinks = source_to_sinks(nc, in, true);
-	}
-	else
-	  sinks = CONS(CELL, nc, NIL);
-      }
+    // FI: conditional01.c shows that the C parser may not generate the
+    // right construct when a scalar or an pointer is indexed.
+    // FI: maybe more difficult to guess of array of pointers...
+    if(pointer_type_p(t) && !ENDP(sl)) {
+      sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
     }
-  }
-  else {
-    /* scalar case, rhs is already a lvalue */
-    if(scalar_type_p(ultimate_type(entity_type(e)))) {
-      cell nc = make_cell_reference(copy_reference(r));
-      if(eval_p) {
-	// FI: we have a pointer. It denotes another location.
-	sinks = source_to_sinks(nc, in, true);
-	// FI: in some cases, nc is reused in sinks
-	if(!gen_in_list_p(nc, sinks))
-	  free_cell(nc);
-      }
-      else {
-	// FI: without dereferencing
-	sinks = CONS(CELL, nc, NIL);
-      }
-    }
-    else if(array_type_p(ultimate_type(entity_type(e)))) { // FI: not OK with typedef
-      /* An array name can be used as pointer constant */
-      /* We should add null indices according to its number of dimensions */
-      int n = NumberOfDimension(e);
-      int rd = (int) gen_length(reference_indices(r));
-      int i;
-      reference nr = copy_reference(r);
-      // FI: not efficient
-      for(i=rd; eval_p && i<n; i++) {
-	reference_indices(nr) =
-	  gen_nconc(reference_indices(nr),
-		    CONS(EXPRESSION, int_to_expression(0), NIL));
-	i = n; // to be type compatible
-      }
-      cell nc = make_cell_reference(nr);
-      sinks = CONS(CELL, nc, NIL);
+    else if(array_of_pointers_type_p(t)
+	    && (int) gen_length(sl)>variable_dimension_number(type_variable(t))) {
+      sinks = pointer_reference_to_points_to_sinks(r, in, eval_p);
     }
     else {
-      pips_internal_error("Pointer assignment from something "
-			  "that is not a pointer.\n Could be a "
-			  "function assigned to a functional pointer.\n");
+      // FI: to be checked otherwise?
+      //expression rhs = expression_undefined;
+      if (!ENDP(sl)) { // FI: I'm not sure this is a useful disjunction
+	/* Two proper possibilities: an array of pointers fully subscribed
+	   or any other kind of array partially subscribed. And an
+	   unsuitable one: an integer value... */
+	int nd = NumberOfDimension(e);
+	int rd = (int) gen_length(sl);
+	if(nd>rd) {
+	  /* No matter what, the target is obtained by adding a 0 subscript */
+	  reference nr = copy_reference(r);
+	  cell nc = make_cell_reference(nr);
+	  for(int i=rd; eval_p && i<nd; i++) { // FI: not efficient
+	    expression ze = int_to_expression(0);
+	    reference_indices(nr) = gen_nconc(reference_indices(nr),
+					      CONS(EXPRESSION, ze, NIL));
+	    i = nd; // to be type compatible
+	  }
+	  sinks = CONS(CELL, nc, NIL);
+	}
+	else if(nd==rd) {
+	  // FI: eval_p is not used here...
+	  reference nr = simplified_reference(r);
+	  cell nc = make_cell_reference(nr);
+	  if(eval_p) {
+	    sinks = source_to_sinks(nc, in, true); // FI: allocate a new copy
+	  }
+	  else
+	    sinks = CONS(CELL, nc, NIL);
+	}
+	else { // rd is too big
+	  // Could be a structure with field accesses expressed as indices
+	  // Can be a dereferenced pointer, "p[0]" instead of "*p"
+	  type et = ultimate_type(entity_type(e));
+	  if(struct_type_p(et)) {
+	    reference nr = copy_reference(r);
+	    cell nc = make_cell_reference(nr);
+	    if(eval_p) {
+	      sinks = source_to_sinks(nc, in, true);
+	      /*
+		expression ze = int_to_expression(0);
+		reference_indices(nr) = gen_nconc(reference_indices(nr),
+		CONS(EXPRESSION, ze, NIL));
+	      */
+	    }
+	    else
+	      sinks = CONS(CELL, nc, NIL);
+	  }
+	  else if(pointer_type_p(et)) {
+	    pips_assert("One subscript", rd==1 && nd==0);
+	    /* What is the value of the subscript expression? */
+	    //expression sub = EXPRESSION(CAR(reference_indices(r)));
+	    // FI: should we try to evaluate the subscript statically?
+	    // If the expression is not zero, the target is unchanged but
+	    // * must be used as subscript in sinks
+
+	    entity v = reference_variable(r);
+	    reference nr = make_reference(v, NIL);
+	    cell nc = make_cell_reference(nr);
+	    if(eval_p) {
+	      // FI: two rounds of source_to_sinks() I guess
+	      list sinks_1 = source_to_sinks(nc, in, true);
+	      FOREACH(CELL, c, sinks_1) {
+		list sinks_2 = source_to_sinks(c, in, true);
+		sinks = gen_nconc(sinks, sinks_2);
+	      }
+	    }
+	    else {
+	      // FI: what's going to happen with subscript expressions?
+	      // FI: strict typing?
+	      sinks = source_to_sinks(nc, in, true);
+	    }
+	    // FI FI FI
+	    ;
+	  }
+	  else {
+	    // FI: you may have an array of struct to begin with, and of
+	    // structs including other structs
+	    // Handle it just like a struct
+	    //pips_user_error("Too many subscript expressions for array \"%s\".\n",
+	    //		entity_user_name(e));
+	    reference nr = copy_reference(r);
+	    cell nc = make_cell_reference(nr);
+	    if(eval_p) {
+	      sinks = source_to_sinks(nc, in, true);
+	    }
+	    else
+	      sinks = CONS(CELL, nc, NIL);
+	  }
+	}
+      }
+      else {
+	/* scalar case, rhs is already a lvalue */
+	if(scalar_type_p(t)) {
+	  cell nc = make_cell_reference(copy_reference(r));
+	  if(eval_p) {
+	    // FI: we have a pointer. It denotes another location.
+	    sinks = source_to_sinks(nc, in, true);
+	    // FI: in some cases, nc is reused in sinks
+	    if(!gen_in_list_p(nc, sinks))
+	      free_cell(nc);
+	  }
+	  else {
+	    // FI: without dereferencing
+	    sinks = CONS(CELL, nc, NIL);
+	  }
+	}
+	else if(array_type_p(t)) { // FI: not OK with typedef
+	  /* An array name can be used as pointer constant */
+	  /* We should add null indices according to its number of dimensions */
+	  reference nr = copy_reference(r);
+	  if(false) {
+	    int n = NumberOfDimension(e);
+	    int rd = (int) gen_length(reference_indices(r));
+	    int i;
+	    // FI: not efficient
+	    for(i=rd; eval_p && i<n; i++) {
+	      reference_indices(nr) =
+		gen_nconc(reference_indices(nr),
+			  CONS(EXPRESSION, int_to_expression(0), NIL));
+	      i = n; // to be type compatible
+	    }
+	  }
+	  cell nc = make_cell_reference(nr);
+	  points_to_cell_add_zero_subscripts(nc);
+	  sinks = CONS(CELL, nc, NIL);
+	}
+	else {
+	  pips_internal_error("Pointer assignment from something "
+			      "that is not a pointer.\n Could be a "
+			      "function assigned to a functional pointer.\n");
+	}
+      }
+    }
+
+    if(ENDP(sinks)) {
+      pips_user_warning("Some kind of execution error has been encountered.\n");
+      clear_pt_map(in);
+      points_to_graph_bottom(in) = true;
     }
   }
-  }
 
-  if(ENDP(sinks)) {
-    pips_user_warning("Some kind of execution error has been encountered.\n");
-    clear_pt_map(in);
-    points_to_graph_bottom(in) = true;
-  }
+  if(to_be_freed) free_type(rt);
 
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");
@@ -1319,16 +1367,62 @@ list expression_to_points_to_cells(expression e, pt_map in, bool eval_p)
   return sinks;
 }
 
-/* The returned list contains cells use in "in". They should be copied
- * if they must be changed by side effects of "in" will become
- * nconsistent.
+/* The returned list contains cells used in "in". They should be copied
+ * if they must be changed by side effects or "in" will become
+ * inconsistent.
+ *
+ * This function computes the possible value of a pointer expression.
  */
 list expression_to_points_to_sinks(expression e, pt_map in)
 {
   // FI: question, do we have to propagate eval_p downards or could we
   // simply perform the sinks_to_sources() here after a call to
   // expression_to_points_to_sources()
-  return expression_to_points_to_cells(e, in, true);
+  list sinks = expression_to_points_to_cells(e, in, true);
+
+  // FI: this type check cannot be performed at a low-level, in a
+  // recursicely called function.
+  // It should be performed at the pointer assignment level
+#if 0
+  type t = expression_to_type(e);
+  type ct = compute_basic_concrete_type(t);
+  type st = type_undefined;
+  if(pointer_type_p(ct)) {
+    st = type_to_pointed_type(ct);
+  }
+  else if(array_type_p(ct)) {
+    st = array_type_to_element_type(ct);
+  }
+  else if(scalar_integer_type_p(ct)) {
+    /* At least for the NULL pointer... */
+    st = ct;
+  }
+  else
+    pips_internal_error("Unexpected type for value.\n");
+
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c) && !anywhere_cell_p(c) && !nowhere_cell_p(c)) {
+      bool to_be_freed;
+      type est = points_to_cell_to_type(c, &to_be_freed);
+      type cest = compute_basic_concrete_type(est);
+      if(!array_pointer_type_equal_p(cest, st)) {
+	pips_user_warning("Maybe an issue with a dynamic memory allocation.\n");
+	pips_user_error("At line %d, "
+			"the type returned for the value of expression \"%s\"="
+			"\"%s\", "
+			"\"%s\", is not the expected type, \"%s\".\n",
+			points_to_context_statement_line_number(),
+			expression_to_string(e),
+			effect_reference_to_string(cell_any_reference(c)),
+			// copied from ri-util/type.c, print_type()
+			words_to_string(words_type(cest, NIL, false)),
+			words_to_string(words_type(st, NIL, false)));
+      }
+    }
+  }
+#endif
+
+  return sinks;
 }
 
 list expression_to_points_to_sources(expression e, pt_map in)

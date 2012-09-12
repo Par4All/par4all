@@ -11114,8 +11114,11 @@ HWAC_TERAPIX_RAMPE 1024
 Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
 (size of which is necessarily the number of pe):
 \begin{PipsProp}{HWAC_TERAPIX_DMABW}
-HWAC_TERAPIX_DMABW 32
+HWAC_TERAPIX_DMABW 24
 \end{PipsProp}
+Yes, \emph{twenty-four}, this is not a typo.
+It does not seem to depend whether pixels are 8-bit or 16-bit.
+The DDR tics are a little faster than the Terapix tics.
 
 Terapix 2D global RAM (GRAM) width and height:
 \begin{PipsProp}{HWAC_TERAPIX_GRAM_WIDTH}
@@ -11209,6 +11212,23 @@ Whether to preload pixels before using them in generated kernels.
 Should be better for GPGPU, but not necessarily for CPU implementations.
 \begin{PipsProp}{HWAC_OPENCL_PRELOAD_PIXELS}
 HWAC_OPENCL_PRELOAD_PIXELS TRUE
+\end{PipsProp}
+
+Tell which image dimension is handled by the first OpenCL thread dimension.
+Value is either \emph{height} or \emph{width}.
+\begin{PipsProp}{HWAC_OPENCL_FIRST_THREAD_DIMENSION}
+HWAC_OPENCL_FIRST_THREAD_DIMENSION "height"
+\end{PipsProp}
+
+Tell which is the first loop in the kernel code: either on the image
+\emph{height} or \emph{width}.
+\begin{PipsProp}{HWAC_OPENCL_FIRST_KERNEL_LOOP}
+HWAC_OPENCL_FIRST_KERNEL_LOOP "height"
+\end{PipsProp}
+
+Whether to generate \emph{tiled} kernels on the first thread dimension,
+\begin{PipsProp}{HWAC_OPENCL_TILING}
+HWAC_OPENCL_TILING FALSE
 \end{PipsProp}
 
 

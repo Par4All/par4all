@@ -78,7 +78,8 @@ typedef points_to_graph pt_map;
 		 points_to_graph_set(pt3))
 
 #define empty_pt_map_p(s) set_empty_p(points_to_graph_set(s))
-#define consistent_pt_map_p(s) consistent_points_to_set(points_to_graph_set(s))
+//#define consistent_pt_map_p(s) consistent_points_to_set(points_to_graph_set(s))
+#define consistent_pt_map_p(s) consistent_points_to_graph_p(s)
 // FI: Not so sure we do not need a new name
 #define source_in_pt_map_p(cell,set) source_in_set_p(cell,points_to_graph_set(set))
 // Returns pt_map s after update via side-effect

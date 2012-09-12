@@ -504,6 +504,7 @@ static void substitute_unbounded_call(call c)
 static expression eliminate_calls_to_unbounded(expression e)
 {
   gen_recurse(e, call_domain, gen_true, substitute_unbounded_call);
+  return e;
 }
 
 /* FI: I need more generality than is offered by expression_to_type()
@@ -525,6 +526,44 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
     free_expression(ne);
   }
 
+  return t;
+}
+
+/* Return a new allocated type "t" of the address pointed by expression "e", if
+ * expression "e" denotes an address.
+ *
+ * "t" should not be freed. 
+ */
+type points_to_expression_to_pointed_type(expression e)
+{
+  type t = type_undefined;
+  bool to_be_freed;
+  type et = points_to_expression_to_type(e, &to_be_freed);
+  type cet = compute_basic_concrete_type(et);
+  if(to_be_freed) free_type(et);
+
+  if(pointer_type_p(cet)) {
+    type pt = type_to_pointed_type(cet);
+    t = copy_type(compute_basic_concrete_type(pt));
+  }
+  else if(array_type_p(cet)) {
+    /* We should return a pointer towards an array of dimension
+       n-1. The first dimension is lost. */
+    variable cet_v = type_variable(cet);
+    list cet_v_dl = variable_dimensions(cet_v);
+    /* Build the pointed type, copy of cet except for its first dimension */
+    list ndl = gen_full_copy_list(CDR(cet_v_dl));
+    basic nat_b = copy_basic(variable_basic(cet_v));
+    variable nat_v = make_variable(nat_b, ndl, NIL);
+    type nat = make_type_variable(nat_v);
+    /* Build the poiinter type*/
+    // variable v = type_variable(nat);
+    basic b = make_basic_pointer(nat);
+    variable v = make_variable(b, NIL, NIL);
+    t = make_type_variable(v);
+  }
+  else
+    pips_internal_error("Arg. is not in definition domain.\n");
   return t;
 }
 
@@ -848,31 +887,6 @@ void points_to_cell_types_compatibility(cell l, cell r)
       type rt = points_to_cell_to_type(r, &r_to_be_freed);
       type ult = compute_basic_concrete_type(lt);
       type urt = compute_basic_concrete_type(rt);
-#if 0
-      /* We want to user constant strings as sinks... of type char */
-      if(type_functional_p(urt)) {
-	functional f = type_functional(urt);
-	list pl = functional_parameters(f);
-	type rt = functional_result(f);
-	bool success_p = false;
-	if(ENDP(pl)) {
-	  type crt = compute_basic_concrete_type(rt);
-	  if(string_type_p(crt)) {
-	    success_p = true;
-	    urt = crt; // FI: should it be reduced to char?
-	  }
-	  else if(pointer_type_p(crt)) {
-	    type prt = type_to_pointed_type(crt); // concrete type...
-	    if(char_type_p(prt)) {
-	      urt = prt;
-	      success_p = true;
-	    }
-	  }
-	}
-	if(!success_p)
-	  pips_internal_error("Type is not compatible with a sink points-to cell.\n");
-      }
-#endif
       if(C_pointer_type_p(ult)) {
 	type pt = pointer_type_p(ult) ?
 	  copy_type(compute_basic_concrete_type(type_to_pointed_type(ult))) :
@@ -894,10 +908,10 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	  // A void * pointer may be assigned to anything?
 	  ; // OK, they are compatible...
 	}
-	else if(type_void_p(pt) && overloaded_type_p(urt)) {
+	else if(type_void_p(pt) /* && overloaded_type_p(urt)*/ ) {
 	  // a void * is expected to point toward any type, which is
 	  // encoded with overloaded but could be anything when casts
-	  // are used. See fulguro03.c
+	  // or functions, user or intrinsic, are used. See fulguro03.c
 	  ;
 	}
 	else if(overloaded_type_p(urt)) {
@@ -1007,6 +1021,7 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	   */
 	  if(heap_cell_p(r) && !all_heap_locations_cell_p(r) 
 	     /*&& !all_heap_locations_typed_cell_p(r) */) {
+	    pips_internal_error("Type mistake for heap allocation. Probably a user error. It should have been trapped at a higher level.\n");
 	    type nt = copy_type(pt);
 	    if(array_type_p(nt)
 	       || get_bool_property("POINTS_TO_STRICT_POINTER_TYPES"))
@@ -1024,6 +1039,7 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    r_to_be_freed = true;
 	    reference rr = cell_any_reference(r);
 	    entity rv = reference_variable(rr);
+	    // This assignment breaks the internal consistency of heap modelling
 	    entity_type(rv) = nt;
 	  }
 	  else if(all_heap_locations_cell_p(r))
@@ -1129,4 +1145,58 @@ bool points_to_sink_cell_compatible_p(cell c __attribute__ ((unused)))
   bool compatible_p = true;
 
   return compatible_p;
+}
+
+/* Find the subscript in the reference of cell "c" that would make the
+ * reference type be "t" if the subscript list were truncated just
+ * after it. Select the longest possible subscript list.
+ *
+ * Core dump if it is not possible.
+ *
+ * No smart implementation: trial and error (probably already
+ * implemented somewhere else.
+ */
+list find_points_to_subscript_for_type(cell c, type t)
+{
+  list csl = list_undefined;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  bool to_be_freed;
+  type rt = points_to_reference_to_type(r, &to_be_freed); // reference type
+  list sl = reference_indices(r); // subscript list
+  list rsl = gen_nreverse(sl); // temporary side-effect on "r" (and "c")
+  list crsl = rsl; // current reverse subscript list
+
+  while(!array_pointer_type_equal_p(t, rt) && !ENDP(crsl)) {
+    if(to_be_freed) free_type(rt);
+    POP(crsl);
+    list nsl = gen_copy_seq(crsl);
+    reference nr = make_reference(v, nsl);
+    rt = points_to_reference_to_type(nr, &to_be_freed);
+    reference_indices(nr) = NIL;
+    free_reference(nr);
+  }
+
+  if(to_be_freed) free_type(rt);
+  reference_indices(r)= gen_nreverse(rsl);
+
+  if(!ENDP(crsl)) {
+    csl = crsl;
+  }
+  else {
+    /* Let's try to add a zero subscript instead... */
+    expression z = make_zero_expression();
+    list nsl = CONS(EXPRESSION, z, NIL);
+    /* For the time being, no need to restore the reference in case of
+       failure. */
+    reference_indices(r) = gen_nconc(reference_indices(r), nsl);
+    rt = points_to_reference_to_type(r, &to_be_freed);
+    if(array_pointer_type_equal_p(t, rt))
+      csl = nsl;
+    else
+      pips_internal_error("Type t and reference r are incompatible.\n");
+    if(to_be_freed) free_type(rt);
+  }
+
+  return csl;
 }

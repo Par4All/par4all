@@ -439,6 +439,20 @@ bool concrete_type_equal_p(type t1, type t2)
   return equal_p;
 }
 
+/* T is assumed to be an array type. Get rid of the last dimension and
+   allocate the new type. */
+type array_type_projection(type t)
+{
+  variable v = type_variable(t);
+  list dl = variable_dimensions(v);
+  list ndl = gen_full_copy_list(dl); // new dimension list
+  list lndl = gen_last(ndl); // last dimension
+  gen_list_and_not(&ndl, lndl); // the discarded element is freed
+  variable nv = make_variable(copy_basic(variable_basic(v)), ndl, NIL);
+  type nt = make_type_variable(nv);
+  return nt;
+}
+
 /* assume that a pointer to type x is equal to a 1-D array of x */
 bool array_pointer_type_equal_p(type t1, type t2)
 {
@@ -473,6 +487,13 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	int d = (int) gen_length(variable_dimensions(etv));
 	equal_p = (d==1 && basic_equal_p(pb, eb));
       }
+    }
+    else if(array_type_p(t1) && array_type_p(t2)) {
+      /* Reduce the number of dimensions and try again */
+      type nt1 = array_type_projection(t1);
+      type nt2 = array_type_projection(t2);
+      equal_p = array_pointer_type_equal_p(nt1, nt2);
+      free_type(nt1), free_type(nt2);
     }
     else
       equal_p = false;
@@ -5161,10 +5182,30 @@ type type_to_array_type(type t)
     at = copy_type(t);
 
   variable vt = type_variable(at);
-  dimension d = make_dimension(int_to_expression(0),
-			       make_unbounded_expression());
-  // Add the new dimension as first dimension
-  variable_dimensions(vt) = CONS(DIMENSION, d, variable_dimensions(vt));
+
+    /* You cannot added a second unbounded dimension in C... */
+    /* So you should change the element type... */
+    /* But this is not compatible with points-to references. We can
+       add 0 subscripts as much as we want for unbounded dimensions,
+       but we cannot change *p into p[0]...  This is linked to
+       effects-util and points-to analysis, and should probably not be
+       here in library ri-util */
+
+  //list ld = variable_dimensions(vt);
+  //dimension fd = DIMENSION(CAR(ld));
+  //if(false && unbounded_dimension_p(fd)) {
+  //type et = array_type_to_element_type(at);
+    // type net = type_to_pointer_type(et);
+    //free_basic(variable_basic(vt));
+    //variable_basic(vt) = make_basic_pointer(et);
+    //}
+    //else {
+    dimension d = make_dimension(int_to_expression(0),
+				 make_unbounded_expression());
+    // Add the new dimension as first dimension... be cause an
+    // unbounded dimension must be the first dimension.
+    variable_dimensions(vt) = CONS(DIMENSION, d, variable_dimensions(vt));
+    //  }
 
   return at;
 }

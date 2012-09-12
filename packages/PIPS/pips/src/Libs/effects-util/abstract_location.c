@@ -90,7 +90,7 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
     /* FI: Beware, the symbol table is updated but this is not
        reflected in pipsmake.rc */
     type ct = compute_basic_concrete_type(t);
-    entity_type(e) = ct;
+    entity_type(e) = copy_type(ct);
     entity_storage(e) = make_storage_ram(r);
     entity_initial(e) = make_value_unknown();
     entity_kind(e) = ABSTRACT_LOCATION;
