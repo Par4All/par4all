@@ -1677,6 +1677,12 @@ static int cut_decision(dag d, hash_table erosion)
   // whether as input or output.
 
   int cut = erode/((int)(n_cuts+1));
+
+  // try to fix the balance chosen by the integer division
+  // hmmm... should really look at the weights to choose a side here...
+  if (erode%2==1 && n_cuts<2.0 && nouts<=nins)
+    cut++;
+
   return cut;
 }
 
