@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
-   px = (float *) malloc(sizeof(int));
+   px = (float *) malloc(sizeof(float));
 
    return 0;
 }
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 // pi -> *HEAP*_l_10 , MAY
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
-   px = (float *) malloc(sizeof(int));
+   px = (float *) malloc(sizeof(float));
 
 // Points To:
 // pi -> *HEAP*_l_10 , MAY

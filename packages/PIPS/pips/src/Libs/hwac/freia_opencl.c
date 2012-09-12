@@ -115,7 +115,8 @@ static string pixel_name(
   int shft,           // -4 -3 -2 / -1 0 1 / 2 3 4
   set loaded,         // those already loaded
   string_buffer load, // append load code there if needed
-  list inputs)        // list of input vertices
+  list inputs,        // list of input vertices
+  string indentation)
 {
   // build name
   static char name[30];
@@ -144,7 +145,7 @@ static string pixel_name(
     if (get_bool_property("HWAC_OPENCL_PRELOAD_PIXELS"))
     {
       // we declare and load
-      sb_cat(load, "    " OPENCL_PIXEL, name, " = ");
+      sb_cat(load, indentation, OPENCL_PIXEL, name, " = ");
       if (border_condition[shft+4])
         sb_cat(load, "(", border_condition[shft+4], ")? 0: ");
       sb_cat(load, "j", itoa(in), "[i", shift[shft+4], "];\n");
@@ -176,6 +177,39 @@ static int opencl_compile_mergeable_dag(
              split_name, n_cut, (int) gen_length(dag_vertices(d)));
   ifdebug(4) dag_dump(stderr, cut_name, d);
 
+  // properties
+  bool tiling = get_bool_property("HWAC_OPENCL_TILING");
+  string BODY = tiling? "      ": "    ";  // loop body indentations
+
+  const string first_thread_dim = (const string)
+    get_string_property("HWAC_OPENCL_FIRST_THREAD_DIMENSION");
+  const string first_kernel_loop = (const string)
+    get_string_property("HWAC_OPENCL_FIRST_KERNEL_LOOP");
+  pips_assert("HWAC_OPENCL_FIRST_THREAD_DIMENSION prop is 'height' or 'width'",
+              same_string_p(first_thread_dim, "height") ||
+              same_string_p(first_thread_dim, "width"));
+  pips_assert("HWAC_OPENCL_FIRST_KERNEL_LOOP prop is 'height' or 'width'",
+              same_string_p(first_kernel_loop, "height") ||
+              same_string_p(first_kernel_loop, "width"));
+
+  string Hdim, Wdim;
+  if (same_string_p(first_thread_dim, "height"))
+    Hdim = "0", Wdim = "1";
+  else
+    Hdim = "1", Wdim = "0";
+
+  bool first_loop_on_height = same_string_p(first_kernel_loop, "height");
+
+  // i is the width loop, j the height loop
+  string INDi, INDj;
+  if (tiling)
+    if (first_loop_on_height)
+      INDi = "    ", INDj = "  ";
+    else
+      INDi = "  ", INDj = "    ";
+  else // no tiling, no actual j loop.
+    INDi = "  ", INDj = "  ", first_loop_on_height = true;
+
   dag_dot_dump(module, cut_name, d, NIL, NIL);
 
   // I could handle a closed dag, such as volume(cst(12))...
@@ -197,10 +231,15 @@ static int opencl_compile_mergeable_dag(
     opencl = string_buffer_make(true),      // function signature
     opencl_2 = string_buffer_make(true),    // last "reduction" argument
     opencl_head = string_buffer_make(true), // setup & declarations & loop
+    opencl_i_loop = string_buffer_make(true),
+    opencl_j_loop = string_buffer_make(true),
+    opencl_pointers = string_buffer_make(true), // compute row image pointers
+    // body
     opencl_load = string_buffer_make(true), // load variables
     opencl_body = string_buffer_make(true), // actual operations
-    opencl_tail = string_buffer_make(true), // end of body, store variables
-    opencl_end = string_buffer_make(true),  // after the loop
+    opencl_tail = string_buffer_make(true), // store variables
+    // end of code
+    opencl_end = string_buffer_make(true),  // after loops
     // compilation function
     compile = string_buffer_make(true);
 
@@ -248,21 +287,21 @@ static int opencl_compile_mergeable_dag(
   // count stuff in the generated code
   int nargs = 0, n_params = 0, n_misc = 0, cl_args = 1;
 
-  // get worksize identifiers...
-  sb_cat(opencl_head,
-         "  // get id & compute global image shift\n"
-         // we assume that the image height is on the first thread dimension
-         "  int height = get_global_size(0);\n"
-         // here we assume a 2D worksize
-         "  int thrid = get_global_id(0) + height*get_global_id(1);\n"
-         // compute start of the working area row
-         "  int shift = pitch*get_global_id(0);\n"
-         "\n"
-         "  // get input & output image pointers\n");
+  if (!tiling)
+    sb_cat(opencl_head,
+           // we assume that the image height is on the first thread dimension
+           "  // no tiling on height dimension\n"
+           "  // assert(height==get_global_size(", Hdim, "));\n"
+           "  int j = get_global_id(", Hdim, ");\n"
+           "\n");
+
+  sb_cat(opencl_pointers,
+         tiling? INDj: "", "  // get input & output image pointers\n",
+         tiling? INDj: "", "  int shift = pitch*j;\n");
 
   // output images
   if (n_outs)
-    sb_cat(opencl_tail, "    // set output pixels\n");
+    sb_cat(opencl_tail, BODY, "// set output pixels\n");
   int i = 0;
   FOREACH(dagvtx, v, dag_outputs(d))
   {
@@ -271,14 +310,15 @@ static int opencl_compile_mergeable_dag(
     sb_cat(opencl, nargs? ",": "",
            "\n  " OPENCL_IMAGE "o", si,
            ",\n  int ofs_o", si);
-    // image p<out> = o<out> + ofs_o<out> + shift;
-    sb_cat(opencl_head,
-      "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, " + shift;\n");
+    // image p<out> = o<out> + ofs_o<out>;
+    sb_cat(opencl_pointers, tiling? INDj: "",
+           "  " OPENCL_IMAGE "p", si, " = ",
+             "o", si, " + ofs_o", si, " + shift;\n");
     // , o<out>
     sb_cat(helper_body, ", o", si);
     // p<out>[i] = t<n>;
     sb_cat(opencl_tail,
-           "    p", si, "[i] = t", itoa((int) dagvtx_number(v)), ";\n");
+         BODY, "p", si, "[i] = t", itoa((int) dagvtx_number(v)), ";\n");
     cl_args+=2;
     nargs++;
     free(si);
@@ -287,7 +327,7 @@ static int opencl_compile_mergeable_dag(
 
   // input images
   if (n_ins)
-    sb_cat(opencl_load, "    // get input pixels\n");
+    sb_cat(opencl_load, BODY, "// get input pixels\n");
   for (i = 0; i<n_ins; i++)
   {
     string si = strdup(itoa(i));
@@ -296,8 +336,9 @@ static int opencl_compile_mergeable_dag(
            "\n  " OPENCL_IMAGE "i", si, ", // const?\n  int ofs_i", si);
     cl_args+=2;
     // image j<in> = i<in> + ofs_i<out> + shift;
-    sb_cat(opencl_head,
-      "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, " + shift;\n");
+    sb_cat(opencl_pointers, tiling? INDj: "",
+           "  " OPENCL_IMAGE "j", si, " = ",
+             "i", si, " + ofs_i", si, " + shift;\n");
     // , i<in>
     sb_cat(helper_body, ", i", si);
     nargs++;
@@ -310,11 +351,12 @@ static int opencl_compile_mergeable_dag(
 
   // size parameters to handle an image row
   sb_cat(opencl, ",\n"
-         "  int width, // of the working area, vs image below\n"
+         "  int width, // of the working area, vs image pitch below\n"
+         "  int height, // of the working area\n"
          // the pitch is shared by all images
-         // which thus must be declared of the same size
+         // which thus must be declared of the same size...
          "  int pitch");
-  cl_args+=2;
+  cl_args+=3;
 
   // there are possibly other kernel arguments yet to come...
 
@@ -326,7 +368,7 @@ static int opencl_compile_mergeable_dag(
     limg = CONS(entity, vtxcontent_out(dagvtx_content(via)), limg);
   limg = gen_nreverse(limg);
 
-  sb_cat(opencl_body, "    // pixel computations\n");
+  sb_cat(opencl_body, BODY, "// pixel computations\n");
 
   // actual computations...
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
@@ -391,18 +433,26 @@ static int opencl_compile_mergeable_dag(
         sb_cat(opencl_2, ",\n  GLOBAL TMeasure * redX");
         // declare them all
         sb_cat(opencl_head,
+               "  // reduction stuff is currently hardcoded...\n",
+               "  int vol = 0;\n",
+               "  PIXEL minv = PIXEL_MAX;\n"
+               "  int2 minpos = { 0, 0 };\n"
+               "  PIXEL maxv = PIXEL_MIN;\n"
+               "  int2 maxpos = { 0, 0 };\n"
+               "\n");
+        sb_cat(opencl_end,
                "\n"
-               "  // reduction stuff is currently hardcoded...\n"
-               "  int vol = 0;\n"
-               "  int2 mmin = { PIXEL_MAX, 0 };\n"
-               "  int2 mmax = { PIXEL_MIN, 0 };\n");
-        sb_cat(opencl_end, "\n  // reduction copy out\n");
+               "  // reduction copy out\n"
+               // assume a 2D worksize. any linearization would do.
+               "  int thrid = "
+                 "get_global_id(0)*get_global_size(1)+get_global_id(1);\n");
         n_misc = 1;
       }
       // inner loop reduction code
       dagvtx pred = DAGVTX(CAR(preds));
-      sb_cat(opencl_body, "    ", api->opencl.macro, "(red", svn, ", ",
-             pixel_name(pred, 0, loaded, opencl_load, dag_inputs(d)), ");\n");
+      sb_cat(opencl_body, BODY, api->opencl.macro, "(red", svn, ", ",
+             pixel_name(pred, 0, loaded, opencl_load, dag_inputs(d), BODY),
+             ");\n");
 
 #define RED " = redres." // for a small code compaction
 
@@ -411,12 +461,12 @@ static int opencl_compile_mergeable_dag(
       // ??? HARDCODED for now...
       if (same_string_p(api->compact_name, "max"))
       {
-        sb_cat(opencl_end,  "  redX[thrid].max = mmax.x;\n");
+        sb_cat(opencl_end, "  redX[thrid].max = maxv;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "maximum;\n");
       }
       else if (same_string_p(api->compact_name, "min"))
       {
-        sb_cat(opencl_end, "  redX[thrid].min = mmin.x;\n");
+        sb_cat(opencl_end, "  redX[thrid].min = minv;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "minimum;\n");
       }
       else if (same_string_p(api->compact_name, "vol"))
@@ -427,9 +477,9 @@ static int opencl_compile_mergeable_dag(
       else if (same_string_p(api->compact_name, "max!"))
       {
         sb_cat(opencl_end,
-               "  redX[thrid].max = mmax.x;\n"
-               "  redX[thrid].max_x = (uint) mmax.y;\n"
-               "  redX[thrid].max_y = get_global_id(0);\n");
+               "  redX[thrid].max = maxv;\n",
+               "  redX[thrid].max_x = (uint) maxpos.x;\n",
+               "  redX[thrid].max_y = (uint) maxpos.y;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "maximum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "max_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "max_coord_y;\n");
@@ -437,9 +487,9 @@ static int opencl_compile_mergeable_dag(
       else if (same_string_p(api->compact_name, "min!"))
       {
         sb_cat(opencl_end,
-               "  redX[thrid].min = mmin.x;\n"
-               "  redX[thrid].min_x = (uint) mmin.y;\n"
-               "  redX[thrid].min_y = get_global_id(0);\n");
+               "  redX[thrid].min = minv;\n",
+               "  redX[thrid].min_x = (uint) minpos.x;\n",
+               "  redX[thrid].min_y = (uint) minpos.y;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
         sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
@@ -476,99 +526,99 @@ static int opencl_compile_mergeable_dag(
 
       // pixel t<vertex> = <init>;
       sb_cat(opencl_load,
-             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
+             BODY, OPENCL_PIXEL "t", svn, " = ", api->opencl.init, ";\n");
       // t<vertex> = <op>(t<vertex>, boundary?init:j[i+<shift....>]);
       if (k00)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4-4], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, -4, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, -4, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k01)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4-3], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, -3, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, -3, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k02)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4-2], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, -2, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, -2, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k10)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4-1], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, -1, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, -1, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       // most likely to be non null
       if (k11)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", ",
-               pixel_name(input, 0, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, 0, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k12)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4+1], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, +1, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, +1, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k20)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4+2], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, +2, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, +2, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k21)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4+3], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, +3, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, +3, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
       if (k22)
-        sb_cat(opencl_body, "    t", svn, " = ", api->opencl.macro,
+        sb_cat(opencl_body, BODY, "t", svn, " = ", api->opencl.macro,
                "(t", svn, ", (", border_condition[4+4], ")? ",
                api->opencl.init, ": ",
-               pixel_name(input, +4, loaded, opencl_load, dag_inputs(d)),
+               pixel_name(input, +4, loaded, opencl_load, dag_inputs(d), BODY),
                ");\n");
 
       if (is_a_convolution)
       {
         // compute norm depending on border...
         sb_cat(opencl_body,
-               "    // compute norm\n"
-               "    " OPENCL_PIXEL "n", svn, ";\n");
+               BODY, "// compute norm\n",
+               BODY, OPENCL_PIXEL "n", svn, ";\n");
         // corner first
         sb_cat(opencl_body,
-               "    if (", border_condition[1], ")\n"
-               "      if (", border_condition[3], ") n", svn,
+               BODY, "if (", border_condition[1], ")\n",
+               BODY, "  if (", border_condition[3], ") n", svn,
                " = ", itoa(k11+k12+k21+k22), ";\n"); // NW
         sb_cat(opencl_body,
-               "      else if (", border_condition[5], ") n", svn,
+               BODY, "  else if (", border_condition[5], ") n", svn,
                " = ", itoa(k10+k11+k20+k21), ";\n"); // NE
         sb_cat(opencl_body,
-               "      else n", svn,
+               BODY, "  else n", svn,
                  " = ", itoa(k10+k11+k12+k20+k21+k22), ";\n"); // N
         sb_cat(opencl_body,
-               "    else if (", border_condition[7], ")\n"
-               "      if (", border_condition[3], ") n", svn,
+               BODY, "else if (", border_condition[7], ")\n",
+               BODY, "  if (", border_condition[3], ") n", svn,
                " = ", itoa(k11+k12+k01+k02), ";\n"); // SW
         sb_cat(opencl_body,
-               "      else if (", border_condition[5], ") n", svn,
+               BODY, "  else if (", border_condition[5], ") n", svn,
                " = ", itoa(k10+k11+k00+k01), ";\n"); // SE
         sb_cat(opencl_body,
-               "      else n", svn,
+               BODY, "  else n", svn,
                  " = ", itoa(k00+k01+k02+k10+k11+k12), ";\n"); // S
         sb_cat(opencl_body,
-               "    else if (", border_condition[3], ") n", svn,
+               BODY, "else if (", border_condition[3], ") n", svn,
                " = ", itoa(k01+k11+k12+k02+k21+k22), ";\n"); // W
         sb_cat(opencl_body,
-               "    else if (", border_condition[5], ") n", svn,
+               BODY, "else if (", border_condition[5], ") n", svn,
                " = ", itoa(k00+k01+k10+k11+k20+k21), ";\n"); // E
-        sb_cat(opencl_body, "    else n", svn,
+        sb_cat(opencl_body, BODY, "else n", svn,
                " = ", itoa(k00+k01+k02+k10+k11+k12+k20+k21+k22), ";\n"); // C
-        sb_cat(opencl_body, "    t", svn, " = "
+        sb_cat(opencl_body, BODY, "t", svn, " = "
                "PIXEL_DIV(t", svn, ", n", svn, ");\n");
       }
 
@@ -577,12 +627,12 @@ static int opencl_compile_mergeable_dag(
     {
       // pixel t<vertex> = <op>(args...);
       sb_cat(opencl_body,
-             "    " OPENCL_PIXEL "t", svn, " = ", api->opencl.macro, "(");
+             BODY, OPENCL_PIXEL "t", svn, " = ", api->opencl.macro, "(");
 
       // macro arguments
       FOREACH(dagvtx, p, preds)
         sb_cat(opencl_body, nao++? ", ": "",
-               pixel_name(p, 0, loaded, opencl_load, dag_inputs(d)));
+               pixel_name(p, 0, loaded, opencl_load, dag_inputs(d), BODY));
 
       gen_free_list(preds), preds = NIL;
 
@@ -635,46 +685,100 @@ static int opencl_compile_mergeable_dag(
   string_buffer_append_sb(opencl, opencl_2);
   sb_cat(opencl, ")\n{\n");
   string_buffer_append_sb(opencl, opencl_head);
-  if (has_kernel) {
-    sb_cat(opencl, "\n"
-           "  // N & S boundaries, one thread on first dimension per row\n");
-    if (need_N)
-      sb_cat(opencl, "  int is_N = (get_global_id(0)==0);\n");
-    else
-      sb_cat(opencl, "  // N not needed\n");
-    if (need_S)
-      sb_cat(opencl, "  int is_S = (get_global_id(0)==(height-1));\n");
-    else sb_cat(opencl, "  // S not needed\n");
-  }
-  sb_cat(opencl,
-         "\n"
-         // work per thread so that all pixes are processed
-         "  int workshare = (width+get_global_size(1)-1)/get_global_size(1);\n"
-         // last index in the row for this thread
-         "  int last = (get_global_id(1)+1)*workshare;\n"
-         "  if (last>width) last = width;\n"
-         // thread's pixel loop
-         "  int i;\n"
-         "  for (i=get_global_id(1)*workshare; i<last; i++)\n"
-         "  {\n");
-  if (has_kernel) {
+
+  if (tiling)
+    // j (height) loop bound
     sb_cat(opencl,
-           "    // W & E boundaries, assuming i global index\n");
-    if (need_W)
-      sb_cat(opencl, "    int is_W = (i==0);\n");
-    else
-      sb_cat(opencl, "    // W not needed\n");
-    if (need_E)
-      sb_cat(opencl, "    int is_E = (i==(width-1));\n");
-    else
-      sb_cat(opencl, "    // E not needed\n");
+           "  // loop j upper bound\n"
+           "  int Htile = (height+get_global_size(", Hdim, ")-1)/"
+                                 "get_global_size(", Hdim, ");\n"
+           "  int Hlast = Htile*(get_global_id(", Hdim, ")+1);\n"
+           "  if (Hlast>height) Hlast = height;\n"
+           "\n");
+
+  sb_cat(opencl,
+         // i (width) loop bound
+         // work per thread so that all pixes are processed
+         "  // loop i upper bound\n"
+         "  int Wtile = (width+get_global_size(", Wdim, ")-1)/"
+                              "get_global_size(", Wdim,");\n"
+         // last index in the row for this thread
+         "  int Wlast = Wtile*(get_global_id(", Wdim, ")+1);\n"
+         "  if (Wlast>width) Wlast = width;\n"
+         "\n");
+
+  if (tiling)
+    sb_cat(opencl_j_loop,
+           // thread x-axis tile loop
+           INDj, "int j;\n",
+           INDj, "for (j=Htile*get_global_id(", Hdim, "); j<Hlast; j++)\n",
+           INDj, "{\n");
+
+  if (has_kernel) {
+    // it is on the inside, if there is an inside...
+    string IND = tiling? INDj: "";
+    sb_cat(opencl_j_loop, IND, "  "
+           "// N & S boundaries, one thread on first dimension per row\n");
+    if (tiling)
+      sb_cat(opencl_j_loop, IND, "  ",
+             need_N? "int is_N = (j==0);\n": "// N not needed\n",
+             IND, "  ",
+             need_S? "int is_S = (j==(height-1));\n": "// S not needed\n",
+             "\n");
+    else {
+      sb_cat(opencl_j_loop, IND, "  ");
+      if (need_N)
+        sb_cat(opencl_j_loop, "int is_N = (get_global_id(", Hdim, ")==0);\n");
+      else
+        sb_cat(opencl_j_loop, "// N not needed\n");
+      sb_cat(opencl_j_loop, IND, "  ");
+      if (need_S)
+        sb_cat(opencl_j_loop,
+               "int is_S = (get_global_id(", Hdim, ")==(height-1));\n");
+      else
+        sb_cat(opencl_j_loop, "// S not needed\n");
+      sb_cat(opencl_j_loop, "\n");
+    }
   }
+
+  sb_cat(opencl_i_loop,
+         // thread's pixel loop
+         INDi, "int i;\n",
+         INDi, "for (i=Wtile*get_global_id(", Wdim, "); i<Wlast; i++)\n",
+         INDi, "{\n");
+  if (has_kernel) {
+    sb_cat(opencl_i_loop,
+           INDi, "  // W & E boundaries, assuming i global index\n");
+    sb_cat(opencl_i_loop, INDi, "  ",
+           need_W? "int is_W = (i==0);\n": "// W not needed\n");
+    sb_cat(opencl_i_loop, INDi, "  ",
+           need_E? "int is_E = (i==(width-1));\n": "// E not needed\n");
+    sb_cat(opencl_i_loop, "\n");
+  }
+
+  if (first_loop_on_height) {
+    string_buffer_append_sb(opencl, opencl_j_loop);
+    string_buffer_append_sb(opencl, opencl_pointers);
+    sb_cat(opencl, "\n");
+    string_buffer_append_sb(opencl, opencl_i_loop);
+  }
+  else {
+    string_buffer_append_sb(opencl, opencl_i_loop);
+    string_buffer_append_sb(opencl, opencl_j_loop);
+    string_buffer_append_sb(opencl, opencl_pointers);
+    sb_cat(opencl, "\n");
+  }
+
   string_buffer_append_sb(opencl, opencl_load);
+  sb_cat(opencl, "\n");
   string_buffer_append_sb(opencl, opencl_body);
+  sb_cat(opencl, "\n");
   string_buffer_append_sb(opencl, opencl_tail);
-  sb_cat(opencl, "  }\n");
+  sb_cat(opencl, tiling? "    ": "  ", "}\n"); // close internal loop
+  if (tiling)
+    sb_cat(opencl, "  }\n"); // close external loop
   string_buffer_append_sb(opencl, opencl_end);
-  sb_cat(opencl, "}\n");
+  sb_cat(opencl, "}\n"); // close function
 
   // OpenCL compilation
   sb_cat(compile,
@@ -738,6 +842,9 @@ static int opencl_compile_mergeable_dag(
   string_buffer_free(&opencl);
   string_buffer_free(&opencl_2);
   string_buffer_free(&opencl_head);
+  string_buffer_free(&opencl_i_loop);
+  string_buffer_free(&opencl_j_loop);
+  string_buffer_free(&opencl_pointers);
   string_buffer_free(&opencl_load);
   string_buffer_free(&opencl_body);
   string_buffer_free(&opencl_tail);

@@ -36,6 +36,6 @@ int main()
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "p"
-.INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (non_equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "p".
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (non_equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "q".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "p" at line 10.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (non_equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "p" at line 10.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (non_equal_condition_to_points_to) Unitialized pointer is used to evaluate expression "q" at line 10.
