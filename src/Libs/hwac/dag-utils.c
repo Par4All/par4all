@@ -3017,3 +3017,56 @@ list dag_connected_component(
 
   return lnew;
 }
+
+static list copy_vertices(list lv)
+{
+  list nl = NIL;
+  FOREACH(dagvtx, v, lv)
+    if (dagvtx_number(v)!=0)
+      nl = CONS(dagvtx, v, nl);
+  return gen_nreverse(nl);
+}
+
+/* build connected components
+ */
+list dag_split_connected_components(dag d, set output_images)
+{
+  list lnd = NIL;
+  list vertices = copy_vertices(dag_vertices(d));
+
+  pips_debug(3, "considering %"_intFMT" vertices\n", gen_length(vertices));
+  ifdebug(3)
+    gen_fprint(stderr, "vertices", vertices, dagvtx_nb);
+
+  while (vertices)
+  {
+    list cv = dag_connected_component(d, &vertices, NULL);
+    pips_assert("some connected vertices", cv);
+    if (!vertices) { // take remaining dag in full
+      lnd = CONS(dag, d, lnd);
+      break;
+    }
+
+    ifdebug(3) gen_fprint(stderr, "connected component", cv, dagvtx_nb);
+
+    // else there seems to be an actual split...
+    dag nd = make_dag(NIL, NIL, NIL);
+    cv = gen_nreverse(cv); // ??? they must be introduced in reverse order?
+    FOREACH(dagvtx, v, cv)
+      dag_append_vertex(nd, copy_dagvtx_norec(v));
+    dag_compute_outputs(nd, NULL, output_images, NIL, false);
+    dag_cleanup_other_statements(nd);
+    // ???
+    freia_hack_fix_global_ins_outs(d, nd);
+    lnd = CONS(dag, nd, lnd);
+
+    // cleanup other dag for next round
+    FOREACH(dagvtx, v, cv)
+      dag_remove_vertex(d, v);
+    dag_compute_outputs(d, NULL, output_images, NIL, false);
+    dag_cleanup_other_statements(d);
+  }
+
+  pips_debug(3, "found %"_intFMT" connected components\n", gen_length(lnd));
+  return gen_nreverse(lnd);
+}
