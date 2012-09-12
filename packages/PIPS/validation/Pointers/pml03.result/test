@@ -20,13 +20,13 @@ int main()
    root = malloc(sizeof(list));
 
 // Points To:
-// root -> *HEAP*_l_12 , MAY
+// root -> *HEAP*_l_20 , MAY
 
    root->next = malloc(sizeof(list));
 
 // Points To:
-// *HEAP*_l_12.next -> *HEAP*_l_13 , MAY
-// root -> *HEAP*_l_12 , MAY
+// *HEAP*_l_20.next -> *HEAP*_l_21 , MAY
+// root -> *HEAP*_l_20 , MAY
 
    free(root);
 

@@ -1,0 +1,1 @@
+The typing generated for root->next is not compatible with the points-to analysis (see Pointers/pml03).
