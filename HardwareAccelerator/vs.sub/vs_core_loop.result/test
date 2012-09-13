@@ -2154,7 +2154,7 @@ freia_status vs_core_loop_terapix_helper_0_0_0(
   int image_height = o0->heightWa;
   int max_computed_size = 512;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 512;
@@ -2336,7 +2336,7 @@ freia_status vs_core_loop_terapix_helper_3_0_0(
   int image_height = i0->heightWa;
   int max_computed_size = 170;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 170;
@@ -2775,7 +2775,7 @@ freia_status vs_core_loop_terapix_helper_3_1_0(
   int image_height = i0->heightWa;
   int max_computed_size = 164;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 170;
