@@ -122,10 +122,10 @@
 + skip non implemented ops? fast_correlation?
 + cleanup declarations in the generated code, when not used?
 + dynamic optimal tile size computation instead of static?
++ split along connected components?
 - implement "enumerate" dag cutting strategy
 - it would be great if the terapix simulator timings are ok for a paper...
 - wrong placement of tmp images under REPEAT for antibio
-- split along connected components?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler

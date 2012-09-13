@@ -1177,7 +1177,7 @@ static _int freia_terapix_call
     sb_cat(decl,
       "  int max_computed_size = ", itoa(max_computed_size), ";\n"
       "  int n_tiles = (image_height+max_computed_size-1)/max_computed_size;\n"
-      "  int imagelet_size =\n"
+      "  int imagelet_size = (n_tiles==1)? image_height:\n"
       "        ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;\n");
     if (max_size)
     {
@@ -1250,6 +1250,7 @@ static _int freia_terapix_call
   // tell about imagelet erosion...
   // current output should be max(w,e) & max(n,s)
   sb_cat(body, "  // imagelet erosion for the computation\n");
+  // terapix runtime issue if n_tiles==1...
   sb_cat(body, "  mcu_instr.borderTop    = ", itoa(n), ";\n");
   sb_cat(body, "  mcu_instr.borderBottom = ", itoa(s), ";\n");
   sb_cat(body, "  mcu_instr.borderLeft   = ", itoa(w), ";\n");
@@ -1621,6 +1622,10 @@ static int cut_decision(dag d, hash_table erosion)
   int com_cost_per_row = get_int_property(trpx_dmabw_prop);
   int  width, cost, nops, n, s, w, e;
   (void)dag_terapix_measures(d, erosion, &width, &cost, &nops, &n, &s, &w, &e);
+
+  // bye bye...
+  if (width==0) return 0;
+
   int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
 
   // if we assume that the imagelet size is quite large, say around 128
@@ -1807,6 +1812,9 @@ list freia_trpx_compile_calls
  set helpers,
  int number)
 {
+  bool reduce_cc =
+    get_bool_property("HWAC_TERAPIX_REDUCE_TO_CONNECTED_COMPONENTS");
+
   // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
@@ -1854,6 +1862,15 @@ list freia_trpx_compile_calls
                                  output_images);
   hash_table_free(erosion), erosion = NULL;
 
+  // split ld dags by connected components
+  if (reduce_cc)
+  {
+    list nld = NIL;
+    FOREACH(dag, d, ld)
+      nld = gen_nconc(nld, dag_split_connected_components(d, output_images));
+    gen_free_list(ld), ld = nld, nld = NIL;
+  }
+
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
   const char* dag_cut = get_string_property(trpx_dag_cut);
@@ -1900,18 +1917,36 @@ list freia_trpx_compile_calls
       while ((cut = cut_decision(d, erosion)))
       {
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
-        migrate_statements(sq, dc, dones);
-        // generate code for cut
-        stnb =
-          freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
-                n_cut++, global_remainings, helper_file, helpers, stnb, init);
-        // cleanup
-        free_dag(dc);
-        hash_table_clear(erosion);
-      }
-      migrate_statements(sq, d, dones);
-      stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+
+        // may separate by connected components...
+        list ld;
+        if (reduce_cc)
+          ld = dag_split_connected_components(dc, output_images);
+        else
+          ld = CONS(dag, dc, NIL);
+
+        FOREACH(dag, dci, ld)
+        {
+          migrate_statements(sq, dci, dones);
+          // generate code for cut
+          stnb =
+            freia_trpx_compile_one_dag(module, ls, dci, fname_fulldag, n_split,
                  n_cut++, global_remainings, helper_file, helpers, stnb, init);
+          // cleanup
+          free_dag(dci);
+        }
+
+        hash_table_clear(erosion);
+        gen_free_list(ld);
+      }
+
+      if (dag_vertices(d)) {
+        // should it *ALWAYS* HAPPEN?
+        migrate_statements(sq, d, dones);
+        stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+               n_cut++, global_remainings, helper_file, helpers, stnb, init);
+      }
+
       hash_table_free(erosion);
     }
     else if (trpx_dag_cut_enumerate_p(dag_cut))

@@ -11136,7 +11136,7 @@ HWAC_TERAPIX_DAG_CUT "compute"
 \end{PipsProp}
 
 Whether input and output memory transfers overlap one with the other,
-that we have a full duplex DMA.
+that is we have a full duplex DMA.
 \begin{PipsProp}{HWAC_TERAPIX_OVERLAP_IO}
 HWAC_TERAPIX_OVERLAP_IO FALSE
 \end{PipsProp}
@@ -11155,6 +11155,13 @@ runtime is not surprised. This is rather use of debug to impose
 an imagelet size.
 \begin{PipsProp}{HWAC_TERAPIX_IMAGELET_MAX_SIZE}
 HWAC_TERAPIX_IMAGELET_MAX_SIZE 0
+\end{PipsProp}
+
+Whether to reduce graphs to subgraphs of connected components.
+This should be always beneficial for Terapix, so this is the default.
+This option is added as a workaround against potential issues with the runtime.
+\begin{PipsProp}{HWAC_TERAPIX_REDUCE_TO_CONNECTED_COMPONENTS}
+HWAC_TERAPIX_REDUCE_TO_CONNECTED_COMPONENTS TRUE
 \end{PipsProp}
 
 \subsection{FREIA OpenCL}
