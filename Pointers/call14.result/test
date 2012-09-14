@@ -1,6 +1,32 @@
 
-POINTS-TO
+POINTS TO
 
+
+// Points To IN:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+
+// Points To OUT: none
+
+void call14(int n, int m, int *x)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   for(i = 0; i <= n*m-1; i += 1)
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+      x[i] = i;
+}
 
 // Points To IN: none
 

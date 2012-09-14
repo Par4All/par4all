@@ -20,8 +20,8 @@ echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-#display PRINTED_FILE[%ALLFUNC]
-display PRINTED_FILE[bmatrix]
+display PRINTED_FILE[%ALLFUNC]
+#display PRINTED_FILE[bmatrix]
 
 close
 delete fread03
