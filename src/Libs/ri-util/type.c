@@ -466,11 +466,17 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
+#if 0
 	basic pb = variable_basic(type_variable(pt));
 	variable etv = type_variable(t2);
 	basic eb = variable_basic(etv);
 	int d = (int) gen_length(variable_dimensions(etv));
 	equal_p = (d==1 && basic_equal_p(pb, eb));
+#endif
+	// Generalization
+	type st = array_type_to_sub_array_type(t2);
+	equal_p = array_pointer_type_equal_p(pt, st);
+	free_type(st);
       }
     }
     else if(pointer_type_p(t2) && array_type_p(t1)) {
@@ -481,11 +487,17 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
+#if 0
 	basic pb = variable_basic(type_variable(pt));
 	variable etv = type_variable(t1);
 	basic eb = variable_basic(etv);
 	int d = (int) gen_length(variable_dimensions(etv));
 	equal_p = (d==1 && basic_equal_p(pb, eb));
+#endif
+	// Generalization
+	type st = array_type_to_sub_array_type(t1);
+	equal_p = array_pointer_type_equal_p(pt, st);
+	free_type(st);
       }
     }
     else if(array_type_p(t1) && array_type_p(t2)) {

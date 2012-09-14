@@ -583,3 +583,65 @@ type points_to_array_reference_to_type(reference r)
   }
   return t;
 }
+
+
+/* Add a set of zero subscripts to a reference "r" by side effect.
+ *
+ * Used when a partial array reference must be converted into a
+ * reference to the first array element (zero_p==true) or to any
+ * element (zero_p==false).
+ *
+ * The difficulty lies with field subscripts...
+ */
+void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p)
+{
+  type t = type_undefined;
+
+  // FI: this assert makes sense within the ri-util framework but is
+  // too strong for the kind of references used in effects-util
+  // pips_assert("scalar type", ENDP(reference_indices(r)));
+
+  /* Find the current number of effective subscripts: is there a field
+     subscript somewhere? */
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+  list rsl = gen_nreverse(sl);
+  int i = 0;
+  bool field_found_p = false;
+
+  FOREACH(EXPRESSION, se, rsl) {
+    if(expression_field_p(se)) {
+      reference fr = expression_reference(se);
+      entity f = reference_variable(fr);
+      t = entity_basic_concrete_type(f); 
+      field_found_p = true;
+      break;
+    }
+    i++;
+  }
+
+  if(!field_found_p)
+    t = entity_basic_concrete_type(v);
+
+  variable vt = type_variable(t);
+  list dl = variable_dimensions(vt);
+  int d = (int) gen_length(dl);
+
+  pips_assert("Not Too many subscripts wrt the type.\n", i<=d);
+
+  list nsl = NIL; // subscript list
+  int j;
+  for(j=i+1;j<=d;j++) {
+    expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
+    // reference_indices(r) = CONS(EXPRESSION, s, reference_indices(r));
+    nsl = CONS(EXPRESSION, s, nsl);
+  }
+
+  reference_indices(r) = gen_nreverse(rsl);
+  reference_indices(r) = gen_nconc(reference_indices(r), nsl);
+}
+
+void complete_points_to_reference_with_zero_subscripts(reference r)
+{
+  complete_points_to_reference_with_fixed_subscripts(r, true);
+}

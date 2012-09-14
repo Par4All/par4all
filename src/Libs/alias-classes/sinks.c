@@ -906,8 +906,8 @@ list cast_to_points_to_sinks(cast c,
 	    else {
 	      // You should try to add or remove zero subscripts till the expected
 	      // type is reached.
-	      points_to_cell_add_zero_subscripts(c);
 	      reference r = cell_any_reference(c);
+	      complete_points_to_reference_with_zero_subscripts(r);
 	      adapt_reference_to_type(r, pt);
 	      if(to_be_freed) free_type(mct);
 	      mct = points_to_cell_to_type(c, &m_to_be_freed);
@@ -942,7 +942,13 @@ list cast_to_points_to_sinks(cast c,
 	  ; // nothing to do
 	else { // We should create a stub of the proper type because a
 	  // reference cannot include the address-of operator, "&"
-	  pips_internal_error("Not implemented yet: stub with proper type needed.\n");
+	  if(pointer_type_p(t) && array_type_p(cct)) {
+	    reference r = cell_any_reference(c);
+	    complete_points_to_reference_with_zero_subscripts(r);
+	    adapt_reference_to_type(r, t);
+	  }
+	  else
+	    pips_internal_error("Not implemented yet: stub with proper type needed.\n");
 	}
       }
     }

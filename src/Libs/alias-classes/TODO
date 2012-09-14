@@ -84,7 +84,12 @@ because the sink is not large enough.
 35. Heap model: malloc can return a NULL pointer. This is not the
 usual case, but it should be controlled by a property...
 
-Next item will be 36.
+36. Condition with side effects in and_operator02 is not taken into account.
+
+37. call14: cast in actual argument not properly processed. We might
+need new stubs to cope with this.
+
+Next item will be 37.
 
 ----------------------------------------------------------
 
