@@ -1309,7 +1309,8 @@ list subscript_to_points_to_sinks(subscript s,
 	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
 
 	  // FI: let's add the zero subscripts again...
-	  points_to_cell_add_zero_subscripts(c);
+	  // points_to_cell_add_zero_subscripts(c);
+	  complete_points_to_reference_with_zero_subscripts(r);
 	}
 	else {
 	  // Expression "a" does not require any dereferencing, add

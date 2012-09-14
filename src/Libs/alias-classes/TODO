@@ -75,21 +75,14 @@ propagated.
 32. statement01_dec: should we generate a NOWHERE rather than a bottom
 graph? Should this be a property?
 
-33. cast must be exploited to avoid further bugs when pointer
-arithmetic is used.
-
-34. Strict_typing.sub/malloc03: "pt++" is not properly interpreted
-because the sink is not large enough.
-
 35. Heap model: malloc can return a NULL pointer. This is not the
 usual case, but it should be controlled by a property...
 
 36. Condition with side effects in and_operator02 is not taken into account.
 
-37. call14: cast in actual argument not properly processed. We might
-need new stubs to cope with this.
+38. pointer15: the indices for _t_1 are not properly located. The first subscript should be zero for the implicit dimension. [1][2] should be the second and third subscripts
 
-Next item will be 37.
+Next item will be 39.
 
 ----------------------------------------------------------
 
@@ -154,3 +147,19 @@ warning. Neither does PIPS, but it generates a wrong and meaningless
 reference to i[1].
 
 31. arithmetic11: type error. One too many [0] subscript... Core dumps.
+
+37. call14: cast in actual argument not properly processed. We might
+need new stubs to cope with this.
+
+-> fixed in that case by tuning the reference according to the cast;
+   namely, (int *) y is changed in &y[0];
+
+34. Strict_typing.sub/malloc03: "pt++" is not properly interpreted
+because the sink is not large enough.
+
+-> either sources with this issue were modified and the necessary dimension declared or the their tpips were modified to avoid core dumping when a user error is encountered
+
+33. cast must be exploited to avoid further bugs when pointer
+arithmetic is used.
+
+-> at least, partly implemented in simple cases

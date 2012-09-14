@@ -1012,7 +1012,7 @@ void offset_points_to_cell(cell sink, expression delta, type t)
   // FI: this has been dealt with somewhere else
   // else if(entity_array_p(rv)
   //   || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
-  else if(entity_array_p(rv)) {
+  else if(entity_array_p(rv) || cell_typed_anywhere_locations_p(sink)) {
     value val = EvalExpression(delta);
     list sl = reference_indices(r);
     if(value_constant_p(val) && constant_int_p(value_constant(val))) {
