@@ -6,7 +6,8 @@ noinst_LTLIBRARIES=libgpu.la
 libgpu_la_SOURCES=	\
 		gpu-ify.c\
 		loop_nest_annotate.c \
-		xml_output.c
+		xml_output.c \
+		one_thread_kernel.c
 
 
 include $(srcdir)/../pipslibs_includes.mk

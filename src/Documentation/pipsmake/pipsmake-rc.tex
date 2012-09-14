@@ -8418,6 +8418,17 @@ gpu_parallelize_annotated_loop_nest        > MODULE.code
 \end{PipsMake}
 
 
+\begin{PipsPass}{one_thread_parallelize}
+This phase promote a whole function body into a parallel loop with one thread.
+\end{PipsPass}
+
+\begin{PipsMake}
+one_thread_parallelize	> MODULE.code
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
+
 
 \begin{PipsPass}{gpu_promote_sequential}
 This phase promote sequential code in GPU kernels to avoid memory transfers.
