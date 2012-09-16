@@ -1141,6 +1141,7 @@ static _int freia_terapix_call
   // now I know how many imagelets are needed
   int total_imagelets = n_imagelets + n_double_buffers;
   int imagelet_rows = available_memory/total_imagelets; // round down
+  int imagelet_max_rows = imagelet_rows;
 
   // declarations when we know the number of operations
   // [2] for flip/flop double buffer handling
@@ -1197,11 +1198,15 @@ static _int freia_terapix_call
     int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
     // now we compute back the row size
     int optim_rows = ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
+    // fix if the tile is too large
+    if (optim_rows>image_height) optim_rows = image_height;
+    imagelet_rows = optim_rows;
+
     pips_assert("optimized row size lower than max row size",
                 optim_rows<=imagelet_rows && optim_rows>0);
+
     // now we set the value directly
-    sb_cat(decl, "  // imagelet max size: ", itoa(imagelet_rows), "\n");
-    imagelet_rows = optim_rows;
+    sb_cat(decl, "  // imagelet max size: ", itoa(imagelet_max_rows), "\n");
 
     // the runtime can use imagelet_rows or less
     sb_cat(decl, "  int imagelet_size = ",
@@ -1216,7 +1221,7 @@ static _int freia_terapix_call
   for (int i=1; i<=total_imagelets; i++)
   {
     sb_cat(decl, "  int " IMG_PTR, itoa(i), " = ");
-    sb_cat(decl, itoa(imagelet_rows * (i-1)), ";\n");
+    sb_cat(decl, itoa(imagelet_max_rows * (i-1)), ";\n");
   }
   // append reduction memory pointers
   sb_cat(decl, "\n");
