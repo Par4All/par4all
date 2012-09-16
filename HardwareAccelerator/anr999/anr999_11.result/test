@@ -1684,10 +1684,10 @@ freia_status anr999_terapix_helper_0_0_0(
   // imagelet max size: 204
   int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 122;
-  int imagelet_3 = 244;
-  int imagelet_4 = 366;
-  int imagelet_5 = 488;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // memory for reductions
   int reduction_0 = 1023;
@@ -2019,10 +2019,10 @@ freia_status anr999_terapix_helper_0_0_1(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2192,10 +2192,10 @@ freia_status anr999_terapix_helper_0_0_2(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2365,10 +2365,10 @@ freia_status anr999_terapix_helper_0_0_3(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2538,10 +2538,10 @@ freia_status anr999_terapix_helper_0_0_4(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2711,10 +2711,10 @@ freia_status anr999_terapix_helper_0_0_5(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2884,10 +2884,10 @@ freia_status anr999_terapix_helper_0_0_6(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3057,10 +3057,10 @@ freia_status anr999_terapix_helper_0_0_7(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3230,10 +3230,10 @@ freia_status anr999_terapix_helper_0_0_8(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3403,10 +3403,10 @@ freia_status anr999_terapix_helper_0_0_9(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3576,10 +3576,10 @@ freia_status anr999_terapix_helper_0_0_10(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3749,10 +3749,10 @@ freia_status anr999_terapix_helper_0_0_11(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3922,10 +3922,10 @@ freia_status anr999_terapix_helper_0_0_12(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 242;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 242;
-  int imagelet_3 = 484;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -4095,10 +4095,10 @@ freia_status anr999_terapix_helper_0_0_13(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 244;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 244;
-  int imagelet_3 = 488;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -4272,10 +4272,10 @@ freia_status anr999_terapix_helper_0_0_14(
   // - 2 computation imagelets
   // - 1 double buffer imagelets
   // imagelet max size: 341
-  int imagelet_size = 244;
+  int imagelet_size = 240;
   int imagelet_1 = 0;
-  int imagelet_2 = 244;
-  int imagelet_3 = 488;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -4453,10 +4453,10 @@ freia_status anr999_terapix_helper_0_0_15(
   // imagelet max size: 204
   int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 122;
-  int imagelet_3 = 244;
-  int imagelet_4 = 366;
-  int imagelet_5 = 488;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;

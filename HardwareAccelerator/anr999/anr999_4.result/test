@@ -1599,10 +1599,10 @@ freia_status anr999_terapix_helper_0_0_0(
   // imagelet max size: 204
   int imagelet_size = 148;
   int imagelet_1 = 0;
-  int imagelet_2 = 148;
-  int imagelet_3 = 296;
-  int imagelet_4 = 444;
-  int imagelet_5 = 592;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // memory for reductions
   int reduction_0 = 1023;

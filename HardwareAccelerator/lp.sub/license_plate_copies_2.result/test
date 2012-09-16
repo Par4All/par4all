@@ -4972,10 +4972,10 @@ freia_status license_plate_copies_terapix_helper_0_0_0(
   // imagelet max size: 204
   int imagelet_size = 171;
   int imagelet_1 = 0;
-  int imagelet_2 = 171;
-  int imagelet_3 = 342;
-  int imagelet_4 = 513;
-  int imagelet_5 = 684;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -5315,8 +5315,8 @@ freia_status license_plate_copies_terapix_helper_0_0_1(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -5584,8 +5584,8 @@ freia_status license_plate_copies_terapix_helper_0_0_2(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -5860,8 +5860,8 @@ freia_status license_plate_copies_terapix_helper_0_0_3(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -6162,8 +6162,8 @@ freia_status license_plate_copies_terapix_helper_0_0_4(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -6431,8 +6431,8 @@ freia_status license_plate_copies_terapix_helper_0_0_5(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -6746,8 +6746,8 @@ freia_status license_plate_copies_terapix_helper_0_0_6(
   // imagelet max size: 341
   int imagelet_size = 256;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -7024,10 +7024,10 @@ freia_status license_plate_copies_terapix_helper_0_0_7(
   // imagelet max size: 204
   int imagelet_size = 183;
   int imagelet_1 = 0;
-  int imagelet_2 = 183;
-  int imagelet_3 = 366;
-  int imagelet_4 = 549;
-  int imagelet_5 = 732;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -7395,8 +7395,8 @@ freia_status license_plate_copies_terapix_helper_0_0_8(
   // imagelet max size: 341
   int imagelet_size = 260;
   int imagelet_1 = 0;
-  int imagelet_2 = 260;
-  int imagelet_3 = 520;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -7725,10 +7725,10 @@ freia_status license_plate_copies_terapix_helper_0_0_9(
   // imagelet max size: 204
   int imagelet_size = 177;
   int imagelet_1 = 0;
-  int imagelet_2 = 177;
-  int imagelet_3 = 354;
-  int imagelet_4 = 531;
-  int imagelet_5 = 708;
+  int imagelet_2 = 204;
+  int imagelet_3 = 408;
+  int imagelet_4 = 612;
+  int imagelet_5 = 816;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
