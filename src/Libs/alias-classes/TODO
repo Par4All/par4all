@@ -43,7 +43,7 @@ looked at.
 not detected. And there is a bug for "double * z1=*q++".
 
 19. Improve heap model. Add an extra first dimension to model the
-different intraprocedural dynamic occurences of a malloc?
+different intraprocedural dynamic occurences of a malloc? See Point 11 too.
 
 20. Pre-decrement and pre-increment are likely to be evaluated
 twice. See the post case in
@@ -73,7 +73,10 @@ struct are not initialized, hence only exact nowhere information is
 propagated.
 
 32. statement01_dec: should we generate a NOWHERE rather than a bottom
-graph? Should this be a property?
+graph? Should this be a property? Ot it should generate a pointer
+towards an integer stub...  which would make dependence testing maybe
+more difficult... unless you trust the programmer that integer pointer
+values do not interact with any properly declared variable.
 
 35. Heap model: malloc can return a NULL pointer. This is not the
 usual case, but it should be controlled by a property...
@@ -82,7 +85,21 @@ usual case, but it should be controlled by a property...
 
 38. pointer15: the indices for _t_1 are not properly located. The first subscript should be zero for the implicit dimension. [1][2] should be the second and third subscripts
 
-Next item will be 39.
+39. If a stub is added to deal with casts, Rice/test03.c could be
+parallelized by trusting the type of the pointer
+"toto". EffectWithPointsTo should also be able to understand these
+stubs of a new kind...
+
+40. Rice/test03: when the points-to information is recomputed the
+formal context should be cleaned up, unless it is explictly defined as
+an input. Samething for the heap. Which means that this stubs should
+be added to the declaration list of the module... Impact on symbole
+table?
+
+41. Rice/test03: the type of entities in the formal context should not
+be changed once they have been allocated.
+
+Next item will be 42.
 
 ----------------------------------------------------------
 

@@ -1057,6 +1057,9 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    reference rr = cell_any_reference(r);
 	    entity rv = reference_variable(rr);
 	    // This assignment breaks the internal consistency of heap modelling
+	    if(!array_pointer_type_equal_p(nt, entity_type(rv)))
+	      pips_internal_error("Incompatible types for \"%s\".\n",
+				  entity_name(rv));
 	    entity_type(rv) = nt;
 	  }
 	  else if(all_heap_locations_cell_p(r))

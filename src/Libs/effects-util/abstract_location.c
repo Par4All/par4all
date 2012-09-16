@@ -78,7 +78,7 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
 {
   entity e;
   string s;
-  asprintf(&s,HEAP_AREA_LOCAL_NAME "_l_%d",stmt_number);
+  asprintf(&s, HEAP_AREA_LOCAL_NAME "_l_%d", stmt_number);
 
   e = FindOrCreateEntity(get_current_module_name(),s);
   free(s);
@@ -105,6 +105,7 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
     //pips_assert("The type is unchanged",
     // type_equal_p(ct, et));
     if(!type_equal_p(ct,et)) {
+      // FI: this might be improvable with array_pointer_type_equal_p
       if(pointer_type_p(ct) && array_type_p(et)) {
 	type pt = type_to_pointed_type(ct);
 	basic pb = variable_basic(type_variable(pt));
@@ -239,6 +240,9 @@ type malloc_arg_to_type(expression e)
   if (!expression_undefined_p(n) && !unbounded_expression_p(n)
       && !expression_constant_p(n))
     {
+      // FI: I do not see why we cannot generate dependent types...
+      // We would have to be careful to evaluate the expression in
+      // case its variables are modified. Just as the parser should do.
       pips_debug(5, "non constant number of elements "
 		 "-> generating unbounded dimension\n");
       free_expression(n);
@@ -411,18 +415,23 @@ entity calloc_to_abstract_location(expression n, expression size,
   return(e);
 }
 
-/* to handle malloc instruction : type t = (cast)
- * malloc(sizeof(expression). This function return a reference
- * according to the value of the property ABSTRACT_HEAP_LOCATIONS */
+/* to handle malloc statemennts:
+ *
+ * p = (cast t) malloc(sizeof(expression))
+ *
+ * This function return a reference
+ * according to the value of the property ABSTRACT_HEAP_LOCATIONS.
+ */
 /* the list of callers will be added to ensure the context sensitive
    property. We should keep in mind that context and sensitive
    properties are orthogonal and we should modify them in pipsmake.*/
-reference original_malloc_to_abstract_location(expression lhs,
-					       type  __attribute__ ((unused)) var_t,
-					       type __attribute__ ((unused)) cast_t,
-					       expression sizeof_exp,
-					       entity f,
-					       statement stmt)
+reference
+original_malloc_to_abstract_location(expression lhs __attribute__ ((unused)),
+				     type  __attribute__ ((unused)) var_t,
+				     type __attribute__ ((unused)) cast_t,
+				     expression sizeof_exp,
+				     entity f,
+				     statement stmt)
 {
   reference r = reference_undefined;
   entity e = entity_undefined;
