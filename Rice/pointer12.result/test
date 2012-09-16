@@ -2,8 +2,7 @@
 POINTS TO
 
 
-// Points To IN:
-// a.array -> _a_1[0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -11,38 +10,34 @@ POINTS TO
 void pointer12(array_2D a)
 {
 
-// Points To:
-// a.array -> _a_1[0] , MAY
+// Points To: none
 
    int i, j;
 
-// Points To:
-// a.array -> _a_1[0] , MAY
+// Points To: none
 
    a.d1 = 5;
 
-// Points To:
-// a.array -> _a_1[0] , MAY
+// Points To: none
 
    a.d2 = 4;
 
-// Points To:
-// a.array -> _a_1[0] , MAY
+// Points To: none
 
-   a.array = malloc(a.d1+a.d2*sizeof(double));
+   a.array = malloc(a.d1*a.d2*sizeof(double));
 
 // Points To:
-// a.array -> *HEAP*_l_20[0] , EXACT
+// a.array -> *HEAP*_l_20[0] , MAY
 
    for(i = 0; i <= a.d1-1; i += 1)
 
 // Points To:
-// a.array -> *HEAP*_l_20[0] , EXACT
+// a.array -> *HEAP*_l_20[0] , MAY
 
       for(j = 0; j <= a.d2-1; j += 1)
 
 // Points To:
-// a.array -> *HEAP*_l_20[0] , EXACT
+// a.array -> *HEAP*_l_20[0] , MAY
 
          (a.array)[a.d2*i+j] = 0.;
 }
@@ -62,7 +57,7 @@ void pointer12(array_2D a)
 //             <    is read   >: a.d1 a.d2 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: a.array _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: a a a
-   a.array = malloc(a.d1+a.d2*sizeof(double));
+   a.array = malloc(a.d1*a.d2*sizeof(double));
 //             <    is read   >: a.d1
 //             <    is written>: i
 //             <    is referenced>: a i
@@ -71,8 +66,8 @@ void pointer12(array_2D a)
 //             <    is written>: j
 //             <    is referenced>: a a j
       for(j = 0; j <= a.d2-1; j += 1)
+//             <may be written>: *HEAP*_l_20[a.d2*i+j]
 //             <    is read   >: a.array a.d1 a.d2 a.d2 i j
-//             <    is written>: *HEAP*_l_20[a.d2*i+j]
 //             <    is referenced>: a a a a i j
          (a.array)[a.d2*i+j] = 0.;
 }
@@ -97,7 +92,7 @@ void pointer12(array_2D a)
 //             <    is read   >: a.d1 a.d2 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: a.array _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: a
-   a.array = malloc(a.d1+a.d2*sizeof(double));
+   a.array = malloc(a.d1*a.d2*sizeof(double));
 //             <may be read   >: a.array a.d2 i j
 //             <may be written>: *HEAP*_l_20[*] j
 //             <may be referenced>: j
@@ -125,7 +120,7 @@ void pointer12(array_2D a)
    int i, j;
    a.d1 = 5;
    a.d2 = 4;
-   a.array = malloc(a.d1+a.d2*sizeof(double));
+   a.array = malloc(a.d1*a.d2*sizeof(double));
    for(i = 0; i <= a.d1-1; i += 1)
       for(j = 0; j <= a.d2-1; j += 1)
          (a.array)[a.d2*i+j] = 0.;
