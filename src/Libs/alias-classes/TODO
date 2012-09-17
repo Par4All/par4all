@@ -20,7 +20,8 @@ probably due to NULL pointer initialization, but should have been
 automatically eliminated by the dereferencement. In fact call15 does
 not check its argument pi or q. Stricto sensu, it is really a may. But
 if summary information is linked to a function that returns, the
-information should be a must at the caller level...
+information should be a must at the caller level... See also results
+for struct22 and probably many other test cases.
 
 11. EffectsWithPointsTo/chap2_exp4: why do we get a maybe effect on
 *heap*? because the heap lattice is not precise enough to distinguish
@@ -36,8 +37,6 @@ account an implicit dimension.
 
 15. EffectsWithPointsTo: differences from global02 to varargs04 to be
 looked at.
-
-17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
 
 18. dereferencing02: a variable, w, is used uninitialized and this is
 not detected. And there is a bug for "double * z1=*q++".
@@ -64,13 +63,6 @@ vertex of out-degree strictly greater than 1 must be may arcs.
 
 27. In Strict_typing.sub/list02, in "main", the points-to obtained on
 exit of the while loop is declared "unreachable". Same in list03.
-
-28. pv_local_var03: issue with declaration and assignment of array of
-structs; the generated arcs do not seem added to the current "in"
-points-to environment; it is not clear if index * should or not
-susbsumes indices 0 and 1. The test case is not good because the rhs
-struct are not initialized, hence only exact nowhere information is
-propagated.
 
 32. statement01_dec: should we generate a NOWHERE rather than a bottom
 graph? Should this be a property? Ot it should generate a pointer
@@ -180,3 +172,17 @@ because the sink is not large enough.
 arithmetic is used.
 
 -> at least, partly implemented in simple cases
+
+28. pv_local_var03: issue with declaration and assignment of array of
+structs; the generated arcs do not seem added to the current "in"
+points-to environment; it is not clear if index * should or not
+susbsumes indices 0 and 1. The test case is not good because the rhs
+struct are not initialized, hence only exact nowhere information is
+propagated.
+
+-> arcs due to local variables do not have to appear in the "in"
+   points-to environment
+
+17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
+
+-> a first cut

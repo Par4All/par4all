@@ -1723,10 +1723,12 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       bool to_be_freed;
       type t = points_to_cell_to_type(c, &to_be_freed);
       type ct = compute_basic_concrete_type(t);
-      if(!C_pointer_type_p(ct)) {
+      if(!C_pointer_type_p(ct) && !overloaded_type_p(ct)) {
+	fprintf(stderr, "nc=");
 	print_points_to_cell(nc);
+	fprintf(stderr, "\nc=");
 	print_points_to_cell(c);
-	pips_internal_error("Source cell cannot really be a source cell\n");
+	pips_internal_error("\nSource cell cannot really be a source cell\n");
       }
       if(to_be_freed) free_type(t);
       free_cell(nc);
@@ -1818,11 +1820,13 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     // FI->AM: shouldn't it be a kill_must here?
     set_difference(pt_out_s, pt_out_s, kill);
 
-    pips_assert("", consistent_points_to_graph_p(pt_out));
+    pips_assert("After removing the kill set, pt_out is consistent",
+		consistent_points_to_graph_p(pt_out));
     
     set_union(pt_out_s, pt_out_s, gen);
 
-    pips_assert("", consistent_points_to_graph_p(pt_out));
+    pips_assert("After adding the gen set, pt_out is consistent",
+		consistent_points_to_graph_p(pt_out));
 
     // FI->AM: use kill_may to reduce the precision of these arcs
     SET_FOREACH(points_to, pt, kill_may) {
