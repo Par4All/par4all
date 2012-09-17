@@ -41,4 +41,4 @@ void pointer17(float ***p)
 }
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (list_assignment_to_points_to) Dereferencing of a null pointer.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (list_assignment_to_points_to) Possible NULL pointer dereferencing.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (points_to_block_projection) Dangling pointer "_p_1_1" towards "z".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (points_to_set_block_projection) Dangling pointer "_p_1_1" towards "z".

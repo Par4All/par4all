@@ -35,4 +35,4 @@ void pointer15(double *(*t[3][4])[5][6][7])
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer15] (points_to_block_projection) Dangling pointer "_t_1" towards "z".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer15] (points_to_set_block_projection) Dangling pointer "_t_1" towards "z".
