@@ -24,8 +24,9 @@ information should be a must at the caller level... See also results
 for struct22 and probably many other test cases.
 
 11. EffectsWithPointsTo/chap2_exp4: why do we get a maybe effect on
-*heap*? because the heap lattice is not precise enough to distinguish
-between exact heap references and abstract heap references.
+*heap*? Because the heap lattice is not precise enough to distinguish
+between exact heap references and abstract heap references. Add an
+extra dimension to model the occurences? See below heap modeling (19).
 
 12. EffectsWithPointsTo/dereferencing06: improved results thanks to a
 better analysis of pointer arithmetics.
@@ -73,8 +74,6 @@ values do not interact with any properly declared variable.
 35. Heap model: malloc can return a NULL pointer. This is not the
 usual case, but it should be controlled by a property...
 
-36. Condition with side effects in and_operator02 is not taken into account.
-
 38. pointer15: the indices for _t_1 are not properly located. The first subscript should be zero for the implicit dimension. [1][2] should be the second and third subscripts
 
 39. If a stub is added to deal with casts, Rice/test03.c could be
@@ -85,11 +84,12 @@ stubs of a new kind...
 40. Rice/test03: when the points-to information is recomputed the
 formal context should be cleaned up, unless it is explictly defined as
 an input. Samething for the heap. Which means that this stubs should
-be added to the declaration list of the module... Impact on symbole
-table?
+be added to the declaration list of the module... Impact on symbol
+table? See 41.
 
 41. Rice/test03: the type of entities in the formal context should not
-be changed once they have been allocated.
+be changed once they have been allocated. Unless some code
+transformation has indeed changed them. For instance, dependent types may be changed into constant types by "partial eval". See 40.
 
 Next item will be 42.
 
@@ -186,3 +186,7 @@ propagated.
 17. Take care of casts. See for instance Strict_typing.sub/malloc03.c
 
 -> a first cut
+
+36. Condition with side effects in and_operator02 is not taken into account.
+
+-> not really useful, I believe (FI), but apparently easy to implement.

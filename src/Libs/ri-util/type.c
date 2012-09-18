@@ -2290,8 +2290,9 @@ type reference_to_type(reference ref)
 
 
 /**
-  For an array declared as int a[10][20], the type returned for a[i] is
-  int [20].
+  For an array declared as int a[10][20], the type returned for a[i]
+  is int [20]. gcc claims it is int (*)[10], that is a pointer to an
+  array of 10 elements.
 
    @param exp is an expression
    @return a new allocated type which is the ntype of the expression in which

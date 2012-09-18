@@ -645,3 +645,29 @@ void complete_points_to_reference_with_zero_subscripts(reference r)
 {
   complete_points_to_reference_with_fixed_subscripts(r, true);
 }
+
+bool cells_must_point_to_null_p(list cl)
+{
+  bool must_p = true;
+  pips_assert("The input list is not empty", !ENDP(cl));
+  FOREACH(CELL, c, cl) {
+    if(!null_cell_p(c)) {
+      must_p = false;
+      break;
+    }
+  }
+  return must_p;
+}
+
+bool cells_may_not_point_to_null_p(list cl)
+{
+  bool may_not_p = true;
+  pips_assert("The input list is not empty", !ENDP(cl));
+  FOREACH(CELL, c, cl) {
+    if(null_cell_p(c) || nowhere_cell_p(c)) {
+      may_not_p = false;
+      break;
+    }
+  }
+  return may_not_p;
+}

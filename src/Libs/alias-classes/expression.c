@@ -2166,6 +2166,29 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     out = relational_intrinsic_call_condition_to_points_to(c, in, true_p);
   else if(ENTITY_LOGICAL_OPERATOR_P(f))
     out = boolean_intrinsic_call_condition_to_points_to(c, in, true_p);
+  else if(ENTITY_ASSIGN_P(f)) {
+    out = intrinsic_call_to_points_to(c, in);
+    expression lhs = EXPRESSION(CAR(call_arguments(c)));
+    bool to_be_freed;
+    type t = points_to_expression_to_type(lhs, &to_be_freed);
+    type lhs_t = compute_basic_concrete_type(t);
+    if(to_be_freed) free_type(t);
+    if(pointer_type_p(lhs_t)) {
+      expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
+      list R = expression_to_points_to_sinks(rhs, out);
+      if(cells_must_point_to_null_p(R) && true_p) {
+	pips_user_warning("Dead code detected.\n");
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+      }
+      else if(cells_may_not_point_to_null_p(R) && !true_p) {
+	pips_user_warning("Dead code detected.\n");
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+      }
+      gen_free_list(R);
+    }
+  }
   else {
     if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)
        || ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)
