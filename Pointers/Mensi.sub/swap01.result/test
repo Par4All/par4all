@@ -20,7 +20,7 @@ int main()
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
 
-   swap(ppi, ppj);
+   swap01(ppi, ppj);
 
 // Points To:
 // *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
@@ -40,7 +40,7 @@ int main()
 // _p_1 -> _q_2_2 , EXACT
 // _q_2 -> _p_1_1 , EXACT
 
-void swap(int **p, int **q)
+void swap01(int **p, int **q)
 {
 
 // Points To:
@@ -84,12 +84,12 @@ int main()
 //             <    is written>: i j pi pj ppi ppj
    int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
-   swap(ppi, ppj);
+//             <    is written>: swap01:_p_1 swap01:_q_2
+   swap01(ppi, ppj);
 
    return 0;
 }
-void swap(int **p, int **q)
+void swap01(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: pt
@@ -102,27 +102,27 @@ void swap(int **p, int **q)
    *q = pt;
    return;
 }
-void swap(int **p, int **q);
+void swap01(int **p, int **q);
 
 int main();
 
 CUMULATED  EFFECTS WITH POINTS TO
 
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
+//             <    is written>: swap01:_p_1 swap01:_q_2
 int main()
 {
 //             <    is written>: i j pi pj ppi ppj
    int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
-   swap(ppi, ppj);
+//             <    is written>: swap01:_p_1 swap01:_q_2
+   swap01(ppi, ppj);
 
    return 0;
 }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: _p_1 _q_2
-void swap(int **p, int **q)
+void swap01(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: pt
@@ -135,7 +135,7 @@ void swap(int **p, int **q)
    *q = pt;
    return;
 }
-void swap(int **p, int **q);
+void swap01(int **p, int **q);
 
 int main();
 
@@ -160,7 +160,7 @@ int main()
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
 
-   swap(ppi, ppj);
+   swap01(ppi, ppj);
 
 // Points To:
 // pi -> j , EXACT
@@ -183,7 +183,7 @@ int main()
 // _p_1 -> _q_2_2 , EXACT
 // _q_2 -> _p_1_1 , EXACT
 
-void swap(int **p, int **q)
+void swap01(int **p, int **q)
 {
 
 // Points To:
@@ -222,7 +222,7 @@ void swap(int **p, int **q)
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[swap] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+INIT_POINTS_TO_ANALYSIS[swap01] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
