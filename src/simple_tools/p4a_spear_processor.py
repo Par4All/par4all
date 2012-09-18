@@ -110,7 +110,6 @@ class p4a_spear_processor(p4a_processor):
 <!ELEMENT Task (Arg)+>
 <!ATTLIST Task
   xmlns CDATA #FIXED ''
-  function NMTOKEN #REQUIRED
   kernel NMTOKEN #REQUIRED
   name NMTOKEN #REQUIRED
   nbParallelLoops CDATA #REQUIRED>
