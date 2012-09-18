@@ -1314,6 +1314,23 @@ list points_to_sink_to_sources(cell sink, pt_map ptm, bool fresh_p)
   return sources;
 }
 
+/* Return the points-to "fpt" ending in cell "sink" if it
+   exists. Return points-to_undefined otherwise. */
+points_to points_to_sink_to_points_to(cell sink, pt_map ptm)
+{
+  points_to fpt = points_to_undefined;;
+  set pts = points_to_graph_set(ptm);
+
+  /* 1. See if cell "sink" is the destination vertex of a points-to arc. */
+  SET_FOREACH( points_to, pt, pts) {
+    if(cell_equal_p(sink, points_to_sink(pt))) {
+      fpt = pt;
+      break;
+    }
+  }
+  return fpt;
+}
+
 /* Use "sn" as a source name to derive a list of sink cells according
  * to the points-to graph ptm.
  *
@@ -2370,4 +2387,31 @@ bool consistent_points_to_graph_p(points_to_graph ptg)
     consistent_p = consistent_points_to_set(ptg_s);
   }
   return consistent_p;
+}
+
+/* You know that null and undefined cells in "*pL" are impossible
+ * because of the operation that is going to be performed on
+ * it. Remove the corresponding arcs in points-to graph "in". Remove
+ * the corresponding cells from "*pL".
+ *
+ * The search uses pointers. So "*pL" must contain sink cells of arcs of
+ * "in".
+ */
+void remove_impossible_arcs_to_null(list * pL, pt_map in)
+{
+  list fl = NIL;
+  bool nowhere_ok_p =
+    get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  FOREACH(CELL, pc, *pL) {
+    if(null_cell_p(pc) || (nowhere_cell_p(pc) && !nowhere_ok_p)) {
+      points_to pt = points_to_sink_to_points_to(pc, in);
+      if(points_to_undefined_p(pt))
+	pips_internal_error("NULL, returned as a source for an expression, "
+			    "does not appear in the points-to graph.\n");
+      remove_arc_from_pt_map(pt, in);
+      fl = CONS(CELL, pc, fl);
+    }
+  }
+  gen_list_and_not(pL, fl);
+  gen_free_list(fl);
 }

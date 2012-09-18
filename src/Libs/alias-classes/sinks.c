@@ -327,6 +327,7 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
   else if(ENTITY_POINT_TO_P(f)) { // p->a
     // FI: allocation of a fully fresh list? Theroretically...
     list L = expression_to_points_to_sinks(a1, in);
+    remove_impossible_arcs_to_null(&L, in);
     pips_assert("in is consistent after computing L",
 		consistent_points_to_graph_p(in));
     // a2 must be a field entity
@@ -367,8 +368,11 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     }
   }
   else if(ENTITY_FIELD_P(f)) { // p.1
+    // Seems to have no impact whatsoever
+    list oL = expression_to_points_to_sources(a1, in);
+    remove_impossible_arcs_to_null(&oL, in);
     // FI: memory leak, but you need a copy to add the field
-    list L = gen_full_copy_list(expression_to_points_to_sources(a1, in));
+    list L = gen_full_copy_list(oL);
     // a2 must be a field entity
     entity f = reference_variable(syntax_reference(expression_syntax(a2)));
     type ft = entity_basic_concrete_type(f);

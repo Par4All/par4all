@@ -1285,9 +1285,9 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   /* Retrieve the memory locations that might be reached by the rhs
    *
-   * Update the calling context by adding new stubs linked directly or
-   * indirectly to the formal parameters and global variables if
-   * necessary.
+   * Update the real "pt_in", the calling context, and "pt_out" by
+   * adding new stubs linked directly or indirectly to the formal
+   * parameters and global variables if necessary.
    */
   list R = expression_to_points_to_sinks(rhs, pt_out);
 
