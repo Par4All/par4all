@@ -1,4 +1,4 @@
-setenv WSPACE=fprintf01
+setenv WSPACE=dereferencing12
 delete $WSPACE
 create $WSPACE $WSPACE.c
 

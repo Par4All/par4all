@@ -70,41 +70,41 @@ int main()
    /*   printf("address of q=%p\n",q); */
    /*   printf("address of s=%p\n",s); */
    
-   b = (p = q)&&(r = s);
+   b = p==q&&r==s;
 
 // Points To:
-// p -> j[0] , EXACT
+// p -> k[0] , EXACT
 // q -> j[0] , EXACT
-// r -> l[0] , EXACT
+// r -> i[0] , EXACT
 // s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   if ((p = q)&&(r = s))
+   if (p==q&&r==s)
 
-// Points To:
-// p -> j[0] , EXACT
-// q -> j[0] , EXACT
-// r -> l[0] , EXACT
-// s -> l[0] , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
       *p++;
    else
 
-// Points To: unreachable
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       /*  printf("address of p=%p\n",p); */
       /*   printf("address of r=%p\n",r); */
-      if ((p = q)||(r = s))
+      if (p==q||r==s)
 
 // Points To: unreachable
 
          *r++;
 
 // Points To:
-// p -> j[1] , EXACT
+// p -> k[0] , EXACT
 // q -> j[0] , EXACT
-// r -> l[0] , EXACT
+// r -> i[0] , EXACT
 // s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 

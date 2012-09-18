@@ -1,4 +1,4 @@
-setenv WSPACE=fprintf01
+setenv WSPACE=and_operator03
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
