@@ -85,6 +85,8 @@ def replace_by_opencl_own_declarations(content):
     # substituted by:
     # P4A_accel_kernel.*(.*  P4A_accel_global_address type  *var
     content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
+    # Handle address space in casts
+    content = re.sub("\(([a-zA-Z]*) \*\)","(P4A_accel_global_address \\1 *)", content)
     #content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
     content = re.sub("(static [^\n]*?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
 
