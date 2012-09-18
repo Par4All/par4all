@@ -3,13 +3,16 @@
 \RequirePackage{comment}
 
 \begin{comment}
-  $Header: /home/keryell/TeX/bib/RCS/abbrev_reactive.sty,v 1.16 2007/06/19 07:25:00 keryell Exp keryell $
+  $Header: /home/keryell/TeX/bib/RCS/abbrev_reactive.sty,v 1.17 2012/09/17 22:42:24 keryell Exp $
   
   Copyright (c) École Nationale Supérieure des Télécommunications de
   Bretagne
 
 
   $Log: abbrev_reactive.sty,v $
+  Revision 1.17  2012/09/17 22:42:24  keryell
+  Add 5 years of common definitions from HPC Project, SILKAN, TÃ©lÃ©com Bretagne...
+
   Revision 1.16  2007/06/19 07:25:00  keryell
   RajoutÃ© trucs de cryptographie
 
@@ -64,10 +67,13 @@
 %\def\ABBREVx#1#2{\expandafter\gdef\csname
 %  A#1\endcsname{\index{#1@#2}#2\egroup\xspace}}
 \def\ABBREVx#1#2{\DefProtectCharMacro{A#1}{\index{#1@#2}#2\egroup\xspace}}
+
 % Create an abreviation in small caps with text from the second argument:
 \def\ABBREVsc#1#2{\ABBREVx{#1}{\textsc{#2}}}
+
 % Automatically put an abreviation in small caps:
 \def\ABBREV#1{\ABBREVsc{#1}{#1}}
+
 % Idem with linking:
 \def\ABBREVxl#1#2#3{\DefProtectCharMacro{A#1}{\index{#1@#2}\href{#3}{#2}\egroup\xspace}}
 \def\ABBREVscl#1#2#3{\ABBREVxl{#1}{\textsc{#2}}{#3}}
@@ -101,6 +107,7 @@
 \ABBREVsc{archdraft}{ArchDraft}
 \ABBREV{arm}
 \ABBREV{arp}
+\ABBREV{artemis}
 \ABBREV{ascii}
 \ABBREV{asip}
 \ABBREV{ast}
@@ -108,6 +115,7 @@
 \ABBREVx{autotools}{\textsc{AutoTools}}
 \ABBREV{aux}
 \ABBREVx{auxextension}{\texttt{.aux}}
+\ABBREV{avx}
 \ABBREV{basic}
 \ABBREVx{bblextension}{\texttt{.bbl}}
 \ABBREV{bbn}
@@ -125,17 +133,21 @@
 \ABBREV{c}
 \ABBREVx{canes}{\textsc{cane}s}
 \ABBREV{cao}
+\ABBREV{caps}
 \ABBREV{cbc}
 \ABBREV{cd}
 \ABBREV{cdd}
 \ABBREV{cde}
 \ABBREVsc{cdrom}{cd-rom}
+\ABBREV{cea}
 \ABBREV{cerv}
+\ABBREVx{cetus}{Cetus}
 \ABBREVsc{cfengine}{Cfengine}
 \ABBREV{cfg}
 \ABBREV{cig}
 \ABBREV{cisc}
 \ABBREV{cisco}
+\ABBREVx{cloog}{\textsc{cl}oo\textsc{g}}
 \ABBREV{clut}
 \ABBREV{cm}
 \ABBREV{cmm}
@@ -146,6 +158,7 @@
 \ABBREV{corba}
 \ABBREV{cpl}
 \ABBREVsc{cplusplus}{c++}
+\ABBREV{cpp}
 \ABBREV{cpu}
 \ABBREV{cray}
 \ABBREV{cre}
@@ -161,6 +174,7 @@
 \ABBREVsc{darwin}{Darwin}
 \ABBREV{dce}
 \ABBREV{dct}
+\ABBREV{ddr}
 \ABBREV{dea}
 \ABBREVxl{deainforennesI}{\textsc{dea} informatique de Rennes 1}{http://www.irisa.fr/master/}
 \ABBREVsc{debian}{Debian}
@@ -181,6 +195,7 @@
 \ABBREV{cvs}
 \ABBREV{dvecom}
 \ABBREV{ecb}
+\ABBREV{ecc}
 \ABBREV{emacs}
 \ABBREV{ens}
 \ABBREV{ensmp}
@@ -191,6 +206,8 @@
 \ABBREVsc{ethernet}{Ethernet}
 \ABBREV{fai}
 \ABBREV{faq}
+\ABBREV{fir}
+\ABBREV{fft}
 \ABBREV{flex}
 \ABBREV{fm}
 \ABBREV{fortran}
@@ -213,13 +230,19 @@
 \ABBREV{gnu}
 \ABBREV{gop}
 \ABBREV{gpl}
+\ABBREV{gpgpu}
 \ABBREV{gpu}
+\ABBREV{graphite}
+\ABBREV{gsm}
 \ABBREVsc{gstreamer}{Gstreamer}
 \ABBREV{h}
 \ABBREVsc{hCCLXI}{h.261}
 \ABBREVsc{hCCLXIII}{h.263}
 \ABBREVsc{hCCCXXII}{h.323}
+\ABBREV{hal}
+\ABBREV{hcfg}
 \ABBREV{hmac}
+\ABBREV{hmpp}
 \ABBREV{hpc}
 \ABBREVx{hpcp}{\Ahpc Project}
 \ABBREV{hpf}
@@ -227,14 +250,20 @@
 \ABBREV{http}
 \ABBREVsc{hyperc}{HyperC}
 \ABBREVl{iahp}{https://info.enstb.org/enseignement/mri/modules/iahp}
+\ABBREV{icc}
 \ABBREV{idl}
+\ABBREV{isa}
 \ABBREV{ieee}
 \ABBREV{ietf}
 \ABBREV{imm}
+\ABBREV{intel}
+\ABBREV{isa}
 \ABBREVsc{internet}{Internet}
 \ABBREVsc{intserv}{IntServ}
 \ABBREV{ip}
+\ABBREVx{io}{\textsc{i/o}}
 \ABBREVx{ipsec}{\textsc{ip}sec}
+\ABBREV{ir}
 \ABBREVl{isia}{http://www-isia.cma.fr/}
 \ABBREV{isis}
 \ABBREV{iv}
@@ -252,6 +281,8 @@
 \ABBREVsc{linux}{Linux}
 \ABBREV{lisp}
 \ABBREV{lit}
+\ABBREV{llvm}
+\ABBREVx{loopo}{\textsc{l}oo\textsc{p}o}
 \ABBREV{lri}
 \ABBREV{mac}
 \ABBREV{madeo}
@@ -263,6 +294,8 @@
 \ABBREV{mdp}
 \ABBREV{mdu}
 \ABBREVl{mecalog}{http://www.mecalog.fr}
+\ABBREVx{mediagpu}{\textsc{m}edia\Agpu}
+\ABBREV{mesi}
 \ABBREV{mflops}
 \ABBREV{miad}
 \ABBREV{mimd}
@@ -285,19 +318,26 @@
 \ABBREVsc{muse}{Muse}
 \ABBREVsc{mzero}{m0}
 \ABBREV{nack}
+\ABBREV{neon}
 \ABBREV{netscript}
 \ABBREVsc{newgen}{NewGen}
 \ABBREV{nfs}
 \ABBREV{nis}
 \ABBREVx{noc}{\textsc{n}o\textsc{c}}
+\ABBREV{nsf}
 \ABBREV{nt}
 \ABBREV{numa}
+\ABBREV{nvcc}
+\ABBREV{nvidia}
 \ABBREVx{nvod}{\textsc{nv}o\textsc{d}}
 \ABBREVsc{odyssey}{Odyssey}
 \ABBREV{omg}
+\ABBREVx{openacc}{\textsc{o}pen\textsc{acc}}
 \ABBREV{OpenDivX}
-\ABBREVx{opencl}{\textsc{OpenCL}}
-\ABBREVx{openmp}{\textsc{OpenMP}}
+\ABBREVx{opencl}{\textsc{o}pen\textsc{cl}}
+\ABBREVx{opengl}{\textsc{o}pen\textsc{gl}}
+\ABBREVx{opengpu}{\textsc{O}pen\Agpu}
+\ABBREVx{openmp}{\textsc{o}pen\textsc{mp}}
 \ABBREVxl{openoffice}{OpenOffice}{http://www.openoffice.org}
 \ABBREVsc{opensmartcard}{OpenSmartCard}
 \ABBREV{os}
@@ -310,10 +350,12 @@
 \ABBREV{pe}
 \ABBREV{perl}
 \ABBREV{pgp}
+\ABBREV{pgi}
 \ABBREV{phrase}
 \ABBREV{pips}
 \ABBREVsc{pipsgfc}{pips-gfc}
 \ABBREV{plan}
+\ABBREVx{pocc}{\textsc{p}o\textsc{cc}}
 \ABBREVsc{polylib}{PolyLib}
 \ABBREV{pomp}
 \ABBREVsc{pompc}{pompC}
@@ -321,6 +363,8 @@
 \ABBREVx{powerpc}{\textsc{p}ower\textsc{pc}}
 \ABBREV{ppp}
 \ABBREVsc{projectmayo}{ProjectMayo}
+\ABBREV{psd}
+\ABBREV{pu}
 \ABBREV{pvm}
 \ABBREVx{pyps}{\textsc{p}y\textsc{ps}}
 \ABBREV{python}
@@ -339,9 +383,11 @@
 \ABBREV{rfc}
 \ABBREV{rire}
 \ABBREV{risc}
-\ABBREV{rom}
 \ABBREV{rmp}
+\ABBREV{rom}
+\ABBREV{rose}
 \ABBREV{rsim}
+\ABBREVx{rstream}{R-Stream}
 \ABBREV{rsvp}
 \ABBREV{rtcp}
 \ABBREV{rtl}
@@ -353,31 +399,40 @@
 \ABBREV{samba}
 \ABBREV{sane}
 \ABBREV{sarl}
+\ABBREV{scalopes}
 \ABBREV{scmp}
 \ABBREV{scsi}
 \ABBREV{sctp}
 \ABBREV{sdl}
+\ABBREVsc{sesam}{Sesam}
 \ABBREV{sgbd}
 \ABBREV{sha}
 \ABBREV{sip}
 \ABBREV{sif}
 \ABBREV{simd}
+\ABBREV{sloc}
 \ABBREVsc{smartpackets}{SmartPackets}
 \ABBREV{smb}
+\ABBREV{smec}
+\ABBREV{smecy}
 \ABBREV{smt}
 \ABBREVx{soc}{\textsc{s}o\textsc{c}}
 \ABBREVsc{solaris}{Solaris}
 \ABBREV{sparc}
+\ABBREV{spdd}
 \ABBREV{spe}
 \ABBREVx{spearde}{\textsc{spear}-\textsc{de}}
+\ABBREV{spmd}
 \ABBREVx{spoc}{\textsc{sp}o\textsc{c}}
 \ABBREV{sqrt}
 \ABBREV{sse}
 \ABBREV{ssii}
 \ABBREVxl{staroffice}{StarOffice}{http://www.sun.com/software/star/staroffice}
+\ABBREV{suif}
 \ABBREVsc{sun}{Sun}
 \ABBREV{svn}
 \ABBREVsc{switchware}{SwitchWare}
+\ABBREVx{systematic}{\textsc{s}ystem@\textsc{tic}}
 \ABBREVx{tb}{\textsc{Télécom} Bretagne}
 \ABBREV{tcg}
 \ABBREV{tcp}
@@ -388,8 +443,10 @@
 \ABBREVx{tex}{\TeX}
 \ABBREV{tflops}
 \ABBREV{tfrc}
+\ABBREV{thales}
 \ABBREV{tlb}
 \ABBREV{tpm}
+\ABBREV{tr}
 \ABBREV{trt}
 \ABBREV{ubo}
 \ABBREV{ucsd}
@@ -399,6 +456,7 @@
 \ABBREV{urgc}
 \ABBREV{url}
 \ABBREV{van}
+\ABBREV{vhdl}
 \ABBREVx{videolan}{\textsc{v}ideo\textsc{lan}}
 \ABBREV{vl}
 \ABBREV{vliw}
