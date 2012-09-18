@@ -12,9 +12,7 @@ POINTS TO for pointer18
 
 
 // Points To OUT:
-// _p_1[1] -> *NULL_POINTER* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
-// _p_1_1[1][2] -> *NULL_POINTER* , MAY
 // _p_1_1[1][2] -> _p_1_1_1[1][2][0] , MAY
 // _p_1_1_1[1][2][3] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -37,9 +35,7 @@ void pointer18(float ****p)
    p[1][2][3] = &z;
 
 // Points To:
-// _p_1[1] -> *NULL_POINTER* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
-// _p_1_1[1][2] -> *NULL_POINTER* , MAY
 // _p_1_1[1][2] -> _p_1_1_1[1][2][0] , MAY
 // _p_1_1_1[1][2][3] -> z , EXACT
 // p -> _p_1[0] , EXACT
@@ -47,6 +43,4 @@ void pointer18(float ****p)
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer18] (list_assignment_to_points_to) Dereferencing of a null pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer18] (list_assignment_to_points_to) Possible NULL pointer dereferencing.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer18] (points_to_set_block_projection) Dangling pointer "_p_1_1_1" towards "z".

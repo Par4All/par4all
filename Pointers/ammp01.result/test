@@ -685,8 +685,7 @@ ATOM * a_next(int flag)
 // _first_8[0].next -> _first_8_3__8[0][0] , MAY
 // a_next -> *NULL_POINTER* , MAY
 // a_next -> _first_8[0] , MAY
-// ap -> *NULL_POINTER* , MAY
-// ap -> _first_8[0] , MAY
+// ap -> _first_8[0] , EXACT
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8[0] , MAY
 
@@ -697,8 +696,7 @@ ATOM * a_next(int flag)
 // _first_8[0].next -> _first_8_3__8[0][0] , MAY
 // a_next -> *NULL_POINTER* , MAY
 // a_next -> _first_8[0] , MAY
-// ap -> *NULL_POINTER* , MAY
-// ap -> _first_8[0] , MAY
+// ap -> _first_8[0] , EXACT
 // first -> *NULL_POINTER* , MAY
 // first -> _first_8[0] , MAY
 
@@ -945,6 +943,8 @@ Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or P
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 52.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_number] (pointer_assignment_to_points_to) Expression "ap->next" could not be dereferenced at line 52.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[a_m_serial] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

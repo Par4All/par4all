@@ -24,8 +24,8 @@ void chain(ilp_t c1, ilp_t c2)
 
 
 // Points To OUT:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
+// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
 
 int main()
 {
@@ -35,37 +35,37 @@ int main()
    ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
-// x1 -> *HEAP*_l_12 , EXACT
+// x1 -> *HEAP*_l_12 , MAY
 
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
+// x1 -> *HEAP*_l_12 , MAY
+// x2 -> *HEAP*_l_13 , MAY
 
    x1->next = (void *) 0;
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_12 , MAY
+// x2 -> *HEAP*_l_13 , MAY
 
    x2->next = (void *) 0;
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_12 , MAY
+// x2 -> *HEAP*_l_13 , MAY
 
 
    chain(x1, x2);
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
+// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_12 , MAY
+// x2 -> *HEAP*_l_13 , MAY
 
    return 0;
 }
@@ -86,11 +86,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
+//             <may be written>: *HEAP*_l_12.next
 //             <    is read   >: x1
-//             <    is written>: *HEAP*_l_12.next
    x1->next = (void *) 0;
+//             <may be written>: *HEAP*_l_13.next
 //             <    is read   >: x2
-//             <    is written>: *HEAP*_l_13.next
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
 //             <    is written>: chain:_c1_1.next
@@ -120,11 +120,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
+//             <may be written>: *HEAP*_l_12.next
 //             <    is read   >: x1
-//             <    is written>: *HEAP*_l_12.next
    x1->next = (void *) 0;
+//             <may be written>: *HEAP*_l_13.next
 //             <    is read   >: x2
-//             <    is written>: *HEAP*_l_13.next
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
 //             <    is written>: chain:_c1_1.next
@@ -153,61 +153,3 @@ void chain(ilp_t c1, ilp_t c2)
 
    c1->next = c2;
 }
-
-// Points To IN:
-// chain:_c1_1.next -> _c1_1_1 , EXACT
-
-
-// Points To OUT:
-// *HEAP*_l_12.next -> *HEAP*_l_13 , EXACT
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
-
-int main()
-{
-
-// Points To: none
-
-   ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
-
-// Points To:
-// x1 -> *HEAP*_l_12 , EXACT
-
-   ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-
-// Points To:
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
-
-   x1->next = (void *) 0;
-
-// Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
-
-   x2->next = (void *) 0;
-
-// Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
-
-
-   chain(x1, x2);
-
-// Points To:
-// *HEAP*_l_12.next -> *HEAP*_l_13 , EXACT
-// *HEAP*_l_12.next -> *NULL_POINTER* , EXACT
-// *HEAP*_l_13.next -> *NULL_POINTER* , EXACT
-// x1 -> *HEAP*_l_12 , EXACT
-// x2 -> *HEAP*_l_13 , EXACT
-
-   return 0;
-}
-INIT_POINTS_TO_ANALYSIS[chain] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_13".
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_12".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_12".
