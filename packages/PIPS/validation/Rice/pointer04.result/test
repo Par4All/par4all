@@ -12,9 +12,7 @@ POINTS TO
 void pointer04(int n, float *p)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_2[0] , MAY
+// Points To: none
 
    int i;
 
@@ -25,19 +23,19 @@ void pointer04(int n, float *p)
    p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer04.c", 13, (const char *) 0);
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 
    float *r = p+1;
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 // r -> _p_2[1] , EXACT
 
 
    for(i = 0; i <= n-1; i += 1)
 
 // Points To:
-// p -> _p_2[0] , MAY
+// p -> _p_2[0] , EXACT
 // r -> _p_2[1] , EXACT
 
       p[i] = r[i];
@@ -62,8 +60,8 @@ void pointer04(int n, float *p)
 //             <    is referenced>: i n
 
    for(i = 0; i <= n-1; i += 1)
-//             <may be written>: _p_2[i]
 //             <    is read   >: _p_2[1+i] i n p r
+//             <    is written>: _p_2[i]
 //             <    is referenced>: i n p r
       p[i] = r[i];
 }

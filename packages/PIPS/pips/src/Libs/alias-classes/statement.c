@@ -211,7 +211,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     bool main_p = ms==s && entity_main_module_p(m);
     list dl = statement_declarations(s);
     points_to_graph_set(pt_out) =
-      points_to_block_projection(points_to_graph_set(pt_out), dl, main_p);
+      points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p);
   }
 
   /* Because arc removals do not update the approximations of the
@@ -278,8 +278,9 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 					     exp_init,
 					     pt_out);
 	  else {
-	    pips_user_warning("Type mismatch for initialization of \"\"\n",
-			      entity_user_name(e));
+	    pips_user_warning("Type mismatch for initialization of \"%s\" at line %d.\n",
+			      entity_user_name(e),
+			      points_to_context_statement_line_number());
 	    clear_pt_map(pt_out);
 	    points_to_graph_bottom(pt_out) = true;
 	  }
@@ -298,6 +299,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 					  make_approximation_exact(),
 					  make_descriptor_none());
 	    add_arc_to_pt_map(pt, pt_out);
+	    // The declared variable is local
+	    // add_arc_to_points_to_context(copy_points_to(pt));
 	  }
 	  else {
 	    FOREACH(CELL, source, l) {
@@ -306,6 +309,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 					    make_approximation_exact(),
 					    make_descriptor_none());
 	      add_arc_to_pt_map(pt, pt_out);
+	      // The declared variable is local
+	      // add_arc_to_points_to_context(copy_points_to(pt));
 	    }
 	  }
 	}
@@ -522,7 +527,7 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
   //list dl = statement_declarations(ws);
   // FI: to be improved
   //if(declaration_statement_p(ws) && !ENDP(dl))
-  //  pt_out = points_to_block_projection(pt_out, dl);
+  //  pt_out = points_to_set_block_projection(pt_out, dl);
 
       pips_assert("", consistent_points_to_graph_p(pt_out));
 

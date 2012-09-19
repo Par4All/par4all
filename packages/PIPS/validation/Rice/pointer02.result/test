@@ -15,8 +15,8 @@ void pointer02(int n, float *p)
 //             <    is referenced>: i n
 
    for(i = 0; i <= n-1; i += 1)
-//             <may be written>: _p_2[i]
 //             <    is read   >: _p_2[-1+i] i n p r
+//             <    is written>: _p_2[i]
 //             <    is referenced>: i n p r
       p[i] = r[i];
 }
@@ -31,9 +31,9 @@ void pointer02(int n, float *p)
 		from <r-W-EXACT> to <r-R-EXACT>
 		from <r-WE-EXACT> to <r-RE-EXACT>
 	13 --> 13 with conflicts
-		from <_p_2[i]-W-MAY> to <_p_2[i]-W-MAY>
-		from <_p_2[i]-W-MAY> to <_p_2[-1+i]-R-EXACT>
-		from <_p_2[-1+i]-R-EXACT> to <_p_2[i]-W-MAY>
+		from <_p_2[i]-W-EXACT> to <_p_2[i]-W-EXACT>
+		from <_p_2[i]-W-EXACT> to <_p_2[-1+i]-R-EXACT>
+		from <_p_2[-1+i]-R-EXACT> to <_p_2[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 void pointer02(int n, float *p)

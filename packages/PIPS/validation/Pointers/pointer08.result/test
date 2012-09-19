@@ -50,4 +50,4 @@ void pointer08()
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer08] (points_to_block_projection) Memory leak for bucket "pointer08:*HEAP*_l_10".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer08] (points_to_set_block_projection) Memory leak for bucket "pointer08:*HEAP*_l_10".

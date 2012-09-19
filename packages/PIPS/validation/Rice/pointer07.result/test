@@ -16,23 +16,11 @@ POINTS TO
 void pointer07(double *a, double *b, double *c, int cnt)
 {
 
-// Points To:
-// a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , MAY
+// Points To: none
 
    double *w = (void *) 0;
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , MAY
 // w -> *NULL_POINTER* , EXACT
 
    int i;
@@ -61,7 +49,7 @@ void pointer07(double *a, double *b, double *c, int cnt)
 // a -> _a_1[0] , EXACT
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
-// w -> *HEAP*_l_13[0] , EXACT
+// w -> *HEAP*_l_13[0] , MAY
 
    for(i = 0; i <= cnt-1; i += 1)
 
@@ -69,7 +57,7 @@ void pointer07(double *a, double *b, double *c, int cnt)
 // a -> _a_1[0] , EXACT
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
-// w -> *HEAP*_l_13[0] , EXACT
+// w -> *HEAP*_l_13[0] , MAY
 
       w[i] = c[i]+a[i]*b[i];
 }
@@ -96,8 +84,8 @@ void pointer07(double *a, double *b, double *c, int cnt)
 //             <    is written>: i
 //             <    is referenced>: cnt i
    for(i = 0; i <= cnt-1; i += 1)
+//             <may be written>: *HEAP*_l_13[i]
 //             <    is read   >: _a_1[i] _b_2[i] _c_3[i] a b c cnt i w
-//             <    is written>: *HEAP*_l_13[i]
 //             <    is referenced>: a b c cnt i w
       w[i] = c[i]+a[i]*b[i];
 }

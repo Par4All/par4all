@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 // Points To:
 // pi -> *HEAP*_l_13 , MAY
-// pt -> *HEAP*_l_16[0] , MAY
+// pt -> *HEAP*_l_16 , MAY
 // px -> *HEAP*_l_14 , MAY
 // pz -> *HEAP*_l_15 , MAY
 

@@ -4,11 +4,11 @@ POINTS TO
 
 // Points To IN:
 // a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , EXACT
+// a -> _a_1[0][0] , MAY
 // b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , EXACT
+// b -> _b_2[0][0] , MAY
 // c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , EXACT
+// c -> _c_3[0][0] , MAY
 
 
 // Points To OUT: none
@@ -16,69 +16,57 @@ POINTS TO
 void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 {
 
-// Points To:
-// a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , EXACT
-// b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , EXACT
-// c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , EXACT
+// Points To: none
 
    double (*w)[N];
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , EXACT
-// b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , EXACT
-// c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , EXACT
 // w -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int i;
 
 // Points To:
 // a -> *NULL_POINTER* , MAY
-// a -> _a_1[0] , EXACT
+// a -> _a_1[0][0] , MAY
 // b -> *NULL_POINTER* , MAY
-// b -> _b_2[0] , EXACT
+// b -> _b_2[0][0] , MAY
 // c -> *NULL_POINTER* , MAY
-// c -> _c_3[0] , EXACT
+// c -> _c_3[0][0] , MAY
 // w -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    a!=(void *) 0&&b!=(void *) 0&&c!=(void *) 0?(void) 0:__assert_fail("a!=((void *)0) && b!=((void *)0) && c!=((void *)0)", "./pointer10.c", 9, (const char *) 0);
 
 // Points To:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
+// a -> _a_1[0][0] , EXACT
+// b -> _b_2[0][0] , EXACT
+// c -> _c_3[0][0] , EXACT
 // w -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    w = (double (*)[N]) malloc(N*sizeof(double));
 
 // Points To:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
-// w -> *HEAP*_l_11[0] , EXACT
+// a -> _a_1[0][0] , EXACT
+// b -> _b_2[0][0] , EXACT
+// c -> _c_3[0][0] , EXACT
+// w -> *HEAP*_l_11 , MAY
 
 
    for(i = 0; i <= N-1; i += 1)
 
 // Points To:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
-// w -> *HEAP*_l_11[0] , EXACT
+// a -> _a_1[0][0] , EXACT
+// b -> _b_2[0][0] , EXACT
+// c -> _c_3[0][0] , EXACT
+// w -> *HEAP*_l_11 , MAY
 
       (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
 
 // Points To:
-// a -> _a_1[0] , EXACT
-// b -> _b_2[0] , EXACT
-// c -> _c_3[0] , EXACT
-// w -> *HEAP*_l_11[0] , EXACT
+// a -> _a_1[0][0] , EXACT
+// b -> _b_2[0][0] , EXACT
+// c -> _c_3[0][0] , EXACT
+// w -> *HEAP*_l_11 , MAY
 
 
    return;
@@ -105,9 +93,9 @@ void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 //             <    is referenced>: N i
 
    for(i = 0; i <= N-1; i += 1)
-//             <    is read   >: N _a_1[0][i] _b_2[0][i] _c_3[0][i] a 
-//                               b c i w
-//             <    is written>: *HEAP*_l_11[0][i]
+//             <may be written>: *HEAP*_l_11[i]
+//             <    is read   >: N _a_1[0][0][i] _b_2[0][0][i] 
+//                               _c_3[0][0][i] a b c i w
 //             <    is referenced>: N a b c i w
       (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
 

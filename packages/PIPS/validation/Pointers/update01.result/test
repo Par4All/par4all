@@ -1,20 +1,4 @@
 
-PROPER  EFFECTS
-
-void update01()
-{
-   int i;
-   int *p;
-//             <    is written>: p
-
-   p = &i;
-//             <    is read   >: p
-//             <    is written>: p
-   p++;
-//             <    is written>: i
-   i = 2;
-}
-
 POINTS-TO
 
 
@@ -28,25 +12,52 @@ void update01()
 
 // Points To: none
 
-   int i;
+   int i[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 // Points To: none
 
-   int *p;
+   int *p, *q;
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
-   p = &i;
+   p = i;
 
 // Points To:
-// p -> i , EXACT
+// p -> i[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q = &i[0];
+
+// Points To:
+// p -> i[0] , EXACT
+// q -> i[0] , EXACT
 
    p++;
 
 // Points To:
 // p -> i[1] , EXACT
+// q -> i[0] , EXACT
 
-   i = 2;
+   q++;
+
+// Points To:
+// p -> i[1] , EXACT
+// q -> i[1] , EXACT
+
+   *p = 2;
+
+// Points To:
+// p -> i[1] , EXACT
+// q -> i[1] , EXACT
+
+   *q = 3;
+
+// Points To:
+// p -> i[1] , EXACT
+// q -> i[1] , EXACT
+
+   printf("a[1]=%d\n", i[1]);
 }

@@ -719,7 +719,7 @@ set points_to_sequence(sequence seq, set pt_in, bool store) {
   FOREACH(statement, st, sequence_statements(seq)) {
     pt_out = points_to_recursive_statement(st,pt_out,store);
     if(statement_block_p(st) && !ENDP(dl=statement_declarations(st)))
-      pt_out = points_to_block_projection(pt_out, dl, false);
+      pt_out = points_to_set_block_projection(pt_out, dl, false);
   }
   
   return pt_out;
@@ -1910,11 +1910,11 @@ set points_to_recursive_statement(statement current,
     statement true_stmt = test_true(instruction_test(i));
     statement false_stmt = test_false(instruction_test(i));
     if(statement_block_p(true_stmt) && !ENDP(dl=statement_declarations(true_stmt))){
-      pt_out = points_to_block_projection(pt_out, dl, false);
+      pt_out = points_to_set_block_projection(pt_out, dl, false);
       pt_out = merge_points_to_set(pt_out, pt_in);
     }
     if(statement_block_p(false_stmt) && !ENDP(dl=statement_declarations(false_stmt))){
-      pt_out = points_to_block_projection(pt_out, dl, false);
+      pt_out = points_to_set_block_projection(pt_out, dl, false);
       pt_out = merge_points_to_set(pt_out, pt_in);
      }
   }
@@ -1931,7 +1931,7 @@ set points_to_recursive_statement(statement current,
     
       statement ws = whileloop_body(instruction_whileloop(i));
       if(statement_block_p(ws) && !ENDP(dl=statement_declarations(ws)))
-        pt_out = points_to_block_projection(pt_out, dl, false);
+        pt_out = points_to_set_block_projection(pt_out, dl, false);
   }
     break;
   case is_instruction_loop: {
@@ -1940,7 +1940,7 @@ set points_to_recursive_statement(statement current,
     pt_out = points_to_loop(instruction_loop(i), pt_in, store);
     statement ls = loop_body(instruction_loop(i));
       if(statement_block_p(ls) && !ENDP(dl=statement_declarations(ls)))
-        pt_out = points_to_block_projection(pt_out, dl, false);
+        pt_out = points_to_set_block_projection(pt_out, dl, false);
   }
     break;
   case is_instruction_forloop: {
@@ -1950,7 +1950,7 @@ set points_to_recursive_statement(statement current,
                                          pt_in, store);
     statement ls = forloop_body(instruction_forloop(i));
     if(statement_block_p(ls) && !ENDP(dl=statement_declarations(ls)))
-      pt_out = points_to_block_projection(pt_out, dl, false);
+      pt_out = points_to_set_block_projection(pt_out, dl, false);
   }
     break;
   case is_instruction_expression: {

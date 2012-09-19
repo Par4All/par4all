@@ -925,9 +925,30 @@ points_to offset_cell(points_to pt, expression delta, type et)
   // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
   else {
     type vt = entity_basic_concrete_type(v);
+    // FI: I do not understand why this is based on the type of v and
+    // not on the ype of r
     if(array_type_p(vt)
-       || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
-      offset_array_reference(r, delta, et);
+       // FI: the property should have been taken care of earlier when
+       // building sink
+       /*|| !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")*/) {
+      cell source = points_to_source(npt);
+      bool to_be_freed;
+      type source_t = points_to_cell_to_type(source, &to_be_freed);
+      type c_source_t = compute_basic_concrete_type(source_t);
+      if(to_be_freed) free_type(source_t);
+      type pt = type_to_pointed_type(c_source_t);
+      type e_sink_t = compute_basic_concrete_type(pt);
+      if(array_pointer_type_equal_p(vt, e_sink_t)
+	 && get_bool_property("POINTS_TO_STRICT_POINTER_TYPES"))
+	pips_user_error("Use of pointer arithmetic on \"%s\" at line %d via reference \"%s\" is not "
+			"standard-compliant.\n"
+			"Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
+			" for usual non-standard compliant C code.\n",
+			entity_user_name(v),
+			points_to_context_statement_line_number(),
+			effect_reference_to_string(cell_any_reference(source)));
+      else
+	offset_array_reference(r, delta, et);
     }
     else if(struct_type_p(vt)) {
       // The struct may contain an array field.
@@ -936,11 +957,14 @@ points_to offset_cell(points_to pt, expression delta, type et)
     }
     // FI to be extended to pointers and points-to stubs
     else {
-      pips_user_error("Use of pointer arithmetic on %s is not "
+      cell source = points_to_source(npt);
+      pips_user_error("Use of pointer arithmetic on \"%s\" at line %d via reference \"%s\" is not "
 		      "standard-compliant.\n"
 		      "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
 		      " for usual non-standard compliant C code.\n",
-		      entity_user_name(v));
+		      entity_user_name(v),
+		      points_to_context_statement_line_number(),
+		      effect_reference_to_string(cell_any_reference(source)));
     }
   }
   return npt;
@@ -985,8 +1009,10 @@ void offset_points_to_cell(cell sink, expression delta, type t)
     ; // It is already fuzzy no need to add more
   // FI: it might be necessary to exclude *HEAP* too when a minimal
   // heap model is used (ABSTRACT_HEAP_LOCATIONS = "unique")
-  else if(entity_array_p(rv)
-     || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+  // FI: this has been dealt with somewhere else
+  // else if(entity_array_p(rv)
+  //   || !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")) {
+  else if(entity_array_p(rv) || cell_typed_anywhere_locations_p(sink)) {
     value val = EvalExpression(delta);
     list sl = reference_indices(r);
     if(value_constant_p(val) && constant_int_p(value_constant(val))) {
@@ -1051,11 +1077,19 @@ void offset_points_to_cell(cell sink, expression delta, type t)
   }
   // FI to be extended to pointers and points-to stubs
   else {
-    pips_user_error("Use of pointer arithmetic on %s is not "
-		    "standard-compliant.\n"
-		    "Reset property \"POINTS_TO_STRICT_POINTER_TYPES\""
-		    " for usual non-standard compliant C code.\n",
-		    entity_user_name(rv));
+    if(zero_expression_p(delta)) {
+      ;
+    }
+    else {
+    pips_user_error("Use of pointer arithmetic on \"%s\" at line %d is not "
+		    "standard-compliant.\n%s",
+		    entity_user_name(rv),
+		    points_to_context_statement_line_number(),
+		    get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")?
+		    "Try resetting property \"POINTS_TO_STRICT_POINTER_TYPES\""
+		    " for usual non-standard compliant C code.\n"
+		    :"");
+    }
   }
 }
 
@@ -1107,19 +1141,81 @@ pt_map assignment_to_points_to(expression lhs, expression rhs, pt_map pt_in)
   return pt_out;
 }
 
+/* Check that all cells in list "sinks" are compatible with type "ct"
+ * if "eval_p" is false, and with the type pointed by "st" if eval_p is
+ * true.
+ */
+void check_type_of_points_to_cells(list sinks, type ct, bool eval_p)
+{
+  type st = type_undefined;
+
+  if(!ENDP(sinks)) {
+    if(eval_p) {
+      if(pointer_type_p(ct))
+	st = copy_type(type_to_pointed_type(ct));
+      else if(array_type_p(ct)) {
+	st = array_type_to_sub_array_type(ct);
+      }
+      else
+	pips_internal_error("Unexpected \"ct\" argument.\n");
+    }
+    else
+      st = copy_type(ct);
+  }
+
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c)
+       && !anywhere_cell_p(c)
+       && !cell_typed_anywhere_locations_p(c)
+       && !nowhere_cell_p(c)) {
+      bool to_be_freed;
+      type est = points_to_cell_to_type(c, &to_be_freed);
+      type cest = compute_basic_concrete_type(est);
+      if(!array_pointer_type_equal_p(cest, st)
+	 /* Adding the zero subscripts may muddle the type issue
+	    because "&a[0]" has not the same type as "a" although we
+	    normalize every cell into "a[0]". */
+	 && !(array_type_p(st)
+	      && array_pointer_type_equal_p(cest,
+					    array_type_to_element_type(st)))
+	 /* Take care of the constant strings like "hello" */
+	 && !(char_type_p(st) && char_star_constant_function_type_p(cest))
+	 /* Take care of void */
+	 && !type_void_p(st) // cest could be checked as overloaded
+	 && !overloaded_type_p(cest)
+	 ) {
+	pips_user_warning("Maybe an issue with a dynamic memory allocation.\n");
+	pips_user_error("At line %d, "
+			// "the type returned for the value of expression \"%s\"="
+			"the type returned for the cell"
+			"\"%s\", "
+			"\"%s\", is not the expected type, \"%s\".\n",
+			points_to_context_statement_line_number(),
+			// expression_to_string(rhs),
+			effect_reference_to_string(cell_any_reference(c)),
+			// copied from ri-util/type.c, print_type()
+			words_to_string(words_type(cest, NIL, false)),
+			words_to_string(words_type(st, NIL, false)));
+      }
+    }
+  }
+}
 
 /* Check that the cells in list "sinks" have types compatible with the
  * expression on the left-hand side, lhs.
  *
  * List "sinks" is assumed to have been derived from the "rhs" expression.
  */
-void check_rhs_value_types(expression lhs, expression rhs, list sinks)
+void check_rhs_value_types(expression lhs,
+			   // Was used in the error message..
+			   expression rhs __attribute__ ((unused)),
+			   list sinks)
 {
   // Some expression are synthesized to reuse existing functions.
   bool to_be_freed;
   type t = points_to_expression_to_type(lhs, &to_be_freed);
   type ct = compute_basic_concrete_type(t);
-  type st = type_undefined;
+  type st = type_undefined; // sink type
   if(pointer_type_p(ct)) {
     st = compute_basic_concrete_type(type_to_pointed_type(ct));
   }
@@ -1134,38 +1230,7 @@ void check_rhs_value_types(expression lhs, expression rhs, list sinks)
     pips_internal_error("Unexpected type for value.\n");
 
   if(!type_void_star_p(ct)) { // void * is compatible with all types...
-    FOREACH(CELL, c, sinks) {
-      if(!null_cell_p(c)
-	 && !anywhere_cell_p(c)
-	 && !cell_typed_anywhere_locations_p(c)
-	 && !nowhere_cell_p(c)) {
-	bool to_be_freed;
-	type est = points_to_cell_to_type(c, &to_be_freed);
-	type cest = compute_basic_concrete_type(est);
-	if(!array_pointer_type_equal_p(cest, st)
-	  /* Adding the zero subscripts may muddle the type issue
-	     because "&a[0]" has not the same type as "a" although we
-	     normalize every cell into "a[0]". */
-	   && !(array_type_p(st)
-		&& array_pointer_type_equal_p(cest,
-					      array_type_to_element_type(st)))
-	   /* Take care of the constant strings like "hello" */
-	   && !(char_type_p(st) && char_star_constant_function_type_p(cest))
-	   ) {
-	    pips_user_warning("Maybe an issue with a dynamic memory allocation.\n");
-	    pips_user_error("At line %d, "
-			    "the type returned for the value of expression \"%s\"="
-			    "\"%s\", "
-			    "\"%s\", is not the expected type, \"%s\".\n",
-			    points_to_context_statement_line_number(),
-			    expression_to_string(rhs),
-			    effect_reference_to_string(cell_any_reference(c)),
-			    // copied from ri-util/type.c, print_type()
-			    words_to_string(words_type(cest, NIL, false)),
-			    words_to_string(words_type(st, NIL, false)));
-	  }
-      }
-    }
+    check_type_of_points_to_cells(sinks, st, false);
   }
   // Late free, to be able to see "t" under gdb...
   if(to_be_freed) free_type(t);
@@ -1220,9 +1285,9 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   /* Retrieve the memory locations that might be reached by the rhs
    *
-   * Update the calling context by adding new stubs linked directly or
-   * indirectly to the formal parameters and global variables if
-   * necessary.
+   * Update the real "pt_in", the calling context, and "pt_out" by
+   * adding new stubs linked directly or indirectly to the formal
+   * parameters and global variables if necessary.
    */
   list R = expression_to_points_to_sinks(rhs, pt_out);
 
@@ -1658,10 +1723,12 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       bool to_be_freed;
       type t = points_to_cell_to_type(c, &to_be_freed);
       type ct = compute_basic_concrete_type(t);
-      if(!C_pointer_type_p(ct)) {
+      if(!C_pointer_type_p(ct) && !overloaded_type_p(ct)) {
+	fprintf(stderr, "nc=");
 	print_points_to_cell(nc);
+	fprintf(stderr, "\nc=");
 	print_points_to_cell(c);
-	pips_internal_error("Source cell cannot really be a source cell\n");
+	pips_internal_error("\nSource cell cannot really be a source cell\n");
       }
       if(to_be_freed) free_type(t);
       free_cell(nc);
@@ -1753,11 +1820,13 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     // FI->AM: shouldn't it be a kill_must here?
     set_difference(pt_out_s, pt_out_s, kill);
 
-    pips_assert("", consistent_points_to_graph_p(pt_out));
+    pips_assert("After removing the kill set, pt_out is consistent",
+		consistent_points_to_graph_p(pt_out));
     
     set_union(pt_out_s, pt_out_s, gen);
 
-    pips_assert("", consistent_points_to_graph_p(pt_out));
+    pips_assert("After adding the gen set, pt_out is consistent",
+		consistent_points_to_graph_p(pt_out));
 
     // FI->AM: use kill_may to reduce the precision of these arcs
     SET_FOREACH(points_to, pt, kill_may) {
@@ -2097,6 +2166,29 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     out = relational_intrinsic_call_condition_to_points_to(c, in, true_p);
   else if(ENTITY_LOGICAL_OPERATOR_P(f))
     out = boolean_intrinsic_call_condition_to_points_to(c, in, true_p);
+  else if(ENTITY_ASSIGN_P(f)) {
+    out = intrinsic_call_to_points_to(c, in);
+    expression lhs = EXPRESSION(CAR(call_arguments(c)));
+    bool to_be_freed;
+    type t = points_to_expression_to_type(lhs, &to_be_freed);
+    type lhs_t = compute_basic_concrete_type(t);
+    if(to_be_freed) free_type(t);
+    if(pointer_type_p(lhs_t)) {
+      expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
+      list R = expression_to_points_to_sinks(rhs, out);
+      if(cells_must_point_to_null_p(R) && true_p) {
+	pips_user_warning("Dead code detected.\n");
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+      }
+      else if(cells_may_not_point_to_null_p(R) && !true_p) {
+	pips_user_warning("Dead code detected.\n");
+	clear_pt_map(out);
+	points_to_graph_bottom(out) = true;
+      }
+      gen_free_list(R);
+    }
+  }
   else {
     if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)
        || ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)

@@ -7,7 +7,7 @@ POINTS TO for tableau_dynamique
 
 
 // Points To OUT:
-// _pa_1.data -> *HEAP*_l_7[0] , EXACT
+// _pa_1.data -> *HEAP*_l_7[0] , MAY
 
 void allocate_array(parray_t pa)
 {
@@ -27,13 +27,11 @@ void allocate_array(parray_t pa)
 void init_array(parray_t pa)
 {
 
-// Points To:
-// pa -> _pa_1 , EXACT
+// Points To: none
 
    int i;
 
-// Points To:
-// pa -> _pa_1 , EXACT
+// Points To: none
 
    for(i = 0; i <= pa->dim-1; i += 1)
 
@@ -62,12 +60,12 @@ int main()
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
 
 // Points To:
-// ma -> *HEAP*_l_20 , EXACT
+// ma -> *HEAP*_l_20 , MAY
 
    allocate_array(ma);
 
 // Points To:
-// ma -> *HEAP*_l_20 , EXACT
+// ma -> *HEAP*_l_20 , MAY
 
    //init_array(ma);
    
@@ -85,7 +83,7 @@ void allocate_array(parray_t pa)
 void init_array(parray_t pa)
 {
    int i;
-//             <    is read   >: _pa_1.dim pa
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: i
    for(i = 0; i <= pa->dim-1; i += 1)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -119,15 +117,13 @@ void allocate_array(parray_t pa)
 //             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
    pa->data = (float *) malloc(pa->dim*sizeof(float));
 }
-//             <may be read   >: _pa_1.data
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _pa_1.dim pa
 void init_array(parray_t pa)
 {
    int i;
-//             <may be read   >: _pa_1.data i
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _pa_1.dim pa
    for(i = 0; i <= pa->dim-1; i += 1)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _pa_1.data _pa_1.dim i pa
@@ -162,7 +158,7 @@ POINTS TO for tableau_dynamique
 
 
 // Points To OUT:
-// _pa_1.data -> *HEAP*_l_7[0] , EXACT
+// _pa_1.data -> *HEAP*_l_7[0] , MAY
 
 void allocate_array(parray_t pa)
 {
@@ -182,13 +178,11 @@ void allocate_array(parray_t pa)
 void init_array(parray_t pa)
 {
 
-// Points To:
-// pa -> _pa_1 , EXACT
+// Points To: none
 
    int i;
 
-// Points To:
-// pa -> _pa_1 , EXACT
+// Points To: none
 
    for(i = 0; i <= pa->dim-1; i += 1)
 
@@ -205,11 +199,11 @@ void init_array(parray_t pa)
 }
 
 // Points To IN:
-// allocate_array:_pa_1.data -> _pa_1_1 , EXACT
+// allocate_array:_pa_1.data -> _pa_1_2__1 , EXACT
 
 
 // Points To OUT:
-// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , EXACT
+// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
 
 int main()
 {
@@ -219,13 +213,14 @@ int main()
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
 
 // Points To:
-// ma -> *HEAP*_l_20 , EXACT
+// allocate_array:_pa_1.data -> _pa_1_2__1 , EXACT
+// ma -> *HEAP*_l_20 , MAY
 
    allocate_array(ma);
 
 // Points To:
-// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , EXACT
-// ma -> *HEAP*_l_20 , EXACT
+// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
+// ma -> *HEAP*_l_20 , MAY
 
    //init_array(ma);
    
@@ -234,5 +229,5 @@ int main()
 INIT_POINTS_TO_ANALYSIS[allocate_array] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[init_array] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_20".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_block_projection) Memory leak for bucket "main:*HEAP*_l_20".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1".

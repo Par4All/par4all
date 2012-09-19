@@ -14,11 +14,7 @@ POINTS TO
 void pointer01(int n, float *p, float *q)
 {
 
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _q_3[0] , MAY
+// Points To: none
 
    int i;
 
@@ -31,14 +27,14 @@ void pointer01(int n, float *p, float *q)
    if (p!=(void *) 0&&q!=(void *) 0)
 
 // Points To:
-// p -> _p_2[0] , MAY
-// q -> _q_3[0] , MAY
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
 
       for(i = 0; i <= n-1; i += 1)
 
 // Points To:
-// p -> _p_2[0] , MAY
-// q -> _q_3[0] , MAY
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
 
          p[i] = q[i];
 }
@@ -56,9 +52,8 @@ void pointer01(int n, float *p, float *q)
 //             <    is written>: i
 //             <    is referenced>: i n
       for(i = 0; i <= n-1; i += 1)
-//             <may be read   >: _q_3[i]
-//             <may be written>: _p_2[i]
-//             <    is read   >: i n p q
+//             <    is read   >: _q_3[i] i n p q
+//             <    is written>: _p_2[i]
 //             <    is referenced>: i n p q
          p[i] = q[i];
 }

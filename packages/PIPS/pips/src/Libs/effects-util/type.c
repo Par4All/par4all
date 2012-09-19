@@ -284,10 +284,27 @@ static type r_cell_reference_to_type(list ref_l_ind, type current_type, bool *to
 		/* Warning : qualifiers are set to NIL, because I do not see
 		   the need for something else for the moment. BC.
 		*/
-		t = make_type(is_type_variable,
-			      make_variable(copy_basic(current_basic),
-					    gen_full_copy_list(l_current_dim),
-					    NIL));
+		/* Sub arrays are pointers to arrays, not arrays, at least for gcc
+		 *
+		 * a[10][20][30] -> a is int (*)[20][30]
+		 *               -> a[1] is int *[30]
+		 *               -> a[1][2] is int *
+		 */
+		if(ENDP(l_current_dim)) {
+		    /* Beatrice's version */
+		    t = make_type(is_type_variable,
+				  make_variable(copy_basic(current_basic),
+						gen_full_copy_list(l_current_dim),
+						NIL));
+		}
+		else {
+		  list n_dims = CDR(l_current_dim);
+		  t = make_type(is_type_variable,
+				make_variable(copy_basic(current_basic),
+					      gen_full_copy_list(n_dims),
+					      NIL));
+		  t = type_to_pointer_type(t);
+		}
 		*to_be_freed = true;
 	      }
 	    else
@@ -1040,6 +1057,9 @@ void points_to_cell_types_compatibility(cell l, cell r)
 	    reference rr = cell_any_reference(r);
 	    entity rv = reference_variable(rr);
 	    // This assignment breaks the internal consistency of heap modelling
+	    if(!array_pointer_type_equal_p(nt, entity_type(rv)))
+	      pips_internal_error("Incompatible types for \"%s\".\n",
+				  entity_name(rv));
 	    entity_type(rv) = nt;
 	  }
 	  else if(all_heap_locations_cell_p(r))

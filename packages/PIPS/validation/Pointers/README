@@ -5,9 +5,15 @@ conditional_01, 01, 02, 03, 04 : To treat assignements like x = cond? &i : y.
 
 do_while : To illustrate points-to relations in control statements.
 
+dereferencing12: make sure that implicit information dur to pointer
+dereferencing is used
+
 for00:
 
 formal_parameter00 : To illustrate the treatement of formal parameter. 
+
+fprintf02: make sure that implicit information dur to pointer
+dereferencing is used
 
 fulguro04: subscript construct in a rhs
 

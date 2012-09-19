@@ -5,7 +5,9 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
 
 void pointer06()
 {
@@ -27,46 +29,46 @@ void pointer06()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// t -> *HEAP*_l_10 , EXACT
+// t -> *HEAP*_l_10 , MAY
 
    t->left = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
-// t -> *HEAP*_l_10 , EXACT
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// t -> *HEAP*_l_10 , MAY
 
    t->right = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
-// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
-// t -> *HEAP*_l_10 , EXACT
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
 
    struct tree *tl = t->left;
 
 // Points To:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
-// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
-// t -> *HEAP*_l_10 , EXACT
-// tl -> *HEAP*_l_11 , EXACT
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+// tl -> *HEAP*_l_11 , MAY
 
    struct tree *tr = t->right;
 
 // Points To:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
-// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
-// t -> *HEAP*_l_10 , EXACT
-// tl -> *HEAP*_l_11 , EXACT
-// tr -> *HEAP*_l_12 , EXACT
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+// tl -> *HEAP*_l_11 , MAY
+// tr -> *HEAP*_l_12 , MAY
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , EXACT
-// *HEAP*_l_10.right -> *HEAP*_l_12 , EXACT
-// t -> *HEAP*_l_10 , EXACT
-// tl -> *HEAP*_l_11 , EXACT
-// tr -> *HEAP*_l_12 , EXACT
+// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// t -> *HEAP*_l_10 , MAY
+// tl -> *HEAP*_l_11 , MAY
+// tr -> *HEAP*_l_12 , MAY
 
       (t->val)[i] = (tl->val)[i]+(tr->val)[i];
 }
@@ -88,22 +90,24 @@ void pointer06()
 //             <    is referenced>: t
 //             <    is declared>: t
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+//             <may be written>: *HEAP*_l_10.left
 //             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: *HEAP*_l_10.left 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: t
    t->left = (struct tree *) malloc(sizeof(struct tree ));
+//             <may be written>: *HEAP*_l_10.right
 //             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: *HEAP*_l_10.right 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is referenced>: t
    t->right = (struct tree *) malloc(sizeof(struct tree ));
-//             <    is read   >: *HEAP*_l_10.left t
+//             <may be read   >: *HEAP*_l_10.left
+//             <    is read   >: t
 //             <    is written>: tl
 //             <    is referenced>: t tl
 //             <    is declared>: tl
    struct tree *tl = t->left;
-//             <    is read   >: *HEAP*_l_10.right t
+//             <may be read   >: *HEAP*_l_10.right
+//             <    is read   >: t
 //             <    is written>: tr
 //             <    is referenced>: t tr
 //             <    is declared>: tr
@@ -111,9 +115,9 @@ void pointer06()
 //             <    is written>: i
 //             <    is referenced>: i
    for(i = 0; i <= 9; i += 1)
-//             <    is read   >: *HEAP*_l_11.val[i] *HEAP*_l_12.val[i]
-//                               i t tl tr
-//             <    is written>: *HEAP*_l_10.val[i]
+//             <may be read   >: *HEAP*_l_11.val[i] *HEAP*_l_12.val[i]
+//             <may be written>: *HEAP*_l_10.val[i]
+//             <    is read   >: i t tl tr
 //             <    is referenced>: i t tl tr
       (t->val)[i] = (tl->val)[i]+(tr->val)[i];
 }

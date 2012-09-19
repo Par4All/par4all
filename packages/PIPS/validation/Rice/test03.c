@@ -9,7 +9,9 @@ int main(int argc, char** argv){
   void * toto;
 
   a_d1=a_d2=5;
-  toto = malloc(sizeof(double)*a_d1*a_d2);
+  // a_d1*a_d2 must be parenthesized because of the limited number of
+  // patterns checked by the abstract heap stub generator
+  toto = malloc(sizeof(double)*(a_d1*a_d2));
 
   for(i=0;i<a_d1;i++){
     for(j=0;j<a_d2;j++){
@@ -21,7 +23,7 @@ int main(int argc, char** argv){
 
 
   a_d1=a_d2=10;
-  toto = malloc(sizeof(double)*a_d1*a_d2);
+  toto = malloc(sizeof(double)*(a_d1*a_d2));
 
   for(i=0;i<a_d1;i++){
     for(j=0;j<a_d2;j++){
