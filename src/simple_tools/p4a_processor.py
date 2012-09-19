@@ -1112,6 +1112,7 @@ class p4a_processor(object):
             # Where the file actually is in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
+            output_name = name + extension_out
 
             #p4a_util.warn("pips_file " +pips_file)
             if self.accel and (p4a_util.c_file_p(pips_file) or p4a_util.opencl_file_p(pips_file)):
@@ -1123,7 +1124,16 @@ class p4a_processor(object):
                 # update the pips file to the postprocess one
                 pips_file = os.path.join(self.workspace.dirname, "P4A", name + extension_in)
 
-            output_name = name + extension_out
+            if (self.opencl == True):
+                shutil.copyfile(pips_file, pips_file + ".tmp")
+                os.remove(pips_file)
+                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+                p4a_util.merge_files (pips_file, [h_file, pips_file+".tmp"])
+                os.remove(pips_file+".tmp")
+                end_file =  os.path.join(subs_dir, output_name)
+                shutil.copyfile(pips_file, end_file)
+                #p4a_util.warn("end_file after join "+end_file)
+
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             if (self.fortran_wrapper_p (pips_file) == True):
@@ -1133,22 +1143,6 @@ class p4a_processor(object):
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
 
-            if (self.opencl == True):
-                # Merging the content of the p4a_accel_wrapper-OpenCL.h
-                # in the .cl kernel file
-                end_file =  os.path.join(subs_dir, output_name)
-                #p4a_util.warn("end file "+end_file)
-                # In the merge operation, the output file is only open in
-                # append mode. When multiple compilation are launched,
-                # without cleaning, the resulting file cumulates all
-                # the versions. Removing the file before, prevent from this
-                try:
-                    os.remove(end_file)
-                except os.error:
-                    pass
-                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
-                p4a_util.merge_files (end_file, [h_file, output_file])
-                #p4a_util.warn("end_file after join "+end_file)
 
 
             if (self.fortran == False):

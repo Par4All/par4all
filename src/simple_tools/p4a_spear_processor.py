@@ -53,18 +53,21 @@ class p4a_spear_processor(p4a_processor):
         for task in self.tasks:
             parallelLoops = int(task.attrib['nbParallelLoops'])
             warn("Parallelizing Task {0} with {1} nested parallel loops".format(task.attrib['name'],parallelLoops))
-            loops = self.workspace[task.attrib['name']].loops()
-            while parallelLoops > 0:
-                if len(loops)>1:
-                    raise Exception("Expect {0} perfectly nested loop but got only %{1}".format(task.attrib['nbParallelLoops'],int(task.attrib['nbParallelLoops'])-parallelLoops))
-                # Schedule as parallel
-                loops[0].parallel=True
-                parallelLoops=parallelLoops-1
-                loops=loops[0].loops()
+            if parallelLoops==0:
+                self.workspace[task.attrib['name']].one_thread_parallelize()
+            else:
+                loops = self.workspace[task.attrib['name']].loops()
+                while parallelLoops > 0:
+                    if len(loops)>1:
+                        raise Exception("Expect {0} perfectly nested loop but got only %{1}".format(task.attrib['nbParallelLoops'],int(task.attrib['nbParallelLoops'])-parallelLoops))
+                    # Schedule as parallel
+                    loops[0].parallel=True
+                    parallelLoops=parallelLoops-1
+                    loops=loops[0].loops()
         #p4a_processor.parallelize(self,fine_grain = True,  *args, **kwargs)
         
     def save_generated (self, output_dir, subs_dir):
-    	ret = p4a_processor.save_generated(self,output_dir,subs_dir)
+        ret = p4a_processor.save_generated(self,output_dir,subs_dir)
         # 
         warn("XML Post processing " + output_dir + " " + subs_dir)
         tasks_xml = ""
@@ -107,7 +110,6 @@ class p4a_spear_processor(p4a_processor):
 <!ELEMENT Task (Arg)+>
 <!ATTLIST Task
   xmlns CDATA #FIXED ''
-  function NMTOKEN #REQUIRED
   kernel NMTOKEN #REQUIRED
   name NMTOKEN #REQUIRED
   nbParallelLoops CDATA #REQUIRED>
