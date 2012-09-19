@@ -53,7 +53,7 @@ int main()
    p[0] = q;
 
 // Points To:
-// *HEAP*_l_11[0] -> *HEAP*_l_9 , MAY
+// *HEAP*_l_11 -> *HEAP*_l_9 , MAY
 // *HEAP*_l_9 -> a , MAY
 // p -> *HEAP*_l_11 , MAY
 // q -> *HEAP*_l_9 , MAY

@@ -24,22 +24,16 @@ int pointer_reference04(char **p)
    char *q = p[3];
 
 // Points To:
-// _p_1[3] -> *NULL_POINTER* , MAY
 // _p_1[3] -> _p_1_1[3][0] , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _p_1_1[3][0] , MAY
+// p -> _p_1[0] , EXACT
+// q -> _p_1_1[3][0] , EXACT
 
    char *r = "hello";
 
 // Points To:
-// _p_1[3] -> *NULL_POINTER* , MAY
 // _p_1[3] -> _p_1_1[3][0] , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
-// q -> _p_1_1[3][0] , MAY
+// p -> _p_1[0] , EXACT
+// q -> _p_1_1[3][0] , EXACT
 // r -> "hello" , EXACT
 
    p[3] = r;
@@ -47,8 +41,7 @@ int pointer_reference04(char **p)
 // Points To:
 // _p_1[3] -> "hello" , EXACT
 // p -> _p_1[0] , EXACT
-// q -> *NULL_POINTER* , MAY
-// q -> _p_1_1[3][0] , MAY
+// q -> _p_1_1[3][0] , EXACT
 // r -> "hello" , EXACT
 
    return 0;

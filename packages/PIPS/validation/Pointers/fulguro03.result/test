@@ -101,7 +101,6 @@ POINTS TO
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
@@ -126,8 +125,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // array_s -> _vct_4_3__4[0][0] , MAY
 // dat -> *NULL_POINTER* , MAY
 // dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// vct -> _vct_4[0] , EXACT
 
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
 
@@ -136,16 +134,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
    int I_0 = vct->spp;
    {
@@ -155,16 +150,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       register fgUINT16 val;
 
@@ -173,16 +165,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       register int i;
 
@@ -191,16 +180,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       register int k;
 
@@ -209,16 +195,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       unsigned short _return0;
 
@@ -227,16 +210,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       i = col*I_0;
 
@@ -245,16 +225,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
       for(k = 0; k <= I_0-1; k += 1) {
 
@@ -263,16 +240,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> *NULL_POINTER* , MAY
 // array_s -> _vct_4_3__4[0][0] , MAY
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
          _return0 = array_s[k];
 
@@ -281,15 +255,12 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> _vct_4_3__4[0][0] , EXACT
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
          val = _return0;
 
@@ -298,15 +269,12 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> *NULL_POINTER* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> _vct_4_3__4[0][0] , EXACT
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
          array_d[i] = val;
 
@@ -315,14 +283,11 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// _vct_4[0].array -> *NULL_POINTER* , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , EXACT
 // array_s -> _vct_4_3__4[0][0] , EXACT
-// dat -> *NULL_POINTER* , MAY
-// dat -> _dat_1[0] , MAY
-// vct -> *NULL_POINTER* , MAY
-// vct -> _vct_4[0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
          i++;
       }

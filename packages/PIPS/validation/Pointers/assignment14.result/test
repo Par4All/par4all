@@ -16,11 +16,9 @@ POINTS TO for assignment14
 
 
 // Points To OUT:
-// _tx_1[0] -> *NULL_POINTER* , MAY
 // _tx_1[0] -> _tx_1_1[0][0] , MAY
 // _tx_1_1[0][0].ip1 -> *NULL_POINTER* , MAY
 // _tx_1_1[0][0].ip1 -> _ty_2_2_5__2[0][0][0] , MAY
-// _ty_2[0] -> *NULL_POINTER* , MAY
 // _ty_2[0] -> _ty_2_2[0][0] , MAY
 // _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
 // _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
@@ -43,11 +41,9 @@ void assignment14(struct foo **tx, struct foo **ty)
    (**tx).ip1 = (**ty).ip2;
 
 // Points To:
-// _tx_1[0] -> *NULL_POINTER* , MAY
 // _tx_1[0] -> _tx_1_1[0][0] , MAY
 // _tx_1_1[0][0].ip1 -> *NULL_POINTER* , MAY
 // _tx_1_1[0][0].ip1 -> _ty_2_2_5__2[0][0][0] , MAY
-// _ty_2[0] -> *NULL_POINTER* , MAY
 // _ty_2[0] -> _ty_2_2[0][0] , MAY
 // _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
 // _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
@@ -56,5 +52,3 @@ void assignment14(struct foo **tx, struct foo **ty)
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment14] (list_assignment_to_points_to) Dereferencing of a null pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment14] (list_assignment_to_points_to) Possible NULL pointer dereferencing.

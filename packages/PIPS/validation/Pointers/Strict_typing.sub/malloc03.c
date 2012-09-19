@@ -2,7 +2,10 @@
  *
  * FI: I changed the initialization and the type of pt
  *
- * The initialization was wrong: the allocated 
+ * The initialization was wrong: the allocatedis not compatible with "pt++"
+ * which add 120 to pt (30 four-byte elements).
+ *
+ * Currently, the bug is not detected...
  */
 
 #include <stdio.h>
@@ -19,12 +22,10 @@ int main(int argc, char *argv[])
   px = (float *) malloc(sizeof(float));
   pz = (float *) malloc(sizeof(float));
   pt = (int (*)[30]) malloc(sizeof(*pt));
-  // FI: a correct memory allocation to support pt++
-  //pt = (int (*)[30]) malloc(10*sizeof(*pt));
 
   printf("%p\n", pt);
 
-  pt++;
+  // pt++; Let's avoid this bug to preserve the remainder of the test case
 
   printf("%p\n", pt);
 

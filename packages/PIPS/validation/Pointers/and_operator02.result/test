@@ -1,47 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: i j k l
-   int i = 0, j = 1, k = 2, l = 3;
-   _Bool b;
-   int *p, *q, *r, *s, *t;
-//             <    is written>: p
-   p = &k;
-//             <    is written>: r
-   r = &i;
-//             <    is written>: q
-   q = &j;
-//             <    is written>: s
-   s = &l;
-//             <    is read   >: q s
-//             <    is written>: b p r
-   /* printf("address of p=%p\n ",p); */
-   /*   printf("address of r=%p\n",r); */
-   /*   printf("address of q=%p\n",q); */
-   /*   printf("address of s=%p\n",s); */
-   
-   b = (p = q)&&(r = s);
-//             <    is read   >: q s
-//             <    is written>: p r
-   if ((p = q)&&(r = s))
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: p
-      *p++;
-   else
-//             <    is read   >: q s
-//             <    is written>: p r
-      /*  printf("address of p=%p\n",p); */
-      /*   printf("address of r=%p\n",r); */
-      if ((p = q)||(r = s))
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: r
-         *r++;
-
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -55,7 +12,7 @@ int main()
 
 // Points To: none
 
-   int i = 0, j = 1, k = 2, l = 3;
+   int i[10], j[20], k[30], l[40];
 
 // Points To: none
 
@@ -72,40 +29,40 @@ int main()
 // s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   p = &k;
+   p = &k[0];
 
 // Points To:
-// p -> k , EXACT
+// p -> k[0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   r = &i;
+   r = &i[0];
 
 // Points To:
-// p -> k , EXACT
+// p -> k[0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> i , EXACT
+// r -> i[0] , EXACT
 // s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   q = &j;
+   q = &j[0];
 
 // Points To:
-// p -> k , EXACT
-// q -> j , EXACT
-// r -> i , EXACT
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
 // s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   s = &l;
+   s = &l[0];
 
 // Points To:
-// p -> k , EXACT
-// q -> j , EXACT
-// r -> i , EXACT
-// s -> l , EXACT
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    /* printf("address of p=%p\n ",p); */
@@ -116,51 +73,39 @@ int main()
    b = (p = q)&&(r = s);
 
 // Points To:
-// p -> j , EXACT
-// q -> j , EXACT
-// r -> l , EXACT
-// s -> l , EXACT
+// p -> j[0] , EXACT
+// q -> j[0] , EXACT
+// r -> l[0] , EXACT
+// s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    if ((p = q)&&(r = s))
 
 // Points To:
-// p -> j , EXACT
-// q -> j , EXACT
-// r -> l , EXACT
-// s -> l , EXACT
+// p -> j[0] , EXACT
+// q -> j[0] , EXACT
+// r -> l[0] , EXACT
+// s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       *p++;
    else
 
-// Points To:
-// p -> j , EXACT
-// q -> j , EXACT
-// r -> l , EXACT
-// s -> l , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
       /*  printf("address of p=%p\n",p); */
       /*   printf("address of r=%p\n",r); */
       if ((p = q)||(r = s))
 
-// Points To:
-// p -> j , EXACT
-// q -> j , EXACT
-// r -> l , EXACT
-// s -> l , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
          *r++;
 
 // Points To:
-// p -> j[1] , MAY
-// p -> j , MAY
-// q -> j , EXACT
-// r -> l[1] , MAY
-// r -> l , MAY
-// s -> l , EXACT
+// p -> j[1] , EXACT
+// q -> j[0] , EXACT
+// r -> l[0] , EXACT
+// s -> l[0] , EXACT
 // t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 

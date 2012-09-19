@@ -1,0 +1,79 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _ps_1[0].pp1 -> *NULL_POINTER* , MAY
+// _ps_1[0].pp2 -> *NULL_POINTER* , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// ps -> *NULL_POINTER* , MAY
+// ps -> _ps_1[0] , MAY
+
+
+// Points To OUT:
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _ps_1_2__1[0][0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void foo(struct s *ps)
+{
+
+// Points To: none
+
+   int i, j;
+
+// Points To:
+// _ps_1[0].pp1 -> *NULL_POINTER* , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// ps -> *NULL_POINTER* , MAY
+// ps -> _ps_1[0] , MAY
+
+   *(*ps).pp1 = &i;
+
+// Points To:
+// _ps_1[0].pp2 -> *NULL_POINTER* , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> i , EXACT
+// ps -> _ps_1[0] , EXACT
+
+   *(*ps).pp2 = &j;
+
+// Points To:
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> i , EXACT
+// _ps_1_2__1[0][0] -> j , EXACT
+// ps -> _ps_1[0] , EXACT
+
+   **(*ps).pp1 = 1;
+
+// Points To:
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> i , EXACT
+// _ps_1_2__1[0][0] -> j , EXACT
+// ps -> _ps_1[0] , EXACT
+
+   **(*ps).pp2 = 2;
+
+// Points To:
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> i , EXACT
+// _ps_1_2__1[0][0] -> j , EXACT
+// ps -> _ps_1[0] , EXACT
+
+   **(*ps).pp1 = 3;
+
+// Points To:
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
+// _ps_1_1__1[0][0] -> i , EXACT
+// _ps_1_2__1[0][0] -> j , EXACT
+// ps -> _ps_1[0] , EXACT
+
+   return;
+}

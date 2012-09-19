@@ -31,8 +31,7 @@ int main(int argc, char **argv)
 // Points To:
 // _argv_2[0] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
+// argv -> _argv_2[0] , EXACT
 // s0 -> *NULL_POINTER* , MAY
 // s0 -> _argv_2_2[0][0] , MAY
 
@@ -41,7 +40,6 @@ int main(int argc, char **argv)
 // Points To:
 // _argv_2[0] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
-// argv -> *NULL_POINTER* , MAY
 // argv -> _argv_2[*] , MAY
 // argv -> _argv_2[0] , MAY
 // argv -> _argv_2[1] , MAY
@@ -69,7 +67,6 @@ int main(int argc, char **argv)
 // Points To:
 // _argv_2[0] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
-// argv -> *NULL_POINTER* , MAY
 // argv -> _argv_2[*] , MAY
 // argv -> _argv_2[0] , MAY
 // argv -> _argv_2[1] , MAY

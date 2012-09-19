@@ -1,0 +1,113 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i[10], j[20], k[30], l[40];
+
+// Points To: none
+
+   _Bool b;
+
+// Points To: none
+
+   int *p, *q, *r, *s, *t;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &k[0];
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   r = &i[0];
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> i[0] , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q = &j[0];
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   s = &l[0];
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   /* printf("address of p=%p\n ",p); */
+   /*   printf("address of r=%p\n",r); */
+   /*   printf("address of q=%p\n",q); */
+   /*   printf("address of s=%p\n",s); */
+   
+   b = p==q&&r==s;
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (p==q&&r==s)
+
+// Points To: unreachable
+
+      *p++;
+   else
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      /*  printf("address of p=%p\n",p); */
+      /*   printf("address of r=%p\n",r); */
+      if (p==q||r==s)
+
+// Points To: unreachable
+
+         *r++;
+
+// Points To:
+// p -> k[0] , EXACT
+// q -> j[0] , EXACT
+// r -> i[0] , EXACT
+// s -> l[0] , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   return 0;
+}

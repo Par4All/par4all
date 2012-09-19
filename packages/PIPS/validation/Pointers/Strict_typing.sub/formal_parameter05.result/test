@@ -73,8 +73,7 @@ int formal_parameter05(my_struct *p)
 // Points To:
 // _p_1.two -> *NULL_POINTER* , MAY
 // _p_1.two -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 // s1.two -> *NULL_POINTER* , MAY
 // s1.two -> _p_1_2__1 , MAY
 
@@ -83,8 +82,7 @@ int formal_parameter05(my_struct *p)
 // Points To:
 // _p_1.two -> *NULL_POINTER* , MAY
 // _p_1.two -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 // s1.two -> *NULL_POINTER* , MAY
 // s1.two -> _p_1_2__1 , MAY
 // s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -94,8 +92,7 @@ int formal_parameter05(my_struct *p)
 // Points To:
 // _p_1.two -> *NULL_POINTER* , MAY
 // _p_1.two -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 // s1.two -> *NULL_POINTER* , MAY
 // s1.two -> _p_1_2__1 , MAY
 // s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -106,8 +103,7 @@ int formal_parameter05(my_struct *p)
 // Points To:
 // _p_1.two -> *NULL_POINTER* , MAY
 // _p_1.two -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1 , MAY
+// p -> _p_1 , EXACT
 // s1.two -> *NULL_POINTER* , MAY
 // s1.two -> _p_1_2__1 , MAY
 // s2.two -> *NULL_POINTER* , MAY

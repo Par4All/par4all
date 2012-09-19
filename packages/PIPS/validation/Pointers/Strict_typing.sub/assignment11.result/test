@@ -13,12 +13,18 @@ int assignment11()
 // Points To: none
 
    struct {
-      int a[10][10];
+      int a[10][20];
    } s;
 
 // Points To: none
 
    int *q = (s.a)[5];
+
+// Points To:
+// q -> s.a[5][0] , EXACT
+
+
+   foo((s.a)[5]);
 
 // Points To:
 // q -> s.a[5][0] , EXACT

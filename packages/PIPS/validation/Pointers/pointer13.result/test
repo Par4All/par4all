@@ -117,4 +117,4 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
       w[i] = c[i]+a[i]*b[i];
 }
 INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer13] (reference_condition_to_points_to) Dead code detected.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer13] (points_to_block_projection) Memory leak for bucket "*ANY_MODULE*:*HEAP**ANYWHERE*".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer13] (points_to_set_block_projection) Memory leak for bucket "*ANY_MODULE*:*HEAP**ANYWHERE*".
