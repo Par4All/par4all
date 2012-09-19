@@ -219,8 +219,8 @@ reference expression_to_reference(expression e)
     message_assert("reference", syntax_reference_p(s));
     return syntax_reference(s);
 }
-
-/* Add a zero subscript to a reference "r" by side effect.
+
+/* Add a set of zero subscripts to a reference "r" by side effect.
  *
  * Used when array names are used to convert to the first array element
  */
@@ -252,7 +252,7 @@ void reference_add_unbounded_subscripts(reference r, type t)
 {
   generic_reference_add_fixed_subscripts(r, t, false);
 }
-
+
 /* Build an expression that call a function or procedure.
 
    @param c is the call

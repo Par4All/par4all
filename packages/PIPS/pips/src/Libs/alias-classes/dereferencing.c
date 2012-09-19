@@ -107,6 +107,8 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
     }
     case is_syntax_call: {
       // FI: you do not want to apply side-effects twice...
+      // But you then miss the detection of pointers that are not NULL
+      // because they are dereferenced
       //call c = syntax_call(s);
       //list al = call_arguments(c);
       //in = expressions_to_points_to(al, in);
@@ -283,6 +285,7 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
      be found as in *(p+2) in which case an evaluation occurs in
      expression_to_points_to_sources(). */
   list cl = expression_to_points_to_sources(a, in);
+  remove_impossible_arcs_to_null(&cl, in);
   // The pointer may not be found: *(p+i)
   // list cl = expression_to_points_to_sinks(a, in);
   bool evaluated_p = !expression_to_points_to_cell_p(a);
@@ -298,9 +301,13 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
       /* Do we want to dereference c? */
       if( (null_dereferencing_p || !null_cell_p(c))
 	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+	list o_pointed = source_to_sinks(c, in, true);
+	remove_impossible_arcs_to_null(&o_pointed, in);
 	/* Do not create sharing between elements of "in" and elements of
 	   "sinks". */
-	list pointed = source_to_sinks(c, in, true);
+	// list pointed = source_to_sinks(c, in, true);
+	list pointed = gen_full_copy_list(o_pointed);
+	gen_free_list(o_pointed);
 	if(ENDP(pointed)) {
 	  reference r = cell_any_reference(c);
 	  entity v = reference_variable(r);

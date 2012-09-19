@@ -466,11 +466,17 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
+#if 0
 	basic pb = variable_basic(type_variable(pt));
 	variable etv = type_variable(t2);
 	basic eb = variable_basic(etv);
 	int d = (int) gen_length(variable_dimensions(etv));
 	equal_p = (d==1 && basic_equal_p(pb, eb));
+#endif
+	// Generalization
+	type st = array_type_to_sub_array_type(t2);
+	equal_p = array_pointer_type_equal_p(pt, st);
+	free_type(st);
       }
     }
     else if(pointer_type_p(t2) && array_type_p(t1)) {
@@ -481,11 +487,17 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
+#if 0
 	basic pb = variable_basic(type_variable(pt));
 	variable etv = type_variable(t1);
 	basic eb = variable_basic(etv);
 	int d = (int) gen_length(variable_dimensions(etv));
 	equal_p = (d==1 && basic_equal_p(pb, eb));
+#endif
+	// Generalization
+	type st = array_type_to_sub_array_type(t1);
+	equal_p = array_pointer_type_equal_p(pt, st);
+	free_type(st);
       }
     }
     else if(array_type_p(t1) && array_type_p(t2)) {
@@ -2056,10 +2068,19 @@ type intrinsic_call_to_type(call c)
 
 	    if (! minus_c_pointer_arithmetic )
 	      {
-		/* current type of expression is type of first argument */
+		/* current type of expression is type of first
+		   argument, except if it is an array, e.g. "fifi+3"
+		   after declaration "int fifi[3];" */
 		type ct = expression_to_type(EXPRESSION(CAR(args)));
 
-		MAP(EXPRESSION, arg, {
+		if(array_type_p(ct)) {
+		  type sct = array_type_to_sub_array_type(ct);
+		  type nct = type_to_pointer_type(sct);
+		  free_type(ct);
+		  ct = nct;
+		}
+
+		FOREACH(EXPRESSION, arg, CDR(args)) {
 		    type nt = expression_to_type(arg);
 		    basic nb = variable_basic(type_variable(nt));
 		    list  nd = variable_dimensions(type_variable(nt));
@@ -2091,7 +2112,7 @@ type intrinsic_call_to_type(call c)
 		      }
 
 
-		  }, CDR(args));
+		  }
 		t = ct;
 	      }
 	  }
@@ -2269,8 +2290,9 @@ type reference_to_type(reference ref)
 
 
 /**
-  For an array declared as int a[10][20], the type returned for a[i] is
-  int [20].
+  For an array declared as int a[10][20], the type returned for a[i]
+  is int [20]. gcc claims it is int (*)[10], that is a pointer to an
+  array of 10 elements.
 
    @param exp is an expression
    @return a new allocated type which is the ntype of the expression in which
@@ -4823,6 +4845,7 @@ bool overloaded_parameters_p(list lparams)
   return overloaded_p;
 }
 
+/* allocate a new type "pt" which includes directly "t". */
 type type_to_pointer_type(type t)
 {
   type pt = make_type_variable(make_variable(make_basic_pointer(t), NIL, NIL));
@@ -5225,6 +5248,27 @@ type array_type_to_element_type(type t)
     //list dl = variable_dimensions(v);
     basic b = variable_basic(v);
     et = make_type_variable(make_variable(copy_basic(b), NIL, NIL));
+  }
+  else
+    pips_internal_error("Ill. arg.\n");
+  return et; 
+}
+/* Allocate a new type, the sub-array type of "t". It "t" is
+ * "int[10][20][30]", the sub-array type is "int[20][30]".
+ *
+ * No sharing is created between argument "t" and result "et"
+ */
+type array_type_to_sub_array_type(type t)
+{
+  type et = type_undefined;
+  if(array_type_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+    basic b = variable_basic(v);
+    POP(dl);
+    et = make_type_variable(make_variable(copy_basic(b),
+					  gen_full_copy_list(dl),
+					  NIL));
   }
   else
     pips_internal_error("Ill. arg.\n");

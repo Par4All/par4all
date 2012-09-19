@@ -319,37 +319,36 @@ typedef struct {
 } guesser_param;
 
 /** 
- * try hard to guess wether the call @param c writes @param p
- * Note that it is just aguess and may be wwrong
- * this function only exist because effects are not available in the controlizer
- * moreover, no aliasing information is available, so the guess **may** be wrong
+ * Try hard to guess wether the call @param c writes @param p
+ * Note that it is just a guess and may be wwrong
+ *
+ * This function only exists because effects are not available in the
+ * controlizer moreover, no aliasing information is available, so the
+ * guess **may** be wrong
  */
 static bool guess_write_effect_on_entity_walker(call c, guesser_param *p)
 {
-    entity op = call_function(c);
-    list args = call_arguments(c);
-    if( ENTITY_ASSIGN_P(op) ||
-            ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
-            ENTITY_BITWISE_AND_UPDATE_P(op)||ENTITY_BITWISE_OR_UPDATE_P(op)||ENTITY_BITWISE_XOR_UPDATE_P(op)||
-            ENTITY_DIVIDE_UPDATE_P(op)||ENTITY_MULTIPLY_UPDATE_P(op)||
-            ENTITY_MODULO_UPDATE_P(op)||
-            ENTITY_LEFT_SHIFT_UPDATE_P(op)||ENTITY_RIGHT_SHIFT_UPDATE_P(op)||
-            ENTITY_ADDRESS_OF_P(op)||
-            ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
-            ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)
-      )
-
-    {
-        expression lhs = EXPRESSION(CAR(args));
-        if(expression_reference_p(lhs) &&
-                same_entity_p(p->target,reference_variable(expression_reference(lhs))))
-        {
-            p->written=true;
-            gen_recurse_stop(0);
-        }
-
-    }
-    return true;
+  entity op = call_function(c);
+  list args = call_arguments(c);
+  if( ENTITY_ASSIGN_P(op) ||
+      ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
+      ENTITY_BITWISE_AND_UPDATE_P(op)||ENTITY_BITWISE_OR_UPDATE_P(op)||ENTITY_BITWISE_XOR_UPDATE_P(op)||
+      ENTITY_DIVIDE_UPDATE_P(op)||ENTITY_MULTIPLY_UPDATE_P(op)||
+      ENTITY_MODULO_UPDATE_P(op)||
+      ENTITY_LEFT_SHIFT_UPDATE_P(op)||ENTITY_RIGHT_SHIFT_UPDATE_P(op)||
+      ENTITY_ADDRESS_OF_P(op)|| // FI: pretty pessimistic; see Rice/malloc02.c
+      ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
+      ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)
+      ) {
+    expression lhs = EXPRESSION(CAR(args));
+    if(expression_reference_p(lhs) &&
+       same_entity_p(p->target,reference_variable(expression_reference(lhs))))
+      {
+	p->written=true;
+	gen_recurse_stop(0);
+      }
+  }
+  return true;
 }
 
 /** 

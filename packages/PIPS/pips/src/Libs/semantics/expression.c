@@ -3285,15 +3285,19 @@ transformer transformer_add_any_relation_information(
 		 entity_name(op));
       break;
     case is_basic_bit:
-      pips_user_warning("bit type not analyzed for operator %s\n",
-			entity_name(op));
+      // Do not emit the same message during the second analysis of
+      // the condition
+      if(veracity)
+	pips_user_warning("bit type not analyzed for operator %s\n",
+			  entity_name(op));
       break;
     case is_basic_pointer:
-      pips_user_warning("pointer type not analyzed for operator %s\n",
-			entity_name(op));
+      if(veracity)
+	pips_user_warning("pointer type not analyzed for operator %s\n",
+			  entity_name(op));
       break;
     case is_basic_derived:
-      /* Nothing to be done wit hsturct and union */
+      /* Nothing to be done with struct and union */
       break;
     case is_basic_typedef:
       pips_internal_error("typedef should ne converted to concrete types for operator %s",

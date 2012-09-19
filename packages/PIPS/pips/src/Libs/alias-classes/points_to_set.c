@@ -189,9 +189,11 @@ string points_to_cell_name(cell source)
  *
  * Side-effects on argument "pts".
  */
-set points_to_block_projection(set pts, list  l, bool main_p)
+set points_to_set_block_projection(set pts, list  l, bool main_p)
 {
   list pls = NIL; // Possibly lost sinks
+  list new_l = NIL; // new arcs to add
+  list old_l = NIL; // old arcs to remove
   FOREACH(ENTITY, e, l) {
     type uet = entity_basic_concrete_type(e);
     // The use of "sink_p" is only an optimization
@@ -237,13 +239,21 @@ set points_to_block_projection(set pts, list  l, bool main_p)
 					 make_typed_nowhere_cell(n_sink_t),
 					 copy_approximation(a),
 					 make_descriptor_none());
-	  // Although we are looping on pts...
-	  add_arc_to_simple_pt_map(npt, pts);
-	  remove_arc_from_simple_pt_map(pt, pts);
+	  // Since we are looping on pts... no side-effects on pts
+	  new_l = CONS(POINTS_TO, npt, new_l);
+	  old_l = CONS(POINTS_TO, pt, old_l);
 	}
       }
     }
   }
+
+  FOREACH(POINTS_TO, npt, new_l)
+    add_arc_to_simple_pt_map(npt, pts);
+  gen_free_list(new_l);
+  FOREACH(POINTS_TO, pt, old_l)
+    remove_arc_from_simple_pt_map(pt, pts);
+  gen_free_list(old_l);
+
   if(!main_p) {
     /* Any memory leak? */
     FOREACH(CELL, c, pls) {
@@ -358,7 +368,7 @@ bool cell_out_of_scope_p(cell c)
 }
 
 /* print a points-to arc for debug */
-void print_points_to(const points_to pt)
+void print_or_dump_points_to(const points_to pt, bool print_p)
 {
   if(points_to_undefined_p(pt))
     (void) fprintf(stderr,"POINTS_TO UNDEFINED\n");
@@ -376,12 +386,26 @@ void print_points_to(const points_to pt)
     print_reference(r1);
     fprintf(stderr,"->");
     print_reference(r2);
-    fprintf(stderr," (%s)\n", approximation_to_string(app));
+    fprintf(stderr," (%s)", approximation_to_string(app));
+    if(!print_p) {
+      fprintf(stderr," [%p, %p]", points_to_source(pt), points_to_sink(pt));
+    }
+    fprintf(stderr,"\n");
   }
 }
 
+void print_points_to(const points_to pt)
+{
+  print_or_dump_points_to(pt, true);
+}
+
+void dump_points_to(const points_to pt)
+{
+  print_or_dump_points_to(pt, false);
+}
+
 /* Print a set of points-to for debug */
-void print_points_to_set(string what,  set s)
+void print_or_dump_points_to_set(string what,  set s, bool print_p)
 {
   fprintf(stderr,"points-to set %s:\n", what);
   if(set_undefined_p(s))
@@ -390,9 +414,25 @@ void print_points_to_set(string what,  set s)
     fprintf(stderr, "uninitialized set\n");
   else if(set_size(s)==0)
     fprintf(stderr, "empty set\n");
-  else
-    SET_MAP(elt, print_points_to((points_to) elt), s);
+  else {
+    if(print_p) {
+      SET_MAP(elt, print_points_to((points_to) elt), s);
+    }
+    else {
+      SET_MAP(elt, dump_points_to((points_to) elt), s);
+    }
+  }
   fprintf(stderr, "\n");
+}
+
+void print_points_to_set(string what,  set s)
+{
+  print_or_dump_points_to_set(what, s, true);
+}
+
+void dump_points_to_set(string what,  set s)
+{
+  print_or_dump_points_to_set(what, s, false);
 }
 
 /* test if a cell appear as a source in a set of points-to */
@@ -871,31 +911,31 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
   return sources;
 }
 
-list stub_source_to_sinks(cell source, pt_map pts)
+list stub_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   list sinks = NIL;
   reference r = cell_any_reference(source);
   list sl = reference_indices(r);
   if(ENDP(sl))
-    sinks = scalar_stub_source_to_sinks(source, pts);
+    sinks = scalar_stub_source_to_sinks(source, pts, fresh_p);
   else
-    sinks = array_stub_source_to_sinks(source, pts);
+    sinks = array_stub_source_to_sinks(source, pts, fresh_p);
   return sinks;
 }
 
-list scalar_stub_source_to_sinks(cell source, pt_map pts)
+list scalar_stub_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
-  list sinks = generic_stub_source_to_sinks(source, pts, false);
+  list sinks = generic_stub_source_to_sinks(source, pts, false, fresh_p);
   return sinks;
 }
 
-list array_stub_source_to_sinks(cell source, pt_map pts)
+list array_stub_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
-  list sinks = generic_stub_source_to_sinks(source, pts, true);
+  list sinks = generic_stub_source_to_sinks(source, pts, true, fresh_p);
   return sinks;
 }
 
-list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
+list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p, bool fresh_p)
 {
   list sinks = NIL;
   bool null_initialization_p =
@@ -909,7 +949,7 @@ list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
     points_to pt = create_k_limited_stub_points_to(source, nst, array_p, pts);
     pts = add_arc_to_pt_map(pt, pts);
     add_arc_to_points_to_context(copy_points_to(pt));
-    sinks = source_to_sinks(source, pts, false);
+    sinks = source_to_sinks(source, pts, fresh_p);
     if(null_initialization_p) {
       // FI: I'm lost here... both with the meaning of null
       // initialization_p and with the insertion of a
@@ -934,7 +974,7 @@ list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
       points_to pt = create_k_limited_stub_points_to(source, uft, array_p, pts);
       pts = add_arc_to_pt_map(pt, pts);
       add_arc_to_points_to_context(copy_points_to(pt));
-      sinks = source_to_sinks(source, pts, false);
+      sinks = source_to_sinks(source, pts, fresh_p);
     }
   }
   else if(array_type_p(rt)) {
@@ -950,7 +990,7 @@ list generic_stub_source_to_sinks(cell source, pt_map pts, bool array_p)
       add_arc_to_points_to_context(copy_points_to(pt));
       // sinks = source_to_sinks(source, pts, false); should be ns instead of source
       points_to_cell_add_zero_subscripts(source);
-      sinks = source_to_sinks(source, pts, false);
+      sinks = source_to_sinks(source, pts, fresh_p);
       //sinks = source_to_sinks(ns, pts, false);
       //sinks = CONS(CELL, copy_cell(points_to_sink(pt)), NIL);
       // FI: this is usually dealt with at the source_to_sinks() level...
@@ -1075,7 +1115,7 @@ list null_source_to_sinks(cell source, pt_map pts)
  *
  * Test cases: argv03.c
  */
-list formal_source_to_sinks(cell source, pt_map pts)
+list formal_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   list sinks = NIL;
 
@@ -1109,7 +1149,7 @@ list formal_source_to_sinks(cell source, pt_map pts)
   }
   pts = add_arc_to_pt_map(pt, pts);
   add_arc_to_points_to_context(copy_points_to(pt));
-  sinks = source_to_sinks(source, pts, false);
+  sinks = source_to_sinks(source, pts, fresh_p);
   if(null_initialization_p){
     list ls = null_to_sinks(source, pts);
     sinks = gen_nconc(ls, sinks);
@@ -1118,7 +1158,7 @@ list formal_source_to_sinks(cell source, pt_map pts)
   return sinks;
 }
 
-list global_source_to_sinks(cell source, pt_map pts)
+list global_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   bool null_initialization_p =
     get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION");
@@ -1174,7 +1214,7 @@ list global_source_to_sinks(cell source, pt_map pts)
     }
     pts = add_arc_to_pt_map(pt, pts);
     add_arc_to_points_to_context(copy_points_to(pt));
-    sinks = source_to_sinks(source, pts, false);
+    sinks = source_to_sinks(source, pts, fresh_p);
     if(null_initialization_p){
       list ls = null_to_sinks(source, pts);
       sinks = gen_nconc(ls, sinks);
@@ -1272,6 +1312,23 @@ list points_to_sink_to_sources(cell sink, pt_map ptm, bool fresh_p)
   }
 
   return sources;
+}
+
+/* Return the points-to "fpt" ending in cell "sink" if it
+   exists. Return points-to_undefined otherwise. */
+points_to points_to_sink_to_points_to(cell sink, pt_map ptm)
+{
+  points_to fpt = points_to_undefined;;
+  set pts = points_to_graph_set(ptm);
+
+  /* 1. See if cell "sink" is the destination vertex of a points-to arc. */
+  SET_FOREACH( points_to, pt, pts) {
+    if(cell_equal_p(sink, points_to_sink(pt))) {
+      fpt = pt;
+      break;
+    }
+  }
+  return fpt;
 }
 
 /* Use "sn" as a source name to derive a list of sink cells according
@@ -1395,7 +1452,9 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
   bool to_be_freed;
   type source_t = points_to_cell_to_type(source, & to_be_freed);
   type c_source_t = compute_basic_concrete_type(source_t);
-  bool ok_p = C_pointer_type_p(c_source_t) || null_cell_p(source);
+  bool ok_p = C_pointer_type_p(c_source_t)
+    || overloaded_type_p(c_source_t) // might be a pointer
+    || null_cell_p(source);
   if(to_be_freed) free_type(source_t);
 
   /* Can we expect a sink? */
@@ -1444,13 +1503,13 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
       reference r = cell_any_reference(source);
       entity v = reference_variable(r);
       if(formal_parameter_p(v)) {
-	sinks = formal_source_to_sinks(source, pts);
+	sinks = formal_source_to_sinks(source, pts, fresh_p);
       }
       else if(top_level_entity_p(v) || static_global_variable_p(v)) {
-	sinks = global_source_to_sinks(source, pts);
+	sinks = global_source_to_sinks(source, pts, fresh_p);
       }
       else if(entity_stub_sink_p(v)) {
-	sinks = stub_source_to_sinks(source, pts);
+	sinks = stub_source_to_sinks(source, pts, fresh_p);
       }
       else if(entity_typed_anywhere_locations_p(v)) {
 	pips_internal_error("This case should have been handled above.\n");
@@ -1839,10 +1898,12 @@ bool consistent_points_to_set(set s)
 {
   bool consistent_p = true;
 
+  /* Check the consistency of each arc */
   SET_FOREACH(points_to, a, s) {
     consistent_p = consistent_p && points_to_consistent_p(a);
   }
 
+  /* Check the validity of the approximations */
   SET_FOREACH(points_to, pt1, s) {
     approximation a1 = points_to_approximation(pt1);
     SET_FOREACH(points_to, pt2, s) {
@@ -1901,9 +1962,88 @@ bool consistent_points_to_set(set s)
     }
   }
 
+  /* Check that no sharing exists between arcs at the cell and
+     reference levels */
+  if(consistent_p) {
+    consistent_p = !points_to_set_sharing_p(s);
+    if(!consistent_p)
+      fprintf(stderr, "Sharing detected\n");
+  }
   return consistent_p;
 }
 
+bool points_to_set_sharing_p(set s)
+{
+  bool sharing_p = false;
+
+  SET_FOREACH(points_to, pt1, s) {
+    cell source_1 = points_to_source(pt1);
+    cell sink_1 = points_to_sink(pt1);
+    reference source_r1 = cell_any_reference(source_1);
+    reference sink_r1 = cell_any_reference(sink_1);
+
+    bool found_p = false;
+    SET_FOREACH(points_to, pt2, s) {
+      if(pt1==pt2) 
+	found_p = true;
+      if(found_p && pt1!=pt2) {
+	cell source_2 = points_to_source(pt2);
+	cell sink_2 = points_to_sink(pt2);
+	reference source_r2 = cell_any_reference(source_2);
+	reference sink_r2 = cell_any_reference(sink_2);
+
+	bool new_sharing_p = false;
+
+	/* Sharing of cells */
+	if(source_1==source_2) {
+	  new_sharing_p = true;
+	  fprintf(stderr, "Sharing between source_1 and source_2.\n");
+	}
+	else if(source_1==sink_2) {
+	  new_sharing_p = true;
+	  fprintf(stderr, "Sharing between source_1 and sink_2.\n");
+	}
+	else if(sink_1==source_2) {
+	  new_sharing_p = true;
+	  fprintf(stderr, "Sharing between sink_1 and source_2.\n");
+	}
+	else if(sink_1==sink_2) {
+	  new_sharing_p = true;
+	  fprintf(stderr, "Sharing between sink_1 and sink_2.\n");
+	}
+
+	if(!new_sharing_p) {
+	  /* Sharing of references */
+	  if(source_r1==source_r2) {
+	    new_sharing_p = true;
+	    fprintf(stderr, "Sharing between source_r1 and source_r2.\n");
+	  }
+	  else if(source_r1==sink_r2) {
+	    new_sharing_p = true;
+	    fprintf(stderr, "Sharing between source_r1 and sink_r2.\n");
+	  }
+	  else if(sink_r1==source_r2) {
+	    new_sharing_p = true;
+	    fprintf(stderr, "Sharing between sink_r1 and source_r2.\n");
+	  }
+	  else if(sink_r1==sink_r2) {
+	    new_sharing_p = true;
+	    fprintf(stderr, "Sharing between sink_r1 and sinke_r2.\n");
+	  }
+	}
+	if(new_sharing_p) {
+	  fprintf(stderr, "For pt1 ");
+	  dump_points_to(pt1);
+	  fprintf(stderr, "\nand pt2 ");
+	  dump_points_to(pt2);
+	}
+	sharing_p = sharing_p || new_sharing_p;
+      }
+    }
+  }
+  return sharing_p;
+}
+
 /* because of points-to set implementation, you cannot change
  * approximations by side effects.
  */
@@ -2247,4 +2387,31 @@ bool consistent_points_to_graph_p(points_to_graph ptg)
     consistent_p = consistent_points_to_set(ptg_s);
   }
   return consistent_p;
+}
+
+/* You know that null and undefined cells in "*pL" are impossible
+ * because of the operation that is going to be performed on
+ * it. Remove the corresponding arcs in points-to graph "in". Remove
+ * the corresponding cells from "*pL".
+ *
+ * The search uses pointers. So "*pL" must contain sink cells of arcs of
+ * "in".
+ */
+void remove_impossible_arcs_to_null(list * pL, pt_map in)
+{
+  list fl = NIL;
+  bool nowhere_ok_p =
+    get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  FOREACH(CELL, pc, *pL) {
+    if(null_cell_p(pc) || (nowhere_cell_p(pc) && !nowhere_ok_p)) {
+      points_to pt = points_to_sink_to_points_to(pc, in);
+      if(points_to_undefined_p(pt))
+	pips_internal_error("NULL, returned as a source for an expression, "
+			    "does not appear in the points-to graph.\n");
+      remove_arc_from_pt_map(pt, in);
+      fl = CONS(CELL, pc, fl);
+    }
+  }
+  gen_list_and_not(pL, fl);
+  gen_free_list(fl);
 }

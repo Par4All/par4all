@@ -1802,6 +1802,10 @@ void freia_migrate_statements(sequence sq, const set stats, const set before)
     return;
   }
 
+  // nothing to do either
+  if (set_size(stats)==0)
+    return;
+
   // build before/in/end statement lists in reverse order
   list lbefore = NIL, lin = NIL, lend = NIL;
   FOREACH(statement, s, sequence_statements(sq))
