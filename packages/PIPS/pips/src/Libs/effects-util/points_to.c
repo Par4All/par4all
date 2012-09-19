@@ -492,3 +492,182 @@ reference points_to_cells_minimal_reference_upper_bound(entity m __attribute__ (
   reference r = reference_undefined;
   return r;
 }
+
+/* Is this a reference to an array or a reference to a pointer? This
+   is not linked to the type of the reference, as a reference may be a
+   pointer, such as "a[10]" when "a" is declared int "a[10][20]".*/
+bool points_to_array_reference_p(reference r)
+{
+  bool array_p = false;
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+
+  if(ENDP(sl)) {
+    type t = entity_basic_concrete_type(v);
+    array_p = array_type_p(t);
+  }
+  else {
+    /* Look for the last field among the subscript */
+    list rsl = gen_nreverse(sl);
+    type t = type_undefined;
+    int i = 0;
+    FOREACH(EXPRESSION, se, rsl) {
+      if(field_reference_expression_p(se)) {
+	entity f = reference_variable(expression_reference(se));
+	t = entity_basic_concrete_type(f);
+	break;
+      }
+      i++;
+    }
+    if(type_undefined_p(t)) {
+      t = entity_basic_concrete_type(v);
+      variable vt = type_variable(t);
+      list dl = variable_dimensions(vt);
+      int d = (int) gen_length(dl);
+      int i = (int) gen_length(rsl);
+      if(i<d)
+	array_p = true;
+    }
+    else {
+      if(i==0) { // FI: could be merged with the "else if" clause
+	array_p = array_type_p(t);
+      }
+      else if(array_type_p(t)) {
+	variable vt = type_variable(t);
+	list dl = variable_dimensions(vt);
+	int d = (int) gen_length(dl);
+	if(i<d)
+	  array_p = true;
+      }
+    }
+    reference_indices(r) = gen_nreverse(rsl);
+  }
+  return array_p;
+}
+
+/* If this is an array reference, what is the type of the underlying array type?
+ *
+ * This information cannot be obtained by direct type information
+ * because subarrays are typed as pointers to even smaller arrays.
+ *
+ * If it is not an array reference, the returned type is undefined.
+ *
+ * No new type is allocated.
+ */
+type points_to_array_reference_to_type(reference r)
+{
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+  type t = type_undefined;
+
+  if(ENDP(sl)) {
+    t = entity_basic_concrete_type(v);
+  }
+  else {
+    /* Look for the last field among the subscript */
+    list rsl = gen_nreverse(sl);
+    FOREACH(EXPRESSION, se, rsl) {
+      if(field_reference_expression_p(se)) {
+	entity f = reference_variable(expression_reference(se));
+	t = entity_basic_concrete_type(f);
+	break;
+      }
+    }
+    if(type_undefined_p(t)) {
+      t = entity_basic_concrete_type(v);
+    }
+    else {
+      ;
+    }
+    reference_indices(r) = gen_nreverse(rsl);
+  }
+  return t;
+}
+
+
+/* Add a set of zero subscripts to a reference "r" by side effect.
+ *
+ * Used when a partial array reference must be converted into a
+ * reference to the first array element (zero_p==true) or to any
+ * element (zero_p==false).
+ *
+ * The difficulty lies with field subscripts...
+ */
+void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p)
+{
+  type t = type_undefined;
+
+  // FI: this assert makes sense within the ri-util framework but is
+  // too strong for the kind of references used in effects-util
+  // pips_assert("scalar type", ENDP(reference_indices(r)));
+
+  /* Find the current number of effective subscripts: is there a field
+     subscript somewhere? */
+  list sl = reference_indices(r);
+  entity v = reference_variable(r);
+  list rsl = gen_nreverse(sl);
+  int i = 0;
+  bool field_found_p = false;
+
+  FOREACH(EXPRESSION, se, rsl) {
+    if(expression_field_p(se)) {
+      reference fr = expression_reference(se);
+      entity f = reference_variable(fr);
+      t = entity_basic_concrete_type(f); 
+      field_found_p = true;
+      break;
+    }
+    i++;
+  }
+
+  if(!field_found_p)
+    t = entity_basic_concrete_type(v);
+
+  variable vt = type_variable(t);
+  list dl = variable_dimensions(vt);
+  int d = (int) gen_length(dl);
+
+  pips_assert("Not Too many subscripts wrt the type.\n", i<=d);
+
+  list nsl = NIL; // subscript list
+  int j;
+  for(j=i+1;j<=d;j++) {
+    expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
+    // reference_indices(r) = CONS(EXPRESSION, s, reference_indices(r));
+    nsl = CONS(EXPRESSION, s, nsl);
+  }
+
+  reference_indices(r) = gen_nreverse(rsl);
+  reference_indices(r) = gen_nconc(reference_indices(r), nsl);
+}
+
+void complete_points_to_reference_with_zero_subscripts(reference r)
+{
+  complete_points_to_reference_with_fixed_subscripts(r, true);
+}
+
+bool cells_must_point_to_null_p(list cl)
+{
+  bool must_p = true;
+  pips_assert("The input list is not empty", !ENDP(cl));
+  FOREACH(CELL, c, cl) {
+    if(!null_cell_p(c)) {
+      must_p = false;
+      break;
+    }
+  }
+  return must_p;
+}
+
+bool cells_may_not_point_to_null_p(list cl)
+{
+  bool may_not_p = true;
+  pips_assert("The input list is not empty", !ENDP(cl));
+  FOREACH(CELL, c, cl) {
+    if(null_cell_p(c) || nowhere_cell_p(c)) {
+      may_not_p = false;
+      break;
+    }
+  }
+  return may_not_p;
+}

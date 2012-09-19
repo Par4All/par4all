@@ -1442,8 +1442,17 @@ reference simple_reference_add_field_dimension(reference r, entity f)
 void points_to_cell_add_fixed_subscripts(cell c, bool zero_p)
 {
   bool to_be_freed = false;
-  type t = points_to_cell_to_type(c, &to_be_freed);
+  type t = type_undefined;
   reference r = cell_any_reference(c);
+  if(points_to_array_reference_p(r)) {
+    //type at = points_to_array_reference_to_type(r);
+    //t = array_type_to_element_type(at);
+    t = points_to_array_reference_to_type(r);
+    // partial memory leak with "at"?
+  }
+  else
+    t = points_to_cell_to_type(c, &to_be_freed);
+
   if(zero_p)
     reference_add_zero_subscripts(r, t);
   else

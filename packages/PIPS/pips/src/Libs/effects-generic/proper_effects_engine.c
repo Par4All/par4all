@@ -1181,6 +1181,8 @@ static list generic_proper_effects_of_complex_address_call_expression(expression
 
 		  pips_user_warning("PIPS currently does not know how to precisely handle "
 				    "complex cast expressions\n");
+		  // FI->BC: this is pretty pessimistic when the C
+		  // standard claims that the pointed object is unchanged.
 		  *l_pme = effect_to_list(make_anywhere_effect
 					  (write_p ? make_action_write_memory() : make_action_read_memory()));
 		}

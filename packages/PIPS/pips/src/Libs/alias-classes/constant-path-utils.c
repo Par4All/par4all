@@ -1400,7 +1400,10 @@ set gen_may_constant_paths(cell l,
       SET_FOREACH(points_to, i, in_may){
 	if (/* locations_equal_p */equal_must_vreference(r, points_to_source(i)) /* &&  !entity_abstract_location_p(el) */ ){
 	  cell nl = copy_cell(l);
-	  pt = make_points_to(nl, points_to_sink(i), make_approximation_may(), make_descriptor_none());
+	  pt = make_points_to(nl,
+			      copy_cell(points_to_sink(i)),
+			      make_approximation_may(),
+			      make_descriptor_none());
 	}
 	if(array_entity_p(reference_variable(cell_any_reference(r)))){
 	  reference ref = cell_any_reference(r);
@@ -1437,7 +1440,7 @@ set gen_may_constant_paths(cell l,
       cell nl = copy_cell(l);
       /* Make sure the types are compatible... */
       points_to_cell_types_compatibility(nl, r);
-      pt = make_points_to(nl, r, a, make_descriptor_none());
+      pt = make_points_to(nl, copy_cell(r), a, make_descriptor_none());
       set_add_element(gen_may_cps, gen_may_cps, (void*)pt);
     }
   }
