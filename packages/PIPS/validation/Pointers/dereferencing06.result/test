@@ -3,23 +3,37 @@ PROPER  EFFECTS
 
 void dereferencing06()
 {
-//             <    is written>: x
-   double x = 1.;
+//             <may be written>: x[*]
+   double x[3] = {1., 2., 3.};
 //             <    is written>: p
-   double *p = &x;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: p
-   
-   /* This read has no effect unless p == 0 and the compiler does not optimize? */
-   *p++;
+   double *p = x;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x[2] __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%f\n", x[2]);
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-   *p++ = 1;
+   *p++ = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p++ = 1.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 2.;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x[2] __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%f\n", x[2]);
 }
 int main()
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    dereferencing06();
    return 0;
 }
@@ -37,23 +51,37 @@ void dereferencing06()
 
 // Points To: none
 
-   double x = 1.;
+   double x[3] = {1., 2., 3.};
 
 // Points To: none
 
-   double *p = &x;
+   double *p = x;
 
 // Points To:
-// p -> x , EXACT
+// p -> x[0] , EXACT
 
-   
-   /* This read has no effect unless p == 0 and the compiler does not optimize? */
-   *p++;
+
+   printf("%f\n", x[2]);
+
+// Points To:
+// p -> x[0] , EXACT
+
+   *p++ = 0.;
 
 // Points To:
 // p -> x[1] , EXACT
 
-   *p++ = 1;
+   *p++ = 1.;
+
+// Points To:
+// p -> x[2] , EXACT
+
+   *p = 2.;
+
+// Points To:
+// p -> x[2] , EXACT
+
+   printf("%f\n", x[2]);
 }
 
 // Points To IN: none

@@ -41,20 +41,20 @@ int main()
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// pi -> *HEAP*_l_6 , EXACT
+// pi -> *HEAP*_l_6 , MAY
 // qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 S:   qi = pi;
 
 // Points To:
-// pi -> *HEAP*_l_6 , EXACT
-// qi -> *HEAP*_l_6 , EXACT
+// pi -> *HEAP*_l_6 , MAY
+// qi -> *HEAP*_l_6 , MAY
 
    free(pi);
 
 // Points To:
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
 
    return 0;

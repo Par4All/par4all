@@ -99,11 +99,11 @@ int use_def_elim01()
 //             <    is written>: y
 //             <    is referenced>: x y
    y = x;                                                               /*0009*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: y
+//             <    is written>: i
 //             <    is referenced>: y
    *y = 1;                                                              /*0010*/
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i y
 //             <    is referenced>: y
 
    return *y;                                                           /*0012*/

@@ -1,14 +1,17 @@
-/* Check the handling of comma expression */
+/* Check the handling of comma expression
+ *
+ * And the side-effects in expressions and conditions...
+ */
 #include<stdio.h>
 int main ()
 {
-  int i = 0, j = 1, k = 2, l = 3;
+  int i[10], j[20], k[30], l[40];
   _Bool b;
   int * p, *q, * r, * s, *t;
-  p = &k;
-  r = &i;
-  q = &j;
-  s = &l;
+  p = &k[0];
+  r = &i[0];
+  q = &j[0];
+  s = &l[0];
   /* printf("address of p=%p\n ",p); */
 /*   printf("address of r=%p\n",r); */
 /*   printf("address of q=%p\n",q); */

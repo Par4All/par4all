@@ -1,0 +1,129 @@
+
+PROPER  EFFECTS 
+
+void foo(struct s *ps)
+{
+//             <    is written>: i j
+   int i = 1, j = 2;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   // S1
+   *(*ps).pp1 = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   // S2
+   *(*ps).pp2 = &j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   // S3
+   (*ps).pp1 = (*ps).pp2;
+   // S4
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _ps_1.pp1 -> _ps_1_1__1 , EXACT
+// _ps_1.pp2 -> _ps_1_2__1 , EXACT
+// ps -> _ps_1 , EXACT
+
+
+// Points To OUT:
+// _ps_1.pp1 -> _ps_1_2__1 , EXACT
+// _ps_1.pp2 -> _ps_1_2__1 , EXACT
+// _ps_1_1__1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _ps_1_2__1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void foo(struct s *ps)
+{
+
+// Points To: none
+
+   int i = 1, j = 2;
+
+// Points To:
+// _ps_1.pp1 -> _ps_1_1__1 , EXACT
+// ps -> _ps_1 , EXACT
+
+   // S1
+   *(*ps).pp1 = &i;
+
+// Points To:
+// _ps_1.pp1 -> _ps_1_1__1 , EXACT
+// _ps_1.pp2 -> _ps_1_2__1 , EXACT
+// _ps_1_1__1 -> i , EXACT
+// ps -> _ps_1 , EXACT
+
+   // S2
+   *(*ps).pp2 = &j;
+
+// Points To:
+// _ps_1.pp1 -> _ps_1_1__1 , EXACT
+// _ps_1.pp2 -> _ps_1_2__1 , EXACT
+// _ps_1_1__1 -> i , EXACT
+// _ps_1_2__1 -> j , EXACT
+// ps -> _ps_1 , EXACT
+
+   // S3
+   (*ps).pp1 = (*ps).pp2;
+
+// Points To:
+// _ps_1.pp1 -> _ps_1_2__1 , EXACT
+// _ps_1.pp2 -> _ps_1_2__1 , EXACT
+// _ps_1_1__1 -> i , EXACT
+// _ps_1_2__1 -> j , EXACT
+// ps -> _ps_1 , EXACT
+
+   // S4
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void foo(struct s *ps)
+{
+//             <    is written>: i j
+   int i = 1, j = 2;
+//             <    is read   >: _ps_1.pp1 ps
+//             <    is written>: _ps_1_1__1
+   // S1
+   *(*ps).pp1 = &i;
+//             <    is read   >: _ps_1.pp2 ps
+//             <    is written>: _ps_1_2__1
+   // S2
+   *(*ps).pp2 = &j;
+//             <    is read   >: _ps_1.pp2 ps
+//             <    is written>: _ps_1.pp1
+   // S3
+   (*ps).pp1 = (*ps).pp2;
+   // S4
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: _ps_1.pp1 _ps_1.pp2 ps
+//             <    is written>: _ps_1.pp1 _ps_1_1__1 _ps_1_2__1
+void foo(struct s *ps)
+{
+//             <    is written>: i j
+   int i = 1, j = 2;
+//             <    is read   >: _ps_1.pp1 ps
+//             <    is written>: _ps_1_1__1
+   // S1
+   *(*ps).pp1 = &i;
+//             <    is read   >: _ps_1.pp2 ps
+//             <    is written>: _ps_1_2__1
+   // S2
+   *(*ps).pp2 = &j;
+//             <    is read   >: _ps_1.pp2 ps
+//             <    is written>: _ps_1.pp1
+   // S3
+   (*ps).pp1 = (*ps).pp2;
+   // S4
+   return;
+}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_1__1" towards "i".
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_2__1" towards "j".

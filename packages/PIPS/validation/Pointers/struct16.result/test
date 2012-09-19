@@ -33,12 +33,9 @@ POINTS-TO
 // _x_1__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // _x_2__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // _x_3__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// x.first -> *NULL_POINTER* , MAY
-// x.second -> *NULL_POINTER* , MAY
-// x.third -> *NULL_POINTER* , MAY
-// x.first -> _x_1__0[0] , MAY
-// x.second -> _x_2__0[0] , MAY
-// x.third -> _x_3__0[0] , MAY
+// x.first -> _x_1__0[0] , EXACT
+// x.second -> _x_2__0[0] , EXACT
+// x.third -> _x_3__0[0] , EXACT
 
 int main()
 {
@@ -55,9 +52,8 @@ int main()
 
 // Points To:
 // _x_1__0[0] -> y[5] , EXACT
-// x.first -> *NULL_POINTER* , MAY
 // x.second -> *NULL_POINTER* , MAY
-// x.first -> _x_1__0[0] , MAY
+// x.first -> _x_1__0[0] , EXACT
 // x.second -> _x_2__0[0] , MAY
 
    *x.second = &y[6];
@@ -65,11 +61,9 @@ int main()
 // Points To:
 // _x_1__0[0] -> y[5] , EXACT
 // _x_2__0[0] -> y[6] , EXACT
-// x.first -> *NULL_POINTER* , MAY
-// x.second -> *NULL_POINTER* , MAY
 // x.third -> *NULL_POINTER* , MAY
-// x.first -> _x_1__0[0] , MAY
-// x.second -> _x_2__0[0] , MAY
+// x.first -> _x_1__0[0] , EXACT
+// x.second -> _x_2__0[0] , EXACT
 // x.third -> _x_3__0[0] , MAY
 
    *x.third = &y[7];
@@ -78,12 +72,9 @@ int main()
 // _x_1__0[0] -> y[5] , EXACT
 // _x_2__0[0] -> y[6] , EXACT
 // _x_3__0[0] -> y[7] , EXACT
-// x.first -> *NULL_POINTER* , MAY
-// x.second -> *NULL_POINTER* , MAY
-// x.third -> *NULL_POINTER* , MAY
-// x.first -> _x_1__0[0] , MAY
-// x.second -> _x_2__0[0] , MAY
-// x.third -> _x_3__0[0] , MAY
+// x.first -> _x_1__0[0] , EXACT
+// x.second -> _x_2__0[0] , EXACT
+// x.third -> _x_3__0[0] , EXACT
 
 
    return 0;

@@ -1,37 +1,12 @@
 
-PROPER  EFFECTS
-
-int foo()
-{
-//             <    is written>: i
-   int *p, i = 1;
-//             <    is written>: p
-   p = 1+&i;
-   return 0;
-}
-
 POINTS-TO
 
 
-// Points To IN: none
+Warnings
 
-
-// Points To OUT: none
-
-int foo()
-{
-
-// Points To: none
-
-   int *p, i = 1;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   p = 1+&i;
-
-// Points To:
-// p -> i[1] , EXACT
-
-   return 0;
-}
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (offset_points_to_cell) user error
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (offset_points_to_cell) Use of pointer arithmetic on "i" at line 7 is not standard-compliant.
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module foo.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

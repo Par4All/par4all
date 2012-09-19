@@ -2,8 +2,8 @@
 
 int foo()
 {
-  int *p, i=1;
-  p = &i;
+  int *p, i[10];
+  p = (int *) i;
   p++;
   p++;
   return 0;

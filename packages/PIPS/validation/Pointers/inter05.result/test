@@ -16,11 +16,9 @@ POINTS TO for inter05
 
 
 // Points To OUT:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
@@ -43,11 +41,9 @@ void bar(int ***ppp, int ***qqq)
    **ppp = **qqq;
 
 // Points To:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
@@ -96,8 +92,6 @@ void inter05()
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[bar] (list_assignment_to_points_to) Dereferencing of a null pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[bar] (list_assignment_to_points_to) Possible NULL pointer dereferencing.
 C_PARSER[inter05] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[inter05] (simplify_C_expression) Variable "j" is probably used before it is defined
 C_PARSER[inter05] (simplify_C_expression) Variable "k" is probably used before it is defined

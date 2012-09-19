@@ -3,7 +3,7 @@ delete $WS
 create $WS $WS.c
 
 # A user error occurs if the typing is strict...
-# setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE

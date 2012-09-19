@@ -3,18 +3,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create bc_inter04_intra-1 bc_inter04_intra-1.c
 
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
-
-activate PRINT_CODE_PROPER_EFFECTS
-
-
-echo
-echo Proper effects for "main"
-echo
-display PRINTED_FILE[main]
-
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo POINTS TO for "main"

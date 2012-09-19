@@ -16,11 +16,9 @@ POINTS TO for inter06
 
 
 // Points To OUT:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
@@ -43,11 +41,9 @@ void inter06(int ***ppp, int ***qqq)
    **ppp = **qqq;
 
 // Points To:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
@@ -56,5 +52,3 @@ void inter06(int ***ppp, int ***qqq)
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter06] (list_assignment_to_points_to) Dereferencing of a null pointer.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[inter06] (list_assignment_to_points_to) Possible NULL pointer dereferencing.

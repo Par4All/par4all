@@ -1,20 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: m n
-   int n = 4, m = 3;
-   int a[n][m];
-//             <    is written>: p
-   int (*p)[m] = a;
-//             <    is read   >: p
-//             <    is written>: p
-   p += 1;
-
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -46,6 +30,7 @@ int main()
 // Points To:
 // p -> a[1] , EXACT
 
-
+   
+   /* The correct answer before return is p->a[1] and not p->a[1][0] */
    return 0;
 }

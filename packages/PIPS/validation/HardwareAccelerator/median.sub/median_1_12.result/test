@@ -935,7 +935,7 @@ freia_status median_1_terapix_helper_0_0_0(
   int image_height = i0->heightWa;
   int max_computed_size = 337;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
@@ -1118,7 +1118,7 @@ freia_status median_1_terapix_helper_0_0_1(
   int image_height = i0->heightWa;
   int max_computed_size = 337;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
@@ -1303,7 +1303,7 @@ freia_status median_1_terapix_helper_0_0_2(
   int image_height = i0->heightWa;
   int max_computed_size = 200;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
@@ -1523,7 +1523,7 @@ freia_status median_1_terapix_helper_0_0_3(
   int image_height = i0->heightWa;
   int max_computed_size = 337;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
@@ -1706,7 +1706,7 @@ freia_status median_1_terapix_helper_0_0_4(
   int image_height = i0->heightWa;
   int max_computed_size = 337;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 341;
@@ -1890,7 +1890,7 @@ freia_status median_1_terapix_helper_0_0_5(
   int image_height = i0->heightWa;
   int max_computed_size = 200;
   int n_tiles = (image_height+max_computed_size-1)/max_computed_size;
-  int imagelet_size =
+  int imagelet_size = (n_tiles==1)? image_height:
         ((image_height+n_tiles-1)/n_tiles)+2*vertical_border;
   int imagelet_1 = 0;
   int imagelet_2 = 204;

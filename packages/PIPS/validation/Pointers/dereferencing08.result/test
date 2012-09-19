@@ -1,59 +1,4 @@
 
-PROPER  EFFECTS
-
-int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
-{
-//             <    is written>: zaza
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: riri[2]
-   /* proper effects are not precise here for loulou because 
-         of the internal representation of the expression */
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
-}
-int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
-{
-//             <    is written>: zaza
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: riri[2]
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+(3+(6-1-0+1)*(0+(size-1-0+1)*0)));
-}
-int main()
-{
-//             <may be written>: riri[*]
-   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//             <may be written>: fifi[*][*]
-   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
-//             <    is written>: size
-   int size = 2;
-   int loulou[1][size][6];
-   int i;
-   int j;
-//             <    is written>: k
-   int k = 16;
-//             <    is read   >: size
-//             <    is written>: i
-   for(i = 0; i <= size-1; i += 1)
-//             <    is read   >: size
-//             <    is written>: j
-      for(j = 0; j <= 5; j += 1)
-//             <    is read   >: i j k size
-//             <    is written>: k loulou[0][i][j]
-         loulou[0][i][j] = k++;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: riri[2] __IO_EFFECTS:LUNS[1]
-   printf("%d\n", duck1(riri, fifi, size, loulou));
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: riri[2] __IO_EFFECTS:LUNS[1]
-   printf("%d\n", duck2(riri, fifi, size, loulou));
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -64,16 +9,26 @@ POINTS-TO
 
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
+   // Here the array "fifi" is cast into an int *, and then an offset is computed
+   // zaza points towards fifi[0][3]
 
 // Points To: none
 
    int *zaza = (int *) fifi+(3-1-0+1)*1;
+   // zizi points to fifi[3][0]
 
 // Points To:
-// zaza -> fifi[3] , EXACT
+// zaza -> fifi[0][3] , EXACT
 
+   int *zizi = (fifi+(3-1-0+1)*1)[0];
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zizi -> fifi[3][0] , EXACT
+
+   //foo(fifi+(3-1-0+1)*1);
    /* proper effects are not precise here for loulou because 
-         of the internal representation of the expression */
+        of the internal representation of the expression */
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
@@ -90,7 +45,7 @@ int duck2(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
 // Points To:
-// zaza -> fifi[3] , EXACT
+// zaza -> fifi[0][3] , EXACT
 
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+(3+(6-1-0+1)*(0+(size-1-0+1)*0)));
 }
