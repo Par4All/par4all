@@ -81,17 +81,9 @@ parallelized by trusting the type of the pointer
 "toto". EffectWithPointsTo should also be able to understand these
 stubs of a new kind...
 
-40. Rice/test03: when the points-to information is recomputed the
-formal context should be cleaned up, unless it is explictly defined as
-an input. Samething for the heap. Which means that this stubs should
-be added to the declaration list of the module... Impact on symbol
-table? See 41.
+42. Suggestion by Pierre Jouvelot: do not propagate undefined values.
 
-41. Rice/test03: the type of entities in the formal context should not
-be changed once they have been allocated. Unless some code
-transformation has indeed changed them. For instance, dependent types may be changed into constant types by "partial eval". See 40.
-
-Next item will be 42.
+Next item will be 43.
 
 ----------------------------------------------------------
 
@@ -190,3 +182,13 @@ propagated.
 36. Condition with side effects in and_operator02 is not taken into account.
 
 -> not really useful, I believe (FI), but apparently easy to implement.
+
+40. Rice/test03: when the points-to information is recomputed the
+formal context should be cleaned up, unless it is explictly defined as
+an input. Samething for the heap. Which means that this stubs should
+be added to the declaration list of the module... Impact on symbol
+table? See 41.
+
+41. Rice/test03: the type of entities in the formal context should not
+be changed once they have been allocated. Unless some code
+transformation has indeed changed them. For instance, dependent types may be changed into constant types by "partial eval". See 40.
