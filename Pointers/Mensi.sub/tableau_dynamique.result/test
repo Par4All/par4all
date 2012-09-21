@@ -16,6 +16,12 @@ void allocate_array(parray_t pa)
 // pa -> _pa_1 , EXACT
 
    pa->data = (float *) malloc(pa->dim*sizeof(float));
+
+// Points To:
+// _pa_1.data -> *HEAP*_l_7[0] , MAY
+// pa -> _pa_1 , EXACT
+
+   return;
 }
 
 // Points To IN:
@@ -79,6 +85,7 @@ void allocate_array(parray_t pa)
 //             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
    pa->data = (float *) malloc(pa->dim*sizeof(float));
+   return;
 }
 void init_array(parray_t pa)
 {
@@ -116,6 +123,7 @@ void allocate_array(parray_t pa)
 //             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
    pa->data = (float *) malloc(pa->dim*sizeof(float));
+   return;
 }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -167,6 +175,12 @@ void allocate_array(parray_t pa)
 // pa -> _pa_1 , EXACT
 
    pa->data = (float *) malloc(pa->dim*sizeof(float));
+
+// Points To:
+// _pa_1.data -> *HEAP*_l_7[0] , MAY
+// pa -> _pa_1 , EXACT
+
+   return;
 }
 
 // Points To IN:
@@ -226,8 +240,5 @@ int main()
    
    return 0;
 }
-INIT_POINTS_TO_ANALYSIS[allocate_array] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[init_array] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1" at line 21.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1" at line 21.

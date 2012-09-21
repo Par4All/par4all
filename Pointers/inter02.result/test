@@ -121,8 +121,6 @@ int main()
 
    return 1;
 }
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[foo] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variables 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variables 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variables 

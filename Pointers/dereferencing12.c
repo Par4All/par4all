@@ -12,9 +12,11 @@ int main (int argc, char ** argv)
   else if(argc<0)
     p = &argc;
 
+  // Here, p must point toward undefined, NULL or argc
+
   *p = 1;
 
-  // Here, p must points toward argc
+  // Here, p must point toward argc
 
   return 0;
 }

@@ -318,40 +318,38 @@ void f(int **p, int **q, int **r);
 // Points To: none
 
 int main();
-INIT_POINTS_TO_ANALYSIS[f] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 14.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_r_3_3" at line 17.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2" at line 19.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Aliasing between arguments, we have to create a new context
- INIT_POINTS_TO_ANALYSIS[wilson!] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+ 
