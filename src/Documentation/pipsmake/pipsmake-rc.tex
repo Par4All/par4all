@@ -5486,7 +5486,7 @@ expression and subexpression by the points-to analysis.
 
 \subsection{Interprocedural Points to Analysis}
 \label{subsection-interprocedural-points-to-analysis}
-\index{Interprocedural Points to Analysis}
+\index{Interprocedural Points-to Analysis}
 
 \begin{PipsPass}{interprocedural_points_to_analysis}
 This pass is being implemented by Amira \textsc{Mensi}.
@@ -5505,7 +5505,6 @@ interprocedural_points_to_analysis > MODULE.points_to
         ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.init_points_to_list
         < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in
@@ -5533,7 +5532,6 @@ fast_interprocedural_points_to_analysis > MODULE.points_to
         ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.init_points_to_list
         < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in

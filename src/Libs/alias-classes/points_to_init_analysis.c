@@ -153,27 +153,34 @@ entity create_stub_entity(entity e, string fs, type t)
   // FI: the stub entity already exists?
   string formal_name = strdup(concatenate(get_current_module_name(),
 					  MODULE_SEP_STRING, s, NULL));
+  entity m = get_current_module_entity();
   entity stub = gen_find_entity(formal_name);
   // FI: I expect here a pips_assert("The stub cannot exist",
   // entity_undefined_p(stub));
  
   // If entity "stub" does not already exist, create it.
-  if(entity_undefined_p(stub)) { // FI: the stubs could be allocated in the still non-existing FORMAL_AREA
-    entity DummyTarget = FindOrCreateEntity(get_current_module_name(),
+  if(entity_undefined_p(stub)) {
+    entity fa = FindOrCreateEntity(get_current_module_name(),
 					    FORMAL_AREA_LOCAL_NAME);
-    if(type_undefined_p(entity_type(DummyTarget))) {
-      entity_type(DummyTarget) = make_type(is_type_area, make_area(0, NIL));
-      entity_storage(DummyTarget) = make_storage(is_storage_rom, UU);
-      entity_initial(DummyTarget) = make_value(is_value_unknown, UU);
+    if(type_undefined_p(entity_type(fa))) {
+      // entity a = module_to_heap_area(f);
+      entity_type(fa) = make_type(is_type_area, make_area(0, NIL));
+      
+      //ram r = make_ram(f, a, DYNAMIC_RAM_OFFSET, NIL);
+      entity_storage(fa) = make_storage_rom();
+      entity_initial(fa) = make_value(is_value_unknown, UU);
       // FI: DO we want to declare it abstract location?
-      entity_kind(DummyTarget) = ABSTRACT_LOCATION | ENTITY_FORMAL_AREA;
-      //entity_kind(DummyTarget) = ENTITY_FORMAL_AREA;
+      entity_kind(fa) = ABSTRACT_LOCATION | ENTITY_FORMAL_AREA;
+      //entity_kind(fa) = ENTITY_FORMAL_AREA;
+      AddEntityToDeclarations(fa, m);
     }
     stub = make_entity(formal_name,
 		       copy_type(t),
-		       make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
+		       make_storage_ram(make_ram(m, fa, DYNAMIC_RAM_OFFSET, NIL)),
 		       make_value_unknown());
-  
+    (void) add_C_variable_to_area(fa, stub);
+
+    AddEntityToDeclarations(stub, m);
   }
   else {
     /* FI: we are in deep trouble because the stub entity has already

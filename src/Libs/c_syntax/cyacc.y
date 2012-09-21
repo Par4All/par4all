@@ -853,6 +853,8 @@ declaration         {/* discard_C_comment();*/ }
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
+			  else
+			    CCleanLocalEntities(cf);
 			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(true),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);

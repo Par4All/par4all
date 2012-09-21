@@ -1461,7 +1461,9 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
   if(!ok_p) {
     // Likely typing error in source code
     entity v = reference_variable(cell_any_reference(source));
-    pips_user_warning("Typing error in a pointer assignment or a dereferencing with \"%s\".\n", entity_user_name(v));
+    pips_user_warning("Typing error in a pointer assignment or a dereferencing with \"%s\" at line %d.\n",
+		      entity_user_name(v),
+		      points_to_context_statement_line_number());
     // Return an empty list
   }
   else if(nowhere_cell_p(source)) {

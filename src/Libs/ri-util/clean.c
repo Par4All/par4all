@@ -60,17 +60,8 @@ entity e;
 /* Useful when the user edit a source file and parse it again or when
    a program transformation is performed by prettyprinting and
    reparsing. */
-void GenericCleanLocalEntities(entity function, bool fortran_p)
+void GenericCleanEntities(list el, entity function, bool fortran_p)
 {
-  list function_local_entities = NIL;
-  list pe = NIL;
-
-  set_current_function(function);
-
-  function_local_entities =
-    gen_filter_tabulated(local_entity_of_current_function_p, 
-			 entity_domain);
-
   /* FI: A memory leak is better than a dangling pointer? */
   /* My explanation: CleanLocalEntities is called by MakeCurrentFunction when
    * the begin_inst rule is reduced; by that time, the module entity and its
@@ -80,7 +71,9 @@ void GenericCleanLocalEntities(entity function, bool fortran_p)
    */
   /*gen_full_free_list(function_local_entities);*/
 
-  for(pe=function_local_entities; !ENDP(pe); POP(pe)) {
+  list pe = list_undefined;
+
+  for(pe=el; !ENDP(pe); POP(pe)) {
     entity e = ENTITY(CAR(pe));
     storage s = entity_storage(e);
 
@@ -125,6 +118,21 @@ void GenericCleanLocalEntities(entity function, bool fortran_p)
       pips_debug(8, "Clean up %s? NO\n", entity_local_name(e));
     }
   }
+}
+
+void GenericCleanLocalEntities(entity function, bool fortran_p)
+{
+  list function_local_entities = NIL;
+  //list pe = NIL;
+
+  set_current_function(function);
+
+  function_local_entities =
+    gen_filter_tabulated(local_entity_of_current_function_p, 
+			 entity_domain);
+
+  GenericCleanEntities(function_local_entities, function, fortran_p);
+
   gen_free_list(function_local_entities);
 }
 

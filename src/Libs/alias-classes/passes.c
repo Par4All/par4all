@@ -196,6 +196,26 @@ pt_map get_points_to_context()
 {
   return points_to_context;
 }
+
+void clean_up_points_to_stubs(entity module)
+{
+  code c = value_code(entity_initial(module));
+  list dl = code_declarations(c);
+  list sl = NIL;
+
+  FOREACH(ENTITY, v, dl) {
+    if(entity_stub_sink_p(v) || entity_heap_location_p(v)) {
+      sl = CONS(ENTITY, v, sl);
+      fprintf(stderr, "Removed stub: %s\n", entity_name(v));
+    }
+  }
+
+  gen_list_and_not(&code_declarations(c), sl);
+
+  GenericCleanEntities(sl, module, false);
+
+  gen_free_list(sl);
+}
 
 #define FRANCOIS 1
 
@@ -219,7 +239,10 @@ static bool generic_points_to_analysis(char * module_name) {
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
                                                                   module_name, true));
   module_stat = get_current_module_statement();
-  
+
+  /* Clean-up formal context stubs and heap model variables */
+  clean_up_points_to_stubs(module);
+
   /* Stack for on-demand update of in points-to information */
   init_statement_points_to_context();
 
