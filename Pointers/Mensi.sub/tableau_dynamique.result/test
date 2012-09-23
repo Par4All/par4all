@@ -73,8 +73,12 @@ int main()
 // Points To:
 // ma -> *HEAP*_l_20 , MAY
 
-   //init_array(ma);
-   
+   init_array(ma);
+
+// Points To:
+// ma -> *HEAP*_l_20 , MAY
+
+
    return 0;
 }
 
@@ -109,8 +113,10 @@ int main()
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
 //                               allocate_array:_pa_1.data
    allocate_array(ma);
-   //init_array(ma);
-   
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   init_array(ma);
+
    return 0;
 }
 
@@ -139,10 +145,10 @@ void init_array(parray_t pa)
 
    return;
 }
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.dim
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.data
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -153,8 +159,10 @@ int main()
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
 //                               allocate_array:_pa_1.data
    allocate_array(ma);
-   //init_array(ma);
-   
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   init_array(ma);
+
    return 0;
 }
 
@@ -212,8 +220,7 @@ void init_array(parray_t pa)
    return;
 }
 
-// Points To IN:
-// allocate_array:_pa_1.data -> _pa_1_2__1 , EXACT
+// Points To IN: none
 
 
 // Points To OUT:
@@ -227,7 +234,6 @@ int main()
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
 
 // Points To:
-// allocate_array:_pa_1.data -> _pa_1_2__1 , EXACT
 // ma -> *HEAP*_l_20 , MAY
 
    allocate_array(ma);
@@ -236,9 +242,13 @@ int main()
 // *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
 // ma -> *HEAP*_l_20 , MAY
 
-   //init_array(ma);
-   
+   init_array(ma);
+
+// Points To:
+// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
+// ma -> *HEAP*_l_20 , MAY
+
+
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1" at line 21.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_pa_1" at line 21.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_interprocedural) Function has not a side effect on pointers variables 

@@ -305,3 +305,165 @@ void assignment(struct foo **t1, struct foo **t2)
 
    (**t1).ip1 = (**t2).ip2;
 }
+
+// Points To IN:
+// assignment:_t1_1_1.ip1 -> _t1_1_1_1__1 , EXACT
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   struct foo s1;
+
+// Points To:
+// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct foo s2;
+
+// Points To:
+// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct foo **ppt, **pps;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   struct foo *pt = &s1, *ps = &s2;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   int i11 = 1, i12 = 2, i21 = 3, i22 = 4;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   s1.ip1 = &i11;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> i11 , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   s1.ip2 = &i12;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i11 , EXACT
+// s1.ip2 -> i12 , EXACT
+// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   s2.ip1 = &i21;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i11 , EXACT
+// s1.ip2 -> i12 , EXACT
+// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> i21 , EXACT
+
+   s2.ip2 = &i22;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i11 , EXACT
+// s1.ip2 -> i12 , EXACT
+// s2.ip1 -> i21 , EXACT
+// s2.ip2 -> i22 , EXACT
+
+
+   *pt = s2;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i21 , EXACT
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i21 , EXACT
+// s2.ip2 -> i22 , EXACT
+
+   ppt = &pt;
+
+// Points To:
+// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// ppt -> pt , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i21 , EXACT
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i21 , EXACT
+// s2.ip2 -> i22 , EXACT
+
+   pps = &ps;
+
+// Points To:
+// assignment:_t1_1_1.ip1 -> _t1_1_1_1__1 , EXACT
+// pps -> ps , EXACT
+// ppt -> pt , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i21 , EXACT
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i21 , EXACT
+// s2.ip2 -> i22 , EXACT
+
+   assignment(pps, ppt);
+
+// Points To:
+// pps -> ps , EXACT
+// ppt -> pt , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
+// s1.ip1 -> i21 , EXACT
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i22 , EXACT
+// s2.ip2 -> i22 , EXACT
+
+
+   return 0;
+}

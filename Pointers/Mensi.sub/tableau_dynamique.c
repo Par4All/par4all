@@ -19,7 +19,7 @@ void init_array(parray_t pa) {
 int main() {
   parray_t ma = (parray_t) malloc(sizeof(darray_t));
   allocate_array(ma);
-  //init_array(ma);
+  init_array(ma);
 
   return 0;
 }
