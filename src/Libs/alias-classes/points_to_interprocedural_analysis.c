@@ -279,62 +279,112 @@ list stubs_list(set pt_in, set pt_out)
  *
  * Parameter "stubs" is the set E in the intraprocedural and
  * interprocedural analysis chapters of Amira Mensi's PhD
- * dissertation. The list "stubs" contains all the stubs generated
- * when the callee is analyzed.
+ * dissertation. The list "stubs" contains all the stub references
+ * generated when the callee is analyzed.
  *
  * Parameter "args" is a list of cells. Each cell is a reference to a
  * formal parameter of the callee.
  */
-bool sets_binded_and_in_compatibles_p(list stubs, list args, set pt_binded, set pt_in, set pt_out)
+bool sets_binded_and_in_compatibles_p(list stubs,
+				      list args,
+				      set pt_binded,
+				      set pt_in,
+				      set pt_out __attribute__ ((unused)))
 {
   bool compatible_p = true;
-  set io = new_simple_pt_map();
+  // FI->AM: this set does not seem to be used
+  // set io = new_simple_pt_map();
   set bm = new_simple_pt_map();
   list tmp = gen_full_copy_list(stubs);
   gen_sort_list(args, (gen_cmp_func_t) points_to_compare_ptr_cell );
   
-  io = set_union(io, pt_in, pt_out);
+  // io = set_union(io, pt_in, pt_out);
+
+  /* "bm" is a mapping from the formal context to the calling
+   * context. It includes the mapping from formal arguments to the
+   * calling context.
+   */
   bm = points_to_binding(args, pt_in, pt_binded);
+
   while(!ENDP(stubs) && compatible_p) {
     cell st = CELL(CAR(stubs));
-    FOREACH(CELL, c, tmp) {
-      if(!points_to_cell_equal_p(c, st)) {
-	// FI: impedance issue + memory leak
-	points_to_graph bm_g = make_points_to_graph(false, bm);
-	list act1 = source_to_sinks(c, bm_g, false);
-	list act2 = source_to_sinks(st, bm_g, false);
-	points_to_cell_list_and(&act1, act2);
-	if(!ENDP(act1)) {
-	  entity ne = entity_null_locations();
-	  reference nr = make_reference(ne, NIL);
-	  cell nc = make_cell_reference(nr);
-	  entity he =  entity_all_heap_locations();
-	  reference hr = make_reference(he, NIL);
-	  cell hc = make_cell_reference(hr);
+    bool to_be_freed;
+    type st_t = points_to_cell_to_type(st, &to_be_freed);
+    if(pointer_type_p(st_t)) {
+      bool found_p = false; // the comparison is symetrical
+      FOREACH(CELL, c, tmp) {
+	if(points_to_cell_equal_p(c, st))
+	  found_p = true;
+	if(found_p && !points_to_cell_equal_p(c, st)) {
+	  bool to_be_freed_2;
+	  type c_t = points_to_cell_to_type(c, &to_be_freed_2);
+	  if(pointer_type_p(c_t)) {
+	    // FI: impedance issue + memory leak
+	    points_to_graph bm_g = make_points_to_graph(false, bm);
+	    list act1 = source_to_sinks(c, bm_g, false);
+	    list act2 = source_to_sinks(st, bm_g, false);
+	    /* Compute the intersection of the abstract value lists of
+	       the two stubs in the actual context. */
+	    points_to_cell_list_and(&act1, act2);
+
+	    if(!ENDP(act1)) {
+	      /* We are still OK if the common element(s) are NULL,
+		 NOWHERE or even maybe a general heap abstract
+		 location. */
+	      //entity ne = entity_null_locations();
+	      //reference nr = make_reference(ne, NIL);
+	      //cell nc = make_cell_reference(nr);
+	      //cell nc = make_null_pointer_value_cell();
+	      //entity he =  entity_all_heap_locations();
+	      //reference hr = make_reference(he, NIL);
+	      //cell hc = make_cell_reference(hr);
 	  
-	  if((int)gen_length(act1) == 1 && (!points_to_cell_in_list_p(nc, act1)|| !points_to_cell_in_list_p(hc, act1)))
-	    compatible_p = false;
-	  break;
+	      //if((int) gen_length(act1) == 1
+	      // && (!points_to_cell_in_list_p(nc, act1)
+	      //     || !points_to_cell_in_list_p(hc, act1)))
+	      // FI: I'm not convinced this test is correct
+	      // I guess we should remove all possibly shared targets
+	      // and then test for emptiness
+	      if((int) gen_length(act1) == 1) {
+		cell act1_c = CELL(CAR(act1));
+		if(!null_cell_p(act1_c)
+		   && !all_heap_locations_cell_p(act1_c)) {
+		  compatible_p = false;
+		  break;
+		}
+	      }
+	    }
+	    gen_free_list(act1);
+	    gen_free_list(act2);
+	  }
+	  if(to_be_freed_2) free_type(c_t);
 	}
-	gen_free_list(act1);
-	gen_free_list(act2);
       }
     }
+    if(to_be_freed) free_type(st_t);
     stubs = CDR(stubs);
   }
   gen_full_free_list(tmp);
-  set_free(io);
+  // set_free(io);
 
   return compatible_p;
 }
 
-/* Translate the out set into the scope of the caller */ 
-set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in, set pt_binded)
+/* Translate the "out" set into the scope of the caller
+ *
+ * Shouldn't it be the "written" list that needs to be translated?
+ */ 
+set compute_points_to_kill_set(list written,
+			       set pt_caller,
+			       list args,
+			       set pt_in,
+			       set pt_binded)
 {
   set kill = new_simple_pt_map(); 	
   list written_cs = NIL;
   set bm = new_simple_pt_map();
 
+  // FI->AM: do you recompute "bm" several times?
   bm = points_to_binding(args, pt_in, pt_binded); 
 
   FOREACH(CELL, c, written) {
@@ -346,12 +396,16 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
       cell sr2 = points_to_source(pp); 
       cell sk2 = points_to_sink(pp); 
       reference r22 = copy_reference(cell_to_reference(sk2));
+      /* FI->AM: this test is loop invariant... and performed within the loop */
       if(!source_in_set_p(c, bm)) {
 	reference r_12 = cell_any_reference(sr2);
 	entity v_12 = reference_variable( r_12 );
 	if(same_string_p(entity_local_name(v_1),entity_local_name(v_12))) { 
-	  reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
+	  reference_indices(r22) = gen_nconc(reference_indices(r22),
+					     gen_full_copy_list(ind1));
 	  new_sr = make_cell_reference(r22);
+	  // FI->AM: I guess this statement was forgotten
+	  written_cs = CONS(CELL, new_sr, written_cs);
 	  break;
 	}
 	else if (heap_cell_p(c)) {
@@ -371,6 +425,7 @@ set compute_points_to_kill_set(list written, set pt_caller, list args, set pt_in
 	set_add_element(kill, kill, (void*)pt);
     }
   }
+
   return kill;
 }
 
