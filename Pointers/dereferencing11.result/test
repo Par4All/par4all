@@ -1,0 +1,66 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int duck1(int riri[10], int fifi[2][3], int size, int loulou[20][size][6])
+{
+   // Here the array "fifi" is cast into an int *, and then an offset is computed
+   // fifi+(3-1-0+1)*1 points towards fifi[0][3],
+
+// Points To: none
+
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   
+   // Here an offset is computed first
+   // fifi+(3-1-0+1)*1 points towards fifi[3], and the cast makes it a
+   // pointer towards fifi[3][0]
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+
+   int *zuzu = (int *) (fifi+(3-1-0+1)*1);
+   
+   // zizi points to fifi[3][0]
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zuzu -> fifi[3][0] , EXACT
+
+   int *zizi = (fifi+(3-1-0+1)*1)[0];
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zizi -> fifi[3][0] , EXACT
+// zuzu -> fifi[3][0] , EXACT
+
+
+   printf("fifi=%p, zaza=%p, zizi=%p, zuzu=%p\n", fifi, zaza, zizi, zuzu);
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zizi -> fifi[3][0] , EXACT
+// zuzu -> fifi[3][0] , EXACT
+
+   bar(fifi+(3-1-0+1)*1);
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zizi -> fifi[3][0] , EXACT
+// zuzu -> fifi[3][0] , EXACT
+
+   foo((fifi+(3-1-0+1)*1)[0]);
+
+// Points To:
+// zaza -> fifi[0][3] , EXACT
+// zizi -> fifi[3][0] , EXACT
+// zuzu -> fifi[3][0] , EXACT
+
+   /* proper effects are not precise here for loulou because 
+        of the internal representation of the expression */
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
