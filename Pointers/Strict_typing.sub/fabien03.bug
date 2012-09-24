@@ -1,4 +1,0 @@
-pips error in entity_flow_or_context_sentitive_heap_location: (/home/francois/MYPIPS/prod/pips/src/Libs/effects-util/abstract_location.c:131) assertion failed
-
- 'The type is unchanged or compatible' not verified
-
