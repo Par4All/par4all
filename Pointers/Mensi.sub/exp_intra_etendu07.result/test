@@ -3,13 +3,25 @@ PROPER  EFFECTS
 
 int main()
 {
-   int *p[5];
-   int q[10][5];
-//             <    is read   >: q[0][0]
-//             <    is written>: p[3]
-   p[3] = q[0][0];
-
-   return 0;
+   char **p, *q, *r, *s, i, j, k;
+//             <    is written>: i j k
+   i = j = k = 'c';
+//             <    is written>: q
+   q = &i;
+//             <    is written>: r
+   r = &j;
+//             <    is read   >: i
+   if (i=='h')
+//             <    is written>: p
+      p = &q;
+   else
+//             <    is written>: p
+      p = &r;
+//             <    is written>: s
+   s = &k;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p s
+   *p = s;
 }
 
 POINTS-TO
@@ -25,50 +37,123 @@ int main()
 
 // Points To: none
 
-   int *p[5];
+   char **p, *q, *r, *s, i, j, k;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
 
-   int q[10][5];
+   i = j = k = 'c';
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
 
-   p[3] = q[0][0];
+   q = &i;
 
-// Points To: unreachable
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> i , EXACT
+// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
 
+   r = &j;
 
-   return 0;
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> i , EXACT
+// r -> j , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   if (i=='h')
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> i , EXACT
+// r -> j , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &q;
+   else
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> i , EXACT
+// r -> j , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+      p = &r;
+
+// Points To:
+// p -> q , MAY
+// p -> r , MAY
+// q -> i , EXACT
+// r -> j , EXACT
+// s -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   s = &k;
+
+// Points To:
+// p -> q , MAY
+// p -> r , MAY
+// q -> i , EXACT
+// r -> j , EXACT
+// s -> k , EXACT
+
+   *p = s;
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {
-   int *p[5];
-   int q[10][5];
-//             <    is read   >: q[0][0]
-//             <    is written>: p[3]
-   p[3] = q[0][0];
-
-   return 0;
+   char **p, *q, *r, *s, i, j, k;
+//             <    is written>: i j k
+   i = j = k = 'c';
+//             <    is written>: q
+   q = &i;
+//             <    is written>: r
+   r = &j;
+//             <    is read   >: i
+   if (i=='h')
+//             <    is written>: p
+      p = &q;
+   else
+//             <    is written>: p
+      p = &r;
+//             <    is written>: s
+   s = &k;
+//             <may be written>: q r
+//             <    is read   >: p s
+   *p = s;
 }
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
-   int *p[5];
-   int q[10][5];
-//             <    is read   >: q[0][0]
-//             <    is written>: p[3]
-   p[3] = q[0][0];
-
-   return 0;
+   char **p, *q, *r, *s, i, j, k;
+//             <    is written>: i j k
+   i = j = k = 'c';
+//             <    is written>: q
+   q = &i;
+//             <    is written>: r
+   r = &j;
+//             <    is read   >: i
+//             <    is written>: p
+   if (i=='h')
+//             <    is written>: p
+      p = &q;
+   else
+//             <    is written>: p
+      p = &r;
+//             <    is written>: s
+   s = &k;
+//             <may be written>: q r
+//             <    is read   >: p s
+   *p = s;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "q" at line 5.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 5.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "q[0][0]" could not be dereferenced at line 5.
