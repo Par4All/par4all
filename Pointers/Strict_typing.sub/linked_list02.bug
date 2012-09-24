@@ -1,4 +1,0 @@
-23. When iterating the analysis of a loop, the points-to graph are
-accumulated when they should be merged. The accumulation does not
-update the approximations. See Strict_typing.sub/linked_list01.c for
-instance.

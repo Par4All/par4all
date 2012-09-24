@@ -203,22 +203,22 @@ list list_cons(double v, list l)
 
 // Points To IN:
 // _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_2__1 , EXACT
+// _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
-// _l_1_2__1.next -> _l_1_2__1_2__1 , EXACT
+// _l_1_2__1.next -> _l_1_2__1_2__1 , MAY
 // _l_1_2__1_2__1.next -> *NULL_POINTER* , MAY
-// _l_1_2__1_2__1.next -> _l_1_2__1_2__1_2__1 , EXACT
+// _l_1_2__1_2__1.next -> _l_1_2__1_2__1_2__1 , MAY
 // _l_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
-// _l_1_2__1_2__1_2__1.next -> _l_1_2__1_2__1_2__1_2__1 , EXACT
+// _l_1_2__1_2__1_2__1.next -> _l_1_2__1_2__1_2__1_2__1 , MAY
 // _l_1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1_2__1_2__1_2__1.next -> _l_1_2__1_2__1_2__1_2__1_2__1
-//     , EXACT
+//     , MAY
 // _l_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1_2__1_2__1_2__1_2__1.next -> 
-//    _l_1_2__1_2__1_2__1_2__1_2__1_2__1 , EXACT
+//    _l_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _l_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
-//    _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , EXACT
+//    _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -449,7 +449,7 @@ int list_len(list l)
 
 // Points To IN:
 // _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_2__1 , EXACT
+// _l_1.next -> _l_1_2__1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -491,7 +491,7 @@ list list_next(list l)
 
 // Points To:
 // _l_1.next -> *NULL_POINTER* , MAY
-// _l_1.next -> _l_1_2__1 , EXACT
+// _l_1.next -> _l_1_2__1 , MAY
 // l -> _l_1 , EXACT
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // nil -> *NULL_POINTER* , EXACT
