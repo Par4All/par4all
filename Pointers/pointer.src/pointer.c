@@ -1,6 +1,6 @@
 /* FI: I do not know who designed this test case
  *
- * I believe a main is useful. And it should be analyzed interprocedurally
+ * I believe a main is useful. And it should be analyzed interprocedurally. See call20 and call21.
  */
 
 #include <stdlib.h>
@@ -43,6 +43,7 @@ int pointer_get(const pointer p)
   return i;
 }
 
+#if 0
 int main()
 {
   pointer p1 = alloc_pointer(1);
@@ -55,3 +56,4 @@ int main()
   printf("*p3=%d\n", pointer_get(p3));
   return 0;
 }
+#endif

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "pointer.c"
+#include "pointer.src/pointer.c"
 
 int main(void)
 {

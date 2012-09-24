@@ -93,7 +93,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// alloc_pointer -> *HEAP*_l_7 , MAY
+// alloc_pointer -> *HEAP*_l_14 , MAY
 
 pointer alloc_pointer(int v)
 {
@@ -103,12 +103,12 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_14 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_14 , MAY
 
    return p;
 }
