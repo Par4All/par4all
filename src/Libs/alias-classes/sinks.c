@@ -1243,8 +1243,11 @@ void adapt_reference_to_type(reference r, type et)
     type nrt = points_to_reference_to_type(r, &to_be_freed);
     t = compute_basic_concrete_type(nrt);
   }
-  if(!array_pointer_type_equal_p(at, t))
+  if(!array_pointer_type_equal_p(at, t)) {
+    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).",
+		      points_to_context_statement_line_number());
     pips_internal_error("Cell type mismatch.");
+  }
   if(to_be_freed) free_type(t);
 }
 
