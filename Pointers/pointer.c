@@ -1,4 +1,11 @@
-#include<stdlib.h>
+/* FI: I do not know who designed this test case
+ *
+ * I believe a main is useful. And it should be analyzed interprocedurally
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef int * pointer;
 
 // should catch that returned value is malloc'ed there
@@ -34,4 +41,17 @@ int pointer_get(const pointer p)
 {
   int i = *p;
   return i;
+}
+
+int main()
+{
+  pointer p1 = alloc_pointer(1);
+  pointer p2 = alloc_pointer(0);
+  pointer p3 = alloc_pointer(0);
+  pointer_set(p2, 2);
+  pointer_add(p3, p1, p2);
+  pointer_free(p1);
+  pointer_free(p2);
+  printf("*p3=%d\n", pointer_get(p3));
+  return 0;
 }
