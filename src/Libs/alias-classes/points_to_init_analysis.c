@@ -261,18 +261,43 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
     int td = variable_dimension_number(type_variable(t));
     pips_assert("The target dimension is greater than or equal to the source dimension", d<=td);
     int i;
-    list tl = NIL;
-    /* FI: use 0 for all proper target dimensions */
-    /* FI: adding 0 subscripts is similar to a dereferencing. We do
-       not know at this level if the dereferencing has been
-       requested. See pointer_reference02. The handling fo eval_p must
-       be modified correspondingly by adding 0 subscripts when the
-       source is an array. Or evaluation must be skipped. */
-    for(i=d;i<td;i++) {
-      tl = CONS(EXPRESSION, make_zero_expression(), tl);
+    //if(false) {
+    if(true) {
+      list tl = NIL;
+      /* FI: use 0 for all proper target dimensions */
+      /* FI: adding 0 subscripts is similar to a dereferencing. We do
+	 not know at this level if the dereferencing has been
+	 requested. See pointer_reference02. The handling fo eval_p must
+	 be modified correspondingly by adding 0 subscripts when the
+	 source is an array. Or evaluation must be skipped. */
+      for(i=d;i<td;i++) {
+	tl = CONS(EXPRESSION, make_zero_expression(), tl);
+      }
+      sl = gen_nconc(sl, tl);
+      sink_ref = make_reference(stub_entity, sl);
     }
-    sl = gen_nconc(sl, tl);
-    sink_ref = make_reference(stub_entity, sl);
+    else {
+      sink_ref = make_reference(stub_entity, sl);
+      bool e_to_be_freed;
+      type ept = points_to_reference_to_type(sink_ref, &e_to_be_freed);
+      i = d;
+      while(!array_pointer_type_equal_p(pt, ept)
+	    && !(type_void_p(pt) && overloaded_type_p(ept))
+	    && i<td) {
+	if(e_to_be_freed) free_type(ept);
+	list tl = CONS(EXPRESSION, make_zero_expression(), NIL);
+	reference_indices(sink_ref) =
+	  gen_nconc(reference_indices(sink_ref), tl);
+	ept = points_to_reference_to_type(sink_ref, &e_to_be_freed);
+	i++;
+      }
+      if(!array_pointer_type_equal_p(pt, ept)
+	 && !(type_void_p(pt) && overloaded_type_p(ept)))
+	pips_internal_error("The stub and expected types are incompatible.\n");
+      else
+	;
+      if(e_to_be_freed) free_type(ept);
+    }
   }
   else if(type_void_p(t)) {
     pips_assert("Implemented", false);

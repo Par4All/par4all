@@ -2196,7 +2196,11 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
       expression p = EXPRESSION(CAR(call_arguments(c)));
       /* Make sure that all dereferencements are possible? Might be
 	 included in intrinsic_call_to_points_to()... */
-      dereferencing_to_points_to(p, in);
+      bool to_be_freed;
+      type et = points_to_expression_to_type(p, &to_be_freed);
+      if(pointer_type_p(et))
+	dereferencing_to_points_to(p, in);
+      if(to_be_freed) free_type(et);
     }
     // Take care of side effects as in "if(*p++)"
     out = intrinsic_call_to_points_to(c, in);

@@ -52,18 +52,10 @@ afraid.
 
 22. Handling of >, >=, <, <= in pointer conditions. No test case yet.
 
-23. When iterating the analysis of a loop, the points-to graph are
-accumulated when they should be merged. The accumulation does not
-update the approximations. See Strict_typing.sub/linked_list01.c for
-instance.
-
 24. The consistency check does not check that arcs starting from a
 vertex of out-degree strictly greater than 1 must be may arcs.
 
 25. Strict_typing.sub/fabien03: bug detected by or in a type check.
-
-27. In Strict_typing.sub/list02, in "main", the points-to obtained on
-exit of the while loop is declared "unreachable". Same in list03.
 
 32. statement01_dec: should we generate a NOWHERE rather than a bottom
 graph? Should this be a property? Ot it should generate a pointer
@@ -191,4 +183,21 @@ table? See 41.
 
 41. Rice/test03: the type of entities in the formal context should not
 be changed once they have been allocated. Unless some code
-transformation has indeed changed them. For instance, dependent types may be changed into constant types by "partial eval". See 40.
+transformation has indeed changed them. For instance, dependent types
+may be changed into constant types by "partial eval". See 40.
+
+-> the past stubs are now deleted before the code is analyzed again
+   after a code transformation, e.g. a constant propagation
+   transforming dependent types into constant types.
+
+27. In Strict_typing.sub/list02, in "main", the points-to obtained on
+exit of the while loop is declared "unreachable". Same in list03.
+
+-> Not observed any more. No idea about the reason.
+
+23. When iterating the analysis of a loop, the points-to graph are
+accumulated when they should be merged. The accumulation does not
+update the approximations. See Strict_typing.sub/linked_list01.c for
+instance.
+
+-> Not observed anymore.

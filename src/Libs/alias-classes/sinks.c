@@ -936,25 +936,32 @@ list cast_to_points_to_sinks(cast c,
     }
   }
   else {
-    list sinks = expression_to_points_to_sources(e, in);
-    FOREACH(CELL, c, sinks) {
-      if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	bool to_be_freed;
-	type ct = points_to_cell_to_type(c, &to_be_freed);
-	type cct = compute_basic_concrete_type(ct);
-	if(array_pointer_type_equal_p(t, cct))
-	  ; // nothing to do
-	else { // We should create a stub of the proper type because a
-	  // reference cannot include the address-of operator, "&"
-	  if(pointer_type_p(t) && array_type_p(cct)) {
-	    reference r = cell_any_reference(c);
-	    complete_points_to_reference_with_zero_subscripts(r);
-	    adapt_reference_to_type(r, t);
+    sinks = expression_to_points_to_sources(e, in);
+    if(pointer_type_p(t)) {
+      FOREACH(CELL, c, sinks) {
+	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+	  bool to_be_freed;
+	  type ct = points_to_cell_to_type(c, &to_be_freed);
+	  type cct = compute_basic_concrete_type(ct);
+	  if(array_pointer_type_equal_p(t, cct))
+	    ; // nothing to do
+	  else { // We should create a stub of the proper type because a
+	    // reference cannot include the address-of operator, "&"
+	    if(pointer_type_p(t) && array_type_p(cct)) {
+	      reference r = cell_any_reference(c);
+	      complete_points_to_reference_with_zero_subscripts(r);
+	      adapt_reference_to_type(r, t);
+	    }
+	    else
+	      pips_internal_error("Not implemented yet: stub with proper type needed.\n");
 	  }
-	  else
-	    pips_internal_error("Not implemented yet: stub with proper type needed.\n");
 	}
       }
+    }
+    else {
+      // FI: should we make sure that we do not tranformer pointers
+      // into integers or other types?
+      ;
     }
   }
   return sinks;
