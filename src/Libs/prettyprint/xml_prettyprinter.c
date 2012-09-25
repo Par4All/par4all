@@ -3258,22 +3258,19 @@ static void tri_abc(int tab_ind[4], int a, int b, int c)
   }
 }
 
-
-static void xml_Transposed_Matrix(reference rout, reference rin, int a[7], int ArrayDim1, int ArrayDim2, string_buffer sb_result)
+static void xml_Transposed_Matrix2D( Pmatrix mat)
 {
-  Pmatrix mat;
+  MATRIX_ELEM(mat,1,1)=0;
+  MATRIX_ELEM(mat,1,2)=1;
+  MATRIX_ELEM(mat,2,1)=1;
+  MATRIX_ELEM(mat,2,2)=0;
+}
+
+static void xml_Transposed_Matrix3D( Pmatrix mat,int a[7], int ArrayDim1, int ArrayDim2)
+{
+
   int i,j,n;
   int tab_ind[3][4];
-  string_buffer_append_word("Transposition",sb_result);
-   mat = matrix_new(ArrayDim1,ArrayDim2);
-  matrix_init(mat,ArrayDim1,ArrayDim2);
-  global_margin++;
-  add_margin(global_margin,sb_result);
-  string_buffer_append(sb_result,
-		       concatenate(OPENANGLE,"TransposParameters ", "OUT=", QUOTE,
-				   entity_user_name(reference_variable(rout)),QUOTE,BL,
-				   "IN=", QUOTE,entity_user_name(reference_variable(rin)),QUOTE,"/",
-				   CLOSEANGLE,NL,NULL));
   tri_abc(tab_ind[1],a[1],a[2],a[3]);
   tri_abc(tab_ind[2],a[4],a[5],a[6]);
   for (i=1; i<= ArrayDim1; i++) {
@@ -3283,10 +3280,7 @@ static void xml_Transposed_Matrix(reference rout, reference rin, int a[7], int A
 	MATRIX_ELEM(mat,i,j)=1;
     }
   }
-  xml_Matrix(mat,ArrayDim1,ArrayDim2,sb_result);
-  global_margin--;
-  string_buffer_append_word("/Transposition",sb_result);
-}
+ }
 static expression skip_field_and_cast_expression(expression arg)
 {
  if (expression_field_p(arg))
@@ -3297,19 +3291,20 @@ static expression skip_field_and_cast_expression(expression arg)
 }
 
 // Only to deal with Opengpu cornerturns
-static void  xml_Transposition(call c,string_buffer sb_result)
+static void  xml_Transposition(call c,int d,string_buffer sb_result)
 {
   int tab[7];
   int i;
   expression arg1,arg2;
   value v;
   list args = call_arguments(c);
-  if (gen_length(args)==12) {
-    for (i=1; i<=3; i++) {
+  Pmatrix mat;
+  if (gen_length(args)>=3+3*d) {
+    for (i=1; i<=d; i++) {
       arg1= EXPRESSION(CAR(args));
       POP(args);
     }
-    for (i=1;i<=6;i++){
+    for (i=1;i<=2*d;i++){
       arg2= EXPRESSION(CAR(args));
       v = EvalExpression(arg2);
       if (value_constant_p(v) && constant_int_p(value_constant(v))) {
@@ -3329,9 +3324,31 @@ static void  xml_Transposition(call c,string_buffer sb_result)
       reference r2 = syntax_reference(expression_syntax(arg2));
       int ArrayDim1 = variable_entity_dimension(reference_variable(r1));
       int ArrayDim2 = variable_entity_dimension(reference_variable(r2));
-
-      xml_Transposed_Matrix(r1,r2,tab, ArrayDim1,ArrayDim2,sb_result) ;
+      if (d==3) {
+	mat = matrix_new(3,3);
+	matrix_init(mat,mat->number_of_lines,mat->number_of_columns);
+	xml_Transposed_Matrix3D(mat,tab, mat->number_of_lines,mat->number_of_columns) ;
+      }
+      if (d==2) {
+	mat = matrix_new(2,2);
+	matrix_init(mat,mat->number_of_lines,mat->number_of_columns);
+	xml_Transposed_Matrix2D(mat);
+      }
+  
+      string_buffer_append_word("Transposition",sb_result);
+      global_margin++;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   concatenate(OPENANGLE,"TransposParameters ", "OUT=", QUOTE,
+				       entity_user_name(reference_variable(r1)),QUOTE,BL,
+				       "IN=", QUOTE,entity_user_name(reference_variable(r2)),QUOTE,"/",
+				       CLOSEANGLE,NL,NULL));
+      xml_Matrix(mat,mat->number_of_lines,mat->number_of_columns,sb_result);
+      matrix_free(mat);
+      global_margin--;
+      string_buffer_append_word("/Transposition",sb_result);
     }
+
   }
 }
 
@@ -3637,8 +3654,12 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
 				     QUOTE,
 				     CLOSEANGLE,NL, NULL));
     global_margin++;
-    if (strstr(strtmp,"cornerturn")!=NULL)
-      xml_Transposition(c,sb_result);
+    //  only detect  Opengpu 2D and 3D cornerturns
+      if (strstr(strtmp,"cornerturn_3D")!=NULL)
+	xml_Transposition(c,3,sb_result);
+      else
+	if (strstr(strtmp,"cornerturn_2D")!=NULL)
+	  xml_Transposition(c,2,sb_result);
     xml_Region_Parameter(pattern_region, sb_result);
     xml_Loops(st,true,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
 
