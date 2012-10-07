@@ -1190,7 +1190,7 @@ reference cell_to_reference(cell c) {
   else if (cell_preference_p(c))
     r = preference_reference(cell_preference(c));
   else
-    pips_internal_error("unexpected cell tag");
+    pips_internal_error("GAPs not implemented yet or unexpected cell tag.\n");
 
   return r;
 }
@@ -1468,4 +1468,15 @@ void points_to_cell_add_zero_subscripts(cell c)
 void points_to_cell_add_unbounded_subscripts(cell c)
 {
   points_to_cell_add_fixed_subscripts(c, false);
+}
+
+bool atomic_effect_p(effect e)
+{
+  bool atomic_p = effect_scalar_p(e);
+  if(!atomic_p) {
+    /* Maybe it is an effect on a structure field */
+    cell c = effect_cell(e);
+    atomic_p = atomic_points_to_cell_p(c);
+  }
+  return atomic_p;
 }

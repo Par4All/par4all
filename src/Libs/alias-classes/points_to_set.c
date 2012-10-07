@@ -1223,7 +1223,61 @@ list global_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 
   return sinks;
 }
+
+ list points_to_reference_to_translation(reference n_r, list sl, pt_map ptm, bool fresh_p)
+ {
+   list translations = NIL;
+   cell n_c = make_cell_reference(n_r); // FI: memory leak
+   list atl = points_to_source_to_sinks(n_c, ptm, fresh_p); // Address Translation List?
 
+   if(ENDP(atl)) {
+     if(ENDP(sl)) {
+       pips_internal_error("Reference \"n_r\" cannot be translated with \"ptm\".\n");
+     }
+     else {
+       /* Try to use an extra subscript */
+       expression ns = EXPRESSION(CAR(sl));
+       reference_indices(n_r) = gen_nconc(reference_indices(n_r),
+					  CONS(EXPRESSION, copy_expression(ns), NIL));
+       translations = points_to_reference_to_translation(n_r, CDR(sl), ptm, fresh_p);
+     }
+   }
+   else {
+     /* We've got one translation at least */
+     FOREACH(CELL, c, atl) {
+       /* Add the next subscripts */
+       reference c_r = cell_any_reference(c);
+       reference_indices(c_r) = gen_nconc(reference_indices(c_r),
+					  gen_full_copy_list(sl));
+       translations = atl; // FI: we may not need to variables...
+     }
+   }
+   return translations;
+ }
+/* Use "ptm" as a translation map
+ *
+ * Must be similar to a function written by Beatrice to evaluate a
+ * complex reference according to points-to information. In her case,
+ * it is not a translation, but an evaluation of the possibly many
+ * dereferencements contained in the reference.
+ *
+ * Try to translate a prefix of the source reference and substitue it
+ * when a translation is found. No need to translate further down,
+ * unike Beatrice's function.
+ *
+ * fresh_p might be useless because new cells always must be generated.
+ */
+list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
+{
+  list translations = NIL;
+  reference r = cell_any_reference(source);
+  entity v = reference_variable(r);
+  list sl = reference_indices(r);
+  reference n_r = make_reference(v, NIL);
+  translations = points_to_reference_to_translation(n_r, sl, ptm, fresh_p);
+  return translations;
+}
+
 /* Build the sinks of source "source" according to the points-to
  * graphs. If "source" is not found in the graph, return an empty list
  * "sinks". If "fresh_p", allocate copies. If not, return pointers to
@@ -1245,7 +1299,6 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
       sinks = CONS(CELL, sc, sinks);
     }
   }
-
 
   /* 2. Much harder... See if source is contained in one of the many
      abstract sources. Step 1 is subsumed by Step 2... but is much faster.  */

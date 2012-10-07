@@ -54,8 +54,8 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
     //statement stmt = make_assign_statement(lhs, rhs);
     //s = set_assign(s, points_to_assignment(stmt, lhs, rhs, s));	
     points_to_graph s_g = make_points_to_graph(false, s);
-      points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
-      s = set_assign(s, points_to_graph_set(a_g));
+    points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
+    s = set_assign(s, points_to_graph_set(a_g));
   }
 
   SET_FOREACH(points_to, pt, s) {
@@ -503,72 +503,124 @@ set compute_points_to_gen_set(list args, set pt_out, set pt_in, set pt_binded)
 }
 
 
-/* find all the arcs, ai, starting from the argument c1 using in, 
-   find all the arcs, aj, starting from the parameter c2 using pt_binded,
-   map each node ai to its corresponding aj.
-*/
+/* Recursively find all the arcs, "ai", starting from the argument
+ * "c1" using "in", find all the arcs, "aj", starting from the
+ * parameter "c2" using "pt_binded", map each node "ai" to its
+ * corresponding "aj" and store the "ai->aj" arc in a new set, "bm".
+ *
+ * "pt_binded" contains the correspondance between formal and actual
+ * parameters, e.g. "fp->ap", with some information about the possible
+ * approximations because one formal parameter can points toward
+ * several actual memory locations of the caller.
+ *
+ * "in" contains the formal context of the callee, as it stands at its
+ * entry point (DBR_POINTS_TO_IN).
+ *
+ * "bm" is the binding relationship between references of the formal
+ * context of the callees towards addresses of the caller. For
+ * instance, when function "void foo(int ** fp)" is called as "ap=&q;
+ * foo(ap);", bm = {(_ap_1, q)}.
+ *
+ * See Amira Mensi's PhD dissertation, chapter about interprocedural analysis
+ */
 set points_to_binding_arguments(cell c1, cell c2 , set in, set pt_binded)
 {
   set bm = new_simple_pt_map();
+
   if(!source_in_set_p(c1, in)) {
-    points_to pt = make_points_to(c1, c2, make_approximation_exact(), make_descriptor_none());
-    add_arc_to_simple_pt_map(pt, bm);
-  } else {
+    // FI: this has already been performed
+    /* c1 is not a pointer: it is simply mapped to c2 */
+    // points_to pt = make_points_to(c1, c2, make_approximation_exact(), make_descriptor_none());
+    // add_arc_to_simple_pt_map(pt, bm);
+    ;
+  }
+  else {
     // FI: impedance problem... and memory leak
     points_to_graph in_g = make_points_to_graph(false, in);
     points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
+    // FI: allocate a new copy for sink1 and sink2
     list sinks1 = source_to_sinks(c1, in_g, true);
     list sinks2 = source_to_sinks(c2, pt_binded_g, true);
+    // FI Allocate more copies
     list tmp1 = gen_full_copy_list(sinks1);
     list tmp2 = gen_full_copy_list(sinks2);
 
-    FOREACH(CELL, s1, sinks1) {
-      FOREACH(CELL, s2, sinks2) {
-	approximation a = approximation_undefined;
-	if((size_t)gen_length(sinks2)>1)
-	  a = make_approximation_may();
-	else
-	  a = make_approximation_exact();
-	cell sink1 = copy_cell(s1);
-	cell sink2 = copy_cell(s2);
-	points_to pt = make_points_to(sink1, sink2, a, make_descriptor_none());
-	add_arc_to_simple_pt_map(pt, bm);
-	gen_remove(&sinks2, (void*)s2);
+    FOREACH(CELL, s1, sinks1) { // Formal cell: fp->_fp_1 or fp->NULL
+      // FI: no need to translate constants NULL and UNDEFINED
+      if(!null_cell_p(s1) && !nowhere_cell_p(s1)) {
+	FOREACH(CELL, s2, sinks2) { // Actual cell: ap-> i... NOWHERE... NULL...
+	  // FI: _fp_1 may or not exist since it is neither null nor undefined
+	  if(!null_cell_p(s2) && !nowhere_cell_p(s2)) {
+	    approximation a = approximation_undefined;
+	    if((size_t)gen_length(sinks2)>1) // FI->FI: atomicity should be tested too
+	      a = make_approximation_may();
+	    else
+	      a = make_approximation_exact();
+	    cell sink1 = copy_cell(s1);
+	    cell sink2 = copy_cell(s2);
+	    // Build arc _fp_1->... NOWHERE ... NULL ...
+	    points_to pt = make_points_to(sink1, sink2, a, make_descriptor_none());
+	    add_arc_to_simple_pt_map(pt, bm);
+	  }
+	  //gen_remove(&sinks2, (void*)s2);
+	}
       }
-      gen_remove(&sinks1, (void*)s1);
+      //gen_remove(&sinks1, (void*)s1);
     }
 
+    /* Recursive call down the different points_to paths*/
     FOREACH(CELL, sr1, tmp1) {
-      FOREACH(CELL, sr2, tmp2) {
-	bm = set_union(bm,points_to_binding_arguments(sr1, sr2, in, pt_binded), bm);
+      if(!null_cell_p(sr1) && !nowhere_cell_p(sr1)) {
+	FOREACH(CELL, sr2, tmp2) {
+	  if(!null_cell_p(sr2) && !nowhere_cell_p(sr2)) {
+	    set sr1sr2 = points_to_binding_arguments(sr1, sr2, in, pt_binded);
+	    bm = set_union(bm, sr1sr2, bm);
+	    set_clear(sr1sr2), set_free(sr1sr2);
+	  }
+	}
       }
     }
   }
   return bm;
 }
 
-/* find for the source of p its corresponding alias, which means
-   finding another source that points to the same location.  */
-cell points_to_source_alias(points_to pt, set pts)
+/* Let "pt_binded" be the results of assignments of actual arguments
+ * to formal arguments (see compute_points_to_binded_set()).
+ *
+ * Let "pt" be a points-to arc in "pt_binded".
+ *
+ * Find for the source of p its corresponding alias, which means
+ * finding another source that points to the same location.
+ */
+cell points_to_source_alias(points_to pt, set pt_binded)
 {
   cell source = cell_undefined;
   cell sink1 = points_to_sink(pt);
-  SET_FOREACH(points_to, p, pts) {
+  SET_FOREACH(points_to, p, pt_binded) {
     cell sink2 =  points_to_sink(p);
     if(cell_equal_p(sink1, sink2)) {
       source = points_to_source(p);
-      break ;
+      break;
       }
   }
   if(cell_undefined_p(source))
-    pips_user_error("");
+    pips_internal_error("At least one alias should be found.\n");
 
   return source;
 
 }
 
-/* Using the result of points_to_binding_arguments complete the process of binding each element of in to its corresponding at the call site.
-   Necessery to translate fields structure.
+/* Apply points_to_binding_arguments() to each pair (, complete the
+ * process of binding each element of "in" to its corresponding memory
+ * address at the call site. Necessary to translate the fields of structures.
+ *
+ * "args": list of formal parameters of some callee
+ *
+ * "in": points-to in of the callee
+ *
+ * "pt_binded": points-to from formal to actual parameters for a specific call site
+ *
+ * A new set is allocated.
  */
 set points_to_binding(list args, set in, set pt_binded)
 {
@@ -576,19 +628,29 @@ set points_to_binding(list args, set in, set pt_binded)
   set bm = new_simple_pt_map();
   set bm1 = new_simple_pt_map();
  
- SET_FOREACH(points_to, pt, pt_binded) {
+  /* Process each formal parameter and look for its actual values in "pt_binded" */
+  SET_FOREACH(points_to, pt, pt_binded) {
     FOREACH(CELL, c1, args) {
       cell source = points_to_source(pt);
       if(cell_equal_p(c1, source)) {
 	cell c2 = points_to_source_alias(pt, pt_binded);
-	approximation a = make_approximation_exact();
-	points_to pt = make_points_to(c1, c2, a, make_descriptor_none());
-	add_arc_to_simple_pt_map(pt, bm);
-	bm = set_union(bm, bm, points_to_binding_arguments(c1 , c2,  in, pt_binded));
+	// FI: We end up with c1=c2=one formal parameter...
+	// No need to add "p->p" in "bm"...
+	//approximation a = make_approximation_exact();
+	//points_to new_pt = make_points_to(c1, c2, a, make_descriptor_none());
+	//add_arc_to_simple_pt_map(new_pt, bm);
+	set c1c2 = points_to_binding_arguments(c1, c2,  in, pt_binded);
+	bm = set_union(bm, bm, c1c2);
+	set_clear(c1c2), set_free(c1c2);
       }
     }
   }
 
+  /* Sometimes, cell_equal_p() is too restrictive to select the proper
+   * points-to arc. For instance, fields create issues because the
+   * sink cell, e.g. "s1" in "p->s1", is different from the next
+   * source cell, "s1.ip2->q". Hence such paths must now be computed.
+   */
   set_assign(bm1, bm);
   SET_FOREACH(points_to, p1,in) {
     cell s = points_to_source(p1);
@@ -608,7 +670,8 @@ set points_to_binding(list args, set in, set pt_binded)
 	  approximation a = points_to_approximation(pt);
 	  points_to pt = make_points_to(s, new_sk, a, make_descriptor_none());
 	  add_arc_to_simple_pt_map(pt, bm);
-	  bm = set_union(bm, points_to_binding_arguments(s, new_sk, in, pt_binded), bm);
+	  set s_new_sk = points_to_binding_arguments(s, new_sk, in, pt_binded);
+	  bm = set_union(bm, s_new_sk, bm);
 	  break;
 	}
       }

@@ -299,6 +299,64 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 }
 
 
+/* FI: temporary developement. This function should not be located here.
+ *
+ * Return a list of actual effects corresponding to an effect on the
+ * formal context "eff".
+ */
+list backward_translation_of_points_to_formal_context_effect(entity callee, 
+							     list real_args, 
+							     effect eff)
+{
+  list ael = NIL; // Actual effect list 
+  // effect n_eff = (*effect_dup_func)(eff); // Temporary solution
+  string mn = (string) module_local_name(callee);
+  string db_get_memory_resource(const string rname, const string oname, bool pure );
+#include <resources.h>
+  points_to_list pts_to_out = (points_to_list)
+    db_get_memory_resource(DBR_POINTS_TO_OUT, mn, true);
+  points_to_list pts_to_in = (points_to_list)
+    db_get_memory_resource(DBR_POINTS_TO_IN, mn, true);
+  statement s = effects_private_current_stmt_head();
+  points_to_list ptl_in = load_pt_to_list(s);
+
+#include <alias-classes.h>
+  pt_map graph_assign_list(pt_map ptm, list l);
+
+  points_to_graph pts_to_in_g = new_pt_map();
+  pts_to_in_g = graph_assign_list(pts_to_in_g, points_to_list_list(pts_to_in));
+  set pts_to_in_s = points_to_graph_set(pts_to_in_g);
+
+  points_to_graph pt_in = new_pt_map();
+  pt_in = graph_assign_list(pt_in, points_to_list_list(ptl_in));
+  //pt_in = graph_assign_list(pt_in, points_to_list_list(pts_to_in));
+  set pt_in_s = points_to_graph_set(pt_in);
+  set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s);
+  ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+
+  set bm = new_simple_pt_map();
+  list dl = code_declarations(value_code(entity_initial(callee)));
+  list formal_args = points_to_cells_parameters(dl);   
+  bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
+  ifdebug(8) print_points_to_set("bm", bm);
+  cell eff_c = effect_cell(eff);
+  points_to_graph bm_g = make_points_to_graph(false, bm);
+  list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
+
+  // FI: memory leak on bm_g
+
+  FOREACH(CELL, n_c, n_eff_cells) {
+    action ac = copy_action(effect_action(eff));
+    approximation ap = copy_approximation(effect_approximation(eff));
+    descriptor d = copy_descriptor(effect_descriptor(eff));
+    effect n_eff =  make_effect(n_c, ac, ap, d);
+    ael = CONS(EFFECT, n_eff, ael);
+  }
+
+  pips_assert("The effect is translated", !ENDP(ael));
+
+  return ael;
+}
 
 
 /**
@@ -325,7 +383,7 @@ list generic_c_effects_backward_translation(entity callee,
   list l_eff = NIL; /* proper effect list to be returned */
   list ra;
   bool param_varargs_p = false;
-  type callee_ut = ultimate_type(entity_type(callee));
+  type callee_ut = entity_basic_concrete_type(callee);
   list formal_args = functional_parameters(type_functional(callee_ut));
   int arg_num;
 
@@ -340,7 +398,7 @@ list generic_c_effects_backward_translation(entity callee,
 
   (*effects_translation_init_func)(callee, real_args, true);
 
-  /* first, take care of global effects */
+  /* first, take care of global and formal context effects */
 
   l_current = l_begin;
   l_prec = NIL;
@@ -352,12 +410,31 @@ list generic_c_effects_backward_translation(entity callee,
 
       if(!formal_parameter_p(v))
 	{
-	  /* This effect must be a global effect. It does not require
-	     translation in C. However, it may not be in the scope of
-	     the caller. */
-	  eff = (*effect_dup_func)(eff);
-	  (*effect_descriptor_interprocedural_translation_op)(eff);
-	  l_eff = gen_nconc(l_eff,CONS(EFFECT, eff, NIL));
+	  /* This effect must be either a global effect or an effect
+	   * on the global context if points-to information is used.
+	   *
+	   * A global effect does not require a translation in
+	   * C. However, it may not be in the scope of the caller.
+	   *
+	   * A formal context effect must be translated.
+	   */
+	  if(entity_stub_sink_p(v)) {
+	    // FI: I have no idea how to make this generic
+	    // FI: also, it's going to be extremely inefficient as the
+	    // translation information has to be recomputer for each effect "eff"
+	    // FI: Should effects_translation_init_func() be used?
+	    list n_effects
+	      = backward_translation_of_points_to_formal_context_effect(callee, real_args, eff);
+	    FOREACH(EFFECT, n_effect, n_effects)
+	      (*effect_descriptor_interprocedural_translation_op)(n_effect);
+	    l_eff = gen_nconc(l_eff, n_effects);
+	  }
+	  else {
+	    // FI-> BC: not nice for the gdb user; "new_efff = ..." would be
+	    eff = (*effect_dup_func)(eff);
+	    (*effect_descriptor_interprocedural_translation_op)(eff);
+	    l_eff = gen_nconc(l_eff,CONS(EFFECT, eff, NIL));
+	  }
 
 	  /* remove the current element from the list */
 	  if (l_begin == l_current)

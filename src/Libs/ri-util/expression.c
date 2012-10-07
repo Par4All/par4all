@@ -1295,6 +1295,14 @@ string expression_to_string(expression e) {
     return out;
 }
 
+string reference_to_string(reference r) {
+    list l = words_reference(r,NIL) ;
+    string out = words_to_string(l);
+    FOREACH(STRING,w,l) free(w);
+    gen_free_list(l);
+    return out;
+}
+
 
 void print_expressions(list le)
 {

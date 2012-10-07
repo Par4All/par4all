@@ -429,7 +429,7 @@ static list effects_generic_inf_difference_op(effect eff1, effect eff2,
   There is a strong assumption on l1 and l2 effects: two effects of l1
   (resp. l2) are not combinable wrt r1_r2_combinable_p.  The algorithm
   relies on this assumption to avoid unecessary comparisons of effects
-  when possible, for performance reasons ((the asymptotic complexity is
+  when possible, for performance reasons (the asymptotic complexity is
   o(n1*n2), but taking into account this assumption reduces the average
   complexity).
 
@@ -1296,8 +1296,24 @@ bool effects_scalars_and_same_action_p(effect eff1, effect eff2)
     action_kind ak2 = action_to_action_kind(effect_action(eff2));
     if(action_kind_tag(ak1)!=action_kind_tag(ak2))
       same_p = false;
-    else
-      same_p = (effect_scalar_p(eff1) || effect_scalar_p(eff2)) && effects_combinable_p(eff1, eff2);
+    else {
+      // FI->BC: s.f and s.f is not recognized as scalar effect
+      // because they are encoded as s[f], which does not appear scalar
+      // Also effects_combinable_p() may redo some of the work
+      // performed above
+      // same_p = (effect_scalar_p(eff1) || effect_scalar_p(eff2))
+      //   && effects_combinable_p(eff1, eff2);
+      same_p = (atomic_effect_p(eff1) || atomic_effect_p(eff2))
+	&& effects_combinable_p(eff1, eff2);
+    //FI : a[*] and a[*] in EffectsWithPointsTo/call10.c
+      if(!same_p) {
+	cell c1 = effect_cell(eff1);
+	cell c2 = effect_cell(eff2);
+	reference r1 = cell_any_reference(c1);
+	reference r2 = cell_any_reference(c2);
+	same_p = reference_equal_p(r1, r2);
+      }
+    }
   }
 
   return same_p;

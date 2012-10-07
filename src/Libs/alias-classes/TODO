@@ -43,19 +43,19 @@ looked at.
 not detected. And there is a bug for "double * z1=*q++".
 
 19. Improve heap model. Add an extra first dimension to model the
-different intraprocedural dynamic occurences of a malloc? See Point 11 too.
+different intraprocedural dynamic occurences of a malloc? Use a
+different name for the abstract location but indicate a static
+conflict as with EQUIVALENCEs in Fortran? See Point 11 too.
 
 20. Pre-decrement and pre-increment are likely to be evaluated
 twice. See the post case in
 unary_intrinsic_call_to_points_to_sinks(). No test case yet I'm
 afraid.
 
-22. Handling of >, >=, <, <= in pointer conditions. No test case yet.
+22. Handling of >, >=, <, <= in pointer conditions. No test case yet. Implies that both pointers points toward the same object...
 
 24. The consistency check does not check that arcs starting from a
 vertex of out-degree strictly greater than 1 must be may arcs.
-
-25. Strict_typing.sub/fabien03: bug detected by or in a type check.
 
 32. statement01_dec: should we generate a NOWHERE rather than a bottom
 graph? Should this be a property? Ot it should generate a pointer
@@ -68,14 +68,11 @@ usual case, but it should be controlled by a property...
 
 38. pointer15: the indices for _t_1 are not properly located. The first subscript should be zero for the implicit dimension. [1][2] should be the second and third subscripts
 
-39. If a stub is added to deal with casts, Rice/test03.c could be
-parallelized by trusting the type of the pointer
-"toto". EffectWithPointsTo should also be able to understand these
-stubs of a new kind...
-
 42. Suggestion by Pierre Jouvelot: do not propagate undefined values.
 
-Next item will be 43.
+43. What happens with unions?
+
+Next item will be 44.
 
 ----------------------------------------------------------
 
@@ -201,3 +198,17 @@ update the approximations. See Strict_typing.sub/linked_list01.c for
 instance.
 
 -> Not observed anymore.
+
+25. Strict_typing.sub/fabien03: bug detected by or in a type check.
+
+-> fabien03.c fixed; a user warning added before the fatal PIPS error,
+   waiting for more experience with this test...
+
+39. If a stub is added to deal with casts, Rice/test03.c could be
+parallelized by trusting the type of the pointer
+"toto". EffectWithPointsTo should also be able to understand these
+stubs of a new kind...
+
+-> up to now, stubs for casts do not appear necessary; test03.c was
+   mishandled for another reason: the type used was changed by a
+   program transformation
