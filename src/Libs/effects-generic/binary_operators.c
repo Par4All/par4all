@@ -1296,6 +1296,9 @@ bool effects_scalars_and_same_action_p(effect eff1, effect eff2)
     action_kind ak2 = action_to_action_kind(effect_action(eff2));
     if(action_kind_tag(ak1)!=action_kind_tag(ak2))
       same_p = false;
+    else
+      same_p = (effect_scalar_p(eff1) || effect_scalar_p(eff2)) && effects_combinable_p(eff1, eff2);
+#if 0
     else {
       // FI->BC: s.f and s.f is not recognized as scalar effect
       // because they are encoded as s[f], which does not appear scalar
@@ -1314,6 +1317,7 @@ bool effects_scalars_and_same_action_p(effect eff1, effect eff2)
 	same_p = reference_equal_p(r1, r2);
       }
     }
+#endif
   }
 
   return same_p;
