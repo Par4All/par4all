@@ -108,10 +108,10 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: ma _MALLOC_EFFECTS:_MALLOC_
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
-//             <    is read   >: ma _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.dim
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.data
+//             <    is read   >: *HEAP*_l_20.dim ma 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: *HEAP*_l_20.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
    allocate_array(ma);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -154,10 +154,10 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: ma _MALLOC_EFFECTS:_MALLOC_
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
-//             <    is read   >: ma _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.dim
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               allocate_array:_pa_1.data
+//             <    is read   >: *HEAP*_l_20.dim ma 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: *HEAP*_l_20.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
    allocate_array(ma);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

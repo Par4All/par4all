@@ -220,10 +220,8 @@ int main()
    ppt = &pt;
 //             <    is written>: pps
    pps = &ps;
-//             <    is read   >: pps ppt assignment:_t1_1 
-//                               assignment:_t2_2 
-//                               assignment:_t2_2_2.ip2
-//             <    is written>: assignment:_t1_1_1.ip1
+//             <    is read   >: pps ppt ps pt s1.ip2
+//             <    is written>: s2.ip1
    assignment(pps, ppt);
 
    return 0;
@@ -267,10 +265,8 @@ int main()
    ppt = &pt;
 //             <    is written>: pps
    pps = &ps;
-//             <    is read   >: pps ppt assignment:_t1_1 
-//                               assignment:_t2_2 
-//                               assignment:_t2_2_2.ip2
-//             <    is written>: assignment:_t1_1_1.ip1
+//             <    is read   >: pps ppt ps pt s1.ip2
+//             <    is written>: s2.ip1
    assignment(pps, ppt);
 
    return 0;

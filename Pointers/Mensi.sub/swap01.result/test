@@ -84,7 +84,7 @@ int main()
 //             <    is written>: i j pi pj ppi ppj
    int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap01:_p_1 swap01:_q_2
+//             <    is written>: pi pj
    swap01(ppi, ppj);
 
    return 0;
@@ -109,13 +109,12 @@ int main();
 CUMULATED  EFFECTS WITH POINTS TO
 
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap01:_p_1 swap01:_q_2
 int main()
 {
 //             <    is written>: i j pi pj ppi ppj
    int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap01:_p_1 swap01:_q_2
+//             <    is written>: pi pj
    swap01(ppi, ppj);
 
    return 0;

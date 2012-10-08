@@ -136,16 +136,16 @@ int main()
    int *x0 = &x, *y0 = &y, *z0 = &z;
 
    if (1)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: y0 z0
+//             <    is written>: x0 y0
       f(&x0, &y0, &z0);
    else if (2)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: x0 y0
+//             <    is written>: x0 z0
       f(&z0, &x0, &y0);
    else
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: x0 y0
+//             <    is written>: x0 y0
       f(&x0, &y0, &x0);
 
    return 0;
@@ -168,27 +168,27 @@ void f(int **p, int **q, int **r)
    *q = *r;
    return;
 }
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
 int main()
 {
    int x, y, z;
 //             <    is written>: x0 y0 z0
    int *x0 = &x, *y0 = &y, *z0 = &z;
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <may be read   >: x0 z0
+//             <may be written>: y0 z0
+//             <    is read   >: y0
+//             <    is written>: x0
 
    if (1)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: y0 z0
+//             <    is written>: x0 y0
       f(&x0, &y0, &z0);
    else if (2)
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: x0 y0
+//             <    is written>: x0 z0
       f(&z0, &x0, &y0);
    else
-//             <    is read   >: f:_q_2 f:_r_3
-//             <    is written>: f:_p_1 f:_q_2
+//             <    is read   >: x0 y0
+//             <    is written>: x0 y0
       f(&x0, &y0, &x0);
 
    return 0;

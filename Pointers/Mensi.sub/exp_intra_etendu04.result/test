@@ -35,7 +35,11 @@ POINTS-TO
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// _p_1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1_2__1.next -> _p_1_2__1 , MAY
 
 int count(liste *p)
 {
@@ -87,7 +91,12 @@ int count(liste *p)
       i++;
    }
 
-// Points To: unreachable
+// Points To:
+// _p_1.next -> _p_1_2__1 , MAY
+// _p_1.val -> tab[*] , MAY
+// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.val -> tab[*] , MAY
+// p -> *NULL_POINTER* , EXACT
 
    return i;
 }

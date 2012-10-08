@@ -104,7 +104,7 @@ int main()
 //             <    is read   >: x2
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
-//             <    is written>: chain:_c1_1.next
+//             <    is written>: *HEAP*_l_17.next
 
    chain(x1, x2);
 
@@ -124,8 +124,7 @@ void chain(ilp_t c1, ilp_t c2)
    return;
 }
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               chain:_c1_1.next
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -141,7 +140,7 @@ int main()
 //             <    is read   >: x2
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
-//             <    is written>: chain:_c1_1.next
+//             <    is written>: *HEAP*_l_17.next
 
    chain(x1, x2);
 

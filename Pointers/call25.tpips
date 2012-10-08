@@ -1,0 +1,33 @@
+setenv WS=call25
+delete $WS
+create $WS $WS.c
+
+# The source code is not compatible with the STRICT property below. A
+# user error must be detected
+
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+# This property is not compatible with pi++
+set POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+echo
+echo POINTS TO
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WS]
+
+
+close
+
+echo
+echo Warnings and errors
+echo
+
+shell cat $WS.database/Warnings
+delete $WS
+quit
