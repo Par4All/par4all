@@ -2386,6 +2386,8 @@ pt_map null_equal_condition_to_points_to(expression e, pt_map in)
   type et = expression_to_type(e);
   if(pointer_type_p(et)) {
     list R = expression_to_points_to_sinks(e, in);
+    bool null_initialization_p
+      = get_bool_property("POINTS_TO_NULL_POINTER_INITIALIZATION"); 
 
     if(ENDP(R)) {
       // Maybe, a dereferencement user error occured?
@@ -2397,7 +2399,10 @@ pt_map null_equal_condition_to_points_to(expression e, pt_map in)
     FOREACH(CELL, c, R) {
       if(null_cell_p(c)
 	 || anywhere_cell_p(c)
-	 || cell_typed_anywhere_locations_p(c)) {
+	 || cell_typed_anywhere_locations_p(c)
+	 /* If NULL initialization is not performed, a stub can
+	    represent a NULL. */
+	 || (!null_initialization_p && stub_points_to_cell_p(c))) {
 	found_p = true;
 	break;
       }
