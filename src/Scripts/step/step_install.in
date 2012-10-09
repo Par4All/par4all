@@ -24,7 +24,6 @@ mkdir -p $DEST_DIR/$STEP_RT
 prefix=@prefix@
 datarootdir=@datarootdir@
 cp @datadir@/step/c/* $DEST_DIR/$STEP_RT
-cp -r @datadir@/step/util $DEST_DIR/$STEP_RT
 
 #installation du Makefile par defaut
 cp @datadir@/step/Makefile $DEST_DIR

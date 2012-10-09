@@ -30,8 +30,8 @@ FLAGS = -g -O2 -DSTEP_ARG=$(STEP_ARG) -DINDEX_TYPE=$(STEP_ARG) -fPIC
 #FLAGS += -O0
 FLAGS += -Wall
 #FLAGS += -DSTEP_DEBUG
-#FLAGS += -DSTEP_COMMUNICATIONS_VERBOSE
-FLAGS += -DTRACE
+FLAGS += -DSTEP_COMMUNICATIONS_VERBOSE
+#FLAGS += -DTRACE
 
 ifeq ($(COMPILER) , gnu)
 endif
@@ -42,14 +42,11 @@ FFLAGS += $(FLAGS)
 CFLAGS += $(FLAGS) -I.
 
 
-INCLUDE_DIR = ./util
-LD_FLAGS = $(INCLUDE_DIR) -ltimings
-
 SRC = step_api.c steprt.c communications.c regions.c array.c timer.c trace.c
 OBJ = $(SRC:.c=.o)
 
 
-all: $(LIBRARY) STEP.h critical_pcoord_program
+all: $(LIBRARY) STEP.h
 
 STEP.h: step_common.h
 	echo "!\n!   Genereted file from $^\n!" > $@ && \
@@ -57,14 +54,11 @@ STEP.h: step_common.h
 	grep -v "^#define[\t ]*STEP_BARRIER" | \
 	sed "s,^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\),\n       INTEGER \1\n       PARAMETER (\1 = \2)," >>$@
 
-critical_pcoord_program: critical_pcoord_program.c
-	$(CC) -o $@ $^
-
 step_type.o: step_type.f STEP.h
 	$(FC) $(FFLAGS) -o $@ -c $<
 
 %.o: %.c
-	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 libstep.a: step_type.o $(OBJ)
 	ar rcs $@ $^
@@ -72,34 +66,9 @@ libstep.a: step_type.o $(OBJ)
 libstep.so: step_type.o $(OBJ)
 	$(CC) -shared -o $@ $^
 
-alltests: test_array test_regions test_communications test_steprt test_step_api test_timer_c test_timer_f
-
-test_array: array.c trace.c
-	$(CC) -D TEST_ARRAY $(CFLAGS) $^ -o $@
-
-test_regions: array.c regions.c trace.c
-	$(CC) -D TEST_REGIONS $(CFLAGS) $^ -o $@
-
-test_communications: steprt.c communications.c array.c regions.c trace.c step_type.o
-	$(CC) -DTEST_COMMUNICATIONS $(CFLAGS) $^ -o $@
-
-test_steprt: steprt.c communications.c array.c regions.c trace.c step_type.o
-	$(CC) -D TEST_STEPRT $(FLAGS) $^ -o $@
-
-test_step_api: step_api.c steprt.c communications.c array.c regions.c trace.c step_type.o
-	$(CC) -fopenmp -D TEST_STEP_API $(FLAGS) $^ -o $@
-#	$(FC) $(FFLAGS) $^ -o $@
-
-test_timer_c: array.c timer.c trace.c
-	$(CC) -D TEST_TIMER_C $(FLAGS) $^ -o $@
-
-test_timer_f: array.c timer.c trace.c
-	$(CC) $(FLAGS) -c $^
-	$(FC) -D TEST_TIMER_F $(FFLAGS) $(^:.c=.o) timer.F -o $@
-
 clean:
 	@rm -f *.o  *~ *__genmod.* &>/dev/null
-	@rm -f $(LIBRARY) test_* *.report $ &>/dev/null
-	@rm -f STEP.h critical_pcoord_program
+	@rm -f $(LIBRARY) *.report $ &>/dev/null
+	@rm -f STEP.h
 
 .IGNORE: clean

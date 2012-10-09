@@ -235,7 +235,7 @@ static void outliner_smart_replacment(statement in, entity old, entity new,size_
     gen_context_recurse(in,&ctxt,reference_domain,gen_true,do_outliner_smart_replacment);
 }
 
-static list statements_referenced_entities(list statements)
+list outliner_statements_referenced_entities(list statements)
 {
     list referenced_entities = NIL;
     set sreferenced_entities = set_make(set_pointer);
@@ -277,7 +277,7 @@ static list statements_referenced_entities(list statements)
  */
 static hash_table outliner_smart_references_computation(list outlined_statements,entity new_module)
 {
-  list referenced_entities = statements_referenced_entities(outlined_statements);
+  list referenced_entities = outliner_statements_referenced_entities(outlined_statements);
 
     /* this will hold new referenced_entities list */
     hash_table entity_to_init = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
@@ -542,7 +542,7 @@ hash_table outliner_init(entity new_fun, list statements_to_outline)
 list outliner_scan(entity new_fun, list statements_to_outline, statement new_body)
 {
     /* Retrieve referenced entities */
-    list referenced_entities = statements_referenced_entities(statements_to_outline);
+    list referenced_entities = outliner_statements_referenced_entities(statements_to_outline);
 
     ifdebug(5) {
       pips_debug(0,"Referenced entities :\n");
@@ -718,7 +718,7 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
             effective_parameters=CONS(EXPRESSION,effective_parameter,effective_parameters);
         }
         /* this is a constant variable or fortran function result */
-        else if(entity_constant_p(e)||entity_function_p(e)) {
+        else if(entity_constant_p(e)||(fortran_module_p(new_fun) && entity_function_p(e))) {
 	  AddLocalEntityToDeclarations(e,new_fun,new_body);
         }
 

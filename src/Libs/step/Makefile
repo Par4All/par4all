@@ -2,17 +2,24 @@
 TARGET	= step
 
 PARSER_COMMENT = comment2pragma
-PARSER_OMP = step_omp
+
+LEXER_STEP = step_lexer
+PARSER_STEP = step_bison_parser
+
 
 INSTALL_INC = STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
 
-DERIVED_HEADERS = $(INSTALL_INC) $(PARSER_COMMENT).h $(PARSER_OMP).h ../../Runtimes/step/c/STEP.h
-DERIVED_CFILES	= $(PARSER_COMMENT).c $(PARSER_OMP).c
+DERIVED_HEADERS = $(INSTALL_INC) $(PARSER_COMMENT).h $(LEXER_STEP).h $(PARSER_STEP).h ../../Runtimes/step/c/STEP.h
+DERIVED_CFILES	= $(PARSER_COMMENT).c $(LEXER_STEP).c $(PARSER_STEP).c
 
 INC_CFILES=	directives.c \
 		analyse.c \
 		compile_RT.c \
-		compile.c
+		compile_mpi.c \
+		compile_regions.c \
+		compile.c \
+		parser.c \
+		install.c
 
 LIB_CFILES = $(DERIVED_CFILES) $(INC_CFILES)
 
@@ -24,6 +31,7 @@ LIB_TARGET =    lib$(TARGET).a
 # common stuff
 ROOT    = ../../..
 PROJECT = pips
+CPPFLAGS += -DPIPS_RUNTIME_DIR=\"$(CURDIR)/../../Runtimes\"
 include $(ROOT)/makes/main.mk
 
 # local stuff
@@ -39,10 +47,13 @@ $(PARSER_COMMENT).c: $(PARSER_COMMENT).l
 
 $(PARSER_COMMENT).h: $(PARSER_COMMENT).c
 
-$(PARSER_OMP).c: $(PARSER_OMP).l
-	$(FLEX) $(LFLAGS) --prefix=$(PARSER_OMP)_ --header-file=$(PARSER_OMP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
+$(LEXER_STEP).c: $(LEXER_STEP).l
+	$(FLEX) $(LFLAGS) --prefix=step_ --header-file=$(LEXER_STEP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
 
-$(PARSER_OMP).h: $(PARSER_OMP).c
+$(PARSER_STEP).c: $(PARSER_STEP).y
+	$(BISON) -d --name-prefix=step_ $(PARSER_STEP).y -o $(PARSER_STEP).c
+
+$(PARSER_STEP).h: $(PARSER_STEP).c
 
 srcdir=.
 include stepstuff.mk
