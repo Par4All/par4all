@@ -1,4 +1,4 @@
-    ###################### matmul_c/matmul_c.database/Src/matmul_c.cpp_processed.c ######################
+###################### matmul_c-STEP/matmul_c.database/Src/matmul_c.cpp_processed.c ######################
 #include "matmul_c.cpp_processed.h"
 #include "step_api.h"
 void main_PAR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1], int k_0[1]);
@@ -34,14 +34,6 @@ void main_PAR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0
    ;
 #pragma omp master
    {
-      
-      //C     Communicating data to other nodes
-      //C     3 communication shemes for all-to-all personalized broadcast :
-      //C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      STEP_ALLTOALL_FULL(a, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
-      STEP_ALLTOALL_FULL(b, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
-      STEP_ALLTOALL_FULL(c, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
-      STEP_FLUSH();
       STEP_CONSTRUCT_END(STEP_PARALLEL);
       *i_0 = i;
       *j_0 = j;
@@ -53,12 +45,10 @@ void main_PAR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0
 }
 void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
 {
-   //PIPS generated variable
-   int STEP_COMM_RANK, STEP_RR_c[2][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       //PIPS generated variable
-      int i, j;
+      int i, j, STEP_COMM_RANK, STEP_RR_c[2][STEP_INDEX_SLICE_UP];
       j = *j_0;
       i = *i_0;
       STEP_CONSTRUCT_BEGIN(STEP_MASTER);
@@ -66,8 +56,7 @@ void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
       //RECV REGIONS
       ;
       
-      //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9, k==10,
-      //    n==10}>
+      //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9}>
       
       ;
       STEP_RR_c[1-1][STEP_INDEX_SLICE_LOW-1] = 0;
@@ -93,15 +82,13 @@ void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
       STEP_CONSTRUCT_END(STEP_MASTER);
       *i_0 = i;
       *j_0 = j;
+      ;
    }
-#pragma omp barrier
-
-   ;
 }
 void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1], int k_0[1])
 {
    //PIPS generated variable
-   int i, j, k, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, IDX, STEP_RR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_RR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_RR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
+   int i, j, k, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_RR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       k = *k_0;
@@ -116,39 +103,50 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
       for(IDX = 1; IDX <= STEP_COMM_SIZE; IDX += 1) {
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
-         //  <c[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
+         //  <a[PHI1][PHI2]-R-EXACT-{PHI1<=9, STEP_i_LOW<=PHI1,
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
          
          ;
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
-         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
-         
-         //  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
-         
-         ;
-         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = STEP_i_LOW;
          STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
-         //  <b[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9, n==10,
-         //    STEP_i_LOW<=9, STEP_i_LOW<=STEP_i_UP, 0<=STEP_i_UP}>
+         //  <b[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
+         //    STEP_i_LOW<=9, STEP_i_LOW<=STEP_i_UP}>
          
          ;
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = 9;
-         STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
+         if (STEP_i_LOW-STEP_i_UP<=0&&STEP_i_LOW-9<=0) {
+            STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = 0;
+            STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = 9;
+            STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
+            STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
+         }
+         else {
+            // Inverted bounds correspond to empty regions
+            // Used when work concerns specific data ex: print A[5]
+            // In this case, only concerned process sends non empty regions
+            STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = n-1;
+            STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = 0;
+            STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = n-1;
+            STEP_RR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 0;
+         }
+         
+         //  <c[PHI1][PHI2]-R-EXACT-{PHI1<=9, STEP_i_LOW<=PHI1,
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
+         
+         ;
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = STEP_i_LOW;
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
+         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
+         STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
       }
-      STEP_SET_RECVREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_c);
       STEP_SET_RECVREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_a);
       STEP_SET_RECVREGIONS(b, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_b);
-      STEP_REGISTER_ALLTOALL_PARTIAL(c, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
+      STEP_SET_RECVREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_c);
       STEP_REGISTER_ALLTOALL_PARTIAL(a, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_REGISTER_ALLTOALL_PARTIAL(b, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
+      STEP_REGISTER_ALLTOALL_PARTIAL(c, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_FLUSH();
       
       //SEND REGIONS
@@ -156,11 +154,11 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
       for(IDX = 1; IDX <= STEP_COMM_SIZE; IDX += 1) {
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
-         //  <c[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
+         //  <c[PHI1][PHI2]-W-EXACT-{PHI1<=9, STEP_i_LOW<=PHI1,
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
          
          ;
-         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = STEP_i_LOW;
          STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
@@ -198,7 +196,7 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
 void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1])
 {
    //PIPS generated variable
-   int i, j, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, IDX, STEP_SR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
+   int i, j, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_SR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       j = *j_0;
@@ -212,8 +210,17 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
       for(IDX = 1; IDX <= STEP_COMM_SIZE; IDX += 1) {
          STEP_GET_LOOPBOUNDS(IDX-1, &STEP_i_LOW, &STEP_i_UP);
          
+         //  <a[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
+         
+         ;
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
+         STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
+         STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
+         
          //  <b[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
          
          ;
          STEP_SR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
@@ -222,26 +229,17 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
          STEP_SR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
          //  <c[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
+         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9}>
          
          ;
          STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
          STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
-         
-         //  <a[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, STEP_i_LOW<=PHI1,
-         //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
-         
-         ;
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
-         STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
-         STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
       }
+      STEP_SET_SENDREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_a);
       STEP_SET_SENDREGIONS(b, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_b);
       STEP_SET_SENDREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_c);
-      STEP_SET_SENDREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_a);
    }
 #pragma omp barrier
 
@@ -261,9 +259,9 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
    ;
 #pragma omp master
    {
+      STEP_REGISTER_ALLTOALL_PARTIAL(a, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_REGISTER_ALLTOALL_PARTIAL(b, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_REGISTER_ALLTOALL_PARTIAL(c, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
-      STEP_REGISTER_ALLTOALL_PARTIAL(a, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_FLUSH();
       STEP_CONSTRUCT_END(STEP_DO);
       *i_0 = i;
@@ -275,11 +273,13 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
 }
 int main(void)
 {
-   int n = 10;
-   float a[n][n], b[n][n], c[n][n];
-   int i, j, k;
    STEP_INIT_C_ORDER();
-   main_PAR_HYBRID(n, a, b, c, &i, &j, &k);
-   STEP_FINALIZE();
-   return 0;
+   {
+      int n = 10;
+      float a[n][n], b[n][n], c[n][n];
+      int i, j, k;
+      main_PAR_HYBRID(n, a, b, c, &i, &j, &k);
+      STEP_FINALIZE();
+      return 0;
+   }
 }

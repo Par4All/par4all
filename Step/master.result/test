@@ -1,4 +1,4 @@
-###################### master/master.database/Src/MASTER_PAR_HYBRID.f ######################
+###################### master-STEP/master.database/Src/MASTER_PAR_HYBRID.f ######################
       SUBROUTINE MASTER_PAR_HYBRID(N, A, I, J)
       implicit none
       include "STEP.h"
@@ -34,18 +34,11 @@ C BEGIN WORK
 !$omp end parallel
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
-     &)
-      CALL STEP_FLUSH
       CALL STEP_CONSTRUCT_END(STEP_PARALLEL)
 !$omp end master
 !$omp barrier
       END
-###################### master/master.database/Src/MASTER_PAR_HYBRID_BARRIER_HYBRID.f ######################
+###################### master-STEP/master.database/Src/MASTER_PAR_HYBRID_BARRIER_HYBRID.f ######################
       SUBROUTINE MASTER_PAR_HYBRID_BARRIER_HYBRID
       implicit none
       include "STEP.h"
@@ -55,7 +48,7 @@ C BEGIN WORK
       CALL STEP_BARRIER
 C END WORK
       END
-###################### master/master.database/Src/MASTER_PAR_HYBRID_DO_HYBRID.f ######################
+###################### master-STEP/master.database/Src/MASTER_PAR_HYBRID_DO_HYBRID.f ######################
       SUBROUTINE MASTER_PAR_HYBRID_DO_HYBRID(N, A, J)
       implicit none
       include "STEP.h"
@@ -73,7 +66,7 @@ C SEND REGIONS
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_J_LOW, STEP_J_UP)
 
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10, STEP_J_LOW<=PHI1,
-C    PHI1<=STEP_J_UP, I==-3}>
+C    PHI1<=STEP_J_UP}>
 
          STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_J_LOW)
          STEP_SR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_J_UP)
@@ -93,14 +86,14 @@ C BEGIN WORK
 !$omp end do
 C END WORK
 !$omp master
-      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
-     &STEP_TAG_DEFAULT)
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
+     &)
       CALL STEP_FLUSH
       CALL STEP_CONSTRUCT_END(STEP_DO)
 !$omp end master
 !$omp barrier
       END
-###################### master/master.database/Src/MASTER_PAR_HYBRID_MASTER_HYBRID.f ######################
+###################### master-STEP/master.database/Src/MASTER_PAR_HYBRID_MASTER_HYBRID.f ######################
       SUBROUTINE MASTER_PAR_HYBRID_MASTER_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
@@ -113,7 +106,7 @@ C END WORK
 
 C RECV REGIONS
 
-C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10, I==-1, J==11}>
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
 
       STEP_RR_A(STEP_INDEX_SLICE_LOW,1) = 1
       STEP_RR_A(STEP_INDEX_SLICE_UP,1) = 10
@@ -124,7 +117,7 @@ C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10, I==-1, J==11}>
 
 C SEND REGIONS
 
-C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10, J==11}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
       STEP_SR_A(STEP_INDEX_SLICE_LOW,1) = 1
       STEP_SR_A(STEP_INDEX_SLICE_UP,1) = 10
@@ -140,14 +133,13 @@ C BEGIN WORK
 20          CONTINUE
       ENDIF
 C END WORK
-      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
-     &STEP_TAG_DEFAULT)
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
+     &)
       CALL STEP_FLUSH
       CALL STEP_CONSTRUCT_END(STEP_MASTER)
 !$omp end master
-!$omp barrier
       END
-###################### master/master.database/Src/master.f ######################
+###################### master-STEP/master.database/Src/master.f ######################
 !
 !
 ! Example of a master directive

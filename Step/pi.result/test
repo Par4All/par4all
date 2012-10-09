@@ -1,15 +1,15 @@
-###################### pi/pi.database/Src/PI_PARDO_HYBRID.f ######################
+###################### pi-STEP/pi.database/Src/PI_PARDO_HYBRID.f ######################
       SUBROUTINE PI_PARDO_HYBRID(CONTRIB, I, ITER, NUM_ITER, X)
       implicit none
       include "STEP.h"
-      INTEGER IDX, STEP_COMM_RANK, STEP_I_UP, STEP_I_LOW, 
-     &STEP_COMM_SIZE, I, NUM_ITER
+      INTEGER STEP_COMM_RANK, STEP_I_UP, STEP_I_LOW, STEP_COMM_SIZE, 
+     &I, NUM_ITER
       REAL*8 CONTRIB, ITER, X
 !$omp master
       CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)
-      CALL STEP_INITREDUCTION(CONTRIB, STEP_SUM, STEP_REAL8)
       CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)
       CALL STEP_COMPUTE_LOOPSLICES(1, NUM_ITER, 1, STEP_COMM_SIZE)
+      CALL STEP_INITREDUCTION(CONTRIB, STEP_SUM_REDUCE, STEP_REAL8)
 !$omp end master
 !$omp barrier
 
@@ -31,7 +31,7 @@ C END WORK
 !$omp end master
 !$omp barrier
       END
-###################### pi/pi.database/Src/pi.f ######################
+###################### pi-STEP/pi.database/Src/pi.f ######################
       PROGRAM PI
 ! MIL-STD-1753 Fortran extension not in PIPS
       implicit none

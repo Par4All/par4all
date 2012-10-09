@@ -1,16 +1,14 @@
-###################### sum/sum.database/Src/SUM_PARDO_HYBRID.f ######################
+###################### sum-STEP/sum.database/Src/SUM_PARDO_HYBRID.f ######################
       SUBROUTINE SUM_PARDO_HYBRID(N, A, B, C, I)
       implicit none
       include "STEP.h"
       INTEGER IDX, STEP_COMM_RANK, STEP_I_UP, STEP_I_LOW, 
      &STEP_COMM_SIZE, N, I
-      INTEGER STEP_SR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:2
+      INTEGER STEP_SR_C(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
      &, 1:STEP_MAX_NB_LOOPSLICES), STEP_SR_B(STEP_INDEX_SLICE_LOW:
-     &STEP_INDEX_SLICE_UP, 1:1, 1:STEP_MAX_NB_LOOPSLICES), STEP_SR_C(
-     &STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1, 1:
-     &STEP_MAX_NB_LOOPSLICES), STEP_RR_B(STEP_INDEX_SLICE_LOW:
-     &STEP_INDEX_SLICE_UP, 1:1, 1:STEP_MAX_NB_LOOPSLICES), A(1:N, 1:2
-     &), B(1:N), C(1:N)
+     &STEP_INDEX_SLICE_UP, 1:1, 1:STEP_MAX_NB_LOOPSLICES), STEP_SR_A(
+     &STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:2, 1:
+     &STEP_MAX_NB_LOOPSLICES), A(1:N, 1:2), B(1:N), C(1:N)
 !$omp master
       CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)
       CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 2, 1, N, 1, 2)
@@ -19,47 +17,39 @@
       CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)
       CALL STEP_COMPUTE_LOOPSLICES(1, N, 1, STEP_COMM_SIZE)
 
-C RECV REGIONS
-      DO IDX = 1, STEP_COMM_SIZE
-         CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
-
-C  <B(PHI1)-R-MAY-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1<=STEP_I_UP}>
-
-         STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
-         STEP_RR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
-      ENDDO
-      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)
-      CALL STEP_REGISTER_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG, 
-     &STEP_TAG_DEFAULT)
-      CALL STEP_FLUSH
-
 C SEND REGIONS
       DO IDX = 1, STEP_COMM_SIZE
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
-C  <C(PHI1)-W-EXACT-{PHI1==1, STEP_I_LOW<=1, 1<=STEP_I_UP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1<=10, STEP_I_LOW<=PHI1, PHI1<=STEP_I_UP,
+C    1<=PHI2, PHI2<=2}>
 
-         STEP_SR_C(STEP_INDEX_SLICE_LOW,1,IDX) = 1
-         STEP_SR_C(STEP_INDEX_SLICE_UP,1,IDX) = 1
-
-C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1<=STEP_I_UP}>
-
-         STEP_SR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
-         STEP_SR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
-
-C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1<=STEP_I_UP, 1<=PHI2, PHI2<=2}>
-
-         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
+         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW
          STEP_SR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
          STEP_SR_A(STEP_INDEX_SLICE_LOW,2,IDX) = 1
          STEP_SR_A(STEP_INDEX_SLICE_UP,2,IDX) = 2
+
+C  <B(PHI1)-W-EXACT-{PHI1<=10, STEP_I_LOW<=PHI1, PHI1<=STEP_I_UP}>
+
+         STEP_SR_B(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW
+         STEP_SR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
+
+C  <C(PHI1)-W-EXACT-{PHI1==1, STEP_I_LOW<=1, 1<=STEP_I_UP}>
+
+         IF (-STEP_I_UP+1.LE.0.AND.STEP_I_LOW-1.LE.0) THEN
+            STEP_SR_C(STEP_INDEX_SLICE_LOW,1,IDX) = 1
+            STEP_SR_C(STEP_INDEX_SLICE_UP,1,IDX) = 1
+         ELSE
+C  Inverted bounds correspond to empty regions
+C  Used when work concerns specific data ex: print A[5]
+C  In this case, only concerned process sends non empty regions
+            STEP_SR_C(STEP_INDEX_SLICE_LOW,1,IDX) = N
+            STEP_SR_C(STEP_INDEX_SLICE_UP,1,IDX) = 1
+         ENDIF
       ENDDO
-      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)
-      CALL STEP_SET_SENDREGIONS(B, STEP_COMM_SIZE, STEP_SR_B)
       CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)
+      CALL STEP_SET_SENDREGIONS(B, STEP_COMM_SIZE, STEP_SR_B)
+      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)
 !$omp end master
 !$omp barrier
 
@@ -76,10 +66,6 @@ C BEGIN WORK
 !$omp end parallel do
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
      &)
       CALL STEP_ALLTOALL_FULL(B, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
@@ -91,16 +77,16 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 !$omp end master
 !$omp barrier
       END
-###################### sum/sum.database/Src/SUM_PARDO_HYBRID_1.f ######################
+###################### sum-STEP/sum.database/Src/SUM_PARDO_HYBRID_1.f ######################
       SUBROUTINE SUM_PARDO_HYBRID_1(N, A, B, C, I)
       implicit none
       include "STEP.h"
       INTEGER IDX, STEP_COMM_RANK, STEP_I_UP, STEP_I_LOW, 
      &STEP_COMM_SIZE, N, I
       INTEGER STEP_SR_C(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
-     &, 1:STEP_MAX_NB_LOOPSLICES), STEP_RR_A(STEP_INDEX_SLICE_LOW:
-     &STEP_INDEX_SLICE_UP, 1:2, 1:STEP_MAX_NB_LOOPSLICES), STEP_RR_B(
-     &STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1, 1:
+     &, 1:STEP_MAX_NB_LOOPSLICES), STEP_RR_B(STEP_INDEX_SLICE_LOW:
+     &STEP_INDEX_SLICE_UP, 1:1, 1:STEP_MAX_NB_LOOPSLICES), STEP_RR_A(
+     &STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:2, 1:
      &STEP_MAX_NB_LOOPSLICES), A(1:N, 1:2), B(1:N), C(1:N)
 !$omp master
       CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)
@@ -114,26 +100,34 @@ C RECV REGIONS
       DO IDX = 1, STEP_COMM_SIZE
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
-C  <B(PHI1)-R-EXACT-{2<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1<=STEP_I_UP}>
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==1, PHI1<=10, STEP_I_LOW<=PHI1+1,
+C    PHI1<=STEP_I_UP, STEP_I_LOW<=10, STEP_I_LOW<=STEP_I_UP}>
 
-         STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(2, STEP_I_LOW)
+         IF (STEP_I_LOW-STEP_I_UP.LE.0.AND.STEP_I_LOW-10.LE.0) THEN
+            STEP_RR_A(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW-1
+            STEP_RR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
+            STEP_RR_A(STEP_INDEX_SLICE_LOW,2,IDX) = 1
+            STEP_RR_A(STEP_INDEX_SLICE_UP,2,IDX) = 1
+         ELSE
+C  Inverted bounds correspond to empty regions
+C  Used when work concerns specific data ex: print A[5]
+C  In this case, only concerned process sends non empty regions
+            STEP_RR_A(STEP_INDEX_SLICE_LOW,1,IDX) = N
+            STEP_RR_A(STEP_INDEX_SLICE_UP,1,IDX) = 1
+            STEP_RR_A(STEP_INDEX_SLICE_LOW,2,IDX) = 2
+            STEP_RR_A(STEP_INDEX_SLICE_UP,2,IDX) = 1
+         ENDIF
+
+C  <B(PHI1)-R-EXACT-{PHI1<=10, STEP_I_LOW<=PHI1, PHI1<=STEP_I_UP}>
+
+         STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW
          STEP_RR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
-
-C  <A(PHI1,PHI2)-R-EXACT-{PHI2==1, 1<=PHI1, PHI1<=10,
-C    STEP_I_LOW<=PHI1+1, PHI1<=STEP_I_UP, STEP_I_LOW<=10,
-C    STEP_I_LOW<=STEP_I_UP, 2<=STEP_I_UP}>
-
-         STEP_RR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW-1)
-         STEP_RR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
-         STEP_RR_A(STEP_INDEX_SLICE_LOW,2,IDX) = 1
-         STEP_RR_A(STEP_INDEX_SLICE_UP,2,IDX) = 1
       ENDDO
-      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)
       CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)
-      CALL STEP_REGISTER_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG, 
-     &STEP_TAG_DEFAULT)
+      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)
       CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
+      CALL STEP_REGISTER_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG, 
      &STEP_TAG_DEFAULT)
       CALL STEP_FLUSH
 
@@ -141,10 +135,9 @@ C SEND REGIONS
       DO IDX = 1, STEP_COMM_SIZE
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
-C  <C(PHI1)-W-EXACT-{2<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1<=STEP_I_UP}>
+C  <C(PHI1)-W-EXACT-{PHI1<=10, STEP_I_LOW<=PHI1, PHI1<=STEP_I_UP}>
 
-         STEP_SR_C(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(2, STEP_I_LOW)
+         STEP_SR_C(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW
          STEP_SR_C(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
       ENDDO
       CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)
@@ -162,14 +155,6 @@ C BEGIN WORK
 !$omp end parallel do
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
-     &)
-      CALL STEP_ALLTOALL_FULL(B, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
-     &)
       CALL STEP_ALLTOALL_FULL(C, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
      &)
       CALL STEP_FLUSH
@@ -177,7 +162,7 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 !$omp end master
 !$omp barrier
       END
-###################### sum/sum.database/Src/SUM_PARDO_HYBRID_2.f ######################
+###################### sum-STEP/sum.database/Src/SUM_PARDO_HYBRID_2.f ######################
       SUBROUTINE SUM_PARDO_HYBRID_2(N, B, I)
       implicit none
       include "STEP.h"
@@ -197,11 +182,20 @@ C RECV REGIONS
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
 C  <B(PHI1)-R-MAY-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1+STEP_I_LOW<=11, STEP_I_LOW<=STEP_I_UP, 1<=STEP_I_UP}>
+C    PHI1+STEP_I_LOW<=11, STEP_I_LOW<=STEP_I_UP}>
 
-         STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
-         STEP_RR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, -STEP_I_LOW+
-     &   11)
+         IF (STEP_I_LOW-STEP_I_UP.LE.0) THEN
+            STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW
+     &      )
+            STEP_RR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, 
+     &      -STEP_I_LOW+11)
+         ELSE
+C  Inverted bounds correspond to empty regions
+C  Used when work concerns specific data ex: print A[5]
+C  In this case, only concerned process sends non empty regions
+            STEP_RR_B(STEP_INDEX_SLICE_LOW,1,IDX) = N
+            STEP_RR_B(STEP_INDEX_SLICE_UP,1,IDX) = 1
+         ENDIF
       ENDDO
       CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)
       CALL STEP_REGISTER_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG, 
@@ -213,11 +207,20 @@ C SEND REGIONS
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
 C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
-C    PHI1+STEP_I_LOW<=11, STEP_I_LOW<=STEP_I_UP, 1<=STEP_I_UP}>
+C    PHI1+STEP_I_LOW<=11, STEP_I_LOW<=STEP_I_UP}>
 
-         STEP_SR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
-         STEP_SR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, -STEP_I_LOW+
-     &   11)
+         IF (STEP_I_LOW-STEP_I_UP.LE.0) THEN
+            STEP_SR_B(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW
+     &      )
+            STEP_SR_B(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, 
+     &      -STEP_I_LOW+11)
+         ELSE
+C  Inverted bounds correspond to empty regions
+C  Used when work concerns specific data ex: print A[5]
+C  In this case, only concerned process sends non empty regions
+            STEP_SR_B(STEP_INDEX_SLICE_LOW,1,IDX) = N
+            STEP_SR_B(STEP_INDEX_SLICE_UP,1,IDX) = 1
+         ENDIF
       ENDDO
       CALL STEP_SET_INTERLACED_SENDREGIONS(B, STEP_COMM_SIZE, 
      &STEP_SR_B)
@@ -236,18 +239,14 @@ C BEGIN WORK
 !$omp end parallel do
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(B, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
-     &)
+      CALL STEP_ALLTOALL_FULL_INTERLACED(B, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
       CALL STEP_FLUSH
       CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)
 !$omp end master
 !$omp barrier
       END
-###################### sum/sum.database/Src/sum.f ######################
+###################### sum-STEP/sum.database/Src/sum.f ######################
 !
 ! sum program
 !
