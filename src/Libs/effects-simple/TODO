@@ -2,7 +2,7 @@ Issues for effects with points-to (in any order)
 
 1. Duplicate effects, same semantics, same print-out, different internal representation: a first attempt at merging them led to the merge of A(I) and A(I+1). See call09.c and call10.c
 
-2. Subscript list: extra [0] subscript in array05.c
+2. Subscript list: extra [0] subscript in array05.c, point_to02.c (very small piece of code).
 
 3. Buggy analyzed codes with NULL or undefined pointer parameters lead to core dumps. See call25.c, call26.c.
 
@@ -12,4 +12,8 @@ Issues for effects with points-to (in any order)
 nowhere01.c, null_pointer01.c. This might be normal but the
 information about the segfault is only know after segfaulting.
 
+6. Bug for points-to analysis in declaration initialization: statement01_dec.c
 
+7. C intrinsics effects: io_intrinsics.c, statement04.c, statement05.c
+
+8. Effects are unduly merged and imprecise: varargs04.c
