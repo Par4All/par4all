@@ -2360,7 +2360,7 @@ graph (CFG).
 
 \begin{PipsPass}{proper_effects}
 The proper memory effects of a statement basically are a list of variables
-that may be read or written by the statement. They are used to build use-def
+that may be read (used) or written (defined) by the statement. They are used to build use-def
 chains (see~\cite{ASU86} or a later edition) and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
@@ -2420,6 +2420,27 @@ proper_effects                  > MODULE.proper_effects
         < MODULE.code
         < CALLEES.summary_effects
 \end{PipsMake}
+
+When pointers are used, points-to information is useful to obtain
+precise proper memory effects.
+
+Because points-to analysis is able to detect some cases of segfaults,
+variables that are not defined/written can nevertheless have a
+different abstract value at the beginning and at the end of a piece of
+code.
+
+This leads to difficulties with memory effects. Firstly, if a piece of
+code is not reachable because a segfault always occurs before it is
+executed, it has no memory effects (as usual, the PIPS output is
+pretty surprising...). Secondly, cumulated memory effects can either
+be any effect that is linked to any execution of a piece of code or
+any effect that happens when the executions reach the end of the piece
+of code.
+
+So EffectsWithPointsTo contains weird results either because the code
+always segfault somewhere or because the code might segfault because a
+function argument is not checked before it is used. Hence, effects
+disappear or must effects become may effects.
 
 \begin{PipsMake}
 proper_effects_with_points_to > MODULE.proper_effects

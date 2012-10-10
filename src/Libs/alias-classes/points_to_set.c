@@ -366,7 +366,7 @@ bool cell_out_of_scope_p(cell c)
   entity e = reference_variable(r);
   return !(variable_static_p(e) ||  entity_stub_sink_p(e) || top_level_entity_p(e) || entity_heap_location_p(e) /*|| formal_parameter_p(e)*/ );
 }
-
+
 /* print a points-to arc for debug */
 void print_or_dump_points_to(const points_to pt, bool print_p)
 {
@@ -434,7 +434,7 @@ void dump_points_to_set(string what,  set s)
 {
   print_or_dump_points_to_set(what, s, false);
 }
-
+
 /* test if a cell appear as a source in a set of points-to */
 bool source_in_set_p(cell source, set s)
 {
@@ -443,6 +443,23 @@ bool source_in_set_p(cell source, set s)
     /* if( opkill_may_vreference(source, points_to_source(pt) )) */
     if(cell_equal_p(source, points_to_source(pt)))
       return true;
+  }
+  return in_p;
+}
+/* test if a cell "source" appears as a source in a set of points-to */
+bool source_subset_in_set_p(cell source, set s)
+{
+  bool in_p = false;
+  SET_FOREACH ( points_to, pt, s ) {
+    /* if( opkill_may_vreference(source, points_to_source(pt) )) */
+    if(cell_equal_p(source, points_to_source(pt))) {
+      in_p = true;
+      break;
+    }
+    else if(cell_included_p(points_to_source(pt), source)) {
+      in_p = true;
+      break;
+    }
   }
   return in_p;
 }
@@ -1286,8 +1303,11 @@ list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
  * It is not clear how much the abstract address lattice must be used
  * to retrieve sinks... If source = a[34], clearly a[*] is an OK
  * equivalent source if a[34] is not a vertex of "ptm".
+ *
+ * If !strict_p, "a[34]" is considered a source for "a[*]".
  */
-list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
+list generic_points_to_source_to_sinks(cell source, pt_map ptm,
+				       bool fresh_p, bool strict_p)
 {
   list sinks = NIL;
   set pts = points_to_graph_set(ptm);
@@ -1319,7 +1339,49 @@ list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
     }
   }
 
+  /* 3. Much harder... See if source contains one of the many
+     abstract sources.  */
+  if(ENDP(sinks) && !strict_p) {
+    SET_FOREACH(points_to, pt, pts) {
+      if(cell_included_p(points_to_source(pt), source)) {
+	// FI: memory leak forced because of refine_points_to_cell_subscripts
+	cell sc = (true||fresh_p)? copy_cell(points_to_sink(pt)) : points_to_sink(pt);
+	// FI->AM: if "source" is stricly included in
+	// "points_to_source(pt)", the subscript expression of sc
+	// might have to be cleaned up
+	//
+	// Which implies to allocate a new copy of sc no matter what
+	// fresh_p prescribes...
+	refine_points_to_cell_subscripts(sc, source, points_to_source(pt));
+	sinks = CONS(CELL, sc, sinks);
+      }
+    }
+  }
+
   return sinks;
+}
+
+/* Build the sinks of source "source" according to the points-to
+ * graphs. If "source" is not found in the graph, return an empty list
+ * "sinks". If "fresh_p", allocate copies. If not, return pointers to
+ * the destination vertices in "ptm".
+ *
+ * It is not clear how much the abstract address lattice must be used
+ * to retrieve sinks... If source = a[34], clearly a[*] is an OK
+ * equivalent source if a[34] is not a vertex of "ptm".
+ */
+list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
+{
+  return generic_points_to_source_to_sinks(source, ptm, fresh_p, true);
+}
+
+/* May not retrieve all sinks of the source.
+ *
+ * This happens with arrays of pointers. See EffectsWithPointers/call22.c
+ */
+list points_to_source_to_some_sinks(cell source, pt_map ptm, bool fresh_p)
+{
+  return generic_points_to_source_to_sinks(source, ptm, fresh_p, false);
 }
 
 /* Build the sources of sink "sink" according to the points-to

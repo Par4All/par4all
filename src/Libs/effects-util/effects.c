@@ -1101,7 +1101,7 @@ tag approximation_or(tag t1, tag t2)
 
 
 /** CELLS */
-/* test if two cells are equal, celles are supposed to be
+/* test if two cells are equal; cells are supposed to be
    references. */
 
 bool cell_equal_p(cell c1, cell c2)
@@ -1110,6 +1110,14 @@ bool cell_equal_p(cell c1, cell c2)
   reference r1 = cell_to_reference(c1);
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
+}
+
+bool cell_entity_equal_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return reference_variable(r1)==reference_variable(r2);
 }
 
 /* FI->FC/AM: some elements of the lattice must be exploited here... */
@@ -1479,4 +1487,77 @@ bool atomic_effect_p(effect e)
     atomic_p = atomic_points_to_cell_p(c);
   }
   return atomic_p;
+}
+
+// static list recursive_cell_to_pointer_cells(cell c)
+list recursive_cell_to_pointer_cells(cell c)
+{
+  list children = NIL;
+  // Too strong for recursive calls
+  //pips_assert("Cell \"c\" has no subscripts.",
+  //	      ENDP(reference_indices(cell_any_reference(c))));
+  bool to_be_freed;
+  type ct = points_to_cell_to_type(c, &to_be_freed);
+
+  if(pointer_type_p(ct)) {
+    children = CONS(CELL, copy_cell(c), NIL);
+  }
+  else if(array_type_p(ct)) {
+    /* Go down if it is an array of pointers or an array of struct */
+    if(array_of_pointers_type_p(ct) || array_of_struct_type_p(ct)) {
+      /* add indices to cell c */
+      cell n_c = copy_cell(c);
+      /* Add subscripts to reach array elements */
+      points_to_cell_add_unbounded_subscripts(n_c);
+      children = recursive_cell_to_pointer_cells(n_c);
+      free_cell(n_c);
+    }
+    else {
+      ; // No children
+    }
+  }
+  else if(struct_type_p(ct)) {
+    /* Look for fields that are either pointers, or arrays or structs */
+    basic b = variable_basic(type_variable(ct));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    list fields = type_struct(dt);
+    FOREACH(ENTITY, f, fields) {
+      type ft = entity_basic_concrete_type(f);
+      if(pointer_type_p(ft)
+	 || array_type_p(ft)
+	 || struct_type_p(ft)) {
+	cell n_c = copy_cell(c);
+	/* Add field subscript to reference */
+	points_to_cell_add_field_dimension(n_c, f);
+	children = recursive_cell_to_pointer_cells(n_c);
+	free_cell(n_c);
+      }
+    }
+  }
+
+  // Too strong for recursive calls
+  //pips_assert("Cell \"c\" has children, "
+  //	      "or this function would not have been called.", !ENDP(children));
+  return children;
+}
+
+/* If the reference in "c" is not a pointer, see if it can be
+ * transformed into a pointer reference by adding subscripts, field
+ * subscripts or a combination of both...
+ *
+ * The "children" list is built with new cells. No sharing is created
+ * between "c" and "children".
+ */
+list cell_to_pointer_cells(cell c)
+{
+  list children = NIL;
+  pips_assert("Cell \"c\" has no subscripts.",
+  	      ENDP(reference_indices(cell_any_reference(c))));
+
+  children = recursive_cell_to_pointer_cells(c);
+
+  pips_assert("Cell \"c\" has children, "
+  	      "or this function would not have been called.", !ENDP(children));
+  return children;
 }

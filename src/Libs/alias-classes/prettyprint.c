@@ -355,8 +355,10 @@ void dprint(expression x)
       print_reference((reference) x);
     else if(ot==points_to_domain)
       print_points_to((points_to) x); // See also print_points_to_relation
-    else if(ot==cell_domain)
+    else if(ot==cell_domain) {
       print_points_to_cell((cell) x);
+      fprintf(stderr, "\n");
+    }
     else if(ot==type_domain)
       print_type((type) x);
     else if(ot==statement_domain)
