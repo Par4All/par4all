@@ -1,6 +1,11 @@
-/* For IEF - Ter@ops */
+/* For IEF - Ter@ops
+ *
+ * This code is likely to be bugged.
+ */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef unsigned char byte;
 
@@ -11,7 +16,7 @@ void ReadPGMrow(FILE  *file, int width, byte  *line)
 
 byte ** LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-  int height, width, gris;
+  int height = 64, width = 128;
   byte **m;
   FILE *file;
   char *buffer;
@@ -19,6 +24,7 @@ byte ** LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
   
   buffer = (char*) calloc(80, sizeof(char));
   file = fopen(filename,"rb");
+  extern void nrerror(char *);
   if (file==NULL)
     nrerror("ouverture du fichier impossible\n");
 
@@ -35,6 +41,7 @@ byte ** LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
   *nrh = height - 1;
   *ncl = 0;
   *nch = width - 1;
+  extern byte ** bmatrix(int, int, int, int);
   m = bmatrix(*nrl, *nrh, *ncl, *nch);
   
   for(i=0; i<height; i++) {

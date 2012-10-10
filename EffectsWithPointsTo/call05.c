@@ -9,7 +9,7 @@ void call05(int r, int m, int *x)
     return;
 }
 
-main()
+int main()
 {
   int d1 = 4;
   int d2 = 4;

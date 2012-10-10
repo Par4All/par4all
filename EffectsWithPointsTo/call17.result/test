@@ -1,4 +1,42 @@
 
+Points-to for call17
+
+
+// Points To IN:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+
+
+// Points To OUT: none
+
+void call17(int *x)
+{
+   /* check aliases */
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+
+   int *y = x;
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+// y -> *NULL_POINTER* , MAY
+// y -> _x_1[0] , MAY
+
+   y[0] = 1;
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+// y -> _x_1[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for call17
+
 void call17(int *x)
 {
    /* check aliases */
@@ -8,11 +46,21 @@ void call17(int *x)
 //             <may be written>: _x_1[0]
 //             <    is read   >: y
    y[0] = 1;
+   return;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for call17
 
-	04 --> 05 with conflicts
-		from <y-W-EXACT> to <y-R-EXACT>
-
-****************** End of Dependence Graph ******************
+//             <may be written>: _x_1[0]
+//             <    is read   >: x
+void call17(int *x)
+{
+   /* check aliases */
+//             <    is read   >: x
+//             <    is written>: y
+   int *y = x;
+//             <may be written>: _x_1[0]
+//             <    is read   >: y
+   y[0] = 1;
+   return;
+}

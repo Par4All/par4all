@@ -1,23 +1,84 @@
 
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
 void dereferencing06()
 {
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
-//             <    is read   >: p x
-//             <    is written>: p
+
+// Points To: none
+
+   double x[3] = {1., 2., 3.};
+
+// Points To: none
+
+   double *p = &x[1];
+
+// Points To:
+// p -> x[1] , EXACT
+
    
-   /* This read has no effect unless p == 0 and the compiler does not optimize? */
-   *p++;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
+   /* This read had no effect unless p == 0 and the compiler does not
+        optimize? I change the code because buggycode is not needed here
+        for EffectsWithPointsTo. */
+   x[0] = *p++;
+
+// Points To:
+// p -> x[2] , EXACT
+
    *p++ = 1;
+
+// Points To:
+// p -> x[3] , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   dereferencing06();
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void dereferencing06()
+{
+//             <may be written>: x[*]
+   double x[3] = {1., 2., 3.};
+//             <    is written>: p
+   double *p = &x[1];
+//             <    is read   >: p x[1]
+//             <    is written>: p x[0]
+   
+   /* This read had no effect unless p == 0 and the compiler does not
+        optimize? I change the code because buggycode is not needed here
+        for EffectsWithPointsTo. */
+   x[0] = *p++;
+//             <    is read   >: p
+//             <    is written>: p x[2]
+   *p++ = 1;
+   return;
 }
 int main()
 {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    dereferencing06();
+   return 0;
 }
 
  *********************** Use-Def Chains *********************

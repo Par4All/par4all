@@ -1,14 +1,16 @@
 
+PROPER  EFFECTS 
+
 int main()
 {
-   int *i, j, k;
+   int *i, j[10], k;
 //             <    is written>: k
    k = 0;
 //             <    is read   >: k
-//             <    is written>: j
-   j = k;
+//             <    is written>: j[0]
+   j[0] = k;
 //             <    is written>: i
-   i = &j;
+   i = &j[0];
 //             <    is read   >: i
 //             <    is written>: i
    i++;
@@ -16,12 +18,63 @@ int main()
    return 0;
 }
 
- *********************** Use-Def Chains *********************
+POINTS-TO
 
-	04 --> 05 with conflicts
-		from <k-W-EXACT> to <k-R-EXACT>
-	06 --> 07 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-W-EXACT> to <i-R-EXACT>
 
-****************** End of Dependence Graph ******************
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *i, j[10], k;
+
+// Points To:
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   k = 0;
+
+// Points To:
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   j[0] = k;
+
+// Points To:
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   i = &j[0];
+
+// Points To:
+// i -> j[0] , EXACT
+
+   i++;
+
+// Points To:
+// i -> j[1] , EXACT
+
+
+   return 0;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *i, j[10], k;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: k
+//             <    is written>: j[0]
+   j[0] = k;
+//             <    is written>: i
+   i = &j[0];
+//             <    is read   >: i
+//             <    is written>: i
+   i++;
+
+   return 0;
+}

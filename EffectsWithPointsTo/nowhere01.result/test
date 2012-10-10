@@ -1,5 +1,48 @@
 
-int main()
+Points-to for nowhere01
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int nowhere01()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int **q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+
+   *p = 1;
+
+// Points To: unreachable
+
+   *q = &i;
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+Proper effects with points-to for nowhere01
+
+int nowhere01()
 {
    int i;
    int *p;
@@ -13,7 +56,19 @@ int main()
    return 0;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for nowhere01
 
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+int nowhere01()
+{
+   int i;
+   int *p;
+   int **q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
 
-****************** End of Dependence Graph ******************
+   *p = 1;
+   *q = &i;
+
+   return 0;
+}

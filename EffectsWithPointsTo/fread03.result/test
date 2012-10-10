@@ -1,7 +1,10 @@
 
+PROPER  EFFECTS 
+
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height, width, gris;
+//             <    is written>: height width
+   int height = 64, width = 128;
    byte **m;
    FILE *file;
    char *buffer;
@@ -9,11 +12,12 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //             <    is written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
-//             <may be read   >: _filename_1[*] __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: __IO_EFFECTS:LUNS[*]
-//             <    is read   >: filename
 //             <    is written>: file
    file = fopen(filename, "rb");
+   void nrerror(char *f1);
 //             <    is read   >: file
    if (file==(void *) 0)
       nrerror("ouverture du fichier impossible\n");
@@ -23,25 +27,25 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    //readitem(file, buffer);
    if (strcmp(buffer, "P5")!=0)
       nrerror("entete du fichier %s invalide\n");
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: nrl
-//             <    is written>: _nrl_2[0]
    
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
    
    *nrl = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: height nrh
-//             <    is written>: _nrh_3[0]
    *nrh = height-1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ncl
-//             <    is written>: _ncl_4[0]
    *ncl = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: nch width
-//             <    is written>: _nch_5[0]
    *nch = width-1;
-//             <    is read   >: _nch_5[0] _ncl_4[0] _nrh_3[0] 
-//                               _nrl_2[0] nch ncl nrh nrl
+   byte **bmatrix(int f1, int f2, int f3, int f4);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: m
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
 //             <    is read   >: height
@@ -50,7 +54,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    for(i = 0; i <= height-1; i += 1)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
       ReadPGMrow(file, width, m[i]);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
@@ -67,16 +72,370 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 }
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
-//             <may be read   >: _file_1[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: _file_1[0] _line_3[*] 
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: file width
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
    fread(&line[0], sizeof(byte), width, file);
 }
-int bmatrix(int f1, int f2, int f3, int f4)
+
+POINTS-TO
+
+
+// Points To IN:
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
+
+
+// Points To OUT:
+// LoadPGM_bmatrix -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+
+// Points To: none
+
+   int height = 64, width = 128;
+
+// Points To: none
+
+   byte **m;
+
+// Points To:
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   FILE *file;
+
+// Points To:
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   char *buffer;
+
+// Points To:
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i;
+
+// Points To:
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   buffer = (char *) calloc(80, sizeof(char));
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   file = fopen(filename, "rb");
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   void nrerror(char *f1);
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (file==(void *) 0)
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *NULL_POINTER* , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      nrerror("ouverture du fichier impossible\n");
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0)
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      nrerror("entete du fichier %s invalide\n");
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nrl -> *NULL_POINTER* , MAY
+// nrl -> _nrl_2[0] , MAY
+
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nrh -> *NULL_POINTER* , MAY
+// nrh -> _nrh_3[0] , MAY
+// nrl -> _nrl_2[0] , EXACT
+
+   *nrh = height-1;
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ncl -> *NULL_POINTER* , MAY
+// ncl -> _ncl_4[0] , MAY
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+   *ncl = 0;
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> *NULL_POINTER* , MAY
+// nch -> _nch_5[0] , MAY
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+   *nch = width-1;
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+   byte **bmatrix(int f1, int f2, int f3, int f4);
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+
+   for(i = 0; i <= height-1; i += 1)
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+      ReadPGMrow(file, width, m[i]);
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> *NULL_POINTER* , MAY
+// m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+
+   fclose(file);
+
+// Points To:
+// buffer -> *HEAP*_l_25[0] , MAY
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+   free(buffer);
+
+// Points To:
+// buffer -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// m -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
+
+
+   return m;
+}
+
+// Points To IN:
+// line -> *NULL_POINTER* , MAY
+// line -> _line_3[0] , MAY
+
+
+// Points To OUT: none
+
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+
+// Points To:
+// line -> *NULL_POINTER* , MAY
+// line -> _line_3[0] , MAY
+
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+byte * * bmatrix(int f1, int f2, int f3, int f4)
 {
 }
-int nrerror(char *f1)
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void nrerror(char *f1)
+{
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+//             <    is written>: height width
+   int height = 64, width = 128;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+//             <    is written>: buffer
+
+   buffer = (char *) calloc(80, sizeof(char));
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: file
+   file = fopen(filename, "rb");
+   void nrerror(char *f1);
+//             <    is read   >: file
+   if (file==(void *) 0)
+      nrerror("ouverture du fichier impossible\n");
+//             <    is read   >: buffer
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0)
+      nrerror("entete du fichier %s invalide\n");
+//             <may be written>: _nrl_2[0]
+//             <    is read   >: nrl
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+//             <may be written>: _nrh_3[0]
+//             <    is read   >: height nrh
+   *nrh = height-1;
+//             <may be written>: _ncl_4[0]
+//             <    is read   >: ncl
+   *ncl = 0;
+//             <may be written>: _nch_5[0]
+//             <    is read   >: nch width
+   *nch = width-1;
+   byte **bmatrix(int f1, int f2, int f3, int f4);
+//             <    is read   >: _nch_5[0] _ncl_4[0] _nrh_3[0] 
+//                               _nrl_2[0] nch ncl nrh nrl
+//             <    is written>: m
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+//             <    is read   >: height
+//             <    is written>: i
+
+   for(i = 0; i <= height-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+      ReadPGMrow(file, width, m[i]);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   fclose(file);
+//             <    is read   >: buffer _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(buffer);
+//             <    is read   >: m
+
+   return m;
+}
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   fread(&line[0], sizeof(byte), width, file);
+}
+byte * * bmatrix(int f1, int f2, int f3, int f4)
+{
+}
+void nrerror(char *f1)
 {
 }
 
