@@ -6,6 +6,7 @@ void call05(int r, int m, int *x)
 
     for(j=0; j<m;j++)
       x[j] = 10*r+j;
+    return;
 }
 
 main()
@@ -23,4 +24,5 @@ main()
       printf("y[%d][%d] = %d\t", i, j, y[i][j]);
     printf("\n");
   }
+  return 0;
 }

@@ -3,30 +3,38 @@ POINTS-TO
 
 
 // Points To IN:
-// _pp_1 -> _pp_1_1 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
-// pp -> _pp_1 , EXACT
-// qq -> _qq_2 , EXACT
+// _qq_2 -> *NULL_POINTER* , MAY
+// _qq_2 -> _qq_2_2 , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1 , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2 , MAY
 
 
 // Points To OUT:
-// _pp_1 -> _qq_2_2 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
+// _pp_1 -> *NULL_POINTER* , MAY
+// _pp_1 -> _qq_2_2 , MAY
+// _qq_2 -> *NULL_POINTER* , MAY
+// _qq_2 -> _qq_2_2 , MAY
 
 void bar(int **pp, int **qq)
 {
 
 // Points To:
-// _pp_1 -> _pp_1_1 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
-// pp -> _pp_1 , EXACT
-// qq -> _qq_2 , EXACT
+// _qq_2 -> *NULL_POINTER* , MAY
+// _qq_2 -> _qq_2_2 , MAY
+// pp -> *NULL_POINTER* , MAY
+// pp -> _pp_1 , MAY
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_2 , MAY
 
    *pp = *qq;
 
 // Points To:
-// _pp_1 -> _qq_2_2 , EXACT
-// _qq_2 -> _qq_2_2 , EXACT
+// _pp_1 -> *NULL_POINTER* , MAY
+// _pp_1 -> _qq_2_2 , MAY
+// _qq_2 -> *NULL_POINTER* , MAY
+// _qq_2 -> _qq_2_2 , MAY
 // pp -> _pp_1 , EXACT
 // qq -> _qq_2 , EXACT
 
@@ -59,8 +67,9 @@ PROPER  EFFECTS WITH POINTS TO
 
 void bar(int **pp, int **qq)
 {
-//             <    is read   >: _qq_2 pp qq
-//             <    is written>: _pp_1
+//             <may be read   >: _qq_2
+//             <may be written>: _pp_1
+//             <    is read   >: pp qq
    *pp = *qq;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -72,8 +81,8 @@ void foo()
 {
 //             <    is written>: i j p pp q qq
    int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
+//             <may be read   >: q stdout[0]
+//             <may be written>: p stdout[0]
 //             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
@@ -82,14 +91,15 @@ void foo()
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
+//             <may be read   >: _qq_2 stdout[0]
+//             <may be written>: _pp_1 stdout[0]
 //             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 void bar(int **pp, int **qq)
 {
-//             <    is read   >: _qq_2 pp qq
-//             <    is written>: _pp_1
+//             <may be read   >: _qq_2
+//             <may be written>: _pp_1
+//             <    is read   >: pp qq
    *pp = *qq;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -105,8 +115,8 @@ void foo()
 {
 //             <    is written>: i j p pp q qq
    int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
+//             <may be read   >: q stdout[0]
+//             <may be written>: p stdout[0]
 //             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 

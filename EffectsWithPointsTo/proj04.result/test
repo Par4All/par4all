@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main(void)
 {
 //             <    is written>: i j
@@ -58,175 +56,12 @@ static int alea(void)
    return rand()%2==1;
 }
 
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   int i = 0, j = 0;
-
-// Points To: none
-
-   int **pp = (void *) 0;
-
-// Points To:
-// pp -> *NULL_POINTER* , EXACT
-
-   srand(time((void *) 0));
-
-// Points To:
-// pp -> *NULL_POINTER* , EXACT
-
-   if (alea()) {
-
-// Points To:
-// pp -> *NULL_POINTER* , EXACT
-
-      int *pi = &i;
-
-// Points To:
-// pi -> i , EXACT
-// pp -> *NULL_POINTER* , EXACT
-
-      pp = &pi;
-   }
-   else {
-
-// Points To:
-// pp -> *NULL_POINTER* , EXACT
-
-      int *pj = &j;
-
-// Points To:
-// pj -> j , EXACT
-// pp -> *NULL_POINTER* , EXACT
-
-      pp = &pj;
-   }
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> *NULL_POINTER* , MAY
-
-
-   printf("pp=%p\n", pp);
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> *NULL_POINTER* , MAY
-
-   
-   // possible segfault.
-   // should generate an error while analyzing?
-   **pp = 0;
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> *NULL_POINTER* , MAY
-
-   return 0;
-}
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-static int alea(void)
-{
-
-// Points To: none
-
-   int r = rand();
-
-// Points To: none
-
-   printf("%d\n", r);
-
-// Points To: none
-
-   return rand()%2==1;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main(void)
-{
-//             <    is written>: i j
-   int i = 0, j = 0;
-//             <    is written>: pp
-   int **pp = (void *) 0;
-//             <    is read   >: __TIME_EFFECTS:KALI
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
-//                               __TIME_EFFECTS:KALI
-   srand(time((void *) 0));
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
-//                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
-//                               __IO_EFFECTS:LUNS[1]
-   if (alea()) {
-//             <    is written>: pi
-      int *pi = &i;
-//             <    is written>: pp
-      pp = &pi;
-   }
-   else {
-//             <    is written>: pj
-      int *pj = &j;
-//             <    is written>: pp
-      pp = &pj;
-   }
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-
-   printf("pp=%p\n", pp);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
-//                               *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
-//                               *ANY_MODULE*:*ANYWHERE*
-   
-   // possible segfault.
-   // should generate an error while analyzing?
-   **pp = 0;
-   return 0;
-}
-static int alea(void)
-{
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
-   int r = rand();
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%d\n", r);
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-   return rand()%2==1;
-}
-
  *********************** Use-Def Chains *********************
 
 	14 --> 33 with conflicts
 		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	15 --> 21 with conflicts
 		from <pp-W-EXACT> to <pp-W-EXACT>
@@ -236,16 +71,12 @@ static int alea(void)
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	15 --> 33 with conflicts
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	17 --> 18 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 	20 --> 33 with conflicts
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	21 --> 26 with conflicts
 		from <pp-W-EXACT> to <pp-W-EXACT>
@@ -253,29 +84,19 @@ static int alea(void)
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 33 with conflicts
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	25 --> 33 with conflicts
 		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	26 --> 29 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	26 --> 33 with conflicts
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	29 --> 33 with conflicts
 		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

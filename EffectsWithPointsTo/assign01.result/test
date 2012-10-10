@@ -1,37 +1,4 @@
 
-PROPER  EFFECTS 
-
-void assign01()
-{
-   int i, j;
-//             <    is written>: i j
-
-   i = j = 1;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void assign01()
-{
-
-// Points To: none
-
-   int i, j;
-
-// Points To: none
-
-
-   i = j = 1;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 void assign01()
 {
    int i, j;

@@ -1,52 +1,12 @@
 
-PROPER  EFFECTS 
-
 void call17(int *x)
 {
    /* check aliases */
 //             <    is read   >: x
 //             <    is written>: y
    int *y = x;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _x_1[0]
 //             <    is read   >: y
-   y[0] = 1;
-}
-
-POINTS-TO
-
-
-// Points To IN:
-// x -> _x_1[0] , EXACT
-
-
-// Points To OUT: none
-
-void call17(int *x)
-{
-   /* check aliases */
-
-// Points To:
-// x -> _x_1[0] , EXACT
-
-   int *y = x;
-
-// Points To:
-// x -> _x_1[0] , EXACT
-// y -> _x_1[0] , EXACT
-
-   y[0] = 1;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-void call17(int *x)
-{
-   /* check aliases */
-//             <    is read   >: x
-//             <    is written>: y
-   int *y = x;
-//             <    is read   >: y
-//             <    is written>: _x_1[0]
    y[0] = 1;
 }
 

@@ -1,12 +1,10 @@
 
-PROPER  EFFECTS 
-
 void call15(int *pi, tf_t *q)
 {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _pi_1[0]
 //             <    is read   >: pi
    *pi = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _q_2[0].one
 //             <    is read   >: q
    q->one = 1;
 }
@@ -14,74 +12,7 @@ int main()
 {
    int i;
    tf_t s;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-   call15(&i, &s);
-}
-
-POINTS-TO
-
-
-// Points To IN:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
-
-
-// Points To OUT: none
-
-void call15(int *pi, tf_t *q)
-{
-
-// Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
-
-   *pi = 1;
-
-// Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
-
-   q->one = 1;
-}
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   tf_t s;
-
-// Points To: none
-
-
-   call15(&i, &s);
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-void call15(int *pi, tf_t *q)
-{
-//             <    is read   >: pi
-//             <    is written>: _pi_1[0]
-   *pi = 1;
-//             <    is read   >: q
-//             <    is written>: _q_2[0].one
-   q->one = 1;
-}
-int main()
-{
-   int i;
-   tf_t s;
+//             <may be written>: i s.one
 
    call15(&i, &s);
 }

@@ -1,0 +1,97 @@
+
+Points-to for call23
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+
+// Points To OUT: none
+
+void call23(int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   *q = 3;
+}
+
+Proper effects with points-to for call23
+
+void call23(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 3;
+}
+
+Cumulated effects with points-to for call23
+
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+void call23(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 3;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, *ip;
+
+// Points To:
+// ip -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   if (i)
+
+// Points To:
+// ip -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      ip = &i;
+
+// Points To:
+// ip -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ip -> i , MAY
+
+
+   call23(ip);
+
+// Points To:
+// ip -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ip -> i , MAY
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   int i, *ip;
+//             <    is read   >: i
+
+   if (i)
+//             <    is written>: ip
+      ip = &i;
+//             <may be written>: i
+//             <    is read   >: ip
+
+   call23(ip);
+   return 0;
+}

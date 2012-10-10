@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 void dereferencing05()
 {
    double *p;
@@ -11,98 +9,13 @@ void dereferencing05()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
    *p-- = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
    *++p = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *--p = 0.;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void dereferencing05()
-{
-
-// Points To: none
-
-   double *p;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int i;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   *p++ = 0.;
-
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-
-   *p-- = 0.;
-
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-
-   *++p = 0.;
-
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-
-   *--p = 0.;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-void dereferencing05()
-{
-   double *p;
-   int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p++ = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p-- = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *++p = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
    *--p = 0.;
 }
 
  *********************** Use-Def Chains *********************
 
 	06 --> 07 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

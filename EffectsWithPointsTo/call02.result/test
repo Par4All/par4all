@@ -1,5 +1,50 @@
 
-PROPER  EFFECTS 
+Points-to for call02
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5[0] , MAY
+// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> _q_4[*][0] , MAY
+
+
+// Points To OUT: none
+
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+
+// Points To: none
+
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+
+// Points To: none
+
+   y[i] = 0;
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_5[0] , MAY
+
+   p->one = 1;
+
+// Points To:
+// p -> _p_5[0] , EXACT
+
+   (p->two)[j] = 2.;
+
+// Points To:
+// p -> _p_5[0] , EXACT
+// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> _q_4[*][0] , MAY
+
+   *q[i] = 3;
+}
+
+Proper effects with points-to for call02
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
@@ -12,78 +57,48 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //             <    is read   >: i
 //             <    is written>: y[i]
    y[i] = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _p_5[0].one
 //             <    is read   >: p
    p->one = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: j p
+//             <    is written>: _p_5[0].two[j]
    (p->two)[j] = 2.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _q_4[*][0]
 //             <    is read   >: i q[i]
    *q[i] = 3;
 }
-int main()
-{
-   int a;
-   int b;
-   int x[10];
-   int *ap[10];
-   tf_t s;
-//             <    is written>: sp
-   tf_t *sp = &s;
-//             <may be read   >: ap[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: a b sp
 
-   call02(a, b, x, ap, sp);
-}
+Cumulated effects with points-to for call02
 
-POINTS-TO
-
-
-// Points To IN:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
-
-// Points To OUT: none
-
+//             <may be read   >: q[*]
+//             <may be written>: _p_5[0].one _p_5[0].two[*] _q_4[*][0]
+//                               y[*]
+//             <    is read   >: i j p
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
-
-// Points To:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
+//             <    is read   >: j
+//             <    is written>: i
    /* i can be modified locally, but it won't show in the summary
         effects... which creates a problem for transformer and
         precondition computation. */
    i = j+1;
-
-// Points To:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
+//             <may be written>: y[*]
+//             <    is read   >: i
    y[i] = 0;
-
-// Points To:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
+//             <may be written>: _p_5[0].one
+//             <    is read   >: p
    p->one = 1;
-
-// Points To:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
+//             <may be written>: _p_5[0].two[*]
+//             <    is read   >: j p
    (p->two)[j] = 2.;
-
-// Points To:
-// p -> _p_5 , EXACT
-// q[*] -> _q_4 , EXACT
-
+//             <may be read   >: q[*]
+//             <may be written>: _q_4[*][0]
+//             <    is read   >: i
    *q[i] = 3;
 }
+
+Points-to for "main"
+
 
 // Points To IN: none
 
@@ -95,15 +110,15 @@ int main()
 
 // Points To: none
 
-   int a;
+   int a = 1;
 
 // Points To: none
 
-   int b;
+   int b = 2;
 
 // Points To: none
 
-   int x[10];
+   int x[10], aa[10], i;
 
 // Points To: none
 
@@ -123,52 +138,57 @@ int main()
 // ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // sp -> s , EXACT
 
+   
+   /* Initialization added to avoid a segfault in the callee */
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
+      ap[i] = &aa[i];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
 
    call02(a, b, x, ap, sp);
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
+   return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "main"
 
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-//             <    is read   >: j
-//             <    is written>: i
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-//             <    is read   >: i
-//             <    is written>: y[i]
-   y[i] = 0;
-//             <    is read   >: p
-//             <    is written>: _p_5.one
-   p->one = 1;
-//             <    is read   >: j p
-//             <    is written>: _p_5.two[j]
-   (p->two)[j] = 2.;
-//             <may be written>: _q_4
-//             <    is read   >: i q[i]
-   *q[i] = 3;
-}
 int main()
 {
-   int a;
-   int b;
-   int x[10];
+//             <    is written>: a
+   int a = 1;
+//             <    is written>: b
+   int b = 2;
+   int x[10], aa[10], i;
    int *ap[10];
    tf_t s;
 //             <    is written>: sp
    tf_t *sp = &s;
+//             <    is written>: i
+   
+   /* Initialization added to avoid a segfault in the callee */
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: ap[i]
+      ap[i] = &aa[i];
 //             <may be read   >: ap[*]
-//             <may be written>: x[*]
+//             <may be written>: aa[*] s.one s.two[*] x[*]
 //             <    is read   >: a b sp
 
    call02(a, b, x, ap, sp);
+   return 0;
 }
-
- *********************** Use-Def Chains *********************
-
-	26 --> 28 with conflicts
-		from <sp-W-EXACT> to <sp-R-EXACT>
-
-****************** End of Dependence Graph ******************

@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int **q, *r, i;
@@ -8,78 +6,10 @@ int main()
 //             <    is written>: q
 
    q = p;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _p_0[0]
 //             <    is read   >: q
    *q = &i;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: r
-   r = &**q;
-
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT:
-// p -> p[0] , EXACT
-
-int main()
-{
-
-// Points To: none
-
-   int **q, *r, i;
-
-// Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-
-   q = p;
-
-// Points To:
-// p[0] -> p[0] , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-   *q = &i;
-
-// Points To:
-// p[0] -> i , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-   r = &**q;
-
-// Points To:
-// p[0] -> i , EXACT
-// p -> p[0] , EXACT
-// q -> p[0] , EXACT
-// r -> i , EXACT
-
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int **q, *r, i;
-//             <    is read   >: p
-//             <    is written>: q
-
-   q = p;
-//             <    is read   >: q
-//             <    is written>: p[0]
-   *q = &i;
-//             <    is read   >: p[0] q
+//             <    is read   >: _p_0[0] q
 //             <    is written>: r
    r = &**q;
 
@@ -93,6 +23,6 @@ int main()
 	09 --> 11 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
 	10 --> 11 with conflicts
-		from <p[0]-W-EXACT> to <p[0]-R-EXACT>
+		from <_p_0[0]-W-MAY> to <_p_0[0]-R-EXACT>
 
 ****************** End of Dependence Graph ******************

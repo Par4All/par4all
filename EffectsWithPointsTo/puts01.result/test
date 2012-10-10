@@ -1,40 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-//             <    is written>: s
-   char *s = "sortie de puts";
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   puts(s);
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   char *s = "sortie de puts";
-
-// Points To:
-// s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-
-   puts(s);
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
 //             <    is written>: s

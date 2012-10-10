@@ -59,12 +59,12 @@ void assign05()
    r = bar(i);
 
 // Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    i = 1;
 
 // Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    *r = 0;
 }
@@ -94,7 +94,8 @@ void foo();
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// bar -> j , EXACT
 
 int * bar(int j)
 {

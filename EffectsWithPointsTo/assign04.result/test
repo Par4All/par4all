@@ -88,11 +88,7 @@ void assign04()
 
    **p = r;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> q , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> i , EXACT
+// Points To: unreachable
 
    ***p = 0;
 }
@@ -144,8 +140,6 @@ void assign04()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
    **p = r;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    ***p = 0;
 }
 /* To be out of Emami's patterns */
@@ -155,7 +149,6 @@ void assign04();
 void foo();
 void foo()
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign04();
 }

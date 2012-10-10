@@ -1,93 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main(void)
-{
-   int i, j;
-   int **pp;
-   {
-//             <    is written>: pi
-      int *pi = &i;
-//             <    is written>: pp
-      pp = &pi;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      **pp = 1;
-   }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // pp points to a dead value in the stack
-   // should generate an error
-   **pp = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pp
-   // segfault?
-   *pp = &j;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   int i, j;
-
-// Points To: none
-
-   int **pp;
-   {
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-      int *pi = &i;
-
-// Points To:
-// pi -> i , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-      pp = &pi;
-
-// Points To:
-// pi -> i , EXACT
-// pp -> pi , EXACT
-
-      **pp = 1;
-   }
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   
-   // pp points to a dead value in the stack
-   // should generate an error
-   **pp = 0;
-
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   // segfault?
-   *pp = &j;
-
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main(void)
 {
    int i, j;
@@ -107,8 +18,6 @@ int main(void)
    // pp points to a dead value in the stack
    // should generate an error
    **pp = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pp
    // segfault?
    *pp = &j;
    return 0;
@@ -121,28 +30,15 @@ int main(void)
 	10 --> 17 with conflicts
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	10 --> 18 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 12 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	11 --> 17 with conflicts
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	11 --> 18 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <pp-R-EXACT>
 	12 --> 17 with conflicts
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 18 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	17 --> 18 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pp-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

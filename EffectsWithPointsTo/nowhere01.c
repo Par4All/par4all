@@ -1,7 +1,8 @@
-/* Make sure that dereferencements of uninitialized pointers are
-   detected. */
+/* Buggy code: Make sure that dereferencements of uninitialized
+ * pointers are detected.
+ */
 
-int main()
+int nowhere01()
 {
   int i;
   int * p;
