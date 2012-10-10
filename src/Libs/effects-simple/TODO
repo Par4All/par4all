@@ -1,0 +1,15 @@
+Issues for effects with points-to (in any order)
+
+1. Duplicate effects, same semantics, same print-out, different internal representation: a first attempt at merging them led to the merge of A(I) and A(I+1). See call09.c and call10.c
+
+2. Subscript list: extra [0] subscript in array05.c
+
+3. Buggy analyzed codes with NULL or undefined pointer parameters lead to core dumps. See call25.c, call26.c.
+
+4. Points-to information in the caller not translated as points-to information in the callee: call27.c
+
+5. Segfault detected one statement too late: dereferencing05.c. Also
+nowhere01.c, null_pointer01.c. This might be normal but the
+information about the segfault is only know after segfaulting.
+
+
