@@ -1,10 +1,15 @@
 
+PROPER  EFFECTS 
+
 void point_to02()
 {
    struct s {
       int a;
       int b[10];
    } c, *p;
+//             <    is written>: p
+
+   p = &c;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
@@ -14,11 +19,58 @@ void point_to02()
    (p->b)[2] = 3;
 }
 
- *********************** Use-Def Chains *********************
+POINTS-TO
 
-	08 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
-****************** End of Dependence Graph ******************
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void point_to02()
+{
+
+// Points To: none
+
+   struct s {
+      int a;
+      int b[10];
+   } c, *p;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   p = &c;
+
+// Points To:
+// p -> c , EXACT
+
+
+   p->a = 1;
+
+// Points To:
+// p -> c , EXACT
+
+   (p->b)[2] = 3;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+void point_to02()
+{
+   struct s {
+      int a;
+      int b[10];
+   } c, *p;
+//             <    is written>: p
+
+   p = &c;
+//             <    is read   >: p
+//             <    is written>: c.a
+
+   p->a = 1;
+//             <    is read   >: p
+//             <    is written>: c.b[2]
+   (p->b)[2] = 3;
+}

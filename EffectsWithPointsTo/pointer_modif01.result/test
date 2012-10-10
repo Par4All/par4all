@@ -6,28 +6,13 @@ int main()
 //             <    is read   >: p
 
    *p = 1;
-//             <    is read   >: p
-//             <    is written>: q
 
    q = p;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
    *q = 2;
    return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	06 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-	06 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

@@ -14,7 +14,9 @@ int main()
 //             <    is read   >: i
 
    while (i<5) {
-//             <may be written>: *HEAP*_l_7[0] *HEAP*_l_7[*]
+//             <may be written>: *HEAP*_l_7[0] *HEAP*_l_7[1] 
+//                               *HEAP*_l_7[2] *HEAP*_l_7[3] 
+//                               *HEAP*_l_7[*]
 //             <    is read   >: i q
       *q = i;
 //             <    is read   >: q
@@ -55,8 +57,17 @@ int main()
 	10 --> 14 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	12 --> 12 with conflicts
+		from <*HEAP*_l_7[3]-W-MAY> to <*HEAP*_l_7[3]-W-MAY>
+		from <*HEAP*_l_7[3]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+		from <*HEAP*_l_7[2]-W-MAY> to <*HEAP*_l_7[2]-W-MAY>
+		from <*HEAP*_l_7[2]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+		from <*HEAP*_l_7[1]-W-MAY> to <*HEAP*_l_7[1]-W-MAY>
+		from <*HEAP*_l_7[1]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
 		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
 		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[3]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[2]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[1]-W-MAY>
 		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
 		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
 	12 --> 13 with conflicts

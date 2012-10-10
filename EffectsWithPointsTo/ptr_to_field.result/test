@@ -15,17 +15,19 @@ int ptr_to_field()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
    n = (my_str *) malloc(sizeof(my_str));
+//             <may be written>: *HEAP*_l_12.q
 //             <    is read   >: m
-//             <    is written>: *HEAP*_l_12.q
    m->q = &i;
+//             <may be written>: *HEAP*_l_12.p
 //             <    is read   >: m
-//             <    is written>: *HEAP*_l_12.p
    m->p = &j;
-//             <    is read   >: *HEAP*_l_12.p m n
-//             <    is written>: *HEAP*_l_13.q
+//             <may be read   >: *HEAP*_l_12.p
+//             <may be written>: *HEAP*_l_13.q
+//             <    is read   >: m n
    n->q = m->p;
-//             <    is read   >: *HEAP*_l_12.q m n
-//             <    is written>: *HEAP*_l_13.p
+//             <may be read   >: *HEAP*_l_12.q
+//             <may be written>: *HEAP*_l_13.p
+//             <    is read   >: m n
    n->p = m->q;
 
    return 0;
@@ -50,8 +52,8 @@ int ptr_to_field()
 	13 --> 17 with conflicts
 		from <n-W-EXACT> to <n-R-EXACT>
 	14 --> 17 with conflicts
-		from <*HEAP*_l_12.q-W-EXACT> to <*HEAP*_l_12.q-R-EXACT>
+		from <*HEAP*_l_12.q-W-MAY> to <*HEAP*_l_12.q-R-MAY>
 	15 --> 16 with conflicts
-		from <*HEAP*_l_12.p-W-EXACT> to <*HEAP*_l_12.p-R-EXACT>
+		from <*HEAP*_l_12.p-W-MAY> to <*HEAP*_l_12.p-R-MAY>
 
 ****************** End of Dependence Graph ******************

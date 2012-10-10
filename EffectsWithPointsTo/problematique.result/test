@@ -29,21 +29,22 @@ int main()
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
+//             <may be written>: *HEAP*_l_10[i]
 //             <    is read   >: b i
-//             <    is written>: *HEAP*_l_10[i]
       b[i] = i;
 //             <    is written>: i
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
+//             <may be written>: *HEAP*_l_11[i]
 //             <    is read   >: c i
-//             <    is written>: *HEAP*_l_11[i]
       c[i] = 1;
 //             <    is written>: i
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//             <    is read   >: *HEAP*_l_10[i] a b i
-//             <    is written>: *HEAP*_l_11[i]
+//             <may be read   >: *HEAP*_l_10[i]
+//             <may be written>: *HEAP*_l_11[i]
+//             <    is read   >: a b i
       a[i] = b[i];
    return 0;
 }
@@ -91,22 +92,22 @@ int main()
 	20 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	21 --> 21 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-W-EXACT>
+		from <*HEAP*_l_10[i]-W-MAY> to <*HEAP*_l_10[i]-W-MAY>
 	21 --> 24 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 28 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-R-EXACT>
+		from <*HEAP*_l_10[i]-W-MAY> to <*HEAP*_l_10[i]-R-MAY>
 	24 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	25 --> 25 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 	25 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	25 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 	28 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

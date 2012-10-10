@@ -25,13 +25,14 @@ s_t make_s(int i, float x)
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
+//             <may be written>: *HEAP*_l_9.entier
 //             <    is read   >: i p
-//             <    is written>: *HEAP*_l_9.entier
    p->entier = i;
+//             <may be written>: *HEAP*_l_9.reel
 //             <    is read   >: p x
-//             <    is written>: *HEAP*_l_9.reel
    p->reel = x;
-//             <    is read   >: *HEAP*_l_9.entier *HEAP*_l_9.reel p
+//             <may be read   >: *HEAP*_l_9.entier *HEAP*_l_9.reel
+//             <    is read   >: p
    return *p;
 }
 

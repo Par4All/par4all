@@ -8,14 +8,14 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
    q = (int *) malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_8
 //             <    is read   >: a q
-//             <    is written>: *HEAP*_l_8
    q[0] = a;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = (int **) malloc(sizeof(int *));
+//             <may be written>: *HEAP*_l_10
 //             <    is read   >: p q
-//             <    is written>: *HEAP*_l_10
    p[0] = q;
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

@@ -6,11 +6,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = (int *) malloc(2*sizeof(int));
+//             <may be written>: *HEAP*_l_7[0]
 //             <    is read   >: p
-//             <    is written>: *HEAP*_l_7[0]
    p[0] = 0;
+//             <may be written>: *HEAP*_l_7[1]
 //             <    is read   >: p
-//             <    is written>: *HEAP*_l_7[1]
    p[1] = 1;
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

@@ -1,4 +1,70 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//:   BEGIN UNSTRUCTURED
+//             <    is read   >: i
+   if (i>0) goto l;
+//             <    is written>: i
+   i = 1;
+l:   ;
+//:   END UNSTRUCTURED
+   return 0;
+}
+int main();
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+//:   BEGIN UNSTRUCTURED
+
+// Points To: none
+
+   if (i>0) goto l;
+
+// Points To: none
+
+   i = 1;
+
+// Points To: none
+
+l:   ;
+//:   END UNSTRUCTURED
+
+// Points To: none
+
+   return 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+
+// Points To: none
+
+int main();
+
+PROPER  EFFECTS WITH POINTS TO
+
 int main()
 {
 //             <    is written>: i

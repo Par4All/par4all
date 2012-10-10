@@ -10,8 +10,8 @@ int main()
    p = (int *) malloc(10*sizeof(int));
 //             <    is read   >: i
    do {
+//             <may be written>: *HEAP*_l_7[i]
 //             <    is read   >: i p
-//             <    is written>: *HEAP*_l_7[i]
       p[i] = i;
 //             <    is read   >: i
 //             <    is written>: i
@@ -33,7 +33,7 @@ int main()
 	07 --> 11 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	11 --> 11 with conflicts
-		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
+		from <*HEAP*_l_7[i]-W-MAY> to <*HEAP*_l_7[i]-W-MAY>
 	11 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	12 --> 11 with conflicts

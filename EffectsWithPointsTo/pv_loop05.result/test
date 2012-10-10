@@ -13,7 +13,9 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= 4; i += 1) {
-//             <may be written>: *HEAP*_l_8[0] *HEAP*_l_8[*]
+//             <may be written>: *HEAP*_l_8[0] *HEAP*_l_8[1] 
+//                               *HEAP*_l_8[2] *HEAP*_l_8[3] 
+//                               *HEAP*_l_8[*]
 //             <    is read   >: i q
       *q = i;
 //             <    is read   >: q
@@ -42,8 +44,17 @@ int main()
 		from <q-W-EXACT> to <q-W-EXACT>
 		from <q-W-EXACT> to <q-R-EXACT>
 	13 --> 13 with conflicts
+		from <*HEAP*_l_8[3]-W-MAY> to <*HEAP*_l_8[3]-W-MAY>
+		from <*HEAP*_l_8[3]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[2]-W-MAY> to <*HEAP*_l_8[2]-W-MAY>
+		from <*HEAP*_l_8[2]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[1]-W-MAY> to <*HEAP*_l_8[1]-W-MAY>
+		from <*HEAP*_l_8[1]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
 		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[3]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[2]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[1]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 	13 --> 14 with conflicts

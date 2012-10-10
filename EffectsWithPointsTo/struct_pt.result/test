@@ -12,11 +12,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
    m = (my_str *) malloc(sizeof(my_str));
+//             <may be written>: *HEAP*_l_10.i
 //             <    is read   >: m
-//             <    is written>: *HEAP*_l_10.i
    m->i = 1;
+//             <may be written>: *HEAP*_l_10.p
 //             <    is read   >: m
-//             <    is written>: *HEAP*_l_10.p
    m->p = &j;
 //             <    is read   >: m
 //             <    is written>: n
