@@ -47,7 +47,7 @@ $(PARSER_COMMENT).c: $(PARSER_COMMENT).l
 
 $(PARSER_COMMENT).h: $(PARSER_COMMENT).c
 
-$(LEXER_STEP).c: $(LEXER_STEP).l
+$(LEXER_STEP).c: $(LEXER_STEP).l $(PARSER_STEP).h
 	$(FLEX) $(LFLAGS) --prefix=step_ --header-file=$(LEXER_STEP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
 
 $(PARSER_STEP).c: $(PARSER_STEP).y

@@ -1,4 +1,9 @@
-step_api.tmp: step_api.h 
+# missing dependencies for am?
+step_lexer.c: step_bison_parser.h
+step_bison_parser.h: step_bison_parser.c
+
+# hacks
+step_api.tmp: step_api.h
 	grep '^[ \t]*extern[ \t]*void[ \t]*STEP_API' $^		 |	\
 	sed 's/^[^(]*(step\([^)]*\))[ \t]*(\(.*\));/\1, \2/g'	 |	\
 	sed 's/[ \t]*,[ \t]*/,/g' | sort > $@
