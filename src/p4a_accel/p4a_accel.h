@@ -11,18 +11,20 @@
     but it can also be used to ease heterogeneous parallel manual
     programming.
 
-    Should target Ter\@pix and SCALOPES accelerators (CEA SCMP), CUDA,
-    OpenCL and even OpenMP for emulation.
+    Should target Ter\@pix (Thales TRT) and SCALOPES accelerators (CEA
+    SCMP), CUDA, OpenCL and even OpenMP for emulation.
 
-    This started with funding by the FREIA (French ANR), TransMedi\@
-    (French Pôle de Compétitivité Images and Network) and SCALOPES
-    (Artemis European Project project).
+    This started with funding by various projects: FREIA (French ANR),
+    TransMedi\@ (French Pôle de Compétitivité Images and Network),
+    SCALOPES (Artemis European Project project), MODENA (French Pôle de
+    Compétitivité Mer Bretagne).
 
     "mailto:Stephanie.Even@enstb.org"
-    "mailto:Ronan.Keryell@hpc-project.com"
+    "mailto:Ronan.Keryell@silkan.com"
 
-    Now there are many other contributors and it is funded by the SMECY
-    ARTEMIS project, the SIMILAN System@TIC project.
+    Now there are many other contributors and it is funded by OpenGPU and
+    SIMILAN projects from the French Pôle de Compétitivité Systém@TIC, the
+    SMECY ARTEMIS European project.
 
 */
 

@@ -2,13 +2,17 @@
 
     API of Par4All C to OpenCL for the kernel wrapper and kernel.
 
-    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
-    Compétitivité Images and Network) and SCALOPES (Artemis European
-    Project project), with the support of the MODENA project (French
-    Pôle de Compétitivité Mer Bretagne)
+    This started with funding by various projects: FREIA (French ANR),
+    TransMedi\@ (French Pôle de Compétitivité Images and Network),
+    SCALOPES (Artemis European Project project), MODENA (French Pôle de
+    Compétitivité Mer Bretagne).
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
+
+    Now there are many other contributors and it is funded by OpenGPU and
+    SIMILAN projects from the French Pôle de Compétitivité Systém@TIC, the
+    SMECY ARTEMIS European project.
 
     This work is done under MIT license.
 */
@@ -28,12 +32,12 @@
     The type is here undefined and must be locally defined.
 */
 /* change this define to void:
-#define P4A_accel_kernel inline 
+#define P4A_accel_kernel inline
 */
-#define P4A_accel_kernel void 
+#define P4A_accel_kernel void
 
 /** A declaration attribute of a hardware-accelerated kernel called from
-    the host in CL 
+    the host in CL
 
     This is the return type of the kernel wrapper.
     It must be a void function.
@@ -41,7 +45,7 @@
 */
 #define P4A_accel_kernel_wrapper __kernel void
 
-/** The address space visible for all functions. 
+/** The address space visible for all functions.
     Allocation in the global memory pool.
  */
 #define P4A_accel_global_address __global
@@ -82,10 +86,10 @@ half. An application that wants to be able to write to elements of a
 pointer (or struct) that are of type char, uchar, char2, uchar2,
 short, ushort, and half will need to include the #pragma OPENCL
 EXTENSION cl_khr_byte_addressable_store : enable directive before any
-code that performs writes that may not be supported. 
+code that performs writes that may not be supported.
 */
 #ifdef cl_khr_byte_addressable_store
-#pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
+#pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #endif
 
 /*

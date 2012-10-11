@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-/** A data structure to store the arguments types for a given 
+/** A data structure to store the arguments types for a given
     kernel arguments list.
 */
 /*
@@ -28,7 +28,7 @@ struct p4a_kernel_list {
 
   p4a_kernel_list(const char *k) {
     name = (char *)strdup(k);
-    kernel = NULL;  
+    kernel = NULL;
     char* kernelFile;
     asprintf(&kernelFile,"./%s.cl",k);
     file_name = (char *)strdup(kernelFile);
@@ -59,10 +59,10 @@ extern double p4a_time_copy;
 extern cl_int p4a_global_error;
 /** Events for timing in CL: */
 extern cl_event p4a_event_execution, p4a_event_copy;
-/** The OpenCL context ~ a CPU process 
+/** The OpenCL context ~ a CPU process
 - a module
 - data
-- specific memory address 
+- specific memory address
 */
 extern cl_context p4a_context;
 /** The OpenCL command queue, that allows delayed execution
@@ -74,10 +74,10 @@ extern cl_command_queue_properties p4a_queue_properties;
 
 /** The OpenCL programm composed of a set of modules
  */
-extern cl_program p4a_program;  
+extern cl_program p4a_program;
 /** The current module selected in the program
  */
-extern cl_kernel p4a_kernel; 
+extern cl_kernel p4a_kernel;
 
 #ifdef __cplusplus
 extern std::map<std::string, struct p4a_kernel_list * > p4a_kernels_map ;
@@ -91,7 +91,7 @@ extern struct p4a_kernel_list *p4a_kernels;
 extern struct p4a_kernel_list *current_kernel;
 #endif
 
-  
+
 char * p4a_error_to_string(int error);
 void p4a_clean(int exitCode);
 void p4a_error(cl_int error,const char *currentFile,const int currentLine);
