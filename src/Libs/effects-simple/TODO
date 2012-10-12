@@ -2,7 +2,7 @@ Issues for effects with points-to (in any order)
 
 1. Duplicate effects, same semantics, same print-out, different internal representation: a first attempt at merging them led to the merge of A(I) and A(I+1). See call09.c and call10.c
 
-2. Subscript list: extra [0] subscript in array05.c, point_to02.c (very small piece of code).
+2. Subscript list: extra [0] subscript in array05.c, point_to02.c (very small piece of code). See also Rice/pointer10.c. See also Effects/Old.sub/call19.c.
 
 3. Buggy analyzed codes with NULL or undefined pointer parameters lead to core dumps. See call25.c, call26.c.
 
@@ -17,3 +17,42 @@ information about the segfault is only know after segfaulting.
 7. C intrinsics effects: io_intrinsics.c, statement04.c, statement05.c
 
 8. Effects are unduly merged and imprecise: varargs04.c
+
+10. Effect translation issue for global variables. There
+initializations should be taken into account for the "main"
+modules. See call03.c.
+
+11. Backward translation fails in array03.c, call05.c, in call06.c,
+call07.c, call08.c, call14.c, call20.c, call21.c, call24.c,
+inter02.c. Also in Pointers/Mensi.sub/chain.c and tableau_dynamique.c
+
+12. Segfault for call16.c, call19.c; for call16.c, the caller itself
+is a callee and callee's and caller's stubs must be distinguished
+
+13. Points-to consistency issue: chap2_exp3.c (and the code is buggy)
+
+14. Points-to analysis: pips internal error; see fulguro01.c
+
+15. Points-to analysis: typing bug in inter02.c
+
+16. Points-to analysis core dumps after a bug is detected:
+pointer_modif02.c. I'd like to fix the bug before I fix the source
+code of pointer_modif02.c.
+
+17. Interprocedural effects not translated:
+Pointers/Mensi.sub/struct_inter03.c
+
+18. Inexistant effects are not removed as they should. w is NULL and a
+branch is never taken in Rice/pointer13.c. However, some memory
+effects are still computed although the points-to information is
+"bottom".
+
+Next bug is 18
+
+----------------------------------------------------------------
+
+Problemes solved:
+
+9. Error falsely detected for call03.c?
+
+-> Tpips script changed.
