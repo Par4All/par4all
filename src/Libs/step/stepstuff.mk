@@ -2,7 +2,7 @@
 step_lexer.c: step_lexer.l step_bison_parser.h
 step_bison_parser.h: step_bison_parser.c
 step_bison_parser.c: step_bison_parser.y
-.NOTPARALLEL: step_lexer.c step_bison_parser.h
+.NOTPARALLEL:
 
 # hacks
 step_api.tmp: step_api.h
