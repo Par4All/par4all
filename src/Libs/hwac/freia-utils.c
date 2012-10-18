@@ -1416,6 +1416,7 @@ static bool related_images_p(const entity img1, const entity img2,
 static bool related_effect(statement s, struct related_ctx * ctx)
 {
   pips_debug(8, "on statement %"_intFMT"\n", statement_number(s));
+  entity written = NULL;
   SET_FOREACH(entity, w, (set) hash_get(ctx->image_stats, E_WRITE(s)))
   {
     if (related_images_p(ctx->img, w, ctx->new_images))
@@ -1426,15 +1427,17 @@ static bool related_effect(statement s, struct related_ctx * ctx)
       gen_recurse_stop(NULL);
       return false;
     }
+    written = w;
   }
   if (!ctx->write_only)
   {
+    pips_assert("some written stuff", written);
     SET_FOREACH(entity, r, (set) hash_get(ctx->image_stats, E_READ(s)))
     {
       if (related_images_p(ctx->img, r, ctx->new_images))
       {
         pips_debug(8, "R relation for %s & %s\n",
-                   entity_local_name(ctx->img), entity_local_name(w));
+                   entity_local_name(ctx->img), entity_local_name(written));
         ctx->some_effect = true;
         gen_recurse_stop(NULL);
         return false;
