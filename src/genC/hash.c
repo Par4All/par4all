@@ -840,7 +840,6 @@ hash_key_type hash_table_type(hash_table htp)
  * After you give the previous hentryp and so on
  * at the end NULL is returned
  */
-
 void *
 hash_table_scan(hash_table htp,
 		void * hentryp_arg,
@@ -859,7 +858,7 @@ hash_table_scan(hash_table htp,
     if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
     {
       *pkey = key;
-      *pval = hentryp->val;
+      if (pval) *pval = hentryp->val;
       return hentryp + 1;
     }
     hentryp++;
