@@ -5,7 +5,7 @@ Points-to for nowhere01
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int nowhere01()
 {

@@ -39,6 +39,16 @@ void bar(int **pp, int **qq)
 // qq -> _qq_2 , EXACT
 
    printf("pointers exchanged");
+
+// Points To:
+// _pp_1 -> *NULL_POINTER* , MAY
+// _pp_1 -> _qq_2_2 , MAY
+// _qq_2 -> *NULL_POINTER* , MAY
+// _qq_2 -> _qq_2_2 , MAY
+// pp -> _pp_1 , EXACT
+// qq -> _qq_2 , EXACT
+
+   return;
 }
 
 // Points To IN: none
@@ -61,6 +71,15 @@ void foo()
 
 
    bar(pp, qq);
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> j , MAY
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+
+   return;
 }
 
 PROPER POINTER EFFECTS 
@@ -75,6 +94,7 @@ void bar(int **pp, int **qq)
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("pointers exchanged");
+   return;
 }
 void foo()
 {
@@ -87,6 +107,7 @@ void foo()
 //             <    is written>: pp[0] __IO_EFFECTS:LUNS[1]
 
    bar(pp, qq);
+   return;
 }
 
 CUMULATED  POINTER EFFECTS 
@@ -106,6 +127,7 @@ void bar(int **pp, int **qq)
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("pointers exchanged");
+   return;
 }
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -122,4 +144,5 @@ void foo()
 //             <    is written>: pp[0] __IO_EFFECTS:LUNS[1]
 
    bar(pp, qq);
+   return;
 }

@@ -1,0 +1,86 @@
+
+Points-to for call32
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
+
+
+// Points To OUT:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void call32(int i, int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
+
+   free(q);
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+Points-to for "call32_caller"
+
+
+// Points To IN:
+// s.array -> *NULL_POINTER* , MAY
+// s.array -> _s_1__1[0] , MAY
+
+
+// Points To OUT:
+// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+int call32_caller(struct ad s)
+{
+
+// Points To: none
+
+   int ii = *s.array;
+
+// Points To:
+// s.array -> *NULL_POINTER* , MAY
+// s.array -> _s_1__1[0] , MAY
+
+   call32(ii, s.array);
+
+// Points To:
+// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return ii++;
+}
+
+Proper effects with points-to for "call32_caller"
+
+int call32_caller(struct ad s)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ii
+   int ii = *s.array;
+//             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   call32(ii, s.array);
+//             <    is read   >: ii
+//             <    is written>: ii
+   return ii++;
+}
+
+Cumulated effects with points-to for "call32_caller"
+
+int call32_caller(struct ad s)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: ii
+   int ii = *s.array;
+//             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   call32(ii, s.array);
+//             <    is read   >: ii
+//             <    is written>: ii
+   return ii++;
+}

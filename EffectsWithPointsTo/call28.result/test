@@ -1,0 +1,91 @@
+
+Points-to for call28
+
+
+// Points To IN:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+
+// Points To OUT: none
+
+void call28(int *qq)
+{
+
+// Points To:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+   *qq = 1;
+
+// Points To:
+// qq -> _qq_1[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for call28
+
+void call28(int *qq)
+{
+//             <may be written>: _qq_1[0]
+//             <    is read   >: qq
+   *qq = 1;
+   return;
+}
+
+Cumulated effects with points-to for call28
+
+//             <may be written>: _qq_1[0]
+//             <    is read   >: qq
+void call28(int *qq)
+{
+//             <may be written>: _qq_1[0]
+//             <    is read   >: qq
+   *qq = 1;
+   return;
+}
+
+Points-to for "call28_caller"
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+
+// Points To OUT: none
+
+int call28_caller(int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   call28(q);
+
+// Points To: none
+
+   return 0;
+}
+
+Proper effects with points-to for "call28_caller"
+
+int call28_caller(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   call28(q);
+   return 0;
+}
+
+Cumulated effects with points-to for "call28_caller"
+
+int call28_caller(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   call28(q);
+   return 0;
+}

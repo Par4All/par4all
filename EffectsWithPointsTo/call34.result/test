@@ -1,0 +1,29 @@
+
+Points-to for call34
+
+
+// Points To IN:
+// s.array -> *NULL_POINTER* , MAY
+// s.array -> _s_1__2[0] , MAY
+
+
+// Points To OUT:
+// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void call34(int i, struct ad s)
+{
+
+// Points To:
+// s.array -> *NULL_POINTER* , MAY
+// s.array -> _s_1__2[0] , MAY
+
+   free(s.array);
+
+// Points To:
+// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+Points-to for "call34_caller"
+

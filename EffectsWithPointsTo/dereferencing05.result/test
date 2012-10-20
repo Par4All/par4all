@@ -5,7 +5,7 @@ Points-to for dereferencing05
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void dereferencing05()
 {

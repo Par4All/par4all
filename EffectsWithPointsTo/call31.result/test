@@ -1,0 +1,89 @@
+
+Points-to for call31
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
+
+
+// Points To OUT:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void call31(int i, int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
+
+   free(q);
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+Points-to for "call31_caller"
+
+
+// Points To IN:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+
+// Points To OUT:
+// qq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+int call31_caller(int *qq)
+{
+
+// Points To:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+   int ii = *qq;
+
+// Points To:
+// qq -> _qq_1[0] , EXACT
+
+   call31(ii, qq);
+
+// Points To:
+// qq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return ii++;
+}
+
+Proper effects with points-to for "call31_caller"
+
+int call31_caller(int *qq)
+{
+//             <may be read   >: _qq_1[0]
+//             <    is read   >: qq
+//             <    is written>: ii
+   int ii = *qq;
+//             <    is read   >: ii qq _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   call31(ii, qq);
+//             <    is read   >: ii
+//             <    is written>: ii
+   return ii++;
+}
+
+Cumulated effects with points-to for "call31_caller"
+
+int call31_caller(int *qq)
+{
+//             <may be read   >: _qq_1[0]
+//             <    is read   >: qq
+//             <    is written>: ii
+   int ii = *qq;
+//             <    is read   >: ii qq _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   call31(ii, qq);
+//             <    is read   >: ii
+//             <    is written>: ii
+   return ii++;
+}

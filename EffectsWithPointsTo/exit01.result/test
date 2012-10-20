@@ -7,7 +7,6 @@ void exit01()
 
    j = &i;
    exit(0);
-//             <    is written>: i
    i = 2;
 }
 

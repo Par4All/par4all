@@ -1,18 +1,11 @@
-setenv WSPACE=call16
+setenv WSPACE=call28
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 activate C_PARSER
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-setproperty ALIASING_ACROSS_TYPES FALSE
-setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
+# Failure with both intra- and inter-procedural analyses
 activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 
 echo
@@ -20,6 +13,8 @@ echo Points-to for "$WSPACE"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[$WSPACE]
+
+# quit
 
 echo 
 echo Proper effects with points-to for "$WSPACE"
@@ -38,24 +33,24 @@ display PRINTED_FILE[$WSPACE]
 # quit
 
 echo 
-echo Points-to for "dotprod"
+echo Points-to for "call28_caller"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE[call28_caller]
 
 echo 
-echo Proper effects with points-to for "dotprod"
+echo Proper effects with points-to for "call28_caller"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE[call28_caller]
 
 echo 
-echo Cumulated effects with points-to for "dotprod"
+echo Cumulated effects with points-to for "call28_caller"
 echo
-activate CUMLATED_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE[call28_caller]
 
 
 close
