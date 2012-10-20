@@ -5495,8 +5495,11 @@ alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
+        < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in
 \end{PipsMake}

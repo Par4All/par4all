@@ -672,18 +672,6 @@ bool cells_may_not_point_to_null_p(list cl)
   return may_not_p;
 }
 
-/* Check if points-to arc "spt" belongs to points-to set "pts". */
-bool arc_in_points_to_set_p(points_to spt, set pts)
-{
-  bool in_p = false;
-  SET_FOREACH(points_to, pt, pts) {
-    if(points_to_equal_p(spt, pt)) {
-      in_p = true;
-      break;
-    }
-  }
-  return in_p;
-}
 
 /* Does cell "source" points toward a non null fully defined cell in
  * points-to set pts?
@@ -724,6 +712,13 @@ bool cell_points_to_null_sink_in_set_p(cell source, set pts)
     }
   }
   return null_p;
+}
+
+bool points_to_cell_equal_p(cell c1, cell c2)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  return reference_equal_p(r1,r2);
 }
 
 /* See if an arc like "spt" exists in set "in", regardless of its

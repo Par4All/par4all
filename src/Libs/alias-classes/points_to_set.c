@@ -2212,13 +2212,6 @@ void remove_points_to_arcs(cell source, cell sink, pt_map pt)
 }
 
 
-bool points_to_cell_equal_p(cell c1, cell c2)
-{
-  reference r1 = cell_any_reference(c1);
-  reference r2 = cell_any_reference(c2);
-  return reference_equal_p(r1,r2);
-}
-
 
 /* Compute A = A inter B: complexity in O(n2) */
 void
@@ -2536,4 +2529,17 @@ void remove_impossible_arcs_to_null(list * pL, pt_map in)
   }
   gen_list_and_not(pL, fl);
   gen_free_list(fl);
+}
+
+/* Check if points-to arc "spt" belongs to points-to set "pts". */
+bool arc_in_points_to_set_p(points_to spt, set pts)
+{
+  bool in_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    if(points_to_equal_p(spt, pt)) {
+      in_p = true;
+      break;
+    }
+  }
+  return in_p;
 }
