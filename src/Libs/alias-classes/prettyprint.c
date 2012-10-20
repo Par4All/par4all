@@ -373,8 +373,13 @@ void dprint(expression x)
       print_text(stderr, (text) x);
     else if(ot==entity_domain)
       fprintf(stderr, "%s\n", entity_name((entity) x));
+    else if(ot==basic_domain) {
+      string s = basic_to_string((basic) x);
+      fprintf(stderr, "%s\n", s);
+      free(s);
+    }
     else if(0<=ot && ot<1000)
-      (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d", ot);
+      (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d\n", ot);
     else if(ot>1000 || ot<=0) {
       // FI: I do not know how to get the largest Newgen type
       // We could assume that the object is a list and look for the type

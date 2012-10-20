@@ -671,3 +671,78 @@ bool cells_may_not_point_to_null_p(list cl)
   }
   return may_not_p;
 }
+
+/* Check if points-to arc "spt" belongs to points-to set "pts". */
+bool arc_in_points_to_set_p(points_to spt, set pts)
+{
+  bool in_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    if(points_to_equal_p(spt, pt)) {
+      in_p = true;
+      break;
+    }
+  }
+  return in_p;
+}
+
+/* Does cell "source" points toward a non null fully defined cell in
+ * points-to set pts?
+ *
+ * The function name is not well chosen. Something like
+ * cell_points_to_defined_cell_p()/
+ */
+bool cell_points_to_non_null_sink_in_set_p(cell source, set pts)
+{
+  bool non_null_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    cell pt_source = points_to_source(pt);
+    if(cell_equal_p(pt_source, source)) {
+      cell pt_sink = points_to_sink(pt);
+      if(null_cell_p(pt_sink))
+	;
+      else if(nowhere_cell_p(pt_sink))
+	;
+      else {
+	non_null_p = true;
+	break;
+      }
+    }
+  }
+  return non_null_p;
+}
+bool cell_points_to_null_sink_in_set_p(cell source, set pts)
+{
+  bool null_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    cell pt_source = points_to_source(pt);
+    if(cell_equal_p(pt_source, source)) {
+      cell pt_sink = points_to_sink(pt);
+      if(null_cell_p(pt_sink)) {
+	null_p = true;
+	break;
+      }
+    }
+  }
+  return null_p;
+}
+
+/* See if an arc like "spt" exists in set "in", regardless of its
+ * approximation. If yes, returns the approximation of the arc found
+ * in "in".
+ *
+ * See also arc_in_points_to_set_p(), which requires full identity
+ */
+bool similar_arc_in_points_to_set_p(points_to spt, set in, approximation * pa)
+{
+  bool in_p = false;
+  cell spt_source = points_to_source(spt);
+  cell spt_sink = points_to_sink(spt);
+  SET_FOREACH(points_to, pt, in) {
+    if(points_to_cell_equal_p(spt_source, points_to_source(pt))
+       && points_to_cell_equal_p(spt_sink, points_to_sink(pt))) {
+      *pa = points_to_approximation(pt);
+      break;
+    }
+  }
+  return in_p;
+}

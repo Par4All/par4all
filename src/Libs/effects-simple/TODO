@@ -42,12 +42,13 @@ code of pointer_modif02.c.
 17. Interprocedural effects not translated:
 Pointers/Mensi.sub/struct_inter03.c
 
-18. Inexistant effects are not removed as they should. w is NULL and a
-branch is never taken in Rice/pointer13.c. However, some memory
-effects are still computed although the points-to information is
-"bottom".
+19. call29: A write effect is lost because the callee does not return
 
-Next bug is 18
+20. call30: The free is not taken into account properly by the gen and
+kill sets of the call site.
+
+
+Next bug is 21
 
 ----------------------------------------------------------------
 
@@ -56,3 +57,11 @@ Problemes solved:
 9. Error falsely detected for call03.c?
 
 -> Tpips script changed.
+
+18. Inexistant effects are not removed as they should. w is NULL and a
+branch is never taken in Rice/pointer13.c. However, some memory
+effects are still computed although the points-to information is
+"bottom".
+
+-> In fact, memory effects ignore continuation issues... Not sure this
+   is the correct answer.

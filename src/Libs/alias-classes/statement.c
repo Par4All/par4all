@@ -316,6 +316,15 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	}
       }
     }
+    else {
+      /* The initialization expression may use pointers, directly or
+	 indirectly via struct and arrays. */
+      expression ie = variable_initial_expression(e);
+      if(!expression_undefined_p(ie)) {
+	pt_out = expression_to_points_to(ie, pt_out);
+	free_expression(ie);
+      }
+    }
     /* Take care of expressions in array sizing (see array12.c) */
     if(array_type_p(et)) {
       variable ev = type_variable(et);
@@ -371,7 +380,7 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
     if(points_to_graph_bottom(pt_in))
       pt_out = pt_in;
     else
-      pt_out = call_to_points_to(c, pt_out);
+      pt_out = call_to_points_to(c, pt_out, NIL);
     break;
   }
   case is_instruction_unstructured: {

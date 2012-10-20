@@ -566,8 +566,25 @@ bool entity_stub_sink_p(entity e)
   char penultimate = en[strlen(en) - 2];
   if(dummy_target_p && first == '_' && penultimate == '_')
     stub_sink_p = true;
-
+
   return stub_sink_p;
+}
+
+bool stub_entity_of_module_p(entity s, entity m)
+{
+  bool stub_p = entity_stub_sink_p(s);
+  if(stub_p) {
+    /* There are several ways to decide if entity "s" is local to "m":
+       its module name, its belonging to the declarations of m, its
+       storage,... Let's avoir string comparisons and list scans... */
+    storage ss = entity_storage(s);
+    if(storage_ram_p(ss)) {
+      ram rss = storage_ram(ss);
+      entity f = ram_function(rss);
+      stub_p = m==f;
+    }
+  }
+  return stub_p;
 }
 
 bool entity_abstract_location_p(entity al)

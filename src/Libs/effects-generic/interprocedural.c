@@ -303,6 +303,9 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
  *
  * Return a list of actual effects corresponding to an effect on the
  * formal context "eff".
+ *
+ * The translation mapping is recomputed from scratch for each formal
+ * context effect...
  */
 list backward_translation_of_points_to_formal_context_effect(entity callee, 
 							     list real_args, 
@@ -315,45 +318,54 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
 #include <resources.h>
   points_to_list pts_to_out = (points_to_list)
     db_get_memory_resource(DBR_POINTS_TO_OUT, mn, true);
-  points_to_list pts_to_in = (points_to_list)
-    db_get_memory_resource(DBR_POINTS_TO_IN, mn, true);
-  statement s = effects_private_current_stmt_head();
-  points_to_list ptl_in = load_pt_to_list(s);
+  bool out_bottom_p = points_to_list_bottom(pts_to_out);
+  if(out_bottom_p) {
+    /* The callee does not return. The standard PIPS memory effects
+       due to the call still do exists as they may interfere with
+       parallelization. */
+    ; // FI: temporary way out of the problem
+  }
+  else {
+    points_to_list pts_to_in = (points_to_list)
+      db_get_memory_resource(DBR_POINTS_TO_IN, mn, true);
+    statement s = effects_private_current_stmt_head();
+    points_to_list ptl_in = load_pt_to_list(s);
 
 #include <alias-classes.h>
-  pt_map graph_assign_list(pt_map ptm, list l);
+    pt_map graph_assign_list(pt_map ptm, list l);
 
-  points_to_graph pts_to_in_g = new_pt_map();
-  pts_to_in_g = graph_assign_list(pts_to_in_g, points_to_list_list(pts_to_in));
-  set pts_to_in_s = points_to_graph_set(pts_to_in_g);
+    points_to_graph pts_to_in_g = new_pt_map();
+    pts_to_in_g = graph_assign_list(pts_to_in_g, points_to_list_list(pts_to_in));
+    set pts_to_in_s = points_to_graph_set(pts_to_in_g);
 
-  points_to_graph pt_in = new_pt_map();
-  pt_in = graph_assign_list(pt_in, points_to_list_list(ptl_in));
-  //pt_in = graph_assign_list(pt_in, points_to_list_list(pts_to_in));
-  set pt_in_s = points_to_graph_set(pt_in);
-  set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s);
-  ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+    points_to_graph pt_in = new_pt_map();
+    pt_in = graph_assign_list(pt_in, points_to_list_list(ptl_in));
+    //pt_in = graph_assign_list(pt_in, points_to_list_list(pts_to_in));
+    set pt_in_s = points_to_graph_set(pt_in);
+    set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s);
+    ifdebug(8) print_points_to_set("pt_binded", pts_binded);
 
-  set bm = new_simple_pt_map();
-  list dl = code_declarations(value_code(entity_initial(callee)));
-  list formal_args = points_to_cells_parameters(dl);   
-  bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
-  ifdebug(8) print_points_to_set("bm", bm);
-  cell eff_c = effect_cell(eff);
-  points_to_graph bm_g = make_points_to_graph(false, bm);
-  list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
+    set bm = new_simple_pt_map();
+    list dl = code_declarations(value_code(entity_initial(callee)));
+    list formal_args = points_to_cells_parameters(dl);   
+    bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
+    ifdebug(8) print_points_to_set("bm", bm);
+    cell eff_c = effect_cell(eff);
+    points_to_graph bm_g = make_points_to_graph(false, bm);
+    list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
-  // FI: memory leak on bm_g
+    // FI: memory leak on bm_g
 
-  FOREACH(CELL, n_c, n_eff_cells) {
-    action ac = copy_action(effect_action(eff));
-    approximation ap = copy_approximation(effect_approximation(eff));
-    descriptor d = copy_descriptor(effect_descriptor(eff));
-    effect n_eff =  make_effect(n_c, ac, ap, d);
-    ael = CONS(EFFECT, n_eff, ael);
+    FOREACH(CELL, n_c, n_eff_cells) {
+      action ac = copy_action(effect_action(eff));
+      approximation ap = copy_approximation(effect_approximation(eff));
+      descriptor d = copy_descriptor(effect_descriptor(eff));
+      effect n_eff =  make_effect(n_c, ac, ap, d);
+      ael = CONS(EFFECT, n_eff, ael);
+    }
+
+    pips_assert("The effect is translated", !ENDP(ael));
   }
-
-  pips_assert("The effect is translated", !ENDP(ael));
 
   return ael;
 }

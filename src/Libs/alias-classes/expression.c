@@ -91,7 +91,24 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
   }
   case is_syntax_call: {
     call c = syntax_call(s);
-    pt_out = call_to_points_to(c, pt_in);
+    /* Some idea, but points-to information should rather be used
+     *
+     * list el = expression_to_proper_constant_path_effects(e);
+     *
+     * Also, this would be computed before we know if it is useful
+     * because we need an expression and not a call to have a function
+     * to compute effects. And we do not know if we want an inter or
+     * an intraprocedural points-to analysis.
+     *
+     * The alternative is too always compute points-to information
+     * interprocedurally, which makes sense as it is done for for
+     * memory effects and since points-to information is at a lower
+     * level than memory effects...
+     */
+    // Now, "el" is a useless parameter
+    list el = NIL;
+    pt_out = call_to_points_to(c, pt_in, el);
+    gen_full_free_list(el);
     break;
   }
   case is_syntax_cast: {
@@ -368,8 +385,10 @@ pt_map range_to_points_to(range r, pt_map pt_in)
  * - calls to intrinsics, e.g. ++ or malloc(),
  *
  * - and calls to a user function.
+ *
+ * "el" is the effect list associated to the call site
  */
-pt_map call_to_points_to(call c, pt_map pt_in)
+pt_map call_to_points_to(call c, pt_map pt_in, list el)
 {
   pt_map pt_out = pt_in;
   tag tt;
@@ -402,7 +421,7 @@ pt_map call_to_points_to(call c, pt_map pt_in)
     switch( tt = value_tag(entity_initial(f))) {
     case is_value_code:{
       pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
-      pt_out = user_call_to_points_to(c, pt_out);
+      pt_out = user_call_to_points_to(c, pt_out, el);
     }
       break;
     case is_value_unknown:
@@ -586,6 +605,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in)
   else if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f)
      /* || ENTITY_ASSERT_FAIL_SYSTEM_P(f) */) {
     clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
   }
   else if(ENTITY_C_RETURN_P(f)) {
     /* it is assumed that only one return is present in any module
@@ -2074,7 +2094,10 @@ pt_map condition_to_points_to(expression c, pt_map in, bool true_p)
       out = reference_condition_to_points_to(syntax_reference(cs), in, true_p);
     }
     else if(syntax_call_p(cs)) {
-      out = call_condition_to_points_to(syntax_call(cs), in, true_p);
+      //list el = expression_to_proper_constant_path_effects(c);
+      list el = NIL;
+      out = call_condition_to_points_to(syntax_call(cs), in, el, true_p);
+      //gen_full_free_list(el);
     }
     else {
       pips_internal_error("Not implemented yet.\n");
@@ -2134,7 +2157,7 @@ pt_map reference_condition_to_points_to(reference r, pt_map in, bool true_p)
 
 /* Handle any condition that is a call such as "if(p!=q)", "if(*p)",
  * "if(foo(p=q))"... */
-pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
+pt_map call_condition_to_points_to(call c, pt_map in, list el, bool true_p)
 {
   pt_map out = in;
   entity f = call_function(c);
@@ -2142,7 +2165,7 @@ pt_map call_condition_to_points_to(call c, pt_map in, bool true_p)
   if(value_intrinsic_p(fv))
     out = intrinsic_call_condition_to_points_to(c, in, true_p);
   else if(value_code_p(fv))
-    out = user_call_condition_to_points_to(c, in, true_p);
+    out = user_call_condition_to_points_to(c, in, el, true_p);
   else if(value_constant_p(fv)) {
     // For instance "if(1)"
     ; // do nothing
@@ -2210,7 +2233,7 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
   return out;
 }
 
-pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
+pt_map user_call_condition_to_points_to(call c, pt_map in, list el, bool true_p)
 {
   pt_map out = in;
   // FI: a call site to handle like any other user call site...
@@ -2219,9 +2242,9 @@ pt_map user_call_condition_to_points_to(call c, pt_map in, bool true_p)
   //		    "Call site fully ignored.\n");
   //
   if(true_p) // Analyze the call only once?
-    out = user_call_to_points_to(c, in);
+    out = user_call_to_points_to(c, in, el);
   else // No, because side-effects must be taken into account for both branches
-    out = user_call_to_points_to(c, in);
+    out = user_call_to_points_to(c, in, el);
   return out;
 }
 
