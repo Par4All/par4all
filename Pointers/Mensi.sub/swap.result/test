@@ -21,8 +21,8 @@ int main()
    swap(&pi, &pj);
 
 // Points To:
-// pi -> i , EXACT
-// pj -> j , EXACT
+// pi -> j , EXACT
+// pj -> i , EXACT
 
 
    return 0;

@@ -23,7 +23,10 @@ int main()
    swap01(ppi, ppj);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// pi -> j , EXACT
+// pj -> i , EXACT
+// ppi -> pi , EXACT
+// ppj -> pj , EXACT
 
 
    return 0;

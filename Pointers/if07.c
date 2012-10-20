@@ -2,6 +2,8 @@
 
 // Check the use of NULL (same as if04.c)
 
+// Same bug in the source code as in if03.c: a NULL pointer is dereferenced
+
 #include <stdio.h>
 
 int main() {

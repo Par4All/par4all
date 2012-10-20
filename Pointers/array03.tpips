@@ -6,11 +6,50 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
 echo 
-echo POINTS-TO
+echo Points-to for "foo"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[foo]
+
+echo 
+echo Cumulated effects for "foo"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo 
+echo Points-to for "foo2"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[foo2]
+
+echo 
+echo Cumulated effects for "foo2"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo2]
+
+echo 
+echo Points-to for "foo3"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[foo3]
+
+echo 
+echo Cumulated effects for "foo3"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo3]
+
+echo 
+echo Points-to for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 close
 delete $WSPACE
