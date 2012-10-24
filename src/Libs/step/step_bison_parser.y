@@ -1,10 +1,15 @@
 %{
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
+extern char *step_text;
+extern int step_lex();
+extern int step__scan_string(char*);
+extern int step_parse();
+#else
+	#include "step_lexer.h"
 #endif
 
 #include "defines-local.h"
-#include "step_lexer.h"
 
 
 extern void set_current_transform(int transform);
