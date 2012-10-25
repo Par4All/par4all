@@ -720,11 +720,13 @@ entity abstract_locations_max(entity al1, entity al2)
       char* mn2 = strdup(entity_module_name(al2));
       const char* ln;
       const char* mn;
+      static int mc = 0; // Message count: to avoid multiple repetitions
 
-      if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
+      if(mc==0 && !get_bool_property("ALIASING_ACROSS_TYPES")) {
 	//pips_internal_error("Option not implemented yet.");
 	pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
 			  " for abstract locations.\n");
+	mc++;
       }
 
       if(strcmp(ln1, ln2)==0)

@@ -45,12 +45,29 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
   set pt_binded = set_generic_make(set_private, points_to_equal_p,
 				   points_to_rank);
 
+  /* Be careful with vararags
+   *
+   * This is not sufficient to handle varargs. Much more thinking
+   * needed. And corect examples.
+   */
+  type ft = entity_basic_concrete_type(called_func); // function type
+  functional fft = type_functional(ft);
+  list ptl = functional_parameters(fft); // parameter type list
+  int mnp = (int) gen_length(ptl); // maximum number of formal parameters
+  if(!ENDP(ptl)) {
+    // last parameter type
+    type lpt = parameter_type(PARAMETER(CAR(gen_last(ptl))));
+    if(type_varargs_p(lpt))
+      mnp--;
+  }
+
   cons *pc;
   int ipc;
   s = set_assign(s, pt_caller);
   for (ipc = 1, pc = real_args; pc != NIL; pc = CDR(pc), ipc++) {
     expression rhs = EXPRESSION(CAR(pc));
-    entity fp = find_ith_parameter(called_func, ipc);
+    int tr = ipc>mnp? mnp : ipc;
+    entity fp = find_ith_parameter(called_func, tr);
     type fpt = entity_basic_concrete_type(fp);
     if(array_type_p(fpt)) {
       /* C does not support array assignments... */
@@ -272,20 +289,24 @@ list points_to_cell_translation(cell sink, list args, set pt_in, set pt_binded)
  * New cells are allocated. No sharing is created between parameter
  * "s" and result "sl".
  */
-list points_to_set_to_stub_cell_list(set s, list osl)
+list generic_points_to_set_to_stub_cell_list(entity f, set s, list osl)
 {
   list sl = osl;
   SET_FOREACH(points_to, pt, s) {
     cell sink = points_to_sink(pt);
     reference r1 = cell_any_reference(sink);
     entity e1 = reference_variable(r1);
-    if(entity_stub_sink_p(e1) && !points_to_cell_in_list_p(sink, sl))
+    if( ( (entity_undefined_p(f) && entity_stub_sink_p(e1))
+	  || stub_entity_of_module_p(e1, f) )
+	&& !points_to_cell_in_list_p(sink, sl) )
       sl = CONS(CELL, copy_cell(sink), sl);
       
     cell source = points_to_source(pt);
     reference r2 = cell_any_reference(source);
     entity e2 = reference_variable(r2);
-    if(entity_stub_sink_p(e2) && !points_to_cell_in_list_p(source, sl))
+    if( ( (entity_undefined_p(f) && entity_stub_sink_p(e2))
+	  || stub_entity_of_module_p(e2, f) )
+	&& !points_to_cell_in_list_p(source, sl) )
       sl = CONS(CELL, copy_cell(source), sl);
   }
   
@@ -294,6 +315,15 @@ list points_to_set_to_stub_cell_list(set s, list osl)
   return sl;
 }
 
+list points_to_set_to_stub_cell_list(set s, list osl)
+{
+  return generic_points_to_set_to_stub_cell_list(entity_undefined, s, osl);
+}
+
+list points_to_set_to_module_stub_cell_list(entity m, set s, list osl)
+{
+  return generic_points_to_set_to_stub_cell_list(m, s, osl);
+}
 
 /* returns all the element of E, the set of stubs created when the callee is analyzed.
  *
@@ -508,7 +538,7 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
 	  break;
 	}
 	else if (heap_cell_p(sr1)) {
-	  new_sr = copy_cell(sr1);
+	  new_sr = copy_cell(sr1); // FI->AM: no need for a "break;"?
 	}
       }
       else if(points_to_compare_cell(sr1,sr2)) {
@@ -530,7 +560,7 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
 	  break;
 	}
 	else if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1) || anywhere_cell_p(sk1)) {
-	  new_sk = copy_cell(sk1);
+	  new_sk = copy_cell(sk1); // FI->AM: no need for a "break;"?
 	}
       }
       else if(points_to_compare_cell(sk1,sr2)) {

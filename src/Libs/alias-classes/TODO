@@ -72,7 +72,9 @@ usual case, but it should be controlled by a property...
 
 43. What happens with unions?
 
-Next item will be 44.
+44. Lack of translation for Pointers/bc_inter01.c in call to foo(p1, &p2, q2)
+
+Next item will be 45.
 
 ----------------------------------------------------------
 

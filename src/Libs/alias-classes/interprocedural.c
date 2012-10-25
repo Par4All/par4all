@@ -692,7 +692,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
     points_to_translation_of_formal_parameters(fpcl, al, pt_in, translation);
 
     /* Filter pt_in_callee according to pts_binded. For instance, a
-       formal parameter can point to NULL in pt_in_callee only if it
+v       formal parameter can point to NULL in pt_in_callee only if it
        also points to NULL in pts_binded. In the same way, a formal
        parameter can point to a points-to stub in pt_in_callee only if
        it points to a non-NULL target in pts_binded. Also, a formal
@@ -741,6 +741,12 @@ pt_map user_call_to_points_to_interprocedural(call c,
 					      pts_binded,
 					      translation);
       pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
+
+      /* Some check */
+      list stubs = points_to_set_to_module_stub_cell_list(f, pts_gen, NIL);
+      if(!ENDP(stubs)) {
+	pips_internal_error("Translation failure.\n");
+      }
       // FI: set_union is unsafe; the union of two consistent
       // points-to graph is not a consistent points-to graph
       pt_end = set_union(pt_end, pt_end, pts_gen);

@@ -206,7 +206,7 @@ void clean_up_points_to_stubs(entity module)
   list sl = NIL;
 
   FOREACH(ENTITY, v, dl) {
-    if(entity_stub_sink_p(v) || entity_heap_location_p(v)) {
+    if(stub_entity_of_module_p(v, module) || entity_heap_location_p(v)) {
       sl = CONS(ENTITY, v, sl);
       fprintf(stderr, "Removed stub: %s\n", entity_name(v));
     }
@@ -302,8 +302,15 @@ static bool generic_points_to_analysis(char * module_name) {
   // pts_to_out = remove_unreachable_vertices_in_points_to_graph(pts_to_out);
   /* Filter OUT points-to by deleting local variables, including the
      formal paprameters */
-  if(entity_main_module_p(module))
+  if(entity_main_module_p(module)) {
+    /* FI: you would have to be much more specific about was is kept
+       or not when the main function is exited... I am not sure it is
+       a good idea. Potentially useful information about argv is
+       lost. As well as useless information about memory leaks
+       occuring at the end of the execution. Motsly an issue for
+       validation. */
     clear_pt_map(pts_to_out);
+  }
   else
     points_to_graph_set(pts_to_out) =
       points_to_function_projection(points_to_graph_set(pts_to_out));
