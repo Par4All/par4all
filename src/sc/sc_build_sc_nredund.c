@@ -452,8 +452,6 @@ int n __attribute__ ((unused));
       return ps;
     sc->base = base_copy(ps->base);
     sc->dimension = ps->dimension; 
-    sc->inegalites = contrainte_copy(ps->inegalites);
-    sc->nb_ineq +=1;
 
     for (eq = ps->egalites;
 	 !CONTRAINTE_UNDEFINED_P(eq); eq=eq->succ) {
@@ -463,6 +461,8 @@ int n __attribute__ ((unused));
 
     if (!CONTRAINTE_UNDEFINED_P(ps->inegalites))  {
 
+      sc->inegalites = contrainte_copy(ps->inegalites);
+      sc->nb_ineq +=1;
 	for (pred = ps->inegalites,ineq = (ps->inegalites)->succ;
 	     !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
 
