@@ -41,7 +41,8 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
 
 void assign07()
 {
