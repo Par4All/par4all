@@ -7,9 +7,9 @@ typedef struct LinkedList{
 int  count(list *p)
 {
   int i = 0;
-  if(0){
+  if(p != NULL){
     i++; p = p->next;
-    if (0){
+    if (p != NULL){
     i++; p = p->next;
     }
   }
