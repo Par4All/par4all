@@ -29,13 +29,7 @@ POINTS-TO
 // x.third -> _x_3__0[0] , MAY
 
 
-// Points To OUT:
-// _x_1__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// _x_2__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// _x_3__0[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// x.first -> _x_1__0[0] , EXACT
-// x.second -> _x_2__0[0] , EXACT
-// x.third -> _x_3__0[0] , EXACT
+// Points To OUT: none
 
 int main()
 {

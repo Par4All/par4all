@@ -39,7 +39,7 @@ POINTS TO for "main"
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
