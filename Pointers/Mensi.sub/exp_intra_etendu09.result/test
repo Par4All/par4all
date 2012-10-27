@@ -1,0 +1,146 @@
+
+PROPER  EFFECTS 
+
+int count(list *p)
+{
+//             <    is written>: i
+   int i = 0;
+   if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
+      p = p->next;
+      if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+         i++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
+         p = p->next;
+      }
+   }
+//             <    is read   >: i
+   return i;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
+
+int count(list *p)
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   if (0) {
+
+// Points To: none
+
+      i++;
+
+// Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// p -> _p_1 , EXACT
+
+      p = p->next;
+
+// Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// p -> _p_1_2__1 , EXACT
+
+      if (0) {
+
+// Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// p -> _p_1_2__1 , EXACT
+
+         i++;
+
+// Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
+// p -> _p_1_2__1 , EXACT
+
+         p = p->next;
+      }
+   }
+
+// Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
+// p -> _p_1_2__1 , EXACT
+
+   return i;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int count(list *p)
+{
+//             <    is written>: i
+   int i = 0;
+   if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <    is read   >: _p_1.next p
+//             <    is written>: p
+      p = p->next;
+      if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+         i++;
+//             <    is read   >: _p_1_2__1.next p
+//             <    is written>: p
+         p = p->next;
+      }
+   }
+//             <    is read   >: i
+   return i;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <may be read   >: _p_1.next _p_1_2__1.next p
+int count(list *p)
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be read   >: _p_1.next _p_1_2__1.next i p
+//             <may be written>: i p
+   if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <    is read   >: _p_1.next p
+//             <    is written>: p
+      p = p->next;
+//             <may be read   >: _p_1_2__1.next i p
+//             <may be written>: i p
+      if (0) {
+//             <    is read   >: i
+//             <    is written>: i
+         i++;
+//             <    is read   >: _p_1_2__1.next p
+//             <    is written>: p
+         p = p->next;
+      }
+   }
+//             <    is read   >: i
+   return i;
+}
