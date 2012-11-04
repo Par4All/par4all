@@ -31,7 +31,7 @@ int main()
    a = foo();
 
 // Points To:
-// a -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// a -> foo:*HEAP*_l_7 , MAY
 
    return 0;
 }

@@ -8,6 +8,7 @@ Points-to for "formal_parameter01"
 
 
 // Points To OUT:
+// _pi_1[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 // _pi_1[1] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -16,25 +17,30 @@ int formal_parameter01(int **pi)
 
 // Points To: none
 
-   int **q;
+   /* FI: I need the summary for the sequence */
+   if (1) {
+
+// Points To: none
+
+      int **q;
 
 // Points To:
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   int *i;
+      int *i;
 
 // Points To:
 // i -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   int j;
+      int j;
 
 // Points To:
 // i -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
-   i = 0;
+      i = 0;
 
 // Points To:
 // i -> *NULL_POINTER* , EXACT
@@ -42,7 +48,7 @@ int formal_parameter01(int **pi)
 // pi -> _pi_1[0] , MAY
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   q = pi;
+      q = pi;
 
 // Points To:
 // i -> *NULL_POINTER* , EXACT
@@ -51,7 +57,7 @@ int formal_parameter01(int **pi)
 // q -> *NULL_POINTER* , MAY
 // q -> _pi_1[0] , MAY
 
-   q++;
+      q++;
 
 // Points To:
 // i -> *NULL_POINTER* , EXACT
@@ -59,28 +65,62 @@ int formal_parameter01(int **pi)
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[1] , EXACT
 
-   pi = &i;
+      pi = &i;
 
 // Points To:
 // i -> *NULL_POINTER* , EXACT
 // pi -> i , EXACT
 // q -> _pi_1[1] , EXACT
 
-   *pi = &j;
+      *pi = &j;
 
 // Points To:
 // i -> j , EXACT
 // pi -> i , EXACT
 // q -> _pi_1[1] , EXACT
 
-   *q = &j;
+      *q = &j;
+   }
 
 // Points To:
-// _pi_1[1] -> j , EXACT
-// i -> j , EXACT
-// pi -> i , EXACT
-// q -> _pi_1[1] , EXACT
+// _pi_1[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// _pi_1[1] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
+   return 0;
+}
+
+Cumulated effects for "formal_parameter01"
+
+//             <may be read   >: pi
+//             <may be written>: _pi_1[1]
+int formal_parameter01(int **pi)
+{
+//             <may be read   >: pi
+//             <may be written>: _pi_1[1] pi
+   /* FI: I need the summary for the sequence */
+   if (1) {
+      int **q;
+      int *i;
+      int j;
+//             <    is written>: i
+
+      i = 0;
+//             <    is read   >: pi
+//             <    is written>: q
+      q = pi;
+//             <    is read   >: q
+//             <    is written>: q
+      q++;
+//             <    is written>: pi
+      pi = &i;
+//             <    is read   >: pi
+//             <    is written>: i
+      *pi = &j;
+//             <    is read   >: q
+//             <    is written>: _pi_1[1]
+      *q = &j;
+   }
    return 0;
 }
 
@@ -88,7 +128,9 @@ Points-to for "main"
 
 
 // Points To IN:
+// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
 // formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
+// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
 // formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
 
 
@@ -115,14 +157,21 @@ int main()
 
 // Points To:
 // aipp -> ip , EXACT
+// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
 // formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
+// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
 // formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
 // ip -> i , EXACT
 
-   formal_parameter01(aipp);
+   i = formal_parameter01(aipp);
 
 // Points To:
 // aipp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
+// formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
+// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
+// formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
+// ip[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 // ip[1] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // ip -> i , EXACT
 

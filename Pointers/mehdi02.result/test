@@ -39,7 +39,7 @@ int main()
    p = (struct p_s *) malloc(sizeof(struct p_s ));
 
 // Points To:
-// p -> *HEAP*_l_18 , MAY
+// p -> *HEAP*_l_21 , MAY
 // x -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p->q = x;

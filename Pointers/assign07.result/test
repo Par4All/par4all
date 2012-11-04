@@ -26,6 +26,7 @@ void foo()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign07();
+   return;
 }
 
 PROPER POINTER EFFECTS
@@ -33,6 +34,7 @@ PROPER POINTER EFFECTS
 void foo()
 {
    assign07();
+   return;
 }
 
 POINTS TO
@@ -112,7 +114,8 @@ void assign07()
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
 
 void foo()
 {
@@ -120,4 +123,9 @@ void foo()
 // Points To: none
 
    assign07();
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
+
+   return;
 }
