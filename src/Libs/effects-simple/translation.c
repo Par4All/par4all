@@ -79,35 +79,36 @@ bool add_points_to_subscript_lists(list * posl, list asl, list isl)
       else
 	pips_internal_error("Unexpected case.\n");
     }
-    else if(expression_integer_constant_p(a)) {
-      int as = expression_to_int(a);
-      if(expression_integer_constant_p(i)) {
-	int is = expression_to_int(i);
-	expression ns = int_to_expression(as+is);
-	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+    else {
+      intptr_t as, is;
+      if(expression_integer_value(a,&as)) {
+	if(expression_integer_value(i, &is)) {
+	  expression ns = int_to_expression((int)as+is);
+	  *posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+	}
+	else {
+	  expression ns = expression_undefined;
+	  if(as==0) {
+	    ns = copy_expression(i);
+	  }
+	  else {
+	    ns = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+					     copy_expression(a),
+					     copy_expression(i));
+	  }
+	  *posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+	}
       }
       else {
 	expression ns = expression_undefined;
-	if(as==0) {
-	  ns = copy_expression(i);
-	}
-	else {
+	if(expression_integer_value(i, &is) && is==0)
+	  ns = copy_expression(a);
+	else
 	  ns = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
 					   copy_expression(a),
 					   copy_expression(i));
-	}
 	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
       }
-    }
-    else {
-      expression ns = expression_undefined;
-      if(expression_integer_constant_p(i) && expression_to_int(i)==0)
-	  ns = copy_expression(a);
-      else
-	ns = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-					 copy_expression(a),
-					 copy_expression(i));
-	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
     }
   }
   *posl = gen_nreverse(*posl);
