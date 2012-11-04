@@ -423,9 +423,18 @@ application expression_application(expression e)
   return(syntax_application(expression_syntax(e)));
 }
 
+/* The expression is of kind "s.a", where "s" is a struct and a "a" field. */
 bool expression_field_p(expression e)
 {
-    return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
+  return expression_call_p(e)
+    && ENTITY_FIELD_P(call_function(expression_call(e)));
+}
+
+/* The expression is of kind "a", where "a" is a field of some struct "s". */
+bool field_expression_p(expression e)
+{
+  return expression_reference_p(e)
+    && entity_field_p(reference_variable(expression_reference(e)));
 }
 /* we get the type of the expression by calling expression_to_type()
  * which allocates a new one. Then we call ultimate_type() to have
