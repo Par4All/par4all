@@ -8,6 +8,7 @@ POINTS-TO
 
 
 // Points To OUT:
+// _p_1[*][*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // _p_1[0][3] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int ptr_to_array01(int *(*p)[10])
@@ -24,6 +25,7 @@ int ptr_to_array01(int *(*p)[10])
    (*p)[3] = &a;
 
 // Points To:
+// _p_1[*][*] -> a , MAY
 // _p_1[0][3] -> a , EXACT
 // p -> _p_1[0][0] , EXACT
 
