@@ -11,6 +11,7 @@ POINTS TO for pointer17
 
 // Points To OUT:
 // _p_1[1] -> _p_1_1[1][0] , MAY
+// _p_1_1[*][*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // _p_1_1[1][2] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 void pointer17(float ***p)
@@ -31,6 +32,7 @@ void pointer17(float ***p)
 
 // Points To:
 // _p_1[1] -> _p_1_1[1][0] , MAY
+// _p_1_1[*][*] -> z , MAY
 // _p_1_1[1][2] -> z , EXACT
 // p -> _p_1[0] , EXACT
 

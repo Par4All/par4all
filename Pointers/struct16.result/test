@@ -45,6 +45,7 @@ int main()
    *x.first = &y[5];
 
 // Points To:
+// _x_1__0[*] -> y[5] , MAY
 // _x_1__0[0] -> y[5] , EXACT
 // x.second -> *NULL_POINTER* , MAY
 // x.first -> _x_1__0[0] , EXACT
@@ -53,7 +54,9 @@ int main()
    *x.second = &y[6];
 
 // Points To:
+// _x_1__0[*] -> y[5] , MAY
 // _x_1__0[0] -> y[5] , EXACT
+// _x_2__0[*] -> y[6] , MAY
 // _x_2__0[0] -> y[6] , EXACT
 // x.third -> *NULL_POINTER* , MAY
 // x.first -> _x_1__0[0] , EXACT
@@ -63,8 +66,11 @@ int main()
    *x.third = &y[7];
 
 // Points To:
+// _x_1__0[*] -> y[5] , MAY
 // _x_1__0[0] -> y[5] , EXACT
+// _x_2__0[*] -> y[6] , MAY
 // _x_2__0[0] -> y[6] , EXACT
+// _x_3__0[*] -> y[7] , MAY
 // _x_3__0[0] -> y[7] , EXACT
 // x.first -> _x_1__0[0] , EXACT
 // x.second -> _x_2__0[0] , EXACT

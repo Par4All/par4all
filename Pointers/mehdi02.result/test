@@ -5,7 +5,7 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
@@ -44,10 +44,7 @@ int main()
 
    p->q = x;
 
-// Points To:
-// *HEAP*_l_18.q -> *ANY_MODULE*:*NOWHERE* , MAY
-// p -> *HEAP*_l_18 , MAY
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// Points To: unreachable
 
 
    return 0;

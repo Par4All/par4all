@@ -5,7 +5,7 @@ POINTS TO for assignment19
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void assignment19()
 {
@@ -20,10 +20,9 @@ void assignment19()
 
    p = q;
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// Points To: unreachable
 
    // the value of q is unknown, the assignment is meaningless
    return;
 }
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (pointer_assignment_to_points_to) Assignment of an undefined value at line 8.

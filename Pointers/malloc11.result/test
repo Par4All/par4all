@@ -1,20 +1,27 @@
 
-PROPER  EFFECTS
+Points-to for "foo"
 
-int main()
+
+// Points To IN: none
+
+
+// Points To OUT:
+// foo -> *HEAP*_l_10 , MAY
+
+int * foo(void)
 {
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: i p _MALLOC_EFFECTS:_MALLOC_
-   int i = 1, *p = foo();
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
-   free(p);
+// Points To: none
 
-   return 0;
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_10 , MAY
+
+   return p;
 }
 
-POINTS-TO
+Points-to for "main"
 
 
 // Points To IN: none
@@ -30,7 +37,7 @@ int main()
    int i = 1, *p = foo();
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> foo:*HEAP*_l_10 , MAY
 
 
    free(p);
@@ -39,5 +46,6 @@ int main()
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
-   return 0;
+   return i;
 }
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

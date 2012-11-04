@@ -1,0 +1,36 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int i, *p = &i, *q;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   // An error should be detected according to Pierre Jouvelot, because
+   // the value of q is undefined and then p is assigned an undefined
+   // value too. This is detected by gcc.
+   p = q;
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+Warnings
+
+C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
+INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 13.

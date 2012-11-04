@@ -19,6 +19,12 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[alloc_pointer]
 
 echo 
+echo Points-to for "pointer_free"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_free]
+
+echo 
 echo Points-to for "main"
 echo
 activate PRINT_CODE_POINTS_TO_LIST

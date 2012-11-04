@@ -17,5 +17,5 @@ int main()
 
   free(p);
 
-  return 0;
+  return i;
 }

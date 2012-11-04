@@ -1,3 +1,5 @@
+/* Three different ways to deal with a 2-D array passed as formal parameter */
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -53,8 +55,6 @@ int foo3()
 
   return 1;
 }
-
-
 
 int main() 
 {

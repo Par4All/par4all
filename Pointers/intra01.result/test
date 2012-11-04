@@ -100,7 +100,11 @@ void foo()
    bar(pp, qq);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> j , MAY
+// pp -> p , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
 
    return;
 }

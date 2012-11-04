@@ -1,11 +1,12 @@
 
-POINTS-TO
+Points-to "read_towns"
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// read_towns.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
 
 towns read_towns(const  char fname[])
 {

@@ -7,10 +7,10 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 echo 
-echo POINTS-TO
+echo Points-to "read_towns"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE
+display PRINTED_FILE[read_towns]
 
 close
 echo

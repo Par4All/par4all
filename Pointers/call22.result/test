@@ -42,7 +42,8 @@ int main()
    q = call22(1);
 
 // Points To:
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> i , MAY
+// q -> j , MAY
 
    return 0;
 }

@@ -85,90 +85,90 @@ int main(void)
    p1 = alloc_pointer(13);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p2 = alloc_pointer(17);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p3 = alloc_pointer(19);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    
    // no pointer assigned! can keep all points-to
    pointer_add(p1, p2, p3);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    
    // 36 17 19
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    
    // no pointer assigned! can keep all points-to
    pointer_set(p3, 23);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    
    // no pointer assigned! can keep all points-to
    pointer_add(p3, p2, p1);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    
    // 36 17 53
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
 
    pointer_free(p1);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> alloc_pointer:*HEAP*_l_14 , MAY
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    pointer_free(p2);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 
    pointer_free(p3);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p3 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    return 0;
 }
