@@ -128,6 +128,12 @@ int points_to_context_statement_line_number()
   return statement_number(s);
 }
 
+pt_map points_to_context_statement_in()
+{
+  pt_map in = (pt_map) stack_head(statement_points_to_context);
+  return in;
+}
+
 pt_map pop_statement_points_to_context(void)
 {
   (void) stack_pop(current_statement_points_to_context);
@@ -269,6 +275,7 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  type it = compute_basic_concrete_type(expression_to_type(exp_init));
 	  // See C standard for type compatibility + PIPS idiosyncrasies
 	  // This should be extended to cope with the C type hierarchy
+	  pt_out = expression_to_points_to(exp_init, pt_out);
 	  if(array_pointer_type_equal_p(et, it)
 	     || type_void_star_p(et) || type_void_star_p(it)
 	     || integer_type_p(it)

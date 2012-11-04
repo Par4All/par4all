@@ -50,6 +50,110 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+/* Assume asl and isl have the same number of elements. Build
+ * subscript list osl by adding when possible the subscripts in asl
+ * and isl. See if the addition is exact.
+ *
+ * symbolic expressions are preserved at this stage, to be deleted
+ * later for simple effects because they will be replaced by
+ * *. However, it might be useful when descriptors are used.
+ */
+bool add_points_to_subscript_lists(list * posl, list asl, list isl)
+{
+  list casl, cisl;
+  bool exact_p = true;
+  for(casl=asl, cisl=isl; !ENDP(casl) && !ENDP(cisl); POP(casl), POP(cisl)) {
+    expression a = EXPRESSION(CAR(casl));
+    expression i = EXPRESSION(CAR(cisl));
+    if(unbounded_expression_p(a) || unbounded_expression_p(i)) {
+      expression u = make_unbounded_expression();
+      *posl = CONS(EXPRESSION, u, *posl);
+      exact_p = false;
+    }
+    else if(expression_field_p(a)) {
+      if(expression_field_p(i)) {
+	pips_assert("Both expressions are identical", expression_equal_p(a,i));
+	expression f = copy_expression(a);
+	*posl = CONS(EXPRESSION, f, *posl); // exactitude unchanged
+      }
+      else
+	pips_internal_error("Unexpected case.\n");
+    }
+    else if(expression_integer_constant_p(a)) {
+      int as = expression_to_int(a);
+      if(expression_integer_constant_p(i)) {
+	int is = expression_to_int(i);
+	expression ns = int_to_expression(as+is);
+	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+      }
+      else {
+	expression ns = expression_undefined;
+	if(as==0) {
+	  ns = copy_expression(i);
+	}
+	else {
+	  ns = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+					   copy_expression(a),
+					   copy_expression(i));
+	}
+	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+      }
+    }
+    else {
+      expression ns = expression_undefined;
+      if(expression_integer_constant_p(i) && expression_to_int(i)==0)
+	  ns = copy_expression(a);
+      else
+	ns = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+					 copy_expression(a),
+					 copy_expression(i));
+	*posl = CONS(EXPRESSION, ns, *posl); // exactitude unchanged
+    }
+  }
+  *posl = gen_nreverse(*posl);
+  return exact_p;
+}
+
+/* FI: Let's deal with simple case I think I know how to deal with. */
+bool simple_cell_reference_with_address_of_cell_reference_translation_fi
+(reference input_ref, descriptor __attribute__ ((unused)) input_desc,
+ reference address_of_ref, descriptor __attribute__ ((unused)) address_of_desc,
+ int nb_common_indices,
+ reference *output_ref, descriptor __attribute__ ((unused)) * output_desc,
+ bool *exact_p)
+{
+  bool ok_p = nb_common_indices==0;
+  if(ok_p) {
+    list isl = reference_indices(input_ref);
+    list asl = reference_indices(address_of_ref);
+    int nis = (int) gen_length(isl);
+    int nas = (int) gen_length(asl);
+    if(nis==nas) {
+      bool i_to_be_freed;
+      type it = points_to_reference_to_type(input_ref, &i_to_be_freed);
+      type cit = compute_basic_concrete_type(it);
+      if(i_to_be_freed) free_type(it);
+      bool a_to_be_freed;
+      type at = points_to_reference_to_type(address_of_ref, &a_to_be_freed);
+      type cat = compute_basic_concrete_type(at);
+      if(a_to_be_freed) free_type(at);
+      if(type_equal_p(cit, cat)) {
+	//*output_ref = copy_reference(address_of_ref);
+	*output_ref = make_reference(reference_variable(address_of_ref), NIL);
+	//list osl = reference_indices(*output_ref);
+	list osl = NIL;
+	// Apply an offset
+	*exact_p = add_points_to_subscript_lists(&osl, asl, isl);
+	reference_indices(*output_ref) = osl;
+      }
+      else
+	ok_p = false;
+    }
+    else
+      ok_p = false;
+  }
+  return ok_p;
+}
 
 /** @brief translates a simple memory access path reference from given indices
            using an address_of memory access path reference
@@ -63,7 +167,7 @@
     @param address_of_ref is the simple cell reference giving the output base memory access path.
     @param address_of_desc is here for compatibility with the corresponding convex cells function.
 
-    @param nb_common_indices is the number of indices of input_ref which must be skipped
+    @param nb_common_indices is the number of indices of input_ref which must be skipped (why is it unique for all points-to arcs?)
     @param output_ref is a pointer on the resulting reference
     @param output_desc is here for compatibility with the corresponding convex cells function.
     @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
@@ -74,6 +178,15 @@
     the points-to arc. However, the two indices should be fused and
     not concatenated.
 
+    FI->BC: another example due to Pointers/array15.c. Input_ref is
+    b[0][3] and address_of_ref is _b_1[0][0]. nb_common_indices is
+    0. b os a pointer to an array and the thing to do is to add the
+    indices one by one, not to concatenate anything...
+
+    FI->BC: this function is way too long. It must handle very
+    different cases, e.g. arrays of pointers, struct as well as simple
+    scalar pointer to scalar or arrays. It would be nice to have an
+    example for each class of input.
  */
 void simple_cell_reference_with_address_of_cell_reference_translation
 (reference input_ref, descriptor __attribute__ ((unused)) input_desc,
@@ -86,11 +199,18 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   pips_debug(1, "address_of_ref: %s\n", reference_to_string(address_of_ref));
   pips_debug(1, "nb_common_indices: %d \n", nb_common_indices);
 
+  if(simple_cell_reference_with_address_of_cell_reference_translation_fi(input_ref, input_desc, address_of_ref, address_of_desc, nb_common_indices, output_ref, output_desc, exact_p)) { // Francois' special case
+    ;
+  }
+  else { // Beatrice's code
+
   /* assume exactness */
   *exact_p = true;
 
   /* */
   *output_ref = copy_reference(address_of_ref);
+  // FI: this is already wrong for Pointers/array15.c
+  // We need output_indices=reference_indices(*output_ref)
   list output_indices = gen_last(reference_indices(*output_ref));
   list input_remaining_indices = reference_indices(input_ref);
   for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices));
@@ -102,7 +222,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
     expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
     expression new_exp = expression_undefined;
     /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation
-       this should maybe be put in another function
+       this maybe should be put in another function
     */
     if(!unbounded_expression_p(last_output_indices_exp)) {
       if (expression_reference_p(last_output_indices_exp) &&
@@ -225,7 +345,9 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 							  NIL));
 	}
     }
-  // FI: the consistency of the regenerated reference could be checked
+  }
+
+  // FI: the consistency of the regenerated reference should be checked
   // by computing its type, if only, under a ifdebug() guard...
   pips_debug(8, "output reference %s\n",
 	     reference_to_string(*output_ref));

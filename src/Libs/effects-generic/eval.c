@@ -170,6 +170,10 @@ list reference_to_points_to_matching_list(reference input_ref,
   // list matching_ptl = NIL;
 
   FOREACH(POINTS_TO, pt, ptl) {
+    cell sink_cell = points_to_sink(pt);
+    if(null_cell_p(sink_cell))
+      ; // This points-to arc can be ignored since it would lead to a segfault
+    else {
       cell source_cell = points_to_source(pt);
       reference source_ref = reference_undefined;
       reference tmp_ref = cell_to_reference(source_cell);
@@ -192,32 +196,33 @@ list reference_to_points_to_matching_list(reference input_ref,
 	   && (*cell_reference_preceding_p_func)(source_ref, source_desc, input_ref,
 						 input_desc, current_precondition, true,
 						 &exact_prec)) {
-	  pips_debug(8, "exact_prec is %s\n", exact_prec? "true":"false");
-	  if (source_path_length > *p_current_max_path_length ) {
-	      /* if the candidate has a path length strictly greater
-	       * than the current maximum length, the list of
-	       * previously found matching candidates must be cleared
-	       */
-	    //if(!ENDP(matching_ptl)) {
-	    //	  gen_free_list(matching_ptl);
-	    //	  matching_list = NIL;
-	    //}
-	      if(!ENDP(matching_list)) {
-		  gen_free_list(matching_list);
-		  matching_list = NIL;
-	      }
-	      *p_current_max_path_length = source_path_length;
-	      *exact_p = exact_prec;
-	    }
-	  else
-	    *exact_p = *exact_p && exact_prec;
-	  /* I keep the whole points_to and not only the sink because I will need the approximation to further test
-	     the exactness
-	  */
-	  matching_list = CONS(POINTS_TO, pt, matching_list);
+	pips_debug(8, "exact_prec is %s\n", exact_prec? "true":"false");
+	if (source_path_length > *p_current_max_path_length ) {
+	  /* if the candidate has a path length strictly greater
+	   * than the current maximum length, the list of
+	   * previously found matching candidates must be cleared
+	   */
+	  //if(!ENDP(matching_ptl)) {
+	  //	  gen_free_list(matching_ptl);
+	  //	  matching_list = NIL;
+	  //}
+	  if(!ENDP(matching_list)) {
+	    gen_free_list(matching_list);
+	    matching_list = NIL;
+	  }
+	  *p_current_max_path_length = source_path_length;
+	  *exact_p = exact_prec;
 	}
+	else
+	  *exact_p = *exact_p && exact_prec;
+	/* I keep the whole points_to and not only the sink because I will need the approximation to further test
+	   the exactness
+	*/
+	matching_list = CONS(POINTS_TO, pt, matching_list);
+      }
       if(source_cell != points_to_source(pt)) free_cell(source_cell);
-    } /* end of FOREACH */
+    }
+  } /* end of FOREACH */
   return matching_list;
 }
 

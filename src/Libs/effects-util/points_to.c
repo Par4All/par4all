@@ -736,8 +736,82 @@ bool similar_arc_in_points_to_set_p(points_to spt, set in, approximation * pa)
     if(points_to_cell_equal_p(spt_source, points_to_source(pt))
        && points_to_cell_equal_p(spt_sink, points_to_sink(pt))) {
       *pa = points_to_approximation(pt);
+      in_p = true;
       break;
     }
   }
   return in_p;
+}
+
+/* Return a list of cells that are larger than cell "c" in the
+ * points-to cell lattice.
+ *
+ * This goal is quite open because a[1][2] is dominated by both
+ * a[*][2] and a[1][*], then by a[*][*]. Assuming "a" is variable of
+ * function "foo", then we have "foo:*STACK*_b0",
+ * "*ANYMODULE*:*STACK*_b0", "foo:*ANYWHERE*_b0",
+ * "*ANYMODULE*:*ANYWHERE*_b0", "*ANYMODULE*:*ANYWHERE*".
+ *
+ * They would all be useful to guarantee the consistency of the
+ * points-to information wrt the points-to cell lattice, but we'd
+ * rather maintain a partially consistent points-to graph and rely on
+ * functions using it to add the necessary points-to arcs.
+ *
+ * A lattice-consistent points-to graph would contain too many arcs as
+ * x->y implies x'->y' for all x' bigger than x and y' bigger then
+ * y...
+ *
+ * For the time being, we only need to convert a[i][j][k] into a[*][*][*]
+ * when i, j and k are real subscript expressions, not fields.
+ *
+ * We return an empty list when cell "c" does not need any upper
+ * bound, as is the case with a, a[f] where f is a field, a[*] and all
+ * the abstract locations.
+ *
+ * So, for the time being, this function returns a list with one or
+ * zero elements.
+ */
+list points_to_cell_to_upper_bound_points_to_cells(cell c)
+{
+  list ubl = NIL; // upper bound list
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  if(!entity_abstract_location_p(v)) {
+    list sel = reference_indices(r); // subscript expression list
+    list nsel = NIL; // new subscript expression list
+    bool new_cell_p = false;
+    FOREACH(EXPRESSION, se, sel) {
+      expression nse = expression_undefined;
+      if(integer_expression_p(se)) {
+	nse = make_unbounded_expression();
+	new_cell_p = true;
+      }
+      else
+	nse = copy_expression(se);
+      nsel = CONS(EXPRESSION, nse, nsel);
+    }
+    if(new_cell_p) {
+      nsel = gen_nreverse(nsel);
+      reference nr = make_reference(v, nsel);
+      cell nc = make_cell_reference(nr);
+      ubl = CONS(CELL, nc, ubl);
+    }
+    else
+      gen_full_free_list(nsel);
+  }
+  return ubl;
+}
+
+/* Add to list "l" cells that are upper bound cells of the cells
+ * already in list "l" and return list "l".
+ */
+list points_to_cells_to_upper_bound_points_to_cells(list cl)
+{
+  list ubl = NIL;
+  FOREACH(CELL, c, cl) {
+    list cubl = points_to_cell_to_upper_bound_points_to_cells(c);
+    ubl = gen_nconc(ubl, cubl);
+  }
+  ubl = gen_nconc(cl, ubl);
+  return ubl;
 }

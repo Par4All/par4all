@@ -507,75 +507,102 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
 			      set pt_out,
 			      set pt_in __attribute__ ((unused)),
 			      set pt_binded __attribute__ ((unused)),
-			      set translation)
+			      set translation,
+			      entity f)
 {
   set gen = new_simple_pt_map(); 		
-  set bm = new_simple_pt_map();
+  // set bm = new_simple_pt_map();
   //bm = points_to_binding(args, pt_in, pt_binded);
-  bm = translation;
+  set bm = translation;
+  entity rv = any_function_to_return_value(f);
 
+  /* Consider all points-to arcs "(sr1, sk1)" in "pt_out" */
   SET_FOREACH(points_to, p, pt_out) {
     cell new_sr = cell_undefined; 
+    list new_sr_l = NIL;
     cell new_sk = cell_undefined;
-    approximation a = points_to_approximation(p);
+    list new_sk_l = NIL;
+    approximation a = copy_approximation(points_to_approximation(p));
     cell sr1 = points_to_source(p); 
     cell sk1 = points_to_sink(p); 
+
+    /* Translate sr1 if needed */
     reference r_1 = cell_any_reference(sr1);
-    reference r_2 = cell_any_reference(sk1);
     entity v_1 = reference_variable(r_1);
     list ind1 = reference_indices(r_1);
-    entity v_2 = reference_variable(r_2);
-    SET_FOREACH(points_to, pp, bm) {
-      cell sr2 = points_to_source(pp); 
-      cell sk2 = points_to_sink(pp); 
-      reference r22 = copy_reference(cell_to_reference(sk2));
-      if(!source_in_set_p(sr1, bm)) {
-	reference r_12 = cell_any_reference(sr2);
-	entity v_12 = reference_variable( r_12 );
-	if(same_string_p(entity_local_name(v_1),entity_local_name(v_12))) { 
-	  reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
-	  new_sr = make_cell_reference(r22);
-	  break;
+    if(entity_anywhere_locations_p(v_1)
+       || entity_typed_anywhere_locations_p(v_1)
+       || heap_cell_p(sr1)
+       || v_1==rv
+       || entity_to_module_entity(v_1)!=f) {
+      new_sr = copy_cell(sr1);
+      new_sr_l = CONS(CELL, new_sr, new_sr_l);
+    }
+    else {
+      SET_FOREACH(points_to, pp, bm) {
+	cell sr2 = points_to_source(pp); 
+	cell sk2 = points_to_sink(pp); 
+	reference r22 = copy_reference(cell_to_reference(sk2));
+	if(!source_in_set_p(sr1, bm)) {
+	  reference r_12 = cell_any_reference(sr2);
+	  entity v_12 = reference_variable( r_12 );
+	  if(same_string_p(entity_local_name(v_1),entity_local_name(v_12))) { 
+	    reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
+	    new_sr = make_cell_reference(r22);
+	    new_sr_l = CONS(CELL, new_sr, new_sr_l);
+	  }
 	}
-	else if (heap_cell_p(sr1)) {
-	  new_sr = copy_cell(sr1); // FI->AM: no need for a "break;"?
+	else if(points_to_compare_cell(sr1,sr2)) {
+	  new_sr = copy_cell(points_to_sink(pp));
+	  new_sr_l = CONS(CELL, new_sr, new_sr_l);
 	}
-      }
-      else if(points_to_compare_cell(sr1,sr2)) {
-	new_sr = copy_cell(points_to_sink(pp));
-	break;
       }
     }
 
-    SET_FOREACH(points_to, pp1, bm) {
-      cell sr2 = points_to_source(pp1); 
-      cell sk2 = points_to_sink(pp1); 
-      reference r22 = copy_reference(cell_to_reference(sk2));
-      if(!source_in_set_p(sk1, bm)) {
-	reference r_12 = cell_any_reference(sr2);
-	entity v_12 = reference_variable( r_12 );
-	if(same_string_p(entity_local_name(v_2),entity_local_name(v_12))) { 
-	  reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
-	  new_sk = make_cell_reference(r22);
-	  break;
+    /* Translate sk1 if needed */
+    reference r_2 = cell_any_reference(sk1);
+    entity v_2 = reference_variable(r_2);
+    if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1)
+	|| anywhere_cell_p(sk1) || entity_to_module_entity(v_2)!=f) {
+      new_sk = copy_cell(sk1);
+      new_sk_l = CONS(CELL, new_sk, new_sk_l);
+    }
+    else {
+      SET_FOREACH(points_to, pp1, bm) {
+	cell sr2 = points_to_source(pp1); 
+	cell sk2 = points_to_sink(pp1); 
+	reference r22 = copy_reference(cell_to_reference(sk2));
+	if(!source_in_set_p(sk1, bm)) {
+	  reference r_12 = cell_any_reference(sr2);
+	  entity v_12 = reference_variable( r_12 );
+	  if(same_string_p(entity_local_name(v_2),entity_local_name(v_12))) { 
+	    reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
+	    new_sk = make_cell_reference(r22);
+	    new_sk_l = CONS(CELL, new_sk, new_sk_l);
+	  }
 	}
-	else if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1) || anywhere_cell_p(sk1)) {
-	  new_sk = copy_cell(sk1); // FI->AM: no need for a "break;"?
+	else if(points_to_compare_cell(sk1,sr2)) {
+	  new_sk = copy_cell(points_to_sink(pp1));
+	  new_sk_l = CONS(CELL, new_sk, new_sk_l);
 	}
-      }
-      else if(points_to_compare_cell(sk1,sr2)) {
-	new_sk = copy_cell(points_to_sink(pp1));
-	break;
       }
     }
-    
-    if(!cell_undefined_p(new_sr) && !cell_undefined_p(new_sk)) { 
-      if(!atomic_points_to_cell_p(new_sr)) {
-	free_approximation(a);
-	a = make_approximation_may();
+
+    if(!ENDP(new_sr_l) && !ENDP(new_sk_l)) { 
+      FOREACH(CELL, new_sr, new_sr_l) {
+	FOREACH(CELL, new_sk, new_sk_l) {
+	  if(!atomic_points_to_cell_p(new_sr)) {
+	    free_approximation(a);
+	    a = make_approximation_may();
+	  }
+	  points_to new_pt = make_points_to(copy_cell(new_sr),
+					    copy_cell(new_sk),
+					    a, make_descriptor_none());
+	  set_add_element(gen, gen, (void*)new_pt);
+	}
       }
-      points_to new_pt = make_points_to(new_sr, new_sk, a, make_descriptor_none());
-      set_add_element(gen, gen, (void*)new_pt);
+      // gen_full_free_list(new_sr_l);
+      // gen_full_free_list(new_sk_l);
     }
   }
 

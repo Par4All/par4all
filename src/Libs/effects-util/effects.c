@@ -1129,10 +1129,10 @@ bool points_to_reference_included_p(reference r1, reference r2)
 
   list dims1 = reference_indices(r1);
   list dims2 = reference_indices(r2);
-  list cdims2 = dims2;
 
   if(v1 == v2) {
     if(gen_length(dims1)==gen_length(dims2)) {
+      list cdims2 = dims2;
       FOREACH(EXPRESSION, s1, dims1) {
 	expression s2 = EXPRESSION(CAR(cdims2));
 	if(!expression_equal_p(s1,s2)) {
@@ -1144,8 +1144,22 @@ bool points_to_reference_included_p(reference r1, reference r2)
 	cdims2 = CDR(cdims2);
       }
     }
-    else
+    else if(gen_length(dims1)>gen_length(dims2)) {
+      list cdims1 = dims1;
+      FOREACH(EXPRESSION, s2, dims2) {
+	expression s1 = EXPRESSION(CAR(cdims1));
+	if(!expression_equal_p(s1,s2)) {
+	  if(!unbounded_expression_p(s2)) {
+	    included_p = false;
+	    break;
+	  }
+	}
+	cdims1 = CDR(cdims1);
+      }
+    }
+    else {
       included_p = false;
+    }
   }
   else {
     // pips_internal_error("Abstract location lattice not implemented here.\n");

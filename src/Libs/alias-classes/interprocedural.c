@@ -83,41 +83,44 @@ list points_to_cells_parameters(list dl)
   return fpcl;
 }
 
+/* FI: limited to the interprocedural option */
 points_to_graph user_call_to_points_to(call c,
 				       points_to_graph pt_in,
 				       list el) // effect list
 {
   points_to_graph pt_out = pt_in;
-  entity f = call_function(c);
-  //list al = call_arguments(c);
+  if(!points_to_graph_bottom(pt_in)) {
+    entity f = call_function(c);
+    //list al = call_arguments(c);
 
-  // FI: intraprocedural, use effects
-  // FI: interprocedural, check alias compatibility, generate gen and kill sets,...
-  pt_out = pt_in;
+    // FI: intraprocedural, use effects
+    // FI: interprocedural, check alias compatibility, generate gen and kill sets,...
+    pt_out = pt_in;
 
-  // Code by Amira
-  //list fpcl = NIL; // Formal parameter cell list
-  type t = entity_basic_concrete_type(f);
-  if(type_functional_p(t)) {
-    list dl = code_declarations(value_code(entity_initial(f)));
-    /*fpcl = */points_to_cells_parameters(dl);   
-  }
-  else {
-    pips_internal_error("Function has not a functional type.\n");
-  }
-
-  /* Using memory effects does not simplify the points-to analysis,
-     which is a preliminary analusis wrt memory effects */
-  if(interprocedural_points_to_analysis_p()) {
-    pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+    // Code by Amira
+    //list fpcl = NIL; // Formal parameter cell list
+    type t = entity_basic_concrete_type(f);
+    if(type_functional_p(t)) {
+      list dl = code_declarations(value_code(entity_initial(f)));
+      /*fpcl = */points_to_cells_parameters(dl);   
     }
-  else if(fast_interprocedural_points_to_analysis_p()) {
-    //pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
-    pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+    else {
+      pips_internal_error("Function has not a functional type.\n");
     }
-  else {
-    //pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
-    pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+
+    /* Using memory effects does not simplify the points-to analysis,
+       which is a preliminary analusis wrt memory effects */
+    if(interprocedural_points_to_analysis_p()) {
+      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+    }
+    else if(fast_interprocedural_points_to_analysis_p()) {
+      //pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
+      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+    }
+    else {
+      //pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
+      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+    }
   }
 
   return pt_out;
@@ -130,21 +133,26 @@ list user_call_to_points_to_sinks(call c,
 				  bool eval_p)
 {
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  type t = ultimate_type(entity_type(call_function(c)));
-  type rt = ultimate_type(functional_result(type_functional(t)));
+  type t = entity_basic_concrete_type(call_function(c));
+  type rt = compute_basic_concrete_type(functional_result(type_functional(t)));
   entity ne = entity_undefined;
   list sinks = NIL;
   entity f = call_function(c);
   // Interprocedural version
   // Check if there is a return value at the level of POINTS TO OUT, if yes return its sink
-  if(interprocedural_points_to_analysis_p() ||fast_interprocedural_points_to_analysis_p() ) {
+  if(true || interprocedural_points_to_analysis_p() ||fast_interprocedural_points_to_analysis_p() ) {
     const char* mn = entity_local_name(f);
-    points_to_list pts_to_out = (points_to_list)
-      db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
-    list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
-    set pt_out_callee = new_simple_pt_map();
-    pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
-    SET_FOREACH( points_to, pt, pt_out_callee) {
+    // FI: Warning, they are not translated into the caller's frame...
+    // FI: An up-to-date version of in should be better
+    //points_to_list pts_to_out = (points_to_list)
+    //db_get_memory_resource(DBR_POINTS_TO_OUT, module_local_name(f), true);
+    //list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
+    //set pt_out_callee = new_simple_pt_map();
+    //pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+    // SET_FOREACH( points_to, pt, pt_out_callee) {
+    set in_s = points_to_graph_set(in);
+    list rvptl = NIL;
+    SET_FOREACH( points_to, pt, in_s) {
       cell s = points_to_source(pt);
       reference sr = cell_any_reference(s);
       entity se = reference_variable(sr);
@@ -152,8 +160,15 @@ list user_call_to_points_to_sinks(call c,
       if( strcmp(mn, sn)==0) {
 	cell sc = copy_cell(points_to_sink(pt));
 	sinks = gen_nconc(CONS(CELL, sc, NULL), sinks);
+	rvptl = CONS(POINTS_TO, pt, rvptl);
       }
     }
+    /* Remove all arcs related to the return value of the callee */
+    FOREACH(POINTS_TO, rvpt, rvptl) {
+      remove_arc_from_simple_pt_map(rvpt, in_s);
+      ;
+    }
+    gen_free_list(rvptl);
   /* FI: definitely the intraprocedural version */
   }
   else {
@@ -264,11 +279,22 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
   /* Copy only possible arcs "pt" from "pt_in_callee" into the "filtered" set */
   SET_FOREACH(points_to, pt, pt_in_callee) {
     cell source = points_to_source(pt);
-    if(points_to_cell_in_list_p(source, fcl)) {
+    if(related_points_to_cell_in_list_p(source, fcl)) {
       cell sink = points_to_sink(pt);
       list tsl = points_to_source_to_sinks(source, translation_g, false);
       // FI: this assert may be too strong
       pips_assert("Elements of \"fcl\" can be translated", !ENDP(tsl));
+
+      /* Make sure pts_binded is large enough: the pointer may be
+	 initialized before the call to the caller and used only in
+	 the callee. Because of the on-demand approach, pts_binded
+	 does not contain enough elements. */
+      pt_map pts_binded_g = make_points_to_graph(false, pts_binded);
+      FOREACH(CELL, c, tsl) {
+	list sinks = any_source_to_sinks(c, pts_binded_g, false);
+	gen_free_list(sinks);
+      }
+
       if(null_cell_p(sink)) {
 	/* Do we have a similar arc in pts_binded? */
 	FOREACH(CELL, tc, tsl) {
@@ -302,12 +328,16 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
   list nfcl = NIL;
   FOREACH(CELL, c, fcl) {
     points_to_graph filtered_g = make_points_to_graph(false, filtered);
-    list fl = points_to_source_to_sinks(c, filtered_g, false); // formal list
+    list fl = points_to_source_to_some_sinks(c, filtered_g, false); // formal list
     if(!ENDP(fl)) {
-      list tsl = points_to_source_to_sinks(c, translation_g, false);
+      // FI: I am in trouble with _nl_1 and _nl_1[next]; the first one
+      // is not recognized in the second one.
+      //list tsl = points_to_source_to_sinks(c, translation_g, false);
+      list tsl = points_to_source_to_some_sinks(c, translation_g, false);
+      //list tsl = source_to_sinks(c, translation_g, false);
       FOREACH(CELL, tc, tsl) {
 	points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
-	list al = points_to_source_to_sinks(tc, pts_binded_g, false); // formal list
+	list al = points_to_source_to_some_sinks(tc, pts_binded_g, false); // formal list
 	int nfl = (int) gen_length(fl);
 	int nal = (int) gen_length(al);
 	approximation a = approximation_undefined;
@@ -328,6 +358,11 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	}
 	free_approximation(a);
       }
+    }
+    else {
+      ; // No need to go down... if we stop with a good reason, not
+      // because of a bug
+      // pips_internal_error("Translation error.\n");
     }
   }
 
@@ -352,7 +387,20 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
    parameter cannot points exactly to UNDEFINED in pts_binded as
    it would be useless (not clear if we can remove such an arc
    when it is a may arc...). Finally, each formal parameter must
-   still point to something. */
+   still point to something.
+
+   The context of the caller may be insufficiently developped because
+   its does not use explictly a pointer that is a formal parameter for
+   it. For instance:
+
+   foo(int ***p) {bar(int ***p);}
+
+   The formal context of "foo()" must be developped when the formal
+   context of "bar()" is imported. For instance, *p, **p and ***p may
+   be accessed in "bar()", generating points-to stub in "bar". Similar
+   stubs must be generated here for "foo()" before the translation can
+   be performed.
+ */
 set filter_formal_context_according_to_actual_context(list fpcl,
 						      set pt_in_callee,
 						      set pts_binded,
@@ -385,6 +433,9 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	}
       }
     }
+    else {
+      /* We have to deal recursively with stubs of the formal context */
+    }
   }
 
   /* Compute the translation relation for sinks of the formal arguments */
@@ -393,7 +444,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
   points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
   FOREACH(CELL, c, fpcl) {
     list fl = points_to_source_to_sinks(c, filtered_g, false); // formal list
-    list al = points_to_source_to_sinks(c, pts_binded_g, false); // formal list
+    list al = points_to_source_to_sinks(c, pts_binded_g, false); // actual list
     int nfl = (int) gen_length(fl);
     int nal = (int) gen_length(al);
     approximation a = approximation_undefined;
@@ -454,21 +505,27 @@ set filter_formal_context_according_to_actual_context(list fpcl,
  * ones: yet another potential memory leak...
  */
 set filter_formal_out_context_according_to_formal_in_context
-(set out, set in, list wpl)
+(set out, set in, list wpl, entity f)
 {
   set out_filtered = new_simple_pt_map();
 
   /* First, filter out according to in */
   SET_FOREACH(points_to, pt, out) {
     cell source = points_to_source(pt);
+    entity se = reference_variable(cell_any_reference(source));
+    entity rv = any_function_to_return_value(f);
     cell sink = points_to_sink(pt);
     if(nowhere_cell_p(sink)) {
       /* The source of the arc may not have been modified but the sink
 	 probably has been freed: the arc must be preserved */
       add_arc_to_simple_pt_map(pt, out_filtered);
     }
-    if(points_to_cell_in_list_p(source, wpl)) {
+    else if(points_to_cell_in_list_p(source, wpl)) {
       /* The source of the arc has been modified: the arc must be preserved */
+      add_arc_to_simple_pt_map(pt, out_filtered);
+    }
+    else if(se==rv) {
+      /* the arc defining the return value must be preserved: no! */
       add_arc_to_simple_pt_map(pt, out_filtered);
     }
     else {
@@ -557,7 +614,8 @@ void points_to_translation_of_formal_parameters(list fpcl,
     FOREACH(CELL, ac, acl) {
       cell source = copy_cell(fc);
       bool to_be_freed;
-      type source_t = points_to_cell_to_type(source, &to_be_freed);
+      type a_source_t = points_to_cell_to_type(source, &to_be_freed);
+      type source_t = compute_basic_concrete_type(a_source_t);
       if(pointer_type_p(source_t)) {
 	cell n_source = copy_cell(fc);
 	cell n_sink = copy_cell(ac);
@@ -590,6 +648,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
       else {
 	; // No need
       }
+      if(to_be_freed) free_type(a_source_t);
     }
   }
 }
@@ -640,6 +699,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
 					      list el __attribute__ ((unused)))
 {
   pt_map pt_out = pt_in;
+  pips_assert("pt_in is valid", !points_to_graph_bottom(pt_in));
   entity f = call_function(c);
   list al = call_arguments(c);
   list dl = code_declarations(value_code(entity_initial(f)));
@@ -717,29 +777,44 @@ v       formal parameter can point to NULL in pt_in_callee only if it
 
       set pt_out_callee_filtered =
 	filter_formal_out_context_according_to_formal_in_context
-	(pt_out_callee, pt_in_callee_filtered, wpl);
+	(pt_out_callee, pt_in_callee_filtered, wpl, f);
 
       /* Explicitly written pointers imply some arc removals; pointer
 	 assignments directly or indirectly in the callee. */
-      set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, fpcl,
+      // pt_end = set_difference(pt_end, pt_in_s, pts_kill);
+
+      /* FI: pt_in_s may have been modified implictly because the
+       * formal context has been increased according to the needs of
+       * the callee. But pt_in_s may also have been updated by what
+       * has happened prevously when analyzing the current
+       * statement. See for instance Poitners/sort01.c.
+       */
+      set c_pt_in_s = points_to_graph_set(points_to_context_statement_in());
+      c_pt_in_s = set_union(c_pt_in_s, c_pt_in_s, pt_in_s);
+
+      set pts_kill = compute_points_to_kill_set(wpl, c_pt_in_s, fpcl,
 						pt_in_callee_filtered,
 						pts_binded,
 						translation);
       /* Implicitly written pointers imply some arc removals: free(),
 	 tests and exits. */
-      add_implicitly_killed_arcs_to_kill_set(pts_kill, wpl, pt_in_s,
+      add_implicitly_killed_arcs_to_kill_set(pts_kill, wpl, c_pt_in_s,
 					     pt_out_callee_filtered,
 					     translation);
       ifdebug(8) print_points_to_set("pt_kill", pts_kill);
 
       set pt_end = new_simple_pt_map();
-      pt_end = set_difference(pt_end, pt_in_s, pts_kill);
+      pt_end = set_difference(pt_end, c_pt_in_s, pts_kill);
 
       set pts_gen = compute_points_to_gen_set(fpcl,
 					      pt_out_callee_filtered,
 					      pt_in_callee_filtered,
 					      pts_binded,
-					      translation);
+					      translation, f);
+      // FI: Not satisfying; kludge to solve issue with Pointers/inter04
+      pt_map pts_gen_g = make_points_to_graph(false, pts_gen);
+      upgrade_approximations_in_points_to_set(pts_gen_g);
+
       pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
 
       /* Some check */
