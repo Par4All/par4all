@@ -65,7 +65,9 @@ int call28_caller(int *q)
 
    call28(q);
 
-// Points To: none
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
 
    return 0;
 }

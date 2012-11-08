@@ -159,6 +159,7 @@ int main()
 // a.p -> *HEAP*_l_17[0] , MAY
 // b.p -> *HEAP*_l_17[0] , MAY
 // e.champ[*].p -> *HEAP*_l_29[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       for(j = 0; j <= 9; j += 1)
@@ -167,6 +168,7 @@ int main()
 // a.p -> *HEAP*_l_17[0] , MAY
 // b.p -> *HEAP*_l_17[0] , MAY
 // e.champ[*].p -> *HEAP*_l_29[0] , MAY
+// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
          ((e.champ)[i].p)[j] = i+j;
