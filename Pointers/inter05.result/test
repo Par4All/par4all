@@ -17,7 +17,9 @@ POINTS TO for inter05
 
 // Points To OUT:
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _ppp_1_1[*][*] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[*][*] -> _qqq_2_2_2[0][0][0] , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
@@ -42,7 +44,9 @@ void bar(int ***ppp, int ***qqq)
 
 // Points To:
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _ppp_1_1[*][*] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[*][*] -> _qqq_2_2_2[0][0][0] , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
@@ -53,10 +57,14 @@ void bar(int ***ppp, int ***qqq)
    return;
 }
 
-// Points To IN: none
+// Points To IN:
+// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
+// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
+// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
 
 void inter05()
 {
@@ -76,6 +84,8 @@ void inter05()
    int k = 2, *r = &k;
 
 // Points To:
+// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
+// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
 // p -> i , EXACT
 // pp -> p , EXACT
 // ppp -> pp , EXACT
@@ -87,7 +97,15 @@ void inter05()
    bar(ppp, qqq);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
+// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> j , MAY
+// pp -> p , EXACT
+// ppp -> pp , EXACT
+// q -> j , EXACT
+// qq -> q , EXACT
+// qqq -> qq , EXACT
 // r -> k , EXACT
 
    return;

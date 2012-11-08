@@ -29,4 +29,4 @@ towns read_towns(const  char fname[])
 
 Warnings
 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.

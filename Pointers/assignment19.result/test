@@ -25,4 +25,4 @@ void assignment19()
    // the value of q is unknown, the assignment is meaningless
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (pointer_assignment_to_points_to) Assignment of an undefined value at line 8.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (pointer_assignment_to_points_to) Assignment of an undefined value at line 8.

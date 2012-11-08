@@ -1,5 +1,8 @@
 // conditional operator and structures
 
+// FI: fields b and c should be initialized in s2 and s3 before they
+// are assigned to s1.
+
 typedef struct {int *a; int *b[10]; int (*c)[10];} mystruct;
 
 int main()

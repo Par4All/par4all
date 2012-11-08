@@ -39,4 +39,4 @@ void pointer17(float ***p)
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (points_to_set_block_projection) Dangling pointer "_p_1_1" towards "z".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer17] (points_to_set_block_projection) Dangling pointer "_p_1_1" towards "z".

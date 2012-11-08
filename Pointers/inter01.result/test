@@ -48,3 +48,4 @@ void inter01()
       m = 5;
    }
 }
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

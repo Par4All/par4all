@@ -53,4 +53,4 @@ int main(int argc, char *argv[])
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".
