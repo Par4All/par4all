@@ -114,12 +114,12 @@ points_to_graph user_call_to_points_to(call c,
       pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
     }
     else if(fast_interprocedural_points_to_analysis_p()) {
-      //pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
-      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+      pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
+      //pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
     }
     else {
-      //pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
-      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+      pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
+      //pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
     }
   }
 
@@ -140,7 +140,8 @@ list user_call_to_points_to_sinks(call c,
   entity f = call_function(c);
   // Interprocedural version
   // Check if there is a return value at the level of POINTS TO OUT, if yes return its sink
-  if(true || interprocedural_points_to_analysis_p() ||fast_interprocedural_points_to_analysis_p() ) {
+  if(interprocedural_points_to_analysis_p()
+     ||fast_interprocedural_points_to_analysis_p() ) {
     const char* mn = entity_local_name(f);
     // FI: Warning, they are not translated into the caller's frame...
     // FI: An up-to-date version of in should be better
@@ -771,7 +772,8 @@ v       formal parameter can point to NULL in pt_in_callee only if it
     list stubs = stubs_list(pt_in_callee, pt_out_callee);
     bool compatible_p
       = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,
-					 pt_in_callee_filtered, pt_out_callee);
+					pt_in_callee_filtered, pt_out_callee,
+					translation);
     
     if(compatible_p) {
 
@@ -834,7 +836,9 @@ v       formal parameter can point to NULL in pt_in_callee only if it
 			"We have to create a new formal context "
 			"and to restart the points-to analysis "
 			"and to modify the IN and OUT data structures...\n ");
-      pips_internal_error("No handling of aliasing between formal parameters.\n");
+      pips_internal_error
+	("No handling of aliasing between formal parameters at line %d.\n",
+	 points_to_context_statement_line_number());
       pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
     }
   }

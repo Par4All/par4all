@@ -353,7 +353,8 @@ bool sets_binded_and_in_compatible_p(list stubs,
 				     list args,
 				     set pt_binded,
 				     set pt_in,
-				     set pt_out __attribute__ ((unused)))
+				     set pt_out __attribute__ ((unused)),
+				     set translation)
 {
   bool compatible_p = true;
   // FI->AM: this set does not seem to be used
@@ -370,7 +371,8 @@ bool sets_binded_and_in_compatible_p(list stubs,
    *
    * FI: how can "bm" be computed if "binded" and "in" are incompatible?
    */
-  bm = points_to_binding(args, pt_in, pt_binded);
+  // bm = points_to_binding(args, pt_in, pt_binded);
+  bm = translation;
 
   while(!ENDP(stubs) && compatible_p) {
     cell st = CELL(CAR(stubs));
