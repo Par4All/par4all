@@ -1,12 +1,12 @@
 #include<stdlib.h>
-#include<math.h>
+#include<stdio.h>
 typedef int * pointer;
 
 // should catch that returned value is malloc'ed there
 pointer alloc_pointer(int v)
 {
   pointer p;
-  if(rand())
+  if(p!=NULL)
      p = malloc(sizeof(int));
   else
      p = malloc(2*sizeof(int));
