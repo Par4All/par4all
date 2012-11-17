@@ -3,8 +3,8 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 {
 //             <    is read   >: c
    if (c=='\n'||c=='\r')
-//             <may be written>: _col_4[0]
 //             <    is read   >: col
+//             <    is written>: _col_4[0]
       /* on change de ligne */
       
       *col = 0;
@@ -14,13 +14,11 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       
       while (*col<indent) {
          my_fputc(' ', _stream);
-//             <may be read   >: _nbout_6[0]
-//             <may be written>: _nbout_6[0]
-//             <    is read   >: nbout
+//             <    is read   >: _nbout_6[0] nbout
+//             <    is written>: _nbout_6[0]
          (*nbout)++;
-//             <may be read   >: _col_4[0]
-//             <may be written>: _col_4[0]
-//             <    is read   >: col
+//             <    is read   >: _col_4[0] col
+//             <    is written>: _col_4[0]
          (*col)++;
       }
 //             <    is read   >: _col_4[0] col
@@ -39,34 +37,34 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
  *********************** Use-Def Chains *********************
 
 	12 --> 22 with conflicts
-		from <_col_4[0]-W-MAY> to <_col_4[0]-W-MAY>
-		from <_col_4[0]-W-MAY> to <_col_4[0]-R-MAY>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-W-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-R-EXACT>
 	12 --> 25 with conflicts
-		from <_col_4[0]-W-MAY> to <_col_4[0]-W-EXACT>
-		from <_col_4[0]-W-MAY> to <_col_4[0]-R-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-W-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-R-EXACT>
 	18 --> 21 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_nbout_6[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_nbout_6[0]-W-EXACT>
 	18 --> 22 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_col_4[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_col_4[0]-W-EXACT>
 	18 --> 25 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_col_4[0]-W-EXACT>
 	18 --> 31 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_nbout_6[0]-W-EXACT>
 	21 --> 21 with conflicts
-		from <_nbout_6[0]-W-MAY> to <_nbout_6[0]-W-MAY>
-		from <_nbout_6[0]-W-MAY> to <_nbout_6[0]-R-MAY>
-		from <_nbout_6[0]-R-MAY> to <_nbout_6[0]-W-MAY>
+		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-W-EXACT>
+		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-R-EXACT>
+		from <_nbout_6[0]-R-EXACT> to <_nbout_6[0]-W-EXACT>
 	21 --> 31 with conflicts
-		from <_nbout_6[0]-W-MAY> to <_nbout_6[0]-W-EXACT>
-		from <_nbout_6[0]-W-MAY> to <_nbout_6[0]-R-EXACT>
-		from <_nbout_6[0]-R-MAY> to <_nbout_6[0]-W-EXACT>
+		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-W-EXACT>
+		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-R-EXACT>
+		from <_nbout_6[0]-R-EXACT> to <_nbout_6[0]-W-EXACT>
 	22 --> 22 with conflicts
-		from <_col_4[0]-W-MAY> to <_col_4[0]-W-MAY>
-		from <_col_4[0]-W-MAY> to <_col_4[0]-R-MAY>
-		from <_col_4[0]-R-MAY> to <_col_4[0]-W-MAY>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-W-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-R-EXACT>
+		from <_col_4[0]-R-EXACT> to <_col_4[0]-W-EXACT>
 	22 --> 25 with conflicts
-		from <_col_4[0]-W-MAY> to <_col_4[0]-W-EXACT>
-		from <_col_4[0]-W-MAY> to <_col_4[0]-R-EXACT>
-		from <_col_4[0]-R-MAY> to <_col_4[0]-W-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-W-EXACT>
+		from <_col_4[0]-W-EXACT> to <_col_4[0]-R-EXACT>
+		from <_col_4[0]-R-EXACT> to <_col_4[0]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

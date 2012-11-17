@@ -1,8 +1,7 @@
 
 void foo(int *col)
 {
-//             <may be read   >: _col_1[0]
-//             <    is read   >: col
+//             <    is read   >: _col_1[0] col
 //             <    is written>: col
    *col++;
 

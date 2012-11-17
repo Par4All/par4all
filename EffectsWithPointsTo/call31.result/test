@@ -60,8 +60,7 @@ Proper effects with points-to for "call31_caller"
 
 int call31_caller(int *qq)
 {
-//             <may be read   >: _qq_1[0]
-//             <    is read   >: qq
+//             <    is read   >: _qq_1[0] qq
 //             <    is written>: ii
    int ii = *qq;
 //             <    is read   >: ii qq _MALLOC_EFFECTS:_MALLOC_
@@ -76,8 +75,7 @@ Cumulated effects with points-to for "call31_caller"
 
 int call31_caller(int *qq)
 {
-//             <may be read   >: _qq_1[0]
-//             <    is read   >: qq
+//             <    is read   >: _qq_1[0] qq
 //             <    is written>: ii
    int ii = *qq;
 //             <    is read   >: ii qq _MALLOC_EFFECTS:_MALLOC_

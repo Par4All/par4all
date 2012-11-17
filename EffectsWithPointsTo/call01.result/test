@@ -51,16 +51,16 @@ Proper effects with points-to for "call01"
 
 void call01(int *pi, tf_t *q)
 {
-//             <may be written>: _pi_1[0]
 //             <    is read   >: pi
+//             <    is written>: _pi_1[0]
    *pi = 1;
 //             <    is read   >: pi
 //             <    is written>: pi
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//             <may be written>: _q_2[0].one
 //             <    is read   >: q
+//             <    is written>: _q_2[0].one
    q->one = 1;
 //             <    is read   >: q
 //             <    is written>: _q_2[0].two[4]
@@ -70,21 +70,20 @@ void call01(int *pi, tf_t *q)
 
 Cumulated effects with points-to for "call01"
 
-//             <may be written>: _pi_1[0] _q_2[0].one
 //             <    is read   >: pi q
-//             <    is written>: _q_2[0].two[4]
+//             <    is written>: _pi_1[0] _q_2[0].one _q_2[0].two[4]
 void call01(int *pi, tf_t *q)
 {
-//             <may be written>: _pi_1[0]
 //             <    is read   >: pi
+//             <    is written>: _pi_1[0]
    *pi = 1;
 //             <    is read   >: pi
 //             <    is written>: pi
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//             <may be written>: _q_2[0].one
 //             <    is read   >: q
+//             <    is written>: _q_2[0].one
    q->one = 1;
 //             <    is read   >: q
 //             <    is written>: _q_2[0].two[4]
@@ -127,8 +126,7 @@ int main()
 {
    int i[10];
    tf_t s;
-//             <may be written>: i[0] s.one
-//             <    is written>: s.two[4]
+//             <    is written>: i[0] s.one s.two[4]
 
    call01(&i[0], &s);
 //             <    is read   >: i[1]

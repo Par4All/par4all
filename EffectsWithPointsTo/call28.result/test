@@ -28,20 +28,20 @@ Proper effects with points-to for call28
 
 void call28(int *qq)
 {
-//             <may be written>: _qq_1[0]
 //             <    is read   >: qq
+//             <    is written>: _qq_1[0]
    *qq = 1;
    return;
 }
 
 Cumulated effects with points-to for call28
 
-//             <may be written>: _qq_1[0]
 //             <    is read   >: qq
+//             <    is written>: _qq_1[0]
 void call28(int *qq)
 {
-//             <may be written>: _qq_1[0]
 //             <    is read   >: qq
+//             <    is written>: _qq_1[0]
    *qq = 1;
    return;
 }
@@ -76,8 +76,8 @@ Proper effects with points-to for "call28_caller"
 
 int call28_caller(int *q)
 {
-//             <may be written>: _q_1[0]
 //             <    is read   >: q
+//             <    is written>: _q_1[0]
    call28(q);
    return 0;
 }
@@ -86,8 +86,8 @@ Cumulated effects with points-to for "call28_caller"
 
 int call28_caller(int *q)
 {
-//             <may be written>: _q_1[0]
 //             <    is read   >: q
+//             <    is written>: _q_1[0]
    call28(q);
    return 0;
 }

@@ -36,8 +36,8 @@ int main(void)
    
    // pp may points to a dead value in the stack
    printf("%p\n", pp);
-//             <may be read   >: pi *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: i *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi pp
+//             <    is written>: i
    
    // possible segfault.
    // should generate an error while analyzing?
@@ -62,13 +62,9 @@ static int alea(void)
  *********************** Use-Def Chains *********************
 
 	14 --> 33 with conflicts
-		from <i-W-EXACT> to <i-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-W-EXACT> to <i-W-EXACT>
 	15 --> 33 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <pi-R-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pi-W-EXACT> to <pi-R-EXACT>
 	16 --> 24 with conflicts
 		from <pp-W-EXACT> to <pp-W-EXACT>
 	16 --> 25 with conflicts
@@ -76,8 +72,7 @@ static int alea(void)
 	16 --> 29 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	16 --> 33 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
 	17 --> 25 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	19 --> 21 with conflicts
@@ -85,25 +80,11 @@ static int alea(void)
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 	23 --> 25 with conflicts
 		from <pj-W-EXACT> to <pj-R-EXACT>
-	23 --> 33 with conflicts
-		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	24 --> 25 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	24 --> 29 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	24 --> 33 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	25 --> 33 with conflicts
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pj-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	29 --> 33 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -80,12 +80,10 @@ PROPER  EFFECTS WITH POINTS TO
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
 
-//             <may be read   >: _data1_1.array
-//             <    is read   >: data1
+//             <    is read   >: _data1_1.array data1
 //             <    is written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//             <may be read   >: _data2_2.array
-//             <    is read   >: data2
+//             <    is read   >: _data2_2.array data2
 //             <    is written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
 

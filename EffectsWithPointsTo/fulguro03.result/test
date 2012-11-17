@@ -1,12 +1,11 @@
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//             <may be read   >: _vct_4[0].array
-//             <    is read   >: vct
+//             <    is read   >: _vct_4[0].array vct
 //             <    is written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;
-//             <may be read   >: _dat_1[0].array _dat_1_1__1[0][row]
-//             <    is read   >: dat row
+//             <    is read   >: _dat_1[0].array _dat_1_1__1[0][row] 
+//                               dat row
 //             <    is written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
 //             <    is read   >: _vct_4[0].spp vct
@@ -23,8 +22,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 //             <    is read   >: I_0
 //             <    is written>: k
       for(k = 0; k <= I_0-1; k += 1) {
-//             <may be read   >: _vct_4_3__4[0][k]
-//             <    is read   >: I_0 array_s k
+//             <    is read   >: I_0 _vct_4_3__4[0][k] array_s k
 //             <    is written>: _return0
          _return0 = array_s[k];
 //             <    is read   >: I_0 _return0

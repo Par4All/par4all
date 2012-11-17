@@ -6,8 +6,8 @@ int main()
 //             <    is written>: q
 
    q = p;
-//             <may be written>: _p_0[0]
 //             <    is read   >: q
+//             <    is written>: _p_0[0]
    *q = &i;
 //             <    is read   >: _p_0[0] q
 //             <    is written>: r
@@ -23,6 +23,6 @@ int main()
 	09 --> 11 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
 	10 --> 11 with conflicts
-		from <_p_0[0]-W-MAY> to <_p_0[0]-R-EXACT>
+		from <_p_0[0]-W-EXACT> to <_p_0[0]-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -1,4 +1,96 @@
 
+POINTS-TO
+
+
+// Points To IN:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+
+// Points To OUT: none
+
+void call05(int r, int m, int *x)
+{
+
+// Points To: none
+
+   int j;
+
+// Points To: none
+
+
+   for(j = 0; j <= m-1; j += 1)
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+      x[j] = 10*r+j;
+
+// Points To:
+// x -> _x_3[0] , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int d1 = 4;
+
+// Points To: none
+
+   int d2 = 4;
+
+// Points To: none
+
+   int y[d1][d2];
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1)
+
+// Points To: none
+
+      call05(i, d2, y[i]);
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1) {
+
+// Points To: none
+
+      for(j = 0; j <= d2-1; j += 1)
+
+// Points To: none
+
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+
+// Points To: none
+
+      printf("\n");
+   }
+
+// Points To: none
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
 void call05(int r, int m, int *x)
 {
    int j;
@@ -9,6 +101,7 @@ void call05(int r, int m, int *x)
 //             <    is read   >: j m r x
 //             <    is written>: _x_3[j]
       x[j] = 10*r+j;
+   return;
 }
 int main()
 {
@@ -22,6 +115,7 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: y[i][*]
 //             <    is read   >: d1 d2 i
       call05(i, d2, y[i]);
 //             <    is read   >: d1
@@ -43,58 +137,63 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\n");
    }
+   return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	13 --> 18 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 19 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 21 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 22 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 23 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 24 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 19 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> 20 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 22 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
+		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 23 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> 24 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> 25 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
-	18 --> 21 with conflicts
+	15 --> 23 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	15 --> 24 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	19 --> 22 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	19 --> 21 with conflicts
+	20 --> 20 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
+	20 --> 22 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	22 --> 22 with conflicts
-		from <j-W-EXACT> to <j-W-EXACT>
-	23 --> 22 with conflicts
-		from <j-R-EXACT> to <j-W-EXACT>
+	20 --> 24 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][j]-R-EXACT>
 	23 --> 23 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	23 --> 24 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <j-W-EXACT> to <j-W-EXACT>
 	24 --> 23 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	24 --> 24 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	24 --> 24 with conflicts
+	24 --> 25 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	25 --> 24 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	25 --> 25 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>

@@ -57,8 +57,8 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //             <    is read   >: i
 //             <    is written>: y[i]
    y[i] = 0;
-//             <may be written>: _p_5[0].one
 //             <    is read   >: p
+//             <    is written>: _p_5[0].one
    p->one = 1;
 //             <    is read   >: j p
 //             <    is written>: _p_5[0].two[j]
@@ -71,9 +71,9 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 Cumulated effects with points-to for call02
 
 //             <may be read   >: q[*]
-//             <may be written>: _p_5[0].one _p_5[0].two[*] _q_4[*][0]
-//                               y[*]
+//             <may be written>: _p_5[0].two[*] _q_4[*][0] y[*]
 //             <    is read   >: i j p
+//             <    is written>: _p_5[0].one
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //             <    is read   >: j
@@ -85,8 +85,8 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //             <may be written>: y[*]
 //             <    is read   >: i
    y[i] = 0;
-//             <may be written>: _p_5[0].one
 //             <    is read   >: p
+//             <    is written>: _p_5[0].one
    p->one = 1;
 //             <may be written>: _p_5[0].two[*]
 //             <    is read   >: j p
@@ -186,8 +186,9 @@ int main()
 //             <    is written>: ap[i]
       ap[i] = &aa[i];
 //             <may be read   >: ap[*]
-//             <may be written>: aa[*] s.one s.two[*] x[*]
+//             <may be written>: aa[*] s.two[*] x[*]
 //             <    is read   >: a b sp
+//             <    is written>: s.one
 
    call02(a, b, x, ap, sp);
    return 0;

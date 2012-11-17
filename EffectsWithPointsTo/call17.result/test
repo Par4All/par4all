@@ -43,24 +43,24 @@ void call17(int *x)
 //             <    is read   >: x
 //             <    is written>: y
    int *y = x;
-//             <may be written>: _x_1[0]
 //             <    is read   >: y
+//             <    is written>: _x_1[0]
    y[0] = 1;
    return;
 }
 
 Cumulated effects with points-to for call17
 
-//             <may be written>: _x_1[0]
 //             <    is read   >: x
+//             <    is written>: _x_1[0]
 void call17(int *x)
 {
    /* check aliases */
 //             <    is read   >: x
 //             <    is written>: y
    int *y = x;
-//             <may be written>: _x_1[0]
 //             <    is read   >: y
+//             <    is written>: _x_1[0]
    y[0] = 1;
    return;
 }

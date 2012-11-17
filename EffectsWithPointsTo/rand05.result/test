@@ -18,8 +18,8 @@ int main(void)
    if (alea())
 //             <    is written>: pp
       pp = &pi1;
-//             <may be written>: pi1 *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pp
+//             <    is written>: pi1
    *pp = (void *) 0;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -46,24 +46,17 @@ static int alea(void)
  *********************** Use-Def Chains *********************
 
 	16 --> 22 with conflicts
-		from <pi1-W-EXACT> to <pi1-W-MAY>
-		from <pi1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi1-W-EXACT> to <pi1-W-EXACT>
 	16 --> 23 with conflicts
 		from <pi1-W-EXACT> to <pi1-R-EXACT>
 	18 --> 19 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 	20 --> 22 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	20 --> 23 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	22 --> 23 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <pi1-W-MAY> to <pi1-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pp-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pi1-R-EXACT>
+		from <pi1-W-EXACT> to <pi1-R-EXACT>
 
 ****************** End of Dependence Graph ******************

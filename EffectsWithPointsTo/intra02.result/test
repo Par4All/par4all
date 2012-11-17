@@ -55,9 +55,8 @@ PROPER  EFFECTS WITH POINTS TO
 
 void bar(int **bpp, int **bqq)
 {
-//             <may be read   >: _bqq_2
-//             <may be written>: _bpp_1
-//             <    is read   >: bpp bqq
+//             <    is read   >: _bqq_2 bpp bqq
+//             <    is written>: _bpp_1
    *bpp = *bqq;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -69,15 +68,15 @@ void bar(int **bpp, int **bqq)
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be read   >: _bqq_2 stdout[0]
-//             <may be written>: _bpp_1 stdout[0]
-//             <    is read   >: bpp bqq stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _bqq_2 bpp bqq stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _bpp_1 __IO_EFFECTS:LUNS[1]
 void bar(int **bpp, int **bqq)
 {
-//             <may be read   >: _bqq_2
-//             <may be written>: _bpp_1
-//             <    is read   >: bpp bqq
+//             <    is read   >: _bqq_2 bpp bqq
+//             <    is written>: _bpp_1
    *bpp = *bqq;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -127,10 +126,10 @@ void foo()
 {
 //             <    is written>: i j p pp q qq
    int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
-//             <may be read   >: q stdout[0]
-//             <may be written>: p stdout[0]
-//             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp q qq stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: p __IO_EFFECTS:LUNS[1]
 
    bar(pp, qq);
    return;
@@ -146,10 +145,10 @@ void foo()
 {
 //             <    is written>: i j p pp q qq
    int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
-//             <may be read   >: q stdout[0]
-//             <may be written>: p stdout[0]
-//             <    is read   >: pp qq stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp q qq stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: p __IO_EFFECTS:LUNS[1]
 
    bar(pp, qq);
    return;
