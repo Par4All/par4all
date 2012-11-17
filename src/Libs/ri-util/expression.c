@@ -1402,7 +1402,9 @@ bool expression_equal_p(expression e1, expression e2)
   return syntax_equal_p(s1, s2);
 }
 
-bool expressions_equal_p(list l1, list l2)
+// FI: renamed because of gcc
+//bool expressions_equal_p(list l1, list l2)
+bool expression_lists_equal_p(list l1, list l2)
 {
   bool equal_p = true;
   list cl1 = l1, cl2 = l2;
