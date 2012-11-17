@@ -71,8 +71,8 @@ Cumulated effects for "foo"
 int foo(float (*b)[3])
 {
    float c;
-//             <may be written>: _b_1[0][3]
 //             <    is read   >: b
+//             <    is written>: _b_1[0][3]
    (*b)[3] = 2.0;
 //             <    is read   >: _b_1[0][3] b
 //             <    is written>: c

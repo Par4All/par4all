@@ -164,7 +164,17 @@ int main()
    foo(a1, a2, b3, c4);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_22 -> *HEAP*_l_31 , MAY
+// *HEAP*_l_22 -> *NULL_POINTER* , MAY
+// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_23 -> *HEAP*_l_35 , MAY
+// *HEAP*_l_23 -> *NULL_POINTER* , MAY
+// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
+// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
+// a1 -> *HEAP*_l_22 , MAY
+// a2 -> *HEAP*_l_28 , MAY
+// b3 -> *HEAP*_l_31 , MAY
 // c4 -> *HEAP*_l_35 , MAY
 
 

@@ -12,8 +12,12 @@ POINTS TO for "main"
 
 
 // Points To OUT:
+// _a1_1[*].q -> *NULL_POINTER* , MAY
 // _a1_1[0].q -> *NULL_POINTER* , MAY
+// _a1_1[*].q -> _b2_3[0] , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
+// _pa2_2[*] -> *NULL_POINTER* , MAY
+// _pa2_2[*] -> _a1_1[0] , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
 
 void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
@@ -29,7 +33,9 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
    *pa2 = a1;
 
 // Points To:
+// _pa2_2[*] -> *NULL_POINTER* , MAY
 // _pa2_2[0] -> *NULL_POINTER* , MAY
+// _pa2_2[*] -> _a1_1[0] , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
@@ -40,8 +46,12 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
    (*pa2)->q = b2;
 
 // Points To:
+// _a1_1[*].q -> *NULL_POINTER* , MAY
 // _a1_1[0].q -> *NULL_POINTER* , MAY
+// _a1_1[*].q -> _b2_3[0] , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
+// _pa2_2[*] -> *NULL_POINTER* , MAY
+// _pa2_2[*] -> _a1_1[0] , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
@@ -135,7 +145,7 @@ int main()
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
 // p1 -> *HEAP*_l_29 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *HEAP*_l_29 , MAY
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 

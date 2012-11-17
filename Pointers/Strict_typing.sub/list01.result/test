@@ -6,8 +6,7 @@ POINTS-TO
 // nil -> *NULL_POINTER* , EXACT
 
 
-// Points To OUT:
-// nil -> *NULL_POINTER* , EXACT
+// Points To OUT: none
 
 int main(void)
 {
@@ -42,14 +41,14 @@ int main(void)
       while (n--) {
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
 
          l = list_cons((double) n, l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> list_cons:*HEAP*_l_15 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
          /* Result? */
@@ -57,21 +56,21 @@ int main(void)
       }
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
 
    n = list_len(l);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
 
    fprintf(stdout, "n=%d, i=%d\n", n, i);
 
 // Points To:
-// l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
 
