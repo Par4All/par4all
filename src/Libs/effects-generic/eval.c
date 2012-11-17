@@ -126,8 +126,19 @@ static list transform_sink_cells_from_matching_list
 	 &exact_translation_p);
       *exact_p = *exact_p && exact_translation_p;
       /* the approximation tag of the points-to is taken into account
-	 for the exactness of the result */
-      *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
+	 for the exactness of the result except if the matching list
+	 has been reduced to one element and if the target is
+	 atomic. */
+      int mll = (int) gen_length(matching_list); // matching list length
+      if(mll==1) {
+	cell sink_c = points_to_sink(pt);
+	reference sink_c_r = cell_any_reference(sink_c);
+	*exact_p = *exact_p && generic_atomic_points_to_reference_p(sink_c_r, false);
+      }
+      else {
+	/* It should be false as soon as mll>1... */
+	*exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
+      }
       pips_debug(8, "adding reference %s\n",
 		 effect_reference_to_string(build_ref));
       l = CONS(EFFECT, make_effect(make_cell(is_cell_reference, build_ref),
@@ -171,7 +182,7 @@ list reference_to_points_to_matching_list(reference input_ref,
 
   FOREACH(POINTS_TO, pt, ptl) {
     cell sink_cell = points_to_sink(pt);
-    if(null_cell_p(sink_cell))
+    if(null_cell_p(sink_cell)  || nowhere_cell_p(sink_cell))
       ; // This points-to arc can be ignored since it would lead to a segfault
     else {
       cell source_cell = points_to_source(pt);
@@ -244,12 +255,15 @@ list reference_to_points_to_matching_list(reference input_ref,
 
 
   @param c is a the cell for which we look an equivalent constant path
+
   @param ptl is the list of points-to in which we search for constant paths
-  @param  exact_p is a pointer towards a boolean. It is set to true if
+
+  @param exact_p is a pointer towards a boolean. It is set to true if
          the result is exact, and to false if it is an approximation,
 	 either because the matching points-to sources found in ptl are
 	 over-approximations of the preceding path of the input cell or because
 	 the matching points-to have MAY approximation tag.
+
   @return a list of constant path effect. It is a list because at a given
           program point the cell may correspond to several constant paths.
 

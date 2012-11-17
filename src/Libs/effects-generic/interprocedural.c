@@ -345,23 +345,34 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
     set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s);
     ifdebug(8) print_points_to_set("pt_binded", pts_binded);
 
-    set bm = new_simple_pt_map();
     list dl = code_declarations(value_code(entity_initial(callee)));
     list formal_args = points_to_cells_parameters(dl);   
-    bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
+
+    /* Compute the translation table bm; pt_in_callee_filtered is useless. */
+    set bm = new_simple_pt_map();
+    points_to_translation_of_formal_parameters(formal_args, real_args, pt_in, bm);
+    set pt_in_callee_filtered =
+      filter_formal_context_according_to_actual_context(formal_args,
+							pts_to_in_s /* pt_in_callee*/,
+							pts_binded,
+							bm);
+    // bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
     ifdebug(8) print_points_to_set("bm", bm);
-    cell eff_c = effect_cell(eff);
+ 
+   cell eff_c = effect_cell(eff);
     points_to_graph bm_g = make_points_to_graph(false, bm);
     list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
     // FI: memory leak on bm_g
 
     FOREACH(CELL, n_c, n_eff_cells) {
-      action ac = copy_action(effect_action(eff));
-      approximation ap = copy_approximation(effect_approximation(eff));
-      descriptor d = copy_descriptor(effect_descriptor(eff));
-      effect n_eff =  make_effect(n_c, ac, ap, d);
-      ael = CONS(EFFECT, n_eff, ael);
+      if(!null_cell_p(n_c) && !nowhere_cell_p(n_c)) {
+	action ac = copy_action(effect_action(eff));
+	approximation ap = copy_approximation(effect_approximation(eff));
+	descriptor d = copy_descriptor(effect_descriptor(eff));
+	effect n_eff =  make_effect(n_c, ac, ap, d);
+	ael = CONS(EFFECT, n_eff, ael);
+      }
     }
 
     pips_assert("The effect is translated", !ENDP(ael));

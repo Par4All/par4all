@@ -95,16 +95,35 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
 	pips_internal_error("Not implemented yet.\n");
     }
     else {
-      expression lhs = entity_to_expression(fp);
-      //statement stmt = make_assign_statement(lhs, rhs);
-      //s = set_assign(s, points_to_assignment(stmt, lhs, rhs, s));	
-      points_to_graph s_g = make_points_to_graph(false, s);
-      // This is a dangerous call when compute_points_to_binded_set()
-      // is called from backward_translation_of_points_to_formal_context_effect()
-      // because the points-to environment and especially the context
-      // are not initialized.
-      points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
-      s = set_assign(s, points_to_graph_set(a_g));
+      /* It would be nice to build an assignment of rhs to fp and to
+	 let it deal with the many possible kinds of assignments. But
+	 if it is a pure poiints-to function, the symbolic subscripts
+	 are going to be lost. This is fine for points-to translation,
+	 but not OK for effects translation. */
+
+      if(pointer_type_p(fpt)) {
+	points_to_graph s_g = make_points_to_graph(false, s);
+	list sinks = expression_to_points_to_cells(rhs, s_g, true, false);
+	int nsinks = (int) gen_length(sinks);
+	FOREACH(CELL, sink, sinks) {
+	  cell o = make_cell_reference(make_reference(fp, NIL));
+	  cell d = copy_cell(sink);
+	  approximation a = nsinks==1? make_approximation_exact() :
+	    make_approximation_may();
+	  descriptor desc = make_descriptor_none();
+	  points_to pt = make_points_to(o, d, a, desc);
+	  add_arc_to_simple_pt_map(pt, s);
+	}
+      }
+      else if(struct_type_p(fpt)) {
+	/* In the short term, build the assignment... */
+	expression lhs = entity_to_expression(fp);
+	points_to_graph s_g = make_points_to_graph(false, s);
+	points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
+	s = set_assign(s, points_to_graph_set(a_g));
+      }
+      else
+	; // do nothing for other types
     }
   }
 
@@ -351,8 +370,8 @@ list stubs_list(set pt_in, set pt_out)
  */
 bool sets_binded_and_in_compatible_p(list stubs,
 				     list args,
-				     set pt_binded,
-				     set pt_in,
+				     set pt_binded __attribute__ ((unused)),
+				     set pt_in __attribute__ ((unused)),
 				     set pt_out __attribute__ ((unused)),
 				     set translation)
 {

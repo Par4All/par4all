@@ -412,7 +412,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
   /* Copy only possible arcs "pt" from "pt_in_callee" into the "filtered" set */
   SET_FOREACH(points_to, pt, pt_in_callee) {
     cell source = points_to_source(pt);
-    if(points_to_cell_in_list_p(source, fpcl)) {
+    if(related_points_to_cell_in_list_p(source, fpcl)) {
       cell sink = points_to_sink(pt);
       if(null_cell_p(sink)) {
 	/* Do we have the same arc in pts_binded? */
@@ -444,8 +444,8 @@ set filter_formal_context_according_to_actual_context(list fpcl,
   points_to_graph filtered_g = make_points_to_graph(false, filtered);
   points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
   FOREACH(CELL, c, fpcl) {
-    list fl = points_to_source_to_sinks(c, filtered_g, false); // formal list
-    list al = points_to_source_to_sinks(c, pts_binded_g, false); // actual list
+    list fl = points_to_source_to_any_sinks(c, filtered_g, false); // formal list
+    list al = points_to_source_to_any_sinks(c, pts_binded_g, false); // actual list
     int nfl = (int) gen_length(fl);
     int nal = (int) gen_length(al);
     approximation a = approximation_undefined;
@@ -608,8 +608,18 @@ void points_to_translation_of_formal_parameters(list fpcl,
     entity v = reference_variable(cell_any_reference(fc));
     int n = formal_offset(storage_formal(entity_storage(v)));
     expression a = EXPRESSION(gen_nth(n-1, al));
+    /* This function does not return constant memory paths... This
+     * could fixed below with calls to
+     * points_to_indices_to_unbounded_indices(), but it could/should also be
+     * fixed later in the processing, at callees level. See
+     * EffectsWithPointsTo.sub/call05.c
+     *
+     * See also EffectsWithPointsTo.sub/call08.c: &y[i][1]
+     * You need expression_to_points_to_sinks() on such a lhs expression...
+     */
     list acl = expression_to_points_to_sources(a, pt_in);
     int nacl = (int) gen_length(acl);
+    // FI->FI: you should check nacl==0...
     approximation ap = nacl==1? make_approximation_exact() :
       make_approximation_may();
     FOREACH(CELL, ac, acl) {
@@ -620,6 +630,8 @@ void points_to_translation_of_formal_parameters(list fpcl,
       if(pointer_type_p(source_t)) {
 	cell n_source = copy_cell(fc);
 	cell n_sink = copy_cell(ac);
+	reference n_sink_r = cell_any_reference(n_sink);
+	// points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
 	points_to pt = make_points_to(n_source, n_sink, copy_approximation(ap),
 				      make_descriptor_none());
 	add_arc_to_simple_pt_map(pt, translation);
@@ -631,6 +643,8 @@ void points_to_translation_of_formal_parameters(list fpcl,
 	     pointer to an array with fewer dimensions. */
 	  cell n_source = copy_cell(fc);
 	  cell n_sink = copy_cell(ac);
+	  reference n_sink_r = cell_any_reference(n_sink);
+	  // points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
 	  points_to pt = make_points_to(n_source, n_sink, copy_approximation(ap),
 					make_descriptor_none());
 	  add_arc_to_simple_pt_map(pt, translation);

@@ -1287,36 +1287,229 @@ list global_source_to_sinks(cell source, pt_map pts, bool fresh_p)
   return sinks;
 }
 
- list points_to_reference_to_translation(reference n_r, list sl, pt_map ptm, bool fresh_p)
- {
-   list translations = NIL;
-   cell n_c = make_cell_reference(n_r); // FI: memory leak
-   list atl = points_to_source_to_sinks(n_c, ptm, fresh_p); // Address Translation List?
+/* This function is designed to work properly for the translation of
+ * effects at call sites. ptm is assumed to be a translation
+ * mapping.
+ *
+ * Knowing that v(o_sl) is translated into w(d_sl), what is the
+ * translation of v(sl), w[tsl], assuming that o_sl, d_sl and sl are all
+ * subscript lists?
+ *
+ * We assume that |o_sl|<|sl| because otherwise v[o_sl] would not be a
+ * constant memory location (?). We assume that |o_sl|<|d_sl| because
+ * we do not modelize sharing.
+ *
+ * tsl is the result of the concatenation of three subscripts lists: a
+ * prefix made of the first subscripts of d_sl that are not covered by
+ * sl, the other subscripts of d_sl, updated according to the
+ * subscript values in sl, and a suffix, the subscripts in sl that
+ * have not equivalent in o_sl.
+ *
+ * Update the last subscripts. E.g. _x_3[*] and _x_3[0] -> y[i][0]
+ * leads to y[i][*] (see EffectsWithPointsTo/call05.c or call01.c).
+ *
+ * Update the last subscripts. E.g. _q_2[0][one] and _q_2[0] -> s leads
+ * to s[one] (see EffectsWithPointsTo/call05.c).
+ *
+ * Update the last subscripts. E.g. _x_3[4] and _x_3[0] -> y[*][1]
+ * leads to y[*][5]... A proof is needed to justify the subscript
+ * addition... if only to show that _x_3[0] is acceptable to claim
+ * something about _x_[4]... (see EffectsWithPointsTo.sub/call08,c).
+ *
+ * Same thing with _x_3[i] and _x_3[0] -> y[*][j]?
+ *
+ * This functions is similar to what must be done to compute the sink
+ * or the source of an expression, but here both the subscript list sl
+ * and the sinks of the points-to arcs in ptm do not have to be
+ * constant paths.
+ */
+list reference_to_points_to_translations(entity v, list sl, pt_map ptm)
+{
+  // list of translated cells corresponding to the reference v[sl]
+  list tl = NIL;
+  set ptm_s = points_to_graph_set(ptm);
+  SET_FOREACH(points_to, pt, ptm_s) {
+    cell d = points_to_sink(pt);
+    /* null and undefined targets are not possible */
+    if(!null_cell_p(d) && !nowhere_cell_p(d)) {
+      cell o = points_to_source(pt);
+      reference o_r = cell_any_reference(o);
+      entity o_v = reference_variable(o_r);
+      if(o_v == v) {
+	/* Are the subscript lists compatible? */
+	list o_sl = reference_indices(o_r);
+	list csl = sl, co_sl = o_sl;
+	bool compatible_p = true;
+	while(!ENDP(csl) && !ENDP(co_sl)) {
+	  expression sl_e = EXPRESSION(CAR(csl));
+	  expression o_sl_e = EXPRESSION(CAR(co_sl));
+	  if(unbounded_expression_p(sl_e) 
+	     || unbounded_expression_p(o_sl_e)
+	     || expression_equal_p(sl_e, o_sl_e))
+	    ;
+	  else if(extended_integer_constant_expression_p(sl_e)
+		  && extended_integer_constant_expression_p(o_sl_e))
+	    /* Offset to be applied... */
+	    ;
+	  else {
+	    compatible_p = false;
+	    break;
+	  }
+	  POP(csl), POP(co_sl);
+	}
+	if(compatible_p) {
+	  reference d_r = cell_any_reference(d);
+	  list d_sl = reference_indices(d_r);
+	  /* The subscripts left in csl must be happened to the new sink */
+	  int nsl = (int) gen_length(sl);
+	  int no_sl = (int) gen_length(o_sl);
+	  int nd_sl = (int) gen_length(d_sl);
+	  int np = nd_sl-no_sl; // #subscripts linked to the destination only
+	  // np may b negative because the source has a [0] subscript
+	  // that is non-significant
+	  int ns = nsl-no_sl; // #subscripts linked to the new source only
+	  int nb = no_sl; // #subscripts to update for body, unless np is <0
+	  pips_assert("the suffix and the body have positive length",
+		      ns>=0 && nb>=0);
+	  int i = 0;
+	  // The new subscript list is built backwards
+	  list tsl = NIL;
+	  list cd_sl = d_sl;
+	  /* Build the prefix */
+	  for(i=0; i<np; i++) {
+	    expression se = EXPRESSION(CAR(cd_sl));
+	    tsl = CONS(EXPRESSION,copy_expression(se), tsl);
+	    POP(cd_sl);
+	  }
+	  /* Build the body: depending on the subscripts in sl and o_sl,
+	     update or not the susbcripts in cd_sl */
+	  co_sl = o_sl;
+	  csl = sl;
+	  /* Skip subscripts not reproduced in the destination */
+	  while(np<0) {
+	    POP(csl), np++, nb--;
+	  }
+	  for(i=0;i<nb; i++) {
+	    expression sl_e = EXPRESSION(CAR(csl));
+	    expression d_sl_e = EXPRESSION(CAR(cd_sl));
+	    if(unbounded_expression_p(sl_e))
+	      tsl = CONS(EXPRESSION,copy_expression(sl_e), tsl);
+	    else if(unbounded_expression_p(d_sl_e))
+	      tsl = CONS(EXPRESSION,copy_expression(sl_e), tsl);
+	    else if(zero_expression_p(sl_e))
+	      tsl = CONS(EXPRESSION,copy_expression(d_sl_e), tsl);
+	    else if(zero_expression_p(d_sl_e))
+	      tsl = CONS(EXPRESSION,copy_expression(sl_e), tsl);
+	    else {
+	      value sl_v = EvalExpression(sl_e);
+	      value d_sl_v = EvalExpression(d_sl_e);
+	      expression ne = expression_undefined;
+	      if(value_constant_p(sl_v) && value_constant_p(d_sl_v)) {
+		constant sl_c = value_constant(sl_v);
+		constant d_sl_c = value_constant(d_sl_v);
+		if(constant_int_p(sl_c) && constant_int_p(d_sl_c)) {
+		  // POssible overflow
+		  int nic = constant_int(sl_c)+constant_int(d_sl_c);
+		  ne = int_to_expression(nic);
+		}
+	      }
+	      if(expression_undefined_p(ne))
+		ne = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+						 copy_expression(d_sl_e),
+						 copy_expression(sl_e));
+	      tsl = CONS(EXPRESSION, ne, tsl);
+	    }
+	    POP(csl);
+	    POP(co_sl);
+	    POP(cd_sl);
+	  }
+	  /* Build the suffix */
+	  while(!ENDP(csl)) {
+	    expression sl_e = EXPRESSION(CAR(csl));
+	    tsl = CONS(EXPRESSION,copy_expression(sl_e), tsl);
+	    POP(csl);
+	  }
+	  tsl = gen_nreverse(tsl);
+	  /* Check the resulting length */
+	  int ntsl = (int) gen_length(tsl);
+	  pips_assert("The resulting", ntsl==np+nb+ns);
+	  entity d_v = reference_variable(d_r);
+	  reference tr = make_reference(d_v, tsl);
+	  cell tc = make_cell_reference(tr);
+	  tl = CONS(CELL, tc, tl);
+	}
+      }
+    }
+  }
+  return tl;
+}
 
-   if(ENDP(atl)) {
-     if(ENDP(sl)) {
-       pips_internal_error("Reference \"n_r\" cannot be translated with \"ptm\".\n");
-     }
-     else {
-       /* Try to use an extra subscript */
-       expression ns = EXPRESSION(CAR(sl));
-       reference_indices(n_r) = gen_nconc(reference_indices(n_r),
-					  CONS(EXPRESSION, copy_expression(ns), NIL));
-       translations = points_to_reference_to_translation(n_r, CDR(sl), ptm, fresh_p);
-     }
-   }
-   else {
-     /* We've got one translation at least */
-     FOREACH(CELL, c, atl) {
-       /* Add the next subscripts */
-       reference c_r = cell_any_reference(c);
-       reference_indices(c_r) = gen_nconc(reference_indices(c_r),
-					  gen_full_copy_list(sl));
-       translations = atl; // FI: we may not need to variables...
-     }
-   }
-   return translations;
- }
+/* FI: easier it fresh_p is true... */
+ list points_to_reference_to_translation(reference n_r,
+					 list sl,
+					 pt_map ptm,
+					 bool fresh_p)
+{
+  pips_assert("fresh_p must be set to true", fresh_p);
+  list translations = NIL;
+  // cell n_c = make_cell_reference(n_r); // FI: memory leak
+  //list atl = points_to_source_to_sinks(n_c, ptm, fresh_p); // Address Translation List?
+  // list atl = points_to_source_to_any_sinks(n_c, ptm, fresh_p); // Address Translation List?
+  list atl = NIL;
+  entity v = reference_variable(n_r);
+  // matching list of points-to arcs:
+  //list ml = source_entity_to_points_to(v, sl, ptm);
+  list ml = reference_to_points_to_translations(v, sl, ptm);
+  return ml;
+
+  if(ENDP(ml)) {
+    if(ENDP(sl)) {
+      pips_internal_error("Reference \"n_r\" cannot be translated with \"ptm\".\n");
+    }
+    else {
+      /* Try to use an extra subscript */
+      expression ns = EXPRESSION(CAR(sl));
+      reference_indices(n_r) = gen_nconc(reference_indices(n_r),
+					 CONS(EXPRESSION, copy_expression(ns), NIL));
+      translations = points_to_reference_to_translation(n_r, CDR(sl), ptm, fresh_p);
+    }
+  }
+  else {
+    /* We've got one translation at least. Now, we must update the subscripts. */
+    FOREACH(CELL, c, atl) {
+      if(!null_cell_p(c) && !nowhere_cell_p(c)) {
+	reference c_r = cell_any_reference(c);
+	/* We assume that c has at least as many subscripts as n_r */
+	int c_d = (int) gen_length(reference_indices(c_r));
+	int r_d = (int) gen_length(reference_indices(n_r))+gen_length(sl);
+	//pips_assert("The target dimension is larger than the source dimension",
+	//	    c_d>=r_d);
+	int o = c_d-r_d;
+	if(o==0) {
+	  reference_indices(c_r) = gen_nconc(reference_indices(n_r),
+					     gen_full_copy_list(sl));
+	}
+	else if(o>0) {
+	  /* Update the last subscripts. E.g. _x_3[*] and _x_3[0]
+	     ->y[i][0] leads to y[i][*] (see EffectsWithPointsTo/call05.c) */
+	  list csl =  reference_indices(c_r);
+	  list acsl = gen_nthcdr(o-1, csl);
+	  CDR(acsl) = gen_nconc(reference_indices(n_r),
+				gen_full_copy_list(sl));
+	}
+	else { 
+	  /* Update the last subscripts. E.g. _q_2[0][one] and _q_2[0]
+	     ->s leads to s[one] (see EffectsWithPointsTo/call05.c) */
+	  // FI: it should be more complex, but I'll wait for more examples...
+	  reference_indices(n_r) = gen_full_copy_list(sl);
+	}
+	translations = atl; // FI: we may not need to variables...
+      }
+    }
+  }
+  return translations;
+}
+
 /* Use "ptm" as a translation map
  *
  * Must be similar to a function written by Beatrice to evaluate a
@@ -1326,18 +1519,42 @@ list global_source_to_sinks(cell source, pt_map pts, bool fresh_p)
  *
  * Try to translate a prefix of the source reference and substitue it
  * when a translation is found. No need to translate further down,
- * unike Beatrice's function.
+ * unlike Beatrice's function.
  *
  * fresh_p might be useless because new cells always must be generated.
  */
 list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
 {
-  list translations = NIL;
+  //list translations = points_to_source_to_sinks(source, ptm, fresh_p);
   reference r = cell_any_reference(source);
   entity v = reference_variable(r);
-  list sl = reference_indices(r);
-  reference n_r = make_reference(v, NIL);
-  translations = points_to_reference_to_translation(n_r, sl, ptm, fresh_p);
+  list translations = NIL;
+
+  if(ENDP(translations)) {
+    /* Outdated comment: The cell source is not a source in ptm, but a
+       related cell may be the source */
+    list sl = reference_indices(r);
+    reference n_r = make_reference(v, NIL);
+    translations = points_to_reference_to_translation(n_r, sl, ptm, fresh_p);
+  }
+
+  ifdebug(0) {
+    bool to_be_freed;
+    type source_t = points_to_cell_to_type(source, &to_be_freed);
+    type source_et = compute_basic_concrete_type(source_t);
+    FOREACH(CELL, c, translations) {
+      if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+	bool c_to_be_freed;
+	type c_t = points_to_cell_to_type(c, &c_to_be_freed);
+	type c_et = compute_basic_concrete_type(c_t);
+	if(!type_equal_p(source_et, c_et))
+	  pips_internal_error("Type mismatch after translation.\n");
+	if(c_to_be_freed) free_type(c_t);
+      }
+    }
+    if(to_be_freed) free_type(source_t);
+  }
+
   return translations;
 }
 

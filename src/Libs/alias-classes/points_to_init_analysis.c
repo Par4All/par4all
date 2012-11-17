@@ -294,8 +294,9 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
       if(!array_pointer_type_equal_p(pt, ept)
 	 && !(type_void_p(pt) && overloaded_type_p(ept)))
 	pips_internal_error("The stub and expected types are incompatible.\n");
-      else
+      else {
 	;
+      }
       if(e_to_be_freed) free_type(ept);
     }
   }
@@ -358,10 +359,21 @@ void points_to_indices_to_unbounded_indices(list sl)
   for(csl = sl; !ENDP(csl); POP(csl)) {
     expression se = EXPRESSION(CAR(csl));
     if(!expression_reference_p(se)) {
-      if(!unbounded_expression_p(se)) {
+      if(unbounded_expression_p(se))
+	;
+      else if(expression_is_constant_p(se))
+	;
+      else {
 	free_expression(se);
 	EXPRESSION_(CAR(csl)) = make_unbounded_expression();
       }
+    }
+    else {
+      reference r = expression_reference(se);
+      entity v = reference_variable(r);
+      if(!entity_field_p(v))
+	free_expression(se);
+	EXPRESSION_(CAR(csl)) = make_unbounded_expression();
     }
   }
   return; // Useful for gdb?

@@ -590,21 +590,21 @@ bool stub_entity_of_module_p(entity s, entity m)
 bool entity_abstract_location_p(entity al)
 {
 #ifndef NDEBUG
-        const char * en = entity_name(al);
-        const char * module_sep = strchr(en,MODULE_SEP_CHAR);
-        bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
-                ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
-                ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, FORMAL_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
-                )
-            ;
-        pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
+  const char * en = entity_name(al);
+  const char * module_sep = strchr(en,MODULE_SEP_CHAR);
+  bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
+				  ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
+				  ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, FORMAL_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
+				  )
+    ;
+  pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
 #endif
-    return entity_kind(al) & ABSTRACT_LOCATION;
+  return (entity_kind(al) & ABSTRACT_LOCATION) ? true : false;
 }
 
 

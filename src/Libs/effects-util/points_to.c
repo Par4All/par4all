@@ -394,8 +394,13 @@ bool atomic_points_to_cell_p(cell c)
  * Note: it is assumed that the reference is a points-to
  * reference. All subscripts are constants, field references or
  * unbounded expressions.
+ *
+ * Note: FI, I have a probleme when calling this function from a
+ * proper effects environment. In that case, stubs might be assumed to
+ * be unique memory locations. The exactness information can be
+ * derived from the numer of targets in the matching list.
  */
-bool atomic_points_to_reference_p(reference r)
+bool generic_atomic_points_to_reference_p(reference r, bool strict_p)
 {
   bool atomic_p = false;
   entity v = reference_variable(r);
@@ -407,7 +412,7 @@ bool atomic_points_to_reference_p(reference r)
      && !entity_heap_location_p(v)) {
     list sl = reference_indices(r);
     entity v = reference_variable(r);
-    if(!entity_stub_sink_p(v)) {
+    if(!entity_stub_sink_p(v) || !strict_p) {
       atomic_p = true;
       FOREACH(EXPRESSION, se, sl) {
 	if(unbounded_expression_p(se)) {
@@ -419,6 +424,11 @@ bool atomic_points_to_reference_p(reference r)
   }
 
   return atomic_p;
+}
+
+bool atomic_points_to_reference_p(reference r)
+{
+  return generic_atomic_points_to_reference_p(r, true);
 }
 
 /* points-to cells use abstract addresses, hence the proper comparison
@@ -684,7 +694,8 @@ bool cell_points_to_non_null_sink_in_set_p(cell source, set pts)
   bool non_null_p = false;
   SET_FOREACH(points_to, pt, pts) {
     cell pt_source = points_to_source(pt);
-    if(cell_equal_p(pt_source, source)) {
+    //if(cell_equal_p(pt_source, source)) {
+    if(cell_equivalent_p(pt_source, source)) {
       cell pt_sink = points_to_sink(pt);
       if(null_cell_p(pt_sink))
 	;

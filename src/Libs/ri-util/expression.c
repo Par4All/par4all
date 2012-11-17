@@ -1383,6 +1383,7 @@ void print_normalized(normalized n)
 	   ever added to linear library */
 	vect_debug((Pvecteur)normalized_linear(n));
 }
+
 bool expression_equal_p(expression e1, expression e2)
 {
   syntax s1, s2;
@@ -1399,6 +1400,24 @@ bool expression_equal_p(expression e1, expression e2)
   s2 = expression_syntax(e2);
 
   return syntax_equal_p(s1, s2);
+}
+
+bool expressions_equal_p(list l1, list l2)
+{
+  bool equal_p = true;
+  list cl1 = l1, cl2 = l2;
+  while(!ENDP(cl1) && !ENDP(cl2)) {
+    expression e1 = EXPRESSION(CAR(cl1));
+    expression e2 = EXPRESSION(CAR(cl2));
+    if(!expression_equal_p(e1, e2)) {
+      equal_p = false;
+      break;
+    }
+    POP(cl1), POP(cl2);
+  }
+  if(equal_p)
+    equal_p = ENDP(cl1) && ENDP(cl2);
+  return equal_p;
 }
 
 /* this is slightly different from expression_equal_p, as it will return true for

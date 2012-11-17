@@ -1090,11 +1090,12 @@ bool cells_combinable_p(cell c1, cell c2)
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
+  list l1 = reference_indices(r1);
+  list l2 = reference_indices(r2);
+
   if (same_entity_p(e1, e2))
     {
       /* let us check the indices */
-      list l1 = reference_indices(r1);
-      list l2 = reference_indices(r2);
       
       if (gen_length(l1) != gen_length(l2))
 	combinable_p = false;
@@ -1206,12 +1207,30 @@ bool cells_combinable_p(cell c1, cell c2)
 	      else if ((al1_p && entity_all_locations_p(e1))
 		    || (al2_p && entity_all_locations_p(e2)))
 		  combinable_p = true;
-	      else if ((al1_p && undefined_pointer_value_entity_p(e1))
-		      || (al2_p && undefined_pointer_value_entity_p(e2)))
+	      else if (al1_p && (undefined_pointer_value_entity_p(e1)
+				 || entity_nowhere_locations_p(e1)
+				 || entity_typed_nowhere_locations_p(e1))) {
+		if(al2_p && (undefined_pointer_value_entity_p(e2)
+			     || entity_nowhere_locations_p(e2)
+			     || entity_typed_nowhere_locations_p(e2)))
+		  combinable_p = true;
+		else
+		  combinable_p = false;
+	      }
+		else if (al2_p && (undefined_pointer_value_entity_p(e2)
+				   || entity_nowhere_locations_p(e2)
+				   || entity_typed_nowhere_locations_p(e2))) {
+		  combinable_p = false;
+	      }
+	      else if (al1_p && entity_null_locations_p(e1)) {
+		if(al2_p && entity_null_locations_p(e2))
+		  combinable_p = true;
+		else
+		  combinable_p = false;
+	      }
+	      else if (al2_p && entity_null_locations_p(e2)) {
 		combinable_p = false;
-	      else if ((al1_p && entity_null_locations_p(e1))
-		      || (al2_p && entity_null_locations_p(e2)))
-		combinable_p = false;
+	      }
 	      else if ( (al1_p && al2_p)
 		       || (al1_p && ENDP(reference_indices(r2)))
 		       || (al2_p && ENDP(reference_indices(r1))))
@@ -1255,9 +1274,19 @@ bool cells_combinable_p(cell c1, cell c2)
 			{
 			  /* here we should consider the type of the non abstract location reference,
 			     whether there is a dereferencement or not to guess the memory area, ... */
-			  pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
-					      effect_reference_to_string(r1),
-					      effect_reference_to_string(r2));
+			  // FI: we end up here with c1 = *ANY_MODULE*:*ANYWHERE*_b0.next, c2 = _ll_1.next
+			  if(expressions_equal_p(l1, l2)) {
+			    reference nr1 = make_reference(e1, NIL);
+			    reference nr2 = make_reference(e2, NIL);
+			    cell nc1 = make_cell_reference(nr1);
+			    cell nc2 = make_cell_reference(nr2);
+			    combinable_p = cells_combinable_p(nc1, nc2);
+			    free_cell(nc1), free_cell(nc2);
+			  }
+			  else
+			    pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
+						effect_reference_to_string(r1),
+						effect_reference_to_string(r2));
 			}
 		    }
 	    }

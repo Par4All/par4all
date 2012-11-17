@@ -2,11 +2,6 @@ Points to improve in points-to analysis
 
 No priority order.
 
-7. EffectsWithPointsTo: the fully subscripted sources and sinks
-require index substitution in EffectsWithPointsTo, or the parallelism
-detection is lost; also it is not clear if you want to preserver x[j]
-instead of *(x+j)....; see for instance call05.c. See also call14.c.
-
 8. EffectsWithPointsTo: Also in call14 or call05, probably an
 interprocedural translation issue in call08 for _x_3 in the callee and
 y in the caller. Also, many returns are missing in the source codes of
@@ -90,7 +85,12 @@ bugged. See Pointers/Strict_typing.sub/pv_assign03.c.
 
 49. A useless space before a comma in the print-out
 
-Next item will be 50.
+50. Pointers/StrictTyping.sub/list03: two different names for the same anywhere:
+ // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+ // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+
+
+Next item will be 51.
 
 ----------------------------------------------------------
 
@@ -246,3 +246,8 @@ in "main".
    the real reason is that points-to transformer should include a list
    of freed cells. This should be easy to detect from the equations
    used to model the impact of a free.
+
+7. EffectsWithPointsTo: the fully subscripted sources and sinks
+require index substitution in EffectsWithPointsTo, or the parallelism
+detection is lost; also it is not clear if you want to preserver x[j]
+instead of *(x+j)....; see for instance call05.c. See also call14.c.
