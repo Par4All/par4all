@@ -1275,7 +1275,7 @@ bool cells_combinable_p(cell c1, cell c2)
 			  /* here we should consider the type of the non abstract location reference,
 			     whether there is a dereferencement or not to guess the memory area, ... */
 			  // FI: we end up here with c1 = *ANY_MODULE*:*ANYWHERE*_b0.next, c2 = _ll_1.next
-			  if(expressions_equal_p(l1, l2)) {
+			  if(expression_lists_equal_p(l1, l2)) {
 			    reference nr1 = make_reference(e1, NIL);
 			    reference nr2 = make_reference(e2, NIL);
 			    cell nc1 = make_cell_reference(nr1);
