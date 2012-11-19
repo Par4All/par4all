@@ -3531,8 +3531,8 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
       call cl = syntax_call(sr);
       const char* fun = entity_local_name(call_function(cl));
       if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0) {
-	expression exp2 = EXPRESSION(CAR(call_arguments(cl)));
-	sr = expression_syntax(exp2);
+	exp = EXPRESSION(CAR(call_arguments(cl)));
+	sr = expression_syntax(exp);
       }
     }
     if (syntax_reference_p(sr)) {
