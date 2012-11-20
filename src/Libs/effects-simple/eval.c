@@ -276,7 +276,9 @@ list simple_effect_to_constant_path_effects_with_points_to(effect eff)
 	    pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
 	    /* We have not found any equivalent constant path : it may point anywhere */
 	    /* We should maybe contract these effects later. Is it done by the callers ? */
-	    le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	    // le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	    le = NIL; // A translation failure means an execution
+	    // failure, at least according to the standard
 	  }
 	else
 	  {

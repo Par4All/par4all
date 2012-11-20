@@ -64,100 +64,102 @@
 pt_map expression_to_points_to(expression e, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  syntax s = expression_syntax(e);
-  tag t = syntax_tag(s);
+  if(!points_to_graph_bottom(pt_in)) {
+    syntax s = expression_syntax(e);
+    tag t = syntax_tag(s);
 
-  switch(t) {
-  case is_syntax_reference: {
-    reference r = syntax_reference(s);
-    list sl = reference_indices(r);
-    entity v = reference_variable(r);
-    type vt = entity_basic_concrete_type(v);
-    // FI: call16.c shows that the C parser does not generate the
-    // right construct, a subscript, when a scalar pointer is indexed
-    if(pointer_type_p(vt) && !ENDP(sl)) {
-      expression tmp = entity_to_expression(v);
-      pt_out = dereferencing_to_points_to(tmp, pt_in);
-      pt_out = expressions_to_points_to(sl, pt_out);
-      free_expression(tmp);
+    switch(t) {
+    case is_syntax_reference: {
+      reference r = syntax_reference(s);
+      list sl = reference_indices(r);
+      entity v = reference_variable(r);
+      type vt = entity_basic_concrete_type(v);
+      // FI: call16.c shows that the C parser does not generate the
+      // right construct, a subscript, when a scalar pointer is indexed
+      if(pointer_type_p(vt) && !ENDP(sl)) {
+	expression tmp = entity_to_expression(v);
+	pt_out = dereferencing_to_points_to(tmp, pt_in);
+	pt_out = expressions_to_points_to(sl, pt_out);
+	free_expression(tmp);
+      }
+      pt_out = reference_to_points_to(r, pt_in);
+      break;
     }
-    pt_out = reference_to_points_to(r, pt_in);
-    break;
-  }
-  case is_syntax_range: {
-    range r = syntax_range(s);
-    pt_out = range_to_points_to(r, pt_in);
-    break;
-  }
-  case is_syntax_call: {
-    call c = syntax_call(s);
-    /* Some idea, but points-to information should rather be used
-     *
-     * list el = expression_to_proper_constant_path_effects(e);
-     *
-     * Also, this would be computed before we know if it is useful
-     * because we need an expression and not a call to have a function
-     * to compute effects. And we do not know if we want an inter or
-     * an intraprocedural points-to analysis.
-     *
-     * The alternative is too always compute points-to information
-     * interprocedurally, which makes sense as it is done for for
-     * memory effects and since points-to information is at a lower
-     * level than memory effects...
-     */
-    // Now, "el" is a useless parameter
-    list el = NIL;
-    pt_out = call_to_points_to(c, pt_in, el);
-    gen_full_free_list(el);
-    break;
-  }
-  case is_syntax_cast: {
-    cast c = syntax_cast(s);
-    expression ce = cast_expression(c);
-    pt_out = expression_to_points_to(ce, pt_in);
-    break;
-  }
-  case is_syntax_sizeofexpression: {
-    sizeofexpression soe = syntax_sizeofexpression(s);
-    if(sizeofexpression_type_p(soe))
-      ; // pt_in is not modified
-    else {
-      // expression ne = sizeofexpression_expression(soe);
-      // FI: we have a problem because sizeof(*p) does not imply that
-      // *p is evaluated...
-      // pt_out = expression_to_points_to(ne, pt_in);
+    case is_syntax_range: {
+      range r = syntax_range(s);
+      pt_out = range_to_points_to(r, pt_in);
+      break;
+    }
+    case is_syntax_call: {
+      call c = syntax_call(s);
+      /* Some idea, but points-to information should rather be used
+       *
+       * list el = expression_to_proper_constant_path_effects(e);
+       *
+       * Also, this would be computed before we know if it is useful
+       * because we need an expression and not a call to have a function
+       * to compute effects. And we do not know if we want an inter or
+       * an intraprocedural points-to analysis.
+       *
+       * The alternative is too always compute points-to information
+       * interprocedurally, which makes sense as it is done for for
+       * memory effects and since points-to information is at a lower
+       * level than memory effects...
+       */
+      // Now, "el" is a useless parameter
+      list el = NIL;
+      pt_out = call_to_points_to(c, pt_in, el);
+      gen_full_free_list(el);
+      break;
+    }
+    case is_syntax_cast: {
+      cast c = syntax_cast(s);
+      expression ce = cast_expression(c);
+      pt_out = expression_to_points_to(ce, pt_in);
+      break;
+    }
+    case is_syntax_sizeofexpression: {
+      sizeofexpression soe = syntax_sizeofexpression(s);
+      if(sizeofexpression_type_p(soe))
+	; // pt_in is not modified
+      else {
+	// expression ne = sizeofexpression_expression(soe);
+	// FI: we have a problem because sizeof(*p) does not imply that
+	// *p is evaluated...
+	// pt_out = expression_to_points_to(ne, pt_in);
+	;
+      }
+      break;
+    }
+    case is_syntax_subscript: {
+      subscript sub = syntax_subscript(s);
+      expression a = subscript_array(sub);
+      list sel = subscript_indices(sub);
+      /* a cannot evaluate to null or undefined */
+      /* FI: we may need a special case for stubs... */
+      pt_out = dereferencing_to_points_to(a, pt_in);
+      pt_out = expression_to_points_to(a, pt_out);
+      pt_out = expressions_to_points_to(sel, pt_out);
+      break;
+    }
+    case is_syntax_application: {
+      application a = syntax_application(s);
+      pt_out = application_to_points_to(a, pt_out);
+      break;
+    }
+    case is_syntax_va_arg: {
+      // The call to va_arg() does not create a points-to per se
+      list soel = syntax_va_arg(s);
+      sizeofexpression soe1 = SIZEOFEXPRESSION(CAR(soel));
+      //sizeofexpression soe2 = SIZEOFEXPRESSION(CAR(CDR(soel)));
+      expression se = sizeofexpression_expression(soe1);
+      // type t = sizeofexpression_type(soe2);
+      pt_out = expression_to_points_to(se, pt_out);
+      break;
+    }
+    default:
       ;
     }
-    break;
-  }
-  case is_syntax_subscript: {
-    subscript sub = syntax_subscript(s);
-    expression a = subscript_array(sub);
-    list sel = subscript_indices(sub);
-    /* a cannot evaluate to null or undefined */
-    /* FI: we may need a special case for stubs... */
-    pt_out = dereferencing_to_points_to(a, pt_in);
-    pt_out = expression_to_points_to(a, pt_out);
-    pt_out = expressions_to_points_to(sel, pt_out);
-    break;
-  }
-  case is_syntax_application: {
-    application a = syntax_application(s);
-    pt_out = application_to_points_to(a, pt_out);
-    break;
-  }
-  case is_syntax_va_arg: {
-    // The call to va_arg() does not create a points-to per se
-    list soel = syntax_va_arg(s);
-    sizeofexpression soe1 = SIZEOFEXPRESSION(CAR(soel));
-    //sizeofexpression soe2 = SIZEOFEXPRESSION(CAR(CDR(soel)));
-    expression se = sizeofexpression_expression(soe1);
-    // type t = sizeofexpression_type(soe2);
-    pt_out = expression_to_points_to(se, pt_out);
-    break;
-  }
-  default:
-    ;
   }
   pips_assert("pt_out is consistent and defined",
 	      points_to_graph_consistent_p(pt_out)
@@ -175,14 +177,11 @@ pt_map expression_to_points_to(expression e, pt_map pt_in)
 pt_map expressions_to_points_to(list el, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  //pt_map pt_prev = copy_set(pt_in);
   FOREACH(EXPRESSION, e, el) {
+    if(points_to_graph_bottom(pt_out))
+      break;
     pt_out = expression_to_points_to(e, pt_out);
-    //pt_map pt_new = expression_to_points_to(e, pt_prev);
-    //free_set(pt_prev);
-    //pt_prev = pt_new;
   }
-  //pt_out = pt_prev;
 
   return pt_out;
 }
@@ -195,20 +194,22 @@ pt_map expressions_to_points_to(list el, pt_map pt_in)
 pt_map reference_to_points_to(reference r, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
-  list sel = reference_indices(r);
-  entity v = reference_variable(r);
-  type t = ultimate_type(entity_type(v));
-  // FI: some or all of these tests could be placed in
-  // dereferencing_to_points_to()
-  if(!entity_stub_sink_p(v)
-     && !formal_parameter_p(v)
-     && !ENDP(sel)
-     && pointer_type_p(t)) {
-    expression e = entity_to_expression(v);
-    pt_out = dereferencing_to_points_to(e, pt_in);
-    free_expression(e);
+  if(!points_to_graph_bottom(pt_in)) {
+    list sel = reference_indices(r);
+    entity v = reference_variable(r);
+    type t = ultimate_type(entity_type(v));
+    // FI: some or all of these tests could be placed in
+    // dereferencing_to_points_to()
+    if(!entity_stub_sink_p(v)
+       && !formal_parameter_p(v)
+       && !ENDP(sel)
+       && pointer_type_p(t)) {
+      expression e = entity_to_expression(v);
+      pt_out = dereferencing_to_points_to(e, pt_in);
+      free_expression(e);
+    }
+    pt_out = expressions_to_points_to(sel, pt_in);
   }
-  pt_out = expressions_to_points_to(sel, pt_in);
   return pt_out;
 }
 
@@ -419,38 +420,40 @@ pt_map call_to_points_to(call c, pt_map pt_in, list el)
       else
 	pt_out = expression_to_points_to(EXPRESSION(CAR(al)), pt_in);
 
-      switch( tt = value_tag(entity_initial(f))) {
-      case is_value_code:{
-	pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
-	pt_out = user_call_to_points_to(c, pt_out, el);
-      }
-	break;
-      case is_value_unknown:
-	pips_internal_error("function %s has an unknown value\n",
-			    entity_name(f));
-	break;
-      case is_value_intrinsic:
-	pt_out = intrinsic_call_to_points_to(c, pt_in);
-	break;
-      case is_value_constant:
-	pt_out = pt_in; // FI?
-	break;
-      case is_value_symbolic:{
-	value v = entity_initial(f);
-	symbolic s = value_symbolic(v);
-	expression ex = symbolic_expression(s);
-	pt_out = expression_to_points_to(ex, pt_in);
-      }
-	break;
-      case is_value_expression:{
-	value v = entity_initial(f);
-	expression ex = value_expression(v);
-	pt_out = expression_to_points_to(ex, pt_in);
-      }
-	break;
-      default:
-	pips_internal_error("unknown tag %d\n", tt);
-	break;
+      if(!points_to_graph_bottom(pt_out)) {
+	switch( tt = value_tag(entity_initial(f))) {
+	case is_value_code:{
+	  pips_assert("f is a user-defined function", value_code_p(entity_initial(f)));
+	  pt_out = user_call_to_points_to(c, pt_out, el);
+	}
+	  break;
+	case is_value_unknown:
+	  pips_internal_error("function %s has an unknown value\n",
+			      entity_name(f));
+	  break;
+	case is_value_intrinsic:
+	  pt_out = intrinsic_call_to_points_to(c, pt_in);
+	  break;
+	case is_value_constant:
+	  pt_out = pt_in; // FI?
+	  break;
+	case is_value_symbolic:{
+	  value v = entity_initial(f);
+	  symbolic s = value_symbolic(v);
+	  expression ex = symbolic_expression(s);
+	  pt_out = expression_to_points_to(ex, pt_in);
+	}
+	  break;
+	case is_value_expression:{
+	  value v = entity_initial(f);
+	  expression ex = value_expression(v);
+	  pt_out = expression_to_points_to(ex, pt_in);
+	}
+	  break;
+	default:
+	  pips_internal_error("unknown tag %d\n", tt);
+	  break;
+	}
       }
     }
     else if(type_variable_p(ft)) {
@@ -905,10 +908,12 @@ void offset_cells(cell source, list sinks, expression delta, type et, pt_map in)
   pt_map old = new_pt_map();
   pt_map new = new_pt_map();
   FOREACH(CELL, sink, sinks) {
-    points_to pt = find_arc_in_points_to_set(source, sink, in);
-    add_arc_to_pt_map(pt, old);
-    points_to npt = offset_cell(pt, delta, et);
-    add_arc_to_pt_map(npt, new);
+    if(!anywhere_cell_p(sink) && !cell_typed_anywhere_locations_p(sink)) {
+      points_to pt = find_arc_in_points_to_set(source, sink, in);
+      add_arc_to_pt_map(pt, old);
+      points_to npt = offset_cell(pt, delta, et);
+      add_arc_to_pt_map(npt, new);
+    }
   }
   difference_of_pt_maps(in, in, old);
   union_of_pt_maps(in, in, new);

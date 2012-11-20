@@ -630,7 +630,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
       if(pointer_type_p(source_t)) {
 	cell n_source = copy_cell(fc);
 	cell n_sink = copy_cell(ac);
-	reference n_sink_r = cell_any_reference(n_sink);
+	//reference n_sink_r = cell_any_reference(n_sink);
 	// points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
 	points_to pt = make_points_to(n_source, n_sink, copy_approximation(ap),
 				      make_descriptor_none());
@@ -643,7 +643,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
 	     pointer to an array with fewer dimensions. */
 	  cell n_source = copy_cell(fc);
 	  cell n_sink = copy_cell(ac);
-	  reference n_sink_r = cell_any_reference(n_sink);
+	  //reference n_sink_r = cell_any_reference(n_sink);
 	  // points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
 	  points_to pt = make_points_to(n_source, n_sink, copy_approximation(ap),
 					make_descriptor_none());
@@ -702,6 +702,83 @@ void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
       }
     }
   }
+}
+
+list translation_transitive_closure(cell c, set translation)
+{
+  list succ = CONS(CELL, c, NIL);
+  list n_succ = gen_copy_seq(succ);
+  bool finished_p = false;
+  while(!finished_p) {
+    points_to_graph translation_g = make_points_to_graph(false, translation);
+    // Do not worry about sharing due to NULL or UNDEFINED/NOWHERE
+    n_succ = points_to_sources_to_effective_sinks(n_succ, translation_g, false);
+    gen_list_and_not(&n_succ, succ);
+    if(ENDP(n_succ)) {
+      /* We are done */
+      finished_p = true;
+      break;
+    }
+    else {
+      succ = gen_nconc(succ, n_succ);
+      n_succ = gen_copy_seq(n_succ);
+    }
+  }
+  return succ;
+}
+
+/* See if two cells in "fpcl" point toward the same location via the
+   transitive closure of "translation". */
+bool aliased_translation_p(list fpcl, set translation)
+{
+  bool alias_p = false;
+  hash_table closure = hash_table_make(hash_pointer, 0);
+  list c_fpcl = fpcl;
+  list p_fpcl = fpcl;
+
+  for( ; !ENDP(c_fpcl); POP(c_fpcl)) {
+    cell c = CELL(CAR(c_fpcl));
+    list succ_l = translation_transitive_closure(c, translation);
+    hash_put(closure, (void *) c, (void *) succ_l);
+    for(p_fpcl = fpcl; p_fpcl!=c_fpcl; POP(p_fpcl)) {
+      cell p_c = CELL(CAR(p_fpcl));
+      list p_succ_l = (list) hash_get(closure, (void *) p_c);
+      list c_succ_l = gen_copy_seq(succ_l);
+      // FI: this is not sufficient, conflicts between cells should be
+      // checked to take into account abstract locations.
+      // gen_list_and(&c_succ_l, p_succ_l);
+      bool conflict_p = points_to_cell_lists_may_conflict_p(c_succ_l, p_succ_l);
+      //if(!ENDP(c_succ_l)) {
+      if(conflict_p) {
+	alias_p = true;
+	gen_free_list(c_succ_l);
+	entity fp1 = reference_variable(cell_any_reference(c));
+	entity fp2 = reference_variable(cell_any_reference(p_c));
+	
+	pips_user_warning("aliasing detected between formal parameters "
+			  "\"%s\" and \"%s\".\n", entity_user_name(fp1),
+			  entity_user_name(fp2));
+	break;
+      }
+      gen_free_list(c_succ_l);
+    }
+  }
+
+  if(alias_p) {
+    /* Print the transitive closures */
+    HASH_MAP(c, succs,
+	     { entity fp = reference_variable(cell_any_reference((cell) c));
+	       fprintf(stderr, "\"%s\" -> ", entity_user_name(fp));
+	       print_points_to_cells((list) succs);
+	       fprintf(stderr, "\n");
+	     }, closure);
+  }
+
+  /* Clean up the hash-table... */
+  HASH_MAP(c, succs, {gen_free_list((list) succs);}, closure);
+
+  hash_table_free(closure);
+  return alias_p;
 }
 
 
@@ -767,7 +844,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
     points_to_translation_of_formal_parameters(fpcl, al, pt_in, translation);
 
     /* Filter pt_in_callee according to pts_binded. For instance, a
-v       formal parameter can point to NULL in pt_in_callee only if it
+       formal parameter can point to NULL in pt_in_callee only if it
        also points to NULL in pts_binded. In the same way, a formal
        parameter can point to a points-to stub in pt_in_callee only if
        it points to a non-NULL target in pts_binded. Also, a formal
@@ -788,7 +865,11 @@ v       formal parameter can point to NULL in pt_in_callee only if it
       = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,
 					pt_in_callee_filtered, pt_out_callee,
 					translation);
-    
+    /* See if two formal parameters can reach the same memory cell,
+     * i.e. transitive closure of translation map. We should take care
+     * of global variables too... */
+    compatible_p = compatible_p && !aliased_translation_p(fpcl, pts_binded);
+
     if(compatible_p) {
 
       set pt_out_callee_filtered =
@@ -803,7 +884,7 @@ v       formal parameter can point to NULL in pt_in_callee only if it
        * formal context has been increased according to the needs of
        * the callee. But pt_in_s may also have been updated by what
        * has happened prevously when analyzing the current
-       * statement. See for instance Poitners/sort01.c.
+       * statement. See for instance Pointers/sort01.c.
        */
       set c_pt_in_s = points_to_graph_set(points_to_context_statement_in());
       c_pt_in_s = set_union(c_pt_in_s, c_pt_in_s, pt_in_s);
@@ -846,14 +927,20 @@ v       formal parameter can point to NULL in pt_in_callee only if it
       points_to_graph_set(pt_out) = pt_end;
     }
     else {
-      pips_user_warning("Aliasing between arguments.\n"
-			"We have to create a new formal context "
+      pips_user_warning("Aliasing between arguments at line %d.\n"
+			"We would have to create a new formal context "
 			"and to restart the points-to analysis "
-			"and to modify the IN and OUT data structures...\n ");
-      pips_internal_error
-	("No handling of aliasing between formal parameters at line %d.\n",
-	 points_to_context_statement_line_number());
-      pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
+			"and to modify the IN and OUT data structures...\n"
+			"Or use a simpler analysis, here an intraprocedural one.\n",
+			points_to_context_statement_line_number());
+
+      // pips_internal_error
+      // ("No handling of aliasing between formal parameters at line %d.\n",
+      // points_to_context_statement_line_number());
+
+      // pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
+
+      pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
     }
   }
   else {
