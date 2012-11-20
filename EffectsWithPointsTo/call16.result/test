@@ -1,18 +1,111 @@
 
+Points-to for call16
+
+
+// Points To IN:
+// _a -> *NULL_POINTER* , MAY
+// _a -> __a_2[0] , MAY
+// _b -> *NULL_POINTER* , MAY
+// _b -> __b_3[0] , MAY
+// _c -> *NULL_POINTER* , MAY
+// _c -> __c_4[0] , MAY
+
+
+// Points To OUT: none
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+
+// Points To:
+// _a -> *NULL_POINTER* , MAY
+// _a -> __a_2[0] , MAY
+// _b -> *NULL_POINTER* , MAY
+// _b -> __b_3[0] , MAY
+// _c -> *NULL_POINTER* , MAY
+// _c -> __c_4[0] , MAY
+
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Proper effects with points-to for call16
+
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 //             <    is read   >: __b_3[_i] __c_4[_i] _a _b _c _i
 //             <    is written>: __a_2[_i]
    _a[_i] = _b[_i]+_c[_i];
 }
-void call16(int _i, int *_a, int *_b, int *_c);
 
-void dotprod(int *a, int *b, int *c);
+Cumulated effects with points-to for call16
+
+//             <may be read   >: __b_3[*] __c_4[*]
+//             <may be written>: __a_2[*]
+//             <    is read   >: _a _b _c _i
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//             <may be read   >: __b_3[*] __c_4[*]
+//             <may be written>: __a_2[*]
+//             <    is read   >: _a _b _c _i
+   _a[_i] = _b[_i]+_c[_i];
+}
+
+Points-to for "dotprod"
+
+
+// Points To IN:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_1[0] , MAY
+// b -> *NULL_POINTER* , MAY
+// b -> _b_2[0] , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _c_3[0] , MAY
+
+
+// Points To OUT: none
+
+void dotprod(int *a, int *b, int *c)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   for(i = 0; i <= 999999; i += 1)
+
+// Points To:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_1[0] , MAY
+// b -> *NULL_POINTER* , MAY
+// b -> _b_2[0] , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _c_3[0] , MAY
+
+      call16(i, a, b, c);
+
+// Points To:
+// a -> *NULL_POINTER* , MAY
+// a -> _a_1[0] , MAY
+// b -> *NULL_POINTER* , MAY
+// b -> _b_2[0] , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _c_3[0] , MAY
+
+   
+   
+   return;
+}
+
+Proper effects with points-to for "dotprod"
+
 void dotprod(int *a, int *b, int *c)
 {
    int i;
 //             <    is written>: i
    for(i = 0; i <= 999999; i += 1)
+//             <may be read   >: _b_2[*] _c_3[*]
+//             <may be written>: _a_1[*]
 //             <    is read   >: a b c i
       call16(i, a, b, c);
    
@@ -20,7 +113,18 @@ void dotprod(int *a, int *b, int *c)
    return;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for "dotprod"
 
-
-****************** End of Dependence Graph ******************
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 999999; i += 1)
+//             <may be read   >: _b_2[*] _c_3[*]
+//             <may be written>: _a_1[*]
+//             <    is read   >: a b c i
+      call16(i, a, b, c);
+   
+   
+   return;
+}

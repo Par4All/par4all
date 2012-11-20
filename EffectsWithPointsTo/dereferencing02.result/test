@@ -115,7 +115,7 @@ void dereferencing02()
 {
 //             <may be written>: x[*]
    double x[2] = {1., 2.};
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: p[*]
    double *p[1] = {&x[0]};
 //             <    is written>: q
    double **q = &p[0];

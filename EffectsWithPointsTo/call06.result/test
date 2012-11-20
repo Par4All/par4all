@@ -1,4 +1,78 @@
 
+POINTS-TO
+
+
+// Points To IN:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+
+// Points To OUT: none
+
+void call06(int r, int m, int *x)
+{
+
+// Points To: none
+
+   int j;
+
+// Points To: none
+
+
+   for(j = 0; j <= m-1; j += 1)
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
+
+      x[j] = 10*r+j;
+
+// Points To:
+// x -> _x_3[0] , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int d1 = 4;
+
+// Points To: none
+
+   int d2 = 4;
+
+// Points To: none
+
+   int y[d1][d2];
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+
+   for(i = 0; i <= d1-1; i += 1)
+
+// Points To: none
+
+      call06(i, d2, &y[i][0]);
+
+// Points To: none
+
+   exit(0);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
 void call06(int r, int m, int *x)
 {
    int j;
@@ -23,6 +97,7 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: y[i][*]
 //             <    is read   >: d1 d2 i
       call06(i, d2, &y[i][0]);
    exit(0);
@@ -36,5 +111,7 @@ int main()
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	15 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
+	20 --> 20 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
 
 ****************** End of Dependence Graph ******************

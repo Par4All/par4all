@@ -1,4 +1,117 @@
 
+POINTS-TO
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT: none
+
+int bla(int *p)
+{
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+   *p = 13;
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   return 17;
+}
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+
+// Points To OUT: none
+
+int call19(int *q)
+{
+
+// Points To: none
+
+   int i, k;
+
+// Points To: none
+
+   something st;
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   // bla(int *)
+   i = bla(q);
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   i += *q;
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += bla(&k);
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += k;
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += bla(&st.data);
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += st.data;
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   // foo(int)
+   i += foo(*q);
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += foo(k);
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   i += foo(st.data);
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   return i;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int foo(int a)
+{
+
+// Points To: none
+
+   return a*3;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
 int bla(int *p)
 {
 //             <    is read   >: p
@@ -11,20 +124,20 @@ int call19(int *q)
    int i, k;
    something st;
 //             <    is read   >: q
-//             <    is written>: i
+//             <    is written>: _q_1[0] i
    // bla(int *)
    i = bla(q);
 //             <    is read   >: _q_1[0] i q
 //             <    is written>: i
    i += *q;
 //             <    is read   >: i
-//             <    is written>: i
+//             <    is written>: i k
    i += bla(&k);
 //             <    is read   >: i k
 //             <    is written>: i
    i += k;
 //             <    is read   >: i
-//             <    is written>: i
+//             <    is written>: i st.data
    i += bla(&st.data);
 //             <    is read   >: i st.data
 //             <    is written>: i

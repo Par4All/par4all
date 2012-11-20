@@ -1,4 +1,6 @@
 
+PROPER  EFFECTS 
+
 FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
 {
    FLGR_Data2D *dat;
@@ -7,90 +9,123 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
 //             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
    /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: dat overlapSize
-//             <    is written>: *HEAP*_l_22.link_overlap
    dat->link_overlap = overlapSize;
 //             <    is read   >: nbrow overlapSize
 //             <    is written>: i
 
    for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: *HEAP*_l_22.row[i]
-      (dat->row)[i] = (datain->row)[i];
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: *HEAP*_l_22.row *HEAP*_l_22.row[i] 
-//                               dat i nbrow overlapSize
+      (dat->row)[i] = (datain->row)[i];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (dat->row)[i]->dim = i;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: *HEAP*_l_22.array[i]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      (dat->array)[i] = (dat->row)[i]->array;
+   }
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// datain -> *NULL_POINTER* , MAY
+// datain -> _datain_1 , MAY
+
+
+// Points To OUT: none
+
+FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
+{
+
+// Points To: none
+
+   FLGR_Data2D *dat;
+
+// Points To:
+// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i, k, nbrow, startin;
+
+// Points To:
+// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
+   dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+
+// Points To:
+// dat -> *HEAP*_l_33 , MAY
+
+   dat->link_overlap = overlapSize;
+
+// Points To:
+// dat -> *HEAP*_l_33 , MAY
+
+
+   for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
+
+// Points To:
+// dat -> *HEAP*_l_33 , MAY
+// datain -> *NULL_POINTER* , MAY
+// datain -> _datain_1 , MAY
+
+      (dat->row)[i] = (datain->row)[i];
+
+// Points To: none
+
+      (dat->row)[i]->dim = i;
+
+// Points To: none
+
+      (dat->array)[i] = (dat->row)[i]->array;
+   }
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
+{
+   FLGR_Data2D *dat;
+   int i, k, nbrow, startin;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
+   /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
+   dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+//             <may be written>: *HEAP*_l_33.link_overlap
+//             <    is read   >: dat overlapSize
+   dat->link_overlap = overlapSize;
+//             <    is read   >: nbrow overlapSize
+//             <    is written>: i
+
+   for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
+//             <may be read   >: *HEAP*_l_33.row
+//             <may be written>: *HEAP*_l_33.row[i]
+//             <    is read   >: _datain_1.row dat datain i nbrow 
+//                               overlapSize
+      (dat->row)[i] = (datain->row)[i];
+//             <    is read   >: dat i nbrow overlapSize
+      (dat->row)[i]->dim = i;
+//             <    is read   >: dat i nbrow overlapSize
       (dat->array)[i] = (dat->row)[i]->array;
    }
 }
 
  *********************** Use-Def Chains *********************
 
-	22 --> 23 with conflicts
+	33 --> 34 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	22 --> 26 with conflicts
-		from <dat-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	22 --> 27 with conflicts
-		from <dat-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	33 --> 37 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	22 --> 28 with conflicts
-		from <dat-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	23 --> 26 with conflicts
-		from <*HEAP*_l_22.link_overlap-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	23 --> 27 with conflicts
-		from <*HEAP*_l_22.link_overlap-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <overlapSize-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <dat-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	23 --> 28 with conflicts
-		from <*HEAP*_l_22.link_overlap-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	25 --> 27 with conflicts
-		from <overlapSize-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <nbrow-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	26 --> 26 with conflicts
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*HEAP*_l_22.row[i]-W-EXACT>
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_22.row[i]-W-EXACT>
-	26 --> 27 with conflicts
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*HEAP*_l_22.row[i]-R-EXACT>
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*HEAP*_l_22.row-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	26 --> 28 with conflicts
-		from <*HEAP*_l_22.row[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_22.array[i]-W-EXACT>
-	27 --> 26 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_22.row[i]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*HEAP*_l_22.row[i]-R-EXACT> to <*HEAP*_l_22.row[i]-W-EXACT>
-		from <*HEAP*_l_22.row-R-EXACT> to <*HEAP*_l_22.row[i]-W-EXACT>
-	27 --> 27 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <overlapSize-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <nbrow-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <dat-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_22.row[i]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_22.row-R-EXACT>
-		from <overlapSize-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <nbrow-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <dat-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*HEAP*_l_22.row[i]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*HEAP*_l_22.row-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	27 --> 28 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_22.array[i]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	28 --> 26 with conflicts
-		from <*HEAP*_l_22.array[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_22.row[i]-W-EXACT>
-	28 --> 27 with conflicts
-		from <*HEAP*_l_22.array[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	28 --> 28 with conflicts
-		from <*HEAP*_l_22.array[i]-W-EXACT> to <*HEAP*_l_22.array[i]-W-EXACT>
-		from <*HEAP*_l_22.array[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_22.array[i]-W-EXACT>
+	33 --> 38 with conflicts
+		from <dat-W-EXACT> to <dat-R-EXACT>
+	33 --> 39 with conflicts
+		from <dat-W-EXACT> to <dat-R-EXACT>
+	37 --> 37 with conflicts
+		from <*HEAP*_l_33.row[i]-W-MAY> to <*HEAP*_l_33.row[i]-W-MAY>
+		from <*HEAP*_l_33.row[i]-W-MAY> to <*HEAP*_l_33.row-R-MAY>
+		from <*HEAP*_l_33.row-R-MAY> to <*HEAP*_l_33.row[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

@@ -9,7 +9,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       
       *col = 0;
    else {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: col indent
       /* indentation ok ? */
       
       while (*col<indent) {
@@ -42,14 +42,6 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 	12 --> 25 with conflicts
 		from <_col_4[0]-W-EXACT> to <_col_4[0]-W-EXACT>
 		from <_col_4[0]-W-EXACT> to <_col_4[0]-R-EXACT>
-	18 --> 21 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_nbout_6[0]-W-EXACT>
-	18 --> 22 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_col_4[0]-W-EXACT>
-	18 --> 25 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_col_4[0]-W-EXACT>
-	18 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_nbout_6[0]-W-EXACT>
 	21 --> 21 with conflicts
 		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-W-EXACT>
 		from <_nbout_6[0]-W-EXACT> to <_nbout_6[0]-R-EXACT>

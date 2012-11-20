@@ -3,7 +3,7 @@ long long int get_result(int argc, char **argv)
 {
 //             <    is written>: result
    long long int result = 0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _argv_2[1] argv
 //             <    is written>: result
    result = atoll(argv[1]);
 //             <may be read   >: stdout[0]
@@ -16,9 +16,10 @@ long long int get_result(int argc, char **argv)
 }
 int main(int argc, char **argv)
 {
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: _argv_2[1] argc argv stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size

@@ -43,11 +43,11 @@ void dereferencing05()
 {
    double *p;
    int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p++ = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p-- = 0.;
    *++p = 0.;
    *--p = 0.;
@@ -55,16 +55,15 @@ void dereferencing05()
 
 Cumulated effects with points-to for dereferencing05
 
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing05()
 {
    double *p;
    int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p++ = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p-- = 0.;
    *++p = 0.;
    *--p = 0.;

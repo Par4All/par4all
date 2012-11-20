@@ -35,8 +35,7 @@ int main(void)
    // possible segfault.
    // should generate an error while analyzing?
    if (pp)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pp
       **pp = 0;
    return 0;
 }
@@ -64,8 +63,7 @@ static int alea(void)
 	15 --> 26 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	15 --> 30 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
 	15 --> 30 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	17 --> 18 with conflicts
@@ -73,27 +71,13 @@ static int alea(void)
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 	20 --> 22 with conflicts
 		from <pi-W-EXACT> to <pi-R-EXACT>
-	20 --> 30 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	21 --> 22 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 26 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 30 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 30 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
-	22 --> 30 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	26 --> 30 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

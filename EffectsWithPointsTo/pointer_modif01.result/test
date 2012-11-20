@@ -2,7 +2,6 @@
 int main()
 {
    int *p, *q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;

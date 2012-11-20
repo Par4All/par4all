@@ -3,20 +3,13 @@ void dereferencing03()
 {
    double *p;
    int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
    *(p+1) = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i p
    *(p+i) = 0.;
 }
 
  *********************** Use-Def Chains *********************
 
-	06 --> 07 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

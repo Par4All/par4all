@@ -47,7 +47,6 @@ int nowhere01()
    int i;
    int *p;
    int **q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;
@@ -58,13 +57,11 @@ int nowhere01()
 
 Cumulated effects with points-to for nowhere01
 
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int nowhere01()
 {
    int i;
    int *p;
    int **q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;

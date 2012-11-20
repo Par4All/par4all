@@ -31,8 +31,7 @@ int main(void)
    
    // pp points to a dead value in the stack
    printf("%p\n", pp);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pp
    
    // possible segfault.
    // should generate an error while analyzing?
@@ -61,25 +60,11 @@ static int alea(void)
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 	20 --> 23 with conflicts
 		from <pi-W-EXACT> to <pi-R-EXACT>
-	20 --> 31 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	21 --> 23 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 27 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 31 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	23 --> 31 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	27 --> 31 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

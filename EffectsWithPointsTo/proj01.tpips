@@ -9,12 +9,6 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 set POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 echo 
-echo PROPER  EFFECTS 
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [%ALLFUNC]
-
-echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
@@ -28,5 +22,11 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [%ALLFUNC]
 
 close
+
+echo
+echo Warnings
+echo
+
+shell cat $WSPACE.database/Warnings
 delete $WSPACE
 quit

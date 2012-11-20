@@ -153,7 +153,6 @@ void assign04()
 //             <    is written>: p
    //q = &r;
    p = &q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
    **p = r;
    ***p = 0;
@@ -169,7 +168,6 @@ void assign04();
 void foo();
 void foo()
 {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign04();
    return;
 }

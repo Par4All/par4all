@@ -59,7 +59,7 @@ Proper effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_
@@ -74,7 +74,7 @@ Cumulated effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_

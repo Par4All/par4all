@@ -53,7 +53,7 @@ display PRINTED_FILE[dotprod]
 echo 
 echo Cumulated effects with points-to for "dotprod"
 echo
-activate CUMLATED_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[dotprod]
 

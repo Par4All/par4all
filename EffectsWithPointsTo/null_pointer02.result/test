@@ -7,8 +7,7 @@ int main()
 //             <    is written>: p
 
    p = 0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
    **q = 0;
 
    *p = 1;
@@ -19,8 +18,5 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	11 --> 12 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 
 ****************** End of Dependence Graph ******************

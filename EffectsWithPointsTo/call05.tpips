@@ -23,8 +23,8 @@ activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [%ALLFUNC]
 
-activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+#activate PRINT_CHAINS_GRAPH
+#display DG_FILE 
 
 close
 delete $WSPACE
