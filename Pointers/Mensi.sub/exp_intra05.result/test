@@ -56,7 +56,6 @@ int main()
 //             <    is written>: p
    // S1
    p = (void *) 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
    // S2
    *p = 1;
@@ -66,14 +65,12 @@ int main()
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int main()
 {
    int *p;
 //             <    is written>: p
    // S1
    p = (void *) 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
    // S2
    *p = 1;

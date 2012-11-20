@@ -141,9 +141,6 @@ int main()
    return 0;
 }
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "exit01(r)" could not be dereferenced at line 14.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "exit01(r)" could not be dereferenced at line 14.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "exit01(r)" could not be dereferenced at line 14.
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

@@ -1,15 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int **a, b;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: a
-   a[0] = &b;
-   return 0;
-}
-
 POINTS-TO
 
 
