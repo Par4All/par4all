@@ -57,9 +57,9 @@ int main()
 //             <    is read   >: msg1
 //             <    is written>: msg2
    char *msg2 = msg1;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: msg2 stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    msg_error(msg2);
 
@@ -3630,9 +3630,9 @@ void msg_error(char *msg);
 int main();
 void msg_error(char *msg)
 {
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s", msg);
    exit(1);
@@ -3640,7 +3640,7 @@ void msg_error(char *msg)
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -3651,9 +3651,9 @@ int main()
 //             <    is read   >: msg1
 //             <    is written>: msg2
    char *msg2 = msg1;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: msg2 stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    msg_error(msg2);
 
@@ -7222,15 +7222,15 @@ int getloadavg(double __loadavg[], int __nelem);
 void msg_error(char *msg);
 
 int main();
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 void msg_error(char *msg)
 {
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%s", msg);
    exit(1);
