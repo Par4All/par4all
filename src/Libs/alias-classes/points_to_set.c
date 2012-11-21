@@ -1572,7 +1572,7 @@ list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
 	bool c_to_be_freed;
 	type c_t = points_to_cell_to_type(c, &c_to_be_freed);
 	type c_et = compute_basic_concrete_type(c_t);
-	if(!type_equal_p(source_et, c_et))
+	if(!overloaded_type_p(c_et) && !type_equal_p(source_et, c_et))
 	  pips_internal_error("Type mismatch after translation.\n");
 	if(c_to_be_freed) free_type(c_t);
       }
