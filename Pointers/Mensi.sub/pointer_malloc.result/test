@@ -36,17 +36,15 @@ int main(void)
 
 // Points To: none
 
-   pointer p1, p2;
+   pointer p1;
 
 // Points To:
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p1 = alloc_pointer(13);
 
 // Points To:
 // p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    return;
 }
@@ -66,7 +64,7 @@ pointer alloc_pointer(int v)
 }
 int main(void)
 {
-   pointer p1, p2;
+   pointer p1;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
    p1 = alloc_pointer(13);
@@ -92,7 +90,7 @@ pointer alloc_pointer(int v)
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main(void)
 {
-   pointer p1, p2;
+   pointer p1;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
    p1 = alloc_pointer(13);
@@ -136,17 +134,15 @@ int main(void)
 
 // Points To: none
 
-   pointer p1, p2;
+   pointer p1;
 
 // Points To:
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p1 = alloc_pointer(13);
 
 // Points To:
 // p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    return;
 }

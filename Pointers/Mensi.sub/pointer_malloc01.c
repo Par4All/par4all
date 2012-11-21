@@ -12,7 +12,7 @@ pointer alloc_pointer(int v)
 
 int main(void)
 {
-  pointer p1, p2;
+  pointer p1;
   p1 = alloc_pointer(13);
   return;
 }

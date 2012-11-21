@@ -3,7 +3,7 @@ INLINING "alloc_pointer"
 
 int main(void)
 {
-   pointer p1, p2;
+   pointer p1;
    //PIPS generated variable
    pointer _return0;
    {
@@ -62,12 +62,11 @@ int main(void)
 
 // Points To: none
 
-   pointer p1, p2;
+   pointer p1;
    //PIPS generated variable
 
 // Points To:
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    pointer _return0;
    {
@@ -76,7 +75,6 @@ int main(void)
 // Points To:
 // _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
       int v0 = 13;
       {
@@ -84,7 +82,6 @@ int main(void)
 // Points To:
 // _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
          pointer p;
 
@@ -92,7 +89,6 @@ int main(void)
 // _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
          p = malloc(sizeof(int));
 
@@ -100,7 +96,6 @@ int main(void)
 // _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p -> *HEAP*_l_11 , MAY
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
          *p = v0;
 
@@ -108,7 +103,6 @@ int main(void)
 // _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p -> *HEAP*_l_11 , MAY
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
          _return0 = p;
       }
@@ -117,14 +111,12 @@ int main(void)
 // Points To:
 // _return0 -> *HEAP*_l_11 , MAY
 // p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    p1 = _return0;
 
 // Points To:
 // _return0 -> *HEAP*_l_11 , MAY
 // p1 -> *HEAP*_l_11 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    return;
 }
@@ -145,7 +137,7 @@ pointer alloc_pointer(int v)
 }
 int main(void)
 {
-   pointer p1, p2;
+   pointer p1;
    //PIPS generated variable
    pointer _return0;
    {
@@ -191,7 +183,7 @@ pointer alloc_pointer(int v)
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main(void)
 {
-   pointer p1, p2;
+   pointer p1;
    //PIPS generated variable
    pointer _return0;
    {
