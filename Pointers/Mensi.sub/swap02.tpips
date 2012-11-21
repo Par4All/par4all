@@ -1,4 +1,4 @@
-setenv WS=if04
+setenv WS=swap02
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
@@ -8,9 +8,9 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 create $WS $WS.c
 
 echo
-echo  INLINING "init"
+echo  INLINING "swap"
 echo
-apply INLINING[init]
+apply INLINING[swap]
 activate PRINT_CODE
 display PRINTED_FILE[main]
 

@@ -1,9 +1,17 @@
-void init(int *p)
+
+INLINING "init"
+
+int main()
 {
-   if (p==(void *) 0)
+   int init_p = 1;
+   int *q = (void *) 0;
+   if (init_p)
+      q = (int *) malloc(4*sizeof(int));
+   if (q==(void *) 0)
       exit(1);
    else
-      *p = 0;
+      *q = 0;
+   return 0;
 }
 
 POINTS TO for if04
