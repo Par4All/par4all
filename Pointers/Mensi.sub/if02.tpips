@@ -3,6 +3,8 @@ delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
 create $WS $WS.c
 
 
