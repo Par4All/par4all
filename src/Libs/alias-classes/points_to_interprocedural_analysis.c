@@ -613,21 +613,26 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
       }
     }
 
-    if(!ENDP(new_sr_l) && !ENDP(new_sk_l)) { 
+    if(!ENDP(new_sr_l) && !ENDP(new_sk_l)) {
+      int new_sk_n = (int) gen_length(new_sk_l);
       FOREACH(CELL, new_sr, new_sr_l) {
+	approximation na = approximation_undefined;
+	if(!atomic_points_to_cell_p(new_sr) || new_sk_n>1) {
+	  na = make_approximation_may();
+	}
+	else
+	  na = copy_approximation(a);
 	FOREACH(CELL, new_sk, new_sk_l) {
-	  if(!atomic_points_to_cell_p(new_sr)) {
-	    free_approximation(a);
-	    a = make_approximation_may();
-	  }
 	  points_to new_pt = make_points_to(copy_cell(new_sr),
 					    copy_cell(new_sk),
-					    a, make_descriptor_none());
+					    na,
+					    make_descriptor_none());
 	  set_add_element(gen, gen, (void*)new_pt);
 	}
       }
       // gen_full_free_list(new_sr_l);
       // gen_full_free_list(new_sk_l);
+      free_approximation(a);
     }
   }
 
