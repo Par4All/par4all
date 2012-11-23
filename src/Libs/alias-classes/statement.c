@@ -145,6 +145,11 @@ void reset_statement_points_to_context()
   stack_free(&statement_points_to_context);
   statement_points_to_context = stack_undefined;
 }
+
+bool statement_points_to_context_defined_p()
+{
+  return statement_points_to_context != stack_undefined;
+}
 
 /* See points_to_statement()
  *

@@ -363,6 +363,8 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
     points_to_graph bm_g = make_points_to_graph(false, bm);
     list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
+    pips_assert("The effect is translated", !ENDP(n_eff_cells));
+
     // FI: memory leak on bm_g
 
     FOREACH(CELL, n_c, n_eff_cells) {

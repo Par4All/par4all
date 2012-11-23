@@ -865,8 +865,15 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
     }
 
     if(ENDP(sinks)) {
-      pips_user_warning("Some kind of execution error has been encountered at line %d.\n",
-			points_to_context_statement_line_number());
+      /* This function may be called from the effect library via
+	 backward_translation_of_points_to_formal_context() */
+      if(statement_points_to_context_defined_p()) {
+	pips_user_warning("Some kind of execution error has been encountered at line %d.\n",
+			  points_to_context_statement_line_number());
+      }
+      else {
+	pips_user_warning("Some kind of execution error has been encountered.\n");
+      }
       clear_pt_map(in);
       points_to_graph_bottom(in) = true;
     }

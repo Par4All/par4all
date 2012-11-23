@@ -1382,7 +1382,13 @@ list reference_to_points_to_translations(entity v, list sl, pt_map ptm)
 	  }
 	  POP(csl), POP(co_sl);
 	}
-	if(compatible_p) {
+	if(compatible_p && ENDP(csl) && ENDP(co_sl)
+	   && expression_lists_equal_p(sl, o_sl)) {
+	  /* We have an equality between the effect and the origin */
+	  cell tc = copy_cell(points_to_sink(pt));
+	  tl = CONS(CELL, tc, tl);
+	}
+	else if(compatible_p) {
 	  reference d_r = cell_any_reference(d);
 	  list d_sl = reference_indices(d_r);
 	  /* The subscripts left in csl must be happened to the new sink */
