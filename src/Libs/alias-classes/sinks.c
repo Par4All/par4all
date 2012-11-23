@@ -1606,3 +1606,19 @@ bool reference_must_points_to_null_p(reference r, pt_map in)
   gen_free_list(sinks);
   return must_p;
 }
+
+bool reference_may_points_to_null_p(reference r, pt_map in)
+{
+  list sinks = reference_to_sinks(r, in, false);
+  bool may_p = false;
+
+  FOREACH(CELL, c, sinks) {
+    if(null_cell_p(c)) {
+      may_p = true;
+      break;
+    }
+  }
+
+  gen_free_list(sinks);
+  return may_p;
+}

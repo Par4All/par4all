@@ -284,14 +284,18 @@ static bool generic_points_to_analysis(char * module_name) {
   init_points_to_context(pt_in);
 #endif
 
-  /* Compute the points-to relations using the pt_in as input.*/
-#if !FRANCOIS
-  // FI: old version
-  pts_to_out = points_to_statement(module_stat, pt_in);
+  /* Necessary to compute memory effects
+   *
+   * Memory effects may be computed to avoid issues with side effects
+   * Three possible options: 1) a new expression_to_points_to() that
+   * does not take side effects into account, 2) an extension of
+   * condition_to_points_to() to take care of dereferencing as in
+   * expression_to_points_to(), or use memory effects to deal with
+   * side effect free expressions only.
+   */
+  // set_methods_for_simple_effects();
 
-#else  // FI: new version
   pts_to_out = statement_to_points_to(module_stat, pt_in);
-#endif
   /* Store the points-to relations */
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO, module_name, get_pt_to_list());
 

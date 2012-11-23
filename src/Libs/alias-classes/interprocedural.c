@@ -349,10 +349,12 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	FOREACH(CELL, fc, fl) {
 	  if(!null_cell_p(fc)) {
 	    FOREACH(CELL, ac, al) {
-	      points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), 
-					    copy_approximation(a),
-					    make_descriptor_none());
-	      add_arc_to_simple_pt_map(tr, translation);
+	      if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
+		points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), 
+					      copy_approximation(a),
+					      make_descriptor_none());
+		add_arc_to_simple_pt_map(tr, translation);
+	      }
 	    }
 	    nfcl = CONS(CELL, fc, nfcl);
 	  }
@@ -456,9 +458,11 @@ set filter_formal_context_according_to_actual_context(list fpcl,
     FOREACH(CELL, fc, fl) {
       if(!null_cell_p(fc)) {
 	FOREACH(CELL, ac, al) {
-	  points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), a,
-					make_descriptor_none());
-	  add_arc_to_simple_pt_map(tr, translation);
+	  if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
+	    points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), a,
+					  make_descriptor_none());
+	    add_arc_to_simple_pt_map(tr, translation);
+	  }
 	}
 	fcl = CONS(CELL, fc, fcl);
       }

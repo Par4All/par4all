@@ -587,7 +587,11 @@ proper_constant_path_effects_of_expression(expression e)
 
 
 
-/* Same as above, but with debug control. Used by semantics. */
+/* Same as above, but with debug control. Used by semantics.
+ *
+ * FI: What has to be initialized? I end up with functional pointer
+ * reference_to_effect_func unitialized, i.e. 0.
+ */
 list
 expression_to_proper_constant_path_effects(expression e)
 {

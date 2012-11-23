@@ -1001,6 +1001,21 @@ bool effects_write_variable_p(list el, entity v)
   return result;
 }
 
+bool effects_write_p(list el)
+{
+  bool result = false;
+
+  FOREACH(EFFECT, e, el) {
+    action a  = effect_action(e);
+    if (action_write_p(a) && store_effect_p(e)) {
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
 bool effects_read_variable_p(list el, entity v)
 {
   bool result = false;
