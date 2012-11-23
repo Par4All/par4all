@@ -64,7 +64,9 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       *col = 0;
    else {
 
-// Points To: none
+// Points To:
+// col -> *NULL_POINTER* , MAY
+// col -> _col_4[0] , MAY
 
       /* indentation ok ? */
       
@@ -72,20 +74,19 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> _nbout_6[0] , EXACT
+// nbout -> _nbout_6[0] , MAY
 
          my_fputc(' ', _stream);
 
 // Points To:
-// col -> _col_4[0] , MAY
+// col -> _col_4[0] , EXACT
 // nbout -> *NULL_POINTER* , MAY
 // nbout -> _nbout_6[0] , MAY
 
          (*nbout)++;
 
 // Points To:
-// col -> *NULL_POINTER* , MAY
-// col -> _col_4[0] , MAY
+// col -> _col_4[0] , EXACT
 // nbout -> _nbout_6[0] , EXACT
 
          (*col)++;

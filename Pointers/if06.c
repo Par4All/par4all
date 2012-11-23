@@ -11,6 +11,9 @@ int main() {
   if(p++) {
     *p = 1;
   }
-  
+  else {
+    *p = 0;
+  }
+
   return 0;
 }
