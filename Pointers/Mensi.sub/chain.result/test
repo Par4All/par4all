@@ -31,9 +31,7 @@ void chain(ilp_t c1, ilp_t c2)
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// Points To OUT: none
 
 int main()
 {
@@ -70,6 +68,7 @@ int main()
    chain(x1, x2);
 
 // Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // *HEAP*_l_18.next -> *NULL_POINTER* , MAY
 // x1 -> *HEAP*_l_17 , MAY
@@ -179,9 +178,7 @@ void chain(ilp_t c1, ilp_t c2)
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_17.next -> *HEAP*_l_18 , EXACT
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// Points To OUT: none
 
 int main()
 {
@@ -218,7 +215,8 @@ int main()
    chain(x1, x2);
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_18 , EXACT
+// *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // *HEAP*_l_18.next -> *NULL_POINTER* , MAY
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
@@ -226,3 +224,4 @@ int main()
 
    return 0;
 }
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
