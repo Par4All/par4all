@@ -1,6 +1,8 @@
 /* #include<stdio.h> */
 
-/* To obtain two read effects on a and b and a warning abount ineffective update of i in call02 */
+/* To obtain two read effects on a and b and a warning abount
+ * ineffective update of i in call02
+ */
 
 typedef struct two_fields{int one; int two[10];} tf_t;
 

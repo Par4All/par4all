@@ -6,7 +6,7 @@
 void fpointer02(int * col,
 		int   indent)
 {
-  *col = 0;
+  // *col = 0;
   if(*col < indent)
     {
       ;

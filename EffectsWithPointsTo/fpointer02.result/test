@@ -16,11 +16,7 @@ void fpointer02(int *col, int indent)
 // col -> *NULL_POINTER* , MAY
 // col -> _col_1[0] , MAY
 
-   *col = 0;
-
-// Points To:
-// col -> _col_1[0] , EXACT
-
+   // *col = 0;
    if (*col<indent)
       ;
 
@@ -35,10 +31,8 @@ Proper effects with points-to for fpointer02
 
 void fpointer02(int *col, int indent)
 {
-//             <    is read   >: col
-//             <    is written>: _col_1[0]
-   *col = 0;
 //             <    is read   >: _col_1[0] col indent
+   // *col = 0;
    if (*col<indent)
       ;
 //             <    is read   >: _col_1[0] col indent
