@@ -27,8 +27,11 @@
 #include "newgen_set.h"
 #include "points_to_private.h"
 #include "alias-classes.h"
-/* Points-to interprocedural analysis is inspired by the work of Wilson[95]. The documentation 
-   of this phase is a chapter of Amira Mensi thesis. */
+
+/* Points-to interprocedural analysis is inspired by the work of
+ * Wilson[95]. The documentation of this phase is a chapter of Amira
+ * Mensi thesis.
+ */
 
 
 
@@ -122,8 +125,9 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
 	points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
 	s = set_assign(s, points_to_graph_set(a_g));
       }
-      else
+      else {
 	; // do nothing for other types
+      }
     }
   }
 
@@ -628,6 +632,7 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
   }
 
   ifdebug(1) print_points_to_set("gen", gen);
+
   return gen;  
 }
 

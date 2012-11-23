@@ -912,11 +912,15 @@ pt_map user_call_to_points_to_interprocedural(call c,
 					      pt_in_callee_filtered,
 					      pts_binded,
 					      translation, f);
+
+      pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
+
       // FI: Not satisfying; kludge to solve issue with Pointers/inter04
       pt_map pts_gen_g = make_points_to_graph(false, pts_gen);
       upgrade_approximations_in_points_to_set(pts_gen_g);
 
-      pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
+      pips_assert("pts_gen is consistent after upgrade",
+		  consistent_points_to_set(pts_gen));
 
       /* Some check */
       list stubs = points_to_set_to_module_stub_cell_list(f, pts_gen, NIL);
