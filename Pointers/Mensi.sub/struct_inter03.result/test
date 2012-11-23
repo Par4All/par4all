@@ -176,10 +176,15 @@ int main()
    assignment(pps, ppt);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// pps -> ps , EXACT
+// ppt -> pt , EXACT
+// ps -> s2 , EXACT
+// pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
-// s1.ip2 -> i22 , EXACT
-// s2.ip1 -> i21 , EXACT
+// s1.ip2 -> i21 , MAY
+// s1.ip2 -> i22 , MAY
+// s2.ip1 -> i21 , MAY
+// s2.ip1 -> i22 , MAY
 // s2.ip2 -> i22 , EXACT
 
 
@@ -302,8 +307,7 @@ void assignment(struct foo **t1, struct foo **t2)
    (**t1).ip1 = (**t2).ip2;
 }
 
-// Points To IN:
-// assignment:_t1_1_1.ip1 -> _t1_1_1_1__1 , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -438,7 +442,6 @@ int main()
    pps = &ps;
 
 // Points To:
-// assignment:_t1_1_1.ip1 -> _t1_1_1_1__1 , EXACT
 // pps -> ps , EXACT
 // ppt -> pt , EXACT
 // ps -> s2 , EXACT
@@ -456,7 +459,10 @@ int main()
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
-// s1.ip2 -> i22 , EXACT
+// s1.ip2 -> i21 , MAY
+// s1.ip2 -> i22 , MAY
+// s2.ip1 -> i21 , MAY
+// s2.ip1 -> i22 , MAY
 // s2.ip2 -> i22 , EXACT
 
 
