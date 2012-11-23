@@ -3139,15 +3139,19 @@ static Psysteme first_precondition_of_module(const char* module_name __attribute
   switch instruction_tag(inst)
     {
     case is_instruction_sequence:{
-      fst = STATEMENT(CAR(sequence_statements(instruction_sequence(inst))));
+      list sts = sequence_statements(instruction_sequence(inst));
+      if (sts !=NULL)
+	fst = STATEMENT(CAR(sts));
       break;
     }
 
     default:
       fst = st1;
     }
-  t = (transformer)load_statement_precondition(fst);
-  prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+  if ( fst!= statement_undefined) {
+    t = (transformer)load_statement_precondition(fst);
+    prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+  }
   return prec;
 }
 
@@ -3504,7 +3508,6 @@ static void list_of_arguments(call c, Pvecteur *vargs){
       vect_add_elem(vargs,reference_variable(r1), VALUE_ONE);
     }
   }
-
 }
 
 static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, Psysteme prec, string_buffer sb_result )
@@ -3750,6 +3753,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
     bool assign_func = ENTITY_ASSIGN_P(func);
     const char* n= assign_func ? "LocalAssignment" : entity_user_name(func);
     list effects_list = regions_dup(load_statement_local_regions(s));
+    vargs=VECTEUR_NUL;
     if (!assign_func || array_in_effect_list_p(effects_list)) {
 
       add_margin(global_margin,sb_result);
