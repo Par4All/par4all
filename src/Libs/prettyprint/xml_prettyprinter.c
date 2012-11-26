@@ -3485,14 +3485,24 @@ static void xml_LoopOffset(list  ActualArrayInd,int ActualArrayDim, Pvecteur loo
   string_buffer_append_word("/LoopOffset",sb_result);
 }
 
-// A completer
-// Ici, la constante vaut 0
-static void xml_ConstOffset(int ActualArrayDim, string_buffer sb_result)
+
+static void xml_ConstOffset(list ActualArrayInd, int ActualArrayDim, string_buffer sb_result)
 {
   Pmatrix mat;
+  Pvecteur pv;
+  int i=1;
   string_buffer_append_word("ConstOffset",sb_result);
   mat = matrix_new(ActualArrayDim,1);
   matrix_init(mat,ActualArrayDim,1);
+  MAP(EXPRESSION, e , {
+      if (expression_normalized(e) == normalized_undefined)
+	expression_normalized(e)= NormalizeExpression(e);
+      pv = (Pvecteur)normalized_linear(expression_normalized(e));
+      MATRIX_ELEM(mat,i,1)=vect_coeff(TCST,pv);
+      i++;
+    },
+    ActualArrayInd);
+
   xml_Matrix(mat,ActualArrayDim,1,sb_result);
   string_buffer_append_word("/ConstOffset",sb_result);
 }
@@ -3601,7 +3611,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 
       xml_Connection(ActualArrayInd,ActualArrayDim,FormalArrayDim,sb_result);
       xml_LoopOffset(ActualArrayInd,ActualArrayDim, loop_indices,sb_result);
-      xml_ConstOffset(ActualArrayDim,sb_result);
+      xml_ConstOffset(ActualArrayInd,ActualArrayDim,sb_result);
       global_margin--;
       string_buffer_append_word("/ArrayArgument",sb_result);
     }
