@@ -4,25 +4,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create mehdi01 mehdi01.c
 
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
-
-
-echo
-echo Proper effects for "main"
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
-
-echo
-echo Proper Pointer effects for "main"
-echo
-
-activate PRINT_CODE_PROPER_POINTER_EFFECTS 
-display PRINTED_FILE[main]
-
 echo
 echo POINTS TO
 echo 

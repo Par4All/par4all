@@ -5,27 +5,44 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
-
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-#module main
-
 
 echo 
-echo PROPER  EFFECTS
+echo Points-to for "read_towns"
 echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
 
-
-
-echo 
-echo POINTS-TO
-echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[read_towns]
+
+echo 
+echo Points-to for "run"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[run]
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo 
+echo Cumulated effects for "read_towns"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[read_towns]
+
+echo 
+echo Cumulated effects for "run"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[run]
+
+echo 
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 close
 delete $WSPACE

@@ -1,5 +1,0 @@
-Program received signal SIGSEGV, Segmentation fault.
-0x00000000005a09ad in fuse_points_to_sink_cells (source=0x38891f0, 
-    sink_l=0x388e370, in=0x3877b10)
-    at /home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/points_to_set.c:2214
-2214		cell oc = points_to_source(pt);

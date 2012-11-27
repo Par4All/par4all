@@ -5,7 +5,9 @@ POINTS TO for pointer16
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 
 void pointer16()
 {
@@ -30,14 +32,14 @@ void pointer16()
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
@@ -46,10 +48,9 @@ void pointer16()
    i++;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0[*] -> *ANY_MODULE*:*HEAP**ANYWHERE*
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // t -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer16] (points_to_function_projection) Memory cell *HEAP**ANYWHERE* leaked.
