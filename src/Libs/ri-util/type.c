@@ -5341,6 +5341,15 @@ bool char_star_constant_function_type_p(type t)
   return char_star_p;
 }
 
+list struct_type_to_fields(type lt)
+{
+  pips_assert("lt is the type of a struct", type_variable_p(lt)
+	      && basic_derived_p(variable_basic(type_variable(lt))));
+  entity ste = basic_derived(variable_basic(type_variable(lt)));
+  type st = entity_type(ste); // structure type
+  list fl = type_struct(st); // field list
+  return fl;
+}
 /*
  *  that is all
  */

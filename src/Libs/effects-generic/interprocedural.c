@@ -359,11 +359,25 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
     // bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
     ifdebug(8) print_points_to_set("bm", bm);
  
-   cell eff_c = effect_cell(eff);
+    cell eff_c = effect_cell(eff);
     points_to_graph bm_g = make_points_to_graph(false, bm);
     list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
-    pips_assert("The effect is translated", !ENDP(n_eff_cells));
+    // pips_assert("The effect is translated", !ENDP(n_eff_cells));
+    if(ENDP(n_eff_cells)) {
+      /* The effect cannot be translated (probably) because the caller
+	 has not initialized the calling context properly. See for
+	 instance EffectsWithPointsTo/struct08.c: the main function
+	 does not initialize p, q, r or s before calling the
+	 initialization functions. */
+      /* FI: not in the points-to context, look for a way to retrieve
+	 the statement number... */
+      pips_user_error("Effect \"%s\" of callee \"%s\" cannot be translated. "
+		      "Check that the caller \"%s\" provides initialized "
+		      "parameters.\n", effect_to_string(eff), 
+		      entity_user_name(callee),
+		      entity_user_name(get_current_module_entity()));
+    }
 
     // FI: memory leak on bm_g
 
@@ -377,6 +391,9 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
       }
     }
 
+    // FI: if n_eff_cells is not empty, empty(ael) means that the
+    // input code is wrong because a pointer has not been initialized
+    // properly...
     pips_assert("The effect is translated", !ENDP(ael));
   }
 

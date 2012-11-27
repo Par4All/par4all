@@ -136,12 +136,27 @@ bool reference_typed_anywhere_locations_p(reference r)
 }
 
 
-/* test if an entity is the bottom of the lattice*/
+/* Test if an entity is the bottom of the lattice. Not really since it
+ * is typed...
+ *
+ * The typed anywhere locations have names like ANYWHERE_LOCATION_bxxx
+ *
+ * Beware, because the string ANYWHERE_LOCATION is also used for the
+ * heap, *HEAP**ANYWHERE*.
+ *
+ * Also, this does not check for the module: is it ANYMODULE or a
+ * specific module?
+ */
 bool entity_typed_anywhere_locations_p(entity e)
 {
+  bool typed_anywhere_p = false;
   string ln = (string) entity_local_name(e);
   string p = strstr(ln, ANYWHERE_LOCATION);
-  return p!=NULL;
+  if(p==ln) {
+    // if the two strings are equal, we have the non-typed anywhere location
+    typed_anywhere_p = strcmp(ln, ANYWHERE_LOCATION);
+  }
+  return typed_anywhere_p;
 }
 
 /* return *ANY_MODULE*:*NOWHERE* */

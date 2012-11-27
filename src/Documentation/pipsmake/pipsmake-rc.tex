@@ -5697,13 +5697,14 @@ allocated in each function to modelize the heap.
 
 In the "flow-sensitive" case, the statement numbers of the malloc()
 call sites are used to subscribe this array, as well as all indices of
-the surrounding loops [Two improvements in one property...].
+the surrounding loops [Two improvements in one property...]. Only the
+first half of the property is implemented.
 
 In the "context\_sensitive" case, the interprocedural translation of
 memory acces paths based on the abstract heap are prefixed by the same
 information regarding the call site: function containing the call
 site, statement number of the call site and indices of surrounding
-loops.
+loops. This is not implemented.
 
 Note that the naming of options is not fully compatible with
 the usual notations in pointer analyses. Note also that the

@@ -2085,7 +2085,7 @@ list any_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	 || array_of_struct_type_p(f_t)) {
 	cell n_source = copy_cell(source);
 	points_to_cell_add_field_dimension(n_source, f);
-	sinks = any_source_to_sinks(source, pts, fresh_p);
+	sinks = any_source_to_sinks(n_source, pts, fresh_p);
 	free_cell(n_source);
       }
     }
@@ -2728,6 +2728,7 @@ points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
 
   /* Find the incoming arcs on cells of "sink_l" and replace them by arcs
      towards copies of mupc. */
+  list new = NIL, old = NIL;
   FOREACH(CELL, sink, sink_l) {
     if(!null_cell_p(sink) && !nowhere_cell_p(sink)) {
       /* Finds it sources */
@@ -2738,12 +2739,19 @@ points_to fuse_points_to_sink_cells(cell source, list sink_l, pt_map in)
 	  points_to npt = make_points_to(copy_cell(oc), copy_cell(mupc),
 					 make_approximation_may(),
 					 make_descriptor_none());
-	  add_arc_to_pt_map(npt, in);
-	  remove_arc_from_pt_map(pt, in);
+	  //add_arc_to_pt_map(npt, in);
+	  new = CONS(POINTS_TO, npt, new);
+	  // remove_arc_from_pt_map(pt, in);
+	  old = CONS(POINTS_TO, pt, old);
 	}
       }
     }
   }
+  FOREACH(POINTS_TO, npt, new)
+    add_arc_to_pt_map(npt, in);
+  FOREACH(POINTS_TO, pt, old)
+    remove_arc_from_pt_map(pt, in);
+  gen_free_list(new), gen_free_list(old);
   // pips_internal_error("not implemented yet.\n");
 
   /* Find the set of points-to arcs to destroy and remove them from

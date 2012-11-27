@@ -1400,6 +1400,10 @@ list subscript_to_points_to_sinks(subscript s,
       }
       if(to_be_freed2) free_type(t);
     }
+    else if(anywhere_cell_p(c)
+       || all_heap_locations_cell_p(c)) {
+      i_sources = CONS(CELL, c, i_sources);
+    }
   }
 
   gen_full_free_list(csl);

@@ -600,6 +600,74 @@ set filter_formal_out_context_according_to_formal_in_context
   return out_filtered;
 }
 
+void points_to_translation_of_struct_formal_parameter(cell fc,
+						      cell ac,
+						      approximation a,
+						      type st,
+						      set translation)
+{
+  /* We assume that cell fc and cell ac are of type st and that st is
+     a struct type. */
+  // pips_internal_error("Not implemented yet.\n");
+  list fl = struct_type_to_fields(st);
+
+  FOREACH(ENTITY, f, fl) {
+    type ft = entity_basic_concrete_type(f);
+    if(pointer_type_p(ft)) {
+      cell nfc = copy_cell(fc);
+      cell nac = copy_cell(ac);
+      points_to_cell_add_field_dimension(nfc, f);
+      points_to_cell_add_field_dimension(nac, f);
+      points_to pt = make_points_to(nfc, nac, copy_approximation(a),
+				    make_descriptor_none());
+      add_arc_to_simple_pt_map(pt, translation);
+    }
+    else if(struct_type_p(ft)) {
+      cell nfc = copy_cell(fc);
+      cell nac = copy_cell(ac);
+      points_to_cell_add_field_dimension(nfc, f);
+      points_to_cell_add_field_dimension(nac, f);
+      points_to_translation_of_struct_formal_parameter(fc,
+						       ac,
+						       a,
+						       ft,
+						       translation);
+      free_cell(nfc), free_cell(nac);
+    }
+    else if(array_of_pointers_type_p(ft)) {
+      cell nfc = copy_cell(fc);
+      cell nac = copy_cell(ac);
+      points_to_cell_add_field_dimension(nfc, f);
+      points_to_cell_add_field_dimension(nac, f);
+      points_to_cell_add_unbounded_subscripts(nfc);
+      points_to_cell_add_unbounded_subscripts(nac);
+      points_to pt = make_points_to(nfc, nac, copy_approximation(a),
+				    make_descriptor_none());
+      add_arc_to_simple_pt_map(pt, translation);
+    }
+    else if(array_of_struct_type_p(ft)) {
+      cell nfc = copy_cell(fc);
+      cell nac = copy_cell(ac);
+      points_to_cell_add_field_dimension(nfc, f);
+      points_to_cell_add_field_dimension(nac, f);
+      points_to_cell_add_unbounded_subscripts(nfc);
+      points_to_cell_add_unbounded_subscripts(nac);
+      type et = array_type_to_element_type(ft);
+      type cet = compute_basic_concrete_type(et);
+      points_to_translation_of_struct_formal_parameter(fc,
+						       ac,
+						       a,
+						       cet,
+						       translation);
+      free_cell(nfc), free_cell(nac);
+    }
+    else {
+      ; // do nothing
+    }
+  }
+
+}
+
 /* Lits al and fpcl are assumed consistent, and consistent with the
    formal parameter ranks. */
 void points_to_translation_of_formal_parameters(list fpcl, 
@@ -662,13 +730,22 @@ void points_to_translation_of_formal_parameters(list fpcl,
 	}
       }
       else if(struct_type_p(source_t)) {
-	pips_internal_error("Not implemented yet.\n");
+	// Can we make an artificial lhs and rhs and call
+	// assign_to_points_to() in that specific case?
+	// Or do we have to program yet another recursive descent in structs?
+	// How do we keep track of the approximation?
+	points_to_translation_of_struct_formal_parameter(fc,
+							 ac,
+							 ap,
+							 source_t,
+							 translation);
       }
       else {
 	; // No need
       }
       if(to_be_freed) free_type(a_source_t);
     }
+    free_approximation(ap);
   }
 }
 

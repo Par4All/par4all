@@ -588,7 +588,8 @@ set compute_points_to_gen_set(list args __attribute__ ((unused)),
     reference r_2 = cell_any_reference(sk1);
     entity v_2 = reference_variable(r_2);
     if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1)
-	|| anywhere_cell_p(sk1) || entity_to_module_entity(v_2)!=f) {
+	|| anywhere_cell_p(sk1) || cell_typed_anywhere_locations_p(sk1)
+	|| entity_to_module_entity(v_2)!=f) {
       new_sk = copy_cell(sk1);
       new_sk_l = CONS(CELL, new_sk, new_sk_l);
     }

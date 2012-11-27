@@ -1383,7 +1383,7 @@ reference reference_add_field_dimension(reference r, entity f)
     bool to_be_freed = false;
     type t = points_to_reference_to_type(r, &to_be_freed);
     //type t = ultimate_type(entity_type(v));
-    type ut = ultimate_type(t);
+    type ut = compute_basic_concrete_type(t);
 
     if(struct_type_p(ut)) {
       entity ste = basic_derived(variable_basic(type_variable(t)));
@@ -1413,6 +1413,7 @@ reference reference_add_field_dimension(reference r, entity f)
       }
     }
     else {
+      /* Take care of special cases */
       if(entity_all_module_heap_locations_p(v)
 	 || entity_all_heap_locations_p(v)) {
 	/* Nothing done when the heap is modeled by a unique entity */
@@ -1430,6 +1431,11 @@ reference reference_add_field_dimension(reference r, entity f)
 	  pips_assert("No indices yet.\n", ENDP(reference_indices(r)));
 	  reference_indices(r) = CONS(EXPRESSION, z, CONS(EXPRESSION, s, NIL));
 	}
+      }
+      else if(overloaded_type_p(ut) && entity_typed_anywhere_locations_p(v)) {
+	expression s = entity_to_expression(f);
+	pips_assert("No indices yet.\n", ENDP(reference_indices(r)));
+	reference_indices(r) = CONS(EXPRESSION, s, NIL);
       }
       else
 	pips_internal_error("Attempt at adding a field to an object that is not"
@@ -1449,7 +1455,11 @@ reference reference_add_field_dimension(reference r, entity f)
       reference_variable(r) = ne;
       reference_add_zero_subscripts(r, nt);
     }
-    else if(entity_all_heap_locations_p(v)) {
+    else if(entity_all_heap_locations_p(v)
+	    && !get_bool_property("ALIASING_ACROSS_TYPES")) {
+      /* FI: This piece of code should be useless because the
+	 all_heap_locations entity is used only when
+	 ALIASING_ACROSS_TYPES is true. */
       entity ne = entity_all_heap_locations_typed(nt);
       reference_variable(r) = ne;
       reference_add_zero_subscripts(r, nt);
