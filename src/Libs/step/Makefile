@@ -43,15 +43,15 @@ local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) step_api.tmp steprt_f.h
 
 $(PARSER_COMMENT).c: $(PARSER_COMMENT).l
-	$(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT)_ --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ `pwd`/$^
+	$(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT) --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ `pwd`/$^
 
 $(PARSER_COMMENT).h: $(PARSER_COMMENT).c
 
 $(LEXER_STEP).c: $(LEXER_STEP).l $(PARSER_STEP).h
-	$(FLEX) $(LFLAGS) --prefix=step_ --header-file=$(LEXER_STEP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
+	$(FLEX) $(LFLAGS) --prefix=$(LEXER_STEP) --header-file=$(LEXER_STEP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
 
 $(PARSER_STEP).c: $(PARSER_STEP).y
-	$(BISON) -d --name-prefix=step_ $(PARSER_STEP).y -o $(PARSER_STEP).c
+	$(BISON) -d --name-prefix=$(LEXER_STEP) $(PARSER_STEP).y -o $(PARSER_STEP).c
 
 $(PARSER_STEP).h: $(PARSER_STEP).c
 

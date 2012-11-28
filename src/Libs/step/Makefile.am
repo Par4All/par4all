@@ -16,8 +16,8 @@ libstep_la_SOURCES=	comment2pragma.l \
 			parser.c \
 			install.c
 
-AM_LFLAGS=-P step_ -p `basename $< .l`
-AM_YFLAGS=-d -p step_
+AM_LFLAGS=-p `basename $< .l`
+AM_YFLAGS=-d -p step_lexer
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
 CLEANFILES=step_api.tmp STEP_RT_bootstrap.h STEP_RT_intrinsic.h STEP_name.h step_lexer.c comment2pragma.c step_bison_parser.[ch]
 

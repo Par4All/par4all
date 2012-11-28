@@ -1,9 +1,9 @@
 %{
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
-extern char *step_text;
-extern int step_lex();
-extern int step__scan_string(char*);
+extern char *step_lexertext;
+extern int step_lexerlex();
+extern int step_lexer_scan_string(char*);
 extern int step_parse();
 #else
 	#include "step_lexer.h"
@@ -25,9 +25,9 @@ static cons * step_add_to_ident_list(string name, cons * list);
 
 static string pragma_str_original=NULL;
 
-void step_error(const char *s)
+void step_lexererror(const char *s)
 {
-  pips_user_error("\nParsing :\n%s\n%s at '%s'\n", pragma_str_original, s, step_text);
+  pips_user_error("\nParsing :\n%s\n%s at '%s'\n", pragma_str_original, s, step_lexertext);
 }
 
 %}
@@ -327,8 +327,8 @@ void step_bison_parse(pragma pgm, statement stmt)
   ifdebug(4)
     yydebug=1;
   pragma_str_original = strdup(pragma_str);
-  step__scan_string(pragma_str);
-  step_parse();
+  step_lexer_scan_string(pragma_str);
+  step_lexerparse();
   free(pragma_str_original);
   pips_debug(1, "############### PARSER END ################\n");
 
