@@ -80,11 +80,20 @@ entity get_top_level_entity()
 
 void MakeTopLevelEntity()
 {
-  /* To be economic, group this top level entity to it areas*/
+  /* To be economic, group this top-level entity to it areas*/
+  /* FI: this is not convenient if top-level:top-level is a
+     module. All global variables should be declared there. I need
+     also to generate stubs for global variables... Do I? Yes, because
+     the points-to information is computed bottom-up. */
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,TOP_LEVEL_MODULE_NAME);
   entity_storage(e) = make_storage_rom();
-  entity_type(e) = make_type(is_type_area, make_area(0, NIL));
-  entity_initial(e) = make_value_unknown();
+  //entity_type(e) = make_type(is_type_area, make_area(0, NIL));
+  entity_type(e) =
+    make_type_functional(make_functional(NIL, make_type_void(NIL)));
+  //entity_initial(e) = make_value_unknown();
+  code c = make_code(NIL, strdup(""), make_sequence(NIL),
+		     NIL, make_language_c());
+  entity_initial(e) = make_value_code(c);
 }
 
 

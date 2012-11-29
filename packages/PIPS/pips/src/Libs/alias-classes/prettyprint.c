@@ -371,8 +371,13 @@ void dprint(expression x)
       print_points_to_graph((points_to_graph) x);
     else if(ot==text_domain)
       print_text(stderr, (text) x);
-    else if(ot==entity_domain)
-      fprintf(stderr, "%s\n", entity_name((entity) x));
+    else if(ot==entity_domain) {
+      entity m = get_current_module_entity();
+      entity mx = module_name_to_entity(entity_module_name((entity)x));
+      if(m!=mx)
+	fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(mx));
+      fprintf(stderr, "%s\n", entity_local_name((entity) x));
+    }
     else if(ot==basic_domain) {
       string s = basic_to_string((basic) x);
       fprintf(stderr, "%s\n", s);
@@ -401,8 +406,17 @@ void dprint(expression x)
 	print_effects((list) x);
       else if(cot==points_to_domain)
 	print_points_to_relations((list) x);
-      else if(cot==entity_domain)
-	print_entities((list) x);
+      else if(cot==entity_domain) {
+	// print_entities((list) x);
+	list el = (list) x;
+      entity m = get_current_module_entity();
+	FOREACH(ENTITY, e, el) {
+	  entity me = module_name_to_entity(entity_module_name(e));
+	  if(m!=me)
+	    fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(me));
+	  fprintf(stderr, "%s\n", entity_local_name(e));
+	}
+      }
       else
 	(void) fprintf(stderr, "If a list, a list of unknown objects: tag=%d\n", (int) cot);
     }

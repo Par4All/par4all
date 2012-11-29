@@ -423,10 +423,19 @@ void print_or_dump_points_to(const points_to pt, bool print_p)
     approximation app = points_to_approximation(pt);
     reference r1 = cell_to_reference(source);
     reference r2 = cell_to_reference(sink);
+    entity v1 = reference_variable(r1);
+    entity v2 = reference_variable(r2);
+    entity m = get_current_module_entity();
+    entity m1 = module_name_to_entity(entity_module_name(v1));
+    entity m2 = module_name_to_entity(entity_module_name(v2));
 
     fprintf(stderr,"%p ", pt);
+    if(m!=m1)
+      fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(m1));
     print_reference(r1);
     fprintf(stderr,"->");
+    if(m!=m2 && !null_cell_p(sink))
+      fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(m2));
     print_reference(r2);
     fprintf(stderr," (%s)", approximation_to_string(app));
     if(!print_p) {

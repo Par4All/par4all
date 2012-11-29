@@ -942,10 +942,11 @@ pt_map user_call_to_points_to_interprocedural(call c,
     /* We have to test if pts_binded is compatible with pt_in_callee */
     /* We have to start by computing all the elements of E (stubs) */
     list stubs = stubs_list(pt_in_callee, pt_out_callee);
-    bool compatible_p
-      = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,
-					pt_in_callee_filtered, pt_out_callee,
-					translation);
+    bool compatible_p = true;
+    // FI: I do not understand Amira's test
+    // = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,
+    //					pt_in_callee_filtered, pt_out_callee,
+    //					translation);
     /* See if two formal parameters can reach the same memory cell,
      * i.e. transitive closure of translation map. We should take care
      * of global variables too... */
@@ -1002,13 +1003,18 @@ pt_map user_call_to_points_to_interprocedural(call c,
       /* Some check */
       list stubs = points_to_set_to_module_stub_cell_list(f, pts_gen, NIL);
       if(!ENDP(stubs)) {
-	pips_internal_error("Translation failure.\n");
+	pips_internal_error("Translation failure in pts_gen.\n");
       }
       // FI: set_union is unsafe; the union of two consistent
       // points-to graph is not a consistent points-to graph
       pt_end = set_union(pt_end, pt_end, pts_gen);
       pips_assert("pt_end is consistent", consistent_points_to_set(pt_end));
       ifdebug(8) print_points_to_set("pt_end =",pt_end);
+      /* Some check */
+      stubs = points_to_set_to_module_stub_cell_list(f, pt_end, NIL);
+      if(!ENDP(stubs)) {
+	pips_internal_error("Translation failure in pt_end.\n");
+      }
       points_to_graph_set(pt_out) = pt_end;
     }
     else {
